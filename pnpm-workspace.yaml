@@ -1,0 +1,9 @@
+allowBuilds:
+  '@parcel/watcher': false
+  unrs-resolver: false
+
+# Vite+ manual install: route vite and vitest to the Vite+ copies.
+# Keep these versions in step with the installed vite-plus package.
+overrides:
+  vite@*: npm:@voidzero-dev/vite-plus-core@1.4.0
+  vitest@*: 5.0.5
