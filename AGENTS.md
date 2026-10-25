@@ -23,6 +23,7 @@ Expo changes every SDK. Read the docs for the installed major version (`https://
 
 ## Rules
 
+- Read `docs/REQUIREMENTS.md` before you change behavior. When a requirement, assumption or professor answer changes, update it in the same pull request. Gate: no gate. <!-- rule: R-requirements -->
 - Run `pnpm verify` before you declare a task done. Gate: `.github/workflows/ci.yml` (job verify). <!-- rule: R-verify -->
 - Write code, comments, docs and commit messages in English. Gate: no gate (commitlint checks the format, not the language). <!-- rule: R-english -->
 - Commit messages follow Conventional Commits. Gate: `.vite-hooks/commit-msg`, `test/gates/commit-message-gate.test.ts`. <!-- rule: R-conventional-commits -->
