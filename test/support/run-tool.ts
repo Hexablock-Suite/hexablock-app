@@ -26,6 +26,10 @@ export function runTool(
 
 // Lints one fixture path with the repository lint config.
 // A warning also fails, so status 0 means no diagnostic at all.
+// On GitHub runners, Oxlint prints GitHub annotations instead of its default format.
+// The fixed format keeps the asserted text the same on every machine.
 export function lintFixture(relativePath: string): ToolResult {
-  return runTool('vp', ['lint', '--deny-warnings', relativePath], { LINT_FIXTURES: '1' });
+  return runTool('vp', ['lint', '--deny-warnings', '--format=default', relativePath], {
+    LINT_FIXTURES: '1',
+  });
 }
