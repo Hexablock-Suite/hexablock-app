@@ -12,7 +12,8 @@
     "format": "vp fmt",
     "format:check": "vp fmt --check",
     "typecheck": "tsc --noEmit",
-    "test": "jest"
+    "test": "jest",
+    "arch": "depcruise --config .dependency-cruiser.cjs --output-type err src app"
   },
   "dependencies": {
     "@expo/ui": "~58.0.23",

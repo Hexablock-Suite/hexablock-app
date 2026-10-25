@@ -1,0 +1,1 @@
+Game variants, one folder each: `hexa-lines/`, `hexa-fit/`, `hexa-sort/`, `hexa-merge/` (not created yet). A variant may import `src/domain/engine/`, never another variant folder, and never React, React Native or Expo.
