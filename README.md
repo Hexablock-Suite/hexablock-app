@@ -61,8 +61,19 @@ pnpm lint             # Oxlint through Vite+
 pnpm format:check     # Oxfmt through Vite+
 pnpm typecheck        # tsc --noEmit
 pnpm arch             # dependency-cruiser layer rules
-pnpm verify           # all of the above in CI order; CI runs this command
+pnpm pact:check       # fails when pnpm test rewrote a pact file that is not committed
+pnpm verify           # lint, format:check, typecheck, test, pact:check, arch; CI job verify
 ```
+
+Contract tests ([Pact](https://docs.pact.io/)) run inside `pnpm test`. The consumer test calls the real API client against a Pact mock server and writes `pacts/hexablock-app-hexablock-api.json`, which is committed. The backend CI verifies that file from this repository's `main`. Against a running backend:
+
+```bash
+export BACKEND_URL=http://localhost:3000
+pnpm contract:verify  # the backend honors the committed pact
+pnpm api:check        # src/infrastructure/api/schema.d.ts matches the backend OpenAPI document
+```
+
+The CI job `contract` builds and starts hexablock-api `main`, then runs both commands.
 
 Test titles follow `should_<expected_result>_when_<condition>`. The linter rejects other `it` and `test` titles.
 

@@ -14,9 +14,11 @@
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "arch": "depcruise --config .dependency-cruiser.cjs --output-type err src app",
+    "pact:check": "node scripts/contract/check-pact-drift.mjs",
+    "contract:verify": "node scripts/contract/verify-provider.mjs",
     "api:generate": "node scripts/contract/api-types.mjs generate",
     "api:check": "node scripts/contract/api-types.mjs check",
-    "verify": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm arch",
+    "verify": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm pact:check && pnpm arch",
     "prepare": "vp config --no-agent"
   },
   "dependencies": {
