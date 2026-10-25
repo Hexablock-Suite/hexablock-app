@@ -26,6 +26,14 @@ export default defineConfig({
       },
     ],
   },
+  // The pre-commit hook runs these on staged files. Ignored files never fail the hook.
+  staged: {
+    '*.{js,cjs,mjs,ts,tsx}': [
+      'vp lint --fix --deny-warnings --no-error-on-unmatched-pattern',
+      'vp fmt --no-error-on-unmatched-pattern',
+    ],
+    '*.{json,md,yml,yaml}': 'vp fmt --no-error-on-unmatched-pattern',
+  },
   fmt: {
     ignorePatterns: ['pnpm-lock.yaml', 'assets/**', 'test/fixtures/**'],
     singleQuote: true,

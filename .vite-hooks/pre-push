@@ -1,0 +1,2 @@
+# Fast part of pnpm verify. Tests run in CI and in pnpm verify.
+pnpm lint && pnpm typecheck && pnpm arch

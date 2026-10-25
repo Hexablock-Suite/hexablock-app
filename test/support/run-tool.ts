@@ -13,11 +13,13 @@ export function runTool(
   binary: string,
   args: string[],
   env: Record<string, string> = {},
+  input?: string,
 ): ToolResult {
   const result = spawnSync(path.join(repoRoot, 'node_modules', '.bin', binary), args, {
     cwd: repoRoot,
     encoding: 'utf8',
     env: { ...process.env, ...env },
+    input,
   });
   return { status: result.status, output: `${result.stdout}${result.stderr}` };
 }
