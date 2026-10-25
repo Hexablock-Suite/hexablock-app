@@ -50,6 +50,12 @@ The API client in `src/infrastructure/api/` uses types generated from the backen
 pnpm api:generate     # reads $BACKEND_URL/docs-json (default http://localhost:3000)
 ```
 
+To build the installable Android APK, push a version tag. The `Release APK` workflow runs `npx expo prebuild --platform android` and `./gradlew assembleRelease` on JDK 17, then attaches the APK to a GitHub Release. A manual run (Actions tab, `workflow_dispatch`) keeps the APK as a workflow artifact only. The APK is signed with the React Native debug keystore, so Android asks to allow installs from unknown sources.
+
+```bash
+git tag v0.1.0 && git push origin v0.1.0
+```
+
 Check the git hooks with `pnpm exec vp hooks status`. When a global `core.hooksPath` blocks the install, run `GIT_CONFIG_GLOBAL=/dev/null pnpm exec vp hooks enable`.
 
 ## Running Tests

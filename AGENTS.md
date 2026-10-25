@@ -37,4 +37,5 @@ Expo changes every SDK. Read the docs for the installed major version (`https://
 - Log AI use per task in `AI_USAGE.md`. Gate: no gate. <!-- rule: R-ai-usage-log -->
 - Add Expo and React Native packages with `npx expo install`. Gate: no gate (`npx expo-doctor` runs by hand). <!-- rule: R-expo-install -->
 - Do not create or edit `ios/` or `android/` by hand; configure native behavior in `app.json`. Gate: no gate. <!-- rule: R-no-native-folders -->
+- Release the APK by pushing a `v*` tag; `.github/workflows/release-apk.yml` builds it from `npx expo prebuild` and attaches it to a GitHub Release. Never commit `android/` or a keystore. Gate: `test/gates/release-apk.test.ts` (it pins the workflow, not a green build). <!-- rule: R-apk-release -->
 - Every rule in this file names its gate or says "no gate". Gate: `test/docs/agents-rules.test.ts`. <!-- rule: R-rule-gates -->
