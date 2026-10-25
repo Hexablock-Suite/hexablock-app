@@ -14,9 +14,17 @@ export default defineConfig({
   lint: {
     ignorePatterns: ['node_modules/**', '.expo/**', 'dist/**', 'coverage/**', ...fixtureIgnore],
     plugins: ['typescript', 'unicorn', 'oxc', 'jest'],
+    jsPlugins: ['./scripts/lint/hexablock-plugin.mjs'],
     rules: {
       'jest/valid-title': ['error', { mustMatch: { it: testTitle, test: testTitle } }],
     },
+    overrides: [
+      {
+        // Matches src/domain/ at any depth, so fixtures follow the same rule.
+        files: ['**/src/domain/**'],
+        rules: { 'hexablock/no-ambient-nondeterminism': 'error' },
+      },
+    ],
   },
   fmt: {
     ignorePatterns: ['pnpm-lock.yaml', 'assets/**', 'test/fixtures/**'],
