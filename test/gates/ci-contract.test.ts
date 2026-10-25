@@ -22,8 +22,22 @@ describe('CI contract', () => {
     const scripts = JSON.parse(read('package.json')).scripts;
 
     expect(scripts.verify).toBe(
-      'pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm arch',
+      'pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm pact:check && pnpm arch',
     );
+  });
+
+  it('should_verify_pact_and_api_types_against_backend_main_when_job_contract_runs', () => {
+    const workflow = read('.github/workflows/ci.yml');
+    const contractJob = workflow.split(/^ {2}contract:\n/m)[1] ?? '';
+    const scripts = JSON.parse(read('package.json')).scripts;
+
+    expect(workflow).toMatch(/^ {2}contract:\n {4}name: contract$/m);
+    expect(contractJob).toMatch(/repository: Hexablock-Suite\/hexablock-api\n {10}ref: main/);
+    expect(contractJob).toMatch(/curl --silent --fail "\$BACKEND_URL\/health"/);
+    expect(contractJob).toMatch(/^ {6}- run: pnpm contract:verify\n {6}- run: pnpm api:check$/m);
+    expect(scripts['contract:verify']).toBe('node scripts/contract/verify-provider.mjs');
+    expect(scripts['api:check']).toBe('node scripts/contract/api-types.mjs check');
+    expect(scripts['api:generate']).toBe('node scripts/contract/api-types.mjs generate');
   });
 
   it('should_mirror_verify_commands_when_pre_push_hook_runs', () => {

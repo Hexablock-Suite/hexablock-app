@@ -30,3 +30,47 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm verify
+
+  # Starts backend main and checks the client contract against it:
+  # the committed pact (pnpm contract:verify) and the generated API types (pnpm api:check).
+  contract:
+    name: contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      VP_GIT_HOOKS: '0'
+      PACT_DO_NOT_TRACK: 'true'
+      PORT: '3000'
+      BACKEND_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          repository: Hexablock-Suite/hexablock-api
+          ref: main
+          path: hexablock-api
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            hexablock-api/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - name: Build and start backend main
+        working-directory: hexablock-api
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+          nohup node dist/main.js > "$RUNNER_TEMP/backend.log" 2>&1 &
+      - name: Wait for backend health
+        run: |
+          for _ in $(seq 1 30); do
+            if curl --silent --fail "$BACKEND_URL/health"; then exit 0; fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/backend.log"
+          exit 1
+      - run: pnpm contract:verify
+      - run: pnpm api:check

@@ -1,0 +1,65 @@
+name: Release APK
+
+# A version tag (v*) builds the APK and attaches it to a GitHub Release.
+# A manual run builds the APK and keeps it only as a workflow artifact.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  apk:
+    name: apk
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      # gh release create needs write access to the repository contents.
+      contents: write
+    env:
+      VP_GIT_HOOKS: '0'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # React Native 0.88 compiles Android with JDK 17 (jvmToolchain(17)).
+      # The GitHub Ubuntu runner already holds the Android SDK.
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+      # Continuous Native Generation: android/ comes from app.json and stays out of git.
+      - run: npx expo prebuild --platform android
+      # The generated android/app/build.gradle signs release with the template debug keystore.
+      # The APK installs on any device that allows unknown sources. It is not a Play Store build.
+      - name: Assemble the release APK
+        working-directory: android
+        run: ./gradlew assembleRelease --no-daemon
+      # A branch name can hold a slash. The file name replaces it with a dash.
+      - name: Name the APK after the ref
+        run: |
+          apk="hexablock-app-${GITHUB_REF_NAME//\//-}.apk"
+          cp android/app/build/outputs/apk/release/app-release.apk "$apk"
+          echo "APK=$apk" >> "$GITHUB_ENV"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: hexablock-app-apk
+          path: hexablock-app-*.apk
+          if-no-files-found: error
+      - name: Create the GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "$GITHUB_REF_NAME" "$APK"
+          --title "$GITHUB_REF_NAME" --generate-notes --verify-tag

@@ -4,6 +4,9 @@ import { defineConfig } from 'vite-plus';
 // Every other run skips them.
 const fixtureIgnore = process.env.LINT_FIXTURES === '1' ? [] : ['test/fixtures/**'];
 
+// Tools write these files. pnpm api:check and pnpm pact:check guard them, not lint or format.
+const generated = ['src/infrastructure/api/schema.d.ts', 'pacts/**'];
+
 // Test titles follow should_<expected_result>_when_<condition>. Describe titles are free.
 // Oxlint 1.89 ignores the [pattern, message] form of mustMatch, so the pattern is a string.
 const testTitle = '^should_[a-z0-9_]+_when_[a-z0-9_]+$';
@@ -12,7 +15,14 @@ const testTitle = '^should_[a-z0-9_]+_when_[a-z0-9_]+$';
 // Metro builds the app. Vite does not bundle it.
 export default defineConfig({
   lint: {
-    ignorePatterns: ['node_modules/**', '.expo/**', 'dist/**', 'coverage/**', ...fixtureIgnore],
+    ignorePatterns: [
+      'node_modules/**',
+      '.expo/**',
+      'dist/**',
+      'coverage/**',
+      ...generated,
+      ...fixtureIgnore,
+    ],
     plugins: ['typescript', 'unicorn', 'oxc', 'jest'],
     jsPlugins: ['./scripts/lint/hexablock-plugin.mjs'],
     rules: {
@@ -35,7 +45,7 @@ export default defineConfig({
     '*.{json,md,yml,yaml}': 'vp fmt --no-error-on-unmatched-pattern',
   },
   fmt: {
-    ignorePatterns: ['pnpm-lock.yaml', 'assets/**', 'test/fixtures/**'],
+    ignorePatterns: ['pnpm-lock.yaml', 'assets/**', 'test/fixtures/**', ...generated],
     singleQuote: true,
     printWidth: 100,
   },
