@@ -1,4 +1,4 @@
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import path from 'node:path';
 
 export const repoRoot = path.resolve(__dirname, '../..');
@@ -31,5 +31,26 @@ export function runTool(
 export function lintFixture(relativePath: string): ToolResult {
   return runTool('vp', ['lint', '--deny-warnings', '--format=default', relativePath], {
     LINT_FIXTURES: '1',
+  });
+}
+
+// Runs a repository Node script without blocking the event loop.
+// A fake backend in the same test process can answer while the script runs.
+export function runNodeScript(
+  script: string,
+  args: string[],
+  env: Record<string, string> = {},
+  cwd: string = repoRoot,
+): Promise<ToolResult> {
+  return new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, [path.join(repoRoot, script), ...args], {
+      cwd,
+      env: { ...process.env, ...env },
+    });
+    let output = '';
+    child.stdout.on('data', (chunk) => (output += chunk));
+    child.stderr.on('data', (chunk) => (output += chunk));
+    child.on('error', reject);
+    child.on('close', (status) => resolve({ status, output }));
   });
 }

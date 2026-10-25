@@ -14,6 +14,8 @@
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "arch": "depcruise --config .dependency-cruiser.cjs --output-type err src app",
+    "api:generate": "node scripts/contract/api-types.mjs generate",
+    "api:check": "node scripts/contract/api-types.mjs check",
     "verify": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm arch",
     "prepare": "vp config --no-agent"
   },
@@ -32,6 +34,7 @@
     "expo-symbols": "~58.0.4",
     "expo-system-ui": "~58.0.6",
     "expo-web-browser": "~58.0.6",
+    "openapi-fetch": "0.17.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "react-native": "0.88.0",
@@ -45,6 +48,7 @@
   "devDependencies": {
     "@commitlint/cli": "^21.2.4",
     "@commitlint/config-conventional": "^21.2.4",
+    "@pact-foundation/pact": "17.1.4",
     "@testing-library/react-native": "^14.1.0",
     "@types/jest": "30.0.0",
     "@types/node": "~26.6.5",
@@ -52,6 +56,7 @@
     "dependency-cruiser": "^18.7.0",
     "jest": "~30.5.2",
     "jest-expo": "~58.0.12",
+    "openapi-typescript": "7.13.0",
     "typescript": "~6.0.3",
     "vite-plus": "^1.4.0"
   },

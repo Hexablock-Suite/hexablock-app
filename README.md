@@ -44,6 +44,12 @@ pnpm android          # open on an Android emulator or device
 pnpm web              # open in the browser
 ```
 
+The API client in `src/infrastructure/api/` uses types generated from the backend OpenAPI document. With [hexablock-api](https://github.com/Hexablock-Suite/hexablock-api) running, refresh them and commit the result:
+
+```bash
+pnpm api:generate     # reads $BACKEND_URL/docs-json (default http://localhost:3000)
+```
+
 Check the git hooks with `pnpm exec vp hooks status`. When a global `core.hooksPath` blocks the install, run `GIT_CONFIG_GLOBAL=/dev/null pnpm exec vp hooks enable`.
 
 ## Running Tests
