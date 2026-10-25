@@ -16,14 +16,14 @@ describe('domain purity gate (Oxlint)', () => {
   it('should_pass_lint_when_domain_takes_injected_clock_and_random_source', () => {
     const result = lintFixture('test/fixtures/lint/src/domain/engine/injected-sources.ts');
 
-    expect(result.output).toBe('');
+    expect(result.output).not.toContain(rule);
     expect(result.status).toBe(0);
   });
 
   it('should_pass_lint_when_infrastructure_reads_system_clock', () => {
     const result = lintFixture('test/fixtures/lint/src/infrastructure/system-clock.ts');
 
-    expect(result.output).toBe('');
+    expect(result.output).not.toContain(rule);
     expect(result.status).toBe(0);
   });
 });

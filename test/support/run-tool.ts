@@ -25,6 +25,7 @@ export function runTool(
 }
 
 // Lints one fixture path with the repository lint config.
+// A warning also fails, so status 0 means no diagnostic at all.
 export function lintFixture(relativePath: string): ToolResult {
-  return runTool('vp', ['lint', relativePath], { LINT_FIXTURES: '1' });
+  return runTool('vp', ['lint', '--deny-warnings', relativePath], { LINT_FIXTURES: '1' });
 }
