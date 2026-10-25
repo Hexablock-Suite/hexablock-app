@@ -1,41 +1,37 @@
-This is an Expo/React Native mobile application. Prioritize mobile-first patterns, performance, and cross-platform compatibility.
+# AGENTS.md
 
-## Expo has changed — do not trust your training data
+HexaBlock Suite mobile client: four hex-board puzzle games (Hexa Lines, Hexa Fit, Hexa Sort, Hexa Merge) on one generic engine. Expo SDK 58, Expo Router, TypeScript, Node 26, pnpm.
 
-Expo ships breaking changes every SDK release. APIs you remember are likely renamed, moved, or removed. Before writing any code that touches an Expo, EAS, or React Native API:
-
-1. Read the major version of the `expo` package in `package.json`.
-2. Fetch the matching versioned docs: `https://docs.expo.dev/versions/v<major>.0.0/`
-3. For anything else, fetch https://docs.expo.dev/llms.txt — an index of all Expo docs with corrections to common LLM misconceptions. Follow its links to the specific page you need; never answer from memory.
+Every rule ends with an HTML comment marker (`rule: R-<id>`) and names its gate: a script, a test path, or "no gate". `test/docs/agents-rules.test.ts` checks the markers.
 
 ## Commands
 
-Use `bunx` instead of `npx` if the project uses bun (`bun.lock` present).
-
 ```bash
-npx expo install <package>  # ALWAYS use instead of npm/yarn/pnpm/bun add — resolves SDK-compatible versions
-npx expo start              # start the dev server
-npx expo lint               # lint
-npx tsc --noEmit            # typecheck
-npx expo-doctor             # diagnose dependency and config issues
-npx expo install --fix      # fix incompatible package versions
+pnpm install          # dependencies and git hooks
+pnpm verify           # lint, format:check, typecheck, test, arch (CI runs this)
+npx expo install <pkg> # add an Expo or React Native package at the SDK version
+npx expo-doctor       # check dependency and config health
 ```
 
-Run lint and typecheck before declaring any task done.
+Expo changes every SDK. Read the docs for the installed major version (`https://docs.expo.dev/versions/v58.0.0/`), not memory.
 
-## Navigation & Routing
+## Layers
 
-- Use **Expo Router** for all navigation. Routes live in `src/app/` — every file there is a screen, `_layout.tsx` files define navigators. Keep non-route code (components, hooks, utils) outside `src/app/`.
-- Import `Link`, `router`, and `useLocalSearchParams` from `expo-router`.
-- Docs: https://docs.expo.dev/router/introduction.md
-
-## Building with EAS
-
-Use EAS to build, sign, and submit the app in the cloud (`eas build`, `eas submit`) and to ship over-the-air updates (`eas update`) — no local Xcode or Android Studio required. Run EAS CLI as `bunx eas-cli <command>` in Bun projects, or `npx eas-cli@latest <command>` otherwise; substitute that for bare `eas` in docs examples.
-Docs: https://docs.expo.dev/eas/index.md
+`app/` holds Expo Router routes only (framework layer). `src/domain/engine/`, `src/domain/variants/<variant>/`, `src/application/`, `src/adapters/` and `src/infrastructure/` follow Clean Architecture. Each folder README says what it may import.
 
 ## Rules
 
-- If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.
-- Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build: `npx expo run:ios|android` locally, or `eas build --profile development`.
-- Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
+- Run `pnpm verify` before you declare a task done. Gate: `.github/workflows/ci.yml` (job verify). <!-- rule: R-verify -->
+- Write code, comments, docs and commit messages in English. Gate: no gate (commitlint checks the format, not the language). <!-- rule: R-english -->
+- Commit messages follow Conventional Commits. Gate: `.vite-hooks/commit-msg`, `test/gates/commit-message-gate.test.ts`. <!-- rule: R-conventional-commits -->
+- Never bypass a git hook with `--no-verify`. Gate: no gate (CI repeats lint, typecheck and arch, not the hook). <!-- rule: R-no-hook-bypass -->
+- Name every `it` and `test` as `should_<expected_result>_when_<condition>`. Gate: `pnpm lint`, `test/gates/test-title-gate.test.ts`. <!-- rule: R-test-names -->
+- Domain code imports only domain code, and never React, React Native or Expo. Gate: `pnpm arch`, `test/gates/architecture-gate.test.ts`. <!-- rule: R-domain-imports -->
+- The engine never imports a variant, and a variant never imports another variant. Gate: `pnpm arch`, `test/gates/architecture-gate.test.ts`. <!-- rule: R-engine-variants -->
+- Application code imports only domain and application code. Gate: `pnpm arch`, `test/gates/architecture-gate.test.ts`. <!-- rule: R-application-imports -->
+- Domain code takes time and randomness by injection: no `Math.random`, `Date.now` or `new Date()`. Gate: `pnpm lint`, `test/gates/domain-purity-gate.test.ts`. <!-- rule: R-domain-determinism -->
+- Keep the required README and AI_USAGE headings. Gate: `test/docs/docs-skeleton.test.ts`. <!-- rule: R-docs-headings -->
+- Log AI use per task in `AI_USAGE.md`. Gate: no gate. <!-- rule: R-ai-usage-log -->
+- Add Expo and React Native packages with `npx expo install`. Gate: no gate (`npx expo-doctor` runs by hand). <!-- rule: R-expo-install -->
+- Do not create or edit `ios/` or `android/` by hand; configure native behavior in `app.json`. Gate: no gate. <!-- rule: R-no-native-folders -->
+- Every rule in this file names its gate or says "no gate". Gate: `test/docs/agents-rules.test.ts`. <!-- rule: R-rule-gates -->
