@@ -77,7 +77,8 @@ Summary; the details live in `hexablock-api/docs/REQUIREMENTS.md`. Sign-up and s
 
 ## 7. Documentation and deliverables
 
-- **Diagrams (§4):** class diagram (generic types in UML template notation, layers, patterns), Clean layer diagram (ports and adapters), extensibility diagram (engine in the center, variants as extensions). Each one is a high-resolution image in the README and an editable source in `docs/`.
+- **Diagrams (§4):** class diagram (generic types in UML template notation, layers, patterns), Clean layer diagram (ports and adapters), extensibility diagram (engine in the center, variants as extensions). Each one is a high-resolution image in the README and an editable source in `docs/`. In class on 2026-10-26 the professor asked for the class diagram to model the architecture (recording 00:00): it shows which layer each class lives in (27:16), and its relations between layers follow the dependency rule. He does not want an entity-relationship diagram (21:50).
+- **Requirements method (class on 2026-10-26, recording 10:16):** the professor expects functional and non-functional requirements and a plan in one-week sprints. We grow them from this file as the professor and the team confirm each item.
 - **README (§6.1):** in English, with the sections the README skeleton already holds (a test keeps them).
 - **Commits (§6.2):** Conventional Commits in English.
 - **AI usage (§7):** `AI_USAGE.md` in each repo with the tools, a log per significant task (prompt, result, our changes, lessons) and a critical evaluation. Undocumented AI use counts as plagiarism, and the team must be able to explain any code in the defense.
@@ -86,18 +87,23 @@ Summary; the details live in `hexablock-api/docs/REQUIREMENTS.md`. Sign-up and s
 
 ## 8. Variation register
 
-An abstraction is justified when it absorbs a change someone declared. Add a row whenever the professor names a possible change, with its source.
+Every abstraction needs a written reason, and there are two kinds. A declared change: the statement, the professor or the team names something that may vary; add a row here with its source. A layer boundary: an interface that keeps an inner layer from depending on an outer one needs no row, because the dependency rule is its reason. The statement is a starting point, not the limit, so the team adds its own rows too. An abstraction does not have to be a design pattern; a plain interface is often enough.
 
-| Axis                                                                                                   | Source                                 | What absorbs it                                                                                             |
-| ------------------------------------------------------------------------------------------------------ | -------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| Cell content, board shape, move type, resolution rule, piece source, end of game, progress model, undo | §1.5                                   | Cell, move and state type parameters; rules contract; piece source; progress model; separate undo interface |
-| Board size                                                                                             | §3.1 (jury variation)                  | Board shape from configuration                                                                              |
-| Scoring policy                                                                                         | §3.1 (jury variation)                  | Scoring policy strategy, decorators for bonuses                                                             |
-| Piece shape                                                                                            | §3.1 (jury variation)                  | Piece definitions as data (composite of cells)                                                              |
-| Square cells instead of hexagons                                                                       | Professor, in class, before 2026-10-24 | Grid topology behind one interface (D4)                                                                     |
-| End of game after the target tile                                                                      | §1.4 vs §5.1.4                         | End policy (A3)                                                                                             |
-| Sort piece source                                                                                      | §1.3, §1.5 vs §5.1.5                   | Piece source chosen per level (A4)                                                                          |
-| Level origin                                                                                           | §5.1.5 vs §5.2.4                       | Level repository with bundled files and backend (A6)                                                        |
+| Axis                                                                                                   | Source                                                                     | What absorbs it                                                                                                                                               |
+| ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cell content, board shape, move type, resolution rule, piece source, end of game, progress model, undo | §1.5                                                                       | Cell, move and state type parameters; rules contract; piece source; progress model; separate undo interface                                                   |
+| Board size                                                                                             | §3.1 (jury variation)                                                      | Board shape from configuration                                                                                                                                |
+| Scoring policy                                                                                         | §3.1 (jury variation)                                                      | Scoring policy strategy, decorators for bonuses                                                                                                               |
+| Piece shape                                                                                            | §3.1 (jury variation)                                                      | Piece definitions as data (composite of cells)                                                                                                                |
+| Square cells instead of hexagons                                                                       | Professor, in class, before 2026-10-24; again 2026-10-26 (recording 69:52) | Grid topology behind one interface (D4)                                                                                                                       |
+| Triangular cells                                                                                       | Professor, in class, 2026-10-26 (recording 73:38)                          | Grid topology behind one interface (D4)                                                                                                                       |
+| 3D board                                                                                               | Professor, in class, 2026-10-26 (recording 32:17, 50:18)                   | Planned (D5): the topology with generic coordinates, so a 3D topology is one more implementation of D4                                                        |
+| A different game with no board (Angry Birds as the example)                                            | Professor, in class, 2026-10-26 (recording 50:24)                          | Planned (D5): a game module contract and a game registry, so the app does not assume every game runs on the board engine                                      |
+| Database engine (MongoDB instead of Postgres, backend)                                                 | Professor, in class, 2026-10-26 (recording 50:11)                          | Planned (D5): repository ports in the backend application layer and one adapter per database engine                                                           |
+| Desktop as well as phone                                                                               | Professor, in class, 2026-10-26 (recording 13:26)                          | Expo already builds for the web (`react-native-web`, `web` in `app.json`). Planned (D5): the presentation layer does not assume touch input or a phone screen |
+| End of game after the target tile                                                                      | §1.4 vs §5.1.4                                                             | End policy (A3)                                                                                                                                               |
+| Sort piece source                                                                                      | §1.3, §1.5 vs §5.1.5                                                       | Piece source chosen per level (A4)                                                                                                                            |
+| Level origin                                                                                           | §5.1.5 vs §5.2.4                                                           | Level repository with bundled files and backend (A6)                                                                                                          |
 
 ## 9. Assumptions
 
@@ -120,6 +126,7 @@ Each assumption holds under both readings of the statement, or names what change
 - **D2 — States (§3.3).** Game lifecycle states (playing, resolving, paused, game over, victory) live in the domain. The menu belongs to the presentation layer.
 - **D3 — Rendering (§1.5).** A shared board renderer draws the grid and delegates each cell to a cell renderer per variant (Strategy), which the variant's factory provides. The piece preview is a clone (Prototype). Visitor fits only inside the piece and figure Composite, where the node types are closed (cell and region) and the operations grow (area, bounds, rotation). A Visitor over variants would force every new variant to edit all visitors, which breaks the extensibility test.
 - **D4 — Grid topology.** Neighbors, slide directions, line axes, rotation step, coordinates and screen layout live behind one topology interface. Rules ask the topology and never hard-code 6 directions, 3 axes or 60°. A minimal square topology used in engine tests proves the engine does not depend on hexagons.
+- **D5 — Seams for named variations.** Every axis in §8 gets its seam when the part it touches is built, never on the last day. A late request from the professor must then mean new classes or a new adapter, not a rewrite. This is deliberate insurance: we accept some extra abstraction, as long as each one keeps a written reason (a row in §8 or a layer boundary).
 
 ### Still to define (team)
 
@@ -130,12 +137,16 @@ Each assumption holds under both readings of the statement, or names what change
 
 ## 11. Questions for the professor
 
+Ask design questions, not debugging questions. On 2026-10-26 the professor refused to help with a bug ("Eso lo tienes que resolver tú", recording 39:15). He wants to know which layer a class lives in and how it interacts with the others, so he can judge whether the architecture is well designed (recording 39:20, 39:27). Bring the options you weighed, for example "we can do it this way or that way; which dependency is right?".
+
 Real questions (they change the plan):
 
 - **Q1:** The statement sets delivery on Monday 2026-12-14, and the class plan sets the final project delivery on 2026-12-07 and 2026-12-11, with grades on 2026-12-14. Which date and time is the deadline?
 - **Q2:** Must the backend also meet the generics, GoF patterns, `EXTENSIBILITY.md` and the three diagrams, or only the client?
 - **Q3:** Do we implement all 14 listed patterns, or a minimum? Which one?
 - **Q4:** Who may update level definitions in the backend? The statement asks only for sign-up and sign-in, with no roles.
+- **Q5:** In class on 2026-10-26 (recording 09:49) we heard "select at least three" games. The statement asks for an executable with the four variants (§8). Must we deliver three games or four?
+- **Q6:** The statement does not set the team size. In class on 2026-10-26 we heard two or three members (recording 33:27 and 81:19). What is the maximum team size?
 
 Confirmations (we already work under an assumption):
 
