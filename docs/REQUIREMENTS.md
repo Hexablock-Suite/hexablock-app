@@ -77,7 +77,8 @@ Summary; the details live in `hexablock-api/docs/REQUIREMENTS.md`. Sign-up and s
 
 ## 7. Documentation and deliverables
 
-- **Diagrams (§4):** class diagram (generic types in UML template notation, layers, patterns), Clean layer diagram (ports and adapters), extensibility diagram (engine in the center, variants as extensions). Each one is a high-resolution image in the README and an editable source in `docs/`.
+- **Diagrams (§4):** class diagram (generic types in UML template notation, layers, patterns), Clean layer diagram (ports and adapters), extensibility diagram (engine in the center, variants as extensions). Each one is a high-resolution image in the README and an editable source in `docs/`. In class on 2026-10-26 the professor asked for the class diagram to model the architecture (recording 00:00): it shows which layer each class lives in (27:16), and its relations between layers follow the dependency rule. He does not want an entity-relationship diagram (21:50).
+- **Requirements method (class on 2026-10-26, recording 10:16):** the professor expects functional and non-functional requirements and a plan in one-week sprints. We grow them from this file as the professor and the team confirm each item.
 - **README (§6.1):** in English, with the sections the README skeleton already holds (a test keeps them).
 - **Commits (§6.2):** Conventional Commits in English.
 - **AI usage (§7):** `AI_USAGE.md` in each repo with the tools, a log per significant task (prompt, result, our changes, lessons) and a critical evaluation. Undocumented AI use counts as plagiarism, and the team must be able to explain any code in the defense.
