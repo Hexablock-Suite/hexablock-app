@@ -88,16 +88,20 @@ Summary; the details live in `hexablock-api/docs/REQUIREMENTS.md`. Sign-up and s
 
 An abstraction is justified when it absorbs a change someone declared. Add a row whenever the professor names a possible change, with its source.
 
-| Axis                                                                                                   | Source                                 | What absorbs it                                                                                             |
-| ------------------------------------------------------------------------------------------------------ | -------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| Cell content, board shape, move type, resolution rule, piece source, end of game, progress model, undo | §1.5                                   | Cell, move and state type parameters; rules contract; piece source; progress model; separate undo interface |
-| Board size                                                                                             | §3.1 (jury variation)                  | Board shape from configuration                                                                              |
-| Scoring policy                                                                                         | §3.1 (jury variation)                  | Scoring policy strategy, decorators for bonuses                                                             |
-| Piece shape                                                                                            | §3.1 (jury variation)                  | Piece definitions as data (composite of cells)                                                              |
-| Square cells instead of hexagons                                                                       | Professor, in class, before 2026-10-24 | Grid topology behind one interface (D4)                                                                     |
-| End of game after the target tile                                                                      | §1.4 vs §5.1.4                         | End policy (A3)                                                                                             |
-| Sort piece source                                                                                      | §1.3, §1.5 vs §5.1.5                   | Piece source chosen per level (A4)                                                                          |
-| Level origin                                                                                           | §5.1.5 vs §5.2.4                       | Level repository with bundled files and backend (A6)                                                        |
+| Axis                                                                                                   | Source                                                                     | What absorbs it                                                                                                                        |
+| ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Cell content, board shape, move type, resolution rule, piece source, end of game, progress model, undo | §1.5                                                                       | Cell, move and state type parameters; rules contract; piece source; progress model; separate undo interface                            |
+| Board size                                                                                             | §3.1 (jury variation)                                                      | Board shape from configuration                                                                                                         |
+| Scoring policy                                                                                         | §3.1 (jury variation)                                                      | Scoring policy strategy, decorators for bonuses                                                                                        |
+| Piece shape                                                                                            | §3.1 (jury variation)                                                      | Piece definitions as data (composite of cells)                                                                                         |
+| Square cells instead of hexagons                                                                       | Professor, in class, before 2026-10-24; again 2026-10-26 (recording 69:52) | Grid topology behind one interface (D4)                                                                                                |
+| Triangular cells                                                                                       | Professor, in class, 2026-10-26 (recording 73:38)                          | Grid topology behind one interface (D4)                                                                                                |
+| 3D board                                                                                               | Professor, in class, 2026-10-26 (recording 32:17, 50:18)                   | Nothing yet: D4 covers 2D topologies only. See "Still to define (team)"                                                                |
+| A different game with no board (Angry Birds as the example)                                            | Professor, in class, 2026-10-26 (recording 50:24)                          | Nothing yet: every variant runs on the board engine. See "Still to define (team)"                                                      |
+| Database engine (MongoDB instead of Postgres, backend)                                                 | Professor, in class, 2026-10-26 (recording 50:11)                          | Nothing yet: Drizzle lives in the backend persistence adapters, but no rule makes the engine replaceable. See "Still to define (team)" |
+| End of game after the target tile                                                                      | §1.4 vs §5.1.4                                                             | End policy (A3)                                                                                                                        |
+| Sort piece source                                                                                      | §1.3, §1.5 vs §5.1.5                                                       | Piece source chosen per level (A4)                                                                                                     |
+| Level origin                                                                                           | §5.1.5 vs §5.2.4                                                           | Level repository with bundled files and backend (A6)                                                                                   |
 
 ## 9. Assumptions
 
@@ -127,6 +131,7 @@ Each assumption holds under both readings of the statement, or names what change
 - Merge: merge order inside one slide, and whether a tile merges once per move; probability of a 2 versus a 4; whether undo restores the random state or regenerates the new tile.
 - Lines: whether a combo counts lines on several axes; what a streak is.
 - Scoring per variant (§5.1.6) and what orders the per-level leaderboard for Fit and Sort; whether undo and remove count as moves for Fit stars.
+- Variations named in class on 2026-10-26 (§8): the 3D board, a game with no board and the MongoDB switch. Decide which ones get an abstraction now and which ones get only a written plan in `docs/EXTENSIBILITY.md`. The professor presented them as last-minute requests before the delivery.
 
 ## 11. Questions for the professor
 
@@ -136,6 +141,8 @@ Real questions (they change the plan):
 - **Q2:** Must the backend also meet the generics, GoF patterns, `EXTENSIBILITY.md` and the three diagrams, or only the client?
 - **Q3:** Do we implement all 14 listed patterns, or a minimum? Which one?
 - **Q4:** Who may update level definitions in the backend? The statement asks only for sign-up and sign-in, with no roles.
+- **Q5:** In class on 2026-10-26 (recording 09:49) we heard "select at least three" games. The statement asks for an executable with the four variants (§8). Must we deliver three games or four?
+- **Q6:** The statement does not set the team size. In class on 2026-10-26 we heard two or three members (recording 33:27 and 81:19). What is the maximum team size?
 
 Confirmations (we already work under an assumption):
 
