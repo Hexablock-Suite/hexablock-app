@@ -86,7 +86,7 @@ Summary; the details live in `hexablock-api/docs/REQUIREMENTS.md`. Sign-up and s
 
 ## 8. Variation register
 
-An abstraction is justified when it absorbs a change someone declared. Add a row whenever the professor names a possible change, with its source.
+Every abstraction needs a written reason, and there are two kinds. A declared change: the statement, the professor or the team names something that may vary; add a row here with its source. A layer boundary: an interface that keeps an inner layer from depending on an outer one needs no row, because the dependency rule is its reason. The statement is a starting point, not the limit, so the team adds its own rows too. An abstraction does not have to be a design pattern; a plain interface is often enough.
 
 | Axis                                                                                                   | Source                                                                     | What absorbs it                                                                                                                                               |
 | ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -125,7 +125,7 @@ Each assumption holds under both readings of the statement, or names what change
 - **D2 — States (§3.3).** Game lifecycle states (playing, resolving, paused, game over, victory) live in the domain. The menu belongs to the presentation layer.
 - **D3 — Rendering (§1.5).** A shared board renderer draws the grid and delegates each cell to a cell renderer per variant (Strategy), which the variant's factory provides. The piece preview is a clone (Prototype). Visitor fits only inside the piece and figure Composite, where the node types are closed (cell and region) and the operations grow (area, bounds, rotation). A Visitor over variants would force every new variant to edit all visitors, which breaks the extensibility test.
 - **D4 — Grid topology.** Neighbors, slide directions, line axes, rotation step, coordinates and screen layout live behind one topology interface. Rules ask the topology and never hard-code 6 directions, 3 axes or 60°. A minimal square topology used in engine tests proves the engine does not depend on hexagons.
-- **D5 — Seams for named variations.** Every axis in §8 gets its seam when the part it touches is built, never on the last day. A late request from the professor must then mean new classes or a new adapter, not a rewrite. This is deliberate insurance: we accept some extra abstraction, but only for the axes in §8.
+- **D5 — Seams for named variations.** Every axis in §8 gets its seam when the part it touches is built, never on the last day. A late request from the professor must then mean new classes or a new adapter, not a rewrite. This is deliberate insurance: we accept some extra abstraction, as long as each one keeps a written reason (a row in §8 or a layer boundary).
 
 ### Still to define (team)
 
