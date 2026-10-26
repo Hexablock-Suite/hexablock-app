@@ -39,7 +39,7 @@ Required:
 Required:
 
 - **SOLID (§3.2):** every principle used is documented in the README with a concrete example from our code. The engine has no conditionals on the variant type (LSP). Undo, timing and seeded randomness are separate interfaces, so Hexa Lines does not implement undo (ISP).
-- **GoF patterns (§3.3):** Strategy and Abstract Factory (one factory per variant) are mandatory. The statement also lists Builder, Singleton or single-scope injection, Prototype, Composite, Decorator, Adapter, Facade, Observer, Command, State, Template Method and Iterator. Each pattern used has a justification, a code excerpt and a README entry. See A10 and Q3.
+- **GoF patterns (§3.3):** Strategy and Abstract Factory (one factory per variant) are mandatory. The statement also lists Builder, Singleton or single-scope injection, Prototype, Composite, Decorator, Adapter, Facade, Observer, Command, State, Template Method and Iterator. Each pattern used has a justification, a code excerpt and a README entry. See D7.
 - **Clean Architecture (§3.4):** four layers with dependencies pointing inward. The whole generic engine and the variant rules live in the entities layer with no external dependency. Use cases are generic, never one copy per game. A layer diagram is an image in the README and an editable source in the repo.
 - **AOP (§3.5):** at least one cross-cutting aspect (logging, centralized errors with retry, profiling, authorization or caching), built as decorators or proxies over the use cases. One aspect on the generic use case covers all four variants. See A2.
 
@@ -117,8 +117,8 @@ Each assumption holds under both readings of the statement, or names what change
 - **A6 — Level origin (§5.1.5, §5.2.4).** Levels bundled in the app always work offline; levels from the backend add to them or replace them. Who may edit levels is Q4.
 - **A7 — Public repositories (§2, §9).** Both repositories are public, because GitHub Free protects branches only on public repositories. Confirmation C6.
 - **A8 — Delivery date.** We plan against the earliest date, 2026-12-07. See Q1.
-- **A9 — Backend scope (§6.1).** Until Q2 is answered, the backend also follows Clean Architecture, SOLID, the patterns where they fit naturally, and has its own diagrams.
-- **A10 — Patterns (§3.3).** Until Q3 is answered, we implement every listed pattern where it fits without forcing it.
+- **A9 — Backend scope (§6.1).** Replaced by D6 on 2026-10-26.
+- **A10 — Patterns (§3.3).** Replaced by D7 on 2026-10-26.
 
 ## 10. Team design decisions
 
@@ -127,6 +127,9 @@ Each assumption holds under both readings of the statement, or names what change
 - **D3 — Rendering (§1.5).** A shared board renderer draws the grid and delegates each cell to a cell renderer per variant (Strategy), which the variant's factory provides. The piece preview is a clone (Prototype). Visitor fits only inside the piece and figure Composite, where the node types are closed (cell and region) and the operations grow (area, bounds, rotation). A Visitor over variants would force every new variant to edit all visitors, which breaks the extensibility test.
 - **D4 — Grid topology.** Neighbors, slide directions, line axes, rotation step, coordinates and screen layout live behind one topology interface. Rules ask the topology and never hard-code 6 directions, 3 axes or 60°. A minimal square topology used in engine tests proves the engine does not depend on hexagons.
 - **D5 — Seams for named variations.** Every axis in §8 gets its seam when the part it touches is built, never on the last day. A late request from the professor must then mean new classes or a new adapter, not a rewrite. This is deliberate insurance: we accept some extra abstraction, as long as each one keeps a written reason (a row in §8 or a layer boundary).
+- **D6 — Backend scope (§6.1).** The backend meets the same standards as the client: generics, SOLID, Clean Architecture, the patterns it needs (D7), `EXTENSIBILITY.md` and its own diagrams. Decided by the team on 2026-10-26; it closes Q2 and replaces A9.
+- **D7 — Patterns (§3.3).** Strategy and Abstract Factory are mandatory. We use the other listed patterns only where the design needs them, and each one has a written justification. We bring the patterns we identify to the professor as design questions (§11). Decided by the team on 2026-10-26; it closes Q3 and replaces A10.
+- **D8 — Variants delivered (§8).** Three games are the minimum (class on 2026-10-26, recording 09:49). We deliver the four variants of the statement. Decided by the team on 2026-10-26; it closes Q5.
 
 ### Still to define (team)
 
@@ -142,11 +145,11 @@ Ask design questions, not debugging questions. On 2026-10-26 the professor refus
 Real questions (they change the plan):
 
 - **Q1:** The statement sets delivery on Monday 2026-12-14, and the class plan sets the final project delivery on 2026-12-07 and 2026-12-11, with grades on 2026-12-14. Which date and time is the deadline?
-- **Q2:** Must the backend also meet the generics, GoF patterns, `EXTENSIBILITY.md` and the three diagrams, or only the client?
-- **Q3:** Do we implement all 14 listed patterns, or a minimum? Which one?
+- **Q2:** Closed by the team on 2026-10-26: the backend meets the same standards (D6).
+- **Q3:** Closed by the team on 2026-10-26: the patterns the design needs, each justified (D7).
 - **Q4:** Who may update level definitions in the backend? The statement asks only for sign-up and sign-in, with no roles.
-- **Q5:** In class on 2026-10-26 (recording 09:49) we heard "select at least three" games. The statement asks for an executable with the four variants (§8). Must we deliver three games or four?
-- **Q6:** The statement does not set the team size. In class on 2026-10-26 we heard two or three members (recording 33:27 and 81:19). What is the maximum team size?
+- **Q5:** Closed by the team on 2026-10-26: three games are the minimum, and we deliver four (D8).
+- **Q6:** Closed on 2026-10-26: the team is already set, with three members.
 
 Confirmations (we already work under an assumption):
 
