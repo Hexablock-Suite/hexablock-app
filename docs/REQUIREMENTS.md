@@ -136,6 +136,8 @@ Each assumption holds under both readings of the statement, or names what change
 
 ## 11. Questions for the professor
 
+Ask design questions, not debugging questions. On 2026-10-26 the professor refused to help with a bug ("Eso lo tienes que resolver tú", recording 39:15). He wants to know which layer a class lives in and how it interacts with the others, so he can judge whether the architecture is well designed (recording 39:20, 39:27). Bring the options you weighed, for example "we can do it this way or that way; which dependency is right?".
+
 Real questions (they change the plan):
 
 - **Q1:** The statement sets delivery on Monday 2026-12-14, and the class plan sets the final project delivery on 2026-12-07 and 2026-12-11, with grades on 2026-12-14. Which date and time is the deadline?
