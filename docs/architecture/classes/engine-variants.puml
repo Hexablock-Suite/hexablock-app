@@ -1,0 +1,270 @@
+@startuml engine-variants
+' HexaBlock Suite class diagram, part 2: how each variant instantiates the generic engine.
+' Every class here lives in layer 1 (entities), src/domain/variants/<variant>/.
+' Color marks the Clean layer. A stereotype marks the role of a class in a GoF pattern.
+' A <<bind>> arrow is a UML template binding: it names the type each parameter takes.
+' Render: see docs/architecture/classes.md.
+
+title HexaBlock Suite: the four variants as instantiations of the engine (layer 1, src/domain/variants/)
+
+' A dot in a package name is text, not a namespace separator.
+set separator none
+
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam nodesep 30
+skinparam ranksep 60
+skinparam class {
+  BackgroundColor #FDE68A
+  BorderColor #B45309
+  ArrowColor #374151
+  StereotypeFontColor #7C2D12
+}
+skinparam class<<engine>> {
+  BackgroundColor #FEF3C7
+  BorderColor #D97706
+}
+skinparam package {
+  BackgroundColor #FFFBEB
+  BorderColor #D97706
+  FontColor #7C2D12
+}
+skinparam legend {
+  BackgroundColor #FFFFFF
+  BorderColor #9CA3AF
+}
+left to right direction
+hide empty members
+hide <<engine>> members
+hide <<engine>> stereotype
+
+legend top left
+  Light yellow: engine types from part 1 (src/domain/engine/), shown without members.
+  Dark yellow: variant types (src/domain/variants/<variant>/). Both are layer 1, entities.
+  <<bind>> arrow: UML template binding. Its label names the type each parameter takes.
+  Rule variants-isolated: a variant imports the engine and never another variant.
+  Every class is planned.
+endlegend
+
+package "Engine (part 1)" {
+  interface BoardState<TCell> <<engine>>
+  interface IGameRules<TCell, TMove, TState> <<engine>>
+  interface IScoringPolicy<TState> <<engine>>
+  abstract class ScoringDecorator<TState> <<engine>>
+  interface IVariantFactory<TCell, TMove, TState> <<engine>>
+  interface ILevelBuilder<TLevel> <<engine>>
+  interface IMergeable<T> <<engine>>
+  abstract class GameEvent <<engine>>
+}
+
+package "hexa-lines: endless game (statement 1.1)" {
+  class PlacePiece <<value object>> {
+    +trayIndex: number
+    +at: HexCoord
+  }
+  class LinesState {
+    +board: HexBoard<Color>
+    +tray: Piece<Color>[]
+    +streak: number
+  }
+  class HexaLinesRules <<Concrete Strategy>> {
+    -pieces: IPieceSource<Piece<Color>>
+    clears full lines on the 3 axes
+  }
+  class LinesScoring <<Concrete Strategy>> {
+    cells placed plus a bonus per line
+  }
+  class ComboMultiplierDecorator <<Concrete Decorator>> {
+    multiplier for combos and streaks
+  }
+  class LineCleared {
+    +axis: Axis
+    +cells: HexCoord[]
+  }
+  class HexaLinesFactory <<Concrete Factory>> {
+    pieces: SeededPieceSource
+    progress: HighScoreProgress
+    history: none (no IUndoable)
+  }
+}
+
+package "hexa-fit: levels of exact cover (statement 1.2)" {
+  class PieceId <<value object>>
+  interface FitMove
+  class PlaceFitPiece <<value object>> {
+    +pieceId: PieceId
+    +rotation: number
+    +at: HexCoord
+  }
+  class RemoveFitPiece <<value object>> {
+    +pieceId: PieceId
+  }
+  class RotateFitPiece <<value object>> {
+    +pieceId: PieceId
+    +steps: number
+  }
+  class FitState {
+    +board: HexBoard<PieceId>
+    +remaining: Piece<PieceId>[]
+    +moves: number
+  }
+  class HexaFitRules <<Concrete Strategy>> {
+    exact cover, no resolution step
+  }
+  class FitScoring <<Concrete Strategy>> {
+    -timer: ITimed
+    stars from moves and time
+  }
+  class FitLevel <<value object>> {
+    +figure: ShapeGroup
+    +pieces: Piece<PieceId>[]
+    +witness: Placement[]
+  }
+  class FitLevelBuilder <<Concrete Builder>> {
+    +withFigure(figure: ShapeGroup): FitLevelBuilder
+    +withPieces(pieces: Piece<PieceId>[]): FitLevelBuilder
+    +withWitness(witness: Placement[]): FitLevelBuilder
+    +build(): FitLevel
+  }
+  class HexaFitFactory <<Concrete Factory>> {
+    -level: FitLevel
+    pieces: FixedListPieceSource
+    progress: LevelProgress with stars
+    history: RedoableHistory, no limit
+    timer: LevelTimer (ITimed)
+  }
+}
+
+package "hexa-sort: stacks and cascades (statement 1.3)" {
+  class ColorStack <<value object>> {
+    +chips: Color[]
+    +top(): Color
+    +topRun(): Color[]
+  }
+  class PlaceStack <<value object>> {
+    +at: HexCoord
+  }
+  class SortState {
+    +board: HexBoard<ColorStack>
+    +tray: Piece<ColorStack>[]
+    +goalsDone: number
+    +goalsNeeded: number
+  }
+  class HexaSortRules <<Concrete Strategy>> {
+    -pieces: IPieceSource<Piece<ColorStack>>
+    cascade transfer, clears a stack of 10
+  }
+  class SortScoring <<Concrete Strategy>> {
+    criteria still to define
+  }
+  class StackMerged {
+    +at: HexCoord
+    +color: Color
+  }
+  class SortLevel <<value object>> {
+    +radius: number
+    +goals: number
+    +source: "seeded" | "fixed"
+  }
+  class SortLevelBuilder <<Concrete Builder>> {
+    +build(): SortLevel
+  }
+  class HexaSortFactory <<Concrete Factory>> {
+    -level: SortLevel
+    pieces: seeded or fixed, per level (A4)
+    progress: LevelProgress
+    history: none (no IUndoable)
+  }
+}
+
+package "hexa-merge: slide and merge (statement 1.4)" {
+  class MergeTile <<value object>> {
+    +value: number
+  }
+  class Slide <<value object>> {
+    +direction: Direction
+  }
+  class MergeState<TCell> {
+    +board: HexBoard<TCell>
+    +targetReached: boolean
+  }
+  class MergeRules<TCell extends IMergeable> <<Concrete Strategy>> {
+    -spawn: IPieceSource<Piece<TCell>>
+    slide to the edge, merge on collision
+  }
+  class MergeScoring <<Concrete Strategy>> {
+    sum of the merged values
+  }
+  class TileMerged {
+    +value: number
+  }
+  class TargetReached
+  class HexaMergeFactory <<Concrete Factory>> {
+    spawn: SeededPieceSource (2 or 4, IRandomSeeded)
+    progress: HighScoreProgress
+    history: MoveHistory, limit 1
+  }
+}
+
+' Hexa Lines
+LinesState ..|> BoardState : <<bind>> TCell = Color
+HexaLinesRules ..|> IGameRules : <<bind>> Color, PlacePiece, LinesState
+LinesScoring ..|> IScoringPolicy : <<bind>> LinesState
+ComboMultiplierDecorator --|> ScoringDecorator
+LineCleared --|> GameEvent
+HexaLinesFactory ..|> IVariantFactory : <<bind>> Color, PlacePiece, LinesState
+
+' Hexa Fit
+FitMove <|.. PlaceFitPiece
+FitMove <|.. RemoveFitPiece
+FitMove <|.. RotateFitPiece
+FitState ..|> BoardState : <<bind>> TCell = PieceId
+HexaFitRules ..|> IGameRules : <<bind>> PieceId, FitMove, FitState
+FitScoring ..|> IScoringPolicy : <<bind>> FitState
+FitLevelBuilder ..|> ILevelBuilder : <<bind>> FitLevel
+FitLevelBuilder ..> FitLevel : builds
+HexaFitFactory ..|> IVariantFactory : <<bind>> PieceId, FitMove, FitState
+HexaFitFactory --> FitLevel
+
+' Hexa Sort
+SortState ..|> BoardState : <<bind>> TCell = ColorStack
+HexaSortRules ..|> IGameRules : <<bind>> ColorStack, PlaceStack, SortState
+SortScoring ..|> IScoringPolicy : <<bind>> SortState
+StackMerged --|> GameEvent
+SortLevelBuilder ..|> ILevelBuilder : <<bind>> SortLevel
+SortLevelBuilder ..> SortLevel : builds
+HexaSortFactory ..|> IVariantFactory : <<bind>> ColorStack, PlaceStack, SortState
+HexaSortFactory --> SortLevel
+
+' Hexa Merge
+MergeTile ..|> IMergeable : <<bind>> T = MergeTile
+MergeState ..|> BoardState
+MergeRules ..|> IGameRules : <<bind>> TCell, Slide, MergeState<TCell>
+MergeScoring ..|> IScoringPolicy : <<bind>> MergeState<MergeTile>
+TileMerged --|> GameEvent
+TargetReached --|> GameEvent
+HexaMergeFactory ..|> IVariantFactory : <<bind>> MergeTile, Slide, MergeState<MergeTile>
+HexaMergeFactory ..> MergeRules : <<bind>> TCell = MergeTile
+
+note bottom of MergeRules
+  Bounded generic (statement 3.1, A1):
+  TCell extends IMergeable<TCell>.
+  The rules call canMergeWith and mergeWith,
+  so they need that capability of the cell.
+  A plain number cannot implement an interface,
+  so MergeTile wraps the number.
+end note
+
+note bottom of FitLevelBuilder
+  build() checks A5: the areas match, and the
+  witness placement covers the figure exactly.
+  An adapter parses the JSON or YAML file;
+  the builder gets plain data.
+end note
+
+note bottom of TargetReached
+  A3: reaching the target tile is an event,
+  not the end of the game.
+end note
+@enduml

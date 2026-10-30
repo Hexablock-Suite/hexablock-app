@@ -2,7 +2,7 @@
 
 Status: draft for review with the professor, 2026-10-30.
 
-This page answers one question: in which layer does each piece of the client live? It follows the statement (§3.4, §4.2) and the layer rules in `.dependency-cruiser.cjs`. The engine is not written yet. Today `src/` holds one README per layer folder plus the API client in `src/infrastructure/api/`. Component names follow the statement (§3.1, §3.4). They are not final. IDs such as A1, D3 and Q7 refer to [`docs/REQUIREMENTS.md`](../REQUIREMENTS.md).
+This page answers one question: in which layer does each piece of the client live? It follows the statement (§3.4, §4.2) and the layer rules in `.dependency-cruiser.cjs`. The engine is not written yet. Today `src/` holds one README per layer folder plus the API client in `src/infrastructure/api/`. Component names follow the statement (§3.1, §3.4). They are not final. IDs such as A1, D3 and Q7 refer to [`docs/REQUIREMENTS.md`](../REQUIREMENTS.md). The classes of layer 1 are in the [class diagram](classes.md).
 
 ## Diagram
 
@@ -69,7 +69,7 @@ flowchart TB
       CONTRACTS["Engine contracts: IGameRules#lt;TCell, TMove, TState#gt;,<br/>IPieceSource#lt;TPiece#gt;, IScoringPolicy#lt;TState#gt;,<br/>IProgressModel (planned)"]
       DPORTS(["Clock and RandomSource ports (planned)"])
       CAPS["Capability interfaces: IMergeable#lt;TCell#gt;,<br/>IUndoable, ITimed, IRandomSeeded (planned)"]
-      CMDSTATE["MoveCommand and GameState classes (planned)"]
+      CMDSTATE["MoveCommand and GamePhase classes (planned)"]
       FACTORY["IVariantFactory interface (planned, Q8)"]
       EVPORT(["GameEventPublisher port (planned)"])
     end
@@ -164,8 +164,8 @@ The "May depend on" column repeats `.dependency-cruiser.cjs`. `pnpm arch` checks
 - **Generic engine:** layer 1, `src/domain/engine/`. `HexBoard<TCell>`, `GameEngine<TCell, TMove, TState>` (turn skeleton, D1) and the contracts `IGameRules`, `IPieceSource<TPiece>`, `IScoringPolicy<TState>` and `IProgressModel`. The shared implementations (seeded or fixed piece source, high score or levels with stars) live here too. They take time and randomness through the `Clock` and `RandomSource` ports.
 - **The four variants:** layer 1, `src/domain/variants/hexa-lines/`, `hexa-fit/`, `hexa-sort/` and `hexa-merge/`. Each one implements `IGameRules` for its own cell type, for example `MergeTile` for Hexa Merge (A1). A variant imports the engine. The engine never imports a variant.
 - **Abstract Factory per variant:** layer 1. The interface `IVariantFactory` lives in `src/domain/engine/`, and each variant folder holds one implementation. It builds the rules, piece source, scoring policy and progress model. `StartGame` receives a factory and never names a variant. The cell renderer that D3 assigns to this factory cannot live here. Q8 asks where the renderer goes, and its answer can move the factory too.
-- **Capability interfaces:** layer 1, `src/domain/engine/`. `IMergeable<TCell>` is the bound on the Hexa Merge cell (§3.1). `IUndoable`, `ITimed` and `IRandomSeeded` stay separate (§3.2, ISP): a variant implements only the ones it uses, so Hexa Lines does not implement `IUndoable`.
-- **Command and State:** layer 1, `src/domain/engine/`. `MoveCommand` wraps each move, so the history supports undo and redo: unlimited in Hexa Fit, one move in Hexa Merge (§3.3). `GameState` has one state per phase of a game: Playing, Resolving, Paused, GameOver and Victory (§3.3). The menu belongs to the presentation layer, not to `GameState` (D2).
+- **Capability interfaces:** layer 1, `src/domain/engine/`. `IMergeable<TCell>` is the bound on the Hexa Merge cell (§3.1). `IUndoable`, `ITimed` and `IRandomSeeded` stay separate (§3.2, ISP): a variant implements only the ones it uses, so Hexa Lines does not implement `IUndoable`. `IRedoable` is our addition: Hexa Fit redoes, and Hexa Merge only undoes (§5.1.8).
+- **Command and State:** layer 1, `src/domain/engine/`. `MoveCommand` wraps each move, so the history supports undo and redo: unlimited in Hexa Fit, one move in Hexa Merge (§3.3). `GamePhase` has one class per phase of a game: Playing, Resolving, Paused, GameOver and Victory (§3.3). The name avoids a clash with the `TState` type parameter. The menu belongs to the presentation layer, not to `GamePhase` (D2).
 - **Game events (Observer):** the `GameEventPublisher` port lives in layer 1, `src/domain/engine/`, because the engine notifies at the end of each turn. It publishes events such as `LineCleared`, `StackMerged`, `TileMerged` and `GameOver` (§3.3). `GameEventBus` in layer 3 implements it. The presenters, the score display and the audio facade in layer 4 listen to it, so the engine never knows about sound or screens.
 - **Use cases:** layer 2, `src/application/`. One generic set for the four variants:
   - `StartGame`, `ApplyMove`, `UndoMove`, `SaveProgress` and `SyncLeaderboard`.
