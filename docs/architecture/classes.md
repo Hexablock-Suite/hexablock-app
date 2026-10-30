@@ -34,7 +34,7 @@ This page answers statement §4.1 for the client. It shows the generic types in 
 
 ### View 2: board and pieces
 
-![Board and pieces: HexBoard as Iterator and Prototype, GridTopology as Strategy, ShapeNode as Composite](classes/views/engine-2-board.png)
+![Board and pieces: HexBoard as Iterator and Prototype, GridTopology as Strategy with every coordinate calculation, ShapeNode as Composite](classes/views/engine-2-board.png)
 
 ### View 3: undo and redo
 
@@ -164,6 +164,8 @@ The fourteen patterns of §3.3 all appear. Eleven live in layer 1; Adapter, Faca
 12. **`SettingsStore` (proposal).** `UpdateSettings` keeps the mute option and the language through this port. [layers.md](layers.md) left that storage open. `LocalSettingsStore` implements it over `KeyValueStore`.
 13. **Singleton in the composition root.** `CompositionRoot.instance()` is the classic form of §3.3. The rest of the app receives its dependencies by injection and never calls `instance()`. Q9 decides its file.
 14. **State mappers and cell renderers.** `StateMapper<TState>` in layer 3 turns the state of a variant into `CellView` values, and one `CellRenderer` per variant draws them (D3). Q8 decides where the renderers live and whether the variant factory provides them.
+15. **Builder in the levels, not in the board.** The statement puts Builder on the levels of Fit and Sort (§3.3). `HexBoard` has two required parts and no optional ones, so its constructor and `GridTopology.region()` are enough. The level builders already carry what changes from one level to the next: `FitLevel.figure` gives the cells of the board, and `SortLevel.radius` gives its size. A `BoardBuilder` pays off only if a level gains optional board parts, such as blocked or prefilled cells.
+16. **The topology does every coordinate calculation.** `GridTopology` owns `rotate()`, `translate()` and `region()`, and `HexCoord` only holds `q` and `r`. Adding two coordinates one component at a time works for hexagons and squares. It fails for triangles, because the parity of column plus row decides whether a triangle points up or down. With this rule, triangular cells (§8, the professor on 2026-10-26) mean one more class, `TriangleTopology`, plus new level data. `HexBoard` and `HexCoord` keep the names of the statement (§3.1). The square test double of D4 cannot catch this kind of coupling, because a square adds coordinates the same way a hexagon does. To check with the team: an engine test that translates a piece by an odd offset with a triangle double.
 
 ## Render the images
 
