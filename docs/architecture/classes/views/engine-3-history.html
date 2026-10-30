@@ -1,0 +1,791 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Undo and redo · UML class diagram</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --color-paper: #f3f5f6;
+        --color-ink: #17212a;
+        --color-muted: #5b6873;
+        --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+        --font-serif: 'Instrument Serif', serif;
+        --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+      }
+      body {
+        font-family: var(--font-sans);
+        background: var(--color-paper);
+        color: var(--color-ink);
+        padding: 3rem 2rem;
+      }
+      .frame {
+        max-width: 1240px;
+        margin: 0 auto;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-muted);
+        margin-bottom: 0.5rem;
+      }
+      h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        margin-bottom: 1.5rem;
+      }
+      svg {
+        width: 100%;
+        min-width: 900px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <p class="eyebrow">Class diagram · Part 1 · View 3 of 5</p>
+      <h1>Undo and redo: Command and segregated capabilities</h1>
+
+      <svg
+        viewBox="0 0 1040 628"
+        xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-labelledby="history-title history-desc"
+      >
+        <title id="history-title">HexaBlock undo and redo · UML class diagram</title>
+        <desc id="history-desc">
+          Class diagram of layer 1 showing MoveHistory as the Command invoker that keeps the done
+          MoveCommand objects and implements IUndoable, RedoableHistory extending it with redo
+          through IRedoable, and LevelTimer implementing the separate ITimed capability.
+        </desc>
+        <defs>
+          <marker
+            id="history-triangle"
+            markerWidth="16"
+            markerHeight="12"
+            refX="15"
+            refY="6"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          </marker>
+          <marker
+            id="history-diamond-hollow"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon
+              points="0 5, 9 0, 18 5, 9 10"
+              fill="#ffffff"
+              stroke="#17212a"
+              stroke-width="1"
+            />
+          </marker>
+        </defs>
+
+        <rect width="100%" height="100%" fill="#f3f5f6" />
+
+        <!-- Layer zone: layer 1, entities -->
+        <rect
+          x="24"
+          y="24"
+          width="992"
+          height="452"
+          rx="8"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="44"
+          fill="#b45309"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 1 · ENTITIES · src/domain/engine/
+        </text>
+
+        <!-- Pattern groups -->
+        <rect
+          x="56"
+          y="64"
+          width="920"
+          height="188"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="68"
+          y="80"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          COMMAND · §3.3 · §5.1.8
+        </text>
+
+        <rect
+          x="56"
+          y="296"
+          width="920"
+          height="148"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="68"
+          y="312"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          CAPABILITIES · ISP · §3.2
+        </text>
+
+        <!-- Relationships (drawn before boxes) -->
+        <!-- MoveHistory keeps the done MoveCommands: aggregation -->
+        <line
+          x1="376"
+          y1="164"
+          x2="312"
+          y2="164"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#history-diamond-hollow)"
+        />
+        <!-- RedoableHistory extends MoveHistory: generalization -->
+        <line
+          x1="760"
+          y1="156"
+          x2="696"
+          y2="156"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#history-triangle)"
+        />
+        <!-- MoveHistory implements IUndoable: realization -->
+        <line
+          x1="616"
+          y1="236"
+          x2="616"
+          y2="324"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#history-triangle)"
+        />
+        <!-- RedoableHistory implements IRedoable: realization -->
+        <line
+          x1="860"
+          y1="196"
+          x2="860"
+          y2="324"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#history-triangle)"
+        />
+        <!-- LevelTimer implements ITimed: realization -->
+        <line
+          x1="232"
+          y1="360"
+          x2="296"
+          y2="360"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#history-triangle)"
+        />
+
+        <!-- Arrow labels -->
+        <rect x="332" y="144" width="32" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="348"
+          y="153"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          DONE
+        </text>
+
+        <!-- Multiplicities -->
+        <rect x="318" y="158" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="324"
+          y="167"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          *
+        </text>
+
+        <!-- Class: MoveCommand (Command) -->
+        <rect
+          x="72"
+          y="92"
+          width="240"
+          height="144"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="72" y1="140" x2="312" y2="140" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="72" y1="196" x2="312" y2="196" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="192"
+          y="110"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «Command»
+        </text>
+        <text
+          x="192"
+          y="128"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          MoveCommand
+        </text>
+        <text x="88" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + move: TMove
+        </text>
+        <text x="88" y="172" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - before: TState
+        </text>
+        <text x="88" y="188" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - after: TState
+        </text>
+        <text x="88" y="212" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + undo(): TState
+        </text>
+        <text x="88" y="228" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + redo(): TState
+        </text>
+
+        <!-- Class: MoveHistory (focal, Invoker) -->
+        <rect
+          x="376"
+          y="92"
+          width="320"
+          height="144"
+          rx="6"
+          fill="rgba(15,111,116,0.05)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <rect x="376" y="92" width="320" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="376" y="132" width="320" height="8" fill="rgba(15,111,116,0.10)" />
+        <line x1="376" y1="140" x2="696" y2="140" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <line x1="376" y1="180" x2="696" y2="180" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <text
+          x="536"
+          y="110"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «Invoker»
+        </text>
+        <text
+          x="536"
+          y="128"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          MoveHistory
+        </text>
+        <text x="392" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - done: MoveCommand[]
+        </text>
+        <text x="392" y="172" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + limit: number [0..1]
+        </text>
+        <text x="392" y="196" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + record(command: MoveCommand&lt;TMove, TState&gt;): void
+        </text>
+        <text x="392" y="212" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + canUndo(): boolean
+        </text>
+        <text x="392" y="228" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + undo(): void
+        </text>
+
+        <!-- Class: RedoableHistory -->
+        <rect
+          x="760"
+          y="92"
+          width="200"
+          height="104"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="760" y1="132" x2="960" y2="132" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="760" y1="156" x2="960" y2="156" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="860"
+          y="117"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          RedoableHistory
+        </text>
+        <text x="776" y="148" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - undone: MoveCommand[]
+        </text>
+        <text x="776" y="172" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + canRedo(): boolean
+        </text>
+        <text x="776" y="188" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + redo(): void
+        </text>
+
+        <!-- Class: LevelTimer -->
+        <rect
+          x="72"
+          y="324"
+          width="160"
+          height="104"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="72" y1="364" x2="232" y2="364" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="72" y1="404" x2="232" y2="404" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="152"
+          y="349"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          LevelTimer
+        </text>
+        <text x="88" y="380" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - clock: Clock
+        </text>
+        <text x="88" y="396" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - startedAt: number
+        </text>
+        <text x="88" y="420" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + elapsedMs(): number
+        </text>
+
+        <!-- Class: ITimed (interface) -->
+        <rect
+          x="296"
+          y="324"
+          width="160"
+          height="72"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="296" y1="372" x2="456" y2="372" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="376"
+          y="342"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface»
+        </text>
+        <text
+          x="376"
+          y="360"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          ITimed
+        </text>
+        <text x="312" y="388" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + elapsedMs(): number
+        </text>
+
+        <!-- Class: IUndoable (interface) -->
+        <rect
+          x="536"
+          y="324"
+          width="160"
+          height="88"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="536" y1="372" x2="696" y2="372" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="616"
+          y="342"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface»
+        </text>
+        <text
+          x="616"
+          y="360"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          IUndoable
+        </text>
+        <text x="552" y="388" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + canUndo(): boolean
+        </text>
+        <text x="552" y="404" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + undo(): void
+        </text>
+
+        <!-- Class: IRedoable (interface) -->
+        <rect
+          x="780"
+          y="324"
+          width="160"
+          height="88"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="780" y1="372" x2="940" y2="372" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="860"
+          y="342"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface»
+        </text>
+        <text
+          x="860"
+          y="360"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          IRedoable
+        </text>
+        <text x="796" y="388" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + canRedo(): boolean
+        </text>
+        <text x="796" y="404" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + redo(): void
+        </text>
+
+        <!-- UML template boxes: type parameters on the top-right corner -->
+        <rect
+          x="240"
+          y="82"
+          width="84"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="282"
+          y="94"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TMove, TState
+        </text>
+        <rect
+          x="624"
+          y="82"
+          width="84"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="666"
+          y="94"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TMove, TState
+        </text>
+        <rect
+          x="888"
+          y="82"
+          width="84"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="930"
+          y="94"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TMove, TState
+        </text>
+
+        <!-- Footnote: classes the budget leaves out -->
+        <text
+          x="24"
+          y="504"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          GameEngine holds zero or one MoveHistory; the variant factory decides. Fit:
+          RedoableHistory, no limit. Merge: MoveHistory, limit 1. Lines and Sort: none.
+        </text>
+        <text
+          x="24"
+          y="520"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          IRedoable is our addition (§3.2, ISP). LevelTimer reads time from the Clock port (D6).
+        </text>
+
+        <!-- Legend -->
+        <line x1="24" y1="540" x2="1016" y2="540" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <text
+          x="24"
+          y="558"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LEGEND
+        </text>
+
+        <line
+          x1="24"
+          y1="576"
+          x2="52"
+          y2="576"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#history-triangle)"
+        />
+        <text
+          x="60"
+          y="580"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Inheritance
+        </text>
+        <line
+          x1="184"
+          y1="576"
+          x2="212"
+          y2="576"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#history-triangle)"
+        />
+        <text
+          x="220"
+          y="580"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Realization
+        </text>
+        <line
+          x1="344"
+          y1="576"
+          x2="372"
+          y2="576"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#history-diamond-hollow)"
+        />
+        <text
+          x="380"
+          y="580"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aggregation · has
+        </text>
+
+        <rect
+          x="24"
+          y="596"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="60"
+          y="605"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · Clean layer
+        </text>
+        <rect
+          x="184"
+          y="596"
+          width="28"
+          height="12"
+          rx="2"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="220"
+          y="605"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dashed frame · GoF pattern or principle
+        </text>
+        <rect
+          x="424"
+          y="596"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="460"
+          y="605"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Corner box · type parameters
+        </text>
+        <rect
+          x="624"
+          y="596"
+          width="28"
+          height="12"
+          rx="2"
+          fill="rgba(15,111,116,0.10)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <text
+          x="660"
+          y="605"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Teal · focal class
+        </text>
+      </svg>
+    </div>
+  </body>
+</html>
