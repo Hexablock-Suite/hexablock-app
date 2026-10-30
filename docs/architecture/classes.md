@@ -19,6 +19,19 @@ This page answers statement §4.1 for the domain. It shows the generic types in 
 
 ![Class diagram of the generic engine](classes/engine-core.svg)
 
+## Part 2: the four variants
+
+`src/domain/variants/<variant>/`. Each variant imports the engine and never another variant (rule `variants-isolated`).
+
+![Class diagram of the four variants as instantiations of the engine](classes/engine-variants.svg)
+
+| Variant    | `TCell`                      | `TMove`                                    | `TState`                | Undo                        | Piece source                           | Progress                   |
+| ---------- | ---------------------------- | ------------------------------------------ | ----------------------- | --------------------------- | -------------------------------------- | -------------------------- |
+| Hexa Lines | `Color`                      | `PlacePiece`                               | `LinesState`            | none                        | `SeededPieceSource`                    | `HighScoreProgress`        |
+| Hexa Fit   | `PieceId`                    | `FitMove`: place, remove or rotate a piece | `FitState`              | `RedoableHistory`, no limit | `FixedListPieceSource`                 | `LevelProgress` with stars |
+| Hexa Sort  | `ColorStack`                 | `PlaceStack`                               | `SortState`             | none                        | seeded or fixed, chosen per level (A4) | `LevelProgress`            |
+| Hexa Merge | `MergeTile`, an `IMergeable` | `Slide`                                    | `MergeState<MergeTile>` | `MoveHistory`, limit 1      | `SeededPieceSource`, tiles of 2 or 4   | `HighScoreProgress`        |
+
 ## Patterns in the domain
 
 Eleven of the fourteen patterns of §3.3 live in layer 1. D7 asks for a written reason for each one, so the last column names the requirement behind it.
@@ -48,13 +61,14 @@ The other three patterns live outside the domain, so the next parts draw them: A
 5. **`Color` and `GameId` live in the engine.** Lines and Sort both use `Color`, and rule `variants-isolated` forbids one variant from importing another.
 6. **One piece type for the four variants.** Every piece is a `Piece<TCell>`: a shape plus the content it puts on the board. A Sort piece is one cell with a stack, and a Merge spawn is one cell with a tile. So `IPieceSource<Piece<TCell>>` serves the four variants.
 7. **The board changes in place.** `HexBoard.set()` changes the board, and `clone()` takes the snapshot for undo and for the piece preview. The alternative is an immutable board, where each move returns a new board. Then undo keeps the old board, and Prototype applies only to pieces.
+8. **The Merge rules are generic.** `MergeRules<TCell extends IMergeable<TCell>>` is the bounded generic of §3.1. The Merge factory binds it to `MergeTile`. Only one cell type uses it today. The bound states which capability the rules need from a cell.
 
 ## Render the images
 
 The `.svg` images come from the `.puml` files. After you edit a `.puml` file, run this from the repository root:
 
 ```sh
-docker run --rm -u "$(id -u):$(id -g)" -v "$PWD/docs/architecture/classes:/data" plantuml/plantuml:1.2026.9 -tsvg /data/engine-core.puml
+docker run --rm -u "$(id -u):$(id -g)" -v "$PWD/docs/architecture/classes:/data" plantuml/plantuml:1.2026.9 -tsvg /data/engine-core.puml /data/engine-variants.puml
 ```
 
 Commit each `.puml` file together with its `.svg` image.
