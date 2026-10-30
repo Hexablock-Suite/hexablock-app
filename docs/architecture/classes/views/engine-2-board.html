@@ -180,8 +180,8 @@
         <rect
           x="648"
           y="64"
-          width="312"
-          height="188"
+          width="344"
+          height="220"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -201,9 +201,9 @@
         </text>
 
         <rect
-          x="584"
-          y="296"
-          width="272"
+          x="560"
+          y="308"
+          width="406"
           height="172"
           rx="8"
           fill="none"
@@ -212,8 +212,8 @@
           stroke-dasharray="4,4"
         />
         <text
-          x="596"
-          y="312"
+          x="572"
+          y="324"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -270,9 +270,18 @@
         <!-- BoardShape builds from ShapeNode: dependency -->
         <line
           x1="400"
-          y1="436"
+          y1="420"
           x2="400"
           y2="528"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#board-open)"
+        />
+        <!-- GridTopology builds the BoardShape region: dependency -->
+        <path
+          d="M664,252 H496 Q488,252 488,260 V372 Q488,380 480,380 H432"
+          fill="none"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
@@ -281,7 +290,7 @@
         <!-- Piece owns its ShapeNode: composition -->
         <line
           x1="640"
-          y1="452"
+          y1="464"
           x2="640"
           y2="528"
           stroke="#17212a"
@@ -292,7 +301,7 @@
         <line
           x1="248"
           y1="588"
-          x2="344"
+          x2="312"
           y2="588"
           stroke="#17212a"
           stroke-width="1"
@@ -334,6 +343,18 @@
         >
           TOPOLOGY
         </text>
+        <rect x="496" y="310" width="42" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="517"
+          y="319"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          REGION
+        </text>
         <rect x="408" y="456" width="64" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="440"
@@ -346,10 +367,10 @@
         >
           BUILDS FROM
         </text>
-        <rect x="648" y="476" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="648" y="484" width="36" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="666"
-          y="485"
+          y="493"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -472,17 +493,17 @@
         <rect
           x="664"
           y="92"
-          width="280"
-          height="144"
+          width="312"
+          height="176"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="664" y1="140" x2="944" y2="140" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="664" y1="164" x2="944" y2="164" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="664" y1="140" x2="976" y2="140" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="664" y1="164" x2="976" y2="164" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="804"
+          x="820"
           y="110"
           fill="#5b6873"
           font-size="8"
@@ -493,7 +514,7 @@
           «interface» «Strategy»
         </text>
         <text
-          x="804"
+          x="820"
           y="128"
           fill="#17212a"
           font-size="12"
@@ -518,13 +539,19 @@
         <text x="680" y="228" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + rotate(c: HexCoord, steps: number): HexCoord
         </text>
+        <text x="680" y="244" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + translate(c: HexCoord, offset: HexCoord): HexCoord
+        </text>
+        <text x="680" y="260" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + region(size: number): BoardShape
+        </text>
 
         <!-- Class: BoardShape (value object) -->
         <rect
           x="172"
           y="324"
           width="260"
-          height="112"
+          height="96"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -565,35 +592,25 @@
           font-family="'IBM Plex Mono', monospace"
           text-decoration="underline"
         >
-          + hexagon(radius: number): BoardShape
-        </text>
-        <text
-          x="188"
-          y="428"
-          fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-          text-decoration="underline"
-        >
           + fromShape(shape: ShapeNode): BoardShape
         </text>
 
         <!-- Class: Piece (Prototype) -->
         <rect
-          x="600"
-          y="324"
-          width="240"
+          x="576"
+          y="336"
+          width="370"
           height="128"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="600" y1="372" x2="840" y2="372" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="600" y1="412" x2="840" y2="412" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="576" y1="384" x2="946" y2="384" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="576" y1="424" x2="946" y2="424" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="720"
-          y="342"
+          x="761"
+          y="354"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -603,8 +620,8 @@
           «Prototype»
         </text>
         <text
-          x="720"
-          y="360"
+          x="761"
+          y="372"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -613,33 +630,33 @@
         >
           Piece
         </text>
-        <text x="616" y="388" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="592" y="400" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + shape: ShapeNode
         </text>
-        <text x="616" y="404" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="592" y="416" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + content: TCell
         </text>
-        <text x="616" y="428" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + rotated(steps: number): Piece&lt;TCell&gt;
+        <text x="592" y="440" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + rotated(steps: number, topology: GridTopology): Piece&lt;TCell&gt;
         </text>
-        <text x="616" y="444" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="592" y="456" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + clone(): Piece&lt;TCell&gt;
         </text>
 
         <!-- Class: ShapeNode (interface, Component) -->
         <rect
-          x="344"
+          x="312"
           y="528"
-          width="352"
+          width="384"
           height="120"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="344" y1="576" x2="696" y2="576" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="312" y1="576" x2="696" y2="576" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="520"
+          x="504"
           y="546"
           fill="#5b6873"
           font-size="8"
@@ -650,7 +667,7 @@
           «interface» «Component»
         </text>
         <text
-          x="520"
+          x="504"
           y="564"
           fill="#17212a"
           font-size="12"
@@ -660,17 +677,17 @@
         >
           ShapeNode
         </text>
-        <text x="360" y="592" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="328" y="592" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + cells(): HexCoord[]
         </text>
-        <text x="360" y="608" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="328" y="608" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + area(): number
         </text>
-        <text x="360" y="624" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="328" y="624" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + rotated(steps: number, topology: GridTopology): ShapeNode
         </text>
-        <text x="360" y="640" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + translated(offset: HexCoord): ShapeNode
+        <text x="328" y="640" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + translated(offset: HexCoord, topology: GridTopology): ShapeNode
         </text>
 
         <!-- Class: CellNode (Leaf) -->
@@ -772,8 +789,8 @@
           TCell
         </text>
         <rect
-          x="808"
-          y="314"
+          x="914"
+          y="326"
           width="44"
           height="18"
           rx="2"
@@ -783,8 +800,8 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="830"
-          y="326"
+          x="936"
+          y="338"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -811,7 +828,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          HexTopology implements GridTopology; SquareTopology is a test double.
+          HexTopology implements GridTopology; SquareTopology is a test double. The topology does
+          every coordinate calculation (D4).
         </text>
 
         <!-- Legend -->
