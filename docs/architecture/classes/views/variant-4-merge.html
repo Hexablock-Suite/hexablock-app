@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hexa Merge · UML class diagram</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --color-paper: #f3f5f6;
+        --color-ink: #17212a;
+        --color-muted: #5b6873;
+        --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+        --font-serif: 'Instrument Serif', serif;
+        --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+      }
+      body {
+        font-family: var(--font-sans);
+        background: var(--color-paper);
+        color: var(--color-ink);
+        padding: 3rem 2rem;
+      }
+      .frame {
+        max-width: 1240px;
+        margin: 0 auto;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-muted);
+        margin-bottom: 0.5rem;
+      }
+      h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        margin-bottom: 1.5rem;
+      }
+      svg {
+        width: 100%;
+        min-width: 900px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <p class="eyebrow">Class diagram · Part 2 · View 4 of 4</p>
+      <h1>Hexa Merge: the bounded generic of §3.1</h1>
+
+      <svg
+        viewBox="0 0 1040 900"
+        xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-labelledby="merge-title merge-desc"
+      >
+        <title id="merge-title">HexaBlock Hexa Merge variant · UML class diagram</title>
+        <desc id="merge-desc">
+          Class diagram of the Hexa Merge variant in layer 1 showing MergeRules bounding its TCell
+          parameter by the engine interface IMergeable, MergeTile implementing IMergeable with T
+          bound to MergeTile, MergeRules typed by MergeState and Slide, and HexaMergeFactory binding
+          TCell to MergeTile on MergeRules and creating MergeScoring, each variant class marked with
+          the engine interface it implements and its binding.
+        </desc>
+        <defs>
+          <marker
+            id="merge-triangle"
+            markerWidth="16"
+            markerHeight="12"
+            refX="15"
+            refY="6"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          </marker>
+          <marker
+            id="merge-open"
+            markerWidth="10"
+            markerHeight="8"
+            refX="9"
+            refY="4"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
+          </marker>
+        </defs>
+
+        <rect width="100%" height="100%" fill="#f3f5f6" />
+
+        <!-- Layer zone: layer 1, entities -->
+        <rect
+          x="24"
+          y="24"
+          width="992"
+          height="724"
+          rx="8"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="44"
+          fill="#b45309"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 1 · ENTITIES · src/domain/variants/hexa-merge/
+        </text>
+
+        <!-- Pattern groups -->
+        <rect
+          x="48"
+          y="64"
+          width="360"
+          height="120"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="60"
+          y="80"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          ABSTRACT FACTORY · §3.3
+        </text>
+
+        <rect
+          x="48"
+          y="216"
+          width="848"
+          height="176"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="60"
+          y="232"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          STRATEGY · §3.3 · D1
+        </text>
+
+        <rect
+          x="48"
+          y="424"
+          width="280"
+          height="300"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="60"
+          y="440"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          BOUNDED GENERIC · §3.1 · A1
+        </text>
+
+        <!-- Relationships (drawn before boxes) -->
+        <!-- HexaMergeFactory creates MergeScoring: dependency «create» -->
+        <path
+          d="M264 136 H740 Q748 136 748 144 V272"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#merge-open)"
+        />
+        <!-- HexaMergeFactory binds TCell to MergeTile on MergeRules: dependency «bind» -->
+        <path
+          d="M264 152 H360 Q368 152 368 160 V272"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#merge-open)"
+        />
+        <!-- MergeRules bounds TCell by IMergeable: dependency -->
+        <path
+          d="M368 360 V492 Q368 500 360 500 H304"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#merge-open)"
+        />
+        <!-- MergeRules is typed by MergeState: dependency -->
+        <line
+          x1="464"
+          y1="360"
+          x2="464"
+          y2="448"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#merge-open)"
+        />
+        <!-- MergeRules is typed by Slide: dependency -->
+        <path
+          d="M584 340 H608 Q616 340 616 348 V448"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#merge-open)"
+        />
+        <!-- MergeTile implements IMergeable: realization with binding -->
+        <line
+          x1="128"
+          y1="596"
+          x2="128"
+          y2="548"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#merge-triangle)"
+        />
+
+        <!-- Arrow labels -->
+        <rect x="546" y="118" width="48" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="570"
+          y="127"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          «create»
+        </text>
+        <rect x="376" y="194" width="132" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="442"
+          y="203"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          «bind» TCell → MergeTile
+        </text>
+        <rect x="296" y="400" width="64" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="328"
+          y="409"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          TCELL BOUND
+        </text>
+        <rect x="472" y="400" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="490"
+          y="409"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          TSTATE
+        </text>
+        <rect x="624" y="400" width="32" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="640"
+          y="409"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          TMOVE
+        </text>
+        <rect x="136" y="566" width="112" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="192"
+          y="575"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          «bind» T → MergeTile
+        </text>
+
+        <!-- Class: HexaMergeFactory (concrete factory) -->
+        <rect
+          x="64"
+          y="120"
+          width="200"
+          height="48"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="164"
+          y="138"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «Concrete Factory»
+        </text>
+        <text
+          x="164"
+          y="156"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          HexaMergeFactory
+        </text>
+
+        <!-- Class: MergeRules (focal, concrete strategy) -->
+        <rect
+          x="344"
+          y="272"
+          width="240"
+          height="88"
+          rx="6"
+          fill="rgba(15,111,116,0.05)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <rect x="344" y="272" width="240" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="344" y="312" width="240" height="8" fill="rgba(15,111,116,0.10)" />
+        <line x1="344" y1="320" x2="584" y2="320" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <text
+          x="464"
+          y="290"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «Concrete Strategy»
+        </text>
+        <text
+          x="464"
+          y="308"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          MergeRules
+        </text>
+        <text x="360" y="336" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - spawn: IPieceSource&lt;Piece&lt;TCell&gt;&gt;
+        </text>
+        <text x="360" y="352" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          slide to the edge, merge on collision
+        </text>
+
+        <!-- Class: MergeScoring (concrete strategy) -->
+        <rect
+          x="648"
+          y="272"
+          width="200"
+          height="72"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="648" y1="320" x2="848" y2="320" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="748"
+          y="290"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «Concrete Strategy»
+        </text>
+        <text
+          x="748"
+          y="308"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          MergeScoring
+        </text>
+        <text x="664" y="336" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          sum of the merged values
+        </text>
+
+        <!-- Class: MergeState -->
+        <rect
+          x="384"
+          y="448"
+          width="176"
+          height="80"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="384" y1="488" x2="560" y2="488" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="472"
+          y="473"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          MergeState
+        </text>
+        <text x="400" y="504" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + board: HexBoard&lt;TCell&gt;
+        </text>
+        <text x="400" y="520" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + targetReached: boolean
+        </text>
+
+        <!-- Class: Slide (value object) -->
+        <rect
+          x="600"
+          y="448"
+          width="160"
+          height="72"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="600" y1="496" x2="760" y2="496" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="680"
+          y="466"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="680"
+          y="484"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          Slide
+        </text>
+        <text x="616" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + direction: Direction
+        </text>
+
+        <!-- Class: IMergeable (engine interface, the bound) -->
+        <rect
+          x="64"
+          y="452"
+          width="240"
+          height="96"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="64" y1="508" x2="304" y2="508" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="184"
+          y="468"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface»
+        </text>
+        <text
+          x="184"
+          y="480"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          engine
+        </text>
+        <text
+          x="184"
+          y="498"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          IMergeable
+        </text>
+        <text x="80" y="524" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + canMergeWith(other: T): boolean
+        </text>
+        <text x="80" y="540" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + mergeWith(other: T): T
+        </text>
+
+        <!-- Class: MergeTile (value object) -->
+        <rect
+          x="64"
+          y="596"
+          width="248"
+          height="112"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="64" y1="644" x2="312" y2="644" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="64" y1="668" x2="312" y2="668" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="188"
+          y="614"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="188"
+          y="632"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          MergeTile
+        </text>
+        <text x="80" y="660" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + value: number
+        </text>
+        <text x="80" y="684" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + canMergeWith(other: MergeTile): boolean
+        </text>
+        <text x="80" y="700" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + mergeWith(other: MergeTile): MergeTile
+        </text>
+
+        <!-- UML template boxes: type parameters on the top-right corner -->
+        <rect
+          x="428"
+          y="262"
+          width="168"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="512"
+          y="274"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCell extends IMergeable&lt;TCell&gt;
+        </text>
+        <rect
+          x="528"
+          y="438"
+          width="44"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="550"
+          y="450"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCell
+        </text>
+        <rect
+          x="292"
+          y="442"
+          width="24"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="304"
+          y="454"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          T
+        </text>
+
+        <!-- Lollipops: engine interface each variant class implements, with its binding -->
+        <line x1="80" y1="120" x2="80" y2="104" stroke="#17212a" stroke-width="1" />
+        <circle cx="80" cy="99" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="91" y="102" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          IVariantFactory‹MergeTile, Slide, MergeState‹MergeTile››
+        </text>
+        <line x1="344" y1="316" x2="328" y2="316" stroke="#17212a" stroke-width="1" />
+        <circle cx="323" cy="316" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text
+          x="312"
+          y="319"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+        >
+          IGameRules‹TCell, Slide, MergeState‹TCell››
+        </text>
+        <line x1="664" y1="344" x2="664" y2="360" stroke="#17212a" stroke-width="1" />
+        <circle cx="664" cy="365" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="675" y="368" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          IScoringPolicy‹MergeState‹MergeTile››
+        </text>
+        <line x1="400" y1="528" x2="400" y2="544" stroke="#17212a" stroke-width="1" />
+        <circle cx="400" cy="549" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="411" y="552" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          BoardState‹TCell›
+        </text>
+
+        <!-- Footnote: classes the budget leaves out -->
+        <text
+          x="24"
+          y="772"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          A plain number cannot implement an interface, so MergeTile wraps the number. Not drawn:
+          TileMerged and TargetReached extend GameEvent;
+        </text>
+        <text
+          x="24"
+          y="788"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          reaching the target is an event, not the end (A3). Undo: MoveHistory, limit 1. Spawn:
+          SeededPieceSource, tiles of 2 or 4.
+        </text>
+
+        <!-- Legend -->
+        <line x1="24" y1="812" x2="1016" y2="812" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <text
+          x="24"
+          y="830"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LEGEND
+        </text>
+
+        <line
+          x1="24"
+          y1="848"
+          x2="52"
+          y2="848"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#merge-triangle)"
+        />
+        <text
+          x="60"
+          y="852"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Realization
+        </text>
+        <line
+          x1="184"
+          y1="848"
+          x2="212"
+          y2="848"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#merge-open)"
+        />
+        <text
+          x="220"
+          y="852"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dependency · uses
+        </text>
+
+        <rect
+          x="24"
+          y="868"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="60"
+          y="877"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · Clean layer
+        </text>
+        <rect
+          x="184"
+          y="868"
+          width="28"
+          height="12"
+          rx="2"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="220"
+          y="877"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dashed frame · GoF pattern or principle
+        </text>
+        <rect
+          x="424"
+          y="868"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="460"
+          y="877"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Corner box · type parameters
+        </text>
+        <rect
+          x="600"
+          y="868"
+          width="28"
+          height="12"
+          rx="2"
+          fill="rgba(15,111,116,0.10)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <text
+          x="636"
+          y="877"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Teal · focal class
+        </text>
+        <line x1="760" y1="874" x2="776" y2="874" stroke="#17212a" stroke-width="1" />
+        <circle cx="781" cy="874" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text
+          x="796"
+          y="877"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Lollipop · engine interface + binding
+        </text>
+      </svg>
+    </div>
+  </body>
+</html>

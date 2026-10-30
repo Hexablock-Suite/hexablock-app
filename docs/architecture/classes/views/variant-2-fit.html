@@ -1,0 +1,816 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hexa Fit · UML class diagram</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --color-paper: #f3f5f6;
+        --color-ink: #17212a;
+        --color-muted: #5b6873;
+        --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+        --font-serif: 'Instrument Serif', serif;
+        --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+      }
+      body {
+        font-family: var(--font-sans);
+        background: var(--color-paper);
+        color: var(--color-ink);
+        padding: 3rem 2rem;
+      }
+      .frame {
+        max-width: 1240px;
+        margin: 0 auto;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-muted);
+        margin-bottom: 0.5rem;
+      }
+      h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        margin-bottom: 1.5rem;
+      }
+      svg {
+        width: 100%;
+        min-width: 900px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <p class="eyebrow">Class diagram · Part 2 · View 2 of 4</p>
+      <h1>Hexa Fit: levels built and checked by a Builder</h1>
+
+      <svg
+        viewBox="0 0 1040 712"
+        xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-labelledby="fit-title fit-desc"
+      >
+        <title id="fit-title">Hexa Fit variant · UML class diagram</title>
+        <desc id="fit-desc">
+          Class diagram of layer 1 for the Hexa Fit variant. FitLevelBuilder creates FitLevel.
+          HexaFitFactory holds one FitLevel and creates HexaFitRules and FitScoring. HexaFitRules
+          uses FitMove as TMove and FitState as TState. Lollipops show the engine interface each
+          variant class implements, with its binding.
+        </desc>
+        <defs>
+          <marker
+            id="fit-open"
+            markerWidth="10"
+            markerHeight="8"
+            refX="9"
+            refY="4"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
+          </marker>
+        </defs>
+
+        <rect width="100%" height="100%" fill="#f3f5f6" />
+
+        <!-- Layer zone: layer 1, entities -->
+        <rect
+          x="24"
+          y="24"
+          width="992"
+          height="536"
+          rx="8"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="44"
+          fill="#b45309"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 1 · ENTITIES · src/domain/variants/hexa-fit/
+        </text>
+
+        <!-- Pattern groups -->
+        <rect
+          x="316"
+          y="64"
+          width="268"
+          height="280"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="328"
+          y="80"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          STRATEGY · §3.3 · D1
+        </text>
+
+        <rect
+          x="636"
+          y="64"
+          width="308"
+          height="144"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="648"
+          y="80"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          ABSTRACT FACTORY · §3.3
+        </text>
+
+        <rect
+          x="192"
+          y="352"
+          width="680"
+          height="184"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="204"
+          y="368"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          BUILDER · §3.3 · A5
+        </text>
+
+        <!-- Relationships (drawn before boxes) -->
+        <!-- HexaFitRules uses FitMove as TMove: dependency -->
+        <line
+          x1="328"
+          y1="136"
+          x2="268"
+          y2="136"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#fit-open)"
+        />
+        <!-- HexaFitRules uses FitState as TState: dependency -->
+        <line
+          x1="328"
+          y1="184"
+          x2="240"
+          y2="184"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#fit-open)"
+        />
+        <!-- HexaFitFactory creates HexaFitRules: dependency «create» -->
+        <line
+          x1="648"
+          y1="144"
+          x2="568"
+          y2="144"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#fit-open)"
+        />
+        <!-- HexaFitFactory creates FitScoring: dependency «create», one elbow -->
+        <path
+          d="M680,192 L680,260 Q680,268 672,268 L528,268"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#fit-open)"
+        />
+        <!-- HexaFitFactory holds one FitLevel: association -->
+        <line
+          x1="800"
+          y1="192"
+          x2="800"
+          y2="380"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#fit-open)"
+        />
+        <!-- FitLevelBuilder creates FitLevel: dependency «create» -->
+        <line
+          x1="552"
+          y1="440"
+          x2="648"
+          y2="440"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#fit-open)"
+        />
+
+        <!-- Arrow labels -->
+        <rect x="274" y="116" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="292"
+          y="125"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          TMOVE
+        </text>
+        <rect x="272" y="164" width="40" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="292"
+          y="173"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          TSTATE
+        </text>
+        <rect x="588" y="124" width="44" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="610"
+          y="133"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          «create»
+        </text>
+        <rect x="592" y="248" width="48" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="616"
+          y="257"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          «create»
+        </text>
+        <rect x="808" y="272" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="826"
+          y="281"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          LEVEL
+        </text>
+        <rect x="576" y="420" width="48" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="600"
+          y="429"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          «create»
+        </text>
+
+        <!-- Multiplicities -->
+        <rect x="794" y="362" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="800"
+          y="371"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          1
+        </text>
+
+        <!-- Lollipops: engine interface and its binding -->
+        <line x1="64" y1="272" x2="64" y2="288" stroke="#17212a" stroke-width="1" />
+        <circle cx="64" cy="293" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="75" y="296" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          BoardState‹PieceId›
+        </text>
+        <line x1="352" y1="104" x2="352" y2="120" stroke="#17212a" stroke-width="1" />
+        <circle cx="352" cy="99" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="363" y="102" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          IGameRules‹PieceId, FitMove, FitState›
+        </text>
+        <line x1="352" y1="304" x2="352" y2="320" stroke="#17212a" stroke-width="1" />
+        <circle cx="352" cy="325" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="363" y="328" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          IScoringPolicy‹FitState›
+        </text>
+        <line x1="672" y1="104" x2="672" y2="120" stroke="#17212a" stroke-width="1" />
+        <circle cx="672" cy="99" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="683" y="102" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          IVariantFactory‹PieceId, FitMove, FitState›
+        </text>
+        <line x1="240" y1="500" x2="240" y2="516" stroke="#17212a" stroke-width="1" />
+        <circle cx="240" cy="521" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="251" y="524" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          ILevelBuilder‹FitLevel›
+        </text>
+
+        <!-- Class: FitMove (interface) -->
+        <rect
+          x="40"
+          y="56"
+          width="228"
+          height="104"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="40" y1="104" x2="268" y2="104" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="154"
+          y="74"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface»
+        </text>
+        <text
+          x="154"
+          y="92"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          FitMove
+        </text>
+        <text x="56" y="120" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          PlaceFitPiece(pieceId, rotation, at)
+        </text>
+        <text x="56" y="136" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          RemoveFitPiece(pieceId)
+        </text>
+        <text x="56" y="152" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          RotateFitPiece(pieceId, steps)
+        </text>
+
+        <!-- Class: FitState -->
+        <rect
+          x="40"
+          y="176"
+          width="200"
+          height="96"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="40" y1="216" x2="240" y2="216" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="140"
+          y="201"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          FitState
+        </text>
+        <text x="56" y="232" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + board: HexBoard&lt;PieceId&gt;
+        </text>
+        <text x="56" y="248" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + remaining: Piece&lt;PieceId&gt;[]
+        </text>
+        <text x="56" y="264" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + moves: number
+        </text>
+
+        <!-- Class: HexaFitRules (Concrete Strategy) -->
+        <rect
+          x="328"
+          y="120"
+          width="240"
+          height="72"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="328" y1="168" x2="568" y2="168" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="448"
+          y="138"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «Concrete Strategy»
+        </text>
+        <text
+          x="448"
+          y="156"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          HexaFitRules
+        </text>
+        <text x="344" y="184" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          exact cover, no resolution step
+        </text>
+
+        <!-- Class: FitScoring (Concrete Strategy) -->
+        <rect
+          x="328"
+          y="232"
+          width="200"
+          height="72"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="328" y1="280" x2="528" y2="280" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="428"
+          y="250"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «Concrete Strategy»
+        </text>
+        <text
+          x="428"
+          y="268"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          FitScoring
+        </text>
+        <text x="344" y="296" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - timer: ITimed
+        </text>
+
+        <!-- Class: HexaFitFactory (Concrete Factory) -->
+        <rect
+          x="648"
+          y="120"
+          width="200"
+          height="72"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="648" y1="168" x2="848" y2="168" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="748"
+          y="138"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «Concrete Factory»
+        </text>
+        <text
+          x="748"
+          y="156"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          HexaFitFactory
+        </text>
+        <text x="664" y="184" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - level: FitLevel
+        </text>
+
+        <!-- Class: FitLevel (value object) -->
+        <rect
+          x="648"
+          y="380"
+          width="200"
+          height="104"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="648" y1="428" x2="848" y2="428" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="748"
+          y="398"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="748"
+          y="416"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          FitLevel
+        </text>
+        <text x="664" y="444" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + figure: ShapeGroup
+        </text>
+        <text x="664" y="460" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + pieces: Piece&lt;PieceId&gt;[]
+        </text>
+        <text x="664" y="476" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + witness: Placement[]
+        </text>
+
+        <!-- Class: FitLevelBuilder (focal, Concrete Builder) -->
+        <rect
+          x="216"
+          y="380"
+          width="336"
+          height="120"
+          rx="6"
+          fill="rgba(15,111,116,0.05)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <rect x="216" y="380" width="336" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="216" y="420" width="336" height="8" fill="rgba(15,111,116,0.10)" />
+        <line x1="216" y1="428" x2="552" y2="428" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <text
+          x="384"
+          y="398"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «Concrete Builder»
+        </text>
+        <text
+          x="384"
+          y="416"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          FitLevelBuilder
+        </text>
+        <text x="232" y="444" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + withFigure(figure: ShapeGroup): FitLevelBuilder
+        </text>
+        <text x="232" y="460" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + withPieces(pieces: Piece&lt;PieceId&gt;[]): FitLevelBuilder
+        </text>
+        <text x="232" y="476" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + withWitness(witness: Placement[]): FitLevelBuilder
+        </text>
+        <text x="232" y="492" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + build(): FitLevel
+        </text>
+
+        <!-- Footnote: classes the budget leaves out -->
+        <text
+          x="24"
+          y="584"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          build() checks A5: the areas match, and the witness covers the figure exactly. An adapter
+          parses the level file; the builder gets plain data.
+        </text>
+        <text
+          x="24"
+          y="600"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Undo: RedoableHistory, no limit. Timer: LevelTimer (ITimed).
+        </text>
+
+        <!-- Legend -->
+        <line x1="24" y1="624" x2="1016" y2="624" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <text
+          x="24"
+          y="642"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LEGEND
+        </text>
+
+        <line
+          x1="24"
+          y1="660"
+          x2="52"
+          y2="660"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#fit-open)"
+        />
+        <text
+          x="60"
+          y="664"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Association
+        </text>
+        <line
+          x1="184"
+          y1="660"
+          x2="212"
+          y2="660"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#fit-open)"
+        />
+        <text
+          x="220"
+          y="664"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dependency · uses
+        </text>
+
+        <rect
+          x="24"
+          y="680"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="60"
+          y="689"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · Clean layer
+        </text>
+        <rect
+          x="184"
+          y="680"
+          width="28"
+          height="12"
+          rx="2"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="220"
+          y="689"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dashed frame · GoF pattern or principle
+        </text>
+        <rect
+          x="424"
+          y="680"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="460"
+          y="689"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Corner box · type parameters
+        </text>
+        <rect
+          x="600"
+          y="680"
+          width="28"
+          height="12"
+          rx="2"
+          fill="rgba(15,111,116,0.10)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <text
+          x="636"
+          y="689"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Teal · focal class
+        </text>
+        <line x1="760" y1="686" x2="776" y2="686" stroke="#17212a" stroke-width="1" />
+        <circle cx="781" cy="686" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text
+          x="796"
+          y="689"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Lollipop · engine interface + binding
+        </text>
+      </svg>
+    </div>
+  </body>
+</html>
