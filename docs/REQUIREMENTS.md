@@ -153,12 +153,12 @@ Real questions (they change the plan):
 
 Layer questions from the draft layer diagrams of 2026-10-30. Each one lists the options in the draft page:
 
-- **Q7 (app):** Where does the backend repository live: in `src/adapters/` behind a `BackendApi` port, or in `src/infrastructure/api/` implementing the layer-2 port directly? See [`docs/architecture/layers.md`](architecture/layers.md), question 1.
-- **Q8 (app):** Where do the variant factory and the cell renderer live, given that `domain-no-framework` keeps React out of `src/domain/` and D3 asks the factory for the renderer? See question 2.
-- **Q9 (app):** Where does the composition root live: in `app/_layout.tsx`, or in a module in `src/infrastructure/` that `_layout.tsx` calls? See question 3.
-- **Q10 (backend):** Where do the ports live: in `src/domain`, as the backend does today, or in `src/application`, as §3.4 says? See the backend's `docs/architecture/layers.md`, question 1.
+- **Q7 (app):** Where does the backend repository live: in `src/adapters/` behind a `BackendApi` port, or in `src/infrastructure/api/` implementing the layer-2 port directly? See Q7 in [`docs/architecture/layers.md`](architecture/layers.md).
+- **Q8 (app):** Where do the variant factory and the cell renderer live, given that `domain-no-framework` keeps React out of `src/domain/` and D3 asks the factory for the renderer? See Q8 in the same file.
+- **Q9 (app):** Where does the composition root live: in `app/_layout.tsx`, or in a module in `src/infrastructure/` that `_layout.tsx` calls? See Q9 in the same file.
+- **Q10 (backend):** Where do the ports live: in `src/domain`, as the backend does today, or in `src/application`, as §3.4 says? See Q10 in the backend's `docs/architecture/layers.md`.
 - **Q11 (backend):** Closed by the team on 2026-10-30: the Drizzle schema lives in `src/adapters/persistence/schema.ts`, next to the repositories that query it. Rule `adapters-never-import-infrastructure` kept them from importing it in `src/infrastructure/database/`.
-- **Q12 (backend):** Where do the AOP aspects live: in `src/application` as a plain decorator over a logger port, or in `src/infrastructure` as a wrapper that the Nest modules apply? See question 3.
+- **Q12 (backend):** Where do the AOP aspects live: in `src/application` as a plain decorator over a logger port, or in `src/infrastructure` as a wrapper that the Nest modules apply? See Q12 in the backend's `docs/architecture/layers.md`.
 
 Confirmations (we already work under an assumption):
 
