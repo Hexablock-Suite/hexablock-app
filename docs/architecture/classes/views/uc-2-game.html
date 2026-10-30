@@ -1,0 +1,1039 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game use cases · UML class diagram</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --color-paper: #f3f5f6;
+        --color-ink: #17212a;
+        --color-muted: #5b6873;
+        --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+        --font-serif: 'Instrument Serif', serif;
+        --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+      }
+      body {
+        font-family: var(--font-sans);
+        background: var(--color-paper);
+        color: var(--color-ink);
+        padding: 3rem 2rem;
+      }
+      .frame {
+        max-width: 1240px;
+        margin: 0 auto;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-muted);
+        margin-bottom: 0.5rem;
+      }
+      h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        margin-bottom: 1.5rem;
+      }
+      svg {
+        width: 100%;
+        min-width: 900px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <p class="eyebrow">Class diagram · Part 3 · View 2 of 4</p>
+      <h1>Playing a game: the game use cases</h1>
+
+      <svg
+        viewBox="0 0 1040 956"
+        xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-labelledby="ucgame-title ucgame-desc"
+      >
+        <title id="ucgame-title">HexaBlock game use cases · UML class diagram</title>
+        <desc id="ucgame-desc">
+          Class diagram of layers 2 and 1 showing the StartGame, ApplyMove, UndoMove and RedoMove
+          use cases, each implementing the UseCase input port and reaching the running game through
+          the RunningGameStore output port, which holds at most one GameEngine; StartGame creates
+          the game with an IVariantFactory and ApplyMove plays the move on the GameEngine of layer
+          1.
+        </desc>
+        <defs>
+          <marker
+            id="ucgame-triangle"
+            markerWidth="16"
+            markerHeight="12"
+            refX="15"
+            refY="6"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          </marker>
+          <marker
+            id="ucgame-diamond-filled"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 5, 9 0, 18 5, 9 10" fill="#17212a" />
+          </marker>
+          <marker
+            id="ucgame-diamond-hollow"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon
+              points="0 5, 9 0, 18 5, 9 10"
+              fill="#ffffff"
+              stroke="#17212a"
+              stroke-width="1"
+            />
+          </marker>
+          <marker
+            id="ucgame-open"
+            markerWidth="10"
+            markerHeight="8"
+            refX="9"
+            refY="4"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
+          </marker>
+        </defs>
+
+        <rect width="100%" height="100%" fill="#f3f5f6" />
+
+        <!-- Layer zone: layer 2, use cases -->
+        <rect
+          x="24"
+          y="24"
+          width="992"
+          height="644"
+          rx="8"
+          fill="#e3f5e6"
+          stroke="rgba(21,128,61,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="44"
+          fill="#15803d"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 2 · USE CASES · src/application/
+        </text>
+
+        <!-- Layer zone: layer 1, entities -->
+        <rect
+          x="24"
+          y="676"
+          width="992"
+          height="108"
+          rx="8"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="696"
+          fill="#b45309"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 1 · ENTITIES · src/domain/engine/
+        </text>
+
+        <!-- Pattern groups -->
+        <rect
+          x="624"
+          y="64"
+          width="328"
+          height="588"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="636"
+          y="80"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          GAME USE CASES · §5.1.3 · §5.1.8 · D1
+        </text>
+
+        <rect
+          x="56"
+          y="284"
+          width="380"
+          height="136"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="68"
+          y="300"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          OUTPUT PORT · §3.4
+        </text>
+
+        <!-- Relationships (drawn before boxes) -->
+        <!-- UndoMove reaches the running game: association -->
+        <path
+          d="M640 184 H256 Q248 184 248 192 V316"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucgame-open)"
+        />
+        <!-- RedoMove reaches the running game: association -->
+        <line
+          x1="640"
+          y1="340"
+          x2="408"
+          y2="340"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucgame-open)"
+        />
+        <!-- StartGame stores the new game: association -->
+        <path
+          d="M640 472 H384 Q376 472 376 464 V404"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucgame-open)"
+        />
+        <!-- ApplyMove reaches the running game: association -->
+        <path
+          d="M640 600 H352 Q344 600 344 592 V404"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucgame-open)"
+        />
+        <!-- RunningGameStore holds zero or one GameEngine: association -->
+        <line
+          x1="312"
+          y1="404"
+          x2="312"
+          y2="720"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucgame-open)"
+        />
+        <!-- ApplyMove calls GameEngine.play(): dependency -->
+        <path
+          d="M688 636 V732 Q688 740 680 740 H392"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#ucgame-open)"
+        />
+        <!-- StartGame creates the game with IVariantFactory: dependency -->
+        <path
+          d="M928 456 H960 Q968 456 968 464 V720"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#ucgame-open)"
+        />
+
+        <!-- Arrow labels -->
+        <rect x="504" y="322" width="40" height="12" rx="2" fill="#e3f5e6" />
+        <text
+          x="524"
+          y="331"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          GAMES
+        </text>
+        <rect x="268" y="540" width="36" height="12" rx="2" fill="#e3f5e6" />
+        <text
+          x="286"
+          y="549"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          HOLDS
+        </text>
+        <rect x="516" y="722" width="40" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="536"
+          y="731"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          PLAY()
+        </text>
+        <rect x="892" y="690" width="68" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="926"
+          y="699"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          CREATES WITH
+        </text>
+
+        <!-- Multiplicities -->
+        <rect x="298" y="698" width="28" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="312"
+          y="707"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          0..1
+        </text>
+
+        <!-- Class: UndoMove (use case) -->
+        <rect
+          x="640"
+          y="120"
+          width="288"
+          height="100"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="640" y1="180" x2="928" y2="180" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="784"
+          y="138"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «use case»
+        </text>
+        <text
+          x="784"
+          y="156"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          UndoMove
+        </text>
+        <text
+          x="784"
+          y="170"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          APP-FR-08
+        </text>
+        <text x="656" y="196" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - games: RunningGameStore
+        </text>
+        <text x="656" y="212" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          fails when the history is not IUndoable
+        </text>
+
+        <!-- Class: RedoMove (use case) -->
+        <rect
+          x="640"
+          y="264"
+          width="288"
+          height="100"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="640" y1="324" x2="928" y2="324" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="784"
+          y="282"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «use case»
+        </text>
+        <text
+          x="784"
+          y="300"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          RedoMove
+        </text>
+        <text
+          x="784"
+          y="314"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          APP-FR-08
+        </text>
+        <text x="656" y="340" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - games: RunningGameStore
+        </text>
+        <text x="656" y="356" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          fails when the history is not IRedoable
+        </text>
+
+        <!-- Class: StartGame (use case) -->
+        <rect
+          x="640"
+          y="408"
+          width="288"
+          height="100"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="640" y1="468" x2="928" y2="468" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="784"
+          y="426"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «use case»
+        </text>
+        <text
+          x="784"
+          y="444"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          StartGame
+        </text>
+        <text
+          x="784"
+          y="458"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          APP-FR-01 · APP-FR-03
+        </text>
+        <text x="656" y="484" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - factory: IVariantFactory&lt;TCell, TMove, TState&gt;
+        </text>
+        <text x="656" y="500" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - games: RunningGameStore&lt;TCell, TMove, TState&gt;
+        </text>
+
+        <!-- Class: ApplyMove (focal, use case) -->
+        <rect
+          x="640"
+          y="552"
+          width="288"
+          height="84"
+          rx="6"
+          fill="rgba(15,111,116,0.05)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <rect x="640" y="552" width="288" height="60" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="640" y="604" width="288" height="8" fill="rgba(15,111,116,0.10)" />
+        <line x1="640" y1="612" x2="928" y2="612" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <text
+          x="784"
+          y="570"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «use case»
+        </text>
+        <text
+          x="784"
+          y="588"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          ApplyMove
+        </text>
+        <text
+          x="784"
+          y="602"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          APP-FR-03
+        </text>
+        <text x="656" y="628" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - games: RunningGameStore&lt;TCell, TMove, TState&gt;
+        </text>
+
+        <!-- Class: RunningGameStore (interface, output port) -->
+        <rect
+          x="72"
+          y="316"
+          width="336"
+          height="88"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="72" y1="364" x2="408" y2="364" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="240"
+          y="334"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «port»
+        </text>
+        <text
+          x="240"
+          y="352"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          RunningGameStore
+        </text>
+        <text x="88" y="380" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + current(): GameEngine&lt;TCell, TMove, TState&gt; | undefined
+        </text>
+        <text x="88" y="396" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + replace(game: GameEngine&lt;TCell, TMove, TState&gt;): void
+        </text>
+
+        <!-- Reference box: IVariantFactory, detailed in Part 1 -->
+        <rect
+          x="832"
+          y="720"
+          width="160"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="912"
+          y="734"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          PART 1 · VIEW 5
+        </text>
+        <text
+          x="912"
+          y="751"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          IVariantFactory
+        </text>
+
+        <!-- Reference box: GameEngine, detailed in Part 1 -->
+        <rect
+          x="232"
+          y="720"
+          width="160"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="312"
+          y="734"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          PART 1 · VIEW 1
+        </text>
+        <text
+          x="312"
+          y="751"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GameEngine
+        </text>
+
+        <!-- UML template boxes: type parameters on the top-right corner -->
+        <rect
+          x="820"
+          y="398"
+          width="120"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="880"
+          y="410"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCell, TMove, TState
+        </text>
+        <rect
+          x="820"
+          y="542"
+          width="120"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="880"
+          y="554"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCell, TMove, TState
+        </text>
+        <rect
+          x="300"
+          y="306"
+          width="120"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="360"
+          y="318"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCell, TMove, TState
+        </text>
+
+        <!-- Lollipops: input port each use case implements, with its binding -->
+        <line x1="656" y1="120" x2="656" y2="104" stroke="#17212a" stroke-width="1" />
+        <circle cx="656" cy="99" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="667" y="102" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          UseCase‹void, MoveResult›
+        </text>
+        <line x1="656" y1="264" x2="656" y2="248" stroke="#17212a" stroke-width="1" />
+        <circle cx="656" cy="243" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="667" y="246" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          UseCase‹void, MoveResult›
+        </text>
+        <line x1="656" y1="408" x2="656" y2="392" stroke="#17212a" stroke-width="1" />
+        <circle cx="656" cy="387" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="667" y="390" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          UseCase‹StartGameRequest, MoveResult‹TState››
+        </text>
+        <line x1="656" y1="552" x2="656" y2="536" stroke="#17212a" stroke-width="1" />
+        <circle cx="656" cy="531" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="667" y="534" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          UseCase‹ApplyMoveRequest‹TMove›, MoveResult‹TState››
+        </text>
+
+        <!-- Footnote -->
+        <text
+          x="24"
+          y="808"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          StartGame never names a variant: the composition root injects the factory of the chosen
+          game. ApplyMove calls GameEngine.play(),
+        </text>
+        <text
+          x="24"
+          y="824"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          so the turn stays in the domain (D1). RunningGameStore is a proposal.
+        </text>
+
+        <!-- Legend -->
+        <line x1="24" y1="848" x2="1016" y2="848" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <text
+          x="24"
+          y="866"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LEGEND
+        </text>
+
+        <line
+          x1="24"
+          y1="884"
+          x2="52"
+          y2="884"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#ucgame-triangle)"
+        />
+        <text
+          x="60"
+          y="888"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Inheritance
+        </text>
+        <line
+          x1="184"
+          y1="884"
+          x2="212"
+          y2="884"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#ucgame-triangle)"
+        />
+        <text
+          x="220"
+          y="888"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Realization
+        </text>
+        <line
+          x1="344"
+          y1="884"
+          x2="372"
+          y2="884"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#ucgame-diamond-filled)"
+        />
+        <text
+          x="380"
+          y="888"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Composition · owns
+        </text>
+        <line
+          x1="504"
+          y1="884"
+          x2="532"
+          y2="884"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#ucgame-diamond-hollow)"
+        />
+        <text
+          x="540"
+          y="888"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aggregation · has
+        </text>
+        <line
+          x1="664"
+          y1="884"
+          x2="692"
+          y2="884"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucgame-open)"
+        />
+        <text
+          x="700"
+          y="888"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Association
+        </text>
+        <line
+          x1="824"
+          y1="884"
+          x2="852"
+          y2="884"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#ucgame-open)"
+        />
+        <text
+          x="860"
+          y="888"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dependency · uses
+        </text>
+
+        <rect
+          x="24"
+          y="904"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#e3f5e6"
+          stroke="rgba(21,128,61,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="60"
+          y="913"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · layer 2 · use cases
+        </text>
+        <rect
+          x="204"
+          y="904"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="240"
+          y="913"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · layer 1 · entities
+        </text>
+        <rect
+          x="384"
+          y="904"
+          width="28"
+          height="12"
+          rx="2"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="420"
+          y="913"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dashed frame · GoF pattern or principle
+        </text>
+        <rect
+          x="624"
+          y="904"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="660"
+          y="913"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Corner box · type parameters
+        </text>
+        <rect
+          x="820"
+          y="904"
+          width="28"
+          height="12"
+          rx="2"
+          fill="rgba(15,111,116,0.10)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <text
+          x="856"
+          y="913"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Teal · focal class
+        </text>
+
+        <line x1="24" y1="930" x2="40" y2="930" stroke="#17212a" stroke-width="1" />
+        <circle cx="45" cy="930" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text
+          x="60"
+          y="933"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Lollipop · input port it implements + binding
+        </text>
+        <rect
+          x="384"
+          y="924"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="420"
+          y="933"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Reference box · class detailed in another view
+        </text>
+      </svg>
+    </div>
+  </body>
+</html>

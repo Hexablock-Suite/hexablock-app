@@ -1,0 +1,818 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game events and sound · UML class diagram</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --color-paper: #f3f5f6;
+        --color-ink: #17212a;
+        --color-muted: #5b6873;
+        --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+        --font-serif: 'Instrument Serif', serif;
+        --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+      }
+      body {
+        font-family: var(--font-sans);
+        background: var(--color-paper);
+        color: var(--color-ink);
+        padding: 3rem 2rem;
+      }
+      .frame {
+        max-width: 1240px;
+        margin: 0 auto;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-muted);
+        margin-bottom: 0.5rem;
+      }
+      h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        margin-bottom: 1.5rem;
+      }
+      svg {
+        width: 100%;
+        min-width: 900px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <p class="eyebrow">Class diagram · Part 4 · View 3 of 4</p>
+      <h1>Game events and sound: Observer and Facade</h1>
+
+      <svg
+        viewBox="0 0 1040 736"
+        xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-labelledby="adevents-title adevents-desc"
+      >
+        <title id="adevents-title">HexaBlock game events and sound · UML class diagram</title>
+        <desc id="adevents-desc">
+          Class diagram across layers 4, 3 and 1 showing GameEventBus in layer 3 implementing the
+          GameEventPublisher port of layer 1 and holding many GameEventListener objects,
+          GamePresenter and the AudioFacade of layer 4 implementing GameEventListener, AudioFacade
+          playing through an external SoundLibrary, and GameEventPublisher publishing GameEvent.
+        </desc>
+        <defs>
+          <marker
+            id="adevents-triangle"
+            markerWidth="16"
+            markerHeight="12"
+            refX="15"
+            refY="6"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          </marker>
+          <marker
+            id="adevents-diamond-hollow"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon
+              points="0 5, 9 0, 18 5, 9 10"
+              fill="#ffffff"
+              stroke="#17212a"
+              stroke-width="1"
+            />
+          </marker>
+          <marker
+            id="adevents-open"
+            markerWidth="10"
+            markerHeight="8"
+            refX="9"
+            refY="4"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
+          </marker>
+        </defs>
+
+        <rect width="100%" height="100%" fill="#f3f5f6" />
+
+        <!-- Layer zone: layer 4, frameworks and drivers -->
+        <rect
+          x="24"
+          y="24"
+          width="992"
+          height="232"
+          rx="8"
+          fill="#eceef0"
+          stroke="rgba(75,85,99,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="44"
+          fill="#4b5563"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 4 · FRAMEWORKS AND DRIVERS · src/infrastructure/
+        </text>
+
+        <!-- Layer zone: layer 3, interface adapters -->
+        <rect
+          x="24"
+          y="264"
+          width="992"
+          height="208"
+          rx="8"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="284"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 3 · INTERFACE ADAPTERS · src/adapters/
+        </text>
+
+        <!-- Layer zone: layer 1, entities -->
+        <rect
+          x="24"
+          y="480"
+          width="992"
+          height="104"
+          rx="8"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="500"
+          fill="#b45309"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 1 · ENTITIES · src/domain/engine/
+        </text>
+
+        <!-- Pattern groups -->
+        <rect
+          x="304"
+          y="64"
+          width="532"
+          height="172"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="316"
+          y="80"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          FACADE · §3.3 · §5.1.10
+        </text>
+
+        <rect
+          x="304"
+          y="304"
+          width="688"
+          height="148"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="316"
+          y="320"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          OBSERVER · §3.3
+        </text>
+
+        <!-- Relationships (drawn before boxes) -->
+        <!-- AudioFacade plays with SoundLibrary: dependency -->
+        <line
+          x1="560"
+          y1="128"
+          x2="640"
+          y2="128"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#adevents-open)"
+        />
+        <!-- AudioFacade implements GameEventListener: realization, down from layer 4 to layer 3 -->
+        <line
+          x1="440"
+          y1="220"
+          x2="440"
+          y2="348"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#adevents-triangle)"
+        />
+        <!-- GamePresenter implements GameEventListener: realization -->
+        <line
+          x1="244"
+          y1="384"
+          x2="320"
+          y2="384"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#adevents-triangle)"
+        />
+        <!-- GameEventBus has many GameEventListener objects: aggregation -->
+        <line
+          x1="656"
+          y1="384"
+          x2="560"
+          y2="384"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#adevents-diamond-hollow)"
+        />
+        <!-- GameEventBus implements GameEventPublisher: realization, down from layer 3 to layer 1 -->
+        <line
+          x1="816"
+          y1="436"
+          x2="816"
+          y2="520"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#adevents-triangle)"
+        />
+        <!-- GameEventPublisher publishes GameEvent: dependency -->
+        <line
+          x1="716"
+          y1="540"
+          x2="620"
+          y2="540"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#adevents-open)"
+        />
+
+        <!-- Arrow labels -->
+        <rect x="570" y="108" width="60" height="12" rx="2" fill="#eceef0" />
+        <text
+          x="600"
+          y="117"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          PLAYS WITH
+        </text>
+        <rect x="582" y="364" width="52" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="608"
+          y="373"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          LISTENERS
+        </text>
+        <rect x="640" y="520" width="56" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="668"
+          y="529"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          PUBLISHES
+        </text>
+
+        <!-- Multiplicities -->
+        <rect x="566" y="378" width="12" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="572"
+          y="387"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          *
+        </text>
+
+        <!-- Class: AudioFacade (facade) -->
+        <rect
+          x="320"
+          y="92"
+          width="240"
+          height="128"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="320" y1="140" x2="560" y2="140" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="320" y1="164" x2="560" y2="164" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="440"
+          y="110"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «Facade»
+        </text>
+        <text
+          x="440"
+          y="128"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          AudioFacade
+        </text>
+        <text x="336" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - muted: boolean
+        </text>
+        <text x="336" y="180" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + onEvent(event: GameEvent): void
+        </text>
+        <text x="336" y="196" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + playMusic(): void
+        </text>
+        <text x="336" y="212" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + setMuted(muted: boolean): void
+        </text>
+
+        <!-- Class: SoundLibrary (external) -->
+        <rect
+          x="640"
+          y="92"
+          width="180"
+          height="72"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="640" y1="140" x2="820" y2="140" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="730"
+          y="110"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «external»
+        </text>
+        <text
+          x="730"
+          y="128"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          SoundLibrary
+        </text>
+        <text x="656" y="156" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          library to choose
+        </text>
+
+        <!-- Class: GameEventListener (interface) -->
+        <rect
+          x="320"
+          y="348"
+          width="240"
+          height="72"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="320" y1="396" x2="560" y2="396" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="440"
+          y="366"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface»
+        </text>
+        <text
+          x="440"
+          y="384"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GameEventListener
+        </text>
+        <text x="336" y="412" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + onEvent(event: GameEvent): void
+        </text>
+
+        <!-- Class: GameEventBus (focal) -->
+        <rect
+          x="656"
+          y="332"
+          width="320"
+          height="104"
+          rx="6"
+          fill="rgba(15,111,116,0.05)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <rect x="656" y="332" width="320" height="40" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="656" y="364" width="320" height="8" fill="rgba(15,111,116,0.10)" />
+        <line x1="656" y1="372" x2="976" y2="372" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <line x1="656" y1="396" x2="976" y2="396" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <text
+          x="816"
+          y="357"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GameEventBus
+        </text>
+        <text x="672" y="388" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - listeners: GameEventListener[]
+        </text>
+        <text x="672" y="412" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + subscribe(listener: GameEventListener): () =&gt; void
+        </text>
+        <text x="672" y="428" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + publish(event: GameEvent): void
+        </text>
+
+        <!-- Reference box: GamePresenter, detailed in view 4.1 -->
+        <rect
+          x="64"
+          y="364"
+          width="180"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="154"
+          y="378"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          VIEW 4.1
+        </text>
+        <text
+          x="154"
+          y="394"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GamePresenter
+        </text>
+
+        <!-- Reference box: GameEventPublisher, detailed in Part 1 view 5 -->
+        <rect
+          x="716"
+          y="520"
+          width="200"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="816"
+          y="534"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          PART 1 · VIEW 5
+        </text>
+        <text
+          x="816"
+          y="550"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GameEventPublisher
+        </text>
+
+        <!-- Reference box: GameEvent (abstract), detailed in Part 1 view 5 -->
+        <rect
+          x="440"
+          y="520"
+          width="180"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="530"
+          y="534"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          PART 1 · VIEW 5
+        </text>
+        <text
+          x="530"
+          y="550"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-style="italic"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GameEvent
+        </text>
+
+        <!-- Footnote -->
+        <text
+          x="24"
+          y="608"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          The engine publishes at the end of each turn. The audio facade hides the sound library and
+          honours the mute setting (APP-FR-10).
+        </text>
+        <text
+          x="24"
+          y="624"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          The score display listens to the bus too.
+        </text>
+
+        <!-- Legend -->
+        <line x1="24" y1="648" x2="1016" y2="648" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <text
+          x="24"
+          y="666"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LEGEND
+        </text>
+
+        <line
+          x1="24"
+          y1="684"
+          x2="52"
+          y2="684"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#adevents-triangle)"
+        />
+        <text
+          x="60"
+          y="688"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Realization
+        </text>
+        <line
+          x1="184"
+          y1="684"
+          x2="212"
+          y2="684"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#adevents-diamond-hollow)"
+        />
+        <text
+          x="220"
+          y="688"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aggregation · has
+        </text>
+        <line
+          x1="344"
+          y1="684"
+          x2="372"
+          y2="684"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#adevents-open)"
+        />
+        <text
+          x="380"
+          y="688"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dependency · uses
+        </text>
+
+        <rect
+          x="24"
+          y="704"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#eceef0"
+          stroke="rgba(75,85,99,0.45)"
+          stroke-width="1"
+        />
+        <rect
+          x="56"
+          y="704"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
+          stroke-width="1"
+        />
+        <rect
+          x="88"
+          y="704"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="124"
+          y="713"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zones · layers 4, 3 and 1
+        </text>
+        <rect
+          x="264"
+          y="704"
+          width="28"
+          height="12"
+          rx="2"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="300"
+          y="713"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dashed frame · GoF pattern or principle
+        </text>
+        <rect
+          x="488"
+          y="704"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="524"
+          y="713"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Reference box · detailed in another view
+        </text>
+        <rect
+          x="720"
+          y="704"
+          width="28"
+          height="12"
+          rx="2"
+          fill="rgba(15,111,116,0.10)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <text
+          x="756"
+          y="713"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Teal · focal class
+        </text>
+      </svg>
+    </div>
+  </body>
+</html>

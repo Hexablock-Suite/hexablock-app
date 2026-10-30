@@ -1,0 +1,1886 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Adapters map · UML class diagram</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --color-paper: #f3f5f6;
+        --color-ink: #17212a;
+        --color-muted: #5b6873;
+        --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+        --font-serif: 'Instrument Serif', serif;
+        --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+      }
+      body {
+        font-family: var(--font-sans);
+        background: var(--color-paper);
+        color: var(--color-ink);
+        padding: 3rem 2rem;
+      }
+      .frame {
+        max-width: 1240px;
+        margin: 0 auto;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-muted);
+        margin-bottom: 0.5rem;
+      }
+      h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        margin-bottom: 1.5rem;
+      }
+      svg {
+        width: 100%;
+        min-width: 900px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <p class="eyebrow">Class diagram · Part 4 · Map</p>
+      <h1>Adapters, presenters and drivers at a glance</h1>
+
+      <svg
+        viewBox="0 0 1040 1230"
+        xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-labelledby="mapad-title mapad-desc"
+      >
+        <title id="mapad-title">HexaBlock adapters map · UML class diagram</title>
+        <desc id="mapad-desc">
+          Overview map of the 48 classes of layers 4 and 3 in 11 groups: the routes render the board
+          and use the presenters, the composition root creates the presenters, the drivers implement
+          the driver ports that the repositories use, and the presenters map game state with one
+          state mapper per variant; each group names the view that shows its members.
+        </desc>
+        <defs>
+          <marker
+            id="mapad-open"
+            markerWidth="10"
+            markerHeight="8"
+            refX="9"
+            refY="4"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
+          </marker>
+        </defs>
+
+        <rect width="100%" height="100%" fill="#f3f5f6" />
+
+        <!-- Layer zone: layer 4, frameworks and drivers -->
+        <rect
+          x="24"
+          y="24"
+          width="992"
+          height="534"
+          rx="8"
+          fill="#eceef0"
+          stroke="rgba(75,85,99,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="44"
+          fill="#4b5563"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 4 · FRAMEWORKS AND DRIVERS · src/infrastructure/ · app/
+        </text>
+        <!-- Layer zone: layer 3, interface adapters (8px under layer 4) -->
+        <rect
+          x="24"
+          y="566"
+          width="992"
+          height="536"
+          rx="8"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="586"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 3 · INTERFACE ADAPTERS · src/adapters/
+        </text>
+
+        <!-- Groups: layer 4 -->
+        <!-- Group: board -->
+        <rect
+          x="56"
+          y="64"
+          width="352"
+          height="178"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="68"
+          y="80"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          BOARD · STRATEGY · D3 · Q8
+        </text>
+        <text
+          x="396"
+          y="80"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+          letter-spacing="0.14em"
+        >
+          VIEW 4.1
+        </text>
+        <!-- Group: sound -->
+        <rect
+          x="448"
+          y="64"
+          width="168"
+          height="128"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="460"
+          y="80"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          SOUND · FACADE
+        </text>
+        <text
+          x="604"
+          y="80"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+          letter-spacing="0.14em"
+        >
+          VIEW 4.3
+        </text>
+        <!-- Group: drivers -->
+        <rect
+          x="656"
+          y="64"
+          width="328"
+          height="178"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="668"
+          y="80"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          DRIVERS · ADAPTER
+        </text>
+        <text
+          x="972"
+          y="80"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+          letter-spacing="0.14em"
+        >
+          VIEWS 4.2, 4.4
+        </text>
+        <!-- Group: routes -->
+        <rect
+          x="56"
+          y="298"
+          width="312"
+          height="228"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="68"
+          y="314"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          ROUTES · app/
+        </text>
+        <text
+          x="356"
+          y="314"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+          letter-spacing="0.14em"
+        >
+          VIEW 4.1
+        </text>
+        <!-- Group: composition root -->
+        <rect
+          x="392"
+          y="448"
+          width="280"
+          height="78"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="404"
+          y="464"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          COMPOSITION ROOT · SINGLETON · Q9
+        </text>
+        <text
+          x="660"
+          y="464"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+          letter-spacing="0.14em"
+        >
+          VIEW 4.4
+        </text>
+        <!-- Groups: layer 3 -->
+        <!-- Group: presenters -->
+        <rect
+          x="56"
+          y="606"
+          width="628"
+          height="128"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="68"
+          y="622"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          PRESENTERS
+        </text>
+        <text
+          x="672"
+          y="622"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+          letter-spacing="0.14em"
+        >
+          VIEW 4.1
+        </text>
+        <!-- Group: driver ports -->
+        <rect
+          x="800"
+          y="606"
+          width="184"
+          height="128"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="812"
+          y="622"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          DRIVER PORTS · Q7
+        </text>
+        <text
+          x="972"
+          y="622"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+          letter-spacing="0.14em"
+        >
+          VIEW 4.2
+        </text>
+        <!-- Group: state mappers -->
+        <rect
+          x="56"
+          y="790"
+          width="320"
+          height="178"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="68"
+          y="806"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          STATE MAPPERS · STRATEGY
+        </text>
+        <text
+          x="364"
+          y="806"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+          letter-spacing="0.14em"
+        >
+          VIEW 4.1
+        </text>
+        <!-- Group: repositories -->
+        <rect
+          x="464"
+          y="790"
+          width="520"
+          height="178"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="476"
+          y="806"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          REPOSITORIES · ADAPTER
+        </text>
+        <text
+          x="972"
+          y="806"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+          letter-spacing="0.14em"
+        >
+          VIEWS 4.2, 4.4
+        </text>
+        <!-- Group: view models -->
+        <rect
+          x="56"
+          y="992"
+          width="288"
+          height="78"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="68"
+          y="1008"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          VIEW MODELS
+        </text>
+        <text
+          x="332"
+          y="1008"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+          letter-spacing="0.14em"
+        >
+          VIEW 4.1
+        </text>
+        <!-- Group: events -->
+        <rect
+          x="368"
+          y="992"
+          width="304"
+          height="78"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="380"
+          y="1008"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          EVENTS · OBSERVER
+        </text>
+        <text
+          x="660"
+          y="1008"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+          letter-spacing="0.14em"
+        >
+          VIEW 4.3
+        </text>
+
+        <!-- Dependencies between groups (drawn before chips) -->
+        <!-- Routes render the board: up, inside layer 4 -->
+        <line
+          x1="212"
+          y1="298"
+          x2="212"
+          y2="242"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#mapad-open)"
+        />
+        <!-- Routes use the presenters: down into layer 3 -->
+        <line
+          x1="340"
+          y1="526"
+          x2="340"
+          y2="606"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#mapad-open)"
+        />
+        <!-- Composition root creates the presenters: down into layer 3 -->
+        <line
+          x1="532"
+          y1="526"
+          x2="532"
+          y2="606"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#mapad-open)"
+        />
+        <!-- Drivers implement the driver ports: down into layer 3 -->
+        <line
+          x1="920"
+          y1="242"
+          x2="920"
+          y2="606"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#mapad-open)"
+        />
+        <!-- Presenters map with the state mappers: down, inside layer 3 -->
+        <line
+          x1="216"
+          y1="734"
+          x2="216"
+          y2="790"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#mapad-open)"
+        />
+        <!-- Repositories use the driver ports: up, inside layer 3 -->
+        <line
+          x1="864"
+          y1="790"
+          x2="864"
+          y2="734"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#mapad-open)"
+        />
+
+        <!-- Arrow labels (masks use the fill of their zone) -->
+        <rect x="220" y="264" width="40" height="12" rx="2" fill="#eceef0" />
+        <text
+          x="240"
+          y="273"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          RENDER
+        </text>
+        <rect x="348" y="536" width="24" height="12" rx="2" fill="#eceef0" />
+        <text
+          x="360"
+          y="545"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          USE
+        </text>
+        <rect x="540" y="536" width="44" height="12" rx="2" fill="#eceef0" />
+        <text
+          x="562"
+          y="545"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          CREATES
+        </text>
+        <rect x="856" y="394" width="56" height="12" rx="2" fill="#eceef0" />
+        <text
+          x="884"
+          y="403"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          IMPLEMENT
+        </text>
+        <rect x="224" y="756" width="52" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="250"
+          y="765"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          MAP WITH
+        </text>
+        <rect x="832" y="756" width="24" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="844"
+          y="765"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          USE
+        </text>
+
+        <!-- Chips: board -->
+        <g data-class="BoardView">
+          <rect
+            x="72"
+            y="92"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="148"
+            y="104"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            component
+          </text>
+          <text x="148" y="117" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              BoardView
+            </tspan>
+          </text>
+        </g>
+        <g data-class="CellRenderer">
+          <rect
+            x="240"
+            y="92"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="316"
+            y="104"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="316" y="117" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              CellRenderer
+            </tspan>
+            <tspan
+              font-family="'IBM Plex Mono', monospace"
+              font-size="9"
+              font-weight="400"
+              fill="#5b6873"
+            >
+              &lt;TCellView&gt;
+            </tspan>
+          </text>
+        </g>
+        <g data-class="LinesCellRenderer">
+          <rect
+            x="72"
+            y="142"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="148" y="163" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              LinesCellRenderer
+            </tspan>
+          </text>
+        </g>
+        <g data-class="FitCellRenderer">
+          <rect
+            x="240"
+            y="142"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="316" y="163" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              FitCellRenderer
+            </tspan>
+          </text>
+        </g>
+        <g data-class="SortCellRenderer">
+          <rect
+            x="72"
+            y="192"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="148" y="213" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              SortCellRenderer
+            </tspan>
+          </text>
+        </g>
+        <g data-class="MergeCellRenderer">
+          <rect
+            x="240"
+            y="192"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="316" y="213" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              MergeCellRenderer
+            </tspan>
+          </text>
+        </g>
+        <!-- Chips: sound -->
+        <g data-class="AudioFacade">
+          <rect
+            x="464"
+            y="92"
+            width="136"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="532" y="113" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              AudioFacade
+            </tspan>
+          </text>
+        </g>
+        <g data-class="SoundLibrary">
+          <rect
+            x="464"
+            y="142"
+            width="136"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="532"
+            y="154"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            external
+          </text>
+          <text x="532" y="167" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              SoundLibrary
+            </tspan>
+          </text>
+        </g>
+        <!-- Chips: drivers -->
+        <g data-class="DeviceKeyValueStore">
+          <rect
+            x="672"
+            y="92"
+            width="140"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="742" y="113" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              DeviceKeyValueStore
+            </tspan>
+          </text>
+        </g>
+        <g data-class="HttpBackendApi">
+          <rect
+            x="828"
+            y="92"
+            width="140"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="898" y="113" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              HttpBackendApi
+            </tspan>
+          </text>
+        </g>
+        <g data-class="SecureSessionStore">
+          <rect
+            x="672"
+            y="142"
+            width="140"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="742" y="163" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              SecureSessionStore
+            </tspan>
+          </text>
+        </g>
+        <g data-class="SystemClock">
+          <rect
+            x="828"
+            y="142"
+            width="140"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="898" y="163" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              SystemClock
+            </tspan>
+          </text>
+        </g>
+        <g data-class="SeededRandomSource">
+          <rect
+            x="672"
+            y="192"
+            width="140"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="742" y="213" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              SeededRandomSource
+            </tspan>
+          </text>
+        </g>
+        <g data-class="ConsoleLogger">
+          <rect
+            x="828"
+            y="192"
+            width="140"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="898" y="213" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              ConsoleLogger
+            </tspan>
+          </text>
+        </g>
+        <!-- Chips: routes -->
+        <g data-class="RootLayout">
+          <rect
+            x="72"
+            y="326"
+            width="132"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="138"
+            y="338"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            component
+          </text>
+          <text x="138" y="351" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              RootLayout
+            </tspan>
+          </text>
+        </g>
+        <g data-class="HomeScreen">
+          <rect
+            x="220"
+            y="326"
+            width="132"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="286"
+            y="338"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            component
+          </text>
+          <text x="286" y="351" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              HomeScreen
+            </tspan>
+          </text>
+        </g>
+        <g data-class="LevelSelectorScreen">
+          <rect
+            x="72"
+            y="376"
+            width="132"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="138"
+            y="388"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            component
+          </text>
+          <text x="138" y="401" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              LevelSelectorScreen
+            </tspan>
+          </text>
+        </g>
+        <g data-class="GameScreen">
+          <rect
+            x="220"
+            y="376"
+            width="132"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="286"
+            y="388"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            component
+          </text>
+          <text x="286" y="401" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              GameScreen
+            </tspan>
+          </text>
+        </g>
+        <g data-class="VictoryScreen">
+          <rect
+            x="72"
+            y="426"
+            width="132"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="138"
+            y="438"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            component
+          </text>
+          <text x="138" y="451" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              VictoryScreen
+            </tspan>
+          </text>
+        </g>
+        <g data-class="DefeatScreen">
+          <rect
+            x="220"
+            y="426"
+            width="132"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="286"
+            y="438"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            component
+          </text>
+          <text x="286" y="451" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              DefeatScreen
+            </tspan>
+          </text>
+        </g>
+        <g data-class="AccountScreen">
+          <rect
+            x="72"
+            y="476"
+            width="132"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="138"
+            y="488"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            component
+          </text>
+          <text x="138" y="501" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              AccountScreen
+            </tspan>
+          </text>
+        </g>
+        <g data-class="LeaderboardScreen">
+          <rect
+            x="220"
+            y="476"
+            width="132"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="286"
+            y="488"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            component
+          </text>
+          <text x="286" y="501" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              LeaderboardScreen
+            </tspan>
+          </text>
+        </g>
+        <!-- Chips: composition root -->
+        <g data-class="CompositionRoot">
+          <rect
+            x="468"
+            y="476"
+            width="128"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="532" y="497" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              CompositionRoot
+            </tspan>
+          </text>
+        </g>
+        <!-- Chips: presenters (GamePresenter is the focal class) -->
+        <g data-class="HomePresenter">
+          <rect
+            x="72"
+            y="634"
+            width="188"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="166" y="655" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              HomePresenter
+            </tspan>
+          </text>
+        </g>
+        <g data-class="LevelSelectorPresenter">
+          <rect
+            x="276"
+            y="634"
+            width="188"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="370" y="655" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              LevelSelectorPresenter
+            </tspan>
+          </text>
+        </g>
+        <g data-class="GamePresenter">
+          <rect
+            x="480"
+            y="634"
+            width="188"
+            height="34"
+            rx="4"
+            fill="rgba(15,111,116,0.10)"
+            stroke="#0f6f74"
+            stroke-width="1"
+          />
+          <text x="574" y="655" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              GamePresenter
+            </tspan>
+            <tspan
+              font-family="'IBM Plex Mono', monospace"
+              font-size="9"
+              font-weight="400"
+              fill="#5b6873"
+            >
+              &lt;TMove, TState&gt;
+            </tspan>
+          </text>
+        </g>
+        <g data-class="ResultPresenter">
+          <rect
+            x="72"
+            y="684"
+            width="188"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="166" y="705" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              ResultPresenter
+            </tspan>
+          </text>
+        </g>
+        <g data-class="AccountPresenter">
+          <rect
+            x="276"
+            y="684"
+            width="188"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="370" y="705" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              AccountPresenter
+            </tspan>
+          </text>
+        </g>
+        <g data-class="LeaderboardPresenter">
+          <rect
+            x="480"
+            y="684"
+            width="188"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="574" y="705" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              LeaderboardPresenter
+            </tspan>
+          </text>
+        </g>
+        <!-- Chips: driver ports -->
+        <g data-class="KeyValueStore">
+          <rect
+            x="816"
+            y="634"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="892"
+            y="646"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="892" y="659" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              KeyValueStore
+            </tspan>
+          </text>
+        </g>
+        <g data-class="BackendApi">
+          <rect
+            x="816"
+            y="684"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="892"
+            y="696"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="892" y="709" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              BackendApi
+            </tspan>
+          </text>
+        </g>
+        <!-- Chips: state mappers -->
+        <g data-class="StateMapper">
+          <rect
+            x="72"
+            y="818"
+            width="136"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="140"
+            y="830"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="140" y="843" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              StateMapper
+            </tspan>
+            <tspan
+              font-family="'IBM Plex Mono', monospace"
+              font-size="9"
+              font-weight="400"
+              fill="#5b6873"
+            >
+              &lt;TState&gt;
+            </tspan>
+          </text>
+        </g>
+        <g data-class="LinesStateMapper">
+          <rect
+            x="224"
+            y="818"
+            width="136"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="292" y="839" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              LinesStateMapper
+            </tspan>
+          </text>
+        </g>
+        <g data-class="FitStateMapper">
+          <rect
+            x="72"
+            y="868"
+            width="136"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="140" y="889" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              FitStateMapper
+            </tspan>
+          </text>
+        </g>
+        <g data-class="SortStateMapper">
+          <rect
+            x="224"
+            y="868"
+            width="136"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="292" y="889" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              SortStateMapper
+            </tspan>
+          </text>
+        </g>
+        <g data-class="MergeStateMapper">
+          <rect
+            x="72"
+            y="918"
+            width="136"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="140" y="939" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              MergeStateMapper
+            </tspan>
+          </text>
+        </g>
+        <!-- Chips: repositories -->
+        <g data-class="LocalProgressRepository">
+          <rect
+            x="480"
+            y="818"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="556" y="839" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              LocalProgressRepository
+            </tspan>
+          </text>
+        </g>
+        <g data-class="ApiProgressRepository">
+          <rect
+            x="648"
+            y="818"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="724" y="839" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              ApiProgressRepository
+            </tspan>
+          </text>
+        </g>
+        <g data-class="ApiLeaderboardGateway">
+          <rect
+            x="816"
+            y="818"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="892" y="839" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              ApiLeaderboardGateway
+            </tspan>
+          </text>
+        </g>
+        <g data-class="BundledLevelRepository">
+          <rect
+            x="480"
+            y="868"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="556" y="889" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              BundledLevelRepository
+            </tspan>
+          </text>
+        </g>
+        <g data-class="ApiLevelRepository">
+          <rect
+            x="648"
+            y="868"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="724" y="889" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              ApiLevelRepository
+            </tspan>
+          </text>
+        </g>
+        <g data-class="ApiAccountGateway">
+          <rect
+            x="816"
+            y="868"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="892" y="889" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              ApiAccountGateway
+            </tspan>
+          </text>
+        </g>
+        <g data-class="LocalSettingsStore">
+          <rect
+            x="480"
+            y="918"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="556" y="939" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              LocalSettingsStore
+            </tspan>
+          </text>
+        </g>
+        <g data-class="InMemoryRunningGameStore">
+          <rect
+            x="648"
+            y="918"
+            width="320"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="808" y="939" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              InMemoryRunningGameStore
+            </tspan>
+            <tspan
+              font-family="'IBM Plex Mono', monospace"
+              font-size="9"
+              font-weight="400"
+              fill="#5b6873"
+            >
+              &lt;TCell, TMove, TState&gt;
+            </tspan>
+          </text>
+        </g>
+        <!-- Chips: view models -->
+        <g data-class="GameViewModel">
+          <rect
+            x="72"
+            y="1020"
+            width="120"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="132"
+            y="1032"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="132" y="1045" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              GameViewModel
+            </tspan>
+          </text>
+        </g>
+        <g data-class="CellView">
+          <rect
+            x="208"
+            y="1020"
+            width="120"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="268"
+            y="1032"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="268" y="1045" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              CellView
+            </tspan>
+          </text>
+        </g>
+        <!-- Chips: events -->
+        <g data-class="GameEventBus">
+          <rect
+            x="384"
+            y="1020"
+            width="128"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="448" y="1041" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              GameEventBus
+            </tspan>
+          </text>
+        </g>
+        <g data-class="GameEventListener">
+          <rect
+            x="528"
+            y="1020"
+            width="128"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="592"
+            y="1032"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="592" y="1045" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              GameEventListener
+            </tspan>
+          </text>
+        </g>
+
+        <!-- Footnote -->
+        <text
+          x="24"
+          y="1130"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Layer 3 implements the output ports of Part 3; layer 4 implements the driver ports and the
+          ports of layer 1 (Clock, RandomSource).
+        </text>
+
+        <!-- Legend -->
+        <line
+          x1="24"
+          y1="1154"
+          x2="1016"
+          y2="1154"
+          stroke="rgba(23,33,42,0.10)"
+          stroke-width="0.8"
+        />
+        <text
+          x="24"
+          y="1172"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LEGEND
+        </text>
+
+        <line
+          x1="24"
+          y1="1190"
+          x2="52"
+          y2="1190"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#mapad-open)"
+        />
+        <text
+          x="60"
+          y="1194"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dependency · uses
+        </text>
+        <rect
+          x="184"
+          y="1184"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#eceef0"
+          stroke="rgba(75,85,99,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="220"
+          y="1193"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · layer 4, frameworks and drivers
+        </text>
+        <rect
+          x="432"
+          y="1184"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="468"
+          y="1193"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · layer 3, interface adapters
+        </text>
+
+        <rect
+          x="24"
+          y="1210"
+          width="28"
+          height="12"
+          rx="2"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="60"
+          y="1219"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dashed frame · group (pattern and source)
+        </text>
+        <rect
+          x="272"
+          y="1210"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="308"
+          y="1219"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Chip · one class, name only
+        </text>
+        <text
+          x="472"
+          y="1219"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          <tspan
+            fill="#1d4ed8"
+            font-size="8"
+            font-weight="500"
+            font-family="'IBM Plex Mono', monospace"
+            letter-spacing="0.14em"
+          >
+            VIEW n
+          </tspan>
+          · the view with its members
+        </text>
+        <rect
+          x="664"
+          y="1210"
+          width="28"
+          height="12"
+          rx="2"
+          fill="rgba(15,111,116,0.10)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <text
+          x="700"
+          y="1219"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Teal · focal class
+        </text>
+      </svg>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,782 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Repositories · UML class diagram</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --color-paper: #f3f5f6;
+        --color-ink: #17212a;
+        --color-muted: #5b6873;
+        --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+        --font-serif: 'Instrument Serif', serif;
+        --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+      }
+      body {
+        font-family: var(--font-sans);
+        background: var(--color-paper);
+        color: var(--color-ink);
+        padding: 3rem 2rem;
+      }
+      .frame {
+        max-width: 1240px;
+        margin: 0 auto;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-muted);
+        margin-bottom: 0.5rem;
+      }
+      h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        margin-bottom: 1.5rem;
+      }
+      svg {
+        width: 100%;
+        min-width: 900px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <p class="eyebrow">Class diagram · Part 4 · View 2 of 4</p>
+      <h1>Repositories: Adapter over storage and HTTP</h1>
+
+      <svg
+        viewBox="0 0 1040 836"
+        xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-labelledby="adrepos-title adrepos-desc"
+      >
+        <title id="adrepos-title">HexaBlock repositories · UML class diagram</title>
+        <desc id="adrepos-desc">
+          Class diagram across layers 4, 3 and 2 showing LocalProgressRepository and
+          ApiProgressRepository implementing the ProgressRepository port of layer 2 as adapters,
+          each using a layer 3 driver port, KeyValueStore or BackendApi, which the layer 4 drivers
+          DeviceKeyValueStore and HttpBackendApi implement.
+        </desc>
+        <defs>
+          <marker
+            id="adrepos-triangle"
+            markerWidth="16"
+            markerHeight="12"
+            refX="15"
+            refY="6"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          </marker>
+          <marker
+            id="adrepos-open"
+            markerWidth="10"
+            markerHeight="8"
+            refX="9"
+            refY="4"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
+          </marker>
+        </defs>
+
+        <rect width="100%" height="100%" fill="#f3f5f6" />
+
+        <!-- Layer zones: outer to inner, top to bottom -->
+        <rect
+          x="24"
+          y="24"
+          width="992"
+          height="184"
+          rx="8"
+          fill="#eceef0"
+          stroke="rgba(75,85,99,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="44"
+          fill="#4b5563"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 4 · FRAMEWORKS AND DRIVERS · src/infrastructure/
+        </text>
+
+        <rect
+          x="24"
+          y="216"
+          width="992"
+          height="368"
+          rx="8"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="236"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 3 · INTERFACE ADAPTERS · src/adapters/
+        </text>
+
+        <rect
+          x="24"
+          y="592"
+          width="992"
+          height="92"
+          rx="8"
+          fill="#e3f5e6"
+          stroke="rgba(21,128,61,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="612"
+          fill="#15803d"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 2 · USE CASES · src/application/
+        </text>
+
+        <!-- Pattern groups -->
+        <rect
+          x="224"
+          y="60"
+          width="672"
+          height="132"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="236"
+          y="76"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          ADAPTER · §3.3
+        </text>
+
+        <rect
+          x="196"
+          y="252"
+          width="764"
+          height="168"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="208"
+          y="268"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          DRIVER PORTS · Q7
+        </text>
+
+        <rect
+          x="224"
+          y="452"
+          width="664"
+          height="116"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="236"
+          y="468"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          ADAPTER · §3.3
+        </text>
+
+        <!-- Relationships (drawn before boxes) -->
+        <!-- DeviceKeyValueStore implements KeyValueStore: realization, down from layer 4 to layer 3 -->
+        <line
+          x1="360"
+          y1="160"
+          x2="360"
+          y2="284"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#adrepos-triangle)"
+        />
+        <!-- HttpBackendApi implements BackendApi: realization, down from layer 4 to layer 3 -->
+        <line
+          x1="752"
+          y1="176"
+          x2="752"
+          y2="284"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#adrepos-triangle)"
+        />
+        <!-- LocalProgressRepository uses KeyValueStore: dependency -->
+        <line
+          x1="360"
+          y1="480"
+          x2="360"
+          y2="372"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#adrepos-open)"
+        />
+        <!-- ApiProgressRepository uses BackendApi: dependency -->
+        <line
+          x1="752"
+          y1="480"
+          x2="752"
+          y2="404"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#adrepos-open)"
+        />
+        <!-- LocalProgressRepository implements ProgressRepository: realization, down from layer 3 to layer 2 -->
+        <path
+          d="M360 552 V640 Q360 648 368 648 H456"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#adrepos-triangle)"
+        />
+        <!-- ApiProgressRepository implements ProgressRepository: realization, down from layer 3 to layer 2 -->
+        <path
+          d="M752 552 V640 Q752 648 744 648 H656"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#adrepos-triangle)"
+        />
+
+        <!-- Class: DeviceKeyValueStore (adapter, driver) -->
+        <rect
+          x="240"
+          y="88"
+          width="240"
+          height="72"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="240" y1="136" x2="480" y2="136" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="360"
+          y="106"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «Adapter»
+        </text>
+        <text
+          x="360"
+          y="124"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          DeviceKeyValueStore
+        </text>
+        <text x="256" y="152" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          storage library to choose
+        </text>
+
+        <!-- Class: HttpBackendApi (adapter, driver) -->
+        <rect
+          x="624"
+          y="88"
+          width="256"
+          height="88"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="624" y1="136" x2="880" y2="136" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="752"
+          y="106"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «Adapter»
+        </text>
+        <text
+          x="752"
+          y="124"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          HttpBackendApi
+        </text>
+        <text x="640" y="152" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - client: Client&lt;paths&gt;
+          <tspan fill="#5b6873">(openapi-fetch)</tspan>
+        </text>
+        <text x="640" y="168" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          wraps createApiClient
+        </text>
+
+        <!-- Class: KeyValueStore (interface, port) -->
+        <rect
+          x="212"
+          y="284"
+          width="296"
+          height="88"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="212" y1="332" x2="508" y2="332" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="360"
+          y="302"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «port»
+        </text>
+        <text
+          x="360"
+          y="320"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          KeyValueStore
+        </text>
+        <text x="228" y="348" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + get(key: string): Promise&lt;string | undefined&gt;
+        </text>
+        <text x="228" y="364" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + set(key: string, value: string): Promise&lt;void&gt;
+        </text>
+
+        <!-- Class: BackendApi (interface, port, question Q7) -->
+        <rect
+          x="560"
+          y="284"
+          width="384"
+          height="120"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="560" y1="332" x2="944" y2="332" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="752"
+          y="302"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «port» · Q7
+        </text>
+        <text
+          x="752"
+          y="320"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          BackendApi
+        </text>
+        <text x="576" y="348" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + signIn(body: CredentialsDto): Promise&lt;SessionDto&gt;
+        </text>
+        <text x="576" y="364" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + saveProgress(body: ProgressDto): Promise&lt;void&gt;
+        </text>
+        <text x="576" y="380" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + leaderboard(query: LeaderboardQueryDto): Promise&lt;LeaderboardDto&gt;
+        </text>
+        <text x="576" y="396" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + levels(gameId: string): Promise&lt;LevelDto[]&gt;
+        </text>
+
+        <!-- Class: LocalProgressRepository (adapter) -->
+        <rect
+          x="240"
+          y="480"
+          width="240"
+          height="72"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="240" y1="528" x2="480" y2="528" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="360"
+          y="498"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «Adapter»
+        </text>
+        <text
+          x="360"
+          y="516"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          LocalProgressRepository
+        </text>
+        <text x="256" y="544" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - store: KeyValueStore
+        </text>
+
+        <!-- Class: ApiProgressRepository (adapter, focal) -->
+        <rect
+          x="632"
+          y="480"
+          width="240"
+          height="72"
+          rx="6"
+          fill="rgba(15,111,116,0.05)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <rect x="632" y="480" width="240" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="632" y="520" width="240" height="8" fill="rgba(15,111,116,0.10)" />
+        <line x1="632" y1="528" x2="872" y2="528" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <text
+          x="752"
+          y="498"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «Adapter»
+        </text>
+        <text
+          x="752"
+          y="516"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          ApiProgressRepository
+        </text>
+        <text x="648" y="544" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - api: BackendApi
+        </text>
+
+        <!-- Reference box: ProgressRepository, detailed in view 3.3 -->
+        <rect
+          x="456"
+          y="628"
+          width="200"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="556"
+          y="642"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          VIEW 3.3
+        </text>
+        <text
+          x="556"
+          y="658"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          ProgressRepository
+        </text>
+
+        <!-- Footnote: classes the budget leaves out -->
+        <text
+          x="24"
+          y="708"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          The other ports follow the same shape: ApiLeaderboardGateway → LeaderboardGateway,
+          BundledLevelRepository and ApiLevelRepository → LevelRepository,
+        </text>
+        <text
+          x="24"
+          y="724"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          ApiAccountGateway → AccountGateway, LocalSettingsStore → SettingsStore. Q7: option B moves
+          ApiProgressRepository into layer 4 and drops BackendApi.
+        </text>
+
+        <!-- Legend -->
+        <line x1="24" y1="748" x2="1016" y2="748" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <text
+          x="24"
+          y="766"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LEGEND
+        </text>
+
+        <line
+          x1="24"
+          y1="784"
+          x2="52"
+          y2="784"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#adrepos-triangle)"
+        />
+        <text
+          x="60"
+          y="788"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Realization
+        </text>
+        <line
+          x1="184"
+          y1="784"
+          x2="212"
+          y2="784"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#adrepos-open)"
+        />
+        <text
+          x="220"
+          y="788"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dependency · uses
+        </text>
+        <rect
+          x="344"
+          y="778"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="380"
+          y="788"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Reference box · detailed in another view
+        </text>
+        <rect
+          x="584"
+          y="778"
+          width="28"
+          height="12"
+          rx="2"
+          fill="rgba(15,111,116,0.10)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <text
+          x="620"
+          y="788"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Teal · focal class
+        </text>
+
+        <rect
+          x="24"
+          y="804"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#eceef0"
+          stroke="rgba(75,85,99,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="60"
+          y="813"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · layer 4
+        </text>
+        <rect
+          x="184"
+          y="804"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="220"
+          y="813"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · layer 3
+        </text>
+        <rect
+          x="344"
+          y="804"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#e3f5e6"
+          stroke="rgba(21,128,61,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="380"
+          y="813"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · layer 2
+        </text>
+        <rect
+          x="584"
+          y="804"
+          width="28"
+          height="12"
+          rx="2"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="620"
+          y="813"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dashed frame · GoF pattern or principle
+        </text>
+      </svg>
+    </div>
+  </body>
+</html>

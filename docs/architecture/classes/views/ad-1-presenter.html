@@ -1,0 +1,972 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game presenter · UML class diagram</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --color-paper: #f3f5f6;
+        --color-ink: #17212a;
+        --color-muted: #5b6873;
+        --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+        --font-serif: 'Instrument Serif', serif;
+        --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+      }
+      body {
+        font-family: var(--font-sans);
+        background: var(--color-paper);
+        color: var(--color-ink);
+        padding: 3rem 2rem;
+      }
+      .frame {
+        max-width: 1240px;
+        margin: 0 auto;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-muted);
+        margin-bottom: 0.5rem;
+      }
+      h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        margin-bottom: 1.5rem;
+      }
+      svg {
+        width: 100%;
+        min-width: 900px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <p class="eyebrow">Class diagram · Part 4 · View 1 of 4</p>
+      <h1>Presenting a game: presenter, view model and state mapper</h1>
+
+      <svg
+        viewBox="0 0 1040 736"
+        xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-labelledby="adpresenter-title adpresenter-desc"
+      >
+        <title id="adpresenter-title">HexaBlock game presenter · UML class diagram</title>
+        <desc id="adpresenter-desc">
+          Class diagram across layers 4, 3 and 2 showing the GameScreen route using GamePresenter
+          and rendering BoardView, BoardView reading GameViewModel, GamePresenter building
+          GameViewModel, mapping state through the StateMapper strategy that LinesStateMapper
+          implements, and calling the UseCase input port of layer 2.
+        </desc>
+        <defs>
+          <marker
+            id="adpresenter-triangle"
+            markerWidth="16"
+            markerHeight="12"
+            refX="15"
+            refY="6"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          </marker>
+          <marker
+            id="adpresenter-open"
+            markerWidth="10"
+            markerHeight="8"
+            refX="9"
+            refY="4"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
+          </marker>
+        </defs>
+
+        <rect width="100%" height="100%" fill="#f3f5f6" />
+
+        <!-- Layer zones: outer to inner, top to bottom -->
+        <rect
+          x="24"
+          y="24"
+          width="992"
+          height="184"
+          rx="8"
+          fill="#eceef0"
+          stroke="rgba(75,85,99,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="44"
+          fill="#4b5563"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 4 · FRAMEWORKS AND DRIVERS · app/ · src/infrastructure/
+        </text>
+
+        <rect
+          x="24"
+          y="216"
+          width="992"
+          height="268"
+          rx="8"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="236"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 3 · INTERFACE ADAPTERS · src/adapters/
+        </text>
+
+        <rect
+          x="24"
+          y="492"
+          width="992"
+          height="92"
+          rx="8"
+          fill="#e3f5e6"
+          stroke="rgba(21,128,61,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="512"
+          fill="#15803d"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 2 · USE CASES · src/application/
+        </text>
+
+        <!-- Pattern groups -->
+        <rect
+          x="720"
+          y="60"
+          width="272"
+          height="132"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="732"
+          y="76"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          BOARD · STRATEGY · D3 · Q8
+        </text>
+
+        <rect
+          x="40"
+          y="252"
+          width="248"
+          height="216"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="52"
+          y="268"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          STRATEGY · §3.3 · D3
+        </text>
+
+        <rect
+          x="320"
+          y="252"
+          width="672"
+          height="184"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="332"
+          y="268"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          PRESENTER · VIEW MODEL · §3.4
+        </text>
+
+        <!-- Relationships (drawn before boxes) -->
+        <!-- GameScreen to BoardView: dependency -->
+        <line
+          x1="656"
+          y1="120"
+          x2="736"
+          y2="120"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#adpresenter-open)"
+        />
+        <!-- GameScreen to GamePresenter: association, down from layer 4 to layer 3 -->
+        <line
+          x1="536"
+          y1="168"
+          x2="536"
+          y2="284"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#adpresenter-open)"
+        />
+        <!-- BoardView to GameViewModel: dependency, down from layer 4 to layer 3 -->
+        <line
+          x1="880"
+          y1="176"
+          x2="880"
+          y2="284"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#adpresenter-open)"
+        />
+        <!-- GamePresenter to StateMapper: association -->
+        <line
+          x1="336"
+          y1="340"
+          x2="272"
+          y2="340"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#adpresenter-open)"
+        />
+        <!-- GamePresenter to GameViewModel: dependency -->
+        <line
+          x1="720"
+          y1="356"
+          x2="776"
+          y2="356"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#adpresenter-open)"
+        />
+        <!-- LinesStateMapper implements StateMapper: realization with binding -->
+        <line
+          x1="96"
+          y1="412"
+          x2="96"
+          y2="356"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#adpresenter-triangle)"
+        />
+        <!-- GamePresenter to UseCase: dependency, down from layer 3 to layer 2 -->
+        <line
+          x1="528"
+          y1="420"
+          x2="528"
+          y2="528"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#adpresenter-open)"
+        />
+
+        <!-- Arrow labels -->
+        <rect x="666" y="100" width="44" height="12" rx="2" fill="#eceef0" />
+        <text
+          x="688"
+          y="109"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          RENDERS
+        </text>
+        <rect x="888" y="226" width="32" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="904"
+          y="235"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          READS
+        </text>
+        <rect x="292" y="320" width="40" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="312"
+          y="329"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          MAPPER
+        </text>
+        <rect x="728" y="336" width="40" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="748"
+          y="345"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          BUILDS
+        </text>
+        <rect x="104" y="378" width="144" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="176"
+          y="387"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          «bind» TState → LinesState
+        </text>
+        <rect x="536" y="448" width="32" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="552"
+          y="457"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          CALLS
+        </text>
+
+        <!-- Multiplicities -->
+        <rect x="530" y="264" width="12" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="536"
+          y="273"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          1
+        </text>
+        <rect x="278" y="334" width="12" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="284"
+          y="343"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          1
+        </text>
+
+        <!-- Class: GameScreen (component, route) -->
+        <rect
+          x="416"
+          y="88"
+          width="240"
+          height="80"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="416" y1="144" x2="656" y2="144" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="536"
+          y="106"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «component» «route»
+        </text>
+        <text
+          x="536"
+          y="124"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GameScreen
+        </text>
+        <text
+          x="536"
+          y="137"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          app/game.tsx
+        </text>
+        <text x="432" y="160" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          renders GameViewModel, sends moves
+        </text>
+
+        <!-- Class: BoardView (component, question Q8) -->
+        <rect
+          x="736"
+          y="88"
+          width="240"
+          height="88"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="736" y1="136" x2="976" y2="136" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="856"
+          y="106"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «component» · Q8
+        </text>
+        <text
+          x="856"
+          y="124"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          BoardView
+        </text>
+        <text x="752" y="152" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - renderer: CellRenderer&lt;TCellView&gt;
+        </text>
+        <text x="752" y="168" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          one cell renderer per variant (D3)
+        </text>
+
+        <!-- Class: GamePresenter (focal) -->
+        <rect
+          x="336"
+          y="284"
+          width="384"
+          height="136"
+          rx="6"
+          fill="rgba(15,111,116,0.05)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <rect x="336" y="284" width="384" height="40" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="336" y="316" width="384" height="8" fill="rgba(15,111,116,0.10)" />
+        <line x1="336" y1="324" x2="720" y2="324" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <line x1="336" y1="364" x2="720" y2="364" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <text
+          x="528"
+          y="309"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GamePresenter
+        </text>
+        <text x="352" y="340" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - applyMove: UseCase&lt;ApplyMoveRequest&lt;TMove&gt;, MoveResult&lt;TState&gt;&gt;
+        </text>
+        <text x="352" y="356" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - mapper: StateMapper&lt;TState&gt;
+        </text>
+        <text x="352" y="380" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + onMove(move: TMove): Promise&lt;void&gt;
+        </text>
+        <text x="352" y="396" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + onEvent(event: GameEvent): void
+        </text>
+        <text x="352" y="412" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + viewModel(): GameViewModel
+        </text>
+
+        <!-- Class: GameViewModel (value object) -->
+        <rect
+          x="776"
+          y="284"
+          width="200"
+          height="136"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="776" y1="332" x2="976" y2="332" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="876"
+          y="302"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="876"
+          y="320"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GameViewModel
+        </text>
+        <text x="792" y="348" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + cells: CellView[]
+        </text>
+        <text x="792" y="364" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + score: number
+        </text>
+        <text x="792" y="380" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + canUndo: boolean
+        </text>
+        <text x="792" y="396" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + canRedo: boolean
+        </text>
+        <text x="792" y="412" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + phase: string
+        </text>
+
+        <!-- Class: StateMapper (interface, strategy) -->
+        <rect
+          x="56"
+          y="284"
+          width="216"
+          height="72"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="56" y1="332" x2="272" y2="332" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="164"
+          y="302"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «Strategy»
+        </text>
+        <text
+          x="164"
+          y="320"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          StateMapper
+        </text>
+        <text x="72" y="348" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + toCells(state: TState): CellView[]
+        </text>
+
+        <!-- Class: LinesStateMapper -->
+        <rect
+          x="56"
+          y="412"
+          width="216"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="164"
+          y="437"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          LinesStateMapper
+        </text>
+
+        <!-- Reference box: UseCase, detailed in view 3.1 -->
+        <rect
+          x="448"
+          y="528"
+          width="160"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="528"
+          y="542"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          VIEW 3.1
+        </text>
+        <text
+          x="528"
+          y="558"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          UseCase
+        </text>
+
+        <!-- UML template boxes: type parameters on the top-right corner -->
+        <rect
+          x="648"
+          y="274"
+          width="84"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="690"
+          y="286"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TMove, TState
+        </text>
+        <rect
+          x="236"
+          y="274"
+          width="48"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="260"
+          y="286"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TState
+        </text>
+
+        <!-- Footnote: classes the budget leaves out -->
+        <text
+          x="24"
+          y="608"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          One state mapper per variant: Lines, Fit, Sort and Merge. The other presenters follow the
+          same shape: Home, LevelSelector, Result, Account and Leaderboard.
+        </text>
+        <text
+          x="24"
+          y="624"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Q8: the folder of BoardView and the cell renderers is open.
+        </text>
+
+        <!-- Legend -->
+        <line x1="24" y1="648" x2="1016" y2="648" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <text
+          x="24"
+          y="666"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LEGEND
+        </text>
+
+        <line
+          x1="24"
+          y1="684"
+          x2="52"
+          y2="684"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#adpresenter-triangle)"
+        />
+        <text
+          x="60"
+          y="688"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Realization
+        </text>
+        <line
+          x1="184"
+          y1="684"
+          x2="212"
+          y2="684"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#adpresenter-open)"
+        />
+        <text
+          x="220"
+          y="688"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Association
+        </text>
+        <line
+          x1="344"
+          y1="684"
+          x2="372"
+          y2="684"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#adpresenter-open)"
+        />
+        <text
+          x="380"
+          y="688"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dependency · uses
+        </text>
+        <rect
+          x="504"
+          y="678"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="540"
+          y="688"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Reference box · detailed in another view
+        </text>
+        <rect
+          x="744"
+          y="678"
+          width="28"
+          height="12"
+          rx="2"
+          fill="rgba(15,111,116,0.10)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <text
+          x="780"
+          y="688"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Teal · focal class
+        </text>
+
+        <rect
+          x="24"
+          y="704"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#eceef0"
+          stroke="rgba(75,85,99,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="60"
+          y="713"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · layer 4
+        </text>
+        <rect
+          x="184"
+          y="704"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="220"
+          y="713"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · layer 3
+        </text>
+        <rect
+          x="344"
+          y="704"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#e3f5e6"
+          stroke="rgba(21,128,61,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="380"
+          y="713"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · layer 2
+        </text>
+        <rect
+          x="504"
+          y="704"
+          width="28"
+          height="12"
+          rx="2"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="540"
+          y="713"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dashed frame · GoF pattern or principle
+        </text>
+        <rect
+          x="744"
+          y="704"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="780"
+          y="713"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Corner box · type parameters
+        </text>
+      </svg>
+    </div>
+  </body>
+</html>
