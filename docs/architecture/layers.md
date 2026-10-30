@@ -23,6 +23,8 @@ flowchart TB
     subgraph INFRA["src/infrastructure/"]
       API["api/client.ts: createApiClient<br/>api/schema.d.ts: generated OpenAPI types"]
       STORAGE["Local storage driver (planned)"]
+      SECURE["Secure token storage (planned)"]
+      AUDIO["Audio facade over the sound library (planned)"]
       CLOCK["SystemClock (planned)"]
       RNG["SeededRandomSource (planned)"]
       LOGGER["ConsoleLogger (planned)"]
@@ -34,6 +36,7 @@ flowchart TB
   subgraph L3["Layer 3: Interface adapters, src/adapters/"]
     PRESENTERS["Presenters and view models,<br/>one per screen (planned)"]
     MAPPERS["State mappers per variant (planned)"]
+    EVENTBUS["GameEventBus: delivers game events<br/>to presenters, score and audio (planned)"]
     LOCALREPO["LocalProgressRepository (planned)"]
     APIREPO["ApiProgressRepository (planned)"]
     APILB["ApiLeaderboardGateway (planned)"]
@@ -49,6 +52,8 @@ flowchart TB
     LBPORT(["LeaderboardGateway port (planned)"])
     LVPORT(["LevelRepository port (planned)"])
     LOGPORT(["Logger port (planned)"])
+    INPORTS(["Input ports, one interface per use case (planned)"])
+    SESSPORT(["SessionStore port (planned)"])
   end
 
   subgraph L1["Layer 1: Entities"]
@@ -62,6 +67,10 @@ flowchart TB
       CORE["HexBoard#lt;TCell#gt;, HexCoord, Piece, GridTopology,<br/>GameEngine#lt;TCell, TMove, TState#gt; (planned)"]
       CONTRACTS(["IGameRules#lt;TCell, TMove, TState#gt;, IPieceSource#lt;TPiece#gt;,<br/>IScoringPolicy#lt;TState#gt;, IProgressModel (planned)"])
       DPORTS(["Clock and RandomSource ports (planned)"])
+      CAPS(["IMergeable#lt;TCell#gt;, IUndoable, ITimed,<br/>IRandomSeeded (planned)"])
+      CMDSTATE(["MoveCommand, GameState (planned)"])
+      FACTORY(["IVariantFactory (planned)"])
+      EVPORT(["GameEventPublisher port (planned)"])
     end
   end
 
@@ -99,16 +108,31 @@ flowchart TB
   LINES & FIT & SORT & MERGE -.->|implement| CONTRACTS
   CORE --> CONTRACTS
   CORE --> DPORTS
+  CORE --> CAPS
+  CORE --> CMDSTATE
+  CORE --> EVPORT
+  LINES & FIT & SORT & MERGE -.->|implement| CAPS
+  LINES & FIT & SORT & MERGE -.->|implement| FACTORY
+  UC --> FACTORY
+
+  PRESENTERS -->|calls| INPORTS
+  UC -.->|implements| INPORTS
+  ASPECTS -.->|implements| INPORTS
+  ASPECTS --> SESSPORT
+  SECURE -.->|implements| SESSPORT
+  EVENTBUS -.->|implements| EVPORT
+  PRESENTERS -->|listens| EVENTBUS
+  AUDIO -->|listens| EVENTBUS
 
   %% Invisible links keep the layers stacked from outer to inner.
   KV & BACKEND & MAPPERS ~~~ ASPECTS
-  PPORT & LBPORT & LVPORT & LOGPORT ~~~ CORE & LINES & FIT & SORT & MERGE
+  PPORT & LBPORT & LVPORT & LOGPORT & INPORTS & SESSPORT ~~~ CORE & LINES & FIT & SORT & MERGE
 
   classDef planned stroke-dasharray: 5 5
-  class SCREENS,STORAGE,CLOCK,RNG,LOGGER,VIEWS,ROOT planned
-  class PRESENTERS,MAPPERS,LOCALREPO,APIREPO,APILB,LEVELREPO,KV,BACKEND planned
-  class UC,ASPECTS,PPORT,LBPORT,LVPORT,LOGPORT planned
-  class LINES,FIT,SORT,MERGE,CORE,CONTRACTS,DPORTS planned
+  class SCREENS,STORAGE,SECURE,AUDIO,CLOCK,RNG,LOGGER,VIEWS,ROOT planned
+  class PRESENTERS,MAPPERS,EVENTBUS,LOCALREPO,APIREPO,APILB,LEVELREPO,KV,BACKEND planned
+  class UC,ASPECTS,PPORT,LBPORT,LVPORT,LOGPORT,INPORTS,SESSPORT planned
+  class LINES,FIT,SORT,MERGE,CORE,CONTRACTS,DPORTS,CAPS,CMDSTATE,FACTORY,EVPORT planned
 
   style L4 fill:#f3f4f6,stroke:#4b5563,color:#111827
   style APP fill:#e5e7eb,stroke:#4b5563,color:#111827
@@ -137,8 +161,13 @@ The "May depend on" column repeats `.dependency-cruiser.cjs`. `pnpm arch` checks
 
 - **Generic engine:** layer 1, `src/domain/engine/`. `HexBoard<TCell>`, `GameEngine<TCell, TMove, TState>` (turn skeleton, D1) and the contracts `IGameRules`, `IPieceSource<TPiece>`, `IScoringPolicy<TState>` and `IProgressModel`. The shared implementations (seeded or fixed piece source, high score or levels with stars) live here too. They take time and randomness through the `Clock` and `RandomSource` ports.
 - **The four variants:** layer 1, `src/domain/variants/hexa-lines/`, `hexa-fit/`, `hexa-sort/` and `hexa-merge/`. Each one implements `IGameRules` for its own cell type, for example `MergeTile` for Hexa Merge (A1). A variant imports the engine. The engine never imports a variant.
-- **Abstract Factory per variant:** layer 1, one factory in each variant folder. It builds the rules, piece source, scoring policy and progress model. The cell renderer that D3 assigns to this factory cannot live here (Q2).
+- **Abstract Factory per variant:** layer 1. The interface `IVariantFactory` lives in `src/domain/engine/`, and each variant folder holds one implementation. It builds the rules, piece source, scoring policy and progress model. `StartGame` receives a factory and never names a variant. The cell renderer that D3 assigns to this factory cannot live here (Q2).
+- **Capability interfaces:** layer 1, `src/domain/engine/`. `IMergeable<TCell>` is the bound on the Hexa Merge cell (§3.1). `IUndoable`, `ITimed` and `IRandomSeeded` stay separate (§3.2, ISP): a variant implements only the ones it uses, so Hexa Lines does not implement `IUndoable`.
+- **Command and State:** layer 1, `src/domain/engine/`. `MoveCommand` wraps each move, so the history supports undo and redo: unlimited in Hexa Fit, one move in Hexa Merge (§3.3). `GameState` has one state per phase of a game: Menu, Playing, Resolving, Paused, GameOver and Victory (§3.3).
+- **Game events (Observer):** the `GameEventPublisher` port lives in layer 1, `src/domain/engine/`, because the engine notifies at the end of each turn. It publishes events such as `LineCleared`, `StackMerged`, `TileMerged` and `GameOver` (§3.3). `GameEventBus` in layer 3 implements it. The presenters, the score display and the audio facade in layer 4 listen to it, so the engine never knows about sound or screens.
 - **Use cases:** layer 2, `src/application/`. One generic set for the four variants: `StartGame`, `ApplyMove`, `UndoMove`, `SaveProgress` and `SyncLeaderboard`.
+- **Input ports:** layer 2, `src/application/`, one interface per use case. The presenters depend on the interface, not on the class. Each use case implements its interface, and each aspect decorator implements the same interface to wrap it. Tests call the same interfaces.
+- **Session:** the `SessionStore` port lives in layer 2. A secure token storage adapter in layer 4 implements it. The authorization aspect reads it before `SaveProgress` and `SyncLeaderboard` run (§3.5).
 - **AOP decorators:** layer 2, `src/application/`. Each decorator implements the same use case interface and wraps a use case (§3.5, A2). It logs through the `Logger` port, because `application-imports-only-domain` forbids a logging package there. The concrete logger lives in layer 4.
 - **Repositories:** the ports (`ProgressRepository`, `LeaderboardGateway`, `LevelRepository`) live in layer 2. The implementations live in layer 3, `src/adapters/`: one for local storage and one for the backend. The storage driver and the HTTP client live in layer 4. A new database or backend means a new adapter, and the use cases do not change.
 - **API client:** layer 4, `src/infrastructure/api/client.ts`. It uses the types in `schema.d.ts`, which `pnpm api:generate` writes from the backend OpenAPI document. `pacts/hexablock-app-hexablock-api.json` is the contract the consumer test writes for this client. It is a test artifact, not a layer.
