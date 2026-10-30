@@ -151,6 +151,15 @@ Real questions (they change the plan):
 - **Q5:** Closed by the team on 2026-10-26: three games are the minimum, and we deliver four (D8).
 - **Q6:** Closed on 2026-10-26: the team is already set, with three members.
 
+Layer questions from the draft layer diagrams of 2026-10-30. Each one lists the options in the draft page:
+
+- **Q7 (app):** Where does the backend repository live: in `src/adapters/` behind a `BackendApi` port, or in `src/infrastructure/api/` implementing the layer-2 port directly? See [`docs/architecture/layers.md`](architecture/layers.md), question 1.
+- **Q8 (app):** Where do the variant factory and the cell renderer live, given that `domain-no-framework` keeps React out of `src/domain/` and D3 asks the factory for the renderer? See question 2.
+- **Q9 (app):** Where does the composition root live: in `app/_layout.tsx`, or in a module in `src/infrastructure/` that `_layout.tsx` calls? See question 3.
+- **Q10 (backend):** Where do the ports live: in `src/domain`, as the backend does today, or in `src/application`, as §3.4 says? See the backend's `docs/architecture/layers.md`, question 1.
+- **Q11 (backend):** Where does the Drizzle schema live, given that `adapters-never-import-infrastructure` keeps the repositories from importing `src/infrastructure/database/schema.ts`? See question 2.
+- **Q12 (backend):** Where do the AOP aspects live: in `src/application` as a plain decorator over a logger port, or in `src/infrastructure` as a wrapper that the Nest modules apply? See question 3.
+
 Confirmations (we already work under an assumption):
 
 - **C1:** The Fit illustration has 21 cells and 20 of pieces. Do you expect the system to check that a level can be won? (A5)
