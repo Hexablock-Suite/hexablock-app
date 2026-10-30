@@ -2,7 +2,7 @@
 
 Status: draft for review with the professor, 2026-10-30. This first part covers layer 1: the generic engine and the four variants. The use cases, the adapters and the presenters come in the next parts.
 
-This page answers statement §4.1 for the domain. It shows the generic types in UML template notation, how each variant instantiates them, and the design patterns that live in the domain. Nine small views carry the reading, with at most seven classes each. A full map of each part follows its views. IDs such as A1, D1 and Q8 refer to [`docs/REQUIREMENTS.md`](../REQUIREMENTS.md). The layers themselves are in [layers.md](layers.md).
+This page answers statement §4.1 for the domain. It shows the generic types in UML template notation, how each variant instantiates them, and the design patterns that live in the domain. Each part opens with a map that names every class, grouped by pattern, with no members. Nine small views then show the members, with at most seven classes each. IDs such as A1, D1 and Q8 refer to [`docs/REQUIREMENTS.md`](../REQUIREMENTS.md). The layers themselves are in [layers.md](layers.md).
 
 ## How to read it
 
@@ -12,12 +12,18 @@ This page answers statement §4.1 for the domain. It shows the generic types in 
 - The dashed box at the top right of a class holds its type parameters. This is the UML template notation that §4.1 asks for.
 - The teal class is the focal class of the view.
 - In the variant views, a lollipop (a circle on a short line) is an engine interface that the class implements. Its label names the type that each parameter takes, for example `IGameRules‹Color, PlacePiece, LinesState›`.
+- In a map, a chip is one class with its name only. The group header names the view that shows the members, for example `VIEW 2`.
+- In the variants map, a dashed chip is an engine type. Each class in its row implements or extends it.
 - `«port»` marks an interface that an outer layer implements.
 - Every class is planned. `src/domain/` holds only README files today.
 
 ## Part 1: the generic engine
 
 `src/domain/engine/`. It imports no variant and no framework (rules `domain-no-framework` and `engine-no-variants`).
+
+### Map of the engine
+
+![Map of the generic engine: the 50 classes by name in thirteen groups, each group with the view that shows its members](classes/views/overview-engine.png)
 
 ### View 1: the turn
 
@@ -39,13 +45,13 @@ This page answers statement §4.1 for the domain. It shows the generic types in 
 
 ![Wiring a variant: IVariantFactory, ILevelBuilder, the game events and the Clock and RandomSource ports](classes/views/engine-5-factory.png)
 
-### Full map of the engine
-
-![Class diagram of the generic engine](classes/engine-core.svg)
-
 ## Part 2: the four variants
 
 `src/domain/variants/<variant>/`. Each variant imports the engine and never another variant (rule `variants-isolated`).
+
+### Map of the variants
+
+![Map of the four variants: one column per variant and one row per engine type, with every variant class by name](classes/views/overview-variants.png)
 
 ### Hexa Lines
 
@@ -62,10 +68,6 @@ This page answers statement §4.1 for the domain. It shows the generic types in 
 ### Hexa Merge
 
 ![Hexa Merge: MergeRules with the bounded generic TCell extends IMergeable](classes/views/variant-4-merge.png)
-
-### Full map of the variants
-
-![Class diagram of the four variants as instantiations of the engine](classes/engine-variants.svg)
 
 | Variant    | `TCell`                      | `TMove`                                    | `TState`                | Undo                        | Piece source                           | Progress                   |
 | ---------- | ---------------------------- | ------------------------------------------ | ----------------------- | --------------------------- | -------------------------------------- | -------------------------- |
@@ -107,12 +109,4 @@ The other three patterns live outside the domain, so the next parts draw them: A
 
 ## Render the images
 
-The `.svg` images come from the `.puml` files. After you edit a `.puml` file, run this from the repository root:
-
-```sh
-docker run --rm -u "$(id -u):$(id -g)" -v "$PWD/docs/architecture/classes:/data" plantuml/plantuml:1.2026.9 -tsvg /data/engine-core.puml /data/engine-variants.puml
-```
-
-Commit each `.puml` file together with its `.svg` image.
-
-The nine views come from the HTML files in [`classes/views/`](classes/views/). Each file holds one inline SVG drawn with the diagram-design skill. Open the file in a browser to see the view. The `.png` image next to it is that SVG rendered at scale 2 by a headless browser. After you edit a view, export the image again with `/diagram-design:export-diagram docs/architecture/classes/views/<view>.html --png-only`, then run `pnpm format`. The formatter changes the HTML layout only; the drawing stays the same. Commit each `.html` file together with its `.png` image.
+The two maps and the nine views come from the HTML files in [`classes/views/`](classes/views/). Each file holds one inline SVG drawn with the diagram-design skill. Open the file in a browser to see the drawing. The `.png` image next to it is that SVG rendered at scale 2 by a headless browser. After you edit a file, export the image again with `/diagram-design:export-diagram docs/architecture/classes/views/<view>.html --png-only`, then run `pnpm format`. The formatter changes the HTML layout only; the drawing stays the same. Commit each `.html` file together with its `.png` image. When a class is added or removed, update its map and its view in the same commit.
