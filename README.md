@@ -16,6 +16,8 @@ TODO: add screenshots or a short video of each variant.
 
 TODO: add the Clean Architecture diagram (image plus editable source) and explain the layers in `src/` and `app/`.
 
+Draft layer diagram (in review with the professor): [docs/architecture/layers.md](docs/architecture/layers.md).
+
 ## Generic Engine
 
 TODO: explain the generic types (board, rules, engine) and how each variant instantiates them.
