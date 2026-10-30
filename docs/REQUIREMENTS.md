@@ -3,8 +3,15 @@
 This file is the team's working copy of the project requirements, written in our own words. It is the canonical requirements document for both repositories; `hexablock-api/docs/REQUIREMENTS.md` holds the backend view and links here.
 
 - **Source:** the course statement "Proyecto Semestral — HexaBlock Suite", version 1.0, issued 2026-10-23. It is not redistributed in this repository. Each item cites its section as `§n`.
-- **Status words:** **Required** comes from the statement. **A#** is an assumption we work under until the professor answers. **D#** is a team design decision. **Q#** is an open question for the professor. **C#** is a confirmation we will ask for, but it does not block work.
+- **Status words:** **Required** comes from the statement. **Derived** is not in the statement, but a statement item needs it. **A#** is an assumption we work under until the professor answers. **D#** is a team design decision. **Q#** is an open question for the professor. **C#** is a confirmation we will ask for, but it does not block work.
+- **Requirement IDs:** **APP-FR-n** is a functional requirement: what the app does for the player. **APP-NFR-n** is a non-functional requirement: how the app is built, tested and documented. The backend uses API-FR-n and API-NFR-n. An ID never changes; a dropped requirement keeps its ID and says "Dropped".
+- **Checks:** each requirement ends with _Check_, the evidence that shows it is met. Where a gate already exists, the check names it. The other checks are a proposal of 2026-10-30 for the team to review.
 - **Rule:** when a requirement, an assumption or an answer from the professor changes, update this file in the same pull request.
+
+| Kind                                             | IDs                      | Sections       |
+| ------------------------------------------------ | ------------------------ | -------------- |
+| Functional: what the app does for the player     | APP-FR-01 to APP-FR-15   | §5, §6         |
+| Non-functional: how the app is built and checked | APP-NFR-01 to APP-NFR-24 | §2, §3, §4, §7 |
 
 ## 1. Product
 
@@ -23,67 +30,69 @@ One mobile app with four puzzle games on hexagonal boards, built on one generic 
 
 Sections: Lines §1.1, Fit §1.2, Sort §1.3, Merge §1.4, comparison §1.5.
 
-## 2. Generic engine (§3.1)
+## 2. Generic engine (non-functional, §3.1)
 
-Required:
+- **APP-NFR-01 — Generic board (§3.1).** A hexagonal board generic over the cell type, in axial coordinates (q, r), with configurable shape, neighbors, axis traversal and rotation. It is written once and used by all four variants. _Check:_ the four variants use the same board class with a different cell type, and no variant has a board class of its own.
+- **APP-NFR-02 — Generic rules contract (§3.1).** A rules contract generic over cell, move and state: valid moves, apply a move, run the resolution rule, evaluate the end of the game. Each variant implements it. _Check:_ each variant's rules class implements the contract, and the engine calls only the contract.
+- **APP-NFR-03 — Generic game engine (§3.1).** A game engine generic over cell, move and state that runs the turn cycle (start, receive, validate, apply, resolve, evaluate, notify). It knows no variant and no UI framework. _Check:_ `pnpm arch` passes rules `engine-no-variants` and `domain-no-framework`, and the engine test of APP-NFR-13 runs with a fake cell type.
+- **APP-NFR-04 — Interchangeable sources and policies (§3.1).** Abstractions for the piece source (seeded random generator or fixed list per level), the scoring policy and the progress model (high score or levels with stars), all interchangeable. _Check:_ a test swaps each implementation and the engine code does not change.
+- **APP-NFR-05 — Bounded generics (§3.1).** Bounded generics where the engine needs a capability of the cell content (for example a mergeable bound for Hexa Merge). The README explains why each bound exists. _Check:_ the README section "Generic Engine" lists every bound with its reason.
+- **APP-NFR-06 — Extensibility proof (§3.1).** `docs/EXTENSIBILITY.md` explains, step by step with real class names, which files a fifth variant adds and which files it does **not** touch. In the defense the jury proposes a small rule change (board size, scoring policy or piece shape) and the change must stay in new classes or configuration. _Check:_ before the defense we apply each of the three example changes on a branch, and the diff touches no engine file.
+- **APP-NFR-07 — Reproducible randomness (§1.4, §3.6).** Random generation is injectable and reproducible with a seed, so a game can be tested deterministically. _Check:_ gate `test/gates/domain-purity-gate.test.ts` (rule R-domain-determinism in `AGENTS.md`), and a Merge test with a fixed seed always gets the same new tiles.
 
-- A hexagonal board generic over the cell type, in axial coordinates (q, r), with configurable shape, neighbors, axis traversal and rotation. It is written once and used by all four variants.
-- A rules contract generic over cell, move and state: valid moves, apply a move, run the resolution rule, evaluate the end of the game. Each variant implements it.
-- A game engine generic over cell, move and state that runs the turn cycle (start, receive, validate, apply, resolve, evaluate, notify). It knows no variant and no UI framework.
-- Abstractions for the piece source (seeded random generator or fixed list per level), the scoring policy and the progress model (high score or levels with stars), all interchangeable.
-- Bounded generics where the engine needs a capability of the cell content (for example a mergeable bound for Hexa Merge). The README explains why each bound exists.
-- `docs/EXTENSIBILITY.md` explains, step by step with real class names, which files a fifth variant adds and which files it does **not** touch. In the defense the jury proposes a small rule change (board size, scoring policy or piece shape) and the change must stay in new classes or configuration.
+## 3. Principles, patterns and architecture (non-functional)
 
-## 3. Principles, patterns and architecture
+- **APP-NFR-08 — SOLID (§3.2).** Every principle used is documented in the README with a concrete example from our code. The engine has no conditionals on the variant type (LSP). Undo, timing and seeded randomness are separate interfaces, so Hexa Lines does not implement undo (ISP). _Check:_ the README section "SOLID Principles" has one example per principle with a link to its file, and the engine has no `if` or `switch` on the game id.
+- **APP-NFR-09 — GoF patterns (§3.3).** Strategy and Abstract Factory (one factory per variant) are mandatory. The statement also lists Builder, Singleton or single-scope injection, Prototype, Composite, Decorator, Adapter, Facade, Observer, Command, State, Template Method and Iterator. Each pattern used has a justification, a code excerpt and a README entry. See D7. _Check:_ the README section "Design Patterns" lists each pattern used with its justification and a link to its file, and Strategy and Abstract Factory are in it.
+- **APP-NFR-10 — Clean Architecture (§3.4).** Four layers with dependencies pointing inward. The whole generic engine and the variant rules live in the entities layer with no external dependency. Use cases are generic, never one copy per game. A layer diagram is an image in the README and an editable source in the repo. _Check:_ `pnpm arch` passes, and [`architecture/layers.md`](architecture/layers.md) holds the layer diagram.
+- **APP-NFR-11 — AOP (§3.5).** At least one cross-cutting aspect (logging, centralized errors with retry, profiling, authorization or caching), built as decorators or proxies over the use cases. One aspect on the generic use case covers all four variants. See A2. _Check:_ a test shows that one aspect runs for the four variants, and the use case it wraps has no line of the aspect's code.
 
-Required:
+## 4. Tests (non-functional, §3.6)
 
-- **SOLID (§3.2):** every principle used is documented in the README with a concrete example from our code. The engine has no conditionals on the variant type (LSP). Undo, timing and seeded randomness are separate interfaces, so Hexa Lines does not implement undo (ISP).
-- **GoF patterns (§3.3):** Strategy and Abstract Factory (one factory per variant) are mandatory. The statement also lists Builder, Singleton or single-scope injection, Prototype, Composite, Decorator, Adapter, Facade, Observer, Command, State, Template Method and Iterator. Each pattern used has a justification, a code excerpt and a README entry. See D7.
-- **Clean Architecture (§3.4):** four layers with dependencies pointing inward. The whole generic engine and the variant rules live in the entities layer with no external dependency. Use cases are generic, never one copy per game. A layer diagram is an image in the README and an editable source in the repo.
-- **AOP (§3.5):** at least one cross-cutting aspect (logging, centralized errors with retry, profiling, authorization or caching), built as decorators or proxies over the use cases. One aspect on the generic use case covers all four variants. See A2.
+- **APP-NFR-12 — Unit tests.** Unit tests for every entity, use case and service; each variant's rules have their own tests (lines on 3 axes, exact cover, cascade transfer, merge on collision). _Check:_ `pnpm test` runs them in CI, with one test file for the rules of each variant.
+- **APP-NFR-13 — Engine without a variant.** The engine is tested with a fake cell type, to show it depends on no variant. _Check:_ an engine test uses a cell type and a square topology that exist only in the tests (D4).
+- **APP-NFR-14 — Test doubles and style.** Mocks or stubs for repositories, network and a fixed-seed random source; Arrange-Act-Assert; names `should_[result]_when_[condition]`; tests check behavior, not implementation details. _Check:_ gate `test/gates/test-title-gate.test.ts` (rule R-test-names).
+- **APP-NFR-15 — Integration tests.** Use cases with real repositories on an in-memory database; save and load progress per variant end to end. _Check:_ one integration test per variant saves progress and loads it back.
+- **APP-NFR-16 — Widget and UI tests.** Rendering, interaction, and navigation between home, game selector, level selector, game, victory and defeat. _Check:_ a navigation test visits the six screens.
+- **APP-NFR-17 — Contract tests.** Contract tests with Pact (recommended). _Check:_ `pnpm pact:check` passes, and `pacts/` is committed.
+- **APP-NFR-18 — CI.** CI runs the tests on every pull request. _Check:_ the `verify` job of `.github/workflows/` runs on every pull request.
 
-## 4. Tests (§3.6)
+## 5. App features (functional, §5.1)
 
-Required:
+APP-FR-01 to APP-FR-11 keep the numbers of statement §5.1.
 
-- Unit tests for every entity, use case and service; each variant's rules have their own tests (lines on 3 axes, exact cover, cascade transfer, merge on collision).
-- The engine is tested with a fake cell type, to show it depends on no variant.
-- Mocks or stubs for repositories, network and a fixed-seed random source; Arrange-Act-Assert; names `should_[result]_when_[condition]`; tests check behavior, not implementation details.
-- Integration tests: use cases with real repositories on an in-memory database; save and load progress per variant end to end.
-- Widget and UI tests: rendering, interaction, and navigation between home, game selector, level selector, game, victory and defeat.
-- Contract tests with Pact (recommended).
-- CI runs the tests on every pull request.
+- **APP-FR-01 — Home screen (§5.1.1).** Home screen with the suite name, settings and a game selector with the four variants. _Check:_ a UI test opens each of the four variants from the selector.
+- **APP-FR-02 — Level selector (§5.1.2).** Level selector for Fit and Sort, with progress and locked levels. _Check:_ for Fit and Sort, the selector shows which levels are completed, which are open and which are locked.
+- **APP-FR-03 — Shared engine (§5.1.3).** The shared engine: board, pieces, moves, resolution and end of game. _Check:_ APP-NFR-01 to APP-NFR-03.
+- **APP-FR-04 — Endless games (§5.1.4).** Lines and Merge playable without levels, with a saved high score. _Check:_ the high score of Lines and of Merge is still there after the app restarts.
+- **APP-FR-05 — Hand-made levels (§5.1.5).** Fit with at least 15 and Sort with at least 10 hand-made levels, loaded from configuration files, with rising difficulty. _Check:_ a CI test counts the bundled level files and checks every Fit level against A5.
+- **APP-FR-06 — Scoring (§5.1.6).** Scoring per variant, defined and documented by the team. _Check:_ the README documents the scoring of each variant. The rules are still open (§10, "Still to define").
+- **APP-FR-07 — Victory and defeat (§5.1.7).** Victory screen with score and next level or new game; defeat screen with retry. _Check:_ a UI test reaches both screens and uses their buttons.
+- **APP-FR-08 — Undo and redo (§5.1.8).** Undo and redo in Fit; undo of one move in Merge. _Check:_ in Fit, undo and then redo give back the same board; in Merge, a second undo in a row changes nothing; Lines and Sort show no undo.
+- **APP-FR-09 — Local progress (§5.1.9).** Local persistence of progress per variant (completed levels, stars, scores). _Check:_ APP-NFR-15.
+- **APP-FR-10 — Sound (§5.1.10).** Sound effects and background music, with mute. _Check:_ the mute option silences both the effects and the music.
+- **APP-FR-11 — Languages (§5.1.11).** At least Spanish and English. _Check:_ every visible text has a Spanish and an English entry.
 
-## 5. App features (§5.1)
+## 6. Backend features, client side (functional, §5.2)
 
-Required minimum:
+The backend requirements live in `hexablock-api/docs/REQUIREMENTS.md`, as API-FR-01 to API-FR-06. In short: sign-up and sign-in with JWT; progress sync with `gameId` as a required key (one entry per user and variant); a global leaderboard per `gameId` and, for level-based variants, per level; read and update level definitions for Fit and Sort with one generic schema plus a section per `gameId`; Swagger/OpenAPI; consistent HTTP errors.
 
-1. Home screen with the suite name, settings and a game selector with the four variants.
-2. Level selector for Fit and Sort, with progress and locked levels.
-3. The shared engine: board, pieces, moves, resolution and end of game.
-4. Lines and Merge playable without levels, with a saved high score.
-5. Fit with at least 15 and Sort with at least 10 hand-made levels, loaded from configuration files, with rising difficulty.
-6. Scoring per variant, defined and documented by the team.
-7. Victory screen with score and next level or new game; defeat screen with retry.
-8. Undo and redo in Fit; undo of one move in Merge.
-9. Local persistence of progress per variant (completed levels, stars, scores).
-10. Sound effects and background music, with mute.
-11. At least Spanish and English.
+The app needs its own side of these features. Statement §5.1 does not list them, so each one is **Derived** from the backend item it serves.
 
-## 6. Backend (§5.2)
+- **APP-FR-12 — Account (derived from §5.2.1).** The player can sign up and sign in from the app, and the app keeps the session for the next requests. _Check:_ after sign-in, a sync request carries the token.
+- **APP-FR-13 — Progress sync (derived from §5.2.2).** The app sends the local progress of each variant to the backend. _Check:_ progress saved in the app appears in the backend entry for that user and `gameId`.
+- **APP-FR-14 — Leaderboard (derived from §5.2.3).** The app shows the global leaderboard per variant and, for Fit and Sort, per level. Assumption: §5.1 lists no leaderboard screen, so its place in the app is ours to choose. _Check:_ a UI test shows both leaderboards from a stubbed API.
+- **APP-FR-15 — Levels from the backend (derived from §5.2.4, A6).** Bundled levels always work offline; levels from the backend add to them or replace them. _Check:_ with the network off, every bundled level opens.
 
-Summary; the details live in `hexablock-api/docs/REQUIREMENTS.md`. Sign-up and sign-in with JWT; progress sync with `gameId` as a required key (one entry per user and variant); a global leaderboard per `gameId` and, for level-based variants, per level; read and update level definitions for Fit and Sort with one generic schema plus a section per `gameId`; Swagger/OpenAPI; consistent HTTP errors.
+## 7. Documentation and deliverables (non-functional)
 
-## 7. Documentation and deliverables
-
-- **Diagrams (§4):** class diagram (generic types in UML template notation, layers, patterns), Clean layer diagram (ports and adapters), extensibility diagram (engine in the center, variants as extensions). Each one is a high-resolution image in the README and an editable source in `docs/`. In class on 2026-10-26 the professor asked for the class diagram to model the architecture (recording 00:00): it shows which layer each class lives in (27:16), and its relations between layers follow the dependency rule. He does not want an entity-relationship diagram (21:50).
-- **Requirements method (class on 2026-10-26, recording 10:16):** the professor expects functional and non-functional requirements and a plan in one-week sprints. We grow them from this file as the professor and the team confirm each item.
-- **README (§6.1):** in English, with the sections the README skeleton already holds (a test keeps them).
-- **Commits (§6.2):** Conventional Commits in English.
-- **AI usage (§7):** `AI_USAGE.md` in each repo with the tools, a log per significant task (prompt, result, our changes, lessons) and a critical evaluation. Undocumented AI use counts as plagiarism, and the team must be able to explain any code in the defense.
-- **Deliverables (§8):** the two repository URLs by the Module 7 inbox; diagrams and `docs/EXTENSIBILITY.md` in `docs/`; README and `AI_USAGE.md` on `main`; an Android or iOS executable with the four variants as a GitHub Release.
-- **Integrity (§9):** no copied code without citation; individual commits are reviewed, and a member without significant commits can get a lower grade.
+- **APP-NFR-19 — Diagrams (§4).** Class diagram (generic types in UML template notation, layers, patterns), Clean layer diagram (ports and adapters), extensibility diagram (engine in the center, variants as extensions). Each one is a high-resolution image in the README and an editable source in `docs/`. In class on 2026-10-26 the professor asked for the class diagram to model the architecture (recording 00:00): it shows which layer each class lives in (27:16), and its relations between layers follow the dependency rule. He does not want an entity-relationship diagram (21:50). _Check:_ the README embeds the three images; [`architecture/layers.md`](architecture/layers.md) and [`architecture/classes.md`](architecture/classes.md) hold two of the sources, and the extensibility diagram is still to draw.
+- **Requirements method (class on 2026-10-26, recording 10:16):** the professor expects functional and non-functional requirements and a plan in one-week sprints. This file numbers them since 2026-10-30: APP-FR for functional and APP-NFR for non-functional. We grow them as the professor and the team confirm each item.
+- **APP-NFR-20 — README (§6.1).** In English, with the sections the README skeleton already holds. _Check:_ gate `test/docs/docs-skeleton.test.ts` (rule R-docs-headings).
+- **APP-NFR-21 — Commits (§6.2).** Conventional Commits in English. _Check:_ the commit-msg hook and gate `test/gates/commit-message-gate.test.ts` (rule R-conventional-commits).
+- **APP-NFR-22 — AI usage (§7).** `AI_USAGE.md` in each repo with the tools, a log per significant task (prompt, result, our changes, lessons) and a critical evaluation. Undocumented AI use counts as plagiarism, and the team must be able to explain any code in the defense. _Check:_ no gate (rule R-ai-usage-log); each pull request adds its entry.
+- **APP-NFR-23 — Deliverables (§8).** The two repository URLs by the Module 7 inbox; diagrams and `docs/EXTENSIBILITY.md` in `docs/`; README and `AI_USAGE.md` on `main`; an Android or iOS executable with the four variants as a GitHub Release. _Check:_ pushing a `v*` tag runs `.github/workflows/release-apk.yml`, which attaches the APK to a GitHub Release.
+- **APP-NFR-24 — Integrity (§9).** No copied code without citation; individual commits are reviewed, and a member without significant commits can get a lower grade. _Check:_ no gate; the reviewer of each pull request checks the citations.
 
 ## 8. Variation register
 
