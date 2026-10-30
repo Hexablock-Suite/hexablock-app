@@ -1,0 +1,851 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Use case contract · UML class diagram</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --color-paper: #f3f5f6;
+        --color-ink: #17212a;
+        --color-muted: #5b6873;
+        --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+        --font-serif: 'Instrument Serif', serif;
+        --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+      }
+      body {
+        font-family: var(--font-sans);
+        background: var(--color-paper);
+        color: var(--color-ink);
+        padding: 3rem 2rem;
+      }
+      .frame {
+        max-width: 1240px;
+        margin: 0 auto;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-muted);
+        margin-bottom: 0.5rem;
+      }
+      h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        margin-bottom: 1.5rem;
+      }
+      svg {
+        width: 100%;
+        min-width: 900px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <p class="eyebrow">Class diagram · Part 3 · View 1 of 4</p>
+      <h1>The use case contract and its aspects: Decorator for AOP</h1>
+
+      <svg
+        viewBox="0 0 1040 856"
+        xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-labelledby="uccontract-title uccontract-desc"
+      >
+        <title id="uccontract-title">HexaBlock use case contract · UML class diagram</title>
+        <desc id="uccontract-desc">
+          Class diagram of layer 2 showing the UseCase input port that every use case implements,
+          the abstract UseCaseAspect decorator that implements UseCase and wraps one inner UseCase,
+          the logging, timing, retry and authorization aspects that extend it, and the Logger output
+          port that the logging and timing aspects use.
+        </desc>
+        <defs>
+          <marker
+            id="uccontract-triangle"
+            markerWidth="16"
+            markerHeight="12"
+            refX="15"
+            refY="6"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          </marker>
+          <marker
+            id="uccontract-diamond-filled"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 5, 9 0, 18 5, 9 10" fill="#17212a" />
+          </marker>
+          <marker
+            id="uccontract-diamond-hollow"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon
+              points="0 5, 9 0, 18 5, 9 10"
+              fill="#ffffff"
+              stroke="#17212a"
+              stroke-width="1"
+            />
+          </marker>
+          <marker
+            id="uccontract-open"
+            markerWidth="10"
+            markerHeight="8"
+            refX="9"
+            refY="4"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
+          </marker>
+        </defs>
+
+        <rect width="100%" height="100%" fill="#f3f5f6" />
+
+        <!-- Layer zone: layer 2, use cases -->
+        <rect
+          x="24"
+          y="24"
+          width="992"
+          height="680"
+          rx="8"
+          fill="#e3f5e6"
+          stroke="rgba(21,128,61,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="44"
+          fill="#15803d"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 2 · USE CASES · src/application/
+        </text>
+
+        <!-- Pattern groups -->
+        <rect
+          x="344"
+          y="64"
+          width="352"
+          height="120"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="356"
+          y="80"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          INPUT PORT · §3.4
+        </text>
+
+        <rect
+          x="68"
+          y="232"
+          width="904"
+          height="288"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="80"
+          y="248"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          DECORATOR · AOP · §3.5 · A2
+        </text>
+
+        <rect
+          x="300"
+          y="552"
+          width="440"
+          height="136"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="312"
+          y="568"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          OUTPUT PORT · §3.4
+        </text>
+
+        <!-- Relationships (drawn before boxes) -->
+        <!-- UseCaseAspect implements UseCase: realization -->
+        <line
+          x1="432"
+          y1="264"
+          x2="432"
+          y2="168"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#uccontract-triangle)"
+        />
+        <!-- UseCaseAspect has one inner UseCase: aggregation -->
+        <line
+          x1="528"
+          y1="264"
+          x2="528"
+          y2="168"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#uccontract-diamond-hollow)"
+        />
+        <!-- RetryAspect extends UseCaseAspect: inheritance -->
+        <path
+          d="M184 424 V400 Q184 392 192 392 H392 Q400 392 400 384 V360"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#uccontract-triangle)"
+        />
+        <!-- LoggingAspect extends UseCaseAspect: inheritance -->
+        <line
+          x1="480"
+          y1="424"
+          x2="480"
+          y2="360"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#uccontract-triangle)"
+        />
+        <!-- TimingAspect extends UseCaseAspect: inheritance -->
+        <line
+          x1="560"
+          y1="424"
+          x2="560"
+          y2="360"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#uccontract-triangle)"
+        />
+        <!-- AuthorizationAspect extends UseCaseAspect: inheritance -->
+        <path
+          d="M856 424 V400 Q856 392 848 392 H648 Q640 392 640 384 V360"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#uccontract-triangle)"
+        />
+        <!-- LoggingAspect uses Logger: dependency -->
+        <line
+          x1="440"
+          y1="504"
+          x2="440"
+          y2="584"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#uccontract-open)"
+        />
+        <!-- TimingAspect uses Logger: dependency -->
+        <line
+          x1="600"
+          y1="504"
+          x2="600"
+          y2="584"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#uccontract-open)"
+        />
+
+        <!-- Arrow labels -->
+        <rect x="536" y="206" width="36" height="12" rx="2" fill="#e3f5e6" />
+        <text
+          x="554"
+          y="215"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          INNER
+        </text>
+
+        <!-- Multiplicities -->
+        <rect x="522" y="188" width="12" height="12" rx="2" fill="#e3f5e6" />
+        <text
+          x="528"
+          y="197"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          1
+        </text>
+
+        <!-- Class: UseCase (focal, interface, input port) -->
+        <rect
+          x="360"
+          y="96"
+          width="320"
+          height="72"
+          rx="6"
+          fill="rgba(15,111,116,0.05)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <rect x="360" y="96" width="320" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="360" y="136" width="320" height="8" fill="rgba(15,111,116,0.10)" />
+        <line x1="360" y1="144" x2="680" y2="144" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <text
+          x="520"
+          y="114"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «input port»
+        </text>
+        <text
+          x="520"
+          y="132"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          UseCase
+        </text>
+        <text
+          x="376"
+          y="160"
+          fill="#0f6f74"
+          font-size="9"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + execute(request: TRequest): Promise&lt;TResponse&gt;
+        </text>
+
+        <!-- Class: UseCaseAspect (abstract decorator) -->
+        <rect
+          x="360"
+          y="264"
+          width="320"
+          height="96"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="360" y1="312" x2="680" y2="312" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="360" y1="336" x2="680" y2="336" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="520"
+          y="282"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «abstract» «Decorator»
+        </text>
+        <text
+          x="520"
+          y="300"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-style="italic"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          UseCaseAspect
+        </text>
+        <text x="376" y="328" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          # inner: UseCase&lt;TRequest, TResponse&gt;
+        </text>
+        <text x="376" y="352" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + execute(request: TRequest): Promise&lt;TResponse&gt;
+        </text>
+
+        <!-- Class: RetryAspect -->
+        <rect
+          x="84"
+          y="424"
+          width="200"
+          height="64"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="84" y1="464" x2="284" y2="464" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="184"
+          y="449"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          RetryAspect
+        </text>
+        <text x="100" y="480" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - attempts: number
+        </text>
+
+        <!-- Class: LoggingAspect -->
+        <rect
+          x="308"
+          y="424"
+          width="200"
+          height="80"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="308" y1="464" x2="508" y2="464" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="408"
+          y="449"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          LoggingAspect
+        </text>
+        <text x="324" y="480" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - logger: Logger
+        </text>
+        <text x="324" y="496" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - name: string
+        </text>
+
+        <!-- Class: TimingAspect -->
+        <rect
+          x="532"
+          y="424"
+          width="200"
+          height="80"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="532" y1="464" x2="732" y2="464" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="632"
+          y="449"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          TimingAspect
+        </text>
+        <text x="548" y="480" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - clock: Clock
+        </text>
+        <text x="548" y="496" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - logger: Logger
+        </text>
+
+        <!-- Class: AuthorizationAspect -->
+        <rect
+          x="756"
+          y="424"
+          width="200"
+          height="64"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="756" y1="464" x2="956" y2="464" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="856"
+          y="449"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          AuthorizationAspect
+        </text>
+        <text x="772" y="480" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - session: SessionStore
+        </text>
+
+        <!-- Class: Logger (interface, output port) -->
+        <rect
+          x="380"
+          y="584"
+          width="280"
+          height="88"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="380" y1="632" x2="660" y2="632" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="520"
+          y="602"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «port»
+        </text>
+        <text
+          x="520"
+          y="620"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          Logger
+        </text>
+        <text x="396" y="648" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + info(message: string, data?: object): void
+        </text>
+        <text x="396" y="664" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + error(message: string, error: unknown): void
+        </text>
+
+        <!-- UML template boxes: type parameters on the top-right corner -->
+        <rect
+          x="572"
+          y="86"
+          width="112"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="628"
+          y="98"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TRequest, TResponse
+        </text>
+        <rect
+          x="572"
+          y="254"
+          width="112"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="628"
+          y="266"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TRequest, TResponse
+        </text>
+
+        <!-- Footnote -->
+        <text
+          x="24"
+          y="728"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Every use case implements UseCase. The composition root wraps each one, for example new
+          LoggingAspect(new AuthorizationAspect(saveProgress)).
+        </text>
+        <text
+          x="24"
+          y="744"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          AuthorizationAspect wraps SaveProgress and SyncLeaderboard; RetryAspect wraps the backend
+          calls. Clock is the port of layer 1.
+        </text>
+
+        <!-- Legend -->
+        <line x1="24" y1="768" x2="1016" y2="768" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <text
+          x="24"
+          y="786"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LEGEND
+        </text>
+
+        <line
+          x1="24"
+          y1="804"
+          x2="52"
+          y2="804"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#uccontract-triangle)"
+        />
+        <text
+          x="60"
+          y="808"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Inheritance
+        </text>
+        <line
+          x1="184"
+          y1="804"
+          x2="212"
+          y2="804"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#uccontract-triangle)"
+        />
+        <text
+          x="220"
+          y="808"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Realization
+        </text>
+        <line
+          x1="344"
+          y1="804"
+          x2="372"
+          y2="804"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#uccontract-diamond-filled)"
+        />
+        <text
+          x="380"
+          y="808"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Composition · owns
+        </text>
+        <line
+          x1="504"
+          y1="804"
+          x2="532"
+          y2="804"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#uccontract-diamond-hollow)"
+        />
+        <text
+          x="540"
+          y="808"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aggregation · has
+        </text>
+        <line
+          x1="664"
+          y1="804"
+          x2="692"
+          y2="804"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#uccontract-open)"
+        />
+        <text
+          x="700"
+          y="808"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Association
+        </text>
+        <line
+          x1="824"
+          y1="804"
+          x2="852"
+          y2="804"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#uccontract-open)"
+        />
+        <text
+          x="860"
+          y="808"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dependency · uses
+        </text>
+
+        <rect
+          x="24"
+          y="824"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#e3f5e6"
+          stroke="rgba(21,128,61,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="60"
+          y="833"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · layer 2 · use cases
+        </text>
+        <rect
+          x="204"
+          y="824"
+          width="28"
+          height="12"
+          rx="2"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="240"
+          y="833"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dashed frame · GoF pattern or principle
+        </text>
+        <rect
+          x="444"
+          y="824"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="480"
+          y="833"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Corner box · type parameters
+        </text>
+        <rect
+          x="620"
+          y="824"
+          width="28"
+          height="12"
+          rx="2"
+          fill="rgba(15,111,116,0.10)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <text
+          x="656"
+          y="833"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Teal · focal class
+        </text>
+      </svg>
+    </div>
+  </body>
+</html>
