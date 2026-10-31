@@ -293,27 +293,27 @@
         </text>
 
         <!-- Relationships (drawn before boxes) -->
-        <!-- GameEngine to IGameRules: association -->
+        <!-- GameEngine holds the IGameRules it receives as rules: aggregation -->
         <line
           x1="380"
           y1="256"
           x2="332"
           y2="256"
-          stroke="#5b6873"
           stroke-width="1"
-          marker-end="url(#t-open)"
+          marker-start="url(#t-diamond-hollow)"
+          stroke="#17212a"
         />
-        <!-- GameEngine to IScoringPolicy: association -->
+        <!-- GameEngine holds the IScoringPolicy it receives as scoring: aggregation -->
         <line
           x1="380"
           y1="372"
           x2="332"
           y2="372"
-          stroke="#5b6873"
           stroke-width="1"
-          marker-end="url(#t-open)"
+          marker-start="url(#t-diamond-hollow)"
+          stroke="#17212a"
         />
-        <!-- GameEngine owns its GamePhase: composition -->
+        <!-- GameEngine creates its GamePhase phase: composition -->
         <line
           x1="660"
           y1="256"
@@ -323,7 +323,7 @@
           stroke-width="1"
           marker-start="url(#t-diamond-filled)"
         />
-        <!-- GameEngine has zero or one MoveHistory: aggregation -->
+        <!-- GameEngine holds zero or one MoveHistory it receives as history: aggregation -->
         <line
           x1="660"
           y1="372"
@@ -333,41 +333,39 @@
           stroke-width="1"
           marker-start="url(#t-diamond-hollow)"
         />
-        <!-- GameEngine notifies through GameEventPublisher: dependency -->
+        <!-- GameEngine notifies through GameEventPublisher: use -->
         <line
           x1="520"
           y1="216"
           x2="520"
           y2="164"
-          stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#t-open)"
+          stroke="#5b6873"
         />
-        <!-- TState is bounded by BoardState: dependency -->
+        <!-- TState is bounded by BoardState: use labelled with the type parameter -->
         <line
           x1="560"
           y1="384"
           x2="560"
           y2="436"
-          stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#t-open)"
+          stroke="#5b6873"
         />
 
         <!-- Arrow labels -->
-        <rect x="336" y="236" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="336" y="238" width="36" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="354"
-          y="245"
+          y="247"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          STEPS
+          rules
         </text>
         <rect x="528" y="184" width="52" height="12" rx="2" fill="#f9f4dc" />
         <text
@@ -381,24 +379,59 @@
         >
           NOTIFIES
         </text>
-        <rect x="568" y="404" width="72" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="524" y="398" width="72" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="604"
-          y="413"
+          x="560"
+          y="407"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          TSTATE BOUND
+          TState bound
         </text>
-
+        <rect x="335" y="379" width="42" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="356"
+          y="388"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          scoring
+        </text>
+        <rect x="680" y="240" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="698"
+          y="249"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          phase
+        </text>
+        <rect x="670" y="354" width="48" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="694"
+          y="363"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          history
+        </text>
         <!-- Multiplicities -->
-        <rect x="338" y="250" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="338" y="260" width="12" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="344"
-          y="259"
+          y="269"
           fill="#17212a"
           font-size="8"
           font-weight="600"
@@ -407,10 +440,10 @@
         >
           1
         </text>
-        <rect x="338" y="366" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="346" y="358" width="12" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="344"
-          y="375"
+          x="352"
+          y="367"
           fill="#17212a"
           font-size="8"
           font-weight="600"
@@ -419,10 +452,10 @@
         >
           1
         </text>
-        <rect x="702" y="250" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="702" y="260" width="12" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="708"
-          y="259"
+          y="269"
           fill="#17212a"
           font-size="8"
           font-weight="600"
@@ -431,10 +464,10 @@
         >
           1
         </text>
-        <rect x="688" y="366" width="28" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="688" y="378" width="28" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="702"
-          y="375"
+          y="387"
           fill="#17212a"
           font-size="8"
           font-weight="600"
@@ -901,9 +934,9 @@
           Inheritance
         </text>
         <line
-          x1="184"
+          x1="144"
           y1="700"
-          x2="212"
+          x2="172"
           y2="700"
           stroke="#17212a"
           stroke-width="1"
@@ -911,7 +944,7 @@
           marker-end="url(#t-triangle)"
         />
         <text
-          x="220"
+          x="180"
           y="704"
           fill="#5b6873"
           font-size="8.5"
@@ -920,79 +953,59 @@
           Realization
         </text>
         <line
-          x1="344"
+          x1="264"
           y1="700"
-          x2="372"
+          x2="292"
           y2="700"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#t-diamond-filled)"
         />
         <text
-          x="380"
+          x="300"
           y="704"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Composition · owns
+          Composition · attribute it creates
         </text>
         <line
-          x1="504"
+          x1="474"
           y1="700"
-          x2="532"
+          x2="502"
           y2="700"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#t-diamond-hollow)"
         />
         <text
-          x="540"
+          x="510"
           y="704"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Aggregation · has
+          Aggregation · attribute it receives
         </text>
         <line
-          x1="664"
+          x1="694"
           y1="700"
-          x2="692"
+          x2="722"
           y2="700"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#t-open)"
         />
         <text
-          x="700"
+          x="730"
           y="704"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Association
+          Use · parameter, return, local or new
         </text>
-        <line
-          x1="824"
-          y1="700"
-          x2="852"
-          y2="700"
-          stroke="#5b6873"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#t-open)"
-        />
-        <text
-          x="860"
-          y="704"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Dependency · uses
-        </text>
-
         <rect
           x="24"
           y="720"
