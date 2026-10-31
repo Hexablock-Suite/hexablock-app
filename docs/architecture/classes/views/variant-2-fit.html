@@ -64,7 +64,7 @@
       <h1>Hexa Fit: levels built and checked by a Builder</h1>
 
       <svg
-        viewBox="0 0 1040 712"
+        viewBox="0 0 1040 760"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="fit-title fit-desc"
@@ -72,9 +72,9 @@
         <title id="fit-title">Hexa Fit variant · UML class diagram</title>
         <desc id="fit-desc">
           Class diagram of layer 1 for the Hexa Fit variant. FitLevelBuilder creates FitLevel.
-          HexaFitFactory holds one FitLevel and creates HexaFitRules and FitScoring. HexaFitRules
-          uses FitMove as TMove and FitState as TState. Lollipops show the engine interface each
-          variant class implements, with its binding.
+          FitFactory holds one FitLevel and creates FitRules and FitScoring. FitRules uses FitMove
+          as TMove and FitState as TState. Lollipops show the engine interface each variant class
+          implements, with its binding.
         </desc>
         <defs>
           <marker
@@ -97,7 +97,7 @@
           x="24"
           y="24"
           width="992"
-          height="536"
+          height="552"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -165,8 +165,8 @@
         <rect
           x="192"
           y="352"
-          width="680"
-          height="184"
+          width="752"
+          height="200"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -186,29 +186,29 @@
         </text>
 
         <!-- Relationships (drawn before boxes) -->
-        <!-- HexaFitRules uses FitMove as TMove: dependency -->
+        <!-- FitRules uses FitMove as TMove: dependency -->
         <line
           x1="328"
           y1="136"
-          x2="268"
+          x2="276"
           y2="136"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#fit-open)"
         />
-        <!-- HexaFitRules uses FitState as TState: dependency -->
+        <!-- FitRules uses FitState as TState: dependency -->
         <line
           x1="328"
           y1="184"
-          x2="240"
+          x2="280"
           y2="184"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#fit-open)"
         />
-        <!-- HexaFitFactory creates HexaFitRules: dependency «create» -->
+        <!-- FitFactory creates FitRules: dependency «create» -->
         <line
           x1="648"
           y1="144"
@@ -219,7 +219,7 @@
           stroke-dasharray="4,3"
           marker-end="url(#fit-open)"
         />
-        <!-- HexaFitFactory creates FitScoring: dependency «create», one elbow -->
+        <!-- FitFactory creates FitScoring: dependency «create», one elbow -->
         <path
           d="M680,192 L680,260 Q680,268 672,268 L528,268"
           fill="none"
@@ -228,7 +228,7 @@
           stroke-dasharray="4,3"
           marker-end="url(#fit-open)"
         />
-        <!-- HexaFitFactory holds one FitLevel: association -->
+        <!-- FitFactory holds one FitLevel: association -->
         <line
           x1="800"
           y1="192"
@@ -240,9 +240,9 @@
         />
         <!-- FitLevelBuilder creates FitLevel: dependency «create» -->
         <line
-          x1="552"
+          x1="640"
           y1="440"
-          x2="648"
+          x2="696"
           y2="440"
           stroke="#5b6873"
           stroke-width="1"
@@ -251,9 +251,9 @@
         />
 
         <!-- Arrow labels -->
-        <rect x="274" y="116" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="280" y="116" width="36" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="292"
+          x="298"
           y="125"
           fill="#7d8a94"
           font-size="8"
@@ -263,10 +263,10 @@
         >
           TMOVE
         </text>
-        <rect x="272" y="164" width="40" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="284" y="190" width="40" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="292"
-          y="173"
+          x="304"
+          y="199"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -311,9 +311,9 @@
         >
           LEVEL
         </text>
-        <rect x="576" y="420" width="48" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="642" y="420" width="52" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="600"
+          x="668"
           y="429"
           fill="#7d8a94"
           font-size="8"
@@ -342,7 +342,7 @@
         <line x1="64" y1="272" x2="64" y2="288" stroke="#17212a" stroke-width="1" />
         <circle cx="64" cy="293" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text x="75" y="296" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          BoardState‹PieceId›
+          BoardState‹PieceId, TCoord›
         </text>
         <line x1="352" y1="104" x2="352" y2="120" stroke="#17212a" stroke-width="1" />
         <circle cx="352" cy="99" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
@@ -359,9 +359,9 @@
         <text x="683" y="102" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           IVariantFactory‹PieceId, FitMove, FitState›
         </text>
-        <line x1="240" y1="500" x2="240" y2="516" stroke="#17212a" stroke-width="1" />
-        <circle cx="240" cy="521" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="251" y="524" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="240" y1="516" x2="240" y2="532" stroke="#17212a" stroke-width="1" />
+        <circle cx="240" cy="537" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="251" y="540" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           ILevelBuilder‹FitLevel›
         </text>
 
@@ -369,16 +369,16 @@
         <rect
           x="40"
           y="56"
-          width="228"
+          width="236"
           height="104"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="40" y1="104" x2="268" y2="104" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="40" y1="104" x2="276" y2="104" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="154"
+          x="158"
           y="74"
           fill="#5b6873"
           font-size="8"
@@ -389,7 +389,7 @@
           «interface»
         </text>
         <text
-          x="154"
+          x="158"
           y="92"
           fill="#17212a"
           font-size="12"
@@ -413,16 +413,16 @@
         <rect
           x="40"
           y="176"
-          width="200"
+          width="240"
           height="96"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="40" y1="216" x2="240" y2="216" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="40" y1="216" x2="280" y2="216" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="140"
+          x="160"
           y="201"
           fill="#17212a"
           font-size="12"
@@ -433,16 +433,16 @@
           FitState
         </text>
         <text x="56" y="232" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + board: HexBoard&lt;PieceId&gt;
+          + board: Board&lt;PieceId, TCoord&gt;
         </text>
         <text x="56" y="248" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + remaining: Piece&lt;PieceId&gt;[]
+          + remaining: Piece&lt;PieceId, TCoord&gt;[]
         </text>
         <text x="56" y="264" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + moves: number
         </text>
 
-        <!-- Class: HexaFitRules (Concrete Strategy) -->
+        <!-- Class: FitRules (Concrete Strategy) -->
         <rect
           x="328"
           y="120"
@@ -474,7 +474,7 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          HexaFitRules
+          FitRules
         </text>
         <text x="344" y="184" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           exact cover, no resolution step
@@ -518,7 +518,7 @@
           - timer: ITimed
         </text>
 
-        <!-- Class: HexaFitFactory (Concrete Factory) -->
+        <!-- Class: FitFactory (Concrete Factory) -->
         <rect
           x="648"
           y="120"
@@ -550,7 +550,7 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          HexaFitFactory
+          FitFactory
         </text>
         <text x="664" y="184" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - level: FitLevel
@@ -558,18 +558,18 @@
 
         <!-- Class: FitLevel (value object) -->
         <rect
-          x="648"
+          x="696"
           y="380"
-          width="200"
-          height="104"
+          width="232"
+          height="120"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="648" y1="428" x2="848" y2="428" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="696" y1="428" x2="928" y2="428" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="748"
+          x="812"
           y="398"
           fill="#5b6873"
           font-size="8"
@@ -580,7 +580,7 @@
           «value object»
         </text>
         <text
-          x="748"
+          x="812"
           y="416"
           fill="#17212a"
           font-size="12"
@@ -590,32 +590,35 @@
         >
           FitLevel
         </text>
-        <text x="664" y="444" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + figure: ShapeGroup
+        <text x="712" y="460" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + figure: ShapeGroup&lt;TCoord&gt;
         </text>
-        <text x="664" y="460" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + pieces: Piece&lt;PieceId&gt;[]
+        <text x="712" y="476" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + pieces: Piece&lt;PieceId, TCoord&gt;[]
         </text>
-        <text x="664" y="476" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + witness: Placement[]
+        <text x="712" y="492" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + witness: Placement&lt;TCoord&gt;[]
         </text>
 
+        <text x="712" y="444" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + header: LevelHeader
+        </text>
         <!-- Class: FitLevelBuilder (focal, Concrete Builder) -->
         <rect
-          x="216"
+          x="200"
           y="380"
-          width="336"
-          height="120"
+          width="440"
+          height="136"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
           stroke-width="1"
         />
-        <rect x="216" y="380" width="336" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
-        <rect x="216" y="420" width="336" height="8" fill="rgba(15,111,116,0.10)" />
-        <line x1="216" y1="428" x2="552" y2="428" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <rect x="200" y="380" width="440" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="200" y="420" width="440" height="8" fill="rgba(15,111,116,0.10)" />
+        <line x1="200" y1="428" x2="640" y2="428" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text
-          x="384"
+          x="420"
           y="398"
           fill="#5b6873"
           font-size="8"
@@ -626,7 +629,7 @@
           «Concrete Builder»
         </text>
         <text
-          x="384"
+          x="420"
           y="416"
           fill="#17212a"
           font-size="12"
@@ -636,30 +639,108 @@
         >
           FitLevelBuilder
         </text>
-        <text x="232" y="444" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + withFigure(figure: ShapeGroup): FitLevelBuilder
+        <text x="216" y="460" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + withFigure(figure: ShapeGroup&lt;TCoord&gt;): FitLevelBuilder&lt;TCoord&gt;
         </text>
-        <text x="232" y="460" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + withPieces(pieces: Piece&lt;PieceId&gt;[]): FitLevelBuilder
+        <text x="216" y="476" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + withPieces(pieces: Piece&lt;PieceId, TCoord&gt;[]): FitLevelBuilder&lt;TCoord&gt;
         </text>
-        <text x="232" y="476" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + withWitness(witness: Placement[]): FitLevelBuilder
+        <text x="216" y="492" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + withWitness(witness: Placement&lt;TCoord&gt;[]): FitLevelBuilder&lt;TCoord&gt;
         </text>
-        <text x="232" y="492" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="216" y="508" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + build(): FitLevel
         </text>
 
-        <!-- Footnote: classes the budget leaves out -->
-        <text
-          x="24"
-          y="584"
-          fill="#5b6873"
-          font-size="11"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          build() checks A5: the areas match, and the witness covers the figure exactly. An adapter
-          parses the level file; the builder gets plain data.
+        <text x="216" y="444" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + withHeader(header: LevelHeader): FitLevelBuilder&lt;TCoord&gt;
         </text>
+        <!-- UML template boxes: type parameters on the top-right corner -->
+        <rect
+          x="240"
+          y="48"
+          width="48"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="264"
+          y="60"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCoord
+        </text>
+        <rect
+          x="244"
+          y="166"
+          width="48"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="268"
+          y="178"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCoord
+        </text>
+        <rect
+          x="892"
+          y="370"
+          width="48"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="916"
+          y="382"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCoord
+        </text>
+        <rect
+          x="604"
+          y="370"
+          width="48"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="628"
+          y="382"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCoord
+        </text>
+        <!-- Footnote: classes the budget leaves out -->
         <text
           x="24"
           y="600"
@@ -667,14 +748,45 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Undo: RedoableHistory, no limit. Timer: LevelTimer (ITimed).
+          build() checks A5: the areas match, and the witness covers the figure exactly. An adapter
+          reads the level file; the builder gets plain data.
         </text>
-
-        <!-- Legend -->
-        <line x1="24" y1="624" x2="1016" y2="624" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="642"
+          y="616"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          LevelHeader is the common part of every level: gameId, levelId, order, version and
+          topology. The builder asks BoardBuilder for the board (view 6).
+        </text>
+
+        <text
+          x="24"
+          y="632"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Undo: RedoableHistory, no limit. FitFactory wraps FitRules, which extends BaseGameRules,
+          in TimedRulesDecorator (Part 1, view 7).
+        </text>
+        <text
+          x="24"
+          y="648"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          TCoord is the coordinate type of the geometry (decision 16). FitRules, FitScoring and
+          FitFactory take it too; the bindings leave it out.
+        </text>
+        <!-- Legend -->
+        <line x1="24" y1="672" x2="1016" y2="672" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <text
+          x="24"
+          y="690"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -685,16 +797,16 @@
 
         <line
           x1="24"
-          y1="660"
+          y1="708"
           x2="52"
-          y2="660"
+          y2="708"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#fit-open)"
         />
         <text
           x="60"
-          y="664"
+          y="712"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -703,9 +815,9 @@
         </text>
         <line
           x1="184"
-          y1="660"
+          y1="708"
           x2="212"
-          y2="660"
+          y2="708"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
@@ -713,7 +825,7 @@
         />
         <text
           x="220"
-          y="664"
+          y="712"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -723,7 +835,7 @@
 
         <rect
           x="24"
-          y="680"
+          y="728"
           width="28"
           height="12"
           rx="2"
@@ -733,7 +845,7 @@
         />
         <text
           x="60"
-          y="689"
+          y="737"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -742,7 +854,7 @@
         </text>
         <rect
           x="184"
-          y="680"
+          y="728"
           width="28"
           height="12"
           rx="2"
@@ -753,7 +865,7 @@
         />
         <text
           x="220"
-          y="689"
+          y="737"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -762,7 +874,7 @@
         </text>
         <rect
           x="424"
-          y="680"
+          y="728"
           width="28"
           height="12"
           rx="2"
@@ -773,7 +885,7 @@
         />
         <text
           x="460"
-          y="689"
+          y="737"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -782,7 +894,7 @@
         </text>
         <rect
           x="600"
-          y="680"
+          y="728"
           width="28"
           height="12"
           rx="2"
@@ -792,18 +904,18 @@
         />
         <text
           x="636"
-          y="689"
+          y="737"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
         </text>
-        <line x1="760" y1="686" x2="776" y2="686" stroke="#17212a" stroke-width="1" />
-        <circle cx="781" cy="686" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="760" y1="734" x2="776" y2="734" stroke="#17212a" stroke-width="1" />
+        <circle cx="781" cy="734" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="796"
-          y="689"
+          y="737"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
