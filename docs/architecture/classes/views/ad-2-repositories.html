@@ -74,7 +74,8 @@
           Class diagram across layers 4, 3 and 2 showing ApiProgressRepository in layer 4, which
           holds the ApiClient and the ApiDtoMapper and implements the ProgressRepository port of
           layer 2 directly, and LocalProgressRepository in layer 3, which holds the KeyValueStore
-          driver port that DeviceKeyValueStore implements and implements the same port.
+          driver interface of layer 3 that DeviceKeyValueStore implements and implements the same
+          port.
         </desc>
         <defs>
           <marker
@@ -236,7 +237,7 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.14em"
         >
-          DRIVER PORT · §3.4
+          DRIVER INTERFACE · LAYER 3
         </text>
         <rect
           x="432"
@@ -460,7 +461,7 @@
         <text x="760" y="172" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - mapper: ApiDtoMapper
         </text>
-        <!-- Class: KeyValueStore (interface, port) -->
+        <!-- Class: KeyValueStore (interface of layer 3) -->
         <rect
           x="56"
           y="284"
@@ -481,7 +482,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «port»
+          «interface»
         </text>
         <text
           x="216"

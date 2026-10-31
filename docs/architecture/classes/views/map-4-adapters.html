@@ -73,7 +73,7 @@
         <desc id="mapad-desc">
           Overview map of the 47 classes of layers 4 and 3 in 12 groups: the routes render the board
           and use the presenters, the composition root creates the presenters, the drivers implement
-          the driver port that the local repositories use, the HTTP repositories of layer 4
+          the driver interface that the local repositories use, the HTTP repositories of layer 4
           implement the output ports of Part 3, and the presenters map game state with one state
           mapper per variant; each group names the view that shows its members.
         </desc>
@@ -423,7 +423,7 @@
         >
           VIEW 4.1
         </text>
-        <!-- Group: driver ports -->
+        <!-- Group: driver interface -->
         <rect
           x="712"
           y="606"
@@ -444,7 +444,7 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.14em"
         >
-          DRIVER PORT · §3.4
+          DRIVER INTERFACE · LAYER 3
         </text>
         <text
           x="972"
@@ -630,7 +630,7 @@
           stroke-width="1"
           marker-end="url(#mapad-open)"
         />
-        <!-- Drivers implement the driver ports: realization, down into layer 3 -->
+        <!-- Drivers implement the driver interface: realization, down into layer 3 -->
         <line
           x1="948"
           y1="242"
@@ -651,7 +651,7 @@
           stroke-width="1"
           marker-start="url(#mapad-diamond-hollow)"
         />
-        <!-- Local repositories keep the driver port they receive: aggregation, up, inside layer 3 -->
+        <!-- Local repositories keep the driver interface they receive: aggregation, up, inside layer 3 -->
         <line
           x1="864"
           y1="790"
@@ -1369,9 +1369,9 @@
         </g>
         <g data-class="GamePresenter">
           <rect
-            x="480"
+            x="472"
             y="634"
-            width="188"
+            width="204"
             height="34"
             rx="4"
             fill="rgba(15,111,116,0.10)"
@@ -1384,11 +1384,11 @@
             </tspan>
             <tspan
               font-family="'IBM Plex Mono', monospace"
-              font-size="9"
+              font-size="8.5"
               font-weight="400"
               fill="#5b6873"
             >
-              &lt;TMove, TState&gt;
+              &lt;TCell, TCoord, TMove&gt;
             </tspan>
           </text>
         </g>
@@ -1443,7 +1443,7 @@
             </tspan>
           </text>
         </g>
-        <!-- Chips: driver ports -->
+        <!-- Chips: driver interface -->
         <g data-class="KeyValueStore">
           <rect
             x="816"
@@ -1505,7 +1505,7 @@
               font-weight="400"
               fill="#5b6873"
             >
-              &lt;TState&gt;
+              &lt;TCell&gt;
             </tspan>
           </text>
         </g>
@@ -1776,7 +1776,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Layer 4 also implements the driver port and the ports of layer 1 (Clock, RandomSource).
+          Layer 4 also implements KeyValueStore of layer 3 and the engine interfaces Clock and
+          RandomSource.
         </text>
 
         <!-- Legend -->

@@ -64,17 +64,17 @@
       <h1>The use cases at a glance</h1>
 
       <svg
-        viewBox="0 0 1040 1132"
+        viewBox="0 0 1040 1184"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="mapuc-title mapuc-desc"
       >
         <title id="mapuc-title">HexaBlock use cases map · UML class diagram</title>
         <desc id="mapuc-desc">
-          Overview map of the 33 layer 2 classes in 7 groups: the aspect decorators wrap the UseCase
+          Overview map of the 35 layer 2 classes in 7 groups: the aspect decorators wrap the UseCase
           input port, the game, progress and account use cases implement it and use the output
-          ports, and the request and response models travel through them; each group names the view
-          that shows its members.
+          ports, and the request and response models and the Result type travel through them; each
+          group names the view that shows its members.
         </desc>
         <defs>
           <marker
@@ -135,7 +135,7 @@
           x="24"
           y="24"
           width="992"
-          height="980"
+          height="1032"
           rx="8"
           fill="#e3f5e6"
           stroke="rgba(21,128,61,0.45)"
@@ -369,7 +369,7 @@
           x="56"
           y="842"
           width="928"
-          height="128"
+          height="178"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -385,7 +385,19 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.14em"
         >
-          REQUEST AND RESPONSE MODELS
+          REQUEST AND RESPONSE MODELS · RESULT
+        </text>
+        <text
+          x="972"
+          y="858"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+          letter-spacing="0.14em"
+        >
+          VIEW 3.5
         </text>
 
         <!-- Dependencies between groups (drawn before chips) -->
@@ -1279,7 +1291,7 @@
               font-weight="400"
               fill="#5b6873"
             >
-              &lt;TState&gt;
+              &lt;TCell, TCoord&gt;
             </tspan>
           </text>
         </g>
@@ -1452,10 +1464,74 @@
           </text>
         </g>
 
+        <g data-class="Result">
+          <rect
+            x="88"
+            y="970"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="168"
+            y="982"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="168" y="995" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              Result
+            </tspan>
+            <tspan
+              font-family="'IBM Plex Mono', monospace"
+              font-size="9"
+              font-weight="400"
+              fill="#5b6873"
+            >
+              &lt;T, E&gt;
+            </tspan>
+          </text>
+        </g>
+        <g data-class="UseCaseError">
+          <rect
+            x="264"
+            y="970"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="344"
+            y="982"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="344" y="995" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              UseCaseError
+            </tspan>
+          </text>
+        </g>
         <!-- Footnote -->
         <text
           x="24"
-          y="1032"
+          y="1084"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1467,15 +1543,15 @@
         <!-- Legend -->
         <line
           x1="24"
-          y1="1056"
+          y1="1108"
           x2="1016"
-          y2="1056"
+          y2="1108"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1074"
+          y="1126"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1486,16 +1562,16 @@
 
         <line
           x1="24"
-          y1="1092"
+          y1="1144"
           x2="52"
-          y2="1092"
+          y2="1144"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#mapuc-triangle)"
         />
         <text
           x="60"
-          y="1096"
+          y="1148"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1504,9 +1580,9 @@
         </text>
         <line
           x1="144"
-          y1="1092"
+          y1="1144"
           x2="172"
-          y2="1092"
+          y2="1144"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -1514,7 +1590,7 @@
         />
         <text
           x="180"
-          y="1096"
+          y="1148"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1523,16 +1599,16 @@
         </text>
         <line
           x1="264"
-          y1="1092"
+          y1="1144"
           x2="292"
-          y2="1092"
+          y2="1144"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#mapuc-diamond-filled)"
         />
         <text
           x="300"
-          y="1096"
+          y="1148"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1541,16 +1617,16 @@
         </text>
         <line
           x1="488"
-          y1="1092"
+          y1="1144"
           x2="516"
-          y2="1092"
+          y2="1144"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#mapuc-diamond-hollow)"
         />
         <text
           x="524"
-          y="1096"
+          y="1148"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1559,16 +1635,16 @@
         </text>
         <line
           x1="720"
-          y1="1092"
+          y1="1144"
           x2="748"
-          y2="1092"
+          y2="1144"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#mapuc-open)"
         />
         <text
           x="756"
-          y="1096"
+          y="1148"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1578,7 +1654,7 @@
 
         <rect
           x="24"
-          y="1112"
+          y="1164"
           width="28"
           height="12"
           rx="2"
@@ -1588,7 +1664,7 @@
         />
         <text
           x="60"
-          y="1121"
+          y="1173"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1597,7 +1673,7 @@
         </text>
         <rect
           x="184"
-          y="1112"
+          y="1164"
           width="28"
           height="12"
           rx="2"
@@ -1608,7 +1684,7 @@
         />
         <text
           x="220"
-          y="1121"
+          y="1173"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1617,7 +1693,7 @@
         </text>
         <rect
           x="432"
-          y="1112"
+          y="1164"
           width="28"
           height="12"
           rx="2"
@@ -1627,7 +1703,7 @@
         />
         <text
           x="468"
-          y="1121"
+          y="1173"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1636,7 +1712,7 @@
         </text>
         <text
           x="632"
-          y="1121"
+          y="1173"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1654,7 +1730,7 @@
         </text>
         <rect
           x="824"
-          y="1112"
+          y="1164"
           width="28"
           height="12"
           rx="2"
@@ -1664,7 +1740,7 @@
         />
         <text
           x="860"
-          y="1121"
+          y="1173"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
