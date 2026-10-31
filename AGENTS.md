@@ -32,7 +32,8 @@ Expo changes every SDK. Read the docs for the installed major version (`https://
 - Domain code imports only domain code, and never React, React Native or Expo. Gate: `pnpm arch`, `test/gates/architecture-gate.test.ts`. <!-- rule: R-domain-imports -->
 - The engine never imports a variant, and a variant never imports another variant. Gate: `pnpm arch`, `test/gates/architecture-gate.test.ts`. <!-- rule: R-engine-variants -->
 - Application code imports only domain and application code. Gate: `pnpm arch`, `test/gates/architecture-gate.test.ts`. <!-- rule: R-application-imports -->
-- Domain code takes time and randomness by injection: no `Math.random`, `Date.now` or `new Date()`. Gate: `pnpm lint`, `test/gates/domain-purity-gate.test.ts`. <!-- rule: R-domain-determinism -->
+- Adapter code imports only domain, application and adapter code: never a driver of `src/infrastructure/`. Gate: `pnpm arch`, `test/gates/architecture-gate.test.ts`. <!-- rule: R-adapters-imports -->
+- Domain and application code take time and randomness by injection: no `Math.random`, `Date.now` or `new Date()`. Gate: `pnpm lint`, `test/gates/domain-purity-gate.test.ts`. <!-- rule: R-domain-determinism -->
 - Do not edit `src/infrastructure/api/schema.d.ts` by hand: run `pnpm api:generate` against backend `main` and commit it. Commit `pacts/` whenever `pnpm test` rewrites it. Gate: `.github/workflows/ci.yml` (job contract runs `pnpm contract:verify` and `pnpm api:check`), `pnpm pact:check`, `test/gates/ci-contract.test.ts`. <!-- rule: R-api-contract -->
 - Keep the required README and AI_USAGE headings. Gate: `test/docs/docs-skeleton.test.ts`. <!-- rule: R-docs-headings -->
 - Log AI use per task in `AI_USAGE.md`. Gate: no gate. <!-- rule: R-ai-usage-log -->

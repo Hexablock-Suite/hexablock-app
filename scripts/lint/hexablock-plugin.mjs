@@ -12,15 +12,17 @@ function isMember(node, object, property) {
   );
 }
 
-// Domain code gets time from an injected clock and randomness from an
-// injected, seeded source. Then games are reproducible and testable.
+// Domain and application code get time from an injected clock and randomness
+// from an injected, seeded source. Then games are reproducible and testable.
 const noAmbientNondeterminism = defineRule({
   meta: {
     type: 'problem',
     messages: {
-      mathRandom: 'Domain code must not use Math.random. Inject a seeded random source.',
-      dateNow: 'Domain code must not use Date.now. Inject a clock.',
-      newDate: 'Domain code must not call new Date() without arguments. Inject a clock.',
+      mathRandom:
+        'Domain and application code must not use Math.random. Inject a seeded random source.',
+      dateNow: 'Domain and application code must not use Date.now. Inject a clock.',
+      newDate:
+        'Domain and application code must not call new Date() without arguments. Inject a clock.',
     },
   },
   create(context) {

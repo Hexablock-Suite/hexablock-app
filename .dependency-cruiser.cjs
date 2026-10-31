@@ -43,6 +43,14 @@ module.exports = {
       from: { path: layer('application') },
       to: { pathNot: '(?:^|/)src/(?:domain|application)/' },
     },
+    {
+      name: 'adapters-imports-only-inner-layers',
+      comment:
+        'Adapter code imports only domain, application and adapter code: no driver, package or Node module.',
+      severity: 'error',
+      from: { path: layer('adapters') },
+      to: { pathNot: '(?:^|/)src/(?:domain|application|adapters)/' },
+    },
   ],
   options: {
     doNotFollow: { path: 'node_modules' },

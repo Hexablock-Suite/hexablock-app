@@ -30,8 +30,8 @@ export default defineConfig({
     },
     overrides: [
       {
-        // Matches src/domain/ at any depth, so fixtures follow the same rule.
-        files: ['**/src/domain/**'],
+        // Matches src/domain/ and src/application/ at any depth, so fixtures follow the same rule.
+        files: ['**/src/domain/**', '**/src/application/**'],
         rules: { 'hexablock/no-ambient-nondeterminism': 'error' },
       },
     ],
