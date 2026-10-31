@@ -219,7 +219,7 @@
         <rect
           x="40"
           y="256"
-          width="352"
+          width="348"
           height="120"
           rx="8"
           fill="none"
@@ -239,9 +239,9 @@
           DRIVER PORT · §3.4
         </text>
         <rect
-          x="424"
+          x="432"
           y="256"
-          width="288"
+          width="280"
           height="120"
           rx="8"
           fill="none"
@@ -250,7 +250,7 @@
           stroke-dasharray="4,4"
         />
         <text
-          x="436"
+          x="444"
           y="272"
           fill="#5b6873"
           font-size="8"
@@ -272,7 +272,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#adrepos-triangle)"
         />
-        <!-- LocalProgressRepository holds KeyValueStore: aggregation -->
+        <!-- LocalProgressRepository keeps the KeyValueStore it receives: aggregation -->
         <line
           x1="440"
           y1="328"
@@ -282,11 +282,11 @@
           stroke-width="1"
           marker-start="url(#adrepos-diamond-hollow)"
         />
-        <!-- ApiProgressRepository holds its ApiDtoMapper: aggregation -->
+        <!-- ApiProgressRepository keeps the ApiDtoMapper it receives: aggregation -->
         <line
           x1="744"
           y1="148"
-          x2="712"
+          x2="688"
           y2="148"
           stroke="#17212a"
           stroke-width="1"
@@ -312,31 +312,32 @@
           stroke-dasharray="5,4"
           marker-end="url(#adrepos-triangle)"
         />
-        <!-- Multiplicities -->
-        <rect x="382" y="332" width="12" height="12" rx="2" fill="#e2ebf8" />
+        <!-- Role names and multiplicities at the part end -->
+        <rect x="392" y="312" width="38" height="12" rx="2" fill="#e2ebf8" />
         <text
-          x="388"
-          y="341"
+          x="394"
+          y="321"
           fill="#17212a"
           font-size="8"
-          font-weight="600"
           font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
+          text-anchor="start"
         >
-          1
+          store
+          <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="716" y="152" width="12" height="12" rx="2" fill="#eceef0" />
+        <rect x="690" y="131" width="43" height="12" rx="2" fill="#eceef0" />
         <text
-          x="722"
-          y="161"
+          x="692"
+          y="140"
           fill="#17212a"
           font-size="8"
-          font-weight="600"
           font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
+          text-anchor="start"
         >
-          1
+          mapper
+          <tspan font-weight="600">1</tspan>
         </text>
+
         <!-- Class: DeviceKeyValueStore (adapter, driver) -->
         <rect
           x="56"
@@ -378,16 +379,16 @@
         <rect
           x="376"
           y="92"
-          width="336"
+          width="312"
           height="104"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="376" y1="140" x2="712" y2="140" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="376" y1="140" x2="688" y2="140" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="544"
+          x="532"
           y="110"
           fill="#5b6873"
           font-size="8"
@@ -398,7 +399,7 @@
           «mapper»
         </text>
         <text
-          x="544"
+          x="532"
           y="128"
           fill="#17212a"
           font-size="12"
@@ -614,6 +615,7 @@
         >
           LEGEND
         </text>
+
         <line
           x1="24"
           y1="612"
@@ -621,7 +623,6 @@
           y2="612"
           stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="5,4"
           marker-end="url(#adrepos-triangle)"
         />
         <text
@@ -631,26 +632,82 @@
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
+          Inheritance
+        </text>
+        <line
+          x1="144"
+          y1="612"
+          x2="172"
+          y2="612"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#adrepos-triangle)"
+        />
+        <text
+          x="180"
+          y="616"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
           Realization
         </text>
         <line
-          x1="184"
+          x1="264"
           y1="612"
-          x2="212"
+          x2="292"
+          y2="612"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#adrepos-diamond-filled)"
+        />
+        <text
+          x="300"
+          y="616"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Composition · attribute it creates
+        </text>
+        <line
+          x1="488"
+          y1="612"
+          x2="516"
           y2="612"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#adrepos-diamond-hollow)"
         />
         <text
-          x="220"
+          x="524"
           y="616"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Aggregation · has
+          Aggregation · attribute it receives
         </text>
+        <line
+          x1="720"
+          y1="612"
+          x2="748"
+          y2="612"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#adrepos-open)"
+        />
+        <text
+          x="756"
+          y="616"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Use · parameter, return, local or new
+        </text>
+
         <rect
           x="24"
           y="632"
@@ -748,6 +805,7 @@
         >
           Reference box · detailed in another view
         </text>
+
         <rect
           x="24"
           y="656"
