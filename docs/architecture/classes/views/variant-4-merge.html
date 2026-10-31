@@ -100,6 +100,33 @@
           >
             <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
           </marker>
+          <marker
+            id="merge-diamond-filled"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 5, 9 0, 18 5, 9 10" fill="#17212a" />
+          </marker>
+          <marker
+            id="merge-diamond-hollow"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon
+              points="0 5, 9 0, 18 5, 9 10"
+              fill="#ffffff"
+              stroke="#17212a"
+              stroke-width="1"
+            />
+          </marker>
         </defs>
 
         <rect width="100%" height="100%" fill="#f3f5f6" />
@@ -198,53 +225,31 @@
         </text>
 
         <!-- Relationships (drawn before boxes) -->
-        <!-- MergeFactory creates MergeScoring: dependency «create» -->
+        <!-- MergeFactory creates MergeScoring: use «create» -->
         <path
           d="M264 136 H740 Q748 136 748 144 V272"
           fill="none"
-          stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#merge-open)"
+          stroke="#5b6873"
         />
-        <!-- MergeFactory binds TCell to MergeTile on MergeRules: dependency «bind» -->
+        <!-- MergeFactory creates MergeRules and binds TCell to MergeTile: use «bind» -->
         <path
           d="M264 152 H360 Q368 152 368 160 V272"
           fill="none"
-          stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#merge-open)"
+          stroke="#5b6873"
         />
-        <!-- MergeRules bounds TCell by IMergeable: dependency -->
+        <!-- MergeRules bounds TCell by IMergeable: use labelled with the type parameter -->
         <path
           d="M368 360 V492 Q368 500 360 500 H304"
           fill="none"
-          stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#merge-open)"
-        />
-        <!-- MergeRules is typed by MergeState: dependency -->
-        <line
-          x1="464"
-          y1="360"
-          x2="464"
-          y2="448"
           stroke="#5b6873"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#merge-open)"
         />
-        <!-- MergeRules is typed by Slide: dependency -->
-        <path
-          d="M620 340 H632 Q640 340 640 348 V448"
-          fill="none"
-          stroke="#5b6873"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#merge-open)"
-        />
+
         <!-- MergeTile implements IMergeable: realization with binding -->
         <line
           x1="128"
@@ -270,9 +275,9 @@
         >
           «create»
         </text>
-        <rect x="376" y="194" width="132" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="302" y="194" width="132" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="442"
+          x="368"
           y="203"
           fill="#7d8a94"
           font-size="8"
@@ -282,9 +287,9 @@
         >
           «bind» TCell → MergeTile
         </text>
-        <rect x="296" y="400" width="64" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="334" y="400" width="68" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="328"
+          x="368"
           y="409"
           fill="#7d8a94"
           font-size="8"
@@ -292,31 +297,7 @@
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          TCELL BOUND
-        </text>
-        <rect x="472" y="400" width="36" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="490"
-          y="409"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          TSTATE
-        </text>
-        <rect x="648" y="400" width="40" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="668"
-          y="409"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          TMOVE
+          TCell bound
         </text>
         <rect x="136" y="566" width="112" height="12" rx="2" fill="#f9f4dc" />
         <text
@@ -759,7 +740,6 @@
           y2="864"
           stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="5,4"
           marker-end="url(#merge-triangle)"
         />
         <text
@@ -769,28 +749,81 @@
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Realization
+          Inheritance
         </text>
         <line
-          x1="184"
+          x1="144"
           y1="864"
-          x2="212"
+          x2="172"
           y2="864"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#merge-open)"
+          stroke-dasharray="5,4"
+          marker-end="url(#merge-triangle)"
         />
         <text
-          x="220"
+          x="180"
           y="868"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Dependency · uses
+          Realization
         </text>
-
+        <line
+          x1="264"
+          y1="864"
+          x2="292"
+          y2="864"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#merge-diamond-filled)"
+        />
+        <text
+          x="300"
+          y="868"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Composition · attribute it creates
+        </text>
+        <line
+          x1="474"
+          y1="864"
+          x2="502"
+          y2="864"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#merge-diamond-hollow)"
+        />
+        <text
+          x="510"
+          y="868"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aggregation · attribute it receives
+        </text>
+        <line
+          x1="694"
+          y1="864"
+          x2="722"
+          y2="864"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#merge-open)"
+        />
+        <text
+          x="730"
+          y="868"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Use · parameter, return, local or new
+        </text>
         <rect
           x="24"
           y="884"

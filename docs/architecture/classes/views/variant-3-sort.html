@@ -88,6 +88,44 @@
           >
             <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
           </marker>
+          <marker
+            id="sort-triangle"
+            markerWidth="16"
+            markerHeight="12"
+            refX="15"
+            refY="6"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          </marker>
+          <marker
+            id="sort-diamond-filled"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 5, 9 0, 18 5, 9 10" fill="#17212a" />
+          </marker>
+          <marker
+            id="sort-diamond-hollow"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon
+              points="0 5, 9 0, 18 5, 9 10"
+              fill="#ffffff"
+              stroke="#17212a"
+              stroke-width="1"
+            />
+          </marker>
         </defs>
 
         <rect width="100%" height="100%" fill="#f3f5f6" />
@@ -186,67 +224,51 @@
         </text>
 
         <!-- Relationships (drawn before boxes) -->
-        <!-- SortFactory creates SortScoring: dependency «create» -->
+        <!-- SortFactory creates SortScoring: use «create» -->
         <line
           x1="288"
           y1="144"
           x2="464"
           y2="144"
-          stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#sort-open)"
+          stroke="#5b6873"
         />
-        <!-- SortFactory creates SortRules: dependency «create» -->
+        <!-- SortFactory creates SortRules: use «create» -->
         <path
           d="M288 172 H416 Q424 172 424 180 V276 Q424 284 432 284 H464"
           fill="none"
-          stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#sort-open)"
+          stroke="#5b6873"
         />
-        <!-- SortFactory holds its SortLevel: association -->
+        <!-- SortFactory holds the SortLevel it receives as level: aggregation -->
         <line
           x1="216"
           y1="192"
           x2="216"
           y2="272"
-          stroke="#5b6873"
           stroke-width="1"
-          marker-end="url(#sort-open)"
+          marker-start="url(#sort-diamond-hollow)"
+          stroke="#17212a"
         />
-        <!-- SortLevelBuilder creates SortLevel: dependency «create» -->
+        <!-- SortLevelBuilder creates SortLevel: use «create» -->
         <line
           x1="160"
           y1="440"
           x2="160"
           y2="392"
-          stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#sort-open)"
+          stroke="#5b6873"
         />
-        <!-- SortRules is typed by SortState: dependency -->
-        <line
-          x1="680"
-          y1="328"
-          x2="680"
-          y2="392"
+
+        <!-- SortState binds TCell to ColorStack through its board and tray: use «bind» -->
+        <path
+          d="M740,504 V532 H896 V512"
+          fill="none"
           stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#sort-open)"
-        />
-        <!-- SortState holds ColorStack cells: dependency -->
-        <line
-          x1="760"
-          y1="456"
-          x2="816"
-          y2="456"
-          stroke="#5b6873"
-          stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#sort-open)"
         />
 
@@ -275,17 +297,17 @@
         >
           «create»
         </text>
-        <rect x="168" y="218" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="176" y="258" width="36" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="186"
-          y="227"
+          x="194"
+          y="267"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          LEVEL
+          level
         </text>
         <rect x="168" y="410" width="56" height="12" rx="2" fill="#f9f4dc" />
         <text
@@ -299,36 +321,23 @@
         >
           «create»
         </text>
-        <rect x="688" y="354" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="782" y="536" width="72" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="708"
-          y="363"
+          x="818"
+          y="545"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          TSTATE
+          «bind» TCell
         </text>
-        <rect x="768" y="436" width="32" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="788"
-          y="445"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          TCELL
-        </text>
-
         <!-- Multiplicities -->
-        <rect x="222" y="254" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="222" y="258" width="12" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="228"
-          y="263"
+          y="267"
           fill="#17212a"
           font-size="8"
           font-weight="600"
@@ -732,9 +741,9 @@
           y1="692"
           x2="52"
           y2="692"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          marker-end="url(#sort-open)"
+          marker-end="url(#sort-triangle)"
         />
         <text
           x="60"
@@ -743,28 +752,81 @@
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Association
+          Inheritance
         </text>
         <line
-          x1="184"
+          x1="144"
           y1="692"
-          x2="212"
+          x2="172"
           y2="692"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#sort-open)"
+          stroke-dasharray="5,4"
+          marker-end="url(#sort-triangle)"
         />
         <text
-          x="220"
+          x="180"
           y="696"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Dependency · uses
+          Realization
         </text>
-
+        <line
+          x1="264"
+          y1="692"
+          x2="292"
+          y2="692"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#sort-diamond-filled)"
+        />
+        <text
+          x="300"
+          y="696"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Composition · attribute it creates
+        </text>
+        <line
+          x1="474"
+          y1="692"
+          x2="502"
+          y2="692"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#sort-diamond-hollow)"
+        />
+        <text
+          x="510"
+          y="696"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aggregation · attribute it receives
+        </text>
+        <line
+          x1="694"
+          y1="692"
+          x2="722"
+          y2="692"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#sort-open)"
+        />
+        <text
+          x="730"
+          y="696"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Use · parameter, return, local or new
+        </text>
         <rect
           x="24"
           y="712"
