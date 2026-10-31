@@ -26,6 +26,9 @@ TODO: explain the generic types (board, rules, engine) and how each variant inst
 
 TODO: list each GoF pattern, where it lives and why.
 
+The pattern table of the class diagram is the plan for this section: [docs/architecture/classes.md](docs/architecture/classes.md#patterns).
+State has no `MenuState`. The menu is navigation, so it lives in the presentation layer, and the domain states cover only the game lifecycle (D2).
+
 ## SOLID Principles
 
 TODO: give one concrete example per principle from this codebase.
