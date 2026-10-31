@@ -225,39 +225,39 @@
         </text>
 
         <!-- Relationships (drawn before boxes) -->
-        <!-- UndoMove reaches the running game: association -->
+        <!-- UndoMove holds RunningGameStore: aggregation -->
         <path
-          d="M640 184 H256 Q248 184 248 192 V316"
+          marker-start="url(#ucgame-diamond-hollow)"
+          d="M632 184 H256 Q248 184 248 192 V316"
           fill="none"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          marker-end="url(#ucgame-open)"
         />
-        <!-- RedoMove reaches the running game: association -->
+        <!-- RedoMove holds RunningGameStore: aggregation -->
         <line
-          x1="640"
+          marker-start="url(#ucgame-diamond-hollow)"
+          x1="632"
           y1="340"
-          x2="408"
+          x2="428"
           y2="340"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          marker-end="url(#ucgame-open)"
         />
-        <!-- StartGame stores the new game: association -->
+        <!-- StartGame holds RunningGameStore: aggregation -->
         <path
-          d="M640 472 H384 Q376 472 376 464 V404"
+          marker-start="url(#ucgame-diamond-hollow)"
+          d="M632 472 H384 Q376 472 376 464 V404"
           fill="none"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          marker-end="url(#ucgame-open)"
         />
-        <!-- ApplyMove reaches the running game: association -->
+        <!-- ApplyMove holds RunningGameStore: aggregation -->
         <path
-          d="M640 600 H352 Q344 600 344 592 V404"
+          marker-start="url(#ucgame-diamond-hollow)"
+          d="M632 600 H352 Q344 600 344 592 V404"
           fill="none"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          marker-end="url(#ucgame-open)"
         />
         <!-- RunningGameStore holds zero or one GameEngine: association -->
         <line
@@ -278,14 +278,13 @@
           stroke-dasharray="4,3"
           marker-end="url(#ucgame-open)"
         />
-        <!-- StartGame creates the game with IVariantFactory: dependency -->
+        <!-- StartGame holds its IVariantFactory: aggregation -->
         <path
-          d="M928 456 H960 Q968 456 968 464 V720"
+          marker-start="url(#ucgame-diamond-hollow)"
+          d="M936 456 H960 Q968 456 968 464 V720"
           fill="none"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#ucgame-open)"
         />
 
         <!-- Arrow labels -->
@@ -325,9 +324,9 @@
         >
           PLAY()
         </text>
-        <rect x="892" y="690" width="68" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="912" y="690" width="48" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="926"
+          x="936"
           y="699"
           fill="#7d8a94"
           font-size="8"
@@ -335,7 +334,7 @@
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          CREATES WITH
+          FACTORY
         </text>
 
         <!-- Multiplicities -->
@@ -354,16 +353,16 @@
 
         <!-- Class: UndoMove (use case) -->
         <rect
-          x="640"
+          x="632"
           y="120"
-          width="288"
+          width="304"
           height="100"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="640" y1="180" x2="928" y2="180" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="632" y1="180" x2="936" y2="180" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="784"
           y="138"
@@ -397,25 +396,25 @@
         >
           APP-FR-08
         </text>
-        <text x="656" y="196" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="648" y="196" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - games: RunningGameStore
         </text>
-        <text x="656" y="212" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="648" y="212" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           fails when the history is not IUndoable
         </text>
 
         <!-- Class: RedoMove (use case) -->
         <rect
-          x="640"
+          x="632"
           y="264"
-          width="288"
+          width="304"
           height="100"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="640" y1="324" x2="928" y2="324" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="632" y1="324" x2="936" y2="324" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="784"
           y="282"
@@ -449,25 +448,25 @@
         >
           APP-FR-08
         </text>
-        <text x="656" y="340" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="648" y="340" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - games: RunningGameStore
         </text>
-        <text x="656" y="356" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="648" y="356" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           fails when the history is not IRedoable
         </text>
 
         <!-- Class: StartGame (use case) -->
         <rect
-          x="640"
+          x="632"
           y="408"
-          width="288"
+          width="304"
           height="100"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="640" y1="468" x2="928" y2="468" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="632" y1="468" x2="936" y2="468" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="784"
           y="426"
@@ -501,27 +500,27 @@
         >
           APP-FR-01 · APP-FR-03
         </text>
-        <text x="656" y="484" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="648" y="484" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - factory: IVariantFactory&lt;TCell, TMove, TState&gt;
         </text>
-        <text x="656" y="500" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="648" y="500" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - games: RunningGameStore&lt;TCell, TMove, TState&gt;
         </text>
 
         <!-- Class: ApplyMove (focal, use case) -->
         <rect
-          x="640"
+          x="632"
           y="552"
-          width="288"
+          width="304"
           height="84"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
           stroke-width="1"
         />
-        <rect x="640" y="552" width="288" height="60" rx="6" fill="rgba(15,111,116,0.10)" />
-        <rect x="640" y="604" width="288" height="8" fill="rgba(15,111,116,0.10)" />
-        <line x1="640" y1="612" x2="928" y2="612" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <rect x="632" y="552" width="304" height="60" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="632" y="604" width="304" height="8" fill="rgba(15,111,116,0.10)" />
+        <line x1="632" y1="612" x2="936" y2="612" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text
           x="784"
           y="570"
@@ -555,24 +554,24 @@
         >
           APP-FR-03
         </text>
-        <text x="656" y="628" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="648" y="628" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - games: RunningGameStore&lt;TCell, TMove, TState&gt;
         </text>
 
         <!-- Class: RunningGameStore (interface, output port) -->
         <rect
-          x="72"
+          x="64"
           y="316"
-          width="336"
+          width="364"
           height="88"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="72" y1="364" x2="408" y2="364" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="64" y1="364" x2="428" y2="364" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="240"
+          x="246"
           y="334"
           fill="#5b6873"
           font-size="8"
@@ -583,7 +582,7 @@
           «interface» «port»
         </text>
         <text
-          x="240"
+          x="246"
           y="352"
           fill="#17212a"
           font-size="12"
@@ -593,10 +592,10 @@
         >
           RunningGameStore
         </text>
-        <text x="88" y="380" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="380" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + current(): GameEngine&lt;TCell, TMove, TState&gt; | undefined
         </text>
-        <text x="88" y="396" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="396" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + replace(game: GameEngine&lt;TCell, TMove, TState&gt;): void
         </text>
 
@@ -674,7 +673,7 @@
 
         <!-- UML template boxes: type parameters on the top-right corner -->
         <rect
-          x="820"
+          x="828"
           y="398"
           width="120"
           height="18"
@@ -685,7 +684,7 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="880"
+          x="888"
           y="410"
           fill="#5b6873"
           font-size="8.5"
@@ -695,7 +694,7 @@
           TCell, TMove, TState
         </text>
         <rect
-          x="820"
+          x="828"
           y="542"
           width="120"
           height="18"
@@ -706,7 +705,7 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="880"
+          x="888"
           y="554"
           fill="#5b6873"
           font-size="8.5"
@@ -716,7 +715,7 @@
           TCell, TMove, TState
         </text>
         <rect
-          x="300"
+          x="320"
           y="306"
           width="120"
           height="18"
@@ -727,7 +726,7 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="360"
+          x="380"
           y="318"
           fill="#5b6873"
           font-size="8.5"

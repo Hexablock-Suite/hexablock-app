@@ -281,27 +281,25 @@
           stroke-width="1"
           marker-end="url(#uccontract-triangle)"
         />
-        <!-- LoggingAspect uses Logger: dependency -->
+        <!-- LoggingAspect holds Logger: aggregation -->
         <line
+          marker-start="url(#uccontract-diamond-hollow)"
           x1="440"
           y1="504"
           x2="440"
           y2="584"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#uccontract-open)"
         />
-        <!-- TimingAspect uses Logger: dependency -->
+        <!-- TimingAspect holds Logger: aggregation -->
         <line
+          marker-start="url(#uccontract-diamond-hollow)"
           x1="600"
           y1="504"
           x2="600"
           y2="584"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#uccontract-open)"
         />
 
         <!-- Arrow labels -->
@@ -538,16 +536,16 @@
 
         <!-- Class: Logger (interface, output port) -->
         <rect
-          x="380"
+          x="372"
           y="584"
-          width="280"
+          width="296"
           height="88"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="380" y1="632" x2="660" y2="632" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="372" y1="632" x2="668" y2="632" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="520"
           y="602"
@@ -570,10 +568,10 @@
         >
           Logger
         </text>
-        <text x="396" y="648" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="388" y="648" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + info(message: string, data?: object): void
         </text>
-        <text x="396" y="664" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="388" y="664" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + error(message: string, error: unknown): void
         </text>
 

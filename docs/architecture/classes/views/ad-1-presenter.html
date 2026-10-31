@@ -78,6 +78,22 @@
         </desc>
         <defs>
           <marker
+            id="adpresenter-diamond-hollow"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon
+              points="0 5, 9 0, 18 5, 9 10"
+              fill="#ffffff"
+              stroke="#17212a"
+              stroke-width="1"
+            />
+          </marker>
+          <marker
             id="adpresenter-triangle"
             markerWidth="16"
             markerHeight="12"
@@ -195,9 +211,9 @@
         </text>
 
         <rect
-          x="40"
+          x="32"
           y="252"
-          width="248"
+          width="256"
           height="216"
           rx="8"
           fill="none"
@@ -206,7 +222,7 @@
           stroke-dasharray="4,4"
         />
         <text
-          x="52"
+          x="44"
           y="268"
           fill="#5b6873"
           font-size="8"
@@ -220,7 +236,7 @@
         <rect
           x="320"
           y="252"
-          width="672"
+          width="680"
           height="184"
           rx="8"
           fill="none"
@@ -277,7 +293,7 @@
         <line
           x1="336"
           y1="340"
-          x2="272"
+          x2="280"
           y2="340"
           stroke="#5b6873"
           stroke-width="1"
@@ -285,9 +301,9 @@
         />
         <!-- GamePresenter to GameViewModel: dependency -->
         <line
-          x1="720"
+          x1="744"
           y1="356"
-          x2="776"
+          x2="796"
           y2="356"
           stroke="#5b6873"
           stroke-width="1"
@@ -305,16 +321,15 @@
           stroke-dasharray="5,4"
           marker-end="url(#adpresenter-triangle)"
         />
-        <!-- GamePresenter to UseCase: dependency, down from layer 3 to layer 2 -->
+        <!-- GamePresenter holds its UseCase input port: aggregation, down from layer 3 to layer 2 -->
         <line
+          marker-start="url(#adpresenter-diamond-hollow)"
           x1="528"
           y1="420"
           x2="528"
           y2="528"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#adpresenter-open)"
         />
 
         <!-- Arrow labels -->
@@ -354,9 +369,9 @@
         >
           MAPPER
         </text>
-        <rect x="728" y="336" width="40" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="748" y="336" width="44" height="12" rx="2" fill="#e2ebf8" />
         <text
-          x="748"
+          x="770"
           y="345"
           fill="#7d8a94"
           font-size="8"
@@ -404,9 +419,9 @@
         >
           1
         </text>
-        <rect x="278" y="334" width="12" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="286" y="334" width="12" height="12" rx="2" fill="#e2ebf8" />
         <text
-          x="284"
+          x="292"
           y="343"
           fill="#17212a"
           font-size="8"
@@ -510,19 +525,19 @@
         <rect
           x="336"
           y="284"
-          width="384"
+          width="408"
           height="136"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
           stroke-width="1"
         />
-        <rect x="336" y="284" width="384" height="40" rx="6" fill="rgba(15,111,116,0.10)" />
-        <rect x="336" y="316" width="384" height="8" fill="rgba(15,111,116,0.10)" />
-        <line x1="336" y1="324" x2="720" y2="324" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
-        <line x1="336" y1="364" x2="720" y2="364" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <rect x="336" y="284" width="408" height="40" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="336" y="316" width="408" height="8" fill="rgba(15,111,116,0.10)" />
+        <line x1="336" y1="324" x2="744" y2="324" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <line x1="336" y1="364" x2="744" y2="364" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text
-          x="528"
+          x="540"
           y="309"
           fill="#17212a"
           font-size="12"
@@ -550,18 +565,18 @@
 
         <!-- Class: GameViewModel (value object) -->
         <rect
-          x="776"
+          x="796"
           y="284"
-          width="200"
+          width="196"
           height="136"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="776" y1="332" x2="976" y2="332" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="796" y1="332" x2="992" y2="332" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="876"
+          x="894"
           y="302"
           fill="#5b6873"
           font-size="8"
@@ -572,7 +587,7 @@
           «value object»
         </text>
         <text
-          x="876"
+          x="894"
           y="320"
           fill="#17212a"
           font-size="12"
@@ -582,36 +597,36 @@
         >
           GameViewModel
         </text>
-        <text x="792" y="348" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="812" y="348" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + cells: CellView[]
         </text>
-        <text x="792" y="364" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="812" y="364" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + score: number
         </text>
-        <text x="792" y="380" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="812" y="380" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + canUndo: boolean
         </text>
-        <text x="792" y="396" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="812" y="396" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + canRedo: boolean
         </text>
-        <text x="792" y="412" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="812" y="412" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + phase: string
         </text>
 
         <!-- Class: StateMapper (interface, strategy) -->
         <rect
-          x="56"
+          x="44"
           y="284"
-          width="216"
+          width="236"
           height="72"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="56" y1="332" x2="272" y2="332" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="44" y1="332" x2="280" y2="332" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="164"
+          x="162"
           y="302"
           fill="#5b6873"
           font-size="8"
@@ -622,7 +637,7 @@
           «interface» «Strategy»
         </text>
         <text
-          x="164"
+          x="162"
           y="320"
           fill="#17212a"
           font-size="12"
@@ -632,15 +647,15 @@
         >
           StateMapper
         </text>
-        <text x="72" y="348" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="60" y="348" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + toCells(state: TState): CellView[]
         </text>
 
         <!-- Class: LinesStateMapper -->
         <rect
-          x="56"
+          x="44"
           y="412"
-          width="216"
+          width="236"
           height="40"
           rx="6"
           fill="#ffffff"
@@ -648,7 +663,7 @@
           stroke-width="1"
         />
         <text
-          x="164"
+          x="162"
           y="437"
           fill="#17212a"
           font-size="12"
@@ -697,7 +712,7 @@
 
         <!-- UML template boxes: type parameters on the top-right corner -->
         <rect
-          x="648"
+          x="672"
           y="274"
           width="84"
           height="18"
@@ -708,7 +723,7 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="690"
+          x="714"
           y="286"
           fill="#5b6873"
           font-size="8.5"
@@ -718,7 +733,7 @@
           TMove, TState
         </text>
         <rect
-          x="236"
+          x="244"
           y="274"
           width="48"
           height="18"
@@ -729,7 +744,7 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="260"
+          x="268"
           y="286"
           fill="#5b6873"
           font-size="8.5"
@@ -965,6 +980,24 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Corner box · type parameters
+        </text>
+        <line
+          x1="904"
+          y1="710"
+          x2="932"
+          y2="710"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#adpresenter-diamond-hollow)"
+        />
+        <text
+          x="940"
+          y="714"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aggregation · has
         </text>
       </svg>
     </div>
