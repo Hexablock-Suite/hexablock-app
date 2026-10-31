@@ -222,7 +222,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#geo-triangle)"
         />
-        <!-- BoardBuilder holds its GeometryFactory: aggregation -->
+        <!-- BoardBuilder holds the GeometryFactory it receives as geometry: aggregation -->
         <line
           x1="584"
           y1="152"
@@ -232,36 +232,33 @@
           stroke-width="1"
           marker-start="url(#geo-diamond-hollow)"
         />
-        <!-- HexGeometry creates HexCoord: dependency «create» -->
+        <!-- HexGeometry creates HexCoord: use «create» -->
         <line
           x1="140"
           y1="344"
           x2="140"
           y2="440"
-          stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#geo-open)"
+          stroke="#5b6873"
         />
-        <!-- HexGeometry creates HexTopology: dependency «create» -->
+        <!-- HexGeometry creates HexTopology: use «create» -->
         <path
           d="M232 344 V384 Q232 392 240 392 H396 Q404 392 404 400 V440"
           fill="none"
-          stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#geo-open)"
+          stroke="#5b6873"
         />
-        <!-- BoardBuilder creates Board: dependency «create» -->
+        <!-- BoardBuilder creates Board: use «create» -->
         <line
-          x1="780"
+          x1="700"
           y1="228"
-          x2="780"
+          x2="700"
           y2="296"
-          stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#geo-open)"
+          stroke="#5b6873"
         />
         <!-- Arrow labels -->
         <rect x="180" y="228" width="148" height="12" rx="2" fill="#f9f4dc" />
@@ -288,17 +285,17 @@
         >
           «bind» TCoord → SquareCoord
         </text>
-        <rect x="480" y="132" width="56" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="452" y="136" width="52" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="508"
-          y="141"
+          x="478"
+          y="145"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          GEOMETRY
+          geometry
         </text>
         <rect x="148" y="400" width="56" height="12" rx="2" fill="#f9f4dc" />
         <text
@@ -324,9 +321,9 @@
         >
           «create»
         </text>
-        <rect x="788" y="256" width="56" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="704" y="256" width="56" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="816"
+          x="732"
           y="265"
           fill="#7d8a94"
           font-size="8"
@@ -707,7 +704,6 @@
           y2="688"
           stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="5,4"
           marker-end="url(#geo-triangle)"
         />
         <text
@@ -717,44 +713,80 @@
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
+          Inheritance
+        </text>
+        <line
+          x1="144"
+          y1="688"
+          x2="172"
+          y2="688"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#geo-triangle)"
+        />
+        <text
+          x="180"
+          y="692"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
           Realization
         </text>
         <line
-          x1="184"
+          x1="264"
           y1="688"
-          x2="212"
+          x2="292"
+          y2="688"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#geo-diamond-filled)"
+        />
+        <text
+          x="300"
+          y="692"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Composition · attribute it creates
+        </text>
+        <line
+          x1="474"
+          y1="688"
+          x2="502"
           y2="688"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#geo-diamond-hollow)"
         />
         <text
-          x="220"
+          x="510"
           y="692"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Aggregation · has
+          Aggregation · attribute it receives
         </text>
         <line
-          x1="344"
+          x1="694"
           y1="688"
-          x2="372"
+          x2="722"
           y2="688"
           stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#geo-open)"
         />
         <text
-          x="380"
+          x="730"
           y="692"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Dependency · «create»
+          Use · parameter, return, local or new
         </text>
         <rect
           x="24"

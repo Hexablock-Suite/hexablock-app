@@ -219,15 +219,15 @@
           DECORATOR · §3.3
         </text>
         <!-- Relationships (drawn before boxes) -->
-        <!-- GameEngine holds its IGameRules: association -->
+        <!-- GameEngine holds the IGameRules it receives as rules: aggregation -->
         <line
           x1="208"
           y1="168"
           x2="296"
           y2="168"
-          stroke="#5b6873"
           stroke-width="1"
-          marker-end="url(#rules-open)"
+          marker-start="url(#rules-diamond-hollow)"
+          stroke="#17212a"
         />
         <!-- BaseGameRules implements IGameRules: realization -->
         <line
@@ -249,7 +249,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#rules-triangle)"
         />
-        <!-- TimedRulesDecorator wraps one inner IGameRules: aggregation -->
+        <!-- TimedRulesDecorator holds the IGameRules it wraps as inner: aggregation -->
         <path
           d="M848 320 V136 Q848 128 840 128 H616"
           fill="none"
@@ -257,7 +257,7 @@
           stroke-width="1"
           marker-start="url(#rules-diamond-hollow)"
         />
-        <!-- TimedRulesDecorator holds a LevelTimer: aggregation -->
+        <!-- TimedRulesDecorator holds the LevelTimer it receives as timer: aggregation -->
         <line
           x1="844"
           y1="448"
@@ -288,41 +288,41 @@
           marker-end="url(#rules-triangle)"
         />
         <!-- Arrow labels -->
-        <rect x="216" y="148" width="40" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="256" y="152" width="36" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="236"
-          y="157"
+          x="274"
+          y="161"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          RULES
+          rules
         </text>
-        <rect x="640" y="108" width="40" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="622" y="112" width="36" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="660"
-          y="117"
+          x="640"
+          y="121"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          INNER
+          inner
         </text>
-        <rect x="852" y="478" width="40" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="848" y="500" width="36" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="872"
-          y="487"
+          x="866"
+          y="509"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          TIMER
+          timer
         </text>
         <!-- Multiplicities -->
         <rect x="278" y="172" width="12" height="12" rx="2" fill="#f9f4dc" />
@@ -810,9 +810,9 @@
           Inheritance
         </text>
         <line
-          x1="184"
+          x1="144"
           y1="704"
-          x2="212"
+          x2="172"
           y2="704"
           stroke="#17212a"
           stroke-width="1"
@@ -820,7 +820,7 @@
           marker-end="url(#rules-triangle)"
         />
         <text
-          x="220"
+          x="180"
           y="708"
           fill="#5b6873"
           font-size="8.5"
@@ -829,40 +829,58 @@
           Realization
         </text>
         <line
-          x1="344"
+          x1="264"
           y1="704"
-          x2="372"
+          x2="292"
+          y2="704"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#rules-diamond-filled)"
+        />
+        <text
+          x="300"
+          y="708"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Composition · attribute it creates
+        </text>
+        <line
+          x1="474"
+          y1="704"
+          x2="502"
           y2="704"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#rules-diamond-hollow)"
         />
         <text
-          x="380"
+          x="510"
           y="708"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Aggregation · has
+          Aggregation · attribute it receives
         </text>
         <line
-          x1="504"
+          x1="694"
           y1="704"
-          x2="532"
+          x2="722"
           y2="704"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#rules-open)"
         />
         <text
-          x="540"
+          x="730"
           y="708"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Association
+          Use · parameter, return, local or new
         </text>
         <rect
           x="24"
