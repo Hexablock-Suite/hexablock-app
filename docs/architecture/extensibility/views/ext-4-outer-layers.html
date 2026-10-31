@@ -74,9 +74,9 @@
         <desc id="ext-4-outer-layers-desc">
           Extension points of layers 2 to 4 that §8 or the class diagram declare: local and HTTP
           adapters of the layer 2 output ports for storage and backend, the two level origins of A6,
-          GameEventBus and its listeners over the GameEventPublisher port, the use case aspects over
-          UseCaseAspect, and the planned desktop layout and game registry of D5 as dashed
-          placeholders.
+          GameEventBus and its listeners over the GameEventPublisher interface of the engine, the
+          use case aspects over UseCaseAspect, and the planned desktop layout and game registry of
+          D5 as dashed placeholders.
         </desc>
         <defs>
           <marker
@@ -243,7 +243,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#ext4-triangle)"
         />
-        <!-- Observer: GameEventBus implements the engine port GameEventPublisher: realization -->
+        <!-- Observer: GameEventBus implements the engine interface GameEventPublisher: realization -->
         <path
           d="M584,276 L584,620"
           fill="none"
@@ -937,7 +937,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «port»
+          «interface»
         </text>
         <text
           x="584.0"

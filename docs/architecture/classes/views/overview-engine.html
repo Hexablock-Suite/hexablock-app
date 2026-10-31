@@ -72,10 +72,11 @@
         <title id="ovengine-title">HexaBlock generic engine map · UML class diagram</title>
         <desc id="ovengine-desc">
           Overview map of the 58 layer 1 engine classes in 14 groups, with the turn group at the
-          center: it holds a phase and an optional history, scores with the scoring policies,
-          notifies through the event port and reads the board, while the variant factory creates its
-          parts, the piece sources draw the pieces and the geometry family creates the piece shapes;
-          each group names the view that shows its members.
+          center: GameEngine is the aggregate root of a game, holds a phase and an optional history,
+          scores with the scoring policies, the domain service, notifies through the event interface
+          and reads the board, while the variant factory creates its parts, the piece sources draw
+          the pieces and the geometry family creates the piece shapes; each group names the view
+          that shows its members.
         </desc>
         <defs>
           <marker
@@ -213,7 +214,7 @@
         >
           VIEWS 5, 6
         </text>
-        <!-- Group: ports -->
+        <!-- Group: interfaces for time and randomness -->
         <rect
           x="744"
           y="64"
@@ -234,7 +235,7 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.14em"
         >
-          PORTS · §3.4 · D6
+          INJECTED · APP-NFR-07
         </text>
         <text
           x="972"
@@ -1326,7 +1327,7 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            interface
+            interface · domain service
           </text>
           <text x="462" y="645" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
@@ -1990,7 +1991,18 @@
             stroke="#0f6f74"
             stroke-width="1"
           />
-          <text x="180" y="457" fill="#17212a" text-anchor="middle">
+          <text
+            x="180"
+            y="448"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            aggregate root
+          </text>
+          <text x="180" y="461" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               GameEngine
             </tspan>

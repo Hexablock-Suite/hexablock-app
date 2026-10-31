@@ -63,7 +63,7 @@
       <p class="eyebrow">Extensibility diagram · View 1 · Statement §4.3</p>
       <h1>The engine in the center and the interfaces a fifth variant implements</h1>
       <svg
-        viewBox="0 0 1040 1460"
+        viewBox="0 0 1040 1476"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="ext-1-extension-points-title ext-1-extension-points-desc"
@@ -77,7 +77,9 @@
           abstract BaseGameRules, the TCell, TMove and TState type arguments, IScoringPolicy,
           IPieceSource, IProgressModel, ILevelBuilder and the optional capabilities IUndoable,
           IRedoable, ITimed and IRandomSeeded, plus StateMapper in layer 3 and CellRenderer in layer
-          4. The four variants and the declared Hexa Fill implement them, one package each.
+          4. The variant factory creates the rules, piece source, scoring and board. The four
+          variants and the declared Hexa Fill implement them, one package each, and each declares
+          its own open GameId.
         </desc>
         <defs>
           <marker
@@ -647,7 +649,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TState
+          TCell
         </text>
         <rect x="704" y="176" width="240" height="56" rx="6" fill="#e2ebf8" />
         <rect
@@ -890,7 +892,7 @@
           x="64"
           y="484"
           width="256"
-          height="136"
+          height="168"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -919,19 +921,25 @@
           IVariantFactory
         </text>
         <line x1="64" y1="532" x2="320" y2="532" stroke="#17212a" stroke-width="1" />
-        <text x="80" y="550" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="548" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createRules(): IGameRules
         </text>
-        <text x="80" y="566" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="564" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + createPieceSource(): IPieceSource
+        </text>
+        <text x="80" y="580" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createScoring(): IScoringPolicy
         </text>
-        <text x="80" y="582" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="596" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + createBoard(): Board
+        </text>
+        <text x="80" y="612" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createProgressModel(): IProgressModel
         </text>
-        <text x="80" y="598" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="628" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createInitialState(): TState
         </text>
-        <text x="80" y="614" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="644" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createHistory(): MoveHistory [0..1]
         </text>
         <rect
@@ -1992,6 +2000,16 @@
         </text>
         <text
           x="24"
+          y="1344"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          GameId is open: the new factory declares its own id, and only the composition root and the
+          game selector list the new game (D15, docs/EXTENSIBILITY.md).
+        </text>
+        <text
+          x="24"
           y="1296"
           fill="#5b6873"
           font-size="11"
@@ -2023,15 +2041,15 @@
         <!-- Legend -->
         <line
           x1="24"
-          y1="1352"
+          y1="1368"
           x2="1016"
-          y2="1352"
+          y2="1368"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1370"
+          y="1386"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -2041,16 +2059,16 @@
         </text>
         <line
           x1="24"
-          y1="1392"
+          y1="1408"
           x2="52"
-          y2="1392"
+          y2="1408"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#ext1-triangle)"
         />
         <text
           x="60"
-          y="1396"
+          y="1412"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2059,9 +2077,9 @@
         </text>
         <line
           x1="144"
-          y1="1392"
+          y1="1408"
           x2="172"
-          y2="1392"
+          y2="1408"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -2069,7 +2087,7 @@
         />
         <text
           x="180"
-          y="1396"
+          y="1412"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2078,16 +2096,16 @@
         </text>
         <line
           x1="264"
-          y1="1392"
+          y1="1408"
           x2="292"
-          y2="1392"
+          y2="1408"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#ext1-diamond-filled)"
         />
         <text
           x="300"
-          y="1396"
+          y="1412"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2096,16 +2114,16 @@
         </text>
         <line
           x1="474"
-          y1="1392"
+          y1="1408"
           x2="502"
-          y2="1392"
+          y2="1408"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#ext1-diamond-hollow)"
         />
         <text
           x="510"
-          y="1396"
+          y="1412"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2114,16 +2132,16 @@
         </text>
         <line
           x1="694"
-          y1="1392"
+          y1="1408"
           x2="722"
-          y2="1392"
+          y2="1408"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#ext1-open)"
         />
         <text
           x="730"
-          y="1396"
+          y="1412"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2132,7 +2150,7 @@
         </text>
         <rect
           x="520"
-          y="1430"
+          y="1446"
           width="12"
           height="5"
           rx="1"
@@ -2142,7 +2160,7 @@
         />
         <rect
           x="520"
-          y="1434"
+          y="1450"
           width="28"
           height="12"
           rx="2"
@@ -2152,7 +2170,7 @@
         />
         <text
           x="556"
-          y="1443"
+          y="1459"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2161,7 +2179,7 @@
         </text>
         <rect
           x="776"
-          y="1434"
+          y="1450"
           width="28"
           height="12"
           rx="2"
@@ -2171,7 +2189,7 @@
         />
         <text
           x="812"
-          y="1443"
+          y="1459"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2180,7 +2198,7 @@
         </text>
         <rect
           x="24"
-          y="1410"
+          y="1426"
           width="28"
           height="12"
           rx="2"
@@ -2190,7 +2208,7 @@
         />
         <text
           x="60"
-          y="1419"
+          y="1435"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2199,7 +2217,7 @@
         </text>
         <rect
           x="264"
-          y="1410"
+          y="1426"
           width="28"
           height="12"
           rx="2"
@@ -2209,7 +2227,7 @@
         />
         <text
           x="300"
-          y="1419"
+          y="1435"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2218,7 +2236,7 @@
         </text>
         <rect
           x="520"
-          y="1410"
+          y="1426"
           width="28"
           height="12"
           rx="2"
@@ -2228,7 +2246,7 @@
         />
         <text
           x="556"
-          y="1419"
+          y="1435"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2237,7 +2255,7 @@
         </text>
         <rect
           x="776"
-          y="1410"
+          y="1426"
           width="28"
           height="12"
           rx="2"
@@ -2248,7 +2266,7 @@
         />
         <text
           x="812"
-          y="1419"
+          y="1435"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2257,7 +2275,7 @@
         </text>
         <rect
           x="24"
-          y="1434"
+          y="1450"
           width="28"
           height="12"
           rx="2"
@@ -2268,7 +2286,7 @@
         />
         <text
           x="60"
-          y="1443"
+          y="1459"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2277,7 +2295,7 @@
         </text>
         <rect
           x="264"
-          y="1434"
+          y="1450"
           width="28"
           height="12"
           rx="2"
@@ -2288,7 +2306,7 @@
         />
         <text
           x="300"
-          y="1443"
+          y="1459"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
