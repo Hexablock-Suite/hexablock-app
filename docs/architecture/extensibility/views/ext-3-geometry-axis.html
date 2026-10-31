@@ -499,9 +499,9 @@
         </text>
         <!-- UML template box: type parameters on the top-right corner -->
         <rect
-          x="592"
+          x="572"
           y="222"
-          width="136"
+          width="156"
           height="18"
           rx="2"
           fill="#ffffff"
@@ -510,14 +510,14 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="660"
+          x="650"
           y="234"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TCell, TMove, TState
+          TCell, TCoord, TMove, TState
         </text>
         <!-- Geometry axis: the real family, the test family and two declared ones -->
         <!-- Class: HexGeometry (the real family) -->
@@ -682,8 +682,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Each variant factory receives the GeometryFactory, so there is no class per game and
-          geometry (decision 17).
+          Each variant factory keeps the GeometryFactory in its geometry attribute, so there is no
+          class per game and geometry (decision 17).
         </text>
         <text
           x="24"

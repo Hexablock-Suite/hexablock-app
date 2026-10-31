@@ -76,7 +76,7 @@
           BaseGameRules, scoring with the IScoringPolicy strategy, holding a GamePhase state and an
           optional MoveHistory, giving its undo and redo capabilities through typed accessors,
           notifying through the GameEventPublisher interface, and bounding its TState parameter by
-          BoardState.
+          BoardState in its template box.
         </desc>
         <defs>
           <marker
@@ -206,7 +206,7 @@
           x="40"
           y="172"
           width="304"
-          height="272"
+          height="304"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -226,7 +226,7 @@
         </text>
 
         <rect
-          x="704"
+          x="744"
           y="172"
           width="252"
           height="148"
@@ -237,7 +237,7 @@
           stroke-dasharray="4,4"
         />
         <text
-          x="716"
+          x="756"
           y="188"
           fill="#5b6873"
           font-size="8"
@@ -249,10 +249,10 @@
         </text>
 
         <rect
-          x="704"
+          x="744"
           y="328"
           width="252"
-          height="148"
+          height="164"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -260,7 +260,7 @@
           stroke-dasharray="4,4"
         />
         <text
-          x="716"
+          x="756"
           y="344"
           fill="#5b6873"
           font-size="8"
@@ -308,9 +308,9 @@
         <!-- GameEngine holds the IScoringPolicy it receives as scoring: aggregation -->
         <line
           x1="380"
-          y1="372"
+          y1="388"
           x2="332"
-          y2="372"
+          y2="388"
           stroke-width="1"
           marker-start="url(#t-diamond-hollow)"
           stroke="#17212a"
@@ -319,7 +319,7 @@
         <line
           x1="660"
           y1="256"
-          x2="720"
+          x2="760"
           y2="256"
           stroke="#17212a"
           stroke-width="1"
@@ -329,7 +329,7 @@
         <line
           x1="660"
           y1="372"
-          x2="720"
+          x2="760"
           y2="372"
           stroke="#17212a"
           stroke-width="1"
@@ -341,16 +341,6 @@
           y1="216"
           x2="520"
           y2="164"
-          stroke-width="1"
-          marker-end="url(#t-open)"
-          stroke="#5b6873"
-        />
-        <!-- TState is bounded by BoardState: use labelled with the type parameter -->
-        <line
-          x1="560"
-          y1="440"
-          x2="560"
-          y2="492"
           stroke-width="1"
           marker-end="url(#t-open)"
           stroke="#5b6873"
@@ -369,9 +359,9 @@
         >
           rules
         </text>
-        <rect x="528" y="184" width="52" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="460" y="184" width="52" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="554"
+          x="486"
           y="193"
           fill="#7d8a94"
           font-size="8"
@@ -381,22 +371,11 @@
         >
           NOTIFIES
         </text>
-        <rect x="524" y="454" width="72" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="560"
-          y="463"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          TState bound
-        </text>
-        <rect x="335" y="379" width="42" height="12" rx="2" fill="#f9f4dc" />
+
+        <rect x="335" y="395" width="42" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="356"
-          y="388"
+          y="404"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -405,9 +384,9 @@
         >
           scoring
         </text>
-        <rect x="680" y="240" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="720" y="240" width="36" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="698"
+          x="738"
           y="249"
           fill="#7d8a94"
           font-size="8"
@@ -417,9 +396,9 @@
         >
           phase
         </text>
-        <rect x="670" y="354" width="48" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="710" y="354" width="48" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="694"
+          x="734"
           y="363"
           fill="#7d8a94"
           font-size="8"
@@ -442,10 +421,10 @@
         >
           1
         </text>
-        <rect x="346" y="358" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="346" y="374" width="12" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="352"
-          y="367"
+          y="383"
           fill="#17212a"
           font-size="8"
           font-weight="600"
@@ -454,9 +433,9 @@
         >
           1
         </text>
-        <rect x="702" y="260" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="742" y="260" width="12" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="708"
+          x="748"
           y="269"
           fill="#17212a"
           font-size="8"
@@ -466,9 +445,9 @@
         >
           1
         </text>
-        <rect x="688" y="378" width="28" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="728" y="378" width="28" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="702"
+          x="742"
           y="387"
           fill="#17212a"
           font-size="8"
@@ -534,7 +513,7 @@
         <line x1="380" y1="336" x2="660" y2="336" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text
           x="520"
-          y="234"
+          y="238"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -545,7 +524,7 @@
         </text>
         <text
           x="520"
-          y="252"
+          y="256"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -590,7 +569,7 @@
           x="52"
           y="200"
           width="280"
-          height="136"
+          height="152"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -620,36 +599,39 @@
           IGameRules
         </text>
         <text x="68" y="264" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + isValid(state, move): boolean
+          + isValid(state: TState, move: TMove): boolean
         </text>
         <text x="68" y="280" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + apply(state, move): TState
+          + apply(state: TState, move: TMove): TState
         </text>
         <text x="68" y="296" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + resolve(state): Resolution&lt;TState&gt;
+          + resolve(state: TState): Resolution&lt;TState&gt;
         </text>
         <text x="68" y="312" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + evaluate(state): Outcome
+          + evaluate(state: TState): Outcome
         </text>
 
         <text x="68" y="328" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + playTurn(state, move): Resolution&lt;TState&gt;
+          + playTurn(state: TState, move: TMove):
+        </text>
+        <text x="84" y="344" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Resolution&lt;TState&gt;
         </text>
         <!-- Class: IScoringPolicy (interface) -->
         <rect
           x="52"
-          y="356"
+          y="372"
           width="280"
-          height="72"
+          height="88"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="52" y1="404" x2="332" y2="404" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="52" y1="420" x2="332" y2="420" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="192"
-          y="374"
+          y="390"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -660,7 +642,7 @@
         </text>
         <text
           x="192"
-          y="392"
+          y="408"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -669,13 +651,16 @@
         >
           IScoringPolicy
         </text>
-        <text x="68" y="420" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + score(before, res): number
+        <text x="68" y="436" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + score(before: TState,
+        </text>
+        <text x="84" y="452" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          resolution: Resolution&lt;TState&gt;): number
         </text>
 
         <!-- Class: GamePhase (interface) -->
         <rect
-          x="720"
+          x="760"
           y="200"
           width="220"
           height="104"
@@ -684,9 +669,9 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="720" y1="248" x2="940" y2="248" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="760" y1="248" x2="980" y2="248" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="830"
+          x="870"
           y="218"
           fill="#5b6873"
           font-size="8"
@@ -697,7 +682,7 @@
           «interface»
         </text>
         <text
-          x="830"
+          x="870"
           y="236"
           fill="#17212a"
           font-size="12"
@@ -707,31 +692,31 @@
         >
           GamePhase
         </text>
-        <text x="736" y="264" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="776" y="264" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + canPlay(): boolean
         </text>
-        <text x="736" y="280" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="776" y="280" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + after(o: Outcome): GamePhase
         </text>
-        <text x="736" y="296" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="776" y="296" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + pause(): GamePhase
         </text>
 
         <!-- Class: MoveHistory -->
         <rect
-          x="720"
+          x="760"
           y="356"
           width="220"
-          height="104"
+          height="120"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="720" y1="396" x2="940" y2="396" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="720" y1="436" x2="940" y2="436" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="760" y1="396" x2="980" y2="396" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="760" y1="436" x2="980" y2="436" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="830"
+          x="870"
           y="381"
           fill="#17212a"
           font-size="12"
@@ -741,14 +726,17 @@
         >
           MoveHistory
         </text>
-        <text x="736" y="412" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="776" y="412" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - done: MoveCommand[]
         </text>
-        <text x="736" y="428" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="776" y="428" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + limit: number [0..1]
         </text>
-        <text x="736" y="452" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + record(c: MoveCommand): void
+        <text x="776" y="452" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + record(command:
+        </text>
+        <text x="792" y="468" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          MoveCommand&lt;TMove, TState&gt;): void
         </text>
 
         <!-- Class: BoardState (interface) -->
@@ -798,10 +786,10 @@
 
         <!-- UML template boxes: type parameters on the top-right corner -->
         <rect
-          x="552"
-          y="206"
-          width="120"
-          height="18"
+          x="528"
+          y="196"
+          width="212"
+          height="30"
           rx="2"
           fill="#ffffff"
           stroke="#5b6873"
@@ -809,14 +797,24 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="612"
-          y="218"
+          x="634"
+          y="208"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TCell, TMove, TState
+          TCell, TCoord, TMove,
+        </text>
+        <text
+          x="634"
+          y="221"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TState extends BoardState‹TCell, TCoord›
         </text>
         <rect
           x="224"
@@ -841,7 +839,7 @@
         </text>
         <rect
           x="296"
-          y="346"
+          y="362"
           width="48"
           height="18"
           rx="2"
@@ -852,7 +850,7 @@
         />
         <text
           x="320"
-          y="358"
+          y="374"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -861,7 +859,7 @@
           TState
         </text>
         <rect
-          x="868"
+          x="908"
           y="346"
           width="84"
           height="18"
@@ -872,7 +870,7 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="910"
+          x="950"
           y="358"
           fill="#5b6873"
           font-size="8.5"
@@ -921,8 +919,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          BoardState&lt;TCell, TCoord&gt; carries the coordinate type, so GameEngine keeps three
-          type parameters (decision 16).
+          GameEngine declares TCoord and bounds TState by BoardState&lt;TCell, TCoord&gt; in its
+          corner box (decision 16).
         </text>
         <text
           x="24"

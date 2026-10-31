@@ -73,7 +73,8 @@
         <desc id="history-desc">
           Class diagram of layer 1 showing MoveHistory as the Command invoker that keeps the done
           MoveCommand objects and implements IUndoable, RedoableHistory extending it with redo
-          through IRedoable, and LevelTimer implementing the separate ITimed capability.
+          through IRedoable and keeping the undone MoveCommand objects, and LevelTimer implementing
+          the separate ITimed capability.
         </desc>
         <defs>
           <marker
@@ -220,12 +221,10 @@
           stroke-width="1"
           marker-end="url(#history-triangle)"
         />
-        <!-- MoveHistory implements IUndoable: realization -->
-        <line
-          x1="616"
-          y1="236"
-          x2="616"
-          y2="324"
+        <!-- MoveHistory implements IUndoable: realization, with a hop over the undone line -->
+        <path
+          d="M616 236 V264 a 8,8 0 0,1 0,16 V324"
+          fill="none"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -254,6 +253,15 @@
           marker-end="url(#history-triangle)"
         />
 
+        <!-- RedoableHistory holds the MoveCommands it can redo as undone: aggregation -->
+        <path
+          d="M800 196 V264 Q800 272 792 272 H200 Q192 272 192 264 V236"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#history-diamond-hollow)"
+        />
+
         <!-- Arrow labels -->
         <rect x="316" y="148" width="32" height="12" rx="2" fill="#f9f4dc" />
         <text
@@ -267,11 +275,35 @@
         >
           done
         </text>
+        <rect x="200" y="242" width="40" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="220"
+          y="251"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          undone
+        </text>
         <!-- Multiplicities -->
         <rect x="316" y="168" width="28" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="330"
           y="177"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          0..*
+        </text>
+        <rect x="156" y="242" width="28" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="170"
+          y="251"
           fill="#17212a"
           font-size="8"
           font-weight="600"

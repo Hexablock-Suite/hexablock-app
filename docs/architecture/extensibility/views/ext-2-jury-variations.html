@@ -155,7 +155,7 @@
           x="48"
           y="64"
           width="288"
-          height="292"
+          height="308"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -177,7 +177,7 @@
           x="376"
           y="64"
           width="288"
-          height="292"
+          height="308"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -199,7 +199,7 @@
           x="704"
           y="64"
           width="288"
-          height="292"
+          height="308"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -462,7 +462,7 @@
           x="64"
           y="252"
           width="240"
-          height="88"
+          height="104"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -492,10 +492,13 @@
         </text>
         <line x1="64" y1="300" x2="304" y2="300" stroke="#17212a" stroke-width="1" />
         <text x="80" y="318" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + withRegion(size: number)
+          + withRegion(size: number):
         </text>
-        <text x="80" y="334" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + build‹TCell›(): Board
+        <text x="96" y="334" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          BoardBuilder&lt;TCoord&gt;
+        </text>
+        <text x="80" y="350" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + build&lt;TCell&gt;(): Board&lt;TCell, TCoord&gt;
         </text>
         <rect
           x="264"
@@ -522,7 +525,7 @@
           x="392"
           y="252"
           width="240"
-          height="88"
+          height="104"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -552,10 +555,13 @@
         </text>
         <line x1="392" y1="300" x2="632" y2="300" stroke="#17212a" stroke-width="1" />
         <text x="408" y="318" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + score(before, res): number
+          + score(before: TState, resolution:
         </text>
-        <text x="408" y="334" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          factory: createScoring()
+        <text x="424" y="334" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Resolution&lt;TState&gt;): number
+        </text>
+        <text x="408" y="350" fill="#7d8a94" font-size="9" font-family="'IBM Plex Mono', monospace">
+          the variant factory creates it
         </text>
         <rect
           x="592"
@@ -582,7 +588,7 @@
           x="720"
           y="252"
           width="240"
-          height="88"
+          height="104"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -615,7 +621,10 @@
           leaves CellNode, groups ShapeGroup
         </text>
         <text x="736" y="334" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + rotated() · area()
+          + area(): number
+        </text>
+        <text x="736" y="350" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + cells(): TCoord[]
         </text>
         <rect
           x="920"
@@ -674,9 +683,9 @@
           «generic engine» · D1 · no file changes
         </text>
         <rect
-          x="856"
+          x="828"
           y="402"
-          width="128"
+          width="156"
           height="18"
           rx="2"
           fill="#ffffff"
@@ -685,14 +694,14 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="920.0"
+          x="906"
           y="414"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TCell, TMove, TState
+          TCell, TCoord, TMove, TState
         </text>
         <text x="80" y="462" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           Board, GridTopology and

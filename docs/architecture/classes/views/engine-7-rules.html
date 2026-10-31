@@ -64,7 +64,7 @@
       <h1>The rules: Template Method and Decorator</h1>
 
       <svg
-        viewBox="0 0 1040 776"
+        viewBox="0 0 1040 808"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="rules-title rules-desc"
@@ -134,7 +134,7 @@
           x="24"
           y="24"
           width="992"
-          height="568"
+          height="600"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -156,7 +156,7 @@
           x="280"
           y="64"
           width="352"
-          height="196"
+          height="208"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -176,9 +176,9 @@
         </text>
         <rect
           x="232"
-          y="288"
+          y="304"
           width="440"
-          height="284"
+          height="300"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -187,7 +187,7 @@
         />
         <text
           x="244"
-          y="304"
+          y="320"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -198,9 +198,9 @@
         </text>
         <rect
           x="688"
-          y="288"
+          y="304"
           width="312"
-          height="284"
+          height="300"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -209,7 +209,7 @@
         />
         <text
           x="700"
-          y="304"
+          y="320"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -232,9 +232,9 @@
         <!-- BaseGameRules implements IGameRules: realization -->
         <line
           x1="456"
-          y1="320"
+          y1="336"
           x2="456"
-          y2="236"
+          y2="252"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -242,7 +242,7 @@
         />
         <!-- TimedRulesDecorator implements IGameRules: realization -->
         <path
-          d="M820 320 V184 Q820 176 812 176 H616"
+          d="M820 336 V184 Q820 176 812 176 H616"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -251,7 +251,7 @@
         />
         <!-- TimedRulesDecorator holds the IGameRules it wraps as inner: aggregation -->
         <path
-          d="M848 320 V136 Q848 128 840 128 H616"
+          d="M848 336 V136 Q848 128 840 128 H616"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -260,9 +260,9 @@
         <!-- TimedRulesDecorator holds the LevelTimer it receives as timer: aggregation -->
         <line
           x1="844"
-          y1="448"
+          y1="480"
           x2="844"
-          y2="520"
+          y2="552"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#rules-diamond-hollow)"
@@ -270,9 +270,9 @@
         <!-- LinesRules extends BaseGameRules: inheritance -->
         <line
           x1="360"
-          y1="520"
+          y1="552"
           x2="360"
-          y2="456"
+          y2="488"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#rules-triangle)"
@@ -280,9 +280,9 @@
         <!-- FitRules extends BaseGameRules: inheritance -->
         <line
           x1="552"
-          y1="520"
+          y1="552"
           x2="552"
-          y2="456"
+          y2="488"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#rules-triangle)"
@@ -312,10 +312,10 @@
         >
           inner
         </text>
-        <rect x="848" y="500" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="848" y="532" width="36" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="866"
-          y="509"
+          y="541"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -349,10 +349,10 @@
         >
           1
         </text>
-        <rect x="824" y="500" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="824" y="532" width="12" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="830"
-          y="509"
+          y="541"
           fill="#17212a"
           font-size="8"
           font-weight="600"
@@ -366,7 +366,7 @@
           x="296"
           y="100"
           width="320"
-          height="136"
+          height="152"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -396,37 +396,40 @@
           IGameRules
         </text>
         <text x="312" y="164" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + isValid(state, move): boolean
+          + isValid(state: TState, move: TMove): boolean
         </text>
         <text x="312" y="180" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + apply(state, move): TState
+          + apply(state: TState, move: TMove): TState
         </text>
         <text x="312" y="196" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + resolve(state): Resolution&lt;TState&gt;
+          + resolve(state: TState): Resolution&lt;TState&gt;
         </text>
         <text x="312" y="212" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + evaluate(state): Outcome
+          + evaluate(state: TState): Outcome
         </text>
         <text x="312" y="228" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + playTurn(state, move): Resolution&lt;TState&gt;
+          + playTurn(state: TState, move: TMove):
+        </text>
+        <text x="328" y="244" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Resolution&lt;TState&gt;
         </text>
         <!-- Class: BaseGameRules (abstract, template method, focal) -->
         <rect
           x="284"
-          y="320"
+          y="336"
           width="352"
-          height="136"
+          height="152"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
           stroke-width="1"
         />
-        <rect x="284" y="320" width="352" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
-        <rect x="284" y="360" width="352" height="8" fill="rgba(15,111,116,0.10)" />
-        <line x1="284" y1="368" x2="636" y2="368" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <rect x="284" y="336" width="352" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="284" y="376" width="352" height="8" fill="rgba(15,111,116,0.10)" />
+        <line x1="284" y1="384" x2="636" y2="384" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text
           x="460"
-          y="338"
+          y="354"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -437,7 +440,7 @@
         </text>
         <text
           x="460"
-          y="356"
+          y="372"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -449,33 +452,23 @@
         </text>
         <text
           x="300"
-          y="384"
+          y="400"
           fill="#0f6f74"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
           font-weight="600"
         >
-          + playTurn(state, move): Resolution&lt;TState&gt; {template}
+          + playTurn(state: TState, move: TMove):
         </text>
         <text
-          x="300"
-          y="400"
-          fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-          font-style="italic"
-        >
-          + isValid(state, move): boolean
-        </text>
-        <text
-          x="300"
+          x="316"
           y="416"
-          fill="#17212a"
+          fill="#0f6f74"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
-          font-style="italic"
+          font-weight="600"
         >
-          + apply(state, move): TState
+          Resolution&lt;TState&gt; {template}
         </text>
         <text
           x="300"
@@ -485,7 +478,7 @@
           font-family="'IBM Plex Mono', monospace"
           font-style="italic"
         >
-          + resolve(state): Resolution&lt;TState&gt;
+          + isValid(state: TState, move: TMove): boolean
         </text>
         <text
           x="300"
@@ -495,24 +488,44 @@
           font-family="'IBM Plex Mono', monospace"
           font-style="italic"
         >
-          + evaluate(state): Outcome
+          + apply(state: TState, move: TMove): TState
+        </text>
+        <text
+          x="300"
+          y="464"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          font-style="italic"
+        >
+          + resolve(state: TState): Resolution&lt;TState&gt;
+        </text>
+        <text
+          x="300"
+          y="480"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          font-style="italic"
+        >
+          + evaluate(state: TState): Outcome
         </text>
         <!-- Class: TimedRulesDecorator (decorator) -->
         <rect
           x="704"
-          y="320"
+          y="336"
           width="280"
-          height="128"
+          height="144"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="704" y1="368" x2="984" y2="368" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="704" y1="408" x2="984" y2="408" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="704" y1="384" x2="984" y2="384" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="704" y1="424" x2="984" y2="424" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="844"
-          y="338"
+          y="354"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -523,7 +536,7 @@
         </text>
         <text
           x="844"
-          y="356"
+          y="372"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -532,17 +545,20 @@
         >
           TimedRulesDecorator
         </text>
-        <text x="720" y="384" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="720" y="400" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           # inner: IGameRules&lt;TCell, TMove, TState&gt;
         </text>
-        <text x="720" y="400" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="720" y="416" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - timer: LevelTimer
         </text>
-        <text x="720" y="424" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + playTurn(state, move): Resolution&lt;TState&gt;
-        </text>
         <text x="720" y="440" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + evaluate(state): Outcome
+          + playTurn(state: TState, move: TMove):
+        </text>
+        <text x="736" y="456" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Resolution&lt;TState&gt;
+        </text>
+        <text x="720" y="472" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + evaluate(state: TState): Outcome
         </text>
         <!-- Reference box: GameEngine, detailed in part 1 · view 1 -->
         <rect
@@ -582,7 +598,7 @@
         <!-- Reference box: LinesRules, detailed in part 2 · lines -->
         <rect
           x="272"
-          y="520"
+          y="552"
           width="176"
           height="40"
           rx="6"
@@ -593,7 +609,7 @@
         />
         <text
           x="360"
-          y="534"
+          y="566"
           fill="#7d8a94"
           font-size="7"
           font-weight="500"
@@ -605,7 +621,7 @@
         </text>
         <text
           x="360"
-          y="550"
+          y="582"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -617,7 +633,7 @@
         <!-- Reference box: FitRules, detailed in part 2 · fit -->
         <rect
           x="464"
-          y="520"
+          y="552"
           width="176"
           height="40"
           rx="6"
@@ -628,7 +644,7 @@
         />
         <text
           x="552"
-          y="534"
+          y="566"
           fill="#7d8a94"
           font-size="7"
           font-weight="500"
@@ -640,7 +656,7 @@
         </text>
         <text
           x="552"
-          y="550"
+          y="582"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -652,7 +668,7 @@
         <!-- Reference box: LevelTimer, detailed in part 1 · view 3 -->
         <rect
           x="744"
-          y="520"
+          y="552"
           width="200"
           height="40"
           rx="6"
@@ -663,7 +679,7 @@
         />
         <text
           x="844"
-          y="534"
+          y="566"
           fill="#7d8a94"
           font-size="7"
           font-weight="500"
@@ -675,7 +691,7 @@
         </text>
         <text
           x="844"
-          y="550"
+          y="582"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -708,7 +724,7 @@
         </text>
         <rect
           x="528"
-          y="310"
+          y="326"
           width="120"
           height="18"
           rx="2"
@@ -719,7 +735,7 @@
         />
         <text
           x="588"
-          y="322"
+          y="338"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -729,7 +745,7 @@
         </text>
         <rect
           x="876"
-          y="310"
+          y="326"
           width="120"
           height="18"
           rx="2"
@@ -740,7 +756,7 @@
         />
         <text
           x="936"
-          y="322"
+          y="338"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -751,7 +767,7 @@
         <!-- Footnote: classes the budget leaves out -->
         <text
           x="24"
-          y="616"
+          y="648"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -761,7 +777,7 @@
         </text>
         <text
           x="24"
-          y="632"
+          y="664"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -771,7 +787,7 @@
         </text>
         <text
           x="24"
-          y="648"
+          y="680"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -780,10 +796,10 @@
           the game (decision 19).
         </text>
         <!-- Legend -->
-        <line x1="24" y1="668" x2="1016" y2="668" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <line x1="24" y1="700" x2="1016" y2="700" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="686"
+          y="718"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -793,16 +809,16 @@
         </text>
         <line
           x1="24"
-          y1="704"
+          y1="736"
           x2="52"
-          y2="704"
+          y2="736"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#rules-triangle)"
         />
         <text
           x="60"
-          y="708"
+          y="740"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -811,9 +827,9 @@
         </text>
         <line
           x1="144"
-          y1="704"
+          y1="736"
           x2="172"
-          y2="704"
+          y2="736"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -821,7 +837,7 @@
         />
         <text
           x="180"
-          y="708"
+          y="740"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -830,16 +846,16 @@
         </text>
         <line
           x1="264"
-          y1="704"
+          y1="736"
           x2="292"
-          y2="704"
+          y2="736"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#rules-diamond-filled)"
         />
         <text
           x="300"
-          y="708"
+          y="740"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -848,16 +864,16 @@
         </text>
         <line
           x1="474"
-          y1="704"
+          y1="736"
           x2="502"
-          y2="704"
+          y2="736"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#rules-diamond-hollow)"
         />
         <text
           x="510"
-          y="708"
+          y="740"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -866,16 +882,16 @@
         </text>
         <line
           x1="694"
-          y1="704"
+          y1="736"
           x2="722"
-          y2="704"
+          y2="736"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#rules-open)"
         />
         <text
           x="730"
-          y="708"
+          y="740"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -884,7 +900,7 @@
         </text>
         <rect
           x="24"
-          y="724"
+          y="756"
           width="28"
           height="12"
           rx="2"
@@ -894,7 +910,7 @@
         />
         <text
           x="60"
-          y="733"
+          y="765"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -903,7 +919,7 @@
         </text>
         <rect
           x="184"
-          y="724"
+          y="756"
           width="28"
           height="12"
           rx="2"
@@ -914,7 +930,7 @@
         />
         <text
           x="220"
-          y="733"
+          y="765"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -923,7 +939,7 @@
         </text>
         <rect
           x="440"
-          y="724"
+          y="756"
           width="28"
           height="12"
           rx="2"
@@ -934,7 +950,7 @@
         />
         <text
           x="476"
-          y="733"
+          y="765"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -943,7 +959,7 @@
         </text>
         <rect
           x="648"
-          y="724"
+          y="756"
           width="28"
           height="12"
           rx="2"
@@ -954,7 +970,7 @@
         />
         <text
           x="684"
-          y="733"
+          y="765"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -963,7 +979,7 @@
         </text>
         <rect
           x="24"
-          y="748"
+          y="780"
           width="28"
           height="12"
           rx="2"
@@ -973,7 +989,7 @@
         />
         <text
           x="60"
-          y="757"
+          y="789"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
