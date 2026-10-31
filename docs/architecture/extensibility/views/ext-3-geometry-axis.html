@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Extensibility · UML class diagram</title>
+    <title>Geometry axis · extensibility diagram</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
       rel="stylesheet"
@@ -60,25 +60,23 @@
   </head>
   <body>
     <div class="frame">
-      <p class="eyebrow">Extensibility diagram · Statement §4</p>
-      <h1>Engine in the center, variants and geometries as extensions</h1>
+      <p class="eyebrow">Extensibility diagram · View 3 · §8 · D11</p>
+      <h1>The geometry axis: one family per cell shape, next to the variant axis</h1>
 
       <svg
         viewBox="0 0 1040 760"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
-        aria-labelledby="extensibility-title extensibility-desc"
+        aria-labelledby="ext-3-geometry-axis-title ext-3-geometry-axis-desc"
       >
-        <title id="extensibility-title">
-          HexaBlock extensibility · engine, variants and geometries
-        </title>
-        <desc id="extensibility-desc">
+        <title id="ext-3-geometry-axis-title">HexaBlock extensibility · the geometry axis</title>
+        <desc id="ext-3-geometry-axis-desc">
           Extensibility diagram of layer 1 with the generic GameEngine in the center. The variant
-          axis above holds the four variant factories of the statement and a fifth declared one, and
-          they implement the engine contracts. The geometry axis below holds the hexagonal family,
-          the square test family and the declared triangular and 3D families, and they implement
-          GeometryFactory. Each variant factory holds one GeometryFactory, so no class exists per
-          game and geometry.
+          axis above holds the four variant factories of the statement and Hexa Fill, the declared
+          fifth variant, and they implement the engine contracts. The geometry axis below holds the
+          hexagonal family, the square test family and the declared triangular and 3D families, and
+          they implement GeometryFactory. Each variant factory holds one GeometryFactory, so no
+          class exists per game and geometry.
         </desc>
         <defs>
           <marker
@@ -416,7 +414,7 @@
         >
           MergeFactory
         </text>
-        <!-- Declared extension, no class yet: a fifth variant -->
+        <!-- Declared extension, no class yet: Hexa Fill, the fifth variant of §3.1 -->
         <rect
           x="804"
           y="96"
@@ -437,7 +435,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          NEW VARIANT · APP-NFR-06
+          HEXA FILL · PLACEHOLDER
         </text>
         <text
           x="888"
@@ -448,7 +446,7 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          FifthFactory
+          FillFactory
         </text>
         <!-- Engine in the center (focal) -->
         <!-- Class: GameEngine (focal, the generic engine) -->
