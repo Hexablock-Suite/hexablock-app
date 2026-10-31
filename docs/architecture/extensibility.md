@@ -15,7 +15,8 @@ Statement §4.3 asks for a «Diagrama que muestre el motor genérico en el centr
 - A realization arrow points from an extension to the contract it implements. A solid line with a hollow triangle is inheritance.
 - A diamond marks an attribute. The part end shows the attribute name and its multiplicity, also when it is `1`. A hollow diamond is an object that the class receives (aggregation, decision 23). A filled diamond is an object that the class creates (composition).
 - A solid line with an open arrow is a use: a parameter, a return value, a local variable or a `new`. Its label is a verb, for example `PASSED TO`.
-- The dashed box at the top right of a class holds its type parameters (UML template notation).
+- The dashed box at the top right of a class holds its type parameters (UML template notation). A bound on a parameter goes in the same box, never on a line.
+- Every operation shows the type of each parameter and its return type. View 1 abbreviates the type arguments of attributes and return types, for example `IGameRules` for `IGameRules<TCell, TMove, TState>`, and leaves out the `gameId` attribute of `IVariantFactory`. In every view, the corner box of `GameEngine` leaves out the bound of `TState`. The views of the [class diagram](classes.md) show them in full.
 
 ## View 1: the extension points
 
