@@ -117,6 +117,17 @@
           >
             <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
           </marker>
+          <marker
+            id="ext4-diamond-filled"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 5, 9 0, 18 5, 9 10" fill="#17212a" />
+          </marker>
         </defs>
         <rect width="100%" height="100%" fill="#f3f5f6" />
         <!-- Layer zone: layer 4, frameworks and drivers -->
@@ -232,7 +243,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#ext4-triangle)"
         />
-        <!-- Observer: the bus implements the engine port, the listeners subscribe to it -->
+        <!-- Observer: GameEventBus implements the engine port GameEventPublisher: realization -->
         <path
           d="M584,276 L584,620"
           fill="none"
@@ -241,25 +252,15 @@
           stroke-dasharray="5,4"
           marker-end="url(#ext4-triangle)"
         />
+        <!-- GameEventBus keeps the listeners it receives: aggregation -->
         <path
-          d="M656,248 L704,248"
+          d="M656,248 L752,248"
           fill="none"
           stroke-width="1"
           stroke="#17212a"
           marker-start="url(#ext4-diamond-hollow)"
         />
-        <rect x="688.0" y="231" width="12" height="12" rx="2" fill="#e2ebf8" />
-        <text
-          x="694"
-          y="240"
-          fill="#17212a"
-          font-size="8"
-          font-weight="600"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          *
-        </text>
+        <!-- AudioManager implements GameEventListener: realization -->
         <path
           d="M784,116 L784,220"
           fill="none"
@@ -268,15 +269,16 @@
           stroke-dasharray="5,4"
           marker-end="url(#ext4-triangle)"
         />
+        <!-- A new subscriber implements GameEventListener: realization -->
         <path
-          d="M936,116 L936,240 Q936,248 928,248 L880,248"
+          d="M936,116 L936,240 Q936,248 928,248 L896,248"
           fill="none"
           stroke-width="1"
           stroke="#17212a"
           stroke-dasharray="5,4"
           marker-end="url(#ext4-triangle)"
         />
-        <!-- Aspects extend UseCaseAspect -->
+        <!-- Aspects extend UseCaseAspect: inheritance -->
         <path
           d="M784,412 L840,412"
           fill="none"
@@ -291,14 +293,40 @@
           stroke="#17212a"
           marker-end="url(#ext4-triangle)"
         />
-        <!-- Game registry holds the game modules -->
+        <!-- GameRegistry keeps the game modules it receives: aggregation -->
         <path
-          d="M240,520 L288,520"
+          d="M200,520 L288,520"
           fill="none"
           stroke-width="1"
           stroke="#17212a"
           marker-start="url(#ext4-diamond-hollow)"
         />
+        <!-- Role names and multiplicities at the part end -->
+        <rect x="676" y="233" width="72" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="678"
+          y="242"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          listeners
+          <tspan font-weight="600">0..*</tspan>
+        </text>
+        <rect x="220" y="504" width="62" height="12" rx="2" fill="#e3f5e6" />
+        <text
+          x="222"
+          y="513"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          modules
+          <tspan font-weight="600">0..*</tspan>
+        </text>
+
         <rect x="48" y="60" width="208" height="56" rx="6" fill="#eceef0" />
         <rect
           x="48"
@@ -571,9 +599,9 @@
           GameEventBus
         </text>
         <rect
-          x="704"
+          x="752"
           y="220"
-          width="176"
+          width="144"
           height="56"
           rx="6"
           fill="#ffffff"
@@ -581,7 +609,7 @@
           stroke-width="1"
         />
         <text
-          x="792.0"
+          x="824"
           y="244.0"
           fill="#5b6873"
           font-size="8"
@@ -592,7 +620,7 @@
           «interface»
         </text>
         <text
-          x="792.0"
+          x="824"
           y="262.0"
           fill="#17212a"
           font-size="12"
@@ -677,11 +705,11 @@
         >
           SettingsStore
         </text>
-        <rect x="48" y="492" width="192" height="56" rx="6" fill="#e3f5e6" />
+        <rect x="48" y="492" width="152" height="56" rx="6" fill="#e3f5e6" />
         <rect
           x="48"
           y="492"
-          width="192"
+          width="152"
           height="56"
           rx="6"
           fill="rgba(23,33,42,0.02)"
@@ -690,7 +718,7 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="144.0"
+          x="124"
           y="516.0"
           fill="#5b6873"
           font-size="8"
@@ -701,7 +729,7 @@
           DECLARED · §8 · D5
         </text>
         <text
-          x="144.0"
+          x="124"
           y="534.0"
           fill="#5b6873"
           font-size="12"
@@ -972,6 +1000,7 @@
           D5: desktop and a game with no board are planned seams. Dashed boxes have placeholder
           names. The layer of GameRegistry is open.
         </text>
+        <!-- Legend -->
         <line x1="24" y1="804" x2="1016" y2="804" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
@@ -983,14 +1012,14 @@
         >
           LEGEND
         </text>
+
         <line
           x1="24"
-          y1="844"
+          y1="843"
           x2="52"
-          y2="844"
+          y2="843"
           stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="5,4"
           marker-end="url(#ext4-triangle)"
         />
         <text
@@ -1000,16 +1029,35 @@
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Realization · implements
+          Inheritance
+        </text>
+        <line
+          x1="144"
+          y1="843"
+          x2="172"
+          y2="843"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#ext4-triangle)"
+        />
+        <text
+          x="180"
+          y="847"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Realization
         </text>
         <line
           x1="264"
-          y1="844"
+          y1="843"
           x2="292"
-          y2="844"
+          y2="843"
           stroke="#17212a"
           stroke-width="1"
-          marker-end="url(#ext4-triangle)"
+          marker-start="url(#ext4-diamond-filled)"
         />
         <text
           x="300"
@@ -1018,45 +1066,45 @@
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Inheritance · extends
+          Composition · attribute it creates
         </text>
         <line
-          x1="520"
-          y1="844"
-          x2="548"
-          y2="844"
+          x1="488"
+          y1="843"
+          x2="516"
+          y2="843"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#ext4-diamond-hollow)"
         />
         <text
-          x="556"
+          x="524"
           y="847"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Aggregation · has
+          Aggregation · attribute it receives
         </text>
-        <rect
-          x="776"
-          y="838"
-          width="28"
-          height="12"
-          rx="2"
-          fill="#ffffff"
-          stroke="#17212a"
+        <line
+          x1="720"
+          y1="843"
+          x2="748"
+          y2="843"
+          stroke="#5b6873"
           stroke-width="1"
+          marker-end="url(#ext4-open)"
         />
         <text
-          x="812"
+          x="756"
           y="847"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          List box · classes of one kind
+          Use · parameter, return, local or new
         </text>
+
         <rect
           x="24"
           y="862"
@@ -1133,6 +1181,7 @@
         >
           Zone · layer 1
         </text>
+
         <rect
           x="24"
           y="886"
@@ -1152,6 +1201,25 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Dashed box · declared, no class yet
+        </text>
+        <rect
+          x="260"
+          y="886"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="296"
+          y="895"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          List box · classes of one kind
         </text>
       </svg>
     </div>

@@ -221,7 +221,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#ext-triangle)"
         />
-        <!-- Each variant factory holds a GeometryFactory: aggregation -->
+        <!-- Each variant factory holds the GeometryFactory it receives as geometry: aggregation -->
         <line
           x1="176"
           y1="168"
@@ -256,17 +256,17 @@
         >
           GeometryFactory‹TCoord›
         </text>
-        <rect x="184" y="290" width="136" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="120" y="400" width="52" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="252"
-          y="299"
+          x="146"
+          y="409"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          GEOMETRY · DECISION 17
+          geometry
         </text>
         <!-- Multiplicities -->
         <rect x="182" y="400" width="12" height="12" rx="2" fill="#f9f4dc" />
@@ -714,7 +714,6 @@
           y2="684"
           stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="5,4"
           marker-end="url(#ext-triangle)"
         />
         <text
@@ -724,25 +723,80 @@
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
+          Inheritance
+        </text>
+        <line
+          x1="144"
+          y1="684"
+          x2="172"
+          y2="684"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#ext-triangle)"
+        />
+        <text
+          x="180"
+          y="688"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
           Realization
         </text>
         <line
-          x1="184"
+          x1="264"
           y1="684"
-          x2="212"
+          x2="292"
+          y2="684"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#ext-diamond-filled)"
+        />
+        <text
+          x="300"
+          y="688"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Composition · attribute it creates
+        </text>
+        <line
+          x1="474"
+          y1="684"
+          x2="502"
           y2="684"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#ext-diamond-hollow)"
         />
         <text
-          x="220"
+          x="510"
           y="688"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Aggregation · has
+          Aggregation · attribute it receives
+        </text>
+        <line
+          x1="694"
+          y1="684"
+          x2="722"
+          y2="684"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ext-open)"
+        />
+        <text
+          x="730"
+          y="688"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Use · parameter, return, local or new
         </text>
         <rect
           x="24"

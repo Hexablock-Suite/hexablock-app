@@ -118,6 +118,17 @@
           >
             <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
           </marker>
+          <marker
+            id="ext1-diamond-filled"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 5, 9 0, 18 5, 9 10" fill="#17212a" />
+          </marker>
         </defs>
         <rect width="100%" height="100%" fill="#f3f5f6" />
         <!-- Layer zone: layer 4, frameworks and drivers -->
@@ -272,7 +283,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#ext1-triangle)"
         />
-        <!-- GameEngine holds the rules and the scoring policy: aggregation -->
+        <!-- GameEngine holds the IGameRules and the IScoringPolicy it receives as rules and scoring: aggregation -->
         <path
           d="M456,484 L456,436"
           fill="none"
@@ -310,6 +321,30 @@
           text-anchor="middle"
         >
           1
+        </text>
+        <rect x="416" y="439" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="434"
+          y="448"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          rules
+        </text>
+        <rect x="732" y="439" width="48" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="756"
+          y="448"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          scoring
         </text>
         <!-- Each variant package implements the extension points -->
         <path
@@ -1985,6 +2020,7 @@
           Hexa Fill is the example of statement §3.1. Its dashed boxes are declared extensions with
           no class yet.
         </text>
+        <!-- Legend -->
         <line
           x1="24"
           y1="1352"
@@ -2010,17 +2046,35 @@
           y2="1392"
           stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="5,4"
           marker-end="url(#ext1-triangle)"
         />
         <text
           x="60"
-          y="1395"
+          y="1396"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Realization · implements
+          Inheritance
+        </text>
+        <line
+          x1="144"
+          y1="1392"
+          x2="172"
+          y2="1392"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#ext1-triangle)"
+        />
+        <text
+          x="180"
+          y="1396"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Realization
         </text>
         <line
           x1="264"
@@ -2029,20 +2083,56 @@
           y2="1392"
           stroke="#17212a"
           stroke-width="1"
-          marker-start="url(#ext1-diamond-hollow)"
+          marker-start="url(#ext1-diamond-filled)"
         />
         <text
           x="300"
-          y="1395"
+          y="1396"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Aggregation · has
+          Composition · attribute it creates
+        </text>
+        <line
+          x1="474"
+          y1="1392"
+          x2="502"
+          y2="1392"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#ext1-diamond-hollow)"
+        />
+        <text
+          x="510"
+          y="1396"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aggregation · attribute it receives
+        </text>
+        <line
+          x1="694"
+          y1="1392"
+          x2="722"
+          y2="1392"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ext1-open)"
+        />
+        <text
+          x="730"
+          y="1396"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Use · parameter, return, local or new
         </text>
         <rect
           x="520"
-          y="1382"
+          y="1430"
           width="12"
           height="5"
           rx="1"
@@ -2052,7 +2142,7 @@
         />
         <rect
           x="520"
-          y="1386"
+          y="1434"
           width="28"
           height="12"
           rx="2"
@@ -2062,7 +2152,7 @@
         />
         <text
           x="556"
-          y="1395"
+          y="1443"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2071,7 +2161,7 @@
         </text>
         <rect
           x="776"
-          y="1386"
+          y="1434"
           width="28"
           height="12"
           rx="2"
@@ -2081,7 +2171,7 @@
         />
         <text
           x="812"
-          y="1395"
+          y="1443"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

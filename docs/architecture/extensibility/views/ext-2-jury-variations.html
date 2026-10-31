@@ -116,6 +116,17 @@
           >
             <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
           </marker>
+          <marker
+            id="ext2-diamond-filled"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 5, 9 0, 18 5, 9 10" fill="#17212a" />
+          </marker>
         </defs>
         <rect width="100%" height="100%" fill="#f3f5f6" />
         <!-- Layer zone: layer 1, entities -->
@@ -228,14 +239,13 @@
         >
           WHAT DOES NOT CHANGE · src/domain/engine/ · APP-NFR-06
         </text>
-        <!-- The new data or class reaches an existing extension point -->
+        <!-- The new data or class reaches an existing extension point: a size passed to BoardBuilder is a use -->
         <path
           d="M184,204 L184,252"
           fill="none"
           stroke-width="1"
-          stroke="#5b6873"
-          stroke-dasharray="5,4"
           marker-end="url(#ext2-open)"
+          stroke="#5b6873"
         />
         <rect x="189" y="223" width="60" height="12" rx="2" fill="#f9f4dc" />
         <text
@@ -249,6 +259,7 @@
         >
           PASSED TO
         </text>
+        <!-- A new scoring class implements IScoringPolicy: realization -->
         <path
           d="M512,204 L512,252"
           fill="none"
@@ -269,13 +280,13 @@
         >
           IMPLEMENTS
         </text>
+        <!-- A new piece definition is built as a ShapeNode: use -->
         <path
           d="M840,204 L840,252"
           fill="none"
           stroke-width="1"
-          stroke="#5b6873"
-          stroke-dasharray="5,4"
           marker-end="url(#ext2-open)"
+          stroke="#5b6873"
         />
         <rect x="845" y="223" width="52" height="12" rx="2" fill="#f9f4dc" />
         <text
@@ -751,6 +762,7 @@
           Check: before the defense the team applies each change on a branch, and the diff touches
           no engine file.
         </text>
+        <!-- Legend -->
         <line x1="24" y1="652" x2="1016" y2="652" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
@@ -769,40 +781,93 @@
           y2="692"
           stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="5,4"
           marker-end="url(#ext2-triangle)"
         />
         <text
           x="60"
-          y="695"
+          y="696"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Realization · implements
+          Inheritance
+        </text>
+        <line
+          x1="144"
+          y1="692"
+          x2="172"
+          y2="692"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#ext2-triangle)"
+        />
+        <text
+          x="180"
+          y="696"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Realization
         </text>
         <line
           x1="264"
           y1="692"
           x2="292"
           y2="692"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="5,4"
-          marker-end="url(#ext2-open)"
+          marker-start="url(#ext2-diamond-filled)"
         />
         <text
           x="300"
-          y="695"
+          y="696"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Dependency · uses
+          Composition · attribute it creates
+        </text>
+        <line
+          x1="474"
+          y1="692"
+          x2="502"
+          y2="692"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#ext2-diamond-hollow)"
+        />
+        <text
+          x="510"
+          y="696"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aggregation · attribute it receives
+        </text>
+        <line
+          x1="694"
+          y1="692"
+          x2="722"
+          y2="692"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ext2-open)"
+        />
+        <text
+          x="730"
+          y="696"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Use · parameter, return, local or new
         </text>
         <rect
-          x="520"
-          y="686"
+          x="560"
+          y="710"
           width="28"
           height="12"
           rx="2"
@@ -811,8 +876,8 @@
           stroke-width="1"
         />
         <text
-          x="556"
-          y="695"
+          x="596"
+          y="719"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -820,8 +885,8 @@
           Zone · layer 1
         </text>
         <rect
-          x="776"
-          y="686"
+          x="688"
+          y="710"
           width="28"
           height="12"
           rx="2"
@@ -831,8 +896,8 @@
           stroke-dasharray="4,4"
         />
         <text
-          x="812"
-          y="695"
+          x="724"
+          y="719"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -860,7 +925,7 @@
           Corner box · type parameters
         </text>
         <rect
-          x="264"
+          x="216"
           y="710"
           width="28"
           height="12"
@@ -871,7 +936,7 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="300"
+          x="252"
           y="719"
           fill="#5b6873"
           font-size="8.5"
@@ -880,7 +945,7 @@
           Dashed box · new, no class yet
         </text>
         <rect
-          x="520"
+          x="416"
           y="710"
           width="28"
           height="12"
@@ -890,7 +955,7 @@
           stroke-width="1"
         />
         <text
-          x="556"
+          x="452"
           y="719"
           fill="#5b6873"
           font-size="8.5"
