@@ -3,6 +3,7 @@
 TODO: index the project documents here (architecture, class and extensibility diagrams, decisions).
 
 - [REQUIREMENTS.md](REQUIREMENTS.md): the project requirements in our own words, with assumptions, design decisions and questions for the professor.
+- [ROADMAP.md](ROADMAP.md): the one-week sprint plan for both repositories, with the requirement IDs and the exit check of each sprint and the release tag that closes it (proposal for team review).
 - [EXTENSIBILITY.md](EXTENSIBILITY.md): how to add a fifth variant without changing the engine.
 - [architecture/layers.md](architecture/layers.md): the Clean layers and the component in each layer (draft).
 - [architecture/classes.md](architecture/classes.md): the class diagram, from the engine and the four variants out to the use cases, adapters and drivers (draft).
