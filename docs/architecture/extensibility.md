@@ -2,7 +2,7 @@
 
 Status: draft for review with the team, 2026-10-31.
 
-Statement §4.3 asks for a «Diagrama que muestre el motor genérico en el centro y las cuatro variantes como extensiones, resaltando los puntos de extensión (interfaces que una quinta variante debería implementar)». This page answers it for the client in four views. View 1 is that diagram. Views 2 to 4 show the other extensions that the requirements declare: the jury variations, the geometry family and the extension points outside the engine. Class names come from the [class diagram](classes.md). IDs such as D4 and APP-NFR-06 refer to [`docs/REQUIREMENTS.md`](../REQUIREMENTS.md). [`docs/EXTENSIBILITY.md`](../EXTENSIBILITY.md) will give the file-by-file steps that APP-NFR-06 asks for.
+Statement §4.3 asks for a «Diagrama que muestre el motor genérico en el centro y las cuatro variantes como extensiones, resaltando los puntos de extensión (interfaces que una quinta variante debería implementar)». This page answers it for the client in four views. View 1 is that diagram. Views 2 to 4 show the other extensions that the requirements declare: the jury variations, the geometry family and the extension points outside the engine. Class names come from the [class diagram](classes.md). IDs such as D4 and APP-NFR-06 refer to [`docs/REQUIREMENTS.md`](../REQUIREMENTS.md). [`docs/EXTENSIBILITY.md`](../EXTENSIBILITY.md) gives the file-by-file steps that APP-NFR-06 asks for.
 
 ## How to read it
 
@@ -19,7 +19,7 @@ Statement §4.3 asks for a «Diagrama que muestre el motor genérico en el centr
 
 ## View 1: the extension points
 
-The engine sits in the center of layer 1. Around it are the interfaces that a fifth variant implements, and the type arguments that it binds. The four variants of the statement and Hexa Fill, the example of §3.1 («por ejemplo, Hexa Fill: pintar celdas con restricciones»), implement them. Each variant also adds a state mapper in layer 3 and a cell renderer in layer 4 (D3).
+The engine sits in the center of layer 1. Around it are the interfaces that a fifth variant implements, and the type arguments that it binds. The four variants of the statement and Hexa Fill, the example of §3.1 («por ejemplo, Hexa Fill: pintar celdas con restricciones»), implement them. Each variant also adds a state mapper in layer 3 and a cell renderer in layer 4 (D3). The variant factory creates the rules, the piece source, the scoring policy and the board (decision 31). `GameId` is open: each factory declares its own id, so a fifth variant changes no engine file (decision 30, D15).
 
 ![Extension points: GameEngine in the center of layer 1; around it IVariantFactory, IGameRules with the abstract BaseGameRules, IScoringPolicy, IPieceSource, IProgressModel, ILevelBuilder, the TCell, TMove and TState type arguments and the optional capabilities IUndoable, IRedoable, ITimed and IRandomSeeded; StateMapper in layer 3 and CellRenderer in layer 4; the packages Hexa Lines, Hexa Fit, Hexa Sort, Hexa Merge and the declared Hexa Fill implement them](extensibility/views/ext-1-extension-points.png)
 
@@ -29,11 +29,11 @@ In the defense the jury proposes «un nuevo tamaño de tablero, una política de
 
 ![The three jury variations: a new board size is data passed to BoardBuilder.withRegion(size); a new scoring policy is a class that implements IScoringPolicy or extends ScoringDecorator; a new piece shape is a ShapeGroup of CellNode cells; GameEngine does not change](extensibility/views/ext-2-jury-variations.png)
 
-| Variation      | What is new                                                                                | Where it lives                                                                                                                   | What does not change                          |
-| -------------- | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| Board size     | A size value: configuration data (§8)                                                      | The level file (`SortLevel.radius`), or the size that `LinesFactory` or `MergeFactory` passes to `BoardBuilder.withRegion(size)` | `Board`, `GridTopology`, `GameEngine`         |
-| Scoring policy | A class that implements `IScoringPolicy<TState>`, or a `ScoringDecorator` for a bonus (§8) | The variant folder, `src/domain/variants/<variant>/`. The variant factory returns it from `createScoring()`                      | `GameEngine`, which calls `score()` as before |
-| Piece shape    | A piece definition as data: a `ShapeGroup` of `CellNode` cells (§8)                        | The Fit level file (`FitLevel.pieces`), or the piece list of the variant                                                         | `Piece`, `IPieceSource`, `GameEngine`         |
+| Variation      | What is new                                                                                | Where it lives                                                                                                                                                                                | What does not change                          |
+| -------------- | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| Board size     | A size value: configuration data (§8)                                                      | The Sort level file (`radius`, which `SortLevelBuilder.withRegion(radius)` turns into the board), or the size that `LinesFactory` or `MergeFactory` passes to `BoardBuilder.withRegion(size)` | `Board`, `GridTopology`, `GameEngine`         |
+| Scoring policy | A class that implements `IScoringPolicy<TState>`, or a `ScoringDecorator` for a bonus (§8) | The variant folder, `src/domain/variants/<variant>/`. The variant factory returns it from `createScoring()`                                                                                   | `GameEngine`, which calls `score()` as before |
+| Piece shape    | A piece definition as data: a `ShapeGroup` of `CellNode` cells (§8)                        | The Fit level file (`FitLevel.pieces`), or the piece list of the variant                                                                                                                      | `Piece`, `IPieceSource`, `GameEngine`         |
 
 ## View 3: the geometry axis
 
@@ -47,7 +47,7 @@ Layers 2 to 4 have their own extension points. The view shows only the ones that
 
 - **Database and backend.** A new storage or backend is one more adapter of the layer 2 ports. The use cases do not change (§3.3, §3.4, decision 22).
 - **Level origin (A6).** `BundledLevelRepository` and `ApiLevelRepository` both implement `LevelRepository`, so bundled levels work offline (APP-FR-15).
-- **Observer.** A new subscriber implements `GameEventListener` and subscribes to `GameEventBus`, which implements the engine port `GameEventPublisher`.
+- **Observer.** A new subscriber implements `GameEventListener` and subscribes to `GameEventBus`, which implements the engine interface `GameEventPublisher`.
 - **Aspects.** A new aspect extends `UseCaseAspect` and wraps any use case (§3.5, APP-NFR-11).
 - **Desktop and a game with no board (D5).** Both are planned seams with no class yet. The layer of the game registry is still open.
 
@@ -75,7 +75,7 @@ Each row is one extension point. Each cell names the class or the type argument 
 | `StateMapper` (layer 3)              | `LinesStateMapper`                         | `FitStateMapper`                                               | `SortStateMapper`                                   | `MergeStateMapper`                     | `FillStateMapper`                      |
 | `CellRenderer` (layer 4, Q8)         | `LinesCellRenderer`                        | `FitCellRenderer`                                              | `SortCellRenderer`                                  | `MergeCellRenderer`                    | `FillCellRenderer`                     |
 
-The capability classes `MoveHistory`, `RedoableHistory`, `LevelTimer` and `SeededPieceSource` live in the engine. A variant does not write them: its factory picks them (decision 3). `HighScoreProgress` and `LevelProgress` live in the engine too.
+The capability classes `MoveHistory`, `RedoableHistory`, `LevelTimer` and `SeededPieceSource` live in the engine. A variant does not write them: its factory picks them (decision 3), and `GameEngine.undoable()` and `redoable()` give them to the use cases (decision 27). `HighScoreProgress` and `LevelProgress` live in the engine too.
 
 ## Render the images
 
