@@ -138,7 +138,7 @@ Layer 3, `src/adapters/`, and layer 4, `src/infrastructure/` and `app/`. Layer 3
 
 ### View 4.3: game events and sound
 
-![Game events and sound: GameEventBus implements the engine port, and the presenter and AudioManager, the audio facade, listen to it](classes/views/ad-3-events.png)
+![Game events and sound: GameEventBus implements the event interface of the engine, and the presenter and AudioManager, the audio facade, listen to it](classes/views/ad-3-events.png)
 
 ### View 4.4: wiring
 
