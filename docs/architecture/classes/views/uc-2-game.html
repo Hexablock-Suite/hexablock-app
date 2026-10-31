@@ -225,92 +225,79 @@
         </text>
 
         <!-- Relationships (drawn before boxes) -->
-        <!-- UndoMove holds RunningGameStore: aggregation -->
+        <!-- UndoMove keeps the RunningGameStore it receives: aggregation -->
         <path
-          marker-start="url(#ucgame-diamond-hollow)"
           d="M632 184 H256 Q248 184 248 192 V316"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
-        />
-        <!-- RedoMove holds RunningGameStore: aggregation -->
-        <line
           marker-start="url(#ucgame-diamond-hollow)"
+        />
+        <!-- RedoMove keeps the RunningGameStore it receives: aggregation -->
+        <line
           x1="632"
           y1="340"
           x2="428"
           y2="340"
           stroke="#17212a"
           stroke-width="1"
-        />
-        <!-- StartGame holds RunningGameStore: aggregation -->
-        <path
           marker-start="url(#ucgame-diamond-hollow)"
+        />
+        <!-- StartGame keeps the RunningGameStore it receives: aggregation -->
+        <path
           d="M632 472 H384 Q376 472 376 464 V404"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
-        />
-        <!-- ApplyMove holds RunningGameStore: aggregation -->
-        <path
           marker-start="url(#ucgame-diamond-hollow)"
+        />
+        <!-- ApplyMove keeps the RunningGameStore it receives: aggregation -->
+        <path
           d="M632 600 H352 Q344 600 344 592 V404"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
+          marker-start="url(#ucgame-diamond-hollow)"
         />
-        <!-- RunningGameStore holds zero or one GameEngine: association -->
+        <!-- RunningGameStore stores and returns the GameEngine: use, the interface keeps no attribute -->
         <line
-          x1="312"
+          x1="288"
           y1="404"
-          x2="312"
+          x2="288"
           y2="720"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#ucgame-open)"
         />
-        <!-- ApplyMove calls GameEngine.play(): dependency -->
+        <!-- ApplyMove calls GameEngine.play(): use -->
         <path
-          d="M688 636 V732 Q688 740 680 740 H392"
+          d="M688 636 V732 Q688 740 680 740 H424"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#ucgame-open)"
         />
-        <!-- StartGame holds its IVariantFactory: aggregation -->
+        <!-- StartGame keeps the IVariantFactory it receives: aggregation -->
         <path
-          marker-start="url(#ucgame-diamond-hollow)"
           d="M936 456 H960 Q968 456 968 464 V720"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
+          marker-start="url(#ucgame-diamond-hollow)"
         />
 
         <!-- Arrow labels -->
-        <rect x="504" y="322" width="40" height="12" rx="2" fill="#e3f5e6" />
+        <rect x="292" y="551" width="36" height="12" rx="2" fill="#e3f5e6" />
         <text
-          x="524"
-          y="331"
+          x="294"
+          y="560"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
+          text-anchor="start"
           letter-spacing="0.06em"
         >
-          GAMES
-        </text>
-        <rect x="268" y="540" width="36" height="12" rx="2" fill="#e3f5e6" />
-        <text
-          x="286"
-          y="549"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          HOLDS
+          STORES
         </text>
         <rect x="516" y="722" width="40" height="12" rx="2" fill="#f9f4dc" />
         <text
@@ -324,31 +311,67 @@
         >
           PLAY()
         </text>
-        <rect x="912" y="690" width="48" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="936"
-          y="699"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          FACTORY
-        </text>
 
-        <!-- Multiplicities -->
-        <rect x="298" y="698" width="28" height="12" rx="2" fill="#f9f4dc" />
+        <!-- Role names and multiplicities at the part end -->
+        <rect x="252" y="297" width="38" height="12" rx="2" fill="#e3f5e6" />
         <text
-          x="312"
-          y="707"
+          x="254"
+          y="306"
           fill="#17212a"
           font-size="8"
-          font-weight="600"
           font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
+          text-anchor="start"
         >
-          0..1
+          games
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <rect x="440" y="326" width="38" height="12" rx="2" fill="#e3f5e6" />
+        <text
+          x="442"
+          y="335"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          games
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <rect x="380" y="427" width="38" height="12" rx="2" fill="#e3f5e6" />
+        <text
+          x="382"
+          y="436"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          games
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <rect x="302" y="427" width="38" height="12" rx="2" fill="#e3f5e6" />
+        <text
+          x="338"
+          y="436"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+        >
+          games
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <rect x="916" y="703" width="48" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="962"
+          y="712"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+        >
+          factory
+          <tspan font-weight="600">1</tspan>
         </text>
 
         <!-- Class: UndoMove (use case) -->
@@ -637,7 +660,7 @@
 
         <!-- Reference box: GameEngine, detailed in Part 1 -->
         <rect
-          x="232"
+          x="264"
           y="720"
           width="160"
           height="40"
@@ -648,7 +671,7 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="312"
+          x="344"
           y="734"
           fill="#7d8a94"
           font-size="7"
@@ -660,7 +683,7 @@
           PART 1 · VIEW 1
         </text>
         <text
-          x="312"
+          x="344"
           y="751"
           fill="#17212a"
           font-size="12"
@@ -811,9 +834,9 @@
           Inheritance
         </text>
         <line
-          x1="184"
+          x1="144"
           y1="884"
-          x2="212"
+          x2="172"
           y2="884"
           stroke="#17212a"
           stroke-width="1"
@@ -821,7 +844,7 @@
           marker-end="url(#ucgame-triangle)"
         />
         <text
-          x="220"
+          x="180"
           y="888"
           fill="#5b6873"
           font-size="8.5"
@@ -830,77 +853,58 @@
           Realization
         </text>
         <line
-          x1="344"
+          x1="264"
           y1="884"
-          x2="372"
+          x2="292"
           y2="884"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#ucgame-diamond-filled)"
         />
         <text
-          x="380"
+          x="300"
           y="888"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Composition · owns
+          Composition · attribute it creates
         </text>
         <line
-          x1="504"
+          x1="488"
           y1="884"
-          x2="532"
+          x2="516"
           y2="884"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#ucgame-diamond-hollow)"
         />
         <text
-          x="540"
+          x="524"
           y="888"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Aggregation · has
+          Aggregation · attribute it receives
         </text>
         <line
-          x1="664"
+          x1="720"
           y1="884"
-          x2="692"
+          x2="748"
           y2="884"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#ucgame-open)"
         />
         <text
-          x="700"
+          x="756"
           y="888"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Association
-        </text>
-        <line
-          x1="824"
-          y1="884"
-          x2="852"
-          y2="884"
-          stroke="#5b6873"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#ucgame-open)"
-        />
-        <text
-          x="860"
-          y="888"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Dependency · uses
+          Use · parameter, return, local or new
         </text>
 
         <rect

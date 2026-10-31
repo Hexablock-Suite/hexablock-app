@@ -226,43 +226,43 @@
         </text>
 
         <!-- Relationships (drawn before boxes) -->
-        <!-- Register holds SessionStore: aggregation -->
+        <!-- Register keeps the SessionStore it receives: aggregation -->
         <line
-          marker-start="url(#ucaccount-diamond-hollow)"
           x1="280"
           y1="220"
           x2="280"
           y2="300"
           stroke="#17212a"
           stroke-width="1"
-        />
-        <!-- Login holds SessionStore: aggregation -->
-        <line
           marker-start="url(#ucaccount-diamond-hollow)"
+        />
+        <!-- Login keeps the SessionStore it receives: aggregation -->
+        <line
           x1="432"
           y1="220"
           x2="432"
           y2="300"
           stroke="#17212a"
           stroke-width="1"
-        />
-        <!-- Register holds AccountGateway: aggregation -->
-        <path
           marker-start="url(#ucaccount-diamond-hollow)"
+        />
+        <!-- Register keeps the AccountGateway it receives: aggregation -->
+        <path
           d="M112 220 V476 Q112 484 120 484 H152"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
-        />
-        <!-- Login holds AccountGateway: aggregation -->
-        <path
           marker-start="url(#ucaccount-diamond-hollow)"
+        />
+        <!-- Login keeps the AccountGateway it receives: aggregation -->
+        <path
           d="M560 220 V460 Q560 468 552 468 H496"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
+          marker-start="url(#ucaccount-diamond-hollow)"
         />
-        <!-- AccountGateway returns Session values: dependency -->
+        <!-- AccountGateway returns Session values: use -->
         <line
           x1="496"
           y1="500"
@@ -270,18 +270,17 @@
           y2="500"
           stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#ucaccount-open)"
         />
-        <!-- UpdateSettings holds SettingsStore: aggregation -->
+        <!-- UpdateSettings keeps the SettingsStore it receives: aggregation -->
         <line
-          marker-start="url(#ucaccount-diamond-hollow)"
           x1="840"
           y1="204"
           x2="840"
           y2="300"
           stroke="#17212a"
           stroke-width="1"
+          marker-start="url(#ucaccount-diamond-hollow)"
         />
 
         <!-- Arrow labels -->
@@ -296,6 +295,68 @@
           letter-spacing="0.06em"
         >
           RETURNS
+        </text>
+
+        <!-- Role names and multiplicities at the part end -->
+        <rect x="284" y="283" width="48" height="12" rx="2" fill="#e3f5e6" />
+        <text
+          x="286"
+          y="292"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          session
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <rect x="436" y="283" width="48" height="12" rx="2" fill="#e3f5e6" />
+        <text
+          x="438"
+          y="292"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          session
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <rect x="56" y="467" width="52" height="12" rx="2" fill="#e3f5e6" />
+        <text
+          x="106"
+          y="476"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+        >
+          accounts
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <rect x="502" y="454" width="52" height="12" rx="2" fill="#e3f5e6" />
+        <text
+          x="552"
+          y="463"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+        >
+          accounts
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <rect x="844" y="283" width="52" height="12" rx="2" fill="#e3f5e6" />
+        <text
+          x="846"
+          y="292"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          settings
+          <tspan font-weight="600">1</tspan>
         </text>
 
         <!-- Class: Register (use case) -->
@@ -666,7 +727,7 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           A use case keeps its ports as attributes, so each link to a port is an aggregation
-          (decision 23). A parameter type stays a dependency.
+          (decision 23). A parameter or return type is a use line.
         </text>
         <!-- Legend -->
         <line x1="24" y1="652" x2="1016" y2="652" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
@@ -700,9 +761,9 @@
           Inheritance
         </text>
         <line
-          x1="184"
+          x1="144"
           y1="688"
-          x2="212"
+          x2="172"
           y2="688"
           stroke="#17212a"
           stroke-width="1"
@@ -710,7 +771,7 @@
           marker-end="url(#ucaccount-triangle)"
         />
         <text
-          x="220"
+          x="180"
           y="692"
           fill="#5b6873"
           font-size="8.5"
@@ -719,77 +780,58 @@
           Realization
         </text>
         <line
-          x1="344"
+          x1="264"
           y1="688"
-          x2="372"
+          x2="292"
           y2="688"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#ucaccount-diamond-filled)"
         />
         <text
-          x="380"
+          x="300"
           y="692"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Composition · owns
+          Composition · attribute it creates
         </text>
         <line
-          x1="504"
+          x1="488"
           y1="688"
-          x2="532"
+          x2="516"
           y2="688"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#ucaccount-diamond-hollow)"
         />
         <text
-          x="540"
+          x="524"
           y="692"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Aggregation · has
+          Aggregation · attribute it receives
         </text>
         <line
-          x1="664"
+          x1="720"
           y1="688"
-          x2="692"
+          x2="748"
           y2="688"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#ucaccount-open)"
         />
         <text
-          x="700"
+          x="756"
           y="692"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Association
-        </text>
-        <line
-          x1="824"
-          y1="688"
-          x2="852"
-          y2="688"
-          stroke="#5b6873"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#ucaccount-open)"
-        />
-        <text
-          x="860"
-          y="692"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Dependency · uses
+          Use · parameter, return, local or new
         </text>
 
         <rect

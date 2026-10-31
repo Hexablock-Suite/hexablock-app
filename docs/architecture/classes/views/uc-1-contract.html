@@ -235,7 +235,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#uccontract-triangle)"
         />
-        <!-- UseCaseAspect has one inner UseCase: aggregation -->
+        <!-- UseCaseAspect keeps the inner UseCase it receives: aggregation -->
         <line
           x1="528"
           y1="264"
@@ -281,53 +281,63 @@
           stroke-width="1"
           marker-end="url(#uccontract-triangle)"
         />
-        <!-- LoggingAspect holds Logger: aggregation -->
+        <!-- LoggingAspect keeps the Logger it receives: aggregation -->
         <line
-          marker-start="url(#uccontract-diamond-hollow)"
           x1="440"
           y1="504"
           x2="440"
           y2="584"
           stroke="#17212a"
           stroke-width="1"
-        />
-        <!-- TimingAspect holds Logger: aggregation -->
-        <line
           marker-start="url(#uccontract-diamond-hollow)"
+        />
+        <!-- TimingAspect keeps the Logger it receives: aggregation -->
+        <line
           x1="600"
           y1="504"
           x2="600"
           y2="584"
           stroke="#17212a"
           stroke-width="1"
+          marker-start="url(#uccontract-diamond-hollow)"
         />
 
-        <!-- Arrow labels -->
-        <rect x="536" y="206" width="36" height="12" rx="2" fill="#e3f5e6" />
+        <!-- Role names and multiplicities at the part end -->
+        <rect x="534" y="195" width="38" height="12" rx="2" fill="#e3f5e6" />
         <text
-          x="554"
-          y="215"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          INNER
-        </text>
-
-        <!-- Multiplicities -->
-        <rect x="522" y="188" width="12" height="12" rx="2" fill="#e3f5e6" />
-        <text
-          x="528"
-          y="197"
+          x="536"
+          y="204"
           fill="#17212a"
           font-size="8"
-          font-weight="600"
           font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
+          text-anchor="start"
         >
-          1
+          inner
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <rect x="444" y="567" width="43" height="12" rx="2" fill="#e3f5e6" />
+        <text
+          x="446"
+          y="576"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          logger
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <rect x="604" y="567" width="43" height="12" rx="2" fill="#e3f5e6" />
+        <text
+          x="606"
+          y="576"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          logger
+          <tspan font-weight="600">1</tspan>
         </text>
 
         <!-- Class: UseCase (focal, interface, input port) -->
@@ -673,9 +683,9 @@
           Inheritance
         </text>
         <line
-          x1="184"
+          x1="144"
           y1="804"
-          x2="212"
+          x2="172"
           y2="804"
           stroke="#17212a"
           stroke-width="1"
@@ -683,7 +693,7 @@
           marker-end="url(#uccontract-triangle)"
         />
         <text
-          x="220"
+          x="180"
           y="808"
           fill="#5b6873"
           font-size="8.5"
@@ -692,77 +702,58 @@
           Realization
         </text>
         <line
-          x1="344"
+          x1="264"
           y1="804"
-          x2="372"
+          x2="292"
           y2="804"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#uccontract-diamond-filled)"
         />
         <text
-          x="380"
+          x="300"
           y="808"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Composition · owns
+          Composition · attribute it creates
         </text>
         <line
-          x1="504"
+          x1="488"
           y1="804"
-          x2="532"
+          x2="516"
           y2="804"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#uccontract-diamond-hollow)"
         />
         <text
-          x="540"
+          x="524"
           y="808"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Aggregation · has
+          Aggregation · attribute it receives
         </text>
         <line
-          x1="664"
+          x1="720"
           y1="804"
-          x2="692"
+          x2="748"
           y2="804"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#uccontract-open)"
         />
         <text
-          x="700"
+          x="756"
           y="808"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Association
-        </text>
-        <line
-          x1="824"
-          y1="804"
-          x2="852"
-          y2="804"
-          stroke="#5b6873"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#uccontract-open)"
-        />
-        <text
-          x="860"
-          y="808"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Dependency · uses
+          Use · parameter, return, local or new
         </text>
 
         <rect
