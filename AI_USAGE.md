@@ -11,6 +11,7 @@ TODO: add one entry per task: date, task, tool, prompt summary, what was kept an
 | Date       | Task                 | Tool        | What it produced                                                   | What the team changed |
 | ---------- | -------------------- | ----------- | ------------------------------------------------------------------ | --------------------- |
 | 2026-10-24 | Repository bootstrap | Claude Code | Expo scaffold cleanup, lint, test, architecture and docs gates, CI | TODO                  |
+| 2026-10-31 | Sprint releases      | Claude Code | `docs/ROADMAP.md`, CHANGELOG, rule R-sprint-release and its gate   | Renamed sprint 0      |
 
 ## Critical Evaluation
 
