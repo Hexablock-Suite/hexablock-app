@@ -64,7 +64,7 @@
       <h1>Adapters, presenters and drivers at a glance</h1>
 
       <svg
-        viewBox="0 0 1040 1246"
+        viewBox="0 0 1040 1271"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="mapad-title mapad-desc"
@@ -88,6 +88,44 @@
             markerUnits="userSpaceOnUse"
           >
             <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
+          </marker>
+          <marker
+            id="mapad-triangle"
+            markerWidth="16"
+            markerHeight="12"
+            refX="15"
+            refY="6"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          </marker>
+          <marker
+            id="mapad-diamond-filled"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 5, 9 0, 18 5, 9 10" fill="#17212a" />
+          </marker>
+          <marker
+            id="mapad-diamond-hollow"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon
+              points="0 5, 9 0, 18 5, 9 10"
+              fill="#ffffff"
+              stroke="#17212a"
+              stroke-width="1"
+            />
           </marker>
         </defs>
 
@@ -562,7 +600,7 @@
         </text>
 
         <!-- Dependencies between groups (drawn before chips) -->
-        <!-- Routes render the board: up, inside layer 4 -->
+        <!-- Routes render the board: use, up, inside layer 4 -->
         <line
           x1="212"
           y1="298"
@@ -570,21 +608,19 @@
           y2="242"
           stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#mapad-open)"
         />
-        <!-- Routes use the presenters: down into layer 3 -->
+        <!-- Routes keep the presenter they receive as a prop: aggregation, down into layer 3 -->
         <line
           x1="340"
           y1="526"
           x2="340"
           y2="606"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#mapad-open)"
+          marker-start="url(#mapad-diamond-hollow)"
         />
-        <!-- Composition root creates the presenters: down into layer 3 -->
+        <!-- Composition root creates the presenters: use, down into layer 3 -->
         <line
           x1="532"
           y1="526"
@@ -592,41 +628,38 @@
           y2="606"
           stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#mapad-open)"
         />
-        <!-- Drivers implement the driver ports: down into layer 3 -->
+        <!-- Drivers implement the driver ports: realization, down into layer 3 -->
         <line
           x1="948"
           y1="242"
           x2="948"
           y2="606"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#mapad-open)"
+          stroke-dasharray="5,4"
+          marker-end="url(#mapad-triangle)"
         />
-        <!-- Presenters map with the state mappers: down, inside layer 3 -->
+        <!-- Presenters keep the state mapper they receive: aggregation, down, inside layer 3 -->
         <line
           x1="216"
           y1="734"
           x2="216"
           y2="790"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#mapad-open)"
+          marker-start="url(#mapad-diamond-hollow)"
         />
-        <!-- Repositories use the driver ports: up, inside layer 3 -->
+        <!-- Local repositories keep the driver port they receive: aggregation, up, inside layer 3 -->
         <line
           x1="864"
           y1="790"
           x2="864"
           y2="684"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#mapad-open)"
+          marker-start="url(#mapad-diamond-hollow)"
         />
 
         <!-- Arrow labels (masks use the fill of their zone) -->
@@ -641,18 +674,6 @@
           letter-spacing="0.06em"
         >
           RENDER
-        </text>
-        <rect x="348" y="536" width="24" height="12" rx="2" fill="#eceef0" />
-        <text
-          x="360"
-          y="545"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          USE
         </text>
         <rect x="540" y="536" width="44" height="12" rx="2" fill="#eceef0" />
         <text
@@ -678,29 +699,43 @@
         >
           IMPLEMENT
         </text>
-        <rect x="224" y="756" width="52" height="12" rx="2" fill="#e2ebf8" />
+
+        <!-- Role names and multiplicities at the part end -->
+        <rect x="344" y="589" width="57" height="12" rx="2" fill="#e2ebf8" />
         <text
-          x="250"
-          y="765"
-          fill="#7d8a94"
+          x="346"
+          y="598"
+          fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
+          text-anchor="start"
         >
-          MAP WITH
+          presenter
+          <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="832" y="731" width="24" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="220" y="775" width="43" height="12" rx="2" fill="#e2ebf8" />
         <text
-          x="844"
-          y="740"
-          fill="#7d8a94"
+          x="222"
+          y="784"
+          fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
+          text-anchor="start"
         >
-          USE
+          mapper
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <rect x="868" y="689" width="38" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="870"
+          y="698"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          store
+          <tspan font-weight="600">1</tspan>
         </text>
 
         <!-- Chips: board -->
@@ -1766,60 +1801,94 @@
 
         <line
           x1="24"
-          y1="1206"
+          y1="1205"
           x2="52"
-          y2="1206"
-          stroke="#5b6873"
+          y2="1205"
+          stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#mapad-open)"
+          marker-end="url(#mapad-triangle)"
         />
         <text
           x="60"
-          y="1210"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Dependency · uses
-        </text>
-        <rect
-          x="184"
-          y="1200"
-          width="28"
-          height="12"
-          rx="2"
-          fill="#eceef0"
-          stroke="rgba(75,85,99,0.45)"
-          stroke-width="1"
-        />
-        <text
-          x="220"
           y="1209"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Zone · layer 4, frameworks and drivers
+          Inheritance
         </text>
-        <rect
-          x="432"
-          y="1200"
-          width="28"
-          height="12"
-          rx="2"
-          fill="#e2ebf8"
-          stroke="rgba(29,78,216,0.40)"
+        <line
+          x1="144"
+          y1="1205"
+          x2="172"
+          y2="1205"
+          stroke="#17212a"
           stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#mapad-triangle)"
         />
         <text
-          x="468"
+          x="180"
           y="1209"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Zone · layer 3, interface adapters
+          Realization
+        </text>
+        <line
+          x1="264"
+          y1="1205"
+          x2="292"
+          y2="1205"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#mapad-diamond-filled)"
+        />
+        <text
+          x="300"
+          y="1209"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Composition · attribute it creates
+        </text>
+        <line
+          x1="488"
+          y1="1205"
+          x2="516"
+          y2="1205"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#mapad-diamond-hollow)"
+        />
+        <text
+          x="524"
+          y="1209"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aggregation · attribute it receives
+        </text>
+        <line
+          x1="720"
+          y1="1205"
+          x2="748"
+          y2="1205"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#mapad-open)"
+        />
+        <text
+          x="756"
+          y="1209"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Use · parameter, return, local or new
         </text>
 
         <rect
@@ -1897,6 +1966,45 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
+        </text>
+
+        <rect
+          x="24"
+          y="1251"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#eceef0"
+          stroke="rgba(75,85,99,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="60"
+          y="1260"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · layer 4, frameworks and drivers
+        </text>
+        <rect
+          x="272"
+          y="1251"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="308"
+          y="1260"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · layer 3, interface adapters
         </text>
       </svg>
     </div>
