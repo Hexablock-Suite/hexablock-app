@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Use case results · UML class diagram</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --color-paper: #f3f5f6;
+        --color-ink: #17212a;
+        --color-muted: #5b6873;
+        --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+        --font-serif: 'Instrument Serif', serif;
+        --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+      }
+      body {
+        font-family: var(--font-sans);
+        background: var(--color-paper);
+        color: var(--color-ink);
+        padding: 3rem 2rem;
+      }
+      .frame {
+        max-width: 1240px;
+        margin: 0 auto;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-muted);
+        margin-bottom: 0.5rem;
+      }
+      h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        margin-bottom: 1.5rem;
+      }
+      svg {
+        width: 100%;
+        min-width: 900px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <p class="eyebrow">Class diagram · Part 3 · View 5 of 5</p>
+      <h1>Results and response models: errors as values, plain data out</h1>
+
+      <svg
+        viewBox="0 0 1040 700"
+        xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-labelledby="ucresult-title ucresult-desc"
+      >
+        <title id="ucresult-title">HexaBlock use case results · UML class diagram</title>
+        <desc id="ucresult-desc">
+          Class diagram of layer 2 showing the UseCase input port returning the generic Result value
+          object, which carries either a value or an error whose type defaults to UseCaseError, and
+          ApplyMove building MoveResult, the plain response model with the cells, score, outcome and
+          undo flags of a game.
+        </desc>
+        <defs>
+          <marker
+            id="ucresult-triangle"
+            markerWidth="16"
+            markerHeight="12"
+            refX="15"
+            refY="6"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          </marker>
+          <marker
+            id="ucresult-diamond-filled"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 5, 9 0, 18 5, 9 10" fill="#17212a" />
+          </marker>
+          <marker
+            id="ucresult-diamond-hollow"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon
+              points="0 5, 9 0, 18 5, 9 10"
+              fill="#ffffff"
+              stroke="#17212a"
+              stroke-width="1"
+            />
+          </marker>
+          <marker
+            id="ucresult-open"
+            markerWidth="10"
+            markerHeight="8"
+            refX="9"
+            refY="4"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
+          </marker>
+        </defs>
+
+        <rect width="100%" height="100%" fill="#f3f5f6" />
+
+        <!-- Layer zone: layer 2, use cases -->
+        <rect
+          x="24"
+          y="24"
+          width="992"
+          height="448"
+          rx="8"
+          fill="#e3f5e6"
+          stroke="rgba(21,128,61,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="44"
+          fill="#15803d"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 2 · USE CASES · src/application/
+        </text>
+
+        <!-- Pattern groups -->
+        <rect
+          x="40"
+          y="64"
+          width="952"
+          height="188"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="52"
+          y="80"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          RESULT · ERRORS AS VALUES · §3.4 · DECISION 28
+        </text>
+
+        <rect
+          x="40"
+          y="268"
+          width="952"
+          height="184"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="52"
+          y="284"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          RESPONSE MODEL · PLAIN DATA · DECISION 29
+        </text>
+
+        <!-- Relationships (drawn before boxes) -->
+        <!-- UseCase returns a Result from execute(): use -->
+        <line
+          x1="280"
+          y1="132"
+          x2="360"
+          y2="132"
+          stroke-width="1"
+          marker-end="url(#ucresult-open)"
+          stroke="#5b6873"
+        />
+        <!-- ApplyMove builds the MoveResult it returns: use -->
+        <line
+          x1="280"
+          y1="368"
+          x2="360"
+          y2="368"
+          stroke-width="1"
+          marker-end="url(#ucresult-open)"
+          stroke="#5b6873"
+        />
+
+        <!-- Arrow labels -->
+        <rect x="294" y="114" width="52" height="12" rx="2" fill="#e3f5e6" />
+        <text
+          x="320"
+          y="123"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          RETURNS
+        </text>
+        <rect x="298" y="350" width="44" height="12" rx="2" fill="#e3f5e6" />
+        <text
+          x="320"
+          y="359"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          BUILDS
+        </text>
+
+        <!-- Reference box: UseCase, detailed in view 3.1 -->
+        <rect
+          x="80"
+          y="112"
+          width="200"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="180"
+          y="126"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          VIEW 3.1
+        </text>
+        <text
+          x="180"
+          y="143"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          UseCase
+        </text>
+
+        <!-- Reference box: ApplyMove, detailed in view 3.2 -->
+        <rect
+          x="80"
+          y="348"
+          width="200"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="180"
+          y="362"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          VIEW 3.2
+        </text>
+        <text
+          x="180"
+          y="379"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          ApplyMove
+        </text>
+
+        <!-- Class: Result (focal, value object) -->
+        <rect
+          x="360"
+          y="92"
+          width="320"
+          height="148"
+          rx="6"
+          fill="rgba(15,111,116,0.05)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <rect x="360" y="92" width="320" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="360" y="132" width="320" height="8" fill="rgba(15,111,116,0.10)" />
+        <line x1="360" y1="140" x2="680" y2="140" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <line x1="360" y1="196" x2="680" y2="196" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <text
+          x="520"
+          y="110"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="520"
+          y="128"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          Result
+        </text>
+        <text x="376" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + ok: boolean
+        </text>
+        <text x="376" y="172" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + value: T [0..1]
+        </text>
+        <text x="376" y="188" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + error: E [0..1]
+        </text>
+        <text
+          x="376"
+          y="212"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + success(value: T): Result&lt;T, E&gt;
+        </text>
+        <text
+          x="376"
+          y="228"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + failure(error: E): Result&lt;T, E&gt;
+        </text>
+
+        <!-- Class: UseCaseError (value object) -->
+        <rect
+          x="760"
+          y="92"
+          width="216"
+          height="104"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="760" y1="140" x2="976" y2="140" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="868"
+          y="110"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="868"
+          y="128"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          UseCaseError
+        </text>
+        <text x="776" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + code: string
+        </text>
+        <text x="776" y="172" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + message: string
+        </text>
+        <text x="776" y="188" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + retryable: boolean
+        </text>
+
+        <!-- Class: MoveResult (value object, response model) -->
+        <rect
+          x="360"
+          y="300"
+          width="320"
+          height="136"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="360" y1="348" x2="680" y2="348" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="520"
+          y="318"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object» «response model»
+        </text>
+        <text
+          x="520"
+          y="336"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          MoveResult
+        </text>
+        <text x="376" y="364" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + cells: [TCoord, TCell][]
+        </text>
+        <text x="376" y="380" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + score: number
+        </text>
+        <text x="376" y="396" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + outcome: Outcome
+        </text>
+        <text x="376" y="412" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + canUndo: boolean
+        </text>
+        <text x="376" y="428" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + canRedo: boolean
+        </text>
+
+        <!-- UML template boxes: type parameters on the top-right corner -->
+        <rect
+          x="572"
+          y="82"
+          width="120"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="632"
+          y="94"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          T, E = UseCaseError
+        </text>
+        <rect
+          x="608"
+          y="290"
+          width="84"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="650"
+          y="302"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCell, TCoord
+        </text>
+
+        <!-- Footnote -->
+        <text
+          x="24"
+          y="500"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          A use case never throws to the presenter: it returns Result.success(value) or
+          Result.failure(error) (decision 28).
+        </text>
+        <text
+          x="24"
+          y="516"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          E defaults to UseCaseError, so execute() returns Promise&lt;Result&lt;TResponse&gt;&gt;.
+          RetryAspect runs again while error.retryable is true (view 3.1).
+        </text>
+        <text
+          x="24"
+          y="532"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          ApplyMove builds MoveResult from GameEngine.snapshot(), and the other game use cases
+          return it too (view 3.2).
+        </text>
+        <text
+          x="24"
+          y="548"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          MoveResult is plain data: it copies the cells, so no Board and no engine reach a presenter
+          in layer 3 (decision 29).
+        </text>
+
+        <!-- Legend -->
+        <line x1="24" y1="588" x2="1016" y2="588" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <text
+          x="24"
+          y="606"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LEGEND
+        </text>
+
+        <line
+          x1="24"
+          y1="624"
+          x2="52"
+          y2="624"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#ucresult-triangle)"
+        />
+        <text
+          x="60"
+          y="628"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Inheritance
+        </text>
+        <line
+          x1="144"
+          y1="624"
+          x2="172"
+          y2="624"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#ucresult-triangle)"
+        />
+        <text
+          x="180"
+          y="628"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Realization
+        </text>
+        <line
+          x1="264"
+          y1="624"
+          x2="292"
+          y2="624"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#ucresult-diamond-filled)"
+        />
+        <text
+          x="300"
+          y="628"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Composition · attribute it creates
+        </text>
+        <line
+          x1="488"
+          y1="624"
+          x2="516"
+          y2="624"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#ucresult-diamond-hollow)"
+        />
+        <text
+          x="524"
+          y="628"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aggregation · attribute it receives
+        </text>
+        <line
+          x1="720"
+          y1="624"
+          x2="748"
+          y2="624"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucresult-open)"
+        />
+        <text
+          x="756"
+          y="628"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Use · parameter, return, local or new
+        </text>
+
+        <rect
+          x="24"
+          y="644"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#e3f5e6"
+          stroke="rgba(21,128,61,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="60"
+          y="653"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · layer 2 · use cases
+        </text>
+        <rect
+          x="204"
+          y="644"
+          width="28"
+          height="12"
+          rx="2"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="240"
+          y="653"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dashed frame · GoF pattern or principle
+        </text>
+        <rect
+          x="444"
+          y="644"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="480"
+          y="653"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Corner box · type parameters
+        </text>
+        <rect
+          x="620"
+          y="644"
+          width="28"
+          height="12"
+          rx="2"
+          fill="rgba(15,111,116,0.10)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <text
+          x="656"
+          y="653"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Teal · focal class
+        </text>
+        <rect
+          x="24"
+          y="664"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="60"
+          y="673"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Reference box · class detailed in another view
+        </text>
+      </svg>
+    </div>
+  </body>
+</html>
