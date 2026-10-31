@@ -64,7 +64,7 @@
       <h1>Hexa Merge: the bounded generic of §3.1</h1>
 
       <svg
-        viewBox="0 0 1040 900"
+        viewBox="0 0 1040 916"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="merge-title merge-desc"
@@ -73,7 +73,7 @@
         <desc id="merge-desc">
           Class diagram of the Hexa Merge variant in layer 1 showing MergeRules bounding its TCell
           parameter by the engine interface IMergeable, MergeTile implementing IMergeable with T
-          bound to MergeTile, MergeRules typed by MergeState and Slide, and HexaMergeFactory binding
+          bound to MergeTile, MergeRules typed by MergeState and Slide, and MergeFactory binding
           TCell to MergeTile on MergeRules and creating MergeScoring, each variant class marked with
           the engine interface it implements and its binding.
         </desc>
@@ -99,6 +99,33 @@
             markerUnits="userSpaceOnUse"
           >
             <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
+          </marker>
+          <marker
+            id="merge-diamond-filled"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 5, 9 0, 18 5, 9 10" fill="#17212a" />
+          </marker>
+          <marker
+            id="merge-diamond-hollow"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon
+              points="0 5, 9 0, 18 5, 9 10"
+              fill="#ffffff"
+              stroke="#17212a"
+              stroke-width="1"
+            />
           </marker>
         </defs>
 
@@ -198,53 +225,31 @@
         </text>
 
         <!-- Relationships (drawn before boxes) -->
-        <!-- HexaMergeFactory creates MergeScoring: dependency «create» -->
+        <!-- MergeFactory creates MergeScoring: use «create» -->
         <path
           d="M264 136 H740 Q748 136 748 144 V272"
           fill="none"
-          stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#merge-open)"
+          stroke="#5b6873"
         />
-        <!-- HexaMergeFactory binds TCell to MergeTile on MergeRules: dependency «bind» -->
+        <!-- MergeFactory creates MergeRules and binds TCell to MergeTile: use «bind» -->
         <path
           d="M264 152 H360 Q368 152 368 160 V272"
           fill="none"
-          stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#merge-open)"
+          stroke="#5b6873"
         />
-        <!-- MergeRules bounds TCell by IMergeable: dependency -->
+        <!-- MergeRules bounds TCell by IMergeable: use labelled with the type parameter -->
         <path
           d="M368 360 V492 Q368 500 360 500 H304"
           fill="none"
-          stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#merge-open)"
-        />
-        <!-- MergeRules is typed by MergeState: dependency -->
-        <line
-          x1="464"
-          y1="360"
-          x2="464"
-          y2="448"
           stroke="#5b6873"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#merge-open)"
         />
-        <!-- MergeRules is typed by Slide: dependency -->
-        <path
-          d="M584 340 H608 Q616 340 616 348 V448"
-          fill="none"
-          stroke="#5b6873"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#merge-open)"
-        />
+
         <!-- MergeTile implements IMergeable: realization with binding -->
         <line
           x1="128"
@@ -270,9 +275,9 @@
         >
           «create»
         </text>
-        <rect x="376" y="194" width="132" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="302" y="194" width="132" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="442"
+          x="368"
           y="203"
           fill="#7d8a94"
           font-size="8"
@@ -282,9 +287,9 @@
         >
           «bind» TCell → MergeTile
         </text>
-        <rect x="296" y="400" width="64" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="334" y="400" width="68" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="328"
+          x="368"
           y="409"
           fill="#7d8a94"
           font-size="8"
@@ -292,31 +297,7 @@
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          TCELL BOUND
-        </text>
-        <rect x="472" y="400" width="36" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="490"
-          y="409"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          TSTATE
-        </text>
-        <rect x="624" y="400" width="32" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="640"
-          y="409"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          TMOVE
+          TCell bound
         </text>
         <rect x="136" y="566" width="112" height="12" rx="2" fill="#f9f4dc" />
         <text
@@ -331,7 +312,7 @@
           «bind» T → MergeTile
         </text>
 
-        <!-- Class: HexaMergeFactory (concrete factory) -->
+        <!-- Class: MergeFactory (concrete factory) -->
         <rect
           x="64"
           y="120"
@@ -362,25 +343,25 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          HexaMergeFactory
+          MergeFactory
         </text>
 
         <!-- Class: MergeRules (focal, concrete strategy) -->
         <rect
           x="344"
           y="272"
-          width="240"
+          width="276"
           height="88"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
           stroke-width="1"
         />
-        <rect x="344" y="272" width="240" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
-        <rect x="344" y="312" width="240" height="8" fill="rgba(15,111,116,0.10)" />
-        <line x1="344" y1="320" x2="584" y2="320" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <rect x="344" y="272" width="276" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="344" y="312" width="276" height="8" fill="rgba(15,111,116,0.10)" />
+        <line x1="344" y1="320" x2="620" y2="320" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text
-          x="464"
+          x="482"
           y="290"
           fill="#5b6873"
           font-size="8"
@@ -391,7 +372,7 @@
           «Concrete Strategy»
         </text>
         <text
-          x="464"
+          x="482"
           y="308"
           fill="#17212a"
           font-size="12"
@@ -402,7 +383,7 @@
           MergeRules
         </text>
         <text x="360" y="336" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - spawn: IPieceSource&lt;Piece&lt;TCell&gt;&gt;
+          - spawn: IPieceSource&lt;Piece&lt;TCell, TCoord&gt;&gt;
         </text>
         <text x="360" y="352" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           slide to the edge, merge on collision
@@ -450,16 +431,16 @@
         <rect
           x="384"
           y="448"
-          width="176"
+          width="200"
           height="80"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="384" y1="488" x2="560" y2="488" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="384" y1="488" x2="584" y2="488" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="472"
+          x="484"
           y="473"
           fill="#17212a"
           font-size="12"
@@ -470,7 +451,7 @@
           MergeState
         </text>
         <text x="400" y="504" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + board: HexBoard&lt;TCell&gt;
+          + board: Board&lt;TCell, TCoord&gt;
         </text>
         <text x="400" y="520" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + targetReached: boolean
@@ -478,7 +459,7 @@
 
         <!-- Class: Slide (value object) -->
         <rect
-          x="600"
+          x="616"
           y="448"
           width="160"
           height="72"
@@ -487,9 +468,9 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="600" y1="496" x2="760" y2="496" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="616" y1="496" x2="776" y2="496" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="680"
+          x="696"
           y="466"
           fill="#5b6873"
           font-size="8"
@@ -500,7 +481,7 @@
           «value object»
         </text>
         <text
-          x="680"
+          x="696"
           y="484"
           fill="#17212a"
           font-size="12"
@@ -510,7 +491,7 @@
         >
           Slide
         </text>
-        <text x="616" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="632" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + direction: Direction
         </text>
 
@@ -571,17 +552,17 @@
         <rect
           x="64"
           y="596"
-          width="248"
+          width="264"
           height="112"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="64" y1="644" x2="312" y2="644" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="64" y1="668" x2="312" y2="668" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="64" y1="644" x2="328" y2="644" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="64" y1="668" x2="328" y2="668" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="188"
+          x="196"
           y="614"
           fill="#5b6873"
           font-size="8"
@@ -592,7 +573,7 @@
           «value object»
         </text>
         <text
-          x="188"
+          x="196"
           y="632"
           fill="#17212a"
           font-size="12"
@@ -614,9 +595,9 @@
 
         <!-- UML template boxes: type parameters on the top-right corner -->
         <rect
-          x="428"
+          x="444"
           y="262"
-          width="168"
+          width="188"
           height="18"
           rx="2"
           fill="#ffffff"
@@ -625,7 +606,7 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="512"
+          x="538"
           y="274"
           fill="#5b6873"
           font-size="8.5"
@@ -635,9 +616,9 @@
           TCell extends IMergeable&lt;TCell&gt;
         </text>
         <rect
-          x="528"
+          x="512"
           y="438"
-          width="44"
+          width="84"
           height="18"
           rx="2"
           fill="#ffffff"
@@ -646,14 +627,14 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="550"
+          x="554"
           y="450"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TCell
+          TCell, TCoord
         </text>
         <rect
           x="292"
@@ -703,7 +684,7 @@
         <line x1="400" y1="528" x2="400" y2="544" stroke="#17212a" stroke-width="1" />
         <circle cx="400" cy="549" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text x="411" y="552" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          BoardState‹TCell›
+          BoardState‹TCell, TCoord›
         </text>
 
         <!-- Footnote: classes the budget leaves out -->
@@ -728,11 +709,22 @@
           SeededPieceSource, tiles of 2 or 4.
         </text>
 
-        <!-- Legend -->
-        <line x1="24" y1="812" x2="1016" y2="812" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="830"
+          y="804"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          MergeRules extends BaseGameRules (Part 1, view 7). TCoord is the coordinate type of the
+          geometry (decision 16); the other Merge classes take it too, and the bindings leave it
+          out.
+        </text>
+        <!-- Legend -->
+        <line x1="24" y1="828" x2="1016" y2="828" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <text
+          x="24"
+          y="846"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -743,17 +735,35 @@
 
         <line
           x1="24"
-          y1="848"
+          y1="864"
           x2="52"
-          y2="848"
+          y2="864"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#merge-triangle)"
+        />
+        <text
+          x="60"
+          y="868"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Inheritance
+        </text>
+        <line
+          x1="144"
+          y1="864"
+          x2="172"
+          y2="864"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
           marker-end="url(#merge-triangle)"
         />
         <text
-          x="60"
-          y="852"
+          x="180"
+          y="868"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -761,28 +771,62 @@
           Realization
         </text>
         <line
-          x1="184"
-          y1="848"
-          x2="212"
-          y2="848"
-          stroke="#5b6873"
+          x1="264"
+          y1="864"
+          x2="292"
+          y2="864"
+          stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#merge-open)"
+          marker-start="url(#merge-diamond-filled)"
         />
         <text
-          x="220"
-          y="852"
+          x="300"
+          y="868"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Dependency · uses
+          Composition · attribute it creates
         </text>
-
+        <line
+          x1="474"
+          y1="864"
+          x2="502"
+          y2="864"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#merge-diamond-hollow)"
+        />
+        <text
+          x="510"
+          y="868"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aggregation · attribute it receives
+        </text>
+        <line
+          x1="694"
+          y1="864"
+          x2="722"
+          y2="864"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#merge-open)"
+        />
+        <text
+          x="730"
+          y="868"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Use · parameter, return, local or new
+        </text>
         <rect
           x="24"
-          y="868"
+          y="884"
           width="28"
           height="12"
           rx="2"
@@ -792,7 +836,7 @@
         />
         <text
           x="60"
-          y="877"
+          y="893"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -801,7 +845,7 @@
         </text>
         <rect
           x="184"
-          y="868"
+          y="884"
           width="28"
           height="12"
           rx="2"
@@ -812,7 +856,7 @@
         />
         <text
           x="220"
-          y="877"
+          y="893"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -821,7 +865,7 @@
         </text>
         <rect
           x="424"
-          y="868"
+          y="884"
           width="28"
           height="12"
           rx="2"
@@ -832,7 +876,7 @@
         />
         <text
           x="460"
-          y="877"
+          y="893"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -841,7 +885,7 @@
         </text>
         <rect
           x="600"
-          y="868"
+          y="884"
           width="28"
           height="12"
           rx="2"
@@ -851,18 +895,18 @@
         />
         <text
           x="636"
-          y="877"
+          y="893"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
         </text>
-        <line x1="760" y1="874" x2="776" y2="874" stroke="#17212a" stroke-width="1" />
-        <circle cx="781" cy="874" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="760" y1="890" x2="776" y2="890" stroke="#17212a" stroke-width="1" />
+        <circle cx="781" cy="890" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="796"
-          y="877"
+          y="893"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

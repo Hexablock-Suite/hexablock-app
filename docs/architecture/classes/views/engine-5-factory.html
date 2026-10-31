@@ -60,7 +60,7 @@
   </head>
   <body>
     <div class="frame">
-      <p class="eyebrow">Class diagram · Part 1 · View 5 of 5</p>
+      <p class="eyebrow">Class diagram · Part 1 · View 5 of 7</p>
       <h1>Wiring a variant: Abstract Factory, Builder, Observer and ports</h1>
 
       <svg
@@ -155,9 +155,9 @@
 
         <!-- Pattern groups -->
         <rect
-          x="48"
+          x="40"
           y="64"
-          width="352"
+          width="360"
           height="244"
           rx="8"
           fill="none"
@@ -166,7 +166,7 @@
           stroke-dasharray="4,4"
         />
         <text
-          x="60"
+          x="52"
           y="80"
           fill="#5b6873"
           font-size="8"
@@ -247,16 +247,15 @@
         </text>
 
         <!-- Relationships (drawn before boxes) -->
-        <!-- GameEventPublisher publishes GameEvent: dependency -->
+        <!-- GameEventPublisher publishes GameEvent: use -->
         <line
           x1="680"
           y1="128"
           x2="776"
           y2="128"
-          stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#factory-open)"
+          stroke="#5b6873"
         />
         <!-- GameOver extends GameEvent: generalization -->
         <line
@@ -285,21 +284,21 @@
 
         <!-- Class: IVariantFactory (interface, abstract factory, focal) -->
         <rect
-          x="64"
+          x="56"
           y="92"
-          width="320"
+          width="328"
           height="160"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
           stroke-width="1"
         />
-        <rect x="64" y="92" width="320" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
-        <rect x="64" y="132" width="320" height="8" fill="rgba(15,111,116,0.10)" />
-        <line x1="64" y1="140" x2="384" y2="140" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
-        <line x1="64" y1="164" x2="384" y2="164" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <rect x="56" y="92" width="328" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="56" y="132" width="328" height="8" fill="rgba(15,111,116,0.10)" />
+        <line x1="56" y1="140" x2="384" y2="140" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <line x1="56" y1="164" x2="384" y2="164" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text
-          x="224"
+          x="220"
           y="110"
           fill="#5b6873"
           font-size="8"
@@ -310,7 +309,7 @@
           «interface» «Abstract Factory»
         </text>
         <text
-          x="224"
+          x="220"
           y="128"
           fill="#17212a"
           font-size="12"
@@ -320,22 +319,22 @@
         >
           IVariantFactory
         </text>
-        <text x="80" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="72" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + gameId: GameId
         </text>
-        <text x="80" y="180" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="72" y="180" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createRules(): IGameRules&lt;TCell, TMove, TState&gt;
         </text>
-        <text x="80" y="196" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="72" y="196" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createScoring(): IScoringPolicy&lt;TState&gt;
         </text>
-        <text x="80" y="212" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="72" y="212" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createProgressModel(): IProgressModel
         </text>
-        <text x="80" y="228" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="72" y="228" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createInitialState(): TState
         </text>
-        <text x="80" y="244" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="72" y="244" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createHistory(): MoveHistory&lt;TMove, TState&gt; [0..1]
         </text>
 
@@ -612,8 +611,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          One factory per variant: HexaLinesFactory, HexaFitFactory, HexaSortFactory,
-          HexaMergeFactory (Part 2).
+          One factory per variant: LinesFactory, FitFactory, SortFactory and MergeFactory (Part 2).
+          Each one receives a GeometryFactory and a BoardBuilder (view 6).
         </text>
         <text
           x="24"
@@ -622,8 +621,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          GameEventBus in layer 3 implements GameEventPublisher. Layer 3 also implements Clock and
-          RandomSource.
+          GameEventBus in layer 3 implements GameEventPublisher. Layer 4 implements Clock and
+          RandomSource (view 4.4).
         </text>
 
         <!-- Legend -->
@@ -658,25 +657,78 @@
           Inheritance
         </text>
         <line
-          x1="184"
+          x1="144"
           y1="572"
-          x2="212"
+          x2="172"
           y2="572"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#factory-open)"
+          stroke-dasharray="5,4"
+          marker-end="url(#factory-triangle)"
         />
         <text
-          x="220"
+          x="180"
           y="576"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Dependency · uses
+          Realization
         </text>
-
+        <line
+          x1="264"
+          y1="572"
+          x2="292"
+          y2="572"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#factory-diamond-filled)"
+        />
+        <text
+          x="300"
+          y="576"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Composition · attribute it creates
+        </text>
+        <line
+          x1="474"
+          y1="572"
+          x2="502"
+          y2="572"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#factory-diamond-hollow)"
+        />
+        <text
+          x="510"
+          y="576"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aggregation · attribute it receives
+        </text>
+        <line
+          x1="694"
+          y1="572"
+          x2="722"
+          y2="572"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#factory-open)"
+        />
+        <text
+          x="730"
+          y="576"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Use · parameter, return, local or new
+        </text>
         <rect
           x="24"
           y="592"

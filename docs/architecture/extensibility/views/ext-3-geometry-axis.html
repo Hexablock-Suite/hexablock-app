@@ -1,0 +1,903 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Geometry axis · extensibility diagram</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --color-paper: #f3f5f6;
+        --color-ink: #17212a;
+        --color-muted: #5b6873;
+        --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+        --font-serif: 'Instrument Serif', serif;
+        --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+      }
+      body {
+        font-family: var(--font-sans);
+        background: var(--color-paper);
+        color: var(--color-ink);
+        padding: 3rem 2rem;
+      }
+      .frame {
+        max-width: 1240px;
+        margin: 0 auto;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-muted);
+        margin-bottom: 0.5rem;
+      }
+      h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        margin-bottom: 1.5rem;
+      }
+      svg {
+        width: 100%;
+        min-width: 900px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <p class="eyebrow">Extensibility diagram · View 3 · §8 · D11</p>
+      <h1>The geometry axis: one family per cell shape, next to the variant axis</h1>
+
+      <svg
+        viewBox="0 0 1040 760"
+        xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-labelledby="ext-3-geometry-axis-title ext-3-geometry-axis-desc"
+      >
+        <title id="ext-3-geometry-axis-title">HexaBlock extensibility · the geometry axis</title>
+        <desc id="ext-3-geometry-axis-desc">
+          Extensibility diagram of layer 1 with the generic GameEngine in the center. The variant
+          axis above holds the four variant factories of the statement and Hexa Fill, the declared
+          fifth variant, and they implement the engine contracts. The geometry axis below holds the
+          hexagonal family, the square test family and the declared triangular and 3D families, and
+          they implement GeometryFactory. Each variant factory holds one GeometryFactory, so no
+          class exists per game and geometry.
+        </desc>
+        <defs>
+          <marker
+            id="ext-triangle"
+            markerWidth="16"
+            markerHeight="12"
+            refX="15"
+            refY="6"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          </marker>
+          <marker
+            id="ext-diamond-filled"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 5, 9 0, 18 5, 9 10" fill="#17212a" />
+          </marker>
+          <marker
+            id="ext-diamond-hollow"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon
+              points="0 5, 9 0, 18 5, 9 10"
+              fill="#ffffff"
+              stroke="#17212a"
+              stroke-width="1"
+            />
+          </marker>
+          <marker
+            id="ext-open"
+            markerWidth="10"
+            markerHeight="8"
+            refX="9"
+            refY="4"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
+          </marker>
+        </defs>
+
+        <rect width="100%" height="100%" fill="#f3f5f6" />
+        <!-- Layer zone: layer 1, entities -->
+        <rect
+          x="24"
+          y="24"
+          width="992"
+          height="528"
+          rx="8"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="44"
+          fill="#b45309"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 1 · ENTITIES · src/domain/
+        </text>
+        <!-- Extension axes: one dashed frame each -->
+        <rect
+          x="48"
+          y="64"
+          width="944"
+          height="104"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="60"
+          y="80"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          VARIANT AXIS · ABSTRACT FACTORY · §3.1 · §3.3 · APP-NFR-06
+        </text>
+        <rect
+          x="48"
+          y="424"
+          width="944"
+          height="104"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="60"
+          y="440"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          GEOMETRY AXIS · ABSTRACT FACTORY · §8 · D4 · D11
+        </text>
+        <!-- Relationships (drawn before boxes) -->
+        <!-- The variants implement the engine contracts: realization -->
+        <line
+          x1="520"
+          y1="168"
+          x2="520"
+          y2="232"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#ext-triangle)"
+        />
+        <!-- The geometries implement GeometryFactory: realization -->
+        <line
+          x1="520"
+          y1="424"
+          x2="520"
+          y2="352"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#ext-triangle)"
+        />
+        <!-- Each variant factory holds the GeometryFactory it receives as geometry: aggregation -->
+        <line
+          x1="176"
+          y1="168"
+          x2="176"
+          y2="424"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#ext-diamond-hollow)"
+        />
+        <!-- Arrow labels -->
+        <rect x="528" y="194" width="188" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="622"
+          y="203"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          IVariantFactory · BaseGameRules
+        </text>
+        <rect x="528" y="382" width="144" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="600"
+          y="391"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          GeometryFactory‹TCoord›
+        </text>
+        <rect x="120" y="400" width="52" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="146"
+          y="409"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          geometry
+        </text>
+        <!-- Multiplicities -->
+        <rect x="182" y="400" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="188"
+          y="409"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          1
+        </text>
+        <!-- Variant axis: the four variants of the statement and a fifth one -->
+        <!-- Class: LinesFactory (concrete factory of one variant) -->
+        <rect
+          x="68"
+          y="96"
+          width="168"
+          height="48"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="152"
+          y="114"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «Concrete Factory»
+        </text>
+        <text
+          x="152"
+          y="132"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          LinesFactory
+        </text>
+        <!-- Class: FitFactory (concrete factory of one variant) -->
+        <rect
+          x="252"
+          y="96"
+          width="168"
+          height="48"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="336"
+          y="114"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «Concrete Factory»
+        </text>
+        <text
+          x="336"
+          y="132"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          FitFactory
+        </text>
+        <!-- Class: SortFactory (concrete factory of one variant) -->
+        <rect
+          x="436"
+          y="96"
+          width="168"
+          height="48"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="520"
+          y="114"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «Concrete Factory»
+        </text>
+        <text
+          x="520"
+          y="132"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          SortFactory
+        </text>
+        <!-- Class: MergeFactory (concrete factory of one variant) -->
+        <rect
+          x="620"
+          y="96"
+          width="168"
+          height="48"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="704"
+          y="114"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «Concrete Factory»
+        </text>
+        <text
+          x="704"
+          y="132"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          MergeFactory
+        </text>
+        <!-- Declared extension, no class yet: Hexa Fill, the fifth variant of §3.1 -->
+        <rect
+          x="804"
+          y="96"
+          width="168"
+          height="48"
+          rx="6"
+          fill="rgba(23,33,42,0.02)"
+          stroke="rgba(23,33,42,0.35)"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="888"
+          y="114"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          HEXA FILL · PLACEHOLDER
+        </text>
+        <text
+          x="888"
+          y="132"
+          fill="#5b6873"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          FillFactory
+        </text>
+        <!-- Engine in the center (focal) -->
+        <!-- Class: GameEngine (focal, the generic engine) -->
+        <rect
+          x="328"
+          y="232"
+          width="384"
+          height="120"
+          rx="6"
+          fill="rgba(15,111,116,0.05)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <rect x="328" y="232" width="384" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="328" y="272" width="384" height="8" fill="rgba(15,111,116,0.10)" />
+        <line x1="328" y1="280" x2="712" y2="280" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <text
+          x="520"
+          y="250"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «generic engine» · D1
+        </text>
+        <text
+          x="520"
+          y="268"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GameEngine
+        </text>
+        <text x="344" y="296" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          plays each turn through IGameRules&lt;TCell, TMove, TState&gt;
+        </text>
+        <text x="344" y="312" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          keeps the cells on Board&lt;TCell, TCoord&gt;
+        </text>
+        <text x="344" y="328" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          asks GridTopology&lt;TCoord&gt; for every geometry fact
+        </text>
+        <text x="344" y="344" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          knows no variant and no geometry
+        </text>
+        <!-- UML template box: type parameters on the top-right corner -->
+        <rect
+          x="592"
+          y="222"
+          width="136"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="660"
+          y="234"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCell, TMove, TState
+        </text>
+        <!-- Geometry axis: the real family, the test family and two declared ones -->
+        <!-- Class: HexGeometry (the real family) -->
+        <rect
+          x="84"
+          y="456"
+          width="200"
+          height="48"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="184"
+          y="474"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          REAL · HEXAGONS
+        </text>
+        <text
+          x="184"
+          y="492"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          HexGeometry
+        </text>
+        <!-- Class: SquareGeometry (test family) -->
+        <rect
+          x="308"
+          y="456"
+          width="200"
+          height="48"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="408"
+          y="474"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          ENGINE TESTS · D4
+        </text>
+        <text
+          x="408"
+          y="492"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          SquareGeometry
+        </text>
+        <!-- Declared extension, no class yet: triangular cells -->
+        <rect
+          x="532"
+          y="456"
+          width="200"
+          height="48"
+          rx="6"
+          fill="rgba(23,33,42,0.02)"
+          stroke="rgba(23,33,42,0.35)"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="632"
+          y="474"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          DECLARED · §8
+        </text>
+        <text
+          x="632"
+          y="492"
+          fill="#5b6873"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          TriangleGeometry
+        </text>
+        <!-- Declared extension, no class yet: a 3D board -->
+        <rect
+          x="756"
+          y="456"
+          width="200"
+          height="48"
+          rx="6"
+          fill="rgba(23,33,42,0.02)"
+          stroke="rgba(23,33,42,0.35)"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="856"
+          y="474"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          DECLARED · §8 · D5
+        </text>
+        <text
+          x="856"
+          y="492"
+          fill="#5b6873"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          Geometry3D
+        </text>
+        <!-- Footnotes -->
+        <text
+          x="24"
+          y="580"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          A new variant adds its factory, rules, cell type and cell renderer. It changes no engine
+          file (APP-NFR-06).
+        </text>
+        <text
+          x="24"
+          y="596"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          A new geometry adds one family: a coordinate type, a topology and the piece shapes. It
+          changes no engine file and no variant (D4).
+        </text>
+        <text
+          x="24"
+          y="612"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Each variant factory receives the GeometryFactory, so there is no class per game and
+          geometry (decision 17).
+        </text>
+        <text
+          x="24"
+          y="628"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dashed boxes are declared extensions with no class yet (APP-NFR-06, §8). Their names are
+          placeholders.
+        </text>
+        <!-- Legend -->
+        <line x1="24" y1="648" x2="1016" y2="648" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <text
+          x="24"
+          y="666"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LEGEND
+        </text>
+        <line
+          x1="24"
+          y1="684"
+          x2="52"
+          y2="684"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#ext-triangle)"
+        />
+        <text
+          x="60"
+          y="688"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Inheritance
+        </text>
+        <line
+          x1="144"
+          y1="684"
+          x2="172"
+          y2="684"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#ext-triangle)"
+        />
+        <text
+          x="180"
+          y="688"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Realization
+        </text>
+        <line
+          x1="264"
+          y1="684"
+          x2="292"
+          y2="684"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#ext-diamond-filled)"
+        />
+        <text
+          x="300"
+          y="688"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Composition · attribute it creates
+        </text>
+        <line
+          x1="474"
+          y1="684"
+          x2="502"
+          y2="684"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#ext-diamond-hollow)"
+        />
+        <text
+          x="510"
+          y="688"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aggregation · attribute it receives
+        </text>
+        <line
+          x1="694"
+          y1="684"
+          x2="722"
+          y2="684"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ext-open)"
+        />
+        <text
+          x="730"
+          y="688"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Use · parameter, return, local or new
+        </text>
+        <rect
+          x="24"
+          y="704"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="60"
+          y="713"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · Clean layer
+        </text>
+        <rect
+          x="184"
+          y="704"
+          width="28"
+          height="12"
+          rx="2"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="220"
+          y="713"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dashed frame · GoF pattern or principle
+        </text>
+        <rect
+          x="440"
+          y="704"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="476"
+          y="713"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Corner box · type parameters
+        </text>
+        <rect
+          x="648"
+          y="704"
+          width="28"
+          height="12"
+          rx="2"
+          fill="rgba(15,111,116,0.10)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <text
+          x="684"
+          y="713"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Teal · focal class
+        </text>
+        <!-- Legend: declared extension -->
+        <rect
+          x="24"
+          y="728"
+          width="28"
+          height="12"
+          rx="2"
+          fill="rgba(23,33,42,0.02)"
+          stroke="rgba(23,33,42,0.35)"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="60"
+          y="737"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dashed box · declared extension, no class yet
+        </text>
+      </svg>
+    </div>
+  </body>
+</html>

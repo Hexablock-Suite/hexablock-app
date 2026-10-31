@@ -73,8 +73,9 @@
         <desc id="adevents-desc">
           Class diagram across layers 4, 3 and 1 showing GameEventBus in layer 3 implementing the
           GameEventPublisher port of layer 1 and holding many GameEventListener objects,
-          GamePresenter and the AudioFacade of layer 4 implementing GameEventListener, AudioFacade
-          playing through an external SoundLibrary, and GameEventPublisher publishing GameEvent.
+          GamePresenter and AudioManager, the audio facade of layer 4, implementing
+          GameEventListener, AudioManager playing through an external SoundLibrary, and
+          GameEventPublisher publishing GameEvent.
         </desc>
         <defs>
           <marker
@@ -114,6 +115,17 @@
             markerUnits="userSpaceOnUse"
           >
             <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
+          </marker>
+          <marker
+            id="adevents-diamond-filled"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 5, 9 0, 18 5, 9 10" fill="#17212a" />
           </marker>
         </defs>
 
@@ -236,7 +248,7 @@
         </text>
 
         <!-- Relationships (drawn before boxes) -->
-        <!-- AudioFacade plays with SoundLibrary: dependency -->
+        <!-- AudioManager plays with SoundLibrary: use -->
         <line
           x1="560"
           y1="128"
@@ -244,10 +256,9 @@
           y2="128"
           stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#adevents-open)"
         />
-        <!-- AudioFacade implements GameEventListener: realization, down from layer 4 to layer 3 -->
+        <!-- AudioManager implements GameEventListener: realization, down from layer 4 to layer 3 -->
         <line
           x1="440"
           y1="220"
@@ -269,7 +280,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#adevents-triangle)"
         />
-        <!-- GameEventBus has many GameEventListener objects: aggregation -->
+        <!-- GameEventBus keeps the GameEventListener objects it receives: aggregation -->
         <line
           x1="656"
           y1="384"
@@ -290,7 +301,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#adevents-triangle)"
         />
-        <!-- GameEventPublisher publishes GameEvent: dependency -->
+        <!-- GameEventPublisher publishes GameEvent: use -->
         <line
           x1="716"
           y1="540"
@@ -298,7 +309,6 @@
           y2="540"
           stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#adevents-open)"
         />
 
@@ -315,18 +325,6 @@
         >
           PLAYS WITH
         </text>
-        <rect x="582" y="364" width="52" height="12" rx="2" fill="#e2ebf8" />
-        <text
-          x="608"
-          y="373"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          LISTENERS
-        </text>
         <rect x="640" y="520" width="56" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="668"
@@ -340,21 +338,21 @@
           PUBLISHES
         </text>
 
-        <!-- Multiplicities -->
-        <rect x="566" y="378" width="12" height="12" rx="2" fill="#e2ebf8" />
+        <!-- Role names and multiplicities at the part end -->
+        <rect x="562" y="369" width="72" height="12" rx="2" fill="#e2ebf8" />
         <text
-          x="572"
-          y="387"
+          x="564"
+          y="378"
           fill="#17212a"
           font-size="8"
-          font-weight="600"
           font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
+          text-anchor="start"
         >
-          *
+          listeners
+          <tspan font-weight="600">0..*</tspan>
         </text>
 
-        <!-- Class: AudioFacade (facade) -->
+        <!-- Class: AudioManager (facade) -->
         <rect
           x="320"
           y="92"
@@ -376,7 +374,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «Facade»
+          «Facade» «single scope»
         </text>
         <text
           x="440"
@@ -387,7 +385,7 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          AudioFacade
+          AudioManager
         </text>
         <text x="336" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - muted: boolean
@@ -482,19 +480,19 @@
         <rect
           x="656"
           y="332"
-          width="320"
+          width="328"
           height="104"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
           stroke-width="1"
         />
-        <rect x="656" y="332" width="320" height="40" rx="6" fill="rgba(15,111,116,0.10)" />
-        <rect x="656" y="364" width="320" height="8" fill="rgba(15,111,116,0.10)" />
-        <line x1="656" y1="372" x2="976" y2="372" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
-        <line x1="656" y1="396" x2="976" y2="396" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <rect x="656" y="332" width="328" height="40" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="656" y="364" width="328" height="8" fill="rgba(15,111,116,0.10)" />
+        <line x1="656" y1="372" x2="984" y2="372" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <line x1="656" y1="396" x2="984" y2="396" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text
-          x="816"
+          x="820"
           y="357"
           fill="#17212a"
           font-size="12"
@@ -631,8 +629,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          The engine publishes at the end of each turn. The audio facade hides the sound library and
-          honours the mute setting (APP-FR-10).
+          The engine publishes at the end of each turn. AudioManager is the audio facade: it hides
+          the sound library and honours mute (APP-FR-10).
         </text>
         <text
           x="24"
@@ -641,7 +639,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          The score display listens to the bus too.
+          The composition root creates AudioManager once and injects it, so the app has one audio
+          manager (decision 18). The score display listens to the bus too.
         </text>
 
         <!-- Legend -->
@@ -664,7 +663,6 @@
           y2="684"
           stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="5,4"
           marker-end="url(#adevents-triangle)"
         />
         <text
@@ -674,44 +672,80 @@
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
+          Inheritance
+        </text>
+        <line
+          x1="144"
+          y1="684"
+          x2="172"
+          y2="684"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#adevents-triangle)"
+        />
+        <text
+          x="180"
+          y="688"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
           Realization
         </text>
         <line
-          x1="184"
+          x1="264"
           y1="684"
-          x2="212"
+          x2="292"
+          y2="684"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#adevents-diamond-filled)"
+        />
+        <text
+          x="300"
+          y="688"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Composition · attribute it creates
+        </text>
+        <line
+          x1="488"
+          y1="684"
+          x2="516"
           y2="684"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#adevents-diamond-hollow)"
         />
         <text
-          x="220"
+          x="524"
           y="688"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Aggregation · has
+          Aggregation · attribute it receives
         </text>
         <line
-          x1="344"
+          x1="720"
           y1="684"
-          x2="372"
+          x2="748"
           y2="684"
           stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#adevents-open)"
         />
         <text
-          x="380"
+          x="756"
           y="688"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Dependency · uses
+          Use · parameter, return, local or new
         </text>
 
         <rect

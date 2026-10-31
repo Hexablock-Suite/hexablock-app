@@ -1,0 +1,969 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jury variations · extensibility diagram</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --color-paper: #f3f5f6;
+        --color-ink: #17212a;
+        --color-muted: #5b6873;
+        --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+        --font-serif: 'Instrument Serif', serif;
+        --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+      }
+      body {
+        font-family: var(--font-sans);
+        background: var(--color-paper);
+        color: var(--color-ink);
+        padding: 3rem 2rem;
+      }
+      .frame {
+        max-width: 1240px;
+        margin: 0 auto;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-muted);
+        margin-bottom: 0.5rem;
+      }
+      h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        margin-bottom: 1.5rem;
+      }
+      svg {
+        width: 100%;
+        min-width: 900px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <p class="eyebrow">Extensibility diagram · View 2 · Statement §3.1</p>
+      <h1>The three jury variations: new data or classes, same engine</h1>
+      <svg
+        viewBox="0 0 1040 736"
+        xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-labelledby="ext-2-jury-variations-title ext-2-jury-variations-desc"
+      >
+        <title id="ext-2-jury-variations-title">
+          HexaBlock extensibility · the three jury variations
+        </title>
+        <desc id="ext-2-jury-variations-desc">
+          Three columns, one per jury variation of statement §3.1. A new board size is configuration
+          data passed to BoardBuilder.withRegion(size). A new scoring policy is a class that
+          implements IScoringPolicy or extends ScoringDecorator. A new piece shape is data, a
+          ShapeGroup of CellNode cells. Below them, GameEngine does not change.
+        </desc>
+        <defs>
+          <marker
+            id="ext2-triangle"
+            markerWidth="16"
+            markerHeight="12"
+            refX="15"
+            refY="6"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          </marker>
+          <marker
+            id="ext2-diamond-hollow"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon
+              points="0 5, 9 0, 18 5, 9 10"
+              fill="#ffffff"
+              stroke="#17212a"
+              stroke-width="1"
+            />
+          </marker>
+          <marker
+            id="ext2-open"
+            markerWidth="10"
+            markerHeight="8"
+            refX="9"
+            refY="4"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
+          </marker>
+          <marker
+            id="ext2-diamond-filled"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 5, 9 0, 18 5, 9 10" fill="#17212a" />
+          </marker>
+        </defs>
+        <rect width="100%" height="100%" fill="#f3f5f6" />
+        <!-- Layer zone: layer 1, entities -->
+        <rect
+          x="24"
+          y="24"
+          width="992"
+          height="512"
+          rx="8"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="44"
+          fill="#b45309"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 1 · ENTITIES · src/domain/
+        </text>
+        <rect
+          x="48"
+          y="64"
+          width="288"
+          height="292"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="60"
+          y="80"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          BOARD SIZE · §3.1 · §8
+        </text>
+        <rect
+          x="376"
+          y="64"
+          width="288"
+          height="292"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="388"
+          y="80"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          SCORING POLICY · §3.1 · §8
+        </text>
+        <rect
+          x="704"
+          y="64"
+          width="288"
+          height="292"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="716"
+          y="80"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          PIECE SHAPE · §3.1 · §8
+        </text>
+        <rect
+          x="48"
+          y="380"
+          width="944"
+          height="132"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="60"
+          y="396"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          WHAT DOES NOT CHANGE · src/domain/engine/ · APP-NFR-06
+        </text>
+        <!-- The new data or class reaches an existing extension point: a size passed to BoardBuilder is a use -->
+        <path
+          d="M184,204 L184,252"
+          fill="none"
+          stroke-width="1"
+          marker-end="url(#ext2-open)"
+          stroke="#5b6873"
+        />
+        <rect x="189" y="223" width="60" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="194"
+          y="232"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          PASSED TO
+        </text>
+        <!-- A new scoring class implements IScoringPolicy: realization -->
+        <path
+          d="M512,204 L512,252"
+          fill="none"
+          stroke-width="1"
+          stroke="#17212a"
+          stroke-dasharray="5,4"
+          marker-end="url(#ext2-triangle)"
+        />
+        <rect x="517" y="223" width="64" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="522"
+          y="232"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          IMPLEMENTS
+        </text>
+        <!-- A new piece definition is built as a ShapeNode: use -->
+        <path
+          d="M840,204 L840,252"
+          fill="none"
+          stroke-width="1"
+          marker-end="url(#ext2-open)"
+          stroke="#5b6873"
+        />
+        <rect x="845" y="223" width="52" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="850"
+          y="232"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          BUILT AS
+        </text>
+        <!-- Row A: what the jury change adds -->
+        <rect x="64" y="100" width="240" height="104" rx="6" fill="#f9f4dc" />
+        <rect
+          x="64"
+          y="100"
+          width="240"
+          height="104"
+          rx="6"
+          fill="rgba(23,33,42,0.02)"
+          stroke="rgba(23,33,42,0.35)"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="184.0"
+          y="118"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          NEW · CONFIGURATION DATA
+        </text>
+        <text
+          x="184.0"
+          y="136"
+          fill="#5b6873"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          A new board size
+        </text>
+        <line
+          x1="64"
+          y1="148"
+          x2="304"
+          y2="148"
+          stroke="rgba(23,33,42,0.35)"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text x="80" y="166" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          example: radius 5, not 4
+        </text>
+        <text x="80" y="182" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Sort: radius in the level file
+        </text>
+        <text x="80" y="198" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Lines, Merge: their factory
+        </text>
+        <rect x="392" y="100" width="240" height="104" rx="6" fill="#f9f4dc" />
+        <rect
+          x="392"
+          y="100"
+          width="240"
+          height="104"
+          rx="6"
+          fill="rgba(23,33,42,0.02)"
+          stroke="rgba(23,33,42,0.35)"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="512.0"
+          y="118"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          NEW · CLASS IN THE VARIANT
+        </text>
+        <text
+          x="512.0"
+          y="136"
+          fill="#5b6873"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          A new scoring class
+        </text>
+        <line
+          x1="392"
+          y1="148"
+          x2="632"
+          y2="148"
+          stroke="rgba(23,33,42,0.35)"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text x="408" y="166" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          implements IScoringPolicy
+        </text>
+        <text x="408" y="182" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          or extends ScoringDecorator
+        </text>
+        <text x="408" y="198" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          in src/domain/variants/
+        </text>
+        <rect x="720" y="100" width="240" height="104" rx="6" fill="#f9f4dc" />
+        <rect
+          x="720"
+          y="100"
+          width="240"
+          height="104"
+          rx="6"
+          fill="rgba(23,33,42,0.02)"
+          stroke="rgba(23,33,42,0.35)"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="840.0"
+          y="118"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          NEW · DATA
+        </text>
+        <text
+          x="840.0"
+          y="136"
+          fill="#5b6873"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          A new piece definition
+        </text>
+        <line
+          x1="720"
+          y1="148"
+          x2="960"
+          y2="148"
+          stroke="rgba(23,33,42,0.35)"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text x="736" y="166" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          cells as a ShapeGroup of CellNode
+        </text>
+        <text x="736" y="182" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Fit: pieces in the level file
+        </text>
+        <text x="736" y="198" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Lines: its piece list
+        </text>
+        <!-- Row B: the extension point that takes it -->
+        <rect
+          x="64"
+          y="252"
+          width="240"
+          height="88"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="184.0"
+          y="270"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «Builder» «DDD factory» · D9
+        </text>
+        <text
+          x="184.0"
+          y="288"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          BoardBuilder
+        </text>
+        <line x1="64" y1="300" x2="304" y2="300" stroke="#17212a" stroke-width="1" />
+        <text x="80" y="318" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + withRegion(size: number)
+        </text>
+        <text x="80" y="334" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + build‹TCell›(): Board
+        </text>
+        <rect
+          x="264"
+          y="242"
+          width="56"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="292.0"
+          y="254"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCoord
+        </text>
+        <rect
+          x="392"
+          y="252"
+          width="240"
+          height="88"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="512.0"
+          y="270"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «Strategy»
+        </text>
+        <text
+          x="512.0"
+          y="288"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          IScoringPolicy
+        </text>
+        <line x1="392" y1="300" x2="632" y2="300" stroke="#17212a" stroke-width="1" />
+        <text x="408" y="318" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + score(before, res): number
+        </text>
+        <text x="408" y="334" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          factory: createScoring()
+        </text>
+        <rect
+          x="592"
+          y="242"
+          width="56"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="620.0"
+          y="254"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TState
+        </text>
+        <rect
+          x="720"
+          y="252"
+          width="240"
+          height="88"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="840.0"
+          y="270"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «Composite»
+        </text>
+        <text
+          x="840.0"
+          y="288"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          ShapeNode
+        </text>
+        <line x1="720" y1="300" x2="960" y2="300" stroke="#17212a" stroke-width="1" />
+        <text x="736" y="318" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          leaves CellNode, groups ShapeGroup
+        </text>
+        <text x="736" y="334" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + rotated() · area()
+        </text>
+        <rect
+          x="920"
+          y="242"
+          width="56"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="948.0"
+          y="254"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCoord
+        </text>
+        <!-- Class: GameEngine (focal), unchanged by the three changes -->
+        <rect x="64" y="412" width="904" height="84" rx="6" fill="#f9f4dc" />
+        <rect
+          x="64"
+          y="412"
+          width="904"
+          height="84"
+          rx="6"
+          fill="rgba(15,111,116,0.05)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <rect x="64" y="412" width="904" height="28" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="64" y="432" width="904" height="8" fill="rgba(15,111,116,0.10)" />
+        <line x1="64" y1="440" x2="968" y2="440" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <text
+          x="80"
+          y="431"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          GameEngine
+        </text>
+        <text
+          x="176"
+          y="430"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.08em"
+        >
+          «generic engine» · D1 · no file changes
+        </text>
+        <rect
+          x="856"
+          y="402"
+          width="128"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="920.0"
+          y="414"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCell, TMove, TState
+        </text>
+        <text x="80" y="462" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Board, GridTopology and
+        </text>
+        <text x="80" y="478" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          GameEngine stay the same
+        </text>
+        <text x="408" y="462" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          GameEngine calls score()
+        </text>
+        <text x="408" y="478" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          on IScoringPolicy, as before
+        </text>
+        <text x="736" y="462" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Piece, IPieceSource and
+        </text>
+        <text x="736" y="478" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          GameEngine stay the same
+        </text>
+        <text
+          x="24"
+          y="564"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          In the defense the jury proposes one of these three changes (§3.1). Each one stays in new
+          classes or data (APP-NFR-06).
+        </text>
+        <text
+          x="24"
+          y="580"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Board size: level data, or the size that the Lines or Merge factory passes to
+          BoardBuilder.withRegion(size) (decision 15).
+        </text>
+        <text
+          x="24"
+          y="596"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Scoring policy: a new class in the variant folder. The variant factory returns it from
+          createScoring() (§8).
+        </text>
+        <text
+          x="24"
+          y="612"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Piece shape: data, a ShapeGroup of CellNode cells (§8). Fit reads it from the level file;
+          Lines keeps its own piece list.
+        </text>
+        <text
+          x="24"
+          y="628"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Check: before the defense the team applies each change on a branch, and the diff touches
+          no engine file.
+        </text>
+        <!-- Legend -->
+        <line x1="24" y1="652" x2="1016" y2="652" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <text
+          x="24"
+          y="670"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LEGEND
+        </text>
+        <line
+          x1="24"
+          y1="692"
+          x2="52"
+          y2="692"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#ext2-triangle)"
+        />
+        <text
+          x="60"
+          y="696"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Inheritance
+        </text>
+        <line
+          x1="144"
+          y1="692"
+          x2="172"
+          y2="692"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#ext2-triangle)"
+        />
+        <text
+          x="180"
+          y="696"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Realization
+        </text>
+        <line
+          x1="264"
+          y1="692"
+          x2="292"
+          y2="692"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#ext2-diamond-filled)"
+        />
+        <text
+          x="300"
+          y="696"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Composition · attribute it creates
+        </text>
+        <line
+          x1="474"
+          y1="692"
+          x2="502"
+          y2="692"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#ext2-diamond-hollow)"
+        />
+        <text
+          x="510"
+          y="696"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aggregation · attribute it receives
+        </text>
+        <line
+          x1="694"
+          y1="692"
+          x2="722"
+          y2="692"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ext2-open)"
+        />
+        <text
+          x="730"
+          y="696"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Use · parameter, return, local or new
+        </text>
+        <rect
+          x="560"
+          y="710"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="596"
+          y="719"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · layer 1
+        </text>
+        <rect
+          x="688"
+          y="710"
+          width="28"
+          height="12"
+          rx="2"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="724"
+          y="719"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dashed frame · group and source
+        </text>
+        <rect
+          x="24"
+          y="710"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="60"
+          y="719"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Corner box · type parameters
+        </text>
+        <rect
+          x="216"
+          y="710"
+          width="28"
+          height="12"
+          rx="2"
+          fill="rgba(23,33,42,0.02)"
+          stroke="rgba(23,33,42,0.35)"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="252"
+          y="719"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dashed box · new, no class yet
+        </text>
+        <rect
+          x="416"
+          y="710"
+          width="28"
+          height="12"
+          rx="2"
+          fill="rgba(15,111,116,0.10)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <text
+          x="452"
+          y="719"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Teal · focal class
+        </text>
+      </svg>
+    </div>
+  </body>
+</html>

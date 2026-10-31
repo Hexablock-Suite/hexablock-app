@@ -1,0 +1,2301 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Extension points · extensibility diagram</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --color-paper: #f3f5f6;
+        --color-ink: #17212a;
+        --color-muted: #5b6873;
+        --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+        --font-serif: 'Instrument Serif', serif;
+        --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+      }
+      body {
+        font-family: var(--font-sans);
+        background: var(--color-paper);
+        color: var(--color-ink);
+        padding: 3rem 2rem;
+      }
+      .frame {
+        max-width: 1240px;
+        margin: 0 auto;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-muted);
+        margin-bottom: 0.5rem;
+      }
+      h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        margin-bottom: 1.5rem;
+      }
+      svg {
+        width: 100%;
+        min-width: 900px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <p class="eyebrow">Extensibility diagram · View 1 · Statement §4.3</p>
+      <h1>The engine in the center and the interfaces a fifth variant implements</h1>
+      <svg
+        viewBox="0 0 1040 1460"
+        xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-labelledby="ext-1-extension-points-title ext-1-extension-points-desc"
+      >
+        <title id="ext-1-extension-points-title">
+          HexaBlock extensibility · extension points of the engine
+        </title>
+        <desc id="ext-1-extension-points-desc">
+          Extensibility diagram with the generic GameEngine in the center of layer 1, surrounded by
+          every extension point a fifth variant implements: IVariantFactory, IGameRules through the
+          abstract BaseGameRules, the TCell, TMove and TState type arguments, IScoringPolicy,
+          IPieceSource, IProgressModel, ILevelBuilder and the optional capabilities IUndoable,
+          IRedoable, ITimed and IRandomSeeded, plus StateMapper in layer 3 and CellRenderer in layer
+          4. The four variants and the declared Hexa Fill implement them, one package each.
+        </desc>
+        <defs>
+          <marker
+            id="ext1-triangle"
+            markerWidth="16"
+            markerHeight="12"
+            refX="15"
+            refY="6"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          </marker>
+          <marker
+            id="ext1-diamond-hollow"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon
+              points="0 5, 9 0, 18 5, 9 10"
+              fill="#ffffff"
+              stroke="#17212a"
+              stroke-width="1"
+            />
+          </marker>
+          <marker
+            id="ext1-open"
+            markerWidth="10"
+            markerHeight="8"
+            refX="9"
+            refY="4"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
+          </marker>
+          <marker
+            id="ext1-diamond-filled"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 5, 9 0, 18 5, 9 10" fill="#17212a" />
+          </marker>
+        </defs>
+        <rect width="100%" height="100%" fill="#f3f5f6" />
+        <!-- Layer zone: layer 4, frameworks and drivers -->
+        <rect
+          x="24"
+          y="24"
+          width="992"
+          height="104"
+          rx="8"
+          fill="#eceef0"
+          stroke="rgba(75,85,99,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="44"
+          fill="#4b5563"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 4 · FRAMEWORKS AND DRIVERS · src/infrastructure/ · app/ · Q8
+        </text>
+        <!-- Layer zone: layer 3, interface adapters -->
+        <rect
+          x="24"
+          y="140"
+          width="992"
+          height="104"
+          rx="8"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="160"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 3 · INTERFACE ADAPTERS · src/adapters/
+        </text>
+        <!-- Layer zone: layer 1, entities -->
+        <rect
+          x="24"
+          y="256"
+          width="992"
+          height="996"
+          rx="8"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="276"
+          fill="#b45309"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 1 · ENTITIES · src/domain/
+        </text>
+        <rect
+          x="48"
+          y="292"
+          width="952"
+          height="648"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="60"
+          y="308"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          EXTENSION POINTS · WHAT A FIFTH VARIANT IMPLEMENTS · §4.3 · APP-NFR-06
+        </text>
+        <rect
+          x="64"
+          y="828"
+          width="912"
+          height="96"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="76"
+          y="844"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          OPTIONAL CAPABILITIES · ISP · §3.2 · THE VARIANT FACTORY PICKS THEM
+        </text>
+        <!-- Outer layers: the per-variant classes implement the outer extension points -->
+        <path
+          d="M336,88 L400,88"
+          fill="none"
+          stroke-width="1"
+          stroke="#17212a"
+          stroke-dasharray="5,4"
+          marker-end="url(#ext1-triangle)"
+        />
+        <path
+          d="M704,88 L640,88"
+          fill="none"
+          stroke-width="1"
+          stroke="#17212a"
+          stroke-dasharray="5,4"
+          marker-end="url(#ext1-triangle)"
+        />
+        <path
+          d="M336,204 L400,204"
+          fill="none"
+          stroke-width="1"
+          stroke="#17212a"
+          stroke-dasharray="5,4"
+          marker-end="url(#ext1-triangle)"
+        />
+        <path
+          d="M704,204 L640,204"
+          fill="none"
+          stroke-width="1"
+          stroke="#17212a"
+          stroke-dasharray="5,4"
+          marker-end="url(#ext1-triangle)"
+        />
+        <!-- BaseGameRules implements IGameRules -->
+        <path
+          d="M320,384 L392,384"
+          fill="none"
+          stroke-width="1"
+          stroke="#17212a"
+          stroke-dasharray="5,4"
+          marker-end="url(#ext1-triangle)"
+        />
+        <!-- GameEngine holds the IGameRules and the IScoringPolicy it receives as rules and scoring: aggregation -->
+        <path
+          d="M456,484 L456,436"
+          fill="none"
+          stroke-width="1"
+          stroke="#17212a"
+          marker-start="url(#ext1-diamond-hollow)"
+        />
+        <path
+          d="M648,508 L676,508 Q684,508 684,500 L684,468 Q684,460 692,460 L776,460 Q784,460 784,452 L784,436"
+          fill="none"
+          stroke-width="1"
+          stroke="#17212a"
+          marker-start="url(#ext1-diamond-hollow)"
+        />
+        <rect x="462.0" y="439" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="468"
+          y="448"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          1
+        </text>
+        <rect x="790.0" y="439" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="796"
+          y="448"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          1
+        </text>
+        <rect x="416" y="439" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="434"
+          y="448"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          rules
+        </text>
+        <rect x="732" y="439" width="48" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="756"
+          y="448"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          scoring
+        </text>
+        <!-- Each variant package implements the extension points -->
+        <path
+          d="M152,1030 L152,940"
+          fill="none"
+          stroke-width="1"
+          stroke="#17212a"
+          stroke-dasharray="5,4"
+          marker-end="url(#ext1-triangle)"
+        />
+        <path
+          d="M336,1030 L336,940"
+          fill="none"
+          stroke-width="1"
+          stroke="#17212a"
+          stroke-dasharray="5,4"
+          marker-end="url(#ext1-triangle)"
+        />
+        <path
+          d="M520,1030 L520,940"
+          fill="none"
+          stroke-width="1"
+          stroke="#17212a"
+          stroke-dasharray="5,4"
+          marker-end="url(#ext1-triangle)"
+        />
+        <path
+          d="M704,1030 L704,940"
+          fill="none"
+          stroke-width="1"
+          stroke="#17212a"
+          stroke-dasharray="5,4"
+          marker-end="url(#ext1-triangle)"
+        />
+        <path
+          d="M888,1030 L888,940"
+          fill="none"
+          stroke-width="1"
+          stroke="#17212a"
+          stroke-dasharray="5,4"
+          marker-end="url(#ext1-triangle)"
+        />
+        <rect x="190.0" y="981" width="60" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="220"
+          y="990"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          IMPLEMENT
+        </text>
+        <!-- Layer 4: one cell renderer per variant (D3, Q8) -->
+        <rect
+          x="48"
+          y="60"
+          width="288"
+          height="56"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="60"
+          y="76"
+          fill="#5b6873"
+          font-size="7.5"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.12em"
+        >
+          «Concrete Strategy» · ONE PER VARIANT
+        </text>
+        <text x="60" y="94" fill="#17212a" font-size="9.5" font-family="'IBM Plex Mono', monospace">
+          LinesCellRenderer
+        </text>
+        <text
+          x="60"
+          y="110"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          SortCellRenderer
+        </text>
+        <text
+          x="200"
+          y="94"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          FitCellRenderer
+        </text>
+        <text
+          x="200"
+          y="110"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          MergeCellRenderer
+        </text>
+        <rect
+          x="400"
+          y="60"
+          width="240"
+          height="56"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="520.0"
+          y="84.0"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «Strategy» · D3
+        </text>
+        <text
+          x="520.0"
+          y="102.0"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          CellRenderer
+        </text>
+        <rect
+          x="584"
+          y="50"
+          width="72"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="620.0"
+          y="62"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCellView
+        </text>
+        <rect x="704" y="60" width="240" height="56" rx="6" fill="#eceef0" />
+        <rect
+          x="704"
+          y="60"
+          width="240"
+          height="56"
+          rx="6"
+          fill="rgba(23,33,42,0.02)"
+          stroke="rgba(23,33,42,0.35)"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="824.0"
+          y="84.0"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          HEXA FILL · PLACEHOLDER
+        </text>
+        <text
+          x="824.0"
+          y="102.0"
+          fill="#5b6873"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          FillCellRenderer
+        </text>
+        <!-- Layer 3: one state mapper per variant -->
+        <rect
+          x="48"
+          y="176"
+          width="288"
+          height="56"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="60"
+          y="192"
+          fill="#5b6873"
+          font-size="7.5"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.12em"
+        >
+          «Concrete Strategy» · ONE PER VARIANT
+        </text>
+        <text
+          x="60"
+          y="210"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          LinesStateMapper
+        </text>
+        <text
+          x="60"
+          y="226"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          SortStateMapper
+        </text>
+        <text
+          x="200"
+          y="210"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          FitStateMapper
+        </text>
+        <text
+          x="200"
+          y="226"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          MergeStateMapper
+        </text>
+        <rect
+          x="400"
+          y="176"
+          width="240"
+          height="56"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="520.0"
+          y="200.0"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «Strategy» · §3.4
+        </text>
+        <text
+          x="520.0"
+          y="218.0"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          StateMapper
+        </text>
+        <rect
+          x="600"
+          y="166"
+          width="56"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="628.0"
+          y="178"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TState
+        </text>
+        <rect x="704" y="176" width="240" height="56" rx="6" fill="#e2ebf8" />
+        <rect
+          x="704"
+          y="176"
+          width="240"
+          height="56"
+          rx="6"
+          fill="rgba(23,33,42,0.02)"
+          stroke="rgba(23,33,42,0.35)"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="824.0"
+          y="200.0"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          HEXA FILL · PLACEHOLDER
+        </text>
+        <text
+          x="824.0"
+          y="218.0"
+          fill="#5b6873"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          FillStateMapper
+        </text>
+        <!-- Row 1: the rules contract, its template and the scoring policy -->
+        <rect
+          x="64"
+          y="332"
+          width="256"
+          height="104"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="192.0"
+          y="350"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «abstract» «Template Method» · D13
+        </text>
+        <text
+          x="192.0"
+          y="368"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-style="italic"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          BaseGameRules
+        </text>
+        <line x1="64" y1="380" x2="320" y2="380" stroke="#17212a" stroke-width="1" />
+        <text x="80" y="398" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + playTurn(state, move) {template}
+        </text>
+        <text
+          x="80"
+          y="414"
+          fill="#5b6873"
+          font-size="9"
+          font-style="italic"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + isValid() · apply()
+        </text>
+        <text
+          x="80"
+          y="430"
+          fill="#5b6873"
+          font-size="9"
+          font-style="italic"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + resolve() · evaluate()
+        </text>
+        <rect
+          x="208"
+          y="322"
+          width="128"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="272.0"
+          y="334"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCell, TMove, TState
+        </text>
+        <rect
+          x="392"
+          y="332"
+          width="256"
+          height="104"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="520.0"
+          y="350"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «Strategy» · D1
+        </text>
+        <text
+          x="520.0"
+          y="368"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          IGameRules
+        </text>
+        <line x1="392" y1="380" x2="648" y2="380" stroke="#17212a" stroke-width="1" />
+        <text x="408" y="398" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + playTurn(state, move)
+        </text>
+        <text x="408" y="414" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + evaluate(state): Outcome
+        </text>
+        <text x="408" y="430" fill="#7d8a94" font-size="9" font-family="'IBM Plex Mono', monospace">
+          a variant extends BaseGameRules
+        </text>
+        <rect
+          x="536"
+          y="322"
+          width="128"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="600.0"
+          y="334"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCell, TMove, TState
+        </text>
+        <rect
+          x="720"
+          y="332"
+          width="256"
+          height="104"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="848.0"
+          y="350"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «Strategy» · §8
+        </text>
+        <text
+          x="848.0"
+          y="368"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          IScoringPolicy
+        </text>
+        <line x1="720" y1="380" x2="976" y2="380" stroke="#17212a" stroke-width="1" />
+        <text x="736" y="398" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + score(before, res): number
+        </text>
+        <text x="736" y="414" fill="#7d8a94" font-size="9" font-family="'IBM Plex Mono', monospace">
+          ScoringDecorator adds bonuses
+        </text>
+        <rect
+          x="936"
+          y="322"
+          width="56"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="964.0"
+          y="334"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TState
+        </text>
+        <!-- Row 2: the variant factory, the engine (focal) and the piece source -->
+        <rect
+          x="64"
+          y="484"
+          width="256"
+          height="136"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="192.0"
+          y="502"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «Abstract Factory» · §3.3
+        </text>
+        <text
+          x="192.0"
+          y="520"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          IVariantFactory
+        </text>
+        <line x1="64" y1="532" x2="320" y2="532" stroke="#17212a" stroke-width="1" />
+        <text x="80" y="550" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + createRules(): IGameRules
+        </text>
+        <text x="80" y="566" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + createScoring(): IScoringPolicy
+        </text>
+        <text x="80" y="582" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + createProgressModel(): IProgressModel
+        </text>
+        <text x="80" y="598" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + createInitialState(): TState
+        </text>
+        <text x="80" y="614" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + createHistory(): MoveHistory [0..1]
+        </text>
+        <rect
+          x="208"
+          y="474"
+          width="128"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="272.0"
+          y="486"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCell, TMove, TState
+        </text>
+        <rect x="392" y="484" width="256" height="136" rx="6" fill="#f9f4dc" />
+        <rect
+          x="392"
+          y="484"
+          width="256"
+          height="136"
+          rx="6"
+          fill="rgba(15,111,116,0.05)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <rect x="392" y="484" width="256" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="392" y="524" width="256" height="8" fill="rgba(15,111,116,0.10)" />
+        <text
+          x="520.0"
+          y="502"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «generic engine» · D1 · APP-NFR-03
+        </text>
+        <text
+          x="520.0"
+          y="520"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GameEngine
+        </text>
+        <line x1="392" y1="532" x2="648" y2="532" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <text x="408" y="550" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - rules: IGameRules
+        </text>
+        <text x="408" y="566" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - scoring: IScoringPolicy
+        </text>
+        <text x="408" y="582" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - history: MoveHistory [0..1]
+        </text>
+        <text x="408" y="598" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + play(move: TMove): Outcome
+        </text>
+        <text x="408" y="614" fill="#7d8a94" font-size="9" font-family="'IBM Plex Mono', monospace">
+          knows no variant
+        </text>
+        <rect
+          x="536"
+          y="474"
+          width="128"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="600.0"
+          y="486"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCell, TMove, TState
+        </text>
+        <rect
+          x="720"
+          y="484"
+          width="256"
+          height="136"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="848.0"
+          y="502"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «Strategy» · §3.1
+        </text>
+        <text
+          x="848.0"
+          y="520"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          IPieceSource
+        </text>
+        <line x1="720" y1="532" x2="976" y2="532" stroke="#17212a" stroke-width="1" />
+        <text x="736" y="550" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + hasNext(): boolean
+        </text>
+        <text x="736" y="566" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + next(): TPiece
+        </text>
+        <text x="736" y="582" fill="#7d8a94" font-size="9" font-family="'IBM Plex Mono', monospace">
+          SeededPieceSource or
+        </text>
+        <text x="736" y="598" fill="#7d8a94" font-size="9" font-family="'IBM Plex Mono', monospace">
+          FixedListPieceSource
+        </text>
+        <rect
+          x="936"
+          y="474"
+          width="56"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="964.0"
+          y="486"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TPiece
+        </text>
+        <!-- Row 3: the level builder, the type arguments and the progress model -->
+        <rect
+          x="64"
+          y="668"
+          width="256"
+          height="112"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="192.0"
+          y="686"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «Builder» · §3.3
+        </text>
+        <text
+          x="192.0"
+          y="704"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          ILevelBuilder
+        </text>
+        <line x1="64" y1="716" x2="320" y2="716" stroke="#17212a" stroke-width="1" />
+        <text x="80" y="734" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + build(): TLevel
+        </text>
+        <text x="80" y="750" fill="#7d8a94" font-size="9" font-family="'IBM Plex Mono', monospace">
+          only variants with levels
+        </text>
+        <rect
+          x="280"
+          y="658"
+          width="56"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="308.0"
+          y="670"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TLevel
+        </text>
+        <rect
+          x="392"
+          y="668"
+          width="256"
+          height="112"
+          rx="6"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="520.0"
+          y="686"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «type arguments» · §3.1
+        </text>
+        <text
+          x="520.0"
+          y="704"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          TCell · TMove · TState
+        </text>
+        <line
+          x1="392"
+          y1="716"
+          x2="648"
+          y2="716"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text x="408" y="734" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          TCell: what a cell holds
+        </text>
+        <text x="408" y="750" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          TMove: what the player does
+        </text>
+        <text x="408" y="766" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          TState: a BoardState‹TCell, TCoord›
+        </text>
+        <rect
+          x="720"
+          y="668"
+          width="256"
+          height="112"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="848.0"
+          y="686"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «Strategy» · §3.1
+        </text>
+        <text
+          x="848.0"
+          y="704"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          IProgressModel
+        </text>
+        <line x1="720" y1="716" x2="976" y2="716" stroke="#17212a" stroke-width="1" />
+        <text x="736" y="734" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + record(result): ProgressRecord
+        </text>
+        <text x="736" y="750" fill="#7d8a94" font-size="9" font-family="'IBM Plex Mono', monospace">
+          HighScoreProgress or LevelProgress
+        </text>
+        <!-- Row 4: the optional capability interfaces -->
+        <rect
+          x="84"
+          y="852"
+          width="200"
+          height="56"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="184.0"
+          y="870.0"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface»
+        </text>
+        <text
+          x="184.0"
+          y="887.0"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          IUndoable
+        </text>
+        <text
+          x="184.0"
+          y="901.0"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          engine class: MoveHistory
+        </text>
+        <rect
+          x="308"
+          y="852"
+          width="200"
+          height="56"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="408.0"
+          y="870.0"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface»
+        </text>
+        <text
+          x="408.0"
+          y="887.0"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          IRedoable
+        </text>
+        <text
+          x="408.0"
+          y="901.0"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          engine class: RedoableHistory
+        </text>
+        <rect
+          x="532"
+          y="852"
+          width="200"
+          height="56"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="632.0"
+          y="870.0"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface»
+        </text>
+        <text
+          x="632.0"
+          y="887.0"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          ITimed
+        </text>
+        <text
+          x="632.0"
+          y="901.0"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          engine class: LevelTimer
+        </text>
+        <rect
+          x="756"
+          y="852"
+          width="200"
+          height="56"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="856.0"
+          y="870.0"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface»
+        </text>
+        <text
+          x="856.0"
+          y="887.0"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          IRandomSeeded
+        </text>
+        <text
+          x="856.0"
+          y="901.0"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          engine class: SeededPieceSource
+        </text>
+        <!-- The four variants and the declared fifth one, one package each -->
+        <rect
+          x="68"
+          y="1016"
+          width="64"
+          height="16"
+          rx="2"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="68"
+          y="1030"
+          width="168"
+          height="198"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="80"
+          y="1052"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Hexa Lines
+        </text>
+        <text x="80" y="1066" fill="#5b6873" font-size="8" font-family="'IBM Plex Mono', monospace">
+          hexa-lines/ · §1.1
+        </text>
+        <line x1="68" y1="1076" x2="236" y2="1076" stroke="rgba(23,33,42,0.25)" stroke-width="1" />
+        <text
+          x="80"
+          y="1094"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          LinesFactory
+        </text>
+        <text
+          x="80"
+          y="1110"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          LinesRules
+        </text>
+        <text
+          x="80"
+          y="1126"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          LinesState
+        </text>
+        <text
+          x="80"
+          y="1142"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          PlacePiece
+        </text>
+        <text
+          x="80"
+          y="1158"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          LinesScoring
+        </text>
+        <text
+          x="80"
+          y="1174"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          ComboMultiplierDecorator
+        </text>
+        <text
+          x="80"
+          y="1190"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          LineCleared
+        </text>
+        <text
+          x="80"
+          y="1206"
+          fill="#7d8a94"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          TCell: Color (engine)
+        </text>
+        <rect
+          x="252"
+          y="1016"
+          width="64"
+          height="16"
+          rx="2"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="252"
+          y="1030"
+          width="168"
+          height="198"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="264"
+          y="1052"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Hexa Fit
+        </text>
+        <text
+          x="264"
+          y="1066"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          hexa-fit/ · §1.2
+        </text>
+        <line x1="252" y1="1076" x2="420" y2="1076" stroke="rgba(23,33,42,0.25)" stroke-width="1" />
+        <text
+          x="264"
+          y="1094"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          FitFactory
+        </text>
+        <text
+          x="264"
+          y="1110"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          FitRules
+        </text>
+        <text
+          x="264"
+          y="1126"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          FitState
+        </text>
+        <text
+          x="264"
+          y="1142"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          FitMove and 3 moves
+        </text>
+        <text
+          x="264"
+          y="1158"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          PieceId
+        </text>
+        <text
+          x="264"
+          y="1174"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          FitScoring
+        </text>
+        <text
+          x="264"
+          y="1190"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          FitLevel
+        </text>
+        <text
+          x="264"
+          y="1206"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          FitLevelBuilder
+        </text>
+        <rect
+          x="436"
+          y="1016"
+          width="64"
+          height="16"
+          rx="2"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="436"
+          y="1030"
+          width="168"
+          height="198"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="448"
+          y="1052"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Hexa Sort
+        </text>
+        <text
+          x="448"
+          y="1066"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          hexa-sort/ · §1.3
+        </text>
+        <line x1="436" y1="1076" x2="604" y2="1076" stroke="rgba(23,33,42,0.25)" stroke-width="1" />
+        <text
+          x="448"
+          y="1094"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          SortFactory
+        </text>
+        <text
+          x="448"
+          y="1110"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          SortRules
+        </text>
+        <text
+          x="448"
+          y="1126"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          SortState
+        </text>
+        <text
+          x="448"
+          y="1142"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          PlaceStack
+        </text>
+        <text
+          x="448"
+          y="1158"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          ColorStack
+        </text>
+        <text
+          x="448"
+          y="1174"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          SortScoring
+        </text>
+        <text
+          x="448"
+          y="1190"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          SortLevel
+        </text>
+        <text
+          x="448"
+          y="1206"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          SortLevelBuilder
+        </text>
+        <text
+          x="448"
+          y="1222"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          StackMerged
+        </text>
+        <rect
+          x="620"
+          y="1016"
+          width="64"
+          height="16"
+          rx="2"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="620"
+          y="1030"
+          width="168"
+          height="198"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="632"
+          y="1052"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Hexa Merge
+        </text>
+        <text
+          x="632"
+          y="1066"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          hexa-merge/ · §1.4
+        </text>
+        <line x1="620" y1="1076" x2="788" y2="1076" stroke="rgba(23,33,42,0.25)" stroke-width="1" />
+        <text
+          x="632"
+          y="1094"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          MergeFactory
+        </text>
+        <text
+          x="632"
+          y="1110"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          MergeRules
+        </text>
+        <text
+          x="632"
+          y="1126"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          MergeState
+        </text>
+        <text
+          x="632"
+          y="1142"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          Slide
+        </text>
+        <text
+          x="632"
+          y="1158"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          MergeTile
+        </text>
+        <text
+          x="632"
+          y="1174"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          MergeScoring
+        </text>
+        <text
+          x="632"
+          y="1190"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          TileMerged
+        </text>
+        <text
+          x="632"
+          y="1206"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          TargetReached
+        </text>
+        <rect x="804" y="1016" width="64" height="16" rx="2" fill="#f9f4dc" />
+        <rect x="804" y="1030" width="168" height="198" rx="4" fill="#f9f4dc" />
+        <rect
+          x="804"
+          y="1016"
+          width="64"
+          height="16"
+          rx="2"
+          fill="rgba(23,33,42,0.02)"
+          stroke="rgba(23,33,42,0.35)"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <rect
+          x="804"
+          y="1030"
+          width="168"
+          height="198"
+          rx="4"
+          fill="rgba(23,33,42,0.02)"
+          stroke="rgba(23,33,42,0.35)"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="816"
+          y="1052"
+          fill="#5b6873"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Hexa Fill
+        </text>
+        <text
+          x="816"
+          y="1066"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          hexa-fill/ · §3.1 example
+        </text>
+        <line
+          x1="804"
+          y1="1076"
+          x2="972"
+          y2="1076"
+          stroke="rgba(23,33,42,0.35)"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="816"
+          y="1094"
+          fill="#5b6873"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          FillFactory
+        </text>
+        <text
+          x="816"
+          y="1110"
+          fill="#5b6873"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          FillRules
+        </text>
+        <text
+          x="816"
+          y="1126"
+          fill="#5b6873"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          FillState
+        </text>
+        <text
+          x="816"
+          y="1142"
+          fill="#5b6873"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          FillMove
+        </text>
+        <text
+          x="816"
+          y="1158"
+          fill="#5b6873"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          FillCell
+        </text>
+        <text
+          x="816"
+          y="1174"
+          fill="#5b6873"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          FillScoring
+        </text>
+        <text
+          x="816"
+          y="1190"
+          fill="#7d8a94"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          names are placeholders
+        </text>
+        <text
+          x="24"
+          y="1280"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          A fifth variant implements the interfaces in the frame and binds TCell, TMove and TState.
+          It changes no engine file (APP-NFR-06).
+        </text>
+        <text
+          x="24"
+          y="1296"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          It also adds one StateMapper in layer 3 and one CellRenderer in layer 4 (D3). Q8 decides
+          the folder of the cell renderers.
+        </text>
+        <text
+          x="24"
+          y="1312"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          The variant factory picks the optional capabilities: createHistory() returns MoveHistory,
+          RedoableHistory or nothing (decision 3).
+        </text>
+        <text
+          x="24"
+          y="1328"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Hexa Fill is the example of statement §3.1. Its dashed boxes are declared extensions with
+          no class yet.
+        </text>
+        <!-- Legend -->
+        <line
+          x1="24"
+          y1="1352"
+          x2="1016"
+          y2="1352"
+          stroke="rgba(23,33,42,0.10)"
+          stroke-width="0.8"
+        />
+        <text
+          x="24"
+          y="1370"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LEGEND
+        </text>
+        <line
+          x1="24"
+          y1="1392"
+          x2="52"
+          y2="1392"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#ext1-triangle)"
+        />
+        <text
+          x="60"
+          y="1396"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Inheritance
+        </text>
+        <line
+          x1="144"
+          y1="1392"
+          x2="172"
+          y2="1392"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#ext1-triangle)"
+        />
+        <text
+          x="180"
+          y="1396"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Realization
+        </text>
+        <line
+          x1="264"
+          y1="1392"
+          x2="292"
+          y2="1392"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#ext1-diamond-filled)"
+        />
+        <text
+          x="300"
+          y="1396"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Composition · attribute it creates
+        </text>
+        <line
+          x1="474"
+          y1="1392"
+          x2="502"
+          y2="1392"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#ext1-diamond-hollow)"
+        />
+        <text
+          x="510"
+          y="1396"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aggregation · attribute it receives
+        </text>
+        <line
+          x1="694"
+          y1="1392"
+          x2="722"
+          y2="1392"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ext1-open)"
+        />
+        <text
+          x="730"
+          y="1396"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Use · parameter, return, local or new
+        </text>
+        <rect
+          x="520"
+          y="1430"
+          width="12"
+          height="5"
+          rx="1"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="520"
+          y="1434"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="556"
+          y="1443"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Package · one variant
+        </text>
+        <rect
+          x="776"
+          y="1434"
+          width="28"
+          height="12"
+          rx="2"
+          fill="rgba(15,111,116,0.10)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <text
+          x="812"
+          y="1443"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Teal · focal class
+        </text>
+        <rect
+          x="24"
+          y="1410"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#eceef0"
+          stroke="rgba(75,85,99,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="60"
+          y="1419"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · layer 4
+        </text>
+        <rect
+          x="264"
+          y="1410"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="300"
+          y="1419"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · layer 3
+        </text>
+        <rect
+          x="520"
+          y="1410"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="556"
+          y="1419"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · layer 1
+        </text>
+        <rect
+          x="776"
+          y="1410"
+          width="28"
+          height="12"
+          rx="2"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="812"
+          y="1419"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dashed frame · group and source
+        </text>
+        <rect
+          x="24"
+          y="1434"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="60"
+          y="1443"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dashed white box · type parameters
+        </text>
+        <rect
+          x="264"
+          y="1434"
+          width="28"
+          height="12"
+          rx="2"
+          fill="rgba(23,33,42,0.02)"
+          stroke="rgba(23,33,42,0.35)"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="300"
+          y="1443"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dashed box · declared, no class yet
+        </text>
+      </svg>
+    </div>
+  </body>
+</html>

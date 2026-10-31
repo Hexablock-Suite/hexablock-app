@@ -60,7 +60,7 @@
   </head>
   <body>
     <div class="frame">
-      <p class="eyebrow">Class diagram · Part 1 · View 4 of 5</p>
+      <p class="eyebrow">Class diagram · Part 1 · View 4 of 7</p>
       <h1>Piece sources, scoring and progress: Strategy and Decorator</h1>
 
       <svg
@@ -258,7 +258,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#sources-triangle)"
         />
-        <!-- ScoringDecorator has an inner IScoringPolicy: aggregation -->
+        <!-- ScoringDecorator holds the IScoringPolicy it receives as inner: aggregation -->
         <line
           x1="824"
           y1="228"
@@ -268,30 +268,29 @@
           stroke-width="1"
           marker-start="url(#sources-diamond-hollow)"
         />
-        <!-- IProgressModel records a GameResult: dependency -->
+        <!-- IProgressModel records a GameResult: use -->
         <line
           x1="512"
           y1="436"
           x2="608"
           y2="436"
-          stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#sources-open)"
+          stroke="#5b6873"
         />
 
         <!-- Arrow labels -->
-        <rect x="832" y="192" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="828" y="168" width="36" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="850"
-          y="201"
+          x="846"
+          y="177"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          INNER
+          inner
         </text>
         <rect x="538" y="416" width="44" height="12" rx="2" fill="#f9f4dc" />
         <text
@@ -307,10 +306,10 @@
         </text>
 
         <!-- Multiplicities -->
-        <rect x="818" y="170" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="806" y="168" width="12" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="824"
-          y="179"
+          x="812"
+          y="177"
           fill="#17212a"
           font-size="8"
           font-weight="600"
@@ -741,7 +740,6 @@
           y2="676"
           stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="5,4"
           marker-end="url(#sources-triangle)"
         />
         <text
@@ -751,46 +749,81 @@
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
+          Inheritance
+        </text>
+        <line
+          x1="144"
+          y1="676"
+          x2="172"
+          y2="676"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#sources-triangle)"
+        />
+        <text
+          x="180"
+          y="680"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
           Realization
         </text>
         <line
-          x1="184"
+          x1="264"
           y1="676"
-          x2="212"
+          x2="292"
+          y2="676"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#sources-diamond-filled)"
+        />
+        <text
+          x="300"
+          y="680"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Composition · attribute it creates
+        </text>
+        <line
+          x1="474"
+          y1="676"
+          x2="502"
           y2="676"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#sources-diamond-hollow)"
         />
         <text
-          x="220"
+          x="510"
           y="680"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Aggregation · has
+          Aggregation · attribute it receives
         </text>
         <line
-          x1="424"
+          x1="694"
           y1="676"
-          x2="452"
+          x2="722"
           y2="676"
           stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#sources-open)"
         />
         <text
-          x="460"
+          x="730"
           y="680"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Dependency · uses
+          Use · parameter, return, local or new
         </text>
-
         <rect
           x="24"
           y="696"

@@ -60,7 +60,7 @@
   </head>
   <body>
     <div class="frame">
-      <p class="eyebrow">Class diagram · Part 1 · View 3 of 5</p>
+      <p class="eyebrow">Class diagram · Part 1 · View 3 of 7</p>
       <h1>Undo and redo: Command and segregated capabilities</h1>
 
       <svg
@@ -102,6 +102,28 @@
               stroke="#17212a"
               stroke-width="1"
             />
+          </marker>
+          <marker
+            id="history-diamond-filled"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 5, 9 0, 18 5, 9 10" fill="#17212a" />
+          </marker>
+          <marker
+            id="history-open"
+            markerWidth="10"
+            markerHeight="8"
+            refX="9"
+            refY="4"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
           </marker>
         </defs>
 
@@ -178,7 +200,7 @@
         </text>
 
         <!-- Relationships (drawn before boxes) -->
-        <!-- MoveHistory keeps the done MoveCommands: aggregation -->
+        <!-- MoveHistory holds the MoveCommands it receives as done: aggregation -->
         <line
           x1="376"
           y1="164"
@@ -233,33 +255,31 @@
         />
 
         <!-- Arrow labels -->
-        <rect x="332" y="144" width="32" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="316" y="148" width="32" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="348"
-          y="153"
+          x="332"
+          y="157"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          DONE
+          done
         </text>
-
         <!-- Multiplicities -->
-        <rect x="318" y="158" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="316" y="168" width="28" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="324"
-          y="167"
+          x="330"
+          y="177"
           fill="#17212a"
           font-size="8"
           font-weight="600"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          *
+          0..*
         </text>
-
         <!-- Class: MoveCommand (Command) -->
         <rect
           x="72"
@@ -670,9 +690,9 @@
           Inheritance
         </text>
         <line
-          x1="184"
+          x1="144"
           y1="576"
-          x2="212"
+          x2="172"
           y2="576"
           stroke="#17212a"
           stroke-width="1"
@@ -680,7 +700,7 @@
           marker-end="url(#history-triangle)"
         />
         <text
-          x="220"
+          x="180"
           y="580"
           fill="#5b6873"
           font-size="8.5"
@@ -689,24 +709,59 @@
           Realization
         </text>
         <line
-          x1="344"
+          x1="264"
           y1="576"
-          x2="372"
+          x2="292"
+          y2="576"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#history-diamond-filled)"
+        />
+        <text
+          x="300"
+          y="580"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Composition · attribute it creates
+        </text>
+        <line
+          x1="474"
+          y1="576"
+          x2="502"
           y2="576"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#history-diamond-hollow)"
         />
         <text
-          x="380"
+          x="510"
           y="580"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Aggregation · has
+          Aggregation · attribute it receives
         </text>
-
+        <line
+          x1="694"
+          y1="576"
+          x2="722"
+          y2="576"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#history-open)"
+        />
+        <text
+          x="730"
+          y="580"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Use · parameter, return, local or new
+        </text>
         <rect
           x="24"
           y="596"

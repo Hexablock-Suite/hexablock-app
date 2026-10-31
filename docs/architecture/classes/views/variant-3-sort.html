@@ -64,17 +64,17 @@
       <h1>Hexa Sort: stacks, cascades and levels</h1>
 
       <svg
-        viewBox="0 0 1040 712"
+        viewBox="0 0 1040 744"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="sort-title sort-desc"
       >
         <title id="sort-title">HexaBlock Hexa Sort variant · UML class diagram</title>
         <desc id="sort-desc">
-          Class diagram of the Hexa Sort variant in layer 1 showing HexaSortFactory creating the
-          HexaSortRules and SortScoring strategies and holding a SortLevel that SortLevelBuilder
-          creates, with HexaSortRules typed by SortState and SortState holding ColorStack cells,
-          each variant class marked with the engine interface it implements and its binding.
+          Class diagram of the Hexa Sort variant in layer 1 showing SortFactory creating the
+          SortRules and SortScoring strategies and holding a SortLevel that SortLevelBuilder
+          creates, with SortRules typed by SortState and SortState holding ColorStack cells, each
+          variant class marked with the engine interface it implements and its binding.
         </desc>
         <defs>
           <marker
@@ -87,6 +87,44 @@
             markerUnits="userSpaceOnUse"
           >
             <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
+          </marker>
+          <marker
+            id="sort-triangle"
+            markerWidth="16"
+            markerHeight="12"
+            refX="15"
+            refY="6"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          </marker>
+          <marker
+            id="sort-diamond-filled"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 5, 9 0, 18 5, 9 10" fill="#17212a" />
+          </marker>
+          <marker
+            id="sort-diamond-hollow"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon
+              points="0 5, 9 0, 18 5, 9 10"
+              fill="#ffffff"
+              stroke="#17212a"
+              stroke-width="1"
+            />
           </marker>
         </defs>
 
@@ -142,7 +180,7 @@
         <rect
           x="448"
           y="64"
-          width="304"
+          width="344"
           height="280"
           rx="8"
           fill="none"
@@ -166,7 +204,7 @@
           x="48"
           y="240"
           width="256"
-          height="296"
+          height="312"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -186,67 +224,51 @@
         </text>
 
         <!-- Relationships (drawn before boxes) -->
-        <!-- HexaSortFactory creates SortScoring: dependency «create» -->
+        <!-- SortFactory creates SortScoring: use «create» -->
         <line
           x1="288"
           y1="144"
           x2="464"
           y2="144"
-          stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#sort-open)"
+          stroke="#5b6873"
         />
-        <!-- HexaSortFactory creates HexaSortRules: dependency «create» -->
+        <!-- SortFactory creates SortRules: use «create» -->
         <path
           d="M288 172 H416 Q424 172 424 180 V276 Q424 284 432 284 H464"
           fill="none"
-          stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#sort-open)"
+          stroke="#5b6873"
         />
-        <!-- HexaSortFactory holds its SortLevel: association -->
+        <!-- SortFactory holds the SortLevel it receives as level: aggregation -->
         <line
           x1="216"
           y1="192"
           x2="216"
           y2="272"
-          stroke="#5b6873"
           stroke-width="1"
-          marker-end="url(#sort-open)"
+          marker-start="url(#sort-diamond-hollow)"
+          stroke="#17212a"
         />
-        <!-- SortLevelBuilder creates SortLevel: dependency «create» -->
+        <!-- SortLevelBuilder creates SortLevel: use «create» -->
         <line
           x1="160"
-          y1="424"
+          y1="440"
           x2="160"
-          y2="376"
-          stroke="#5b6873"
+          y2="392"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#sort-open)"
+          stroke="#5b6873"
         />
-        <!-- HexaSortRules is typed by SortState: dependency -->
-        <line
-          x1="736"
-          y1="284"
-          x2="800"
-          y2="284"
+
+        <!-- SortState binds TCell to ColorStack through its board and tray: use «bind» -->
+        <path
+          d="M740,504 V532 H896 V512"
+          fill="none"
           stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#sort-open)"
-        />
-        <!-- SortState holds ColorStack cells: dependency -->
-        <line
-          x1="896"
-          y1="352"
-          x2="896"
-          y2="400"
-          stroke="#5b6873"
-          stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#sort-open)"
         />
 
@@ -275,22 +297,22 @@
         >
           «create»
         </text>
-        <rect x="168" y="218" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="176" y="258" width="36" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="186"
-          y="227"
+          x="194"
+          y="267"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          LEVEL
+          level
         </text>
-        <rect x="168" y="394" width="48" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="168" y="410" width="56" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="192"
-          y="403"
+          x="196"
+          y="419"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -299,36 +321,23 @@
         >
           «create»
         </text>
-        <rect x="758" y="266" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="782" y="536" width="72" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="776"
-          y="275"
+          x="818"
+          y="545"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          TSTATE
+          «bind» TCell
         </text>
-        <rect x="904" y="370" width="32" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="920"
-          y="379"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          TCELL
-        </text>
-
         <!-- Multiplicities -->
-        <rect x="222" y="254" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="222" y="258" width="12" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="228"
-          y="263"
+          y="267"
           fill="#17212a"
           font-size="8"
           font-weight="600"
@@ -338,7 +347,7 @@
           1
         </text>
 
-        <!-- Class: HexaSortFactory (concrete factory) -->
+        <!-- Class: SortFactory (concrete factory) -->
         <rect
           x="64"
           y="120"
@@ -370,7 +379,7 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          HexaSortFactory
+          SortFactory
         </text>
         <text x="80" y="184" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - level: SortLevel
@@ -414,22 +423,22 @@
           criteria still to define
         </text>
 
-        <!-- Class: HexaSortRules (focal, concrete strategy) -->
+        <!-- Class: SortRules (focal, concrete strategy) -->
         <rect
           x="464"
           y="240"
-          width="272"
+          width="312"
           height="88"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
           stroke-width="1"
         />
-        <rect x="464" y="240" width="272" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
-        <rect x="464" y="280" width="272" height="8" fill="rgba(15,111,116,0.10)" />
-        <line x1="464" y1="288" x2="736" y2="288" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <rect x="464" y="240" width="312" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="464" y="280" width="312" height="8" fill="rgba(15,111,116,0.10)" />
+        <line x1="464" y1="288" x2="776" y2="288" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text
-          x="600"
+          x="620"
           y="258"
           fill="#5b6873"
           font-size="8"
@@ -440,7 +449,7 @@
           «Concrete Strategy»
         </text>
         <text
-          x="600"
+          x="620"
           y="276"
           fill="#17212a"
           font-size="12"
@@ -448,10 +457,10 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          HexaSortRules
+          SortRules
         </text>
         <text x="480" y="304" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - pieces: IPieceSource&lt;Piece&lt;ColorStack&gt;&gt;
+          - pieces: IPieceSource&lt;Piece&lt;ColorStack, TCoord&gt;&gt;
         </text>
         <text x="480" y="320" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           cascade transfer, clears a stack of 10
@@ -459,19 +468,19 @@
 
         <!-- Class: SortState -->
         <rect
-          x="800"
-          y="240"
-          width="192"
+          x="520"
+          y="392"
+          width="240"
           height="112"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="800" y1="280" x2="992" y2="280" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="520" y1="432" x2="760" y2="432" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="896"
-          y="265"
+          x="640"
+          y="417"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -480,16 +489,16 @@
         >
           SortState
         </text>
-        <text x="816" y="296" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + board: HexBoard&lt;ColorStack&gt;
+        <text x="536" y="448" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + board: Board&lt;ColorStack, TCoord&gt;
         </text>
-        <text x="816" y="312" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + tray: Piece&lt;ColorStack&gt;[]
+        <text x="536" y="464" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + tray: Piece&lt;ColorStack, TCoord&gt;[]
         </text>
-        <text x="816" y="328" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="536" y="480" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + goalsDone: number
         </text>
-        <text x="816" y="344" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="536" y="496" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + goalsNeeded: number
         </text>
 
@@ -543,7 +552,7 @@
           x="64"
           y="272"
           width="192"
-          height="104"
+          height="120"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -572,20 +581,23 @@
         >
           SortLevel
         </text>
-        <text x="80" y="336" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="352" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + radius: number
         </text>
-        <text x="80" y="352" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="368" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + goals: number
         </text>
-        <text x="80" y="368" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="384" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + source: "seeded" | "fixed"
         </text>
 
+        <text x="80" y="336" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + header: LevelHeader
+        </text>
         <!-- Class: SortLevelBuilder (concrete builder) -->
         <rect
           x="64"
-          y="424"
+          y="440"
           width="192"
           height="72"
           rx="6"
@@ -593,10 +605,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="64" y1="472" x2="256" y2="472" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="64" y1="488" x2="256" y2="488" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="160"
-          y="442"
+          y="458"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -607,7 +619,7 @@
         </text>
         <text
           x="160"
-          y="460"
+          y="476"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -616,7 +628,7 @@
         >
           SortLevelBuilder
         </text>
-        <text x="80" y="488" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="504" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + build(): SortLevel
         </text>
 
@@ -636,17 +648,39 @@
         <text x="491" y="222" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           IGameRules‹ColorStack, PlaceStack, SortState›
         </text>
-        <line x1="816" y1="240" x2="816" y2="224" stroke="#17212a" stroke-width="1" />
-        <circle cx="816" cy="219" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="827" y="222" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          BoardState‹ColorStack›
+        <line x1="536" y1="504" x2="536" y2="520" stroke="#17212a" stroke-width="1" />
+        <circle cx="536" cy="525" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="547" y="528" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          BoardState‹ColorStack, TCoord›
         </text>
-        <line x1="80" y1="496" x2="80" y2="512" stroke="#17212a" stroke-width="1" />
-        <circle cx="80" cy="517" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="91" y="520" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="80" y1="512" x2="80" y2="528" stroke="#17212a" stroke-width="1" />
+        <circle cx="80" cy="533" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="91" y="536" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           ILevelBuilder‹SortLevel›
         </text>
 
+        <!-- UML template boxes: type parameters on the top-right corner -->
+        <rect
+          x="724"
+          y="382"
+          width="48"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="748"
+          y="394"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCoord
+        </text>
         <!-- Footnote: classes the budget leaves out -->
         <text
           x="24"
@@ -655,7 +689,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Not drawn: PlaceStack (the move, at: HexCoord) and StackMerged extends GameEvent.
+          Not drawn: PlaceStack (the move, at: TCoord) and StackMerged extends GameEvent. SortRules
+          extends BaseGameRules (Part 1, view 7).
         </text>
         <text
           x="24"
@@ -668,11 +703,31 @@
           undo.
         </text>
 
-        <!-- Legend -->
-        <line x1="24" y1="624" x2="1016" y2="624" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="642"
+          y="616"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          An adapter reads the level file, and SortLevelBuilder gets plain data. LevelHeader is the
+          common part of every level (Hexa Fit view); the builder asks BoardBuilder for the board.
+        </text>
+        <text
+          x="24"
+          y="632"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          TCoord is the coordinate type of the geometry (decision 16). SortRules, SortScoring and
+          SortFactory take it too; the bindings leave it out.
+        </text>
+        <!-- Legend -->
+        <line x1="24" y1="656" x2="1016" y2="656" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <text
+          x="24"
+          y="674"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -683,45 +738,98 @@
 
         <line
           x1="24"
-          y1="660"
+          y1="692"
           x2="52"
-          y2="660"
-          stroke="#5b6873"
+          y2="692"
+          stroke="#17212a"
           stroke-width="1"
-          marker-end="url(#sort-open)"
+          marker-end="url(#sort-triangle)"
         />
         <text
           x="60"
-          y="664"
+          y="696"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Association
+          Inheritance
         </text>
         <line
-          x1="184"
-          y1="660"
-          x2="212"
-          y2="660"
+          x1="144"
+          y1="692"
+          x2="172"
+          y2="692"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#sort-triangle)"
+        />
+        <text
+          x="180"
+          y="696"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Realization
+        </text>
+        <line
+          x1="264"
+          y1="692"
+          x2="292"
+          y2="692"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#sort-diamond-filled)"
+        />
+        <text
+          x="300"
+          y="696"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Composition · attribute it creates
+        </text>
+        <line
+          x1="474"
+          y1="692"
+          x2="502"
+          y2="692"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#sort-diamond-hollow)"
+        />
+        <text
+          x="510"
+          y="696"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aggregation · attribute it receives
+        </text>
+        <line
+          x1="694"
+          y1="692"
+          x2="722"
+          y2="692"
           stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#sort-open)"
         />
         <text
-          x="220"
-          y="664"
+          x="730"
+          y="696"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Dependency · uses
+          Use · parameter, return, local or new
         </text>
-
         <rect
           x="24"
-          y="680"
+          y="712"
           width="28"
           height="12"
           rx="2"
@@ -731,7 +839,7 @@
         />
         <text
           x="60"
-          y="689"
+          y="721"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -740,7 +848,7 @@
         </text>
         <rect
           x="184"
-          y="680"
+          y="712"
           width="28"
           height="12"
           rx="2"
@@ -751,7 +859,7 @@
         />
         <text
           x="220"
-          y="689"
+          y="721"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -760,7 +868,7 @@
         </text>
         <rect
           x="424"
-          y="680"
+          y="712"
           width="28"
           height="12"
           rx="2"
@@ -770,23 +878,43 @@
         />
         <text
           x="460"
-          y="689"
+          y="721"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
         </text>
-        <line x1="584" y1="686" x2="600" y2="686" stroke="#17212a" stroke-width="1" />
-        <circle cx="605" cy="686" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="584" y1="718" x2="600" y2="718" stroke="#17212a" stroke-width="1" />
+        <circle cx="605" cy="718" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="620"
-          y="689"
+          y="721"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Lollipop · engine interface + binding
+        </text>
+        <rect
+          x="800"
+          y="712"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="836"
+          y="721"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Corner box · type parameters
         </text>
       </svg>
     </div>
