@@ -88,6 +88,44 @@
           >
             <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
           </marker>
+          <marker
+            id="fit-triangle"
+            markerWidth="16"
+            markerHeight="12"
+            refX="15"
+            refY="6"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          </marker>
+          <marker
+            id="fit-diamond-filled"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 5, 9 0, 18 5, 9 10" fill="#17212a" />
+          </marker>
+          <marker
+            id="fit-diamond-hollow"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon
+              points="0 5, 9 0, 18 5, 9 10"
+              fill="#ffffff"
+              stroke="#17212a"
+              stroke-width="1"
+            />
+          </marker>
         </defs>
 
         <rect width="100%" height="100%" fill="#f3f5f6" />
@@ -186,95 +224,47 @@
         </text>
 
         <!-- Relationships (drawn before boxes) -->
-        <!-- FitRules uses FitMove as TMove: dependency -->
-        <line
-          x1="328"
-          y1="136"
-          x2="276"
-          y2="136"
-          stroke="#5b6873"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#fit-open)"
-        />
-        <!-- FitRules uses FitState as TState: dependency -->
-        <line
-          x1="328"
-          y1="184"
-          x2="280"
-          y2="184"
-          stroke="#5b6873"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#fit-open)"
-        />
-        <!-- FitFactory creates FitRules: dependency «create» -->
+
+        <!-- FitFactory creates FitRules: use «create» -->
         <line
           x1="648"
           y1="144"
           x2="568"
           y2="144"
-          stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#fit-open)"
+          stroke="#5b6873"
         />
-        <!-- FitFactory creates FitScoring: dependency «create», one elbow -->
+        <!-- FitFactory creates FitScoring: use «create», one elbow -->
         <path
           d="M680,192 L680,260 Q680,268 672,268 L528,268"
           fill="none"
-          stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#fit-open)"
+          stroke="#5b6873"
         />
-        <!-- FitFactory holds one FitLevel: association -->
+        <!-- FitFactory holds the FitLevel it receives as level: aggregation -->
         <line
           x1="800"
           y1="192"
           x2="800"
           y2="380"
-          stroke="#5b6873"
           stroke-width="1"
-          marker-end="url(#fit-open)"
+          marker-start="url(#fit-diamond-hollow)"
+          stroke="#17212a"
         />
-        <!-- FitLevelBuilder creates FitLevel: dependency «create» -->
+        <!-- FitLevelBuilder creates FitLevel: use «create» -->
         <line
           x1="640"
           y1="440"
           x2="696"
           y2="440"
-          stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#fit-open)"
+          stroke="#5b6873"
         />
 
         <!-- Arrow labels -->
-        <rect x="280" y="116" width="36" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="298"
-          y="125"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          TMOVE
-        </text>
-        <rect x="284" y="190" width="40" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="304"
-          y="199"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          TSTATE
-        </text>
         <rect x="588" y="124" width="44" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="610"
@@ -299,17 +289,17 @@
         >
           «create»
         </text>
-        <rect x="808" y="272" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="804" y="360" width="36" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="826"
-          y="281"
+          x="822"
+          y="369"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          LEVEL
+          level
         </text>
         <rect x="642" y="420" width="52" height="12" rx="2" fill="#f9f4dc" />
         <text
@@ -325,10 +315,10 @@
         </text>
 
         <!-- Multiplicities -->
-        <rect x="794" y="362" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="784" y="360" width="12" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="800"
-          y="371"
+          x="790"
+          y="369"
           fill="#17212a"
           font-size="8"
           font-weight="600"
@@ -800,9 +790,9 @@
           y1="708"
           x2="52"
           y2="708"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          marker-end="url(#fit-open)"
+          marker-end="url(#fit-triangle)"
         />
         <text
           x="60"
@@ -811,28 +801,81 @@
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Association
+          Inheritance
         </text>
         <line
-          x1="184"
+          x1="144"
           y1="708"
-          x2="212"
+          x2="172"
           y2="708"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#fit-open)"
+          stroke-dasharray="5,4"
+          marker-end="url(#fit-triangle)"
         />
         <text
-          x="220"
+          x="180"
           y="712"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Dependency · uses
+          Realization
         </text>
-
+        <line
+          x1="264"
+          y1="708"
+          x2="292"
+          y2="708"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#fit-diamond-filled)"
+        />
+        <text
+          x="300"
+          y="712"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Composition · attribute it creates
+        </text>
+        <line
+          x1="474"
+          y1="708"
+          x2="502"
+          y2="708"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#fit-diamond-hollow)"
+        />
+        <text
+          x="510"
+          y="712"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aggregation · attribute it receives
+        </text>
+        <line
+          x1="694"
+          y1="708"
+          x2="722"
+          y2="708"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#fit-open)"
+        />
+        <text
+          x="730"
+          y="712"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Use · parameter, return, local or new
+        </text>
         <rect
           x="24"
           y="728"
