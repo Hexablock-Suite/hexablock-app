@@ -1,8 +1,16 @@
+<!-- The banner comes from brand/tools/profile-assets/gen.py --repo hexablock-app in Hexablock-Suite/.github. Regenerate it there; do not edit the SVG files by hand. -->
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/banner-dark.svg">
+  <img src="docs/assets/banner-light.svg" alt="HexaBlock App. Mobile client: the four games on one generic engine." width="100%">
+</picture>
+
 # HexaBlock Suite — Mobile App
 
 ## Project Title & Badges
 
-TODO: add the CI status badge once the GitHub organization exists.
+[![hexablock-app CI](https://img.shields.io/github/actions/workflow/status/Hexablock-Suite/hexablock-app/ci.yml?branch=main&style=flat-square&label=CI&logo=githubactions&logoColor=white&labelColor=262830)](https://github.com/Hexablock-Suite/hexablock-app/actions/workflows/ci.yml)
+
+Mobile client: the four games on one generic engine.
 
 ## Description
 
