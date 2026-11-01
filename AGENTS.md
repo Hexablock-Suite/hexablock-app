@@ -39,4 +39,5 @@ Expo changes every SDK. Read the docs for the installed major version (`https://
 - Add Expo and React Native packages with `npx expo install`. Gate: no gate (`npx expo-doctor` runs by hand). <!-- rule: R-expo-install -->
 - Do not create or edit `ios/` or `android/` by hand; configure native behavior in `app.json`. Gate: no gate. <!-- rule: R-no-native-folders -->
 - Release the APK by pushing a `v*` tag; `.github/workflows/release-apk.yml` builds it from `npx expo prebuild` and attaches it to a GitHub Release. Never commit `android/` or a keystore. Gate: `test/gates/release-apk.test.ts` (it pins the workflow, not a green build). <!-- rule: R-apk-release -->
+- Close each sprint of `docs/ROADMAP.md` with a `v0.N.0` tag, the same tag as hexablock-api; the final delivery is `v1.0.0`. Before you push the tag, move the `## [Unreleased]` entries of `CHANGELOG.md` into a `## [x.y.z] - YYYY-MM-DD` section for that version. Gate: `test/docs/changelog.test.ts` (it pins the CHANGELOG format, not the tag). <!-- rule: R-sprint-release -->
 - Every rule in this file names its gate or says "no gate". Gate: `test/docs/agents-rules.test.ts`. <!-- rule: R-rule-gates -->
