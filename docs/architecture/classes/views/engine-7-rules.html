@@ -156,7 +156,7 @@
           x="280"
           y="64"
           width="352"
-          height="208"
+          height="224"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -172,7 +172,7 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.14em"
         >
-          STRATEGY · §3.3 · D1
+          STRATEGY · ITERATOR · §3.3 · D1
         </text>
         <rect
           x="232"
@@ -234,7 +234,7 @@
           x1="456"
           y1="336"
           x2="456"
-          y2="252"
+          y2="268"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -366,7 +366,7 @@
           x="296"
           y="100"
           width="320"
-          height="152"
+          height="168"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -399,18 +399,21 @@
           + isValid(state: TState, move: TMove): boolean
         </text>
         <text x="312" y="180" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + apply(state: TState, move: TMove): TState
+          + validMoves(state: TState): Iterable&lt;TMove&gt;
         </text>
         <text x="312" y="196" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + resolve(state: TState): Resolution&lt;TState&gt;
+          + apply(state: TState, move: TMove): TState
         </text>
         <text x="312" y="212" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + evaluate(state: TState): Outcome
+          + resolve(state: TState): Resolution&lt;TState&gt;
         </text>
         <text x="312" y="228" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + evaluate(state: TState): Outcome
+        </text>
+        <text x="312" y="244" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + playTurn(state: TState, move: TMove):
         </text>
-        <text x="328" y="244" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="328" y="260" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Resolution&lt;TState&gt;
         </text>
         <!-- Class: BaseGameRules (abstract, template method, focal) -->
