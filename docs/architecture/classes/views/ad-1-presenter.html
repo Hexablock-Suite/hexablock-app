@@ -64,7 +64,7 @@
       <h1>Presenting a game: presenter, view model and state mapper</h1>
 
       <svg
-        viewBox="0 0 1040 736"
+        viewBox="0 0 1040 777"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="adpresenter-title adpresenter-desc"
@@ -73,10 +73,27 @@
         <desc id="adpresenter-desc">
           Class diagram across layers 4, 3 and 2 showing the GameScreen route using GamePresenter
           and rendering BoardView, BoardView reading GameViewModel, GamePresenter building
-          GameViewModel, mapping state through the StateMapper strategy that LinesStateMapper
-          implements, and calling the UseCase input port of layer 2.
+          GameViewModel, mapping each cell of the plain MoveResult through the StateMapper strategy
+          that LinesStateMapper implements, and calling the UseCase input port of layer 2, which
+          returns a Result.
         </desc>
         <defs>
+          <marker
+            id="adpresenter-diamond-hollow"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon
+              points="0 5, 9 0, 18 5, 9 10"
+              fill="#ffffff"
+              stroke="#17212a"
+              stroke-width="1"
+            />
+          </marker>
           <marker
             id="adpresenter-triangle"
             markerWidth="16"
@@ -99,6 +116,17 @@
           >
             <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
           </marker>
+          <marker
+            id="adpresenter-diamond-filled"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 5, 9 0, 18 5, 9 10" fill="#17212a" />
+          </marker>
         </defs>
 
         <rect width="100%" height="100%" fill="#f3f5f6" />
@@ -110,14 +138,14 @@
           width="992"
           height="184"
           rx="8"
-          fill="#eceef0"
-          stroke="rgba(75,85,99,0.45)"
+          fill="#cfdcf3"
+          stroke="rgba(30,58,138,0.50)"
           stroke-width="1"
         />
         <text
           x="40"
           y="44"
-          fill="#4b5563"
+          fill="#1e3a8a"
           font-size="8"
           font-weight="500"
           font-family="'IBM Plex Mono', monospace"
@@ -154,14 +182,14 @@
           width="992"
           height="92"
           rx="8"
-          fill="#e3f5e6"
-          stroke="rgba(21,128,61,0.45)"
+          fill="#efe7f8"
+          stroke="rgba(126,34,206,0.40)"
           stroke-width="1"
         />
         <text
           x="40"
           y="512"
-          fill="#15803d"
+          fill="#7e22ce"
           font-size="8"
           font-weight="500"
           font-family="'IBM Plex Mono', monospace"
@@ -195,9 +223,9 @@
         </text>
 
         <rect
-          x="40"
+          x="32"
           y="252"
-          width="248"
+          width="256"
           height="216"
           rx="8"
           fill="none"
@@ -206,7 +234,7 @@
           stroke-dasharray="4,4"
         />
         <text
-          x="52"
+          x="44"
           y="268"
           fill="#5b6873"
           font-size="8"
@@ -218,10 +246,10 @@
         </text>
 
         <rect
-          x="320"
+          x="328"
           y="252"
           width="672"
-          height="184"
+          height="192"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -229,7 +257,7 @@
           stroke-dasharray="4,4"
         />
         <text
-          x="332"
+          x="340"
           y="268"
           fill="#5b6873"
           font-size="8"
@@ -241,7 +269,7 @@
         </text>
 
         <!-- Relationships (drawn before boxes) -->
-        <!-- GameScreen to BoardView: dependency -->
+        <!-- GameScreen renders BoardView: use -->
         <line
           x1="656"
           y1="120"
@@ -249,20 +277,19 @@
           y2="120"
           stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#adpresenter-open)"
         />
-        <!-- GameScreen to GamePresenter: association, down from layer 4 to layer 3 -->
+        <!-- GameScreen keeps the GamePresenter it receives as a prop: aggregation, down from layer 4 to layer 3 -->
         <line
           x1="536"
-          y1="168"
+          y1="184"
           x2="536"
           y2="284"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          marker-end="url(#adpresenter-open)"
+          marker-start="url(#adpresenter-diamond-hollow)"
         />
-        <!-- BoardView to GameViewModel: dependency, down from layer 4 to layer 3 -->
+        <!-- BoardView reads GameViewModel: use, down from layer 4 to layer 3 -->
         <line
           x1="880"
           y1="176"
@@ -270,28 +297,26 @@
           y2="284"
           stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#adpresenter-open)"
         />
-        <!-- GamePresenter to StateMapper: association -->
+        <!-- GamePresenter keeps the StateMapper it receives: aggregation -->
         <line
           x1="336"
           y1="340"
-          x2="272"
+          x2="280"
           y2="340"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          marker-end="url(#adpresenter-open)"
+          marker-start="url(#adpresenter-diamond-hollow)"
         />
-        <!-- GamePresenter to GameViewModel: dependency -->
+        <!-- GamePresenter builds GameViewModel: use -->
         <line
-          x1="720"
+          x1="776"
           y1="356"
-          x2="776"
+          x2="832"
           y2="356"
           stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#adpresenter-open)"
         />
         <!-- LinesStateMapper implements StateMapper: realization with binding -->
@@ -305,20 +330,19 @@
           stroke-dasharray="5,4"
           marker-end="url(#adpresenter-triangle)"
         />
-        <!-- GamePresenter to UseCase: dependency, down from layer 3 to layer 2 -->
+        <!-- GamePresenter keeps the UseCase input port it receives: aggregation, down from layer 3 to layer 2 -->
         <line
           x1="528"
           y1="420"
           x2="528"
           y2="528"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#adpresenter-open)"
+          marker-start="url(#adpresenter-diamond-hollow)"
         />
 
         <!-- Arrow labels -->
-        <rect x="666" y="100" width="44" height="12" rx="2" fill="#eceef0" />
+        <rect x="666" y="100" width="44" height="12" rx="2" fill="#cfdcf3" />
         <text
           x="688"
           y="109"
@@ -342,21 +366,9 @@
         >
           READS
         </text>
-        <rect x="292" y="320" width="40" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="782" y="336" width="44" height="12" rx="2" fill="#e2ebf8" />
         <text
-          x="312"
-          y="329"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          MAPPER
-        </text>
-        <rect x="728" y="336" width="40" height="12" rx="2" fill="#e2ebf8" />
-        <text
-          x="748"
+          x="804"
           y="345"
           fill="#7d8a94"
           font-size="8"
@@ -366,7 +378,7 @@
         >
           BUILDS
         </text>
-        <rect x="104" y="378" width="144" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="124" y="378" width="104" height="12" rx="2" fill="#e2ebf8" />
         <text
           x="176"
           y="387"
@@ -376,45 +388,55 @@
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          «bind» TState → LinesState
-        </text>
-        <rect x="536" y="448" width="32" height="12" rx="2" fill="#e2ebf8" />
-        <text
-          x="552"
-          y="457"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          CALLS
+          «bind» TCell → Color
         </text>
 
-        <!-- Multiplicities -->
-        <rect x="530" y="264" width="12" height="12" rx="2" fill="#e2ebf8" />
+        <!-- Role names and multiplicities at the part end -->
+        <rect x="540" y="267" width="57" height="12" rx="2" fill="#e2ebf8" />
         <text
-          x="536"
-          y="273"
+          x="542"
+          y="276"
           fill="#17212a"
           font-size="8"
-          font-weight="600"
           font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
+          text-anchor="start"
         >
-          1
+          presenter
+          <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="278" y="334" width="12" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="290" y="323" width="33" height="12" rx="2" fill="#e2ebf8" />
         <text
-          x="284"
-          y="343"
+          x="292"
+          y="332"
           fill="#17212a"
           font-size="8"
-          font-weight="600"
           font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
+          text-anchor="start"
         >
-          1
+          mapper
+        </text>
+        <rect x="290" y="343" width="9" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="292"
+          y="352"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <rect x="532" y="511" width="57" height="12" rx="2" fill="#efe7f8" />
+        <text
+          x="534"
+          y="520"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          applyMove
+          <tspan font-weight="600">1</tspan>
         </text>
 
         <!-- Class: GameScreen (component, route) -->
@@ -422,7 +444,7 @@
           x="416"
           y="88"
           width="240"
-          height="80"
+          height="96"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -461,7 +483,10 @@
         >
           app/game.tsx
         </text>
-        <text x="432" y="160" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="432" y="160" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - presenter: GamePresenter
+        </text>
+        <text x="432" y="176" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           renders GameViewModel, sends moves
         </text>
 
@@ -510,19 +535,19 @@
         <rect
           x="336"
           y="284"
-          width="384"
+          width="440"
           height="136"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
           stroke-width="1"
         />
-        <rect x="336" y="284" width="384" height="40" rx="6" fill="rgba(15,111,116,0.10)" />
-        <rect x="336" y="316" width="384" height="8" fill="rgba(15,111,116,0.10)" />
-        <line x1="336" y1="324" x2="720" y2="324" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
-        <line x1="336" y1="364" x2="720" y2="364" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <rect x="336" y="284" width="440" height="40" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="336" y="316" width="440" height="8" fill="rgba(15,111,116,0.10)" />
+        <line x1="336" y1="324" x2="776" y2="324" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <line x1="336" y1="364" x2="776" y2="364" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text
-          x="528"
+          x="540"
           y="309"
           fill="#17212a"
           font-size="12"
@@ -533,10 +558,10 @@
           GamePresenter
         </text>
         <text x="352" y="340" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - applyMove: UseCase&lt;ApplyMoveRequest&lt;TMove&gt;, MoveResult&lt;TState&gt;&gt;
+          - applyMove: UseCase&lt;ApplyMoveRequest&lt;TMove&gt;, MoveResult&lt;TCell, TCoord&gt;&gt;
         </text>
         <text x="352" y="356" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - mapper: StateMapper&lt;TState&gt;
+          - mapper: StateMapper&lt;TCell&gt;
         </text>
         <text x="352" y="380" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + onMove(move: TMove): Promise&lt;void&gt;
@@ -550,18 +575,18 @@
 
         <!-- Class: GameViewModel (value object) -->
         <rect
-          x="776"
+          x="832"
           y="284"
-          width="200"
-          height="136"
+          width="160"
+          height="152"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="776" y1="332" x2="976" y2="332" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="832" y1="332" x2="992" y2="332" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="876"
+          x="912"
           y="302"
           fill="#5b6873"
           font-size="8"
@@ -572,7 +597,7 @@
           «value object»
         </text>
         <text
-          x="876"
+          x="912"
           y="320"
           fill="#17212a"
           font-size="12"
@@ -582,36 +607,39 @@
         >
           GameViewModel
         </text>
-        <text x="792" y="348" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="848" y="348" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + cells: CellView[]
         </text>
-        <text x="792" y="364" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="848" y="364" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + score: number
         </text>
-        <text x="792" y="380" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="848" y="380" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + canUndo: boolean
         </text>
-        <text x="792" y="396" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="848" y="396" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + canRedo: boolean
         </text>
-        <text x="792" y="412" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="848" y="412" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + phase: string
+        </text>
+        <text x="848" y="428" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + error: string [0..1]
         </text>
 
         <!-- Class: StateMapper (interface, strategy) -->
         <rect
-          x="56"
+          x="44"
           y="284"
-          width="216"
+          width="236"
           height="72"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="56" y1="332" x2="272" y2="332" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="44" y1="332" x2="280" y2="332" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="164"
+          x="162"
           y="302"
           fill="#5b6873"
           font-size="8"
@@ -622,7 +650,7 @@
           «interface» «Strategy»
         </text>
         <text
-          x="164"
+          x="162"
           y="320"
           fill="#17212a"
           font-size="12"
@@ -632,15 +660,15 @@
         >
           StateMapper
         </text>
-        <text x="72" y="348" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + toCells(state: TState): CellView[]
+        <text x="60" y="348" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + toView(cell: TCell): CellView
         </text>
 
         <!-- Class: LinesStateMapper -->
         <rect
-          x="56"
+          x="44"
           y="412"
-          width="216"
+          width="236"
           height="40"
           rx="6"
           fill="#ffffff"
@@ -648,7 +676,7 @@
           stroke-width="1"
         />
         <text
-          x="164"
+          x="162"
           y="437"
           fill="#17212a"
           font-size="12"
@@ -697,9 +725,9 @@
 
         <!-- UML template boxes: type parameters on the top-right corner -->
         <rect
-          x="648"
+          x="676"
           y="274"
-          width="84"
+          width="112"
           height="18"
           rx="2"
           fill="#ffffff"
@@ -708,17 +736,17 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="690"
+          x="732"
           y="286"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TMove, TState
+          TCell, TCoord, TMove
         </text>
         <rect
-          x="236"
+          x="244"
           y="274"
           width="48"
           height="18"
@@ -729,16 +757,37 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="260"
+          x="268"
           y="286"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TState
+          TCell
         </text>
 
+        <rect
+          x="928"
+          y="78"
+          width="60"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="958"
+          y="90"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCellView
+        </text>
         <!-- Footnote: classes the budget leaves out -->
         <text
           x="24"
@@ -759,12 +808,22 @@
         >
           Q8: the folder of BoardView and the cell renderers is open.
         </text>
-
-        <!-- Legend -->
-        <line x1="24" y1="648" x2="1016" y2="648" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="666"
+          y="640"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          MoveResult is plain data with no Board (decision 29). onMove() reads a failed Result and
+          puts its message in GameViewModel.error, so no exception reaches the screen (decision 28).
+        </text>
+
+        <!-- Legend -->
+        <line x1="24" y1="664" x2="1016" y2="664" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <text
+          x="24"
+          y="682"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -775,17 +834,35 @@
 
         <line
           x1="24"
-          y1="684"
+          y1="700"
           x2="52"
-          y2="684"
+          y2="700"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#adpresenter-triangle)"
+        />
+        <text
+          x="60"
+          y="704"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Inheritance
+        </text>
+        <line
+          x1="144"
+          y1="700"
+          x2="172"
+          y2="700"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
           marker-end="url(#adpresenter-triangle)"
         />
         <text
-          x="60"
-          y="688"
+          x="180"
+          y="704"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -793,95 +870,73 @@
           Realization
         </text>
         <line
-          x1="184"
-          y1="684"
-          x2="212"
-          y2="684"
-          stroke="#5b6873"
+          x1="264"
+          y1="700"
+          x2="292"
+          y2="700"
+          stroke="#17212a"
           stroke-width="1"
-          marker-end="url(#adpresenter-open)"
+          marker-start="url(#adpresenter-diamond-filled)"
         />
         <text
-          x="220"
-          y="688"
+          x="300"
+          y="704"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Association
+          Composition · attribute it creates
         </text>
         <line
-          x1="344"
-          y1="684"
-          x2="372"
-          y2="684"
+          x1="488"
+          y1="700"
+          x2="516"
+          y2="700"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#adpresenter-diamond-hollow)"
+        />
+        <text
+          x="524"
+          y="704"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aggregation · attribute it receives
+        </text>
+        <line
+          x1="720"
+          y1="700"
+          x2="748"
+          y2="700"
           stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#adpresenter-open)"
         />
         <text
-          x="380"
-          y="688"
+          x="756"
+          y="704"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Dependency · uses
-        </text>
-        <rect
-          x="504"
-          y="678"
-          width="28"
-          height="12"
-          rx="2"
-          fill="#ffffff"
-          stroke="#7d8a94"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-        />
-        <text
-          x="540"
-          y="688"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Reference box · detailed in another view
-        </text>
-        <rect
-          x="744"
-          y="678"
-          width="28"
-          height="12"
-          rx="2"
-          fill="rgba(15,111,116,0.10)"
-          stroke="#0f6f74"
-          stroke-width="1"
-        />
-        <text
-          x="780"
-          y="688"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Teal · focal class
+          Use · parameter, return, local or new
         </text>
 
         <rect
           x="24"
-          y="704"
+          y="720"
           width="28"
           height="12"
           rx="2"
-          fill="#eceef0"
-          stroke="rgba(75,85,99,0.45)"
+          fill="#cfdcf3"
+          stroke="rgba(30,58,138,0.50)"
           stroke-width="1"
         />
         <text
           x="60"
-          y="713"
+          y="729"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -890,7 +945,7 @@
         </text>
         <rect
           x="184"
-          y="704"
+          y="720"
           width="28"
           height="12"
           rx="2"
@@ -900,7 +955,7 @@
         />
         <text
           x="220"
-          y="713"
+          y="729"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -909,17 +964,17 @@
         </text>
         <rect
           x="344"
-          y="704"
+          y="720"
           width="28"
           height="12"
           rx="2"
-          fill="#e3f5e6"
-          stroke="rgba(21,128,61,0.45)"
+          fill="#efe7f8"
+          stroke="rgba(126,34,206,0.40)"
           stroke-width="1"
         />
         <text
           x="380"
-          y="713"
+          y="729"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -928,7 +983,7 @@
         </text>
         <rect
           x="504"
-          y="704"
+          y="720"
           width="28"
           height="12"
           rx="2"
@@ -939,7 +994,7 @@
         />
         <text
           x="540"
-          y="713"
+          y="729"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -948,7 +1003,7 @@
         </text>
         <rect
           x="744"
-          y="704"
+          y="720"
           width="28"
           height="12"
           rx="2"
@@ -959,12 +1014,52 @@
         />
         <text
           x="780"
-          y="713"
+          y="729"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Corner box · type parameters
+        </text>
+
+        <rect
+          x="24"
+          y="744"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="60"
+          y="754"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Reference box · detailed in another view
+        </text>
+        <rect
+          x="280"
+          y="744"
+          width="28"
+          height="12"
+          rx="2"
+          fill="rgba(15,111,116,0.10)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <text
+          x="316"
+          y="754"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Teal · focal class
         </text>
       </svg>
     </div>

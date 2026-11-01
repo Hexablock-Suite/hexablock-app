@@ -64,17 +64,18 @@
       <h1>Wiring: the drivers and the composition root</h1>
 
       <svg
-        viewBox="0 0 1040 736"
+        viewBox="0 0 1040 777"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="adwiring-title adwiring-desc"
       >
         <title id="adwiring-title">HexaBlock wiring · UML class diagram</title>
         <desc id="adwiring-desc">
-          Class diagram across layers 4 and 3 showing the CompositionRoot singleton in layer 4
-          creating the four drivers SystemClock, SeededRandomSource, ConsoleLogger and
-          SecureSessionStore, which implement the Clock, RandomSource, Logger and SessionStore
-          ports, and creating InMemoryRunningGameStore and GameEventBus in layer 3.
+          Class diagram across layers 4 and 3 showing CompositionRoot in layer 4 creating each
+          driver once: AudioManager, SeededRandomSource, ConsoleLogger and SessionManager, which
+          implement the GameEventListener, RandomSource, Logger and SessionStore interfaces, and
+          creating InMemoryRunningGameStore and GameEventBus in layer 3, so single-scope injection
+          replaces a classic Singleton.
         </desc>
         <defs>
           <marker
@@ -88,6 +89,44 @@
           >
             <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
           </marker>
+          <marker
+            id="adwiring-triangle"
+            markerWidth="16"
+            markerHeight="12"
+            refX="15"
+            refY="6"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          </marker>
+          <marker
+            id="adwiring-diamond-filled"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 5, 9 0, 18 5, 9 10" fill="#17212a" />
+          </marker>
+          <marker
+            id="adwiring-diamond-hollow"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon
+              points="0 5, 9 0, 18 5, 9 10"
+              fill="#ffffff"
+              stroke="#17212a"
+              stroke-width="1"
+            />
+          </marker>
         </defs>
 
         <rect width="100%" height="100%" fill="#f3f5f6" />
@@ -99,14 +138,14 @@
           width="992"
           height="392"
           rx="8"
-          fill="#eceef0"
-          stroke="rgba(75,85,99,0.45)"
+          fill="#cfdcf3"
+          stroke="rgba(30,58,138,0.50)"
           stroke-width="1"
         />
         <text
           x="40"
           y="44"
-          fill="#4b5563"
+          fill="#1e3a8a"
           font-size="8"
           font-weight="500"
           font-family="'IBM Plex Mono', monospace"
@@ -182,20 +221,19 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.14em"
         >
-          SINGLETON · §3.3 · Q9
+          SINGLE SCOPE · §3.3 · Q9
         </text>
 
-        <!-- Relationships (drawn before boxes): CompositionRoot creates each object, dependency «create» -->
-        <!-- To SystemClock -->
+        <!-- Relationships (drawn before boxes): CompositionRoot creates each object. It keeps two as attributes (composition) and only creates the others (use «create»). -->
+        <!-- CompositionRoot creates AudioManager and keeps it: composition -->
         <path
           d="M272 316 H152 Q144 316 144 308 V160"
           fill="none"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#adwiring-open)"
+          marker-start="url(#adwiring-diamond-filled)"
         />
-        <!-- To SeededRandomSource -->
+        <!-- CompositionRoot creates SeededRandomSource: use «create» -->
         <line
           x1="432"
           y1="252"
@@ -203,10 +241,9 @@
           y2="184"
           stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#adwiring-open)"
         />
-        <!-- To ConsoleLogger -->
+        <!-- CompositionRoot creates ConsoleLogger: use «create» -->
         <line
           x1="560"
           y1="252"
@@ -214,19 +251,17 @@
           y2="160"
           stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#adwiring-open)"
         />
-        <!-- To SecureSessionStore -->
+        <!-- CompositionRoot creates SessionManager and keeps it: composition -->
         <path
           d="M592 316 H840 Q848 316 848 308 V184"
           fill="none"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#adwiring-open)"
+          marker-start="url(#adwiring-diamond-filled)"
         />
-        <!-- To GameEventBus, down from layer 4 to layer 3 -->
+        <!-- CompositionRoot creates GameEventBus: use «create», down from layer 4 to layer 3 -->
         <line
           x1="352"
           y1="380"
@@ -234,10 +269,9 @@
           y2="472"
           stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#adwiring-open)"
         />
-        <!-- To InMemoryRunningGameStore, down from layer 4 to layer 3 -->
+        <!-- CompositionRoot creates InMemoryRunningGameStore: use «create», down from layer 4 to layer 3 -->
         <line
           x1="560"
           y1="380"
@@ -245,37 +279,86 @@
           y2="472"
           stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="4,3"
           marker-end="url(#adwiring-open)"
         />
 
         <!-- Arrow labels -->
-        <rect x="184" y="296" width="48" height="12" rx="2" fill="#eceef0" />
+        <rect x="436" y="206" width="47" height="12" rx="2" fill="#cfdcf3" />
         <text
-          x="208"
-          y="305"
+          x="438"
+          y="215"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
+          text-anchor="start"
           letter-spacing="0.06em"
         >
           «create»
         </text>
-        <rect x="692" y="296" width="48" height="12" rx="2" fill="#eceef0" />
+        <rect x="564" y="206" width="47" height="12" rx="2" fill="#cfdcf3" />
         <text
-          x="716"
-          y="305"
+          x="566"
+          y="215"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          «create»
+        </text>
+        <rect x="356" y="453" width="47" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="358"
+          y="462"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          «create»
+        </text>
+        <rect x="564" y="453" width="47" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="566"
+          y="462"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
           letter-spacing="0.06em"
         >
           «create»
         </text>
 
-        <!-- Class: SystemClock (driver) -->
+        <!-- Role names and multiplicities at the part end -->
+        <rect x="148" y="167" width="38" height="12" rx="2" fill="#cfdcf3" />
+        <text
+          x="150"
+          y="176"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          audio
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <rect x="852" y="206" width="48" height="12" rx="2" fill="#cfdcf3" />
+        <text
+          x="854"
+          y="215"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          session
+          <tspan font-weight="600">1</tspan>
+        </text>
+
+        <!-- Class: AudioManager (audio facade, single scope) -->
         <rect
           x="64"
           y="120"
@@ -295,7 +378,7 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          SystemClock
+          AudioManager
         </text>
 
         <!-- Class: SeededRandomSource (driver) -->
@@ -348,7 +431,7 @@
           ConsoleLogger
         </text>
 
-        <!-- Class: SecureSessionStore (driver) -->
+        <!-- Class: SessionManager (driver, single scope) -->
         <rect
           x="728"
           y="120"
@@ -369,13 +452,13 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          SecureSessionStore
+          SessionManager
         </text>
         <text x="744" y="176" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           secure storage library to choose
         </text>
 
-        <!-- Class: CompositionRoot (focal, singleton) -->
+        <!-- Class: CompositionRoot (focal, composition root) -->
         <rect
           x="272"
           y="252"
@@ -399,7 +482,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «Singleton» · Q9
+          «composition root» · Q9
         </text>
         <text
           x="432"
@@ -413,20 +496,13 @@
           CompositionRoot
         </text>
         <text x="288" y="316" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - bus: GameEventBus
+          - audio: AudioManager
         </text>
         <text x="288" y="332" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - logger: Logger
+          - session: SessionManager
         </text>
-        <text
-          x="288"
-          y="356"
-          fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-          text-decoration="underline"
-        >
-          + instance(): CompositionRoot
+        <text x="288" y="356" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + start(): void
         </text>
         <text x="288" y="372" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + gameUseCases(gameId: GameId): GameUseCases
@@ -472,16 +548,16 @@
         <rect
           x="512"
           y="472"
-          width="320"
+          width="336"
           height="64"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="512" y1="512" x2="832" y2="512" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="512" y1="512" x2="848" y2="512" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="672"
+          x="680"
           y="497"
           fill="#17212a"
           font-size="12"
@@ -492,14 +568,14 @@
           InMemoryRunningGameStore
         </text>
         <text x="528" y="528" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - game: GameEngine&lt;TCell, TMove, TState&gt; [0..1]
+          - game: GameEngine&lt;TCell, TCoord, TMove, TState&gt; [0..1]
         </text>
 
         <!-- UML template boxes: type parameters on the top-right corner -->
         <rect
-          x="724"
+          x="704"
           y="462"
-          width="120"
+          width="156"
           height="18"
           rx="2"
           fill="#ffffff"
@@ -508,21 +584,21 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="784"
+          x="782"
           y="474"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TCell, TMove, TState
+          TCell, TCoord, TMove, TState
         </text>
 
-        <!-- Lollipops: port each class implements, with its binding -->
+        <!-- Lollipops: interface or port each class implements, with its binding -->
         <line x1="80" y1="120" x2="80" y2="104" stroke="#17212a" stroke-width="1" />
         <circle cx="80" cy="99" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text x="91" y="102" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          Clock
+          GameEventListener
         </text>
         <line x1="288" y1="120" x2="288" y2="104" stroke="#17212a" stroke-width="1" />
         <circle cx="288" cy="99" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
@@ -542,7 +618,7 @@
         <line x1="528" y1="536" x2="528" y2="552" stroke="#17212a" stroke-width="1" />
         <circle cx="528" cy="557" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text x="539" y="560" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          RunningGameStore‹TCell, TMove, TState›
+          RunningGameStore‹TCell, TCoord, TMove, TState›
         </text>
 
         <!-- Footnote -->
@@ -553,8 +629,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          The composition root builds each adapter once, wraps every use case in its aspects and
-          gives each screen its presenter.
+          The composition root creates each driver and adapter once and injects it. No class has a
+          static instance(), so tests can pass their own (decision 18).
         </text>
         <text
           x="24"
@@ -563,14 +639,25 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          It is the only module that names a variant factory. Q9: its file is open.
+          Not drawn: SystemClock, created the same way. CompositionRoot is the only module that
+          names a variant factory. Q9: its file is open.
+        </text>
+        <text
+          x="24"
+          y="640"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          InMemoryRunningGameStore keeps the running game, the aggregate root, for the use cases of
+          layer 2 only. A presenter never gets the engine: it gets a plain MoveResult (decision 29).
         </text>
 
         <!-- Legend -->
-        <line x1="24" y1="648" x2="1016" y2="648" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <line x1="24" y1="664" x2="1016" y2="664" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="666"
+          y="682"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -581,48 +668,109 @@
 
         <line
           x1="24"
-          y1="684"
+          y1="700"
           x2="52"
-          y2="684"
-          stroke="#5b6873"
+          y2="700"
+          stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#adwiring-open)"
+          marker-end="url(#adwiring-triangle)"
         />
         <text
           x="60"
-          y="688"
+          y="704"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Dependency · «create»
+          Inheritance
         </text>
-        <line x1="184" y1="684" x2="200" y2="684" stroke="#17212a" stroke-width="1" />
-        <circle cx="205" cy="684" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line
+          x1="144"
+          y1="700"
+          x2="172"
+          y2="700"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#adwiring-triangle)"
+        />
         <text
-          x="220"
-          y="688"
+          x="180"
+          y="704"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Lollipop · port it implements + binding
+          Realization
+        </text>
+        <line
+          x1="264"
+          y1="700"
+          x2="292"
+          y2="700"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#adwiring-diamond-filled)"
+        />
+        <text
+          x="300"
+          y="704"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Composition · attribute it creates
+        </text>
+        <line
+          x1="488"
+          y1="700"
+          x2="516"
+          y2="700"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#adwiring-diamond-hollow)"
+        />
+        <text
+          x="524"
+          y="704"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aggregation · attribute it receives
+        </text>
+        <line
+          x1="720"
+          y1="700"
+          x2="748"
+          y2="700"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#adwiring-open)"
+        />
+        <text
+          x="756"
+          y="704"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Use · parameter, return, local or new
         </text>
 
         <rect
           x="24"
-          y="704"
+          y="720"
           width="28"
           height="12"
           rx="2"
-          fill="#eceef0"
-          stroke="rgba(75,85,99,0.45)"
+          fill="#cfdcf3"
+          stroke="rgba(30,58,138,0.50)"
           stroke-width="1"
         />
         <rect
           x="56"
-          y="704"
+          y="720"
           width="28"
           height="12"
           rx="2"
@@ -632,7 +780,7 @@
         />
         <text
           x="92"
-          y="713"
+          y="729"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -641,7 +789,7 @@
         </text>
         <rect
           x="216"
-          y="704"
+          y="720"
           width="28"
           height="12"
           rx="2"
@@ -652,7 +800,7 @@
         />
         <text
           x="252"
-          y="713"
+          y="729"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -661,7 +809,7 @@
         </text>
         <rect
           x="440"
-          y="704"
+          y="720"
           width="28"
           height="12"
           rx="2"
@@ -672,7 +820,7 @@
         />
         <text
           x="476"
-          y="713"
+          y="729"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -681,7 +829,7 @@
         </text>
         <rect
           x="616"
-          y="704"
+          y="720"
           width="28"
           height="12"
           rx="2"
@@ -692,7 +840,7 @@
         />
         <text
           x="652"
-          y="713"
+          y="729"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -701,7 +849,7 @@
         </text>
         <rect
           x="840"
-          y="704"
+          y="720"
           width="28"
           height="12"
           rx="2"
@@ -711,12 +859,24 @@
         />
         <text
           x="876"
-          y="713"
+          y="729"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
+        </text>
+
+        <line x1="24" y1="750" x2="40" y2="750" stroke="#17212a" stroke-width="1" />
+        <circle cx="45" cy="750" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text
+          x="60"
+          y="754"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Lollipop · interface or port it implements + binding
         </text>
       </svg>
     </div>

@@ -8,9 +8,15 @@ describe('domain purity gate (Oxlint)', () => {
     const result = lintFixture('test/fixtures/lint/src/domain/engine/ambient-nondeterminism.ts');
 
     expect(result.status).not.toBe(0);
-    expect(result.output).toContain(`${rule}: Domain code must not use Math.random`);
-    expect(result.output.split(`${rule}: Domain code must not use Date.now`)).toHaveLength(3);
-    expect(result.output).toContain(`${rule}: Domain code must not call new Date()`);
+    expect(result.output).toContain(
+      `${rule}: Domain and application code must not use Math.random`,
+    );
+    expect(
+      result.output.split(`${rule}: Domain and application code must not use Date.now`),
+    ).toHaveLength(3);
+    expect(result.output).toContain(
+      `${rule}: Domain and application code must not call new Date()`,
+    );
   });
 
   it('should_pass_lint_when_domain_takes_injected_clock_and_random_source', () => {
@@ -18,6 +24,19 @@ describe('domain purity gate (Oxlint)', () => {
 
     expect(result.output).not.toContain(rule);
     expect(result.status).toBe(0);
+  });
+
+  it('should_fail_lint_when_application_reads_ambient_time_or_randomness', () => {
+    const result = lintFixture('test/fixtures/lint/src/application/timing-aspect.ts');
+
+    expect(result.status).not.toBe(0);
+    expect(result.output).toContain(`${rule}: Domain and application code must not use Date.now`);
+    expect(result.output).toContain(
+      `${rule}: Domain and application code must not use Math.random`,
+    );
+    expect(result.output).toContain(
+      `${rule}: Domain and application code must not call new Date()`,
+    );
   });
 
   it('should_pass_lint_when_infrastructure_reads_system_clock', () => {
