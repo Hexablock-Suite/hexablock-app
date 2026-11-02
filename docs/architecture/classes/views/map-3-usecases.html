@@ -71,7 +71,7 @@
       >
         <title id="mapuc-title">HexaBlock use cases map · UML class diagram</title>
         <desc id="mapuc-desc">
-          Overview map of the 35 layer 2 classes in 7 groups: the aspect decorators wrap the UseCase
+          Overview map of the 36 layer 2 classes in 7 groups: the aspect decorators wrap the UseCase
           input port, the game, progress and account use cases implement it and use the output
           ports, and the request and response models and the Result type travel through them; each
           group names the view that shows its members.
@@ -401,7 +401,7 @@
         </text>
 
         <!-- Dependencies between groups (drawn before chips) -->
-        <!-- Aspects keep the inner UseCase they receive: aggregation, down -->
+        <!-- Aspects keep the inner UseCase they receive: aggregation, down, kept because Decorator holds it -->
         <line
           x1="520"
           y1="192"
@@ -444,37 +444,37 @@
           stroke-dasharray="5,4"
           marker-end="url(#mapuc-triangle)"
         />
-        <!-- Game use cases keep the output ports they receive: aggregation, down -->
+        <!-- Game use cases keep the output ports they receive in attributes: use, down -->
         <line
           x1="288"
           y1="610"
           x2="288"
           y2="690"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#mapuc-diamond-hollow)"
+          marker-end="url(#mapuc-open)"
         />
 
-        <!-- Progress use cases keep the output ports they receive: aggregation, down -->
+        <!-- Progress use cases keep the output ports they receive in attributes: use, down -->
         <line
           x1="532"
           y1="560"
           x2="532"
           y2="690"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#mapuc-diamond-hollow)"
+          marker-end="url(#mapuc-open)"
         />
 
-        <!-- Account and settings keep the output ports they receive: aggregation, down -->
+        <!-- Account and settings keep the output ports they receive in attributes: use, down -->
         <line
           x1="764"
           y1="560"
           x2="764"
           y2="690"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#mapuc-diamond-hollow)"
+          marker-end="url(#mapuc-open)"
         />
 
         <!-- Arrow labels -->
@@ -1464,6 +1464,34 @@
             </tspan>
           </text>
         </g>
+        <g data-class="UseCaseLogEntry">
+          <rect
+            x="440"
+            y="970"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="520"
+            y="982"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="520" y="995" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              UseCaseLogEntry
+            </tspan>
+          </text>
+        </g>
         <!-- Footnote -->
         <text
           x="24"
@@ -1549,43 +1577,43 @@
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Composition · attribute it creates
+          Composition · in-layer pattern or domain part
         </text>
         <line
-          x1="488"
+          x1="504"
           y1="1144"
-          x2="516"
+          x2="532"
           y2="1144"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#mapuc-diamond-hollow)"
         />
         <text
-          x="524"
+          x="540"
           y="1148"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Aggregation · attribute it receives
+          Aggregation · in-layer pattern or domain part
         </text>
         <line
-          x1="720"
+          x1="744"
           y1="1144"
-          x2="748"
+          x2="772"
           y2="1144"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#mapuc-open)"
         />
         <text
-          x="756"
+          x="780"
           y="1148"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Use · parameter, return, local or new
+          Use · attribute, parameter, return, local or new
         </text>
 
         <rect

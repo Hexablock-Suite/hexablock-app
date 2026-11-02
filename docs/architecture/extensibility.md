@@ -13,8 +13,8 @@ Statement §4.3 asks for a «Diagrama que muestre el motor genérico en el centr
 - A package (a box with a tab) is one variant folder. It lists the classes of that variant, and one realization arrow says that the variant implements the extension points.
 - A list box names several classes of one kind, for example the local adapters.
 - A realization arrow points from an extension to the contract it implements. A solid line with a hollow triangle is inheritance.
-- A diamond marks an attribute. The part end shows the attribute name and its multiplicity, also when it is `1`. A hollow diamond is an object that the class receives (aggregation, decision 23). A filled diamond is an object that the class creates (composition).
-- A solid line with an open arrow is a use: a parameter, a return value, a local variable or a `new`. Its label is a verb, for example `PASSED TO`.
+- A solid line with an open arrow is a use: an attribute, a parameter, a return value, a local variable or a `new`. Every dependency between two layers is a use. For an attribute, the arrow end shows the attribute name and its multiplicity. Otherwise the label is a verb, for example `PASSED TO`.
+- Inside one layer, a diamond marks an attribute only where it shows a pattern or a domain relation (decision 23). The part end shows the attribute name and its multiplicity, also when it is `1`. A hollow diamond is an object that the class receives (aggregation). A filled diamond is an object that the class creates (composition).
 - The dashed box at the top right of a class holds its type parameters (UML template notation). A bound on a parameter goes in the same box, never on a line.
 - Every operation shows the type of each parameter and its return type. View 1 abbreviates the type arguments of attributes and return types, for example `IGameRules` for `IGameRules<TCell, TMove, TState>`, and leaves out the `gameId` attribute of `IVariantFactory`. In every view, the corner box of `GameEngine` leaves out the bound of `TState`. The views of the [class diagram](classes.md) show them in full.
 

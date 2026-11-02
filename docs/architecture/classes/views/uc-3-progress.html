@@ -64,7 +64,7 @@
       <h1>Progress, levels and leaderboard: use cases over output ports</h1>
 
       <svg
-        viewBox="0 0 1040 748"
+        viewBox="0 0 1040 868"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="ucprogress-title ucprogress-desc"
@@ -136,7 +136,7 @@
           x="24"
           y="24"
           width="992"
-          height="540"
+          height="660"
           rx="8"
           fill="#efe7f8"
           stroke="rgba(126,34,206,0.40)"
@@ -159,7 +159,7 @@
           x="48"
           y="64"
           width="272"
-          height="476"
+          height="596"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -180,7 +180,7 @@
 
         <rect
           x="456"
-          y="184"
+          y="224"
           width="464"
           height="356"
           rx="8"
@@ -191,7 +191,7 @@
         />
         <text
           x="468"
-          y="200"
+          y="240"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -212,49 +212,49 @@
           stroke-width="1"
           marker-end="url(#ucprogress-open)"
         />
-        <!-- ListLevels keeps the LevelRepository it receives: aggregation -->
+        <!-- ListLevels keeps the LevelRepository it receives in an attribute: use -->
         <path
-          d="M304 172 H392 Q400 172 400 180 V240 Q400 248 408 248 H472"
+          d="M304 172 H392 Q400 172 400 180 V280 Q400 288 408 288 H472"
           fill="none"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#ucprogress-diamond-hollow)"
+          marker-end="url(#ucprogress-open)"
         />
-        <!-- ListLevels keeps the ProgressRepository it receives: aggregation -->
+        <!-- ListLevels keeps the ProgressRepository it receives in an attribute: use -->
         <path
-          d="M304 204 H360 Q368 204 368 212 V324 Q368 332 376 332 H472"
+          d="M304 204 H360 Q368 204 368 212 V364 Q368 372 376 372 H472"
           fill="none"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#ucprogress-diamond-hollow)"
+          marker-end="url(#ucprogress-open)"
         />
-        <!-- SaveProgress keeps the ProgressRepository it receives: aggregation -->
+        <!-- SaveProgress keeps the ProgressRepository it receives in an attribute: use -->
         <line
           x1="304"
-          y1="356"
+          y1="396"
           x2="472"
-          y2="356"
-          stroke="#17212a"
+          y2="396"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#ucprogress-diamond-hollow)"
+          marker-end="url(#ucprogress-open)"
         />
-        <!-- SyncLeaderboard keeps the ProgressRepository it receives: aggregation -->
+        <!-- SyncLeaderboard keeps the ProgressRepository it receives in an attribute: use -->
         <path
-          d="M304 432 H376 Q384 432 384 424 V388 Q384 380 392 380 H472"
+          d="M304 512 H376 Q384 512 384 504 V428 Q384 420 392 420 H472"
           fill="none"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#ucprogress-diamond-hollow)"
+          marker-end="url(#ucprogress-open)"
         />
-        <!-- SyncLeaderboard keeps the LeaderboardGateway it receives: aggregation -->
+        <!-- SyncLeaderboard keeps the LeaderboardGateway it receives in an attribute: use -->
         <line
           x1="304"
-          y1="480"
+          y1="540"
           x2="472"
-          y2="480"
-          stroke="#17212a"
+          y2="540"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#ucprogress-diamond-hollow)"
+          marker-end="url(#ucprogress-open)"
         />
 
         <!-- Arrow labels -->
@@ -272,10 +272,10 @@
         </text>
 
         <!-- Role names and multiplicities at the part end -->
-        <rect x="411" y="235" width="43" height="12" rx="2" fill="#efe7f8" />
+        <rect x="411" y="275" width="43" height="12" rx="2" fill="#efe7f8" />
         <text
           x="452"
-          y="244"
+          y="284"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -284,10 +284,10 @@
           levels
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="402" y="319" width="52" height="12" rx="2" fill="#efe7f8" />
+        <rect x="402" y="359" width="52" height="12" rx="2" fill="#efe7f8" />
         <text
           x="452"
-          y="328"
+          y="368"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -296,10 +296,10 @@
           progress
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="392" y="343" width="62" height="12" rx="2" fill="#efe7f8" />
+        <rect x="392" y="383" width="62" height="12" rx="2" fill="#efe7f8" />
         <text
           x="452"
-          y="352"
+          y="392"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -308,10 +308,10 @@
           repository
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="402" y="367" width="52" height="12" rx="2" fill="#efe7f8" />
+        <rect x="402" y="407" width="52" height="12" rx="2" fill="#efe7f8" />
         <text
           x="452"
-          y="376"
+          y="416"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -320,10 +320,10 @@
           progress
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="406" y="467" width="48" height="12" rx="2" fill="#efe7f8" />
+        <rect x="406" y="527" width="48" height="12" rx="2" fill="#efe7f8" />
         <text
           x="452"
-          y="476"
+          y="536"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -338,7 +338,7 @@
           x="64"
           y="120"
           width="240"
-          height="100"
+          height="140"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -386,22 +386,29 @@
         <text x="80" y="212" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - progress: ProgressRepository
         </text>
+        <line x1="64" y1="220" x2="304" y2="220" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <text x="80" y="236" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + execute(request: GameId):
+        </text>
+        <text x="96" y="252" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Promise&lt;Result&lt;LevelSummary[]&gt;&gt;
+        </text>
 
         <!-- Class: SaveProgress (use case) -->
         <rect
           x="64"
-          y="268"
+          y="308"
           width="240"
-          height="100"
+          height="140"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="64" y1="328" x2="304" y2="328" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="64" y1="368" x2="304" y2="368" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="184"
-          y="286"
+          y="326"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -412,7 +419,7 @@
         </text>
         <text
           x="184"
-          y="304"
+          y="344"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -423,7 +430,7 @@
         </text>
         <text
           x="184"
-          y="318"
+          y="358"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -432,28 +439,35 @@
         >
           APP-FR-09 · APP-FR-13
         </text>
-        <text x="80" y="344" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="384" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - repository: ProgressRepository
         </text>
-        <text x="80" y="360" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="400" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - model: IProgressModel
+        </text>
+        <line x1="64" y1="408" x2="304" y2="408" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="80" y="424" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + execute(request: GameResult):
+        </text>
+        <text x="96" y="440" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Promise&lt;Result&lt;ProgressRecord&gt;&gt;
         </text>
 
         <!-- Class: SyncLeaderboard (use case) -->
         <rect
           x="64"
-          y="416"
+          y="496"
           width="240"
-          height="100"
+          height="140"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="64" y1="476" x2="304" y2="476" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="64" y1="556" x2="304" y2="556" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="184"
-          y="434"
+          y="514"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -464,7 +478,7 @@
         </text>
         <text
           x="184"
-          y="452"
+          y="532"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -475,7 +489,7 @@
         </text>
         <text
           x="184"
-          y="466"
+          y="546"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -484,11 +498,18 @@
         >
           APP-FR-14
         </text>
-        <text x="80" y="492" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="572" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - gateway: LeaderboardGateway
         </text>
-        <text x="80" y="508" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="588" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - progress: ProgressRepository
+        </text>
+        <line x1="64" y1="596" x2="304" y2="596" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="80" y="612" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + execute(request: GameId):
+        </text>
+        <text x="96" y="628" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Promise&lt;Result&lt;LeaderboardEntry[]&gt;&gt;
         </text>
 
         <!-- Class: LevelSummary (value object) -->
@@ -538,7 +559,7 @@
         <!-- Class: LevelRepository (interface, port) -->
         <rect
           x="472"
-          y="212"
+          y="252"
           width="336"
           height="72"
           rx="6"
@@ -546,10 +567,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="472" y1="260" x2="808" y2="260" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="472" y1="300" x2="808" y2="300" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="640"
-          y="230"
+          y="270"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -560,7 +581,7 @@
         </text>
         <text
           x="640"
-          y="248"
+          y="288"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -569,14 +590,14 @@
         >
           LevelRepository
         </text>
-        <text x="488" y="276" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="488" y="316" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + list(gameId: GameId): Promise&lt;LevelDefinition[]&gt;
         </text>
 
         <!-- Class: ProgressRepository (interface, port) -->
         <rect
           x="472"
-          y="316"
+          y="356"
           width="392"
           height="88"
           rx="6"
@@ -584,10 +605,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="472" y1="364" x2="864" y2="364" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="472" y1="404" x2="864" y2="404" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="668"
-          y="334"
+          y="374"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -598,7 +619,7 @@
         </text>
         <text
           x="668"
-          y="352"
+          y="392"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -607,17 +628,17 @@
         >
           ProgressRepository
         </text>
-        <text x="488" y="380" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="488" y="420" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + load(gameId: GameId): Promise&lt;ProgressRecord | undefined&gt;
         </text>
-        <text x="488" y="396" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="488" y="436" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + save(gameId: GameId, record: ProgressRecord): Promise&lt;void&gt;
         </text>
 
         <!-- Class: LeaderboardGateway (interface, port) -->
         <rect
           x="472"
-          y="436"
+          y="476"
           width="432"
           height="88"
           rx="6"
@@ -625,10 +646,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="472" y1="484" x2="904" y2="484" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="472" y1="524" x2="904" y2="524" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="688"
-          y="454"
+          y="494"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -639,7 +660,7 @@
         </text>
         <text
           x="688"
-          y="472"
+          y="512"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -648,10 +669,10 @@
         >
           LeaderboardGateway
         </text>
-        <text x="488" y="500" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="488" y="540" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + submit(result: GameResult): Promise&lt;void&gt;
         </text>
-        <text x="488" y="516" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="488" y="556" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + top(gameId: GameId, levelId?: string): Promise&lt;LeaderboardEntry[]&gt;
         </text>
 
@@ -661,21 +682,21 @@
         <text x="91" y="102" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           UseCase‹GameId, LevelSummary[]›
         </text>
-        <line x1="80" y1="268" x2="80" y2="252" stroke="#17212a" stroke-width="1" />
-        <circle cx="80" cy="247" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="91" y="250" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="80" y1="308" x2="80" y2="292" stroke="#17212a" stroke-width="1" />
+        <circle cx="80" cy="287" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="91" y="290" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           UseCase‹GameResult, ProgressRecord›
         </text>
-        <line x1="80" y1="416" x2="80" y2="400" stroke="#17212a" stroke-width="1" />
-        <circle cx="80" cy="395" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="91" y="398" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="80" y1="496" x2="80" y2="480" stroke="#17212a" stroke-width="1" />
+        <circle cx="80" cy="475" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="91" y="478" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           UseCase‹GameId, LeaderboardEntry[]›
         </text>
 
         <!-- Footnote: classes the budget leaves out -->
         <text
           x="24"
-          y="588"
+          y="708"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -685,7 +706,7 @@
         </text>
         <text
           x="24"
-          y="604"
+          y="724"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -696,19 +717,19 @@
 
         <text
           x="24"
-          y="620"
+          y="740"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          A use case gets its ports in the constructor and keeps them as attributes, so each link is
-          an aggregation (decision 23). GameResult and ProgressRecord are layer 1 types.
+          A use case keeps its ports as attributes, and each link is a use line that names the
+          attribute (decision 23). GameResult and ProgressRecord are layer 1 types.
         </text>
         <!-- Legend -->
-        <line x1="24" y1="660" x2="1016" y2="660" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <line x1="24" y1="780" x2="1016" y2="780" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="678"
+          y="798"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -719,16 +740,16 @@
 
         <line
           x1="24"
-          y1="696"
+          y1="816"
           x2="52"
-          y2="696"
+          y2="816"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#ucprogress-triangle)"
         />
         <text
           x="60"
-          y="700"
+          y="820"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -737,9 +758,9 @@
         </text>
         <line
           x1="144"
-          y1="696"
+          y1="816"
           x2="172"
-          y2="696"
+          y2="816"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -747,7 +768,7 @@
         />
         <text
           x="180"
-          y="700"
+          y="820"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -756,62 +777,62 @@
         </text>
         <line
           x1="264"
-          y1="696"
+          y1="816"
           x2="292"
-          y2="696"
+          y2="816"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#ucprogress-diamond-filled)"
         />
         <text
           x="300"
-          y="700"
+          y="820"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Composition · attribute it creates
+          Composition · in-layer pattern or domain part
         </text>
         <line
-          x1="488"
-          y1="696"
-          x2="516"
-          y2="696"
+          x1="504"
+          y1="816"
+          x2="532"
+          y2="816"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#ucprogress-diamond-hollow)"
         />
         <text
-          x="524"
-          y="700"
+          x="540"
+          y="820"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Aggregation · attribute it receives
+          Aggregation · in-layer pattern or domain part
         </text>
         <line
-          x1="720"
-          y1="696"
-          x2="748"
-          y2="696"
+          x1="744"
+          y1="816"
+          x2="772"
+          y2="816"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#ucprogress-open)"
         />
         <text
-          x="756"
-          y="700"
+          x="780"
+          y="820"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Use · parameter, return, local or new
+          Use · attribute, parameter, return, local or new
         </text>
 
         <rect
           x="24"
-          y="716"
+          y="836"
           width="28"
           height="12"
           rx="2"
@@ -821,7 +842,7 @@
         />
         <text
           x="60"
-          y="725"
+          y="845"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -830,7 +851,7 @@
         </text>
         <rect
           x="184"
-          y="716"
+          y="836"
           width="28"
           height="12"
           rx="2"
@@ -841,7 +862,7 @@
         />
         <text
           x="220"
-          y="725"
+          y="845"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -850,7 +871,7 @@
         </text>
         <rect
           x="424"
-          y="716"
+          y="836"
           width="28"
           height="12"
           rx="2"
@@ -860,18 +881,18 @@
         />
         <text
           x="460"
-          y="725"
+          y="845"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
         </text>
-        <line x1="600" y1="722" x2="616" y2="722" stroke="#17212a" stroke-width="1" />
-        <circle cx="621" cy="722" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="600" y1="842" x2="616" y2="842" stroke="#17212a" stroke-width="1" />
+        <circle cx="621" cy="842" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="636"
-          y="725"
+          y="845"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
