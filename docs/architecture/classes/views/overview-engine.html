@@ -601,35 +601,35 @@
         </text>
 
         <!-- Relationships between groups (drawn before chips) -->
-        <!-- Turn: GameEngine creates its GamePhase phase, up to lifecycle: composition, kept because State holds it -->
+        <!-- Turn uses the lifecycle phases, up: use. Groups join with uses; the diamond between GameEngine and GamePhase is in view 1 -->
         <line
           x1="848"
           y1="408"
           x2="848"
           y2="352"
           stroke-width="1"
-          marker-start="url(#ovengine-diamond-filled)"
-          stroke="#17212a"
+          marker-end="url(#ovengine-open)"
+          stroke="#5b6873"
         />
-        <!-- Turn: GameEngine holds zero or one MoveHistory it receives as history, down: aggregation, kept because the aggregate root holds its part -->
+        <!-- Turn keeps the move history, down: use. The diamond between GameEngine and MoveHistory is in view 3 -->
         <line
           x1="868"
           y1="536"
           x2="868"
           y2="592"
           stroke-width="1"
-          marker-start="url(#ovengine-diamond-hollow)"
-          stroke="#17212a"
+          marker-end="url(#ovengine-open)"
+          stroke="#5b6873"
         />
-        <!-- Turn: GameEngine holds the IScoringPolicy it receives as scoring, down: aggregation, kept because Strategy holds it -->
+        <!-- Turn scores through the scoring group, down: use. The diamond between GameEngine and IScoringPolicy is in view 4 -->
         <line
           x1="548"
           y1="536"
           x2="548"
           y2="592"
           stroke-width="1"
-          marker-start="url(#ovengine-diamond-hollow)"
-          stroke="#17212a"
+          marker-end="url(#ovengine-open)"
+          stroke="#5b6873"
         />
         <!-- Turn notifies through events, up: use -->
         <line
@@ -641,15 +641,15 @@
           marker-end="url(#ovengine-open)"
           stroke="#5b6873"
         />
-        <!-- Turn: BoardState holds the Board it receives as board, down: aggregation, kept because the aggregate holds its part -->
+        <!-- Turn plays on the board group, down: use. The diamond between BoardState and Board is in view 2 -->
         <line
           x1="264"
           y1="536"
           x2="264"
           y2="592"
           stroke-width="1"
-          marker-start="url(#ovengine-diamond-hollow)"
-          stroke="#17212a"
+          marker-end="url(#ovengine-open)"
+          stroke="#5b6873"
         />
         <!-- Board shapes from pieces, down: use -->
         <line
@@ -683,9 +683,9 @@
         />
 
         <!-- Arrow labels -->
-        <rect x="852" y="356" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="852" y="356" width="44" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="870"
+          x="874"
           y="365"
           fill="#7d8a94"
           font-size="8"
@@ -693,9 +693,9 @@
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          phase
+          CHANGES
         </text>
-        <rect x="870" y="574" width="48" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="872" y="574" width="44" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="894"
           y="583"
@@ -705,11 +705,11 @@
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          history
+          RECORDS
         </text>
-        <rect x="552" y="574" width="48" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="552" y="574" width="40" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="576"
+          x="572"
           y="583"
           fill="#7d8a94"
           font-size="8"
@@ -717,7 +717,7 @@
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          scoring
+          SCORES
         </text>
         <rect x="152" y="374" width="48" height="12" rx="2" fill="#f9f4dc" />
         <text
@@ -731,9 +731,9 @@
         >
           NOTIFIES
         </text>
-        <rect x="268" y="574" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="268" y="574" width="48" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="286"
+          x="292"
           y="583"
           fill="#7d8a94"
           font-size="8"
@@ -741,7 +741,7 @@
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          board
+          PLAYS ON
         </text>
         <rect x="202" y="801" width="66" height="12" rx="2" fill="#f9f4dc" />
         <text
@@ -778,54 +778,6 @@
           letter-spacing="0.06em"
         >
           CREATES THE PARTS
-        </text>
-        <rect x="830" y="356" width="12" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="836"
-          y="365"
-          fill="#17212a"
-          font-size="8"
-          font-weight="600"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          1
-        </text>
-        <rect x="836" y="574" width="28" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="850"
-          y="583"
-          fill="#17212a"
-          font-size="8"
-          font-weight="600"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          0..1
-        </text>
-        <rect x="532" y="574" width="12" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="538"
-          y="583"
-          fill="#17212a"
-          font-size="8"
-          font-weight="600"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          1
-        </text>
-        <rect x="248" y="574" width="12" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="254"
-          y="583"
-          fill="#17212a"
-          font-size="8"
-          font-weight="600"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          1
         </text>
         <!-- Chips: shared -->
         <g data-class="GameId">
@@ -2360,9 +2312,9 @@
           y1="1290"
           x2="292"
           y2="1290"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#ovengine-diamond-filled)"
+          marker-end="url(#ovengine-open)"
         />
         <text
           x="300"
@@ -2371,43 +2323,7 @@
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Composition · in-layer pattern or domain part
-        </text>
-        <line
-          x1="504"
-          y1="1290"
-          x2="532"
-          y2="1290"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#ovengine-diamond-hollow)"
-        />
-        <text
-          x="540"
-          y="1294"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Aggregation · in-layer pattern or domain part
-        </text>
-        <line
-          x1="744"
-          y1="1290"
-          x2="772"
-          y2="1290"
-          stroke="#5b6873"
-          stroke-width="1"
-          marker-end="url(#ovengine-open)"
-        />
-        <text
-          x="780"
-          y="1294"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Use · attribute, parameter, return, local or new
+          Use · between groups; diamonds join two classes, in the views
         </text>
         <rect
           x="24"
