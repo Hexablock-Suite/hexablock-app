@@ -8,7 +8,7 @@ This page answers one question: in which layer does each piece of the client liv
 
 Statement §4.2 asks for four concentric layers. Mermaid draws them as a stack: layer 4, the outer ring, is at the top, and layer 1, the center, is at the bottom. Every arrow goes from the component that imports to the component it imports. No arrow points up, toward an outer layer. Some arrows stay inside one layer, for example from the presenters to the mappers.
 
-- Solid arrow: uses (imports). Dotted arrow: implements an interface.
+- Solid arrow: uses (imports). Dotted arrow: realization, the class implements an interface. Mermaid draws no hollow triangle, so the dotted line and its label `implements` stand for the UML realization.
 - Rounded node: a port, an interface that layer 2 owns and an outer layer implements. Ports live in the application layer, because a use case may depend only on ports of its own layer (§3.4). So only layer 2 has rounded nodes.
 - Plain box: a class or an interface that is not a port. The engine owns `Clock`, `RandomSource` and `GameEventPublisher`, and layer 3 owns `KeyValueStore`. An outer layer implements them too, but they are interfaces of their own layer, not ports (decision 25 of the class diagram).
 - Dashed border and the suffix "(planned)": the component does not exist yet. A solid border means the file exists today.
@@ -146,7 +146,7 @@ flowchart TB
     LGPORT(["Rounded node: a port of layer 2"])
     LGPLAN["Dashed border: planned"]
     LGFROM["Importer"] -->|uses| LGTO["Imported"]
-    LGIMPL["Implementation"] -.->|implements| LGIFACE["Interface"]
+    LGIMPL["Implementation"] -.->|realization: implements| LGIFACE["Interface"]
   end
 
   %% Invisible links keep the layers stacked from outer to inner, with the legend last.
