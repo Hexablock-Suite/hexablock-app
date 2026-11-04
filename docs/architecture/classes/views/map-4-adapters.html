@@ -630,36 +630,35 @@
           stroke-width="1"
           marker-end="url(#mapad-open)"
         />
-        <!-- Drivers implement the driver interface: realization, down into layer 3 -->
+        <!-- Drivers implement the driver interface, down into layer 3: use. Groups join with uses; view 4.2 shows KeyValueStore -->
         <line
           x1="948"
           y1="242"
           x2="948"
           y2="606"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="5,4"
-          marker-end="url(#mapad-triangle)"
+          marker-end="url(#mapad-open)"
         />
-        <!-- Presenters keep the state mapper they receive: aggregation, down, inside layer 3, kept because Strategy holds it -->
+        <!-- Presenters map the state through the state mappers, down, inside layer 3: use. The diamond between GamePresenter and StateMapper is in view 4.1 -->
         <line
           x1="216"
           y1="734"
           x2="216"
           y2="790"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#mapad-diamond-hollow)"
+          marker-end="url(#mapad-open)"
         />
-        <!-- Local repositories keep the driver interface they receive: aggregation, up, inside layer 3, kept because object Adapter holds it -->
+        <!-- Local repositories store through the driver interface, up, inside layer 3: use. The diamond between LocalProgressRepository and KeyValueStore is in view 4.2 -->
         <line
           x1="864"
           y1="790"
           x2="864"
           y2="684"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#mapad-diamond-hollow)"
+          marker-end="url(#mapad-open)"
         />
 
         <!-- Arrow labels (masks use the fill of their zone) -->
@@ -700,6 +699,31 @@
           IMPLEMENT
         </text>
 
+        <rect x="220" y="756" width="32" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="236"
+          y="765"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          MAPS
+        </text>
+        <rect x="868" y="730" width="52" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="894"
+          y="739"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          STORES IN
+        </text>
+
         <!-- Role names and multiplicities at the part end -->
         <rect x="344" y="589" width="57" height="12" rx="2" fill="#e2ebf8" />
         <text
@@ -711,30 +735,6 @@
           text-anchor="start"
         >
           presenter
-          <tspan font-weight="600">1</tspan>
-        </text>
-        <rect x="220" y="775" width="43" height="12" rx="2" fill="#e2ebf8" />
-        <text
-          x="222"
-          y="784"
-          fill="#17212a"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
-        >
-          mapper
-          <tspan font-weight="600">1</tspan>
-        </text>
-        <rect x="868" y="689" width="38" height="12" rx="2" fill="#e2ebf8" />
-        <text
-          x="870"
-          y="698"
-          fill="#17212a"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
-        >
-          store
           <tspan font-weight="600">1</tspan>
         </text>
 
@@ -1773,85 +1773,12 @@
           y1="1205"
           x2="52"
           y2="1205"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-end="url(#mapad-triangle)"
-        />
-        <text
-          x="60"
-          y="1209"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Inheritance
-        </text>
-        <line
-          x1="144"
-          y1="1205"
-          x2="172"
-          y2="1205"
-          stroke="#17212a"
-          stroke-width="1"
-          stroke-dasharray="5,4"
-          marker-end="url(#mapad-triangle)"
-        />
-        <text
-          x="180"
-          y="1209"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Realization
-        </text>
-        <line
-          x1="264"
-          y1="1205"
-          x2="292"
-          y2="1205"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#mapad-diamond-filled)"
-        />
-        <text
-          x="300"
-          y="1209"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Composition · in-layer pattern or domain part
-        </text>
-        <line
-          x1="504"
-          y1="1205"
-          x2="532"
-          y2="1205"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#mapad-diamond-hollow)"
-        />
-        <text
-          x="540"
-          y="1209"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Aggregation · in-layer pattern or domain part
-        </text>
-        <line
-          x1="744"
-          y1="1205"
-          x2="772"
-          y2="1205"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#mapad-open)"
         />
         <text
-          x="780"
+          x="60"
           y="1209"
           fill="#5b6873"
           font-size="8.5"

@@ -401,48 +401,45 @@
         </text>
 
         <!-- Dependencies between groups (drawn before chips) -->
-        <!-- Aspects keep the inner UseCase they receive: aggregation, down, kept because Decorator holds it -->
+        <!-- Aspects wrap the input port, down: use. Groups join with uses; the diamond between UseCaseAspect and UseCase is in view 3.1 -->
         <line
           x1="520"
           y1="192"
           x2="520"
           y2="248"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#mapuc-diamond-hollow)"
+          marker-end="url(#mapuc-open)"
         />
-        <!-- Game use cases implement the input port: realization, up -->
+        <!-- Game use cases implement the input port, up: use. Groups join with uses; view 3.1 shows UseCase -->
         <line
           x1="288"
           y1="382"
           x2="288"
           y2="326"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="5,4"
-          marker-end="url(#mapuc-triangle)"
+          marker-end="url(#mapuc-open)"
         />
-        <!-- Progress use cases implement the input port: realization, up -->
+        <!-- Progress use cases implement the input port, up: use. Groups join with uses; view 3.1 shows UseCase -->
         <line
           x1="532"
           y1="382"
           x2="532"
           y2="326"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="5,4"
-          marker-end="url(#mapuc-triangle)"
+          marker-end="url(#mapuc-open)"
         />
-        <!-- Account and settings implement the input port: realization, up -->
+        <!-- Account and settings implement the input port, up: use. Groups join with uses; view 3.1 shows UseCase -->
         <line
           x1="764"
           y1="382"
           x2="764"
           y2="326"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          stroke-dasharray="5,4"
-          marker-end="url(#mapuc-triangle)"
+          marker-end="url(#mapuc-open)"
         />
         <!-- Game use cases keep the output ports they receive in attributes: use, down -->
         <line
@@ -478,6 +475,18 @@
         />
 
         <!-- Arrow labels -->
+        <rect x="528" y="214" width="36" height="12" rx="2" fill="#efe7f8" />
+        <text
+          x="546"
+          y="223"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          WRAPS
+        </text>
         <rect x="296" y="348" width="56" height="12" rx="2" fill="#efe7f8" />
         <text
           x="324"
@@ -516,18 +525,6 @@
         </text>
 
         <!-- Role names and multiplicities at the part end -->
-        <rect x="524" y="233" width="38" height="12" rx="2" fill="#efe7f8" />
-        <text
-          x="526"
-          y="242"
-          fill="#17212a"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
-        >
-          inner
-          <tspan font-weight="600">1</tspan>
-        </text>
         <rect x="292" y="675" width="38" height="12" rx="2" fill="#efe7f8" />
         <text
           x="294"
@@ -1529,85 +1526,12 @@
           y1="1144"
           x2="52"
           y2="1144"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-end="url(#mapuc-triangle)"
-        />
-        <text
-          x="60"
-          y="1148"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Inheritance
-        </text>
-        <line
-          x1="144"
-          y1="1144"
-          x2="172"
-          y2="1144"
-          stroke="#17212a"
-          stroke-width="1"
-          stroke-dasharray="5,4"
-          marker-end="url(#mapuc-triangle)"
-        />
-        <text
-          x="180"
-          y="1148"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Realization
-        </text>
-        <line
-          x1="264"
-          y1="1144"
-          x2="292"
-          y2="1144"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#mapuc-diamond-filled)"
-        />
-        <text
-          x="300"
-          y="1148"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Composition · in-layer pattern or domain part
-        </text>
-        <line
-          x1="504"
-          y1="1144"
-          x2="532"
-          y2="1144"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#mapuc-diamond-hollow)"
-        />
-        <text
-          x="540"
-          y="1148"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Aggregation · in-layer pattern or domain part
-        </text>
-        <line
-          x1="744"
-          y1="1144"
-          x2="772"
-          y2="1144"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#mapuc-open)"
         />
         <text
-          x="780"
+          x="60"
           y="1148"
           fill="#5b6873"
           font-size="8.5"
