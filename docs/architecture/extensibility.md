@@ -10,11 +10,13 @@ Statement §4.3 asks for a «Diagrama que muestre el motor genérico en el centr
 - The teal class is the generic engine. It knows no variant and no geometry (APP-NFR-03).
 - A dashed frame groups one extension axis or one pattern. Its label names the source.
 - A solid box is a planned class. A dashed box is a declared extension with no class yet. Its name is a placeholder.
-- A package (a box with a tab) is one variant folder. It lists the classes of that variant, and one realization arrow says that the variant implements the extension points.
+- A package (a box with a tab) is one variant folder. It lists the classes of that variant. A package is a group, so one use arrow joins it to the frame of the extension points. The classes of the package implement those extension points.
+- A group (a dashed frame or a package) joins anything only with a use. A realization or a diamond always starts and ends on a class or interface box.
 - A list box names several classes of one kind, for example the local adapters.
 - A realization arrow points from an extension to the contract it implements. A solid line with a hollow triangle is inheritance.
 - A solid line with an open arrow is a use: an attribute, a parameter, a return value, a local variable or a `new`. Every dependency between two layers is a use. For an attribute, the arrow end shows the attribute name and its multiplicity. Otherwise the label is a verb, for example `PASSED TO`.
 - Inside one layer, a diamond marks an attribute only where it shows a pattern or a domain relation (decision 23). The part end shows the attribute name and its multiplicity, also when it is `1`. A hollow diamond is an object that the class receives (aggregation). A filled diamond is an object that the class creates (composition).
+- The legend of each view lists only the line kinds that the view draws.
 - The dashed box at the top right of a class holds its type parameters (UML template notation). A bound on a parameter goes in the same box, never on a line.
 - Every operation shows the type of each parameter and its return type. View 1 abbreviates the type arguments of attributes and return types, for example `IGameRules` for `IGameRules<TCell, TMove, TState>`, and leaves out the `gameId` attribute of `IVariantFactory`. In every view, the corner box of `GameEngine` leaves out the bound of `TState`. The views of the [class diagram](classes.md) show them in full.
 
@@ -22,7 +24,7 @@ Statement §4.3 asks for a «Diagrama que muestre el motor genérico en el centr
 
 The engine sits in the center of layer 1. Around it are the interfaces that a fifth variant implements, and the type arguments that it binds. The four variants of the statement and Hexa Fill, the example of §3.1 («por ejemplo, Hexa Fill: pintar celdas con restricciones»), implement them. Each variant also adds a state mapper in layer 3 and a cell renderer in layer 4 (D3). The variant factory creates the rules, the piece source, the scoring policy and the board (decision 31). `GameId` is open: each factory declares its own id, so a fifth variant changes no engine file (decision 30, D15).
 
-![Extension points: GameEngine in the center of layer 1; around it IVariantFactory, IGameRules with the abstract BaseGameRules, IScoringPolicy, IPieceSource, IProgressModel, ILevelBuilder, the TCell, TMove and TState type arguments and the optional capabilities IUndoable, IRedoable, ITimed and IRandomSeeded; StateMapper in layer 3 and CellRenderer in layer 4; the packages Hexa Lines, Hexa Fit, Hexa Sort, Hexa Merge and the declared Hexa Fill implement them](extensibility/views/ext-1-extension-points.png)
+![Extension points: GameEngine in the center of layer 1; around it IVariantFactory, IGameRules with the abstract BaseGameRules, IScoringPolicy, IPieceSource, IProgressModel, ILevelBuilder, the TCell, TMove and TState type arguments and the optional capabilities IUndoable, IRedoable, ITimed and IRandomSeeded; StateMapper in layer 3 and CellRenderer in layer 4; the packages Hexa Lines, Hexa Fit, Hexa Sort, Hexa Merge and the declared Hexa Fill implement them, and each package joins the extension points with a use arrow](extensibility/views/ext-1-extension-points.png)
 
 ## View 2: the jury variations
 
@@ -38,9 +40,9 @@ In the defense the jury proposes «un nuevo tamaño de tablero, una política de
 
 ## View 3: the geometry axis
 
-A new geometry adds one family: a coordinate type, a topology and the piece shapes (decision 17, D11). It changes no engine file and no variant. `HexGeometry` is the real family. `SquareGeometry` is the family of the engine tests (D4, APP-NFR-13). Triangular cells and a 3D board are declared variations in §8 of the requirements. Each variant factory receives a `GeometryFactory`, so a new geometry needs no class for each game, and a new game needs no class for each geometry.
+A new geometry adds one family: a coordinate type, a topology and the piece shapes (decision 17, D11). It changes no engine file and no variant. `HexGeometry` is the real family. `SquareGeometry` is the family of the engine tests (D4, APP-NFR-13). Triangular cells and a 3D board are declared variations in §8 of the requirements. Each variant factory receives a `GeometryFactory`, so a new geometry needs no class for each game, and a new game needs no class for each geometry. Both axes are groups, so each one joins the engine with a use: the variants implement `IVariantFactory` and extend `BaseGameRules`, and the geometries implement `GeometryFactory`. No line joins the two axes, because a variant factory keeps the engine interface `GeometryFactory`, not a geometry class.
 
-![The geometry axis: the generic GameEngine in the center; above it, the variant factories LinesFactory, FitFactory, SortFactory, MergeFactory and the declared FillFactory; below it, HexGeometry, SquareGeometry for the engine tests, and the declared TriangleGeometry and Geometry3D](extensibility/views/ext-3-geometry-axis.png)
+![The geometry axis: the generic GameEngine in the center, joined by use arrows to both axes; above it, the variant factories LinesFactory, FitFactory, SortFactory, MergeFactory and the declared FillFactory; below it, HexGeometry, SquareGeometry for the engine tests, and the declared TriangleGeometry and Geometry3D](extensibility/views/ext-3-geometry-axis.png)
 
 ## View 4: outside the engine
 
