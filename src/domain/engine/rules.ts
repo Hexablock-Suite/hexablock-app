@@ -29,7 +29,17 @@ export abstract class BaseGameRules<TCell, TMove, TState> implements IGameRules<
     return resolution.evaluated(this.evaluate(resolution.state));
   }
 
+  // The end condition «no valid move» of Lines, Sort and Merge (classes.md decision 33).
+  // It asks the lazy generator for the first move and stops there,
+  // so it never builds the full list of moves.
+  protected noValidMove(state: TState): boolean {
+    for (const _move of this.validMoves(state)) return false;
+    return true;
+  }
+
   abstract isValid(state: TState, move: TMove): boolean;
+  // Each variant writes it as a generator that walks `Board.line()`, `ring()`
+  // and `neighborhood()` and yields one valid move at a time.
   abstract validMoves(state: TState): Iterable<TMove>;
   abstract apply(state: TState, move: TMove): TState;
   abstract resolve(state: TState): Resolution<TState>;
