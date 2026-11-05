@@ -8,6 +8,7 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 
 ### Added
 
+- The square `GridTopology` test double and the fake cell type in `test/support/engine/`, and a board test that runs `Board<TCell, TCoord>` with them (APP-NFR-13, D4) ([#68](https://github.com/Hexablock-Suite/hexablock-app/issues/68)).
 - The generic board of the engine in `src/domain/engine/`: `GridTopology<TCoord>`, `Board<TCell, TCoord>` with `get`, `set`, `cells`, `clone`, `line`, `ring` and `neighborhood`, `BoardShape<TCoord>` and `Cloneable<T>`. The topology also gives `key()`, and its `line()` takes the board test `contains`, so the board stores cells and stops a line with no coordinate arithmetic of its own ([#67](https://github.com/Hexablock-Suite/hexablock-app/issues/67)).
 - APP-FR-16 in `docs/REQUIREMENTS.md`: the player chooses the board figure (hexagon, square or triangle) on one generic engine and one generic board, derived from the session of 2026-11-03 ([#63](https://github.com/Hexablock-Suite/hexablock-app/pull/63)).
 - A note in `docs/architecture/classes.md` that `UseCase` and `UseCaseAspect` name architecture roles, not game concepts ([#63](https://github.com/Hexablock-Suite/hexablock-app/pull/63)).
