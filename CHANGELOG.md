@@ -8,7 +8,7 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 
 ### Added
 
-- Use case flows in `docs/architecture/flows.md`: `ApplyMove`, with a class view across the four layers and a UML sequence diagram with the same class names ([#63](https://github.com/Hexablock-Suite/hexablock-app/pull/63)).
+- Use case flows in `docs/architecture/flows.md`: `ApplyMove` and `SaveProgress`, each with a class view across the four layers and a UML sequence diagram with the same class names ([#63](https://github.com/Hexablock-Suite/hexablock-app/pull/63)).
 - Sprint plan in `docs/ROADMAP.md`, this changelog, rule R-sprint-release and its gate `test/docs/changelog.test.ts`.
 - Class diagram in `docs/architecture/classes.md`: the generic engine and the four variants ([#9](https://github.com/Hexablock-Suite/hexablock-app/pull/9)), the five engine views and the four variant views ([#11](https://github.com/Hexablock-Suite/hexablock-app/pull/11)), the engine and variant overview maps ([#12](https://github.com/Hexablock-Suite/hexablock-app/pull/12)), and the use case and adapter maps and views ([#13](https://github.com/Hexablock-Suite/hexablock-app/pull/13)).
 - Numbered functional and non-functional requirements, APP-FR-n and APP-NFR-n, each with a check ([#10](https://github.com/Hexablock-Suite/hexablock-app/pull/10)).

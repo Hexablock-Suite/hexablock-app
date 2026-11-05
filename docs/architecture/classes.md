@@ -155,6 +155,10 @@ One use case can cross every layer. [flows.md](flows.md) follows one call throug
 
 ![ApplyMove flow: GameScreen in layer 4; GamePresenter, StateMapper, GameViewModel and InMemoryRunningGameStore in layer 3; UseCase, ApplyMove, ApplyMoveRequest, MoveResult and the RunningGameStore port in layer 2; GameEngine, IGameRules and Board in layer 1](classes/views/flow-1-apply-move.png)
 
+### Flow 2: save progress
+
+![SaveProgress flow: VictoryScreen, ApiProgressRepository, ApiDtoMapper and ApiClient in layer 4; ResultPresenter in layer 3; UseCase, SaveProgress and the ProgressRepository port in layer 2; IProgressModel, GameResult and ProgressRecord in layer 1](classes/views/flow-2-save-progress.png)
+
 ## Patterns
 
 The fourteen patterns of §3.3 all appear, and all fourteen stay after the team audit of 2026-10-30 (D14). Eleven live in layer 1; Adapter, Facade and Singleton live in layers 3 and 4. D7 asks for a written reason for each one, so the Reason column names the requirement behind it. In the Views column, a plain number is a view of part 1, and `3.1` is view 1 of part 3.
