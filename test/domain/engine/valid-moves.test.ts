@@ -2,7 +2,7 @@
 import type { Outcome } from '../../../src/domain/engine/outcome';
 import { Resolution } from '../../../src/domain/engine/resolution';
 import { BaseGameRules } from '../../../src/domain/engine/rules';
-import { fakeCell, type FakeCell } from '../../support/engine/fake-cell';
+import { fakeCell } from '../../support/engine/fake-cell';
 import { emptyState, type FakeState } from '../../support/engine/fake-game';
 import { square, squareTopology, type SquareCoord } from '../../support/engine/square-topology';
 
@@ -10,7 +10,7 @@ import { square, squareTopology, type SquareCoord } from '../../support/engine/s
 // «no valid move» asks for the first move only. These rules exist only in test/.
 // A move is valid on an empty cell next to a filled cell. The generator walks the rows
 // with `Board.line()` and checks the neighbors with `Board.neighborhood()`.
-class AdjacentRules extends BaseGameRules<FakeCell, SquareCoord, FakeState> {
+class AdjacentRules extends BaseGameRules<SquareCoord, FakeState> {
   visited = 0;
 
   *validMoves(state: FakeState): Iterable<SquareCoord> {

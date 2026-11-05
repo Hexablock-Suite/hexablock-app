@@ -1,11 +1,11 @@
 /** @jest-environment node */
 import type { Outcome } from '../../../src/domain/engine/outcome';
 import { Resolution } from '../../../src/domain/engine/resolution';
-import { BaseGameRules } from '../../../src/domain/engine/rules';
+import { BaseGameRules, type IGameRules } from '../../../src/domain/engine/rules';
 
 // A fake rules subclass that exists only in this test. Its state is a number,
 // a move is a number, and it writes the name of each step it runs.
-class RecordingRules extends BaseGameRules<never, number, number> {
+class RecordingRules extends BaseGameRules<number, number> {
   readonly steps: string[] = [];
 
   isValid(_state: number, move: number): boolean {
@@ -59,5 +59,14 @@ describe('BaseGameRules.playTurn()', () => {
     expect(resolution.accepted).toBe(false);
     expect(resolution.state).toBe(1);
     expect(resolution.outcome).toBe('playing');
+  });
+});
+
+describe('IGameRules type parameters', () => {
+  it('should_reject_a_cell_type_argument_when_a_reference_names_three_type_parameters', () => {
+    // @ts-expect-error IGameRules takes two type parameters: the move and the state.
+    const rules: IGameRules<never, number, number> = new RecordingRules();
+
+    expect(rules.playTurn(1, 2).accepted).toBe(true);
   });
 });

@@ -76,7 +76,7 @@ The engine lives in `src/domain/engine/`. It is written once and runs the four g
 The four core types:
 
 - **[`GameEngine<TCell, TCoord, TMove, TState>`](src/domain/engine/game-engine.ts)** is the aggregate root of a game. It runs each turn through `IGameRules`, scores it with `IScoringPolicy`, holds the `GamePhase`, and publishes `GameOver` through `GameEventPublisher`. A game changes only through `play()`, and only while `phase.canPlay()` is true. `start()` and `snapshot()` clone the state (decision 26). The optional `MoveHistory` comes with undo in Sprint 3.
-- **[`IGameRules<TCell, TMove, TState>`](src/domain/engine/rules.ts)** is the rules contract of §3.1: `isValid()`, `validMoves()`, `apply()`, `resolve()` and `evaluate()`. The abstract `BaseGameRules` holds the turn skeleton in its template method `playTurn()`, and each variant extends it (decision 21). `GameEngine` depends only on the interface. `validMoves()` is a lazy generator, and `BaseGameRules.noValidMove()` stops at the first move, for the «no valid move» end of Lines, Sort and Merge (decision 33).
+- **[`IGameRules<TMove, TState>`](src/domain/engine/rules.ts)** is the rules contract of §3.1: `isValid()`, `validMoves()`, `apply()`, `resolve()` and `evaluate()`. The abstract `BaseGameRules` holds the turn skeleton in its template method `playTurn()`, and each variant extends it (decision 21). `GameEngine` depends only on the interface. `validMoves()` is a lazy generator, and `BaseGameRules.noValidMove()` stops at the first move, for the «no valid move» end of Lines, Sort and Merge (decision 33).
 - **[`Board<TCell, TCoord>`](src/domain/engine/board.ts)** is the `HexBoard<TCell>` of §3.1, with no geometry in its name. It stores the cells (`get()`, `set()`, `cells()`), walks the board with `line()`, `ring()` and `neighborhood()`, and clones itself for undo and the piece preview.
 - **[`GridTopology<TCoord>`](src/domain/engine/grid-topology.ts)** does every coordinate calculation: `key()`, `neighbors()`, `directions()`, `axes()`, `rotate()`, `translate()`, `line()`, `ring()` and `region()`. A coordinate only holds its values. `HexTopology` with `HexCoord` is the real geometry, and it comes with the variants. Today a square double and a triangle double in `test/support/engine/` prove that the engine depends on no geometry (D4, APP-NFR-13). The triangle double translates a piece by an odd offset, so code that adds coordinates one component at a time fails (decision 16).
 
@@ -93,7 +93,7 @@ The Status column says whether a bound is in the code today (`code`) or only in 
 | `TState`  | The state that the engine copies           | `BoardState<unknown, unknown>` | `copy()` in `game-engine.ts`, private | code   | The helper calls `clone()` for any cell and coordinate type, and returns the same type. |
 | `TPiece`  | What a piece source gives (`IPieceSource`) | None                           |                                       |        |                                                                                         |
 
-`IGameRules` keeps three type parameters, because none of its members names a coordinate (decision 16).
+`IGameRules` and `BaseGameRules` take two type parameters, `TMove` and `TState`, because none of their members names a cell or a coordinate (decision 16).
 
 ### Why each bound exists
 
