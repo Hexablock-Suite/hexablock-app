@@ -71,10 +71,10 @@
       >
         <title id="board-title">HexaBlock board and pieces · UML class diagram</title>
         <desc id="board-desc">
-          Class diagram of layer 1 showing Board, generic over the cell and the coordinate, owning
+          Class diagram of layer 1 showing Board, generic over the cell and the coordinate, using
           its BoardShape and taking its geometry from the GridTopology strategy, BoardShape built
-          from the ShapeNode composite of CellNode leaves and ShapeGroup children, and Piece owning
-          a ShapeNode as a prototype that clones itself.
+          from the ShapeNode composite of CellNode leaves and ShapeGroup children, and Piece using a
+          ShapeNode as a prototype that clones itself.
         </desc>
         <defs>
           <marker
@@ -257,15 +257,15 @@
           marker-start="url(#board-diamond-hollow)"
           stroke="#17212a"
         />
-        <!-- Board holds the BoardShape it receives from BoardBuilder as shape: aggregation, kept because the entity holds its value object -->
+        <!-- Board keeps the BoardShape it receives from BoardBuilder as shape: use, because no GoF pattern needs a diamond here -->
         <line
           x1="200"
           y1="300"
           x2="200"
           y2="356"
           stroke-width="1"
-          marker-start="url(#board-diamond-hollow)"
-          stroke="#17212a"
+          marker-end="url(#board-open)"
+          stroke="#5b6873"
         />
         <!-- BoardShape builds from ShapeNode: use -->
         <line
@@ -285,15 +285,15 @@
           marker-end="url(#board-open)"
           stroke="#5b6873"
         />
-        <!-- Piece holds the ShapeNode it receives as shape: aggregation, kept because the entity holds its value object -->
+        <!-- Piece keeps the ShapeNode it receives as shape: use, because no GoF pattern needs a diamond here -->
         <line
-          x1="640"
+          x1="600"
           y1="512"
-          x2="640"
+          x2="600"
           y2="560"
           stroke-width="1"
-          marker-start="url(#board-diamond-hollow)"
-          stroke="#17212a"
+          marker-end="url(#board-open)"
+          stroke="#5b6873"
         />
         <!-- CellNode implements ShapeNode: realization -->
         <line
@@ -365,9 +365,9 @@
         >
           BUILDS FROM
         </text>
-        <rect x="644" y="534" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="604" y="534" width="36" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="662"
+          x="622"
           y="543"
           fill="#7d8a94"
           font-size="8"
@@ -439,9 +439,9 @@
           1..*
         </text>
 
-        <rect x="624" y="534" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="584" y="534" width="12" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="630"
+          x="590"
           y="543"
           fill="#17212a"
           font-size="8"
@@ -1030,7 +1030,7 @@
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Aggregation · in-layer pattern or domain part
+          Aggregation · in-layer pattern
         </text>
         <line
           x1="384"
