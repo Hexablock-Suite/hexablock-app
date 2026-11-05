@@ -59,13 +59,15 @@ This sketch shows only the layers and the direction of the dependencies. The ful
 
 **Presentation.** The screens follow Model-View-Presenter. The view is a route in layer 4, for example `GameScreen` with `BoardView`. The presenter (`GamePresenter`) and the view model (`GameViewModel`) live in layer 3. The presenter calls a use case through `UseCase` and maps the plain response to the view model.
 
-**Use case flows.** [docs/architecture/flows.md](docs/architecture/flows.md) follows two use cases through the four layers, each with a class view and a sequence diagram: `ApplyMove` stays inside the app, and `SaveProgress` sends a result to `hexablock-api`.
+**Use case flows.** [docs/architecture/flows.md](docs/architecture/flows.md) follows five use cases through the four layers, each with a class view and a sequence diagram: `ApplyMove` stays inside the app, `SaveProgress` sends a result to `hexablock-api`, `StartGame` wires a variant from its factory, `UndoMove` runs the Command history, and `Login` signs in against the backend and keeps the session. A table there names the path of every other use case.
 
 One placement differs from statement §3.4 on purpose. The statement puts the repository implementations and the DTO mappers in layer 3, interface adapters. The HTTP repositories and their DTO mapper live in layer 4, `src/infrastructure/api/`, next to the HTTP client, and implement the layer 2 ports directly. In layer 3 they needed a `BackendApi` port whose methods named transport types, which ties the use cases to the shape of the HTTP data. The local repositories stay in layer 3. See Q7 in [docs/architecture/layers.md](docs/architecture/layers.md) and decision 22 in [docs/architecture/classes.md](docs/architecture/classes.md).
 
 Two placements are still open with the professor: where the cell renderers live (Q8) and where the composition root lives (Q9). Both are in [docs/architecture/layers.md](docs/architecture/layers.md).
 
 ## Generic Engine
+
+> **Design, not code yet.** This section describes the design in [docs/architecture/classes.md](docs/architecture/classes.md). The engine code starts in sprint 1 of [docs/ROADMAP.md](docs/ROADMAP.md). Today `src/domain/engine/` holds only a README, with no engine class and no engine test.
 
 The engine lives in `src/domain/engine/`. It is written once and runs the four games. It knows no variant, no geometry and no UI framework (APP-NFR-03). The class diagram is in [docs/architecture/classes.md](docs/architecture/classes.md).
 
@@ -116,7 +118,7 @@ A new variant adds classes and data. It changes no engine file, no other variant
 
 ## Design Patterns
 
-The fourteen patterns of statement §3.3 all appear in the design (D14). Each row names the requirement behind the pattern and the quality it protects: what breaks if the pattern is missing. The code does not exist yet, so each link points to the design view in [docs/architecture/classes.md](docs/architecture/classes.md#patterns). The links move to the source files as the code lands.
+The fourteen patterns of statement §3.3 all appear in the design (D14). Each row names the requirement behind the pattern and the quality it protects: what breaks if the pattern is missing. The code does not exist yet: it starts in sprint 1 of [docs/ROADMAP.md](docs/ROADMAP.md). So each link points to the design view in [docs/architecture/classes.md](docs/architecture/classes.md#patterns). The links move to the source files as the code lands.
 
 | Pattern          | Classes                                                                                                                          | Reason                                                                                                                                                          | Quality protected          | Design                                                                                                                                                                                                             |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
