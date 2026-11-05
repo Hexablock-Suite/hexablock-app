@@ -1,10 +1,10 @@
 # Roadmap
 
-> **Status:** a proposal of 2026-10-31 for team review. Nothing in this plan is agreed until the team approves it in review.
+> **Status:** approved. The team approved this plan in review on 2026-11-04. It started as a proposal of 2026-10-31.
 
 This file is the one place for the HexaBlock Suite sprint plan, for both repositories. `hexablock-api` links here and keeps no copy. Each sprint lists the requirement IDs it delivers and its exit check. The IDs come from [`REQUIREMENTS.md`](REQUIREMENTS.md) (APP-FR-n, APP-NFR-n) and from the backend [`REQUIREMENTS.md`](https://github.com/Hexablock-Suite/hexablock-api/blob/main/docs/REQUIREMENTS.md) (API-FR-n, API-NFR-n). The exit check of a requirement is its _Check_, copied here. When a _Check_ changes in a requirements file, update it here in the same pull request. A path in an API row is a path in `hexablock-api`.
 
-No item has an owner yet. The team assigns the owners in review.
+This file names no owner. The team assigns an owner to each task at the start of each sprint. No task has an owner yet.
 
 ## Why one-week sprints
 
@@ -69,7 +69,9 @@ These hold in every sprint, and each sprint's exit check includes them:
 
 ## Sprint 0 — Design week (2026-10-26 to 2026-11-01), tag `v0.0.0`
 
-The design phase: the requirements and the architecture diagrams, with no code. Both repositories number their requirements with a _Check_ each. The architecture diagrams are the layer diagram (E1), the class diagram (E2) and the extensibility diagram (E3). The E2 and E3 updates are in app pull request 15 and backend pull request 9, under team review.
+The design phase: the requirements and the architecture diagrams, with no code. Both repositories number their requirements with a _Check_ each. The architecture diagrams are the layer diagram (E1), the class diagram (E2) and the extensibility diagram (E3). The E2 and E3 updates are in app pull request 15 and backend pull request 9. Both merged on 2026-11-01.
+
+Sprint 0 is closed. The tag `v0.0.0` marks its last app commit, `4e3d9bb` of 2026-11-01.
 
 | ID         | Exit check                                                                                                                                                                                                         |
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
