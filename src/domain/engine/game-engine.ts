@@ -39,14 +39,23 @@ export class GameEngine<TCell, TCoord, TMove, TState extends BoardState<TCell, T
       throw new RangeError(`The game cannot accept a move in the ${this.current.name} phase.`);
     }
     this.current = ResolvingPhase.instance;
-    const before = copy(state);
-    const resolution = this.rules.playTurn(state, move);
+    // The rules and the scoring work on a copy. The engine keeps its state until both
+    // succeed, so an exception leaves the board, the score and the phase as they were.
+    let resolution;
+    try {
+      resolution = this.rules.playTurn(copy(state), move);
+      if (resolution.accepted) {
+        resolution.state.score += this.scoring.score(state, resolution);
+      }
+    } catch (error) {
+      this.current = PlayingPhase.instance;
+      throw error;
+    }
     if (!resolution.accepted) {
       this.current = PlayingPhase.instance;
       return resolution.outcome;
     }
     const next = resolution.state;
-    next.score += this.scoring.score(before, resolution);
     this.state = next;
     this.current = this.current.after(resolution.outcome);
     if (resolution.outcome !== 'playing') {
