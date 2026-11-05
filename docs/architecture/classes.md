@@ -23,6 +23,7 @@ This page answers statement §4.1 for the client. It shows the generic types in 
 - In the variants map, a dashed chip is an engine type. Each class in its row implements or extends it.
 - A dashed box with no members is a class that another view details. Its eyebrow names that view, for example `PART 1 · VIEW 1`.
 - Under the name of a use case, an ID such as `APP-FR-08` names the requirement it serves.
+- `UseCase` and `UseCaseAspect` name architecture roles, not game concepts. `UseCase` is the generic input port, the «input boundary» of Clean Architecture, and every use case implements it (decision 9). `UseCaseAspect` is the abstract base of the AOP decorators of view 3.1. APP-NFR-11 asks one aspect to cover the four variants, so all use cases need one shared contract, and its name states that role. The professor's rule «Tiene que tener semántica del problema» (class of 2026-10-16) applies to the entities, the concrete use cases and the ports, and they follow it: for example `ApplyMove`, `MoveHistory` and `RunningGameStore`.
 - `«port»` marks an interface of layer 2 that an outer layer implements. Ports live in the application layer (decision 25). The engine and layer 3 have other interfaces that an outer layer implements, such as `Clock` and `KeyValueStore`. They carry `«interface»` only. `«aggregate root»` marks the entity that guards a game (decision 26). A question in the stereotype line, such as `«composition root» · Q9`, marks a placement that the professor's answer can move.
 - Every class is planned. Today `src/` holds one README per layer folder and the API client in `src/infrastructure/api/client.ts`.
 
@@ -149,7 +150,7 @@ Layer 3, `src/adapters/`, and layer 4, `src/infrastructure/` and `app/`. Layer 3
 
 ## Use case flows
 
-One use case can cross every layer. [flows.md](flows.md) follows one call through the layers: a class view of that use case only, and a UML sequence diagram with the same class names.
+One use case can cross every layer. [flows.md](flows.md) follows one call through the layers: a class view of that use case only, and a UML sequence diagram with the same class names. It draws one flow for each distinct path and names the path that each other use case follows.
 
 ### Flow 1: apply a move
 
@@ -158,6 +159,18 @@ One use case can cross every layer. [flows.md](flows.md) follows one call throug
 ### Flow 2: save progress
 
 ![SaveProgress flow: VictoryScreen, ApiProgressRepository, ApiDtoMapper and ApiClient in layer 4; ResultPresenter in layer 3; UseCase, SaveProgress and the ProgressRepository port in layer 2; IProgressModel, GameResult and ProgressRecord in layer 1](classes/views/flow-2-save-progress.png)
+
+### Flow 3: start a game
+
+![StartGame flow: GameScreen in layer 4; GamePresenter and InMemoryRunningGameStore in layer 3; UseCase, StartGame, StartGameRequest, MoveResult and the RunningGameStore port in layer 2; IVariantFactory, LinesFactory, BoardBuilder, GeometryFactory, GameEngine and Board in layer 1](classes/views/flow-3-start-game.png)
+
+### Flow 4: undo a move
+
+![UndoMove flow: GameScreen in layer 4; GamePresenter and InMemoryRunningGameStore in layer 3; UseCase, UndoMove, MoveResult and the RunningGameStore port in layer 2; GameEngine, IUndoable, MoveHistory, MoveCommand and Board in layer 1](classes/views/flow-4-undo-move.png)
+
+### Flow 5: sign in
+
+![Login flow: SessionManager, ApiDtoMapper, ApiClient, AccountScreen and ApiAccountGateway in layer 4; AccountPresenter in layer 3; UseCase, Login, Credentials, Session and the SessionStore and AccountGateway ports in layer 2](classes/views/flow-5-login.png)
 
 ## Patterns
 
