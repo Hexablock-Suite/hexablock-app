@@ -16,10 +16,10 @@ This page answers statement §4.1 for the client. It shows the generic types in 
 - An italic class name or operation is abstract.
 - A solid line with an open arrowhead is a use: the other class is an attribute, a parameter, a return value, a local variable or a `new`. Every dependency between two layers is a use. When the class keeps the other class in an attribute, the arrow end names the attribute and its multiplicity, even when it is 1, for example `games 1`. Otherwise the line carries a verb, for example `PLAY()` or `«create»`.
 - Inside one layer, a diamond at the end of the holder marks an attribute only where it makes a GoF pattern visible: Strategy, Decorator, Composite, Observer, Command, State, Adapter, or a builder or a factory that holds its geometry factory. It is hollow (aggregation) when the value comes from outside, and filled (composition) when the class creates it. The other end names the attribute and its multiplicity. Any other attribute is a use with the attribute name and its multiplicity, also between an aggregate and its parts or an entity and its value objects, because the class box already shows the attribute. In the class of 2026-11-02 the professor kept the diamond for a pattern: «Aquí sí porque quiero hacer visible el patrón estratégico» (decision 23).
-- A map joins a group (dashed frame) to another group or a class only with a use, and the use carries a verb, for example `WRAPS`. A group has no attributes and no multiplicity. A realization or a diamond always starts and ends on a class or interface box, in the view that shows them (professor, session of 2026-11-03).
+- No line starts or ends on a dashed frame. A map draws a line between two groups from the chip of the class that holds, calls or implements to the chip of the class it needs, with the same rule as a view: an attribute shows its name and multiplicity, for example `phase 1`, and any other use shows a verb, for example `CREATES`. A line from frame to frame would claim that every class of one group uses every class of the other. In the session of 2026-11-03 the professor asked about such a line: «todas esas usan los tres bloques de abajo, a lo mejor la respuesta es no». A map draws only the main dependencies, one or a few for each pair of groups. The view of each group shows the rest.
 - The legend of each view lists only the line kinds that the view draws.
 - In the variant views, a lollipop (a circle on a short line) is an engine interface that the class implements. Its label names the type that each parameter takes, for example `IGameRules‹Color, PlacePiece, LinesState›`.
-- In a map, a chip is one class with its name only. The group header names the view that shows the members, for example `VIEW 2`.
+- In a map, a chip is one class with its name only. Every line of a map starts and ends on a chip. The group header names the view that shows the members, for example `VIEW 2`.
 - In the variants map, a dashed chip is an engine type. Each class in its row implements or extends it.
 - A dashed box with no members is a class that another view details. Its eyebrow names that view, for example `PART 1 · VIEW 1`.
 - Under the name of a use case, an ID such as `APP-FR-08` names the requirement it serves.
@@ -32,7 +32,7 @@ This page answers statement §4.1 for the client. It shows the generic types in 
 
 ### Map of the engine
 
-![Map of the generic engine: the 58 classes by name in fourteen groups, each group with the view that shows its members](classes/views/overview-engine.png)
+![Map of the generic engine: the 58 classes by name in fourteen groups, each group with the view that shows its members; class-to-class uses join GameEngine to GamePhase, MoveHistory, IScoringPolicy and GameEventPublisher, BoardState to Board, IVariantFactory to IGameRules, and BoardShape and GeometryFactory to ShapeNode](classes/views/overview-engine.png)
 
 ### View 1: the turn
 
@@ -101,7 +101,7 @@ The variant classes stay generic over `TCoord`, like the engine, so a variant ru
 
 ### Map of the use cases
 
-![Map of the use cases: the 36 classes of layer 2 in seven groups, each group with the view that shows its members](classes/views/map-3-usecases.png)
+![Map of the use cases: the 36 classes of layer 2 in seven groups, each group with the view that shows its members; UseCaseAspect, StartGame, SaveProgress and Register implement UseCase, and RedoMove, SyncLeaderboard and UpdateSettings keep an output port](classes/views/map-3-usecases.png)
 
 ### View 3.1: the use case contract and its aspects
 
@@ -129,7 +129,7 @@ Layer 3, `src/adapters/`, and layer 4, `src/infrastructure/` and `app/`. Layer 3
 
 ### Map of the adapters, presenters and drivers
 
-![Map of layers 3 and 4: routes, board, drivers, sound, the HTTP repositories and the composition root in layer 4; presenters, view models, state mappers, events, the local repositories and the driver interface in layer 3](classes/views/map-4-adapters.png)
+![Map of layers 3 and 4: routes, board, drivers, sound, the HTTP repositories and the composition root in layer 4; presenters, view models, state mappers, events, the local repositories and the driver interface in layer 3; class-to-class lines join GameScreen to BoardView and GamePresenter, CompositionRoot to InMemoryRunningGameStore, GamePresenter to StateMapper, and DeviceKeyValueStore and LocalProgressRepository to KeyValueStore](classes/views/map-4-adapters.png)
 
 ### View 4.1: presenting a game
 

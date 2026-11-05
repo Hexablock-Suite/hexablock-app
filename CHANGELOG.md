@@ -19,6 +19,7 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 
 ### Changed
 
+- The engine, use case and adapter maps and extensibility views 1 and 3 draw no line on a dashed frame or a package: each line joins the two classes that depend, with a role and a multiplicity or a verb, and the reading notes say why, after the session of 2026-11-03 ([#63](https://github.com/Hexablock-Suite/hexablock-app/pull/63)).
 - The class and extensibility views keep a diamond only where it makes a GoF pattern visible: `Board` with its `BoardShape` and `Piece` with its `ShapeNode` become use arrows, the legends say «in-layer pattern», and the notation texts and decision 23 drop the domain relation exception ([#63](https://github.com/Hexablock-Suite/hexablock-app/pull/63)).
 - The use case and adapter maps label the uses between groups with a verb, not with a role and a multiplicity ([#63](https://github.com/Hexablock-Suite/hexablock-app/pull/63)).
 - The class diagrams draw use arrows between layers and keep diamonds inside one layer, every use case box shows `execute()`, and `Logger` takes a `UseCaseLogEntry` ([#63](https://github.com/Hexablock-Suite/hexablock-app/pull/63)).

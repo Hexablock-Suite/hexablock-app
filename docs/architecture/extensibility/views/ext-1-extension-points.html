@@ -79,7 +79,9 @@
           IRedoable, ITimed and IRandomSeeded, plus StateMapper in layer 3 and CellRenderer in layer
           4. The variant factory creates the rules, piece source, scoring and board. The four
           variants and the declared Hexa Fill implement them, one package each, and each declares
-          its own open GameId.
+          its own open GameId. The lines start on classes: LinesFactory implements IVariantFactory,
+          LinesRules extends BaseGameRules and MergeScoring implements IScoringPolicy, one line per
+          kind for every variant. No line touches a frame or a package.
         </desc>
         <defs>
           <marker
@@ -348,53 +350,44 @@
         >
           scoring
         </text>
-        <!-- Each variant package implements the extension points, up: use. A package is a group, so it joins the frame with a use -->
+        <!-- Each variant joins the extension points through its classes, never through its package. Hexa Lines and Hexa Merge show one line per kind for every variant. -->
+        <!-- LinesFactory implements IVariantFactory: realization (Lines view) -->
         <path
-          d="M152,1030 L152,940"
+          d="M76,1091 L40,1091 L40,560 L64,560"
           fill="none"
+          stroke="#17212a"
           stroke-width="1"
-          stroke="#5b6873"
-          marker-end="url(#ext1-open)"
+          stroke-dasharray="5,4"
+          marker-end="url(#ext1-triangle)"
         />
+        <!-- LinesRules extends BaseGameRules: inheritance (part 1, view 7) -->
         <path
-          d="M336,1030 L336,940"
+          d="M76,1107 L32,1107 L32,400 L64,400"
           fill="none"
+          stroke="#17212a"
           stroke-width="1"
-          stroke="#5b6873"
-          marker-end="url(#ext1-open)"
+          marker-end="url(#ext1-triangle)"
         />
+        <!-- MergeScoring implements IScoringPolicy: realization (Merge view) -->
         <path
-          d="M520,1030 L520,940"
+          d="M708,1171 L796,1171 L796,992 L1008,992 L1008,384 L976,384"
           fill="none"
+          stroke="#17212a"
           stroke-width="1"
-          stroke="#5b6873"
-          marker-end="url(#ext1-open)"
+          stroke-dasharray="5,4"
+          marker-end="url(#ext1-triangle)"
         />
-        <path
-          d="M704,1030 L704,940"
-          fill="none"
-          stroke-width="1"
-          stroke="#5b6873"
-          marker-end="url(#ext1-open)"
-        />
-        <path
-          d="M888,1030 L888,940"
-          fill="none"
-          stroke-width="1"
-          stroke="#5b6873"
-          marker-end="url(#ext1-open)"
-        />
-        <rect x="190.0" y="981" width="60" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="405" y="970" width="230" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="220"
-          y="990"
+          x="520"
+          y="979"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          IMPLEMENT
+          LINES AND MERGE STAND FOR EACH VARIANT
         </text>
         <!-- Layer 4: one cell renderer per variant (D3, Q8) -->
         <rect
@@ -2045,6 +2038,43 @@
           Hexa Fill is the example of statement §3.1. Its dashed boxes are declared extensions with
           no class yet.
         </text>
+        <!-- Classes inside a package that a line starts from: the outline marks the class -->
+        <g data-class="LinesFactory">
+          <rect
+            x="76"
+            y="1084"
+            width="80"
+            height="14"
+            rx="2"
+            fill="none"
+            stroke="#17212a"
+            stroke-width="0.8"
+          />
+        </g>
+        <g data-class="LinesRules">
+          <rect
+            x="76"
+            y="1100"
+            width="68"
+            height="14"
+            rx="2"
+            fill="none"
+            stroke="#17212a"
+            stroke-width="0.8"
+          />
+        </g>
+        <g data-class="MergeScoring">
+          <rect
+            x="628"
+            y="1164"
+            width="80"
+            height="14"
+            rx="2"
+            fill="none"
+            stroke="#17212a"
+            stroke-width="0.8"
+          />
+        </g>
         <!-- Legend -->
         <line
           x1="24"
@@ -2106,9 +2136,9 @@
           y1="1440"
           x2="412"
           y2="1440"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          marker-end="url(#ext1-open)"
+          marker-end="url(#ext1-triangle)"
         />
         <text
           x="420"
@@ -2117,7 +2147,7 @@
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Use · attribute, parameter, return, local or new
+          Inheritance · a variant class extends an engine class
         </text>
         <rect
           x="520"
