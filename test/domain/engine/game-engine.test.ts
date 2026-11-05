@@ -2,6 +2,7 @@
 import { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameOver } from '../../../src/domain/engine/game-events';
 import { GameId } from '../../../src/domain/engine/game-id';
+import type { Resolution } from '../../../src/domain/engine/resolution';
 import { fakeCell } from '../../support/engine/fake-cell';
 import {
   emptyState,
@@ -9,6 +10,7 @@ import {
   OnePointScoring,
   RecordingPublisher,
   type FakeMove,
+  type FakeState,
 } from '../../support/engine/fake-game';
 import { square } from '../../support/engine/square-topology';
 
@@ -24,6 +26,30 @@ function newGame(log: string[] = []) {
     publisher,
   );
   return { engine, publisher };
+}
+
+// Rules that fail once in `resolve()`, after `apply()` has put the cell on the board.
+class FailingOnceRules extends FakeRules {
+  private failed = false;
+  override resolve(state: FakeState): Resolution<FakeState> {
+    if (!this.failed) {
+      this.failed = true;
+      throw new Error('resolve failed');
+    }
+    return super.resolve(state);
+  }
+}
+
+// A scoring policy that fails once.
+class FailingOnceScoring extends OnePointScoring {
+  private failed = false;
+  override score(before: FakeState, resolution: Resolution<FakeState>): number {
+    if (!this.failed) {
+      this.failed = true;
+      throw new Error('score failed');
+    }
+    return super.score(before, resolution);
+  }
 }
 
 function place(col: number, row: number, value = 1): FakeMove {
@@ -143,5 +169,41 @@ describe('GameEngine.play()', () => {
     initial.board.set(square(0, 0), fakeCell(5));
 
     expect(engine.snapshot().board.get(square(0, 0))).toBeUndefined();
+  });
+
+  it('should_keep_the_board_and_accept_the_next_move_when_the_rules_throw', () => {
+    const engine = new GameEngine(
+      GameId.of('fake-game'),
+      new FailingOnceRules(),
+      new OnePointScoring(),
+      new RecordingPublisher(),
+    );
+    engine.start(emptyState());
+
+    expect(() => engine.play(place(0, 0))).toThrow('resolve failed');
+
+    expect(engine.phase.canPlay()).toBe(true);
+    expect(engine.snapshot().board.get(square(0, 0))).toBeUndefined();
+    expect(engine.snapshot().score).toBe(0);
+    expect(engine.play(place(0, 0))).toBe('playing');
+    expect(engine.snapshot().board.get(square(0, 0))).toEqual(fakeCell(1));
+  });
+
+  it('should_keep_the_board_and_accept_the_next_move_when_the_scoring_throws', () => {
+    const engine = new GameEngine(
+      GameId.of('fake-game'),
+      new FakeRules(),
+      new FailingOnceScoring(),
+      new RecordingPublisher(),
+    );
+    engine.start(emptyState());
+
+    expect(() => engine.play(place(0, 0))).toThrow('score failed');
+
+    expect(engine.phase.canPlay()).toBe(true);
+    expect(engine.snapshot().board.get(square(0, 0))).toBeUndefined();
+    expect(engine.snapshot().score).toBe(0);
+    expect(engine.play(place(0, 0))).toBe('playing');
+    expect(engine.snapshot().score).toBe(1);
   });
 });
