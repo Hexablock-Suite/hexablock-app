@@ -295,7 +295,7 @@
         </text>
 
         <!-- Relationships (drawn before boxes) -->
-        <!-- GameEngine holds the IGameRules it receives as rules: aggregation -->
+        <!-- GameEngine holds the IGameRules it receives as rules: aggregation, kept because Strategy holds it -->
         <line
           x1="380"
           y1="256"
@@ -305,7 +305,7 @@
           marker-start="url(#t-diamond-hollow)"
           stroke="#17212a"
         />
-        <!-- GameEngine holds the IScoringPolicy it receives as scoring: aggregation -->
+        <!-- GameEngine holds the IScoringPolicy it receives as scoring: aggregation, kept because Strategy holds it -->
         <line
           x1="380"
           y1="404"
@@ -315,7 +315,7 @@
           marker-start="url(#t-diamond-hollow)"
           stroke="#17212a"
         />
-        <!-- GameEngine creates its GamePhase phase: composition -->
+        <!-- GameEngine creates its GamePhase phase: composition, kept because State holds it -->
         <line
           x1="660"
           y1="256"
@@ -325,7 +325,7 @@
           stroke-width="1"
           marker-start="url(#t-diamond-filled)"
         />
-        <!-- GameEngine holds zero or one MoveHistory it receives as history: aggregation -->
+        <!-- GameEngine holds zero or one MoveHistory it receives as history: aggregation, kept because Command holds it: MoveHistory is the Command invoker -->
         <line
           x1="660"
           y1="372"
@@ -965,7 +965,7 @@
           y2="788"
           stroke="#17212a"
           stroke-width="1"
-          marker-end="url(#t-triangle)"
+          marker-start="url(#t-diamond-filled)"
         />
         <text
           x="60"
@@ -974,26 +974,7 @@
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Inheritance
-        </text>
-        <line
-          x1="144"
-          y1="788"
-          x2="172"
-          y2="788"
-          stroke="#17212a"
-          stroke-width="1"
-          stroke-dasharray="5,4"
-          marker-end="url(#t-triangle)"
-        />
-        <text
-          x="180"
-          y="792"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Realization
+          Composition · in-layer pattern
         </text>
         <line
           x1="264"
@@ -1002,7 +983,7 @@
           y2="788"
           stroke="#17212a"
           stroke-width="1"
-          marker-start="url(#t-diamond-filled)"
+          marker-start="url(#t-diamond-hollow)"
         />
         <text
           x="300"
@@ -1011,43 +992,25 @@
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Composition · attribute it creates
+          Aggregation · in-layer pattern
         </text>
         <line
-          x1="474"
+          x1="504"
           y1="788"
-          x2="502"
-          y2="788"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#t-diamond-hollow)"
-        />
-        <text
-          x="510"
-          y="792"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Aggregation · attribute it receives
-        </text>
-        <line
-          x1="694"
-          y1="788"
-          x2="722"
+          x2="532"
           y2="788"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#t-open)"
         />
         <text
-          x="730"
+          x="540"
           y="792"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Use · parameter, return, local or new
+          Use · attribute, parameter, return, local or new
         </text>
         <rect
           x="24"

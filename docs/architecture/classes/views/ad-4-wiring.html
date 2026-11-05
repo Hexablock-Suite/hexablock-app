@@ -224,14 +224,14 @@
           SINGLE SCOPE · §3.3 · Q9
         </text>
 
-        <!-- Relationships (drawn before boxes): CompositionRoot creates each object. It keeps two as attributes (composition) and only creates the others (use «create»). -->
-        <!-- CompositionRoot creates AudioManager and keeps it: composition -->
+        <!-- Relationships (drawn before boxes): CompositionRoot creates each object. It keeps two as attributes and only creates the others. Each link is a use «create». -->
+        <!-- CompositionRoot creates AudioManager and keeps it in an attribute: use «create» -->
         <path
           d="M272 316 H152 Q144 316 144 308 V160"
           fill="none"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#adwiring-diamond-filled)"
+          marker-end="url(#adwiring-open)"
         />
         <!-- CompositionRoot creates SeededRandomSource: use «create» -->
         <line
@@ -253,13 +253,13 @@
           stroke-width="1"
           marker-end="url(#adwiring-open)"
         />
-        <!-- CompositionRoot creates SessionManager and keeps it: composition -->
+        <!-- CompositionRoot creates SessionManager and keeps it in an attribute: use «create» -->
         <path
           d="M592 316 H840 Q848 316 848 308 V184"
           fill="none"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#adwiring-diamond-filled)"
+          marker-end="url(#adwiring-open)"
         />
         <!-- CompositionRoot creates GameEventBus: use «create», down from layer 4 to layer 3 -->
         <line
@@ -323,6 +323,30 @@
         <text
           x="566"
           y="462"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          «create»
+        </text>
+        <rect x="148" y="240" width="47" height="12" rx="2" fill="#cfdcf3" />
+        <text
+          x="150"
+          y="249"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          «create»
+        </text>
+        <rect x="852" y="240" width="47" height="12" rx="2" fill="#cfdcf3" />
+        <text
+          x="854"
+          y="249"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -671,9 +695,9 @@
           y1="700"
           x2="52"
           y2="700"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-end="url(#adwiring-triangle)"
+          marker-end="url(#adwiring-open)"
         />
         <text
           x="60"
@@ -682,80 +706,7 @@
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Inheritance
-        </text>
-        <line
-          x1="144"
-          y1="700"
-          x2="172"
-          y2="700"
-          stroke="#17212a"
-          stroke-width="1"
-          stroke-dasharray="5,4"
-          marker-end="url(#adwiring-triangle)"
-        />
-        <text
-          x="180"
-          y="704"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Realization
-        </text>
-        <line
-          x1="264"
-          y1="700"
-          x2="292"
-          y2="700"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#adwiring-diamond-filled)"
-        />
-        <text
-          x="300"
-          y="704"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Composition · attribute it creates
-        </text>
-        <line
-          x1="488"
-          y1="700"
-          x2="516"
-          y2="700"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#adwiring-diamond-hollow)"
-        />
-        <text
-          x="524"
-          y="704"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Aggregation · attribute it receives
-        </text>
-        <line
-          x1="720"
-          y1="700"
-          x2="748"
-          y2="700"
-          stroke="#5b6873"
-          stroke-width="1"
-          marker-end="url(#adwiring-open)"
-        />
-        <text
-          x="756"
-          y="704"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Use · parameter, return, local or new
+          Use · attribute, parameter, return, local or new
         </text>
 
         <rect

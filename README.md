@@ -59,6 +59,8 @@ This sketch shows only the layers and the direction of the dependencies. The ful
 
 **Presentation.** The screens follow Model-View-Presenter. The view is a route in layer 4, for example `GameScreen` with `BoardView`. The presenter (`GamePresenter`) and the view model (`GameViewModel`) live in layer 3. The presenter calls a use case through `UseCase` and maps the plain response to the view model.
 
+**Use case flows.** [docs/architecture/flows.md](docs/architecture/flows.md) follows two use cases through the four layers, each with a class view and a sequence diagram: `ApplyMove` stays inside the app, and `SaveProgress` sends a result to `hexablock-api`.
+
 One placement differs from statement §3.4 on purpose. The statement puts the repository implementations and the DTO mappers in layer 3, interface adapters. The HTTP repositories and their DTO mapper live in layer 4, `src/infrastructure/api/`, next to the HTTP client, and implement the layer 2 ports directly. In layer 3 they needed a `BackendApi` port whose methods named transport types, which ties the use cases to the shape of the HTTP data. The local repositories stay in layer 3. See Q7 in [docs/architecture/layers.md](docs/architecture/layers.md) and decision 22 in [docs/architecture/classes.md](docs/architecture/classes.md).
 
 Two placements are still open with the professor: where the cell renderers live (Q8) and where the composition root lives (Q9). Both are in [docs/architecture/layers.md](docs/architecture/layers.md).

@@ -1,6 +1,6 @@
 # Clean Architecture layers
 
-Status: draft for review with the professor, 2026-10-30. Updated on 2026-10-31 to match the class diagram: one generic input port, the ports of decisions 10 to 12, engine interfaces that are not ports, and the presentation pattern.
+Status: draft for review with the professor, 2026-10-30. Updated on 2026-10-31 to match the class diagram: one generic input port, the ports of decisions 10 to 12, engine interfaces that are not ports, and the presentation pattern. Updated on 2026-11-02: the `Logger` port takes a log entry, and its adapter writes the text (decision 37 of the class diagram).
 
 This page answers one question: in which layer does each piece of the client live? It follows the statement (§3.4, §4.2) and the layer rules in `.dependency-cruiser.cjs`. The engine is not written yet. Today `src/` holds one README per layer folder plus the API client in `src/infrastructure/api/`. Component names follow the statement (§3.1, §3.4) and the [class diagram](classes.md). They are not final. The engine names carry no geometry: `Board<TCell, TCoord>` is the `HexBoard<TCell>` of §3.1 (decision 16 of the class diagram). IDs such as A1, D3 and Q7 refer to [`docs/REQUIREMENTS.md`](../REQUIREMENTS.md). The classes of layer 1 are in the [class diagram](classes.md).
 
@@ -8,7 +8,7 @@ This page answers one question: in which layer does each piece of the client liv
 
 Statement §4.2 asks for four concentric layers. Mermaid draws them as a stack: layer 4, the outer ring, is at the top, and layer 1, the center, is at the bottom. Every arrow goes from the component that imports to the component it imports. No arrow points up, toward an outer layer. Some arrows stay inside one layer, for example from the presenters to the mappers.
 
-- Solid arrow: uses (imports). Dotted arrow: implements an interface.
+- Solid arrow: uses (imports). Dotted arrow: realization, the class implements an interface. Mermaid draws no hollow triangle, so the dotted line and its label `implements` stand for the UML realization.
 - Rounded node: a port, an interface that layer 2 owns and an outer layer implements. Ports live in the application layer, because a use case may depend only on ports of its own layer (§3.4). So only layer 2 has rounded nodes.
 - Plain box: a class or an interface that is not a port. The engine owns `Clock`, `RandomSource` and `GameEventPublisher`, and layer 3 owns `KeyValueStore`. An outer layer implements them too, but they are interfaces of their own layer, not ports (decision 25 of the class diagram).
 - Dashed border and the suffix "(planned)": the component does not exist yet. A solid border means the file exists today.
@@ -31,7 +31,7 @@ flowchart TB
       AUDIO["AudioManager: audio facade over the<br/>sound library, single scope (planned)"]
       CLOCK["SystemClock (planned)"]
       RNG["SeededRandomSource (planned)"]
-      LOGGER["ConsoleLogger (planned)"]
+      LOGGER["ConsoleLogger: writes the log text (planned)"]
       VIEWS["BoardView and cell renderers,<br/>React Native (planned, folder: Q8)"]
       ROOT["Composition root (planned, file: Q9)"]
     end
@@ -59,7 +59,7 @@ flowchart TB
     ACCPORT(["AccountGateway port (planned)"])
     SESSPORT(["SessionStore port (planned)"])
     SETPORT(["SettingsStore port (planned)"])
-    LOGPORT(["Logger port (planned)"])
+    LOGPORT(["Logger port: takes a UseCaseLogEntry (planned)"])
   end
 
   subgraph L1["Layer 1: Entities"]
@@ -146,7 +146,7 @@ flowchart TB
     LGPORT(["Rounded node: a port of layer 2"])
     LGPLAN["Dashed border: planned"]
     LGFROM["Importer"] -->|uses| LGTO["Imported"]
-    LGIMPL["Implementation"] -.->|implements| LGIFACE["Interface"]
+    LGIMPL["Implementation"] -.->|realization: implements| LGIFACE["Interface"]
   end
 
   %% Invisible links keep the layers stacked from outer to inner, with the legend last.
@@ -206,7 +206,7 @@ The "May depend on" column repeats `.dependency-cruiser.cjs`. `pnpm arch` checks
 - **Input port:** layer 2, `src/application/`, one generic interface, `UseCase<TRequest, TResponse>` (decision 9). Each use case binds it, for example `UseCase<ApplyMoveRequest<TMove>, MoveResult<TCell, TCoord>>`. The presenters depend on the interface, not on the class. Each aspect decorator implements the same interface to wrap any use case. Tests call the same interface.
 - **Results and response models:** layer 2. `execute()` returns `Promise<Result<TResponse>>`: a use case reports a failure as a `Result` with a `UseCaseError` and never throws to the screen (decision 28). The response is plain data: `MoveResult` copies the cells and never carries the `Board` or the engine (decision 29).
 - **Session:** the `SessionStore` port lives in layer 2. `SessionManager`, the secure token storage in layer 4, implements it. `Login` and `Register` write the token through it. The authorization aspect reads it before `SaveProgress` and `SyncLeaderboard` run (§3.5).
-- **AOP decorators:** layer 2, `src/application/`. Each decorator implements the same use case interface and wraps a use case (§3.5, A2). `RetryAspect` runs the use case again while the error of its `Result` is retryable. A decorator logs through the `Logger` port and reads the time through the `Clock` interface of the engine, because `application-imports-only-domain` forbids a logging package there. The lint rule of R-domain-determinism covers `src/application/` too, so a decorator never calls `Date.now`. The concrete logger lives in layer 4.
+- **AOP decorators:** layer 2, `src/application/`. Each decorator implements the same use case interface and wraps a use case (§3.5, A2). `RetryAspect` runs the use case again while the error of its `Result` is retryable. A decorator logs through the `Logger` port and reads the time through the `Clock` interface of the engine, because `application-imports-only-domain` forbids a logging package there. The lint rule of R-domain-determinism covers `src/application/` too, so a decorator never calls `Date.now`. The decorator passes a `UseCaseLogEntry` with the use case name, the outcome, the time and the error, never a prebuilt message. The concrete logger lives in layer 4 and writes the text (decision 37 of the class diagram).
 - **Repositories:** the ports (`ProgressRepository`, `LeaderboardGateway`, `LevelRepository`) live in layer 2. The local implementations live in layer 3, `src/adapters/`, and use `KeyValueStore`, a driver interface of layer 3. The HTTP implementations and their DTO mapper live in layer 4, `src/infrastructure/api/`, next to the HTTP client, and implement the layer 2 ports directly (Q7, option B). No port names a transport type. A new database or backend means a new adapter, and the use cases do not change.
 - **API client:** layer 4, `src/infrastructure/api/client.ts`. It uses the types in `schema.d.ts`, which `pnpm api:generate` writes from the backend OpenAPI document. `pacts/hexablock-app-hexablock-api.json` is the contract the consumer test writes for this client. It is a test artifact, not a layer.
 - **Screens:** layer 4, `app/` (Expo Router routes; only the home screen exists). Their presenters and view models live in layer 3. The folder for the React Native board and cell components is open (Q8).

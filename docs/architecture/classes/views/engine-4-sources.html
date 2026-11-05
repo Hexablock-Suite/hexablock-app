@@ -258,7 +258,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#sources-triangle)"
         />
-        <!-- ScoringDecorator holds the IScoringPolicy it receives as inner: aggregation -->
+        <!-- ScoringDecorator holds the IScoringPolicy it receives as inner: aggregation, kept because Decorator holds it -->
         <line
           x1="824"
           y1="228"
@@ -743,6 +743,7 @@
           y2="676"
           stroke="#17212a"
           stroke-width="1"
+          stroke-dasharray="5,4"
           marker-end="url(#sources-triangle)"
         />
         <text
@@ -752,7 +753,7 @@
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Inheritance
+          Realization
         </text>
         <line
           x1="144"
@@ -761,8 +762,7 @@
           y2="676"
           stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="5,4"
-          marker-end="url(#sources-triangle)"
+          marker-start="url(#sources-diamond-hollow)"
         />
         <text
           x="180"
@@ -771,61 +771,25 @@
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Realization
+          Aggregation · in-layer pattern
         </text>
         <line
-          x1="264"
+          x1="384"
           y1="676"
-          x2="292"
-          y2="676"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#sources-diamond-filled)"
-        />
-        <text
-          x="300"
-          y="680"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Composition · attribute it creates
-        </text>
-        <line
-          x1="474"
-          y1="676"
-          x2="502"
-          y2="676"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#sources-diamond-hollow)"
-        />
-        <text
-          x="510"
-          y="680"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Aggregation · attribute it receives
-        </text>
-        <line
-          x1="694"
-          y1="676"
-          x2="722"
+          x2="412"
           y2="676"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#sources-open)"
         />
         <text
-          x="730"
+          x="420"
           y="680"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Use · parameter, return, local or new
+          Use · attribute, parameter, return, local or new
         </text>
         <rect
           x="24"

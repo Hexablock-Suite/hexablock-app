@@ -1,0 +1,1548 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ApplyMove flow · UML class diagram</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --color-paper: #f3f5f6;
+        --color-ink: #17212a;
+        --color-muted: #5b6873;
+        --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+        --font-serif: 'Instrument Serif', serif;
+        --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+      }
+      body {
+        font-family: var(--font-sans);
+        background: var(--color-paper);
+        color: var(--color-ink);
+        padding: 3rem 2rem;
+      }
+      .frame {
+        max-width: 1240px;
+        margin: 0 auto;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-muted);
+        margin-bottom: 0.5rem;
+      }
+      h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        margin-bottom: 1.5rem;
+      }
+      svg {
+        width: 100%;
+        min-width: 900px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <p class="eyebrow">Use case flow · ApplyMove · class view</p>
+      <h1>ApplyMove across the four layers: the classes of one move</h1>
+      <svg
+        viewBox="0 0 1040 1290"
+        xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-labelledby="flowmove-title flowmove-desc"
+      >
+        <title id="flowmove-title">HexaBlock ApplyMove flow · UML class diagram</title>
+        <desc id="flowmove-desc">
+          Cross-layer class diagram of the ApplyMove use case only. In layer 4, GameScreen uses
+          GamePresenter and reads GameViewModel. In layer 3, GamePresenter keeps the StateMapper
+          strategy, builds GameViewModel and uses the UseCase input port; InMemoryRunningGameStore
+          implements the RunningGameStore port. In layer 2, ApplyMove implements UseCase, takes an
+          ApplyMoveRequest, builds a MoveResult and keeps the RunningGameStore port. In layer 1,
+          ApplyMove plays the move on GameEngine, which keeps the IGameRules strategy, and reads the
+          cells of Board. Every dependency between layers points down.
+        </desc>
+        <defs>
+          <marker
+            id="flowmove-triangle"
+            markerWidth="16"
+            markerHeight="12"
+            refX="15"
+            refY="6"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          </marker>
+          <marker
+            id="flowmove-diamond-hollow"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon
+              points="0 5, 9 0, 18 5, 9 10"
+              fill="#ffffff"
+              stroke="#17212a"
+              stroke-width="1"
+            />
+          </marker>
+          <marker
+            id="flowmove-open"
+            markerWidth="10"
+            markerHeight="8"
+            refX="9"
+            refY="4"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
+          </marker>
+        </defs>
+        <rect width="100%" height="100%" fill="#f3f5f6" />
+        <!-- Layer zone: layer 4 · frameworks and drivers -->
+        <rect
+          x="24"
+          y="24"
+          width="992"
+          height="148"
+          rx="8"
+          fill="#cfdcf3"
+          stroke="rgba(30,58,138,0.50)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="44"
+          fill="#1e3a8a"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 4 · FRAMEWORKS AND DRIVERS · app/
+        </text>
+        <!-- Layer zone: layer 3 · interface adapters -->
+        <rect
+          x="24"
+          y="180"
+          width="992"
+          height="320"
+          rx="8"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="200"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 3 · INTERFACE ADAPTERS · src/adapters/
+        </text>
+        <!-- Layer zone: layer 2 · use cases -->
+        <rect
+          x="24"
+          y="508"
+          width="992"
+          height="328"
+          rx="8"
+          fill="#efe7f8"
+          stroke="rgba(126,34,206,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="528"
+          fill="#7e22ce"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 2 · USE CASES · src/application/
+        </text>
+        <!-- Layer zone: layer 1 · entities -->
+        <rect
+          x="24"
+          y="844"
+          width="992"
+          height="236"
+          rx="8"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="864"
+          fill="#b45309"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 1 · ENTITIES · src/domain/engine/
+        </text>
+        <!-- Relationships (drawn before boxes) -->
+        <!-- GameScreen keeps the GamePresenter it receives as a prop: use, down from layer 4 to layer 3 -->
+        <path
+          d="M500 156 V224"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#flowmove-open)"
+        />
+        <!-- GameScreen reads GameViewModel: use, down from layer 4 to layer 3 -->
+        <path
+          d="M680 120 H900 Q908 120 908 128 V224"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#flowmove-open)"
+        />
+        <!-- GamePresenter keeps the StateMapper it receives: aggregation, kept because Strategy holds it -->
+        <path
+          d="M320 296 H268"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#flowmove-diamond-hollow)"
+        />
+        <!-- GamePresenter builds GameViewModel: use -->
+        <path
+          d="M756 296 H816"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#flowmove-open)"
+        />
+        <!-- GamePresenter keeps the UseCase input port it receives in an attribute: use, down from layer 3 to layer 2 -->
+        <path
+          d="M400 368 V548"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#flowmove-open)"
+        />
+        <!-- InMemoryRunningGameStore implements RunningGameStore: realization, down from layer 3 to layer 2 -->
+        <path
+          d="M760 484 V548"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#flowmove-triangle)"
+        />
+        <!-- InMemoryRunningGameStore keeps zero or one GameEngine: use, down from layer 3 to layer 1 -->
+        <path
+          d="M992 444 H1009 V932 Q1009 940 1001 940 H980"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#flowmove-open)"
+        />
+        <!-- ApplyMove implements UseCase: realization -->
+        <path
+          d="M460 680 V620"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#flowmove-triangle)"
+        />
+        <!-- ApplyMove takes an ApplyMoveRequest: use -->
+        <path
+          d="M310 680 V658 Q310 650 302 650 H148 Q140 650 140 642 V620"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#flowmove-open)"
+        />
+        <!-- ApplyMove builds the MoveResult it returns: use -->
+        <path
+          d="M300 750 H250"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#flowmove-open)"
+        />
+        <!-- ApplyMove keeps the RunningGameStore it receives in an attribute: use -->
+        <path
+          d="M628 712 H692 Q700 712 700 704 V636"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#flowmove-open)"
+        />
+        <!-- RunningGameStore stores and returns the GameEngine: use, down from layer 2 to layer 1 -->
+        <path
+          d="M740 636 V896"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#flowmove-open)"
+        />
+        <!-- ApplyMove calls GameEngine.play() and snapshot(): use, down from layer 2 to layer 1 -->
+        <path
+          d="M600 804 V872 Q600 880 608 880 H692 Q700 880 700 888 V896"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#flowmove-open)"
+        />
+        <!-- ApplyMove reads the cells of Board: use, down from layer 2 to layer 1 -->
+        <path
+          d="M316 804 V872 Q316 880 308 880 H178 Q170 880 170 888 V896"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#flowmove-open)"
+        />
+        <!-- GameEngine keeps the IGameRules it receives: aggregation, kept because Strategy holds it -->
+        <path
+          d="M680 952 H590"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#flowmove-diamond-hollow)"
+        />
+        <!-- Arrow labels -->
+        <rect x="912" y="187" width="36" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="916"
+          y="196"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          READS
+        </text>
+        <rect x="764" y="281" width="41.6" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="768"
+          y="290"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          BUILDS
+        </text>
+        <rect x="742" y="751" width="41.6" height="12" rx="2" fill="#efe7f8" />
+        <text
+          x="746"
+          y="760"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          STORES
+        </text>
+        <rect x="206" y="637" width="36" height="12" rx="2" fill="#efe7f8" />
+        <text
+          x="210"
+          y="646"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          TAKES
+        </text>
+        <rect x="252" y="737" width="41.6" height="12" rx="2" fill="#efe7f8" />
+        <text
+          x="256"
+          y="746"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          BUILDS
+        </text>
+        <rect x="602" y="815" width="41.6" height="12" rx="2" fill="#efe7f8" />
+        <text
+          x="606"
+          y="824"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          PLAY()
+        </text>
+        <rect x="318" y="815" width="47.2" height="12" rx="2" fill="#efe7f8" />
+        <text
+          x="322"
+          y="824"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          CELLS()
+        </text>
+        <!-- Role names and multiplicities at the part end -->
+        <rect x="502" y="209" width="59.9" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="504"
+          y="218"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          presenter
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <rect x="270" y="281" width="45.2" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="272"
+          y="290"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          mapper
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <rect x="402" y="533" width="59.9" height="12" rx="2" fill="#efe7f8" />
+        <text
+          x="404"
+          y="542"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          applyMove
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <rect x="702" y="643" width="40.3" height="12" rx="2" fill="#efe7f8" />
+        <text
+          x="704"
+          y="652"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          games
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <rect x="954.9" y="925" width="50.1" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="1003"
+          y="934"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+        >
+          game
+          <tspan font-weight="600">0..1</tspan>
+        </text>
+        <rect x="592" y="937" width="40.3" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="594"
+          y="946"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          rules
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <!-- Class: GameScreen (component, route) -->
+        <rect
+          x="400"
+          y="56"
+          width="280"
+          height="100"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="540"
+          y="74"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «component» «route»
+        </text>
+        <text
+          x="540"
+          y="92"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GameScreen
+        </text>
+        <text
+          x="540"
+          y="106"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          app/game.tsx
+        </text>
+        <line x1="400" y1="116" x2="680" y2="116" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="416" y="132" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - presenter: GamePresenter
+        </text>
+        <text x="416" y="148" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          renders GameViewModel, sends moves
+        </text>
+        <!-- Class: GamePresenter -->
+        <rect
+          x="320"
+          y="224"
+          width="436"
+          height="144"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="538"
+          y="254"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GamePresenter
+        </text>
+        <line x1="320" y1="272" x2="756" y2="272" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="336" y="288" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - applyMove: UseCase&lt;ApplyMoveRequest&lt;TMove&gt;, MoveResult&lt;TCell, TCoord&gt;&gt;
+        </text>
+        <text x="336" y="304" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - mapper: StateMapper&lt;TCell&gt;
+        </text>
+        <line x1="320" y1="312" x2="756" y2="312" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="336" y="328" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + onMove(move: TMove): Promise&lt;void&gt;
+        </text>
+        <text x="336" y="344" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + onEvent(event: GameEvent): void
+        </text>
+        <text x="336" y="360" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + viewModel(): GameViewModel
+        </text>
+        <!-- Class: StateMapper (interface, strategy) -->
+        <rect
+          x="48"
+          y="224"
+          width="220"
+          height="72"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="158"
+          y="242"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «Strategy»
+        </text>
+        <text
+          x="158"
+          y="260"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          StateMapper
+        </text>
+        <line x1="48" y1="272" x2="268" y2="272" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="64" y="288" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + toView(cell: TCell): CellView
+        </text>
+        <!-- Class: GameViewModel (value object) -->
+        <rect
+          x="816"
+          y="224"
+          width="184"
+          height="152"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="908"
+          y="242"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="908"
+          y="260"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GameViewModel
+        </text>
+        <line x1="816" y1="272" x2="1000" y2="272" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="832" y="288" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + cells: CellView[]
+        </text>
+        <text x="832" y="304" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + score: number
+        </text>
+        <text x="832" y="320" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + canUndo: boolean
+        </text>
+        <text x="832" y="336" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + canRedo: boolean
+        </text>
+        <text x="832" y="352" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + phase: string
+        </text>
+        <text x="832" y="368" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + error: string [0..1]
+        </text>
+        <!-- Class: InMemoryRunningGameStore (adapter) -->
+        <rect
+          x="652"
+          y="412"
+          width="340"
+          height="72"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="822"
+          y="442"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          InMemoryRunningGameStore
+        </text>
+        <line x1="652" y1="460" x2="992" y2="460" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="668" y="476" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - game: GameEngine&lt;TCell, TCoord, TMove, TState&gt; [0..1]
+        </text>
+        <!-- Class: UseCase (interface, input port) -->
+        <rect
+          x="250"
+          y="548"
+          width="340"
+          height="72"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="420"
+          y="566"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «input port»
+        </text>
+        <text
+          x="420"
+          y="584"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          UseCase
+        </text>
+        <line x1="250" y1="596" x2="590" y2="596" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="266" y="612" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + execute(request: TRequest): Promise&lt;Result&lt;TResponse&gt;&gt;
+        </text>
+        <!-- Class: ApplyMoveRequest (value object, request model) -->
+        <rect
+          x="40"
+          y="548"
+          width="190"
+          height="72"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="135"
+          y="566"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object» «request»
+        </text>
+        <text
+          x="135"
+          y="584"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          ApplyMoveRequest
+        </text>
+        <line x1="40" y1="596" x2="230" y2="596" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="56" y="612" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + move: TMove
+        </text>
+        <!-- Class: RunningGameStore (interface, output port) -->
+        <rect
+          x="602"
+          y="548"
+          width="392"
+          height="88"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="798"
+          y="566"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «port»
+        </text>
+        <text
+          x="798"
+          y="584"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          RunningGameStore
+        </text>
+        <line x1="602" y1="596" x2="994" y2="596" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="618" y="612" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + current(): GameEngine&lt;TCell, TCoord, TMove, TState&gt; | undefined
+        </text>
+        <text x="618" y="628" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + replace(game: GameEngine&lt;TCell, TCoord, TMove, TState&gt;): void
+        </text>
+        <!-- Class: ApplyMove (focal, use case) -->
+        <rect
+          x="300"
+          y="680"
+          width="328"
+          height="124"
+          rx="6"
+          fill="rgba(15,111,116,0.05)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <rect x="300" y="680" width="328" height="60" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="300" y="732" width="328" height="8" fill="rgba(15,111,116,0.10)" />
+        <text
+          x="464"
+          y="698"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «use case»
+        </text>
+        <text
+          x="464"
+          y="716"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          ApplyMove
+        </text>
+        <text
+          x="464"
+          y="730"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          APP-FR-03
+        </text>
+        <line x1="300" y1="740" x2="628" y2="740" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <text x="316" y="756" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - games: RunningGameStore&lt;TCell, TCoord, TMove, TState&gt;
+        </text>
+        <line x1="300" y1="764" x2="628" y2="764" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <text x="316" y="780" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + execute(request: ApplyMoveRequest&lt;TMove&gt;):
+        </text>
+        <text x="332" y="796" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Promise&lt;Result&lt;MoveResult&lt;TCell, TCoord&gt;&gt;&gt;
+        </text>
+        <!-- Class: MoveResult (value object, response model) -->
+        <rect
+          x="40"
+          y="680"
+          width="210"
+          height="136"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="145"
+          y="698"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object» «response»
+        </text>
+        <text
+          x="145"
+          y="716"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          MoveResult
+        </text>
+        <line x1="40" y1="728" x2="250" y2="728" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="56" y="744" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + cells: [TCoord, TCell][]
+        </text>
+        <text x="56" y="760" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + score: number
+        </text>
+        <text x="56" y="776" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + outcome: Outcome
+        </text>
+        <text x="56" y="792" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + canUndo: boolean
+        </text>
+        <text x="56" y="808" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + canRedo: boolean
+        </text>
+        <!-- Class: Board (engine) -->
+        <rect
+          x="40"
+          y="896"
+          width="260"
+          height="88"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="170"
+          y="914"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «Iterator» «Prototype»
+        </text>
+        <text
+          x="170"
+          y="932"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          Board
+        </text>
+        <line x1="40" y1="944" x2="300" y2="944" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="56" y="960" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + get(at: TCoord): TCell | undefined
+        </text>
+        <text x="56" y="976" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + cells(): [TCoord, TCell][]
+        </text>
+        <!-- Class: IGameRules (interface, strategy) -->
+        <rect
+          x="330"
+          y="896"
+          width="260"
+          height="88"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="460"
+          y="914"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «Strategy»
+        </text>
+        <text
+          x="460"
+          y="932"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          IGameRules
+        </text>
+        <line x1="330" y1="944" x2="590" y2="944" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="346" y="960" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + playTurn(state: TState, move: TMove):
+        </text>
+        <text x="362" y="976" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Resolution&lt;TState&gt;
+        </text>
+        <!-- Class: GameEngine (aggregate root) -->
+        <rect
+          x="680"
+          y="896"
+          width="300"
+          height="160"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="830"
+          y="914"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «aggregate root»
+        </text>
+        <text
+          x="830"
+          y="932"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GameEngine
+        </text>
+        <line x1="680" y1="944" x2="980" y2="944" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="696" y="960" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - rules: IGameRules&lt;TCell, TMove, TState&gt;
+        </text>
+        <text x="696" y="976" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          scoring, phase, history: view 1
+        </text>
+        <line x1="680" y1="984" x2="980" y2="984" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="696"
+          y="1000"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + play(move: TMove): Outcome
+        </text>
+        <text
+          x="696"
+          y="1016"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + snapshot(): TState
+        </text>
+        <text
+          x="696"
+          y="1032"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + undoable(): IUndoable | undefined
+        </text>
+        <text
+          x="696"
+          y="1048"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + redoable(): IRedoable | undefined
+        </text>
+        <!-- UML template boxes: type parameters on the top-right corner -->
+        <rect
+          x="648"
+          y="214"
+          width="120"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="708"
+          y="226"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCell, TCoord, TMove
+        </text>
+        <rect
+          x="238"
+          y="214"
+          width="42"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="259"
+          y="226"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCell
+        </text>
+        <rect
+          x="842.4"
+          y="402"
+          width="161.6"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="923.2"
+          y="414"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCell, TCoord, TMove, TState
+        </text>
+        <rect
+          x="487.2"
+          y="538"
+          width="114.8"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="544.6"
+          y="550"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TRequest, TResponse
+        </text>
+        <rect
+          x="200"
+          y="538"
+          width="42"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="221"
+          y="550"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TMove
+        </text>
+        <rect
+          x="844.4"
+          y="538"
+          width="161.6"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="925.2"
+          y="550"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCell, TCoord, TMove, TState
+        </text>
+        <rect
+          x="478.4"
+          y="670"
+          width="161.6"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="559.2"
+          y="682"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCell, TCoord, TMove, TState
+        </text>
+        <rect
+          x="178.4"
+          y="670"
+          width="83.6"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="220.2"
+          y="682"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCell, TCoord
+        </text>
+        <rect
+          x="228.4"
+          y="886"
+          width="83.6"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="270.2"
+          y="898"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCell, TCoord
+        </text>
+        <rect
+          x="482"
+          y="886"
+          width="120"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="542"
+          y="898"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCell, TMove, TState
+        </text>
+        <rect
+          x="768"
+          y="886"
+          width="224"
+          height="30"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="880"
+          y="898"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCell, TCoord, TMove,
+        </text>
+        <text
+          x="880"
+          y="910"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TState extends BoardState‹TCell, TCoord›
+        </text>
+        <!-- Footnote -->
+        <text
+          x="24"
+          y="1108"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          One move, top to bottom: GameScreen sends the move to GamePresenter, which calls the
+          UseCase port. ApplyMove takes the running
+        </text>
+        <text
+          x="24"
+          y="1124"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          GameEngine from RunningGameStore, calls play() and snapshot(), and copies the cells of
+          Board into a MoveResult (decision 29).
+        </text>
+        <text
+          x="24"
+          y="1140"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          GamePresenter maps each cell with its StateMapper and builds GameViewModel. The sequence
+          diagram of this flow uses the same names.
+        </text>
+        <text
+          x="24"
+          y="1156"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          The composition root wraps ApplyMove in the aspects of view 3.1. Scoring, phase and
+          history stay inside GameEngine (Part 1, view 1).
+        </text>
+        <!-- Legend -->
+        <line
+          x1="24"
+          y1="1180"
+          x2="1016"
+          y2="1180"
+          stroke="rgba(23,33,42,0.10)"
+          stroke-width="0.8"
+        />
+        <text
+          x="24"
+          y="1198"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LEGEND
+        </text>
+        <line
+          x1="24"
+          y1="1216"
+          x2="52"
+          y2="1216"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#flowmove-triangle)"
+        />
+        <text
+          x="60"
+          y="1219"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Realization
+        </text>
+        <line
+          x1="144"
+          y1="1216"
+          x2="172"
+          y2="1216"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#flowmove-diamond-hollow)"
+        />
+        <text
+          x="180"
+          y="1219"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aggregation · in-layer pattern
+        </text>
+        <line
+          x1="344"
+          y1="1216"
+          x2="372"
+          y2="1216"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#flowmove-open)"
+        />
+        <text
+          x="380"
+          y="1219"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Use · attribute, parameter, return, local or new
+        </text>
+        <rect
+          x="24"
+          y="1232"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#cfdcf3"
+          stroke="rgba(30,58,138,0.50)"
+          stroke-width="1"
+        />
+        <text
+          x="60"
+          y="1241"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · layer 4
+        </text>
+        <rect
+          x="144"
+          y="1232"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="180"
+          y="1241"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · layer 3
+        </text>
+        <rect
+          x="264"
+          y="1232"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#efe7f8"
+          stroke="rgba(126,34,206,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="300"
+          y="1241"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · layer 2
+        </text>
+        <rect
+          x="384"
+          y="1232"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="420"
+          y="1241"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · layer 1
+        </text>
+        <rect
+          x="504"
+          y="1232"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="540"
+          y="1241"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Corner box · type parameters
+        </text>
+        <rect
+          x="704"
+          y="1232"
+          width="28"
+          height="12"
+          rx="2"
+          fill="rgba(15,111,116,0.10)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <text
+          x="740"
+          y="1241"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Teal · focal class
+        </text>
+      </svg>
+    </div>
+  </body>
+</html>

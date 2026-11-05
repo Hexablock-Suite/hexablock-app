@@ -8,6 +8,10 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 
 ### Added
 
+- APP-FR-16 in `docs/REQUIREMENTS.md`: the player chooses the board figure (hexagon, square or triangle) on one generic engine and one generic board, derived from the session of 2026-11-03 ([#63](https://github.com/Hexablock-Suite/hexablock-app/pull/63)).
+- A note in `docs/architecture/classes.md` that `UseCase` and `UseCaseAspect` name architecture roles, not game concepts ([#63](https://github.com/Hexablock-Suite/hexablock-app/pull/63)).
+- Use case flows 3 to 5 in `docs/architecture/flows.md`: `StartGame`, `UndoMove` and `Login`, each with a class view across the layers and a UML sequence diagram with `alt` and `ref` fragments, and a table that names the path of every other use case ([#63](https://github.com/Hexablock-Suite/hexablock-app/pull/63)).
+- Use case flows in `docs/architecture/flows.md`: `ApplyMove` and `SaveProgress`, each with a class view across the four layers and a UML sequence diagram with the same class names ([#63](https://github.com/Hexablock-Suite/hexablock-app/pull/63)).
 - Sprint plan in `docs/ROADMAP.md`, this changelog, rule R-sprint-release and its gate `test/docs/changelog.test.ts`.
 - Class diagram in `docs/architecture/classes.md`: the generic engine and the four variants ([#9](https://github.com/Hexablock-Suite/hexablock-app/pull/9)), the five engine views and the four variant views ([#11](https://github.com/Hexablock-Suite/hexablock-app/pull/11)), the engine and variant overview maps ([#12](https://github.com/Hexablock-Suite/hexablock-app/pull/12)), and the use case and adapter maps and views ([#13](https://github.com/Hexablock-Suite/hexablock-app/pull/13)).
 - Numbered functional and non-functional requirements, APP-FR-n and APP-NFR-n, each with a check ([#10](https://github.com/Hexablock-Suite/hexablock-app/pull/10)).
@@ -18,6 +22,12 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 
 ### Changed
 
+- `docs/REQUIREMENTS.md` records the answers of the session of 2026-11-03: C3 and C7 confirm A3 and A5, Q4 keeps the level update behind the token guard with no roles, gravity is not an axis, and APP-NFR-10 names Clean plus an architecture for games for every layer. Flow 5 and its sequence diagram cite view 3.3 of the API class diagram, not view 4.3 ([#63](https://github.com/Hexablock-Suite/hexablock-app/pull/63)).
+- The engine, use case and adapter maps and extensibility views 1 and 3 draw no line on a dashed frame or a package: each line joins the two classes that depend, with a role and a multiplicity or a verb, and the reading notes say why, after the session of 2026-11-03 ([#63](https://github.com/Hexablock-Suite/hexablock-app/pull/63)).
+- The class and extensibility views keep a diamond only where it makes a GoF pattern visible: `Board` with its `BoardShape` and `Piece` with its `ShapeNode` become use arrows, the legends say «in-layer pattern», and the notation texts and decision 23 drop the domain relation exception ([#63](https://github.com/Hexablock-Suite/hexablock-app/pull/63)).
+- The use case and adapter maps label the uses between groups with a verb, not with a role and a multiplicity ([#63](https://github.com/Hexablock-Suite/hexablock-app/pull/63)).
+- The class diagrams draw use arrows between layers and keep diamonds inside one layer, every use case box shows `execute()`, and `Logger` takes a `UseCaseLogEntry` ([#63](https://github.com/Hexablock-Suite/hexablock-app/pull/63)).
+- After the session of 2026-11-03, the use case and adapter maps and extensibility views 1 and 3 join groups only with use arrows, each view legend lists only the line kinds it draws, the layer diagram legend names its dotted arrow a realization, and decision 28 names Clean Architecture ([#63](https://github.com/Hexablock-Suite/hexablock-app/pull/63)).
 - Coordinate arithmetic moves into the grid topology of the class diagram ([#14](https://github.com/Hexablock-Suite/hexablock-app/pull/14)).
 - The overview maps replace the PlantUML class diagrams ([#12](https://github.com/Hexablock-Suite/hexablock-app/pull/12)).
 - The layer diagram is fixed after the draft audit ([#8](https://github.com/Hexablock-Suite/hexablock-app/pull/8)).

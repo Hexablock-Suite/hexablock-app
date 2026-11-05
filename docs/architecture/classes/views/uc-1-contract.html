@@ -64,7 +64,7 @@
       <h1>The use case contract and its aspects: Decorator for AOP</h1>
 
       <svg
-        viewBox="0 0 1040 872"
+        viewBox="0 0 1040 888"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="uccontract-title uccontract-desc"
@@ -74,7 +74,9 @@
           Class diagram of layer 2 showing the UseCase input port that every use case implements,
           whose execute() returns a Result, the abstract UseCaseAspect decorator that implements
           UseCase and wraps one inner UseCase, the logging, timing, retry and authorization aspects
-          that extend it, and the Logger output port that the logging and timing aspects use.
+          that extend it, and the Logger output port that the logging and timing aspects use. Logger
+          takes a UseCaseLogEntry with the use case name, the outcome, the time and the error, and
+          the adapter writes the text.
         </desc>
         <defs>
           <marker
@@ -181,7 +183,7 @@
           x="68"
           y="232"
           width="904"
-          height="288"
+          height="304"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -235,7 +237,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#uccontract-triangle)"
         />
-        <!-- UseCaseAspect keeps the inner UseCase it receives: aggregation -->
+        <!-- UseCaseAspect keeps the inner UseCase it receives: aggregation, kept because Decorator holds it -->
         <line
           x1="528"
           y1="264"
@@ -281,26 +283,50 @@
           stroke-width="1"
           marker-end="url(#uccontract-triangle)"
         />
-        <!-- LoggingAspect keeps the Logger it receives: aggregation -->
+        <!-- LoggingAspect keeps the Logger it receives in an attribute: use -->
         <line
           x1="440"
           y1="504"
           x2="440"
           y2="584"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#uccontract-diamond-hollow)"
+          marker-end="url(#uccontract-open)"
         />
-        <!-- TimingAspect keeps the Logger it receives: aggregation -->
+        <!-- TimingAspect keeps the Logger it receives in an attribute: use -->
         <line
           x1="600"
-          y1="504"
+          y1="520"
           x2="600"
           y2="584"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#uccontract-diamond-hollow)"
+          marker-end="url(#uccontract-open)"
         />
+        <!-- Logger takes a UseCaseLogEntry as its parameter: use -->
+        <line
+          x1="668"
+          y1="620"
+          x2="768"
+          y2="620"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#uccontract-open)"
+        />
+
+        <!-- Arrow labels -->
+        <rect x="700" y="604" width="36" height="12" rx="2" fill="#efe7f8" />
+        <text
+          x="718"
+          y="613"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          TAKES
+        </text>
 
         <!-- Role names and multiplicities at the part end -->
         <rect x="534" y="195" width="38" height="12" rx="2" fill="#efe7f8" />
@@ -492,7 +518,7 @@
           x="532"
           y="424"
           width="200"
-          height="80"
+          height="96"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -515,6 +541,9 @@
         </text>
         <text x="548" y="496" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - logger: Logger
+        </text>
+        <text x="548" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - name: string
         </text>
 
         <!-- Class: AuthorizationAspect -->
@@ -549,7 +578,7 @@
           x="372"
           y="584"
           width="296"
-          height="88"
+          height="72"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -579,10 +608,54 @@
           Logger
         </text>
         <text x="388" y="648" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + info(message: string, data?: object): void
+          + log(entry: UseCaseLogEntry): void
         </text>
-        <text x="388" y="664" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + error(message: string, error: unknown): void
+
+        <!-- Class: UseCaseLogEntry (value object) -->
+        <rect
+          x="768"
+          y="568"
+          width="224"
+          height="120"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="768" y1="616" x2="992" y2="616" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="880"
+          y="586"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="880"
+          y="604"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          UseCaseLogEntry
+        </text>
+        <text x="784" y="632" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + useCase: string
+        </text>
+        <text x="784" y="648" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + outcome: "success" | "failure"
+        </text>
+        <text x="784" y="664" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + elapsedMs: number [0..1]
+        </text>
+        <text x="784" y="680" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + error: UseCaseError [0..1]
         </text>
 
         <!-- UML template boxes: type parameters on the top-right corner -->
@@ -660,12 +733,22 @@
           execute() never throws to the presenter: it returns a Result (view 3.5). RetryAspect runs
           the inner use case again while the error of the Result is retryable.
         </text>
-
-        <!-- Legend -->
-        <line x1="24" y1="784" x2="1016" y2="784" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="802"
+          y="776"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          The aspects pass a UseCaseLogEntry, not a message, to Logger. The adapter in layer 4
+          writes the text (class of 2026-11-02).
+        </text>
+
+        <!-- Legend -->
+        <line x1="24" y1="800" x2="1016" y2="800" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <text
+          x="24"
+          y="818"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -676,16 +759,16 @@
 
         <line
           x1="24"
-          y1="820"
+          y1="836"
           x2="52"
-          y2="820"
+          y2="836"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#uccontract-triangle)"
         />
         <text
           x="60"
-          y="824"
+          y="840"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -694,9 +777,9 @@
         </text>
         <line
           x1="144"
-          y1="820"
+          y1="836"
           x2="172"
-          y2="820"
+          y2="836"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -704,7 +787,7 @@
         />
         <text
           x="180"
-          y="824"
+          y="840"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -713,62 +796,44 @@
         </text>
         <line
           x1="264"
-          y1="820"
+          y1="836"
           x2="292"
-          y2="820"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#uccontract-diamond-filled)"
-        />
-        <text
-          x="300"
-          y="824"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Composition · attribute it creates
-        </text>
-        <line
-          x1="488"
-          y1="820"
-          x2="516"
-          y2="820"
+          y2="836"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#uccontract-diamond-hollow)"
         />
         <text
-          x="524"
-          y="824"
+          x="300"
+          y="840"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Aggregation · attribute it receives
+          Aggregation · in-layer pattern
         </text>
         <line
-          x1="720"
-          y1="820"
-          x2="748"
-          y2="820"
+          x1="504"
+          y1="836"
+          x2="532"
+          y2="836"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#uccontract-open)"
         />
         <text
-          x="756"
-          y="824"
+          x="540"
+          y="840"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Use · parameter, return, local or new
+          Use · attribute, parameter, return, local or new
         </text>
 
         <rect
           x="24"
-          y="840"
+          y="856"
           width="28"
           height="12"
           rx="2"
@@ -778,7 +843,7 @@
         />
         <text
           x="60"
-          y="849"
+          y="865"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -787,7 +852,7 @@
         </text>
         <rect
           x="204"
-          y="840"
+          y="856"
           width="28"
           height="12"
           rx="2"
@@ -798,7 +863,7 @@
         />
         <text
           x="240"
-          y="849"
+          y="865"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -807,7 +872,7 @@
         </text>
         <rect
           x="444"
-          y="840"
+          y="856"
           width="28"
           height="12"
           rx="2"
@@ -818,7 +883,7 @@
         />
         <text
           x="480"
-          y="849"
+          y="865"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -827,7 +892,7 @@
         </text>
         <rect
           x="620"
-          y="840"
+          y="856"
           width="28"
           height="12"
           rx="2"
@@ -837,7 +902,7 @@
         />
         <text
           x="656"
-          y="849"
+          y="865"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

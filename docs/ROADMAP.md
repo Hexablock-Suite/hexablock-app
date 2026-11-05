@@ -112,40 +112,41 @@ Hexa Lines, Hexa Fit, Hexa Sort and Hexa Merge plug into the engine, each with i
 
 ## Sprint 3 — Game flow and local progress (2026-11-16 to 2026-11-22), tag `v0.3.0`
 
-The screens, from home to victory and defeat, in Spanish and English from the first text. Local progress per variant. The first Fit and Sort levels, enough to test the level selector. The backend serves leaderboards and level definitions. The team settles the generic level schema early in the sprint (backend `REQUIREMENTS.md` §4).
+The screens, from home to victory and defeat, in Spanish and English from the first text. Local progress per variant. The first Fit and Sort levels, enough to test the level selector. The backend serves leaderboards and level definitions. The team settles the generic level schema early in the sprint (backend `REQUIREMENTS.md` §4). The player chooses the board figure on the same screens (APP-FR-16): this sprint adds the real square and triangle geometries and a board view that draws any topology layout.
 
-| ID         | Exit check                                                                                                                          |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| APP-FR-01  | A UI test opens each of the four variants from the selector.                                                                        |
-| APP-FR-02  | For Fit and Sort, the selector shows which levels are completed, which are open and which are locked.                               |
-| APP-FR-04  | The high score of Lines and of Merge is still there after the app restarts.                                                         |
-| APP-FR-07  | A UI test reaches both screens and uses their buttons.                                                                              |
-| APP-FR-08  | In Fit, undo and then redo give back the same board; in Merge, a second undo in a row changes nothing; Lines and Sort show no undo. |
-| APP-FR-09  | APP-NFR-15.                                                                                                                         |
-| APP-NFR-15 | One integration test per variant saves progress and loads it back.                                                                  |
-| APP-FR-11  | Every visible text has a Spanish and an English entry.                                                                              |
-| APP-NFR-16 | A navigation test visits the six screens.                                                                                           |
-| API-FR-03  | An endpoint test filters by `gameId` and by level.                                                                                  |
-| API-FR-04  | An endpoint test reads the levels of each `gameId`, and the update rejects a Fit level that fails A5.                               |
+| ID         | Exit check                                                                                                                                              |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| APP-FR-01  | A UI test opens each of the four variants from the selector.                                                                                            |
+| APP-FR-02  | For Fit and Sort, the selector shows which levels are completed, which are open and which are locked.                                                   |
+| APP-FR-04  | The high score of Lines and of Merge is still there after the app restarts.                                                                             |
+| APP-FR-07  | A UI test reaches both screens and uses their buttons.                                                                                                  |
+| APP-FR-08  | In Fit, undo and then redo give back the same board; in Merge, a second undo in a row changes nothing; Lines and Sort show no undo.                     |
+| APP-FR-09  | APP-NFR-15.                                                                                                                                             |
+| APP-NFR-15 | One integration test per variant saves progress and loads it back.                                                                                      |
+| APP-FR-11  | Every visible text has a Spanish and an English entry.                                                                                                  |
+| APP-NFR-16 | A navigation test visits the six screens.                                                                                                               |
+| APP-FR-16  | Switching the figure changes only the `GeometryFactory` that the composition root passes to the variant factory, and no engine or variant file differs. |
+| API-FR-03  | An endpoint test filters by `gameId` and by level.                                                                                                      |
+| API-FR-04  | An endpoint test reads the levels of each `gameId`, and the update rejects a Fit level that fails A5.                                                   |
 
 ## Sprint 4 — Backend sync and architecture documents (2026-11-23 to 2026-11-29), tag `v0.4.0`
 
 The app signs in, syncs progress, shows the leaderboards and takes levels from the backend, against the endpoints of sprints 1 to 3. All hand-made levels and the sound. The forum of 2026-11-29 is answered with the project app, so the architecture documents of both repositories are finished in this sprint.
 
-| ID         | Exit check                                                                                                                                                                                                               |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| APP-FR-12  | After sign-in, a sync request carries the token.                                                                                                                                                                         |
-| APP-FR-13  | Progress saved in the app appears in the backend entry for that user and `gameId`.                                                                                                                                       |
-| APP-FR-14  | A UI test shows both leaderboards from a stubbed API.                                                                                                                                                                    |
-| APP-FR-15  | With the network off, every bundled level opens.                                                                                                                                                                         |
-| APP-FR-05  | A CI test counts the bundled level files and checks every Fit level against A5.                                                                                                                                          |
-| APP-FR-10  | The mute option silences both the effects and the music.                                                                                                                                                                 |
-| APP-NFR-09 | The README section "Design Patterns" lists each pattern used with its justification and a link to its file, and Strategy and Abstract Factory are in it.                                                                 |
-| APP-NFR-19 | The README embeds the three images; [`architecture/layers.md`](architecture/layers.md) and [`architecture/classes.md`](architecture/classes.md) hold two of the sources, and the extensibility diagram is still to draw. |
-| API-NFR-09 | The README section "Design Patterns" lists each pattern used with its justification and a link to its file.                                                                                                              |
-| API-NFR-10 | `architecture/layers.md` holds the layer diagram; the class diagram and `docs/EXTENSIBILITY.md` are still to write.                                                                                                      |
+| ID         | Exit check                                                                                                                                                                                                                                |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| APP-FR-12  | After sign-in, a sync request carries the token.                                                                                                                                                                                          |
+| APP-FR-13  | Progress saved in the app appears in the backend entry for that user and `gameId`.                                                                                                                                                        |
+| APP-FR-14  | A UI test shows both leaderboards from a stubbed API.                                                                                                                                                                                     |
+| APP-FR-15  | With the network off, every bundled level opens.                                                                                                                                                                                          |
+| APP-FR-05  | A CI test counts the bundled level files and checks every Fit level against A5.                                                                                                                                                           |
+| APP-FR-10  | The mute option silences both the effects and the music.                                                                                                                                                                                  |
+| APP-NFR-09 | The README section "Design Patterns" lists each pattern used with its justification and a link to its file, and Strategy and Abstract Factory are in it.                                                                                  |
+| APP-NFR-19 | The README embeds the three images; [`architecture/layers.md`](architecture/layers.md), [`architecture/classes.md`](architecture/classes.md) and [`architecture/extensibility.md`](architecture/extensibility.md) hold the three sources. |
+| API-NFR-09 | The README section "Design Patterns" lists each pattern used with its justification and a link to its file.                                                                                                                               |
+| API-NFR-10 | `architecture/layers.md`, `architecture/classes.md` and `architecture/extensibility.md` hold the layer, class and extensibility diagrams; `docs/EXTENSIBILITY.md` is still to write.                                                      |
 
-The _Check_ of APP-NFR-19 and of API-NFR-10 still says that a diagram or a document is to draw or write. App pull request 15 and backend pull request 9 add them. When those pull requests merge, their _Check_ text changes, and this table follows it.
+App pull request 15 and backend pull request 9 added the three diagrams of each repository. Only `docs/EXTENSIBILITY.md` of the backend is still to write, and its _Check_ says so.
 
 ## Sprint 5 — Delivery (2026-11-30 to 2026-12-06), tag `v1.0.0`
 

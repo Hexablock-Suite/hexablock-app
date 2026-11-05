@@ -201,7 +201,7 @@
         </text>
 
         <!-- Relationships (drawn before boxes) -->
-        <!-- MoveHistory holds the MoveCommands it receives as done: aggregation -->
+        <!-- MoveHistory holds the MoveCommands it receives as done: aggregation, kept because Command holds it -->
         <line
           x1="376"
           y1="164"
@@ -253,7 +253,7 @@
           marker-end="url(#history-triangle)"
         />
 
-        <!-- RedoableHistory holds the MoveCommands it can redo as undone: aggregation -->
+        <!-- RedoableHistory holds the MoveCommands it can redo as undone: aggregation, kept because Command holds it -->
         <path
           d="M800 196 V264 Q800 272 792 272 H200 Q192 272 192 264 V236"
           fill="none"
@@ -748,7 +748,7 @@
           y2="576"
           stroke="#17212a"
           stroke-width="1"
-          marker-start="url(#history-diamond-filled)"
+          marker-start="url(#history-diamond-hollow)"
         />
         <text
           x="300"
@@ -757,43 +757,7 @@
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Composition · attribute it creates
-        </text>
-        <line
-          x1="474"
-          y1="576"
-          x2="502"
-          y2="576"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#history-diamond-hollow)"
-        />
-        <text
-          x="510"
-          y="580"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Aggregation · attribute it receives
-        </text>
-        <line
-          x1="694"
-          y1="576"
-          x2="722"
-          y2="576"
-          stroke="#5b6873"
-          stroke-width="1"
-          marker-end="url(#history-open)"
-        />
-        <text
-          x="730"
-          y="580"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Use · parameter, return, local or new
+          Aggregation · in-layer pattern
         </text>
         <rect
           x="24"

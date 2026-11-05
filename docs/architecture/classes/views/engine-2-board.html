@@ -71,10 +71,10 @@
       >
         <title id="board-title">HexaBlock board and pieces · UML class diagram</title>
         <desc id="board-desc">
-          Class diagram of layer 1 showing Board, generic over the cell and the coordinate, owning
+          Class diagram of layer 1 showing Board, generic over the cell and the coordinate, using
           its BoardShape and taking its geometry from the GridTopology strategy, BoardShape built
-          from the ShapeNode composite of CellNode leaves and ShapeGroup children, and Piece owning
-          a ShapeNode as a prototype that clones itself.
+          from the ShapeNode composite of CellNode leaves and ShapeGroup children, and Piece using a
+          ShapeNode as a prototype that clones itself.
         </desc>
         <defs>
           <marker
@@ -247,7 +247,7 @@
         </text>
 
         <!-- Relationships (drawn before boxes) -->
-        <!-- Board holds the GridTopology it receives as topology: aggregation -->
+        <!-- Board holds the GridTopology it receives as topology: aggregation, kept because Strategy holds it -->
         <line
           x1="448"
           y1="164"
@@ -257,15 +257,15 @@
           marker-start="url(#board-diamond-hollow)"
           stroke="#17212a"
         />
-        <!-- Board holds the BoardShape it receives from BoardBuilder as shape: aggregation -->
+        <!-- Board keeps the BoardShape it receives from BoardBuilder as shape: use, because no GoF pattern needs a diamond here -->
         <line
           x1="200"
           y1="300"
           x2="200"
           y2="356"
           stroke-width="1"
-          marker-start="url(#board-diamond-hollow)"
-          stroke="#17212a"
+          marker-end="url(#board-open)"
+          stroke="#5b6873"
         />
         <!-- BoardShape builds from ShapeNode: use -->
         <line
@@ -285,15 +285,15 @@
           marker-end="url(#board-open)"
           stroke="#5b6873"
         />
-        <!-- Piece holds the ShapeNode it receives as shape: aggregation -->
+        <!-- Piece keeps the ShapeNode it receives as shape: use, because no GoF pattern needs a diamond here -->
         <line
-          x1="640"
+          x1="600"
           y1="512"
-          x2="640"
+          x2="600"
           y2="560"
           stroke-width="1"
-          marker-start="url(#board-diamond-hollow)"
-          stroke="#17212a"
+          marker-end="url(#board-open)"
+          stroke="#5b6873"
         />
         <!-- CellNode implements ShapeNode: realization -->
         <line
@@ -317,7 +317,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#board-triangle)"
         />
-        <!-- ShapeGroup holds the ShapeNode children it receives: aggregation -->
+        <!-- ShapeGroup holds the ShapeNode children it receives: aggregation, kept because Composite holds it -->
         <line
           x1="744"
           y1="636"
@@ -365,9 +365,9 @@
         >
           BUILDS FROM
         </text>
-        <rect x="644" y="534" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="604" y="534" width="36" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="662"
+          x="622"
           y="543"
           fill="#7d8a94"
           font-size="8"
@@ -439,9 +439,9 @@
           1..*
         </text>
 
-        <rect x="624" y="534" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="584" y="534" width="12" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="630"
+          x="590"
           y="543"
           fill="#17212a"
           font-size="8"
@@ -1002,6 +1002,7 @@
           y2="876"
           stroke="#17212a"
           stroke-width="1"
+          stroke-dasharray="5,4"
           marker-end="url(#board-triangle)"
         />
         <text
@@ -1011,7 +1012,7 @@
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Inheritance
+          Realization
         </text>
         <line
           x1="144"
@@ -1020,8 +1021,7 @@
           y2="876"
           stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="5,4"
-          marker-end="url(#board-triangle)"
+          marker-start="url(#board-diamond-hollow)"
         />
         <text
           x="180"
@@ -1030,61 +1030,25 @@
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Realization
+          Aggregation · in-layer pattern
         </text>
         <line
-          x1="264"
+          x1="384"
           y1="876"
-          x2="292"
-          y2="876"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#board-diamond-filled)"
-        />
-        <text
-          x="300"
-          y="880"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Composition · attribute it creates
-        </text>
-        <line
-          x1="474"
-          y1="876"
-          x2="502"
-          y2="876"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#board-diamond-hollow)"
-        />
-        <text
-          x="510"
-          y="880"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Aggregation · attribute it receives
-        </text>
-        <line
-          x1="694"
-          y1="876"
-          x2="722"
+          x2="412"
           y2="876"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#board-open)"
         />
         <text
-          x="730"
+          x="420"
           y="880"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Use · parameter, return, local or new
+          Use · attribute, parameter, return, local or new
         </text>
         <rect
           x="24"

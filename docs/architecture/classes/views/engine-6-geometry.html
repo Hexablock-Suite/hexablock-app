@@ -222,7 +222,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#geo-triangle)"
         />
-        <!-- BoardBuilder holds the GeometryFactory it receives as geometry: aggregation -->
+        <!-- BoardBuilder holds the GeometryFactory it receives as geometry: aggregation, kept because Builder holds its Abstract Factory -->
         <line
           x1="584"
           y1="152"
@@ -704,6 +704,7 @@
           y2="688"
           stroke="#17212a"
           stroke-width="1"
+          stroke-dasharray="5,4"
           marker-end="url(#geo-triangle)"
         />
         <text
@@ -713,7 +714,7 @@
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Inheritance
+          Realization
         </text>
         <line
           x1="144"
@@ -722,8 +723,7 @@
           y2="688"
           stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="5,4"
-          marker-end="url(#geo-triangle)"
+          marker-start="url(#geo-diamond-hollow)"
         />
         <text
           x="180"
@@ -732,61 +732,25 @@
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Realization
+          Aggregation · in-layer pattern
         </text>
         <line
-          x1="264"
+          x1="384"
           y1="688"
-          x2="292"
-          y2="688"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#geo-diamond-filled)"
-        />
-        <text
-          x="300"
-          y="692"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Composition · attribute it creates
-        </text>
-        <line
-          x1="474"
-          y1="688"
-          x2="502"
-          y2="688"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#geo-diamond-hollow)"
-        />
-        <text
-          x="510"
-          y="692"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Aggregation · attribute it receives
-        </text>
-        <line
-          x1="694"
-          y1="688"
-          x2="722"
+          x2="412"
           y2="688"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#geo-open)"
         />
         <text
-          x="730"
+          x="420"
           y="692"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Use · parameter, return, local or new
+          Use · attribute, parameter, return, local or new
         </text>
         <rect
           x="24"

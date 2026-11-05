@@ -71,10 +71,11 @@
       >
         <title id="mapuc-title">HexaBlock use cases map · UML class diagram</title>
         <desc id="mapuc-desc">
-          Overview map of the 35 layer 2 classes in 7 groups: the aspect decorators wrap the UseCase
-          input port, the game, progress and account use cases implement it and use the output
-          ports, and the request and response models and the Result type travel through them; each
-          group names the view that shows its members.
+          Overview map of the 36 layer 2 classes in 7 groups. Each line joins two classes:
+          UseCaseAspect implements UseCase and keeps the inner one, StartGame, SaveProgress and
+          Register each implement UseCase for their group, and RedoMove, SyncLeaderboard and
+          UpdateSettings keep an output port. No line touches a group frame. Each group names the
+          view that shows its members.
         </desc>
         <defs>
           <marker
@@ -400,229 +401,124 @@
           VIEW 3.5
         </text>
 
-        <!-- Dependencies between groups (drawn before chips) -->
-        <!-- Aspects keep the inner UseCase they receive: aggregation, down -->
-        <line
-          x1="520"
-          y1="192"
-          x2="520"
-          y2="248"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#mapuc-diamond-hollow)"
-        />
-        <!-- Game use cases implement the input port: realization, up -->
-        <line
-          x1="288"
-          y1="382"
-          x2="288"
-          y2="326"
+        <!-- Dependencies between classes of two groups (drawn before chips). Each line starts on the class that holds, calls or implements and ends on the class it needs. No line touches a frame. -->
+        <!-- UseCaseAspect implements UseCase: realization (view 3.1) -->
+        <path
+          d="M504,126 L504,276"
+          fill="none"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
           marker-end="url(#mapuc-triangle)"
         />
-        <!-- Progress use cases implement the input port: realization, up -->
-        <line
-          x1="532"
-          y1="382"
-          x2="532"
-          y2="326"
+        <!-- UseCaseAspect keeps the inner UseCase it wraps as inner: use with role and multiplicity (view 3.1) -->
+        <path
+          d="M536,126 L536,276"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#mapuc-open)"
+        />
+        <!-- StartGame implements UseCase: realization, one for the game use cases (view 3.2) -->
+        <path
+          d="M320,410 L320,293 L428,293"
+          fill="none"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
           marker-end="url(#mapuc-triangle)"
         />
-        <!-- Account and settings implement the input port: realization, up -->
-        <line
-          x1="764"
-          y1="382"
-          x2="764"
-          y2="326"
+        <!-- SaveProgress implements UseCase: realization, one for the progress use cases (view 3.3) -->
+        <path
+          d="M612,427 L644,427 L644,301 L612,301"
+          fill="none"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
           marker-end="url(#mapuc-triangle)"
         />
-        <!-- Game use cases keep the output ports they receive: aggregation, down -->
-        <line
-          x1="288"
-          y1="610"
-          x2="288"
-          y2="690"
+        <!-- Register implements UseCase: realization, one for the account use cases (view 3.4) -->
+        <path
+          d="M800,410 L800,285 L612,285"
+          fill="none"
           stroke="#17212a"
           stroke-width="1"
-          marker-start="url(#mapuc-diamond-hollow)"
+          stroke-dasharray="5,4"
+          marker-end="url(#mapuc-triangle)"
         />
-
-        <!-- Progress use cases keep the output ports they receive: aggregation, down -->
-        <line
-          x1="532"
-          y1="560"
-          x2="532"
-          y2="690"
-          stroke="#17212a"
+        <!-- RedoMove keeps the RunningGameStore as games: use with role and multiplicity (view 3.2) -->
+        <path
+          d="M340,594 L340,718"
+          fill="none"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#mapuc-diamond-hollow)"
+          marker-end="url(#mapuc-open)"
         />
-
-        <!-- Account and settings keep the output ports they receive: aggregation, down -->
-        <line
-          x1="764"
-          y1="560"
-          x2="764"
-          y2="690"
-          stroke="#17212a"
+        <!-- SyncLeaderboard keeps the ProgressRepository as progress: use with role and multiplicity (view 3.3) -->
+        <path
+          d="M500,544 L500,718"
+          fill="none"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#mapuc-diamond-hollow)"
+          marker-end="url(#mapuc-open)"
+        />
+        <!-- UpdateSettings keeps the SettingsStore as settings: use with role and multiplicity (view 3.4) -->
+        <path
+          d="M700,544 L700,718"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#mapuc-open)"
         />
 
-        <!-- Arrow labels -->
-        <rect x="296" y="348" width="56" height="12" rx="2" fill="#efe7f8" />
+        <!-- Arrow labels: role and multiplicity at the target end -->
+        <rect x="542" y="226" width="40" height="12" rx="2" fill="#efe7f8" />
         <text
-          x="324"
-          y="357"
+          x="562"
+          y="235"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          IMPLEMENT
+          inner 1
         </text>
-        <rect x="540" y="348" width="56" height="12" rx="2" fill="#efe7f8" />
+        <rect x="346" y="646" width="40" height="12" rx="2" fill="#efe7f8" />
         <text
-          x="568"
-          y="357"
+          x="366"
+          y="655"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          IMPLEMENT
+          games 1
         </text>
-        <rect x="772" y="348" width="56" height="12" rx="2" fill="#efe7f8" />
+        <rect x="506" y="646" width="56" height="12" rx="2" fill="#efe7f8" />
         <text
-          x="800"
-          y="357"
+          x="534"
+          y="655"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          IMPLEMENT
+          progress 1
         </text>
-
-        <!-- Role names and multiplicities at the part end -->
-        <rect x="524" y="233" width="38" height="12" rx="2" fill="#efe7f8" />
+        <rect x="706" y="646" width="56" height="12" rx="2" fill="#efe7f8" />
         <text
-          x="526"
-          y="242"
-          fill="#17212a"
+          x="734"
+          y="655"
+          fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
+          text-anchor="middle"
+          letter-spacing="0.06em"
         >
-          inner
-          <tspan font-weight="600">1</tspan>
-        </text>
-        <rect x="292" y="675" width="38" height="12" rx="2" fill="#efe7f8" />
-        <text
-          x="294"
-          y="684"
-          fill="#17212a"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
-        >
-          games
-          <tspan font-weight="600">1</tspan>
-        </text>
-        <rect x="536" y="636" width="43" height="12" rx="2" fill="#efe7f8" />
-        <text
-          x="538"
-          y="645"
-          fill="#17212a"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
-        >
-          levels
-          <tspan font-weight="600">1</tspan>
-        </text>
-        <rect x="536" y="649" width="52" height="12" rx="2" fill="#efe7f8" />
-        <text
-          x="538"
-          y="658"
-          fill="#17212a"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
-        >
-          progress
-          <tspan font-weight="600">1</tspan>
-        </text>
-        <rect x="536" y="662" width="62" height="12" rx="2" fill="#efe7f8" />
-        <text
-          x="538"
-          y="671"
-          fill="#17212a"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
-        >
-          repository
-          <tspan font-weight="600">1</tspan>
-        </text>
-        <rect x="536" y="675" width="48" height="12" rx="2" fill="#efe7f8" />
-        <text
-          x="538"
-          y="684"
-          fill="#17212a"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
-        >
-          gateway
-          <tspan font-weight="600">1</tspan>
-        </text>
-        <rect x="768" y="649" width="52" height="12" rx="2" fill="#efe7f8" />
-        <text
-          x="770"
-          y="658"
-          fill="#17212a"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
-        >
-          accounts
-          <tspan font-weight="600">1</tspan>
-        </text>
-        <rect x="768" y="662" width="48" height="12" rx="2" fill="#efe7f8" />
-        <text
-          x="770"
-          y="671"
-          fill="#17212a"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
-        >
-          session
-          <tspan font-weight="600">1</tspan>
-        </text>
-        <rect x="768" y="675" width="52" height="12" rx="2" fill="#efe7f8" />
-        <text
-          x="770"
-          y="684"
-          fill="#17212a"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
-        >
-          settings
-          <tspan font-weight="600">1</tspan>
+          settings 1
         </text>
 
         <!-- Chips: aspects -->
@@ -663,14 +559,14 @@
           <rect
             x="232"
             y="142"
-            width="132"
+            width="124"
             height="34"
             rx="4"
             fill="#ffffff"
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="298" y="163" fill="#17212a" text-anchor="middle">
+          <text x="294" y="163" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               LoggingAspect
             </tspan>
@@ -678,16 +574,16 @@
         </g>
         <g data-class="TimingAspect">
           <rect
-            x="380"
+            x="368"
             y="142"
-            width="132"
+            width="124"
             height="34"
             rx="4"
             fill="#ffffff"
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="446" y="163" fill="#17212a" text-anchor="middle">
+          <text x="430" y="163" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               TimingAspect
             </tspan>
@@ -695,16 +591,16 @@
         </g>
         <g data-class="RetryAspect">
           <rect
-            x="528"
+            x="548"
             y="142"
-            width="132"
+            width="124"
             height="34"
             rx="4"
             fill="#ffffff"
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="594" y="163" fill="#17212a" text-anchor="middle">
+          <text x="610" y="163" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               RetryAspect
             </tspan>
@@ -712,16 +608,16 @@
         </g>
         <g data-class="AuthorizationAspect">
           <rect
-            x="676"
+            x="684"
             y="142"
-            width="132"
+            width="124"
             height="34"
             rx="4"
             fill="#ffffff"
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="742" y="163" fill="#17212a" text-anchor="middle">
+          <text x="746" y="163" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               AuthorizationAspect
             </tspan>
@@ -989,7 +885,7 @@
         <g data-class="LevelRepository">
           <rect
             x="580"
-            y="718"
+            y="768"
             width="140"
             height="34"
             rx="4"
@@ -999,7 +895,7 @@
           />
           <text
             x="650"
-            y="730"
+            y="780"
             fill="#5b6873"
             font-size="7"
             font-family="'IBM Plex Mono', monospace"
@@ -1008,7 +904,7 @@
           >
             interface
           </text>
-          <text x="650" y="743" fill="#17212a" text-anchor="middle">
+          <text x="650" y="793" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               LevelRepository
             </tspan>
@@ -1101,7 +997,7 @@
         <g data-class="SettingsStore">
           <rect
             x="580"
-            y="768"
+            y="718"
             width="140"
             height="34"
             rx="4"
@@ -1111,7 +1007,7 @@
           />
           <text
             x="650"
-            y="780"
+            y="730"
             fill="#5b6873"
             font-size="7"
             font-family="'IBM Plex Mono', monospace"
@@ -1120,7 +1016,7 @@
           >
             interface
           </text>
-          <text x="650" y="793" fill="#17212a" text-anchor="middle">
+          <text x="650" y="743" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               SettingsStore
             </tspan>
@@ -1464,6 +1360,34 @@
             </tspan>
           </text>
         </g>
+        <g data-class="UseCaseLogEntry">
+          <rect
+            x="440"
+            y="970"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="520"
+            y="982"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="520" y="995" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              UseCaseLogEntry
+            </tspan>
+          </text>
+        </g>
         <!-- Footnote -->
         <text
           x="24"
@@ -1501,9 +1425,9 @@
           y1="1144"
           x2="52"
           y2="1144"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-end="url(#mapuc-triangle)"
+          marker-end="url(#mapuc-open)"
         />
         <text
           x="60"
@@ -1512,12 +1436,12 @@
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Inheritance
+          Use · class to class: role and multiplicity, or a verb; no line touches a frame
         </text>
         <line
-          x1="144"
+          x1="384"
           y1="1144"
-          x2="172"
+          x2="412"
           y2="1144"
           stroke="#17212a"
           stroke-width="1"
@@ -1525,67 +1449,13 @@
           marker-end="url(#mapuc-triangle)"
         />
         <text
-          x="180"
+          x="420"
           y="1148"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Realization
-        </text>
-        <line
-          x1="264"
-          y1="1144"
-          x2="292"
-          y2="1144"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#mapuc-diamond-filled)"
-        />
-        <text
-          x="300"
-          y="1148"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Composition · attribute it creates
-        </text>
-        <line
-          x1="488"
-          y1="1144"
-          x2="516"
-          y2="1144"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#mapuc-diamond-hollow)"
-        />
-        <text
-          x="524"
-          y="1148"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Aggregation · attribute it receives
-        </text>
-        <line
-          x1="720"
-          y1="1144"
-          x2="748"
-          y2="1144"
-          stroke="#5b6873"
-          stroke-width="1"
-          marker-end="url(#mapuc-open)"
-        />
-        <text
-          x="756"
-          y="1148"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Use · parameter, return, local or new
+          Realization · class to the interface it implements
         </text>
 
         <rect
