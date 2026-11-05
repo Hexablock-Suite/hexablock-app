@@ -16,7 +16,7 @@ export class GameEngine<TCell, TCoord, TMove, TState extends BoardState<TCell, T
 
   constructor(
     private readonly gameId: GameId,
-    private readonly rules: IGameRules<TCell, TMove, TState>,
+    private readonly rules: IGameRules<TMove, TState>,
     private readonly scoring: IScoringPolicy<TState>,
     private readonly events: GameEventPublisher,
   ) {}
