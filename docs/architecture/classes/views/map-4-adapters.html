@@ -610,7 +610,7 @@
           stroke-width="1"
           marker-end="url(#mapad-open)"
         />
-        <!-- Routes keep the presenter they receive as a prop: use, down into layer 3 -->
+        <!-- Routes call the presenter they receive as a prop: use with a verb, down into layer 3 -->
         <line
           x1="340"
           y1="526"
@@ -724,18 +724,18 @@
           STORES IN
         </text>
 
-        <!-- Role names and multiplicities at the part end -->
-        <rect x="344" y="589" width="57" height="12" rx="2" fill="#e2ebf8" />
+        <!-- Verbs on the uses between groups: a group has no attribute and no multiplicity -->
+        <rect x="348" y="536" width="32" height="12" rx="2" fill="#cfdcf3" />
         <text
-          x="346"
-          y="598"
-          fill="#17212a"
+          x="364"
+          y="545"
+          fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
+          text-anchor="middle"
+          letter-spacing="0.06em"
         >
-          presenter
-          <tspan font-weight="600">1</tspan>
+          CALL
         </text>
 
         <!-- Chips: board -->

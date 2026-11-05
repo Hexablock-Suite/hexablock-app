@@ -18,6 +18,7 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 
 ### Changed
 
+- The use case and adapter maps label the uses between groups with a verb, not with a role and a multiplicity ([#63](https://github.com/Hexablock-Suite/hexablock-app/pull/63)).
 - The class diagrams draw use arrows between layers and keep diamonds inside one layer, every use case box shows `execute()`, and `Logger` takes a `UseCaseLogEntry` ([#63](https://github.com/Hexablock-Suite/hexablock-app/pull/63)).
 - After the session of 2026-11-03, the use case and adapter maps and extensibility views 1 and 3 join groups only with use arrows, each view legend lists only the line kinds it draws, the layer diagram legend names its dotted arrow a realization, and decision 28 names Clean Architecture ([#63](https://github.com/Hexablock-Suite/hexablock-app/pull/63)).
 - Coordinate arithmetic moves into the grid topology of the class diagram ([#14](https://github.com/Hexablock-Suite/hexablock-app/pull/14)).
