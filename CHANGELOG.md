@@ -8,6 +8,7 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 
 ### Added
 
+- The rules contract and the engine interfaces in `src/domain/engine/`: `IGameRules`, the abstract `BaseGameRules` with the template method `playTurn()`, `Resolution`, `Outcome`, `GamePhase` with its five phases, `IScoringPolicy`, `RandomSource`, `Clock`, `GameEventPublisher`, `GameEvent`, `GameOver` and `GameId` ([#70](https://github.com/Hexablock-Suite/hexablock-app/issues/70)).
 - The shape Composite (`ShapeNode<TCoord>`, `CellNode`, `ShapeGroup`) and `Piece<TCell, TCoord>` in `src/domain/engine/`, the triangular `GridTopology` test double in `test/support/engine/`, and a test that translates a piece by an odd offset, so an engine that adds coordinates one component at a time fails ([#69](https://github.com/Hexablock-Suite/hexablock-app/issues/69)).
 - The square `GridTopology` test double and the fake cell type in `test/support/engine/`, and a board test that runs `Board<TCell, TCoord>` with them (APP-NFR-13, D4) ([#68](https://github.com/Hexablock-Suite/hexablock-app/issues/68)).
 - The generic board of the engine in `src/domain/engine/`: `GridTopology<TCoord>`, `Board<TCell, TCoord>` with `get`, `set`, `cells`, `clone`, `line`, `ring` and `neighborhood`, `BoardShape<TCoord>` and `Cloneable<T>`. The topology also gives `key()`, and its `line()` takes the board test `contains`, so the board stores cells and stops a line with no coordinate arithmetic of its own ([#67](https://github.com/Hexablock-Suite/hexablock-app/issues/67)).
