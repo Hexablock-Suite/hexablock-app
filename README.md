@@ -76,7 +76,7 @@ The engine lives in `src/domain/engine/`. It is written once and runs the four g
 The four core types:
 
 - **`GameEngine<TCell, TCoord, TMove, TState>`** is the aggregate root of a game. It runs each turn through `IGameRules`, scores it with `IScoringPolicy`, holds the `GamePhase` and an optional `MoveHistory`, and publishes events through `GameEventPublisher`. A game changes only through `play()`. `snapshot()` returns a clone of the state (decision 26).
-- **`IGameRules<TCell, TMove, TState>`** is the rules contract of §3.1: `isValid()`, `validMoves()`, `apply()`, `resolve()` and `evaluate()`. The abstract `BaseGameRules` holds the turn skeleton in its template method `playTurn()`, and each variant extends it (decision 21). `GameEngine` depends only on the interface. `validMoves()` is a lazy generator: the «no valid move» end of Lines, Sort and Merge stops at the first move (decision 33).
+- **`IGameRules<TMove, TState>`** is the rules contract of §3.1: `isValid()`, `validMoves()`, `apply()`, `resolve()` and `evaluate()`. The abstract `BaseGameRules` holds the turn skeleton in its template method `playTurn()`, and each variant extends it (decision 21). `GameEngine` depends only on the interface. `validMoves()` is a lazy generator: the «no valid move» end of Lines, Sort and Merge stops at the first move (decision 33).
 - **`Board<TCell, TCoord>`** is the `HexBoard<TCell>` of §3.1, with no geometry in its name. It stores the cells (`get()`, `set()`, `cells()`), walks the board with `line()`, `ring()` and `neighborhood()`, and clones itself for undo and the piece preview.
 - **`GridTopology<TCoord>`** does every coordinate calculation: `neighbors()`, `directions()`, `axes()`, `rotate()`, `translate()` and `region()`. A coordinate only holds its values. `HexTopology` with `HexCoord` is the real geometry. The square topology of `SquareGeometry` exists for the engine tests, to prove that the engine does not depend on hexagons (D4, APP-NFR-13).
 
@@ -90,7 +90,7 @@ The four core types:
 | `TState`  | The full state of a game, board included   | `BoardState<TCell, TCoord>` in `GameEngine` |
 | `TPiece`  | What a piece source gives (`IPieceSource`) | None                                        |
 
-`IGameRules` keeps three type parameters, because none of its members names a coordinate (decision 16).
+`IGameRules` and `BaseGameRules` take two type parameters, `TMove` and `TState`, because none of their members names a cell or a coordinate (decision 16).
 
 ### Why each bound exists
 
