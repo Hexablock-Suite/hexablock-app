@@ -45,7 +45,7 @@ The same endpoint is use case 1 of the API flows, in `hexablock-api/docs/archite
 ## How to read the class views
 
 - The zones are the Clean layers, with the colors of [layers.md](layers.md): dark blue for layer 4, light blue for layer 3, purple for layer 2 and yellow for layer 1. The outer layer is at the top, so every dependency between layers points down.
-- The lines follow the notation of [classes.md](classes.md). A use arrow joins two layers. A realization joins an adapter to its port, or a use case to `UseCase`. A diamond stays inside one layer and shows a pattern: `GamePresenter` keeps its `StateMapper` strategy, and `GameEngine` keeps its `IGameRules` strategy.
+- The lines follow the notation of [classes.md](classes.md). A use arrow joins two layers. A realization joins an adapter to its port, or a use case to `UseCase`. A diamond stays inside one layer and only where it makes a GoF pattern visible (decision 23): `GamePresenter` keeps its `StateMapper` strategy, and `GameEngine` keeps its `IGameRules` strategy.
 - The views draw the input port `UseCase` as an interface box, not as a lollipop. A box lets the presenter point at the port it holds.
 - The teal class is the focal class: the use case.
 - A flow view shows more than the seven classes of the other views, because it follows one call through every layer.
