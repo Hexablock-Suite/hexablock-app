@@ -18,7 +18,7 @@ Statement §4.3 asks for a «Diagrama que muestre el motor genérico en el centr
 - Inside one layer, a diamond marks an attribute only where it makes a GoF pattern visible (decision 23). Any other attribute, a domain relation included, is a use with the attribute name and its multiplicity. In the class of 2026-11-02 the professor said: «Aquí sí porque quiero hacer visible el patrón estratégico». The part end shows the attribute name and its multiplicity, also when it is `1`. A hollow diamond is an object that the class receives (aggregation). A filled diamond is an object that the class creates (composition).
 - The legend of each view lists only the line kinds that the view draws.
 - The dashed box at the top right of a class holds its type parameters (UML template notation). A bound on a parameter goes in the same box, never on a line.
-- Every operation shows the type of each parameter and its return type. View 1 abbreviates the type arguments of attributes and return types, for example `IGameRules` for `IGameRules<TCell, TMove, TState>`, and leaves out the `gameId` attribute of `IVariantFactory`. In every view, the corner box of `GameEngine` leaves out the bound of `TState`. The views of the [class diagram](classes.md) show them in full.
+- Every operation shows the type of each parameter and its return type. View 1 abbreviates the type arguments of attributes and return types, for example `IGameRules` for `IGameRules<TMove, TState>`, and leaves out the `gameId` attribute of `IVariantFactory`. In every view, the corner box of `GameEngine` leaves out the bound of `TState`. The views of the [class diagram](classes.md) show them in full.
 
 ## View 1: the extension points
 
