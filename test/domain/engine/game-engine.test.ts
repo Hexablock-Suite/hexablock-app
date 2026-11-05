@@ -1,18 +1,20 @@
 /** @jest-environment node */
+import type { Board } from '../../../src/domain/engine/board';
+import type { BoardState } from '../../../src/domain/engine/board-state';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameOver } from '../../../src/domain/engine/game-events';
 import { GameId } from '../../../src/domain/engine/game-id';
 import type { Resolution } from '../../../src/domain/engine/resolution';
-import { fakeCell } from '../../support/engine/fake-cell';
+import { fakeCell, type FakeCell } from '../../support/engine/fake-cell';
 import {
   emptyState,
   FakeRules,
+  FakeState,
   OnePointScoring,
   RecordingPublisher,
   type FakeMove,
-  type FakeState,
 } from '../../support/engine/fake-game';
-import { square } from '../../support/engine/square-topology';
+import { square, type SquareAxis, type SquareCoord } from '../../support/engine/square-topology';
 
 // The turn cycle (statement §3.1): start, receive, validate, apply, resolve, evaluate, notify.
 // The cell type, the rules and the scoring exist only in test/ (APP-NFR-13).
@@ -205,5 +207,33 @@ describe('GameEngine.play()', () => {
     expect(engine.snapshot().score).toBe(0);
     expect(engine.play(place(0, 0))).toBe('playing');
     expect(engine.snapshot().score).toBe(1);
+  });
+});
+
+// A state with one member more than `BoardState`, like a variant state.
+// Its `clone()` promises only the base `BoardState`, and its copy is a `FakeState`.
+class BaseCloneState implements BoardState<FakeCell, SquareCoord> {
+  readonly level = 1;
+
+  constructor(
+    readonly board: Board<FakeCell, SquareCoord, SquareAxis>,
+    public score = 0,
+  ) {}
+
+  clone(): BoardState<FakeCell, SquareCoord> {
+    return new FakeState(this.board.clone(), this.score);
+  }
+}
+
+describe('GameEngine type parameters', () => {
+  it('should_reject_the_state_type_when_its_clone_returns_the_base_board_state', () => {
+    const state = new BaseCloneState(emptyState().board);
+
+    // @ts-expect-error The engine copies the state, so clone() must return the state type.
+    type Rejected = GameEngine<FakeCell, SquareCoord, FakeMove, BaseCloneState>;
+    const rejected: Rejected | undefined = undefined;
+
+    expect(rejected).toBeUndefined();
+    expect(state.clone()).not.toBeInstanceOf(BaseCloneState);
   });
 });
