@@ -133,20 +133,20 @@ The screens, from home to victory and defeat, in Spanish and English from the fi
 
 The app signs in, syncs progress, shows the leaderboards and takes levels from the backend, against the endpoints of sprints 1 to 3. All hand-made levels and the sound. The forum of 2026-11-29 is answered with the project app, so the architecture documents of both repositories are finished in this sprint.
 
-| ID         | Exit check                                                                                                                                                                                                               |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| APP-FR-12  | After sign-in, a sync request carries the token.                                                                                                                                                                         |
-| APP-FR-13  | Progress saved in the app appears in the backend entry for that user and `gameId`.                                                                                                                                       |
-| APP-FR-14  | A UI test shows both leaderboards from a stubbed API.                                                                                                                                                                    |
-| APP-FR-15  | With the network off, every bundled level opens.                                                                                                                                                                         |
-| APP-FR-05  | A CI test counts the bundled level files and checks every Fit level against A5.                                                                                                                                          |
-| APP-FR-10  | The mute option silences both the effects and the music.                                                                                                                                                                 |
-| APP-NFR-09 | The README section "Design Patterns" lists each pattern used with its justification and a link to its file, and Strategy and Abstract Factory are in it.                                                                 |
-| APP-NFR-19 | The README embeds the three images; [`architecture/layers.md`](architecture/layers.md) and [`architecture/classes.md`](architecture/classes.md) hold two of the sources, and the extensibility diagram is still to draw. |
-| API-NFR-09 | The README section "Design Patterns" lists each pattern used with its justification and a link to its file.                                                                                                              |
-| API-NFR-10 | `architecture/layers.md` holds the layer diagram; the class diagram and `docs/EXTENSIBILITY.md` are still to write.                                                                                                      |
+| ID         | Exit check                                                                                                                                                                                                                                |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| APP-FR-12  | After sign-in, a sync request carries the token.                                                                                                                                                                                          |
+| APP-FR-13  | Progress saved in the app appears in the backend entry for that user and `gameId`.                                                                                                                                                        |
+| APP-FR-14  | A UI test shows both leaderboards from a stubbed API.                                                                                                                                                                                     |
+| APP-FR-15  | With the network off, every bundled level opens.                                                                                                                                                                                          |
+| APP-FR-05  | A CI test counts the bundled level files and checks every Fit level against A5.                                                                                                                                                           |
+| APP-FR-10  | The mute option silences both the effects and the music.                                                                                                                                                                                  |
+| APP-NFR-09 | The README section "Design Patterns" lists each pattern used with its justification and a link to its file, and Strategy and Abstract Factory are in it.                                                                                  |
+| APP-NFR-19 | The README embeds the three images; [`architecture/layers.md`](architecture/layers.md), [`architecture/classes.md`](architecture/classes.md) and [`architecture/extensibility.md`](architecture/extensibility.md) hold the three sources. |
+| API-NFR-09 | The README section "Design Patterns" lists each pattern used with its justification and a link to its file.                                                                                                                               |
+| API-NFR-10 | `architecture/layers.md`, `architecture/classes.md` and `architecture/extensibility.md` hold the layer, class and extensibility diagrams; `docs/EXTENSIBILITY.md` is still to write.                                                      |
 
-The _Check_ of APP-NFR-19 and of API-NFR-10 still says that a diagram or a document is to draw or write. App pull request 15 and backend pull request 9 add them. When those pull requests merge, their _Check_ text changes, and this table follows it.
+App pull request 15 and backend pull request 9 added the three diagrams of each repository. Only `docs/EXTENSIBILITY.md` of the backend is still to write, and its _Check_ says so.
 
 ## Sprint 5 — Delivery (2026-11-30 to 2026-12-06), tag `v1.0.0`
 

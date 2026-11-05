@@ -44,7 +44,7 @@ Sections: Lines §1.1, Fit §1.2, Sort §1.3, Merge §1.4, comparison §1.5.
 
 - **APP-NFR-08 — SOLID (§3.2).** Every principle used is documented in the README with a concrete example from our code. The engine has no conditionals on the variant type (LSP). Undo, timing and seeded randomness are separate interfaces, so Hexa Lines does not implement undo (ISP). _Check:_ the README section "SOLID Principles" has one example per principle with a link to its file, and the engine has no `if` or `switch` on the game id.
 - **APP-NFR-09 — GoF patterns (§3.3).** Strategy and Abstract Factory (one factory per variant) are mandatory. The statement also lists Builder, Singleton or single-scope injection, Prototype, Composite, Decorator, Adapter, Facade, Observer, Command, State, Template Method and Iterator. Each pattern used has a justification, a code excerpt and a README entry. See D7. _Check:_ the README section "Design Patterns" lists each pattern used with its justification and a link to its file, and Strategy and Abstract Factory are in it.
-- **APP-NFR-10 — Clean Architecture (§3.4).** Four layers with dependencies pointing inward. The whole generic engine and the variant rules live in the entities layer with no external dependency. Use cases are generic, never one copy per game. A layer diagram is an image in the README and an editable source in the repo. _Check:_ `pnpm arch` passes, and [`architecture/layers.md`](architecture/layers.md) holds the layer diagram.
+- **APP-NFR-10 — Clean Architecture (§3.4).** Four layers with dependencies pointing inward. The whole generic engine and the variant rules live in the entities layer with no external dependency. Use cases are generic, never one copy per game. A layer diagram is an image in the README and an editable source in the repo. In the session of 2026-11-03 the professor named the valid hybrid: Clean plus an architecture made for games, not Hexagonal plus Clean: «no, no, entre hexagonal y clean, perdón, entre clean y alguna arquitectura particular para juegos». A layered architecture that is not Clean is also valid when the team cites its reference and documents it. Every part of the app follows the layers, the presentation layer included: «la arquitectura a todo nivel de tu aplicación». Each layer has a defined meaning and keeps the dependency rule. _Check:_ `pnpm arch` passes, and [`architecture/layers.md`](architecture/layers.md) holds the layer diagram.
 - **APP-NFR-11 — AOP (§3.5).** At least one cross-cutting aspect (logging, centralized errors with retry, profiling, authorization or caching), built as decorators or proxies over the use cases. One aspect on the generic use case covers all four variants. See A2. _Check:_ a test shows that one aspect runs for the four variants, and the use case it wraps has no line of the aspect's code.
 
 ## 4. Tests (non-functional, §3.6)
@@ -124,16 +124,18 @@ Every abstraction needs a written reason, and there are two kinds. A declared ch
 | Sort piece source                                                                                      | §1.3, §1.5 vs §5.1.5                                                                                 | Piece source chosen per level (A4)                                                                                                                            |
 | Level origin                                                                                           | §5.1.5 vs §5.2.4                                                                                     | Level repository with bundled files and backend (A6)                                                                                                          |
 
+Not an axis: gravity. Hexa Lines has no gravity (§1.1: «No hay gravedad»). In the session of 2026-11-03 the professor said that this rule never changes: «eso considero un requerimiento ahí que no va a cambiar». So no seam for gravity exists, in any variant.
+
 ## 9. Assumptions
 
 Each assumption holds under both readings of the statement, or names what changes if the answer differs.
 
 - **A1 — Merge cell (§3.1).** The statement says the Merge cell is an integer and also that it carries a mergeable bound. A primitive integer cannot implement an interface, so the Merge cell is a value object that wraps an integer and implements the bound. It satisfies both sentences; the statement calls its names "orientativos". Confirmation C2.
 - **A2 — Aspects (§3.5).** Aspects are our own decorators or proxies over the generic use case, not a library or framework interceptor. This holds whether libraries are allowed or not. Confirmation C5.
-- **A3 — End of Merge (§1.4, §5.1.4).** Reaching the target tile is an event, not the end of the game; an end policy decides. Default: a victory screen with a "continue" option, as in 2048. Confirmation C3.
+- **A3 — End of Merge (§1.4, §5.1.4).** Reaching the target tile is an event, not the end of the game; an end policy decides. Default: a victory screen with a "continue" option, as in 2048. Confirmation C3. Confirmed on 2026-11-03: the player may continue to get more points (C3).
 - **A4 — Sort pieces (§1.3, §1.5, §5.1.5).** Each Sort level chooses its piece source: seeded random or a fixed list. Default: seeded random per level, so a level is reproducible and can be designed. Confirmation C4.
-- **A5 — Fit levels can be won (§1.2, §5.2.4).** The Fit illustration shows a figure of 21 cells and pieces of 20, against the rule that both areas are equal. We read it as a hint: every Fit level must be provably winnable. Equal area is necessary but not enough, and finding an exact cover is a search problem. So every level file carries the designer's solution (piece, rotation, position). The rotation counts steps of the level's topology, never degrees: the hexagonal topology has six steps of 60°, and another topology gives its own steps (D4). Checking that witness is linear. The Fit Builder checks area and witness when a level loads, a CI test checks every bundled level, and the backend rejects a level whose witness fails. A search tool only helps level designers. Pieces rotate; they are never mirrored (§1.2 mentions rotation only). Confirmations C1 and C7.
-- **A6 — Level origin (§5.1.5, §5.2.4).** Levels bundled in the app always work offline; levels from the backend add to them or replace them. Who may edit levels is Q4.
+- **A5 — Fit levels can be won (§1.2, §5.2.4).** The Fit illustration shows a figure of 21 cells and pieces of 20, against the rule that both areas are equal. We read it as a hint: every Fit level must be provably winnable. Equal area is necessary but not enough, and finding an exact cover is a search problem. So every level file carries the designer's solution (piece, rotation, position). The rotation counts steps of the level's topology, never degrees: the hexagonal topology has six steps of 60°, and another topology gives its own steps (D4). Checking that witness is linear. The Fit Builder checks area and witness when a level loads, a CI test checks every bundled level, and the backend rejects a level whose witness fails. A search tool only helps level designers. Pieces rotate; they are never mirrored (§1.2 mentions rotation only). Confirmations C1 and C7. The rotation rule is confirmed on 2026-11-03 (C7).
+- **A6 — Level origin (§5.1.5, §5.2.4).** Levels bundled in the app always work offline; levels from the backend add to them or replace them. Who may edit levels is Q4, answered on 2026-11-03.
 - **A7 — Public repositories (§2, §9).** Both repositories are public, because GitHub Free protects branches only on public repositories. Confirmation C6.
 - **A8 — Delivery date.** We plan against the earliest date, 2026-12-07. See Q1.
 - **A9 — Backend scope (§6.1).** Replaced by D6 on 2026-10-26.
@@ -178,7 +180,7 @@ Real questions (they change the plan):
 - **Q1:** The statement sets delivery on Monday 2026-12-14, and the class plan sets the final project delivery on 2026-12-07 and 2026-12-11, with grades on 2026-12-14. Which date and time is the deadline?
 - **Q2:** Closed by the team on 2026-10-26: the backend meets the same standards (D6).
 - **Q3:** Closed by the team on 2026-10-26: the patterns the design needs, each justified (D7).
-- **Q4:** Who may update level definitions in the backend? The statement asks only for sign-up and sign-in, with no roles.
+- **Q4:** Who may update level definitions in the backend? The statement asks only for sign-up and sign-in, with no roles. Answered 2026-11-03: the professor does not ask for a level editor or an admin: «Yo no voy a pedir». He asks only for several levels of rising difficulty. The team read this answer on 2026-11-04: the level update endpoint keeps the token guard only, with no roles (API-FR-04).
 - **Q5:** Closed by the team on 2026-10-26: three games are the minimum, and we deliver four (D8).
 - **Q6:** Closed on 2026-10-26: the team is already set, with three members.
 
@@ -195,8 +197,8 @@ Confirmations (we already work under an assumption):
 
 - **C1:** The Fit illustration has 21 cells and 20 of pieces. Do you expect the system to check that a level can be won? (A5)
 - **C2:** Is a value object that wraps an integer acceptable as the Merge cell? (A1)
-- **C3:** Does Merge end when the target tile appears, or may the player continue? (A3)
+- **C3:** Does Merge end when the target tile appears, or may the player continue? (A3) Answered 2026-11-03: the player may continue: «Yo podría que se pueda seguir jugando para tener más puntos». A3 holds.
 - **C4:** Are Sort trays random with a seed per level, or fixed in the level? (A4)
 - **C5:** Is an AOP library allowed, or must the aspect be our own decorator? (A2)
 - **C6:** Are public repositories acceptable? (A7)
-- **C7:** May Fit pieces be mirrored, or only rotated? (A5)
+- **C7:** May Fit pieces be mirrored, or only rotated? (A5) Answered 2026-11-03: only rotated: «No, no, giros, puedes usar giro». A5 holds. The question named turns of 90°; A5 keeps the rule that the topology of the level gives the rotation step (60° on hexagons).
