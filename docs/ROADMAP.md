@@ -112,21 +112,22 @@ Hexa Lines, Hexa Fit, Hexa Sort and Hexa Merge plug into the engine, each with i
 
 ## Sprint 3 — Game flow and local progress (2026-11-16 to 2026-11-22), tag `v0.3.0`
 
-The screens, from home to victory and defeat, in Spanish and English from the first text. Local progress per variant. The first Fit and Sort levels, enough to test the level selector. The backend serves leaderboards and level definitions. The team settles the generic level schema early in the sprint (backend `REQUIREMENTS.md` §4).
+The screens, from home to victory and defeat, in Spanish and English from the first text. Local progress per variant. The first Fit and Sort levels, enough to test the level selector. The backend serves leaderboards and level definitions. The team settles the generic level schema early in the sprint (backend `REQUIREMENTS.md` §4). The player chooses the board figure on the same screens (APP-FR-16): this sprint adds the real square and triangle geometries and a board view that draws any topology layout.
 
-| ID         | Exit check                                                                                                                          |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| APP-FR-01  | A UI test opens each of the four variants from the selector.                                                                        |
-| APP-FR-02  | For Fit and Sort, the selector shows which levels are completed, which are open and which are locked.                               |
-| APP-FR-04  | The high score of Lines and of Merge is still there after the app restarts.                                                         |
-| APP-FR-07  | A UI test reaches both screens and uses their buttons.                                                                              |
-| APP-FR-08  | In Fit, undo and then redo give back the same board; in Merge, a second undo in a row changes nothing; Lines and Sort show no undo. |
-| APP-FR-09  | APP-NFR-15.                                                                                                                         |
-| APP-NFR-15 | One integration test per variant saves progress and loads it back.                                                                  |
-| APP-FR-11  | Every visible text has a Spanish and an English entry.                                                                              |
-| APP-NFR-16 | A navigation test visits the six screens.                                                                                           |
-| API-FR-03  | An endpoint test filters by `gameId` and by level.                                                                                  |
-| API-FR-04  | An endpoint test reads the levels of each `gameId`, and the update rejects a Fit level that fails A5.                               |
+| ID         | Exit check                                                                                                                                              |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| APP-FR-01  | A UI test opens each of the four variants from the selector.                                                                                            |
+| APP-FR-02  | For Fit and Sort, the selector shows which levels are completed, which are open and which are locked.                                                   |
+| APP-FR-04  | The high score of Lines and of Merge is still there after the app restarts.                                                                             |
+| APP-FR-07  | A UI test reaches both screens and uses their buttons.                                                                                                  |
+| APP-FR-08  | In Fit, undo and then redo give back the same board; in Merge, a second undo in a row changes nothing; Lines and Sort show no undo.                     |
+| APP-FR-09  | APP-NFR-15.                                                                                                                                             |
+| APP-NFR-15 | One integration test per variant saves progress and loads it back.                                                                                      |
+| APP-FR-11  | Every visible text has a Spanish and an English entry.                                                                                                  |
+| APP-NFR-16 | A navigation test visits the six screens.                                                                                                               |
+| APP-FR-16  | Switching the figure changes only the `GeometryFactory` that the composition root passes to the variant factory, and no engine or variant file differs. |
+| API-FR-03  | An endpoint test filters by `gameId` and by level.                                                                                                      |
+| API-FR-04  | An endpoint test reads the levels of each `gameId`, and the update rejects a Fit level that fails A5.                                                   |
 
 ## Sprint 4 — Backend sync and architecture documents (2026-11-23 to 2026-11-29), tag `v0.4.0`
 
