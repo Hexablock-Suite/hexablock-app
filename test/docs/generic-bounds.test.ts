@@ -18,8 +18,10 @@ const same = (a: Bound, b: Bound) =>
   a.parameter === b.parameter && compact(a.bound) === compact(b.bound);
 
 // A type parameter is `T` plus a capital letter, for example `TState extends BoardState<…>`.
+// A bound can be an intersection, for example `BoardState<…> & Cloneable<TState>`.
+const type = String.raw`[A-Za-z]\w*(?:<[^<>]*>)?`;
 function codeBounds(): Bound[] {
-  const pattern = /\b(T[A-Z]\w*) extends ([A-Za-z]\w*(?:<[^<>]*>)?)/g;
+  const pattern = new RegExp(String.raw`\b(T[A-Z]\w*) extends (${type}(?:\s*&\s*${type})*)`, 'g');
   return readdirSync(engineDir)
     .filter((file) => file.endsWith('.ts'))
     .flatMap((file) =>
@@ -52,7 +54,7 @@ describe('README generic bounds', () => {
   it('should_find_a_bound_in_the_engine_when_the_code_is_scanned', () => {
     expect(codeBounds()).toContainEqual({
       parameter: 'TState',
-      bound: 'BoardState<TCell, TCoord>',
+      bound: 'BoardState<TCell, TCoord> & Cloneable<TState>',
     });
   });
 
