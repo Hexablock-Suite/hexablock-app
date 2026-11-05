@@ -1,4 +1,5 @@
 import { BoardShape } from '../../../src/domain/engine/board-shape';
+import { coordKey, type CoordKey } from '../../../src/domain/engine/coord-key';
 import type { GridTopology } from '../../../src/domain/engine/grid-topology';
 
 // The triangle topology double (issue 22, APP-NFR-13). It exists only in test/.
@@ -8,6 +9,10 @@ export interface TriangleCoord {
   readonly col: number;
   readonly row: number;
 }
+
+// The closed unions of the triangle double: three axes and three directions.
+export type TriangleAxis = 'row' | 'down-right' | 'down-left';
+export type TriangleDirection = 'left' | 'right' | 'vertical';
 
 export function triangle(col: number, row: number): TriangleCoord {
   return { col, row };
@@ -31,7 +36,7 @@ function neighbors(c: TriangleCoord): TriangleCoord[] {
 
 // One step along an axis, forward or backward. The `row` axis is a straight strip.
 // The two diagonal axes zigzag: the step depends on the orientation of the triangle.
-function step(c: TriangleCoord, axis: string, forward: boolean): TriangleCoord {
+function step(c: TriangleCoord, axis: TriangleAxis, forward: boolean): TriangleCoord {
   const up = isUp(c);
   const { col, row } = c;
   switch (axis) {
@@ -44,7 +49,8 @@ function step(c: TriangleCoord, axis: string, forward: boolean): TriangleCoord {
       if (forward) return up ? triangle(col, row + 1) : triangle(col - 1, row);
       return up ? triangle(col + 1, row) : triangle(col, row - 1);
     default:
-      throw new RangeError(`The triangle grid has no axis ${axis}.`);
+      // This branch still runs when a caller casts a free string to an axis.
+      throw new RangeError(`The triangle grid has no axis ${String(axis)}.`);
   }
 }
 
@@ -66,20 +72,20 @@ function fromCube([x, y, z]: Cube): TriangleCoord {
   return triangle(2 * i + y + (up ? 0 : 1), y);
 }
 
-function key(c: TriangleCoord): string {
-  return `${c.col},${c.row}`;
+function key(c: TriangleCoord): CoordKey {
+  return coordKey(`${c.col},${c.row}`);
 }
 
-export const triangleTopology: GridTopology<TriangleCoord> = {
+export const triangleTopology: GridTopology<TriangleCoord, TriangleAxis, TriangleDirection> = {
   rotationSteps: 6,
   key,
   neighbors,
   directions: () => ['left', 'right', 'vertical'],
   axes: () => ['row', 'down-right', 'down-left'],
   // A sixth of a turn around the origin vertex maps (x, y, z) to (1 - y, 1 - z, 1 - x).
-  rotate: (c, steps) => {
+  rotate: (c, turns) => {
     let [x, y, z] = toCube(c);
-    for (let s = 0; s < ((steps % 6) + 6) % 6; s += 1) [x, y, z] = [1 - y, 1 - z, 1 - x];
+    for (let s = 0; s < ((turns.value % 6) + 6) % 6; s += 1) [x, y, z] = [1 - y, 1 - z, 1 - x];
     return fromCube([x, y, z]);
   },
   // The offset counts lattice cells: one step of `col` is two triangles to the right,
@@ -92,7 +98,7 @@ export const triangleTopology: GridTopology<TriangleCoord> = {
     for (let c = start; contains(c); c = step(c, axis, true)) yield c;
   },
   // The cells at graph distance `radius`, found breadth first.
-  *ring(center, radius) {
+  *ring(center, { value: radius }) {
     let frontier = [center];
     const seen = new Set([key(center)]);
     for (let r = 0; r < radius; r += 1) {
@@ -110,7 +116,7 @@ export const triangleTopology: GridTopology<TriangleCoord> = {
     yield* frontier;
   },
   // A rhombus of size × size lattice cells, two triangles each.
-  region: (size) => {
+  region: ({ value: size }) => {
     const cells: TriangleCoord[] = [];
     for (let j = 0; j < size; j += 1) {
       for (let i = 0; i < size; i += 1) {

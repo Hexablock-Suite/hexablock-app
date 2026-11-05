@@ -1,7 +1,9 @@
 /** @jest-environment node */
 import { Board } from '../../../src/domain/engine/board';
 import { Piece } from '../../../src/domain/engine/piece';
+import { RegionSize } from '../../../src/domain/engine/region-size';
 import { CellNode, ShapeGroup } from '../../../src/domain/engine/shape-node';
+import { Turns } from '../../../src/domain/engine/turns';
 import { fakeCell } from '../../support/engine/fake-cell';
 import {
   isUp,
@@ -77,13 +79,13 @@ describe('Piece translation on the triangle topology double', () => {
   });
 
   it('should_return_to_the_start_when_a_piece_rotates_a_full_turn', () => {
-    const turned = rhombus().rotated(triangleTopology.rotationSteps, triangleTopology);
+    const turned = rhombus().rotated(Turns.of(triangleTopology.rotationSteps), triangleTopology);
 
     expect(turned.shape.cells()).toEqual(rhombus().shape.cells());
   });
 
   it('should_flip_the_orientation_when_a_triangle_rotates_one_step', () => {
-    expect(isUp(triangleTopology.rotate(triangle(0, 0), 1))).toBe(false);
+    expect(isUp(triangleTopology.rotate(triangle(0, 0), Turns.of(1)))).toBe(false);
   });
 
   it('should_give_three_neighbors_of_the_other_orientation_when_neighbors_are_read', () => {
@@ -94,14 +96,14 @@ describe('Piece translation on the triangle topology double', () => {
   });
 
   it('should_keep_two_triangles_neighbors_when_both_rotate_one_step', () => {
-    const a = triangleTopology.rotate(triangle(0, 0), 1);
-    const b = triangleTopology.rotate(triangle(1, 0), 1);
+    const a = triangleTopology.rotate(triangle(0, 0), Turns.of(1));
+    const b = triangleTopology.rotate(triangle(1, 0), Turns.of(1));
 
     expect(triangleTopology.neighbors(a)).toContainEqual(b);
   });
 
   it('should_walk_the_strip_when_a_board_line_follows_the_row_axis', () => {
-    const board = new Board(triangleTopology.region(2), triangleTopology);
+    const board = new Board(triangleTopology.region(RegionSize.of(2)), triangleTopology);
 
     expect([...board.line('row', triangle(2, 0))]).toEqual([
       triangle(0, 0),
@@ -112,7 +114,7 @@ describe('Piece translation on the triangle topology double', () => {
   });
 
   it('should_zigzag_inside_the_board_when_a_board_line_follows_a_diagonal_axis', () => {
-    const board = new Board(triangleTopology.region(2), triangleTopology);
+    const board = new Board(triangleTopology.region(RegionSize.of(2)), triangleTopology);
 
     expect([...board.line('down-right', triangle(1, 0))]).toEqual([
       triangle(1, 0),

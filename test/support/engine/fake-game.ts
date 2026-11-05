@@ -2,11 +2,12 @@ import { Board } from '../../../src/domain/engine/board';
 import type { BoardState } from '../../../src/domain/engine/board-state';
 import type { GameEvent, GameEventPublisher } from '../../../src/domain/engine/game-events';
 import type { Outcome } from '../../../src/domain/engine/outcome';
+import { RegionSize } from '../../../src/domain/engine/region-size';
 import { Resolution } from '../../../src/domain/engine/resolution';
 import { BaseGameRules } from '../../../src/domain/engine/rules';
 import type { IScoringPolicy } from '../../../src/domain/engine/scoring-policy';
 import type { FakeCell } from './fake-cell';
-import { squareTopology, type SquareCoord } from './square-topology';
+import { squareTopology, type SquareAxis, type SquareCoord } from './square-topology';
 
 // A fake game that exists only in test/ (APP-NFR-13). No variant uses these classes.
 
@@ -17,7 +18,7 @@ export interface FakeMove {
 
 export class FakeState implements BoardState<FakeCell, SquareCoord> {
   constructor(
-    readonly board: Board<FakeCell, SquareCoord>,
+    readonly board: Board<FakeCell, SquareCoord, SquareAxis>,
     public score = 0,
   ) {}
 
@@ -28,7 +29,7 @@ export class FakeState implements BoardState<FakeCell, SquareCoord> {
 
 // A square board of size × size empty cells.
 export function emptyState(size = 2): FakeState {
-  return new FakeState(new Board(squareTopology.region(size), squareTopology));
+  return new FakeState(new Board(squareTopology.region(RegionSize.of(size)), squareTopology));
 }
 
 // A move is valid on an empty cell inside the board. The game ends when the board is full.
