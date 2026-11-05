@@ -1,4 +1,5 @@
 import type { BoardState } from './board-state';
+import type { Cloneable } from './cloneable';
 import { GameOver, type GameEventPublisher } from './game-events';
 import type { GameId } from './game-id';
 import { PlayingPhase, ResolvingPhase, type GamePhase } from './game-phase';
@@ -10,7 +11,13 @@ import type { IScoringPolicy } from './scoring-policy';
 // A game changes only through `play()`, and `play()` applies a move only while
 // `phase.canPlay()` is true. `snapshot()` returns a clone, so no caller changes the board.
 // The engine depends only on the interfaces of the rules and the scoring (Strategy, D1).
-export class GameEngine<TCell, TCoord, TMove, TState extends BoardState<TCell, TCoord>> {
+// `TState` is a `BoardState` whose `clone()` returns `TState`, so each copy keeps the state type.
+export class GameEngine<
+  TCell,
+  TCoord,
+  TMove,
+  TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
+> {
   private state: TState | undefined;
   private current: GamePhase = PlayingPhase.instance;
 
@@ -82,7 +89,7 @@ export class GameEngine<TCell, TCoord, TMove, TState extends BoardState<TCell, T
   }
 }
 
-// `BoardState.clone()` of a variant state returns that variant state (see board-state.ts).
-function copy<TState extends BoardState<unknown, unknown>>(state: TState): TState {
-  return state.clone() as TState;
+// The bound `Cloneable<TState>` makes `clone()` return `TState`, so the copy needs no cast.
+function copy<TState extends Cloneable<TState>>(state: TState): TState {
+  return state.clone();
 }
