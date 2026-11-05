@@ -75,7 +75,7 @@ class MovesProgress implements IProgressModel {
 
 // The rules put the next piece of their source on the chosen cell.
 // The variant factory gives the rules their piece source (classes.md decision 31).
-class SourceRules extends BaseGameRules<FakeCell, SquareCoord, FakeState> {
+class SourceRules extends BaseGameRules<SquareCoord, FakeState> {
   last: SquareCoord | undefined;
 
   constructor(private readonly source: IPieceSource<FakeCell>) {
