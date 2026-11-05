@@ -2,7 +2,7 @@
 
 Status: draft for review with the professor, 2026-10-30. Updated on 2026-10-31 with the team decisions that follow the class and the consultation of 2026-10-30 (decisions 15 to 24), with the design review proposals of decisions 25 to 31, and with the pattern decisions 32 to 36 of 2026-11-01. Updated on 2026-11-02 with the corrections of that class: uses between layers (decision 23), an `execute()` in every use case, and a `Logger` port that takes a log entry (decision 37). Parts 1 and 2 cover layer 1: the generic engine and the four variants. Parts 3 and 4 cover layers 2 to 4: the use cases, the adapters, the presenters and the drivers.
 
-This page answers statement §4.1 for the client. It shows the generic types in UML template notation, how each variant instantiates them, the layers each class lives in, and the design patterns. Each part opens with a map that names every class, grouped by pattern, with no members. Small views then show the members, with at most seven classes each. IDs such as A1, D1 and Q8 refer to [`docs/REQUIREMENTS.md`](../REQUIREMENTS.md). The layers themselves are in [layers.md](layers.md). The extensibility diagram, with the engine in the center and the extension points around it, is in [extensibility.md](extensibility.md).
+This page answers statement §4.1 for the client. It shows the generic types in UML template notation, how each variant instantiates them, the layers each class lives in, and the design patterns. Each part opens with a map that names every class, grouped by pattern, with no members. Small views then show the members, with at most seven classes each. IDs such as A1, D1 and Q8 refer to [`docs/REQUIREMENTS.md`](../REQUIREMENTS.md). The layers themselves are in [layers.md](layers.md). The extensibility diagram, with the engine in the center and the extension points around it, is in [extensibility.md](extensibility.md). The use case flows, each with a class view and a sequence diagram, are in [flows.md](flows.md).
 
 ## How to read it
 
@@ -146,6 +146,14 @@ Layer 3, `src/adapters/`, and layer 4, `src/infrastructure/` and `app/`. Layer 3
 ### View 4.4: wiring
 
 ![Wiring: the composition root creates the drivers and the adapters once and injects them, so AudioManager and SessionManager have a single scope](classes/views/ad-4-wiring.png)
+
+## Use case flows
+
+One use case can cross every layer. [flows.md](flows.md) follows one call through the layers: a class view of that use case only, and a UML sequence diagram with the same class names.
+
+### Flow 1: apply a move
+
+![ApplyMove flow: GameScreen in layer 4; GamePresenter, StateMapper, GameViewModel and InMemoryRunningGameStore in layer 3; UseCase, ApplyMove, ApplyMoveRequest, MoveResult and the RunningGameStore port in layer 2; GameEngine, IGameRules and Board in layer 1](classes/views/flow-1-apply-move.png)
 
 ## Patterns
 

@@ -1,0 +1,1539 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ApplyMove flow · UML sequence diagram</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --color-paper: #f3f5f6;
+        --color-ink: #17212a;
+        --color-muted: #5b6873;
+        --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+        --font-serif: 'Instrument Serif', serif;
+        --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+      }
+      body {
+        font-family: var(--font-sans);
+        background: var(--color-paper);
+        color: var(--color-ink);
+        padding: 3rem 2rem;
+      }
+      .frame {
+        max-width: 1240px;
+        margin: 0 auto;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-muted);
+        margin-bottom: 0.5rem;
+      }
+      h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        margin-bottom: 1.5rem;
+      }
+      svg {
+        width: 100%;
+        min-width: 900px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <p class="eyebrow">Use case flow · ApplyMove · sequence diagram</p>
+      <h1>ApplyMove step by step: one move from the screen to the engine and back</h1>
+      <svg
+        viewBox="0 0 1240 1152"
+        xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-labelledby="seqmove-title seqmove-desc"
+      >
+        <title id="seqmove-title">HexaBlock ApplyMove flow · UML sequence diagram</title>
+        <desc id="seqmove-desc">
+          Sequence diagram of one move. The player taps a cell on GameScreen in layer 4.
+          GamePresenter in layer 3 calls execute() on ApplyMove in layer 2 through the UseCase port.
+          ApplyMove takes the running GameEngine from InMemoryRunningGameStore in layer 3 through
+          the RunningGameStore port, plays the move on GameEngine in layer 1, which runs playTurn()
+          on IGameRules, reads the snapshot and the cells of Board, and returns a Result with a
+          MoveResult. GamePresenter maps each cell with StateMapper, builds GameViewModel and
+          GameScreen renders it.
+        </desc>
+        <defs>
+          <marker
+            id="seqmove-call"
+            markerWidth="10"
+            markerHeight="8"
+            refX="9"
+            refY="4"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 0, 9 4, 0 8" fill="#17212a" />
+          </marker>
+          <marker
+            id="seqmove-reply"
+            markerWidth="10"
+            markerHeight="8"
+            refX="9"
+            refY="4"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
+          </marker>
+        </defs>
+        <rect width="100%" height="100%" fill="#f3f5f6" />
+        <!-- Lifeline headers: each names its object, its class and its layer -->
+        <!-- Lifeline: player : Player -->
+        <rect
+          x="18"
+          y="24"
+          width="96"
+          height="64"
+          rx="6"
+          fill="#f3f5f6"
+          stroke="#7d8a94"
+          stroke-width="1"
+        />
+        <text
+          x="66"
+          y="38"
+          fill="#5b6873"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          ACTOR
+        </text>
+        <text
+          x="66"
+          y="52"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          player :
+        </text>
+        <text
+          x="66"
+          y="67"
+          fill="#17212a"
+          font-size="10.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          Player
+        </text>
+        <!-- Lifeline: screen : GameScreen -->
+        <rect
+          x="142"
+          y="24"
+          width="120"
+          height="64"
+          rx="6"
+          fill="#cfdcf3"
+          stroke="rgba(30,58,138,0.50)"
+          stroke-width="1"
+        />
+        <text
+          x="202"
+          y="38"
+          fill="#1e3a8a"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          LAYER 4
+        </text>
+        <text
+          x="202"
+          y="52"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          screen :
+        </text>
+        <text
+          x="202"
+          y="67"
+          fill="#17212a"
+          font-size="10.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GameScreen
+        </text>
+        <!-- Lifeline: presenter : GamePresenter -->
+        <rect
+          x="278"
+          y="24"
+          width="120"
+          height="64"
+          rx="6"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="338"
+          y="38"
+          fill="#1d4ed8"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          LAYER 3
+        </text>
+        <text
+          x="338"
+          y="52"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          presenter :
+        </text>
+        <text
+          x="338"
+          y="67"
+          fill="#17212a"
+          font-size="10.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GamePresenter
+        </text>
+        <!-- Lifeline: mapper : StateMapper -->
+        <rect
+          x="414"
+          y="24"
+          width="120"
+          height="64"
+          rx="6"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="474"
+          y="38"
+          fill="#1d4ed8"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          LAYER 3
+        </text>
+        <text
+          x="474"
+          y="52"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          mapper :
+        </text>
+        <text
+          x="474"
+          y="67"
+          fill="#17212a"
+          font-size="10.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          StateMapper
+        </text>
+        <text
+          x="474"
+          y="80"
+          fill="#5b6873"
+          font-size="7.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          LinesStateMapper, …
+        </text>
+        <!-- Lifeline: applyMove : ApplyMove -->
+        <rect
+          x="550"
+          y="24"
+          width="120"
+          height="64"
+          rx="6"
+          fill="#efe7f8"
+          stroke="rgba(126,34,206,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="610"
+          y="38"
+          fill="#7e22ce"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          LAYER 2
+        </text>
+        <text
+          x="610"
+          y="52"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          applyMove :
+        </text>
+        <text
+          x="610"
+          y="67"
+          fill="#17212a"
+          font-size="10.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          ApplyMove
+        </text>
+        <text
+          x="610"
+          y="80"
+          fill="#5b6873"
+          font-size="7.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          implements UseCase
+        </text>
+        <!-- Lifeline: games : InMemoryRunningGameStore -->
+        <rect
+          x="672"
+          y="24"
+          width="148"
+          height="64"
+          rx="6"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="746"
+          y="38"
+          fill="#1d4ed8"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          LAYER 3
+        </text>
+        <text
+          x="746"
+          y="52"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          games :
+        </text>
+        <text
+          x="746"
+          y="67"
+          fill="#17212a"
+          font-size="10.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          InMemoryRunningGameStore
+        </text>
+        <text
+          x="746"
+          y="80"
+          fill="#5b6873"
+          font-size="7.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          implements RunningGameStore
+        </text>
+        <!-- Lifeline: game : GameEngine -->
+        <rect
+          x="822"
+          y="24"
+          width="120"
+          height="64"
+          rx="6"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="882"
+          y="38"
+          fill="#b45309"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          LAYER 1
+        </text>
+        <text
+          x="882"
+          y="52"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          game :
+        </text>
+        <text
+          x="882"
+          y="67"
+          fill="#17212a"
+          font-size="10.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GameEngine
+        </text>
+        <!-- Lifeline: rules : IGameRules -->
+        <rect
+          x="958"
+          y="24"
+          width="120"
+          height="64"
+          rx="6"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="1018"
+          y="38"
+          fill="#b45309"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          LAYER 1
+        </text>
+        <text
+          x="1018"
+          y="52"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          rules :
+        </text>
+        <text
+          x="1018"
+          y="67"
+          fill="#17212a"
+          font-size="10.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          IGameRules
+        </text>
+        <text
+          x="1018"
+          y="80"
+          fill="#5b6873"
+          font-size="7.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          LinesRules, …
+        </text>
+        <!-- Lifeline: board : Board -->
+        <rect
+          x="1094"
+          y="24"
+          width="120"
+          height="64"
+          rx="6"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="1154"
+          y="38"
+          fill="#b45309"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          LAYER 1
+        </text>
+        <text
+          x="1154"
+          y="52"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          board :
+        </text>
+        <text
+          x="1154"
+          y="67"
+          fill="#17212a"
+          font-size="10.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          Board
+        </text>
+        <!-- Lifelines -->
+        <line
+          x1="66"
+          y1="88"
+          x2="66"
+          y2="964"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="3,3"
+        />
+        <line
+          x1="202"
+          y1="88"
+          x2="202"
+          y2="964"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="3,3"
+        />
+        <line
+          x1="338"
+          y1="88"
+          x2="338"
+          y2="964"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="3,3"
+        />
+        <line
+          x1="474"
+          y1="88"
+          x2="474"
+          y2="964"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="3,3"
+        />
+        <line
+          x1="610"
+          y1="88"
+          x2="610"
+          y2="964"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="3,3"
+        />
+        <line
+          x1="746"
+          y1="88"
+          x2="746"
+          y2="964"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="3,3"
+        />
+        <line
+          x1="882"
+          y1="88"
+          x2="882"
+          y2="964"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="3,3"
+        />
+        <line
+          x1="1018"
+          y1="88"
+          x2="1018"
+          y2="964"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="3,3"
+        />
+        <line
+          x1="1154"
+          y1="88"
+          x2="1154"
+          y2="964"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="3,3"
+        />
+        <!-- Combined fragment: loop -->
+        <rect
+          x="298"
+          y="686"
+          width="246"
+          height="88"
+          rx="1"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+        />
+        <path d="M298 700 H330 L336 694 V686" fill="#ffffff" stroke="#5b6873" stroke-width="1" />
+        <text
+          x="303"
+          y="696"
+          fill="#17212a"
+          font-size="8.5"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          loop
+        </text>
+        <text
+          x="342"
+          y="697"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          [each cell of MoveResult.cells]
+        </text>
+        <!-- Activation bars -->
+        <rect
+          x="198"
+          y="114"
+          width="8"
+          height="840"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="334"
+          y="144"
+          width="8"
+          height="692"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="334"
+          y="862"
+          width="8"
+          height="34"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="606"
+          y="174"
+          width="8"
+          height="494"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="742"
+          y="204"
+          width="8"
+          height="34"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="878"
+          y="264"
+          width="8"
+          height="94"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="878"
+          y="384"
+          width="8"
+          height="34"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="878"
+          y="504"
+          width="8"
+          height="34"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="878"
+          y="564"
+          width="8"
+          height="34"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="1014"
+          y="294"
+          width="8"
+          height="34"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="1150"
+          y="444"
+          width="8"
+          height="34"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="470"
+          y="724"
+          width="8"
+          height="34"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <!-- Messages, top to bottom -->
+        <!-- Message: player calls screen -->
+        <line
+          x1="66"
+          y1="116"
+          x2="198"
+          y2="116"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqmove-call)"
+        />
+        <rect x="99.675" y="102" width="64.65" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="132"
+          y="112"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          taps a cell
+        </text>
+        <!-- Message: screen calls presenter -->
+        <line
+          x1="206"
+          y1="146"
+          x2="334"
+          y2="146"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqmove-call)"
+        />
+        <rect x="217.075" y="132" width="105.85" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="270"
+          y="142"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          onMove(move: TMove)
+        </text>
+        <!-- Message: presenter calls apply -->
+        <line
+          x1="342"
+          y1="176"
+          x2="606"
+          y2="176"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqmove-call)"
+        />
+        <rect x="364.425" y="162" width="219.15" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="474"
+          y="172"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          execute(request: ApplyMoveRequest&lt;TMove&gt;)
+        </text>
+        <!-- Message: apply calls games -->
+        <line
+          x1="614"
+          y1="206"
+          x2="742"
+          y2="206"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqmove-call)"
+        />
+        <rect x="650.825" y="192" width="54.35" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="678"
+          y="202"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          current()
+        </text>
+        <!-- Reply: games returns to apply -->
+        <line
+          x1="742"
+          y1="236"
+          x2="614"
+          y2="236"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqmove-reply)"
+        />
+        <rect x="618" y="222" width="121.3" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="622"
+          y="232"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          GameEngine | undefined
+        </text>
+        <!-- Message: apply calls game -->
+        <line
+          x1="614"
+          y1="266"
+          x2="878"
+          y2="266"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqmove-call)"
+        />
+        <rect x="680.2" y="252" width="131.6" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="746"
+          y="262"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          play(move: request.move)
+        </text>
+        <!-- Message: game calls rules -->
+        <line
+          x1="886"
+          y1="296"
+          x2="1014"
+          y2="296"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqmove-call)"
+        />
+        <rect x="890" y="282" width="193.4" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="894"
+          y="292"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          playTurn(state: TState, move: TMove)
+        </text>
+        <!-- Reply: rules returns to game -->
+        <line
+          x1="1014"
+          y1="326"
+          x2="886"
+          y2="326"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqmove-reply)"
+        />
+        <rect x="899.65" y="312" width="100.7" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="950"
+          y="322"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          Resolution&lt;TState&gt;
+        </text>
+        <!-- Reply: game returns to apply -->
+        <line
+          x1="878"
+          y1="356"
+          x2="614"
+          y2="356"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqmove-reply)"
+        />
+        <rect x="723.975" y="342" width="44.05" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="746"
+          y="352"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          Outcome
+        </text>
+        <!-- Message: apply calls game -->
+        <line
+          x1="614"
+          y1="386"
+          x2="878"
+          y2="386"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqmove-call)"
+        />
+        <rect x="716.25" y="372" width="59.5" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="746"
+          y="382"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          snapshot()
+        </text>
+        <!-- Reply: game returns to apply -->
+        <line
+          x1="878"
+          y1="416"
+          x2="614"
+          y2="416"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqmove-reply)"
+        />
+        <rect x="726.55" y="402" width="38.9" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="746"
+          y="412"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TState
+        </text>
+        <!-- Message: apply calls board -->
+        <line
+          x1="614"
+          y1="446"
+          x2="1150"
+          y2="446"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqmove-call)"
+        />
+        <rect x="821.35" y="432" width="121.3" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="882"
+          y="442"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          cells() · state.board
+        </text>
+        <!-- Reply: board returns to apply -->
+        <line
+          x1="1150"
+          y1="476"
+          x2="614"
+          y2="476"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqmove-reply)"
+        />
+        <rect x="834.225" y="462" width="95.55" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="882"
+          y="472"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          [TCoord, TCell][]
+        </text>
+        <!-- Message: apply calls game -->
+        <line
+          x1="614"
+          y1="506"
+          x2="878"
+          y2="506"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqmove-call)"
+        />
+        <rect x="716.25" y="492" width="59.5" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="746"
+          y="502"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          undoable()
+        </text>
+        <!-- Reply: game returns to apply -->
+        <line
+          x1="878"
+          y1="536"
+          x2="614"
+          y2="536"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqmove-reply)"
+        />
+        <rect x="687.925" y="522" width="116.15" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="746"
+          y="532"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          IUndoable | undefined
+        </text>
+        <!-- Message: apply calls game -->
+        <line
+          x1="614"
+          y1="566"
+          x2="878"
+          y2="566"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqmove-call)"
+        />
+        <rect x="716.25" y="552" width="59.5" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="746"
+          y="562"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          redoable()
+        </text>
+        <!-- Reply: game returns to apply -->
+        <line
+          x1="878"
+          y1="596"
+          x2="614"
+          y2="596"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqmove-reply)"
+        />
+        <rect x="687.925" y="582" width="116.15" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="746"
+          y="592"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          IRedoable | undefined
+        </text>
+        <!-- Self message: apply -->
+        <path
+          d="M614 626 H642 V640 H622"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqmove-call)"
+        />
+        <rect x="644" y="626" width="291.25" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="648"
+          y="636"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          new MoveResult(cells, score, outcome, canUndo, canRedo)
+        </text>
+        <!-- Reply: apply returns to presenter -->
+        <line
+          x1="606"
+          y1="666"
+          x2="342"
+          y2="666"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqmove-reply)"
+        />
+        <rect x="385.025" y="652" width="177.95" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="474"
+          y="662"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          Result&lt;MoveResult&lt;TCell, TCoord&gt;&gt;
+        </text>
+        <!-- Message: presenter calls mapper -->
+        <line
+          x1="342"
+          y1="726"
+          x2="470"
+          y2="726"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqmove-call)"
+        />
+        <rect x="353.075" y="712" width="105.85" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="406"
+          y="722"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          toView(cell: TCell)
+        </text>
+        <!-- Reply: mapper returns to presenter -->
+        <line
+          x1="470"
+          y1="756"
+          x2="342"
+          y2="756"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqmove-reply)"
+        />
+        <rect x="381.4" y="742" width="49.2" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="406"
+          y="752"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          CellView
+        </text>
+        <!-- Self message: presenter -->
+        <path
+          d="M342 794 H370 V808 H350"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqmove-call)"
+        />
+        <rect x="372" y="794" width="296.4" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="376"
+          y="804"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          new GameViewModel(cells, score, canUndo, canRedo, phase)
+        </text>
+        <!-- Reply: presenter returns to screen -->
+        <line
+          x1="334"
+          y1="834"
+          x2="206"
+          y2="834"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqmove-reply)"
+        />
+        <rect x="210" y="820" width="121.3" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="214"
+          y="830"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          Promise&lt;void&gt; resolves
+        </text>
+        <!-- Message: screen calls presenter -->
+        <line
+          x1="206"
+          y1="864"
+          x2="334"
+          y2="864"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqmove-call)"
+        />
+        <rect x="237.675" y="850" width="64.65" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="270"
+          y="860"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          viewModel()
+        </text>
+        <!-- Reply: presenter returns to screen -->
+        <line
+          x1="334"
+          y1="894"
+          x2="206"
+          y2="894"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqmove-reply)"
+        />
+        <rect x="232.525" y="880" width="74.95" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="270"
+          y="890"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          GameViewModel
+        </text>
+        <!-- Self message: screen -->
+        <path
+          d="M206 924 H234 V938 H214"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqmove-call)"
+        />
+        <rect x="236" y="924" width="95.55" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="240"
+          y="934"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          renders the board
+        </text>
+        <!-- Footnote -->
+        <text
+          x="24"
+          y="992"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Each header names the object, its class and its layer, with the colors of the class views.
+          The calls are the operations of the
+        </text>
+        <text
+          x="24"
+          y="1008"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          ApplyMove class view. The calls go from layer 2 out to layer 3 at run time, but the code
+          of ApplyMove names only the RunningGameStore
+        </text>
+        <text
+          x="24"
+          y="1024"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          port: InMemoryRunningGameStore implements it, so the dependency still points down. When
+          current() is undefined or play() rejects the
+        </text>
+        <text
+          x="24"
+          y="1040"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          move, ApplyMove returns Result.failure(error), and onMove() puts its message in
+          GameViewModel.error (decision 28). No HTTP call runs.
+        </text>
+        <!-- Legend -->
+        <line
+          x1="24"
+          y1="1072"
+          x2="1216"
+          y2="1072"
+          stroke="rgba(23,33,42,0.10)"
+          stroke-width="0.8"
+        />
+        <text
+          x="24"
+          y="1090"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LEGEND
+        </text>
+        <line
+          x1="24"
+          y1="1108"
+          x2="52"
+          y2="1108"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqmove-call)"
+        />
+        <text
+          x="60"
+          y="1111"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Call · operation and arguments
+        </text>
+        <line
+          x1="224"
+          y1="1108"
+          x2="252"
+          y2="1108"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqmove-reply)"
+        />
+        <text
+          x="260"
+          y="1111"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Return · returned value
+        </text>
+        <line
+          x1="418"
+          y1="1101"
+          x2="418"
+          y2="1115"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="3,3"
+        />
+        <rect
+          x="414"
+          y="1104"
+          width="8"
+          height="8"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="440"
+          y="1111"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Lifeline with activation bar
+        </text>
+        <rect
+          x="604"
+          y="1102"
+          width="28"
+          height="12"
+          rx="1"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+        />
+        <text
+          x="640"
+          y="1111"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Combined fragment · loop
+        </text>
+        <rect
+          x="24"
+          y="1124"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#cfdcf3"
+          stroke="rgba(30,58,138,0.50)"
+          stroke-width="1"
+        />
+        <text
+          x="60"
+          y="1133"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Header · layer 4
+        </text>
+        <rect
+          x="224"
+          y="1124"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="260"
+          y="1133"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Header · layer 3
+        </text>
+        <rect
+          x="404"
+          y="1124"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#efe7f8"
+          stroke="rgba(126,34,206,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="440"
+          y="1133"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Header · layer 2
+        </text>
+        <rect
+          x="604"
+          y="1124"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="640"
+          y="1133"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Header · layer 1
+        </text>
+      </svg>
+    </div>
+  </body>
+</html>
