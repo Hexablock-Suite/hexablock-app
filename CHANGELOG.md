@@ -8,6 +8,7 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 
 ### Added
 
+- `test/docs/generic-bounds.test.ts`: every generic bound in `src/domain/engine/` must have a `code` row in the README table «Type parameters», and every `code` row must exist in the code ([#75](https://github.com/Hexablock-Suite/hexablock-app/issues/75)).
 - `IProgressModel`, `GameResult` and a draft `ProgressRecord` in `src/domain/engine/progress-model.ts`, and a swap test that runs one `GameEngine` with two dummy piece sources, two dummy scoring policies and two dummy progress models, with no engine change (APP-NFR-04). No real scoring: decision #59 is open ([#74](https://github.com/Hexablock-Suite/hexablock-app/issues/74)).
 - `BaseGameRules.noValidMove(state)` in `src/domain/engine/rules.ts`: the «no valid move» end check reads only the first move of the lazy `validMoves()` generator. A test with rules that walk `Board.line()` and `neighborhood()` shows that the check stops at the first valid move. The README Design Patterns row for Iterator links `validMoves()` to its source file ([#73](https://github.com/Hexablock-Suite/hexablock-app/issues/73)).
 - `IPieceSource<TPiece>` as Strategy and Iterator in `src/domain/engine/piece-source.ts`, with the endless `SeededPieceSource` and the finite `FixedListPieceSource`, plus `SeededRandom` and `IRandomSeeded`. The README Design Patterns row for Iterator links the source file ([#72](https://github.com/Hexablock-Suite/hexablock-app/issues/72)).
@@ -23,6 +24,7 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 
 ### Changed
 
+- The README section «Generic Engine» describes the Sprint 1 code: links to the source files, the members of `GridTopology`, the test doubles, and a bounds table with a Status column that marks `IMergeable<TCell>` on `MergeRules` as a design bound for Sprint 2 ([#75](https://github.com/Hexablock-Suite/hexablock-app/issues/75)).
 - Sprint 0 closes with `v0.0.0`: `docs/ROADMAP.md` is approved, the README names the five use case flows and marks the engine sections as design, `AI_USAGE.md` logs the work of 2026-11-03 and 2026-11-04, and APP-FR-16 no longer says the square geometry exists in the engine tests.
 - `docs/REQUIREMENTS.md` records the answers of the session of 2026-11-03: C3 and C7 confirm A3 and A5, Q4 keeps the level update behind the token guard with no roles, gravity is not an axis, and APP-NFR-10 names Clean plus an architecture for games for every layer. Flow 5 and its sequence diagram cite view 3.3 of the API class diagram, not view 4.3 ([#63](https://github.com/Hexablock-Suite/hexablock-app/pull/63)).
 - The engine, use case and adapter maps and extensibility views 1 and 3 draw no line on a dashed frame or a package: each line joins the two classes that depend, with a role and a multiplicity or a verb, and the reading notes say why, after the session of 2026-11-03 ([#63](https://github.com/Hexablock-Suite/hexablock-app/pull/63)).

@@ -67,7 +67,7 @@ Two placements are still open with the professor: where the cell renderers live 
 
 ## Generic Engine
 
-> **Design, not code yet.** This section describes the design in [docs/architecture/classes.md](docs/architecture/classes.md). The engine code starts in sprint 1 of [docs/ROADMAP.md](docs/ROADMAP.md). Today `src/domain/engine/` holds only a README, with no engine class and no engine test.
+> **Sprint 1 code.** `src/domain/engine/` holds the generic engine of Sprint 1: the board, the topology, the pieces, the rules contract, the turn cycle, the phases, the piece sources and the strategy interfaces. The variants, the geometry family, `BoardBuilder` and undo come in later sprints of [docs/ROADMAP.md](docs/ROADMAP.md). The full design is in [docs/architecture/classes.md](docs/architecture/classes.md).
 
 The engine lives in `src/domain/engine/`. It is written once and runs the four games. It knows no variant, no geometry and no UI framework (APP-NFR-03). The class diagram is in [docs/architecture/classes.md](docs/architecture/classes.md).
 
@@ -75,29 +75,32 @@ The engine lives in `src/domain/engine/`. It is written once and runs the four g
 
 The four core types:
 
-- **`GameEngine<TCell, TCoord, TMove, TState>`** is the aggregate root of a game. It runs each turn through `IGameRules`, scores it with `IScoringPolicy`, holds the `GamePhase` and an optional `MoveHistory`, and publishes events through `GameEventPublisher`. A game changes only through `play()`. `snapshot()` returns a clone of the state (decision 26).
-- **`IGameRules<TCell, TMove, TState>`** is the rules contract of §3.1: `isValid()`, `validMoves()`, `apply()`, `resolve()` and `evaluate()`. The abstract `BaseGameRules` holds the turn skeleton in its template method `playTurn()`, and each variant extends it (decision 21). `GameEngine` depends only on the interface. `validMoves()` is a lazy generator: the «no valid move» end of Lines, Sort and Merge stops at the first move (decision 33).
-- **`Board<TCell, TCoord>`** is the `HexBoard<TCell>` of §3.1, with no geometry in its name. It stores the cells (`get()`, `set()`, `cells()`), walks the board with `line()`, `ring()` and `neighborhood()`, and clones itself for undo and the piece preview.
-- **`GridTopology<TCoord>`** does every coordinate calculation: `neighbors()`, `directions()`, `axes()`, `rotate()`, `translate()` and `region()`. A coordinate only holds its values. `HexTopology` with `HexCoord` is the real geometry. The square topology of `SquareGeometry` exists for the engine tests, to prove that the engine does not depend on hexagons (D4, APP-NFR-13).
+- **[`GameEngine<TCell, TCoord, TMove, TState>`](src/domain/engine/game-engine.ts)** is the aggregate root of a game. It runs each turn through `IGameRules`, scores it with `IScoringPolicy`, holds the `GamePhase`, and publishes `GameOver` through `GameEventPublisher`. A game changes only through `play()`, and only while `phase.canPlay()` is true. `start()` and `snapshot()` clone the state (decision 26). The optional `MoveHistory` comes with undo in Sprint 3.
+- **[`IGameRules<TCell, TMove, TState>`](src/domain/engine/rules.ts)** is the rules contract of §3.1: `isValid()`, `validMoves()`, `apply()`, `resolve()` and `evaluate()`. The abstract `BaseGameRules` holds the turn skeleton in its template method `playTurn()`, and each variant extends it (decision 21). `GameEngine` depends only on the interface. `validMoves()` is a lazy generator, and `BaseGameRules.noValidMove()` stops at the first move, for the «no valid move» end of Lines, Sort and Merge (decision 33).
+- **[`Board<TCell, TCoord>`](src/domain/engine/board.ts)** is the `HexBoard<TCell>` of §3.1, with no geometry in its name. It stores the cells (`get()`, `set()`, `cells()`), walks the board with `line()`, `ring()` and `neighborhood()`, and clones itself for undo and the piece preview.
+- **[`GridTopology<TCoord>`](src/domain/engine/grid-topology.ts)** does every coordinate calculation: `key()`, `neighbors()`, `directions()`, `axes()`, `rotate()`, `translate()`, `line()`, `ring()` and `region()`. A coordinate only holds its values. `HexTopology` with `HexCoord` is the real geometry, and it comes with the variants. Today a square double and a triangle double in `test/support/engine/` prove that the engine depends on no geometry (D4, APP-NFR-13). The triangle double translates a piece by an odd offset, so code that adds coordinates one component at a time fails (decision 16).
 
 ### Type parameters
 
-| Parameter | What it is                                 | Bound on it                                 |
-| --------- | ------------------------------------------ | ------------------------------------------- |
-| `TCell`   | The content of one cell (§1.5)             | `IMergeable<TCell>` in `MergeRules` only    |
-| `TCoord`  | The coordinate type of one geometry        | None                                        |
-| `TMove`   | The move a player makes                    | None                                        |
-| `TState`  | The full state of a game, board included   | `BoardState<TCell, TCoord>` in `GameEngine` |
-| `TPiece`  | What a piece source gives (`IPieceSource`) | None                                        |
+The Status column says whether a bound is in the code today (`code`) or only in the design (`design`). `test/docs/generic-bounds.test.ts` checks that every bound of `src/domain/engine/` has a `code` row, and that every `code` row exists in the code.
+
+| Parameter | What it is                                 | Bound                          | Where                                 | Status | Reason                                                                                  |
+| --------- | ------------------------------------------ | ------------------------------ | ------------------------------------- | ------ | --------------------------------------------------------------------------------------- |
+| `TCell`   | The content of one cell (§1.5)             | `IMergeable<TCell>`            | `MergeRules`, Sprint 2                | design | The Merge rules need a cell that can merge with an equal cell (decision 8).             |
+| `TCoord`  | The coordinate type of one geometry        | None                           |                                       |        |                                                                                         |
+| `TMove`   | The move a player makes                    | None                           |                                       |        |                                                                                         |
+| `TState`  | The full state of a game, board included   | `BoardState<TCell, TCoord>`    | `GameEngine`                          | code   | The engine reads the board and the score, and clones the state (decisions 26 and 34).   |
+| `TState`  | The state that the engine copies           | `BoardState<unknown, unknown>` | `copy()` in `game-engine.ts`, private | code   | The helper calls `clone()` for any cell and coordinate type, and returns the same type. |
+| `TPiece`  | What a piece source gives (`IPieceSource`) | None                           |                                       |        |                                                                                         |
 
 `IGameRules` keeps three type parameters, because none of its members names a coordinate (decision 16).
 
 ### Why each bound exists
 
-Statement §3.1 asks the README to explain each bound (APP-NFR-05). The design has two.
+Statement §3.1 asks the README to explain each bound (APP-NFR-05). The Sprint 1 code has one bound, written in two places, and the design adds one more.
 
-- **`TState extends BoardState<TCell, TCoord>` on `GameEngine`.** `BoardState` gives the `board`, the `score` and `clone()`. The engine needs all three for every variant: it clones the state before each move to keep the undo snapshot (decision 34), and `snapshot()` returns a clone so that no caller changes the board (decision 26). Without the bound, the engine could not clone or read a state it does not know.
-- **`TCell extends IMergeable<TCell>` on `MergeRules`.** The Merge rules merge two equal tiles into one of double value. The bound states the capability that the rules need from a cell, and nothing more (decision 8). The Merge factory binds it to `MergeTile`, a value object that wraps an integer, because a primitive integer cannot implement an interface (A1).
+- **`TState extends BoardState<TCell, TCoord>` on `GameEngine` (code).** `BoardState` gives the `board`, the `score` and `clone()`. The engine needs all three for every variant: it clones the state before each move for the scoring policy and, in Sprint 3, for the undo snapshot (decision 34). `start()` and `snapshot()` clone too, so that no caller changes the board (decision 26). It adds the points of each turn to `score`. Without the bound, the engine could not clone or score a state it does not know. The private helper `copy()` in the same file repeats the bound with `unknown` cell and coordinate types, because it only calls `clone()`.
+- **`TCell extends IMergeable<TCell>` on `MergeRules` (design, Sprint 2).** The Merge rules merge two equal tiles into one of double value. The bound states the capability that the rules need from a cell, and nothing more (decision 8). The Merge factory binds it to `MergeTile`, a value object that wraps an integer, because a primitive integer cannot implement an interface (A1).
 
 ### How each variant binds the engine
 
@@ -118,7 +121,7 @@ A new variant adds classes and data. It changes no engine file, no other variant
 
 ## Design Patterns
 
-The fourteen patterns of statement §3.3 all appear in the design (D14). Each row names the requirement behind the pattern and the quality it protects: what breaks if the pattern is missing. The code does not exist yet: it starts in sprint 1 of [docs/ROADMAP.md](docs/ROADMAP.md). So each link points to the design view in [docs/architecture/classes.md](docs/architecture/classes.md#patterns). The links move to the source files as the code lands.
+The fourteen patterns of statement §3.3 all appear in the design (D14). Each row names the requirement behind the pattern and the quality it protects: what breaks if the pattern is missing. The code starts in sprint 1 of [docs/ROADMAP.md](docs/ROADMAP.md). Each link points to the design view in [docs/architecture/classes.md](docs/architecture/classes.md#patterns), and a row also links its source file once the code lands.
 
 | Pattern          | Classes                                                                                                                          | Reason                                                                                                                                                          | Quality protected          | Design                                                                                                                                                                                                                                                                                                                                 |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
