@@ -34,7 +34,7 @@ export function emptyState(size = 2): FakeState {
 
 // A move is valid on an empty cell inside the board. The game ends when the board is full.
 // Every step writes its name to `log`, so a test can check the order of the turn.
-export class FakeRules extends BaseGameRules<FakeCell, FakeMove, FakeState> {
+export class FakeRules extends BaseGameRules<FakeMove, FakeState> {
   constructor(readonly log: string[] = []) {
     super();
   }
