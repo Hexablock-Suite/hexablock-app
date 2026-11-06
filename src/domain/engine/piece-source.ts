@@ -1,6 +1,6 @@
 import type { RandomSource } from './random-source';
 import type { IRandomSeeded } from './random-seeded';
-import { SeededRandom } from './seeded-random';
+import { Mulberry32Random } from './mulberry32-random';
 
 // Strategy and Iterator (classes.md decision 32). The variant factory picks the source,
 // and a caller reads the pieces with `for...of`.
@@ -26,7 +26,7 @@ export class SeededPieceSource<TPiece> implements IPieceSource<TPiece>, IRandomS
     readonly seed: number,
     private readonly draw: (random: RandomSource) => TPiece,
   ) {
-    this.random = new SeededRandom(seed);
+    this.random = new Mulberry32Random(seed);
   }
 
   hasNext(): boolean {

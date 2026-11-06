@@ -4,7 +4,7 @@ import type { RandomSource } from './random-source';
 // It uses the Mulberry32 generator: pure 32-bit integer arithmetic, no ambient randomness.
 // The seed is an unsigned 32-bit integer. Any other number throws a RangeError,
 // because `>>> 0` would truncate it and two different seeds would give the same game.
-export class SeededRandom implements RandomSource {
+export class Mulberry32Random implements RandomSource {
   private state: number;
 
   constructor(seed: number) {
