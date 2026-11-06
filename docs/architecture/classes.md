@@ -33,7 +33,7 @@ This page answers statement §4.1 for the client. It shows the generic types in 
 
 ### Map of the engine
 
-![Map of the generic engine: the 63 classes by name in fourteen groups, each group with the view that shows its members; a «Sprint N» stereotype marks each class that the code does not have yet; class-to-class uses join GameEngine to GamePhase, MoveHistory, IScoringPolicy and GameEventPublisher, BoardState to Board, IVariantFactory to IGameRules, and GeometryFactory to ShapeNode](classes/views/overview-engine.png)
+![Map of the generic engine: the 63 classes by name in fourteen groups, each group with the view that shows its members; a «Sprint N» stereotype marks each class that the code does not have yet, and N is the docs/ROADMAP.md sprint of the requirement that the class serves; class-to-class uses join GameEngine to GamePhase, MoveHistory, IScoringPolicy and GameEventPublisher, BoardState to Board, IVariantFactory to IGameRules, and GeometryFactory to ShapeNode](classes/views/overview-engine.png)
 
 ### View 1: the turn
 
