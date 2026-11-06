@@ -1,5 +1,6 @@
 /** @jest-environment node */
 import type { Outcome } from '../../../src/domain/engine/outcome';
+import { RegionSize } from '../../../src/domain/engine/region-size';
 import { Resolution } from '../../../src/domain/engine/resolution';
 import { BaseGameRules } from '../../../src/domain/engine/rules';
 import { fakeCell } from '../../support/engine/fake-cell';
@@ -134,7 +135,7 @@ describe('validMoves() and the no-valid-move end check', () => {
   it('should_end_the_game_when_the_board_is_full', () => {
     const rules = new AdjacentRules();
     const state = emptyState(2);
-    for (const c of squareTopology.region(2).cells) state.board.set(c, fakeCell(1));
+    for (const c of squareTopology.region(RegionSize.of(2)).cells) state.board.set(c, fakeCell(1));
 
     expect(rules.evaluate(state)).toBe('game-over');
   });

@@ -14,7 +14,7 @@ import {
   RecordingPublisher,
   type FakeMove,
 } from '../../support/engine/fake-game';
-import { square, type SquareCoord } from '../../support/engine/square-topology';
+import { square, type SquareAxis, type SquareCoord } from '../../support/engine/square-topology';
 
 // The turn cycle (statement §3.1): start, receive, validate, apply, resolve, evaluate, notify.
 // The cell type, the rules and the scoring exist only in test/ (APP-NFR-13).
@@ -216,7 +216,7 @@ class BaseCloneState implements BoardState<FakeCell, SquareCoord> {
   readonly level = 1;
 
   constructor(
-    readonly board: Board<FakeCell, SquareCoord>,
+    readonly board: Board<FakeCell, SquareCoord, SquareAxis>,
     public score = 0,
   ) {}
 

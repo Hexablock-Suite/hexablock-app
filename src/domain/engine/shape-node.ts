@@ -1,12 +1,14 @@
 import type { GridTopology } from './grid-topology';
+import type { Turns } from './turns';
 
 // Composite (statement §3.3): a shape is a tree of cells.
 // Every coordinate calculation goes to the topology (classes.md decision 16).
+// A shape reads no axis and no direction, so it takes a topology with any unions.
 export interface ShapeNode<TCoord> {
   cells(): TCoord[];
   area(): number;
-  rotated(steps: number, topology: GridTopology<TCoord>): ShapeNode<TCoord>;
-  translated(offset: TCoord, topology: GridTopology<TCoord>): ShapeNode<TCoord>;
+  rotated(turns: Turns, topology: GridTopology<TCoord, string, string>): ShapeNode<TCoord>;
+  translated(offset: TCoord, topology: GridTopology<TCoord, string, string>): ShapeNode<TCoord>;
 }
 
 // Leaf: one cell of a shape.
@@ -21,11 +23,11 @@ export class CellNode<TCoord> implements ShapeNode<TCoord> {
     return 1;
   }
 
-  rotated(steps: number, topology: GridTopology<TCoord>): CellNode<TCoord> {
-    return new CellNode(topology.rotate(this.at, steps));
+  rotated(turns: Turns, topology: GridTopology<TCoord, string, string>): CellNode<TCoord> {
+    return new CellNode(topology.rotate(this.at, turns));
   }
 
-  translated(offset: TCoord, topology: GridTopology<TCoord>): CellNode<TCoord> {
+  translated(offset: TCoord, topology: GridTopology<TCoord, string, string>): CellNode<TCoord> {
     return new CellNode(topology.translate(this.at, offset));
   }
 }
@@ -47,11 +49,11 @@ export class ShapeGroup<TCoord> implements ShapeNode<TCoord> {
     return this.children.reduce((sum, child) => sum + child.area(), 0);
   }
 
-  rotated(steps: number, topology: GridTopology<TCoord>): ShapeGroup<TCoord> {
-    return new ShapeGroup(this.children.map((child) => child.rotated(steps, topology)));
+  rotated(turns: Turns, topology: GridTopology<TCoord, string, string>): ShapeGroup<TCoord> {
+    return new ShapeGroup(this.children.map((child) => child.rotated(turns, topology)));
   }
 
-  translated(offset: TCoord, topology: GridTopology<TCoord>): ShapeGroup<TCoord> {
+  translated(offset: TCoord, topology: GridTopology<TCoord, string, string>): ShapeGroup<TCoord> {
     return new ShapeGroup(this.children.map((child) => child.translated(offset, topology)));
   }
 }

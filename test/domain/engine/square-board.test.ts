@@ -1,11 +1,19 @@
 /** @jest-environment node */
 import { Board } from '../../../src/domain/engine/board';
+import { Radius } from '../../../src/domain/engine/radius';
+import { RegionSize } from '../../../src/domain/engine/region-size';
+import { Turns } from '../../../src/domain/engine/turns';
 import { fakeCell, type FakeCell } from '../../support/engine/fake-cell';
-import { square, squareTopology, type SquareCoord } from '../../support/engine/square-topology';
+import {
+  square,
+  squareTopology,
+  type SquareAxis,
+  type SquareCoord,
+} from '../../support/engine/square-topology';
 
 // APP-NFR-13 (D4): the board runs with a cell type and a topology that exist only in test/.
-function newBoard(): Board<FakeCell, SquareCoord> {
-  return new Board(squareTopology.region(3), squareTopology);
+function newBoard(): Board<FakeCell, SquareCoord, SquareAxis> {
+  return new Board(squareTopology.region(RegionSize.of(3)), squareTopology);
 }
 
 describe('Board with the square topology double', () => {
@@ -51,7 +59,7 @@ describe('Board with the square topology double', () => {
   });
 
   it('should_give_the_four_corners_when_the_ring_has_radius_two_around_the_center', () => {
-    const ring = [...newBoard().ring(square(1, 1), 2)];
+    const ring = [...newBoard().ring(square(1, 1), Radius.of(2))];
 
     expect(ring).toHaveLength(4);
     expect(ring).toEqual(
@@ -70,7 +78,9 @@ describe('Board with the square topology double', () => {
   });
 
   it('should_rotate_a_quarter_turn_when_rotate_takes_one_step', () => {
-    expect(squareTopology.rotate(square(1, 0), 1)).toEqual(square(0, 1));
-    expect(squareTopology.rotate(square(1, 0), squareTopology.rotationSteps)).toEqual(square(1, 0));
+    expect(squareTopology.rotate(square(1, 0), Turns.of(1))).toEqual(square(0, 1));
+    expect(squareTopology.rotate(square(1, 0), Turns.of(squareTopology.rotationSteps))).toEqual(
+      square(1, 0),
+    );
   });
 });
