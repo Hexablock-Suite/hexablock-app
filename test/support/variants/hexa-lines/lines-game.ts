@@ -6,16 +6,19 @@ import { Piece } from '../../../../src/domain/engine/piece';
 import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
-import { CellNode, ShapeGroup } from '../../../../src/domain/engine/shape-node';
+import { CellNode, ShapeGroup, type ShapeNode } from '../../../../src/domain/engine/shape-node';
 import { Color } from '../../../../src/domain/variants/hexa-lines/color';
+import { LinesFactory } from '../../../../src/domain/variants/hexa-lines/lines-factory';
 import { LinesRules } from '../../../../src/domain/variants/hexa-lines/lines-rules';
 import { LinesState } from '../../../../src/domain/variants/hexa-lines/lines-state';
 import type { PlacePiece } from '../../../../src/domain/variants/hexa-lines/place-piece';
 import { RecordingPublisher } from '../../engine/fake-game';
+import { square, squareTopology, type SquareCoord } from '../../engine/square-topology';
 
 // Builders for the Hexa Lines rules tests. They exist only in test/.
 
 export const red = Color.of('red');
+export const blue = Color.of('blue');
 
 // A piece of the given cells. The cells are relative to the origin of the piece.
 export function piece<TCoord>(...cells: TCoord[]): Piece<Color, TCoord> {
@@ -66,4 +69,15 @@ export function filledKeys<TCoord>(state: LinesState<TCoord>): string[] {
     .cells()
     .map(([c]) => state.board.topology.key(c))
     .sort();
+}
+
+// A Lines factory on a 3 × 3 square board. By default each piece is one red cell.
+export function linesFactory(
+  seed = 1,
+  shapes: readonly [ShapeNode<SquareCoord>, ...ShapeNode<SquareCoord>[]] = [
+    new CellNode(square(0, 0)),
+  ],
+  colors: readonly [Color, ...Color[]] = [red],
+): LinesFactory<SquareCoord> {
+  return new LinesFactory(squareTopology, { size: RegionSize.of(3), seed, shapes, colors });
 }

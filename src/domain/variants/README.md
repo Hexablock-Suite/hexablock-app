@@ -1,1 +1,1 @@
-Game variants, one folder each: `hexa-lines/`, `hexa-fit/`, `hexa-sort/`, `hexa-merge/`. Only `hexa-fit/` exists today. A variant may import `src/domain/engine/`, never another variant folder, and never React, React Native or Expo.
+Game variants, one folder each: `hexa-lines/`, `hexa-fit/`, `hexa-sort/`, `hexa-merge/`. Each folder holds the factory of its variant, which implements the engine `IVariantFactory`. A variant may import `src/domain/engine/`, never another variant folder, and never React, React Native or Expo.

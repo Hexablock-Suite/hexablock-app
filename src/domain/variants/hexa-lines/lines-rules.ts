@@ -5,11 +5,8 @@ import type { Piece } from '../../engine/piece';
 import { Resolution } from '../../engine/resolution';
 import { BaseGameRules } from '../../engine/rules';
 import type { Color } from './color';
-import { LinesState } from './lines-state';
+import { drawTray, LinesState } from './lines-state';
 import { PlacePiece } from './place-piece';
-
-// The tray holds 3 pieces (statement §1.1).
-const TRAY_SIZE = 3;
 
 // The rules of Hexa Lines (statement §1.1). The rules ask the topology for the axes,
 // so they never hard-code 3 axes or 6 directions (D4).
@@ -39,7 +36,7 @@ export class LinesRules<TCoord> extends BaseGameRules<PlacePiece<TCoord>, LinesS
     for (const c of cells) state.board.set(c, piece.content);
     state.cellsPlaced = cells.length;
     state.tray = state.tray.filter((_, i) => i !== move.trayIndex);
-    if (state.tray.length === 0) state.tray = draw(state, TRAY_SIZE);
+    if (state.tray.length === 0) state.tray = drawTray(state.source);
     return state;
   }
 
@@ -85,16 +82,6 @@ function fits<TCoord>(
   at: TCoord,
 ): boolean {
   return cellsOf(board, piece, at).every((c) => board.contains(c) && board.get(c) === undefined);
-}
-
-// Up to `count` pieces from the source. A finite source can give fewer.
-function draw<TCoord>(state: LinesState<TCoord>, count: number): Piece<Color, TCoord>[] {
-  const pieces: Piece<Color, TCoord>[] = [];
-  for (const piece of state.source) {
-    pieces.push(piece);
-    if (pieces.length === count) break;
-  }
-  return pieces;
 }
 
 // Every distinct full line on every axis of the topology.

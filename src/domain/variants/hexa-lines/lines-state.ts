@@ -4,6 +4,9 @@ import type { Piece } from '../../engine/piece';
 import type { IPieceSource } from '../../engine/piece-source';
 import type { Color } from './color';
 
+// The tray holds 3 pieces (statement §1.1).
+export const TRAY_SIZE = 3;
+
 // The state of one Hexa Lines game: the board of colors, the tray and the piece source.
 // The source lives in the state, so the engine copy and rollback cover it (classes.md decision 31).
 // `streak` and `linesCleared` follow the proposal on issue 58, «Propuesta, pendiente del equipo».
@@ -22,6 +25,14 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
     public score = 0,
   ) {}
 
+  // A new game: the board and a full tray from the source.
+  static start<TCoord>(
+    board: Board<Color, TCoord, string>,
+    source: IPieceSource<Piece<Color, TCoord>>,
+  ): LinesState<TCoord> {
+    return new LinesState(board, drawTray(source), source);
+  }
+
   // Pieces never change, so the tray copy shares them.
   clone(): LinesState<TCoord> {
     return new LinesState(
@@ -34,4 +45,16 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
       this.score,
     );
   }
+}
+
+// Up to `TRAY_SIZE` pieces from the source. A finite source can give fewer.
+export function drawTray<TCoord>(
+  source: IPieceSource<Piece<Color, TCoord>>,
+): Piece<Color, TCoord>[] {
+  const pieces: Piece<Color, TCoord>[] = [];
+  for (const piece of source) {
+    pieces.push(piece);
+    if (pieces.length === TRAY_SIZE) break;
+  }
+  return pieces;
 }
