@@ -9,7 +9,8 @@ import type { Color } from './color';
 // `streak` and `linesCleared` follow the proposal on issue 58, «Propuesta, pendiente del equipo».
 // `linesCleared` is the combo of the last placement: the count of distinct full lines it cleared.
 // `streak` counts the placements in a row that cleared at least one line.
-// The scoring of issue 97 reads both fields.
+// `cellsPlaced` is the count of cells that the last placement put on the board.
+// The scoring of issue 97 reads the three fields, because the policy keeps no game data.
 export class LinesState<TCoord> implements BoardState<Color, TCoord> {
   constructor(
     readonly board: Board<Color, TCoord, string>,
@@ -17,6 +18,7 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
     readonly source: IPieceSource<Piece<Color, TCoord>>,
     public streak = 0,
     public linesCleared = 0,
+    public cellsPlaced = 0,
     public score = 0,
   ) {}
 
@@ -28,6 +30,7 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
       this.source.clone(),
       this.streak,
       this.linesCleared,
+      this.cellsPlaced,
       this.score,
     );
   }

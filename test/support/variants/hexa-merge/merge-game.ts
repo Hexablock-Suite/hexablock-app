@@ -16,7 +16,7 @@ import { RecordingPublisher } from '../../engine/fake-game';
 import { hexTopology, type HexAxis, type HexCoord } from './hex-topology';
 
 // The Merge game for the rules tests, on the hexagonal double.
-// The Merge scoring is issue #97, so the tests score no points.
+// The rules tests score no points. The scoring tests pass their own policy.
 
 export type HexMergeState = MergeState<MergeTile, HexCoord, HexAxis>;
 
@@ -53,13 +53,17 @@ export function values(state: HexMergeState): Record<string, number> {
   return out;
 }
 
-export function mergeGame(initial: HexMergeState, target = MergeTile.of(2048)) {
+export function mergeGame(
+  initial: HexMergeState,
+  target = MergeTile.of(2048),
+  scoring: IScoringPolicy<HexMergeState> = new NoPointScoring(),
+) {
   const rules = new MergeRules<MergeTile, HexCoord, HexAxis>(target);
   const publisher = new RecordingPublisher();
   const engine = new GameEngine<MergeTile, HexCoord, Slide<HexAxis>, HexMergeState>(
     GameId.of('hexa-merge'),
     rules,
-    new NoPointScoring(),
+    scoring,
     publisher,
   );
   engine.start(initial);

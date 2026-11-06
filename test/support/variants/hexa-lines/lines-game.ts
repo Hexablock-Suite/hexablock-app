@@ -37,7 +37,7 @@ export function linesState<TCoord>(
   return new LinesState(board, values.tray, new FixedListPieceSource(values.source ?? []));
 }
 
-// Scoring is issue 97. These tests give no points.
+// The rules tests give no points. The scoring tests pass their own policy.
 class NoScoring<TCoord> implements IScoringPolicy<LinesState<TCoord>> {
   score(): number {
     return 0;
@@ -45,12 +45,15 @@ class NoScoring<TCoord> implements IScoringPolicy<LinesState<TCoord>> {
 }
 
 // A started Lines game on the real engine. The engine calls only the rules contract.
-export function linesGame<TCoord>(initial: LinesState<TCoord>) {
+export function linesGame<TCoord>(
+  initial: LinesState<TCoord>,
+  scoring: IScoringPolicy<LinesState<TCoord>> = new NoScoring<TCoord>(),
+) {
   const publisher = new RecordingPublisher();
   const engine = new GameEngine<Color, TCoord, PlacePiece<TCoord>, LinesState<TCoord>>(
     GameId.of('hexa-lines'),
     new LinesRules<TCoord>(),
-    new NoScoring<TCoord>(),
+    scoring,
     publisher,
   );
   engine.start(initial);

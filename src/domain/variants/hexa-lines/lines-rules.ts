@@ -35,7 +35,9 @@ export class LinesRules<TCoord> extends BaseGameRules<PlacePiece<TCoord>, LinesS
   // When the tray is empty, the next pieces of the source fill it.
   apply(state: LinesState<TCoord>, move: PlacePiece<TCoord>): LinesState<TCoord> {
     const piece = state.tray[move.trayIndex]!;
-    for (const c of cellsOf(state.board, piece, move.at)) state.board.set(c, piece.content);
+    const cells = cellsOf(state.board, piece, move.at);
+    for (const c of cells) state.board.set(c, piece.content);
+    state.cellsPlaced = cells.length;
     state.tray = state.tray.filter((_, i) => i !== move.trayIndex);
     if (state.tray.length === 0) state.tray = draw(state, TRAY_SIZE);
     return state;
@@ -56,6 +58,7 @@ export class LinesRules<TCoord> extends BaseGameRules<PlacePiece<TCoord>, LinesS
         state.source,
         lines.length > 0 ? state.streak + 1 : 0,
         lines.length,
+        state.cellsPlaced,
         state.score,
       ),
     );
