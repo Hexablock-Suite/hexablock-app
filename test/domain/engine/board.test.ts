@@ -1,30 +1,34 @@
 /** @jest-environment node */
 import { Board } from '../../../src/domain/engine/board';
 import { BoardShape } from '../../../src/domain/engine/board-shape';
-import type { Axis, Direction, GridTopology } from '../../../src/domain/engine/grid-topology';
+import { coordKey } from '../../../src/domain/engine/coord-key';
+import type { GridTopology } from '../../../src/domain/engine/grid-topology';
+import { Radius } from '../../../src/domain/engine/radius';
+import { RegionSize } from '../../../src/domain/engine/region-size';
 
 // A one-dimensional topology: a coordinate is an integer on a strip.
 // It exists only in this test, so the board test needs no real geometry.
-const stripTopology: GridTopology<number> = {
+const stripTopology: GridTopology<number, 'x', 'left' | 'right'> = {
   rotationSteps: 2,
-  key: (c) => String(c),
+  key: (c) => coordKey(String(c)),
   neighbors: (c) => [c - 1, c + 1],
-  directions: (): Direction[] => ['left', 'right'],
-  axes: (): Axis[] => ['x'],
-  rotate: (c, steps) => (steps % 2 === 0 ? c : -c),
+  directions: () => ['left', 'right'],
+  axes: () => ['x'],
+  rotate: (c, turns) => (turns.value % 2 === 0 ? c : -c),
   translate: (c, offset) => c + offset,
   *line(_axis, through, contains) {
     let start = through;
     while (contains(start - 1)) start -= 1;
     for (let c = start; contains(c); c += 1) yield c;
   },
-  ring: (center, radius) => (radius === 0 ? [center] : [center - radius, center + radius]),
-  region: (size) => BoardShape.of(Array.from({ length: size }, (_, i) => i)),
+  ring: (center, { value: radius }) =>
+    radius === 0 ? [center] : [center - radius, center + radius],
+  region: ({ value: size }) => BoardShape.of(Array.from({ length: size }, (_, i) => i)),
 };
 
 // The board covers the cells 0 to 4.
-function newBoard(): Board<string, number> {
-  return new Board(stripTopology.region(5), stripTopology);
+function newBoard(): Board<string, number, 'x'> {
+  return new Board(stripTopology.region(RegionSize.of(5)), stripTopology);
 }
 
 describe('Board', () => {
@@ -85,8 +89,8 @@ describe('Board', () => {
   it('should_drop_ring_cells_outside_the_shape_when_ring_is_read', () => {
     const board = newBoard();
 
-    expect([...board.ring(1, 2)]).toEqual([3]);
-    expect([...board.ring(2, 2)]).toEqual([0, 4]);
+    expect([...board.ring(1, Radius.of(2))]).toEqual([3]);
+    expect([...board.ring(2, Radius.of(2))]).toEqual([0, 4]);
   });
 
   it('should_drop_neighbors_outside_the_shape_when_neighborhood_is_read', () => {
@@ -98,7 +102,10 @@ describe('Board', () => {
 
   // A cell is a value: the clone holds the same cell objects, and never copies them.
   it('should_share_the_cell_objects_when_the_board_is_cloned', () => {
-    const board = new Board<{ color: string }, number>(stripTopology.region(5), stripTopology);
+    const board = new Board<{ color: string }, number, 'x'>(
+      stripTopology.region(RegionSize.of(5)),
+      stripTopology,
+    );
     const cell = { color: 'red' };
     board.set(1, cell);
 
@@ -131,10 +138,17 @@ describe('Board shape invariants', () => {
   });
 
   it('should_throw_a_range_error_when_the_topology_gives_two_coordinates_the_same_key', () => {
-    const collidingTopology: GridTopology<number> = { ...stripTopology, key: (c) => String(c % 2) };
+    const collidingTopology: GridTopology<number, 'x', 'left' | 'right'> = {
+      ...stripTopology,
+      key: (c) => coordKey(String(c % 2)),
+    };
 
-    expect(() => new Board(stripTopology.region(3), collidingTopology)).toThrow(RangeError);
-    expect(() => new Board(stripTopology.region(3), collidingTopology)).toThrow('the same key');
+    expect(() => new Board(stripTopology.region(RegionSize.of(3)), collidingTopology)).toThrow(
+      RangeError,
+    );
+    expect(() => new Board(stripTopology.region(RegionSize.of(3)), collidingTopology)).toThrow(
+      'the same key',
+    );
   });
 
   it('should_keep_every_coordinate_when_the_shape_has_no_repeated_key', () => {

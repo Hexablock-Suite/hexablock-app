@@ -1,7 +1,9 @@
 /** @jest-environment node */
 import { Board } from '../../../src/domain/engine/board';
 import { Piece } from '../../../src/domain/engine/piece';
+import { RegionSize } from '../../../src/domain/engine/region-size';
 import { CellNode, ShapeGroup } from '../../../src/domain/engine/shape-node';
+import { Turns } from '../../../src/domain/engine/turns';
 import { fakeCell } from '../../support/engine/fake-cell';
 import {
   isUp,
@@ -77,13 +79,13 @@ describe('Piece translation on the triangle topology double', () => {
   });
 
   it('should_return_to_the_start_when_a_piece_rotates_a_full_turn', () => {
-    const turned = rhombus().rotated(triangleTopology.rotationSteps, triangleTopology);
+    const turned = rhombus().rotated(Turns.of(triangleTopology.rotationSteps), triangleTopology);
 
     expect(turned.shape.cells()).toEqual(rhombus().shape.cells());
   });
 
   it('should_flip_the_orientation_when_a_triangle_rotates_one_step', () => {
-    expect(isUp(triangleTopology.rotate(triangle(0, 0), 1))).toBe(false);
+    expect(isUp(triangleTopology.rotate(triangle(0, 0), Turns.of(1)))).toBe(false);
   });
 
   it('should_give_three_neighbors_of_the_other_orientation_when_neighbors_are_read', () => {
@@ -94,14 +96,14 @@ describe('Piece translation on the triangle topology double', () => {
   });
 
   it('should_keep_two_triangles_neighbors_when_both_rotate_one_step', () => {
-    const a = triangleTopology.rotate(triangle(0, 0), 1);
-    const b = triangleTopology.rotate(triangle(1, 0), 1);
+    const a = triangleTopology.rotate(triangle(0, 0), Turns.of(1));
+    const b = triangleTopology.rotate(triangle(1, 0), Turns.of(1));
 
     expect(triangleTopology.neighbors(a)).toContainEqual(b);
   });
 
   it('should_walk_the_strip_when_a_board_line_follows_the_row_axis', () => {
-    const board = new Board(triangleTopology.region(2), triangleTopology);
+    const board = new Board(triangleTopology.region(RegionSize.of(2)), triangleTopology);
 
     expect([...board.line('row', triangle(2, 0))]).toEqual([
       triangle(0, 0),
@@ -112,7 +114,7 @@ describe('Piece translation on the triangle topology double', () => {
   });
 
   it('should_zigzag_inside_the_board_when_a_board_line_follows_a_diagonal_axis', () => {
-    const board = new Board(triangleTopology.region(2), triangleTopology);
+    const board = new Board(triangleTopology.region(RegionSize.of(2)), triangleTopology);
 
     expect([...board.line('down-right', triangle(1, 0))]).toEqual([
       triangle(1, 0),
@@ -150,12 +152,12 @@ describe('Nested shape groups and negative moves on the triangle topology double
   });
 
   it('should_turn_every_level_through_the_topology_when_a_group_of_groups_is_rotated', () => {
-    const turned = nested().rotated(1, triangleTopology);
+    const turned = nested().rotated(Turns.of(1), triangleTopology);
 
     expect(turned.cells()).toEqual(
       nested()
         .cells()
-        .map((c) => triangleTopology.rotate(c, 1)),
+        .map((c) => triangleTopology.rotate(c, Turns.of(1))),
     );
     expect(turned.children[0]).toBeInstanceOf(ShapeGroup);
     expect(turned.area()).toBe(3);
@@ -172,9 +174,11 @@ describe('Nested shape groups and negative moves on the triangle topology double
   });
 
   it('should_return_to_the_start_when_a_piece_rotates_back_one_step_and_forward_one_step', () => {
-    const back = rhombus().rotated(-1, triangleTopology);
+    const back = rhombus().rotated(Turns.of(-1), triangleTopology);
 
     expect(back.shape.cells()).not.toEqual(rhombus().shape.cells());
-    expect(back.rotated(1, triangleTopology).shape.cells()).toEqual(rhombus().shape.cells());
+    expect(back.rotated(Turns.of(1), triangleTopology).shape.cells()).toEqual(
+      rhombus().shape.cells(),
+    );
   });
 });

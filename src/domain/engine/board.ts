@@ -1,6 +1,8 @@
 import type { BoardShape } from './board-shape';
 import type { Cloneable } from './cloneable';
-import type { Axis, GridTopology } from './grid-topology';
+import type { CoordKey } from './coord-key';
+import type { GridTopology } from './grid-topology';
+import type { Radius } from './radius';
 
 // The generic board: the `HexBoard<TCell>` of statement §3.1 with a generic coordinate.
 // Iterator: `line()`, `ring()` and `neighborhood()` walk the board lazily.
@@ -10,14 +12,18 @@ import type { Axis, GridTopology } from './grid-topology';
 // So `clone()` shares the cell objects with the original board.
 // A caller must not change a cell object. To change a cell, the caller sets a new cell.
 // Each coordinate of the shape has its own topology key. Two equal keys are an error.
-export class Board<TCell, TCoord> implements Cloneable<Board<TCell, TCoord>> {
-  private readonly inside: ReadonlySet<string>;
-  private readonly content: Map<string, [TCoord, TCell]>;
+// `TAxis` is the axis union of the topology. The board reads no direction,
+// so it takes a topology with any direction union.
+export class Board<TCell, TCoord, TAxis extends string> implements Cloneable<
+  Board<TCell, TCoord, TAxis>
+> {
+  private readonly inside: ReadonlySet<CoordKey>;
+  private readonly content: Map<CoordKey, [TCoord, TCell]>;
 
   constructor(
     readonly shape: BoardShape<TCoord>,
-    readonly topology: GridTopology<TCoord>,
-    content: ReadonlyMap<string, [TCoord, TCell]> = new Map(),
+    readonly topology: GridTopology<TCoord, TAxis, string>,
+    content: ReadonlyMap<CoordKey, [TCoord, TCell]> = new Map(),
   ) {
     this.inside = new Set(shape.cells.map((c) => topology.key(c)));
     if (this.inside.size !== shape.cells.length) {
@@ -47,11 +53,11 @@ export class Board<TCell, TCoord> implements Cloneable<Board<TCell, TCoord>> {
     return [...this.content.values()].map(([c, cell]) => [c, cell]);
   }
 
-  line(axis: Axis, through: TCoord): Iterable<TCoord> {
+  line(axis: TAxis, through: TCoord): Iterable<TCoord> {
     return this.topology.line(axis, through, (c) => this.contains(c));
   }
 
-  *ring(center: TCoord, radius: number): Iterable<TCoord> {
+  *ring(center: TCoord, radius: Radius): Iterable<TCoord> {
     for (const c of this.topology.ring(center, radius)) {
       if (this.contains(c)) yield c;
     }
@@ -63,7 +69,7 @@ export class Board<TCell, TCoord> implements Cloneable<Board<TCell, TCoord>> {
     }
   }
 
-  clone(): Board<TCell, TCoord> {
+  clone(): Board<TCell, TCoord, TAxis> {
     return new Board(this.shape, this.topology, this.content);
   }
 }
