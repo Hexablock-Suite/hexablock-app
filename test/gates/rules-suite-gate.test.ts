@@ -162,4 +162,23 @@ describe('rules suite gate (APP-NFR-12)', () => {
     expect(scannedTestFiles(repoRoot)).toContain(path.join(repoRoot, rulesSuitePath('hexa-lines')));
     expect(engineDoubles(repoRoot)).toEqual([]);
   });
+
+  it('should_use_the_whole_folder_name_when_a_variant_folder_has_no_hexa_prefix', () => {
+    const root = path.join(fixtures, 'unprefixed-folder');
+
+    expect(variantFolders(root)).toEqual(['octo', 'tetra']);
+    expect(missingRulesSuites(root)).toEqual([
+      'octo: no rules suite at test/domain/variants/octo/octo-rules.test.ts',
+    ]);
+  });
+
+  // Issue 102 scope: engine tests need fake subclasses of `BaseGameRules`, so the gate skips them.
+  it('should_report_no_double_when_the_double_is_in_an_engine_test_outside_the_variant_folders', () => {
+    const root = path.join(fixtures, 'engine-test-out-of-scope');
+
+    expect(scannedTestFiles(root)).toEqual([
+      path.join(root, 'test/domain/variants/hexa-lines/lines-rules.test.ts'),
+    ]);
+    expect(engineDoubles(root)).toEqual([]);
+  });
 });
