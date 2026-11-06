@@ -2,6 +2,7 @@ import type { GameId } from './game-id';
 
 // The result of one finished game. It is a value object (view 4).
 // `levelId` exists only for games with levels, and `elapsedMs` only for timed games.
+// A decimal or negative move count, a NaN score and a NaN or negative time throw a RangeError.
 export class GameResult {
   private constructor(
     readonly gameId: GameId,
@@ -21,7 +22,10 @@ export class GameResult {
     if (!Number.isInteger(values.moves) || values.moves < 0) {
       throw new RangeError('A game result needs zero or more moves.');
     }
-    if (values.elapsedMs !== undefined && values.elapsedMs < 0) {
+    if (Number.isNaN(values.score)) {
+      throw new RangeError('A game result needs a score that is a number.');
+    }
+    if (values.elapsedMs !== undefined && !(values.elapsedMs >= 0)) {
       throw new RangeError('A game result needs a time of zero or more milliseconds.');
     }
     return new GameResult(
@@ -37,6 +41,7 @@ export class GameResult {
 // What a progress model keeps for one game or one level. It is a value object.
 // Draft: DS-5 fixes the fields the backend receives, and the real models
 // (`HighScoreProgress`, `LevelProgress`) can add fields in Sprint 3.
+// A negative number of stars throws a RangeError.
 export class ProgressRecord {
   private constructor(
     readonly gameId: GameId,
@@ -51,6 +56,9 @@ export class ProgressRecord {
     levelId?: string;
     stars?: number;
   }): ProgressRecord {
+    if (values.stars !== undefined && values.stars < 0) {
+      throw new RangeError('A progress record needs zero or more stars.');
+    }
     return new ProgressRecord(values.gameId, values.score, values.levelId, values.stars);
   }
 }
