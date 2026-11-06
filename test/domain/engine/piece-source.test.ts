@@ -5,7 +5,7 @@ import {
   type IPieceSource,
 } from '../../../src/domain/engine/piece-source';
 import type { RandomSource } from '../../../src/domain/engine/random-source';
-import { SeededRandom } from '../../../src/domain/engine/seeded-random';
+import { Mulberry32Random } from '../../../src/domain/engine/mulberry32-random';
 
 // A draw function that turns one random number into a piece name.
 const colors = ['red', 'green', 'blue', 'yellow'];
@@ -97,7 +97,7 @@ describe('SeededPieceSource', () => {
   for (const [name, seed] of badSeeds) {
     it(`should_throw_a_range_error_when_the_seed_is_${name}`, () => {
       expect(() => new SeededPieceSource(seed, drawColor)).toThrow(RangeError);
-      expect(() => new SeededRandom(seed)).toThrow('seed');
+      expect(() => new Mulberry32Random(seed)).toThrow('seed');
     });
   }
 
@@ -111,9 +111,9 @@ describe('SeededPieceSource', () => {
   });
 });
 
-describe('SeededRandom', () => {
+describe('Mulberry32Random', () => {
   it('should_give_numbers_from_zero_up_to_one_when_next_is_read', () => {
-    const random = new SeededRandom(3);
+    const random = new Mulberry32Random(3);
     const numbers = Array.from({ length: 500 }, () => random.next());
 
     expect(numbers.every((n) => n >= 0 && n < 1)).toBe(true);
