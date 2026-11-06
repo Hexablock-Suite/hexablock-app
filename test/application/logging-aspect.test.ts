@@ -1,6 +1,7 @@
 /** @jest-environment node */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import type { Logger, UseCaseLogEntry } from '../../src/application/logger';
 import { LoggingAspect } from '../../src/application/logging-aspect';
 import { Result, UseCaseError } from '../../src/application/result';
 import type { UseCase } from '../../src/application/use-case';
@@ -47,6 +48,24 @@ class FixedUseCase implements UseCase<string, number> {
   async execute(request: string): Promise<Result<number>> {
     this.requests.push(request);
     return this.result;
+  }
+}
+
+// A logger that tries to change the entry and its error. It keeps the error of each write.
+class ChangingLogger implements Logger {
+  readonly writeErrors: unknown[] = [];
+
+  log(entry: UseCaseLogEntry): void {
+    this.tryWrite(() => Object.assign(entry, { useCase: 'Changed' }));
+    this.tryWrite(() => Object.assign(entry.error ?? {}, { code: 'changed' }));
+  }
+
+  private tryWrite(write: () => void): void {
+    try {
+      write();
+    } catch (error) {
+      this.writeErrors.push(error);
+    }
   }
 }
 
@@ -126,6 +145,20 @@ describe('LoggingAspect', () => {
       ['error', 'outcome', 'useCase'],
     ]);
     expect(logger.entries.every((entry) => Object.isFrozen(entry))).toBe(true);
+  });
+
+  it('should_return_the_result_error_unchanged_when_the_logger_tries_to_change_its_entry', async () => {
+    // The entry is frozen, but its error is the object of the `Result`.
+    // `UseCaseError` is frozen too, so a logger cannot change what the caller gets.
+    const logger = new ChangingLogger();
+    const inner = new FixedUseCase(Result.failure(new UseCaseError('boom', 'It failed.')));
+
+    const result = await new LoggingAspect(inner, logger, 'Fixed').execute('x');
+
+    expect(result).toBe(inner.result);
+    expect([errorOf(result).code, errorOf(result).message]).toEqual(['boom', 'It failed.']);
+    expect(logger.writeErrors).toHaveLength(2);
+    expect(logger.writeErrors.every((error) => error instanceof TypeError)).toBe(true);
   });
 
   it('should_wrap_any_use_case_as_a_use_case_aspect_when_aspects_nest', async () => {
