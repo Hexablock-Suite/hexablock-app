@@ -190,13 +190,13 @@ Notes on the decided design:
 
 ## SOLID Principles
 
-Each example comes from the class diagram. The links point to the design decisions; they move to the source files as the code lands.
+Each principle has one example from the code, with a link to its source file. The design decisions behind them are in [classes.md](docs/architecture/classes.md#decisions-to-check-with-the-team).
 
-- **Single responsibility.** `FitLevelBuilder` builds the level from plain `LevelDefinition` data, and an adapter in an outer layer reads the level file ([decision 24](docs/architecture/classes.md#decisions-to-check-with-the-team)).
-- **Open/closed.** A fifth variant adds a factory that declares its own open `GameId` and changes no engine file ([decision 30](docs/architecture/classes.md#decisions-to-check-with-the-team), [EXTENSIBILITY.md](docs/EXTENSIBILITY.md)).
-- **Liskov substitution.** `GameEngine` takes any `IGameRules`: `LinesRules`, `FitRules`, or `FitRules` wrapped in `TimedRulesDecorator`. The engine has no conditional on the variant type ([decision 21](docs/architecture/classes.md#decisions-to-check-with-the-team), APP-NFR-08).
-- **Interface segregation.** `IUndoable`, `IRedoable`, `ITimed` and `IRandomSeeded` are separate interfaces, so Hexa Lines never implements `IUndoable` and Hexa Merge undoes without redo ([decisions 3 and 4](docs/architecture/classes.md#decisions-to-check-with-the-team)).
-- **Dependency inversion.** The use cases depend on layer 2 ports such as `ProgressRepository`. `LocalProgressRepository` in layer 3 and `ApiProgressRepository` in layer 4 implement it ([decisions 22 and 25](docs/architecture/classes.md#decisions-to-check-with-the-team)).
+- **Single responsibility.** `LoggingAspect` only logs each call of a use case through the `Logger` port, so `StartGame` and `ApplyMove` hold no logging code ([logging-aspect.ts](src/application/logging-aspect.ts)).
+- **Open/closed.** A new variant adds a class that implements `IVariantFactory` and declares its own open `GameId`, and no engine file changes ([variant-factory.ts](src/domain/engine/variant-factory.ts)). `ComboMultiplierDecorator` adds the combo bonus around `LinesScoring` and does not change it.
+- **Liskov substitution.** `GameEngine` takes any `IGameRules`, and `LinesRules`, `FitRules`, `SortRules` and `MergeRules` all extend `BaseGameRules`, which fixes the order of the turn ([rules.ts](src/domain/engine/rules.ts)). The engine has no `if`, `switch` or ternary on the game id, and the gate `test/gates/engine-game-id-gate.test.ts` checks it (APP-NFR-08).
+- **Interface segregation.** `IRandomSeeded` is separate from `IPieceSource`: `SeededPieceSource` implements both, and the finite `FixedListPieceSource` of Hexa Fit implements only `IPieceSource`, so it declares no seed ([piece-source.ts](src/domain/engine/piece-source.ts)). The undo and redo interfaces come with the `MoveHistory` of Sprint 3.
+- **Dependency inversion.** `StartGame` depends on the `IVariantFactory` and `RunningGameStore` ports and never names a variant; the composition root injects the factory of the chosen game ([start-game.ts](src/application/start-game.ts)).
 
 ## AOP
 
