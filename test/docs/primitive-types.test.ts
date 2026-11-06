@@ -8,7 +8,8 @@ import { repoRoot } from '../support/run-tool';
 // APP-NFR-25: the primitive types of the engine design tend to zero, and each one
 // that stays has a reason. Every `number` and `string` in a public signature of
 // `src/domain/engine/` needs a row in the README table «Primitive types».
-// A `boolean` needs no row. The scan reads the written types, not the inferred ones.
+// A `boolean` needs no row. The scan reads the written type of each member. When a member
+// has no written type, the scan reads the type that the TypeScript checker infers.
 
 const engineDir = path.join(repoRoot, 'src/domain/engine');
 const readme = readFileSync(path.join(repoRoot, 'README.md'), 'utf8');
@@ -52,20 +53,52 @@ function typeParameterUses(owner: string, node: ts.DeclarationWithTypeParameterC
   );
 }
 
-// The signature of a member: its type parameters, its parameters and its type.
+type Declaration =
+  | ts.ParameterDeclaration
+  | ts.PropertyDeclaration
+  | ts.PropertySignature
+  | ts.SignatureDeclaration;
+
+// The written type of a declaration. When no type is written, the checker infers it.
+// For a method, an accessor or a function, the type is the return type.
+function typeOf(node: Declaration, checker: ts.TypeChecker): ts.Node | undefined {
+  if (node.type !== undefined) return node.type;
+  const flags = ts.NodeBuilderFlags.NoTruncation;
+  if (ts.isParameter(node) || ts.isPropertyDeclaration(node) || ts.isPropertySignature(node)) {
+    return checker.typeToTypeNode(checker.getTypeAtLocation(node.name), undefined, flags);
+  }
+  const call = checker.getSignatureFromDeclaration(node);
+  if (call === undefined) return undefined;
+  return checker.typeToTypeNode(checker.getReturnTypeOfSignature(call), undefined, flags);
+}
+
+// The signature of a member: its type parameters, its parameter types and its type.
 // A method body and an initializer are not part of the signature.
-function signature(member: ts.Node): (ts.Node | undefined)[] {
-  if (ts.isMethodDeclaration(member) || ts.isMethodSignature(member)) {
-    return [...(member.typeParameters ?? []), ...member.parameters, member.type];
+function signature(member: ts.Node, checker: ts.TypeChecker): (ts.Node | undefined)[] {
+  if (
+    ts.isMethodDeclaration(member) ||
+    ts.isMethodSignature(member) ||
+    ts.isGetAccessorDeclaration(member) ||
+    ts.isSetAccessorDeclaration(member) ||
+    ts.isFunctionDeclaration(member)
+  ) {
+    return [
+      ...(member.typeParameters ?? []),
+      ...member.parameters.map((parameter) => typeOf(parameter, checker)),
+      typeOf(member, checker),
+    ];
   }
-  if (ts.isGetAccessorDeclaration(member) || ts.isSetAccessorDeclaration(member)) {
-    return [...member.parameters, member.type];
+  if (ts.isPropertyDeclaration(member) || ts.isPropertySignature(member)) {
+    return [typeOf(member, checker)];
   }
-  if (ts.isPropertyDeclaration(member) || ts.isPropertySignature(member)) return [member.type];
   return [];
 }
 
-function constructorUses(owner: string, ctor: ts.ConstructorDeclaration): Use[] {
+function constructorUses(
+  owner: string,
+  ctor: ts.ConstructorDeclaration,
+  checker: ts.TypeChecker,
+): Use[] {
   const ctorIsPrivate = isPrivate(ctor);
   return ctor.parameters.flatMap((parameter) => {
     const isProperty = ts.isParameterPropertyDeclaration(parameter, ctor);
@@ -73,24 +106,27 @@ function constructorUses(owner: string, ctor: ts.ConstructorDeclaration): Use[] 
     if (isProperty && isPrivate(parameter)) return [];
     if (!isProperty && ctorIsPrivate) return [];
     const where = isProperty ? `${owner}.${nameOf(parameter)}` : `${owner}.constructor`;
-    return primitivesIn([parameter.type]).map((primitive) => ({ primitive, where }));
+    return primitivesIn([typeOf(parameter, checker)]).map((primitive) => ({ primitive, where }));
   });
 }
 
-function memberUses(owner: string, members: readonly ts.Node[]): Use[] {
+function memberUses(owner: string, members: readonly ts.Node[], checker: ts.TypeChecker): Use[] {
   return members.flatMap((member) => {
-    if (ts.isConstructorDeclaration(member)) return constructorUses(owner, member);
+    if (ts.isConstructorDeclaration(member)) return constructorUses(owner, member, checker);
     if (isPrivate(member)) return [];
     const where = `${owner}.${nameOf(member as ts.NamedDeclaration)}`;
-    return primitivesIn(signature(member)).map((primitive) => ({ primitive, where }));
+    return primitivesIn(signature(member, checker)).map((primitive) => ({ primitive, where }));
   });
 }
 
-function declarationUses(statement: ts.Statement): Use[] {
+function declarationUses(statement: ts.Statement, checker: ts.TypeChecker): Use[] {
   if (!hasModifier(statement, ts.SyntaxKind.ExportKeyword)) return [];
   if (ts.isClassDeclaration(statement) || ts.isInterfaceDeclaration(statement)) {
     const owner = statement.name?.text ?? 'default';
-    return [...typeParameterUses(owner, statement), ...memberUses(owner, statement.members)];
+    return [
+      ...typeParameterUses(owner, statement),
+      ...memberUses(owner, statement.members, checker),
+    ];
   }
   if (ts.isTypeAliasDeclaration(statement)) {
     const owner = statement.name.text;
@@ -99,24 +135,53 @@ function declarationUses(statement: ts.Statement): Use[] {
   }
   if (ts.isFunctionDeclaration(statement)) {
     const owner = statement.name?.text ?? 'default';
-    const uses = primitivesIn([...statement.parameters, statement.type]).map((primitive) => ({
-      primitive,
-      where: owner,
-    }));
-    return [...typeParameterUses(owner, statement), ...uses];
+    // The function's own type parameters are listed once, as `owner<TParam>`.
+    const uses = primitivesIn(
+      signature(statement, checker).slice(statement.typeParameters?.length ?? 0),
+    );
+    return [
+      ...typeParameterUses(owner, statement),
+      ...uses.map((primitive) => ({ primitive, where: owner })),
+    ];
   }
   return [];
 }
 
-function codeUses(): Use[] {
-  const uses = readdirSync(engineDir)
-    .filter((file) => file.endsWith('.ts'))
-    .flatMap((file) => {
-      const text = readFileSync(path.join(engineDir, file), 'utf8');
-      const source = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true);
-      return source.statements.flatMap(declarationUses);
-    });
+// A program over the given files, so the checker can infer the types that are not written.
+// Each file is named by its path. The standard library comes from the installed TypeScript.
+function programOf(files: Record<string, string>): ts.Program {
+  const options: ts.CompilerOptions = { strict: true, target: ts.ScriptTarget.Latest };
+  const host = ts.createCompilerHost(options, true);
+  const fileExists = host.fileExists.bind(host);
+  const readFile = host.readFile.bind(host);
+  const getSourceFile = host.getSourceFile.bind(host);
+  host.fileExists = (file) => file in files || fileExists(file);
+  host.readFile = (file) => files[file] ?? readFile(file);
+  host.getSourceFile = (file, language, ...rest) => {
+    const text = files[file];
+    if (text === undefined) return getSourceFile(file, language, ...rest);
+    return ts.createSourceFile(file, text, language, true);
+  };
+  return ts.createProgram(Object.keys(files), options, host);
+}
+
+// The uses in a set of source files, each named by its path.
+function usesIn(files: Record<string, string>): Use[] {
+  const program = programOf(files);
+  const checker = program.getTypeChecker();
+  const uses = Object.keys(files).flatMap((file) => {
+    const source = program.getSourceFile(file);
+    if (source === undefined) throw new Error(`The program has no file ${file}.`);
+    return source.statements.flatMap((statement) => declarationUses(statement, checker));
+  });
   return [...new Map(uses.map((use) => [key(use), use])).values()];
+}
+
+function codeUses(): Use[] {
+  const files = readdirSync(engineDir)
+    .filter((file) => file.endsWith('.ts'))
+    .map((file) => path.join(engineDir, file));
+  return usesIn(Object.fromEntries(files.map((file) => [file, readFileSync(file, 'utf8')])));
 }
 
 type Row = { primitive: string; places: string[]; reason: string };
@@ -155,6 +220,31 @@ describe('README primitive types', () => {
     expect(places).not.toContain('SeededRandom.state');
     expect(places).not.toContain('Board.contains');
     expect(places).not.toContain('Resolution.accepted');
+  });
+
+  it('should_read_the_inferred_type_when_a_public_member_has_no_written_type', () => {
+    const source = [
+      'export class Counter {',
+      '  count = 0;',
+      "  title = 'none';",
+      "  readonly phase = 'playing';",
+      '  done = false;',
+      '  private hidden = 1;',
+      '  size() {',
+      '    return this.count;',
+      '  }',
+      '}',
+      'export function label(counter: Counter) {',
+      '  return counter.title;',
+      '}',
+    ].join('\n');
+
+    expect(usesIn({ [path.join(engineDir, 'counter.ts')]: source })).toEqual([
+      { primitive: 'number', where: 'Counter.count' },
+      { primitive: 'string', where: 'Counter.title' },
+      { primitive: 'number', where: 'Counter.size' },
+      { primitive: 'string', where: 'label' },
+    ]);
   });
 
   it('should_list_every_primitive_of_the_engine_when_the_readme_table_is_read', () => {
