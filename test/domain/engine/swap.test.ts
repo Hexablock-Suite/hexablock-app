@@ -184,6 +184,15 @@ describe('GameResult and ProgressRecord', () => {
     );
   });
 
+  it('should_throw_when_a_result_has_a_negative_time', () => {
+    const gameId = GameId.of('fake-game');
+
+    expect(() => GameResult.of({ gameId, score: 0, moves: 0, elapsedMs: -1 })).toThrow(
+      'milliseconds',
+    );
+    expect(GameResult.of({ gameId, score: 0, moves: 0, elapsedMs: 0 }).elapsedMs).toBe(0);
+  });
+
   it('should_keep_the_optional_fields_when_a_result_has_a_level_and_a_time', () => {
     const result = GameResult.of({
       gameId: GameId.of('hexa-fit'),
