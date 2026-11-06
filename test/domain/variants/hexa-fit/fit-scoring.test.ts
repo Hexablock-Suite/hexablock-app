@@ -93,4 +93,9 @@ describe('fitStars', () => {
 
     expect(fitStars({ moves: 10, elapsedMs: 60_000 }, threeStars)).toBe(2);
   });
+
+  it('should_give_no_star_when_the_level_lists_no_threshold', () => {
+    // Each star counts on its own, so a level with no star gives 0, even for a perfect play.
+    expect(fitStars({ moves: 0, elapsedMs: 0 }, [])).toBe(0);
+  });
 });
