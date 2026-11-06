@@ -1,6 +1,7 @@
 /** @jest-environment node */
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import ts from 'typescript';
 
 import { repoRoot } from '../support/run-tool';
 
@@ -17,19 +18,26 @@ const compact = (text: string) => text.replace(/\s+/g, '');
 const same = (a: Bound, b: Bound) =>
   a.parameter === b.parameter && compact(a.bound) === compact(b.bound);
 
-// A type parameter is `T` plus a capital letter, for example `TState extends BoardState<…>`.
-// A bound can be an intersection, for example `BoardState<…> & Cloneable<TState>`.
-const type = String.raw`[A-Za-z]\w*(?:<[^<>]*>)?`;
+// The TypeScript parser reads every type parameter that has a bound, whatever its name,
+// for example `TState extends BoardState<…> & Cloneable<TState>` or `K extends CoordKey`.
+// The bound text is the source text of the constraint, so an intersection stays whole.
+function boundsIn(source: string): Bound[] {
+  const file = ts.createSourceFile('engine.ts', source, ts.ScriptTarget.Latest, true);
+  const bounds: Bound[] = [];
+  const visit = (node: ts.Node): void => {
+    if (ts.isTypeParameterDeclaration(node) && node.constraint !== undefined) {
+      bounds.push({ parameter: node.name.text, bound: node.constraint.getText(file) });
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(file);
+  return bounds;
+}
+
 function codeBounds(): Bound[] {
-  const pattern = new RegExp(String.raw`\b(T[A-Z]\w*) extends (${type}(?:\s*&\s*${type})*)`, 'g');
   return readdirSync(engineDir)
     .filter((file) => file.endsWith('.ts'))
-    .flatMap((file) =>
-      [...readFileSync(path.join(engineDir, file), 'utf8').matchAll(pattern)].map((m) => ({
-        parameter: m[1] ?? '',
-        bound: m[2] ?? '',
-      })),
-    );
+    .flatMap((file) => boundsIn(readFileSync(path.join(engineDir, file), 'utf8')));
 }
 
 type Row = Bound & { status: string; reason: string };
@@ -39,7 +47,7 @@ function readmeRows(): Row[] {
   const section = readme.split('### Type parameters')[1]?.split('\n### ')[0] ?? '';
   return section
     .split('\n')
-    .filter((line) => line.startsWith('| `T'))
+    .filter((line) => line.startsWith('| `'))
     .map((line) => line.split('|').map((cell) => cell.trim()))
     .map(([, parameter = '', , bound = '', , status = '', reason = '']) => ({
       parameter: parameter.replace(/`/g, ''),
@@ -56,6 +64,23 @@ describe('README generic bounds', () => {
       parameter: 'TState',
       bound: 'BoardState<TCell, TCoord> & Cloneable<TState>',
     });
+  });
+
+  it('should_find_every_bounded_parameter_when_its_name_does_not_start_with_t', () => {
+    const source = [
+      'export class Cache<K extends CoordKey, TValue> {',
+      '  find<Q extends Iterable<K>>(keys: Q): void {}',
+      '}',
+      'export function pick<Item extends Cloneable<Item>>(items: Item[]): Item[] {',
+      '  return items;',
+      '}',
+    ].join('\n');
+
+    expect(boundsIn(source)).toEqual([
+      { parameter: 'K', bound: 'CoordKey' },
+      { parameter: 'Q', bound: 'Iterable<K>' },
+      { parameter: 'Item', bound: 'Cloneable<Item>' },
+    ]);
   });
 
   it('should_list_every_code_bound_when_the_readme_table_is_read', () => {
