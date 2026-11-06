@@ -9,7 +9,8 @@ Statement §4.3 asks for a «Diagrama que muestre el motor genérico en el centr
 - The colored zone is the Clean layer, with the colors of [layers.md](layers.md). The outer layer is at the top and the inner layer is at the bottom, so every dependency points down.
 - The teal class is the generic engine. It knows no variant and no geometry (APP-NFR-03).
 - A dashed frame groups one extension axis or one pattern. Its label names the source.
-- A solid box is a planned class. A dashed box is a declared extension with no class yet. Its name is a placeholder.
+- A solid box is a class. A dashed box is a declared extension with no class yet. Its name is a placeholder.
+- `«Sprint N»` marks planned design that the code does not have yet. N is its sprint in [`docs/ROADMAP.md`](../ROADMAP.md). A planned class or package carries the marker once, in its header, and the marker covers its members and arrows. A planned member of an existing class carries the marker on its own line. A dashed box with no marker has no sprint yet.
 - A package (a box with a tab) is one variant folder. It lists the classes of that variant. An outlined name inside a package is the class that a line starts from.
 - No line starts or ends on a dashed frame or a package. A line between two groups joins the two classes that depend, for example `LinesFactory` and `IVariantFactory`. A line from a frame or a package would claim that every class of one group uses every class of the other. In the session of 2026-11-03 the professor asked about such a line: «todas esas usan los tres bloques de abajo, a lo mejor la respuesta es no». When every variant has the same line, the view draws it for one variant and says so, for example «LINES AND MERGE STAND FOR EACH VARIANT».
 - A list box names several classes of one kind, for example the local adapters.
@@ -18,7 +19,7 @@ Statement §4.3 asks for a «Diagrama que muestre el motor genérico en el centr
 - Inside one layer, a diamond marks an attribute only where it makes a GoF pattern visible (decision 23). Any other attribute, a domain relation included, is a use with the attribute name and its multiplicity. In the class of 2026-11-02 the professor said: «Aquí sí porque quiero hacer visible el patrón estratégico». The part end shows the attribute name and its multiplicity, also when it is `1`. A hollow diamond is an object that the class receives (aggregation). A filled diamond is an object that the class creates (composition).
 - The legend of each view lists only the line kinds that the view draws.
 - The dashed box at the top right of a class holds its type parameters (UML template notation). A bound on a parameter goes in the same box, never on a line.
-- Every operation shows the type of each parameter and its return type. View 1 abbreviates the type arguments of attributes and return types, for example `IGameRules` for `IGameRules<TMove, TState>`, and leaves out the `gameId` attribute of `IVariantFactory`. In every view, the corner box of `GameEngine` leaves out the bound of `TState`. The views of the [class diagram](classes.md) show them in full.
+- Every operation shows the type of each parameter and its return type. View 1 abbreviates the type arguments of attributes and return types, for example `IGameRules` for `IGameRules<TMove, TState>`, except `createBoard(): Board<TCell, TCoord, string>`, and leaves out the `gameId` attribute of `IVariantFactory`. In every view, the corner box of `GameEngine` leaves out the bound of `TState`. The views of the [class diagram](classes.md) show them in full.
 
 ## View 1: the extension points
 

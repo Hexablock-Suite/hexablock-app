@@ -8,7 +8,12 @@ import type { Radius } from './radius';
 // Iterator: `line()`, `ring()` and `neighborhood()` walk the board lazily.
 // Prototype: `clone()` takes the snapshot for undo (classes.md decision 7).
 // The board asks its topology for every coordinate (classes.md decision 16).
-// A cell is a value: the board copies the references, never the cells.
+// A cell is a value. The board copies the references to the cells, never the cells.
+// So `clone()` shares the cell objects with the original board.
+// A caller must not change a cell object. To change a cell, the caller sets a new cell.
+// Each coordinate of the shape has its own topology key. Two equal keys are an error.
+// The initial content is checked like `set()`: each entry lies inside the shape,
+// and its key is the topology key of its coordinate. The board copies each pair.
 // `TAxis` is the axis union of the topology. The board reads no direction,
 // so it takes a topology with any direction union.
 export class Board<TCell, TCoord, TAxis extends string> implements Cloneable<
@@ -23,7 +28,22 @@ export class Board<TCell, TCoord, TAxis extends string> implements Cloneable<
     content: ReadonlyMap<CoordKey, [TCoord, TCell]> = new Map(),
   ) {
     this.inside = new Set(shape.cells.map((c) => topology.key(c)));
-    this.content = new Map(content);
+    if (this.inside.size !== shape.cells.length) {
+      throw new RangeError('Two coordinates of the shape have the same key.');
+    }
+    this.content = new Map();
+    for (const [key, [c, cell]] of content) {
+      const expected = topology.key(c);
+      if (key !== expected) {
+        throw new RangeError(
+          `The key ${key} does not match the key ${expected} of its coordinate.`,
+        );
+      }
+      if (!this.inside.has(expected)) {
+        throw new RangeError(`The coordinate ${expected} is outside the board.`);
+      }
+      this.content.set(expected, [c, cell]);
+    }
   }
 
   contains(c: TCoord): boolean {
@@ -47,8 +67,10 @@ export class Board<TCell, TCoord, TAxis extends string> implements Cloneable<
     return [...this.content.values()].map(([c, cell]) => [c, cell]);
   }
 
-  line(axis: TAxis, through: TCoord): Iterable<TCoord> {
-    return this.topology.line(axis, through, (c) => this.contains(c));
+  // A line through a coordinate outside the shape is empty.
+  *line(axis: TAxis, through: TCoord): Iterable<TCoord> {
+    if (!this.contains(through)) return;
+    yield* this.topology.line(axis, through, (c) => this.contains(c));
   }
 
   *ring(center: TCoord, radius: Radius): Iterable<TCoord> {

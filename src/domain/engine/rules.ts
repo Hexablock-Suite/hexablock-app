@@ -19,6 +19,8 @@ export abstract class BaseGameRules<TMove, TState> implements IGameRules<TMove, 
   playTurn(state: TState, move: TMove): Resolution<TState> {
     if (!this.isValid(state, move)) return Resolution.rejected(state);
     const resolution = this.resolve(this.apply(state, move));
+    // A move that `resolve()` rejects ends no game, so `evaluate()` does not run.
+    if (!resolution.accepted) return resolution;
     return resolution.evaluated(this.evaluate(resolution.state));
   }
 

@@ -132,6 +132,14 @@ describe('validMoves() and the no-valid-move end check', () => {
     expect(moves[Symbol.iterator]().next().value).toEqual(square(2, 1));
   });
 
+  it('should_yield_nothing_the_second_time_when_the_valid_moves_are_iterated_twice', () => {
+    const rules = new AdjacentRules();
+    const moves = rules.validMoves(stateWithOneCell(square(2, 2)));
+
+    expect([...moves]).toHaveLength(4);
+    expect([...moves]).toEqual([]);
+  });
+
   it('should_end_the_game_when_the_board_is_full', () => {
     const rules = new AdjacentRules();
     const state = emptyState(2);

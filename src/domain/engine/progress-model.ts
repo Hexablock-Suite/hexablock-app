@@ -44,7 +44,9 @@ export class GameResult {
 // What a progress model keeps for one game or one level. It is a value object.
 // Draft: DS-5 fixes the fields the backend receives, and the real models
 // (`HighScoreProgress`, `LevelProgress`) can add fields in Sprint 3.
-// A negative number of stars throws a RangeError.
+// A score that is not finite throws a RangeError.
+// Stars that are not finite or are negative throw a RangeError.
+// Stars can be decimal: no requirement says that they are whole numbers.
 export class ProgressRecord {
   private constructor(
     readonly gameId: GameId,
@@ -59,8 +61,11 @@ export class ProgressRecord {
     levelId?: string;
     stars?: number;
   }): ProgressRecord {
-    if (values.stars !== undefined && values.stars < 0) {
-      throw new RangeError('A progress record needs zero or more stars.');
+    if (!Number.isFinite(values.score)) {
+      throw new RangeError('A progress record needs a score that is a finite number.');
+    }
+    if (values.stars !== undefined && !(Number.isFinite(values.stars) && values.stars >= 0)) {
+      throw new RangeError('A progress record needs a finite number of zero or more stars.');
     }
     return new ProgressRecord(values.gameId, values.score, values.levelId, values.stars);
   }

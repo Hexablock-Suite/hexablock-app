@@ -40,38 +40,41 @@ export class GameEngine<
 
   // One turn: receive the move, let the rules validate, apply, resolve and evaluate it
   // (template method `playTurn()`), score it, and notify when the game ends.
+  // The rollback covers the whole state and the phase. A piece source lives in the state
+  // (classes.md decision 31), and the state `clone()` clones it. So a turn that throws
+  // after a draw leaves the source at its old position, and a retry draws the same piece.
   play(move: TMove): Outcome {
     const state = this.started();
     if (!this.current.canPlay()) {
       throw new RangeError(`The game cannot accept a move in the ${this.current.name} phase.`);
     }
     this.current = ResolvingPhase.instance;
-    // The rules and the scoring work on a copy. The engine keeps its state until both
-    // succeed, so an exception leaves the board, the score and the phase as they were.
-    let resolution;
+    // The rules and the scoring work on copies. The engine keeps its state until the turn
+    // and the next phase are known, so an exception leaves the board, the score and the phase.
+    let turn;
     try {
-      resolution = this.rules.playTurn(copy(state), move);
-      if (resolution.accepted) {
-        resolution.state.score += this.scoring.score(state, resolution);
-      }
+      turn = this.resolveTurn(state, move);
     } catch (error) {
       this.current = PlayingPhase.instance;
       throw error;
     }
-    if (!resolution.accepted) {
+    // A rejected move ends no game, whatever outcome the rules give it.
+    if (turn === undefined) {
       this.current = PlayingPhase.instance;
-      return resolution.outcome;
+      return 'playing';
     }
-    const next = resolution.state;
-    this.state = next;
-    this.current = this.current.after(resolution.outcome);
-    if (resolution.outcome !== 'playing') {
-      this.events.publish(new GameOver(this.gameId, resolution.outcome, next.score));
+    this.state = turn.next;
+    this.current = turn.phase;
+    // The turn is committed before the engine publishes. A publisher that throws
+    // does not undo the turn, and `play()` rethrows its error to the caller.
+    if (turn.outcome !== 'playing') {
+      this.events.publish(new GameOver(this.gameId, turn.outcome, turn.next.score));
     }
-    return resolution.outcome;
+    return turn.outcome;
   }
 
   pause(): void {
+    this.started();
     this.current = this.current.pause();
   }
 
@@ -81,6 +84,26 @@ export class GameEngine<
 
   snapshot(): TState {
     return copy(this.started());
+  }
+
+  // Runs the rules and the scoring, and computes the next phase. It changes no engine field.
+  // It returns `undefined` for a rejected move.
+  private resolveTurn(
+    state: TState,
+    move: TMove,
+  ): { next: TState; phase: GamePhase; outcome: Outcome } | undefined {
+    const resolution = this.rules.playTurn(copy(state), move);
+    if (!resolution.accepted) return undefined;
+    const points = this.scoring.score(copy(state), resolution);
+    if (!Number.isFinite(points)) {
+      throw new RangeError(`The scoring policy returned a score that is not finite: ${points}.`);
+    }
+    resolution.state.score += points;
+    return {
+      next: resolution.state,
+      phase: this.current.after(resolution.outcome),
+      outcome: resolution.outcome,
+    };
   }
 
   private started(): TState {

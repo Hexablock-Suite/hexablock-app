@@ -64,7 +64,7 @@
       <h1>Board and pieces: Iterator, Composite and Prototype</h1>
 
       <svg
-        viewBox="0 0 1040 928"
+        viewBox="0 0 1040 1028"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="board-title board-desc"
@@ -72,9 +72,9 @@
         <title id="board-title">HexaBlock board and pieces · UML class diagram</title>
         <desc id="board-desc">
           Class diagram of layer 1 showing Board, generic over the cell, the coordinate and the axis
-          union, using its BoardShape and taking its geometry from the GridTopology strategy,
-          BoardShape built from the ShapeNode composite of CellNode leaves and ShapeGroup children,
-          and Piece using a ShapeNode as a prototype that clones itself.
+          union, using its BoardShape and taking its geometry from the GridTopology strategy, the
+          ShapeNode composite of CellNode leaves and ShapeGroup children, and Piece using a
+          ShapeNode as a prototype that clones itself.
         </desc>
         <defs>
           <marker
@@ -135,7 +135,7 @@
           x="24"
           y="24"
           width="992"
-          height="736"
+          height="816"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -158,7 +158,7 @@
           x="56"
           y="64"
           width="408"
-          height="252"
+          height="268"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -181,7 +181,7 @@
           x="648"
           y="64"
           width="352"
-          height="220"
+          height="300"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -202,9 +202,9 @@
 
         <rect
           x="560"
-          y="340"
+          y="380"
           width="406"
-          height="184"
+          height="224"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -213,7 +213,7 @@
         />
         <text
           x="572"
-          y="356"
+          y="396"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -225,7 +225,7 @@
 
         <rect
           x="72"
-          y="532"
+          y="612"
           width="916"
           height="196"
           rx="8"
@@ -236,7 +236,7 @@
         />
         <text
           x="84"
-          y="548"
+          y="628"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -260,26 +260,16 @@
         <!-- Board keeps the BoardShape it receives from BoardBuilder as shape: use, because no GoF pattern needs a diamond here -->
         <line
           x1="200"
-          y1="300"
+          y1="316"
           x2="200"
-          y2="356"
-          stroke-width="1"
-          marker-end="url(#board-open)"
-          stroke="#5b6873"
-        />
-        <!-- BoardShape builds from ShapeNode: use -->
-        <line
-          x1="400"
-          y1="452"
-          x2="400"
-          y2="560"
+          y2="396"
           stroke-width="1"
           marker-end="url(#board-open)"
           stroke="#5b6873"
         />
         <!-- GridTopology creates the BoardShape region: use -->
         <path
-          d="M664,252 H496 Q488,252 488,260 V404 Q488,412 480,412 H432"
+          d="M664,252 H496 Q488,252 488,260 V444 Q488,452 480,452 H432"
           fill="none"
           stroke-width="1"
           marker-end="url(#board-open)"
@@ -288,9 +278,9 @@
         <!-- Piece keeps the ShapeNode it receives as shape: use, because no GoF pattern needs a diamond here -->
         <line
           x1="600"
-          y1="512"
+          y1="592"
           x2="600"
-          y2="560"
+          y2="640"
           stroke-width="1"
           marker-end="url(#board-open)"
           stroke="#5b6873"
@@ -298,9 +288,9 @@
         <!-- CellNode implements ShapeNode: realization -->
         <line
           x1="208"
-          y1="620"
+          y1="700"
           x2="256"
-          y2="620"
+          y2="700"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -309,9 +299,9 @@
         <!-- ShapeGroup implements ShapeNode: realization -->
         <line
           x1="744"
-          y1="600"
+          y1="680"
           x2="656"
-          y2="600"
+          y2="680"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -320,9 +310,9 @@
         <!-- ShapeGroup holds the ShapeNode children it receives: aggregation, kept because Composite holds it -->
         <line
           x1="744"
-          y1="636"
+          y1="716"
           x2="656"
-          y2="636"
+          y2="716"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#board-diamond-hollow)"
@@ -341,10 +331,10 @@
         >
           topology
         </text>
-        <rect x="496" y="342" width="48" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="496" y="382" width="48" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="520"
-          y="351"
+          y="391"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -353,22 +343,10 @@
         >
           CREATES
         </text>
-        <rect x="400" y="488" width="68" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="434"
-          y="497"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          BUILDS FROM
-        </text>
-        <rect x="604" y="534" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="604" y="614" width="36" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="622"
-          y="543"
+          y="623"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -377,10 +355,10 @@
         >
           shape
         </text>
-        <rect x="660" y="620" width="52" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="660" y="700" width="52" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="686"
-          y="629"
+          y="709"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -389,10 +367,10 @@
         >
           children
         </text>
-        <rect x="160" y="336" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="160" y="376" width="36" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="178"
-          y="345"
+          y="385"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -414,10 +392,10 @@
         >
           1
         </text>
-        <rect x="206" y="338" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="206" y="378" width="12" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="212"
-          y="347"
+          y="387"
           fill="#17212a"
           font-size="8"
           font-weight="600"
@@ -426,10 +404,10 @@
         >
           1
         </text>
-        <rect x="662" y="640" width="28" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="662" y="720" width="28" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="676"
-          y="649"
+          y="729"
           fill="#17212a"
           font-size="8"
           font-weight="600"
@@ -439,10 +417,10 @@
           1..*
         </text>
 
-        <rect x="584" y="534" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="584" y="614" width="12" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="590"
-          y="543"
+          y="623"
           fill="#17212a"
           font-size="8"
           font-weight="600"
@@ -456,7 +434,7 @@
           x="72"
           y="92"
           width="376"
-          height="208"
+          height="224"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -504,15 +482,18 @@
           + cells(): [TCoord, TCell][]
         </text>
         <text x="88" y="244" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + line(axis: TAxis, through: TCoord): Iterable&lt;TCoord&gt;
+          + contains(c: TCoord): boolean
         </text>
         <text x="88" y="260" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + ring(center: TCoord, radius: Radius): Iterable&lt;TCoord&gt;
+          + line(axis: TAxis, through: TCoord): Iterable&lt;TCoord&gt;
         </text>
         <text x="88" y="276" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + neighborhood(c: TCoord): Iterable&lt;TCoord&gt;
+          + ring(center: TCoord, radius: Radius): Iterable&lt;TCoord&gt;
         </text>
         <text x="88" y="292" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + neighborhood(c: TCoord): Iterable&lt;TCoord&gt;
+        </text>
+        <text x="88" y="308" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + clone(): Board&lt;TCell, TCoord, TAxis&gt;
         </text>
 
@@ -521,7 +502,7 @@
           x="664"
           y="92"
           width="320"
-          height="176"
+          height="256"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -555,28 +536,43 @@
           + rotationSteps: number
         </text>
         <text x="680" y="180" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + neighbors(c: TCoord): TCoord[]
+          + key(c: TCoord): CoordKey
         </text>
         <text x="680" y="196" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + directions(): TDirection[]
+          + neighbors(c: TCoord): TCoord[]
         </text>
         <text x="680" y="212" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + axes(): TAxis[]
+          + directions(): TDirection[]
         </text>
         <text x="680" y="228" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + rotate(c: TCoord, turns: Turns): TCoord
+          + axes(): TAxis[]
         </text>
         <text x="680" y="244" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + translate(c: TCoord, offset: TCoord): TCoord
+          + rotate(c: TCoord, turns: Turns): TCoord
         </text>
         <text x="680" y="260" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + translate(c: TCoord, offset: TCoord): TCoord
+        </text>
+        <text x="680" y="276" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + line(axis: TAxis, through: TCoord, contains:
+        </text>
+        <text x="696" y="292" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          (c: TCoord) =&gt; boolean): Iterable&lt;TCoord&gt;
+        </text>
+        <text x="680" y="308" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + ring(center: TCoord, radius: Radius):
+        </text>
+        <text x="696" y="324" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Iterable&lt;TCoord&gt;
+        </text>
+        <text x="680" y="340" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + region(size: RegionSize): BoardShape&lt;TCoord&gt;
         </text>
 
         <!-- Class: BoardShape (value object) -->
         <rect
           x="72"
-          y="356"
+          y="396"
           width="360"
           height="96"
           rx="6"
@@ -584,11 +580,11 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="72" y1="404" x2="432" y2="404" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="72" y1="428" x2="432" y2="428" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="72" y1="444" x2="432" y2="444" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="72" y1="468" x2="432" y2="468" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="252"
-          y="374"
+          y="414"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -599,7 +595,7 @@
         </text>
         <text
           x="252"
-          y="392"
+          y="432"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -608,36 +604,36 @@
         >
           BoardShape
         </text>
-        <text x="88" y="420" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + cells: TCoord[]
+        <text x="88" y="460" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + cells: readonly TCoord[]
         </text>
         <text
           x="88"
-          y="444"
+          y="484"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
           text-decoration="underline"
         >
-          + fromShape(shape: ShapeNode&lt;TCoord&gt;): BoardShape&lt;TCoord&gt;
+          + of(cells: readonly TCoord[]): BoardShape&lt;TCoord&gt;
         </text>
 
         <!-- Class: Piece (Prototype) -->
         <rect
           x="576"
-          y="368"
+          y="408"
           width="370"
-          height="144"
+          height="184"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="576" y1="416" x2="946" y2="416" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <line x1="576" y1="456" x2="946" y2="456" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="576" y1="496" x2="946" y2="496" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="761"
-          y="386"
+          y="426"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -648,7 +644,7 @@
         </text>
         <text
           x="761"
-          y="404"
+          y="444"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -657,26 +653,32 @@
         >
           Piece
         </text>
-        <text x="592" y="432" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="592" y="472" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + shape: ShapeNode&lt;TCoord&gt;
         </text>
-        <text x="592" y="448" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="592" y="488" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + content: TCell
         </text>
-        <text x="592" y="472" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="592" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + rotated(turns: Turns, topology:
         </text>
-        <text x="608" y="488" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="608" y="528" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           GridTopology&lt;TCoord, string, string&gt;): Piece&lt;TCell, TCoord&gt;
         </text>
-        <text x="592" y="504" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="592" y="544" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + translated(offset: TCoord, topology:
+        </text>
+        <text x="608" y="560" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          GridTopology&lt;TCoord, string, string&gt;): Piece&lt;TCell, TCoord&gt;
+        </text>
+        <text x="592" y="580" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + clone(): Piece&lt;TCell, TCoord&gt;
         </text>
 
         <!-- Class: ShapeNode (interface, Component) -->
         <rect
           x="256"
-          y="560"
+          y="640"
           width="400"
           height="152"
           rx="6"
@@ -684,10 +686,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="256" y1="608" x2="656" y2="608" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="256" y1="688" x2="656" y2="688" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="456"
-          y="578"
+          y="658"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -698,7 +700,7 @@
         </text>
         <text
           x="456"
-          y="596"
+          y="676"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -707,29 +709,29 @@
         >
           ShapeNode
         </text>
-        <text x="272" y="624" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="272" y="704" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + cells(): TCoord[]
         </text>
-        <text x="272" y="640" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="272" y="720" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + area(): number
         </text>
-        <text x="272" y="656" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="272" y="736" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + rotated(turns: Turns, topology:
         </text>
-        <text x="288" y="672" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="288" y="752" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           GridTopology&lt;TCoord, string, string&gt;): ShapeNode&lt;TCoord&gt;
         </text>
-        <text x="272" y="688" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="272" y="768" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + translated(offset: TCoord, topology:
         </text>
-        <text x="288" y="704" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="288" y="784" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           GridTopology&lt;TCoord, string, string&gt;): ShapeNode&lt;TCoord&gt;
         </text>
 
         <!-- Class: CellNode (Leaf) -->
         <rect
           x="88"
-          y="584"
+          y="664"
           width="120"
           height="72"
           rx="6"
@@ -737,10 +739,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="88" y1="632" x2="208" y2="632" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="88" y1="712" x2="208" y2="712" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="148"
-          y="602"
+          y="682"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -751,7 +753,7 @@
         </text>
         <text
           x="148"
-          y="620"
+          y="700"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -760,14 +762,14 @@
         >
           CellNode
         </text>
-        <text x="104" y="648" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="104" y="728" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + at: TCoord
         </text>
 
         <!-- Class: ShapeGroup (Composite) -->
         <rect
           x="744"
-          y="584"
+          y="664"
           width="224"
           height="72"
           rx="6"
@@ -775,10 +777,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="744" y1="632" x2="968" y2="632" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="744" y1="712" x2="968" y2="712" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="856"
-          y="602"
+          y="682"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -789,7 +791,7 @@
         </text>
         <text
           x="856"
-          y="620"
+          y="700"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -798,7 +800,7 @@
         >
           ShapeGroup
         </text>
-        <text x="760" y="648" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="760" y="728" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + children: ShapeNode&lt;TCoord&gt;[]
         </text>
 
@@ -826,7 +828,7 @@
         </text>
         <rect
           x="874"
-          y="358"
+          y="398"
           width="84"
           height="18"
           rx="2"
@@ -837,7 +839,7 @@
         />
         <text
           x="916"
-          y="370"
+          y="410"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -869,7 +871,7 @@
         </text>
         <rect
           x="396"
-          y="346"
+          y="386"
           width="48"
           height="18"
           rx="2"
@@ -880,7 +882,7 @@
         />
         <text
           x="420"
-          y="358"
+          y="398"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -890,7 +892,7 @@
         </text>
         <rect
           x="620"
-          y="550"
+          y="630"
           width="48"
           height="18"
           rx="2"
@@ -901,7 +903,7 @@
         />
         <text
           x="644"
-          y="562"
+          y="642"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -911,7 +913,7 @@
         </text>
         <rect
           x="172"
-          y="574"
+          y="654"
           width="48"
           height="18"
           rx="2"
@@ -922,7 +924,7 @@
         />
         <text
           x="196"
-          y="586"
+          y="666"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -932,7 +934,7 @@
         </text>
         <rect
           x="932"
-          y="574"
+          y="654"
           width="48"
           height="18"
           rx="2"
@@ -943,7 +945,7 @@
         />
         <text
           x="956"
-          y="586"
+          y="666"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -954,40 +956,40 @@
         <!-- Footnote: classes the budget leaves out -->
         <text
           x="24"
-          y="788"
+          y="868"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Board, Piece and BoardState implement Cloneable&lt;T&gt;: clone() takes the snapshot for
-          undo and for the piece preview (D3).
+          Board, Piece and BoardState implement Cloneable&lt;T&gt;: clone() copies the state for the
+          scoring policy and the rollback of a turn. Sprint 3 adds the undo snapshot (D3).
         </text>
         <text
           x="24"
-          y="804"
+          y="884"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Board is the HexBoard&lt;TCell&gt; of statement §3.1. HexCoord and HexTopology form the
-          hexagonal family, and BoardBuilder builds the board (view 6).
+          Board is the HexBoard&lt;TCell&gt; of statement §3.1. In Sprint 2, HexCoord and
+          HexTopology form the hexagonal family, and BoardBuilder builds the board (view 6).
         </text>
 
         <text
           x="24"
-          y="820"
+          y="900"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          A ShapeGroup holds at least one child. Radius, RegionSize and Turns check a whole number
-          in of(); each topology binds TAxis and TDirection to closed unions.
+          A ShapeGroup holds at least one child. Radius, RegionSize and Turns check a safe whole
+          number in of(); each topology binds TAxis and TDirection to closed unions.
         </text>
         <!-- Legend -->
-        <line x1="24" y1="840" x2="1016" y2="840" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <line x1="24" y1="920" x2="1016" y2="920" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="858"
+          y="938"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -998,9 +1000,9 @@
 
         <line
           x1="24"
-          y1="876"
+          y1="956"
           x2="52"
-          y2="876"
+          y2="956"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -1008,7 +1010,7 @@
         />
         <text
           x="60"
-          y="880"
+          y="960"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1017,16 +1019,16 @@
         </text>
         <line
           x1="144"
-          y1="876"
+          y1="956"
           x2="172"
-          y2="876"
+          y2="956"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#board-diamond-hollow)"
         />
         <text
           x="180"
-          y="880"
+          y="960"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1035,16 +1037,16 @@
         </text>
         <line
           x1="384"
-          y1="876"
+          y1="956"
           x2="412"
-          y2="876"
+          y2="956"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#board-open)"
         />
         <text
           x="420"
-          y="880"
+          y="960"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1053,7 +1055,7 @@
         </text>
         <rect
           x="24"
-          y="896"
+          y="976"
           width="28"
           height="12"
           rx="2"
@@ -1063,7 +1065,7 @@
         />
         <text
           x="60"
-          y="905"
+          y="985"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1072,7 +1074,7 @@
         </text>
         <rect
           x="184"
-          y="896"
+          y="976"
           width="28"
           height="12"
           rx="2"
@@ -1083,7 +1085,7 @@
         />
         <text
           x="220"
-          y="905"
+          y="985"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1092,7 +1094,7 @@
         </text>
         <rect
           x="424"
-          y="896"
+          y="976"
           width="28"
           height="12"
           rx="2"
@@ -1103,7 +1105,7 @@
         />
         <text
           x="460"
-          y="905"
+          y="985"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1112,7 +1114,7 @@
         </text>
         <rect
           x="624"
-          y="896"
+          y="976"
           width="28"
           height="12"
           rx="2"
@@ -1122,12 +1124,31 @@
         />
         <text
           x="660"
-          y="905"
+          y="985"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
+        </text>
+        <text
+          x="24"
+          y="1008"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          «Sprint N»
+        </text>
+        <text
+          x="92"
+          y="1008"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Planned design, not in the code yet · N is its sprint in docs/ROADMAP.md · a planned class
+          carries it once, for its members and arrows
         </text>
       </svg>
     </div>

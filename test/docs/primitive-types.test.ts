@@ -8,8 +8,10 @@ import { repoRoot } from '../support/run-tool';
 // APP-NFR-25: the primitive types of the engine design tend to zero, and each one
 // that stays has a reason. Every `number` and `string` in a public signature of
 // `src/domain/engine/` needs a row in the README table «Primitive types».
-// A `boolean` needs no row. The scan reads the written type of each member. When a member
-// has no written type, the scan reads the type that the TypeScript checker infers.
+// A `boolean` needs no row. The scan reads exported classes, interfaces, type aliases,
+// functions and variables (`export const`, `export let`). It reads the written type of each
+// member. When a member has no written type, the scan reads the type that the TypeScript
+// checker infers. A literal type, such as `'playing'`, is not a primitive.
 
 const engineDir = path.join(repoRoot, 'src/domain/engine');
 const readme = readFileSync(path.join(repoRoot, 'README.md'), 'utf8');
@@ -57,15 +59,27 @@ type Declaration =
   | ts.ParameterDeclaration
   | ts.PropertyDeclaration
   | ts.PropertySignature
+  | ts.VariableDeclaration
   | ts.SignatureDeclaration;
+
+const flags = ts.NodeBuilderFlags.NoTruncation;
+
+// The type that the checker infers for a name.
+function inferredType(name: ts.Node, checker: ts.TypeChecker): ts.Node | undefined {
+  return checker.typeToTypeNode(checker.getTypeAtLocation(name), undefined, flags);
+}
 
 // The written type of a declaration. When no type is written, the checker infers it.
 // For a method, an accessor or a function, the type is the return type.
 function typeOf(node: Declaration, checker: ts.TypeChecker): ts.Node | undefined {
   if (node.type !== undefined) return node.type;
-  const flags = ts.NodeBuilderFlags.NoTruncation;
-  if (ts.isParameter(node) || ts.isPropertyDeclaration(node) || ts.isPropertySignature(node)) {
-    return checker.typeToTypeNode(checker.getTypeAtLocation(node.name), undefined, flags);
+  if (
+    ts.isParameter(node) ||
+    ts.isPropertyDeclaration(node) ||
+    ts.isPropertySignature(node) ||
+    ts.isVariableDeclaration(node)
+  ) {
+    return inferredType(node.name, checker);
   }
   const call = checker.getSignatureFromDeclaration(node);
   if (call === undefined) return undefined;
@@ -119,6 +133,27 @@ function memberUses(owner: string, members: readonly ts.Node[], checker: ts.Type
   });
 }
 
+// The names that a destructuring pattern binds, at any depth.
+function boundNames(pattern: ts.BindingPattern): ts.Identifier[] {
+  return pattern.elements.flatMap((element) => {
+    if (ts.isOmittedExpression(element)) return [];
+    return ts.isIdentifier(element.name) ? [element.name] : boundNames(element.name);
+  });
+}
+
+// Each declarator of an exported variable statement. A plain name reads its written type.
+// Each name in a destructuring pattern reads the type that the checker infers.
+function variableUses(statement: ts.VariableStatement, checker: ts.TypeChecker): Use[] {
+  return statement.declarationList.declarations.flatMap((declaration) => {
+    const typed = ts.isIdentifier(declaration.name)
+      ? [{ name: declaration.name, type: typeOf(declaration, checker) }]
+      : boundNames(declaration.name).map((name) => ({ name, type: inferredType(name, checker) }));
+    return typed.flatMap(({ name, type }) =>
+      primitivesIn([type]).map((primitive) => ({ primitive, where: name.text })),
+    );
+  });
+}
+
 function declarationUses(statement: ts.Statement, checker: ts.TypeChecker): Use[] {
   if (!hasModifier(statement, ts.SyntaxKind.ExportKeyword)) return [];
   if (ts.isClassDeclaration(statement) || ts.isInterfaceDeclaration(statement)) {
@@ -144,6 +179,7 @@ function declarationUses(statement: ts.Statement, checker: ts.TypeChecker): Use[
       ...uses.map((primitive) => ({ primitive, where: owner })),
     ];
   }
+  if (ts.isVariableStatement(statement)) return variableUses(statement, checker);
   return [];
 }
 
@@ -206,6 +242,12 @@ function readmeUses(): Use[] {
   );
 }
 
+// The uses that have no row in the README table. The gate fails when this list is not empty.
+function unlisted(uses: Use[]): Use[] {
+  const listed = new Set(readmeUses().map(key));
+  return uses.filter((use) => !listed.has(key(use)));
+}
+
 describe('README primitive types', () => {
   it('should_find_a_primitive_in_the_engine_when_the_code_is_scanned', () => {
     const uses = codeUses();
@@ -248,11 +290,44 @@ describe('README primitive types', () => {
   });
 
   it('should_list_every_primitive_of_the_engine_when_the_readme_table_is_read', () => {
-    const listed = new Set(readmeUses().map(key));
+    expect(unlisted(codeUses())).toEqual([]);
+  });
 
-    const missing = codeUses().filter((use) => !listed.has(key(use)));
+  it('should_fail_the_gate_when_an_exported_number_constant_has_no_readme_row', () => {
+    const source = 'export const fixtureLimit: number = 3;';
 
-    expect(missing).toEqual([]);
+    const uses = usesIn({ [path.join(engineDir, 'fixture-limit.ts')]: source });
+
+    expect(unlisted(uses)).toEqual([{ primitive: 'number', where: 'fixtureLimit' }]);
+  });
+
+  it('should_read_every_binding_when_an_exported_variable_statement_is_scanned', () => {
+    const source = [
+      'export const written: string = String(1);',
+      'export let counted = 0;',
+      "export const { width, label } = { width: 2, label: 'x' };",
+      'export const [first] = [1];',
+      'export const total = counted + 1, ready = false;',
+      "export const phase = 'playing';",
+      'const hidden = 1;',
+    ].join('\n');
+
+    expect(usesIn({ [path.join(engineDir, 'fixture-values.ts')]: source })).toEqual([
+      { primitive: 'string', where: 'written' },
+      { primitive: 'number', where: 'counted' },
+      { primitive: 'number', where: 'width' },
+      { primitive: 'string', where: 'label' },
+      { primitive: 'number', where: 'first' },
+      { primitive: 'number', where: 'total' },
+    ]);
+  });
+
+  it('should_fail_the_gate_when_an_exported_function_has_a_primitive_parameter_and_no_row', () => {
+    const source = 'export function fixtureScale(factor: number): void {}';
+
+    const uses = usesIn({ [path.join(engineDir, 'fixture-scale.ts')]: source });
+
+    expect(unlisted(uses)).toEqual([{ primitive: 'number', where: 'fixtureScale' }]);
   });
 
   it('should_list_no_primitive_that_the_engine_lacks_when_the_readme_table_is_read', () => {

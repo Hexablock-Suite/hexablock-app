@@ -2,6 +2,7 @@ import { Board } from '../../../src/domain/engine/board';
 import type { BoardState } from '../../../src/domain/engine/board-state';
 import type { GameEvent, GameEventPublisher } from '../../../src/domain/engine/game-events';
 import type { Outcome } from '../../../src/domain/engine/outcome';
+import type { IPieceSource } from '../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../src/domain/engine/region-size';
 import { Resolution } from '../../../src/domain/engine/resolution';
 import { BaseGameRules } from '../../../src/domain/engine/rules';
@@ -30,6 +31,53 @@ export class FakeState implements BoardState<FakeCell, SquareCoord> {
 // A square board of size × size empty cells.
 export function emptyState(size = 2): FakeState {
   return new FakeState(new Board(squareTopology.region(RegionSize.of(size)), squareTopology));
+}
+
+// A state that holds a piece source, as a variant state does (classes.md decision 31).
+// `clone()` clones the source, so the engine copy and rollback cover its position.
+export class SourceState implements BoardState<FakeCell, SquareCoord> {
+  constructor(
+    readonly board: Board<FakeCell, SquareCoord, SquareAxis>,
+    readonly source: IPieceSource<FakeCell>,
+    public score = 0,
+  ) {}
+
+  clone(): SourceState {
+    return new SourceState(this.board.clone(), this.source.clone(), this.score);
+  }
+}
+
+// A square board of size × size empty cells, with `source` in the state.
+export function sourceState(source: IPieceSource<FakeCell>, size = 2): SourceState {
+  return new SourceState(
+    new Board(squareTopology.region(RegionSize.of(size)), squareTopology),
+    source,
+  );
+}
+
+// The move is the chosen cell. `apply()` puts the next piece of `state.source` on it.
+// A move is valid on an empty cell inside the board. The game ends when no valid move is left.
+export class SourceRules extends BaseGameRules<SquareCoord, SourceState> {
+  isValid(state: SourceState, at: SquareCoord): boolean {
+    return state.board.contains(at) && state.board.get(at) === undefined;
+  }
+
+  *validMoves(state: SourceState): Iterable<SquareCoord> {
+    for (const at of state.board.shape.cells) if (this.isValid(state, at)) yield at;
+  }
+
+  apply(state: SourceState, at: SquareCoord): SourceState {
+    state.board.set(at, state.source.next());
+    return state;
+  }
+
+  resolve(state: SourceState): Resolution<SourceState> {
+    return Resolution.resolved(state);
+  }
+
+  evaluate(state: SourceState): Outcome {
+    return this.noValidMove(state) ? 'game-over' : 'playing';
+  }
 }
 
 // A move is valid on an empty cell inside the board. The game ends when the board is full.

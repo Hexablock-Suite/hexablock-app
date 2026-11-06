@@ -64,7 +64,7 @@
       <h1>Geometry and board: Abstract Factory and Builder</h1>
 
       <svg
-        viewBox="0 0 1040 760"
+        viewBox="0 0 1040 776"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="geometry-title geometry-desc"
@@ -384,7 +384,7 @@
           + createCoord(values: number[]): TCoord
         </text>
         <text x="88" y="180" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + createTopology(): GridTopology&lt;TCoord&gt;
+          + createTopology(): GridTopology&lt;TCoord, string, string&gt;
         </text>
         <text x="88" y="196" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createPieceShapes(): ShapeNode&lt;TCoord&gt;[]
@@ -562,13 +562,13 @@
           - geometry: GeometryFactory&lt;TCoord&gt;
         </text>
         <text x="600" y="188" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + withRegion(size: number): BoardBuilder&lt;TCoord&gt;
+          + withRegion(size: RegionSize): BoardBuilder&lt;TCoord&gt;
         </text>
         <text x="600" y="204" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + withFigure(figure: ShapeNode&lt;TCoord&gt;): BoardBuilder&lt;TCoord&gt;
         </text>
         <text x="600" y="220" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + build&lt;TCell&gt;(): Board&lt;TCell, TCoord&gt;
+          + build&lt;TCell&gt;(): Board&lt;TCell, TCoord, string&gt;
         </text>
         <!-- Reference box: Board, detailed in part 1 · view 2 -->
         <rect
@@ -609,7 +609,7 @@
         <line x1="320" y1="480" x2="320" y2="496" stroke="#17212a" stroke-width="1" />
         <circle cx="320" cy="501" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text x="331" y="504" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          GridTopology‹HexCoord›
+          GridTopology‹HexCoord, …›
         </text>
         <!-- UML template boxes: type parameters on the top-right corner -->
         <rect
@@ -685,11 +685,21 @@
           SquareGeometry creates SquareCoord and SquareTopology. Triangular and 3D cells are
           declared variations (§8): one more family each.
         </text>
-        <!-- Legend -->
-        <line x1="24" y1="652" x2="1016" y2="652" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="670"
+          y="648"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          HexTopology binds TAxis and TDirection of GridTopology to closed unions of names (issue
+          #86). createTopology() and build() take string for the unions they do not read.
+        </text>
+        <!-- Legend -->
+        <line x1="24" y1="668" x2="1016" y2="668" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <text
+          x="24"
+          y="686"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -699,9 +709,9 @@
         </text>
         <line
           x1="24"
-          y1="688"
+          y1="704"
           x2="52"
-          y2="688"
+          y2="704"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -709,7 +719,7 @@
         />
         <text
           x="60"
-          y="692"
+          y="708"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -718,16 +728,16 @@
         </text>
         <line
           x1="144"
-          y1="688"
+          y1="704"
           x2="172"
-          y2="688"
+          y2="704"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#geo-diamond-hollow)"
         />
         <text
           x="180"
-          y="692"
+          y="708"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -736,16 +746,16 @@
         </text>
         <line
           x1="384"
-          y1="688"
+          y1="704"
           x2="412"
-          y2="688"
+          y2="704"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#geo-open)"
         />
         <text
           x="420"
-          y="692"
+          y="708"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -754,7 +764,7 @@
         </text>
         <rect
           x="24"
-          y="708"
+          y="724"
           width="28"
           height="12"
           rx="2"
@@ -764,7 +774,7 @@
         />
         <text
           x="60"
-          y="717"
+          y="733"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -773,7 +783,7 @@
         </text>
         <rect
           x="184"
-          y="708"
+          y="724"
           width="28"
           height="12"
           rx="2"
@@ -784,7 +794,7 @@
         />
         <text
           x="220"
-          y="717"
+          y="733"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -793,7 +803,7 @@
         </text>
         <rect
           x="440"
-          y="708"
+          y="724"
           width="28"
           height="12"
           rx="2"
@@ -804,7 +814,7 @@
         />
         <text
           x="476"
-          y="717"
+          y="733"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -813,7 +823,7 @@
         </text>
         <rect
           x="648"
-          y="708"
+          y="724"
           width="28"
           height="12"
           rx="2"
@@ -824,7 +834,7 @@
         />
         <text
           x="684"
-          y="717"
+          y="733"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -833,7 +843,7 @@
         </text>
         <rect
           x="24"
-          y="732"
+          y="748"
           width="28"
           height="12"
           rx="2"
@@ -843,18 +853,18 @@
         />
         <text
           x="60"
-          y="741"
+          y="757"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
         </text>
-        <line x1="184" y1="738" x2="200" y2="738" stroke="#17212a" stroke-width="1" />
-        <circle cx="205" cy="738" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="184" y1="754" x2="200" y2="754" stroke="#17212a" stroke-width="1" />
+        <circle cx="205" cy="754" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="220"
-          y="741"
+          y="757"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

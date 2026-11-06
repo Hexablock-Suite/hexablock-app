@@ -106,6 +106,17 @@ describe('SeededPieceSource', () => {
     expect(new SeededPieceSource(4294967295, drawColor).seed).toBe(4294967295);
   });
 
+  it('should_continue_the_sequence_when_a_seeded_source_is_read_in_two_loops', () => {
+    const source = new SeededPieceSource(42, drawColor);
+    const expected = take(new SeededPieceSource(42, drawColor), 10);
+
+    const first = take(source, 5);
+    const second = take(source, 5);
+
+    expect([...first, ...second]).toEqual(expected);
+    expect(second).not.toEqual(expected.slice(0, 5));
+  });
+
   it('should_expose_its_seed_when_the_seed_is_read', () => {
     expect(new SeededPieceSource(42, drawColor).seed).toBe(42);
   });
@@ -117,5 +128,46 @@ describe('Mulberry32Random', () => {
     const numbers = Array.from({ length: 500 }, () => random.next());
 
     expect(numbers.every((n) => n >= 0 && n < 1)).toBe(true);
+  });
+});
+
+// Prototype (classes.md decision 7). A clone copies the position or the generator state.
+// So the engine copy of a state that holds a source also covers the source.
+describe('cloning a source', () => {
+  it('should_give_the_same_sequence_when_a_seeded_source_is_cloned', () => {
+    const source = new SeededPieceSource(42, drawColor);
+    take(source, 3);
+    const random = new Mulberry32Random(7);
+    random.next();
+
+    const clone = source.clone();
+    const randomClone = random.clone();
+
+    expect(clone.seed).toBe(42);
+    expect(take(clone, 10)).toEqual(take(source, 10));
+    expect(take(clone, 10)).toEqual(take(new SeededPieceSource(42, drawColor), 23).slice(13));
+    expect(Array.from({ length: 10 }, () => randomClone.next())).toEqual(
+      Array.from({ length: 10 }, () => random.next()),
+    );
+  });
+
+  it('should_keep_the_original_unchanged_when_a_clone_draws', () => {
+    const seeded = new SeededPieceSource(42, drawColor);
+    const seededExpected = take(new SeededPieceSource(42, drawColor), 5);
+    const fixed = new FixedListPieceSource(['a', 'b', 'c']);
+    fixed.next();
+    const random = new Mulberry32Random(7);
+    const fresh = new Mulberry32Random(7);
+    const randomExpected = Array.from({ length: 5 }, () => fresh.next());
+
+    take(seeded.clone(), 5);
+    expect([...fixed.clone()]).toEqual(['b', 'c']);
+    const randomClone = random.clone();
+    for (let i = 0; i < 5; i += 1) randomClone.next();
+
+    expect(take(seeded, 5)).toEqual(seededExpected);
+    expect(fixed.hasNext()).toBe(true);
+    expect([...fixed]).toEqual(['b', 'c']);
+    expect(Array.from({ length: 5 }, () => random.next())).toEqual(randomExpected);
   });
 });

@@ -4,7 +4,9 @@ import type { BoardState } from '../../../src/domain/engine/board-state';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameOver } from '../../../src/domain/engine/game-events';
 import { GameId } from '../../../src/domain/engine/game-id';
-import type { Resolution } from '../../../src/domain/engine/resolution';
+import type { Outcome } from '../../../src/domain/engine/outcome';
+import { FixedListPieceSource } from '../../../src/domain/engine/piece-source';
+import { Resolution } from '../../../src/domain/engine/resolution';
 import { fakeCell, type FakeCell } from '../../support/engine/fake-cell';
 import {
   emptyState,
@@ -12,7 +14,10 @@ import {
   FakeState,
   OnePointScoring,
   RecordingPublisher,
+  SourceRules,
+  sourceState,
   type FakeMove,
+  type SourceState,
 } from '../../support/engine/fake-game';
 import { square, type SquareAxis, type SquareCoord } from '../../support/engine/square-topology';
 
@@ -49,6 +54,51 @@ class FailingOnceScoring extends OnePointScoring {
     if (!this.failed) {
       this.failed = true;
       throw new Error('score failed');
+    }
+    return super.score(before, resolution);
+  }
+}
+
+// Rules whose `resolve()` refuses the move after `apply()` has put the cell on the copy.
+class RejectingResolveRules extends FakeRules {
+  override resolve(state: FakeState): Resolution<FakeState> {
+    this.log.push('resolve');
+    return Resolution.rejected(state);
+  }
+}
+
+// Rules that throw in one step while `armed` is true.
+// `apply()` throws after it has put the cell on the copy.
+class ThrowingStepRules extends FakeRules {
+  armed = false;
+
+  constructor(private readonly step: 'apply' | 'evaluate') {
+    super();
+  }
+
+  override apply(state: FakeState, move: FakeMove): FakeState {
+    const next = super.apply(state, move);
+    if (this.armed && this.step === 'apply') throw new Error('apply failed');
+    return next;
+  }
+
+  override evaluate(state: FakeState): Outcome {
+    if (this.armed && this.step === 'evaluate') throw new Error('evaluate failed');
+    return super.evaluate(state);
+  }
+}
+
+// A scoring policy that calls `engine.play()` again from `score()`, a reentrant call.
+// It keeps the error of the inner call and scores the outer turn.
+class ReentrantScoring extends OnePointScoring {
+  engine: GameEngine<FakeCell, SquareCoord, FakeMove, FakeState> | undefined;
+  innerError: unknown;
+
+  override score(before: FakeState, resolution: Resolution<FakeState>): number {
+    try {
+      this.engine?.play(place(1, 0));
+    } catch (error) {
+      this.innerError = error;
     }
     return super.score(before, resolution);
   }
@@ -91,6 +141,25 @@ describe('GameEngine.play()', () => {
     expect(engine.snapshot().board.get(square(0, 0))).toEqual(fakeCell(1));
     expect(engine.snapshot().score).toBe(1);
     expect(engine.phase.canPlay()).toBe(true);
+  });
+
+  it('should_keep_the_old_board_when_resolve_rejects_the_move_after_apply', () => {
+    const publisher = new RecordingPublisher();
+    const engine = new GameEngine(
+      GameId.of('fake-game'),
+      new RejectingResolveRules(),
+      new OnePointScoring(),
+      publisher,
+    );
+    engine.start(emptyState());
+
+    const outcome = engine.play(place(0, 0));
+
+    expect(outcome).toBe('playing');
+    expect(engine.snapshot().board.get(square(0, 0))).toBeUndefined();
+    expect(engine.snapshot().score).toBe(0);
+    expect(engine.phase.name).toBe('playing');
+    expect(publisher.events).toEqual([]);
   });
 
   it('should_publish_game_over_with_the_final_score_when_the_board_fills', () => {
@@ -224,6 +293,294 @@ class BaseCloneState implements BoardState<FakeCell, SquareCoord> {
     return new FakeState(this.board.clone(), this.score);
   }
 }
+
+// A game with one played move, whose rules throw in `step` on the next move.
+function armedGame(step: 'apply' | 'evaluate') {
+  const rules = new ThrowingStepRules(step);
+  const engine = new GameEngine(
+    GameId.of('fake-game'),
+    rules,
+    new OnePointScoring(),
+    new RecordingPublisher(),
+  );
+  engine.start(emptyState());
+  engine.play(place(0, 0));
+  rules.armed = true;
+  return { engine, rules };
+}
+
+// The board cells, the score and the phase name of a game.
+function summary(engine: GameEngine<FakeCell, SquareCoord, FakeMove, FakeState>) {
+  const state = engine.snapshot();
+  return { cells: state.board.cells(), score: state.score, phase: engine.phase.name };
+}
+
+const afterOneMove = { cells: [[square(0, 0), fakeCell(1)]], score: 1, phase: 'playing' };
+
+describe('GameEngine edge cases', () => {
+  it('should_keep_the_board_the_score_and_the_phase_when_apply_throws', () => {
+    const { engine, rules } = armedGame('apply');
+
+    expect(() => engine.play(place(1, 0))).toThrow('apply failed');
+
+    expect(summary(engine)).toEqual(afterOneMove);
+    rules.armed = false;
+    expect(engine.play(place(1, 0))).toBe('playing');
+  });
+
+  it('should_keep_the_board_the_score_and_the_phase_when_evaluate_throws', () => {
+    const { engine, rules } = armedGame('evaluate');
+
+    expect(() => engine.play(place(1, 0))).toThrow('evaluate failed');
+
+    expect(summary(engine)).toEqual(afterOneMove);
+    rules.armed = false;
+    expect(engine.play(place(1, 0))).toBe('playing');
+  });
+
+  // `play()` enters the resolving phase before it calls the rules and the scoring.
+  // The resolving phase refuses a move, so a reentrant `play()` throws a RangeError.
+  it('should_reject_a_reentrant_play_when_the_scoring_calls_play_during_a_turn', () => {
+    const scoring = new ReentrantScoring();
+    const engine = new GameEngine(
+      GameId.of('fake-game'),
+      new FakeRules(),
+      scoring,
+      new RecordingPublisher(),
+    );
+    scoring.engine = engine;
+    engine.start(emptyState());
+
+    const outcome = engine.play(place(0, 0));
+
+    expect(scoring.innerError).toBeInstanceOf(RangeError);
+    expect(String(scoring.innerError)).toContain('cannot accept a move in the resolving phase');
+    expect(outcome).toBe('playing');
+    expect(summary(engine)).toEqual(afterOneMove);
+  });
+
+  it('should_start_a_new_game_when_start_runs_after_game_over', () => {
+    const { engine, publisher } = newGame();
+    engine.start(emptyState(1));
+    engine.play(place(0, 0));
+
+    engine.start(emptyState(1));
+
+    expect(engine.phase.name).toBe('playing');
+    expect(engine.snapshot().board.cells()).toEqual([]);
+    expect(engine.snapshot().score).toBe(0);
+    expect(engine.play(place(0, 0))).toBe('game-over');
+    expect(publisher.events).toHaveLength(2);
+  });
+});
+
+// Rules whose `playTurn()` returns `resolution` for every move.
+class FixedResolutionRules extends FakeRules {
+  constructor(private readonly resolution: (state: FakeState) => Resolution<FakeState>) {
+    super();
+  }
+
+  override playTurn(state: FakeState): Resolution<FakeState> {
+    return this.resolution(state);
+  }
+}
+
+// Rules whose `evaluate()` returns `outcome` for every move.
+class FixedOutcomeRules extends FakeRules {
+  constructor(private readonly outcome: Outcome) {
+    super();
+  }
+
+  override evaluate(): Outcome {
+    return this.outcome;
+  }
+}
+
+// A scoring policy that returns `points` for every move.
+class FixedScoring extends OnePointScoring {
+  constructor(private readonly points: number) {
+    super();
+  }
+
+  override score(): number {
+    return this.points;
+  }
+}
+
+// A scoring policy that changes the state it receives, then throws.
+class MutatingThrowingScoring extends OnePointScoring {
+  override score(before: FakeState): number {
+    before.board.set(square(1, 1), fakeCell(9));
+    before.score = 99;
+    throw new Error('score failed');
+  }
+}
+
+// A publisher that always throws.
+class ThrowingPublisher extends RecordingPublisher {
+  override publish(): void {
+    throw new Error('publish failed');
+  }
+}
+
+// Rules that draw from the piece source of the state (classes.md decision 31).
+// The first `apply()` throws after the draw.
+class DrawingRules extends SourceRules {
+  private failed = false;
+
+  override apply(state: SourceState, at: SquareCoord): SourceState {
+    const next = super.apply(state, at);
+    if (!this.failed) {
+      this.failed = true;
+      throw new Error('apply failed');
+    }
+    return next;
+  }
+}
+
+// Rules whose `resolve()` rejects every move after `apply()` has drawn a piece.
+class RejectingDrawRules extends SourceRules {
+  rejecting = true;
+
+  override resolve(state: SourceState): Resolution<SourceState> {
+    return this.rejecting ? Resolution.rejected(state) : super.resolve(state);
+  }
+}
+
+// A game whose state holds a fixed list of three pieces.
+function sourceGame(rules: SourceRules) {
+  const engine = new GameEngine(
+    GameId.of('fake-game'),
+    rules,
+    { score: () => 1 },
+    new RecordingPublisher(),
+  );
+  engine.start(sourceState(new FixedListPieceSource([fakeCell(1), fakeCell(2), fakeCell(3)])));
+  return engine;
+}
+
+function gameWith(
+  rules: FakeRules,
+  scoring: OnePointScoring = new OnePointScoring(),
+  publisher: RecordingPublisher = new RecordingPublisher(),
+) {
+  const engine = new GameEngine(GameId.of('fake-game'), rules, scoring, publisher);
+  engine.start(emptyState());
+  return { engine, publisher };
+}
+
+const initial = { cells: [], score: 0, phase: 'playing' };
+
+describe('GameEngine review findings', () => {
+  it('should_return_playing_when_the_rules_return_a_rejected_resolution_with_a_final_outcome', () => {
+    // `Resolution.evaluated()` refuses a rejected resolution, so a structural copy stands in
+    // for a custom `IGameRules` that returns a rejected resolution with a final outcome.
+    const forged = (state: FakeState) =>
+      ({ state, accepted: false, outcome: 'victory' }) as unknown as Resolution<FakeState>;
+    const { engine, publisher } = gameWith(new FixedResolutionRules(forged));
+
+    const outcome = engine.play(place(0, 0));
+
+    expect(outcome).toBe('playing');
+    expect(summary(engine)).toEqual(initial);
+    expect(publisher.events).toEqual([]);
+    expect(engine.play(place(0, 0))).toBe('playing');
+  });
+
+  it('should_keep_the_state_when_the_scoring_mutates_before_and_throws', () => {
+    const { engine, publisher } = gameWith(new FakeRules(), new MutatingThrowingScoring());
+
+    expect(() => engine.play(place(0, 0))).toThrow('score failed');
+
+    expect(summary(engine)).toEqual(initial);
+    expect(publisher.events).toEqual([]);
+  });
+
+  it('should_throw_and_keep_the_state_when_the_scoring_returns_a_non_finite_number', () => {
+    for (const points of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
+      const { engine, publisher } = gameWith(new FakeRules(), new FixedScoring(points));
+
+      expect(() => engine.play(place(0, 0))).toThrow(
+        new RangeError(`The scoring policy returned a score that is not finite: ${points}.`),
+      );
+
+      expect(summary(engine)).toEqual(initial);
+      expect(publisher.events).toEqual([]);
+    }
+  });
+
+  it('should_throw_a_range_error_and_keep_the_state_when_the_rules_return_an_unknown_outcome', () => {
+    const { engine, publisher } = gameWith(new FixedOutcomeRules('draw' as Outcome));
+
+    expect(() => engine.play(place(0, 0))).toThrow(new RangeError('Unknown outcome: draw.'));
+
+    expect(summary(engine)).toEqual(initial);
+    expect(publisher.events).toEqual([]);
+  });
+
+  // The engine commits the turn before it publishes. A throwing publisher cannot undo it.
+  it('should_commit_the_turn_and_rethrow_when_the_publisher_throws', () => {
+    const { engine } = gameWith(
+      new FixedOutcomeRules('game-over'),
+      new OnePointScoring(),
+      new ThrowingPublisher(),
+    );
+
+    expect(() => engine.play(place(0, 0))).toThrow('publish failed');
+
+    expect(summary(engine)).toEqual({ ...afterOneMove, phase: 'game-over' });
+  });
+
+  // The rollback covers the board, the score, the phase and the piece source in the state.
+  it('should_draw_the_same_piece_when_a_turn_is_retried_after_a_throw', () => {
+    const engine = sourceGame(new DrawingRules());
+
+    expect(() => engine.play(square(0, 0))).toThrow('apply failed');
+    expect(engine.snapshot().board.cells()).toEqual([]);
+    expect(engine.snapshot().score).toBe(0);
+    expect(engine.phase.name).toBe('playing');
+
+    expect(engine.play(square(0, 0))).toBe('playing');
+    expect(engine.snapshot().board.get(square(0, 0))).toEqual(fakeCell(1));
+    expect([...engine.snapshot().source]).toEqual([fakeCell(2), fakeCell(3)]);
+  });
+
+  it('should_keep_the_source_position_when_the_rules_reject_a_move_after_apply', () => {
+    const rules = new RejectingDrawRules();
+    const engine = sourceGame(rules);
+
+    expect(engine.play(square(0, 0))).toBe('playing');
+    expect(engine.snapshot().board.cells()).toEqual([]);
+    expect([...engine.snapshot().source]).toEqual([fakeCell(1), fakeCell(2), fakeCell(3)]);
+
+    rules.rejecting = false;
+    expect(engine.play(square(0, 0))).toBe('playing');
+    expect(engine.snapshot().board.get(square(0, 0))).toEqual(fakeCell(1));
+  });
+
+  it('should_publish_game_over_with_the_victory_outcome_when_the_rules_return_victory', () => {
+    const { engine, publisher } = gameWith(new FixedOutcomeRules('victory'));
+
+    const outcome = engine.play(place(0, 0));
+
+    expect(outcome).toBe('victory');
+    expect(engine.phase.name).toBe('victory');
+    expect(publisher.events).toHaveLength(1);
+    const event = publisher.events[0] as GameOver;
+    expect(event).toBeInstanceOf(GameOver);
+    expect(event.gameId.value).toBe('fake-game');
+    expect(event.outcome).toBe('victory');
+    expect(event.finalScore).toBe(1);
+  });
+
+  it('should_throw_when_pause_is_called_before_start', () => {
+    const { engine } = newGame();
+
+    expect(() => engine.pause()).toThrow(new RangeError('The game has not started.'));
+
+    expect(engine.phase.name).toBe('playing');
+  });
+});
 
 describe('GameEngine type parameters', () => {
   it('should_reject_the_state_type_when_its_clone_returns_the_base_board_state', () => {

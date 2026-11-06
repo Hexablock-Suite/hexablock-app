@@ -63,7 +63,7 @@
       <p class="eyebrow">Extensibility diagram · View 1 · Statement §4.3</p>
       <h1>The engine in the center and the interfaces a fifth variant implements</h1>
       <svg
-        viewBox="0 0 1040 1508"
+        viewBox="0 0 1040 1528"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="ext-1-extension-points-title ext-1-extension-points-desc"
@@ -81,7 +81,8 @@
           variants and the declared Hexa Fill implement them, one package each, and each declares
           its own open GameId. The lines start on classes: LinesFactory implements IVariantFactory,
           LinesRules extends BaseGameRules and MergeScoring implements IScoringPolicy, one line per
-          kind for every variant. No line touches a frame or a package.
+          kind for every variant. No line touches a frame or a package. «Sprint N» marks the planned
+          classes and members that the code does not have yet, with their sprint.
         </desc>
         <defs>
           <marker
@@ -409,7 +410,7 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.12em"
         >
-          «Concrete Strategy» · ONE PER VARIANT
+          «Concrete Strategy» · ONE PER VARIANT · «Sprint 3»
         </text>
         <text x="60" y="94" fill="#17212a" font-size="9.5" font-family="'IBM Plex Mono', monospace">
           LinesCellRenderer
@@ -460,7 +461,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Strategy» · D3
+          «interface» «Strategy» · D3 · «Sprint 3»
         </text>
         <text
           x="520.0"
@@ -548,7 +549,7 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.12em"
         >
-          «Concrete Strategy» · ONE PER VARIANT
+          «Concrete Strategy» · ONE PER VARIANT · «Sprint 3»
         </text>
         <text
           x="60"
@@ -605,7 +606,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Strategy» · §3.4
+          «interface» «Strategy» · §3.4 «Sprint 3»
         </text>
         <text
           x="520.0"
@@ -841,7 +842,7 @@
           resolution: Resolution&lt;TState&gt;): number
         </text>
         <text x="736" y="430" fill="#7d8a94" font-size="9" font-family="'IBM Plex Mono', monospace">
-          ScoringDecorator adds bonuses
+          ScoringDecorator adds bonuses «Sprint 2»
         </text>
         <rect
           x="936"
@@ -868,7 +869,7 @@
         <rect
           x="64"
           y="484"
-          width="256"
+          width="304"
           height="168"
           rx="6"
           fill="#ffffff"
@@ -876,7 +877,7 @@
           stroke-width="1"
         />
         <text
-          x="192.0"
+          x="216.0"
           y="502"
           fill="#5b6873"
           font-size="8"
@@ -884,10 +885,10 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Abstract Factory» · §3.3
+          «interface» «Abstract Factory» · §3.3 · «Sprint 2»
         </text>
         <text
-          x="192.0"
+          x="216.0"
           y="520"
           fill="#17212a"
           font-size="12"
@@ -897,7 +898,7 @@
         >
           IVariantFactory
         </text>
-        <line x1="64" y1="532" x2="320" y2="532" stroke="#17212a" stroke-width="1" />
+        <line x1="64" y1="532" x2="368" y2="532" stroke="#17212a" stroke-width="1" />
         <text x="80" y="548" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createRules(): IGameRules
         </text>
@@ -908,7 +909,7 @@
           + createScoring(): IScoringPolicy
         </text>
         <text x="80" y="596" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + createBoard(): Board
+          + createBoard(): Board&lt;TCell, TCoord, string&gt;
         </text>
         <text x="80" y="612" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createProgressModel(): IProgressModel
@@ -917,10 +918,10 @@
           + createInitialState(): TState
         </text>
         <text x="80" y="644" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + createHistory(): MoveHistory [0..1]
+          + createHistory(): MoveHistory [0..1] «Sprint 3»
         </text>
         <rect
-          x="180"
+          x="228"
           y="474"
           width="156"
           height="18"
@@ -931,7 +932,7 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="258"
+          x="306"
           y="486"
           fill="#5b6873"
           font-size="8.5"
@@ -983,7 +984,7 @@
           - scoring: IScoringPolicy
         </text>
         <text x="408" y="582" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - history: MoveHistory [0..1]
+          - history: MoveHistory [0..1] «Sprint 3»
         </text>
         <text x="408" y="598" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           + play(move: TMove): Outcome
@@ -1098,7 +1099,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Builder» · §3.3
+          «interface» «Builder» · §3.3 · «Sprint 3»
         </text>
         <text
           x="192.0"
@@ -1191,9 +1192,9 @@
           TState: a BoardState‹TCell, TCoord›
         </text>
         <rect
-          x="720"
+          x="680"
           y="668"
-          width="256"
+          width="296"
           height="112"
           rx="6"
           fill="#ffffff"
@@ -1201,7 +1202,7 @@
           stroke-width="1"
         />
         <text
-          x="848.0"
+          x="828.0"
           y="686"
           fill="#5b6873"
           font-size="8"
@@ -1212,7 +1213,7 @@
           «interface» «Strategy» · §3.1
         </text>
         <text
-          x="848.0"
+          x="828.0"
           y="704"
           fill="#17212a"
           font-size="12"
@@ -1222,15 +1223,15 @@
         >
           IProgressModel
         </text>
-        <line x1="720" y1="716" x2="976" y2="716" stroke="#17212a" stroke-width="1" />
-        <text x="736" y="734" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="680" y1="716" x2="976" y2="716" stroke="#17212a" stroke-width="1" />
+        <text x="696" y="734" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           + record(result: GameResult):
         </text>
-        <text x="752" y="750" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="712" y="750" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           ProgressRecord
         </text>
-        <text x="736" y="766" fill="#7d8a94" font-size="9" font-family="'IBM Plex Mono', monospace">
-          HighScoreProgress or LevelProgress
+        <text x="696" y="766" fill="#7d8a94" font-size="9" font-family="'IBM Plex Mono', monospace">
+          HighScoreProgress, LevelProgress «Sprint 3»
         </text>
         <!-- Row 4: the optional capability interfaces -->
         <rect
@@ -1252,7 +1253,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface»
+          «interface» «Sprint 3»
         </text>
         <text
           x="184.0"
@@ -1294,7 +1295,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface»
+          «interface» «Sprint 3»
         </text>
         <text
           x="408.0"
@@ -1336,7 +1337,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface»
+          «interface» «Sprint 3»
         </text>
         <text
           x="632.0"
@@ -1433,7 +1434,7 @@
           Hexa Lines
         </text>
         <text x="80" y="1066" fill="#5b6873" font-size="8" font-family="'IBM Plex Mono', monospace">
-          hexa-lines/ · §1.1
+          hexa-lines/ · §1.1 «Sprint 2»
         </text>
         <line x1="68" y1="1076" x2="236" y2="1076" stroke="rgba(23,33,42,0.25)" stroke-width="1" />
         <text
@@ -1545,7 +1546,7 @@
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
         >
-          hexa-fit/ · §1.2
+          hexa-fit/ · §1.2 «Sprint 2»
         </text>
         <line x1="252" y1="1076" x2="420" y2="1076" stroke="rgba(23,33,42,0.25)" stroke-width="1" />
         <text
@@ -1657,7 +1658,7 @@
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
         >
-          hexa-sort/ · §1.3
+          hexa-sort/ · §1.3 «Sprint 2»
         </text>
         <line x1="436" y1="1076" x2="604" y2="1076" stroke="rgba(23,33,42,0.25)" stroke-width="1" />
         <text
@@ -1778,7 +1779,7 @@
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
         >
-          hexa-merge/ · §1.4
+          hexa-merge/ · §1.4 «Sprint 2»
         </text>
         <line x1="620" y1="1076" x2="788" y2="1076" stroke="rgba(23,33,42,0.25)" stroke-width="1" />
         <text
@@ -1996,7 +1997,7 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           This view abbreviates: members drop their type arguments (IGameRules for IGameRules‹TMove,
-          TState›), IVariantFactory leaves out gameId,
+          TState›) except createBoard(), IVariantFactory leaves out gameId,
         </text>
         <text
           x="24"
@@ -2313,6 +2314,25 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Dashed box · declared, no class yet
+        </text>
+        <text
+          x="24"
+          y="1512"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          «Sprint N»
+        </text>
+        <text
+          x="92"
+          y="1512"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Planned design, not in the code yet · N is its sprint in docs/ROADMAP.md · a planned class
+          carries it once, for its members and arrows
         </text>
       </svg>
     </div>

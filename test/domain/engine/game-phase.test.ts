@@ -40,6 +40,12 @@ describe('GamePhase', () => {
     expect(paused.resume()).toBe(PlayingPhase.instance);
   });
 
+  // A turn that resolves cannot pause: the phase stays resolving until the outcome arrives.
+  it('should_stay_resolving_when_a_resolving_turn_is_paused', () => {
+    expect(ResolvingPhase.instance.pause()).toBe(ResolvingPhase.instance);
+    expect(ResolvingPhase.instance.resume()).toBe(ResolvingPhase.instance);
+  });
+
   it('should_stay_ended_when_an_ended_game_is_paused_or_resumed', () => {
     expect(GameOverPhase.instance.pause()).toBe(GameOverPhase.instance);
     expect(VictoryPhase.instance.resume()).toBe(VictoryPhase.instance);
@@ -47,7 +53,10 @@ describe('GamePhase', () => {
 
   it('should_name_each_phase_when_the_name_is_read', () => {
     expect(PlayingPhase.instance.name).toBe('playing');
+    expect(ResolvingPhase.instance.name).toBe('resolving');
+    expect(PausedPhase.instance.name).toBe('paused');
     expect(GameOverPhase.instance.name).toBe('game-over');
+    expect(VictoryPhase.instance.name).toBe('victory');
   });
 });
 
@@ -58,6 +67,37 @@ describe('GameId', () => {
 
   it('should_throw_when_the_id_is_empty', () => {
     expect(() => GameId.of('  ')).toThrow('empty');
+  });
+
+  it('should_throw_a_range_error_when_the_id_is_not_a_lowercase_kebab_case_slug', () => {
+    const invalid = [
+      'Hexa Fit',
+      'hexa\tfit',
+      'Hexa-Fit',
+      '\thexa-fit',
+      'hexa_fit',
+      'hexa--fit',
+      '-hexa',
+    ];
+
+    for (const value of invalid) {
+      expect(() => GameId.of(value)).toThrow(RangeError);
+      expect(() => GameId.of(value)).toThrow('lowercase kebab-case');
+    }
+  });
+
+  it('should_keep_the_value_when_the_id_is_a_lowercase_kebab_case_slug', () => {
+    const valid = [
+      'hexa-lines',
+      'hexa-fit',
+      'hexa-sort',
+      'hexa-merge',
+      'hexa-fill',
+      'fake-game',
+      'game2',
+    ];
+
+    expect(valid.map((value) => GameId.of(value).value)).toEqual(valid);
   });
 
   it('should_be_equal_when_two_ids_hold_the_same_value', () => {

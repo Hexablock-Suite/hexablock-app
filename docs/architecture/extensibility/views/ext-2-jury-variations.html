@@ -63,7 +63,7 @@
       <p class="eyebrow">Extensibility diagram · View 2 · Statement §3.1</p>
       <h1>The three jury variations: new data or classes, same engine</h1>
       <svg
-        viewBox="0 0 1040 736"
+        viewBox="0 0 1040 772"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="ext-2-jury-variations-title ext-2-jury-variations-desc"
@@ -75,7 +75,8 @@
           Three columns, one per jury variation of statement §3.1. A new board size is configuration
           data passed to BoardBuilder.withRegion(size). A new scoring policy is a class that
           implements IScoringPolicy or extends ScoringDecorator. A new piece shape is data, a
-          ShapeGroup of CellNode cells. Below them, GameEngine does not change.
+          ShapeGroup of CellNode cells. Below them, GameEngine does not change. BoardBuilder and
+          ScoringDecorator are planned for Sprint 2.
         </desc>
         <defs>
           <marker
@@ -134,7 +135,7 @@
           x="24"
           y="24"
           width="992"
-          height="512"
+          height="528"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -155,7 +156,7 @@
           x="48"
           y="64"
           width="288"
-          height="308"
+          height="324"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -177,7 +178,7 @@
           x="376"
           y="64"
           width="288"
-          height="308"
+          height="324"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -199,7 +200,7 @@
           x="704"
           y="64"
           width="288"
-          height="308"
+          height="324"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -219,7 +220,7 @@
         </text>
         <rect
           x="48"
-          y="380"
+          y="396"
           width="944"
           height="132"
           rx="8"
@@ -230,7 +231,7 @@
         />
         <text
           x="60"
-          y="396"
+          y="412"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -400,7 +401,7 @@
           implements IScoringPolicy
         </text>
         <text x="408" y="182" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          or extends ScoringDecorator
+          or a ScoringDecorator «Sprint 2»
         </text>
         <text x="408" y="198" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           in src/domain/variants/
@@ -462,7 +463,7 @@
           x="64"
           y="252"
           width="240"
-          height="104"
+          height="120"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -477,7 +478,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «Builder» «DDD factory» · D9
+          «Builder» «DDD factory» · D9 «Sprint 2»
         </text>
         <text
           x="184.0"
@@ -492,13 +493,16 @@
         </text>
         <line x1="64" y1="300" x2="304" y2="300" stroke="#17212a" stroke-width="1" />
         <text x="80" y="318" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + withRegion(size: number):
+          + withRegion(size: RegionSize):
         </text>
         <text x="96" y="334" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           BoardBuilder&lt;TCoord&gt;
         </text>
         <text x="80" y="350" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + build&lt;TCell&gt;(): Board&lt;TCell, TCoord&gt;
+          + build&lt;TCell&gt;():
+        </text>
+        <text x="96" y="366" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Board&lt;TCell, TCoord, string&gt;
         </text>
         <rect
           x="264"
@@ -648,10 +652,10 @@
           TCoord
         </text>
         <!-- Class: GameEngine (focal), unchanged by the three changes -->
-        <rect x="64" y="412" width="904" height="84" rx="6" fill="#f9f4dc" />
+        <rect x="64" y="428" width="904" height="84" rx="6" fill="#f9f4dc" />
         <rect
           x="64"
-          y="412"
+          y="428"
           width="904"
           height="84"
           rx="6"
@@ -659,12 +663,12 @@
           stroke="#0f6f74"
           stroke-width="1"
         />
-        <rect x="64" y="412" width="904" height="28" rx="6" fill="rgba(15,111,116,0.10)" />
-        <rect x="64" y="432" width="904" height="8" fill="rgba(15,111,116,0.10)" />
-        <line x1="64" y1="440" x2="968" y2="440" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <rect x="64" y="428" width="904" height="28" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="64" y="448" width="904" height="8" fill="rgba(15,111,116,0.10)" />
+        <line x1="64" y1="456" x2="968" y2="456" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text
           x="80"
-          y="431"
+          y="447"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -674,7 +678,7 @@
         </text>
         <text
           x="176"
-          y="430"
+          y="446"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -684,7 +688,7 @@
         </text>
         <rect
           x="828"
-          y="402"
+          y="418"
           width="156"
           height="18"
           rx="2"
@@ -695,7 +699,7 @@
         />
         <text
           x="906"
-          y="414"
+          y="430"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -703,27 +707,27 @@
         >
           TCell, TCoord, TMove, TState
         </text>
-        <text x="80" y="462" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="478" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           Board, GridTopology and
         </text>
-        <text x="80" y="478" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="494" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           GameEngine stay the same
         </text>
-        <text x="408" y="462" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="408" y="478" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           GameEngine calls score()
         </text>
-        <text x="408" y="478" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="408" y="494" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           on IScoringPolicy, as before
         </text>
-        <text x="736" y="462" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="736" y="478" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           Piece, IPieceSource and
         </text>
-        <text x="736" y="478" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="736" y="494" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           GameEngine stay the same
         </text>
         <text
           x="24"
-          y="564"
+          y="580"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -733,7 +737,7 @@
         </text>
         <text
           x="24"
-          y="580"
+          y="596"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -743,7 +747,7 @@
         </text>
         <text
           x="24"
-          y="596"
+          y="612"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -753,7 +757,7 @@
         </text>
         <text
           x="24"
-          y="612"
+          y="628"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -763,7 +767,7 @@
         </text>
         <text
           x="24"
-          y="628"
+          y="644"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -772,10 +776,10 @@
           no engine file.
         </text>
         <!-- Legend -->
-        <line x1="24" y1="652" x2="1016" y2="652" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <line x1="24" y1="668" x2="1016" y2="668" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="670"
+          y="686"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -785,9 +789,9 @@
         </text>
         <line
           x1="24"
-          y1="692"
+          y1="708"
           x2="52"
-          y2="692"
+          y2="708"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -795,7 +799,7 @@
         />
         <text
           x="60"
-          y="696"
+          y="712"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -804,16 +808,16 @@
         </text>
         <line
           x1="144"
-          y1="692"
+          y1="708"
           x2="172"
-          y2="692"
+          y2="708"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#ext2-open)"
         />
         <text
           x="180"
-          y="696"
+          y="712"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -822,7 +826,7 @@
         </text>
         <rect
           x="560"
-          y="710"
+          y="726"
           width="28"
           height="12"
           rx="2"
@@ -832,7 +836,7 @@
         />
         <text
           x="596"
-          y="719"
+          y="735"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -841,7 +845,7 @@
         </text>
         <rect
           x="688"
-          y="710"
+          y="726"
           width="28"
           height="12"
           rx="2"
@@ -852,7 +856,7 @@
         />
         <text
           x="724"
-          y="719"
+          y="735"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -861,7 +865,7 @@
         </text>
         <rect
           x="24"
-          y="710"
+          y="726"
           width="28"
           height="12"
           rx="2"
@@ -872,7 +876,7 @@
         />
         <text
           x="60"
-          y="719"
+          y="735"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -881,7 +885,7 @@
         </text>
         <rect
           x="216"
-          y="710"
+          y="726"
           width="28"
           height="12"
           rx="2"
@@ -892,7 +896,7 @@
         />
         <text
           x="252"
-          y="719"
+          y="735"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -901,7 +905,7 @@
         </text>
         <rect
           x="416"
-          y="710"
+          y="726"
           width="28"
           height="12"
           rx="2"
@@ -911,12 +915,31 @@
         />
         <text
           x="452"
-          y="719"
+          y="735"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
+        </text>
+        <text
+          x="24"
+          y="756"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          «Sprint N»
+        </text>
+        <text
+          x="92"
+          y="756"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Planned design, not in the code yet · N is its sprint in docs/ROADMAP.md · a planned class
+          carries it once, for its members and arrows
         </text>
       </svg>
     </div>

@@ -64,7 +64,7 @@
       <h1>Piece sources, scoring and progress: Strategy and Decorator</h1>
 
       <svg
-        viewBox="0 0 1040 728"
+        viewBox="0 0 1040 1024"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="sources-title sources-desc"
@@ -73,9 +73,12 @@
           HexaBlock piece sources, scoring and progress · UML class diagram
         </title>
         <desc id="sources-desc">
-          Class diagram of layer 1 showing the IPieceSource strategy and iterator with its seeded
-          and fixed-list implementations, the IScoringPolicy strategy wrapped by the abstract
-          ScoringDecorator, and the IProgressModel strategy that records a GameResult.
+          Class diagram of layer 1 showing the IPieceSource strategy, iterator and prototype with
+          its seeded and fixed-list implementations, each with a clone() that copies its position,
+          SeededPieceSource keeping the Mulberry32Random random source that it builds from its seed
+          and clones, the IScoringPolicy strategy wrapped by the abstract ScoringDecorator planned
+          for Sprint 2, and the IProgressModel strategy that records a GameResult and returns a
+          ProgressRecord.
         </desc>
         <defs>
           <marker
@@ -136,7 +139,7 @@
           x="24"
           y="24"
           width="992"
-          height="556"
+          height="816"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -158,8 +161,8 @@
         <rect
           x="52"
           y="64"
-          width="504"
-          height="284"
+          width="524"
+          height="460"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -175,7 +178,7 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.14em"
         >
-          STRATEGY · ITERATOR · §3.3 · §1.5
+          STRATEGY · ITERATOR · PROTOTYPE · §3.3 · §1.5
         </text>
 
         <rect
@@ -203,9 +206,9 @@
 
         <rect
           x="216"
-          y="372"
+          y="548"
           width="608"
-          height="180"
+          height="276"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -214,7 +217,7 @@
         />
         <text
           x="228"
-          y="388"
+          y="564"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -230,7 +233,7 @@
           x1="256"
           y1="228"
           x2="256"
-          y2="196"
+          y2="212"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -241,7 +244,7 @@
           x1="380"
           y1="228"
           x2="380"
-          y2="196"
+          y2="212"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -271,9 +274,9 @@
         <!-- IProgressModel records a GameResult: use -->
         <line
           x1="512"
-          y1="436"
+          y1="612"
           x2="608"
-          y2="436"
+          y2="612"
           stroke-width="1"
           marker-end="url(#sources-open)"
           stroke="#5b6873"
@@ -292,10 +295,10 @@
         >
           inner
         </text>
-        <rect x="538" y="416" width="44" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="538" y="592" width="44" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="560"
-          y="425"
+          y="601"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -320,9 +323,9 @@
         </text>
 
         <!-- Lollipop: SeededPieceSource implements IRandomSeeded -->
-        <line x1="100" y1="308" x2="100" y2="324" stroke="#17212a" stroke-width="1" />
-        <circle cx="100" cy="329" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="112" y="332" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="100" y1="340" x2="100" y2="352" stroke="#17212a" stroke-width="1" />
+        <circle cx="100" cy="357" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="112" y="360" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           IRandomSeeded
         </text>
 
@@ -331,7 +334,7 @@
           x="176"
           y="92"
           width="264"
-          height="104"
+          height="120"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -369,21 +372,24 @@
         <text x="192" y="188" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + [Symbol.iterator](): Iterator&lt;TPiece&gt;
         </text>
+        <text x="192" y="204" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + clone(): IPieceSource&lt;TPiece&gt;
+        </text>
 
         <!-- Class: SeededPieceSource -->
         <rect
           x="68"
           y="228"
-          width="248"
-          height="80"
+          width="264"
+          height="112"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="68" y1="268" x2="316" y2="268" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="68" y1="268" x2="332" y2="268" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="192"
+          x="200"
           y="253"
           fill="#17212a"
           font-size="12"
@@ -394,26 +400,32 @@
           SeededPieceSource
         </text>
         <text x="84" y="284" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - random: RandomSource
+          + seed: number
         </text>
         <text x="84" y="300" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - random: RandomSource
+        </text>
+        <text x="84" y="316" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - draw: (random: RandomSource) =&gt; TPiece
+        </text>
+        <text x="84" y="332" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + clone(): SeededPieceSource
         </text>
 
         <!-- Class: FixedListPieceSource -->
         <rect
-          x="356"
+          x="344"
           y="228"
-          width="184"
-          height="64"
+          width="216"
+          height="96"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="356" y1="268" x2="540" y2="268" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="344" y1="268" x2="560" y2="268" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="448"
+          x="452"
           y="253"
           fill="#17212a"
           font-size="12"
@@ -423,22 +435,28 @@
         >
           FixedListPieceSource
         </text>
-        <text x="372" y="284" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="360" y="284" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - pieces: TPiece[]
+        </text>
+        <text x="360" y="300" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - index: number
+        </text>
+        <text x="360" y="316" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + clone(): FixedListPieceSource
         </text>
 
         <!-- Class: IScoringPolicy (interface, strategy) -->
         <rect
-          x="596"
+          x="588"
           y="92"
-          width="376"
+          width="396"
           height="72"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="596" y1="140" x2="972" y2="140" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="588" y1="140" x2="984" y2="140" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="784"
           y="110"
@@ -461,7 +479,7 @@
         >
           IScoringPolicy
         </text>
-        <text x="612" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="600" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + score(before: TState, resolution: Resolution&lt;TState&gt;): number
         </text>
 
@@ -488,7 +506,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «abstract» «Decorator»
+          «abstract» «Decorator» «Sprint 2»
         </text>
         <text
           x="784"
@@ -509,7 +527,7 @@
         <!-- Class: IProgressModel (interface, strategy) -->
         <rect
           x="232"
-          y="400"
+          y="576"
           width="280"
           height="72"
           rx="6"
@@ -517,10 +535,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="232" y1="448" x2="512" y2="448" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="232" y1="624" x2="512" y2="624" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="372"
-          y="418"
+          y="594"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -531,7 +549,7 @@
         </text>
         <text
           x="372"
-          y="436"
+          y="612"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -540,14 +558,163 @@
         >
           IProgressModel
         </text>
-        <text x="248" y="464" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="248" y="640" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + record(result: GameResult): ProgressRecord
+        </text>
+
+        <!-- SeededPieceSource keeps the Mulberry32Random it creates as random: use -->
+        <line
+          x1="256"
+          y1="340"
+          x2="256"
+          y2="376"
+          stroke-width="1"
+          marker-end="url(#sources-open)"
+          stroke="#5b6873"
+        />
+        <rect x="262" y="350" width="40" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="282"
+          y="359"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          random
+        </text>
+        <rect x="236" y="352" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="242"
+          y="361"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          1
+        </text>
+
+        <!-- Class: Mulberry32Random -->
+        <rect
+          x="68"
+          y="376"
+          width="264"
+          height="120"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="68" y1="416" x2="332" y2="416" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="68" y1="440" x2="332" y2="440" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="200"
+          y="401"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          Mulberry32Random
+        </text>
+        <text x="84" y="432" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - state: number
+        </text>
+        <text x="84" y="456" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + constructor(seed: number)
+        </text>
+        <text x="84" y="472" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + next(): number
+        </text>
+        <text x="84" y="488" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + clone(): Mulberry32Random
+        </text>
+
+        <!-- Lollipop: Mulberry32Random implements RandomSource -->
+        <line x1="100" y1="496" x2="100" y2="506" stroke="#17212a" stroke-width="1" />
+        <circle cx="100" cy="511" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="112" y="514" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          RandomSource
+        </text>
+
+        <!-- IProgressModel returns a ProgressRecord: use -->
+        <line
+          x1="372"
+          y1="648"
+          x2="372"
+          y2="688"
+          stroke-width="1"
+          marker-end="url(#sources-open)"
+          stroke="#5b6873"
+        />
+        <rect x="378" y="662" width="48" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="402"
+          y="671"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          RETURNS
+        </text>
+
+        <!-- Class: ProgressRecord (value object) -->
+        <rect
+          x="232"
+          y="688"
+          width="280"
+          height="120"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="232" y1="736" x2="512" y2="736" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="372"
+          y="706"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="372"
+          y="724"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          ProgressRecord
+        </text>
+        <text x="248" y="752" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + gameId: GameId
+        </text>
+        <text x="248" y="768" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + score: number
+        </text>
+        <text x="248" y="784" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + levelId: string [0..1]
+        </text>
+        <text x="248" y="800" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + stars: number [0..1]
         </text>
 
         <!-- Class: GameResult (value object) -->
         <rect
           x="608"
-          y="400"
+          y="576"
           width="200"
           height="136"
           rx="6"
@@ -555,10 +722,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="608" y1="448" x2="808" y2="448" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="608" y1="624" x2="808" y2="624" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="708"
-          y="418"
+          y="594"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -569,7 +736,7 @@
         </text>
         <text
           x="708"
-          y="436"
+          y="612"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -578,19 +745,19 @@
         >
           GameResult
         </text>
-        <text x="624" y="464" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="624" y="640" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + gameId: GameId
         </text>
-        <text x="624" y="480" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="624" y="656" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + levelId: string [0..1]
         </text>
-        <text x="624" y="496" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="624" y="672" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + score: number
         </text>
-        <text x="624" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="624" y="688" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + moves: number
         </text>
-        <text x="624" y="528" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="624" y="704" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + elapsedMs: number [0..1]
         </text>
 
@@ -617,7 +784,7 @@
           TPiece
         </text>
         <rect
-          x="280"
+          x="296"
           y="218"
           width="48"
           height="18"
@@ -628,7 +795,7 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="304"
+          x="320"
           y="230"
           fill="#5b6873"
           font-size="8.5"
@@ -638,7 +805,7 @@
           TPiece
         </text>
         <rect
-          x="504"
+          x="524"
           y="218"
           width="48"
           height="18"
@@ -649,7 +816,7 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="528"
+          x="548"
           y="230"
           fill="#5b6873"
           font-size="8.5"
@@ -704,30 +871,41 @@
         <!-- Footnote: classes the budget leaves out -->
         <text
           x="24"
-          y="604"
+          y="868"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          IProgressModel implementations: HighScoreProgress (Lines, Merge) and LevelProgress (Fit
-          with stars, Sort).
+          A variant state holds its piece source, and the state clone() clones it, so the rollback
+          of a turn covers the source (decision 31). No clone() replays the draws.
         </text>
         <text
           x="24"
-          y="620"
+          y="884"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          SeededPieceSource reads randomness from the RandomSource interface (§1.4, APP-NFR-07).
-          Lines adds ComboMultiplierDecorator over ScoringDecorator.
+          SeededPieceSource builds a Mulberry32Random from its seed (§1.4, APP-NFR-07). RandomSource
+          extends Cloneable, so Mulberry32Random.clone() copies the generator state.
+        </text>
+
+        <text
+          x="24"
+          y="900"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Planned: ComboMultiplierDecorator for Lines «Sprint 2»; IProgressModel implementations
+          HighScoreProgress (Lines, Merge) and LevelProgress (Fit with stars, Sort) «Sprint 3».
         </text>
 
         <!-- Legend -->
-        <line x1="24" y1="640" x2="1016" y2="640" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <line x1="24" y1="920" x2="1016" y2="920" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="658"
+          y="938"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -738,9 +916,9 @@
 
         <line
           x1="24"
-          y1="676"
+          y1="956"
           x2="52"
-          y2="676"
+          y2="956"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -748,7 +926,7 @@
         />
         <text
           x="60"
-          y="680"
+          y="960"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -757,16 +935,16 @@
         </text>
         <line
           x1="144"
-          y1="676"
+          y1="956"
           x2="172"
-          y2="676"
+          y2="956"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#sources-diamond-hollow)"
         />
         <text
           x="180"
-          y="680"
+          y="960"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -775,16 +953,16 @@
         </text>
         <line
           x1="384"
-          y1="676"
+          y1="956"
           x2="412"
-          y2="676"
+          y2="956"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#sources-open)"
         />
         <text
           x="420"
-          y="680"
+          y="960"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -793,7 +971,7 @@
         </text>
         <rect
           x="24"
-          y="696"
+          y="976"
           width="28"
           height="12"
           rx="2"
@@ -803,7 +981,7 @@
         />
         <text
           x="60"
-          y="705"
+          y="985"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -812,7 +990,7 @@
         </text>
         <rect
           x="184"
-          y="696"
+          y="976"
           width="28"
           height="12"
           rx="2"
@@ -823,7 +1001,7 @@
         />
         <text
           x="220"
-          y="705"
+          y="985"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -832,7 +1010,7 @@
         </text>
         <rect
           x="424"
-          y="696"
+          y="976"
           width="28"
           height="12"
           rx="2"
@@ -843,7 +1021,7 @@
         />
         <text
           x="460"
-          y="705"
+          y="985"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -852,7 +1030,7 @@
         </text>
         <rect
           x="600"
-          y="696"
+          y="976"
           width="28"
           height="12"
           rx="2"
@@ -862,23 +1040,42 @@
         />
         <text
           x="636"
-          y="705"
+          y="985"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
         </text>
-        <line x1="776" y1="702" x2="792" y2="702" stroke="#17212a" stroke-width="1" />
-        <circle cx="797" cy="702" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="776" y1="982" x2="792" y2="982" stroke="#17212a" stroke-width="1" />
+        <circle cx="797" cy="982" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="812"
-          y="705"
+          y="985"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Lollipop · engine interface
+        </text>
+        <text
+          x="24"
+          y="1008"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          «Sprint N»
+        </text>
+        <text
+          x="92"
+          y="1008"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Planned design, not in the code yet · N is its sprint in docs/ROADMAP.md · a planned class
+          carries it once, for its members and arrows
         </text>
       </svg>
     </div>
