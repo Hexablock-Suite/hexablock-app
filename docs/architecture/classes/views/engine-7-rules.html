@@ -272,7 +272,7 @@
           x1="360"
           y1="552"
           x2="360"
-          y2="488"
+          y2="520"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#rules-triangle)"
@@ -282,7 +282,7 @@
           x1="552"
           y1="552"
           x2="552"
-          y2="488"
+          y2="520"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#rules-triangle)"
@@ -421,7 +421,7 @@
           x="284"
           y="336"
           width="352"
-          height="152"
+          height="184"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -491,7 +491,7 @@
           font-family="'IBM Plex Mono', monospace"
           font-style="italic"
         >
-          + apply(state: TState, move: TMove): TState
+          + validMoves(state: TState): Iterable&lt;TMove&gt;
         </text>
         <text
           x="300"
@@ -501,7 +501,7 @@
           font-family="'IBM Plex Mono', monospace"
           font-style="italic"
         >
-          + resolve(state: TState): Resolution&lt;TState&gt;
+          + apply(state: TState, move: TMove): TState
         </text>
         <text
           x="300"
@@ -511,7 +511,20 @@
           font-family="'IBM Plex Mono', monospace"
           font-style="italic"
         >
+          + resolve(state: TState): Resolution&lt;TState&gt;
+        </text>
+        <text
+          x="300"
+          y="496"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          font-style="italic"
+        >
           + evaluate(state: TState): Outcome
+        </text>
+        <text x="300" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          # noValidMove(state: TState): boolean
         </text>
         <!-- Class: TimedRulesDecorator (decorator) -->
         <rect

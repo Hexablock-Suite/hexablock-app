@@ -64,14 +64,14 @@
       <h1>The generic engine at a glance</h1>
 
       <svg
-        viewBox="0 0 1040 1330"
+        viewBox="0 0 1040 1480"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="ovengine-title ovengine-desc"
       >
         <title id="ovengine-title">HexaBlock generic engine map · UML class diagram</title>
         <desc id="ovengine-desc">
-          Overview map of the 58 layer 1 engine classes in 14 groups. Each line joins two classes:
+          Overview map of the 63 layer 1 engine classes in 14 groups. Each line joins two classes:
           GameEngine keeps its GamePhase, its optional MoveHistory and its IScoringPolicy and
           notifies through GameEventPublisher, BoardState keeps its Board, IVariantFactory creates
           the IGameRules, BoardShape builds from a ShapeNode and GeometryFactory creates the piece
@@ -136,7 +136,7 @@
           x="24"
           y="24"
           width="992"
-          height="1198"
+          height="1348"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -358,7 +358,7 @@
           x="56"
           y="592"
           width="288"
-          height="178"
+          height="278"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -461,7 +461,7 @@
         <!-- Group: pieces -->
         <rect
           x="56"
-          y="844"
+          y="944"
           width="288"
           height="178"
           rx="8"
@@ -472,7 +472,7 @@
         />
         <text
           x="68"
-          y="860"
+          y="960"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -483,7 +483,7 @@
         </text>
         <text
           x="332"
-          y="860"
+          y="960"
           fill="#1d4ed8"
           font-size="8"
           font-weight="500"
@@ -496,9 +496,9 @@
         <!-- Group: sources -->
         <rect
           x="416"
-          y="844"
+          y="944"
           width="224"
-          height="178"
+          height="228"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -507,7 +507,7 @@
         />
         <text
           x="428"
-          y="860"
+          y="960"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -518,7 +518,7 @@
         </text>
         <text
           x="628"
-          y="860"
+          y="960"
           fill="#1d4ed8"
           font-size="8"
           font-weight="500"
@@ -531,7 +531,7 @@
         <!-- Group: capabilities -->
         <rect
           x="712"
-          y="844"
+          y="944"
           width="272"
           height="178"
           rx="8"
@@ -542,7 +542,7 @@
         />
         <text
           x="724"
-          y="860"
+          y="960"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -553,7 +553,7 @@
         </text>
         <text
           x="972"
-          y="860"
+          y="960"
           fill="#1d4ed8"
           font-size="8"
           font-weight="500"
@@ -648,9 +648,9 @@
           stroke-width="1"
           marker-end="url(#ovengine-open)"
         />
-        <!-- BoardShape builds from a ShapeNode in fromShape(): use with a verb (view 2) -->
+        <!-- BoardShape builds from a ShapeNode: use with a verb (view 2) -->
         <path
-          d="M324,737 L356,737 L356,989 L336,989"
+          d="M324,737 L356,737 L356,1089 L336,1089"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -658,7 +658,7 @@
         />
         <!-- GeometryFactory creates the ShapeNode piece shapes in createPieceShapes(): use with a verb (view 6) -->
         <path
-          d="M320,1098 L320,1006"
+          d="M320,1248 L320,1106"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -738,10 +738,10 @@
         >
           CREATES
         </text>
-        <rect x="362" y="826" width="66" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="362" y="926" width="66" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="395"
-          y="835"
+          y="935"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -750,10 +750,10 @@
         >
           BUILDS FROM
         </text>
-        <rect x="326" y="1040" width="44" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="326" y="1140" width="44" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="348"
-          y="1049"
+          y="1149"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1201,6 +1201,119 @@
             </tspan>
           </text>
         </g>
+        <g data-class="Radius">
+          <rect
+            x="76"
+            y="770"
+            width="120"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="136"
+            y="782"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="136" y="795" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              Radius
+            </tspan>
+          </text>
+        </g>
+        <g data-class="RegionSize">
+          <rect
+            x="204"
+            y="770"
+            width="120"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="264"
+            y="782"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="264" y="795" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              RegionSize
+            </tspan>
+          </text>
+        </g>
+        <g data-class="Turns">
+          <rect
+            x="76"
+            y="820"
+            width="120"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="136"
+            y="832"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="136" y="845" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              Turns
+            </tspan>
+          </text>
+        </g>
+        <g data-class="CoordKey">
+          <rect
+            x="204"
+            y="820"
+            width="120"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="264"
+            y="832"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            branded string
+          </text>
+          <text x="264" y="845" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              CoordKey
+            </tspan>
+          </text>
+        </g>
+
         <!-- Chips: scoring -->
         <g data-class="IScoringPolicy">
           <rect
@@ -1437,7 +1550,7 @@
         <g data-class="ShapeNode">
           <rect
             x="204"
-            y="972"
+            y="1072"
             width="132"
             height="34"
             rx="4"
@@ -1447,7 +1560,7 @@
           />
           <text
             x="270"
-            y="984"
+            y="1084"
             fill="#5b6873"
             font-size="7"
             font-family="'IBM Plex Mono', monospace"
@@ -1456,7 +1569,7 @@
           >
             interface
           </text>
-          <text x="270" y="997" fill="#17212a" text-anchor="middle">
+          <text x="270" y="1097" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               ShapeNode
             </tspan>
@@ -1465,7 +1578,7 @@
         <g data-class="CellNode">
           <rect
             x="68"
-            y="872"
+            y="972"
             width="132"
             height="34"
             rx="4"
@@ -1473,7 +1586,7 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="134" y="893" fill="#17212a" text-anchor="middle">
+          <text x="134" y="993" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               CellNode
             </tspan>
@@ -1482,7 +1595,7 @@
         <g data-class="ShapeGroup">
           <rect
             x="204"
-            y="872"
+            y="972"
             width="132"
             height="34"
             rx="4"
@@ -1490,7 +1603,7 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="270" y="893" fill="#17212a" text-anchor="middle">
+          <text x="270" y="993" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               ShapeGroup
             </tspan>
@@ -1499,7 +1612,7 @@
         <g data-class="Piece">
           <rect
             x="68"
-            y="922"
+            y="1022"
             width="132"
             height="34"
             rx="4"
@@ -1507,7 +1620,7 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="134" y="943" fill="#17212a" text-anchor="middle">
+          <text x="134" y="1043" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               Piece
             </tspan>
@@ -1516,7 +1629,7 @@
         <g data-class="Cloneable">
           <rect
             x="204"
-            y="922"
+            y="1022"
             width="132"
             height="34"
             rx="4"
@@ -1526,7 +1639,7 @@
           />
           <text
             x="270"
-            y="934"
+            y="1034"
             fill="#5b6873"
             font-size="7"
             font-family="'IBM Plex Mono', monospace"
@@ -1535,7 +1648,7 @@
           >
             interface
           </text>
-          <text x="270" y="947" fill="#17212a" text-anchor="middle">
+          <text x="270" y="1047" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               Cloneable
             </tspan>
@@ -1545,7 +1658,7 @@
         <g data-class="IPieceSource">
           <rect
             x="438"
-            y="872"
+            y="972"
             width="180"
             height="34"
             rx="4"
@@ -1555,7 +1668,7 @@
           />
           <text
             x="528"
-            y="884"
+            y="984"
             fill="#5b6873"
             font-size="7"
             font-family="'IBM Plex Mono', monospace"
@@ -1564,7 +1677,7 @@
           >
             interface
           </text>
-          <text x="528" y="897" fill="#17212a" text-anchor="middle">
+          <text x="528" y="997" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               IPieceSource
             </tspan>
@@ -1573,7 +1686,7 @@
         <g data-class="SeededPieceSource">
           <rect
             x="438"
-            y="922"
+            y="1022"
             width="180"
             height="34"
             rx="4"
@@ -1581,7 +1694,7 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="528" y="943" fill="#17212a" text-anchor="middle">
+          <text x="528" y="1043" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               SeededPieceSource
             </tspan>
@@ -1590,7 +1703,7 @@
         <g data-class="FixedListPieceSource">
           <rect
             x="438"
-            y="972"
+            y="1072"
             width="180"
             height="34"
             rx="4"
@@ -1598,126 +1711,32 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="528" y="993" fill="#17212a" text-anchor="middle">
+          <text x="528" y="1093" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               FixedListPieceSource
             </tspan>
           </text>
         </g>
+        <g data-class="Mulberry32Random">
+          <rect
+            x="438"
+            y="1122"
+            width="180"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="528" y="1143" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              Mulberry32Random
+            </tspan>
+          </text>
+        </g>
+
         <!-- Chips: capabilities -->
         <g data-class="IUndoable">
-          <rect
-            x="728"
-            y="872"
-            width="112"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text
-            x="784"
-            y="884"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            interface
-          </text>
-          <text x="784" y="897" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              IUndoable
-            </tspan>
-          </text>
-        </g>
-        <g data-class="IRedoable">
-          <rect
-            x="856"
-            y="872"
-            width="112"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text
-            x="912"
-            y="884"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            interface
-          </text>
-          <text x="912" y="897" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              IRedoable
-            </tspan>
-          </text>
-        </g>
-        <g data-class="ITimed">
-          <rect
-            x="728"
-            y="922"
-            width="112"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text
-            x="784"
-            y="934"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            interface
-          </text>
-          <text x="784" y="947" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              ITimed
-            </tspan>
-          </text>
-        </g>
-        <g data-class="IRandomSeeded">
-          <rect
-            x="856"
-            y="922"
-            width="112"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text
-            x="912"
-            y="934"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            interface
-          </text>
-          <text x="912" y="947" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              IRandomSeeded
-            </tspan>
-          </text>
-        </g>
-        <g data-class="IMergeable">
           <rect
             x="728"
             y="972"
@@ -1741,11 +1760,11 @@
           </text>
           <text x="784" y="997" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              IMergeable
+              IUndoable
             </tspan>
           </text>
         </g>
-        <g data-class="LevelTimer">
+        <g data-class="IRedoable">
           <rect
             x="856"
             y="972"
@@ -1756,7 +1775,119 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="912" y="993" fill="#17212a" text-anchor="middle">
+          <text
+            x="912"
+            y="984"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="912" y="997" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              IRedoable
+            </tspan>
+          </text>
+        </g>
+        <g data-class="ITimed">
+          <rect
+            x="728"
+            y="1022"
+            width="112"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="784"
+            y="1034"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="784" y="1047" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              ITimed
+            </tspan>
+          </text>
+        </g>
+        <g data-class="IRandomSeeded">
+          <rect
+            x="856"
+            y="1022"
+            width="112"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="912"
+            y="1034"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="912" y="1047" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              IRandomSeeded
+            </tspan>
+          </text>
+        </g>
+        <g data-class="IMergeable">
+          <rect
+            x="728"
+            y="1072"
+            width="112"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="784"
+            y="1084"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="784" y="1097" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              IMergeable
+            </tspan>
+          </text>
+        </g>
+        <g data-class="LevelTimer">
+          <rect
+            x="856"
+            y="1072"
+            width="112"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="912" y="1093" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               LevelTimer
             </tspan>
@@ -1895,7 +2026,7 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            enum
+            literal union
           </text>
           <text x="270" y="461" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
@@ -2004,7 +2135,7 @@
         <!-- Group: geometry -->
         <rect
           x="56"
-          y="1070"
+          y="1220"
           width="928"
           height="128"
           rx="8"
@@ -2015,7 +2146,7 @@
         />
         <text
           x="68"
-          y="1086"
+          y="1236"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -2026,7 +2157,7 @@
         </text>
         <text
           x="972"
-          y="1086"
+          y="1236"
           fill="#1d4ed8"
           font-size="8"
           font-weight="500"
@@ -2040,7 +2171,7 @@
         <g data-class="GeometryFactory">
           <rect
             x="300"
-            y="1098"
+            y="1248"
             width="212"
             height="34"
             rx="4"
@@ -2050,7 +2181,7 @@
           />
           <text
             x="406"
-            y="1110"
+            y="1260"
             fill="#5b6873"
             font-size="7"
             font-family="'IBM Plex Mono', monospace"
@@ -2059,7 +2190,7 @@
           >
             interface
           </text>
-          <text x="406" y="1123" fill="#17212a" text-anchor="middle">
+          <text x="406" y="1273" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               GeometryFactory
             </tspan>
@@ -2068,7 +2199,7 @@
         <g data-class="HexGeometry">
           <rect
             x="76"
-            y="1098"
+            y="1248"
             width="160"
             height="34"
             rx="4"
@@ -2076,7 +2207,7 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="156" y="1119" fill="#17212a" text-anchor="middle">
+          <text x="156" y="1269" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               HexGeometry
             </tspan>
@@ -2085,7 +2216,7 @@
         <g data-class="HexCoord">
           <rect
             x="536"
-            y="1098"
+            y="1248"
             width="160"
             height="34"
             rx="4"
@@ -2095,7 +2226,7 @@
           />
           <text
             x="616"
-            y="1110"
+            y="1260"
             fill="#5b6873"
             font-size="7"
             font-family="'IBM Plex Mono', monospace"
@@ -2104,7 +2235,7 @@
           >
             value object
           </text>
-          <text x="616" y="1123" fill="#17212a" text-anchor="middle">
+          <text x="616" y="1273" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               HexCoord
             </tspan>
@@ -2113,7 +2244,7 @@
         <g data-class="HexTopology">
           <rect
             x="720"
-            y="1098"
+            y="1248"
             width="160"
             height="34"
             rx="4"
@@ -2121,7 +2252,7 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="800" y="1119" fill="#17212a" text-anchor="middle">
+          <text x="800" y="1269" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               HexTopology
             </tspan>
@@ -2130,7 +2261,7 @@
         <g data-class="SquareGeometry">
           <rect
             x="76"
-            y="1148"
+            y="1298"
             width="160"
             height="34"
             rx="4"
@@ -2140,7 +2271,7 @@
           />
           <text
             x="156"
-            y="1160"
+            y="1310"
             fill="#5b6873"
             font-size="7"
             font-family="'IBM Plex Mono', monospace"
@@ -2149,7 +2280,7 @@
           >
             test double
           </text>
-          <text x="156" y="1173" fill="#17212a" text-anchor="middle">
+          <text x="156" y="1323" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               SquareGeometry
             </tspan>
@@ -2158,7 +2289,7 @@
         <g data-class="SquareCoord">
           <rect
             x="536"
-            y="1148"
+            y="1298"
             width="160"
             height="34"
             rx="4"
@@ -2168,7 +2299,7 @@
           />
           <text
             x="616"
-            y="1160"
+            y="1310"
             fill="#5b6873"
             font-size="7"
             font-family="'IBM Plex Mono', monospace"
@@ -2177,7 +2308,7 @@
           >
             test double
           </text>
-          <text x="616" y="1173" fill="#17212a" text-anchor="middle">
+          <text x="616" y="1323" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               SquareCoord
             </tspan>
@@ -2186,7 +2317,7 @@
         <g data-class="SquareTopology">
           <rect
             x="720"
-            y="1148"
+            y="1298"
             width="160"
             height="34"
             rx="4"
@@ -2196,7 +2327,7 @@
           />
           <text
             x="800"
-            y="1160"
+            y="1310"
             fill="#5b6873"
             font-size="7"
             font-family="'IBM Plex Mono', monospace"
@@ -2205,7 +2336,7 @@
           >
             test double
           </text>
-          <text x="800" y="1173" fill="#17212a" text-anchor="middle">
+          <text x="800" y="1323" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               SquareTopology
             </tspan>
@@ -2214,15 +2345,15 @@
         <!-- Legend -->
         <line
           x1="24"
-          y1="1254"
+          y1="1404"
           x2="1016"
-          y2="1254"
+          y2="1404"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1272"
+          y="1422"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -2233,16 +2364,16 @@
 
         <line
           x1="24"
-          y1="1290"
+          y1="1440"
           x2="52"
-          y2="1290"
+          y2="1440"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#ovengine-open)"
         />
         <text
           x="60"
-          y="1294"
+          y="1444"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2251,7 +2382,7 @@
         </text>
         <rect
           x="24"
-          y="1310"
+          y="1460"
           width="28"
           height="12"
           rx="2"
@@ -2261,7 +2392,7 @@
         />
         <text
           x="60"
-          y="1319"
+          y="1469"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2270,7 +2401,7 @@
         </text>
         <rect
           x="184"
-          y="1310"
+          y="1460"
           width="28"
           height="12"
           rx="2"
@@ -2281,7 +2412,7 @@
         />
         <text
           x="220"
-          y="1319"
+          y="1469"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2290,7 +2421,7 @@
         </text>
         <rect
           x="432"
-          y="1310"
+          y="1460"
           width="28"
           height="12"
           rx="2"
@@ -2300,7 +2431,7 @@
         />
         <text
           x="468"
-          y="1319"
+          y="1469"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2309,7 +2440,7 @@
         </text>
         <text
           x="632"
-          y="1319"
+          y="1469"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2327,7 +2458,7 @@
         </text>
         <rect
           x="824"
-          y="1310"
+          y="1460"
           width="28"
           height="12"
           rx="2"
@@ -2337,7 +2468,7 @@
         />
         <text
           x="860"
-          y="1319"
+          y="1469"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
