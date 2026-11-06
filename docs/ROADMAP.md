@@ -98,20 +98,20 @@ The engine and its tests, with no variant yet. The backend serves accounts and o
 
 Hexa Lines, Hexa Fit, Hexa Sort and Hexa Merge plug into the engine, each with its rules tests. The generic use case and its aspect wrap all four. The backend stores progress per `gameId`. The team settles the scoring of each variant (`REQUIREMENTS.md` §10, "Still to define").
 
-| ID         | Exit check                                                                                                                                                                                    |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| APP-NFR-01 | The four variants use the same board class with a different cell type, and no variant has a board class of its own.                                                                           |
-| APP-NFR-02 | Each variant's rules class implements the contract, and the engine calls only the contract.                                                                                                   |
-| APP-FR-03  | APP-NFR-01 to APP-NFR-03.                                                                                                                                                                     |
-| APP-NFR-07 | Gate `test/gates/domain-purity-gate.test.ts` (rule R-domain-determinism in `AGENTS.md`), and a Merge test with a fixed seed always gets the same new tiles.                                   |
-| APP-NFR-12 | `pnpm test` runs them in CI, with one test file for the rules of each variant.                                                                                                                |
-| APP-NFR-11 | A test shows that one aspect runs for the four variants, and the use case it wraps has no line of the aspect's code.                                                                          |
-| APP-NFR-08 | The README section "SOLID Principles" has one example per principle with a link to its file, and the engine has no `if` or `switch` on the game id.                                           |
-| APP-FR-06  | The README documents the scoring of each variant.                                                                                                                                             |
-| API-FR-02  | An endpoint test saves progress for two variants and reads back two entries; a second save for the same user and variant does not add an entry; a request without `gameId` is rejected.       |
-| API-NFR-03 | The e2e suite has one save-and-load test per variant.                                                                                                                                         |
-| API-NFR-07 | Gate `test/gates/architecture.gate.spec.ts` keeps Nest out of `src/application` (rule R-application-pure), and a test shows the aspect runs while the use case it wraps has none of its code. |
-| API-NFR-06 | The README section "SOLID Principles" has one example per principle with a link to its file.                                                                                                  |
+| ID         | Exit check                                                                                                                                                                                                    |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| APP-NFR-01 | The four variants use the same board class with a different cell type, and no variant has a board class of its own.                                                                                           |
+| APP-NFR-02 | Each variant's rules class implements the contract, and the engine calls only the contract.                                                                                                                   |
+| APP-FR-03  | APP-NFR-01 to APP-NFR-03.                                                                                                                                                                                     |
+| APP-NFR-07 | Gate `test/gates/domain-purity-gate.test.ts` (rule R-domain-determinism in `AGENTS.md`), and a Merge test with a fixed seed always gets the same new tiles.                                                   |
+| APP-NFR-12 | `pnpm test` runs them in CI, with one rules suite per variant, and no test replaces an engine or variant class with a double. Gate `test/gates/rules-suite-gate.test.ts` (rule R-rules-suite in `AGENTS.md`). |
+| APP-NFR-11 | A test shows that one aspect runs for the four variants, and the use case it wraps has no line of the aspect's code.                                                                                          |
+| APP-NFR-08 | The README section "SOLID Principles" has one example per principle with a link to its file, and the engine has no `if` or `switch` on the game id.                                                           |
+| APP-FR-06  | The README documents the scoring of each variant.                                                                                                                                                             |
+| API-FR-02  | An endpoint test saves progress for two variants and reads back two entries; a second save for the same user and variant does not add an entry; a request without `gameId` is rejected.                       |
+| API-NFR-03 | The e2e suite has one save-and-load test per variant.                                                                                                                                                         |
+| API-NFR-07 | Gate `test/gates/architecture.gate.spec.ts` keeps Nest out of `src/application` (rule R-application-pure), and a test shows the aspect runs while the use case it wraps has none of its code.                 |
+| API-NFR-06 | The README section "SOLID Principles" has one example per principle with a link to its file.                                                                                                                  |
 
 ## Sprint 3 — Game flow and local progress (2026-11-16 to 2026-11-22), tag `v0.3.0`
 
