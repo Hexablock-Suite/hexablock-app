@@ -51,6 +51,24 @@ function comboPlacement(scoring: IScoringPolicy<LinesState<SquareCoord>>) {
   return engine.snapshot();
 }
 
+// A clearing placement, then a vertical domino at the origin that fills row 0 and column 0.
+// So the second placement has a combo of 2 lines and a streak of 2.
+function comboInAStreak(scoring: IScoringPolicy<LinesState<SquareCoord>>) {
+  const domino = piece(origin, square(0, 1));
+  const { engine } = linesGame(
+    linesState(squareTopology, 3, {
+      filled: [square(1, 1), square(2, 1), square(1, 0), square(2, 0), square(0, 2)],
+      tray: [one, domino],
+      source: [one],
+    }),
+    scoring,
+  );
+  engine.play(new PlacePiece(0, square(0, 1)));
+  const first = engine.snapshot().score;
+  engine.play(new PlacePiece(0, origin));
+  return { first, state: engine.snapshot() };
+}
+
 describe('Hexa Lines scoring', () => {
   it('should_score_only_the_placed_cells_when_a_placement_clears_no_line', () => {
     const domino = piece(origin, square(1, 0));
@@ -91,6 +109,17 @@ describe('Hexa Lines scoring', () => {
   it('should_multiply_the_line_bonus_by_lines_plus_streak_minus_one_when_clearing_placements_follow_in_a_row', () => {
     // 11, then 1 + 10 × 1 × (1 + 2 - 1) = 21, then 1 cell with no line.
     expect(twoClearingPlacements(decorated())).toEqual([11, 32, 33]);
+  });
+
+  it('should_multiply_the_line_bonus_by_lines_plus_streak_minus_one_when_a_combo_follows_a_clearing_placement', () => {
+    // Only a combo inside a streak tells `lines + streak - 1` (3) from `lines × streak` (4).
+    const { first, state } = comboInAStreak(decorated());
+
+    expect([state.linesCleared, state.streak, state.cellsPlaced]).toEqual([2, 2, 2]);
+    // 11, then 2 cells + 10 × 2 lines × (2 + 2 - 1) = 62.
+    expect([first, state.score]).toEqual([11, 73]);
+    // The base scoring gives 2 cells + 10 × 2 lines = 22 for the same placement.
+    expect(comboInAStreak(new LinesScoring<SquareCoord>()).state.score).toBe(33);
   });
 
   it('should_give_no_multiplier_when_the_base_lines_scoring_plays_alone', () => {

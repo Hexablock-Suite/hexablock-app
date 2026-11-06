@@ -49,6 +49,14 @@ describe('Hexa Merge scoring', () => {
     expect(state.score).toBe(12);
   });
 
+  it('should_score_each_merge_when_one_slide_makes_two_merges_of_the_same_value', () => {
+    // A tile merges at most once per move, so 2 2 2 2 gives two tiles of 4, not one 8.
+    const state = slideRow([2, 2, 2, 2]);
+
+    expect(state.merged.map((tile) => tile.value)).toEqual([4, 4]);
+    expect(state.score).toBe(8);
+  });
+
   it('should_score_zero_when_the_slide_moves_tiles_but_merges_none', () => {
     const state = slideRow([2, 4]);
 
