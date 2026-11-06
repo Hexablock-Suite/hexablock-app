@@ -8,9 +8,11 @@ import {
   FixedListPieceSource,
   type IPieceSource,
 } from '../../../../src/domain/engine/piece-source';
+import { RegionSize } from '../../../../src/domain/engine/region-size';
 import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
 import { CellNode } from '../../../../src/domain/engine/shape-node';
 import { ColorStack, type Color } from '../../../../src/domain/variants/hexa-sort/color-stack';
+import { SortFactory } from '../../../../src/domain/variants/hexa-sort/sort-factory';
 import { SortRules } from '../../../../src/domain/variants/hexa-sort/sort-rules';
 import { SortState, type PlaceStack } from '../../../../src/domain/variants/hexa-sort/sort-state';
 import { RecordingPublisher } from '../../engine/fake-game';
@@ -95,4 +97,16 @@ export function place(col: number, row = 0): PlaceStack<SquareCoord> {
 // The tiles of the cell `(col, row)`, from the bottom to the top. An empty cell gives `[]`.
 export function chipsAt(game: SortGame, col: number, row = 0): readonly Color[] {
   return game.snapshot().board.get(square(col, row))?.chips ?? [];
+}
+
+// A Sort factory on a 2 × 2 square board. The level offers `offered` from a fixed list.
+export function sortFactory(
+  offered: readonly ColorStack[] = [stack('red'), stack('blue')],
+  goalsNeeded = 5,
+): SortFactory<SquareCoord> {
+  return new SortFactory(squareTopology, {
+    size: RegionSize.of(2),
+    source: new FixedListPieceSource(offered.map(stackPiece)),
+    goalsNeeded,
+  });
 }
