@@ -33,12 +33,14 @@ export class CellNode<TCoord> implements ShapeNode<TCoord> {
 }
 
 // Composite: a group of shapes. A group holds at least one child.
+// The group copies the children array, so a change to the caller's array does not change the group.
+// The copy is frozen, because `readonly` holds only at compile time.
 export class ShapeGroup<TCoord> implements ShapeNode<TCoord> {
   readonly children: readonly ShapeNode<TCoord>[];
 
   constructor(children: readonly ShapeNode<TCoord>[]) {
     if (children.length === 0) throw new RangeError('A shape group holds at least one child.');
-    this.children = [...children];
+    this.children = Object.freeze([...children]);
   }
 
   cells(): TCoord[] {

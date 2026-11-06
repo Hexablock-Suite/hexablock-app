@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { Board } from '../../../src/domain/engine/board';
 import { BoardShape } from '../../../src/domain/engine/board-shape';
-import { coordKey } from '../../../src/domain/engine/coord-key';
+import { coordKey, type CoordKey } from '../../../src/domain/engine/coord-key';
 import type { GridTopology } from '../../../src/domain/engine/grid-topology';
 import { Radius } from '../../../src/domain/engine/radius';
 import { RegionSize } from '../../../src/domain/engine/region-size';
@@ -115,6 +115,35 @@ describe('Board', () => {
     expect(copy.cells()[0]?.[1]).toBe(cell);
   });
 
+  it('should_yield_nothing_when_a_line_starts_outside_the_board', () => {
+    const board = newBoard();
+
+    expect([...board.line('x', 5)]).toEqual([]);
+    expect([...board.line('x', -1)]).toEqual([]);
+  });
+
+  // The walks are one-shot iterables: a second loop over the same iterable gives nothing.
+  it('should_yield_nothing_the_second_time_when_a_line_is_iterated_twice', () => {
+    const line = newBoard().line('x', 2);
+
+    expect([...line]).toEqual([0, 1, 2, 3, 4]);
+    expect([...line]).toEqual([]);
+  });
+
+  it('should_yield_nothing_the_second_time_when_a_ring_is_iterated_twice', () => {
+    const ring = newBoard().ring(2, Radius.of(2));
+
+    expect([...ring]).toEqual([0, 4]);
+    expect([...ring]).toEqual([]);
+  });
+
+  it('should_yield_nothing_the_second_time_when_a_neighborhood_is_iterated_twice', () => {
+    const neighborhood = newBoard().neighborhood(2);
+
+    expect([...neighborhood]).toEqual([1, 3]);
+    expect([...neighborhood]).toEqual([]);
+  });
+
   it('should_report_whether_a_coordinate_is_inside_when_contains_is_asked', () => {
     const board = newBoard();
 
@@ -156,5 +185,61 @@ describe('Board shape invariants', () => {
 
     expect(board.shape.cells).toEqual([4, 2, 0]);
     expect([0, 2, 4].every((c) => board.contains(c))).toBe(true);
+  });
+});
+
+describe('Board initial content', () => {
+  function contentOf(...entries: [CoordKey, [number, string]][]): Map<CoordKey, [number, string]> {
+    return new Map(entries);
+  }
+
+  it('should_throw_a_range_error_when_the_initial_content_lies_outside_the_shape', () => {
+    const shape = stripTopology.region(RegionSize.of(5));
+    const content = contentOf([coordKey('7'), [7, 'red']]);
+
+    expect(() => new Board(shape, stripTopology, content)).toThrow(RangeError);
+    expect(() => new Board(shape, stripTopology, content)).toThrow(
+      'The coordinate 7 is outside the board.',
+    );
+  });
+
+  it('should_throw_a_range_error_when_an_initial_key_does_not_match_its_coordinate', () => {
+    const shape = stripTopology.region(RegionSize.of(5));
+    const content = contentOf([coordKey('3'), [1, 'red']]);
+
+    expect(() => new Board(shape, stripTopology, content)).toThrow(RangeError);
+    expect(() => new Board(shape, stripTopology, content)).toThrow(
+      'The key 3 does not match the key 1 of its coordinate.',
+    );
+  });
+
+  it('should_keep_the_board_unchanged_when_the_caller_changes_an_initial_tuple', () => {
+    const tuple: [number, string] = [1, 'red'];
+    const board = new Board(
+      stripTopology.region(RegionSize.of(5)),
+      stripTopology,
+      contentOf([coordKey('1'), tuple]),
+    );
+    const copy = board.clone();
+
+    tuple[1] = 'blue';
+    const [first] = board.cells();
+    if (first !== undefined) first[1] = 'green';
+
+    expect(board.get(1)).toBe('red');
+    expect(copy.get(1)).toBe('red');
+  });
+
+  it('should_keep_the_initial_cells_when_the_content_matches_the_shape', () => {
+    const board = new Board(
+      stripTopology.region(RegionSize.of(5)),
+      stripTopology,
+      contentOf([coordKey('0'), [0, 'red']], [coordKey('4'), [4, 'blue']]),
+    );
+
+    expect(board.cells()).toEqual([
+      [0, 'red'],
+      [4, 'blue'],
+    ]);
   });
 });

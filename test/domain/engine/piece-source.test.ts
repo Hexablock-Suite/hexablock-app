@@ -106,6 +106,17 @@ describe('SeededPieceSource', () => {
     expect(new SeededPieceSource(4294967295, drawColor).seed).toBe(4294967295);
   });
 
+  it('should_continue_the_sequence_when_a_seeded_source_is_read_in_two_loops', () => {
+    const source = new SeededPieceSource(42, drawColor);
+    const expected = take(new SeededPieceSource(42, drawColor), 10);
+
+    const first = take(source, 5);
+    const second = take(source, 5);
+
+    expect([...first, ...second]).toEqual(expected);
+    expect(second).not.toEqual(expected.slice(0, 5));
+  });
+
   it('should_expose_its_seed_when_the_seed_is_read', () => {
     expect(new SeededPieceSource(42, drawColor).seed).toBe(42);
   });

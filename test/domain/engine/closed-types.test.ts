@@ -83,6 +83,20 @@ describe('Radius', () => {
     }
   });
 
+  it('should_store_zero_when_a_radius_is_negative_zero', () => {
+    expect(Radius.of(-0).value).toBe(0);
+  });
+
+  it('should_throw_a_range_error_when_a_radius_is_not_a_safe_integer', () => {
+    for (const value of [2 ** 53, Number.MAX_VALUE]) {
+      expect(() => Radius.of(value)).toThrow(RangeError);
+      expect(() => Radius.of(value)).toThrow(
+        `A radius needs a whole number of zero or more, not ${value}.`,
+      );
+    }
+    expect(Radius.of(Number.MAX_SAFE_INTEGER).value).toBe(Number.MAX_SAFE_INTEGER);
+  });
+
   it('should_give_the_center_when_a_board_ring_has_radius_zero', () => {
     const board = new Board(squareTopology.region(RegionSize.of(3)), squareTopology);
 
@@ -105,6 +119,16 @@ describe('RegionSize', () => {
     }
   });
 
+  it('should_throw_a_range_error_when_a_region_size_is_not_a_safe_integer', () => {
+    for (const value of [2 ** 53, Number.MAX_VALUE]) {
+      expect(() => RegionSize.of(value)).toThrow(RangeError);
+      expect(() => RegionSize.of(value)).toThrow(
+        `A region size needs a whole number of one or more, not ${value}.`,
+      );
+    }
+    expect(RegionSize.of(Number.MAX_SAFE_INTEGER).value).toBe(Number.MAX_SAFE_INTEGER);
+  });
+
   it('should_cover_one_cell_when_the_region_size_is_one', () => {
     expect(squareTopology.region(RegionSize.of(1)).cells).toEqual([square(0, 0)]);
   });
@@ -122,6 +146,18 @@ describe('Turns', () => {
       expect(() => Turns.of(value)).toThrow(RangeError);
       expect(() => Turns.of(value)).toThrow(`A turn count needs a whole number, not ${value}.`);
     }
+  });
+
+  it('should_throw_a_range_error_when_a_turn_count_is_not_a_safe_integer', () => {
+    for (const value of [2 ** 53, -(2 ** 53), Number.MAX_VALUE]) {
+      expect(() => Turns.of(value)).toThrow(RangeError);
+      expect(() => Turns.of(value)).toThrow(`A turn count needs a whole number, not ${value}.`);
+    }
+    expect(Turns.of(Number.MIN_SAFE_INTEGER).value).toBe(Number.MIN_SAFE_INTEGER);
+  });
+
+  it('should_store_zero_when_a_turn_count_is_negative_zero', () => {
+    expect(Turns.of(-0).value).toBe(0);
   });
 
   it('should_rotate_backward_when_the_count_is_negative', () => {
