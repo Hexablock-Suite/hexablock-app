@@ -2,7 +2,7 @@ import type { GameId } from './game-id';
 
 // The result of one finished game. It is a value object (view 4).
 // `levelId` exists only for games with levels, and `elapsedMs` only for timed games.
-// A decimal or negative move count, a NaN score and a NaN or negative time throw a RangeError.
+// A decimal or negative move count, a score or a time that is not finite, and a negative time, throw a RangeError.
 export class GameResult {
   private constructor(
     readonly gameId: GameId,
@@ -22,10 +22,13 @@ export class GameResult {
     if (!Number.isInteger(values.moves) || values.moves < 0) {
       throw new RangeError('A game result needs zero or more moves.');
     }
-    if (Number.isNaN(values.score)) {
-      throw new RangeError('A game result needs a score that is a number.');
+    if (!Number.isFinite(values.score)) {
+      throw new RangeError('A game result needs a score that is a finite number.');
     }
-    if (values.elapsedMs !== undefined && !(values.elapsedMs >= 0)) {
+    if (
+      values.elapsedMs !== undefined &&
+      !(Number.isFinite(values.elapsedMs) && values.elapsedMs >= 0)
+    ) {
       throw new RangeError('A game result needs a time of zero or more milliseconds.');
     }
     return new GameResult(

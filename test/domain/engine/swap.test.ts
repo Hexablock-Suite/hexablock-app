@@ -233,6 +233,17 @@ describe('GameResult and ProgressRecord', () => {
     );
   });
 
+  it('should_throw_a_range_error_when_a_result_has_an_infinite_score_or_time', () => {
+    const gameId = GameId.of('fake-game');
+
+    for (const score of [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
+      expect(() => GameResult.of({ gameId, score, moves: 0 })).toThrow('score');
+    }
+    expect(() =>
+      GameResult.of({ gameId, score: 0, moves: 0, elapsedMs: Number.POSITIVE_INFINITY }),
+    ).toThrow('milliseconds');
+  });
+
   it('should_throw_a_range_error_when_a_record_has_negative_stars', () => {
     const gameId = GameId.of('fake-game');
 
