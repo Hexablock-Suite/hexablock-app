@@ -2,10 +2,15 @@ import type { RandomSource } from './random-source';
 
 // A random source that a seed fixes (APP-NFR-07): the same seed gives the same numbers.
 // It uses the Mulberry32 generator: pure 32-bit integer arithmetic, no ambient randomness.
+// The seed is an unsigned 32-bit integer. Any other number throws a RangeError,
+// because `>>> 0` would truncate it and two different seeds would give the same game.
 export class SeededRandom implements RandomSource {
   private state: number;
 
   constructor(seed: number) {
+    if (!Number.isInteger(seed) || seed < 0 || seed > 0xffffffff) {
+      throw new RangeError(`A seed must be an integer from 0 to 4294967295, not ${seed}.`);
+    }
     this.state = seed >>> 0;
   }
 

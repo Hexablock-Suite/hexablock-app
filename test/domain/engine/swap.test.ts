@@ -13,7 +13,7 @@ import { BaseGameRules } from '../../../src/domain/engine/rules';
 import type { IScoringPolicy } from '../../../src/domain/engine/scoring-policy';
 import { fakeCell, type FakeCell } from '../../support/engine/fake-cell';
 import { emptyState, RecordingPublisher, type FakeState } from '../../support/engine/fake-game';
-import { type SquareCoord } from '../../support/engine/square-topology';
+import { square, type SquareCoord } from '../../support/engine/square-topology';
 
 // APP-NFR-04: the piece source, the scoring policy and the progress model swap,
 // and no engine file changes. Every implementation here is a dummy that exists only in test/.
@@ -175,6 +175,21 @@ describe('swapping the piece source, the scoring policy and the progress model',
       expect(game.outcome).toBe('game-over');
     });
   }
+
+  it('should_reject_a_fifth_move_and_keep_the_state_when_the_board_is_full', () => {
+    const rules = new SourceRules(sources.counting());
+    const events = new RecordingPublisher();
+    const engine = new GameEngine(GameId.of('fake-game'), rules, onePerMove(), events);
+    engine.start(emptyState(2));
+    for (const at of emptyState(2).board.shape.cells) engine.play(at);
+    const full = engine.snapshot();
+
+    expect(() => engine.play(square(0, 0))).toThrow(RangeError);
+    expect(() => engine.play(square(0, 0))).toThrow('game-over phase');
+    expect(engine.phase.name).toBe('game-over');
+    expect(engine.snapshot()).toEqual(full);
+    expect(events.events).toHaveLength(1);
+  });
 });
 
 describe('GameResult and ProgressRecord', () => {
@@ -191,6 +206,39 @@ describe('GameResult and ProgressRecord', () => {
       'milliseconds',
     );
     expect(GameResult.of({ gameId, score: 0, moves: 0, elapsedMs: 0 }).elapsedMs).toBe(0);
+  });
+
+  it('should_throw_a_range_error_when_a_result_has_a_decimal_number_of_moves', () => {
+    const gameId = GameId.of('fake-game');
+
+    expect(() => GameResult.of({ gameId, score: 0, moves: 2.5 })).toThrow(RangeError);
+    expect(() => GameResult.of({ gameId, score: 0, moves: 2.5 })).toThrow('moves');
+  });
+
+  it('should_throw_a_range_error_when_a_result_has_a_score_that_is_not_a_number', () => {
+    const gameId = GameId.of('fake-game');
+
+    expect(() => GameResult.of({ gameId, score: Number.NaN, moves: 0 })).toThrow(RangeError);
+    expect(() => GameResult.of({ gameId, score: Number.NaN, moves: 0 })).toThrow('score');
+  });
+
+  it('should_throw_a_range_error_when_a_result_has_a_time_that_is_not_a_number', () => {
+    const gameId = GameId.of('fake-game');
+
+    expect(() => GameResult.of({ gameId, score: 0, moves: 0, elapsedMs: Number.NaN })).toThrow(
+      RangeError,
+    );
+    expect(() => GameResult.of({ gameId, score: 0, moves: 0, elapsedMs: Number.NaN })).toThrow(
+      'milliseconds',
+    );
+  });
+
+  it('should_throw_a_range_error_when_a_record_has_negative_stars', () => {
+    const gameId = GameId.of('fake-game');
+
+    expect(() => ProgressRecord.of({ gameId, score: 0, stars: -1 })).toThrow(RangeError);
+    expect(() => ProgressRecord.of({ gameId, score: 0, stars: -1 })).toThrow('stars');
+    expect(ProgressRecord.of({ gameId, score: 0, stars: 0 }).stars).toBe(0);
   });
 
   it('should_keep_the_optional_fields_when_a_result_has_a_level_and_a_time', () => {

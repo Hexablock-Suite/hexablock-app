@@ -48,6 +48,22 @@ describe('FixedListPieceSource', () => {
   it('should_end_at_once_when_the_list_is_empty', () => {
     expect([...new FixedListPieceSource<string>([])]).toEqual([]);
   });
+
+  it('should_give_nothing_the_second_time_when_the_source_is_read_twice', () => {
+    const source = new FixedListPieceSource(['a', 'b']);
+
+    expect([...source]).toEqual(['a', 'b']);
+    expect([...source]).toEqual([]);
+  });
+
+  it('should_throw_a_range_error_when_the_list_holds_undefined', () => {
+    expect(() => new FixedListPieceSource<string | undefined>(['a', undefined])).toThrow(
+      RangeError,
+    );
+    expect(() => new FixedListPieceSource<string | undefined>(['a', undefined])).toThrow(
+      'undefined',
+    );
+  });
 });
 
 describe('SeededPieceSource', () => {
@@ -70,6 +86,24 @@ describe('SeededPieceSource', () => {
 
     expect(take(source, 1000)).toHaveLength(1000);
     expect(source.hasNext()).toBe(true);
+  });
+
+  const badSeeds = [
+    ['not_a_number', Number.NaN],
+    ['a_decimal', 1.9],
+    ['negative', -1],
+    ['too_large', 4294967296],
+  ] as const;
+  for (const [name, seed] of badSeeds) {
+    it(`should_throw_a_range_error_when_the_seed_is_${name}`, () => {
+      expect(() => new SeededPieceSource(seed, drawColor)).toThrow(RangeError);
+      expect(() => new SeededRandom(seed)).toThrow('seed');
+    });
+  }
+
+  it('should_accept_the_seed_when_it_is_zero_or_the_largest_32_bit_integer', () => {
+    expect(new SeededPieceSource(0, drawColor).seed).toBe(0);
+    expect(new SeededPieceSource(4294967295, drawColor).seed).toBe(4294967295);
   });
 
   it('should_expose_its_seed_when_the_seed_is_read', () => {
