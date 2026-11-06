@@ -53,7 +53,10 @@ describe('GamePhase', () => {
 
   it('should_name_each_phase_when_the_name_is_read', () => {
     expect(PlayingPhase.instance.name).toBe('playing');
+    expect(ResolvingPhase.instance.name).toBe('resolving');
+    expect(PausedPhase.instance.name).toBe('paused');
     expect(GameOverPhase.instance.name).toBe('game-over');
+    expect(VictoryPhase.instance.name).toBe('victory');
   });
 });
 
@@ -64,6 +67,37 @@ describe('GameId', () => {
 
   it('should_throw_when_the_id_is_empty', () => {
     expect(() => GameId.of('  ')).toThrow('empty');
+  });
+
+  it('should_throw_a_range_error_when_the_id_is_not_a_lowercase_kebab_case_slug', () => {
+    const invalid = [
+      'Hexa Fit',
+      'hexa\tfit',
+      'Hexa-Fit',
+      '\thexa-fit',
+      'hexa_fit',
+      'hexa--fit',
+      '-hexa',
+    ];
+
+    for (const value of invalid) {
+      expect(() => GameId.of(value)).toThrow(RangeError);
+      expect(() => GameId.of(value)).toThrow('lowercase kebab-case');
+    }
+  });
+
+  it('should_keep_the_value_when_the_id_is_a_lowercase_kebab_case_slug', () => {
+    const valid = [
+      'hexa-lines',
+      'hexa-fit',
+      'hexa-sort',
+      'hexa-merge',
+      'hexa-fill',
+      'fake-game',
+      'game2',
+    ];
+
+    expect(valid.map((value) => GameId.of(value).value)).toEqual(valid);
   });
 
   it('should_be_equal_when_two_ids_hold_the_same_value', () => {

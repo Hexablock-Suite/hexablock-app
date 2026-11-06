@@ -122,3 +122,59 @@ describe('Piece translation on the triangle topology double', () => {
     ]);
   });
 });
+
+// A group of groups: the rhombus as one child group, and one more triangle.
+function nested(): ShapeGroup<TriangleCoord> {
+  return new ShapeGroup([
+    new ShapeGroup([new CellNode(triangle(0, 0)), new CellNode(triangle(1, 0))]),
+    new CellNode(triangle(2, 0)),
+  ]);
+}
+
+describe('Nested shape groups and negative moves on the triangle topology double', () => {
+  it('should_list_the_cells_of_every_level_when_a_group_holds_a_group', () => {
+    expect(nested().cells()).toEqual([triangle(0, 0), triangle(1, 0), triangle(2, 0)]);
+    expect(nested().area()).toBe(3);
+  });
+
+  it('should_move_every_level_through_the_topology_when_a_group_of_groups_is_translated', () => {
+    const moved = nested().translated(oddOffset, triangleTopology);
+
+    expect(moved.cells()).toEqual(
+      nested()
+        .cells()
+        .map((c) => triangleTopology.translate(c, oddOffset)),
+    );
+    expect(moved.children[0]).toBeInstanceOf(ShapeGroup);
+    expect(moved.area()).toBe(3);
+  });
+
+  it('should_turn_every_level_through_the_topology_when_a_group_of_groups_is_rotated', () => {
+    const turned = nested().rotated(1, triangleTopology);
+
+    expect(turned.cells()).toEqual(
+      nested()
+        .cells()
+        .map((c) => triangleTopology.rotate(c, 1)),
+    );
+    expect(turned.children[0]).toBeInstanceOf(ShapeGroup);
+    expect(turned.area()).toBe(3);
+  });
+
+  it('should_keep_every_cell_orientation_when_the_offset_is_negative', () => {
+    const negativeOffset = triangle(-1, 0);
+    const before = rhombus().shape.cells();
+
+    const after = rhombus().translated(negativeOffset, triangleTopology).shape.cells();
+
+    expect(after).toEqual([triangle(-2, 0), triangle(-1, 0)]);
+    expect(after.map(isUp)).toEqual(before.map(isUp));
+  });
+
+  it('should_return_to_the_start_when_a_piece_rotates_back_one_step_and_forward_one_step', () => {
+    const back = rhombus().rotated(-1, triangleTopology);
+
+    expect(back.shape.cells()).not.toEqual(rhombus().shape.cells());
+    expect(back.rotated(1, triangleTopology).shape.cells()).toEqual(rhombus().shape.cells());
+  });
+});

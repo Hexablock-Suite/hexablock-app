@@ -33,7 +33,26 @@ class RecordingRules extends BaseGameRules<number, number> {
   }
 }
 
+// Rules whose `resolve()` refuses the move after `apply()` has changed the state.
+class RejectingRules extends RecordingRules {
+  override resolve(state: number): Resolution<number> {
+    this.steps.push('resolve');
+    return Resolution.rejected(state);
+  }
+}
+
 describe('BaseGameRules.playTurn()', () => {
+  it('should_return_the_rejected_resolution_when_resolve_rejects_after_apply', () => {
+    const rules = new RejectingRules();
+
+    const resolution = rules.playTurn(1, 2);
+
+    expect(rules.steps).toEqual(['isValid', 'apply', 'resolve', 'evaluate']);
+    expect(resolution.accepted).toBe(false);
+    expect(resolution.state).toBe(3);
+    expect(resolution.outcome).toBe('playing');
+  });
+
   it('should_call_the_four_steps_in_order_when_the_move_is_valid', () => {
     const rules = new RecordingRules();
 

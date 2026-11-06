@@ -4,7 +4,7 @@ import type { BoardState } from '../../../src/domain/engine/board-state';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameOver } from '../../../src/domain/engine/game-events';
 import { GameId } from '../../../src/domain/engine/game-id';
-import type { Resolution } from '../../../src/domain/engine/resolution';
+import { Resolution } from '../../../src/domain/engine/resolution';
 import { fakeCell, type FakeCell } from '../../support/engine/fake-cell';
 import {
   emptyState,
@@ -54,6 +54,14 @@ class FailingOnceScoring extends OnePointScoring {
   }
 }
 
+// Rules whose `resolve()` refuses the move after `apply()` has put the cell on the copy.
+class RejectingResolveRules extends FakeRules {
+  override resolve(state: FakeState): Resolution<FakeState> {
+    this.log.push('resolve');
+    return Resolution.rejected(state);
+  }
+}
+
 function place(col: number, row: number, value = 1): FakeMove {
   return { at: square(col, row), cell: fakeCell(value) };
 }
@@ -91,6 +99,25 @@ describe('GameEngine.play()', () => {
     expect(engine.snapshot().board.get(square(0, 0))).toEqual(fakeCell(1));
     expect(engine.snapshot().score).toBe(1);
     expect(engine.phase.canPlay()).toBe(true);
+  });
+
+  it('should_keep_the_old_board_when_resolve_rejects_the_move_after_apply', () => {
+    const publisher = new RecordingPublisher();
+    const engine = new GameEngine(
+      GameId.of('fake-game'),
+      new RejectingResolveRules(),
+      new OnePointScoring(),
+      publisher,
+    );
+    engine.start(emptyState());
+
+    const outcome = engine.play(place(0, 0));
+
+    expect(outcome).toBe('playing');
+    expect(engine.snapshot().board.get(square(0, 0))).toBeUndefined();
+    expect(engine.snapshot().score).toBe(0);
+    expect(engine.phase.name).toBe('playing');
+    expect(publisher.events).toEqual([]);
   });
 
   it('should_publish_game_over_with_the_final_score_when_the_board_fills', () => {
