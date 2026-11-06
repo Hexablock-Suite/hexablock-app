@@ -84,6 +84,11 @@ On 2026-10-30 the team closed two shapes of this contract. The detail is in `hex
 - **DS-5 — Progress shape.** One progress row per user and `gameId`, plus a level results table. The app sends a level result as `stars`, `moves` and `elapsedMs`, the field names of `GameResult`. In the backend domain, `PlayerProgress` is the aggregate root and keeps its level results; one repository saves both tables.
 - **DS-6 — Level schema.** A common part (`gameId`, `levelId`, `order`, `version`, `topology`) plus a typed section per `gameId`. The Fit section holds `figure`, `pieces` and `witness`. The Sort section holds `radius`, `goals` and `source`. The Fit check reads the rotation steps from the topology that the `topology` field names, so the API accepts a level of any topology that the code knows; it does not reject a topology only because it is not hexagonal (A5).
 
+On 2026-11-06 the team closed two sync rules. The detail is in `hexablock-api/docs/REQUIREMENTS.md` §4, under DS-11 and DS-12:
+
+- **DS-11 — Level version.** The app can hold a bundled copy and a backend copy of one level, with the same `gameId` and `levelId`. The copy with the higher `version` wins. When the versions are equal, the app uses the bundled copy. A `levelId` that only the backend has adds a level.
+- **DS-12 — Best result per level.** When one account sends two results for one level, the backend keeps the best one. DS-4 decides which result is the best. The high score follows the same rule: the highest one stays. So the order of the syncs does not change the stored progress.
+
 On 2026-10-31 the backend moved its `Clock` port to the application layer (API-NFR-11): `src/application` reads the time from the `Clock` port in `src/application/ports/clock.ts` and passes the instant to `src/domain` as a parameter, because ports live in the application layer and the domain never imports it.
 
 DS-4, what orders the per-level leaderboard, is still open (§10, "Still to define").
@@ -91,9 +96,9 @@ DS-4, what orders the per-level leaderboard, is still open (§10, "Still to defi
 The app needs its own side of these features. Statement §5.1 does not list them, so each one is **Derived** from the backend item it serves.
 
 - **APP-FR-12 — Account (derived from §5.2.1).** The player can sign up and sign in from the app, and the app keeps the session for the next requests. _Check:_ after sign-in, a sync request carries the token.
-- **APP-FR-13 — Progress sync (derived from §5.2.2).** The app sends the local progress of each variant to the backend. _Check:_ progress saved in the app appears in the backend entry for that user and `gameId`.
+- **APP-FR-13 — Progress sync (derived from §5.2.2).** The app sends the local progress of each variant to the backend. When two results of one level arrive, the backend keeps the best one (DS-12). _Check:_ progress saved in the app appears in the backend entry for that user and `gameId`.
 - **APP-FR-14 — Leaderboard (derived from §5.2.3).** The app shows the global leaderboard per variant and, for Fit and Sort, per level. Assumption: §5.1 lists no leaderboard screen, so its place in the app is ours to choose. _Check:_ a UI test shows both leaderboards from a stubbed API.
-- **APP-FR-15 — Levels from the backend (derived from §5.2.4, A6).** Bundled levels always work offline; levels from the backend add to them or replace them. _Check:_ with the network off, every bundled level opens.
+- **APP-FR-15 — Levels from the backend (derived from §5.2.4, A6).** Bundled levels always work offline; levels from the backend add to them or replace them. When both copies of one level exist, the copy with the higher `version` wins (DS-11). _Check:_ with the network off, every bundled level opens; with a bundled copy and a backend copy of one level, the copy with the higher `version` loads.
 
 ## 7. Documentation and deliverables (non-functional)
 
@@ -136,7 +141,7 @@ Each assumption holds under both readings of the statement, or names what change
 - **A3 — End of Merge (§1.4, §5.1.4).** Reaching the target tile is an event, not the end of the game; an end policy decides. Default: a victory screen with a "continue" option, as in 2048. Confirmation C3. Confirmed on 2026-11-03: the player may continue to get more points (C3).
 - **A4 — Sort pieces (§1.3, §1.5, §5.1.5).** Each Sort level chooses its piece source: seeded random or a fixed list. Default: seeded random per level, so a level is reproducible and can be designed. Confirmation C4.
 - **A5 — Fit levels can be won (§1.2, §5.2.4).** The Fit illustration shows a figure of 21 cells and pieces of 20, against the rule that both areas are equal. We read it as a hint: every Fit level must be provably winnable. Equal area is necessary but not enough, and finding an exact cover is a search problem. So every level file carries the designer's solution (piece, rotation, position). The rotation counts steps of the level's topology, never degrees: the hexagonal topology has six steps of 60°, and another topology gives its own steps (D4). Checking that witness is linear. The Fit Builder checks area and witness when a level loads, a CI test checks every bundled level, and the backend rejects a level whose witness fails. A search tool only helps level designers. Pieces rotate; they are never mirrored (§1.2 mentions rotation only). Confirmations C1 and C7. The rotation rule is confirmed on 2026-11-03 (C7).
-- **A6 — Level origin (§5.1.5, §5.2.4).** Levels bundled in the app always work offline; levels from the backend add to them or replace them. Who may edit levels is Q4, answered on 2026-11-03.
+- **A6 — Level origin (§5.1.5, §5.2.4).** Levels bundled in the app always work offline; levels from the backend add to them or replace them. Who may edit levels is Q4, answered on 2026-11-03. When the app and the backend hold the same level, DS-11 decides which copy wins (2026-11-06).
 - **A7 — Public repositories (§2, §9).** Both repositories are public, because GitHub Free protects branches only on public repositories. Confirmation C6.
 - **A8 — Delivery date.** We plan against the earliest date, 2026-12-07. See Q1.
 - **A9 — Backend scope (§6.1).** Replaced by D6 on 2026-10-26.
