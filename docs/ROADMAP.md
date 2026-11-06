@@ -84,14 +84,15 @@ APP-NFR-19 and API-NFR-10 start here with the diagram sources. Sprint 4 finishes
 
 The engine and its tests, with no variant yet. The backend serves accounts and one error shape, so later endpoints reuse both.
 
-| ID         | Exit check                                                                                                                             |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| APP-NFR-03 | `pnpm arch` passes rules `engine-no-variants` and `domain-no-framework`, and the engine test of APP-NFR-13 runs with a fake cell type. |
-| APP-NFR-04 | A test swaps each implementation and the engine code does not change.                                                                  |
-| APP-NFR-05 | The README section "Generic Engine" lists every bound with its reason.                                                                 |
-| APP-NFR-13 | An engine test uses a cell type and a square topology that exist only in the tests (D4).                                               |
-| API-FR-01  | An e2e test signs up, signs in and calls a protected endpoint with the token; the same call without a token gets 401.                  |
-| API-FR-06  | E2e tests for a validation error, a missing token and a missing resource get the same body shape.                                      |
+| ID         | Exit check                                                                                                                                                                    |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| APP-NFR-03 | `pnpm arch` passes rules `engine-no-variants` and `domain-no-framework`, and the engine test of APP-NFR-13 runs with a fake cell type.                                        |
+| APP-NFR-04 | A test swaps each implementation and the engine code does not change.                                                                                                         |
+| APP-NFR-05 | The README section "Generic Engine" lists every bound with its reason.                                                                                                        |
+| APP-NFR-13 | An engine test uses a cell type and a square topology that exist only in the tests (D4).                                                                                      |
+| APP-NFR-25 | Gate `test/docs/primitive-types.test.ts` passes: every `number` and `string` in the public engine signatures has a row with its reason in the README table "Primitive types". |
+| API-FR-01  | An e2e test signs up, signs in and calls a protected endpoint with the token; the same call without a token gets 401.                                                         |
+| API-FR-06  | E2e tests for a validation error, a missing token and a missing resource get the same body shape.                                                                             |
 
 ## Sprint 2 — The four variant rules (2026-11-09 to 2026-11-15), tag `v0.2.0`
 
