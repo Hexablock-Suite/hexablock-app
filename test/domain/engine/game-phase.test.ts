@@ -40,6 +40,12 @@ describe('GamePhase', () => {
     expect(paused.resume()).toBe(PlayingPhase.instance);
   });
 
+  // A turn that resolves cannot pause: the phase stays resolving until the outcome arrives.
+  it('should_stay_resolving_when_a_resolving_turn_is_paused', () => {
+    expect(ResolvingPhase.instance.pause()).toBe(ResolvingPhase.instance);
+    expect(ResolvingPhase.instance.resume()).toBe(ResolvingPhase.instance);
+  });
+
   it('should_stay_ended_when_an_ended_game_is_paused_or_resumed', () => {
     expect(GameOverPhase.instance.pause()).toBe(GameOverPhase.instance);
     expect(VictoryPhase.instance.resume()).toBe(VictoryPhase.instance);

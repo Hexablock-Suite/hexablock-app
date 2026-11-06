@@ -73,4 +73,10 @@ describe('Board with the square topology double', () => {
     expect(squareTopology.rotate(square(1, 0), 1)).toEqual(square(0, 1));
     expect(squareTopology.rotate(square(1, 0), squareTopology.rotationSteps)).toEqual(square(1, 0));
   });
+
+  // A negative count turns the other way: one turn back equals three turns forward.
+  it('should_turn_backward_when_the_turn_count_is_negative', () => {
+    expect(squareTopology.rotate(square(1, 0), -1)).toEqual(square(0, -1));
+    expect(squareTopology.rotate(square(1, 0), -3)).toEqual(square(0, 1));
+  });
 });
