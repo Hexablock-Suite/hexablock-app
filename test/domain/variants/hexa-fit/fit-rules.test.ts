@@ -263,3 +263,181 @@ describe('FitRules', () => {
     expect(() => PieceId.of('  ')).toThrow(RangeError);
   });
 });
+
+// Edge cases of the walkthrough of PR #106 (issue #120).
+describe('FitRules edge cases', () => {
+  // The rotation of the placed piece, as a count of topology steps.
+  function rotationOf(state: FitState<SquareCoord>, id: PieceId): number | undefined {
+    return state.placementOf(id)?.rotation.value;
+  }
+
+  it('should_store_the_rotation_from_zero_to_three_when_a_move_counts_negative_or_huge_steps', () => {
+    // `Placement` stores a count from 0 to `rotationSteps - 1` (placement.ts),
+    // and a negative count turns the other way (turns.ts).
+    const rules = new FitRules<SquareCoord>();
+
+    // Minus one step is three quarter turns: (1,0) goes to (0,-1).
+    const placed = rules.playTurn(dominoLevel(), new PlaceFitPiece(A, Turns.of(-1), square(1, 1)));
+
+    expect(placed.accepted).toBe(true);
+    expect(rotationOf(placed.state, A)).toBe(3);
+    expect(cellsOf(placed.state)).toEqual(['1,0=a', '1,1=a']);
+
+    // 2^53 - 1 is 3 modulo 4. Three steps more than 3 is a half turn.
+    const turned = rules.playTurn(
+      placed.state,
+      new RotateFitPiece(A, Turns.of(Number.MAX_SAFE_INTEGER)),
+    );
+
+    expect(turned.accepted).toBe(true);
+    expect(rotationOf(turned.state, A)).toBe(2);
+    expect(cellsOf(turned.state)).toEqual(['0,1=a', '1,1=a']);
+  });
+
+  it('should_keep_the_tray_and_leave_the_source_read_when_the_state_starts_from_a_fixed_list', () => {
+    // The state reads the source once at start (fit-state.ts), and a fixed list
+    // gives its pieces only once (piece-source.ts).
+    const domino = [square(0, 0), square(1, 0)];
+    const source = new FixedListPieceSource([piece(A, domino), piece(B, domino)]);
+
+    const state = FitState.start(
+      figure(squareTopology, squareTopology.region(RegionSize.of(2))),
+      source,
+    );
+
+    expect(source.hasNext()).toBe(false);
+    expect([...source]).toEqual([]);
+    expect(trayOf(state)).toEqual(['a', 'b']);
+    expect(trayOf(state.clone())).toEqual(['a', 'b']);
+  });
+
+  it('should_keep_playing_with_an_empty_tray_and_no_valid_move_when_the_level_has_no_piece', () => {
+    // The game is won only when the pieces cover the figure, and Fit has no defeat (fit-rules.ts).
+    // A level without pieces never covers its figure.
+    const rules = new FitRules<SquareCoord>();
+    const empty = FitState.start(
+      figure(squareTopology, squareTopology.region(RegionSize.of(2))),
+      new FixedListPieceSource<Piece<PieceId, SquareCoord>>([]),
+    );
+    const engine = engineOn(empty);
+
+    const outcome = engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)));
+
+    expect(trayOf(empty)).toEqual([]);
+    expect(rules.evaluate(empty)).toBe('playing');
+    expect([...rules.validMoves(empty)]).toEqual([]);
+    expect(outcome).toBe('playing');
+    expect(engine.phase.name).toBe('playing');
+    expect(cellsOf(engine.snapshot())).toEqual([]);
+  });
+
+  it('should_keep_the_filled_figure_cells_and_reject_a_piece_on_them_when_the_figure_starts_with_content', () => {
+    // A piece fits only on free cells of the figure (fit-rules.ts). The state copies the figure.
+    const board = figure(squareTopology, squareTopology.region(RegionSize.of(2)));
+    board.set(square(0, 0), PieceId.of('x'));
+    const domino = [square(0, 0), square(1, 0)];
+    const start = FitState.start(
+      board,
+      new FixedListPieceSource([piece(A, domino), piece(B, domino)]),
+    );
+    const engine = engineOn(start);
+
+    const overlap = engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)));
+    const free = engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 1)));
+
+    expect(cellsOf(start)).toEqual(['0,0=x']);
+    expect(overlap).toBe('playing');
+    expect(free).toBe('playing');
+    expect(cellsOf(engine.snapshot())).toEqual(['0,0=x', '0,1=a', '1,1=a']);
+    expect(trayOf(engine.snapshot())).toEqual(['b']);
+  });
+
+  it('should_throw_a_range_error_and_keep_the_game_when_a_move_of_unknown_kind_arrives_through_a_cast', () => {
+    // A value outside the `FitMove` union reaches the rules only through a cast (fit-rules.ts).
+    const rules = new FitRules<SquareCoord>();
+    const jump = { kind: 'jump', pieceId: A } as unknown as FitMove<SquareCoord>;
+    const engine = engineOn(dominoLevel());
+
+    expect(() => rules.isValid(dominoLevel(), jump)).toThrow(RangeError);
+    expect(() => rules.isValid(dominoLevel(), jump)).toThrow('Unknown Fit move: jump.');
+    expect(() => rules.apply(dominoLevel(), jump)).toThrow(RangeError);
+    expect(() => rules.apply(dominoLevel(), jump)).toThrow('Unknown Fit move: jump.');
+    expect(() => engine.play(jump)).toThrow(RangeError);
+    expect(engine.phase.name).toBe('playing');
+    expect(cellsOf(engine.snapshot())).toEqual([]);
+    expect(trayOf(engine.snapshot())).toEqual(['a', 'b']);
+  });
+
+  it('should_give_the_same_moves_in_the_same_order_when_the_valid_moves_are_read_again', () => {
+    // Remove and rotate moves of the placed pieces come first, then the place moves (fit-rules.ts).
+    // Each call gives a new lazy sequence, so a partial read does not change the next call.
+    const rules = new FitRules<SquareCoord>();
+    const state = rules.playTurn(dominoLevel(), new PlaceFitPiece(A, NO_TURN, square(0, 0))).state;
+    const expected = [
+      new RemoveFitPiece(A),
+      new RotateFitPiece(A, Turns.of(1)),
+      new PlaceFitPiece(B, NO_TURN, square(0, 1)),
+      new PlaceFitPiece(B, Turns.of(2), square(1, 1)),
+    ];
+
+    const partial = rules.validMoves(state)[Symbol.iterator]().next();
+    const first = [...rules.validMoves(state)];
+    const second = [...rules.validMoves(state)];
+
+    expect(partial.value).toEqual(expected[0]);
+    expect(first).toEqual(expected);
+    expect(second).toEqual(expected);
+    expect(cellsOf(state)).toEqual(['0,0=a', '1,0=a']);
+  });
+
+  it('should_throw_and_keep_the_game_when_the_topology_throws_during_a_move', () => {
+    // An exception leaves the board, the score and the phase (game-engine.ts).
+    const failing: GridTopology<SquareCoord, string, string> = {
+      ...squareTopology,
+      rotate: (c, turns) => {
+        if (turns.value === 2) throw new Error('The topology failed.');
+        return squareTopology.rotate(c, turns);
+      },
+    };
+    const domino = [square(0, 0), square(1, 0)];
+    const engine = engineOn(
+      FitState.start(
+        figure(failing, failing.region(RegionSize.of(2))),
+        new FixedListPieceSource([piece(A, domino), piece(B, domino)]),
+      ),
+    );
+
+    expect(() => engine.play(new PlaceFitPiece(A, Turns.of(2), square(1, 0)))).toThrow(
+      'The topology failed.',
+    );
+
+    expect(engine.phase.name).toBe('playing');
+    expect(cellsOf(engine.snapshot())).toEqual([]);
+    expect(trayOf(engine.snapshot())).toEqual(['a', 'b']);
+    expect(engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)))).toBe('playing');
+    expect(cellsOf(engine.snapshot())).toEqual(['0,0=a', '1,0=a']);
+  });
+
+  it('should_reject_the_rotation_and_keep_the_board_when_the_topology_turns_a_cell_outside_the_figure', () => {
+    // Every cell of a placed piece lies inside the figure (fit-rules.ts, `fits()`).
+    const outward: GridTopology<SquareCoord, string, string> = {
+      ...squareTopology,
+      rotate: (c, turns) => (turns.value === 1 ? square(9, 9) : squareTopology.rotate(c, turns)),
+    };
+    const domino = [square(0, 0), square(1, 0)];
+    const engine = engineOn(
+      FitState.start(
+        figure(outward, outward.region(RegionSize.of(2))),
+        new FixedListPieceSource([piece(A, domino), piece(B, domino)]),
+      ),
+    );
+    engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)));
+
+    const outcome = engine.play(new RotateFitPiece(A, Turns.of(1)));
+
+    expect(outcome).toBe('playing');
+    expect(engine.phase.name).toBe('playing');
+    expect(cellsOf(engine.snapshot())).toEqual(['0,0=a', '1,0=a']);
+    expect(rotationOf(engine.snapshot(), A)).toBe(0);
+  });
+});
