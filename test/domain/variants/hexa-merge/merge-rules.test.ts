@@ -1,9 +1,20 @@
 /** @jest-environment node */
+import { Board } from '../../../../src/domain/engine/board';
+import { GameEngine } from '../../../../src/domain/engine/game-engine';
+import { GameId } from '../../../../src/domain/engine/game-id';
+import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
+import { RegionSize } from '../../../../src/domain/engine/region-size';
 import { BaseGameRules } from '../../../../src/domain/engine/rules';
+import { MergeRules } from '../../../../src/domain/variants/hexa-merge/merge-rules';
+import { MergeState } from '../../../../src/domain/variants/hexa-merge/merge-state';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
+import type { IMergeable } from '../../../../src/domain/variants/hexa-merge/mergeable';
+import type { NewTile } from '../../../../src/domain/variants/hexa-merge/new-tile';
 import { Slide, type SlideSense } from '../../../../src/domain/variants/hexa-merge/slide';
+import { RecordingPublisher } from '../../../support/engine/fake-game';
 import {
   hex,
+  hexTopology,
   type HexAxis,
   type HexCoord,
 } from '../../../support/variants/hexa-merge/hex-topology';
@@ -222,5 +233,120 @@ describe('MergeRules', () => {
     expect([...rules.validMoves(open)]).toHaveLength(6);
     expect(outcome).toBe('playing');
     expect(values(engine.snapshot())).toEqual(values(stuck));
+  });
+});
+
+// Edge cases of the walkthrough of PR #109 (issue #120).
+describe('Merge edge cases', () => {
+  it('should_throw_a_range_error_when_the_tile_value_is_negative_zero_or_negative_infinity', () => {
+    // A tile value is a power of two of 2 or more. Any other number throws (merge-tile.ts).
+    for (const value of [-0, Number.NEGATIVE_INFINITY]) {
+      expect(() => MergeTile.of(value)).toThrow(RangeError);
+      expect(() => MergeTile.of(value)).toThrow(
+        `A merge tile needs a power of two of 2 or more, not ${value}.`,
+      );
+    }
+  });
+
+  it('should_throw_and_keep_the_game_when_a_tile_or_a_merge_leaves_the_safe_integers', () => {
+    // 2^53 is a power of two, but it is not a safe integer (merge-tile.ts).
+    const big = MergeTile.of(2 ** 52);
+    const tooBig = 'A merge tile needs a power of two of 2 or more, not 9007199254740992.';
+    const { engine, publisher } = mergeGame(
+      mergeState(
+        [
+          [hex(1, 0), 2 ** 52],
+          [hex(2, 0), 2 ** 52],
+        ],
+        3,
+      ),
+    );
+
+    expect(() => MergeTile.of(2 ** 53)).toThrow(RangeError);
+    expect(() => MergeTile.of(2 ** 53)).toThrow(tooBig);
+    expect(() => big.mergeWith(MergeTile.of(2 ** 52))).toThrow(tooBig);
+    // The rollback of a turn keeps the board and the phase (classes.md decision 21).
+    expect(() => engine.play(Slide.of('q', 'forward'))).toThrow(tooBig);
+    expect(values(engine.snapshot())).toEqual({ '1,0': 2 ** 52, '2,0': 2 ** 52 });
+    expect(engine.phase.name).toBe('playing');
+    expect(publisher.events).toEqual([]);
+  });
+
+  it('should_merge_any_mergeable_cell_and_keep_the_game_when_its_merge_throws', () => {
+    // The rules need only `IMergeable` from a cell (decision 8, mergeable.ts).
+    // An exception leaves the board, the score and the phase (game-engine.ts).
+    interface Chip extends IMergeable<Chip> {
+      readonly label: string;
+    }
+    function chip(label: string, failing = false): Chip {
+      return {
+        label,
+        canMergeWith: (other) => other.label === label,
+        mergeWith: (other) => {
+          if (failing) throw new Error('The merge failed.');
+          return chip(label + other.label);
+        },
+      };
+    }
+    function chipGame(cells: readonly [HexCoord, Chip][]) {
+      const board = new Board<Chip, HexCoord, HexAxis>(
+        hexTopology.region(RegionSize.of(3)),
+        hexTopology,
+      );
+      for (const [at, cell] of cells) board.set(at, cell);
+      const engine = new GameEngine<
+        Chip,
+        HexCoord,
+        Slide<HexAxis>,
+        MergeState<Chip, HexCoord, HexAxis>
+      >(
+        GameId.of('hexa-merge'),
+        new MergeRules<Chip, HexCoord, HexAxis>(chip('aaaa')),
+        { score: () => 0 },
+        new RecordingPublisher(),
+      );
+      engine.start(new MergeState(board, new FixedListPieceSource<NewTile<Chip>>([])));
+      return engine;
+    }
+    function labels(engine: ReturnType<typeof chipGame>): Record<string, string> {
+      const out: Record<string, string> = {};
+      for (const [at, cell] of engine.snapshot().board.cells())
+        out[hexTopology.key(at)] = cell.label;
+      return out;
+    }
+    const merging = chipGame([
+      [hex(1, 0), chip('a')],
+      [hex(2, 0), chip('a')],
+    ]);
+    const failing = chipGame([
+      [hex(1, 0), chip('a', true)],
+      [hex(2, 0), chip('a', true)],
+    ]);
+
+    const merged = merging.play(Slide.of('q', 'forward'));
+
+    expect(merged).toBe('playing');
+    expect(labels(merging)).toEqual({ '2,0': 'aa' });
+    expect(() => failing.play(Slide.of('q', 'forward'))).toThrow('The merge failed.');
+    expect(failing.phase.name).toBe('playing');
+    expect(labels(failing)).toEqual({ '1,0': 'a', '2,0': 'a' });
+    // A slide on the axis r moves no chip into another, so no merge runs.
+    expect(failing.play(Slide.of('r', 'forward'))).toBe('playing');
+    expect(labels(failing)).toEqual({ '1,1': 'a', '2,0': 'a' });
+  });
+
+  it('should_end_the_game_when_the_board_is_empty', () => {
+    // The game ends when no slide changes the board (merge-rules.ts).
+    // On an empty board no tile moves, so no slide changes it.
+    const empty = mergeState([], 2);
+    const { engine, rules, publisher } = mergeGame(empty);
+
+    const outcome = engine.play(Slide.of('q', 'forward'));
+
+    expect(rules.evaluate(empty)).toBe('game-over');
+    expect([...rules.validMoves(empty)]).toEqual([]);
+    expect(outcome).toBe('playing');
+    expect(values(engine.snapshot())).toEqual({});
+    expect(publisher.events).toEqual([]);
   });
 });
