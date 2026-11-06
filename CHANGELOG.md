@@ -6,6 +6,8 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-06
+
 ### Added
 
 - Tests that close the review gaps of the merged `GameEngine` ([#71](https://github.com/Hexablock-Suite/hexablock-app/issues/71)): a reentrant `play()` from `score()` throws a `RangeError`, because the engine is in the resolving phase; `start()` after a game over starts a new game; and rules that throw in `apply()` or in `evaluate()` leave the board, the score and the phase unchanged.
