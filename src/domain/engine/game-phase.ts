@@ -20,6 +20,11 @@ function phaseOf(outcome: Outcome): GamePhase {
       return VictoryPhase.instance;
     case 'game-over':
       return GameOverPhase.instance;
+    default: {
+      // A value outside the `Outcome` union reaches this branch only through a cast.
+      const unknown: never = outcome;
+      throw new RangeError(`Unknown outcome: ${String(unknown)}.`);
+    }
   }
 }
 

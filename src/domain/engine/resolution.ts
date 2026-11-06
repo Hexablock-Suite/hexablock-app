@@ -19,7 +19,9 @@ export class Resolution<TState> {
     return new Resolution(state, true, 'playing');
   }
 
+  // Only an accepted move gets an outcome. A rejected move ends no game.
   evaluated(outcome: Outcome): Resolution<TState> {
+    if (!this.accepted) throw new RangeError('A rejected resolution cannot be evaluated.');
     return new Resolution(this.state, this.accepted, outcome);
   }
 }
