@@ -82,13 +82,13 @@ The four core types:
 
 ### Type parameters
 
-| Parameter | What it is                                 | Bound on it                                 |
-| --------- | ------------------------------------------ | ------------------------------------------- |
-| `TCell`   | The content of one cell (§1.5)             | `IMergeable<TCell>` in `MergeRules` only    |
-| `TCoord`  | The coordinate type of one geometry        | None                                        |
-| `TMove`   | The move a player makes                    | None                                        |
-| `TState`  | The full state of a game, board included   | `BoardState<TCell, TCoord>` in `GameEngine` |
-| `TPiece`  | What a piece source gives (`IPieceSource`) | None                                        |
+| Parameter | What it is                                 | Bound on it                                                     |
+| --------- | ------------------------------------------ | --------------------------------------------------------------- |
+| `TCell`   | The content of one cell (§1.5)             | `IMergeable<TCell>` in `MergeRules` only                        |
+| `TCoord`  | The coordinate type of one geometry        | None                                                            |
+| `TMove`   | The move a player makes                    | None                                                            |
+| `TState`  | The full state of a game, board included   | `BoardState<TCell, TCoord> & Cloneable<TState>` in `GameEngine` |
+| `TPiece`  | What a piece source gives (`IPieceSource`) | None                                                            |
 
 `IGameRules` and `BaseGameRules` take two type parameters, `TMove` and `TState`, because none of their members names a cell or a coordinate (decision 16).
 
@@ -96,7 +96,7 @@ The four core types:
 
 Statement §3.1 asks the README to explain each bound (APP-NFR-05). The design has two.
 
-- **`TState extends BoardState<TCell, TCoord>` on `GameEngine`.** `BoardState` gives the `board`, the `score` and `clone()`. The engine needs all three for every variant: it clones the state before each move to keep the undo snapshot (decision 34), and `snapshot()` returns a clone so that no caller changes the board (decision 26). Without the bound, the engine could not clone or read a state it does not know.
+- **`TState extends BoardState<TCell, TCoord> & Cloneable<TState>` on `GameEngine`.** `BoardState` gives the `board`, the `score` and `clone()`. The engine needs all three for every variant: it clones the state before each move to keep the undo snapshot (decision 34), and `snapshot()` returns a clone so that no caller changes the board (decision 26). Without the bound, the engine could not clone or read a state it does not know. `BoardState.clone()` promises only a `BoardState`, so `Cloneable<TState>` makes `clone()` return the variant state itself: a copy keeps the type of the state, with no cast.
 - **`TCell extends IMergeable<TCell>` on `MergeRules`.** The Merge rules merge two equal tiles into one of double value. The bound states the capability that the rules need from a cell, and nothing more (decision 8). The Merge factory binds it to `MergeTile`, a value object that wraps an integer, because a primitive integer cannot implement an interface (A1).
 
 ### How each variant binds the engine
