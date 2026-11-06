@@ -7,6 +7,13 @@ import type { Outcome } from './outcome';
 import type { IGameRules } from './rules';
 import type { IScoringPolicy } from './scoring-policy';
 
+// The report of one turn: whether the rules accepted the move, and the outcome.
+// A rejected move always has the outcome `playing`.
+export interface TurnReport {
+  readonly accepted: boolean;
+  readonly outcome: Outcome;
+}
+
 // The aggregate root of one game (classes.md decision 26).
 // A game changes only through `play()`, and `play()` applies a move only while
 // `phase.canPlay()` is true. `snapshot()` returns a clone, so no caller changes the board.
@@ -40,10 +47,17 @@ export class GameEngine<
 
   // One turn: receive the move, let the rules validate, apply, resolve and evaluate it
   // (template method `playTurn()`), score it, and notify when the game ends.
+  // A rejected move returns `playing`. Call `tryPlay()` to tell it from an accepted move.
+  play(move: TMove): Outcome {
+    return this.tryPlay(move).outcome;
+  }
+
+  // The same turn as `play()`. The report also says whether the rules accepted the move,
+  // so the `ApplyMove` use case can return a failure for a rejected move (issue 100).
   // The rollback covers the whole state and the phase. A piece source lives in the state
   // (classes.md decision 31), and the state `clone()` clones it. So a turn that throws
   // after a draw leaves the source at its old position, and a retry draws the same piece.
-  play(move: TMove): Outcome {
+  tryPlay(move: TMove): TurnReport {
     const state = this.started();
     if (!this.current.canPlay()) {
       throw new RangeError(`The game cannot accept a move in the ${this.current.name} phase.`);
@@ -61,7 +75,7 @@ export class GameEngine<
     // A rejected move ends no game, whatever outcome the rules give it.
     if (turn === undefined) {
       this.current = PlayingPhase.instance;
-      return 'playing';
+      return { accepted: false, outcome: 'playing' };
     }
     this.state = turn.next;
     this.current = turn.phase;
@@ -70,7 +84,7 @@ export class GameEngine<
     if (turn.outcome !== 'playing') {
       this.events.publish(new GameOver(this.gameId, turn.outcome, turn.next.score));
     }
-    return turn.outcome;
+    return { accepted: true, outcome: turn.outcome };
   }
 
   pause(): void {
