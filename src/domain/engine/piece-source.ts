@@ -16,6 +16,8 @@ function* readAll<TPiece>(source: IPieceSource<TPiece>): Iterator<TPiece> {
 }
 
 // An endless source: `hasNext()` is always true. The seed fixes the sequence.
+// So `[...source]` and `Array.from(source)` never return: a caller reads it with
+// `for...of` and `break`, or with `next()`.
 // `draw` turns the random source into one piece, so the variant decides what a piece is.
 export class SeededPieceSource<TPiece> implements IPieceSource<TPiece>, IRandomSeeded {
   private readonly random: RandomSource;
@@ -41,11 +43,16 @@ export class SeededPieceSource<TPiece> implements IPieceSource<TPiece>, IRandomS
 }
 
 // A finite source: it ends after its last piece, so the Fit tray is finite.
+// It reads its list once: a second `for...of` gives no piece.
+// A list that holds `undefined` throws a RangeError, because `undefined` is not a piece.
 export class FixedListPieceSource<TPiece> implements IPieceSource<TPiece> {
   private readonly pieces: readonly TPiece[];
   private index = 0;
 
   constructor(pieces: readonly TPiece[]) {
+    if (pieces.includes(undefined as TPiece)) {
+      throw new RangeError('A piece list cannot hold undefined.');
+    }
     this.pieces = [...pieces];
   }
 
