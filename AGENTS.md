@@ -31,6 +31,7 @@ Expo changes every SDK. Read the docs for the installed major version (`https://
 - Name every `it` and `test` as `should_<expected_result>_when_<condition>`. Gate: `pnpm lint`, `test/gates/test-title-gate.test.ts`. <!-- rule: R-test-names -->
 - Domain code imports only domain code, and never React, React Native or Expo. Gate: `pnpm arch`, `test/gates/architecture-gate.test.ts`. <!-- rule: R-domain-imports -->
 - The engine never imports a variant, and a variant never imports another variant. Gate: `pnpm arch`, `test/gates/architecture-gate.test.ts`. <!-- rule: R-engine-variants -->
+- The engine has no `if`, `switch` or ternary on the game id: each variant changes behavior through its factory, rules and scoring (APP-NFR-08). Gate: `test/gates/engine-game-id-gate.test.ts`. <!-- rule: R-engine-no-game-id -->
 - Application code imports only domain and application code. Gate: `pnpm arch`, `test/gates/architecture-gate.test.ts`. <!-- rule: R-application-imports -->
 - Adapter code imports only domain, application and adapter code: never a driver of `src/infrastructure/`. Gate: `pnpm arch`, `test/gates/architecture-gate.test.ts`. <!-- rule: R-adapters-imports -->
 - Domain and application code take time and randomness by injection: no `Math.random`, `Date.now` or `new Date()`. Gate: `pnpm lint`, `test/gates/domain-purity-gate.test.ts`. <!-- rule: R-domain-determinism -->
