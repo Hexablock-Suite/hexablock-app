@@ -82,7 +82,7 @@ The four core types:
 
 ### Type parameters
 
-The Status column says whether a bound is in the code today (`code`) or only in the design (`design`). `test/docs/generic-bounds.test.ts` checks that every bound of `src/domain/engine/` has a `code` row, and that every `code` row exists in the code.
+The Status column says whether a bound is in the code today (`code`) or only in the design (`design`). `test/docs/generic-bounds.test.ts` reads the engine with the TypeScript parser. It checks that every bounded type parameter of `src/domain/engine/`, whatever its name, has a `code` row, and that every `code` row exists in the code.
 
 | Parameter    | What it is                                 | Bound                                           | Where                                 | Status | Reason                                                                                                                 |
 | ------------ | ------------------------------------------ | ----------------------------------------------- | ------------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------- |
