@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { Result, UseCaseError } from '../../src/application/result';
+import { caughtError, Result, UseCaseError } from '../../src/application/result';
 
 // `Result` holds a value or an error, never both (classes.md decision 28, issue 100).
 
@@ -26,6 +26,22 @@ describe('Result', () => {
 
   it('should_not_be_retryable_when_a_use_case_error_gets_no_retryable_flag', () => {
     expect(new UseCaseError('no-running-game', 'No game is running.').retryable).toBe(false);
+  });
+
+  it('should_give_the_text_of_the_thrown_value_when_caught_error_gets_a_value_that_is_not_an_error', () => {
+    // Any thrown value gives a message: `String()` turns it into text.
+    const thrown: unknown[] = ['The disk is full.', undefined, null, 42, { code: 7 }];
+
+    expect(thrown.map((value) => caughtError('start-failed', value).message)).toEqual([
+      'The disk is full.',
+      'undefined',
+      'null',
+      '42',
+      '[object Object]',
+    ]);
+    expect(caughtError('start-failed', undefined)).toEqual(
+      new UseCaseError('start-failed', 'undefined', false),
+    );
   });
 
   it('should_reject_a_change_when_a_caller_writes_to_a_result', () => {

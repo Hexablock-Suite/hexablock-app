@@ -1,6 +1,10 @@
 /** @jest-environment node */
+import { ApplyMove } from '../../src/application/apply-move';
+import type { RunningGameStore } from '../../src/application/running-game-store';
+import { StartGame } from '../../src/application/start-game';
 import type { BoardState } from '../../src/domain/engine/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
+import type { GameEngine } from '../../src/domain/engine/game-engine';
 import type { GameEvent, GameEventPublisher } from '../../src/domain/engine/game-events';
 import type { Piece } from '../../src/domain/engine/piece';
 import { FixedListPieceSource, type IPieceSource } from '../../src/domain/engine/piece-source';
@@ -11,7 +15,13 @@ import type { ColorStack } from '../../src/domain/variants/hexa-sort/color-stack
 import { SortFactory } from '../../src/domain/variants/hexa-sort/sort-factory';
 import { square, squareTopology, type SquareCoord } from '../support/engine/square-topology';
 import { firstValidMove } from '../support/engine/variant-game';
-import { errorOf, gameUseCases, valueOf } from '../support/application/game-use-cases';
+import {
+  errorOf,
+  gameUseCases,
+  MemoryRunningGameStore,
+  valueOf,
+} from '../support/application/game-use-cases';
+import { RecordingPublisher } from '../support/engine/fake-game';
 import { fitFactory } from '../support/variants/hexa-fit/fit-game';
 import { linesFactory } from '../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../support/variants/hexa-merge/merge-game';
@@ -62,6 +72,54 @@ function brokenStart<
       throw new RangeError('The level is broken.');
     },
   };
+}
+
+// A store whose `current()` or `replace()` throws, as a broken storage adapter would.
+class ThrowingStore<
+  TCell,
+  TCoord,
+  TMove,
+  TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
+> implements RunningGameStore<TCell, TCoord, TMove, TState> {
+  constructor(private readonly failing: 'current' | 'replace') {}
+
+  current(): GameEngine<TCell, TCoord, TMove, TState> | undefined {
+    if (this.failing === 'current') throw new Error('The store cannot read.');
+    return undefined;
+  }
+
+  replace(_game: GameEngine<TCell, TCoord, TMove, TState>): void {
+    if (this.failing === 'replace') throw new Error('The store cannot write.');
+  }
+}
+
+// The cells, the score and the phase of the running game, so a test compares them by value.
+function runningGameOf<
+  TCell,
+  TCoord,
+  TMove,
+  TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
+>(games: MemoryRunningGameStore<TCell, TCoord, TMove, TState>) {
+  const engine = games.running();
+  return [engine.snapshot().board.cells(), engine.snapshot().score, engine.phase.name];
+}
+
+// Starts one game and plays `undefined` and then `null` as the move.
+async function playNoMove<
+  TCell,
+  TCoord,
+  TMove,
+  TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
+  TPiece,
+>(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>) {
+  const { games, startGame, applyMove } = gameUseCases(factory);
+  valueOf(await startGame.execute({}));
+  const before = runningGameOf(games);
+  const ok: boolean[] = [];
+  for (const move of [undefined, null]) {
+    ok.push((await applyMove.execute({ move: move as TMove })).ok);
+  }
+  return { ok, before, after: runningGameOf(games) };
 }
 
 // A Sort level whose source throws in `clone()`, as a broken level source would.
@@ -144,6 +202,66 @@ describe('StartGame and ApplyMove', () => {
       false,
     ]);
     expect(games.current()).toBeUndefined();
+  });
+
+  it('should_return_a_start_failed_failure_and_keep_the_old_game_when_the_factory_throws_while_a_game_runs', async () => {
+    const { games, startGame, applyMove } = gameUseCases(linesFactory());
+    valueOf(await startGame.execute({}));
+    const move = firstValidMove(linesFactory().createRules(), games.running().snapshot());
+    valueOf(await applyMove.execute({ move }));
+    const oldGame = games.running();
+    const before = runningGameOf(games);
+    const broken = new StartGame(brokenStart(linesFactory()), games, new RecordingPublisher());
+
+    const error = errorOf(await broken.execute({}));
+
+    expect([error.code, error.message]).toEqual(['start-failed', 'The level is broken.']);
+    expect(games.current()).toBe(oldGame);
+    expect(runningGameOf(games)).toEqual(before);
+  });
+
+  it('should_return_a_failure_and_keep_the_game_when_the_request_holds_no_move', async () => {
+    // Only a cast passes no move. The failure code depends on the rules of the variant,
+    // so the test checks only that the use case returns a failure and throws nothing.
+    const runs = [
+      await playNoMove(linesFactory()),
+      await playNoMove(fitFactory()),
+      await playNoMove(sortFactory()),
+      await playNoMove(mergeFactory()),
+    ];
+
+    for (const run of runs) {
+      expect(run.ok).toEqual([false, false]);
+      expect(run.after).toEqual(run.before);
+    }
+  });
+
+  it('should_return_a_move_failed_failure_when_the_store_throws_on_current', async () => {
+    const applyMove = new ApplyMove(new ThrowingStore('current'));
+
+    const error = errorOf(await applyMove.execute({ move: new PlacePiece(0, square(0, 0)) }));
+
+    expect([error.code, error.message, error.retryable]).toEqual([
+      'move-failed',
+      'The store cannot read.',
+      false,
+    ]);
+  });
+
+  it('should_return_a_start_failed_failure_when_the_store_throws_on_replace', async () => {
+    const startGame = new StartGame(
+      linesFactory(),
+      new ThrowingStore('replace'),
+      new RecordingPublisher(),
+    );
+
+    const error = errorOf(await startGame.execute({}));
+
+    expect([error.code, error.message, error.retryable]).toEqual([
+      'start-failed',
+      'The store cannot write.',
+      false,
+    ]);
   });
 
   it('should_return_a_move_rejected_failure_and_keep_the_board_when_the_rules_reject_the_move', async () => {
