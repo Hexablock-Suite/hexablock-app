@@ -6,7 +6,10 @@ import type { Axis, GridTopology } from './grid-topology';
 // Iterator: `line()`, `ring()` and `neighborhood()` walk the board lazily.
 // Prototype: `clone()` takes the snapshot for undo (classes.md decision 7).
 // The board asks its topology for every coordinate (classes.md decision 16).
-// A cell is a value: the board copies the references, never the cells.
+// A cell is a value. The board copies the references to the cells, never the cells.
+// So `clone()` shares the cell objects with the original board.
+// A caller must not change a cell object. To change a cell, the caller sets a new cell.
+// Each coordinate of the shape has its own topology key. Two equal keys are an error.
 export class Board<TCell, TCoord> implements Cloneable<Board<TCell, TCoord>> {
   private readonly inside: ReadonlySet<string>;
   private readonly content: Map<string, [TCoord, TCell]>;
@@ -17,6 +20,9 @@ export class Board<TCell, TCoord> implements Cloneable<Board<TCell, TCoord>> {
     content: ReadonlyMap<string, [TCoord, TCell]> = new Map(),
   ) {
     this.inside = new Set(shape.cells.map((c) => topology.key(c)));
+    if (this.inside.size !== shape.cells.length) {
+      throw new RangeError('Two coordinates of the shape have the same key.');
+    }
     this.content = new Map(content);
   }
 

@@ -96,10 +96,51 @@ describe('Board', () => {
     expect([...board.neighborhood(2)]).toEqual([1, 3]);
   });
 
+  // A cell is a value: the clone holds the same cell objects, and never copies them.
+  it('should_share_the_cell_objects_when_the_board_is_cloned', () => {
+    const board = new Board<{ color: string }, number>(stripTopology.region(5), stripTopology);
+    const cell = { color: 'red' };
+    board.set(1, cell);
+
+    const copy = board.clone();
+
+    expect(copy.get(1)).toBe(cell);
+    expect(copy.cells()[0]?.[1]).toBe(cell);
+  });
+
   it('should_report_whether_a_coordinate_is_inside_when_contains_is_asked', () => {
     const board = newBoard();
 
     expect(board.contains(4)).toBe(true);
     expect(board.contains(5)).toBe(false);
+  });
+});
+
+describe('Board shape invariants', () => {
+  it('should_throw_a_range_error_when_the_shape_is_empty', () => {
+    expect(() => BoardShape.of<number>([])).toThrow(RangeError);
+    expect(() => BoardShape.of<number>([])).toThrow('at least one coordinate');
+  });
+
+  // The board owns the topology, so the board finds two equal coordinates by their key.
+  it('should_throw_a_range_error_when_the_shape_repeats_a_coordinate', () => {
+    const shape = BoardShape.of([0, 1, 1]);
+
+    expect(() => new Board(shape, stripTopology)).toThrow(RangeError);
+    expect(() => new Board(shape, stripTopology)).toThrow('the same key');
+  });
+
+  it('should_throw_a_range_error_when_the_topology_gives_two_coordinates_the_same_key', () => {
+    const collidingTopology: GridTopology<number> = { ...stripTopology, key: (c) => String(c % 2) };
+
+    expect(() => new Board(stripTopology.region(3), collidingTopology)).toThrow(RangeError);
+    expect(() => new Board(stripTopology.region(3), collidingTopology)).toThrow('the same key');
+  });
+
+  it('should_keep_every_coordinate_when_the_shape_has_no_repeated_key', () => {
+    const board = new Board(BoardShape.of([4, 2, 0]), stripTopology);
+
+    expect(board.shape.cells).toEqual([4, 2, 0]);
+    expect([0, 2, 4].every((c) => board.contains(c))).toBe(true);
   });
 });
