@@ -149,6 +149,45 @@ The use cases `StartGame` and `ApplyMove` in [`src/application/`](src/applicatio
 
 The variant classes stay generic over `TCoord`, so a variant runs on any geometry. Today the composition root passes `HexGeometry`, so a running game binds `TCoord` to `HexCoord` (decisions 16 and 17). Each variant writes one factory that implements `IVariantFactory`. The factory creates the rules, the piece source, the scoring policy and the board, and picks the engine classes for progress and undo (decision 31).
 
+### Scoring
+
+Each variant gives the engine one `IScoringPolicy` (APP-FR-06). After each accepted turn, the engine adds the points of the policy to the game score. Each policy reads only the facts of the turn in the new state, so it keeps no game data (decision 26). Each constant below is a named export of its file, so a new value is a one-line change.
+
+> **«Propuesta, pendiente del equipo».** Every value and formula in this section codes against the proposal on [#59](https://github.com/Hexablock-Suite/hexablock-app/issues/59) (overnight queue, 2026-11-06). The team has not decided the scoring yet, so `docs/REQUIREMENTS.md` keeps it in «Still to define». Two more points are open: whether undo and remove count as Fit moves ([#60](https://github.com/Hexablock-Suite/hexablock-app/issues/60)), and what orders the per-level leaderboard (DS-4, [hexablock-api#24](https://github.com/Hexablock-Suite/hexablock-api/issues/24)).
+
+#### Hexa Lines
+
+A placement scores its placed cells and a bonus for each line that it clears. The bonus grows with the combo and the streak (statement §1.1).
+
+- Base: [`LinesScoring`](src/domain/variants/hexa-lines/lines-scoring.ts) gives `POINTS_PER_CELL` = 1 per placed cell and `POINTS_PER_LINE` = 10 per cleared line.
+- Multiplier: [`ComboMultiplierDecorator`](src/domain/variants/hexa-lines/combo-multiplier-decorator.ts) wraps the base and multiplies the line bonus by `lines + streak - 1`. The cell points keep factor 1.
+- Formula: `cells × 1 + lines × 10 × (lines + streak - 1)`. The streak counts the current placement, so the first clearing placement has streak 1. A placement that clears no line has no bonus.
+- Examples from [`lines-scoring.test.ts`](test/domain/variants/hexa-lines/lines-scoring.test.ts): one cell that clears one line with streak 1 gives `1 + 10 × 1 × 1` = 11. One cell that clears two lines in one placement gives `1 + 10 × 2 × 2` = 41. A second clearing placement in a row (streak 2, one line) gives `1 + 10 × 1 × 2` = 21.
+
+#### Hexa Merge
+
+A slide scores the sum of the values that its merges make (statement §1.4).
+
+- Policy: [`MergeScoring`](src/domain/variants/hexa-merge/merge-scoring.ts) adds the values of the tiles in `MergeState.merged`. The policy has no constant.
+- The new tile of the turn adds nothing, and a slide that merges no tile gives 0.
+- Example from [`merge-scoring.test.ts`](test/domain/variants/hexa-merge/merge-scoring.test.ts): the row `2 2 4 4` slides into a 4 and an 8, so the slide gives `4 + 8` = 12.
+
+#### Hexa Sort
+
+A turn scores each tile of every stack that it clears. Statement §1.3 defines no points. Sort has no stars: its progress is the levels won.
+
+- Policy: [`SortScoring`](src/domain/variants/hexa-sort/sort-scoring.ts) gives `SORT_POINTS_PER_TILE` = 10 per tile of a cleared stack.
+- Formula: `cleared tiles × 10`. A turn that clears no stack gives 0.
+- Example from [`sort-scoring.test.ts`](test/domain/variants/hexa-sort/sort-scoring.test.ts): a turn clears one stack of 11 tiles (one blue below ten reds), so it gives `11 × 10` = 110.
+
+#### Hexa Fit
+
+Fit grades a won level with stars by moves and time, not with points (statement §1.2).
+
+- Policy: [`FitScoring`](src/domain/variants/hexa-fit/fit-scoring.ts) gives `FIT_POINTS_PER_TURN` = 0 on every turn.
+- Stars: [`fitStars(play, thresholds)`](src/domain/variants/hexa-fit/fit-stars.ts) counts the stars of the level whose two thresholds are both met: `moves <= maxMoves` and `elapsedMs <= maxElapsedMs`. The level file holds the thresholds. Each star counts on its own.
+- Example from [`fit-scoring.test.ts`](test/domain/variants/hexa-fit/fit-scoring.test.ts): with one star of 10 moves and 60 000 ms, a play of 10 moves and 60 000 ms gets the star. A play of 10 moves and 60 001 ms gets no star, because only the moves meet the threshold.
+
 ### Adding a fifth variant
 
 A new variant adds classes and data. It changes no engine file, no other variant, no use case and no presenter (APP-NFR-06). [docs/EXTENSIBILITY.md](docs/EXTENSIBILITY.md) lists the files it adds and the files it does not touch, with Hexa Fill as the example. The [extensibility diagram](docs/architecture/extensibility.md) shows the extension points:
