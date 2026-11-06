@@ -86,7 +86,6 @@ The Status column says whether a bound is in the code today (`code`) or only in 
 
 | Parameter    | What it is                                 | Bound                                           | Where                                 | Status | Reason                                                                                                                 |
 | ------------ | ------------------------------------------ | ----------------------------------------------- | ------------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------- |
-| `TCell`      | The content of one cell (§1.5)             | `IMergeable<TCell>`                             | `MergeRules`, Sprint 2                | design | The Merge rules need a cell that can merge with an equal cell (decision 8).                                            |
 | `TCoord`     | The coordinate type of one geometry        | None                                            |                                       |        |                                                                                                                        |
 | `TMove`      | The move a player makes                    | None                                            |                                       |        |                                                                                                                        |
 | `TState`     | The full state of a game, board included   | `BoardState<TCell, TCoord> & Cloneable<TState>` | `GameEngine`                          | code   | The engine reads the board and the score, and clones the state (decisions 26 and 34).                                  |
@@ -97,13 +96,21 @@ The Status column says whether a bound is in the code today (`code`) or only in 
 
 `IGameRules` and `BaseGameRules` take two type parameters, `TMove` and `TState`, because none of their members names a cell or a coordinate (decision 16). `GameEngine`, `IGameRules` and `BoardState` name no axis: only the topology and the board do (issue #86).
 
+### Variant bounds
+
+A variant may bound a type parameter of its own classes. `test/docs/generic-bounds.test.ts` reads only `src/domain/engine/`, so this table has no gate.
+
+| Parameter | What it is                     | Bound                                                              | Where                                                         | Status | Reason                                                                      |
+| --------- | ------------------------------ | ------------------------------------------------------------------ | ------------------------------------------------------------- | ------ | --------------------------------------------------------------------------- |
+| `TCell`   | The content of one cell (§1.5) | [`IMergeable<TCell>`](src/domain/variants/hexa-merge/mergeable.ts) | [`MergeRules`](src/domain/variants/hexa-merge/merge-rules.ts) | code   | The Merge rules need a cell that can merge with an equal cell (decision 8). |
+
 ### Why each bound exists
 
-Statement §3.1 asks the README to explain each bound (APP-NFR-05). The Sprint 1 code has the state bound, written in two places, and the two name bounds of the topology. The design adds one more.
+Statement §3.1 asks the README to explain each bound (APP-NFR-05). The engine has the state bound, written in two places, and the two name bounds of the topology. The Merge variant adds one more.
 
 - **`TState extends BoardState<TCell, TCoord> & Cloneable<TState>` on `GameEngine` (code).** `BoardState` gives the `board`, the `score` and `clone()`. The engine needs all three for every variant: it clones the state before each move for the scoring policy and, in Sprint 3, for the undo snapshot (decision 34). `start()` and `snapshot()` clone too, so that no caller changes the board (decision 26). It adds the points of each turn to `score`. Without the bound, the engine could not clone or score a state it does not know. `BoardState.clone()` promises only a `BoardState`, so `Cloneable<TState>` makes `clone()` return the variant state itself: a copy keeps the type of the state, with no cast. The private helper `copy()` in the same file needs only `Cloneable<TState>`, because it only calls `clone()`.
 - **`TAxis extends string` and `TDirection extends string` on `GridTopology`, and `TAxis extends string` on `Board` (code).** An axis or a direction is a name, such as `q` or `north-east`. Each topology binds the parameter to a closed union of its names, for example `'col' | 'row'` for the square double. So `line('nort', …)` does not compile. `Board` reads no direction, so it takes a topology with any direction union. `BoardState` holds a board with any axis union, so `GameEngine`, `IGameRules` and `BoardState` need no axis parameter. A variant state narrows its `board` to the board of its own topology.
-- **`TCell extends IMergeable<TCell>` on `MergeRules` (design, Sprint 2).** The Merge rules merge two equal tiles into one of double value. The bound states the capability that the rules need from a cell, and nothing more (decision 8). The Merge factory binds it to `MergeTile`, a value object that wraps an integer, because a primitive integer cannot implement an interface (A1).
+- **`TCell extends IMergeable<TCell>` on [`MergeRules`](src/domain/variants/hexa-merge/merge-rules.ts) (code).** The Merge rules merge two equal tiles into one of double value. The bound states the capability that the rules need from a cell, and nothing more (decision 8). [`MergeTile`](src/domain/variants/hexa-merge/merge-tile.ts) is a value object that wraps an integer and implements the bound, because a primitive integer cannot implement an interface (A1). The Merge factory binds `TCell` to it.
 
 ### Primitive types
 
