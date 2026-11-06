@@ -7,6 +7,7 @@ import {
 } from '../../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
+import { MergeFactory } from '../../../../src/domain/variants/hexa-merge/merge-factory';
 import { MergeRules } from '../../../../src/domain/variants/hexa-merge/merge-rules';
 import { MergeState } from '../../../../src/domain/variants/hexa-merge/merge-state';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
@@ -68,4 +69,13 @@ export function mergeGame(
   );
   engine.start(initial);
   return { engine, rules, publisher };
+}
+
+// A Merge factory on a hexagon of 2 rings, with the target 2048.
+export function mergeFactory(seed = 1): MergeFactory<HexCoord, HexAxis> {
+  return new MergeFactory(hexTopology, {
+    size: RegionSize.of(2),
+    seed,
+    target: MergeTile.of(2048),
+  });
 }

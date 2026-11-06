@@ -57,11 +57,7 @@ export class MergeRules<
   // (`mergeTileSource()`), and undo restores the cloned state, so the same tile comes back.
   // A board with no empty cell, or a source that has ended, gets no new tile.
   resolve(state: MergeState<TCell, TCoord, TAxis>): Resolution<MergeState<TCell, TCoord, TAxis>> {
-    const { board, tiles } = state;
-    const empty = board.shape.cells.filter((c) => board.get(c) === undefined);
-    if (empty.length === 0 || !tiles.hasNext()) return Resolution.resolved(state);
-    const { place, tile } = tiles.next();
-    board.set(empty[Math.floor(place * empty.length)] as TCoord, tile);
+    addNewTile(state);
     return Resolution.resolved(state);
   }
 
@@ -102,6 +98,19 @@ export class MergeRules<
       state.score,
     );
   }
+}
+
+// Puts the next tile of the source on an empty cell that the same draw picks.
+// A board with no empty cell, or a source that has ended, gets no new tile.
+// The rules call it after each slide, and `MergeFactory` calls it for the first tiles.
+export function addNewTile<TCell, TCoord, TAxis extends string>(
+  state: MergeState<TCell, TCoord, TAxis>,
+): void {
+  const { board, tiles } = state;
+  const empty = board.shape.cells.filter((c) => board.get(c) === undefined);
+  if (empty.length === 0 || !tiles.hasNext()) return;
+  const { place, tile } = tiles.next();
+  board.set(empty[Math.floor(place * empty.length)] as TCoord, tile);
 }
 
 function tileAt<TCell, TCoord>(board: Board<TCell, TCoord, string>, c: TCoord): TCell[] {
