@@ -53,7 +53,7 @@ export function row(
   return new Board(shape, squareTopology, cells);
 }
 
-// No points: the Sort scoring is issue #98.
+// No points: the rules tests check the board, not the score.
 export class NoScoring implements IScoringPolicy<SortState<SquareCoord>> {
   score(): number {
     return 0;
@@ -73,12 +73,15 @@ export function sortState(values: {
   });
 }
 
-// A started game whose engine calls only the rules contract.
-export function sortGame(state: SortState<SquareCoord>): SortGame {
+// A started game whose engine calls only the rules contract and the given scoring.
+export function sortGame(
+  state: SortState<SquareCoord>,
+  scoring: IScoringPolicy<SortState<SquareCoord>> = new NoScoring(),
+): SortGame {
   const engine: SortGame = new GameEngine(
     GameId.of('hexa-sort'),
     new SortRules<SquareCoord>(),
-    new NoScoring(),
+    scoring,
     new RecordingPublisher(),
   );
   engine.start(state);

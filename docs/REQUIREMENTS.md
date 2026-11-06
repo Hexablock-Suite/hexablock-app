@@ -170,7 +170,7 @@ Each assumption holds under both readings of the statement, or names what change
 - Sort: tie-break when two stacks have the same count of a color; whether the moving tiles are the whole top run; whether "10 of one color" means 10 in a row at the top, and what happens to tiles of other colors below. Proposal of issue #56, pending the team («Propuesta, pendiente del equipo», 2026-11-06), which `SortRules` (#93) codes against: a tie goes to the first stack in `board.cells()` order; the whole top run of the color moves, and the amount compared is the size of that top run; a top run of 10 or more removes the whole stack, tiles of other colors below included, and counts one goal (§1.3, «se elimina la pila»).
 - Merge: merge order inside one slide, and whether a tile merges once per move; probability of a 2 versus a 4; whether undo restores the random state or regenerates the new tile.
 - Lines: whether a combo counts lines on several axes; what a streak is.
-- Scoring per variant (§5.1.6) and what orders the per-level leaderboard for Fit and Sort (DS-4); whether undo and remove count as moves for Fit stars.
+- Scoring per variant (§5.1.6) and what orders the per-level leaderboard for Fit and Sort (DS-4); whether undo and remove count as moves for Fit stars. Proposal of issue #59, pending the team («Propuesta, pendiente del equipo», 2026-11-06), which `SortScoring` and `FitScoring` (#98) code against: Sort gives 10 points per tile of each stack that the turn clears, and has no stars; Fit gives no points per turn, and a star needs both of its thresholds, the moves and the time (`fitStars`). The leaderboard order (DS-4) and the Fit moves (#60) stay open.
 
 ## 11. Questions for the professor
 
