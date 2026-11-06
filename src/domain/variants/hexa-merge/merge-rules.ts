@@ -14,7 +14,8 @@ import { SLIDE_SENSES, Slide } from './slide';
 // (overnight queue, 2026-11-06). The team has not decided it yet:
 // - A slide reads each line from its leading edge, the edge that the tiles move toward.
 // - A tile merges at most once per move. So `2 2 2` gives `4 2`, and `4 2 2` gives `4 4`.
-// A slide that changes no cell is not valid. The game ends when no slide changes the board.
+// A slide that changes no cell is not valid. The game ends when no slide changes the board
+// after the new tile appears.
 // The target tile sets `targetReached` and does not end the game (A3).
 export class MergeRules<
   TCell extends IMergeable<TCell>,
@@ -49,9 +50,18 @@ export class MergeRules<
     return next;
   }
 
-  // Issue #95 adds the new tile here: 2 or 4 on an empty cell, from the seeded source
-  // that the state holds (classes.md decision 31).
+  // A new tile appears on an empty cell after each accepted slide (§1.4, issue #95).
+  // It comes from the source in the state (classes.md decision 31), so the cell and the
+  // value both come from one seeded source (APP-NFR-07). The proposal on issue #57,
+  // «Propuesta, pendiente del equipo», fixes the rest: a 2 with 0.9 and a 4 with 0.1
+  // (`mergeTileSource()`), and undo restores the cloned state, so the same tile comes back.
+  // A board with no empty cell, or a source that has ended, gets no new tile.
   resolve(state: MergeState<TCell, TCoord, TAxis>): Resolution<MergeState<TCell, TCoord, TAxis>> {
+    const { board, tiles } = state;
+    const empty = board.shape.cells.filter((c) => board.get(c) === undefined);
+    if (empty.length === 0 || !tiles.hasNext()) return Resolution.resolved(state);
+    const { place, tile } = tiles.next();
+    board.set(empty[Math.floor(place * empty.length)] as TCoord, tile);
     return Resolution.resolved(state);
   }
 
@@ -86,6 +96,7 @@ export class MergeRules<
     if (!changed) return undefined;
     return new MergeState(
       new Board(board.shape, board.topology, content),
+      state.tiles,
       state.targetReached || merged.some((tile) => tile.canMergeWith(this.target)),
       merged,
       state.score,
