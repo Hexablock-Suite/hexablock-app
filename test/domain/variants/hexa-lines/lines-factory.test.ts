@@ -2,12 +2,16 @@
 import type { Piece } from '../../../../src/domain/engine/piece';
 import { CellNode, ShapeGroup } from '../../../../src/domain/engine/shape-node';
 import type { Color } from '../../../../src/domain/variants/hexa-lines/color';
+import { PlacePiece } from '../../../../src/domain/variants/hexa-lines/place-piece';
 import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
 import { firstValidMove, startVariant } from '../../../support/engine/variant-game';
 import {
   blue,
   filledKeys,
   linesFactory,
+  linesGame,
+  linesState,
+  piece,
   red,
 } from '../../../support/variants/hexa-lines/lines-game';
 
@@ -65,5 +69,36 @@ describe('LinesFactory', () => {
     expect(linesFactory(42).createInitialState().tray.map(describe_)).toEqual(
       linesFactory(42).createInitialState().tray.map(describe_),
     );
+  });
+
+  it('should_multiply_the_line_bonus_by_the_combo_when_the_lines_factory_scoring_scores_two_lines', () => {
+    // One cell at the origin fills row 0 and column 0 of a 3 × 3 board.
+    const one = piece(square(0, 0));
+    const { engine } = linesGame(
+      linesState(squareTopology, 3, {
+        filled: [square(1, 0), square(2, 0), square(0, 1), square(0, 2), square(2, 2)],
+        tray: [one, one],
+      }),
+      linesFactory().createScoring(),
+    );
+
+    engine.play(new PlacePiece(0, square(0, 0)));
+
+    expect(engine.snapshot().linesCleared).toBe(2);
+    // 1 cell + 10 × 2 lines × (2 + 1 - 1). The base scoring alone gives 21.
+    expect(engine.snapshot().score).toBe(41);
+  });
+
+  it('should_throw_a_range_error_when_the_lines_settings_hold_a_seed_that_is_not_a_32_bit_integer', () => {
+    for (const seed of [Number.NaN, Number.POSITIVE_INFINITY, 1.5, -1, 2 ** 53]) {
+      const message = `A seed must be an integer from 0 to 4294967295, not ${seed}.`;
+
+      expect(() => linesFactory(seed).createPieceSource()).toThrow(new RangeError(message));
+      expect(() => linesFactory(seed).createInitialState()).toThrow(new RangeError(message));
+    }
+  });
+
+  it('should_draw_the_pieces_of_seed_zero_when_the_lines_settings_hold_a_negative_zero_seed', () => {
+    expect(firstPieces(-0, 12)).toEqual(firstPieces(0, 12));
   });
 });

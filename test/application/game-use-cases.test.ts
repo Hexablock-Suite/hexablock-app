@@ -2,15 +2,20 @@
 import type { BoardState } from '../../src/domain/engine/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
 import type { GameEvent, GameEventPublisher } from '../../src/domain/engine/game-events';
+import type { Piece } from '../../src/domain/engine/piece';
+import { FixedListPieceSource, type IPieceSource } from '../../src/domain/engine/piece-source';
+import { RegionSize } from '../../src/domain/engine/region-size';
 import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
 import { PlacePiece } from '../../src/domain/variants/hexa-lines/place-piece';
-import { square } from '../support/engine/square-topology';
+import type { ColorStack } from '../../src/domain/variants/hexa-sort/color-stack';
+import { SortFactory } from '../../src/domain/variants/hexa-sort/sort-factory';
+import { square, squareTopology, type SquareCoord } from '../support/engine/square-topology';
 import { firstValidMove } from '../support/engine/variant-game';
 import { errorOf, gameUseCases, valueOf } from '../support/application/game-use-cases';
 import { fitFactory } from '../support/variants/hexa-fit/fit-game';
 import { linesFactory } from '../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../support/variants/hexa-merge/merge-game';
-import { sortFactory } from '../support/variants/hexa-sort/sort-game';
+import { sortFactory, stack, stackPiece } from '../support/variants/hexa-sort/sort-game';
 
 // `StartGame` and `ApplyMove` run the four variants through one code path (issue 100,
 // APP-FR-03, classes.md decisions 9, 28 and 29). The helper reads only `IVariantFactory`.
@@ -59,6 +64,21 @@ function brokenStart<
   };
 }
 
+// A Sort level whose source throws in `clone()`, as a broken level source would.
+// The real sources never throw there, so this double stands in for the level data.
+function sortLevelWithUncloneableSource(): SortFactory<SquareCoord> {
+  const pieces = new FixedListPieceSource([stack('red')].map(stackPiece));
+  const source: IPieceSource<Piece<ColorStack, SquareCoord>> = {
+    hasNext: () => pieces.hasNext(),
+    next: () => pieces.next(),
+    [Symbol.iterator]: () => pieces[Symbol.iterator](),
+    clone: () => {
+      throw new RangeError('The level source cannot be copied.');
+    },
+  };
+  return new SortFactory(squareTopology, { size: RegionSize.of(2), source, goalsNeeded: 1 });
+}
+
 describe('StartGame and ApplyMove', () => {
   it('should_start_and_play_each_variant_through_the_same_path_when_the_use_cases_get_the_four_factories', async () => {
     const runs = [
@@ -102,6 +122,25 @@ describe('StartGame and ApplyMove', () => {
     expect([error.code, error.message, error.retryable]).toEqual([
       'start-failed',
       'The level is broken.',
+      false,
+    ]);
+    expect(games.current()).toBeUndefined();
+  });
+
+  it('should_return_a_start_failed_failure_and_keep_no_game_when_the_sort_level_source_cannot_be_cloned', async () => {
+    // `SortFactory` clones the level source for each game, so the clone error stops the start.
+    const factory = sortLevelWithUncloneableSource();
+    const { games, startGame } = gameUseCases(factory);
+
+    const error = errorOf(await startGame.execute({}));
+
+    expect(() => factory.createInitialState()).toThrow(
+      new RangeError('The level source cannot be copied.'),
+    );
+
+    expect([error.code, error.message, error.retryable]).toEqual([
+      'start-failed',
+      'The level source cannot be copied.',
       false,
     ]);
     expect(games.current()).toBeUndefined();
