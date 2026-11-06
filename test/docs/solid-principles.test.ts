@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 
 import { repoRoot } from '../support/run-tool';
@@ -34,17 +34,23 @@ function linksIn(line: string): string[] {
     .filter((target) => !/^[a-z]+:/.test(target));
 }
 
+// True when the link names a file of the repository. A folder is not a file.
+function isFile(link: string): boolean {
+  const target = path.join(repoRoot, link);
+  return existsSync(target) && statSync(target).isFile();
+}
+
 // The principles whose bullet has no link to an existing file under `src/`.
 function principlesWithoutSourceLink(section: string): string[] {
   return principles.filter((principle) => {
     const links = linksIn(bulletOf(section, principle) ?? '');
-    return !links.some((link) => link.startsWith('src/') && existsSync(path.join(repoRoot, link)));
+    return !links.some((link) => link.startsWith('src/') && isFile(link));
   });
 }
 
-// Every relative link of the section whose file does not exist.
+// Every relative link of the section that does not name an existing file.
 function brokenLinks(section: string): string[] {
-  return linksIn(section).filter((link) => !existsSync(path.join(repoRoot, link)));
+  return linksIn(section).filter((link) => !isFile(link));
 }
 
 describe('README SOLID principles', () => {
@@ -77,5 +83,12 @@ describe('README SOLID principles', () => {
       'Interface segregation',
       'Dependency inversion',
     ]);
+  });
+
+  it('should_report_the_link_when_it_points_to_a_folder_and_not_a_file', () => {
+    const section = '- **Open/closed.** See [the variants](src/domain/variants).';
+
+    expect(brokenLinks(section)).toEqual(['src/domain/variants']);
+    expect(principlesWithoutSourceLink(section)).toEqual(principles);
   });
 });

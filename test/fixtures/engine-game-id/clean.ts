@@ -5,6 +5,8 @@ export class Engine {
 
   over(score: number, publish: (id: { value: string }) => void): string {
     if (score > 100) publish(this.gameId);
-    return score === 0 ? 'empty' : 'played';
+    score > 50 && publish(this.gameId);
+    const labels = ['empty', 'played'];
+    return labels[score === 0 ? 0 : 1];
   }
 }
