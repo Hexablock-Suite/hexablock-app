@@ -64,7 +64,7 @@
       <h1>Board and pieces: Iterator, Composite and Prototype</h1>
 
       <svg
-        viewBox="0 0 1040 1008"
+        viewBox="0 0 1040 1028"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="board-title board-desc"
@@ -72,9 +72,9 @@
         <title id="board-title">HexaBlock board and pieces · UML class diagram</title>
         <desc id="board-desc">
           Class diagram of layer 1 showing Board, generic over the cell, the coordinate and the axis
-          union, using its BoardShape and taking its geometry from the GridTopology strategy,
-          BoardShape built from the ShapeNode composite of CellNode leaves and ShapeGroup children,
-          and Piece using a ShapeNode as a prototype that clones itself.
+          union, using its BoardShape and taking its geometry from the GridTopology strategy, the
+          ShapeNode composite of CellNode leaves and ShapeGroup children, and Piece using a
+          ShapeNode as a prototype that clones itself.
         </desc>
         <defs>
           <marker
@@ -267,16 +267,6 @@
           marker-end="url(#board-open)"
           stroke="#5b6873"
         />
-        <!-- BoardShape builds from ShapeNode: use -->
-        <line
-          x1="400"
-          y1="492"
-          x2="400"
-          y2="640"
-          stroke-width="1"
-          marker-end="url(#board-open)"
-          stroke="#5b6873"
-        />
         <!-- GridTopology creates the BoardShape region: use -->
         <path
           d="M664,252 H496 Q488,252 488,260 V444 Q488,452 480,452 H432"
@@ -352,18 +342,6 @@
           letter-spacing="0.06em"
         >
           CREATES
-        </text>
-        <rect x="400" y="528" width="68" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="434"
-          y="537"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          BUILDS FROM
         </text>
         <rect x="604" y="614" width="36" height="12" rx="2" fill="#f9f4dc" />
         <text
@@ -627,7 +605,7 @@
           BoardShape
         </text>
         <text x="88" y="460" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + cells: TCoord[]
+          + cells: readonly TCoord[]
         </text>
         <text
           x="88"
@@ -983,8 +961,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Board, Piece and BoardState implement Cloneable&lt;T&gt;: clone() takes the snapshot for
-          undo and for the piece preview (D3).
+          Board, Piece and BoardState implement Cloneable&lt;T&gt;: clone() copies the state for the
+          scoring policy and the rollback of a turn. Sprint 3 adds the undo snapshot (D3).
         </text>
         <text
           x="24"
@@ -993,8 +971,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Board is the HexBoard&lt;TCell&gt; of statement §3.1. HexCoord and HexTopology form the
-          hexagonal family, and BoardBuilder builds the board (view 6).
+          Board is the HexBoard&lt;TCell&gt; of statement §3.1. In Sprint 2, HexCoord and
+          HexTopology form the hexagonal family, and BoardBuilder builds the board (view 6).
         </text>
 
         <text
@@ -1152,6 +1130,25 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
+        </text>
+        <text
+          x="24"
+          y="1008"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          «Sprint N»
+        </text>
+        <text
+          x="92"
+          y="1008"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Planned design, not in the code yet · N is its sprint in docs/ROADMAP.md · a planned class
+          carries it once, for its members and arrows
         </text>
       </svg>
     </div>

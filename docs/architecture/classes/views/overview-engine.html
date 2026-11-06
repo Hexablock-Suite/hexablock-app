@@ -64,7 +64,7 @@
       <h1>The generic engine at a glance</h1>
 
       <svg
-        viewBox="0 0 1040 1480"
+        viewBox="0 0 1040 1504"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="ovengine-title ovengine-desc"
@@ -74,8 +74,9 @@
           Overview map of the 63 layer 1 engine classes in 14 groups. Each line joins two classes:
           GameEngine keeps its GamePhase, its optional MoveHistory and its IScoringPolicy and
           notifies through GameEventPublisher, BoardState keeps its Board, IVariantFactory creates
-          the IGameRules, BoardShape builds from a ShapeNode and GeometryFactory creates the piece
-          shapes. No line touches a group frame. Each group names the view that shows its members.
+          the IGameRules and GeometryFactory creates the piece shapes. No line touches a group
+          frame. Each group names the view that shows its members. A class that the code does not
+          have yet carries «Sprint N», the sprint that plans it.
         </desc>
         <defs>
           <marker
@@ -648,14 +649,6 @@
           stroke-width="1"
           marker-end="url(#ovengine-open)"
         />
-        <!-- BoardShape builds from a ShapeNode: use with a verb (view 2) -->
-        <path
-          d="M324,737 L356,737 L356,1089 L336,1089"
-          fill="none"
-          stroke="#5b6873"
-          stroke-width="1"
-          marker-end="url(#ovengine-open)"
-        />
         <!-- GeometryFactory creates the ShapeNode piece shapes in createPieceShapes(): use with a verb (view 6) -->
         <path
           d="M320,1248 L320,1106"
@@ -738,18 +731,6 @@
         >
           CREATES
         </text>
-        <rect x="362" y="926" width="66" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="395"
-          y="935"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          BUILDS FROM
-        </text>
         <rect x="326" y="1140" width="44" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="348"
@@ -765,9 +746,9 @@
         <!-- Chips: shared -->
         <g data-class="GameId">
           <rect
-            x="72"
+            x="68"
             y="92"
-            width="84"
+            width="68"
             height="34"
             rx="4"
             fill="#ffffff"
@@ -775,7 +756,7 @@
             stroke-width="1"
           />
           <text
-            x="114"
+            x="102"
             y="104"
             fill="#5b6873"
             font-size="7"
@@ -785,7 +766,7 @@
           >
             value object
           </text>
-          <text x="114" y="117" fill="#17212a" text-anchor="middle">
+          <text x="102" y="117" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               GameId
             </tspan>
@@ -793,9 +774,9 @@
         </g>
         <g data-class="Color">
           <rect
-            x="172"
+            x="148"
             y="92"
-            width="84"
+            width="112"
             height="34"
             rx="4"
             fill="#ffffff"
@@ -803,7 +784,7 @@
             stroke-width="1"
           />
           <text
-            x="214"
+            x="204"
             y="104"
             fill="#5b6873"
             font-size="7"
@@ -811,9 +792,9 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            value object
+            value object «Sprint 2»
           </text>
-          <text x="214" y="117" fill="#17212a" text-anchor="middle">
+          <text x="204" y="117" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               Color
             </tspan>
@@ -840,7 +821,7 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            interface
+            interface «Sprint 3»
           </text>
           <text x="374" y="117" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
@@ -1005,7 +986,7 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            interface
+            interface «Sprint 2»
           </text>
           <text x="196" y="327" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
@@ -1363,7 +1344,7 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            abstract
+            abstract «Sprint 2»
           </text>
           <text x="462" y="645" fill="#17212a" text-anchor="middle">
             <tspan
@@ -1415,7 +1396,18 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="634" y="691" fill="#17212a" text-anchor="middle">
+          <text
+            x="634"
+            y="682"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            «Sprint 3»
+          </text>
+          <text x="634" y="695" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               HighScoreProgress
             </tspan>
@@ -1432,7 +1424,18 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="462" y="741" fill="#17212a" text-anchor="middle">
+          <text
+            x="462"
+            y="732"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            «Sprint 3»
+          </text>
+          <text x="462" y="745" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               LevelProgress
             </tspan>
@@ -1506,7 +1509,18 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="868" y="641" fill="#17212a" text-anchor="middle">
+          <text
+            x="868"
+            y="632"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            «Sprint 3»
+          </text>
+          <text x="868" y="645" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               MoveCommand
             </tspan>
@@ -1523,7 +1537,18 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="868" y="691" fill="#17212a" text-anchor="middle">
+          <text
+            x="868"
+            y="682"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            «Sprint 3»
+          </text>
+          <text x="868" y="695" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               MoveHistory
             </tspan>
@@ -1540,7 +1565,18 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="868" y="741" fill="#17212a" text-anchor="middle">
+          <text
+            x="868"
+            y="732"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            «Sprint 3»
+          </text>
+          <text x="868" y="745" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               RedoableHistory
             </tspan>
@@ -1756,7 +1792,7 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            interface
+            interface «Sprint 3»
           </text>
           <text x="784" y="997" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
@@ -1784,7 +1820,7 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            interface
+            interface «Sprint 3»
           </text>
           <text x="912" y="997" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
@@ -1812,7 +1848,7 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            interface
+            interface «Sprint 3»
           </text>
           <text x="784" y="1047" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
@@ -1868,7 +1904,7 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            interface
+            interface «Sprint 2»
           </text>
           <text x="784" y="1097" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
@@ -1887,7 +1923,18 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="912" y="1093" fill="#17212a" text-anchor="middle">
+          <text
+            x="912"
+            y="1084"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            «Sprint 3»
+          </text>
+          <text x="912" y="1097" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               LevelTimer
             </tspan>
@@ -2047,25 +2094,8 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="524" y="113" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              BoardBuilder
-            </tspan>
-          </text>
-        </g>
-        <g data-class="LevelHeader">
-          <rect
-            x="604"
-            y="92"
-            width="108"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
           <text
-            x="658"
+            x="524"
             y="104"
             fill="#5b6873"
             font-size="7"
@@ -2073,9 +2103,37 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            value object
+            «Sprint 2»
           </text>
-          <text x="658" y="117" fill="#17212a" text-anchor="middle">
+          <text x="524" y="117" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              BoardBuilder
+            </tspan>
+          </text>
+        </g>
+        <g data-class="LevelHeader">
+          <rect
+            x="600"
+            y="92"
+            width="120"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="660"
+            y="104"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object «Sprint 3»
+          </text>
+          <text x="660" y="117" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               LevelHeader
             </tspan>
@@ -2126,7 +2184,18 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="826" y="507" fill="#17212a" text-anchor="middle">
+          <text
+            x="826"
+            y="498"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            «Sprint 3»
+          </text>
+          <text x="826" y="511" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               TimedRulesDecorator
             </tspan>
@@ -2188,7 +2257,7 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            interface
+            interface «Sprint 2»
           </text>
           <text x="406" y="1273" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
@@ -2207,7 +2276,18 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="156" y="1269" fill="#17212a" text-anchor="middle">
+          <text
+            x="156"
+            y="1260"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            «Sprint 2»
+          </text>
+          <text x="156" y="1273" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               HexGeometry
             </tspan>
@@ -2233,7 +2313,7 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            value object
+            value object «Sprint 2»
           </text>
           <text x="616" y="1273" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
@@ -2252,7 +2332,18 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="800" y="1269" fill="#17212a" text-anchor="middle">
+          <text
+            x="800"
+            y="1260"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            «Sprint 2»
+          </text>
+          <text x="800" y="1273" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               HexTopology
             </tspan>
@@ -2278,7 +2369,7 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            test double
+            test double «Sprint 3»
           </text>
           <text x="156" y="1323" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
@@ -2474,6 +2565,25 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
+        </text>
+        <text
+          x="24"
+          y="1492"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          «Sprint N»
+        </text>
+        <text
+          x="92"
+          y="1492"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Planned design, not in the code yet · N is its sprint in docs/ROADMAP.md · a planned class
+          carries it once, for its members and arrows
         </text>
       </svg>
     </div>

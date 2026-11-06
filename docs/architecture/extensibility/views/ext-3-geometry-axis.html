@@ -64,7 +64,7 @@
       <h1>The geometry axis: one family per cell shape, next to the variant axis</h1>
 
       <svg
-        viewBox="0 0 1040 880"
+        viewBox="0 0 1040 900"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="ext-3-geometry-axis-title ext-3-geometry-axis-desc"
@@ -76,7 +76,8 @@
           fifth variant. Each factory implements IVariantFactory, which creates the IGameRules that
           GameEngine keeps, and keeps a GeometryFactory. The geometry axis below holds the hexagonal
           family, the square test family and the declared triangular and 3D families, and the two
-          real families implement GeometryFactory. No line touches an axis frame.
+          real families implement GeometryFactory. No line touches an axis frame. «Sprint N» marks
+          the planned classes with their sprint.
         </desc>
         <defs>
           <marker
@@ -348,7 +349,7 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            interface · Abstract Factory
+            interface · Abstract Factory · «Sprint 2»
           </text>
           <text
             x="430"
@@ -416,7 +417,7 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            interface · Abstract Factory
+            interface · Abstract Factory · «Sprint 2»
           </text>
           <text
             x="320"
@@ -450,9 +451,9 @@
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
-          letter-spacing="0.08em"
+          letter-spacing="0.02em"
         >
-          «Concrete Factory»
+          «Concrete Factory» «Sprint 2»
         </text>
         <text
           x="152"
@@ -483,9 +484,9 @@
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
-          letter-spacing="0.08em"
+          letter-spacing="0.02em"
         >
-          «Concrete Factory»
+          «Concrete Factory» «Sprint 2»
         </text>
         <text
           x="336"
@@ -516,9 +517,9 @@
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
-          letter-spacing="0.08em"
+          letter-spacing="0.02em"
         >
-          «Concrete Factory»
+          «Concrete Factory» «Sprint 2»
         </text>
         <text
           x="520"
@@ -549,9 +550,9 @@
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
-          letter-spacing="0.08em"
+          letter-spacing="0.02em"
         >
-          «Concrete Factory»
+          «Concrete Factory» «Sprint 2»
         </text>
         <text
           x="704"
@@ -639,10 +640,10 @@
           plays each turn through IGameRules&lt;TMove, TState&gt;
         </text>
         <text x="344" y="376" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          keeps the cells on Board&lt;TCell, TCoord&gt;
+          keeps the cells on Board&lt;TCell, TCoord, string&gt;
         </text>
         <text x="344" y="392" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          asks GridTopology&lt;TCoord&gt; for every geometry fact
+          asks the GridTopology for every geometry fact
         </text>
         <text x="344" y="408" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           knows no variant and no geometry
@@ -690,7 +691,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          REAL · HEXAGONS
+          REAL · HEXAGONS · «Sprint 2»
         </text>
         <text
           x="184"
@@ -723,7 +724,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          ENGINE TESTS · D4
+          ENGINE TESTS · D4 · «Sprint 3»
         </text>
         <text
           x="408"
@@ -757,7 +758,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          DECLARED · §8
+          DECLARED · §8 · «Sprint 3»
         </text>
         <text
           x="632"
@@ -992,6 +993,25 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Dashed box · declared extension, no class yet
+        </text>
+        <text
+          x="24"
+          y="878"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          «Sprint N»
+        </text>
+        <text
+          x="92"
+          y="878"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Planned design, not in the code yet · N is its sprint in docs/ROADMAP.md · a planned class
+          carries it once, for its members and arrows
         </text>
       </svg>
     </div>
