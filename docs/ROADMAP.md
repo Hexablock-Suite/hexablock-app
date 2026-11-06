@@ -100,7 +100,7 @@ Hexa Lines, Hexa Fit, Hexa Sort and Hexa Merge plug into the engine, each with i
 
 | ID         | Exit check                                                                                                                                                                                    |
 | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| APP-NFR-01 | The four variants use the same board class with a different cell type, and no variant has a board class of its own.                                                                           |
+| APP-NFR-01 | The four variants use the same board class with a different cell type, and no variant has a board class of its own. Gate `test/gates/one-board-gate.test.ts`.                                 |
 | APP-NFR-02 | Each variant's rules class implements the contract, and the engine calls only the contract.                                                                                                   |
 | APP-FR-03  | APP-NFR-01 to APP-NFR-03.                                                                                                                                                                     |
 | APP-NFR-07 | Gate `test/gates/domain-purity-gate.test.ts` (rule R-domain-determinism in `AGENTS.md`), and a Merge test with a fixed seed always gets the same new tiles.                                   |
