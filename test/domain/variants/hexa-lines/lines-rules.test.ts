@@ -1,10 +1,11 @@
 /** @jest-environment node */
 import type { GridTopology } from '../../../../src/domain/engine/grid-topology';
 import { GameOver } from '../../../../src/domain/engine/game-events';
+import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
 import { BaseGameRules, type IGameRules } from '../../../../src/domain/engine/rules';
 import { Color } from '../../../../src/domain/variants/hexa-lines/color';
 import { LinesRules } from '../../../../src/domain/variants/hexa-lines/lines-rules';
-import type { LinesState } from '../../../../src/domain/variants/hexa-lines/lines-state';
+import { LinesState } from '../../../../src/domain/variants/hexa-lines/lines-state';
 import { PlacePiece } from '../../../../src/domain/variants/hexa-lines/place-piece';
 import {
   square,
@@ -267,5 +268,121 @@ describe('Hexa Lines color', () => {
 
   it('should_throw_a_range_error_when_the_color_name_is_blank', () => {
     expect(() => Color.of(' ')).toThrow(RangeError);
+  });
+});
+
+// Edge cases of the walkthrough of PR #107 (issue #120).
+describe('Hexa Lines rules edge cases', () => {
+  const domino = piece(origin, square(1, 0));
+
+  // Plays the move on a new 3 × 3 game and reports what an observer sees.
+  function playOnce(move: PlacePiece<SquareCoord>) {
+    const initial = linesState(squareTopology, 3, { filled: [square(1, 1)], tray: [domino, one] });
+    const { engine, publisher } = linesGame(initial);
+
+    const outcome = engine.play(move);
+
+    const state = engine.snapshot();
+    return {
+      valid: new LinesRules<SquareCoord>().isValid(initial, move),
+      outcome,
+      phase: engine.phase.name,
+      filled: filledKeys(state),
+      tray: state.tray,
+      events: publisher.events,
+    };
+  }
+
+  // A rejected move keeps the board, the tray and the phase, and publishes nothing.
+  const rejected = {
+    valid: false,
+    outcome: 'playing',
+    phase: 'playing',
+    filled: keys([square(1, 1)]),
+    tray: [domino, one],
+    events: [],
+  };
+
+  it('should_reject_the_move_and_keep_the_state_when_the_tray_index_is_not_a_finite_number', () => {
+    // The tray index names a tray piece, so it is a whole number (lines-rules.ts, `isValid()`).
+    for (const index of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
+      expect(playOnce(new PlacePiece(index, square(0, 0)))).toEqual(rejected);
+    }
+  });
+
+  it('should_reject_the_move_and_keep_the_state_when_the_tray_index_is_past_the_safe_integers', () => {
+    // 2^53 is a whole number, but no tray piece has that index.
+    expect(playOnce(new PlacePiece(Number.MAX_SAFE_INTEGER + 1, square(0, 0)))).toEqual(rejected);
+  });
+
+  it('should_place_the_first_tray_piece_when_the_tray_index_is_negative_zero', () => {
+    // The engine reads a negative zero as 0 (classes.md, issue #86: `of()` stores -0 as 0).
+    const { engine } = linesGame(linesState(squareTopology, 4, { tray: [domino, one] }));
+
+    const outcome = engine.play(new PlacePiece(-0, square(1, 2)));
+
+    const state = engine.snapshot();
+    expect(outcome).toBe('playing');
+    expect(filledKeys(state)).toEqual(keys([square(1, 2), square(2, 2)]));
+    expect(state.tray).toEqual([one]);
+  });
+
+  it('should_throw_a_range_error_when_the_color_name_is_empty', () => {
+    expect(() => Color.of('')).toThrow(RangeError);
+    expect(() => Color.of('')).toThrow('A color needs a name.');
+  });
+
+  it('should_end_the_game_with_free_cells_when_a_finite_source_leaves_the_tray_empty', () => {
+    // The tray takes the next pieces, or fewer when a finite source runs out (PR #107).
+    // The game ends when no tray piece fits (REQUIREMENTS.md §1), and an empty tray has none.
+    const { engine, publisher } = linesGame(linesState(squareTopology, 3, { tray: [one] }));
+
+    const outcome = engine.play(new PlacePiece(0, square(1, 1)));
+
+    const state = engine.snapshot();
+    expect(outcome).toBe('game-over');
+    expect(engine.phase.name).toBe('game-over');
+    expect(state.tray).toEqual([]);
+    expect(filledKeys(state)).toEqual(keys([square(1, 1)]));
+    expect(publisher.events).toEqual([expect.any(GameOver)]);
+  });
+
+  it('should_throw_and_keep_the_game_when_the_source_or_the_topology_throws_during_a_move', () => {
+    // The rollback covers the whole state and the phase (classes.md decision 21).
+    const base = linesState(squareTopology, 3, { tray: [one] });
+    const failingSource = new SeededPieceSource<typeof one>(1, () => {
+      throw new Error('The source failed.');
+    });
+    const failingTopology: GridTopology<SquareCoord, SquareAxis, SquareDirection> = {
+      ...squareTopology,
+      translate: (c, offset) => {
+        if (offset.col === 2) throw new Error('The topology failed.');
+        return squareTopology.translate(c, offset);
+      },
+    };
+    const games = [
+      {
+        game: linesGame(new LinesState(base.board, base.tray, failingSource)),
+        error: 'The source failed.',
+      },
+      {
+        game: linesGame(linesState(failingTopology, 3, { tray: [one, one] })),
+        error: 'The topology failed.',
+      },
+    ];
+
+    for (const { game, error } of games) {
+      const { engine, publisher } = game;
+      const tray = engine.snapshot().tray;
+
+      expect(() => engine.play(new PlacePiece(0, square(2, 2)))).toThrow(error);
+
+      const state = engine.snapshot();
+      expect(engine.phase.name).toBe('playing');
+      expect(filledKeys(state)).toEqual([]);
+      expect(state.tray).toEqual(tray);
+      expect(state.streak).toBe(0);
+      expect(publisher.events).toEqual([]);
+    }
   });
 });
