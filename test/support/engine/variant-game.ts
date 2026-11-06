@@ -7,7 +7,8 @@ import { RecordingPublisher } from './fake-game';
 
 // One code path for every variant: it reads only the `IVariantFactory` contract
 // (classes.md decision 31). It names no variant and never reads the game id to branch.
-// Issue 100 moves this wiring into the `StartGame` use case.
+// `StartGame` in `src/application/` holds this wiring for the app (issue 100).
+// This helper stays for the synchronous domain tests that read the rules and the publisher.
 export function startVariant<
   TCell,
   TCoord,

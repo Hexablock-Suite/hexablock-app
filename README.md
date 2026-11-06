@@ -145,6 +145,8 @@ The professor asked that the primitive types of the design tend to zero, and tha
 
 Each variant has its state, rules, scoring and factory in its folder under [`src/domain/variants/`](src/domain/variants/), and each rules class extends `BaseGameRules`. Each factory implements [`IVariantFactory`](src/domain/engine/variant-factory.ts). Until the geometry family of Sprint 3 exists, a factory receives a `GridTopology` in its constructor, and `GeometryFactory<TCoord>` takes that place later (APP-FR-16). The suite `test/domain/variants/variant-factories.test.ts` plays the four variants through one code path that reads only `IVariantFactory`.
 
+The use cases `StartGame` and `ApplyMove` in [`src/application/`](src/application/) run a game of any variant through the same factory. `StartGame` creates the `GameEngine` from the factory and keeps it behind the `RunningGameStore` port, and `ApplyMove` plays one move with `GameEngine.tryPlay()`. Both implement `UseCase`, return a `Result` and never throw, and their response `MoveResult` holds copies of the cells, the score, the outcome and the undo and redo flags, never the `Board` or the engine (decisions 9, 28 and 29). The suite `test/application/game-use-cases.test.ts` runs the four variants through them.
+
 The variant classes stay generic over `TCoord`, so a variant runs on any geometry. Today the composition root passes `HexGeometry`, so a running game binds `TCoord` to `HexCoord` (decisions 16 and 17). Each variant writes one factory that implements `IVariantFactory`. The factory creates the rules, the piece source, the scoring policy and the board, and picks the engine classes for progress and undo (decision 31).
 
 ### Adding a fifth variant
