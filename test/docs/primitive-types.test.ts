@@ -217,7 +217,7 @@ describe('README primitive types', () => {
   it('should_skip_private_members_and_booleans_when_the_code_is_scanned', () => {
     const places = codeUses().map((use) => use.where);
 
-    expect(places).not.toContain('SeededRandom.state');
+    expect(places).not.toContain('Mulberry32Random.state');
     expect(places).not.toContain('Board.contains');
     expect(places).not.toContain('Resolution.accepted');
   });
