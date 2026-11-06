@@ -136,6 +136,8 @@ The professor asked that the primitive types of the design tend to zero, and tha
 | Hexa Sort  | `ColorStack`                 | `PlaceStack`                               | `SortState`             | none                        | seeded or fixed, chosen per level (A4) | `LevelProgress`            |
 | Hexa Merge | `MergeTile`, an `IMergeable` | `Slide`                                    | `MergeState<MergeTile>` | `MoveHistory`, limit 1      | `SeededPieceSource`, tiles of 2 or 4   | `HighScoreProgress`        |
 
+Hexa Fit has its state and rules in [`src/domain/variants/hexa-fit/`](src/domain/variants/hexa-fit/fit-rules.ts): `FitRules` extends `BaseGameRules`, and its suite is `test/domain/variants/hexa-fit/fit-rules.test.ts`. The other three variants are not written yet.
+
 The variant classes stay generic over `TCoord`, so a variant runs on any geometry. Today the composition root passes `HexGeometry`, so a running game binds `TCoord` to `HexCoord` (decisions 16 and 17). Each variant writes one factory that implements `IVariantFactory`. The factory creates the rules, the piece source, the scoring policy and the board, and picks the engine classes for progress and undo (decision 31).
 
 ### Adding a fifth variant
