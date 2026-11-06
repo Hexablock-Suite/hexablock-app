@@ -1,10 +1,14 @@
 /** @jest-environment node */
 import { GameOver } from '../../../../src/domain/engine/game-events';
 import { GameId } from '../../../../src/domain/engine/game-id';
+import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
+import type { RandomSource } from '../../../../src/domain/engine/random-source';
+import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
 import {
   DEFAULT_FOUR_CHANCE,
   mergeTileSource,
 } from '../../../../src/domain/variants/hexa-merge/merge-tile-source';
+import type { NewTile } from '../../../../src/domain/variants/hexa-merge/new-tile';
 import { Slide } from '../../../../src/domain/variants/hexa-merge/slide';
 import { lintFixture } from '../../../support/run-tool';
 import { hex, type HexAxis } from '../../../support/variants/hexa-merge/hex-topology';
@@ -197,5 +201,61 @@ describe('Merge new tiles', () => {
 
     expect(result.output).not.toContain('hexablock(no-ambient-nondeterminism)');
     expect(result.status).toBe(0);
+  });
+});
+
+// Edge cases of the walkthrough of PR #111 (issue #120).
+describe('Merge new tiles edge cases', () => {
+  it('should_throw_a_range_error_when_the_chance_of_a_four_is_infinite', () => {
+    // A `fourChance` outside [0, 1] throws a RangeError (merge-tile-source.ts).
+    for (const bad of [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
+      expect(() => mergeTileSource(1, bad)).toThrow(RangeError);
+      expect(() => mergeTileSource(1, bad)).toThrow(
+        `The chance of a 4 must be a number from 0 to 1, not ${bad}.`,
+      );
+    }
+  });
+
+  it('should_throw_a_range_error_when_the_seed_is_not_an_unsigned_32_bit_integer', () => {
+    // The seed is an integer from 0 to 4294967295, and any other number throws
+    // (classes.md, issue #86). The tile source passes its seed to the engine source.
+    for (const seed of [Number.NaN, 1.5, -1, 2 ** 32, 2 ** 53]) {
+      expect(() => mergeTileSource(seed)).toThrow(RangeError);
+      expect(() => mergeTileSource(seed)).toThrow(
+        `A seed must be an integer from 0 to 4294967295, not ${seed}.`,
+      );
+    }
+    expect(mergeTileSource(0xffffffff).seed).toBe(0xffffffff);
+  });
+
+  it('should_throw_and_draw_the_same_new_tile_on_a_retry_when_the_source_throws_once', () => {
+    // The source lives in the state, and the rollback of `GameEngine.play()` covers each draw
+    // (classes.md decisions 21 and 31). The failing draw reads the generator before it throws.
+    // With seed 12 the first two numbers pick different empty cells,
+    // so a draw that the rollback misses moves the new tile.
+    function source(failOnce: boolean): SeededPieceSource<NewTile<MergeTile>> {
+      let failed = !failOnce;
+      return new SeededPieceSource(12, (random: RandomSource) => {
+        const place = random.next();
+        if (!failed) {
+          failed = true;
+          throw new Error('The source failed.');
+        }
+        return { place, tile: MergeTile.of(2) };
+      });
+    }
+    const slide = Slide.of<HexAxis>('q', 'forward');
+    const reference = mergeGame(mergeState([[hex(0, 0), 2]], 3, source(false)));
+    reference.engine.play(slide);
+    const { engine, publisher } = mergeGame(mergeState([[hex(0, 0), 2]], 3, source(true)));
+
+    expect(() => engine.play(slide)).toThrow('The source failed.');
+    expect(engine.phase.name).toBe('playing');
+    expect(values(engine.snapshot())).toEqual({ '0,0': 2 });
+
+    expect(engine.play(slide)).toBe('playing');
+    expect(Object.keys(values(engine.snapshot()))).toHaveLength(2);
+    expect(values(engine.snapshot())).toEqual(values(reference.engine.snapshot()));
+    expect(publisher.events).toEqual([]);
   });
 });
