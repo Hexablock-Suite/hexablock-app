@@ -40,9 +40,9 @@ export class GameEngine<
 
   // One turn: receive the move, let the rules validate, apply, resolve and evaluate it
   // (template method `playTurn()`), score it, and notify when the game ends.
-  // The rollback covers the board, the score and the phase. It does not cover a collaborator
-  // that the rules hold, such as the piece source (classes.md decision 31).
-  // So a turn that throws after a draw has used that piece, and a retry draws the next piece.
+  // The rollback covers the whole state and the phase. A piece source lives in the state
+  // (classes.md decision 31), and the state `clone()` clones it. So a turn that throws
+  // after a draw leaves the source at its old position, and a retry draws the same piece.
   play(move: TMove): Outcome {
     const state = this.started();
     if (!this.current.canPlay()) {

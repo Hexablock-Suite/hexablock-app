@@ -1,10 +1,14 @@
+import type { Cloneable } from './cloneable';
 import type { RandomSource } from './random-source';
 import type { IRandomSeeded } from './random-seeded';
 import { Mulberry32Random } from './mulberry32-random';
 
 // Strategy and Iterator (classes.md decision 32). The variant factory picks the source,
 // and a caller reads the pieces with `for...of`.
-export interface IPieceSource<TPiece> extends Iterable<TPiece> {
+// Prototype (classes.md decision 7). The source lives in the state (classes.md decision 31).
+// `clone()` copies the position, so the engine copy and rollback of the state cover it.
+// A clone and its original give the same pieces, and neither one changes the other.
+export interface IPieceSource<TPiece> extends Iterable<TPiece>, Cloneable<IPieceSource<TPiece>> {
   hasNext(): boolean;
   next(): TPiece;
   [Symbol.iterator](): Iterator<TPiece>;
@@ -19,8 +23,9 @@ function* readAll<TPiece>(source: IPieceSource<TPiece>): Iterator<TPiece> {
 // So `[...source]` and `Array.from(source)` never return: a caller reads it with
 // `for...of` and `break`, or with `next()`.
 // `draw` turns the random source into one piece, so the variant decides what a piece is.
+// `clone()` clones the random source. It does not replay the draws.
 export class SeededPieceSource<TPiece> implements IPieceSource<TPiece>, IRandomSeeded {
-  private readonly random: RandomSource;
+  private random: RandomSource;
 
   constructor(
     readonly seed: number,
@@ -35,6 +40,12 @@ export class SeededPieceSource<TPiece> implements IPieceSource<TPiece>, IRandomS
 
   next(): TPiece {
     return this.draw(this.random);
+  }
+
+  clone(): SeededPieceSource<TPiece> {
+    const copy = new SeededPieceSource(this.seed, this.draw);
+    copy.random = this.random.clone();
+    return copy;
   }
 
   [Symbol.iterator](): Iterator<TPiece> {
@@ -65,6 +76,13 @@ export class FixedListPieceSource<TPiece> implements IPieceSource<TPiece> {
     const piece = this.pieces[this.index] as TPiece;
     this.index += 1;
     return piece;
+  }
+
+  // The clone copies the list and the position.
+  clone(): FixedListPieceSource<TPiece> {
+    const copy = new FixedListPieceSource(this.pieces);
+    copy.index = this.index;
+    return copy;
   }
 
   [Symbol.iterator](): Iterator<TPiece> {

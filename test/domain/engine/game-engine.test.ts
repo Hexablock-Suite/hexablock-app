@@ -14,7 +14,10 @@ import {
   FakeState,
   OnePointScoring,
   RecordingPublisher,
+  SourceRules,
+  sourceState,
   type FakeMove,
+  type SourceState,
 } from '../../support/engine/fake-game';
 import { square, type SquareAxis, type SquareCoord } from '../../support/engine/square-topology';
 
@@ -420,23 +423,40 @@ class ThrowingPublisher extends RecordingPublisher {
   }
 }
 
-// Rules that hold a piece source, as a variant rules class does (classes.md decision 31).
-// `apply()` draws the next piece. The first `apply()` throws after the draw.
-class DrawingRules extends FakeRules {
+// Rules that draw from the piece source of the state (classes.md decision 31).
+// The first `apply()` throws after the draw.
+class DrawingRules extends SourceRules {
   private failed = false;
 
-  constructor(private readonly pieces: FixedListPieceSource<FakeCell>) {
-    super();
-  }
-
-  override apply(state: FakeState, move: FakeMove): FakeState {
-    const next = super.apply(state, { at: move.at, cell: this.pieces.next() });
+  override apply(state: SourceState, at: SquareCoord): SourceState {
+    const next = super.apply(state, at);
     if (!this.failed) {
       this.failed = true;
       throw new Error('apply failed');
     }
     return next;
   }
+}
+
+// Rules whose `resolve()` rejects every move after `apply()` has drawn a piece.
+class RejectingDrawRules extends SourceRules {
+  rejecting = true;
+
+  override resolve(state: SourceState): Resolution<SourceState> {
+    return this.rejecting ? Resolution.rejected(state) : super.resolve(state);
+  }
+}
+
+// A game whose state holds a fixed list of three pieces.
+function sourceGame(rules: SourceRules) {
+  const engine = new GameEngine(
+    GameId.of('fake-game'),
+    rules,
+    { score: () => 1 },
+    new RecordingPublisher(),
+  );
+  engine.start(sourceState(new FixedListPieceSource([fakeCell(1), fakeCell(2), fakeCell(3)])));
+  return engine;
 }
 
 function gameWith(
@@ -511,16 +531,31 @@ describe('GameEngine review findings', () => {
     expect(summary(engine)).toEqual({ ...afterOneMove, phase: 'game-over' });
   });
 
-  // The rollback covers the board, the score and the phase, not the piece source of the rules.
-  it('should_draw_the_next_piece_when_a_turn_is_retried_after_a_throw', () => {
-    const pieces = new FixedListPieceSource([fakeCell(1), fakeCell(2), fakeCell(3)]);
-    const { engine } = gameWith(new DrawingRules(pieces));
+  // The rollback covers the board, the score, the phase and the piece source in the state.
+  it('should_draw_the_same_piece_when_a_turn_is_retried_after_a_throw', () => {
+    const engine = sourceGame(new DrawingRules());
 
-    expect(() => engine.play(place(0, 0))).toThrow('apply failed');
-    expect(summary(engine)).toEqual(initial);
+    expect(() => engine.play(square(0, 0))).toThrow('apply failed');
+    expect(engine.snapshot().board.cells()).toEqual([]);
+    expect(engine.snapshot().score).toBe(0);
+    expect(engine.phase.name).toBe('playing');
 
-    expect(engine.play(place(0, 0))).toBe('playing');
-    expect(engine.snapshot().board.get(square(0, 0))).toEqual(fakeCell(2));
+    expect(engine.play(square(0, 0))).toBe('playing');
+    expect(engine.snapshot().board.get(square(0, 0))).toEqual(fakeCell(1));
+    expect([...engine.snapshot().source]).toEqual([fakeCell(2), fakeCell(3)]);
+  });
+
+  it('should_keep_the_source_position_when_the_rules_reject_a_move_after_apply', () => {
+    const rules = new RejectingDrawRules();
+    const engine = sourceGame(rules);
+
+    expect(engine.play(square(0, 0))).toBe('playing');
+    expect(engine.snapshot().board.cells()).toEqual([]);
+    expect([...engine.snapshot().source]).toEqual([fakeCell(1), fakeCell(2), fakeCell(3)]);
+
+    rules.rejecting = false;
+    expect(engine.play(square(0, 0))).toBe('playing');
+    expect(engine.snapshot().board.get(square(0, 0))).toEqual(fakeCell(1));
   });
 
   it('should_publish_game_over_with_the_victory_outcome_when_the_rules_return_victory', () => {
