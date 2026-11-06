@@ -23,9 +23,9 @@ const LEGEND_RULE = 'N is the docs/ROADMAP.md sprint of the requirement it serve
 type View = { file: string; html: string };
 type Marker = { where: string; sprint: number; requirement: string | undefined };
 
-// Maps each requirement ID in the table of a `## Sprint N` section to N.
-function sprintOfRequirements(roadmap: string): Map<string, number> {
-  const sprints = new Map<string, number>();
+// Maps each requirement ID in the table of a `## Sprint N` section to every such N.
+function sprintsOfRequirements(roadmap: string): Map<string, number[]> {
+  const sprints = new Map<string, number[]>();
   let sprint: number | undefined;
   for (const line of roadmap.split('\n')) {
     if (line.startsWith('## ')) {
@@ -33,9 +33,18 @@ function sprintOfRequirements(roadmap: string): Map<string, number> {
       sprint = heading === undefined ? undefined : Number(heading);
     }
     const id = /^\|\s*((?:APP|API)-(?:FR|NFR)-\d{2})\s*\|/.exec(line)?.[1];
-    if (sprint !== undefined && id !== undefined) sprints.set(id, sprint);
+    if (sprint !== undefined && id !== undefined)
+      sprints.set(id, [...(sprints.get(id) ?? []), sprint]);
   }
   return sprints;
+}
+
+// Maps each requirement ID to its sprint. For an ID in two sprints, the last one wins.
+// roadmapProblems reports that ID.
+function sprintOfRequirements(roadmap: string): Map<string, number> {
+  return new Map(
+    [...sprintsOfRequirements(roadmap)].map(([id, sprints]) => [id, sprints[sprints.length - 1]]),
+  );
 }
 
 // Reads every marker with the innermost `<text>` or `<tspan>` that holds it.
@@ -93,6 +102,13 @@ function markerProblems(views: View[], roadmap: string): string[] {
       }),
     );
   });
+}
+
+// Returns one line per requirement ID that more than one sprint table lists.
+function roadmapProblems(roadmap: string): string[] {
+  return [...sprintsOfRequirements(roadmap)]
+    .filter(([, sprints]) => sprints.length > 1)
+    .map(([id, sprints]) => `${id} is in Sprint ${sprints.join(' and Sprint ')}`);
 }
 
 // Returns one line per view whose legend does not state the rule.
@@ -175,5 +191,40 @@ describe('«Sprint N» markers of the class and extensibility views', () => {
     expect(legendProblems([fixture('old-legend.html')])).toEqual([
       `old-legend.html keeps the legend «${OLD_LEGEND}»`,
     ]);
+  });
+
+  it('should_report_the_marker_when_it_is_outside_a_text_element', () => {
+    expect(markerProblems([fixture('outside-text.html')], fixtureRoadmap)).toEqual([
+      'outside-text.html:2 «Sprint 3» is outside a <text> element',
+    ]);
+  });
+
+  it('should_report_the_marker_when_its_requirement_is_not_a_well_formed_id', () => {
+    expect(markerProblems([fixture('malformed-id.html')], fixtureRoadmap)).toEqual([
+      'malformed-id.html:3 «Sprint 3» names APP-FR-4, which is not an ID',
+    ]);
+  });
+
+  it('should_report_no_data_requirement_when_the_attribute_is_empty', () => {
+    expect(markerProblems([fixture('empty-requirement.html')], fixtureRoadmap)).toEqual([
+      'empty-requirement.html:3 «Sprint 3» has no data-requirement',
+    ]);
+  });
+
+  it('should_report_the_view_when_it_shows_sprint_n_without_the_legend_rule', () => {
+    expect(legendProblems([fixture('no-legend.html')])).toEqual([
+      `no-legend.html has no legend «${LEGEND_RULE}»`,
+    ]);
+  });
+
+  it('should_list_no_problem_when_each_requirement_is_in_one_sprint_of_the_roadmap', () => {
+    expect(roadmapProblems(roadmap)).toEqual([]);
+    expect(roadmapProblems(fixtureRoadmap)).toEqual([]);
+  });
+
+  it('should_report_the_requirement_when_two_sprints_of_the_roadmap_list_it', () => {
+    const twice = readFileSync(path.join(FIXTURES, 'roadmap-twice.md'), 'utf8');
+
+    expect(roadmapProblems(twice)).toEqual(['APP-FR-16 is in Sprint 2 and Sprint 3']);
   });
 });
