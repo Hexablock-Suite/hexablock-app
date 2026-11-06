@@ -8,6 +8,9 @@ import { repoRoot } from '../support/run-tool';
 // APP-NFR-05: every bound on a generic parameter of the engine has a row,
 // with its reason, in the README table «Type parameters». A row marked `code` must exist
 // in the engine code, and a row marked `design` is planned for a later sprint.
+// The table covers only the engine, so the gate reads only `src/domain/engine/`.
+// This scope is a design choice: a bound in a variant, the application or an adapter
+// has no row and no check here.
 
 const engineDir = path.join(repoRoot, 'src/domain/engine');
 const readme = readFileSync(path.join(repoRoot, 'README.md'), 'utf8');
@@ -80,6 +83,18 @@ describe('README generic bounds', () => {
       { parameter: 'K', bound: 'CoordKey' },
       { parameter: 'Q', bound: 'Iterable<K>' },
       { parameter: 'Item', bound: 'Cloneable<Item>' },
+    ]);
+  });
+
+  it('should_read_the_whole_bound_when_it_nests_two_levels_of_angle_brackets', () => {
+    const source = [
+      'export class Store<TState extends BoardState<Map<string, X>>> {}',
+      'export function load<TItem extends Map<string, Set<Array<X>>> & Cloneable<TItem>>() {}',
+    ].join('\n');
+
+    expect(boundsIn(source)).toEqual([
+      { parameter: 'TState', bound: 'BoardState<Map<string, X>>' },
+      { parameter: 'TItem', bound: 'Map<string, Set<Array<X>>> & Cloneable<TItem>' },
     ]);
   });
 
