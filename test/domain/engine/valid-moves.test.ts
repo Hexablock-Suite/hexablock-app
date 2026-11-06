@@ -47,6 +47,45 @@ class AdjacentRules extends BaseGameRules<SquareCoord, FakeState> {
   }
 }
 
+// Rules whose moves come from a given iterable. They test `noValidMove()` alone.
+class GivenMovesRules extends BaseGameRules<number, FakeState> {
+  constructor(private readonly moves: () => Iterable<number>) {
+    super();
+  }
+
+  *validMoves(): Iterable<number> {
+    yield* this.moves();
+  }
+
+  isValid(): boolean {
+    return true;
+  }
+
+  apply(state: FakeState): FakeState {
+    return state;
+  }
+
+  resolve(state: FakeState): Resolution<FakeState> {
+    return Resolution.resolved(state);
+  }
+
+  evaluate(state: FakeState): Outcome {
+    return this.noValidMove(state) ? 'game-over' : 'playing';
+  }
+}
+
+// An endless generator that counts how many moves a caller reads.
+// A `noValidMove()` that builds an array of the moves never returns here,
+// so the test bounds the reads and fails when the count passes one.
+function countingMoves(counter: { reads: number }): () => Iterable<number> {
+  return function* () {
+    for (let move = 0; move < 1000; move += 1) {
+      counter.reads += 1;
+      yield move;
+    }
+  };
+}
+
 // A 5 × 5 board with one filled cell.
 function stateWithOneCell(at: SquareCoord): FakeState {
   const state = emptyState(5);
@@ -99,5 +138,22 @@ describe('validMoves() and the no-valid-move end check', () => {
     for (const c of squareTopology.region(RegionSize.of(2)).cells) state.board.set(c, fakeCell(1));
 
     expect(rules.evaluate(state)).toBe('game-over');
+  });
+
+  it('should_read_one_move_only_when_the_end_check_runs_on_a_counting_generator', () => {
+    const counter = { reads: 0 };
+    const rules = new GivenMovesRules(countingMoves(counter));
+
+    expect(rules.evaluate(emptyState(2))).toBe('playing');
+    expect(counter.reads).toBe(1);
+  });
+
+  it('should_never_reach_the_throw_when_the_generator_throws_after_its_first_move', () => {
+    const rules = new GivenMovesRules(function* () {
+      yield 1;
+      throw new Error('The end check read past the first move.');
+    });
+
+    expect(rules.evaluate(emptyState(2))).toBe('playing');
   });
 });
