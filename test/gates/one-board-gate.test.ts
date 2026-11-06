@@ -39,6 +39,7 @@ type BoardScan = {
 const engineBoardModule = /(^|\/)engine\/board$/;
 
 // The local names that an import binds to the `Board` export of the engine module.
+// A namespace import `* as engine` binds the qualified name `engine.Board`.
 function engineBoardNames(source: ts.SourceFile): Set<string> {
   const names = new Set<string>();
   for (const statement of source.statements) {
@@ -46,7 +47,11 @@ function engineBoardNames(source: ts.SourceFile): Set<string> {
     const from = statement.moduleSpecifier;
     if (!ts.isStringLiteral(from) || !engineBoardModule.test(from.text)) continue;
     const bindings = statement.importClause?.namedBindings;
-    if (bindings === undefined || !ts.isNamedImports(bindings)) continue;
+    if (bindings === undefined) continue;
+    if (ts.isNamespaceImport(bindings)) {
+      names.add(`${bindings.name.text}.Board`);
+      continue;
+    }
     for (const element of bindings.elements) {
       if ((element.propertyName ?? element.name).text === 'Board') names.add(element.name.text);
     }
@@ -100,8 +105,7 @@ function scanFile(file: string, label: string, scan: BoardScan): void {
         const isEngineBoard =
           type !== undefined &&
           ts.isTypeReferenceNode(type) &&
-          ts.isIdentifier(type.typeName) &&
-          engineBoards.has(type.typeName.text);
+          engineBoards.has(type.typeName.getText());
         if (!isEngineBoard) {
           const written = type?.getText() ?? 'not written';
           scan.violations.push(`${label}: ${name}.board is ${written}, not the engine Board`);
@@ -158,6 +162,38 @@ describe('one board gate (APP-NFR-01)', () => {
 
     expect(scan.violations).toEqual([]);
     expect(scan.holders.sort()).toEqual(['FitState', 'LinesState', 'MergeState', 'SortState']);
+  });
+
+  it('should_report_the_aliased_class_and_accept_the_aliased_state_board_when_a_variant_imports_board_as_grid', () => {
+    const scan = scanVariants(fixture('aliased-import'));
+
+    expect(scan.violations).toEqual([
+      'hexa-lines/lines-cells.ts: the class LinesCells extends Grid',
+    ]);
+    expect(scan.holders).toEqual(['LinesState']);
+  });
+
+  it('should_report_no_violation_when_a_state_holds_the_engine_board_through_a_namespace_import', () => {
+    const scan = scanVariants(fixture('namespace-import'));
+
+    expect(scan.violations).toEqual([]);
+    expect(scan.holders).toEqual(['LinesState']);
+  });
+
+  // APP-NFR-01 names a board class. A type alias of the engine `Board` and an interface hold no cells.
+  it('should_report_no_violation_when_a_type_alias_and_an_interface_end_with_board', () => {
+    const scan = scanVariants(fixture('board-named-types'));
+
+    expect(scan.violations).toEqual([]);
+    expect(scan.holders).toEqual([]);
+  });
+
+  it('should_report_the_anonymous_class_when_a_class_expression_extends_board', () => {
+    const scan = scanVariants(fixture('anonymous-class'));
+
+    expect(scan.violations).toEqual([
+      'hexa-merge/merge-board-factory.ts: the class (anonymous class) extends Board',
+    ]);
   });
 
   // The typed variables make `pnpm typecheck` fail when the cell type of a board changes.
