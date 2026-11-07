@@ -86,7 +86,10 @@ On 2026-10-30 the team closed two shapes of this contract. The detail is in `hex
 
 On 2026-10-31 the backend moved its `Clock` port to the application layer (API-NFR-11): `src/application` reads the time from the `Clock` port in `src/application/ports/clock.ts` and passes the instant to `src/domain` as a parameter, because ports live in the application layer and the domain never imports it.
 
-DS-4, what orders the per-level leaderboard, is still open (§10, "Still to define").
+On 2026-11-06 the team closed two rules of the level results. The detail is in `hexablock-api/docs/REQUIREMENTS.md` §4, under DS-4 and DS-12:
+
+- **DS-4 — Leaderboard order.** One order ranks the results of a level: more `stars` wins; on equal stars, fewer `moves` wins; on equal moves, less `elapsedMs` wins. On a full tie, the stored result stays, so a player never loses a best result. The same order ranks the per-level leaderboard of Fit and Sort, because both variants give stars (D22). Closed on 2026-11-06 ([hexablock-api#24](https://github.com/Hexablock-Suite/hexablock-api/issues/24)).
+- **DS-12 — Best result per level.** The backend keeps one result per user, `gameId` and `levelId`: the best one by the order of DS-4. A worse result that syncs later, from another device or after the player plays the level again, does not take its place.
 
 The app needs its own side of these features. Statement §5.1 does not list them, so each one is **Derived** from the backend item it serves.
 
@@ -171,7 +174,7 @@ Each assumption holds under both readings of the statement, or names what change
 
 - Merge: merge order inside one slide, and whether a tile merges once per move; probability of a 2 versus a 4; whether undo restores the random state or regenerates the new tile.
 - Lines: whether a combo counts lines on several axes; what a streak is. The code of [#91](https://github.com/Hexablock-Suite/hexablock-app/issues/91) follows the proposal on [#58](https://github.com/Hexablock-Suite/hexablock-app/issues/58), «Propuesta, pendiente del equipo»: the combo is the count of distinct full lines on any axis of the topology after one placement, and the rules clear their union, so a shared cell clears once; a streak is the count of placements in a row that clear at least one line, and the first placement that clears none sets it back to 0. The rules also assume that the tray fills again with the next 3 pieces of the source when its last piece is placed.
-- What orders the per-level leaderboard for Fit and Sort (DS-4), and whether undo and remove count as moves for Fit stars ([#60](https://github.com/Hexablock-Suite/hexablock-app/issues/60)). D22 settled the scoring per variant (§5.1.6) on 2026-11-06.
+- Whether undo and remove count as moves for Fit stars ([#60](https://github.com/Hexablock-Suite/hexablock-app/issues/60)). D22 settled the scoring per variant (§5.1.6) on 2026-11-06, and DS-4 settled the order of the per-level leaderboard on the same day.
 
 ## 11. Questions for the professor
 

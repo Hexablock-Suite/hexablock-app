@@ -189,7 +189,7 @@ describe('README scoring section', () => {
     expect(workedExamples().filter((example) => !section.includes(example))).toEqual([]);
   });
 
-  // D22 accepted the scoring of issue #59 on 2026-11-06. Issue #60 and DS-4 stay open.
+  // D22 accepted the scoring of issue #59 on 2026-11-06. Issue #60 stays open.
   it('should_name_the_accepted_decision_d22_when_the_team_accepted_the_scoring_of_issue_59', () => {
     const section = scoringSection();
 
@@ -197,6 +197,17 @@ describe('README scoring section', () => {
     expect(section).not.toContain('Propuesta, pendiente del equipo');
     expect(section).toContain('issues/59');
     expect(section).toContain('issues/60');
+  });
+
+  // The team closed DS-4 on 2026-11-06 (hexablock-api#24): more stars, then
+  // fewer moves, then less time; a full tie keeps the stored result.
+  it('should_state_the_closed_ds4_order_when_the_readme_names_the_per_level_leaderboard', () => {
+    const section = scoringSection().replace(/\s+/g, ' ');
+
     expect(section).toContain('DS-4');
+    expect(section).toContain('hexablock-api/issues/24');
+    expect(section).toContain('more stars, then fewer moves, then less time');
+    expect(section).toContain('full tie keeps the stored result');
+    expect(section).not.toContain('what orders the per-level leaderboard');
   });
 });
