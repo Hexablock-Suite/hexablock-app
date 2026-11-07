@@ -20,7 +20,7 @@ HexaBlock Suite is one mobile app with four puzzle games on hexagonal boards: He
 | ---------- | ---------------------------------------- | ------------------------------------------------ | ---------------------------------- | -------------------- |
 | Hexa Lines | Place a piece from a tray of 3           | Clear full lines on the 3 axes; combos           | High score                         | No                   |
 | Hexa Fit   | Place, remove or rotate a piece          | None; check that the figure is covered           | Levels with stars (moves and time) | Unlimited, with redo |
-| Hexa Sort  | Place the offered stack on an empty cell | Same-color tiles move between stacks, in cascade | Levels                             | No                   |
+| Hexa Sort  | Place the offered stack on an empty cell | Same-color tiles move between stacks, in cascade | Levels with stars (moves)          | No                   |
 | Hexa Merge | Slide all tiles in one of 6 directions   | Two equal tiles that collide merge               | High score                         | One move             |
 
 The full product table and every requirement are in [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md). The sprint plan is in [docs/ROADMAP.md](docs/ROADMAP.md). The game code is not written yet: today `src/` holds one README per layer folder and the API client. The sections below describe the design that the code follows.
@@ -123,7 +123,7 @@ The professor asked that the primitive types of the design tend to zero, and tha
 | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `number`  | `GridTopology.rotationSteps`                                                                                                                                               | A constant of each topology: 6 steps for a hexagon, 4 for a square. No caller passes it in. A caller reads it and builds a `Turns` from it.                                                                      |
 | `number`  | `Radius.value`, `Radius.of`, `RegionSize.value`, `RegionSize.of`, `Turns.value`, `Turns.of`                                                                                | The value object wraps the number, and `of()` checks it. The rest of the engine takes the value object.                                                                                                          |
-| `number`  | `BoardState.score`, `IScoringPolicy.score`, `GameOver.finalScore`                                                                                                          | Points add up with `+=`. A score value object waits for the scoring of each variant, which decision #59 keeps open.                                                                                              |
+| `number`  | `BoardState.score`, `IScoringPolicy.score`, `GameOver.finalScore`                                                                                                          | Points add up with `+=`. D22 settled the scoring of each variant (#59); a score value object waits for a rule that needs it.                                                                                     |
 | `number`  | `GameResult.score`, `GameResult.moves`, `GameResult.elapsedMs`, `GameResult.of`, `ProgressRecord.score`, `ProgressRecord.stars`, `ProgressRecord.of`                       | Draft fields of a finished game. DS-5 fixes the fields that the backend receives as JSON numbers. `GameResult.of()` checks the moves and the time.                                                               |
 | `number`  | `Clock.now`                                                                                                                                                                | Milliseconds from an origin that layer 4 chooses (rule R-domain-determinism). A caller only subtracts two readings.                                                                                              |
 | `number`  | `RandomSource.next`, `Mulberry32Random.next`                                                                                                                               | A number from 0 up to 1, the contract of every random source. A draw function turns it into a piece.                                                                                                             |
@@ -143,7 +143,7 @@ The professor asked that the primitive types of the design tend to zero, and tha
 | ---------- | ---------------------------- | ------------------------------------------ | ----------------------- | --------------------------- | -------------------------------------- | -------------------------- |
 | Hexa Lines | `Color`                      | `PlacePiece`                               | `LinesState`            | none                        | `SeededPieceSource`                    | `HighScoreProgress`        |
 | Hexa Fit   | `PieceId`                    | `FitMove`: place, remove or rotate a piece | `FitState`              | `RedoableHistory`, no limit | `FixedListPieceSource`                 | `LevelProgress` with stars |
-| Hexa Sort  | `ColorStack`                 | `PlaceStack`                               | `SortState`             | none                        | seeded or fixed, chosen per level (A4) | `LevelProgress`            |
+| Hexa Sort  | `ColorStack`                 | `PlaceStack`                               | `SortState`             | none                        | seeded or fixed, chosen per level (A4) | `LevelProgress` with stars |
 | Hexa Merge | `MergeTile`, an `IMergeable` | `Slide`                                    | `MergeState<MergeTile>` | `MoveHistory`, limit 1      | `SeededPieceSource`, tiles of 2 or 4   | `HighScoreProgress`        |
 
 Each variant has its state, rules, scoring and factory in its folder under [`src/domain/variants/`](src/domain/variants/), and each rules class extends `BaseGameRules`. Each factory implements [`IVariantFactory`](src/domain/engine/variant-factory.ts). Until the geometry family of Sprint 3 exists, a factory receives a `GridTopology` in its constructor, and `GeometryFactory<TCoord>` takes that place later (APP-FR-16). The suite `test/domain/variants/variant-factories.test.ts` plays the four variants through one code path that reads only `IVariantFactory`.
@@ -156,7 +156,7 @@ The variant classes stay generic over `TCoord`, so a variant runs on any geometr
 
 Each variant gives the engine one `IScoringPolicy` (APP-FR-06). After each accepted turn, the engine adds the points of the policy to the game score. Each policy reads only the facts of the turn in the new state, so it keeps no game data (decision 26). Each constant below is a named export of its file, so a new value is a one-line change.
 
-> **«Propuesta, pendiente del equipo».** Every value and formula in this section codes against the proposal on [#59](https://github.com/Hexablock-Suite/hexablock-app/issues/59) (overnight queue, 2026-11-06). The team has not decided the scoring yet, so `docs/REQUIREMENTS.md` keeps it in «Still to define». Two more points are open: whether undo and remove count as Fit moves ([#60](https://github.com/Hexablock-Suite/hexablock-app/issues/60)), and what orders the per-level leaderboard (DS-4, [hexablock-api#24](https://github.com/Hexablock-Suite/hexablock-api/issues/24)).
+> **Accepted on 2026-11-06 (D22).** Every value and formula in this section is the accepted rule of [#59](https://github.com/Hexablock-Suite/hexablock-app/issues/59). The team accepted the proposal of that issue as it stands for Lines, Merge and Fit, and added stars by moves to Sort. Two points stay open: whether undo and remove count as Fit moves ([#60](https://github.com/Hexablock-Suite/hexablock-app/issues/60)), and what orders the per-level leaderboard (DS-4, [hexablock-api#24](https://github.com/Hexablock-Suite/hexablock-api/issues/24)).
 
 #### Hexa Lines
 
@@ -177,11 +177,13 @@ A slide scores the sum of the values that its merges make (statement §1.4).
 
 #### Hexa Sort
 
-A turn scores each tile of every stack that it clears. Statement §1.3 defines no points. Sort has no stars: its progress is the levels won.
+A turn scores each tile of every stack that it clears. Statement §1.3 defines no points. A won level also gets stars by moves.
 
 - Policy: [`SortScoring`](src/domain/variants/hexa-sort/sort-scoring.ts) gives `SORT_POINTS_PER_TILE` = 10 per tile of a cleared stack.
 - Formula: `cleared tiles × 10`. A turn that clears no stack gives 0.
 - Example from [`sort-scoring.test.ts`](test/domain/variants/hexa-sort/sort-scoring.test.ts): a turn clears one stack of 11 tiles (one blue below ten reds), so it gives `11 × 10` = 110.
+- Stars: [`sortStars(play, thresholds)`](src/domain/variants/hexa-sort/sort-stars.ts) counts the stars of a won level by moves: a star needs `moves <= maxMoves`. The level file holds one `maxMoves` threshold per star, and the caller counts the moves. The stars are cumulative: star N needs star N-1, so the count stops at the first threshold that the play misses.
+- Example from [`sort-stars.test.ts`](test/domain/variants/hexa-sort/sort-stars.test.ts): with a first star of 10 moves and a second star of 20 moves, a play of 15 moves gets no star, because it misses the first star.
 
 #### Hexa Fit
 
@@ -228,7 +230,7 @@ Notes on the decided design:
 
 - **Visitor.** D3 allows a Visitor only inside the shape Composite, where the node types are closed and the operations grow. `ShapeNode` declares each operation, and no class implements a Visitor. A Visitor over the variants would make every new variant edit every visitor, which breaks the extensibility test of APP-NFR-06 (decision 35).
 - **Mediator.** `GameEventBus` is an Observer: it implements `GameEventPublisher` and sends each event to its listeners. It does not coordinate classes that call each other, so the design does not claim Mediator (decision 35).
-- **Composites for end conditions and star rules.** No source declares a variation there. Fit stars are data: two thresholds per star, a move count and a time, in each level file (decision 36).
+- **Composites for end conditions and star rules.** No source declares a variation there. Fit stars are data: two thresholds per star, a move count and a time, in each level file (decision 36). Sort stars are data too: one move count per star (D22).
 
 ## SOLID Principles
 

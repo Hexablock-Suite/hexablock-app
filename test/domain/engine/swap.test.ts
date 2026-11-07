@@ -21,7 +21,7 @@ import { square, type SquareCoord } from '../../support/engine/square-topology';
 
 // APP-NFR-04: the piece source, the scoring policy and the progress model swap,
 // and no engine file changes. Every implementation here is a dummy that exists only in test/.
-// No real scoring: decision #59 (the scoring of each variant) is open.
+// No real scoring: the accepted rule of issue #59 (D22) has its own suite per variant.
 // Each dummy runs through `GameEngine`: the source lives in the state that the engine
 // copies and rolls back, the engine calls the scoring, and a subscriber of the
 // `GameOver` event gives a `GameResult` to the progress model.

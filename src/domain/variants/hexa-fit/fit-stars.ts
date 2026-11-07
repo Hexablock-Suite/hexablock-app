@@ -12,8 +12,8 @@ export interface FitPlay {
   readonly elapsedMs: number;
 }
 
-// The stars of a won Fit level. Proposal of issue #59, «Propuesta, pendiente del equipo»
-// (2026-11-06): a star needs both of its thresholds, the moves and the time.
+// The stars of a won Fit level. The accepted rule of issue #59 (D22, 2026-11-06):
+// a star needs both of its thresholds, the moves and the time.
 // Each star counts on its own, so the level orders its thresholds as it wants.
 export function fitStars(play: FitPlay, thresholds: readonly FitStarThreshold[]): number {
   return thresholds.filter((t) => play.moves <= t.maxMoves && play.elapsedMs <= t.maxElapsedMs)

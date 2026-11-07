@@ -36,7 +36,8 @@ const A = PieceId.of('a');
 const B = PieceId.of('b');
 const NO_TURN = Turns.of(0);
 
-// Fit scoring is open (decision #59), so these tests give no points.
+// These tests give no points. The Fit scoring, the accepted rule of issue #59 (D22),
+// has its own suite.
 const noPoints: IScoringPolicy<FitState<SquareCoord>> = { score: () => 0 };
 
 function piece<TCoord>(id: PieceId, cells: TCoord[]): Piece<PieceId, TCoord> {

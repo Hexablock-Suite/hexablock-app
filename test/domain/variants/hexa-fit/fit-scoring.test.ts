@@ -19,9 +19,8 @@ import { PieceId } from '../../../../src/domain/variants/hexa-fit/piece-id';
 import { RecordingPublisher } from '../../../support/engine/fake-game';
 import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
 
-// The Fit scoring of issue #98. It codes against the proposal of issue #59,
-// «Propuesta, pendiente del equipo»: no points per turn, and a star needs both of its
-// thresholds (moves and time). Whether undo and remove count as moves is issue #60.
+// The Fit scoring of issue #98. It codes the accepted rule of issue #59 (D22):
+// no points per turn, and a star needs both of its thresholds (moves and time). Whether undo and remove count as moves is issue #60.
 
 const A = PieceId.of('a');
 const B = PieceId.of('b');

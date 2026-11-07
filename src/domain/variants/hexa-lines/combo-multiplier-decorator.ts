@@ -5,8 +5,7 @@ import type { LinesState } from './lines-state';
 
 // Decorator (classes.md patterns table): it wraps the base `LinesScoring` and multiplies
 // the line bonus for the combo and the streak (statement §1.1). The cell points keep factor 1.
-// The multiplier codes against the proposal on issue 59, «Propuesta, pendiente del equipo
-// (cola nocturna, 2026-11-06)»: `lines + streak - 1`. One line with streak 1 gives factor 1.
+// The multiplier codes the accepted rule of issue #59 (D22, 2026-11-06): `lines + streak - 1`. One line with streak 1 gives factor 1.
 // The streak counts the current placement (issue 58), so a second clearing placement in a row
 // has streak 2. The engine has no `ScoringDecorator` yet, so this class implements
 // `IScoringPolicy` directly.

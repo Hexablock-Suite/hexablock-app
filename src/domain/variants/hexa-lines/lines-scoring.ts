@@ -2,8 +2,7 @@ import type { Resolution } from '../../engine/resolution';
 import type { IScoringPolicy } from '../../engine/scoring-policy';
 import type { LinesState } from './lines-state';
 
-// The values code against the proposal on issue 59, «Propuesta, pendiente del equipo
-// (cola nocturna, 2026-11-06)». The team has not decided them yet.
+// The values code the accepted rule of issue #59 (D22, 2026-11-06).
 // Statement §1.1: «celdas colocadas + bonificación por línea + multiplicador por combo y racha».
 export const POINTS_PER_CELL = 1;
 export const POINTS_PER_LINE = 10;

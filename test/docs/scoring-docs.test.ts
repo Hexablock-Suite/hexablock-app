@@ -189,10 +189,12 @@ describe('README scoring section', () => {
     expect(workedExamples().filter((example) => !section.includes(example))).toEqual([]);
   });
 
-  it('should_mark_the_values_as_a_proposal_when_the_team_decision_59_is_open', () => {
+  // D22 accepted the scoring of issue #59 on 2026-11-06. Issue #60 and DS-4 stay open.
+  it('should_name_the_accepted_decision_d22_when_the_team_accepted_the_scoring_of_issue_59', () => {
     const section = scoringSection();
 
-    expect(section).toContain('Propuesta, pendiente del equipo');
+    expect(section).toContain('D22');
+    expect(section).not.toContain('Propuesta, pendiente del equipo');
     expect(section).toContain('issues/59');
     expect(section).toContain('issues/60');
     expect(section).toContain('DS-4');

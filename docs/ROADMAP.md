@@ -96,7 +96,7 @@ The engine and its tests, with no variant yet. The backend serves accounts and o
 
 ## Sprint 2 — The four variant rules (2026-11-09 to 2026-11-15), tag `v0.2.0`
 
-Hexa Lines, Hexa Fit, Hexa Sort and Hexa Merge plug into the engine, each with its rules tests. The generic use case and its aspect wrap all four. The backend stores progress per `gameId`. The team settles the scoring of each variant (`REQUIREMENTS.md` §10, "Still to define").
+Hexa Lines, Hexa Fit, Hexa Sort and Hexa Merge plug into the engine, each with its rules tests. The generic use case and its aspect wrap all four. The backend stores progress per `gameId`. The team settles the scoring of each variant: D22 in `REQUIREMENTS.md` §10 settled it on 2026-11-06.
 
 | ID         | Exit check                                                                                                                                                                                                    |
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

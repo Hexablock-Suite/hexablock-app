@@ -2,8 +2,8 @@ import type { Resolution } from '../../engine/resolution';
 import type { IScoringPolicy } from '../../engine/scoring-policy';
 import type { FitState } from './fit-state';
 
-// The points of one Fit turn. Proposal of issue #59, «Propuesta, pendiente del equipo»
-// (2026-11-06): Fit has no score per turn. Its result is the stars (`fitStars`).
+// The points of one Fit turn. The accepted rule of issue #59 (D22, 2026-11-06):
+// Fit has no score per turn. Its result is the stars (`fitStars`).
 export const FIT_POINTS_PER_TURN = 0;
 
 // The scoring of Hexa Fit (issue #98, APP-FR-06). Statement §1.2 grades a level
