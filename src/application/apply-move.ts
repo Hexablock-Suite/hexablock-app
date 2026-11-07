@@ -1,5 +1,6 @@
 import type { BoardState } from '../domain/engine/board-state';
 import type { Cloneable } from '../domain/engine/cloneable';
+import { logEntryOf, type Logger } from './logger';
 import { moveResultOf, type MoveResult } from './move-result';
 import { caughtError, Result, UseCaseError } from './result';
 import type { RunningGameStore } from './running-game-store';
@@ -15,14 +16,20 @@ export interface ApplyMoveRequest<TMove> {
 // No exception leaves `execute()`. The failures:
 // - `no-running-game`: the store has no engine.
 // - `move-rejected`: the rules reject the move. The engine keeps its state.
-// - `move-failed`: the engine throws, for example after the game ends.
+// - `move-failed`: the engine throws before it saves the turn, for example after the game ends.
+// The engine saves the turn before it publishes. So a publisher failure gives a success
+// built from the saved state (decision 29), and `logger` gets a `publish-failed` entry
+// (issue 132). `ApplyMove` logs nothing else: the logging aspect logs each call.
 export class ApplyMove<
   TCell,
   TCoord,
   TMove,
   TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
 > implements UseCase<ApplyMoveRequest<TMove>, MoveResult<TCell, TCoord>> {
-  constructor(private readonly games: RunningGameStore<TCell, TCoord, TMove, TState>) {}
+  constructor(
+    private readonly games: RunningGameStore<TCell, TCoord, TMove, TState>,
+    private readonly logger: Logger,
+  ) {}
 
   async execute(request: ApplyMoveRequest<TMove>): Promise<Result<MoveResult<TCell, TCoord>>> {
     try {
@@ -34,9 +41,24 @@ export class ApplyMove<
       if (!turn.accepted) {
         return Result.failure(new UseCaseError('move-rejected', 'The rules rejected the move.'));
       }
+      if (turn.publishFailure !== undefined) {
+        this.logPublishFailure(turn.publishFailure.error);
+      }
       return Result.success(moveResultOf(engine.snapshot(), turn.outcome));
     } catch (thrown) {
       return Result.failure(caughtError('move-failed', thrown));
+    }
+  }
+
+  // The turn is already saved. A logger that throws here must not change the answer, so
+  // this method drops that error. A logging aspect around `ApplyMove` reports a broken logger.
+  private logPublishFailure(error: unknown): void {
+    try {
+      this.logger.log(
+        logEntryOf('ApplyMove', Result.failure(caughtError('publish-failed', error))),
+      );
+    } catch {
+      return;
     }
   }
 }

@@ -531,6 +531,34 @@ describe('GameEngine review findings', () => {
     expect(summary(engine)).toEqual({ ...afterOneMove, phase: 'game-over' });
   });
 
+  // `tryPlay()` keeps the publisher failure apart from the outcome (issue 132, G117.2).
+  it('should_report_the_publisher_failure_apart_from_the_outcome_when_try_play_saves_the_turn', () => {
+    const { engine } = gameWith(
+      new FixedOutcomeRules('game-over'),
+      new OnePointScoring(),
+      new ThrowingPublisher(),
+    );
+
+    const report = engine.tryPlay(place(0, 0));
+
+    expect(report).toEqual({
+      accepted: true,
+      outcome: 'game-over',
+      publishFailure: { error: new Error('publish failed') },
+    });
+    expect(summary(engine)).toEqual({ ...afterOneMove, phase: 'game-over' });
+  });
+
+  it('should_report_no_publisher_failure_when_the_publisher_works', () => {
+    const { engine, publisher } = gameWith(new FixedOutcomeRules('game-over'));
+
+    const report = engine.tryPlay(place(0, 0));
+
+    expect(Object.keys(report).sort()).toEqual(['accepted', 'outcome']);
+    expect(report).toEqual({ accepted: true, outcome: 'game-over' });
+    expect(publisher.events).toHaveLength(1);
+  });
+
   // The rollback covers the board, the score, the phase and the piece source in the state.
   it('should_draw_the_same_piece_when_a_turn_is_retried_after_a_throw', () => {
     const engine = sourceGame(new DrawingRules());

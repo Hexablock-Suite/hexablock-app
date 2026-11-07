@@ -174,12 +174,16 @@ describe('LoggingAspect', () => {
   });
 
   it('should_keep_aspect_code_out_of_the_use_cases_when_the_use_case_source_is_read', () => {
+    // `ApplyMove` takes the `Logger` port only to report a publisher failure after the
+    // engine saves the turn (issue 132). It holds no aspect and logs no call.
+    const read = (file: string) =>
+      readFileSync(join(__dirname, '../../src/application', file), 'utf8');
     for (const file of ['start-game.ts', 'apply-move.ts']) {
-      const source = readFileSync(join(__dirname, '../../src/application', file), 'utf8');
-
-      expect(source).not.toMatch(/\b(UseCaseAspect|LoggingAspect|Logger|UseCaseLogEntry|Clock)\b/);
-      expect(source).not.toMatch(/from '\.\/(logger|logging-aspect|use-case-aspect)'/);
+      expect(read(file)).not.toMatch(/\b(UseCaseAspect|LoggingAspect|Clock)\b/);
+      expect(read(file)).not.toMatch(/from '\.\/(logging-aspect|use-case-aspect)'/);
     }
+    expect(read('start-game.ts')).not.toMatch(/\b(Logger|UseCaseLogEntry)\b/);
+    expect(read('start-game.ts')).not.toMatch(/from '\.\/logger'/);
   });
 
   // The log names the call by `name`, so an empty name helps no one (G118.4).
