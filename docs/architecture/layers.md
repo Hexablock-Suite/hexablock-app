@@ -1,8 +1,8 @@
 # Clean Architecture layers
 
-Status: draft for review with the professor, 2026-10-30. Updated on 2026-10-31 to match the class diagram: one generic input port, the ports of decisions 10 to 12, engine interfaces that are not ports, and the presentation pattern. Updated on 2026-11-02: the `Logger` port takes a log entry, and its adapter writes the text (decision 37 of the class diagram).
+Status: draft for review with the professor, 2026-10-30. Updated on 2026-10-31 to match the class diagram: one generic input port, the ports of decisions 10 to 12, engine interfaces that are not ports, and the presentation pattern. Updated on 2026-11-02: the `Logger` port takes a log entry, and its adapter writes the text (decision 37 of the class diagram). Updated on 2026-11-07: the status text and the planned marks of the diagram follow the code in `src/` (issue #147).
 
-This page answers one question: in which layer does each piece of the client live? It follows the statement (§3.4, §4.2) and the layer rules in `.dependency-cruiser.cjs`. The engine is not written yet. Today `src/` holds one README per layer folder plus the API client in `src/infrastructure/api/`. Component names follow the statement (§3.1, §3.4) and the [class diagram](classes.md). They are not final. The engine names carry no geometry: `Board<TCell, TCoord>` is the `HexBoard<TCell>` of §3.1 (decision 16 of the class diagram). IDs such as A1, D3 and Q7 refer to [`docs/REQUIREMENTS.md`](../REQUIREMENTS.md). The classes of layer 1 are in the [class diagram](classes.md).
+This page answers one question: in which layer does each piece of the client live? It follows the statement (§3.4, §4.2) and the layer rules in `.dependency-cruiser.cjs`. Part of the client exists today. `src/domain/` holds the engine and the four variants. `src/application/` holds the first use cases, `StartGame` and `ApplyMove`, with the input port `UseCase`, the ports `RunningGameStore` and `Logger`, and the aspects `UseCaseAspect` and `LoggingAspect`. `src/infrastructure/` holds the API client in `src/infrastructure/api/`. `app/` holds the root layout and a home screen that shows the title. The other screens, the adapters of `src/adapters/`, the drivers and the composition root are planned. The diagram marks each planned piece. Component names follow the statement (§3.1, §3.4) and the [class diagram](classes.md). They are not final. The engine names carry no geometry: `Board<TCell, TCoord>` is the `HexBoard<TCell>` of §3.1 (decision 16 of the class diagram). IDs such as A1, D3 and Q7 refer to [`docs/REQUIREMENTS.md`](../REQUIREMENTS.md). The classes of layer 1 are in the [class diagram](classes.md).
 
 ## Diagram
 
@@ -11,7 +11,7 @@ Statement §4.2 asks for four concentric layers. Mermaid draws them as a stack: 
 - Solid arrow: uses (imports). Dotted arrow: realization, the class implements an interface. Mermaid draws no hollow triangle, so the dotted line and its label `implements` stand for the UML realization.
 - Rounded node: a port, an interface that layer 2 owns and an outer layer implements. Ports live in the application layer, because a use case may depend only on ports of its own layer (§3.4). So only layer 2 has rounded nodes.
 - Plain box: a class or an interface that is not a port. The engine owns `Clock`, `RandomSource` and `GameEventPublisher`, and layer 3 owns `KeyValueStore`. An outer layer implements them too, but they are interfaces of their own layer, not ports (decision 25 of the class diagram).
-- Dashed border and the suffix "(planned)": the component does not exist yet. A solid border means the file exists today.
+- Dashed border and the suffix "(planned)": the component does not exist yet. A solid border means the file exists today. A solid node whose label has a "planned:" part exists in part: only the names after "planned:" do not exist yet.
 - A label that names a question (Q8 or Q9) marks a placement the team has not settled. The box sits where this draft puts it, and the professor's answer can move it.
 - Colors: layer 1 yellow, layer 2 purple, layers 3 and 4 blue. The course colors three layers: the domain yellow, the application purple and the infrastructure blue. With four layers, layers 3 and 4 together are the blue infrastructure, so the team draws layer 3 light blue and layer 4 dark blue. The class views use the same colors.
 - The legend is a box inside the drawing, below layer 1, so the image carries it too. It repeats the colors, the node shapes and the two arrows.
@@ -48,36 +48,36 @@ flowchart TB
   end
 
   subgraph L2["Layer 2: Use cases, src/application/"]
-    UC["Generic use cases (planned):<br/>StartGame, ApplyMove, UndoMove, RedoMove,<br/>ListLevels, SaveProgress, SyncLeaderboard,<br/>Register, Login, UpdateSettings"]
-    ASPECTS["Aspect decorators over the use cases<br/>(planned): logging, timing, retry,<br/>authorization"]
-    MODELS["Request and response models,<br/>Result#lt;T, E#gt; and UseCaseError (planned)"]
-    INPORTS(["UseCase#lt;TRequest, TResponse#gt;: one generic<br/>input port, each use case binds it (planned)"])
+    UC["Generic use cases: StartGame, ApplyMove;<br/>planned: UndoMove, RedoMove, ListLevels,<br/>SaveProgress, SyncLeaderboard, Register,<br/>Login, UpdateSettings"]
+    ASPECTS["Aspect decorators over the use cases:<br/>logging; planned: timing, retry,<br/>authorization"]
+    MODELS["Request and response models,<br/>Result#lt;T, E#gt; and UseCaseError"]
+    INPORTS(["UseCase#lt;TRequest, TResponse#gt;: one generic<br/>input port, each use case binds it"])
     PPORT(["ProgressRepository port (planned)"])
     LBPORT(["LeaderboardGateway port (planned)"])
     LVPORT(["LevelRepository port (planned)"])
-    RGPORT(["RunningGameStore port (planned)"])
+    RGPORT(["RunningGameStore port"])
     ACCPORT(["AccountGateway port (planned)"])
     SESSPORT(["SessionStore port (planned)"])
     SETPORT(["SettingsStore port (planned)"])
-    LOGPORT(["Logger port: takes a UseCaseLogEntry (planned)"])
+    LOGPORT(["Logger port: takes a UseCaseLogEntry"])
   end
 
   subgraph L1["Layer 1: Entities"]
     subgraph VARIANTS["src/domain/variants/"]
-      LINES["hexa-lines (planned)"]
-      FIT["hexa-fit (planned)"]
-      SORT["hexa-sort (planned)"]
-      MERGE["hexa-merge (planned)"]
+      LINES["hexa-lines"]
+      FIT["hexa-fit"]
+      SORT["hexa-sort"]
+      MERGE["hexa-merge"]
     end
     subgraph ENGINE["src/domain/engine/"]
-      CORE["GameEngine#lt;TCell, TCoord, TMove, TState#gt;, the aggregate root,<br/>Board#lt;TCell, TCoord#gt;, Piece, GridTopology#lt;TCoord#gt;,<br/>BoardBuilder, GeometryFactory with HexGeometry,<br/>HexCoord and HexTopology, GameId (planned)"]
-      CONTRACTS["Contracts that a variant implements:<br/>IGameRules#lt;TMove, TState#gt; through BaseGameRules,<br/>IScoringPolicy#lt;TState#gt;, BoardState#lt;TCell, TCoord#gt; (planned)"]
-      STRATS["Strategies with engine classes:<br/>IPieceSource#lt;TPiece#gt;: SeededPieceSource, FixedListPieceSource;<br/>IProgressModel: HighScoreProgress, LevelProgress (planned)"]
-      CAPS["Capability interfaces IUndoable, IRedoable, ITimed,<br/>IRandomSeeded with their engine classes MoveHistory,<br/>RedoableHistory, LevelTimer, SeededPieceSource;<br/>IMergeable#lt;TCell#gt; (planned)"]
-      DPORTS["Clock and RandomSource interfaces (planned)"]
-      CMDSTATE["MoveCommand and GamePhase classes (planned)"]
-      FACTORY["IVariantFactory: creates the rules, piece source,<br/>scoring, board, progress model, initial state<br/>and history (planned, Q8)"]
-      EVPORT["GameEventPublisher interface (planned)"]
+      CORE["GameEngine#lt;TCell, TCoord, TMove, TState#gt;, the aggregate root,<br/>Board#lt;TCell, TCoord#gt;, Piece, GridTopology#lt;TCoord#gt;, GameId;<br/>planned: BoardBuilder, GeometryFactory with HexGeometry,<br/>HexCoord and HexTopology"]
+      CONTRACTS["Contracts that a variant implements:<br/>IGameRules#lt;TMove, TState#gt; through BaseGameRules,<br/>IScoringPolicy#lt;TState#gt;, BoardState#lt;TCell, TCoord#gt;"]
+      STRATS["Strategies with engine classes:<br/>IPieceSource#lt;TPiece#gt;: SeededPieceSource, FixedListPieceSource;<br/>IProgressModel; planned: HighScoreProgress, LevelProgress"]
+      CAPS["Capability interfaces: IRandomSeeded with its engine class<br/>SeededPieceSource, IMergeable#lt;TCell#gt;; planned: IUndoable,<br/>IRedoable, ITimed with their engine classes MoveHistory,<br/>RedoableHistory, LevelTimer"]
+      DPORTS["Clock and RandomSource interfaces"]
+      CMDSTATE["GamePhase classes; planned: MoveCommand"]
+      FACTORY["IVariantFactory: creates the rules, piece source,<br/>scoring, board and initial state; planned:<br/>progress model and history (Q8)"]
+      EVPORT["GameEventPublisher interface"]
     end
   end
 
@@ -157,8 +157,7 @@ flowchart TB
   classDef planned stroke-dasharray: 5 5
   class SCREENS,APIREPOS,STORAGE,SECURE,AUDIO,CLOCK,RNG,LOGGER,VIEWS,ROOT planned
   class PRESENTERS,MAPPERS,EVENTBUS,LOCALREPO,LEVELREPO,RUNSTORE,KV planned
-  class UC,ASPECTS,MODELS,INPORTS,PPORT,LBPORT,LVPORT,RGPORT,ACCPORT,SESSPORT,SETPORT,LOGPORT planned
-  class LINES,FIT,SORT,MERGE,CORE,CONTRACTS,STRATS,CAPS,DPORTS,CMDSTATE,FACTORY,EVPORT planned
+  class PPORT,LBPORT,LVPORT,ACCPORT,SESSPORT,SETPORT planned
   class LGPLAN planned
 
   style L4 fill:#cfdcf3,stroke:#1e3a8a,color:#111827

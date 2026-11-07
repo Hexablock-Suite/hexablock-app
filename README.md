@@ -23,7 +23,7 @@ HexaBlock Suite is one mobile app with four puzzle games on hexagonal boards: He
 | Hexa Sort  | Place the offered stack on an empty cell | Same-color tiles move between stacks, in cascade | Levels with stars (moves)          | No                   |
 | Hexa Merge | Slide all tiles in one of 6 directions   | Two equal tiles that collide merge               | High score                         | One move             |
 
-The full product table and every requirement are in [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md). The sprint plan is in [docs/ROADMAP.md](docs/ROADMAP.md). The game code is not written yet: today `src/` holds one README per layer folder and the API client. The sections below describe the design that the code follows.
+The full product table and every requirement are in [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md). The sprint plan is in [docs/ROADMAP.md](docs/ROADMAP.md). The engine and the four variants exist in `src/domain/`, and the first use cases, `StartGame` and `ApplyMove`, exist in `src/application/`. The game screens and the adapters are planned: `app/` holds only a home screen, and `src/adapters/` holds only its README. The sections below describe the design that the code follows.
 
 ## Demo / Screenshots
 
