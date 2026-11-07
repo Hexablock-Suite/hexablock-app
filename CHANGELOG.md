@@ -36,6 +36,10 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 
 - `«Sprint N»` markers in the class and extensibility views take N from `docs/ROADMAP.md`: N is the sprint of the requirement that the planned class serves, and the `data-requirement` attribute of each marker names it. `GeometryFactory`, `HexGeometry`, `BoardBuilder`, `IVariantFactory` and the four variant factories show Sprint 3 (APP-FR-16), not Sprint 2. `SquareGeometry` shows Sprint 1 (APP-NFR-13), not Sprint 3. The legends of the eight views, `docs/architecture/extensibility.md` and the alt text of the engine map state the rule, and the eight PNG images are exported again. The gate `test/docs/sprint-markers.test.ts` fails when a marker names no requirement or a requirement of another sprint, or when a legend keeps the old wording ([#89](https://github.com/Hexablock-Suite/hexablock-app/issues/89)).
 
+### Fixed
+
+- Hexa Lines counts a full line once when the topology walks it from its other end ([#134](https://github.com/Hexablock-Suite/hexablock-app/issues/134), gap G107.6). `GridTopology.line()` gives the cells of a line in order, but it does not say at which end the walk starts. `fullLines()` in `LinesRules` named a line by its axis and the key of its first cell, so a walk from the other end found the same full row again: a combo of 2 and a score of 41 for one row, not 1 and 11. Now the axis and the sorted topology keys of the cells name a line, so the same line from either end counts once. The engine contract does not change. A new case in `test/domain/variants/hexa-lines/lines-rules.test.ts` plays one full row on a square double that walks some lines from the far end.
+
 ## [0.1.0] - 2026-11-06
 
 ### Added

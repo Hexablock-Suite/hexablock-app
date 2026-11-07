@@ -4,7 +4,9 @@ import { GameOver } from '../../../../src/domain/engine/game-events';
 import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
 import { BaseGameRules, type IGameRules } from '../../../../src/domain/engine/rules';
 import { Color } from '../../../../src/domain/engine/color';
+import { ComboMultiplierDecorator } from '../../../../src/domain/variants/hexa-lines/combo-multiplier-decorator';
 import { LinesRules } from '../../../../src/domain/variants/hexa-lines/lines-rules';
+import { LinesScoring } from '../../../../src/domain/variants/hexa-lines/lines-scoring';
 import { LinesState } from '../../../../src/domain/variants/hexa-lines/lines-state';
 import { PlacePiece } from '../../../../src/domain/variants/hexa-lines/place-piece';
 import {
@@ -384,5 +386,38 @@ describe('Hexa Lines rules edge cases', () => {
       expect(state.streak).toBe(0);
       expect(publisher.events).toEqual([]);
     }
+  });
+
+  it('should_count_one_line_and_score_one_line_when_the_topology_walks_the_line_from_its_other_end', () => {
+    // Gap G107.6 (issue #134). `GridTopology.line()` promises the cells in order, not the start end.
+    // This square double walks a line from its far end when the cell has an odd index on the axis.
+    const reversing: GridTopology<SquareCoord, SquareAxis, SquareDirection> = {
+      ...squareTopology,
+      *line(axis, through, contains) {
+        const cells = [...squareTopology.line(axis, through, contains)];
+        const index = axis === 'col' ? through.col : through.row;
+        yield* index % 2 === 0 ? cells : cells.reverse();
+      },
+    };
+    const probe = linesState(reversing, 3, { tray: [] });
+    const { engine } = linesGame(
+      linesState(reversing, 3, { filled: [square(1, 0), square(2, 0)], tray: [one, one] }),
+      new ComboMultiplierDecorator(new LinesScoring<SquareCoord>()),
+    );
+
+    engine.play(new PlacePiece(0, origin));
+
+    const state = engine.snapshot();
+    expect(keys([...probe.board.line('col', square(1, 0))])).toEqual(
+      keys([...probe.board.line('col', origin)]),
+    );
+    expect(probe.board.line('col', square(1, 0))[Symbol.iterator]().next().value).toEqual(
+      square(2, 0),
+    );
+    expect(state.linesCleared).toBe(1);
+    expect(state.streak).toBe(1);
+    expect(filledKeys(state)).toEqual([]);
+    // One placed cell and one line with factor 1: 1 + 10.
+    expect(state.score).toBe(11);
   });
 });
