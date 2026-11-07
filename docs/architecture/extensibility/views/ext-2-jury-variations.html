@@ -75,8 +75,8 @@
           Three columns, one per jury variation of statement §3.1. A new board size is configuration
           data passed to BoardBuilder.withRegion(size). A new scoring policy is a class that
           implements IScoringPolicy or extends ScoringDecorator. A new piece shape is data, a
-          ShapeGroup of CellNode cells. Below them, GameEngine does not change. ScoringDecorator is
-          planned for Sprint 2, and BoardBuilder for Sprint 3.
+          ShapeGroup of CellNode cells. Below them, GameEngine does not change. BoardBuilder is
+          planned for Sprint 3.
         </desc>
         <defs>
           <marker
@@ -400,15 +400,8 @@
         <text x="408" y="166" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           implements IScoringPolicy
         </text>
-        <text
-          data-requirement="APP-FR-06"
-          x="408"
-          y="182"
-          fill="#5b6873"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          or a ScoringDecorator «Sprint 2»
+        <text x="408" y="182" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          or a ScoringDecorator
         </text>
         <text x="408" y="198" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           in src/domain/variants/
