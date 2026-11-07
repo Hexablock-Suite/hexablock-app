@@ -129,22 +129,28 @@ export interface components {
              */
             error: string;
             /**
-             * @description One sentence that a client can show or log.
+             * @description One sentence that a client can show or log. It never holds the query string.
              * @example Cannot GET /levels/unknown
              */
             message: string;
             /**
-             * @description One entry per problem when a request has several. Empty otherwise.
+             * @description One entry per problem when a request has several. Empty otherwise. No entry holds the query string.
              * @example [
              *       "gameId should not be empty"
              *     ]
              */
             details: string[];
             /**
-             * @description The request path.
+             * @description The request path, without the query string.
              * @example /levels/unknown
              */
             path: string;
+        };
+        LoginDto: {
+            /** @example ada */
+            username: string;
+            /** @example correct horse battery */
+            password: string;
         };
         TokenDto: {
             /**
@@ -190,7 +196,7 @@ export interface components {
              * @example 120
              */
             score?: number | null;
-            /** @description Level results. A later result for a levelId replaces the earlier one. */
+            /** @description Level results. For each levelId the better result stays: more stars, then fewer moves, then less time; on a full tie the stored result stays. */
             results?: components["schemas"]["LevelResultDto"][];
         };
         ProgressDto: {
@@ -266,7 +272,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorDto"];
                 };
             };
-            /** @description Another user has this username. */
+            /** @description Another user has this username, or one that differs only in letter case. */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -286,7 +292,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CredentialsDto"];
+                "application/json": components["schemas"]["LoginDto"];
             };
         };
         responses: {
