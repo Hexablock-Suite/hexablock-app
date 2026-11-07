@@ -1,0 +1,86 @@
+import { Board } from '../../engine/board';
+import type { BoardState } from '../../engine/board-state';
+import type { CoordKey } from '../../engine/coord-key';
+import type { Piece } from '../../engine/piece';
+import type { IPieceSource } from '../../engine/piece-source';
+import type { PieceId } from './piece-id';
+import type { Placement } from './placement';
+
+// The state of one Hexa Fit game: the figure board, the pieces of the level,
+// and the placement of each piece on the figure.
+// The board is the figure: its shape holds only the figure cells (REQUIREMENTS.md §1).
+// The pieces come from the level's `FixedListPieceSource`. The state reads it once at start,
+// because the player picks the tray pieces in any order.
+// The maps use the text of the piece id as key, because a Map compares a string by value.
+// `place()` and `remove()` change nothing in place: each one returns a new state.
+export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
+  private constructor(
+    readonly board: Board<PieceId, TCoord, string>,
+    private readonly pieces: ReadonlyMap<string, Piece<PieceId, TCoord>>,
+    private readonly placements: ReadonlyMap<string, Placement<TCoord>>,
+    public score = 0,
+  ) {}
+
+  // Two pieces with the same id throw a RangeError, because a move names its piece by id.
+  static start<TCoord>(
+    figure: Board<PieceId, TCoord, string>,
+    source: IPieceSource<Piece<PieceId, TCoord>>,
+  ): FitState<TCoord> {
+    const pieces = new Map<string, Piece<PieceId, TCoord>>();
+    for (const piece of source) {
+      if (pieces.has(piece.content.value)) {
+        throw new RangeError(`The level has two pieces with the id ${piece.content.value}.`);
+      }
+      pieces.set(piece.content.value, piece);
+    }
+    return new FitState(figure.clone(), pieces, new Map());
+  }
+
+  piece(id: PieceId): Piece<PieceId, TCoord> | undefined {
+    return this.pieces.get(id.value);
+  }
+
+  placementOf(id: PieceId): Placement<TCoord> | undefined {
+    return this.placements.get(id.value);
+  }
+
+  // The tray: the pieces that are not on the figure, in the order of the source.
+  remaining(): Piece<PieceId, TCoord>[] {
+    return [...this.pieces.values()].filter((p) => !this.placements.has(p.content.value));
+  }
+
+  // The placed pieces, in the order of the source.
+  placed(): PieceId[] {
+    return [...this.pieces.values()]
+      .map((p) => p.content)
+      .filter((id) => this.placements.has(id.value));
+  }
+
+  // Puts the piece on the cells of `placement`. The rules check the move before.
+  place(id: PieceId, placement: Placement<TCoord>): FitState<TCoord> {
+    const piece = this.pieces.get(id.value);
+    if (piece === undefined) throw new RangeError(`The level has no piece ${id.value}.`);
+    const board = this.board.clone();
+    for (const c of placement.cells(piece, board.topology)) board.set(c, id);
+    const placements = new Map(this.placements).set(id.value, placement);
+    return new FitState(board, this.pieces, placements, this.score);
+  }
+
+  // Takes the piece off the figure. The board has no erase, so the state builds
+  // a new board from the other cells.
+  remove(id: PieceId): FitState<TCoord> {
+    const { shape, topology } = this.board;
+    const content = new Map<CoordKey, [TCoord, PieceId]>();
+    for (const [c, cell] of this.board.cells()) {
+      if (!cell.equals(id)) content.set(topology.key(c), [c, cell]);
+    }
+    const placements = new Map(this.placements);
+    placements.delete(id.value);
+    return new FitState(new Board(shape, topology, content), this.pieces, placements, this.score);
+  }
+
+  // A piece never changes, so the clone shares the pieces and the placements.
+  clone(): FitState<TCoord> {
+    return new FitState(this.board.clone(), this.pieces, this.placements, this.score);
+  }
+}
