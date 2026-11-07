@@ -32,9 +32,21 @@ export const Result = {
   },
 };
 
+// The message of a thrown value whose text cannot be built (issue #138).
+const NO_TEXT = 'The thrown value has no text.';
+
 // The error of a caught exception as a `UseCaseError`. Any thrown value gives a message.
 // The error keeps the thrown value as its `cause`.
+// `String()` throws for a value without a prototype or with a `toString` that throws.
+// Then the message is fixed, so this function never throws for any thrown value (issue #138).
 export function caughtError(code: string, thrown: unknown): UseCaseError {
-  const message = thrown instanceof Error ? thrown.message : String(thrown);
-  return new UseCaseError(code, message, false, thrown);
+  return new UseCaseError(code, textOf(thrown), false, thrown);
+}
+
+function textOf(thrown: unknown): string {
+  try {
+    return thrown instanceof Error ? thrown.message : String(thrown);
+  } catch {
+    return NO_TEXT;
+  }
 }
