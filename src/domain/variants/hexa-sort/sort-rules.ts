@@ -1,5 +1,4 @@
 import type { Board } from '../../engine/board';
-import type { CoordKey } from '../../engine/coord-key';
 import type { Outcome } from '../../engine/outcome';
 import { Resolution } from '../../engine/resolution';
 import { BaseGameRules } from '../../engine/rules';
@@ -7,8 +6,8 @@ import { ColorStack } from './color-stack';
 import type { PlaceStack, SortState } from './sort-state';
 
 // A top run of this many tiles of one color clears its stack (statement §1.3).
-// Proposal of issue #56, «Propuesta, pendiente del equipo»: a top run of 10 or more
-// removes the whole stack, tiles of other colors below included, and counts one goal.
+// The accepted rule of issue #56: a top run of 10 or more removes the whole stack,
+// tiles of other colors below included, and counts one goal.
 export const GOAL_RUN = 10;
 
 // The rules of Hexa Sort (statement §1.3). The player places the offered stack on an
@@ -67,7 +66,7 @@ function transfer<TCoord>(state: SortState<TCoord>, at: TCoord): TCoord[] {
   if (color === undefined) return [];
   const matches = [...board.neighborhood(at)].filter((n) => board.get(n)?.top() === color);
   if (matches.length === 0) return [];
-  const target = targetOf(board, [at, ...matches]);
+  const target = targetOf(board, at, matches);
   // When `at` is the target, every matching neighbor gives its run to it.
   // Otherwise only `at` gives its run, because the other neighbors can lie away from the target.
   const key = (c: TCoord) => board.topology.key(c);
@@ -83,25 +82,26 @@ function transfer<TCoord>(state: SortState<TCoord>, at: TCoord): TCoord[] {
   return [...givers, target];
 }
 
-// The stack with the longest top run wins. Proposal of issue #56, «Propuesta, pendiente
-// del equipo»: the amount compared is the size of the top run, and a tie goes to the
-// first stack in `board.cells()` order.
-function targetOf<TCoord>(board: Board<ColorStack, TCoord, string>, candidates: TCoord[]): TCoord {
-  const keys = new Map<CoordKey, TCoord>(candidates.map((c) => [board.topology.key(c), c]));
-  let best: { at: TCoord; run: number } | undefined;
-  for (const [at, cell] of board.cells()) {
-    const candidate = keys.get(board.topology.key(at));
-    const run = cell.topRun().length;
-    if (candidate !== undefined && (best === undefined || run > best.run)) {
-      best = { at: candidate, run };
-    }
-  }
-  // Every candidate holds a stack, so `board.cells()` lists it and `best` exists.
-  return (best as { at: TCoord }).at;
+// The stack with the longest top run wins. The accepted rule of issue #56: the amount
+// compared is the size of the top run, and a tie goes to the stack whose coordinate key
+// comes first. The keys compare by plain string order (code units, `<`), not by
+// `localeCompare`, so the order is the same on every device and locale.
+// The key order does not depend on when a cell was filled or emptied (gap G108.3).
+function targetOf<TCoord>(
+  board: Board<ColorStack, TCoord, string>,
+  first: TCoord,
+  others: readonly TCoord[],
+): TCoord {
+  const run = (c: TCoord) => board.get(c)?.topRun().length ?? 0;
+  const key = (c: TCoord) => board.topology.key(c);
+  return others.reduce((best, c) => {
+    const longer = run(c) - run(best);
+    return longer > 0 || (longer === 0 && key(c) < key(best)) ? c : best;
+  }, first);
 }
 
-// Proposal of issue #56, «Propuesta, pendiente del equipo»: a top run of `GOAL_RUN`
-// or more removes the whole stack and counts one goal. The board cannot remove a cell,
+// The accepted rule of issue #56: a top run of `GOAL_RUN` or more removes
+// the whole stack and counts one goal. The board cannot remove a cell,
 // so the cell gets an empty stack. `clearedTiles` keeps the size for the scoring (#98).
 function clearIfGoal<TCoord>(state: SortState<TCoord>, at: TCoord): void {
   const cell = state.board.get(at);
