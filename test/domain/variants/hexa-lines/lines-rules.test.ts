@@ -3,7 +3,7 @@ import type { GridTopology } from '../../../../src/domain/engine/grid-topology';
 import { GameOver } from '../../../../src/domain/engine/game-events';
 import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
 import { BaseGameRules, type IGameRules } from '../../../../src/domain/engine/rules';
-import { Color } from '../../../../src/domain/variants/hexa-lines/color';
+import { Color } from '../../../../src/domain/engine/color';
 import { LinesRules } from '../../../../src/domain/variants/hexa-lines/lines-rules';
 import { LinesState } from '../../../../src/domain/variants/hexa-lines/lines-state';
 import { PlacePiece } from '../../../../src/domain/variants/hexa-lines/place-piece';

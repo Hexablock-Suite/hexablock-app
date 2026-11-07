@@ -1,10 +1,10 @@
 import { Board } from '../../engine/board';
+import type { Color } from '../../engine/color';
 import type { CoordKey } from '../../engine/coord-key';
 import type { Outcome } from '../../engine/outcome';
 import type { Piece } from '../../engine/piece';
 import { Resolution } from '../../engine/resolution';
 import { BaseGameRules } from '../../engine/rules';
-import type { Color } from './color';
 import { drawTray, LinesState } from './lines-state';
 import { PlacePiece } from './place-piece';
 

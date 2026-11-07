@@ -7,7 +7,7 @@ import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
 import { CellNode, ShapeGroup, type ShapeNode } from '../../../../src/domain/engine/shape-node';
-import { Color } from '../../../../src/domain/variants/hexa-lines/color';
+import { Color } from '../../../../src/domain/engine/color';
 import { LinesFactory } from '../../../../src/domain/variants/hexa-lines/lines-factory';
 import { LinesRules } from '../../../../src/domain/variants/hexa-lines/lines-rules';
 import { LinesState } from '../../../../src/domain/variants/hexa-lines/lines-state';

@@ -1,8 +1,8 @@
 import type { Board } from '../../engine/board';
 import type { BoardState } from '../../engine/board-state';
+import type { Color } from '../../engine/color';
 import type { Piece } from '../../engine/piece';
 import type { IPieceSource } from '../../engine/piece-source';
-import type { Color } from './color';
 
 // The tray holds 3 pieces (statement §1.1).
 export const TRAY_SIZE = 3;

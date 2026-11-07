@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import type { Piece } from '../../../../src/domain/engine/piece';
 import { CellNode, ShapeGroup } from '../../../../src/domain/engine/shape-node';
-import type { Color } from '../../../../src/domain/variants/hexa-lines/color';
+import type { Color } from '../../../../src/domain/engine/color';
 import { PlacePiece } from '../../../../src/domain/variants/hexa-lines/place-piece';
 import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
 import { firstValidMove, startVariant } from '../../../support/engine/variant-game';

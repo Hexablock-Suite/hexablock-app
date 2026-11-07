@@ -1,5 +1,6 @@
 import { Board } from '../../../../src/domain/engine/board';
 import { BoardShape } from '../../../../src/domain/engine/board-shape';
+import { Color } from '../../../../src/domain/engine/color';
 import type { CoordKey } from '../../../../src/domain/engine/coord-key';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
 import { GameId } from '../../../../src/domain/engine/game-id';
@@ -11,7 +12,8 @@ import {
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
 import { CellNode } from '../../../../src/domain/engine/shape-node';
-import { ColorStack, type Color } from '../../../../src/domain/variants/hexa-sort/color-stack';
+import { ColorStack } from '../../../../src/domain/variants/hexa-sort/color-stack';
+import { GoalCount } from '../../../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../../../src/domain/variants/hexa-sort/sort-factory';
 import { SortRules } from '../../../../src/domain/variants/hexa-sort/sort-rules';
 import { SortState, type PlaceStack } from '../../../../src/domain/variants/hexa-sort/sort-state';
@@ -28,13 +30,20 @@ export type SortGame = GameEngine<
   SortState<SquareCoord>
 >;
 
-export function stack(...chips: Color[]): ColorStack {
-  return ColorStack.of(chips);
+// A stack of tiles from the bottom to the top. Each name becomes an engine `Color`,
+// so an empty name throws a RangeError.
+export function stack(...names: string[]): ColorStack {
+  return ColorStack.of(names.map((name) => Color.of(name)));
 }
 
-// `count` tiles of one color.
-export function tiles(color: Color, count: number): Color[] {
-  return Array.from({ length: count }, () => color);
+// The color names of a stack, from the bottom to the top. No stack gives `[]`.
+export function names(content: ColorStack | undefined): string[] {
+  return content?.chips.map((chip) => chip.name) ?? [];
+}
+
+// `count` tiles of one color, by name.
+export function tiles(name: string, count: number): string[] {
+  return Array.from({ length: count }, () => name);
 }
 
 // A Sort piece is one cell with a stack (classes.md decision 6).
@@ -62,6 +71,7 @@ export class NoScoring implements IScoringPolicy<SortState<SquareCoord>> {
   }
 }
 
+// `goalsNeeded` is a number, and the helper wraps it in a `GoalCount`, so 0 throws.
 export function sortState(values: {
   board: Board<ColorStack, SquareCoord, string>;
   offered?: readonly ColorStack[];
@@ -71,7 +81,7 @@ export function sortState(values: {
   return SortState.start({
     board: values.board,
     source: values.source ?? new FixedListPieceSource((values.offered ?? []).map(stackPiece)),
-    goalsNeeded: values.goalsNeeded ?? 5,
+    goalsNeeded: GoalCount.of(values.goalsNeeded ?? 5),
   });
 }
 
@@ -94,12 +104,14 @@ export function place(col: number, row = 0): PlaceStack<SquareCoord> {
   return { at: square(col, row) };
 }
 
-// The tiles of the cell `(col, row)`, from the bottom to the top. An empty cell gives `[]`.
-export function chipsAt(game: SortGame, col: number, row = 0): readonly Color[] {
-  return game.snapshot().board.get(square(col, row))?.chips ?? [];
+// The color names of the cell `(col, row)`, from the bottom to the top.
+// An empty cell gives `[]`.
+export function chipsAt(game: SortGame, col: number, row = 0): string[] {
+  return names(game.snapshot().board.get(square(col, row)));
 }
 
 // A Sort factory on a 2 × 2 square board. The level offers `offered` from a fixed list.
+// The helper wraps `goalsNeeded` in a `GoalCount`, so 0 throws.
 export function sortFactory(
   offered: readonly ColorStack[] = [stack('red'), stack('blue')],
   goalsNeeded = 5,
@@ -107,6 +119,6 @@ export function sortFactory(
   return new SortFactory(squareTopology, {
     size: RegionSize.of(2),
     source: new FixedListPieceSource(offered.map(stackPiece)),
-    goalsNeeded,
+    goalsNeeded: GoalCount.of(goalsNeeded),
   });
 }

@@ -19,6 +19,7 @@ import { MergeScoring } from '../../src/domain/variants/hexa-merge/merge-scoring
 import { MergeState } from '../../src/domain/variants/hexa-merge/merge-state';
 import { MergeTile } from '../../src/domain/variants/hexa-merge/merge-tile';
 import type { ColorStack } from '../../src/domain/variants/hexa-sort/color-stack';
+import { GoalCount } from '../../src/domain/variants/hexa-sort/goal-count';
 import {
   SORT_POINTS_PER_TILE,
   SortScoring,
@@ -105,7 +106,7 @@ function sortPoints(stacks: number[]): number {
       squareTopology,
     ),
     source: new FixedListPieceSource([]),
-    goalsNeeded: 1,
+    goalsNeeded: GoalCount.of(1),
   });
   state.clearedTiles = stacks;
   return turnScore(new SortScoring<SquareCoord>(), state);

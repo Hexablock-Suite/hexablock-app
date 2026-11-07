@@ -1,6 +1,7 @@
 /** @jest-environment node */
 import { Board } from '../../../src/domain/engine/board';
 import type { BoardState } from '../../../src/domain/engine/board-state';
+import { Color } from '../../../src/domain/engine/color';
 import { coordKey, type CoordKey } from '../../../src/domain/engine/coord-key';
 import { Radius } from '../../../src/domain/engine/radius';
 import { RegionSize } from '../../../src/domain/engine/region-size';
@@ -101,6 +102,28 @@ describe('Radius', () => {
     const board = new Board(squareTopology.region(RegionSize.of(3)), squareTopology);
 
     expect([...board.ring(square(1, 1), Radius.of(0))]).toEqual([square(1, 1)]);
+  });
+});
+
+describe('Color', () => {
+  // Issue #129: Lines and Sort share the engine `Color` (classes.md decision 5).
+  it('should_keep_the_name_when_a_color_is_made_from_a_name', () => {
+    expect(Color.of('red').name).toBe('red');
+  });
+
+  it('should_throw_a_range_error_when_the_color_name_is_empty_or_blank', () => {
+    for (const name of ['', ' ', '\t']) {
+      expect(() => Color.of(name)).toThrow(new RangeError('A color needs a name.'));
+    }
+  });
+
+  it('should_be_equal_when_two_colors_have_the_same_name', () => {
+    const red = Color.of('red');
+
+    expect(red.equals(Color.of('red'))).toBe(true);
+    expect(red.equals(red)).toBe(true);
+    expect(red.equals(Color.of('blue'))).toBe(false);
+    expect(red.equals(Color.of('Red'))).toBe(false);
   });
 });
 

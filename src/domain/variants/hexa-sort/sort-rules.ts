@@ -49,7 +49,7 @@ export class SortRules<TCoord> extends BaseGameRules<PlaceStack<TCoord>, SortSta
 
   // The goals reached win. A board with no empty cell, or no stack left to place, loses.
   evaluate(state: SortState<TCoord>): Outcome {
-    if (state.goalsDone >= state.goalsNeeded) return 'victory';
+    if (state.goalsDone >= state.goalsNeeded.value) return 'victory';
     return this.noValidMove(state) ? 'game-over' : 'playing';
   }
 }
@@ -64,7 +64,9 @@ function transfer<TCoord>(state: SortState<TCoord>, at: TCoord): TCoord[] {
   const board = state.board;
   const color = board.get(at)?.top();
   if (color === undefined) return [];
-  const matches = [...board.neighborhood(at)].filter((n) => board.get(n)?.top() === color);
+  const matches = [...board.neighborhood(at)].filter(
+    (n) => board.get(n)?.top()?.equals(color) === true,
+  );
   if (matches.length === 0) return [];
   const target = targetOf(board, at, matches);
   // When `at` is the target, every matching neighbor gives its run to it.

@@ -1,13 +1,17 @@
 /** @jest-environment node */
 import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
+import { GoalCount } from '../../../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../../../src/domain/variants/hexa-sort/sort-factory';
 import { squareTopology } from '../../../support/engine/square-topology';
 import { startVariant } from '../../../support/engine/variant-game';
 import {
   chipsAt,
+  names,
   place,
+  row,
   sortFactory,
+  sortState,
   stack,
   stackPiece,
 } from '../../../support/variants/hexa-sort/sort-game';
@@ -24,13 +28,24 @@ describe('SortFactory', () => {
 
     expect(factory.gameId.value).toBe('hexa-sort');
     expect(factory.createBoard().shape.cells).toHaveLength(4);
-    expect(initial.offered?.content.chips).toEqual(['red', 'red']);
-    expect(initial.goalsNeeded).toBe(5);
+    expect(names(initial.offered?.content)).toEqual(['red', 'red']);
+    expect(initial.goalsNeeded.value).toBe(5);
     expect(outcome).toBe('playing');
     expect(chipsAt(engine, 0, 0)).toEqual(['red', 'red']);
-    expect(engine.snapshot().offered?.content.chips).toEqual(['blue']);
+    expect(names(engine.snapshot().offered?.content)).toEqual(['blue']);
     expect(engine.snapshot().score).toBe(0);
     expect(publisher.events).toEqual([]);
+  });
+
+  it('should_throw_a_range_error_and_build_no_game_when_the_level_goal_is_zero', () => {
+    // A goal of 0 once won the game before the first move (sort-rules.ts, `evaluate()`).
+    // The level and the state now hold a `GoalCount`, which rejects it (#129).
+    const message = 'A goal count needs a whole number of 1 or more, not 0.';
+
+    expect(() => sortFactory([stack('red')], 0)).toThrow(new RangeError(message));
+    expect(() => sortState({ board: row(2), offered: [stack('red')], goalsNeeded: 0 })).toThrow(
+      new RangeError(message),
+    );
   });
 
   it('should_leave_the_level_source_unread_when_the_sort_factory_starts_two_games', () => {
@@ -38,14 +53,14 @@ describe('SortFactory', () => {
     const factory = new SortFactory(squareTopology, {
       size: RegionSize.of(2),
       source,
-      goalsNeeded: 1,
+      goalsNeeded: GoalCount.of(1),
     });
 
     const first = factory.createInitialState();
     const second = factory.createInitialState();
 
-    expect(first.offered?.content.chips).toEqual(['red']);
-    expect(second.offered?.content.chips).toEqual(['red']);
-    expect(source.next().content.chips).toEqual(['red']);
+    expect(names(first.offered?.content)).toEqual(['red']);
+    expect(names(second.offered?.content)).toEqual(['red']);
+    expect(names(source.next().content)).toEqual(['red']);
   });
 });

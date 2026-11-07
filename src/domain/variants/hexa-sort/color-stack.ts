@@ -1,9 +1,8 @@
-// The color of one Sort tile. Decision 5 of classes.md puts `Color` in the engine.
-// The engine has no `Color` yet, so the variant names its own color type.
-export type Color = string;
+import type { Color } from '../../engine/color';
 
 // The cell of Hexa Sort: a stack of colored tiles (statement §1.3).
-// `chips` lists the tiles from the bottom to the top.
+// `chips` lists the tiles from the bottom to the top. Each tile has the engine `Color`
+// (classes.md decision 5), so a tile with an empty color name cannot exist (issue #129).
 // A stack is a value object: each operation returns a new stack.
 // An empty stack is an empty cell. The board cannot remove a cell,
 // so a cleared stack becomes an empty stack.
@@ -35,10 +34,12 @@ export class ColorStack {
   }
 
   // The tiles of the top color, from the top down to the first tile of another color.
+  // Two tiles have the same color when `Color.equals()` says so, never by reference.
   topRun(): Color[] {
     const color = this.top();
+    if (color === undefined) return [];
     let start = this.chips.length;
-    while (start > 0 && this.chips[start - 1] === color) start -= 1;
+    while (start > 0 && this.chips[start - 1]?.equals(color) === true) start -= 1;
     return this.chips.slice(start);
   }
 

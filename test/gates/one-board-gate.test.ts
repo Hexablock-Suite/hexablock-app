@@ -12,9 +12,10 @@ import { Turns } from '../../src/domain/engine/turns';
 import { FitState } from '../../src/domain/variants/hexa-fit/fit-state';
 import { PieceId } from '../../src/domain/variants/hexa-fit/piece-id';
 import { Placement } from '../../src/domain/variants/hexa-fit/placement';
-import { Color } from '../../src/domain/variants/hexa-lines/color';
+import { Color } from '../../src/domain/engine/color';
 import { MergeTile } from '../../src/domain/variants/hexa-merge/merge-tile';
 import { ColorStack } from '../../src/domain/variants/hexa-sort/color-stack';
+import { GoalCount } from '../../src/domain/variants/hexa-sort/goal-count';
 import { SortState } from '../../src/domain/variants/hexa-sort/sort-state';
 import { square, squareTopology, type SquareCoord } from '../support/engine/square-topology';
 import { linesState } from '../support/variants/hexa-lines/lines-game';
@@ -232,11 +233,11 @@ describe('one board gate (APP-NFR-01)', () => {
       squareTopology.region(RegionSize.of(2)),
       squareTopology,
     );
-    start.set(square(0, 0), ColorStack.of(['red']));
+    start.set(square(0, 0), ColorStack.of([Color.of('red')]));
     const state = SortState.start({
       board: start,
       source: new FixedListPieceSource([]),
-      goalsNeeded: 1,
+      goalsNeeded: GoalCount.of(1),
     });
     const board: Board<ColorStack, SquareCoord, string> = state.board;
 
