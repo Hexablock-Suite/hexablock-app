@@ -879,7 +879,7 @@
           stroke-width="1"
           marker-end="url(#seqmove-call)"
         />
-        <rect x="680.2" y="252" width="131.6" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="672.45" y="252" width="147.1" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="746"
           y="262"
@@ -888,7 +888,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          play(move: request.move)
+          tryPlay(move: request.move)
         </text>
         <!-- Message: game calls rules -->
         <line
@@ -944,7 +944,7 @@
           stroke-dasharray="4,3"
           marker-end="url(#seqmove-reply)"
         />
-        <rect x="723.975" y="342" width="44.05" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="716.25" y="342" width="59.5" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="746"
           y="352"
@@ -953,7 +953,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          Outcome
+          TurnReport
         </text>
         <!-- Message: apply calls game -->
         <line
@@ -1343,7 +1343,7 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           port: InMemoryRunningGameStore implements it, so the dependency still points down. When
-          current() is undefined or play() rejects the
+          current() is undefined or tryPlay() rejects the
         </text>
         <text
           x="24"

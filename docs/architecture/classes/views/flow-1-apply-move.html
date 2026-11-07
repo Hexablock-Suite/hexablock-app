@@ -306,7 +306,7 @@
           stroke-width="1"
           marker-end="url(#flowmove-open)"
         />
-        <!-- ApplyMove calls GameEngine.play() and snapshot(): use, down from layer 2 to layer 1 -->
+        <!-- ApplyMove calls GameEngine.tryPlay() and snapshot(): use, down from layer 2 to layer 1 -->
         <path
           d="M600 820 V872 Q600 880 608 880 H692 Q700 880 700 888 V896"
           fill="none"
@@ -391,7 +391,7 @@
         >
           BUILDS
         </text>
-        <rect x="602" y="822" width="41.6" height="12" rx="2" fill="#efe7f8" />
+        <rect x="602" y="822" width="58.4" height="12" rx="2" fill="#efe7f8" />
         <text
           x="606"
           y="831"
@@ -401,7 +401,7 @@
           text-anchor="start"
           letter-spacing="0.06em"
         >
-          PLAY()
+          TRYPLAY()
         </text>
         <rect x="318" y="822" width="47.2" height="12" rx="2" fill="#efe7f8" />
         <text
@@ -1044,7 +1044,7 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          + play(move: TMove): Outcome
+          + tryPlay(move: TMove): TurnReport
         </text>
         <text
           x="696"
@@ -1343,7 +1343,7 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          GameEngine from RunningGameStore, calls play() and snapshot(), and copies the cells of
+          GameEngine from RunningGameStore, calls tryPlay() and snapshot(), and copies the cells of
           Board into a MoveResult (decision 29).
         </text>
         <text
