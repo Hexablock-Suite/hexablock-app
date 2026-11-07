@@ -4,6 +4,19 @@ Status: draft for review with the professor, 2026-10-30. Updated on 2026-10-31 w
 
 This page answers statement §4.1 for the client. It shows the generic types in UML template notation, how each variant instantiates them, the layers each class lives in, and the design patterns. Each part opens with a map that names every class, grouped by pattern, with no members. Small views then show the members, with at most seven classes each. IDs such as A1, D1 and Q8 refer to [`docs/REQUIREMENTS.md`](../REQUIREMENTS.md). The layers themselves are in [layers.md](layers.md). The extensibility diagram, with the engine in the center and the extension points around it, is in [extensibility.md](extensibility.md). The use case flows, each with a class view and a sequence diagram, are in [flows.md](flows.md).
 
+## Whole model in draw.io
+
+[`classes.drawio`](classes.drawio) holds the whole class model in one draw.io file, with 5 pages. Open it in draw.io or diagrams.net.
+
+- Page 1, `All classes`, holds every class, interface and type of the model once, by layer: layer 4 at the top and layer 1 at the bottom, so every dependency points down.
+- Pages 2 to 5, `Engine`, `Variants`, `Use cases` and `Adapters`, hold one part each. A part page shows the types of its part in full. A grey box with the name only is a type of another part that one of its lines touches, and its eyebrow names the page that details it.
+- A solid box is a type that exists in the code at `6614b63`. A dashed box with `«planned»` is design from the views of this page that the code does not have yet. It keeps the `«Sprint N»` of its view when the view gives one.
+- `members not designed yet` marks a planned class that no view details.
+- `«dataType»` marks a type in the code that only carries data; it has no operations by design.
+- The pages follow the reading rules of the next section, and each page has a legend.
+
+The file is generated from the code at `6614b63` plus the views of this page. A hand edit is lost at the next generation.
+
 ## How to read it
 
 - The colored zone is the Clean layer, with the colors of [layers.md](layers.md). Parts 1 and 2 are layer 1, entities, so their zones are yellow.
