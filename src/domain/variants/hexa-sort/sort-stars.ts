@@ -12,7 +12,7 @@ export interface SortPlay {
 // The stars of a won Sort level, by moves (D22, the accepted rule of issue #59).
 // A star needs `moves <= maxMoves`. The stars are cumulative: star N needs star N-1.
 // So the count is the number of leading thresholds that the play meets.
-// The function does not check its input, as `fitStars` does not today.
+// `fitStars` counts the same way. This function does not check its input.
 export function sortStars(play: SortPlay, thresholds: readonly SortStarThreshold[]): number {
   const missed = thresholds.findIndex((t) => play.moves > t.maxMoves);
   return missed < 0 ? thresholds.length : missed;

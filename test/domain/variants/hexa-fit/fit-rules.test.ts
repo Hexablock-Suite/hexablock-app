@@ -442,3 +442,55 @@ describe('FitRules edge cases', () => {
     expect(rotationOf(engine.snapshot(), A)).toBe(0);
   });
 });
+
+// The move count of issue #60: every accepted place, rotate and remove counts one move.
+// The state holds the count, so the clone that undo keeps holds it too (classes.md decision 34).
+describe('FitRules move count', () => {
+  it('should_add_one_to_the_move_count_when_a_place_a_rotate_or_a_remove_is_accepted', () => {
+    const engine = engineOn(dominoLevel());
+    const counts = [engine.snapshot().moves];
+
+    for (const move of [
+      new PlaceFitPiece(A, NO_TURN, square(0, 0)),
+      new RotateFitPiece(A, Turns.of(1)),
+      new RemoveFitPiece(A),
+    ]) {
+      expect(engine.tryPlay(move).accepted).toBe(true);
+      counts.push(engine.snapshot().moves);
+    }
+
+    expect(counts).toEqual([0, 1, 2, 3]);
+  });
+
+  it('should_keep_the_move_count_when_a_move_is_rejected', () => {
+    const engine = engineOn(dominoLevel());
+    engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 1)));
+
+    // B overlaps A, a quarter turn puts A below the figure, and B is not on the figure.
+    const reports = [
+      engine.tryPlay(new PlaceFitPiece(B, NO_TURN, square(0, 1))),
+      engine.tryPlay(new RotateFitPiece(A, Turns.of(1))),
+      engine.tryPlay(new RemoveFitPiece(B)),
+    ];
+
+    expect(reports.map((r) => r.accepted)).toEqual([false, false, false]);
+    expect(engine.snapshot().moves).toBe(1);
+    expect(cellsOf(engine.snapshot())).toEqual(['0,1=a', '1,1=a']);
+  });
+
+  it('should_keep_the_move_count_in_the_clone_when_the_state_is_cloned_for_undo', () => {
+    // The engine has no undo history yet (Sprint 3). Undo keeps a clone of the state before
+    // the move (decision 34), so the clone must hold the count of that state.
+    const rules = new FitRules<SquareCoord>();
+    const placed = rules.playTurn(dominoLevel(), new PlaceFitPiece(A, NO_TURN, square(0, 0))).state;
+    const before = placed.clone();
+
+    const removed = rules.playTurn(placed, new RemoveFitPiece(A)).state;
+    const replayed = rules.playTurn(before, new RemoveFitPiece(A)).state;
+
+    expect(removed.moves).toBe(2);
+    expect(before.moves).toBe(1);
+    expect(cellsOf(before)).toEqual(['0,0=a', '1,0=a']);
+    expect(replayed.moves).toBe(2);
+  });
+});
