@@ -305,7 +305,7 @@ pnpm api:check        # src/infrastructure/api/schema.d.ts matches the backend O
 
 The CI job `contract` builds and starts hexablock-api `main`, then runs both commands.
 
-Test titles follow `should_<expected_result>_when_<condition>`. The linter and `test/gates/test-title-gate.test.ts` reject other `it` and `test` titles. Tests check behavior through the public interface of the engine and the use cases. Test doubles replace only the boundaries: the layer 2 ports and the engine interfaces `Clock`, `RandomSource` and `GameEventPublisher` (APP-NFR-12).
+Test titles follow `should_<expected_result>_when_<condition>`. The linter and `test/gates/test-title-gate.test.ts` reject other `it` and `test` titles. Tests check behavior through the public interface of the engine and the use cases. Test doubles replace only the boundaries: the layer 2 ports and the engine interfaces `Clock`, `RandomSource` and `GameEventPublisher` (APP-NFR-12). A rules suite may also pass an `IScoringPolicy` double, because the scoring of each variant has its own suites.
 
 ## AI Usage Documentation
 
