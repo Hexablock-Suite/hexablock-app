@@ -18,7 +18,8 @@ import {
   tiles,
 } from '../../../support/variants/hexa-sort/sort-game';
 
-// The rules of issue #93 and the proposal of issue #56 («Propuesta, pendiente del equipo»).
+// The rules of issue #93 and the accepted rules of issue #56: a tie goes to the stack
+// whose coordinate key comes first in key order.
 // Every test drives the game through `GameEngine.play()`, so it uses only the rules contract.
 
 describe('SortRules contract', () => {
@@ -88,8 +89,9 @@ describe('SortRules transfer', () => {
     expect(chipsAt(game, 1)).toEqual(['green']);
   });
 
-  it('should_move_to_the_first_stack_in_board_order_when_two_stacks_tie', () => {
+  it('should_move_to_the_stack_whose_coordinate_key_comes_first_when_two_stacks_tie', () => {
     // The board holds (2, 0) before (0, 0), so (2, 0) comes first in `board.cells()`.
+    // The key `0,0` comes before the key `2,0`, so (0, 0) wins the tie (issue #56).
     const game = sortGame(
       sortState({
         board: row(3, [
@@ -102,8 +104,8 @@ describe('SortRules transfer', () => {
 
     game.play(place(1));
 
-    expect(chipsAt(game, 2)).toEqual(['red', 'red', 'red']);
-    expect(chipsAt(game, 0)).toEqual(['red', 'red']);
+    expect(chipsAt(game, 0)).toEqual(['red', 'red', 'red']);
+    expect(chipsAt(game, 2)).toEqual(['red', 'red']);
     expect(chipsAt(game, 1)).toEqual([]);
   });
 
@@ -240,9 +242,10 @@ describe('SortRules edge cases', () => {
     return board;
   }
 
-  it('should_break_the_tie_by_the_old_place_of_a_cleared_cell_when_a_stack_is_placed_on_it', () => {
-    // A tie goes to the first stack in `board.cells()` order (proposal of issue #56).
-    // A cleared cell keeps an empty stack (sort-state.ts), so it keeps its place in that order.
+  it('should_break_the_tie_by_the_coordinate_key_when_a_stack_is_placed_on_a_cleared_cell', () => {
+    // A tie goes to the stack whose coordinate key comes first (issue #56), never to the stack
+    // that comes first in `board.cells()`. A cleared cell keeps an empty stack (sort-state.ts),
+    // so it keeps its old place in that order. The key order does not depend on that history (G108.3).
     const game = sortGame(
       sortState({
         board: row(3, [
@@ -258,16 +261,17 @@ describe('SortRules edge cases', () => {
     expect(game.snapshot().goalsDone).toBe(1);
     expect(chipsAt(game, 1)).toEqual([]);
 
-    // The placed red ties with the red on (0, 0). The cell (1, 0) comes first in the board order.
+    // The placed red on (1, 0) ties with the red on (0, 0). The cell (1, 0) comes first
+    // in `board.cells()`, but the key `0,0` comes before the key `1,0`, so (0, 0) wins.
     game.play(place(1));
 
-    expect(chipsAt(game, 1)).toEqual(['red', 'red']);
-    expect(chipsAt(game, 0)).toEqual(['blue']);
+    expect(chipsAt(game, 0)).toEqual(['blue', 'red', 'red']);
+    expect(chipsAt(game, 1)).toEqual([]);
     expect(chipsAt(game, 2)).toEqual([]);
   });
 
   it('should_clear_the_placed_stack_and_count_a_goal_when_its_top_run_already_holds_ten_or_more', () => {
-    // A top run of 10 or more removes the whole stack and counts one goal (proposal of issue #56).
+    // A top run of 10 or more removes the whole stack and counts one goal (issue #56).
     // The cascade starts at the placed stack (sort-rules.ts), so no neighbor is needed.
     const game = sortGame(
       sortState({
