@@ -85,21 +85,34 @@ function fits<TCoord>(
 }
 
 // Every distinct full line on every axis of the topology.
-// `Board.line()` starts each line at the same end from any cell of it,
-// so the axis and the key of the first cell name one line.
+// `GridTopology.line()` gives the cells of a line in order. It does not say at which end the walk starts.
+// So the axis and the set of the cell keys name one line (gap G107.6, issue #134).
+// The same line from either end gives the same name and counts once.
+// Each line keeps the cell order of the first walk that found it.
 function fullLines<TCoord>(board: Board<Color, TCoord, string>): TCoord[][] {
   const seen = new Set<string>();
   const full: TCoord[][] = [];
   for (const axis of board.topology.axes()) {
     for (const through of board.shape.cells) {
       const line = [...board.line(axis, through)];
-      const id = `${axis} ${board.topology.key(line[0]!)}`;
+      const id = lineId(board, axis, line);
       if (seen.has(id)) continue;
       seen.add(id);
       if (line.every((c) => board.get(c) !== undefined)) full.push(line);
     }
   }
   return full;
+}
+
+// The name of one line: its axis and the sorted topology keys of its cells.
+// JSON keeps the parts apart, so no key text can join two parts into one.
+function lineId<TCoord>(
+  board: Board<Color, TCoord, string>,
+  axis: string,
+  line: readonly TCoord[],
+): string {
+  const keys = line.map((c) => board.topology.key(c)).sort();
+  return JSON.stringify([axis, ...keys]);
 }
 
 // A copy of the board without the `cleared` cells. The engine board has no way to empty a cell,
