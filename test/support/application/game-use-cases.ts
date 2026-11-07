@@ -8,6 +8,7 @@ import type { GameEngine } from '../../../src/domain/engine/game-engine';
 import type { GameEventPublisher } from '../../../src/domain/engine/game-events';
 import type { IVariantFactory } from '../../../src/domain/engine/variant-factory';
 import { RecordingPublisher } from '../engine/fake-game';
+import { RecordingLogger } from './recording-logger';
 
 // Helpers for the game use case tests. They exist only in test/.
 
@@ -37,6 +38,7 @@ export class MemoryRunningGameStore<
 }
 
 // The two game use cases of one variant over one shared store.
+// `ApplyMove` writes a publisher failure to `logger` (issue 132).
 export function gameUseCases<
   TCell,
   TCoord,
@@ -46,12 +48,14 @@ export function gameUseCases<
 >(
   factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>,
   events: GameEventPublisher = new RecordingPublisher(),
+  logger: RecordingLogger = new RecordingLogger(),
 ) {
   const games = new MemoryRunningGameStore<TCell, TCoord, TMove, TState>();
   return {
     games,
+    logger,
     startGame: new StartGame(factory, games, events),
-    applyMove: new ApplyMove(games),
+    applyMove: new ApplyMove(games, logger),
   };
 }
 

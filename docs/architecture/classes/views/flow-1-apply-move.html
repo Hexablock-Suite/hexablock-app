@@ -74,9 +74,9 @@
           GamePresenter and reads GameViewModel. In layer 3, GamePresenter keeps the StateMapper
           strategy, builds GameViewModel and uses the UseCase input port; InMemoryRunningGameStore
           implements the RunningGameStore port. In layer 2, ApplyMove implements UseCase, takes an
-          ApplyMoveRequest, builds a MoveResult and keeps the RunningGameStore port. In layer 1,
-          ApplyMove plays the move on GameEngine, which keeps the IGameRules strategy, and reads the
-          cells of Board. Every dependency between layers points down.
+          ApplyMoveRequest, builds a MoveResult and keeps the RunningGameStore and Logger ports. In
+          layer 1, ApplyMove plays the move on GameEngine, which keeps the IGameRules strategy, and
+          reads the cells of Board. Every dependency between layers points down.
         </desc>
         <defs>
           <marker
@@ -308,7 +308,7 @@
         />
         <!-- ApplyMove calls GameEngine.play() and snapshot(): use, down from layer 2 to layer 1 -->
         <path
-          d="M600 804 V872 Q600 880 608 880 H692 Q700 880 700 888 V896"
+          d="M600 820 V872 Q600 880 608 880 H692 Q700 880 700 888 V896"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -316,7 +316,7 @@
         />
         <!-- ApplyMove reads the cells of Board: use, down from layer 2 to layer 1 -->
         <path
-          d="M316 804 V872 Q316 880 308 880 H178 Q170 880 170 888 V896"
+          d="M316 820 V872 Q316 880 308 880 H178 Q170 880 170 888 V896"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -391,10 +391,10 @@
         >
           BUILDS
         </text>
-        <rect x="602" y="815" width="41.6" height="12" rx="2" fill="#efe7f8" />
+        <rect x="602" y="822" width="41.6" height="12" rx="2" fill="#efe7f8" />
         <text
           x="606"
-          y="824"
+          y="831"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -403,10 +403,10 @@
         >
           PLAY()
         </text>
-        <rect x="318" y="815" width="47.2" height="12" rx="2" fill="#efe7f8" />
+        <rect x="318" y="822" width="47.2" height="12" rx="2" fill="#efe7f8" />
         <text
           x="322"
-          y="824"
+          y="831"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -812,7 +812,7 @@
           x="300"
           y="680"
           width="328"
-          height="124"
+          height="140"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -857,11 +857,14 @@
         <text x="316" y="756" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - games: RunningGameStore&lt;TCell, TCoord, TMove, TState&gt;
         </text>
-        <line x1="300" y1="764" x2="628" y2="764" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
-        <text x="316" y="780" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="316" y="772" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - logger: Logger
+        </text>
+        <line x1="300" y1="780" x2="628" y2="780" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <text x="316" y="796" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + execute(request: ApplyMoveRequest&lt;TMove&gt;):
         </text>
-        <text x="332" y="796" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="332" y="812" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Promise&lt;Result&lt;MoveResult&lt;TCell, TCoord&gt;&gt;&gt;
         </text>
         <!-- Class: MoveResult (value object, response model) -->

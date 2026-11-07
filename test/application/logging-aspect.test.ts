@@ -174,11 +174,97 @@ describe('LoggingAspect', () => {
   });
 
   it('should_keep_aspect_code_out_of_the_use_cases_when_the_use_case_source_is_read', () => {
+    // `ApplyMove` takes the `Logger` port only to report a publisher failure after the
+    // engine saves the turn (issue 132). It holds no aspect and logs no call.
+    const read = (file: string) =>
+      readFileSync(join(__dirname, '../../src/application', file), 'utf8');
     for (const file of ['start-game.ts', 'apply-move.ts']) {
-      const source = readFileSync(join(__dirname, '../../src/application', file), 'utf8');
-
-      expect(source).not.toMatch(/\b(UseCaseAspect|LoggingAspect|Logger|UseCaseLogEntry|Clock)\b/);
-      expect(source).not.toMatch(/from '\.\/(logger|logging-aspect|use-case-aspect)'/);
+      expect(read(file)).not.toMatch(/\b(UseCaseAspect|LoggingAspect|Clock)\b/);
+      expect(read(file)).not.toMatch(/from '\.\/(logging-aspect|use-case-aspect)'/);
     }
+    expect(read('start-game.ts')).not.toMatch(/\b(Logger|UseCaseLogEntry)\b/);
+    expect(read('start-game.ts')).not.toMatch(/from '\.\/logger'/);
+  });
+
+  // The log names the call by `name`, so an empty name helps no one (G118.4).
+  it('should_throw_a_range_error_when_a_logging_aspect_gets_an_empty_or_blank_name', () => {
+    const inner = new FixedUseCase(Result.success(1));
+    const logger = new RecordingLogger();
+
+    for (const name of ['', '  ', '\t']) {
+      expect(() => new LoggingAspect(inner, logger, name)).toThrow(
+        new RangeError('A logging aspect needs a name.'),
+      );
+    }
+    expect(logger.entries).toEqual([]);
+  });
+});
+
+// A use case that breaks its promise and rejects, as a use case with a bug would.
+class RejectingUseCase implements UseCase<string, number> {
+  constructor(private readonly thrown: unknown) {}
+
+  async execute(_request: string): Promise<Result<number>> {
+    throw this.thrown;
+  }
+}
+
+// A logger whose adapter fails on every write.
+class ThrowingLogger implements Logger {
+  log(_entry: UseCaseLogEntry): void {
+    throw new Error('The log disk is full.');
+  }
+}
+
+// The plain Decorator: it adds no concern, so it shows what the base class does.
+class PassThroughAspect<TRequest, TResponse> extends UseCaseAspect<TRequest, TResponse> {}
+
+describe('UseCaseAspect', () => {
+  // `execute()` never throws to the presenter (classes.md decision 28, G118.2).
+  it('should_return_an_unexpected_failure_with_the_cause_when_the_inner_use_case_rejects', async () => {
+    const thrown = new TypeError('The use case has a bug.');
+    const logger = new RecordingLogger();
+
+    const plain = await new PassThroughAspect(new RejectingUseCase(thrown)).execute('x');
+    const logged = await new LoggingAspect(new RejectingUseCase(thrown), logger, 'Broken').execute(
+      'x',
+    );
+
+    for (const result of [plain, logged]) {
+      const error = errorOf(result);
+      expect([error.code, error.message, error.retryable]).toEqual([
+        'unexpected-failure',
+        'The use case has a bug.',
+        false,
+      ]);
+      expect(error.cause).toBe(thrown);
+    }
+    expect(logger.entries).toEqual([
+      { useCase: 'Broken', outcome: 'failure', error: errorOf(logged) },
+    ]);
+  });
+
+  // The aspect's own work fails here: the logger throws after the inner call (G118.1).
+  it('should_return_an_unexpected_failure_with_the_cause_when_the_logger_throws', async () => {
+    const inner = new FixedUseCase(Result.success(5));
+
+    const result = await new LoggingAspect(inner, new ThrowingLogger(), 'Fixed').execute('x');
+
+    const error = errorOf(result);
+    expect([error.code, error.message, error.retryable]).toEqual([
+      'unexpected-failure',
+      'The log disk is full.',
+      false,
+    ]);
+    expect(error.cause).toEqual(new Error('The log disk is full.'));
+    expect(inner.requests).toEqual(['x']);
+  });
+
+  it('should_return_the_inner_result_unchanged_when_the_plain_aspect_wraps_a_use_case', async () => {
+    const success = new FixedUseCase(Result.success(7));
+    const failure = new FixedUseCase(Result.failure(new UseCaseError('boom', 'It failed.', true)));
+
+    expect(await new PassThroughAspect(success).execute('a')).toBe(success.result);
+    expect(await new PassThroughAspect(failure).execute('b')).toBe(failure.result);
   });
 });

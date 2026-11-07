@@ -74,9 +74,9 @@
           Class diagram of layers 2 and 1 showing the StartGame, ApplyMove, UndoMove and RedoMove
           use cases, each implementing the UseCase input port and reaching the running game through
           the RunningGameStore output port, which holds at most one GameEngine; StartGame creates
-          the game with an IVariantFactory and ApplyMove plays the move on the GameEngine of layer
-          1; each use case answers with a plain MoveResult, and UndoMove and RedoMove ask the engine
-          for undoable() and redoable().
+          the game with an IVariantFactory and ApplyMove plays the move on the GameEngine of layer 1
+          and passes a publisher failure to the Logger port; each use case answers with a plain
+          MoveResult, and UndoMove and RedoMove ask the engine for undoable() and redoable().
         </desc>
         <defs>
           <marker
@@ -272,7 +272,7 @@
         />
         <!-- ApplyMove calls GameEngine.play(): use -->
         <path
-          d="M688 796 V900 Q688 908 680 908 H424"
+          d="M688 812 V900 Q688 908 680 908 H424"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -557,7 +557,7 @@
           x="632"
           y="672"
           width="328"
-          height="124"
+          height="140"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -602,11 +602,14 @@
         <text x="648" y="748" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - games: RunningGameStore&lt;TCell, TCoord, TMove, TState&gt;
         </text>
-        <line x1="632" y1="756" x2="960" y2="756" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
-        <text x="648" y="772" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="648" y="764" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - logger: Logger
+        </text>
+        <line x1="632" y1="772" x2="960" y2="772" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <text x="648" y="788" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + execute(request: ApplyMoveRequest&lt;TMove&gt;):
         </text>
-        <text x="664" y="788" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="664" y="804" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Promise&lt;Result&lt;MoveResult&lt;TCell, TCoord&gt;&gt;&gt;
         </text>
 

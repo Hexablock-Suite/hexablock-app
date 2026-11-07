@@ -9,9 +9,17 @@ import type { IScoringPolicy } from './scoring-policy';
 
 // The report of one turn: whether the rules accepted the move, and the outcome.
 // A rejected move always has the outcome `playing`.
+// `publishFailure` is set only when the publisher throws after the engine saves the turn.
+// It holds the thrown value. The turn and its outcome stay valid (issue 132).
 export interface TurnReport {
   readonly accepted: boolean;
   readonly outcome: Outcome;
+  readonly publishFailure?: PublishFailure;
+}
+
+// The value that the event publisher threw after a saved turn.
+export interface PublishFailure {
+  readonly error: unknown;
 }
 
 // The aggregate root of one game (classes.md decision 26).
@@ -48,8 +56,11 @@ export class GameEngine<
   // One turn: receive the move, let the rules validate, apply, resolve and evaluate it
   // (template method `playTurn()`), score it, and notify when the game ends.
   // A rejected move returns `playing`. Call `tryPlay()` to tell it from an accepted move.
+  // A publisher that throws does not undo the turn, and `play()` rethrows its error.
   play(move: TMove): Outcome {
-    return this.tryPlay(move).outcome;
+    const turn = this.tryPlay(move);
+    if (turn.publishFailure !== undefined) throw turn.publishFailure.error;
+    return turn.outcome;
   }
 
   // The same turn as `play()`. The report also says whether the rules accepted the move,
@@ -80,9 +91,13 @@ export class GameEngine<
     this.state = turn.next;
     this.current = turn.phase;
     // The turn is committed before the engine publishes. A publisher that throws
-    // does not undo the turn, and `play()` rethrows its error to the caller.
+    // does not undo the turn. The report keeps its error apart from the outcome.
     if (turn.outcome !== 'playing') {
-      this.events.publish(new GameOver(this.gameId, turn.outcome, turn.next.score));
+      try {
+        this.events.publish(new GameOver(this.gameId, turn.outcome, turn.next.score));
+      } catch (error) {
+        return { accepted: true, outcome: turn.outcome, publishFailure: { error } };
+      }
     }
     return { accepted: true, outcome: turn.outcome };
   }
