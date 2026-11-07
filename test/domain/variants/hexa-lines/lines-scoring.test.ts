@@ -1,11 +1,17 @@
 /** @jest-environment node */
+import { ScoringDecorator } from '../../../../src/domain/engine/scoring-decorator';
 import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
 import { ComboMultiplierDecorator } from '../../../../src/domain/variants/hexa-lines/combo-multiplier-decorator';
 import { LinesScoring } from '../../../../src/domain/variants/hexa-lines/lines-scoring';
 import type { LinesState } from '../../../../src/domain/variants/hexa-lines/lines-state';
 import { PlacePiece } from '../../../../src/domain/variants/hexa-lines/place-piece';
 import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
-import { linesGame, linesState, piece } from '../../../support/variants/hexa-lines/lines-game';
+import {
+  linesFactory,
+  linesGame,
+  linesState,
+  piece,
+} from '../../../support/variants/hexa-lines/lines-game';
 
 // The scoring of Hexa Lines (issue 97, APP-FR-06, statement §1.1).
 // It codes the accepted rule of issue #59 (D22): 1 point per placed cell and 10 per cleared line, and the line bonus
@@ -134,5 +140,10 @@ describe('Hexa Lines scoring', () => {
 
     expect(scoring).toBeInstanceOf(ComboMultiplierDecorator);
     expect(comboPlacement(scoring).score).toBeGreaterThan(comboPlacement(base).score);
+  });
+
+  // The class views draw `ComboMultiplierDecorator extends ScoringDecorator` (issue 146).
+  it('should_be_a_scoring_decorator_when_the_lines_factory_creates_the_scoring', () => {
+    expect(linesFactory().createScoring()).toBeInstanceOf(ScoringDecorator);
   });
 });

@@ -76,9 +76,8 @@
           Class diagram of layer 1 showing the IPieceSource strategy, iterator and prototype with
           its seeded and fixed-list implementations, each with a clone() that copies its position,
           SeededPieceSource keeping the Mulberry32Random random source that it builds from its seed
-          and clones, the IScoringPolicy strategy wrapped by the abstract ScoringDecorator planned
-          for Sprint 2, and the IProgressModel strategy that records a GameResult and returns a
-          ProgressRecord.
+          and clones, the IScoringPolicy strategy wrapped by the abstract ScoringDecorator, and the
+          IProgressModel strategy that records a GameResult and returns a ProgressRecord.
         </desc>
         <defs>
           <marker
@@ -498,7 +497,6 @@
         <rect x="664" y="268" width="240" height="8" fill="rgba(15,111,116,0.10)" />
         <line x1="664" y1="276" x2="904" y2="276" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text
-          data-requirement="APP-FR-06"
           x="784"
           y="246"
           fill="#5b6873"
@@ -507,7 +505,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «abstract» «Decorator» «Sprint 2»
+          «abstract» «Decorator»
         </text>
         <text
           x="784"
@@ -898,10 +896,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Planned: ComboMultiplierDecorator for Lines
-          <tspan data-requirement="APP-FR-06">«Sprint 2»;</tspan>
-          IProgressModel implementations HighScoreProgress (Lines, Merge) and LevelProgress (Fit
-          with stars, Sort)
+          Planned: IProgressModel implementations HighScoreProgress (Lines, Merge) and LevelProgress
+          (Fit with stars, Sort)
           <tspan data-requirement="APP-FR-04 APP-FR-09">«Sprint 3».</tspan>
         </text>
 
