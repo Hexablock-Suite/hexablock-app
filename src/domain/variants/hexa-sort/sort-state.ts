@@ -3,6 +3,7 @@ import type { BoardState } from '../../engine/board-state';
 import type { IPieceSource } from '../../engine/piece-source';
 import type { Piece } from '../../engine/piece';
 import type { ColorStack } from './color-stack';
+import type { GoalCount } from './goal-count';
 
 // The move of Hexa Sort: place the offered stack on the cell `at` (statement §1.3).
 export interface PlaceStack<TCoord> {
@@ -13,14 +14,14 @@ export interface PlaceStack<TCoord> {
 // The piece source lives in the state (classes.md decision 31). The level chooses it:
 // seeded random or a fixed list (A4). A Sort piece is one cell with a stack (decision 6).
 // `offered` is the stack that the player places next. It is `undefined` when the source ends.
-// `goalsDone` and `goalsNeeded` count the cleared stacks and the goal of the level.
+// `goalsDone` counts the cleared stacks. `goalsNeeded` is the goal of the level, a `GoalCount`.
 // `clearedTiles` holds the tile count of each stack that the last turn cleared,
 // so the Sort scoring (issue #98) can read it. `placedAt` is the cell of the last move.
 export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
   private constructor(
     readonly board: Board<ColorStack, TCoord, string>,
     readonly source: IPieceSource<Piece<ColorStack, TCoord>>,
-    readonly goalsNeeded: number,
+    readonly goalsNeeded: GoalCount,
     public offered: Piece<ColorStack, TCoord> | undefined,
     public goalsDone: number,
     public clearedTiles: number[],
@@ -32,7 +33,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
   static start<TCoord>(values: {
     board: Board<ColorStack, TCoord, string>;
     source: IPieceSource<Piece<ColorStack, TCoord>>;
-    goalsNeeded: number;
+    goalsNeeded: GoalCount;
   }): SortState<TCoord> {
     const state = new SortState(
       values.board,

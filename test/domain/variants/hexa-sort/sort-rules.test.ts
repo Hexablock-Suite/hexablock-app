@@ -9,6 +9,7 @@ import { SortRules } from '../../../../src/domain/variants/hexa-sort/sort-rules'
 import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
 import {
   chipsAt,
+  names,
   place,
   row,
   sortGame,
@@ -35,7 +36,7 @@ describe('SortRules placement', () => {
     expect(game.play(place(0))).toBe('playing');
 
     expect(chipsAt(game, 0)).toEqual(['red']);
-    expect(game.snapshot().offered?.content.chips).toEqual(['blue']);
+    expect(names(game.snapshot().offered?.content)).toEqual(['blue']);
   });
 
   it('should_reject_the_move_and_keep_the_state_when_the_cell_holds_a_stack', () => {
@@ -46,7 +47,7 @@ describe('SortRules placement', () => {
     expect(game.play(place(0))).toBe('playing');
 
     expect(chipsAt(game, 0)).toEqual(['green']);
-    expect(game.snapshot().offered?.content.chips).toEqual(['red']);
+    expect(names(game.snapshot().offered?.content)).toEqual(['red']);
   });
 
   it('should_reject_the_move_when_the_cell_is_outside_the_board', () => {
@@ -55,7 +56,7 @@ describe('SortRules placement', () => {
     expect(game.play(place(5))).toBe('playing');
 
     expect(game.snapshot().board.cells()).toEqual([]);
-    expect(game.snapshot().offered?.content.chips).toEqual(['red']);
+    expect(names(game.snapshot().offered?.content)).toEqual(['red']);
   });
 });
 
@@ -208,6 +209,30 @@ describe('SortRules end of the game', () => {
   });
 });
 
+describe('SortRules colors', () => {
+  it('should_throw_a_range_error_when_a_sort_tile_has_an_empty_color_name', () => {
+    // A Sort tile holds the engine `Color`, so it rejects an empty name as Lines does (#129).
+    for (const name of ['', ' ']) {
+      expect(() => stack('red', name)).toThrow(new RangeError('A color needs a name.'));
+    }
+  });
+
+  it('should_move_the_tiles_when_two_stacks_hold_equal_colors_made_apart', () => {
+    // `Color.of()` makes a new object on each call, so the rules compare colors by name.
+    const game = sortGame(
+      sortState({
+        board: row(2, [[square(0, 0), stack('blue', 'red', 'red')]]),
+        offered: [stack('red')],
+      }),
+    );
+
+    game.play(place(1));
+
+    expect(chipsAt(game, 0)).toEqual(['blue', 'red', 'red', 'red']);
+    expect(chipsAt(game, 1)).toEqual([]);
+  });
+});
+
 describe('SortRules piece source (A4)', () => {
   it('should_offer_the_same_stacks_when_two_games_use_the_same_seed', () => {
     const colors = ['red', 'blue', 'green'];
@@ -288,7 +313,7 @@ describe('SortRules edge cases', () => {
     expect(chipsAt(game, 1)).toEqual([]);
     expect(state.goalsDone).toBe(1);
     expect(state.clearedTiles).toEqual([13]);
-    expect(state.offered?.content.chips).toEqual(['green']);
+    expect(names(state.offered?.content)).toEqual(['green']);
   });
 
   it('should_take_the_top_runs_of_every_matching_neighbor_when_the_placed_stack_has_the_longest_run', () => {
@@ -343,7 +368,7 @@ describe('SortRules edge cases', () => {
     const state = game.snapshot();
     expect(game.phase.name).toBe('playing');
     expect(state.board.cells()).toEqual([]);
-    expect(state.offered?.content.chips).toEqual(['red']);
+    expect(names(state.offered?.content)).toEqual(['red']);
     expect(state.placedAt).toBeUndefined();
     expect(state.goalsDone).toBe(0);
   });

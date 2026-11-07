@@ -1,4 +1,5 @@
 import { Board } from '../../engine/board';
+import type { Color } from '../../engine/color';
 import { GameId } from '../../engine/game-id';
 import type { GridTopology } from '../../engine/grid-topology';
 import { Piece } from '../../engine/piece';
@@ -9,7 +10,6 @@ import type { IGameRules } from '../../engine/rules';
 import type { IScoringPolicy } from '../../engine/scoring-policy';
 import type { ShapeNode } from '../../engine/shape-node';
 import type { IVariantFactory } from '../../engine/variant-factory';
-import type { Color } from './color';
 import { ComboMultiplierDecorator } from './combo-multiplier-decorator';
 import { LinesRules } from './lines-rules';
 import { LinesScoring } from './lines-scoring';

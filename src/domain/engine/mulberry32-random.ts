@@ -1,4 +1,8 @@
 import type { RandomSource } from './random-source';
+import { Range } from './range';
+
+// The seeds of the generator: the unsigned 32-bit integers.
+const SEEDS = Range.ofNumbers(0, 0xffffffff);
 
 // A random source that a seed fixes (APP-NFR-07): the same seed gives the same numbers.
 // It uses the Mulberry32 generator: pure 32-bit integer arithmetic, no ambient randomness.
@@ -9,7 +13,7 @@ export class Mulberry32Random implements RandomSource {
   private state: number;
 
   constructor(seed: number) {
-    if (!Number.isInteger(seed) || seed < 0 || seed > 0xffffffff) {
+    if (!Number.isInteger(seed) || !SEEDS.contains(seed)) {
       throw new RangeError(`A seed must be an integer from 0 to 4294967295, not ${seed}.`);
     }
     this.state = seed >>> 0;

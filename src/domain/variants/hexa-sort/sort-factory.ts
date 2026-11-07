@@ -8,16 +8,18 @@ import type { IGameRules } from '../../engine/rules';
 import type { IScoringPolicy } from '../../engine/scoring-policy';
 import type { IVariantFactory } from '../../engine/variant-factory';
 import type { ColorStack } from './color-stack';
+import type { GoalCount } from './goal-count';
 import { SortRules } from './sort-rules';
 import { SortScoring } from './sort-scoring';
 import { SortState, type PlaceStack } from './sort-state';
 
 // One Hexa Sort level: the board region, the source of its stacks and its goal.
+// The goal is a `GoalCount`, so a level cannot ask for 0 goals (issue #129).
 // The level picks a seeded source or a fixed list (A4). `SortLevelBuilder` builds it in Sprint 3.
 export interface SortLevel<TCoord> {
   readonly size: RegionSize;
   readonly source: IPieceSource<Piece<ColorStack, TCoord>>;
-  readonly goalsNeeded: number;
+  readonly goalsNeeded: GoalCount;
 }
 
 // Abstract Factory (classes.md decision 31): the whole family of one Hexa Sort level.
