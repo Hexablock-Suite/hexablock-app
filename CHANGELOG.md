@@ -27,6 +27,7 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 ### Changed
 
 - `«Sprint N»` markers in the class and extensibility views take N from `docs/ROADMAP.md`: N is the sprint of the requirement that the planned class serves, and the `data-requirement` attribute of each marker names it. `GeometryFactory`, `HexGeometry`, `BoardBuilder`, `IVariantFactory` and the four variant factories show Sprint 3 (APP-FR-16), not Sprint 2. `SquareGeometry` shows Sprint 1 (APP-NFR-13), not Sprint 3. The legends of the eight views, `docs/architecture/extensibility.md` and the alt text of the engine map state the rule, and the eight PNG images are exported again. The gate `test/docs/sprint-markers.test.ts` fails when a marker names no requirement or a requirement of another sprint, or when a legend keeps the old wording ([#89](https://github.com/Hexablock-Suite/hexablock-app/issues/89)).
+- `docs/REQUIREMENTS.md` records two offline sync rules that the team closed on 2026-11-06. DS-11: when the app holds a bundled copy and a backend copy of one level, the copy with the higher `version` wins. DS-12: when one account sends two results for one level, the backend keeps the best one. APP-FR-13, APP-FR-15 and A6 point to them, and the check of APP-FR-15 now also loads the higher `version`.
 
 ## [0.1.0] - 2026-11-06
 
