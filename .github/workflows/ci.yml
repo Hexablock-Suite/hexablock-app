@@ -60,10 +60,12 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Build and start backend main
         working-directory: hexablock-api
+        # The API reads JWT_SECRET when it starts. The example values of
+        # hexablock-api start it, and /health reads no database and no token.
         run: |
           pnpm install --frozen-lockfile
           pnpm build
-          nohup node dist/main.js > "$RUNNER_TEMP/backend.log" 2>&1 &
+          nohup node --env-file=.env.example dist/main.js > "$RUNNER_TEMP/backend.log" 2>&1 &
       - name: Wait for backend health
         run: |
           for _ in $(seq 1 30); do
