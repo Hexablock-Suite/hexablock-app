@@ -2,7 +2,7 @@
 
 This page explains how to add a fifth variant. The example is Hexa Fill, the game that statement §3.1 names («por ejemplo, Hexa Fill: pintar celdas con restricciones»). Its rules are not designed yet, so every `Fill` name below is a placeholder.
 
-The steps follow the [class diagram](architecture/classes.md) and the [extensibility diagram](architecture/extensibility.md). Every class is planned: today `src/` holds one README per layer folder and the API client. When the code exists, this page names the real files.
+The steps follow the [class diagram](architecture/classes.md) and the [extensibility diagram](architecture/extensibility.md). The engine, the four variants and the first use cases exist in `src/`. The classes of layers 3 and 4 that the steps name are planned. Some engine classes are planned too, for example `BoardBuilder`, `GeometryFactory`, the progress models and the histories. When a planned class exists, this page names its real file.
 
 ## The rule
 
