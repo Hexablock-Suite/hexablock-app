@@ -14,8 +14,8 @@ import {
 } from '../../../../src/domain/variants/hexa-sort/sort-scoring';
 import type { SquareCoord } from '../../../support/engine/square-topology';
 
-// The Sort scoring of issue #98. It codes against the proposal of issue #59,
-// «Propuesta, pendiente del equipo»: 10 points per tile of a cleared stack, and no stars.
+// The Sort scoring of issue #98. It codes the accepted rule of issue #59 (D22):
+// 10 points per tile of a cleared stack. The Sort stars have their own suite.
 // Every test drives the game through `GameEngine.play()`, so the engine adds the points.
 
 describe('SortScoring', () => {

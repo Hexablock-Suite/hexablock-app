@@ -11,8 +11,7 @@ import {
 import { mergeGame, mergeState, values } from '../../../support/variants/hexa-merge/merge-game';
 
 // The scoring of Hexa Merge (issue 97, APP-FR-06, statement §1.4).
-// It codes against the proposal on issue 59, «Propuesta, pendiente del equipo (cola nocturna,
-// 2026-11-06)»: a slide scores the sum of the values that its merges make,
+// It codes the accepted rule of issue #59 (D22): a slide scores the sum of the values that its merges make,
 // and the new tile adds nothing. The tests play through `GameEngine.play()` with a fixed seed.
 
 const east = Slide.of<HexAxis>('q', 'forward');

@@ -8,8 +8,7 @@ import { square, squareTopology, type SquareCoord } from '../../../support/engin
 import { linesGame, linesState, piece } from '../../../support/variants/hexa-lines/lines-game';
 
 // The scoring of Hexa Lines (issue 97, APP-FR-06, statement §1.1).
-// It codes against the proposal on issue 59, «Propuesta, pendiente del equipo (cola nocturna,
-// 2026-11-06)»: 1 point per placed cell and 10 per cleared line, and the line bonus
+// It codes the accepted rule of issue #59 (D22): 1 point per placed cell and 10 per cleared line, and the line bonus
 // multiplied by `lines + streak - 1` through `ComboMultiplierDecorator`.
 // The tests play through `GameEngine.play()`.
 
