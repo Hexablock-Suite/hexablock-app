@@ -17,6 +17,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AuthController_signUp"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AuthController_signIn"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AuthController_me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/progress": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ProgressController_sync"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/progress/{gameId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ProgressController_read"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -27,6 +107,112 @@ export interface components {
              * @enum {string}
              */
             status: "ok";
+        };
+        CredentialsDto: {
+            /**
+             * @description Letters, digits, dots, hyphens or underscores.
+             * @example ada
+             */
+            username: string;
+            /** @example correct horse battery */
+            password: string;
+        };
+        ErrorDto: {
+            /**
+             * @description The HTTP status code.
+             * @example 404
+             */
+            statusCode: number;
+            /**
+             * @description The standard reason phrase of the status.
+             * @example Not Found
+             */
+            error: string;
+            /**
+             * @description One sentence that a client can show or log. It never holds the query string.
+             * @example Cannot GET /levels/unknown
+             */
+            message: string;
+            /**
+             * @description One entry per problem when a request has several. Empty otherwise. No entry holds the query string.
+             * @example [
+             *       "gameId should not be empty"
+             *     ]
+             */
+            details: string[];
+            /**
+             * @description The request path, without the query string.
+             * @example /levels/unknown
+             */
+            path: string;
+        };
+        LoginDto: {
+            /** @example ada */
+            username: string;
+            /** @example correct horse battery */
+            password: string;
+        };
+        TokenDto: {
+            /**
+             * @description A signed JWT.
+             * @example eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+             */
+            accessToken: string;
+        };
+        CurrentUserDto: {
+            /**
+             * @description The user id.
+             * @example 0b6f6a4e-1c2d-4e5f-8a9b-0c1d2e3f4a5b
+             */
+            userId: string;
+        };
+        LevelResultDto: {
+            /** @example fit-01 */
+            levelId: string;
+            /**
+             * @description A non-negative integer.
+             * @example 3
+             */
+            stars: number;
+            /**
+             * @description A non-negative integer.
+             * @example 12
+             */
+            moves: number;
+            /**
+             * @description A non-negative integer.
+             * @example 45000
+             */
+            elapsedMs: number;
+        };
+        SyncProgressDto: {
+            /**
+             * @description The game variant. Required.
+             * @example hexa-lines
+             */
+            gameId: string;
+            /**
+             * @description The score of the game. The API keeps the highest one.
+             * @example 120
+             */
+            score?: number | null;
+            /** @description Level results. For each levelId the better result stays: more stars, then fewer moves, then less time; on a full tie the stored result stays. */
+            results?: components["schemas"]["LevelResultDto"][];
+        };
+        ProgressDto: {
+            /** @example hexa-lines */
+            gameId: string;
+            /**
+             * @description The highest score, or null when no sync sent a score.
+             * @example 120
+             */
+            highScore: number | null;
+            /**
+             * Format: date-time
+             * @example 2026-11-06T10:00:00.000Z
+             */
+            updatedAt: string;
+            results: components["schemas"]["LevelResultDto"][];
         };
     };
     responses: never;
@@ -53,6 +239,208 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthResponse"];
+                };
+            };
+        };
+    };
+    AuthController_signUp: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CredentialsDto"];
+            };
+        };
+        responses: {
+            /** @description The user exists. The body is empty. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description A field is missing or breaks its rule. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+            /** @description Another user has this username, or one that differs only in letter case. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+        };
+    };
+    AuthController_signIn: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoginDto"];
+            };
+        };
+        responses: {
+            /** @description The credentials are valid. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenDto"];
+                };
+            };
+            /** @description A field is missing or is not a string. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+            /** @description The username or the password is wrong. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+        };
+    };
+    AuthController_me: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The token is valid. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CurrentUserDto"];
+                };
+            };
+            /** @description The bearer token is missing, malformed, expired or signed with another key. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+        };
+    };
+    ProgressController_sync: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SyncProgressDto"];
+            };
+        };
+        responses: {
+            /** @description The progress entry after the sync. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProgressDto"];
+                };
+            };
+            /** @description A field is missing or breaks its rule. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+            /** @description The bearer token is missing, malformed, expired or signed with another key. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+        };
+    };
+    ProgressController_read: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                gameId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The progress entry of the gameId. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProgressDto"];
+                };
+            };
+            /** @description The gameId breaks its rule. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+            /** @description The bearer token is missing, malformed, expired or signed with another key. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+            /** @description The user has no progress for the gameId. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
                 };
             };
         };
