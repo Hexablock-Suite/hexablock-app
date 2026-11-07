@@ -31,6 +31,7 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 
 ### Fixed
 
+- `src/infrastructure/api/schema.d.ts` is generated again from hexablock-api `main` 4912281 ([#144](https://github.com/Hexablock-Suite/hexablock-app/issues/144)), after the api queue merged the progress DTO, the credential limits and the error body changes, so `pnpm api:check` passes.
 - The CI `contract` job starts hexablock-api with `node --env-file=.env.example dist/main.js` ([#142](https://github.com/Hexablock-Suite/hexablock-app/issues/142)). Since the API reads `JWT_SECRET` when it starts, the job stopped before `/health` answered, and every app PR failed `contract`. `src/infrastructure/api/schema.d.ts` is generated again from the OpenAPI document of hexablock-api `main`, which now has the auth and progress endpoints, so `pnpm api:check` passes.
 
 ## [0.1.0] - 2026-11-06
