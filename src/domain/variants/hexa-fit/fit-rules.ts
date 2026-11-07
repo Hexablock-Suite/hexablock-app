@@ -11,6 +11,8 @@ import { Placement } from './placement';
 // A piece fits only on free cells of the figure. A rotation counts steps of the topology (A5).
 // Fit has no resolution step. The game is won when the pieces cover the figure exactly,
 // and it has no defeat: `evaluate()` never returns `game-over`.
+// Each accepted move adds one to `FitState.moves`: place, rotate and remove (issue #60).
+// `playTurn()` applies only a valid move, so a rejected move counts nothing.
 // The rules stay generic over `TCoord`, so they run on any topology (classes.md decision 16).
 export class FitRules<TCoord> extends BaseGameRules<FitMove<TCoord>, FitState<TCoord>> {
   isValid(state: FitState<TCoord>, move: FitMove<TCoord>): boolean {
@@ -57,24 +59,7 @@ export class FitRules<TCoord> extends BaseGameRules<FitMove<TCoord>, FitState<TC
   }
 
   apply(state: FitState<TCoord>, move: FitMove<TCoord>): FitState<TCoord> {
-    const { topology } = state.board;
-    switch (move.kind) {
-      case 'place':
-        return state.place(move.pieceId, Placement.of(move.rotation, move.at, topology));
-      case 'remove':
-        return state.remove(move.pieceId);
-      case 'rotate': {
-        const placement = state.placementOf(move.pieceId);
-        if (placement === undefined) {
-          throw new RangeError(`The piece ${move.pieceId.value} is not on the figure.`);
-        }
-        return state
-          .remove(move.pieceId)
-          .place(move.pieceId, placement.turned(move.steps, topology));
-      }
-      default:
-        return unknownMove(move);
-    }
+    return moved(state, move).countMove();
   }
 
   // Fit has no resolution: the move only places, removes or turns a piece.
@@ -86,6 +71,26 @@ export class FitRules<TCoord> extends BaseGameRules<FitMove<TCoord>, FitState<TC
   evaluate(state: FitState<TCoord>): Outcome {
     const { board } = state;
     return board.cells().length === board.shape.cells.length ? 'victory' : 'playing';
+  }
+}
+
+// The state after the move, before the rules count it.
+function moved<TCoord>(state: FitState<TCoord>, move: FitMove<TCoord>): FitState<TCoord> {
+  const { topology } = state.board;
+  switch (move.kind) {
+    case 'place':
+      return state.place(move.pieceId, Placement.of(move.rotation, move.at, topology));
+    case 'remove':
+      return state.remove(move.pieceId);
+    case 'rotate': {
+      const placement = state.placementOf(move.pieceId);
+      if (placement === undefined) {
+        throw new RangeError(`The piece ${move.pieceId.value} is not on the figure.`);
+      }
+      return state.remove(move.pieceId).place(move.pieceId, placement.turned(move.steps, topology));
+    }
+    default:
+      return unknownMove(move);
   }
 }
 

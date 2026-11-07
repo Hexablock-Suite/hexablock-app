@@ -12,12 +12,14 @@ import type { Placement } from './placement';
 // The pieces come from the level's `FixedListPieceSource`. The state reads it once at start,
 // because the player picks the tray pieces in any order.
 // The maps use the text of the piece id as key, because a Map compares a string by value.
-// `place()` and `remove()` change nothing in place: each one returns a new state.
+// `moves` counts the accepted moves of the game for the stars (issue #60).
+// `place()`, `remove()` and `countMove()` change nothing in place: each one returns a new state.
 export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
   private constructor(
     readonly board: Board<PieceId, TCoord, string>,
     private readonly pieces: ReadonlyMap<string, Piece<PieceId, TCoord>>,
     private readonly placements: ReadonlyMap<string, Placement<TCoord>>,
+    readonly moves = 0,
     public score = 0,
   ) {}
 
@@ -63,7 +65,7 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
     const board = this.board.clone();
     for (const c of placement.cells(piece, board.topology)) board.set(c, id);
     const placements = new Map(this.placements).set(id.value, placement);
-    return new FitState(board, this.pieces, placements, this.score);
+    return new FitState(board, this.pieces, placements, this.moves, this.score);
   }
 
   // Takes the piece off the figure. The board has no erase, so the state builds
@@ -76,11 +78,18 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
     }
     const placements = new Map(this.placements);
     placements.delete(id.value);
-    return new FitState(new Board(shape, topology, content), this.pieces, placements, this.score);
+    const board = new Board(shape, topology, content);
+    return new FitState(board, this.pieces, placements, this.moves, this.score);
+  }
+
+  // The same state with one more move. The rules call it once for each accepted move.
+  countMove(): FitState<TCoord> {
+    return new FitState(this.board, this.pieces, this.placements, this.moves + 1, this.score);
   }
 
   // A piece never changes, so the clone shares the pieces and the placements.
+  // The clone keeps the move count, so undo gives back the count before the move.
   clone(): FitState<TCoord> {
-    return new FitState(this.board.clone(), this.pieces, this.placements, this.score);
+    return new FitState(this.board.clone(), this.pieces, this.placements, this.moves, this.score);
   }
 }

@@ -190,7 +190,7 @@ describe('README scoring section', () => {
     expect(workedExamples().filter((example) => !section.includes(example))).toEqual([]);
   });
 
-  // D22 accepted the scoring of issue #59 on 2026-11-06. Issue #60 stays open.
+  // D22 accepted the scoring of issue #59 on 2026-11-06.
   it('should_name_the_accepted_decision_d22_when_the_team_accepted_the_scoring_of_issue_59', () => {
     const section = scoringSection();
 
@@ -198,6 +198,19 @@ describe('README scoring section', () => {
     expect(section).not.toContain('Propuesta, pendiente del equipo');
     expect(section).toContain('issues/59');
     expect(section).toContain('issues/60');
+  });
+
+  // The team decided issue #60 on 2026-11-06: every accepted Fit move counts, and undo
+  // gives back the count of the state that it restores. The Fit stars are cumulative (G110.5).
+  it('should_state_the_fit_move_count_and_cumulative_stars_when_the_team_decided_issue_60', () => {
+    const section = scoringSection().replace(/\s+/g, ' ');
+    const fit = section.slice(section.indexOf('#### Hexa Fit'));
+
+    expect(section).not.toContain('One point stays open');
+    expect(fit).toContain('every accepted place, rotate and remove counts one move');
+    expect(fit).toContain('undo restores the count before the move');
+    expect(fit).toContain('star N needs star N-1');
+    expect(fit).not.toContain('Each star counts on its own');
   });
 
   // The team closed DS-4 on 2026-11-06 (hexablock-api#24): more stars, then

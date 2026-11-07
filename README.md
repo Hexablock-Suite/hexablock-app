@@ -158,7 +158,7 @@ The variant classes stay generic over `TCoord`, so a variant runs on any geometr
 
 Each variant gives the engine one `IScoringPolicy` (APP-FR-06). After each accepted turn, the engine adds the points of the policy to the game score. Each policy reads only the facts of the turn in the new state, so it keeps no game data (decision 26). Each constant below is a named export of its file, so a new value is a one-line change.
 
-> **Accepted on 2026-11-06 (D22).** Every value and formula in this section is the accepted rule of [#59](https://github.com/Hexablock-Suite/hexablock-app/issues/59). The team accepted the proposal of that issue as it stands for Lines, Merge and Fit, and added stars by moves to Sort. One point stays open: whether undo and remove count as Fit moves ([#60](https://github.com/Hexablock-Suite/hexablock-app/issues/60)). The team closed DS-4 on 2026-11-06 ([hexablock-api#24](https://github.com/Hexablock-Suite/hexablock-api/issues/24)): the best result of a level has more stars, then fewer moves, then less time, and a full tie keeps the stored result. The backend keeps that best result per level, and the same order ranks the per-level leaderboard of Fit and Sort.
+> **Accepted on 2026-11-06 (D22).** Every value and formula in this section is the accepted rule of [#59](https://github.com/Hexablock-Suite/hexablock-app/issues/59). The team accepted the proposal of that issue as it stands for Lines, Merge and Fit, and added stars by moves to Sort. The Fit move count of [#60](https://github.com/Hexablock-Suite/hexablock-app/issues/60) is decided too: see «Hexa Fit» below. The team closed DS-4 on 2026-11-06 ([hexablock-api#24](https://github.com/Hexablock-Suite/hexablock-api/issues/24)): the best result of a level has more stars, then fewer moves, then less time, and a full tie keeps the stored result. The backend keeps that best result per level, and the same order ranks the per-level leaderboard of Fit and Sort.
 
 #### Hexa Lines
 
@@ -192,7 +192,8 @@ A turn scores each tile of every stack that it clears. Statement §1.3 defines n
 Fit grades a won level with stars by moves and time, not with points (statement §1.2).
 
 - Policy: [`FitScoring`](src/domain/variants/hexa-fit/fit-scoring.ts) gives `FIT_POINTS_PER_TURN` = 0 on every turn.
-- Stars: [`fitStars(play, thresholds)`](src/domain/variants/hexa-fit/fit-stars.ts) counts the stars of the level whose two thresholds are both met: `moves <= maxMoves` and `elapsedMs <= maxElapsedMs`. The level file holds the thresholds. Each star counts on its own.
+- Stars: [`fitStars(play, thresholds)`](src/domain/variants/hexa-fit/fit-stars.ts) counts the stars of a won level by moves and time: a star needs both `moves <= maxMoves` and `elapsedMs <= maxElapsedMs`. The level file holds the thresholds. The stars are cumulative: star N needs star N-1, so the count stops at the first threshold that the play misses. A move count that is not a whole number of 0 or more, or a time that is not a finite number of 0 or more, throws a `RangeError`.
+- Moves ([#60](https://github.com/Hexablock-Suite/hexablock-app/issues/60)): every accepted place, rotate and remove counts one move, and a rejected move counts nothing. [`FitState.moves`](src/domain/variants/hexa-fit/fit-state.ts) holds the count, so undo restores the count before the move. Undo itself comes with `MoveHistory` in Sprint 3.
 - Example from [`fit-scoring.test.ts`](test/domain/variants/hexa-fit/fit-scoring.test.ts): with one star of 10 moves and 60 000 ms, a play of 10 moves and 60 000 ms gets the star. A play of 10 moves and 60 001 ms gets no star, because only the moves meet the threshold.
 
 ### Adding a fifth variant
