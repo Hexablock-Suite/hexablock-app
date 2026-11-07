@@ -73,10 +73,10 @@
         <desc id="uccontract-desc">
           Class diagram of layer 2 showing the UseCase input port that every use case implements,
           whose execute() returns a Result, the abstract UseCaseAspect decorator that implements
-          UseCase and wraps one inner UseCase, the logging, timing, retry and authorization aspects
-          that extend it, and the Logger output port that the logging and timing aspects use. Logger
-          takes a UseCaseLogEntry with the use case name, the outcome, the time and the error, and
-          the adapter writes the text.
+          UseCase, wraps one inner UseCase and turns every exception into a failed Result, the
+          logging, timing, retry and authorization aspects that extend it, and the Logger output
+          port that the logging and timing aspects use. Logger takes a UseCaseLogEntry with the use
+          case name, the outcome, the time and the error, and the adapter writes the text.
         </desc>
         <defs>
           <marker
@@ -249,7 +249,7 @@
         />
         <!-- RetryAspect extends UseCaseAspect: inheritance -->
         <path
-          d="M184 424 V400 Q184 392 192 392 H392 Q400 392 400 384 V360"
+          d="M184 424 V408 Q184 400 192 400 H392 Q400 400 400 392 V376"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -260,7 +260,7 @@
           x1="480"
           y1="424"
           x2="480"
-          y2="360"
+          y2="376"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#uccontract-triangle)"
@@ -270,14 +270,14 @@
           x1="560"
           y1="424"
           x2="560"
-          y2="360"
+          y2="376"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#uccontract-triangle)"
         />
         <!-- AuthorizationAspect extends UseCaseAspect: inheritance -->
         <path
-          d="M856 424 V400 Q856 392 848 392 H648 Q640 392 640 384 V360"
+          d="M856 424 V408 Q856 400 848 400 H648 Q640 400 640 392 V376"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -418,7 +418,7 @@
           x="344"
           y="264"
           width="352"
-          height="96"
+          height="112"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -454,6 +454,9 @@
         </text>
         <text x="360" y="352" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + execute(request: TRequest): Promise&lt;Result&lt;TResponse&gt;&gt;
+        </text>
+        <text x="360" y="368" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          # around(request: TRequest): Promise&lt;Result&lt;TResponse&gt;&gt;
         </text>
 
         <!-- Class: RetryAspect -->

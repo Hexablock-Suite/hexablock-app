@@ -44,6 +44,30 @@ describe('Result', () => {
     );
   });
 
+  // The presenter picks its message by `code`, so an empty code helps no one (G117.6).
+  it('should_throw_a_range_error_when_a_use_case_error_gets_an_empty_or_blank_code', () => {
+    for (const code of ['', '  ', '\t']) {
+      expect(() => new UseCaseError(code, 'It failed.')).toThrow(
+        new RangeError('A use case error needs a code.'),
+      );
+    }
+    expect(new UseCaseError(' boom ', 'It failed.').code).toBe(' boom ');
+  });
+
+  it('should_keep_the_thrown_value_as_the_cause_when_caught_error_builds_the_error', () => {
+    const thrown = new TypeError('The adapter has a bug.');
+
+    const error = caughtError('move-failed', thrown);
+
+    expect([error.code, error.message, error.retryable]).toEqual([
+      'move-failed',
+      'The adapter has a bug.',
+      false,
+    ]);
+    expect(error.cause).toBe(thrown);
+    expect(new UseCaseError('boom', 'It failed.').cause).toBeUndefined();
+  });
+
   it('should_reject_a_change_when_a_caller_writes_to_a_result', () => {
     const result = Result.success({ score: 1 });
 
