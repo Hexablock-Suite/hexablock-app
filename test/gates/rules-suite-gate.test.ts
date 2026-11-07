@@ -344,6 +344,21 @@ describe('rules suite gate (APP-NFR-12)', () => {
         `${label}: jest.unstable_mockModule path is not a string literal: path.join('a', 'b')`,
       ]);
     });
+
+    // Issue 136: the gate cannot tell which declaration a mock call reads, so it keeps no value.
+    // A gate that keeps the last value reads `node:fs` here and misses the engine double.
+    it('should_report_the_mock_call_when_the_file_declares_its_path_const_twice', () => {
+      const found = scan([
+        "const RULES = '@/domain/engine/rules';",
+        'jest.mock(RULES);',
+        'function unrelated(): string {',
+        "  const RULES = 'node:fs';",
+        '  return RULES;',
+        '}',
+      ]);
+
+      expect(found).toEqual([`${label}: jest.mock path is not a string literal: RULES`]);
+    });
   });
 
   describe('spies and literal doubles (gap G113.1)', () => {
