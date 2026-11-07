@@ -156,7 +156,7 @@ The variant classes stay generic over `TCoord`, so a variant runs on any geometr
 
 Each variant gives the engine one `IScoringPolicy` (APP-FR-06). After each accepted turn, the engine adds the points of the policy to the game score. Each policy reads only the facts of the turn in the new state, so it keeps no game data (decision 26). Each constant below is a named export of its file, so a new value is a one-line change.
 
-> **Accepted on 2026-11-06 (D22).** Every value and formula in this section is the accepted rule of [#59](https://github.com/Hexablock-Suite/hexablock-app/issues/59). The team accepted the proposal of that issue as it stands for Lines, Merge and Fit, and added stars by moves to Sort. Two points stay open: whether undo and remove count as Fit moves ([#60](https://github.com/Hexablock-Suite/hexablock-app/issues/60)), and what orders the per-level leaderboard (DS-4, [hexablock-api#24](https://github.com/Hexablock-Suite/hexablock-api/issues/24)).
+> **Accepted on 2026-11-06 (D22).** Every value and formula in this section is the accepted rule of [#59](https://github.com/Hexablock-Suite/hexablock-app/issues/59). The team accepted the proposal of that issue as it stands for Lines, Merge and Fit, and added stars by moves to Sort. One point stays open: whether undo and remove count as Fit moves ([#60](https://github.com/Hexablock-Suite/hexablock-app/issues/60)). The team closed DS-4 on 2026-11-06 ([hexablock-api#24](https://github.com/Hexablock-Suite/hexablock-api/issues/24)): the best result of a level has more stars, then fewer moves, then less time, and a full tie keeps the stored result. The backend keeps that best result per level, and the same order ranks the per-level leaderboard of Fit and Sort.
 
 #### Hexa Lines
 
