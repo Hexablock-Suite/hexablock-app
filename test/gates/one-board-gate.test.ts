@@ -29,6 +29,9 @@ import { repoRoot } from '../support/run-tool';
 // - a class that extends `Board` or a class whose name ends with `Board`,
 // - a class member `board` whose type is not the `Board` of `engine/board`.
 // The runtime checks build the state of each variant and read the class of its board.
+// Known gap, accepted in APP-NFR-01 (gap G112.1): the scan does not catch a class with
+// another name that keeps the cells in a `Map`. The `board` member check and the typed
+// variables of the runtime checks catch it when a state keeps that class in `board`.
 
 type BoardScan = {
   violations: string[];

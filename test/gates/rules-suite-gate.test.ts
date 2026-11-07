@@ -8,6 +8,17 @@ import { repoRoot } from '../support/run-tool';
 // APP-NFR-12 (issue 102): each variant has one rules suite, and no test replaces
 // an engine or variant class with a double. Doubles replace only the boundaries,
 // the interfaces that an outer layer implements (`Clock`, `RandomSource`, `GameEventPublisher`).
+// The scoring is the one accepted exception: a rules suite may pass an `IScoringPolicy`
+// double, because the scoring of each variant has its own suites (gap G113.2).
+//
+// A double is one of these forms (issue 124, gaps G113.1 and G113.3):
+// - `jest.mock`, `jest.doMock` or `jest.unstable_mockModule` of an engine or variant module.
+//   The path is a string literal, a template literal without `${…}`, or a `const` that holds one.
+//   The gate reports every other path, because it cannot resolve it.
+// - `jest.spyOn` on an engine or variant class or on its prototype.
+// - a class that extends or implements `IGameRules` or an engine or variant class.
+// - an object literal typed `IGameRules` by an annotation, `satisfies` or a cast.
+// A spy on an instance, such as `jest.spyOn(rules, 'apply')`, is not caught.
 //
 // Naming: the variant folder `src/domain/variants/hexa-<name>/` has its rules suite at
 // `test/domain/variants/hexa-<name>/<name>-rules.test.ts`, next to `<name>-rules.ts`.
@@ -37,8 +48,8 @@ function filesUnder(dir: string, pattern: RegExp): string[] {
     .sort();
 }
 
-function parse(file: string): ts.SourceFile {
-  return ts.createSourceFile(file, readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true);
+function parse(file: string, text = readFileSync(file, 'utf8')): ts.SourceFile {
+  return ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true);
 }
 
 function visit(node: ts.Node, onNode: (node: ts.Node) => void): void {
@@ -94,23 +105,132 @@ function heritageName(expression: ts.Expression): string {
   return ts.isPropertyAccessExpression(expression) ? expression.name.text : expression.getText();
 }
 
-function doublesIn(root: string, file: string, classes: Set<string>): string[] {
+// A call `jest.<method>(…)`, where `method` is one of `methods`.
+function jestCall(
+  node: ts.Node,
+  methods: string[],
+): node is ts.CallExpression & {
+  expression: ts.PropertyAccessExpression;
+} {
+  return (
+    ts.isCallExpression(node) &&
+    ts.isPropertyAccessExpression(node.expression) &&
+    node.expression.expression.getText() === 'jest' &&
+    methods.includes(node.expression.name.text)
+  );
+}
+
+// The `const` declarations of the file that hold a string literal or a template literal
+// without `${…}`. A name that the file declares twice has no value, so the gate reports it.
+function constantPaths(source: ts.SourceFile): Map<string, string | null> {
+  const values = new Map<string, string | null>();
+  visit(source, (node) => {
+    if (!ts.isVariableDeclaration(node) || !ts.isIdentifier(node.name)) return;
+    const isConst = (ts.getCombinedNodeFlags(node) & ts.NodeFlags.Const) !== 0;
+    const value =
+      isConst && node.initializer !== undefined && ts.isStringLiteralLike(node.initializer)
+        ? node.initializer.text
+        : null;
+    values.set(node.name.text, values.has(node.name.text) ? null : value);
+  });
+  return values;
+}
+
+// The text of a mock path: a string literal, a template literal without `${…}`,
+// or a `const` that holds one of them. Any other expression gives `null`.
+function mockPath(argument: ts.Expression, constants: Map<string, string | null>): string | null {
+  if (ts.isStringLiteralLike(argument)) return argument.text;
+  if (ts.isIdentifier(argument)) return constants.get(argument.text) ?? null;
+  return null;
+}
+
+// The protected class that a `jest.spyOn` target names: `LinesRules`,
+// `LinesRules.prototype` or `variants.LinesRules.prototype`.
+function spiedClass(target: ts.Expression, classes: Set<string>): string | null {
+  const isPrototype = ts.isPropertyAccessExpression(target) && target.name.text === 'prototype';
+  const owner = isPrototype ? target.expression : target;
+  if (!ts.isIdentifier(owner) && !ts.isPropertyAccessExpression(owner)) return null;
+  const name = heritageName(owner);
+  if (!classes.has(name)) return null;
+  return isPrototype ? `${name}.prototype` : name;
+}
+
+// The contract interface that the type node names at any depth, as in `Partial<IGameRules<…>>`.
+function contractIn(type: ts.TypeNode): string | null {
+  let found: string | null = null;
+  visit(type, (node) => {
+    if (ts.isTypeReferenceNode(node)) {
+      const name = ts.isQualifiedName(node.typeName) ? node.typeName.right : node.typeName;
+      if (CONTRACT_INTERFACES.includes(name.text)) found = name.text;
+    }
+  });
+  return found;
+}
+
+// The object literal under parentheses and `as` or `satisfies` wrappers, if any.
+function objectLiteral(expression: ts.Expression): ts.ObjectLiteralExpression | null {
+  let inner = expression;
+  while (
+    ts.isParenthesizedExpression(inner) ||
+    ts.isAsExpression(inner) ||
+    ts.isSatisfiesExpression(inner) ||
+    ts.isTypeAssertionExpression(inner)
+  ) {
+    inner = inner.expression;
+  }
+  return ts.isObjectLiteralExpression(inner) ? inner : null;
+}
+
+// An object literal that gets a contract type through an annotation, `satisfies` or a cast,
+// for example `object literal typed IGameRules (satisfies)`.
+function contractLiteral(node: ts.Node): string | null {
+  if (
+    (ts.isVariableDeclaration(node) || ts.isPropertyDeclaration(node) || ts.isParameter(node)) &&
+    node.type !== undefined &&
+    node.initializer !== undefined &&
+    objectLiteral(node.initializer) !== null
+  ) {
+    const contract = contractIn(node.type);
+    if (contract !== null) return `object literal typed ${contract} (annotation)`;
+  }
+  if (
+    (ts.isSatisfiesExpression(node) ||
+      ts.isAsExpression(node) ||
+      ts.isTypeAssertionExpression(node)) &&
+    objectLiteral(node.expression) !== null
+  ) {
+    const contract = contractIn(node.type);
+    const how = ts.isSatisfiesExpression(node) ? 'satisfies' : 'as';
+    if (contract !== null) return `object literal typed ${contract} (${how})`;
+  }
+  return null;
+}
+
+// Reads the doubles in the source text of `file`. `text` defaults to the file content.
+function doublesIn(root: string, file: string, classes: Set<string>, text?: string): string[] {
   const relative = toPosix(path.relative(root, file));
   const found: string[] = [];
-  visit(parse(file), (node) => {
-    if (
-      ts.isCallExpression(node) &&
-      ts.isPropertyAccessExpression(node.expression) &&
-      node.expression.expression.getText() === 'jest' &&
-      MOCK_CALLS.includes(node.expression.name.text) &&
-      node.arguments[0] !== undefined &&
-      ts.isStringLiteralLike(node.arguments[0])
-    ) {
-      const target = modulePath(root, file, node.arguments[0].text);
-      if (isProtectedModule(target)) {
-        found.push(`${relative}: jest.${node.expression.name.text} replaces ${target}`);
+  const source = parse(file, text);
+  const constants = constantPaths(source);
+  visit(source, (node) => {
+    if (jestCall(node, MOCK_CALLS) && node.arguments[0] !== undefined) {
+      const call = `jest.${node.expression.name.text}`;
+      const specifier = mockPath(node.arguments[0], constants);
+      if (specifier === null) {
+        found.push(
+          `${relative}: ${call} path is not a string literal: ${node.arguments[0].getText()}`,
+        );
+      } else {
+        const target = modulePath(root, file, specifier);
+        if (isProtectedModule(target)) found.push(`${relative}: ${call} replaces ${target}`);
       }
     }
+    if (jestCall(node, ['spyOn']) && node.arguments[0] !== undefined) {
+      const spied = spiedClass(node.arguments[0], classes);
+      if (spied !== null) found.push(`${relative}: jest.spyOn on ${spied}`);
+    }
+    const literal = contractLiteral(node);
+    if (literal !== null) found.push(`${relative}: ${literal}`);
     if ((ts.isClassDeclaration(node) || ts.isClassExpression(node)) && node.heritageClauses) {
       const name = node.name?.text ?? '(anonymous)';
       for (const clause of node.heritageClauses) {
@@ -170,6 +290,109 @@ describe('rules suite gate (APP-NFR-12)', () => {
     expect(missingRulesSuites(root)).toEqual([
       'octo: no rules suite at test/domain/variants/octo/octo-rules.test.ts',
     ]);
+  });
+
+  describe('mock paths (gap G113.3)', () => {
+    const suite = path.join(repoRoot, rulesSuitePath('hexa-lines'));
+    const label = rulesSuitePath('hexa-lines');
+    const scan = (lines: string[]) =>
+      doublesIn(repoRoot, suite, protectedClasses(repoRoot), lines.join('\n'));
+
+    it('should_report_the_resolved_path_when_a_mock_path_is_a_const_with_a_string_literal', () => {
+      const found = scan([
+        "const RULES = '../../../../src/domain/engine/rules';",
+        'const LINES = `@/domain/variants/hexa-lines/lines-rules`;',
+        "const FS = 'node:fs';",
+        'jest.mock(RULES);',
+        'jest.doMock(LINES);',
+        'jest.mock(FS);',
+      ]);
+
+      expect(found).toEqual([
+        `${label}: jest.mock replaces src/domain/engine/rules`,
+        `${label}: jest.doMock replaces src/domain/variants/hexa-lines/lines-rules`,
+      ]);
+    });
+
+    it('should_report_the_resolved_path_when_a_mock_path_is_a_template_literal_without_substitutions', () => {
+      const found = scan([
+        'jest.unstable_mockModule(`@/domain/variants/hexa-lines/lines-rules`, () => ({}));',
+        'jest.mock(`node:fs`);',
+      ]);
+
+      expect(found).toEqual([
+        `${label}: jest.unstable_mockModule replaces src/domain/variants/hexa-lines/lines-rules`,
+      ]);
+    });
+
+    it('should_report_the_mock_call_when_its_path_is_not_a_string_literal', () => {
+      const found = scan([
+        "const ROOT = '@/domain/engine';",
+        "let rules = '@/domain/engine/rules';",
+        'jest.mock(`${ROOT}/rules`);',
+        "jest.doMock('@/domain/' + 'engine/rules');",
+        'jest.mock(rules);',
+        'jest.mock(UNKNOWN);',
+        "jest.unstable_mockModule(path.join('a', 'b'), () => ({}));",
+      ]);
+
+      expect(found).toEqual([
+        `${label}: jest.mock path is not a string literal: \`\${ROOT}/rules\``,
+        `${label}: jest.doMock path is not a string literal: '@/domain/' + 'engine/rules'`,
+        `${label}: jest.mock path is not a string literal: rules`,
+        `${label}: jest.mock path is not a string literal: UNKNOWN`,
+        `${label}: jest.unstable_mockModule path is not a string literal: path.join('a', 'b')`,
+      ]);
+    });
+  });
+
+  describe('spies and literal doubles (gap G113.1)', () => {
+    const suite = path.join(repoRoot, rulesSuitePath('hexa-lines'));
+    const label = rulesSuitePath('hexa-lines');
+    const scan = (lines: string[]) =>
+      doublesIn(repoRoot, suite, protectedClasses(repoRoot), lines.join('\n'));
+
+    it('should_report_the_spy_when_a_test_spies_on_an_engine_or_variant_class_or_its_prototype', () => {
+      const found = scan([
+        "jest.spyOn(LinesRules.prototype, 'apply');",
+        "jest.spyOn(BaseGameRules.prototype, 'playTurn');",
+        "jest.spyOn(Slide, 'of');",
+        "jest.spyOn(variants.LinesRules.prototype, 'isValid');",
+        "jest.spyOn(clock, 'now');",
+        "jest.spyOn(Math, 'random');",
+        "jest.spyOn(FixedClock.prototype, 'now');",
+      ]);
+
+      expect(found).toEqual([
+        `${label}: jest.spyOn on LinesRules.prototype`,
+        `${label}: jest.spyOn on BaseGameRules.prototype`,
+        `${label}: jest.spyOn on Slide`,
+        `${label}: jest.spyOn on LinesRules.prototype`,
+      ]);
+    });
+
+    it('should_report_the_literal_when_an_object_literal_is_typed_as_the_rules_contract', () => {
+      const found = scan([
+        'const annotated: IGameRules<Move, State> = { apply: () => state };',
+        'const checked = { apply: () => state } satisfies IGameRules<Move, State>;',
+        'const cast = { apply: () => state } as IGameRules<Move, State>;',
+        'const twice = ({ apply: () => state } as unknown) as engine.IGameRules<Move, State>;',
+        'const angled = <IGameRules<Move, State>>{ apply: () => state };',
+        'const partial: Partial<IGameRules<Move, State>> = { apply: () => state };',
+        'const real: IGameRules<Move, State> = new LinesRules();',
+        'const clock: Clock = { now: () => 0 };',
+        'const free = { now: () => 0 } satisfies Clock;',
+      ]);
+
+      expect(found).toEqual([
+        `${label}: object literal typed IGameRules (annotation)`,
+        `${label}: object literal typed IGameRules (satisfies)`,
+        `${label}: object literal typed IGameRules (as)`,
+        `${label}: object literal typed IGameRules (as)`,
+        `${label}: object literal typed IGameRules (as)`,
+        `${label}: object literal typed IGameRules (annotation)`,
+      ]);
+    });
   });
 
   // Issue 102 scope: engine tests need fake subclasses of `BaseGameRules`, so the gate skips them.
