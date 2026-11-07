@@ -48,4 +48,23 @@ describe('sortStars', () => {
   it('should_give_no_star_when_the_level_has_no_threshold', () => {
     expect(sortStars({ moves: 0 }, [])).toBe(0);
   });
+
+  // Issue 137: NaN fails every comparison, so without the check `moves: NaN` wins every star.
+  // The check and its message are the ones of `fitStars`.
+  it('should_throw_a_range_error_when_the_moves_are_not_a_safe_integer_of_zero_or_more', () => {
+    const played = (moves: number) => () => sortStars({ moves }, THREE_STARS);
+
+    for (const moves of [Number.NaN, -1, 1.5, Number.POSITIVE_INFINITY, 2 ** 53]) {
+      expect(played(moves)).toThrow(RangeError);
+      expect(played(moves)).toThrow(
+        `A move count needs a whole number of 0 or more, not ${moves}.`,
+      );
+    }
+    // A level without thresholds still checks the moves.
+    expect(() => sortStars({ moves: Number.NaN }, [])).toThrow(RangeError);
+    // -0 counts as 0. The largest safe integer is a valid count.
+    expect(played(0)()).toBe(3);
+    expect(played(-0)()).toBe(3);
+    expect(played(Number.MAX_SAFE_INTEGER)()).toBe(0);
+  });
 });

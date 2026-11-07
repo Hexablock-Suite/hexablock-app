@@ -420,4 +420,27 @@ describe('Hexa Lines rules edge cases', () => {
     // One placed cell and one line with factor 1: 1 + 10.
     expect(state.score).toBe(11);
   });
+
+  it('should_count_one_line_and_score_one_line_when_a_full_cell_lies_alone_on_two_axes', () => {
+    // Issue #140: the set of its cell keys names a line, without the axis (decision on #134).
+    // On a 1 × 1 board the only cell is a line of one cell on the col axis and on the row axis.
+    // Both lines hold the same cell, so they are one line.
+    const probe = linesState(squareTopology, 1, { tray: [] });
+    const { engine } = linesGame(
+      linesState(squareTopology, 1, { tray: [one, one] }),
+      new ComboMultiplierDecorator(new LinesScoring<SquareCoord>()),
+    );
+
+    engine.play(new PlacePiece(0, origin));
+
+    const state = engine.snapshot();
+    for (const axis of squareTopology.axes()) {
+      expect(keys([...probe.board.line(axis, origin)])).toEqual(keys([origin]));
+    }
+    expect(state.linesCleared).toBe(1);
+    expect(state.streak).toBe(1);
+    expect(filledKeys(state)).toEqual([]);
+    // One placed cell and one line with factor 1: 1 + 10.
+    expect(state.score).toBe(11);
+  });
 });

@@ -1,3 +1,4 @@
+import { checkMoveCount } from '../../engine/move-count';
 import { Range } from '../../engine/range';
 
 // The two thresholds of one Fit star (statement §1.2, D20): a move count and a time.
@@ -14,8 +15,6 @@ export interface FitPlay {
   readonly elapsedMs: number;
 }
 
-// A move count is a safe integer of 0 or more (gap G110.1).
-const MOVES = Range.ofNumbers(0, Number.MAX_SAFE_INTEGER);
 // A time is a finite number of 0 or more, in milliseconds (gap G110.2).
 const ELAPSED_MS = Range.ofNumbers(0, Number.MAX_VALUE);
 
@@ -26,9 +25,7 @@ const ELAPSED_MS = Range.ofNumbers(0, Number.MAX_VALUE);
 // A move count or a time that no play gives throws a RangeError. -0 counts as 0.
 export function fitStars(play: FitPlay, thresholds: readonly FitStarThreshold[]): number {
   const { moves, elapsedMs } = play;
-  if (!Number.isSafeInteger(moves) || !MOVES.contains(moves)) {
-    throw new RangeError(`A move count needs a whole number of 0 or more, not ${moves}.`);
-  }
+  checkMoveCount(moves);
   if (!ELAPSED_MS.contains(elapsedMs)) {
     throw new RangeError(`An elapsed time needs a finite number of 0 or more, not ${elapsedMs}.`);
   }

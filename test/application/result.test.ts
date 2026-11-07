@@ -68,6 +68,28 @@ describe('Result', () => {
     expect(new UseCaseError('boom', 'It failed.').cause).toBeUndefined();
   });
 
+  // Issue 138: `String()` throws a TypeError for a value without a prototype or with a
+  // `toString` that throws. The error then keeps that value as its cause, not the TypeError.
+  it('should_give_a_fixed_message_and_keep_the_cause_when_the_thrown_value_has_no_text', () => {
+    const noPrototype: unknown = Object.create(null);
+    const brokenText = {
+      toString(): string {
+        throw new Error('No text.');
+      },
+    };
+
+    for (const thrown of [noPrototype, brokenText]) {
+      const error = caughtError('move-failed', thrown);
+
+      expect([error.code, error.message, error.retryable]).toEqual([
+        'move-failed',
+        'The thrown value has no text.',
+        false,
+      ]);
+      expect(error.cause).toBe(thrown);
+    }
+  });
+
   it('should_reject_a_change_when_a_caller_writes_to_a_result', () => {
     const result = Result.success({ score: 1 });
 

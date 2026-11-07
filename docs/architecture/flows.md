@@ -21,7 +21,7 @@ View 3.2 of [classes.md](classes.md) shows `ApplyMove` with layers 2 and 1 only,
 
 ### Sequence diagram
 
-![ApplyMove sequence: GameScreen calls onMove() on GamePresenter, which calls execute() on ApplyMove; ApplyMove takes the GameEngine from InMemoryRunningGameStore, calls play(), snapshot(), cells(), undoable() and redoable(), and returns a Result with a MoveResult; GamePresenter maps each cell with StateMapper and builds GameViewModel](flows/views/seq-1-apply-move.png)
+![ApplyMove sequence: GameScreen calls onMove() on GamePresenter, which calls execute() on ApplyMove; ApplyMove takes the GameEngine from InMemoryRunningGameStore, calls tryPlay(), snapshot(), cells(), undoable() and redoable(), and returns a Result with a MoveResult; GamePresenter maps each cell with StateMapper and builds GameViewModel](flows/views/seq-1-apply-move.png)
 
 ## Use case 2: save progress
 
