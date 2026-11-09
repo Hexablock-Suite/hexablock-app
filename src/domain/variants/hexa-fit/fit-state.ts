@@ -6,6 +6,12 @@ import type { IPieceSource } from '../../engine/piece-source';
 import type { PieceId } from './piece-id';
 import type { Placement } from './placement';
 
+// The data that the Fit screen draws: the tray and the pieces on the figure.
+export interface FitView<TCoord> {
+  readonly remaining: readonly Piece<PieceId, TCoord>[];
+  readonly placed: readonly PieceId[];
+}
+
 // The state of one Hexa Fit game: the figure board, the pieces of the level,
 // and the placement of each piece on the figure.
 // The board is the figure: its shape holds only the figure cells (REQUIREMENTS.md §1).
@@ -85,6 +91,15 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
   // The same state with one more move. The rules call it once for each accepted move.
   countMove(): FitState<TCoord> {
     return new FitState(this.board, this.pieces, this.placements, this.moves + 1, this.score);
+  }
+
+  // A piece and an id never change, so the view shares them. `remaining()` and `placed()`
+  // build new lists, and the view freezes them.
+  view(): FitView<TCoord> {
+    return Object.freeze({
+      remaining: Object.freeze(this.remaining()),
+      placed: Object.freeze(this.placed()),
+    });
   }
 
   // A piece never changes, so the clone shares the pieces and the placements.

@@ -1,7 +1,7 @@
 import type { BoardState } from '../domain/engine/board-state';
 import type { Cloneable } from '../domain/engine/cloneable';
 import { logEntryOf, type Logger } from './logger';
-import { moveResultOf, type MoveResult } from './move-result';
+import { moveResultOf, type MoveResult, type ViewOf } from './move-result';
 import { caughtError, Result, UseCaseError } from './result';
 import type { RunningGameStore } from './running-game-store';
 import type { UseCase } from './use-case';
@@ -25,13 +25,15 @@ export class ApplyMove<
   TCoord,
   TMove,
   TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
-> implements UseCase<ApplyMoveRequest<TMove>, MoveResult<TCell, TCoord>> {
+> implements UseCase<ApplyMoveRequest<TMove>, MoveResult<TCell, TCoord, ViewOf<TState>>> {
   constructor(
     private readonly games: RunningGameStore<TCell, TCoord, TMove, TState>,
     private readonly logger: Logger,
   ) {}
 
-  async execute(request: ApplyMoveRequest<TMove>): Promise<Result<MoveResult<TCell, TCoord>>> {
+  async execute(
+    request: ApplyMoveRequest<TMove>,
+  ): Promise<Result<MoveResult<TCell, TCoord, ViewOf<TState>>>> {
     try {
       const engine = this.games.current();
       if (engine === undefined) {
@@ -44,7 +46,7 @@ export class ApplyMove<
       if (turn.publishFailure !== undefined) {
         this.logPublishFailure(turn.publishFailure.error);
       }
-      return Result.success(moveResultOf(engine.snapshot(), turn.outcome));
+      return Result.success(moveResultOf<TCell, TCoord, TState>(engine.snapshot(), turn.outcome));
     } catch (thrown) {
       return Result.failure(caughtError('move-failed', thrown));
     }

@@ -10,6 +10,13 @@ export interface PlaceStack<TCoord> {
   readonly at: TCoord;
 }
 
+// The data that the Sort screen draws: the offered stack and the goal counts.
+export interface SortView<TCoord> {
+  readonly offered: Piece<ColorStack, TCoord> | undefined;
+  readonly goalsDone: number;
+  readonly goalsNeeded: GoalCount;
+}
+
 // The state of one Hexa Sort game (classes.md, Hexa Sort view).
 // The piece source lives in the state (classes.md decision 31). The level chooses it:
 // seeded random or a fixed list (A4). A Sort piece is one cell with a stack (decision 6).
@@ -52,6 +59,16 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
   // Draws the next stack from the source, or offers none when the source ends.
   offerNext(): void {
     this.offered = this.source.hasNext() ? this.source.next() : undefined;
+  }
+
+  // A piece and a goal count never change, so the view shares them.
+  // `offered` and `goalsDone` are public and mutable, so the view keeps their values of now.
+  view(): SortView<TCoord> {
+    return Object.freeze({
+      offered: this.offered,
+      goalsDone: this.goalsDone,
+      goalsNeeded: this.goalsNeeded,
+    });
   }
 
   clone(): SortState<TCoord> {

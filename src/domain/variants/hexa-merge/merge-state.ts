@@ -3,6 +3,11 @@ import type { BoardState } from '../../engine/board-state';
 import type { IPieceSource } from '../../engine/piece-source';
 import type { NewTile } from './new-tile';
 
+// The data that the Merge screen draws: whether the target tile exists.
+export interface MergeView {
+  readonly targetReached: boolean;
+}
+
 // The state of one Hexa Merge game. It narrows `board` to the board of its topology.
 // `tiles` is the source of the new tiles. It lives in the state (classes.md decision 31),
 // so `clone()` clones it, and the rollback of `GameEngine.play()` covers each draw.
@@ -20,6 +25,10 @@ export class MergeState<TCell, TCoord, TAxis extends string> implements BoardSta
     readonly merged: readonly TCell[] = [],
     public score = 0,
   ) {}
+
+  view(): MergeView {
+    return Object.freeze({ targetReached: this.targetReached });
+  }
 
   clone(): MergeState<TCell, TCoord, TAxis> {
     return new MergeState(

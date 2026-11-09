@@ -292,6 +292,10 @@ class BaseCloneState implements BoardState<FakeCell, SquareCoord> {
   clone(): BoardState<FakeCell, SquareCoord> {
     return new FakeState(this.board.clone(), this.score);
   }
+
+  view(): undefined {
+    return undefined;
+  }
 }
 
 // A game with one played move, whose rules throw in `step` on the next move.
