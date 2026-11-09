@@ -7,11 +7,13 @@ import type { Cloneable } from '../../src/domain/engine/cloneable';
 import { GameEngine } from '../../src/domain/engine/game-engine';
 import type { GameEvent, GameEventPublisher } from '../../src/domain/engine/game-events';
 import { GameId } from '../../src/domain/engine/game-id';
+import { MoveHistory } from '../../src/domain/engine/move-history';
 import type { Piece } from '../../src/domain/engine/piece';
 import { FixedListPieceSource, type IPieceSource } from '../../src/domain/engine/piece-source';
 import { RegionSize } from '../../src/domain/engine/region-size';
 import type { Resolution } from '../../src/domain/engine/resolution';
 import { SquareGeometry } from '../../src/domain/engine/square-geometry';
+import type { IRedoable } from '../../src/domain/engine/undo-capabilities';
 import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
 import { PlacePiece } from '../../src/domain/variants/hexa-lines/place-piece';
 import type { ColorStack } from '../../src/domain/variants/hexa-sort/color-stack';
@@ -118,6 +120,7 @@ function brokenStart<
     createInitialState: () => {
       throw new RangeError('The level is broken.');
     },
+    createHistory: () => factory.createHistory(),
   };
 }
 
@@ -204,22 +207,24 @@ describe('StartGame and ApplyMove', () => {
       ['hexa-merge', 'playing', 'playing'],
     ]);
     for (const run of runs) {
+      // Fit wins with its one move, so only the Merge game keeps a move to undo.
+      const hasUndo = run.gameId === 'hexa-fit' || run.gameId === 'hexa-merge';
       expect(run.started).toEqual({
         cells: run.startCells,
         score: 0,
         outcome: 'playing',
         canUndo: false,
         canRedo: false,
-        hasUndo: false,
+        hasUndo,
         payload: run.startState.view(),
       });
       expect(run.played).toEqual({
         cells: run.after.board.cells(),
         score: run.after.score,
         outcome: run.played.outcome,
-        canUndo: false,
+        canUndo: run.gameId === 'hexa-merge',
         canRedo: false,
-        hasUndo: false,
+        hasUndo,
         payload: run.after.view(),
       });
     }
@@ -375,7 +380,7 @@ describe('StartGame and ApplyMove', () => {
       outcome: 'victory',
       canUndo: false,
       canRedo: false,
-      hasUndo: false,
+      hasUndo: true,
       payload: saved.view(),
     });
     expect(saved.board.cells()).not.toEqual([]);
@@ -473,6 +478,21 @@ describe('StartGame and ApplyMove', () => {
   });
 });
 
+// A history that can redo, as the factory of a redo variant gives it.
+class RedoingHistory extends MoveHistory<FakeMove, FakeState> implements IRedoable {
+  override redoable(): IRedoable {
+    return this;
+  }
+
+  canRedo(): boolean {
+    return true;
+  }
+
+  redo(): void {
+    return;
+  }
+}
+
 // A game that the use cases cannot name. Its state gives its own view.
 function fakeGameFactory(): IVariantFactory<FakeCell, SquareCoord, FakeMove, FakeState, FakeCell> {
   return {
@@ -482,6 +502,7 @@ function fakeGameFactory(): IVariantFactory<FakeCell, SquareCoord, FakeMove, Fak
     createPieceSource: () => undefined,
     createBoard: () => emptyState().board,
     createInitialState: () => emptyState(),
+    createHistory: () => undefined,
   };
 }
 
@@ -581,7 +602,7 @@ describe('the variant data of MoveResult', () => {
     for (const run of runs) expect(run.after).toEqual(run.before);
   });
 
-  it('should_report_no_undo_for_every_variant_when_no_variant_has_a_history', async () => {
+  it('should_report_the_undo_of_each_variant_when_it_starts_and_plays', async () => {
     const runs = [
       await startAndPlayOnce(linesFactory()),
       await startAndPlayOnce(fitFactory()),
@@ -589,11 +610,30 @@ describe('the variant data of MoveResult', () => {
       await startAndPlayOnce(mergeFactory()),
     ];
 
-    expect(runs.map((run) => [run.gameId, run.started.hasUndo, run.played.hasUndo])).toEqual([
-      ['hexa-lines', false, false],
-      ['hexa-fit', false, false],
-      ['hexa-sort', false, false],
-      ['hexa-merge', false, false],
+    expect(
+      runs.map((run) => [
+        run.gameId,
+        run.started.hasUndo,
+        run.started.canUndo,
+        run.played.hasUndo,
+        run.played.canUndo,
+        run.played.canRedo,
+      ]),
+    ).toEqual([
+      ['hexa-lines', false, false, false, false, false],
+      // The one Fit move wins the level, and a finished game has no move to undo.
+      ['hexa-fit', true, false, true, false, false],
+      ['hexa-sort', false, false, false, false, false],
+      ['hexa-merge', true, false, true, true, false],
     ]);
+  });
+
+  it('should_report_the_redo_capability_of_the_history_when_a_history_can_redo', async () => {
+    const factory = { ...fakeGameFactory(), createHistory: () => new RedoingHistory() };
+    const { startGame } = gameUseCases(factory);
+
+    const started = valueOf(await startGame.execute({}));
+
+    expect([started.hasUndo, started.canUndo, started.canRedo]).toEqual([true, false, true]);
   });
 });

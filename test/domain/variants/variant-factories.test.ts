@@ -5,6 +5,7 @@ import type { Cloneable } from '../../../src/domain/engine/cloneable';
 import { Color } from '../../../src/domain/engine/color';
 import type { GeometryFactory, TopologyId } from '../../../src/domain/engine/geometry-factory';
 import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
+import { MoveHistory } from '../../../src/domain/engine/move-history';
 import { Piece } from '../../../src/domain/engine/piece';
 import { FixedListPieceSource } from '../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../src/domain/engine/region-size';
@@ -56,6 +57,19 @@ function twoBoards<
   const first = factory.createBoard();
   const second = factory.createBoard();
   return { distinct: first !== second, filled: first.cells().length + second.cells().length };
+}
+
+// The history of each variant (APP-FR-08, classes.md decision 3). Its class stays out of the
+// suite: each factory is read through `IVariantFactory`, and a game plays through it.
+function historyOf<
+  TCell,
+  TCoord,
+  TMove,
+  TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
+  TPiece,
+>(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>) {
+  const first = factory.createHistory();
+  return { first, distinct: first !== factory.createHistory() };
 }
 
 // The #64 check (APP-FR-16). The settings hold no coordinate,
@@ -186,6 +200,22 @@ describe('IVariantFactory', () => {
       ['hexa-merge', 'playing'],
     ]);
     expect(new Set(results.map((r) => r.gameId)).size).toBe(4);
+  });
+
+  it('should_give_each_variant_the_history_of_its_requirement_when_a_factory_is_asked', () => {
+    const lines = historyOf(linesFactory());
+    const fit = historyOf(fitFactory());
+    const sort = historyOf(sortFactory());
+    const merge = historyOf(mergeFactory());
+
+    // APP-FR-08: Fit undoes with no limit, Merge undoes one move, Lines and Sort have no undo.
+    expect(lines.first).toBeUndefined();
+    expect(sort.first).toBeUndefined();
+    expect(fit.first).toBeInstanceOf(MoveHistory);
+    expect(fit.first?.limit).toBeUndefined();
+    expect(merge.first).toBeInstanceOf(MoveHistory);
+    expect(merge.first?.limit).toBe(1);
+    expect([fit.distinct, merge.distinct]).toEqual([true, true]);
   });
 
   it('should_give_a_new_empty_board_when_a_factory_is_asked_twice', () => {

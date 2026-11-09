@@ -39,10 +39,11 @@ export class StartGame<
         this.factory.createRules(),
         this.factory.createScoring(),
         this.events,
+        this.factory.createHistory(),
       );
       engine.start(this.factory.createInitialState());
       this.games.replace(engine);
-      return Result.success(moveResultOf<TCell, TCoord, TState>(engine.snapshot(), 'playing'));
+      return Result.success(moveResultOf(engine, 'playing'));
     } catch (thrown) {
       return Result.failure(caughtError('start-failed', thrown));
     }

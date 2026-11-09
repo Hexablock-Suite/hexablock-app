@@ -66,6 +66,11 @@ export class LinesFactory<TCoord> implements IVariantFactory<
   createInitialState(): LinesState<TCoord> {
     return LinesState.start(this.createBoard(), this.createPieceSource());
   }
+
+  // Hexa Lines has no undo (APP-FR-08, classes.md decision 3).
+  createHistory(): undefined {
+    return undefined;
+  }
 }
 
 function pick<T>(items: readonly [T, ...T[]], random: RandomSource): T {

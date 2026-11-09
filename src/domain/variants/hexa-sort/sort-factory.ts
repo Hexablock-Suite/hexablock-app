@@ -63,4 +63,9 @@ export class SortFactory<TCoord> implements IVariantFactory<
       goalsNeeded: this.level.goalsNeeded,
     });
   }
+
+  // Hexa Sort has no undo (APP-FR-08, classes.md decision 3).
+  createHistory(): undefined {
+    return undefined;
+  }
 }

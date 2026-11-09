@@ -46,7 +46,7 @@ export class ApplyMove<
       if (turn.publishFailure !== undefined) {
         this.logPublishFailure(turn.publishFailure.error);
       }
-      return Result.success(moveResultOf<TCell, TCoord, TState>(engine.snapshot(), turn.outcome));
+      return Result.success(moveResultOf(engine, turn.outcome));
     } catch (thrown) {
       return Result.failure(caughtError('move-failed', thrown));
     }

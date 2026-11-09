@@ -3,6 +3,7 @@ import { BoardBuilder } from '../../engine/board-builder';
 import type { BoardShape } from '../../engine/board-shape';
 import { GameId } from '../../engine/game-id';
 import type { GeometryFactory, TopologyId } from '../../engine/geometry-factory';
+import { MoveHistory } from '../../engine/move-history';
 import type { Piece } from '../../engine/piece';
 import { FixedListPieceSource } from '../../engine/piece-source';
 import type { IGameRules } from '../../engine/rules';
@@ -69,5 +70,11 @@ export class FitFactory<TCoord> implements IVariantFactory<
 
   createInitialState(): FitState<TCoord> {
     return FitState.start(this.createBoard(), this.createPieceSource());
+  }
+
+  // Hexa Fit undoes with no limit (APP-FR-08, classes.md decision 3).
+  // `RedoableHistory` adds the redo of Hexa Fit in Sprint 3.
+  createHistory(): MoveHistory<FitMove<TCoord>, FitState<TCoord>> {
+    return new MoveHistory();
   }
 }

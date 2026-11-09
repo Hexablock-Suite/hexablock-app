@@ -2,6 +2,7 @@ import type { Board } from '../../engine/board';
 import { BoardBuilder } from '../../engine/board-builder';
 import { GameId } from '../../engine/game-id';
 import type { GeometryFactory } from '../../engine/geometry-factory';
+import { MoveHistory } from '../../engine/move-history';
 import type { SeededPieceSource } from '../../engine/piece-source';
 import type { RegionSize } from '../../engine/region-size';
 import type { IGameRules } from '../../engine/rules';
@@ -18,6 +19,9 @@ import type { Slide } from './slide';
 // The count of tiles on the first board. Statement §1.4 does not give it.
 // The value follows 2048, as the chance of a 4 does (issue 57): two tiles.
 export const START_TILES = 2;
+
+// The count of moves that the Merge history keeps (statement §5.1.8, APP-FR-08).
+export const MERGE_UNDO_LIMIT = 1;
 
 // The settings of one Hexa Merge game. `fourChance` defaults to `DEFAULT_FOUR_CHANCE`.
 export interface MergeSettings {
@@ -68,5 +72,10 @@ export class MergeFactory<TCoord> implements IVariantFactory<
     const state = new MergeState(this.createBoard(), this.createPieceSource());
     for (let i = 0; i < START_TILES; i += 1) addNewTile(state);
     return state;
+  }
+
+  // Hexa Merge undoes one move (APP-FR-08, classes.md decision 3).
+  createHistory(): MoveHistory<Slide<string>, MergeState<MergeTile, TCoord, string>> {
+    return new MoveHistory(MERGE_UNDO_LIMIT);
   }
 }
