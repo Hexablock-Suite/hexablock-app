@@ -366,7 +366,7 @@ describe('SortRules edge cases', () => {
     expect(() => game.play(place(0))).toThrow('The source failed.');
 
     const state = game.snapshot();
-    expect(game.phase.name).toBe('playing');
+    expect(game.currentPhase().name).toBe('playing');
     expect(state.board.cells()).toEqual([]);
     expect(names(state.offered?.content)).toEqual(['red']);
     expect(state.placedAt).toBeUndefined();

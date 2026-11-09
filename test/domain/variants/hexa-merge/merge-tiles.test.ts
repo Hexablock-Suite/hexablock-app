@@ -192,7 +192,7 @@ describe('Merge new tiles', () => {
       '0,1': 8,
     });
     expect([...rules.validMoves(engine.snapshot())]).toEqual([]);
-    expect(engine.phase.canPlay()).toBe(false);
+    expect(engine.currentPhase().canPlay()).toBe(false);
     expect(publisher.events).toEqual([new GameOver(GameId.of('hexa-merge'), 'game-over', 0)]);
   });
 
@@ -250,7 +250,7 @@ describe('Merge new tiles edge cases', () => {
     const { engine, publisher } = mergeGame(mergeState([[hex(0, 0), 2]], 3, source(true)));
 
     expect(() => engine.play(slide)).toThrow('The source failed.');
-    expect(engine.phase.name).toBe('playing');
+    expect(engine.currentPhase().name).toBe('playing');
     expect(values(engine.snapshot())).toEqual({ '0,0': 2 });
 
     expect(engine.play(slide)).toBe('playing');

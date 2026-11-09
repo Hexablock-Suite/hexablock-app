@@ -235,7 +235,7 @@ describe('swapping the piece source, the scoring policy and the progress model',
 
     expect(() => engine.play(square(0, 0))).toThrow(RangeError);
     expect(() => engine.play(square(0, 0))).toThrow('game-over phase');
-    expect(engine.phase.name).toBe('game-over');
+    expect(engine.currentPhase().name).toBe('game-over');
     expect(engine.snapshot().board.cells()).toEqual(full.board.cells());
     expect(engine.snapshot().score).toBe(full.score);
     expect(subscriber.records).toHaveLength(1);

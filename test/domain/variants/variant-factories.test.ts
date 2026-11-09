@@ -44,7 +44,7 @@ function playOnce<
 >(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>) {
   const { engine, rules } = startVariant(factory);
   const outcome = engine.play(firstValidMove(rules, engine.snapshot()));
-  return { gameId: factory.gameId.value, outcome, phase: engine.phase.name };
+  return { gameId: factory.gameId.value, outcome, phase: engine.currentPhase().name };
 }
 
 // Two boards of one factory, in plain facts that a test compares across the four variants.

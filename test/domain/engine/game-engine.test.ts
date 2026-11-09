@@ -140,7 +140,7 @@ describe('GameEngine.play()', () => {
     expect(outcome).toBe('playing');
     expect(engine.snapshot().board.get(square(0, 0))).toEqual(fakeCell(1));
     expect(engine.snapshot().score).toBe(1);
-    expect(engine.phase.canPlay()).toBe(true);
+    expect(engine.currentPhase().canPlay()).toBe(true);
   });
 
   it('should_keep_the_old_board_when_resolve_rejects_the_move_after_apply', () => {
@@ -158,7 +158,7 @@ describe('GameEngine.play()', () => {
     expect(outcome).toBe('playing');
     expect(engine.snapshot().board.get(square(0, 0))).toBeUndefined();
     expect(engine.snapshot().score).toBe(0);
-    expect(engine.phase.name).toBe('playing');
+    expect(engine.currentPhase().name).toBe('playing');
     expect(publisher.events).toEqual([]);
   });
 
@@ -170,7 +170,7 @@ describe('GameEngine.play()', () => {
     const outcome = engine.play(place(1, 1));
 
     expect(outcome).toBe('game-over');
-    expect(engine.phase.name).toBe('game-over');
+    expect(engine.currentPhase().name).toBe('game-over');
     expect(publisher.events).toHaveLength(1);
     const event = publisher.events[0] as GameOver;
     expect(event).toBeInstanceOf(GameOver);
@@ -253,7 +253,7 @@ describe('GameEngine.play()', () => {
 
     expect(() => engine.play(place(0, 0))).toThrow('resolve failed');
 
-    expect(engine.phase.canPlay()).toBe(true);
+    expect(engine.currentPhase().canPlay()).toBe(true);
     expect(engine.snapshot().board.get(square(0, 0))).toBeUndefined();
     expect(engine.snapshot().score).toBe(0);
     expect(engine.play(place(0, 0))).toBe('playing');
@@ -271,7 +271,7 @@ describe('GameEngine.play()', () => {
 
     expect(() => engine.play(place(0, 0))).toThrow('score failed');
 
-    expect(engine.phase.canPlay()).toBe(true);
+    expect(engine.currentPhase().canPlay()).toBe(true);
     expect(engine.snapshot().board.get(square(0, 0))).toBeUndefined();
     expect(engine.snapshot().score).toBe(0);
     expect(engine.play(place(0, 0))).toBe('playing');
@@ -316,7 +316,7 @@ function armedGame(step: 'apply' | 'evaluate') {
 // The board cells, the score and the phase name of a game.
 function summary(engine: GameEngine<FakeCell, SquareCoord, FakeMove, FakeState>) {
   const state = engine.snapshot();
-  return { cells: state.board.cells(), score: state.score, phase: engine.phase.name };
+  return { cells: state.board.cells(), score: state.score, phase: engine.currentPhase().name };
 }
 
 const afterOneMove = { cells: [[square(0, 0), fakeCell(1)]], score: 1, phase: 'playing' };
@@ -370,7 +370,7 @@ describe('GameEngine edge cases', () => {
 
     engine.start(emptyState(1));
 
-    expect(engine.phase.name).toBe('playing');
+    expect(engine.currentPhase().name).toBe('playing');
     expect(engine.snapshot().board.cells()).toEqual([]);
     expect(engine.snapshot().score).toBe(0);
     expect(engine.play(place(0, 0))).toBe('game-over');
@@ -570,7 +570,7 @@ describe('GameEngine review findings', () => {
     expect(() => engine.play(square(0, 0))).toThrow('apply failed');
     expect(engine.snapshot().board.cells()).toEqual([]);
     expect(engine.snapshot().score).toBe(0);
-    expect(engine.phase.name).toBe('playing');
+    expect(engine.currentPhase().name).toBe('playing');
 
     expect(engine.play(square(0, 0))).toBe('playing');
     expect(engine.snapshot().board.get(square(0, 0))).toEqual(fakeCell(1));
@@ -596,7 +596,7 @@ describe('GameEngine review findings', () => {
     const outcome = engine.play(place(0, 0));
 
     expect(outcome).toBe('victory');
-    expect(engine.phase.name).toBe('victory');
+    expect(engine.currentPhase().name).toBe('victory');
     expect(publisher.events).toHaveLength(1);
     const event = publisher.events[0] as GameOver;
     expect(event).toBeInstanceOf(GameOver);
@@ -610,7 +610,7 @@ describe('GameEngine review findings', () => {
 
     expect(() => engine.pause()).toThrow(new RangeError('The game has not started.'));
 
-    expect(engine.phase.name).toBe('playing');
+    expect(engine.currentPhase().name).toBe('playing');
   });
 });
 
@@ -624,5 +624,21 @@ describe('GameEngine type parameters', () => {
 
     expect(rejected).toBeUndefined();
     expect(state.clone()).not.toBeInstanceOf(BaseCloneState);
+  });
+});
+
+describe('GameEngine.currentPhase()', () => {
+  it('should_answer_the_phase_through_a_method_when_the_game_moves_to_its_end', () => {
+    const { engine } = newGame();
+    engine.start(emptyState());
+
+    expect(engine.currentPhase().name).toBe('playing');
+    expect(engine.currentPhase().canPlay()).toBe(true);
+
+    [place(0, 0), place(1, 0), place(0, 1), place(1, 1)].forEach((move) => engine.play(move));
+
+    expect(engine.currentPhase().name).toBe('game-over');
+    expect(engine.currentPhase().canPlay()).toBe(false);
+    expect('phase' in engine).toBe(false);
   });
 });

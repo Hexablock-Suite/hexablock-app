@@ -28,7 +28,7 @@ export interface PublishFailure {
 
 // The aggregate root of one game (classes.md decision 26).
 // A game changes only through `play()` and through the undo capability, and both act only
-// while `phase.canPlay()` is true. `snapshot()` returns a clone, so no caller changes the board.
+// while `currentPhase().canPlay()` is true. `snapshot()` returns a clone, so no caller changes the board.
 // The engine depends only on the interfaces of the rules and the scoring (Strategy, D1).
 // `TState` is a `BoardState` whose `clone()` returns `TState`, so each copy keeps the state type.
 // `history` is optional, because the variant factory decides it (classes.md decision 3).
@@ -51,7 +51,8 @@ export class GameEngine<
     private readonly history?: MoveHistory<TMove, TState>,
   ) {}
 
-  get phase(): GamePhase {
+  // Tells which phase the game is in.
+  currentPhase(): GamePhase {
     return this.current;
   }
 

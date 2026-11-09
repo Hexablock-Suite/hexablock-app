@@ -206,7 +206,7 @@ describe('FitRules', () => {
     const outcome = engine.play(new PlaceFitPiece(B, NO_TURN, square(0, 1)));
 
     expect(outcome).toBe('victory');
-    expect(engine.phase.name).toBe('victory');
+    expect(engine.currentPhase().name).toBe('victory');
     expect(trayOf(engine.snapshot())).toEqual([]);
     expect(publisher.events).toHaveLength(1);
     expect(publisher.events[0]).toBeInstanceOf(GameOver);
@@ -230,7 +230,7 @@ describe('FitRules', () => {
     const outcome = engine.play(new PlaceFitPiece(A, NO_TURN, square(1, 0)));
 
     expect(outcome).toBe('playing');
-    expect(engine.phase.name).toBe('playing');
+    expect(engine.currentPhase().name).toBe('playing');
     const moves = [...new FitRules<SquareCoord>().validMoves(engine.snapshot())];
     expect(moves.filter((move) => move.kind === 'place')).toEqual([]);
     expect(moves).toContainEqual(new RemoveFitPiece(A));
@@ -328,7 +328,7 @@ describe('FitRules edge cases', () => {
     expect(rules.evaluate(empty)).toBe('playing');
     expect([...rules.validMoves(empty)]).toEqual([]);
     expect(outcome).toBe('playing');
-    expect(engine.phase.name).toBe('playing');
+    expect(engine.currentPhase().name).toBe('playing');
     expect(cellsOf(engine.snapshot())).toEqual([]);
   });
 
@@ -364,7 +364,7 @@ describe('FitRules edge cases', () => {
     expect(() => rules.apply(dominoLevel(), jump)).toThrow(RangeError);
     expect(() => rules.apply(dominoLevel(), jump)).toThrow('Unknown Fit move: jump.');
     expect(() => engine.play(jump)).toThrow(RangeError);
-    expect(engine.phase.name).toBe('playing');
+    expect(engine.currentPhase().name).toBe('playing');
     expect(cellsOf(engine.snapshot())).toEqual([]);
     expect(trayOf(engine.snapshot())).toEqual(['a', 'b']);
   });
@@ -412,7 +412,7 @@ describe('FitRules edge cases', () => {
       'The topology failed.',
     );
 
-    expect(engine.phase.name).toBe('playing');
+    expect(engine.currentPhase().name).toBe('playing');
     expect(cellsOf(engine.snapshot())).toEqual([]);
     expect(trayOf(engine.snapshot())).toEqual(['a', 'b']);
     expect(engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)))).toBe('playing');
@@ -437,7 +437,7 @@ describe('FitRules edge cases', () => {
     const outcome = engine.play(new RotateFitPiece(A, Turns.of(1)));
 
     expect(outcome).toBe('playing');
-    expect(engine.phase.name).toBe('playing');
+    expect(engine.currentPhase().name).toBe('playing');
     expect(cellsOf(engine.snapshot())).toEqual(['0,0=a', '1,0=a']);
     expect(rotationOf(engine.snapshot(), A)).toBe(0);
   });

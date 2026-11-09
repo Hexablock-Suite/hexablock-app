@@ -110,5 +110,5 @@ function clearIfGoal<TCoord>(state: SortState<TCoord>, at: TCoord): void {
   if (cell === undefined || cell.topRun().length < GOAL_RUN) return;
   state.board.set(at, ColorStack.empty());
   state.goalsDone += 1;
-  state.clearedTiles.push(cell.size);
+  state.clearedTiles.push(cell.tileCount());
 }

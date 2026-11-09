@@ -95,7 +95,7 @@ describe('Hexa Lines rules', () => {
 
       const state = engine.snapshot();
       expect(outcome).toBe('playing');
-      expect(engine.phase.name).toBe('playing');
+      expect(engine.currentPhase().name).toBe('playing');
       expect(filledKeys(state)).toEqual(keys([square(1, 1)]));
       expect(state.tray).toEqual([domino, one]);
     }
@@ -235,7 +235,7 @@ describe('Hexa Lines rules', () => {
     const outcome = engine.play(new PlacePiece(0, square(1, 1)));
 
     expect(outcome).toBe('game-over');
-    expect(engine.phase.name).toBe('game-over');
+    expect(engine.currentPhase().name).toBe('game-over');
     expect(publisher.events).toEqual([expect.any(GameOver)]);
   });
 
@@ -288,7 +288,7 @@ describe('Hexa Lines rules edge cases', () => {
     return {
       valid: new LinesRules<SquareCoord>().isValid(initial, move),
       outcome,
-      phase: engine.phase.name,
+      phase: engine.currentPhase().name,
       filled: filledKeys(state),
       tray: state.tray,
       events: publisher.events,
@@ -343,7 +343,7 @@ describe('Hexa Lines rules edge cases', () => {
 
     const state = engine.snapshot();
     expect(outcome).toBe('game-over');
-    expect(engine.phase.name).toBe('game-over');
+    expect(engine.currentPhase().name).toBe('game-over');
     expect(state.tray).toEqual([]);
     expect(filledKeys(state)).toEqual(keys([square(1, 1)]));
     expect(publisher.events).toEqual([expect.any(GameOver)]);
@@ -380,7 +380,7 @@ describe('Hexa Lines rules edge cases', () => {
       expect(() => engine.play(new PlacePiece(0, square(2, 2)))).toThrow(error);
 
       const state = engine.snapshot();
-      expect(engine.phase.name).toBe('playing');
+      expect(engine.currentPhase().name).toBe('playing');
       expect(filledKeys(state)).toEqual([]);
       expect(state.tray).toEqual(tray);
       expect(state.streak).toBe(0);

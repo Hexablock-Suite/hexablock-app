@@ -72,7 +72,7 @@ function factsOf(
   return {
     cells: state.board.cells().map(([at, cell]) => [squareTopology.key(at), cell.value]),
     score: state.score,
-    phase: engine.phase.name,
+    phase: engine.currentPhase().name,
     log: rules.log,
     outcomes,
   };
@@ -167,7 +167,7 @@ describe('TimedRulesDecorator', () => {
 
     expect(outcome).toBe('game-over');
     expect(timer.elapsedMs()).toBe(SECOND);
-    expect(engine.phase.name).toBe('playing');
+    expect(engine.currentPhase().name).toBe('playing');
   });
 
   it('should_time_the_retried_turn_when_the_engine_rolls_back_the_last_turn', () => {
@@ -184,7 +184,7 @@ describe('TimedRulesDecorator', () => {
 
     // The rollback keeps the game going, so the end of the game is the retried turn.
     expect(retried).toBe('game-over');
-    expect(engine.phase.name).toBe('game-over');
+    expect(engine.currentPhase().name).toBe('game-over');
     expect(timer.elapsedMs()).toBe(3 * SECOND);
   });
 

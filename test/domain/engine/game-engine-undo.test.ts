@@ -52,7 +52,7 @@ function historyGame(rules = new FakeRules(), size = 2) {
 // The plain facts of a game for a comparison of two runs.
 function factsOf(engine: GameEngine<FakeCell, SquareCoord, FakeMove, FakeState>) {
   const state = engine.snapshot();
-  return { cells: filled(state.board), score: state.score, phase: engine.phase.name };
+  return { cells: filled(state.board), score: state.score, phase: engine.currentPhase().name };
 }
 
 // Rules that throw in `resolve()` while `armed` is true, after `apply()` has run on the copy.

@@ -550,7 +550,7 @@
         <rect x="380" y="216" width="300" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
         <rect x="380" y="256" width="300" height="8" fill="rgba(15,111,116,0.10)" />
         <line x1="380" y1="264" x2="680" y2="264" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
-        <line x1="380" y1="384" x2="680" y2="384" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <line x1="380" y1="368" x2="680" y2="368" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text
           x="530"
           y="238"
@@ -586,28 +586,28 @@
           - events: GameEventPublisher
         </text>
         <text x="396" y="344" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + phase: GamePhase {readOnly}
-        </text>
-        <text x="396" y="360" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - history: MoveHistory&lt;TMove, TState&gt;
         </text>
-        <text x="412" y="376" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="412" y="360" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           [0..1]
         </text>
-        <text x="396" y="400" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="396" y="384" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + start(initial: TState): void
         </text>
-        <text x="396" y="416" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="396" y="400" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + play(move: TMove): Outcome
         </text>
-        <text x="396" y="432" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="396" y="416" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + pause(): void
         </text>
-        <text x="396" y="448" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="396" y="432" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + resume(): void
         </text>
-        <text x="396" y="464" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="396" y="448" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + snapshot(): TState
+        </text>
+        <text x="396" y="464" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + currentPhase(): GamePhase
         </text>
         <text x="396" y="480" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + undoable(): IUndoable | undefined

@@ -56,7 +56,7 @@ function factsOf<
   return {
     cells: state.board.cells(),
     score: state.score,
-    phase: engine.phase.name,
+    phase: engine.currentPhase().name,
     view: state.view(),
   };
 }
@@ -92,7 +92,7 @@ describe('UndoMove', () => {
       elapsedMs: 0,
     });
     expect(games.running().snapshot().board.cells()).toEqual(afterFirst.cells);
-    expect(games.running().phase.name).toBe('playing');
+    expect(games.running().currentPhase().name).toBe('playing');
   });
 
   it('should_give_back_the_same_source_position_when_a_variant_with_a_random_source_undoes_a_move', async () => {

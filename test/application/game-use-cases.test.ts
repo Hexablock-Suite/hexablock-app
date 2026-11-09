@@ -151,7 +151,7 @@ function runningGameOf<
   TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
 >(games: MemoryRunningGameStore<TCell, TCoord, TMove, TState>) {
   const engine = games.running();
-  return [engine.snapshot().board.cells(), engine.snapshot().score, engine.phase.name];
+  return [engine.snapshot().board.cells(), engine.snapshot().score, engine.currentPhase().name];
 }
 
 // Starts one game and plays `undefined` and then `null` as the move.
@@ -342,7 +342,7 @@ describe('StartGame and ApplyMove', () => {
       before.score,
       before.tray,
     ]);
-    expect(games.running().phase.name).toBe('playing');
+    expect(games.running().currentPhase().name).toBe('playing');
   });
 
   it('should_return_a_no_running_game_failure_when_apply_move_runs_before_start_game', async () => {
@@ -389,7 +389,7 @@ describe('StartGame and ApplyMove', () => {
       elapsedMs: 0,
     });
     expect(saved.board.cells()).not.toEqual([]);
-    expect(games.running().phase.name).toBe('victory');
+    expect(games.running().currentPhase().name).toBe('victory');
     expect(logger.entries).toHaveLength(1);
     const [entry] = logger.entries;
     expect([entry.useCase, entry.outcome, entry.error?.code, entry.error?.message]).toEqual([
@@ -417,7 +417,7 @@ describe('StartGame and ApplyMove', () => {
 
     expect(played.outcome).toBe('victory');
     expect(played.cells).toEqual(games.running().snapshot().board.cells());
-    expect(games.running().phase.name).toBe('victory');
+    expect(games.running().currentPhase().name).toBe('victory');
   });
 
   it('should_answer_the_next_move_as_a_finished_game_does_when_the_publisher_threw_on_the_last_turn', async () => {
@@ -457,7 +457,7 @@ describe('StartGame and ApplyMove', () => {
       false,
     ]);
     expect(engine.snapshot().board.cells()).toEqual([]);
-    expect([engine.snapshot().score, engine.phase.name]).toEqual([0, 'playing']);
+    expect([engine.snapshot().score, engine.currentPhase().name]).toEqual([0, 'playing']);
     expect([logger.entries, publisher.events]).toEqual([[], []]);
   });
 

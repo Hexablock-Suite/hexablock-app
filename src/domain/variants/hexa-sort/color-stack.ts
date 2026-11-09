@@ -21,7 +21,8 @@ export class ColorStack {
     return new ColorStack([]);
   }
 
-  get size(): number {
+  // Tells how many tiles the stack holds.
+  tileCount(): number {
     return this.chips.length;
   }
 
