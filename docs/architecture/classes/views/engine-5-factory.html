@@ -383,7 +383,7 @@
           + publish(event: GameEvent): void
         </text>
 
-        <!-- Class: GameEvent (abstract, value object) -->
+        <!-- Class: GameEvent (abstract, domain event) -->
         <rect
           x="792"
           y="92"
@@ -404,7 +404,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «abstract» «value object»
+          «abstract» «domain event»
         </text>
         <text
           x="884"
@@ -422,7 +422,7 @@
           + gameId: GameId
         </text>
 
-        <!-- Class: GameOver -->
+        <!-- Class: GameOver (domain event) -->
         <rect
           x="792"
           y="212"
@@ -436,7 +436,18 @@
         <line x1="792" y1="252" x2="976" y2="252" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="884"
-          y="237"
+          y="227"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «domain event»
+        </text>
+        <text
+          x="884"
+          y="243"
           fill="#17212a"
           font-size="12"
           font-weight="600"
