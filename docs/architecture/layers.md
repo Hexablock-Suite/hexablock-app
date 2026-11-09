@@ -70,7 +70,7 @@ flowchart TB
       MERGE["hexa-merge"]
     end
     subgraph ENGINE["src/domain/engine/"]
-      CORE["GameEngine#lt;TCell, TCoord, TMove, TState#gt;, the aggregate root,<br/>Board#lt;TCell, TCoord#gt;, Piece, GridTopology#lt;TCoord#gt;, GameId;<br/>planned: BoardBuilder, GeometryFactory with HexGeometry,<br/>HexCoord and HexTopology"]
+      CORE["GameEngine#lt;TCell, TCoord, TMove, TState#gt;, the aggregate root,<br/>Board#lt;TCell, TCoord#gt;, Piece, GridTopology#lt;TCoord#gt;, GameId,<br/>BoardBuilder, GeometryFactory with HexGeometry, SquareGeometry<br/>and TriangleGeometry, with their coordinates and topologies"]
       CONTRACTS["Contracts that a variant implements:<br/>IGameRules#lt;TMove, TState#gt; through BaseGameRules,<br/>IScoringPolicy#lt;TState#gt;, BoardState#lt;TCell, TCoord#gt;"]
       STRATS["Strategies with engine classes:<br/>IPieceSource#lt;TPiece#gt;: SeededPieceSource, FixedListPieceSource;<br/>IProgressModel; planned: HighScoreProgress, LevelProgress"]
       CAPS["Capability interfaces: IRandomSeeded with its engine class<br/>SeededPieceSource, IMergeable#lt;TCell#gt;; planned: IUndoable,<br/>IRedoable, ITimed with their engine classes MoveHistory,<br/>RedoableHistory, LevelTimer"]
