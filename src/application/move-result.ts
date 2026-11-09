@@ -15,6 +15,7 @@ export type ViewOf<TState> = TState extends { view(): infer TView } ? TView : ne
 // separate «no undo» from «undo used».
 // `payload` is the variant data of `BoardState.view()`, typed by the state.
 // `TView` defaults to `unknown`, so a signature that does not read the payload need not name it.
+// `elapsedMs` exists only for a timed game. It reads the timer when the response is built.
 export interface MoveResult<TCell, TCoord, TView = unknown> {
   readonly cells: [TCoord, TCell][];
   readonly score: number;
@@ -23,6 +24,7 @@ export interface MoveResult<TCell, TCoord, TView = unknown> {
   readonly canRedo: boolean;
   readonly hasUndo: boolean;
   readonly payload: TView;
+  readonly elapsedMs?: number;
 }
 
 // Builds the response from the engine: a snapshot and its undo capabilities.
@@ -39,6 +41,7 @@ export function moveResultOf<
 ): MoveResult<TCell, TCoord, ViewOf<TState>> {
   const snapshot = engine.snapshot();
   const undoable = engine.undoable();
+  const timed = engine.timed();
   return {
     cells: snapshot.board.cells(),
     score: snapshot.score,
@@ -47,5 +50,6 @@ export function moveResultOf<
     canRedo: engine.redoable()?.canRedo() ?? false,
     hasUndo: undoable !== undefined,
     payload: snapshot.view() as ViewOf<TState>,
+    ...(timed === undefined ? {} : { elapsedMs: timed.elapsedMs() }),
   };
 }

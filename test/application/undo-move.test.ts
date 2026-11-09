@@ -88,6 +88,8 @@ describe('UndoMove', () => {
       canRedo: false,
       hasUndo: true,
       payload: afterFirst.payload,
+      // Fit is timed, and this clock does not move.
+      elapsedMs: 0,
     });
     expect(games.running().snapshot().board.cells()).toEqual(afterFirst.cells);
     expect(games.running().phase.name).toBe('playing');
