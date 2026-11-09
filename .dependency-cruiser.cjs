@@ -44,6 +44,13 @@ module.exports = {
       to: { pathNot: '(?:^|/)src/(?:domain|application)/' },
     },
     {
+      name: 'application-no-variants',
+      comment: 'Application code never imports a concrete variant: the use cases stay generic.',
+      severity: 'error',
+      from: { path: layer('application') },
+      to: { path: layer('domain/variants') },
+    },
+    {
       name: 'adapters-imports-only-inner-layers',
       comment:
         'Adapter code imports only domain, application and adapter code: no driver, package or Node module.',
