@@ -1,10 +1,11 @@
 /** @jest-environment node */
-import { Board } from '../../../src/domain/engine/board';
+import { Board, BoardSpace } from '../../../src/domain/engine/board';
 import { BoardShape } from '../../../src/domain/engine/board-shape';
 import { coordKey, type CoordKey } from '../../../src/domain/engine/coord-key';
 import type { GridTopology } from '../../../src/domain/engine/grid-topology';
 import { Radius } from '../../../src/domain/engine/radius';
 import { RegionSize } from '../../../src/domain/engine/region-size';
+import { ColorStack } from '../../../src/domain/variants/hexa-sort/color-stack';
 
 // A one-dimensional topology: a coordinate is an integer on a strip.
 // It exists only in this test, so the board test needs no real geometry.
@@ -67,6 +68,60 @@ describe('Board', () => {
       [1, 'red'],
       [3, 'blue'],
     ]);
+  });
+
+  it('should_keep_the_first_write_order_when_cells_is_read', () => {
+    const board = newBoard();
+    board.set(3, 'red');
+    board.set(1, 'blue');
+    board.set(3, 'green');
+    const initial = new Board<string, number, 'x'>(
+      stripTopology.region(RegionSize.of(5)),
+      stripTopology,
+      new Map<CoordKey, [number, string]>([
+        [coordKey('4'), [4, 'red']],
+        [coordKey('0'), [0, 'blue']],
+      ]),
+    );
+
+    const written = [
+      [3, 'green'],
+      [1, 'blue'],
+    ];
+    expect(board.cells()).toEqual(written);
+    expect(board.clone().cells()).toEqual(written);
+    expect(initial.cells()).toEqual([
+      [4, 'red'],
+      [0, 'blue'],
+    ]);
+  });
+
+  // Sort marks a free cell with an empty stack. Every other variant leaves the coordinate unset.
+  it('should_keep_both_forms_of_a_free_cell_when_the_board_is_read', () => {
+    const board = new Board<ColorStack, number, 'x'>(
+      stripTopology.region(RegionSize.of(5)),
+      stripTopology,
+    );
+    const empty = ColorStack.empty();
+
+    board.set(1, empty);
+
+    expect(board.get(1)).toBe(empty);
+    expect(board.get(2)).toBeUndefined();
+    expect(board.cells()).toEqual([[1, empty]]);
+  });
+
+  it('should_list_an_undefined_cell_when_it_was_set', () => {
+    const board = new Board<string | undefined, number, 'x'>(
+      stripTopology.region(RegionSize.of(5)),
+      stripTopology,
+    );
+
+    board.set(1, undefined);
+
+    expect(board.get(1)).toBeUndefined();
+    expect(board.cells()).toEqual([[1, undefined]]);
+    expect(board.clone().cells()).toEqual([[1, undefined]]);
   });
 
   it('should_keep_the_clone_unchanged_when_the_original_changes', () => {
@@ -242,5 +297,73 @@ describe('Board initial content', () => {
       [0, 'red'],
       [4, 'blue'],
     ]);
+  });
+});
+
+describe('BoardSpace', () => {
+  // A coordinate is an object here, so one coordinate can have two objects.
+  type Point = { readonly x: number };
+  const pointTopology = { key: (c: Point) => coordKey(String(c.x)) };
+
+  function freeSpace(x: number): BoardSpace<string, Point> {
+    return BoardSpace.free<string, Point>({ x }, pointTopology);
+  }
+
+  it('should_be_the_same_space_when_two_objects_have_the_same_coordinate', () => {
+    const space = freeSpace(1);
+
+    expect(space.equals(freeSpace(1))).toBe(true);
+    expect(space.equals(freeSpace(2))).toBe(false);
+  });
+
+  it('should_ignore_the_state_when_two_spaces_are_compared', () => {
+    const red = freeSpace(1);
+    red.occupy('red');
+    const blue = freeSpace(1);
+    blue.occupy('blue');
+    const redElsewhere = freeSpace(2);
+    redElsewhere.occupy('red');
+
+    expect(red.equals(blue)).toBe(true);
+    expect(red.equals(freeSpace(1))).toBe(true);
+    expect(red.equals(redElsewhere)).toBe(false);
+  });
+
+  it('should_go_from_free_to_occupied_when_a_cell_occupies_the_space', () => {
+    const space = freeSpace(1);
+
+    expect(space.occupation()).toBeUndefined();
+
+    space.occupy('red');
+    expect(space.occupation()).toEqual([{ x: 1 }, 'red']);
+
+    space.occupy('blue');
+    expect(space.occupation()).toEqual([{ x: 1 }, 'blue']);
+  });
+
+  // `Board` hands out no space. The spy runs the real method.
+  // It shows the space of each board: the one that `clone()` reads and the one it returns.
+  it('should_hold_a_distinct_space_on_each_side_when_the_board_is_cloned', () => {
+    const cloneSpace = jest.spyOn(BoardSpace.prototype, 'clone');
+    const board = newBoard();
+    board.set(1, 'red');
+
+    const copy = board.clone();
+
+    const { contexts, results } = cloneSpace.mock;
+    cloneSpace.mockRestore();
+    const original: BoardSpace<string, number> = contexts[0];
+    const cloned: BoardSpace<string, number> = results[0]?.value;
+    expect(contexts).toHaveLength(1);
+    expect(cloned).not.toBe(original);
+    expect(cloned.equals(original)).toBe(true);
+
+    original.occupy('blue');
+    expect(board.get(1)).toBe('blue');
+    expect(copy.get(1)).toBe('red');
+
+    cloned.occupy('green');
+    expect(copy.get(1)).toBe('green');
+    expect(board.get(1)).toBe('blue');
   });
 });

@@ -71,7 +71,7 @@
       >
         <title id="ovengine-title">HexaBlock generic engine map · UML class diagram</title>
         <desc id="ovengine-desc">
-          Overview map of the 63 layer 1 engine classes in 14 groups. Each line joins two classes:
+          Overview map of the 64 layer 1 engine classes in 14 groups. Each line joins two classes:
           GameEngine keeps its GamePhase, its optional MoveHistory and its IScoringPolicy and
           notifies through GameEventPublisher, BoardState keeps its Board, IVariantFactory creates
           the IGameRules and GeometryFactory creates the piece shapes. No line touches a group
@@ -1170,18 +1170,46 @@
         </g>
         <g data-class="Board">
           <rect
-            x="76"
+            x="204"
             y="620"
-            width="248"
+            width="120"
             height="34"
             rx="4"
             fill="#ffffff"
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="200" y="641" fill="#17212a" text-anchor="middle">
+          <text x="264" y="641" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               Board
+            </tspan>
+          </text>
+        </g>
+        <g data-class="BoardSpace">
+          <rect
+            x="76"
+            y="620"
+            width="120"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="136"
+            y="632"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            entity
+          </text>
+          <text x="136" y="645" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              BoardSpace
             </tspan>
           </text>
         </g>
