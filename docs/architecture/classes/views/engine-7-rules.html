@@ -74,8 +74,8 @@
           Class diagram of layer 1 showing the abstract BaseGameRules, which implements the
           IGameRules strategy and holds playTurn() as a template method over abstract steps, both
           returning a Resolution, LinesRules and FitRules extending it (planned for Sprint 2), and
-          TimedRulesDecorator, planned for Sprint 3, which implements IGameRules, wraps an inner
-          IGameRules and times the game with a LevelTimer.
+          TimedRulesDecorator, which implements IGameRules, wraps an inner IGameRules and times the
+          game with a LevelTimer.
         </desc>
         <defs>
           <marker
@@ -235,7 +235,7 @@
           x1="456"
           y1="336"
           x2="456"
-          y2="268"
+          y2="284"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -261,7 +261,7 @@
         <!-- TimedRulesDecorator holds the LevelTimer it receives as timer: use -->
         <line
           x1="844"
-          y1="480"
+          y1="496"
           x2="844"
           y2="552"
           stroke="#5b6873"
@@ -273,7 +273,7 @@
           x1="360"
           y1="552"
           x2="360"
-          y2="520"
+          y2="536"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#rules-triangle)"
@@ -283,7 +283,7 @@
           x1="552"
           y1="552"
           x2="552"
-          y2="520"
+          y2="536"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#rules-triangle)"
@@ -387,7 +387,7 @@
           x="296"
           y="100"
           width="320"
-          height="168"
+          height="184"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -437,12 +437,15 @@
         <text x="328" y="260" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Resolution&lt;TState&gt;
         </text>
+        <text x="312" y="276" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + timed(): ITimed | undefined
+        </text>
         <!-- Class: BaseGameRules (abstract, template method, focal) -->
         <rect
           x="284"
           y="336"
           width="352"
-          height="184"
+          height="200"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -547,12 +550,15 @@
         <text x="300" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           # noValidMove(state: TState): boolean
         </text>
+        <text x="300" y="528" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + timed(): ITimed | undefined
+        </text>
         <!-- Class: TimedRulesDecorator (decorator) -->
         <rect
           x="704"
           y="336"
           width="280"
-          height="144"
+          height="160"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -561,7 +567,6 @@
         <line x1="704" y1="384" x2="984" y2="384" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <line x1="704" y1="424" x2="984" y2="424" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          data-requirement="APP-FR-09"
           x="844"
           y="354"
           fill="#5b6873"
@@ -570,7 +575,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «Decorator» «Sprint 3»
+          «Decorator»
         </text>
         <text
           x="844"
@@ -597,6 +602,9 @@
         </text>
         <text x="720" y="472" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + evaluate(state: TState): Outcome
+        </text>
+        <text x="720" y="488" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + timed(): ITimed
         </text>
         <!-- Reference box: GameEngine, detailed in part 1 · view 1 -->
         <rect
@@ -718,7 +726,6 @@
           stroke-dasharray="4,3"
         />
         <text
-          data-requirement="APP-FR-09"
           x="844"
           y="566"
           fill="#7d8a94"
@@ -728,7 +735,7 @@
           text-anchor="middle"
           letter-spacing="0.14em"
         >
-          PART 1 · VIEW 3 · «Sprint 3»
+          PART 1 · VIEW 3
         </text>
         <text
           x="844"
@@ -945,8 +952,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          TimedRulesDecorator starts LevelTimer on the first turn and stops it when evaluate() ends
-          the game (decision 19).
+          TimedRulesDecorator wraps playTurn(): LevelTimer starts on the first accepted turn and
+          stops when that turn ends the game (decision 19).
         </text>
         <!-- Legend -->
         <line x1="24" y1="700" x2="1016" y2="700" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />

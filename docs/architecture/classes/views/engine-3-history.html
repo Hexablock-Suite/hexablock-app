@@ -461,14 +461,14 @@
           x="72"
           y="324"
           width="160"
-          height="104"
+          height="152"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
         <line x1="72" y1="364" x2="232" y2="364" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="72" y1="404" x2="232" y2="404" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="72" y1="420" x2="232" y2="420" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="152"
           y="349"
@@ -486,7 +486,16 @@
         <text x="88" y="396" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - startedAt: number
         </text>
-        <text x="88" y="420" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="412" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - stoppedAt: number
+        </text>
+        <text x="88" y="436" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + start(): void
+        </text>
+        <text x="88" y="452" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + stop(): void
+        </text>
+        <text x="88" y="468" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + elapsedMs(): number
         </text>
 
@@ -693,8 +702,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          IRedoable is our addition (§3.2, ISP). GameEngine gives them through undoable() and
-          redoable(). LevelTimer reads time from the Clock interface (APP-NFR-07).
+          IRedoable is our addition (§3.2, ISP). GameEngine gives them through undoable(),
+          redoable() and timed(). LevelTimer reads time from the Clock interface (APP-NFR-07).
         </text>
 
         <!-- Legend -->

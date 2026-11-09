@@ -79,7 +79,7 @@ Each row is one extension point. Each cell names the class or the type argument 
 | `StateMapper` (layer 3)              | `LinesStateMapper`                         | `FitStateMapper`                                               | `SortStateMapper`                                   | `MergeStateMapper`                     | `FillStateMapper`                      |
 | `CellRenderer` (layer 4, Q8)         | `LinesCellRenderer`                        | `FitCellRenderer`                                              | `SortCellRenderer`                                  | `MergeCellRenderer`                    | `FillCellRenderer`                     |
 
-The capability classes `MoveHistory`, `RedoableHistory`, `LevelTimer` and `SeededPieceSource` live in the engine. A variant does not write them: its factory picks them (decision 3), and `GameEngine.undoable()` and `redoable()` give them to the use cases (decision 27). `HighScoreProgress` and `LevelProgress` live in the engine too.
+The capability classes `MoveHistory`, `RedoableHistory`, `LevelTimer` and `SeededPieceSource` live in the engine. A variant does not write them: its factory picks them (decision 3), and `GameEngine.undoable()`, `redoable()` and `timed()` give them to the use cases (decision 27). `HighScoreProgress` and `LevelProgress` live in the engine too.
 
 ## Render the images
 
