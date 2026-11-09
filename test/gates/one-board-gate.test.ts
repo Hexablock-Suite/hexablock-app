@@ -4,6 +4,7 @@ import path from 'node:path';
 import * as ts from 'typescript';
 
 import { Board } from '../../src/domain/engine/board';
+import { hex, type HexAxis, type HexCoord } from '../../src/domain/engine/hex-topology';
 import { FixedListPieceSource } from '../../src/domain/engine/piece-source';
 import { Piece } from '../../src/domain/engine/piece';
 import { RegionSize } from '../../src/domain/engine/region-size';
@@ -19,7 +20,6 @@ import { GoalCount } from '../../src/domain/variants/hexa-sort/goal-count';
 import { SortState } from '../../src/domain/variants/hexa-sort/sort-state';
 import { square, squareTopology, type SquareCoord } from '../support/engine/square-topology';
 import { linesState } from '../support/variants/hexa-lines/lines-game';
-import { hex, type HexAxis, type HexCoord } from '../support/variants/hexa-merge/hex-topology';
 import { mergeState } from '../support/variants/hexa-merge/merge-game';
 import { repoRoot } from '../support/run-tool';
 

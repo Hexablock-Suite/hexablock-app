@@ -1,6 +1,7 @@
 /** @jest-environment node */
 import { GameOver } from '../../../../src/domain/engine/game-events';
 import { GameId } from '../../../../src/domain/engine/game-id';
+import { hex, type HexAxis } from '../../../../src/domain/engine/hex-topology';
 import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
 import type { RandomSource } from '../../../../src/domain/engine/random-source';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
@@ -11,7 +12,6 @@ import {
 import type { NewTile } from '../../../../src/domain/variants/hexa-merge/new-tile';
 import { Slide } from '../../../../src/domain/variants/hexa-merge/slide';
 import { lintFixture } from '../../../support/run-tool';
-import { hex, type HexAxis } from '../../../support/variants/hexa-merge/hex-topology';
 import {
   mergeGame,
   mergeState,
@@ -20,7 +20,7 @@ import {
 } from '../../../support/variants/hexa-merge/merge-game';
 
 // The new tiles of Hexa Merge (statement §1.4, APP-NFR-07, issue #95).
-// The tests play through `GameEngine.play()` and the rules contract, on a hexagonal double.
+// The tests play through `GameEngine.play()` and the rules contract, on the real hex geometry.
 // They code against the proposal on issue #57, «Propuesta, pendiente del equipo»:
 // a new tile is 2 with 0.9 and 4 with 0.1, on an empty cell, from one seeded source,
 // and a cloned state gives the same new tile again.

@@ -6,8 +6,7 @@ import {
 } from '../../../../src/domain/variants/hexa-merge/merge-factory';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
 import { firstValidMove, startVariant } from '../../../support/engine/variant-game';
-import { hexTopology } from '../../../support/variants/hexa-merge/hex-topology';
-import { mergeFactory, values } from '../../../support/variants/hexa-merge/merge-game';
+import { hexTopology, mergeFactory, values } from '../../../support/variants/hexa-merge/merge-game';
 
 // A Merge factory on a hexagon of `size` rings, with the target 2048.
 function sizedMergeFactory(size: number, fourChance?: number) {

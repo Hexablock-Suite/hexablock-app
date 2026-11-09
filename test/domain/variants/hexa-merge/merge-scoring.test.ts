@@ -1,13 +1,9 @@
 /** @jest-environment node */
+import { hex, type HexAxis, type HexCoord } from '../../../../src/domain/engine/hex-topology';
 import { MergeScoring } from '../../../../src/domain/variants/hexa-merge/merge-scoring';
 import { mergeTileSource } from '../../../../src/domain/variants/hexa-merge/merge-tile-source';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
 import { Slide } from '../../../../src/domain/variants/hexa-merge/slide';
-import {
-  hex,
-  type HexAxis,
-  type HexCoord,
-} from '../../../support/variants/hexa-merge/hex-topology';
 import { mergeGame, mergeState, values } from '../../../support/variants/hexa-merge/merge-game';
 
 // The scoring of Hexa Merge (issue 97, APP-FR-06, statement §1.4).

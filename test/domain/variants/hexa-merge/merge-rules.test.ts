@@ -2,6 +2,7 @@
 import { Board } from '../../../../src/domain/engine/board';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
 import { GameId } from '../../../../src/domain/engine/game-id';
+import { hex, type HexAxis, type HexCoord } from '../../../../src/domain/engine/hex-topology';
 import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import { BaseGameRules } from '../../../../src/domain/engine/rules';
@@ -13,12 +14,7 @@ import type { NewTile } from '../../../../src/domain/variants/hexa-merge/new-til
 import { Slide, type SlideSense } from '../../../../src/domain/variants/hexa-merge/slide';
 import { RecordingPublisher } from '../../../support/engine/fake-game';
 import {
-  hex,
   hexTopology,
-  type HexAxis,
-  type HexCoord,
-} from '../../../support/variants/hexa-merge/hex-topology';
-import {
   mergeGame,
   mergeState,
   values,
@@ -26,7 +22,7 @@ import {
 } from '../../../support/variants/hexa-merge/merge-game';
 
 // The rules suite of Hexa Merge (statement §1.4, APP-NFR-12).
-// The tests play through `GameEngine.play()` and the rules contract, on a hexagonal double.
+// The tests play through `GameEngine.play()` and the rules contract, on the real hex geometry.
 // They code against the proposal on issue #57, «Propuesta, pendiente del equipo»:
 // a slide merges from the leading edge, and a tile merges at most once per move.
 
