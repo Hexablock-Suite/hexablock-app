@@ -19,6 +19,8 @@ const pieces: readonly (readonly SquareCoord[])[] = [
 
 // Concrete Factory (classes.md decision 17, D11): the real square family.
 export class SquareGeometry implements GeometryFactory<SquareCoord> {
+  readonly id = 'square';
+
   // `values` holds `col` and then `row`.
   createCoord(values: number[]): SquareCoord {
     const [col, row] = values;
