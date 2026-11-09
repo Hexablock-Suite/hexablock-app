@@ -7,13 +7,14 @@ import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
 import { CellNode, ShapeGroup, type ShapeNode } from '../../../../src/domain/engine/shape-node';
+import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
 import { Color } from '../../../../src/domain/engine/color';
 import { LinesFactory } from '../../../../src/domain/variants/hexa-lines/lines-factory';
 import { LinesRules } from '../../../../src/domain/variants/hexa-lines/lines-rules';
 import { LinesState } from '../../../../src/domain/variants/hexa-lines/lines-state';
 import type { PlacePiece } from '../../../../src/domain/variants/hexa-lines/place-piece';
 import { RecordingPublisher } from '../../engine/fake-game';
-import { square, squareTopology, type SquareCoord } from '../../engine/square-topology';
+import { square, type SquareCoord } from '../../engine/square-topology';
 
 // Builders for the Hexa Lines rules tests. They exist only in test/.
 
@@ -79,5 +80,5 @@ export function linesFactory(
   ],
   colors: readonly [Color, ...Color[]] = [red],
 ): LinesFactory<SquareCoord> {
-  return new LinesFactory(squareTopology, { size: RegionSize.of(3), seed, shapes, colors });
+  return new LinesFactory(new SquareGeometry(), { size: RegionSize.of(3), seed, shapes, colors });
 }

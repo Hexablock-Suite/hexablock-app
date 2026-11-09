@@ -1,7 +1,8 @@
-import { Board } from '../../engine/board';
+import type { Board } from '../../engine/board';
+import { BoardBuilder } from '../../engine/board-builder';
 import type { Color } from '../../engine/color';
 import { GameId } from '../../engine/game-id';
-import type { GridTopology } from '../../engine/grid-topology';
+import type { GeometryFactory } from '../../engine/geometry-factory';
 import { Piece } from '../../engine/piece';
 import { SeededPieceSource } from '../../engine/piece-source';
 import type { RandomSource } from '../../engine/random-source';
@@ -26,8 +27,7 @@ export interface LinesSettings<TCoord> {
 }
 
 // Abstract Factory (classes.md decision 31): the whole family of Hexa Lines.
-// The topology is the geometry seam. `GeometryFactory<TCoord>` replaces it in Sprint 3
-// (APP-FR-16, D11), and then it gives the topology and the piece shapes.
+// The geometry comes by composition (APP-FR-16, D11), so the factory runs on any figure.
 // The seed comes by injection (R-domain-determinism), so the same seed gives the same game.
 export class LinesFactory<TCoord> implements IVariantFactory<
   Color,
@@ -38,7 +38,7 @@ export class LinesFactory<TCoord> implements IVariantFactory<
   readonly gameId = GameId.of('hexa-lines');
 
   constructor(
-    private readonly topology: GridTopology<TCoord, string, string>,
+    private readonly geometry: GeometryFactory<TCoord>,
     private readonly settings: LinesSettings<TCoord>,
   ) {}
 
@@ -60,10 +60,7 @@ export class LinesFactory<TCoord> implements IVariantFactory<
   }
 
   createBoard(): Board<Color, TCoord, string> {
-    return new Board<Color, TCoord, string>(
-      this.topology.region(this.settings.size),
-      this.topology,
-    );
+    return new BoardBuilder(this.geometry).withRegion(this.settings.size).build<Color>();
   }
 
   createInitialState(): LinesState<TCoord> {

@@ -1,6 +1,7 @@
-import { Board } from '../../engine/board';
+import type { Board } from '../../engine/board';
+import { BoardBuilder } from '../../engine/board-builder';
 import { GameId } from '../../engine/game-id';
-import type { GridTopology } from '../../engine/grid-topology';
+import type { GeometryFactory } from '../../engine/geometry-factory';
 import type { Piece } from '../../engine/piece';
 import type { IPieceSource } from '../../engine/piece-source';
 import type { RegionSize } from '../../engine/region-size';
@@ -23,8 +24,7 @@ export interface SortLevel<TCoord> {
 }
 
 // Abstract Factory (classes.md decision 31): the whole family of one Hexa Sort level.
-// The topology is the geometry seam. `GeometryFactory<TCoord>` replaces it in Sprint 3
-// (APP-FR-16, D11).
+// The geometry comes by composition (APP-FR-16, D11), so the factory runs on any figure.
 export class SortFactory<TCoord> implements IVariantFactory<
   ColorStack,
   TCoord,
@@ -34,7 +34,7 @@ export class SortFactory<TCoord> implements IVariantFactory<
   readonly gameId = GameId.of('hexa-sort');
 
   constructor(
-    private readonly topology: GridTopology<TCoord, string, string>,
+    private readonly geometry: GeometryFactory<TCoord>,
     private readonly level: SortLevel<TCoord>,
   ) {}
 
@@ -53,10 +53,7 @@ export class SortFactory<TCoord> implements IVariantFactory<
   }
 
   createBoard(): Board<ColorStack, TCoord, string> {
-    return new Board<ColorStack, TCoord, string>(
-      this.topology.region(this.level.size),
-      this.topology,
-    );
+    return new BoardBuilder(this.geometry).withRegion(this.level.size).build<ColorStack>();
   }
 
   createInitialState(): SortState<TCoord> {

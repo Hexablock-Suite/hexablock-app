@@ -1,6 +1,7 @@
-import { Board } from '../../engine/board';
+import type { Board } from '../../engine/board';
+import { BoardBuilder } from '../../engine/board-builder';
 import { GameId } from '../../engine/game-id';
-import type { GridTopology } from '../../engine/grid-topology';
+import type { GeometryFactory } from '../../engine/geometry-factory';
 import type { SeededPieceSource } from '../../engine/piece-source';
 import type { RegionSize } from '../../engine/region-size';
 import type { IGameRules } from '../../engine/rules';
@@ -29,43 +30,41 @@ export interface MergeSettings {
 // Abstract Factory (classes.md decision 31): the whole family of Hexa Merge.
 // The bound `IMergeable` of `MergeRules` is bound here to `MergeTile` (decision 8).
 // The piece source gives `NewTile` draws, so the factory binds `TPiece` to `NewTile<MergeTile>`.
-// The topology is the geometry seam. `GeometryFactory<TCoord>` replaces it in Sprint 3
-// (APP-FR-16, D11). The seed comes by injection (R-domain-determinism).
-export class MergeFactory<TCoord, TAxis extends string> implements IVariantFactory<
+// The geometry comes by composition (APP-FR-16, D11), so the factory runs on any figure.
+// The contract of the geometry names its axes as `string`, so the slides do too.
+// The seed comes by injection (R-domain-determinism).
+export class MergeFactory<TCoord> implements IVariantFactory<
   MergeTile,
   TCoord,
-  Slide<TAxis>,
-  MergeState<MergeTile, TCoord, TAxis>,
+  Slide<string>,
+  MergeState<MergeTile, TCoord, string>,
   NewTile<MergeTile>
 > {
   readonly gameId = GameId.of('hexa-merge');
 
   constructor(
-    private readonly topology: GridTopology<TCoord, TAxis, string>,
+    private readonly geometry: GeometryFactory<TCoord>,
     private readonly settings: MergeSettings,
   ) {}
 
-  createRules(): IGameRules<Slide<TAxis>, MergeState<MergeTile, TCoord, TAxis>> {
-    return new MergeRules<MergeTile, TCoord, TAxis>(this.settings.target);
+  createRules(): IGameRules<Slide<string>, MergeState<MergeTile, TCoord, string>> {
+    return new MergeRules<MergeTile, TCoord, string>(this.settings.target);
   }
 
-  createScoring(): IScoringPolicy<MergeState<MergeTile, TCoord, TAxis>> {
-    return new MergeScoring<TCoord, TAxis>();
+  createScoring(): IScoringPolicy<MergeState<MergeTile, TCoord, string>> {
+    return new MergeScoring<TCoord, string>();
   }
 
   createPieceSource(): SeededPieceSource<NewTile<MergeTile>> {
     return mergeTileSource(this.settings.seed, this.settings.fourChance);
   }
 
-  createBoard(): Board<MergeTile, TCoord, TAxis> {
-    return new Board<MergeTile, TCoord, TAxis>(
-      this.topology.region(this.settings.size),
-      this.topology,
-    );
+  createBoard(): Board<MergeTile, TCoord, string> {
+    return new BoardBuilder(this.geometry).withRegion(this.settings.size).build<MergeTile>();
   }
 
   // The first tiles come from the same source as the later tiles.
-  createInitialState(): MergeState<MergeTile, TCoord, TAxis> {
+  createInitialState(): MergeState<MergeTile, TCoord, string> {
     const state = new MergeState(this.createBoard(), this.createPieceSource());
     for (let i = 0; i < START_TILES; i += 1) addNewTile(state);
     return state;

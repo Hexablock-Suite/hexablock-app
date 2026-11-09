@@ -1,9 +1,9 @@
 /** @jest-environment node */
 import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
+import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
 import { GoalCount } from '../../../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../../../src/domain/variants/hexa-sort/sort-factory';
-import { squareTopology } from '../../../support/engine/square-topology';
 import { startVariant } from '../../../support/engine/variant-game';
 import {
   chipsAt,
@@ -50,7 +50,7 @@ describe('SortFactory', () => {
 
   it('should_leave_the_level_source_unread_when_the_sort_factory_starts_two_games', () => {
     const source = new FixedListPieceSource([stack('red'), stack('blue')].map(stackPiece));
-    const factory = new SortFactory(squareTopology, {
+    const factory = new SortFactory(new SquareGeometry(), {
       size: RegionSize.of(2),
       source,
       goalsNeeded: GoalCount.of(1),

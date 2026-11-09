@@ -11,12 +11,13 @@ import type { Piece } from '../../src/domain/engine/piece';
 import { FixedListPieceSource, type IPieceSource } from '../../src/domain/engine/piece-source';
 import { RegionSize } from '../../src/domain/engine/region-size';
 import type { Resolution } from '../../src/domain/engine/resolution';
+import { SquareGeometry } from '../../src/domain/engine/square-geometry';
 import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
 import { PlacePiece } from '../../src/domain/variants/hexa-lines/place-piece';
 import type { ColorStack } from '../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../src/domain/variants/hexa-sort/sort-factory';
-import { square, squareTopology, type SquareCoord } from '../support/engine/square-topology';
+import { square, type SquareCoord } from '../support/engine/square-topology';
 import { firstValidMove } from '../support/engine/variant-game';
 import {
   errorOf,
@@ -179,7 +180,7 @@ function sortLevelWithUncloneableSource(): SortFactory<SquareCoord> {
       throw new RangeError('The level source cannot be copied.');
     },
   };
-  return new SortFactory(squareTopology, {
+  return new SortFactory(new SquareGeometry(), {
     size: RegionSize.of(2),
     source,
     goalsNeeded: GoalCount.of(1),
