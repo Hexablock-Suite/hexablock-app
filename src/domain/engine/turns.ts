@@ -10,4 +10,9 @@ export class Turns {
     }
     return new Turns(value === 0 ? 0 : value);
   }
+
+  // Two turn counts are equal when they hold the same value.
+  equals(other: Turns): boolean {
+    return this.value === other.value;
+  }
 }

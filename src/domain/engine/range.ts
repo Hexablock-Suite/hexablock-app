@@ -29,6 +29,17 @@ export class Range<T> {
   contains(value: T): boolean {
     return this.compare(this.min, value) <= 0 && this.compare(value, this.max) <= 0;
   }
+
+  // Two ranges are equal when each one reads the bounds of both as the same bounds.
+  // The order of the range compares the bounds, so `T` needs no `equals`.
+  // Each range asks its own order, so the answer is the same in both directions.
+  equals(other: Range<T>): boolean {
+    return this.hasBoundsOf(other) && other.hasBoundsOf(this);
+  }
+
+  private hasBoundsOf(other: Range<T>): boolean {
+    return this.compare(this.min, other.min) === 0 && this.compare(this.max, other.max) === 0;
+  }
 }
 
 // Subtraction gives NaN for two equal infinities, so this function compares.

@@ -17,4 +17,9 @@ export class GoalCount {
     }
     return new GoalCount(value);
   }
+
+  // Two goal counts are equal when they hold the same value.
+  equals(other: GoalCount): boolean {
+    return this.value === other.value;
+  }
 }

@@ -10,4 +10,9 @@ export class RegionSize {
     }
     return new RegionSize(value);
   }
+
+  // Two region sizes are equal when they hold the same value.
+  equals(other: RegionSize): boolean {
+    return this.value === other.value;
+  }
 }

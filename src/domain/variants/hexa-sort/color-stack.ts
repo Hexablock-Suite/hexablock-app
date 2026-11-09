@@ -50,4 +50,12 @@ export class ColorStack {
   withOnTop(run: readonly Color[]): ColorStack {
     return new ColorStack([...this.chips, ...run]);
   }
+
+  // Two stacks are equal when they hold equal colors in the same order, from the bottom up.
+  equals(other: ColorStack): boolean {
+    return (
+      this.chips.length === other.chips.length &&
+      this.chips.every((chip, i) => other.chips[i]?.equals(chip) === true)
+    );
+  }
 }

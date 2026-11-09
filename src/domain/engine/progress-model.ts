@@ -39,6 +39,18 @@ export class GameResult {
       values.elapsedMs,
     );
   }
+
+  // Two results are equal when every field is equal.
+  // The game id comes last, so no condition of this method depends on it (APP-NFR-08).
+  equals(other: GameResult): boolean {
+    return (
+      this.score === other.score &&
+      this.moves === other.moves &&
+      this.levelId === other.levelId &&
+      this.elapsedMs === other.elapsedMs &&
+      this.gameId.equals(other.gameId)
+    );
+  }
 }
 
 // What a progress model keeps for one game or one level. It is a value object.
@@ -68,6 +80,17 @@ export class ProgressRecord {
       throw new RangeError('A progress record needs a finite number of zero or more stars.');
     }
     return new ProgressRecord(values.gameId, values.score, values.levelId, values.stars);
+  }
+
+  // Two records are equal when every field is equal.
+  // The game id comes last, so no condition of this method depends on it (APP-NFR-08).
+  equals(other: ProgressRecord): boolean {
+    return (
+      this.score === other.score &&
+      this.levelId === other.levelId &&
+      this.stars === other.stars &&
+      this.gameId.equals(other.gameId)
+    );
   }
 }
 

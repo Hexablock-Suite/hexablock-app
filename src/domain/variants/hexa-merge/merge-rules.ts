@@ -86,7 +86,7 @@ export class MergeRules<
       cells.forEach((c, i) => {
         const cell = packed[i];
         if (cell !== undefined) content.set(board.topology.key(c), [c, cell]);
-        if (board.get(c) !== cell) changed = true;
+        if (!this.isSameCell(board.get(c), cell)) changed = true;
       });
     }
     if (!changed) return undefined;
@@ -97,6 +97,13 @@ export class MergeRules<
       merged,
       state.score,
     );
+  }
+
+  // Two cells are the same when both are empty, or when their tiles are equal.
+  // The bound has no `equals`. `canMergeWith()` is true exactly for two equal tiles (§1.4).
+  private isSameCell(left: TCell | undefined, right: TCell | undefined): boolean {
+    if (left === undefined || right === undefined) return left === right;
+    return left.canMergeWith(right);
   }
 }
 

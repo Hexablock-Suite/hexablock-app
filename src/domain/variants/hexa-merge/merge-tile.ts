@@ -14,6 +14,11 @@ export class MergeTile implements IMergeable<MergeTile> {
     return new MergeTile(value);
   }
 
+  // Two tiles are equal when they hold the same value.
+  equals(other: MergeTile): boolean {
+    return this.value === other.value;
+  }
+
   canMergeWith(other: MergeTile): boolean {
     return this.value === other.value;
   }
