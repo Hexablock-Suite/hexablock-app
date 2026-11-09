@@ -9,8 +9,9 @@ import type { Turns } from './turns';
 // A coordinate only holds its values. No engine code adds two coordinates itself.
 // Each topology declares its axes and its directions as closed unions of names,
 // for example `'q' | 'r' | 's'`. So the compiler rejects an axis that the topology lacks.
-// A cast such as `'nort' as SquareAxis` passes the compiler. So a real topology must also
-// check the axis and the direction at runtime (design for Sprint 2). The test doubles do not.
+// A cast such as `'nort' as SquareAxis` passes the compiler.
+// So each topology checks the axis in `line()` at runtime and throws a `RangeError`.
+// No method takes a direction, so a topology has no direction to check.
 export interface GridTopology<TCoord, TAxis extends string, TDirection extends string> {
   // The number of rotation steps of a full turn: 6 for a hexagon, 4 for a square.
   readonly rotationSteps: number;
