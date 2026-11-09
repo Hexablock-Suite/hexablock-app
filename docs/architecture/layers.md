@@ -48,7 +48,7 @@ flowchart TB
   end
 
   subgraph L2["Layer 2: Use cases, src/application/"]
-    UC["Generic use cases: StartGame, ApplyMove;<br/>planned: UndoMove, RedoMove, ListLevels,<br/>SaveProgress, SyncLeaderboard, Register,<br/>Login, UpdateSettings"]
+    UC["Generic use cases: StartGame, ApplyMove, UndoMove;<br/>planned: RedoMove, ListLevels,<br/>SaveProgress, SyncLeaderboard, Register,<br/>Login, UpdateSettings"]
     ASPECTS["Aspect decorators over the use cases:<br/>logging; planned: timing, retry,<br/>authorization"]
     MODELS["Request and response models,<br/>Result#lt;T, E#gt; and UseCaseError"]
     INPORTS(["UseCase#lt;TRequest, TResponse#gt;: one generic<br/>input port, each use case binds it"])
@@ -73,10 +73,10 @@ flowchart TB
       CORE["GameEngine#lt;TCell, TCoord, TMove, TState#gt;, the aggregate root,<br/>Board#lt;TCell, TCoord#gt;, Piece, GridTopology#lt;TCoord#gt;, GameId,<br/>BoardBuilder, GeometryFactory with HexGeometry, SquareGeometry<br/>and TriangleGeometry, with their coordinates and topologies"]
       CONTRACTS["Contracts that a variant implements:<br/>IGameRules#lt;TMove, TState#gt; through BaseGameRules,<br/>IScoringPolicy#lt;TState#gt;, BoardState#lt;TCell, TCoord#gt;"]
       STRATS["Strategies with engine classes:<br/>IPieceSource#lt;TPiece#gt;: SeededPieceSource, FixedListPieceSource;<br/>IProgressModel; planned: HighScoreProgress, LevelProgress"]
-      CAPS["Capability interfaces: IRandomSeeded with its engine class<br/>SeededPieceSource, IMergeable#lt;TCell#gt;; planned: IUndoable,<br/>IRedoable, ITimed with their engine classes MoveHistory,<br/>RedoableHistory, LevelTimer"]
+      CAPS["Capability interfaces: IRandomSeeded with its engine class<br/>SeededPieceSource, IMergeable#lt;TCell#gt;, IUndoable and IRedoable with<br/>MoveHistory; planned: ITimed with LevelTimer,<br/>RedoableHistory"]
       DPORTS["Clock and RandomSource interfaces"]
-      CMDSTATE["GamePhase classes; planned: MoveCommand"]
-      FACTORY["IVariantFactory: creates the rules, piece source,<br/>scoring, board and initial state; planned:<br/>progress model and history (Q8)"]
+      CMDSTATE["GamePhase classes, MoveCommand"]
+      FACTORY["IVariantFactory: creates the rules, piece source,<br/>scoring, board, initial state and history;<br/>planned: progress model (Q8)"]
       EVPORT["GameEventPublisher interface"]
     end
   end

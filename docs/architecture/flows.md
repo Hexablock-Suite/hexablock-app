@@ -58,7 +58,7 @@ Why this use case: it is the only path that builds a game. It shows the Abstract
 
 ## Use case 4: undo a move
 
-`UndoMove` (APP-FR-08) takes back the last move. The player taps undo on `GameScreen`. `GamePresenter` calls the `UseCase` port, and `UndoMove` takes the running `GameEngine` through the `RunningGameStore` port. It asks the engine for its `IUndoable` capability. When the variant has no history, the answer is `undefined` and `UndoMove` returns a failed `Result`. Otherwise `MoveHistory`, which implements `IUndoable`, undoes its last `MoveCommand`, and the command gives back its `before` state. `UndoMove` then builds the `MoveResult` as `ApplyMove` does. No HTTP call runs.
+`UndoMove` (APP-FR-08) takes back the last move. The player taps undo on `GameScreen`. `GamePresenter` calls the `UseCase` port, and `UndoMove` takes the running `GameEngine` through the `RunningGameStore` port. It asks the engine for its `IUndoable` capability. When the variant has no history, the answer is `undefined` and `UndoMove` returns a failed `Result`. Otherwise `MoveHistory`, which implements `IUndoable`, undoes its last `MoveCommand`, and the command gives its `before` state back to the engine through the private `GameEngine.restore()`. `UndoMove` then builds the `MoveResult` as `ApplyMove` does. No HTTP call runs.
 
 Why this use case: it is the only path through the Command pattern and the capabilities of §3.2. `UndoMove` never names `MoveHistory`: it asks `GameEngine.undoable()` for the capability (decision 27), so Hexa Lines needs no undo code (ISP). `MoveCommand.before` is the Memento of decision 34.
 
@@ -68,7 +68,7 @@ Why this use case: it is the only path through the Command pattern and the capab
 
 ### Sequence diagram
 
-![UndoMove sequence: GameScreen calls onUndo() on GamePresenter, which calls execute() on UndoMove; UndoMove calls current() on InMemoryRunningGameStore and undoable() on GameEngine; an alt fragment returns Result.failure(error) when undoable() is undefined, and otherwise calls undo() on MoveHistory, which calls undo() on MoveCommand, then reads snapshot(), the cells of Board, canUndo() and redoable(), and returns a Result with a MoveResult](flows/views/seq-4-undo-move.png)
+![UndoMove sequence: GameScreen calls onUndo() on GamePresenter, which calls execute() on UndoMove; UndoMove calls current() on InMemoryRunningGameStore and undoable() on GameEngine; an alt fragment returns Result.failure(error) when undoable() is undefined, and otherwise calls undo() on MoveHistory, which calls undo() on MoveCommand, which calls restore() on GameEngine, then reads snapshot(), the cells of Board, canUndo() and redoable(), and returns a Result with a MoveResult](flows/views/seq-4-undo-move.png)
 
 ## Use case 5: sign in
 
@@ -126,7 +126,7 @@ Each other use case follows the path of one flow above. Its own classes are in t
 - The composition root binds `ProgressRepository` to `ApiProgressRepository` for a signed-in player. This is an assumption for team review: the docs do not say yet when `LocalProgressRepository` runs instead.
 - The route path of `ProgressController.sync()` waits on the OpenAPI export of the endpoint.
 - Flow 3: `GamePresenter.startGame`, `GamePresenter.onStart(request: StartGameRequest)` and `StartGameRequest.levelId` are planned members. No view says yet how the level definition reaches the level builder, so the sequence diagram draws that step as a `ref` box.
-- Flow 4: `GamePresenter.undoMove` and `GamePresenter.onUndo()` are planned members. `MoveHistory.undo()` returns `void`, and decision 34 says that `undo()` gives the kept state back to the engine. No view names the member through which `GameEngine` takes that state back.
+- Flow 4: `GamePresenter.undoMove` and `GamePresenter.onUndo()` are planned members. `MoveHistory.undo()` returns `void`, and `GameEngine` takes the state back through its private `restore(memento)`: the engine gives each `MoveCommand` this method as a function (decision 34, #159). `MoveCommand.after` and `redo()` come with `RedoableHistory` (#178).
 - Flow 5: `AccountPresenter.login`, `AccountPresenter.onLogin(credentials: Credentials)`, the `client` and `mapper` attributes of `ApiAccountGateway`, `ApiDtoMapper.toCredentialsDto()`, `ApiDtoMapper.toSession()` and `ApiClient.signIn()` are planned members. No view gives `Credentials` a member. The endpoint name follows view 3.3 of the API class diagram: `AuthController.signIn(body: CredentialsDto): Promise<TokenDto>`. The answer to a rejected sign-in, a rejected `Promise` that `Login` turns into `Result.failure(error)`, is an assumption for team review.
 
 ## Render the images

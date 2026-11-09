@@ -76,8 +76,8 @@
           BaseGameRules and returns a Resolution that holds an Outcome, scoring with the
           IScoringPolicy strategy, holding a GamePhase state, notifying through the
           GameEventPublisher interface, and bounding its TState parameter by BoardState and
-          Cloneable of TState in its template box. The optional MoveHistory and the undoable() and
-          redoable() accessors are planned for Sprint 3.
+          Cloneable of TState in its template box. The optional MoveHistory gives the undoable() and
+          redoable() capabilities.
         </desc>
         <defs>
           <marker
@@ -591,15 +591,8 @@
         <text x="396" y="360" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - history: MoveHistory&lt;TMove, TState&gt;
         </text>
-        <text
-          data-requirement="APP-FR-08"
-          x="412"
-          y="376"
-          fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          [0..1] «Sprint 3»
+        <text x="412" y="376" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          [0..1]
         </text>
         <text x="396" y="400" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + start(initial: TState): void
@@ -616,25 +609,11 @@
         <text x="396" y="464" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + snapshot(): TState
         </text>
-        <text
-          data-requirement="APP-FR-08"
-          x="396"
-          y="480"
-          fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          + undoable(): IUndoable | undefined «Sprint 3»
+        <text x="396" y="480" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + undoable(): IUndoable | undefined
         </text>
-        <text
-          data-requirement="APP-FR-08"
-          x="396"
-          y="496"
-          fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          + redoable(): IRedoable | undefined «Sprint 3»
+        <text x="396" y="496" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + redoable(): IRedoable | undefined
         </text>
 
         <!-- Class: IGameRules (interface) -->
@@ -802,20 +781,8 @@
         <line x1="760" y1="452" x2="980" y2="452" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <line x1="760" y1="492" x2="980" y2="492" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          data-requirement="APP-FR-08"
           x="870"
-          y="428"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «Sprint 3»
-        </text>
-        <text
-          x="870"
-          y="445"
+          y="437"
           fill="#17212a"
           font-size="12"
           font-weight="600"
