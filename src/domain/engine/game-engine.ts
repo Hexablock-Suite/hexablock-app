@@ -8,6 +8,7 @@ import type { MoveHistory } from './move-history';
 import type { Outcome } from './outcome';
 import type { IGameRules } from './rules';
 import type { IScoringPolicy } from './scoring-policy';
+import type { ITimed } from './timed';
 import type { IRedoable, IUndoable } from './undo-capabilities';
 
 // The report of one turn: whether the rules accepted the move, and the outcome.
@@ -70,6 +71,11 @@ export class GameEngine<
   // The redo capability of the history, or `undefined`.
   redoable(): IRedoable | undefined {
     return this.history?.redoable();
+  }
+
+  // The timer of the rules, or `undefined` for a game with no timer (classes.md decision 27).
+  timed(): ITimed | undefined {
+    return this.rules.timed();
   }
 
   // One turn: receive the move, let the rules validate, apply, resolve and evaluate it

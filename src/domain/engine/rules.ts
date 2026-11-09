@@ -1,5 +1,6 @@
 import type { Outcome } from './outcome';
 import { Resolution } from './resolution';
+import type { ITimed } from './timed';
 
 // Strategy (D1): the rules of one variant. `GameEngine` depends only on this interface.
 // No member names a cell or a coordinate, so it takes two type parameters (classes.md decision 16).
@@ -11,6 +12,8 @@ export interface IGameRules<TMove, TState> {
   resolve(state: TState): Resolution<TState>;
   evaluate(state: TState): Outcome;
   playTurn(state: TState, move: TMove): Resolution<TState>;
+  // The timer of a timed game, or `undefined` (classes.md decision 27).
+  timed(): ITimed | undefined;
 }
 
 // Template Method (D13, classes.md decision 21). `playTurn()` fixes the order of the turn.
@@ -22,6 +25,11 @@ export abstract class BaseGameRules<TMove, TState> implements IGameRules<TMove, 
     // A move that `resolve()` rejects ends no game, so `evaluate()` does not run.
     if (!resolution.accepted) return resolution;
     return resolution.evaluated(this.evaluate(resolution.state));
+  }
+
+  // Plain rules have no timer. `TimedRulesDecorator` gives one around them.
+  timed(): ITimed | undefined {
+    return undefined;
   }
 
   // The end condition «no valid move» of Lines, Sort and Merge (classes.md decision 33).
