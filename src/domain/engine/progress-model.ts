@@ -3,6 +3,7 @@ import type { GameId } from './game-id';
 // The result of one finished game. It is a value object (view 4).
 // `levelId` exists only for games with levels, and `elapsedMs` only for timed games.
 // A decimal or negative move count, a score or a time that is not finite, and a negative time, throw a RangeError.
+// A blank level id throws a RangeError.
 export class GameResult {
   private constructor(
     readonly gameId: GameId,
@@ -30,6 +31,9 @@ export class GameResult {
       !(Number.isFinite(values.elapsedMs) && values.elapsedMs >= 0)
     ) {
       throw new RangeError('A game result needs a time of zero or more milliseconds.');
+    }
+    if (isBlank(values.levelId)) {
+      throw new RangeError('A game result needs a level id that is not blank.');
     }
     return new GameResult(
       values.gameId,
@@ -59,6 +63,7 @@ export class GameResult {
 // A score that is not finite throws a RangeError.
 // Stars that are not finite or are negative throw a RangeError.
 // Stars can be decimal: no requirement says that they are whole numbers.
+// A blank level id throws a RangeError.
 export class ProgressRecord {
   private constructor(
     readonly gameId: GameId,
@@ -79,6 +84,9 @@ export class ProgressRecord {
     if (values.stars !== undefined && !(Number.isFinite(values.stars) && values.stars >= 0)) {
       throw new RangeError('A progress record needs a finite number of zero or more stars.');
     }
+    if (isBlank(values.levelId)) {
+      throw new RangeError('A progress record needs a level id that is not blank.');
+    }
     return new ProgressRecord(values.gameId, values.score, values.levelId, values.stars);
   }
 
@@ -92,6 +100,11 @@ export class ProgressRecord {
       this.gameId.equals(other.gameId)
     );
   }
+}
+
+// A game with no levels has no level id, and that is valid.
+function isBlank(levelId: string | undefined): boolean {
+  return levelId !== undefined && levelId.trim() === '';
 }
 
 // Strategy (statement §3.3, §5.1): how a game turns a result into progress.

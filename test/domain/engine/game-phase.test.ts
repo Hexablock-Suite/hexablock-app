@@ -114,4 +114,15 @@ describe('GameOver event', () => {
     expect(event.outcome).toBe('game-over');
     expect(event.finalScore).toBe(42);
   });
+
+  it('should_throw_a_range_error_when_the_final_score_is_not_finite', () => {
+    const gameId = GameId.of('hexa-lines');
+
+    for (const score of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
+      expect(() => new GameOver(gameId, 'game-over', score)).toThrow(
+        new RangeError('A game over event needs a final score that is a finite number.'),
+      );
+    }
+    expect(new GameOver(gameId, 'game-over', -3).finalScore).toBe(-3);
+  });
 });
