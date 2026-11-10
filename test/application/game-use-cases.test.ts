@@ -270,7 +270,7 @@ describe('StartGame and ApplyMove', () => {
 
     const error = errorOf(await startGame.execute({}));
 
-    expect(() => factory.createInitialState()).toThrow(
+    expect(() => factory.createInitialState(MATCH_ID)).toThrow(
       new RangeError('The level source cannot be copied.'),
     );
 

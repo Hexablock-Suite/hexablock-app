@@ -1,5 +1,6 @@
 import type { Board } from '../../engine/board';
 import type { BoardState } from '../../engine/board-state';
+import type { MatchId } from '../../engine/match-id';
 import type { IPieceSource } from '../../engine/piece-source';
 import type { Piece } from '../../engine/piece';
 import { ColorStack } from './color-stack';
@@ -19,6 +20,7 @@ export interface SortView<TCoord> {
 
 // The state of one Hexa Sort game (classes.md, Hexa Sort view).
 // It is an entity inside the `GameEngine` aggregate (classes.md decisions 7 and 26).
+// Its identity is the `MatchId` of its game, and `equals()` compares only that identity.
 // It changes only through `placeOfferedStack()`, `moveRun()`, `clearStack()`,
 // `offerNext()` and `addPoints()`. The rules decide when to call them.
 // A refused input throws a RangeError and leaves the whole state as it was.
@@ -31,6 +33,7 @@ export interface SortView<TCoord> {
 // so the Sort scoring (issue #98) can read it. `placedAt` is the cell of the last move.
 export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
   private constructor(
+    private readonly matchId: MatchId,
     readonly board: Board<ColorStack, TCoord, string>,
     readonly source: IPieceSource<Piece<ColorStack, TCoord>>,
     readonly goalsNeeded: GoalCount,
@@ -43,11 +46,13 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
 
   // A new game: no goal done, no score, and the first stack of the source on offer.
   static start<TCoord>(values: {
+    matchId: MatchId;
     board: Board<ColorStack, TCoord, string>;
     source: IPieceSource<Piece<ColorStack, TCoord>>;
     goalsNeeded: GoalCount;
   }): SortState<TCoord> {
     const state = new SortState(
+      values.matchId,
       values.board,
       values.source,
       values.goalsNeeded,
@@ -135,6 +140,17 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
     });
   }
 
+  // True when this state is the state of the match `match`.
+  belongsTo(match: MatchId): boolean {
+    return this.matchId.equals(match);
+  }
+
+  // Two states are the same state when they belong to the same match.
+  // Their boards, their scores and their other values do not count.
+  equals(other: BoardState<ColorStack, TCoord>): boolean {
+    return other.belongsTo(this.matchId);
+  }
+
   // A cell inside the board with no stack, or with an empty stack, is free.
   private isFree(at: TCoord): boolean {
     return this.board.contains(at) && (this.board.get(at)?.isEmpty() ?? true);
@@ -148,6 +164,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
 
   clone(): SortState<TCoord> {
     return new SortState(
+      this.matchId,
       this.board.clone(),
       this.source.clone(),
       this.goalsNeeded,

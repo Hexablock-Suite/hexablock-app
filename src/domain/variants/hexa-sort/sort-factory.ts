@@ -2,6 +2,7 @@ import type { Board } from '../../engine/board';
 import { BoardBuilder } from '../../engine/board-builder';
 import { GameId } from '../../engine/game-id';
 import type { GeometryFactory } from '../../engine/geometry-factory';
+import type { MatchId } from '../../engine/match-id';
 import type { Piece } from '../../engine/piece';
 import type { IPieceSource } from '../../engine/piece-source';
 import type { RegionSize } from '../../engine/region-size';
@@ -56,8 +57,9 @@ export class SortFactory<TCoord> implements IVariantFactory<
     return new BoardBuilder(this.geometry).withRegion(this.level.size).build<ColorStack>();
   }
 
-  createInitialState(): SortState<TCoord> {
+  createInitialState(matchId: MatchId): SortState<TCoord> {
     return SortState.start({
+      matchId,
       board: this.createBoard(),
       source: this.createPieceSource(),
       goalsNeeded: this.level.goalsNeeded,

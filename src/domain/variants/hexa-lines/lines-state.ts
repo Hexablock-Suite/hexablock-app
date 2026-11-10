@@ -1,6 +1,7 @@
 import type { Board } from '../../engine/board';
 import type { BoardState } from '../../engine/board-state';
 import type { Color } from '../../engine/color';
+import type { MatchId } from '../../engine/match-id';
 import type { CoordKey } from '../../engine/coord-key';
 import type { Piece } from '../../engine/piece';
 import type { IPieceSource } from '../../engine/piece-source';
@@ -16,6 +17,7 @@ export interface LinesView<TCoord> {
 
 // The state of one Hexa Lines game: the board of colors, the tray and the piece source.
 // It is an entity inside the `GameEngine` aggregate (classes.md decisions 7 and 26).
+// Its identity is the `MatchId` of its game, and `equals()` compares only that identity.
 // It changes only through `placePiece()`, `clearLines()` and `addPoints()`.
 // A refused input throws a RangeError and leaves the whole state as it was.
 // The fields stay public, because the scoring, the rules and the use cases read them.
@@ -29,6 +31,7 @@ export interface LinesView<TCoord> {
 // that are whole numbers of 0 or more, and a finite score.
 export class LinesState<TCoord> implements BoardState<Color, TCoord> {
   constructor(
+    private readonly matchId: MatchId,
     readonly board: Board<Color, TCoord, string>,
     public tray: readonly Piece<Color, TCoord>[],
     readonly source: IPieceSource<Piece<Color, TCoord>>,
@@ -50,10 +53,11 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
 
   // A new game: the board and a full tray from the source.
   static start<TCoord>(
+    matchId: MatchId,
     board: Board<Color, TCoord, string>,
     source: IPieceSource<Piece<Color, TCoord>>,
   ): LinesState<TCoord> {
-    const state = new LinesState(board, [], source);
+    const state = new LinesState(matchId, board, [], source);
     state.drawTray();
     return state;
   }
@@ -109,6 +113,17 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
     this.score += points;
   }
 
+  // True when this state is the state of the match `match`.
+  belongsTo(match: MatchId): boolean {
+    return this.matchId.equals(match);
+  }
+
+  // Two states are the same state when they belong to the same match.
+  // Their boards, their scores and their other values do not count.
+  equals(other: BoardState<Color, TCoord>): boolean {
+    return other.belongsTo(this.matchId);
+  }
+
   // Pieces never change, so the view shares them. `tray` is public and mutable,
   // so the view holds a frozen copy of the list.
   view(): LinesView<TCoord> {
@@ -118,6 +133,7 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
   // Pieces never change, so the tray copy shares them.
   clone(): LinesState<TCoord> {
     return new LinesState(
+      this.matchId,
       this.board.clone(),
       [...this.tray],
       this.source.clone(),

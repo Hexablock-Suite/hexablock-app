@@ -3,7 +3,7 @@ import { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameOver } from '../../../src/domain/engine/game-events';
 import { GameFactory } from '../../../src/domain/engine/game-factory';
 import { GameId } from '../../../src/domain/engine/game-id';
-import type { MatchId } from '../../../src/domain/engine/match-id';
+import { MatchId } from '../../../src/domain/engine/match-id';
 import type { MatchIdGenerator } from '../../../src/domain/engine/match-id-generator';
 import { MoveHistory } from '../../../src/domain/engine/move-history';
 import { fakeCell } from '../../support/engine/fake-cell';
@@ -65,6 +65,23 @@ describe('GameFactory', () => {
 
     expect([first.equals(second), second.equals(first)]).toEqual([false, false]);
     expect(second.snapshot().board.cells()).toEqual([]);
+  });
+
+  it('should_give_each_game_a_first_state_of_its_own_match_when_a_game_is_created', () => {
+    const games = new GameFactory(
+      fakeGameFactory(),
+      new CountingMatchIds(),
+      new RecordingPublisher(),
+    );
+
+    const first = games.createGame().snapshot();
+    const second = games.createGame().snapshot();
+
+    expect([
+      first.belongsTo(MatchId.of('match-1')),
+      second.belongsTo(MatchId.of('match-2')),
+    ]).toEqual([true, true]);
+    expect([first.equals(second), first.belongsTo(MatchId.of('match-2'))]).toEqual([false, false]);
   });
 
   it('should_give_the_engine_and_its_game_over_event_the_id_of_the_generator_when_the_generator_is_fixed', () => {

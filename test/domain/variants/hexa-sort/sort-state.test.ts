@@ -1,5 +1,6 @@
 /** @jest-environment node */
 import type { SortState } from '../../../../src/domain/variants/hexa-sort/sort-state';
+import { MatchId } from '../../../../src/domain/engine/match-id';
 import { square, type SquareCoord } from '../../../support/engine/square-topology';
 import { names, row, sortState, stack, tiles } from '../../../support/variants/hexa-sort/sort-game';
 
@@ -171,5 +172,29 @@ describe('SortState', () => {
       new RangeError('The points of a turn must be a finite number, not NaN.'),
     );
     expect(state.score).toBe(110);
+  });
+
+  // The identity of the state is the identity of its match (classes.md decision 26).
+  it('should_be_the_same_state_when_two_states_belong_to_one_match_whatever_they_hold', () => {
+    const first = sortState({ board: row(2), offered: [stack('red')], matchId: MatchId.of('m-a') });
+    const second = sortState({ board: row(3), matchId: MatchId.of('m-a') });
+    first.placeOfferedStack(square(0, 0));
+
+    expect([first.equals(second), second.equals(first), first.equals(first.clone())]).toEqual([
+      true,
+      true,
+      true,
+    ]);
+  });
+
+  it('should_be_another_state_when_two_states_belong_to_different_matches', () => {
+    const first = sortState({ board: row(2), matchId: MatchId.of('m-a') });
+    const second = sortState({ board: row(2), matchId: MatchId.of('m-b') });
+
+    expect([first.equals(second), second.equals(first)]).toEqual([false, false]);
+    expect([first.belongsTo(MatchId.of('m-a')), first.belongsTo(MatchId.of('m-b'))]).toEqual([
+      true,
+      false,
+    ]);
   });
 });

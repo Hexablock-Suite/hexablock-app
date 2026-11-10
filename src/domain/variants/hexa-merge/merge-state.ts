@@ -1,6 +1,7 @@
 import type { Board } from '../../engine/board';
 import type { BoardState } from '../../engine/board-state';
 import type { CoordKey } from '../../engine/coord-key';
+import type { MatchId } from '../../engine/match-id';
 import type { IPieceSource } from '../../engine/piece-source';
 import type { IMergeable } from './mergeable';
 import type { NewTile } from './new-tile';
@@ -13,6 +14,7 @@ export interface MergeView {
 
 // The state of one Hexa Merge game. It narrows `board` to the board of its topology.
 // It is an entity inside the `GameEngine` aggregate (classes.md decisions 7 and 26).
+// Its identity is the `MatchId` of its game. The state after a slide keeps it.
 // It changes only through its own methods. `addNewTile()` and `addPoints()` change it in place.
 // `slide()` gives the state after the slide and leaves this state unchanged, as the Fit moves do.
 // So `targetReached` and `merged` stay read-only. The rules decide when to call each method.
@@ -33,6 +35,7 @@ export class MergeState<
   TAxis extends string,
 > implements BoardState<TCell, TCoord> {
   constructor(
+    private readonly matchId: MatchId,
     readonly board: Board<TCell, TCoord, TAxis>,
     readonly tiles: IPieceSource<NewTile<TCell>>,
     readonly targetReached = false,
@@ -70,6 +73,7 @@ export class MergeState<
     for (const [c] of this.board.cells()) board.vacate(c);
     for (const [c, cell] of plan.cells) board.occupy(c, cell);
     return new MergeState(
+      this.matchId,
       board,
       this.tiles,
       this.targetReached || plan.merged.some((tile) => tile.canMergeWith(target)),
@@ -85,12 +89,24 @@ export class MergeState<
     this.score += points;
   }
 
+  // True when this state is the state of the match `match`.
+  belongsTo(match: MatchId): boolean {
+    return this.matchId.equals(match);
+  }
+
+  // Two states are the same state when they belong to the same match.
+  // Their boards, their scores and their other values do not count.
+  equals(other: BoardState<TCell, TCoord>): boolean {
+    return other.belongsTo(this.matchId);
+  }
+
   view(): MergeView {
     return Object.freeze({ targetReached: this.targetReached });
   }
 
   clone(): MergeState<TCell, TCoord, TAxis> {
     return new MergeState(
+      this.matchId,
       this.board.clone(),
       this.tiles.clone(),
       this.targetReached,

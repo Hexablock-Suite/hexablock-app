@@ -2,6 +2,7 @@ import type { Board } from '../../engine/board';
 import { BoardBuilder } from '../../engine/board-builder';
 import { GameId } from '../../engine/game-id';
 import type { GeometryFactory } from '../../engine/geometry-factory';
+import type { MatchId } from '../../engine/match-id';
 import { MoveHistory } from '../../engine/move-history';
 import type { SeededPieceSource } from '../../engine/piece-source';
 import type { RegionSize } from '../../engine/region-size';
@@ -68,8 +69,8 @@ export class MergeFactory<TCoord> implements IVariantFactory<
   }
 
   // The first tiles come from the same source as the later tiles.
-  createInitialState(): MergeState<MergeTile, TCoord, string> {
-    const state = new MergeState(this.createBoard(), this.createPieceSource());
+  createInitialState(matchId: MatchId): MergeState<MergeTile, TCoord, string> {
+    const state = new MergeState(matchId, this.createBoard(), this.createPieceSource());
     for (let i = 0; i < START_TILES; i += 1) state.addNewTile();
     return state;
   }

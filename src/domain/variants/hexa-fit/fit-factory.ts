@@ -5,6 +5,7 @@ import type { Clock } from '../../engine/clock';
 import { GameId } from '../../engine/game-id';
 import type { GeometryFactory, TopologyId } from '../../engine/geometry-factory';
 import { LevelTimer } from '../../engine/level-timer';
+import type { MatchId } from '../../engine/match-id';
 import { MoveHistory } from '../../engine/move-history';
 import type { Piece } from '../../engine/piece';
 import { FixedListPieceSource } from '../../engine/piece-source';
@@ -73,8 +74,8 @@ export class FitFactory<TCoord> implements IVariantFactory<
     return new BoardBuilder(this.geometry).withFigure(figure).build<PieceId>();
   }
 
-  createInitialState(): FitState<TCoord> {
-    return FitState.start(this.createBoard(), this.createPieceSource());
+  createInitialState(matchId: MatchId): FitState<TCoord> {
+    return FitState.start(matchId, this.createBoard(), this.createPieceSource());
   }
 
   // Hexa Fit undoes with no limit (APP-FR-08, classes.md decision 3).

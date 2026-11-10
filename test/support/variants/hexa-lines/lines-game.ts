@@ -1,6 +1,7 @@
 import { Board } from '../../../../src/domain/engine/board';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
 import { GameId } from '../../../../src/domain/engine/game-id';
+import type { MatchId } from '../../../../src/domain/engine/match-id';
 import type { GridTopology } from '../../../../src/domain/engine/grid-topology';
 import { Piece } from '../../../../src/domain/engine/piece';
 import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
@@ -35,11 +36,17 @@ export function linesState<TCoord>(
     filled?: readonly TCoord[];
     tray: Piece<Color, TCoord>[];
     source?: readonly Piece<Color, TCoord>[];
+    matchId?: MatchId;
   },
 ): LinesState<TCoord> {
   const board = new Board<Color, TCoord, string>(topology.region(RegionSize.of(size)), topology);
   for (const c of values.filled ?? []) board.occupy(c, red);
-  return new LinesState(board, values.tray, new FixedListPieceSource(values.source ?? []));
+  return new LinesState(
+    values.matchId ?? MATCH_ID,
+    board,
+    values.tray,
+    new FixedListPieceSource(values.source ?? []),
+  );
 }
 
 // The rules tests give no points. The scoring tests pass their own policy.

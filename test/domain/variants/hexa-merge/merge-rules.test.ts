@@ -306,7 +306,7 @@ describe('Merge edge cases', () => {
         { score: () => 0 },
         new RecordingPublisher(),
       );
-      engine.start(new MergeState(board, new FixedListPieceSource<NewTile<Chip>>([])));
+      engine.start(new MergeState(MATCH_ID, board, new FixedListPieceSource<NewTile<Chip>>([])));
       return engine;
     }
     function labels(engine: ReturnType<typeof chipGame>): Record<string, string> {

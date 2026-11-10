@@ -35,6 +35,7 @@ function dominoLevel(): FitState<SquareCoord> {
   const domino = [square(0, 0), square(1, 0)];
   const piece = (id: PieceId) => new Piece(new ShapeGroup(domino.map((c) => new CellNode(c))), id);
   return FitState.start(
+    MATCH_ID,
     new Board<PieceId, SquareCoord, string>(
       squareTopology.region(RegionSize.of(2)),
       squareTopology,

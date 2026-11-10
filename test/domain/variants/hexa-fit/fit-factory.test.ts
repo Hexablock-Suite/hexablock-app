@@ -26,7 +26,7 @@ describe('FitFactory', () => {
   it('should_start_the_level_and_win_it_with_one_move_when_the_fit_factory_builds_it', () => {
     const factory = fitFactory();
 
-    const initial = factory.createInitialState();
+    const initial = factory.createInitialState(MATCH_ID);
     const { engine, publisher } = startVariant(factory);
     const outcome = engine.play(new PlaceFitPiece(A, Turns.of(0), square(0, 0)));
 
@@ -67,7 +67,7 @@ describe('FitFactory', () => {
     const message = 'A piece list cannot hold undefined.';
 
     expect(() => factory.createPieceSource()).toThrow(new RangeError(message));
-    expect(() => factory.createInitialState()).toThrow(new RangeError(message));
+    expect(() => factory.createInitialState(MATCH_ID)).toThrow(new RangeError(message));
   });
 
   it('should_throw_a_range_error_when_the_fit_figure_repeats_a_coordinate', () => {
@@ -84,7 +84,7 @@ describe('FitFactory', () => {
     const message = 'Two coordinates of the shape have the same key.';
 
     expect(() => factory.createBoard()).toThrow(new RangeError(message));
-    expect(() => factory.createInitialState()).toThrow(new RangeError(message));
+    expect(() => factory.createInitialState(MATCH_ID)).toThrow(new RangeError(message));
   });
 
   it('should_wrap_the_fit_rules_in_the_timer_when_the_fit_factory_creates_the_rules', () => {

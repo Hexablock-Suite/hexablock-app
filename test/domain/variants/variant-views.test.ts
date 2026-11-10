@@ -9,6 +9,7 @@ import { A, fitFactory } from '../../support/variants/hexa-fit/fit-game';
 import { linesState, piece } from '../../support/variants/hexa-lines/lines-game';
 import { mergeState, noNewTiles } from '../../support/variants/hexa-merge/merge-game';
 import { row, stack, stackPiece } from '../../support/variants/hexa-sort/sort-game';
+import { MATCH_ID } from '../../support/engine/match-id';
 
 // Each variant state builds its own view from values it already holds (issue 158,
 // classes.md decision 29). The view is plain data that later changes of the state do not reach.
@@ -40,6 +41,7 @@ describe('the view of each variant state', () => {
     const offered = stackPiece(stack('red'));
     const goalsNeeded = GoalCount.of(3);
     const state = SortState.start({
+      matchId: MATCH_ID,
       board: row(2),
       source: new FixedListPieceSource([offered]),
       goalsNeeded,
@@ -62,7 +64,7 @@ describe('the view of each variant state', () => {
   it('should_build_the_view_from_the_remaining_and_placed_pieces_when_a_fit_state_builds_its_view', () => {
     const factory = fitFactory();
     const rules = factory.createRules();
-    const start = factory.createInitialState();
+    const start = factory.createInitialState(MATCH_ID);
     const domino = start.piece(A);
 
     const before = start.view();
@@ -75,7 +77,7 @@ describe('the view of each variant state', () => {
 
   it('should_build_the_view_from_the_target_flag_when_a_merge_state_builds_its_view', () => {
     const notReached = mergeState([]).view();
-    const reached = new MergeState(mergeState([]).board, noNewTiles(), true).view();
+    const reached = new MergeState(MATCH_ID, mergeState([]).board, noNewTiles(), true).view();
 
     expect(notReached).toEqual({ targetReached: false });
     expect(reached).toEqual({ targetReached: true });

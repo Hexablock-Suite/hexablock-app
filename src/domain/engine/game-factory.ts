@@ -25,17 +25,19 @@ export class GameFactory<
 
   // A new game that has started. Each call asks the generator for a new id,
   // and the variant factory for new rules, a new history and a new first state.
+  // The game and its first state get the same id, so the state takes its identity from the game.
   // So two games share no id, no board and no move.
   createGame(): GameEngine<TCell, TCoord, TMove, TState> {
+    const matchId = this.ids.next();
     const game = new GameEngine<TCell, TCoord, TMove, TState>(
-      this.ids.next(),
+      matchId,
       this.variant.gameId,
       this.variant.createRules(),
       this.variant.createScoring(),
       this.events,
       this.variant.createHistory(),
     );
-    game.start(this.variant.createInitialState());
+    game.start(this.variant.createInitialState(matchId));
     return game;
   }
 }

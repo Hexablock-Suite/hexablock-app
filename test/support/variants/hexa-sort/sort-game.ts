@@ -4,6 +4,7 @@ import { Color } from '../../../../src/domain/engine/color';
 import type { CoordKey } from '../../../../src/domain/engine/coord-key';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
 import { GameId } from '../../../../src/domain/engine/game-id';
+import type { MatchId } from '../../../../src/domain/engine/match-id';
 import { Piece } from '../../../../src/domain/engine/piece';
 import {
   FixedListPieceSource,
@@ -91,8 +92,10 @@ export function sortState(values: {
   offered?: readonly ColorStack[];
   source?: IPieceSource<Piece<ColorStack, SquareCoord>>;
   goalsNeeded?: number;
+  matchId?: MatchId;
 }): SortState<SquareCoord> {
   return SortState.start({
+    matchId: values.matchId ?? MATCH_ID,
     board: values.board,
     source: values.source ?? new FixedListPieceSource((values.offered ?? []).map(stackPiece)),
     goalsNeeded: GoalCount.of(values.goalsNeeded ?? 5),

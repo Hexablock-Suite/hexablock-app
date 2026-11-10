@@ -1,5 +1,6 @@
 import type { Board } from '../../engine/board';
 import type { BoardState } from '../../engine/board-state';
+import type { MatchId } from '../../engine/match-id';
 import type { Piece } from '../../engine/piece';
 import type { IPieceSource } from '../../engine/piece-source';
 import type { PieceId } from './piece-id';
@@ -19,10 +20,12 @@ export interface FitView<TCoord> {
 // The maps use the text of the piece id as key, because a Map compares a string by value.
 // `moves` counts the accepted moves of the game for the stars (issue #60).
 // It is an entity inside the `GameEngine` aggregate (classes.md decisions 7 and 26).
+// Its identity is the `MatchId` of its game. Each new state of a move keeps it.
 // `place()`, `remove()` and `countMove()` change nothing in place: each one returns a new state.
 // `addPoints()` adds the points of a turn in place, because the engine calls it on its copy.
 export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
   private constructor(
+    private readonly matchId: MatchId,
     readonly board: Board<PieceId, TCoord, string>,
     private readonly pieces: ReadonlyMap<string, Piece<PieceId, TCoord>>,
     private readonly placements: ReadonlyMap<string, Placement<TCoord>>,
@@ -32,6 +35,7 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
 
   // Two pieces with the same id throw a RangeError, because a move names its piece by id.
   static start<TCoord>(
+    matchId: MatchId,
     figure: Board<PieceId, TCoord, string>,
     source: IPieceSource<Piece<PieceId, TCoord>>,
   ): FitState<TCoord> {
@@ -42,7 +46,7 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
       }
       pieces.set(piece.content.value, piece);
     }
-    return new FitState(figure.clone(), pieces, new Map());
+    return new FitState(matchId, figure.clone(), pieces, new Map());
   }
 
   piece(id: PieceId): Piece<PieceId, TCoord> | undefined {
@@ -72,7 +76,7 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
     const board = this.board.clone();
     for (const c of placement.cells(piece, board.topology)) board.occupy(c, id);
     const placements = new Map(this.placements).set(id.value, placement);
-    return new FitState(board, this.pieces, placements, this.moves, this.score);
+    return new FitState(this.matchId, board, this.pieces, placements, this.moves, this.score);
   }
 
   // Takes the piece off the figure: a copy of the board vacates each cell of the piece.
@@ -83,12 +87,19 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
     }
     const placements = new Map(this.placements);
     placements.delete(id.value);
-    return new FitState(board, this.pieces, placements, this.moves, this.score);
+    return new FitState(this.matchId, board, this.pieces, placements, this.moves, this.score);
   }
 
   // The same state with one more move. The rules call it once for each accepted move.
   countMove(): FitState<TCoord> {
-    return new FitState(this.board, this.pieces, this.placements, this.moves + 1, this.score);
+    return new FitState(
+      this.matchId,
+      this.board,
+      this.pieces,
+      this.placements,
+      this.moves + 1,
+      this.score,
+    );
   }
 
   // The engine adds the points of a turn in place. Points that are not finite throw a RangeError.
@@ -97,6 +108,17 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
       throw new RangeError(`The points of a turn must be a finite number, not ${points}.`);
     }
     this.score += points;
+  }
+
+  // True when this state is the state of the match `match`.
+  belongsTo(match: MatchId): boolean {
+    return this.matchId.equals(match);
+  }
+
+  // Two states are the same state when they belong to the same match.
+  // Their boards, their scores and their other values do not count.
+  equals(other: BoardState<PieceId, TCoord>): boolean {
+    return other.belongsTo(this.matchId);
   }
 
   // A piece and an id never change, so the view shares them. `remaining()` and `placed()`
@@ -111,6 +133,13 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
   // A piece never changes, so the clone shares the pieces and the placements.
   // The clone keeps the move count, so undo gives back the count before the move.
   clone(): FitState<TCoord> {
-    return new FitState(this.board.clone(), this.pieces, this.placements, this.moves, this.score);
+    return new FitState(
+      this.matchId,
+      this.board.clone(),
+      this.pieces,
+      this.placements,
+      this.moves,
+      this.score,
+    );
   }
 }

@@ -15,6 +15,7 @@ import {
   piece,
   red,
 } from '../../../support/variants/hexa-lines/lines-game';
+import { MATCH_ID } from '../../../support/engine/match-id';
 
 // The Lines factory creates the whole family of Hexa Lines (issue 99, classes.md decision 31).
 
@@ -46,7 +47,7 @@ describe('LinesFactory', () => {
   it('should_start_a_game_that_plays_one_move_when_the_lines_factory_builds_it', () => {
     const factory = linesFactory();
 
-    const initial = factory.createInitialState();
+    const initial = factory.createInitialState(MATCH_ID);
     const { engine, rules, publisher } = startVariant(factory);
     const outcome = engine.play(firstValidMove(rules, engine.snapshot()));
 
@@ -69,8 +70,8 @@ describe('LinesFactory', () => {
     expect(firstPieces(43, 12)).not.toEqual(pieces);
     // The draw picks among the shapes and the colors of the settings.
     expect(new Set(pieces).size).toBeGreaterThan(1);
-    expect(linesFactory(42).createInitialState().tray.map(describe_)).toEqual(
-      linesFactory(42).createInitialState().tray.map(describe_),
+    expect(linesFactory(42).createInitialState(MATCH_ID).tray.map(describe_)).toEqual(
+      linesFactory(42).createInitialState(MATCH_ID).tray.map(describe_),
     );
   });
 
@@ -97,7 +98,9 @@ describe('LinesFactory', () => {
       const message = `A seed must be an integer from 0 to 4294967295, not ${seed}.`;
 
       expect(() => linesFactory(seed).createPieceSource()).toThrow(new RangeError(message));
-      expect(() => linesFactory(seed).createInitialState()).toThrow(new RangeError(message));
+      expect(() => linesFactory(seed).createInitialState(MATCH_ID)).toThrow(
+        new RangeError(message),
+      );
     }
   });
 

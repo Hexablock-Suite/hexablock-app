@@ -1,6 +1,7 @@
 /** @jest-environment node */
 import { Board } from '../../../../src/domain/engine/board';
 import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
+import { MatchId } from '../../../../src/domain/engine/match-id';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import type { Color } from '../../../../src/domain/engine/color';
 import { LinesState } from '../../../../src/domain/variants/hexa-lines/lines-state';
@@ -12,6 +13,7 @@ import {
   piece,
   red,
 } from '../../../support/variants/hexa-lines/lines-game';
+import { MATCH_ID } from '../../../support/engine/match-id';
 
 // R7: the Lines state is an entity. It changes only through its business methods,
 // and a refused input leaves the whole state as it was.
@@ -74,6 +76,7 @@ describe('LinesState', () => {
 
   it('should_draw_a_full_tray_when_a_game_starts', () => {
     const state = LinesState.start(
+      MATCH_ID,
       emptyBoard(2),
       new FixedListPieceSource([one, domino, one, domino]),
     );
@@ -197,30 +200,56 @@ describe('LinesState', () => {
     const board = emptyBoard(2);
     const source = new FixedListPieceSource([one]);
 
-    expect(() => new LinesState(board, [one, one, one, one], source)).toThrow(
+    expect(() => new LinesState(MATCH_ID, board, [one, one, one, one], source)).toThrow(
       new RangeError('A Lines tray holds at most 3 pieces, not 4.'),
     );
-    expect(() => new LinesState(board, [], source, -1)).toThrow(
+    expect(() => new LinesState(MATCH_ID, board, [], source, -1)).toThrow(
       new RangeError('The streak of a Lines state must be a whole number of 0 or more, not -1.'),
     );
-    expect(() => new LinesState(board, [], source, 0, 1.5)).toThrow(
+    expect(() => new LinesState(MATCH_ID, board, [], source, 0, 1.5)).toThrow(
       new RangeError(
         'The linesCleared of a Lines state must be a whole number of 0 or more, not 1.5.',
       ),
     );
-    expect(() => new LinesState(board, [], source, 0, 0, Number.NaN)).toThrow(
+    expect(() => new LinesState(MATCH_ID, board, [], source, 0, 0, Number.NaN)).toThrow(
       new RangeError(
         'The cellsPlaced of a Lines state must be a whole number of 0 or more, not NaN.',
       ),
     );
-    expect(() => new LinesState(board, [], source, 0, 0, 0, Number.POSITIVE_INFINITY)).toThrow(
-      new RangeError('The score of a state must be a finite number, not Infinity.'),
-    );
-    expect(new LinesState(board, [one, domino], source, 2, 1, 3, 7)).toMatchObject({
+    expect(
+      () => new LinesState(MATCH_ID, board, [], source, 0, 0, 0, Number.POSITIVE_INFINITY),
+    ).toThrow(new RangeError('The score of a state must be a finite number, not Infinity.'));
+    expect(new LinesState(MATCH_ID, board, [one, domino], source, 2, 1, 3, 7)).toMatchObject({
       streak: 2,
       linesCleared: 1,
       cellsPlaced: 3,
       score: 7,
     });
+  });
+
+  // The identity of the state is the identity of its match (classes.md decision 26).
+  it('should_be_the_same_state_when_two_states_belong_to_one_match_whatever_they_hold', () => {
+    const first = linesState(squareTopology, 3, { tray: [one], matchId: MatchId.of('match-a') });
+    const second = linesState(squareTopology, 2, {
+      filled: [square(0, 0)],
+      tray: [],
+      matchId: MatchId.of('match-a'),
+    });
+    first.addPoints(9);
+
+    expect([first.equals(second), second.equals(first), first.equals(first.clone())]).toEqual([
+      true,
+      true,
+      true,
+    ]);
+    expect(first.belongsTo(MatchId.of('match-a'))).toBe(true);
+  });
+
+  it('should_be_another_state_when_two_states_belong_to_different_matches', () => {
+    const first = linesState(squareTopology, 3, { tray: [one], matchId: MatchId.of('match-a') });
+    const second = linesState(squareTopology, 3, { tray: [one], matchId: MatchId.of('match-b') });
+
+    expect([first.equals(second), second.equals(first)]).toEqual([false, false]);
+    expect(first.belongsTo(MatchId.of('match-b'))).toBe(false);
   });
 });

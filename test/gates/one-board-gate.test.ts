@@ -22,6 +22,7 @@ import { square, squareTopology, type SquareCoord } from '../support/engine/squa
 import { linesState } from '../support/variants/hexa-lines/lines-game';
 import { mergeState } from '../support/variants/hexa-merge/merge-game';
 import { repoRoot } from '../support/run-tool';
+import { MATCH_ID } from '../support/engine/match-id';
 
 // APP-NFR-01: the four variants use the engine `Board` with their own cell type,
 // and no variant has a board class of its own (issue #96).
@@ -217,7 +218,7 @@ describe('one board gate (APP-NFR-01)', () => {
       squareTopology,
     );
     const piece = new Piece(new ShapeGroup([new CellNode(square(0, 0))]), id);
-    const state = FitState.start(figure, new FixedListPieceSource([piece])).place(
+    const state = FitState.start(MATCH_ID, figure, new FixedListPieceSource([piece])).place(
       id,
       Placement.of(Turns.of(0), square(0, 0), squareTopology),
     );
@@ -235,6 +236,7 @@ describe('one board gate (APP-NFR-01)', () => {
     );
     start.occupy(square(0, 0), ColorStack.of([Color.of('red')]));
     const state = SortState.start({
+      matchId: MATCH_ID,
       board: start,
       source: new FixedListPieceSource([]),
       goalsNeeded: GoalCount.of(1),

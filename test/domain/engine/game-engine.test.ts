@@ -304,6 +304,14 @@ class BaseCloneState implements BoardState<FakeCell, SquareCoord> {
     this.score += points;
   }
 
+  belongsTo(match: MatchId): boolean {
+    return MATCH_ID.equals(match);
+  }
+
+  equals(other: BoardState<FakeCell, SquareCoord>): boolean {
+    return other.belongsTo(MATCH_ID);
+  }
+
   clone(): BoardState<FakeCell, SquareCoord> {
     return new FakeState(this.board.clone(), this.score);
   }
@@ -678,7 +686,7 @@ function matchOf(id: MatchId, size = 2) {
     new OnePointScoring(),
     publisher,
   );
-  engine.start(emptyState(size));
+  engine.start(emptyState(size, id));
   return { engine, publisher };
 }
 
@@ -710,9 +718,33 @@ describe('GameEngine identity', () => {
 
     engine.play(place(0, 0));
     engine.pause();
-    engine.start(emptyState());
+    engine.start(emptyState(2, MatchId.of('match-a')));
 
     expect(engine.equals(same)).toBe(true);
+  });
+
+  // The state takes its identity from the game, so the game refuses a state of another match.
+  it('should_throw_a_range_error_and_keep_the_game_when_the_first_state_belongs_to_another_match', () => {
+    const { engine } = matchOf(MatchId.of('match-a'));
+    engine.play(place(0, 0));
+    const before = engine.snapshot();
+
+    expect(() => engine.start(emptyState(2, MatchId.of('match-b')))).toThrow(
+      new RangeError('The first state belongs to another match.'),
+    );
+    expect(engine.snapshot().board.cells()).toEqual(before.board.cells());
+    expect(engine.snapshot().score).toBe(1);
+    expect(engine.snapshot().belongsTo(MatchId.of('match-a'))).toBe(true);
+  });
+
+  it('should_keep_the_identity_of_the_match_in_every_state_when_the_game_plays', () => {
+    const { engine } = matchOf(MatchId.of('match-a'));
+
+    engine.play(place(0, 0));
+    engine.play(place(1, 0));
+
+    expect(engine.snapshot().belongsTo(MatchId.of('match-a'))).toBe(true);
+    expect(engine.snapshot().equals(emptyState(2, MatchId.of('match-a')))).toBe(true);
   });
 
   it('should_publish_game_over_with_the_variant_id_and_the_match_id_when_the_game_ends', () => {

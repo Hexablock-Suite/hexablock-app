@@ -28,7 +28,7 @@ export function startVariant<
     publisher,
     factory.createHistory(),
   );
-  engine.start(factory.createInitialState());
+  engine.start(factory.createInitialState(MATCH_ID));
   return { engine, rules, publisher };
 }
 

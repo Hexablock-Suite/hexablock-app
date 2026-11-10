@@ -9,6 +9,7 @@ import {
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
 import { firstValidMove, startVariant } from '../../../support/engine/variant-game';
 import { mergeFactory, valueOf, values } from '../../../support/variants/hexa-merge/merge-game';
+import { MATCH_ID } from '../../../support/engine/match-id';
 
 // A Merge factory on a hexagon of `size` rings, with the target 2048.
 function sizedMergeFactory(size: number, fourChance?: number) {
@@ -26,7 +27,7 @@ describe('MergeFactory', () => {
   it('should_start_a_game_with_two_tiles_that_plays_one_slide_when_the_merge_factory_builds_it', () => {
     const factory = mergeFactory(7);
 
-    const initial = factory.createInitialState();
+    const initial = factory.createInitialState(MATCH_ID);
     const { engine, rules, publisher } = startVariant(factory);
     const slide = firstValidMove(rules, engine.snapshot());
     const outcome = engine.play(slide);
@@ -63,13 +64,15 @@ describe('MergeFactory', () => {
       const message = `A seed must be an integer from 0 to 4294967295, not ${seed}.`;
 
       expect(() => mergeFactory(seed).createPieceSource()).toThrow(new RangeError(message));
-      expect(() => mergeFactory(seed).createInitialState()).toThrow(new RangeError(message));
+      expect(() => mergeFactory(seed).createInitialState(MATCH_ID)).toThrow(
+        new RangeError(message),
+      );
     }
   });
 
   it('should_give_the_game_of_seed_zero_when_the_merge_settings_hold_a_negative_zero_seed', () => {
-    expect(values(mergeFactory(-0).createInitialState())).toEqual(
-      values(mergeFactory(0).createInitialState()),
+    expect(values(mergeFactory(-0).createInitialState(MATCH_ID))).toEqual(
+      values(mergeFactory(0).createInitialState(MATCH_ID)),
     );
   });
 
@@ -78,14 +81,14 @@ describe('MergeFactory', () => {
     const message = 'The chance of a 4 must be a number from 0 to 1, not NaN.';
 
     expect(() => factory.createPieceSource()).toThrow(new RangeError(message));
-    expect(() => factory.createInitialState()).toThrow(new RangeError(message));
+    expect(() => factory.createInitialState(MATCH_ID)).toThrow(new RangeError(message));
   });
 
   it('should_fill_every_cell_and_stop_when_the_board_has_fewer_cells_than_the_start_tiles', () => {
     // A board with no empty cell gets no new tile, so the rest of the start tiles do not appear.
     const factory = sizedMergeFactory(1);
 
-    const initial = factory.createInitialState();
+    const initial = factory.createInitialState(MATCH_ID);
 
     expect(START_TILES).toBe(2);
     expect(factory.createBoard().shape.cells).toHaveLength(1);

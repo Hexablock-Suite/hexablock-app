@@ -1,6 +1,7 @@
 import { Board } from '../../../../src/domain/engine/board';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
 import { GameId } from '../../../../src/domain/engine/game-id';
+import type { MatchId } from '../../../../src/domain/engine/match-id';
 import { HexGeometry } from '../../../../src/domain/engine/hex-geometry';
 import type { HexAxis, HexCoord } from '../../../../src/domain/engine/hex-topology';
 import {
@@ -42,13 +43,14 @@ export function mergeState(
   tiles: readonly [HexCoord, number][],
   size = 2,
   source: IPieceSource<NewTile<MergeTile>> = noNewTiles(),
+  matchId: MatchId = MATCH_ID,
 ): HexMergeState {
   const board = new Board<MergeTile, HexCoord, HexAxis>(
     hexTopology.region(RegionSize.of(size)),
     hexTopology,
   );
   for (const [at, value] of tiles) board.occupy(at, MergeTile.of(value));
-  return new MergeState(board, source);
+  return new MergeState(matchId, board, source);
 }
 
 // The number of a tile. The field is private, and a tile is worth its value in points (issue #59).

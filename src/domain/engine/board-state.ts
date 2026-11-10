@@ -1,8 +1,12 @@
 import type { Board } from './board';
 import type { Cloneable } from './cloneable';
+import type { MatchId } from './match-id';
 
 // The state of one game: its board and its score. Each variant extends it.
 // The state is an entity inside the `GameEngine` aggregate (classes.md decisions 7 and 26).
+// Its identity is the `MatchId` of its game. It never changes, and a clone keeps it.
+// `belongsTo()` tells whether the state is the state of a match.
+// `equals()` compares two states by that identity only.
 // It changes only through its own methods, which have business names.
 // The rules call them, and the engine calls `addPoints()`. No other class writes a field.
 // `score` stays readable for the scoring policies and the use cases.
@@ -19,5 +23,7 @@ export interface BoardState<TCell, TCoord> extends Cloneable<BoardState<TCell, T
   readonly board: Board<TCell, TCoord, string>;
   readonly score: number;
   addPoints(points: number): void;
+  belongsTo(match: MatchId): boolean;
+  equals(other: BoardState<TCell, TCoord>): boolean;
   view(): unknown;
 }

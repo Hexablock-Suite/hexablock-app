@@ -2,6 +2,7 @@ import { Board } from '../../../src/domain/engine/board';
 import type { BoardState } from '../../../src/domain/engine/board-state';
 import type { GameEvent, GameEventPublisher } from '../../../src/domain/engine/game-events';
 import { GameId } from '../../../src/domain/engine/game-id';
+import type { MatchId } from '../../../src/domain/engine/match-id';
 import type { Outcome } from '../../../src/domain/engine/outcome';
 import type { IPieceSource } from '../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../src/domain/engine/region-size';
@@ -10,6 +11,7 @@ import { BaseGameRules } from '../../../src/domain/engine/rules';
 import type { IScoringPolicy } from '../../../src/domain/engine/scoring-policy';
 import type { IVariantFactory } from '../../../src/domain/engine/variant-factory';
 import type { FakeCell } from './fake-cell';
+import { MATCH_ID } from './match-id';
 import { squareTopology, type SquareAxis, type SquareCoord } from './square-topology';
 
 // A fake game that exists only in test/ (APP-NFR-13). No variant uses these classes.
@@ -19,18 +21,28 @@ export interface FakeMove {
   readonly cell: FakeCell;
 }
 
+// Its identity is the `MatchId` of its game, as in a variant state. The default is `MATCH_ID`.
 export class FakeState implements BoardState<FakeCell, SquareCoord> {
   constructor(
     readonly board: Board<FakeCell, SquareCoord, SquareAxis>,
     public score = 0,
+    private readonly matchId: MatchId = MATCH_ID,
   ) {}
+
+  belongsTo(match: MatchId): boolean {
+    return this.matchId.equals(match);
+  }
+
+  equals(other: BoardState<FakeCell, SquareCoord>): boolean {
+    return other.belongsTo(this.matchId);
+  }
 
   addPoints(points: number): void {
     this.score += points;
   }
 
   clone(): FakeState {
-    return new FakeState(this.board.clone(), this.score);
+    return new FakeState(this.board.clone(), this.score, this.matchId);
   }
 
   // The count of filled cells, so a test sees the view of each state.
@@ -39,9 +51,13 @@ export class FakeState implements BoardState<FakeCell, SquareCoord> {
   }
 }
 
-// A square board of size × size empty cells.
-export function emptyState(size = 2): FakeState {
-  return new FakeState(new Board(squareTopology.region(RegionSize.of(size)), squareTopology));
+// A square board of size × size empty cells, the state of the match `matchId`.
+export function emptyState(size = 2, matchId: MatchId = MATCH_ID): FakeState {
+  return new FakeState(
+    new Board(squareTopology.region(RegionSize.of(size)), squareTopology),
+    0,
+    matchId,
+  );
 }
 
 // A state that holds a piece source, as a variant state does (classes.md decision 31).
@@ -51,14 +67,23 @@ export class SourceState implements BoardState<FakeCell, SquareCoord> {
     readonly board: Board<FakeCell, SquareCoord, SquareAxis>,
     readonly source: IPieceSource<FakeCell>,
     public score = 0,
+    private readonly matchId: MatchId = MATCH_ID,
   ) {}
+
+  belongsTo(match: MatchId): boolean {
+    return this.matchId.equals(match);
+  }
+
+  equals(other: BoardState<FakeCell, SquareCoord>): boolean {
+    return other.belongsTo(this.matchId);
+  }
 
   addPoints(points: number): void {
     this.score += points;
   }
 
   clone(): SourceState {
-    return new SourceState(this.board.clone(), this.source.clone(), this.score);
+    return new SourceState(this.board.clone(), this.source.clone(), this.score, this.matchId);
   }
 
   view(): undefined {
@@ -166,7 +191,7 @@ export function fakeGameFactory(
     createScoring: () => new OnePointScoring(),
     createPieceSource: () => undefined,
     createBoard: () => emptyState(size).board,
-    createInitialState: () => emptyState(size),
+    createInitialState: (matchId) => emptyState(size, matchId),
     createHistory: () => undefined,
   };
 }

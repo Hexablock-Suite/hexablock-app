@@ -68,7 +68,12 @@ export class GameEngine<
 
   // Starts a game from a copy of `initial`, so the caller keeps no reference to the board.
   // A new game has no move to undo.
+  // The state is an entity inside this aggregate, and its identity is the `MatchId` of the game.
+  // A state of another match throws a RangeError, and the game stays as it was.
   start(initial: TState): void {
+    if (!initial.belongsTo(this.matchId)) {
+      throw new RangeError('The first state belongs to another match.');
+    }
     this.state = copy(initial);
     this.current = PlayingPhase.instance;
     this.history?.clear();
