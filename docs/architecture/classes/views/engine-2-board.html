@@ -261,7 +261,7 @@
         <!-- Board keeps the BoardShape it receives from BoardBuilder as shape: use, because no GoF pattern needs a diamond here -->
         <line
           x1="200"
-          y1="316"
+          y1="332"
           x2="200"
           y2="396"
           stroke-width="1"
@@ -462,12 +462,12 @@
         >
           1
         </text>
-        <!-- Class: Board (focal) -->
+        <!-- Class: Board (focal, entity inside the state) -->
         <rect
           x="72"
           y="92"
           width="376"
-          height="224"
+          height="240"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -486,7 +486,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «Iterator» «Prototype»
+          «entity» «Iterator» «Prototype»
         </text>
         <text
           x="260"
@@ -509,24 +509,27 @@
           + get(at: TCoord): TCell | undefined
         </text>
         <text x="88" y="212" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + set(c: TCoord, cell: TCell): void
+          + occupy(c: TCoord, cell: TCell): void
         </text>
         <text x="88" y="228" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + cells(): [TCoord, TCell][]
+          + vacate(c: TCoord): void
         </text>
         <text x="88" y="244" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + contains(c: TCoord): boolean
+          + cells(): [TCoord, TCell][]
         </text>
         <text x="88" y="260" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + line(axis: TAxis, through: TCoord): Iterable&lt;TCoord&gt;
+          + contains(c: TCoord): boolean
         </text>
         <text x="88" y="276" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + ring(center: TCoord, radius: Radius): Iterable&lt;TCoord&gt;
+          + line(axis: TAxis, through: TCoord): Iterable&lt;TCoord&gt;
         </text>
         <text x="88" y="292" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + neighborhood(c: TCoord): Iterable&lt;TCoord&gt;
+          + ring(center: TCoord, radius: Radius): Iterable&lt;TCoord&gt;
         </text>
         <text x="88" y="308" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + neighborhood(c: TCoord): Iterable&lt;TCoord&gt;
+        </text>
+        <text x="88" y="324" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + clone(): Board&lt;TCell, TCoord, TAxis&gt;
         </text>
 
@@ -686,7 +689,7 @@
         </text>
         <text
           x="88"
-          y="546"
+          y="544"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -695,16 +698,19 @@
           + free(at: TCoord, topology: { key(c: TCoord): CoordKey }): BoardSpace&lt;TCell,
           TCoord&gt;
         </text>
-        <text x="88" y="560" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="556" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: BoardSpace&lt;TCell, TCoord&gt;): boolean
         </text>
-        <text x="88" y="574" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="568" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + occupy(cell: TCell): void
         </text>
-        <text x="88" y="588" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="580" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + vacate(): void
+        </text>
+        <text x="88" y="592" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + occupation(): [TCoord, TCell] | undefined
         </text>
-        <text x="88" y="602" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="604" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + clone(): BoardSpace&lt;TCell, TCoord&gt;
         </text>
 

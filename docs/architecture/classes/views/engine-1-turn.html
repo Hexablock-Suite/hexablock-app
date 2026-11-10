@@ -64,7 +64,7 @@
       <h1>The turn: Template Method over Strategy</h1>
 
       <svg
-        viewBox="0 0 1040 980"
+        viewBox="0 0 1040 1036"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="engine-turn-title engine-turn-desc"
@@ -77,7 +77,9 @@
           IScoringPolicy strategy, holding a GamePhase state, notifying through the
           GameEventPublisher interface, and bounding its TState parameter by BoardState and
           Cloneable of TState in its template box. The optional MoveHistory gives the undoable() and
-          redoable() capabilities.
+          redoable() capabilities. BoardState is an entity inside the GameEngine aggregate: its
+          MatchId is its identity, and it changes only through its business methods. Resolution has
+          no tactical stereotype, because it holds the state.
         </desc>
         <defs>
           <marker
@@ -138,7 +140,7 @@
           x="24"
           y="24"
           width="992"
-          height="744"
+          height="800"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -276,7 +278,7 @@
           x="380"
           y="568"
           width="280"
-          height="172"
+          height="228"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -367,7 +369,7 @@
         />
         <!-- Resolution keeps its Outcome as outcome: use with role and multiplicity -->
         <path
-          d="M210,688 V748 H870 V652"
+          d="M210,688 V808 H870 V652"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -815,12 +817,12 @@
           MoveCommand&lt;TMove, TState&gt;): void
         </text>
 
-        <!-- Class: BoardState (interface) -->
+        <!-- Class: BoardState (interface, entity) -->
         <rect
           x="396"
           y="596"
           width="248"
-          height="128"
+          height="192"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -837,7 +839,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface»
+          «interface» «entity»
         </text>
         <text
           x="520"
@@ -854,12 +856,24 @@
           + board: Board&lt;TCell, TCoord, string&gt;
         </text>
         <text x="412" y="676" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + score: number
+          + score: number {readOnly}
         </text>
         <text x="412" y="700" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + clone(): BoardState&lt;TCell, TCoord&gt;
+          + addPoints(points: number): void
         </text>
         <text x="412" y="716" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + belongsTo(match: MatchId): boolean
+        </text>
+        <text x="412" y="732" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: BoardState&lt;TCell,
+        </text>
+        <text x="420" y="748" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          TCoord&gt;): boolean
+        </text>
+        <text x="412" y="764" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + clone(): BoardState&lt;TCell, TCoord&gt;
+        </text>
+        <text x="412" y="780" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + view(): unknown
         </text>
 
@@ -877,7 +891,7 @@
           1
         </text>
 
-        <!-- Class: Resolution (value object) -->
+        <!-- Class: Resolution (no tactical stereotype: it holds the state, an entity) -->
         <rect
           x="52"
           y="528"
@@ -890,17 +904,6 @@
         />
         <line x1="52" y1="576" x2="368" y2="576" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <line x1="52" y1="632" x2="368" y2="632" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text
-          x="210"
-          y="546"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «value object»
-        </text>
         <text
           x="210"
           y="564"
@@ -1139,7 +1142,7 @@
         </text>
 
         <!-- The footnote and the legend sit below the zone, which grew by 32. -->
-        <g transform="translate(0 32)">
+        <g transform="translate(0 88)">
           <!-- Footnote -->
           <text
             x="24"

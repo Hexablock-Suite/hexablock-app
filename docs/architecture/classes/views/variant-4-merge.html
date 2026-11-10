@@ -64,7 +64,7 @@
       <h1>Hexa Merge: the bounded generic of §3.1</h1>
 
       <svg
-        viewBox="0 0 1040 916"
+        viewBox="0 0 1040 1000"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="merge-title merge-desc"
@@ -75,7 +75,9 @@
           parameter by the engine interface IMergeable, MergeTile implementing IMergeable with T
           bound to MergeTile, MergeRules typed by MergeState and Slide, and MergeFactory binding
           TCell to MergeTile on MergeRules and creating MergeScoring, each variant class marked with
-          the engine interface it implements and its binding.
+          the engine interface it implements and its binding. MergeState is an entity inside the
+          GameEngine aggregate: its MatchId is its identity, and it changes only through its
+          business methods.
         </desc>
         <defs>
           <marker
@@ -136,7 +138,7 @@
           x="24"
           y="24"
           width="992"
-          height="724"
+          height="808"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -368,7 +370,7 @@
           MergeRules
         </text>
         <text x="360" y="336" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - spawn: IPieceSource&lt;Piece&lt;TCell, TCoord&gt;&gt;
+          - target: TCell
         </text>
         <text x="360" y="352" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           slide to the edge, merge on collision
@@ -412,21 +414,33 @@
           sum of the merged values
         </text>
 
-        <!-- Class: MergeState -->
+        <!-- Class: MergeState (entity) -->
         <rect
           x="384"
           y="448"
-          width="200"
-          height="80"
+          width="216"
+          height="344"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="384" y1="488" x2="584" y2="488" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="384" y1="496" x2="600" y2="496" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="384" y1="602" x2="600" y2="602" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="484"
-          y="473"
+          x="492"
+          y="466"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «entity»
+        </text>
+        <text
+          x="492"
+          y="484"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -435,11 +449,65 @@
         >
           MergeState
         </text>
-        <text x="400" y="504" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + board: Board&lt;TCell, TCoord&gt;
+        <text x="400" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - matchId: MatchId
         </text>
-        <text x="400" y="520" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="400" y="526" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + board: Board&lt;TCell, TCoord, TAxis&gt;
+        </text>
+        <text x="400" y="540" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + tiles:
+        </text>
+        <text x="408" y="554" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          IPieceSource&lt;NewTile&lt;TCell&gt;&gt;
+        </text>
+        <text x="400" y="568" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + targetReached: boolean
+        </text>
+        <text x="400" y="582" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + merged: TCell[]
+        </text>
+        <text x="400" y="596" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + score: number
+        </text>
+        <text x="400" y="618" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + addNewTile(): void
+        </text>
+        <text x="400" y="632" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + canSlide(slide: Slide&lt;TAxis&gt;):
+        </text>
+        <text x="408" y="646" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          boolean
+        </text>
+        <text x="400" y="660" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + slide(slide: Slide&lt;TAxis&gt;, target:
+        </text>
+        <text x="408" y="674" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          TCell): MergeState&lt;TCell, TCoord,
+        </text>
+        <text x="408" y="688" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          TAxis&gt;
+        </text>
+        <text x="400" y="702" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + addPoints(points: number): void
+        </text>
+        <text x="400" y="716" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + belongsTo(match: MatchId): boolean
+        </text>
+        <text x="400" y="730" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: BoardState&lt;TCell,
+        </text>
+        <text x="408" y="744" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          TCoord&gt;): boolean
+        </text>
+        <text x="400" y="758" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + view(): MergeView
+        </text>
+        <text x="400" y="772" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + clone(): MergeState&lt;TCell, TCoord,
+        </text>
+        <text x="408" y="786" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          TAxis&gt;
         </text>
 
         <!-- Class: Slide (value object) -->
@@ -604,9 +672,9 @@
           TCoord, TCell extends IMergeable‹TCell›
         </text>
         <rect
-          x="512"
+          x="352"
           y="438"
-          width="84"
+          width="260"
           height="18"
           rx="2"
           fill="#ffffff"
@@ -615,14 +683,14 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="554"
+          x="482"
           y="450"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TCell, TCoord
+          TCoord, TAxis, TCell extends IMergeable‹TCell›
         </text>
         <rect
           x="292"
@@ -669,9 +737,9 @@
         <text x="675" y="368" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           IScoringPolicy‹MergeState‹MergeTile››
         </text>
-        <line x1="400" y1="528" x2="400" y2="544" stroke="#17212a" stroke-width="1" />
-        <circle cx="400" cy="549" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="411" y="552" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="400" y1="792" x2="400" y2="808" stroke="#17212a" stroke-width="1" />
+        <circle cx="400" cy="813" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="411" y="816" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           BoardState‹TCell, TCoord›
         </text>
 
@@ -699,7 +767,7 @@
         <!-- Footnote: classes the budget leaves out -->
         <text
           x="24"
-          y="772"
+          y="856"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -709,7 +777,7 @@
         </text>
         <text
           x="24"
-          y="788"
+          y="872"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -720,7 +788,7 @@
 
         <text
           x="24"
-          y="804"
+          y="888"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -729,10 +797,10 @@
           geometry (decision 16), and each class that names it declares it.
         </text>
         <!-- Legend -->
-        <line x1="24" y1="828" x2="1016" y2="828" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <line x1="24" y1="912" x2="1016" y2="912" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="846"
+          y="930"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -743,9 +811,9 @@
 
         <line
           x1="24"
-          y1="864"
+          y1="948"
           x2="52"
-          y2="864"
+          y2="948"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -753,7 +821,7 @@
         />
         <text
           x="60"
-          y="868"
+          y="952"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -762,16 +830,16 @@
         </text>
         <line
           x1="144"
-          y1="864"
+          y1="948"
           x2="172"
-          y2="864"
+          y2="948"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#merge-open)"
         />
         <text
           x="180"
-          y="868"
+          y="952"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -780,7 +848,7 @@
         </text>
         <rect
           x="24"
-          y="884"
+          y="968"
           width="28"
           height="12"
           rx="2"
@@ -790,7 +858,7 @@
         />
         <text
           x="60"
-          y="893"
+          y="977"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -799,7 +867,7 @@
         </text>
         <rect
           x="184"
-          y="884"
+          y="968"
           width="28"
           height="12"
           rx="2"
@@ -810,7 +878,7 @@
         />
         <text
           x="220"
-          y="893"
+          y="977"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -819,7 +887,7 @@
         </text>
         <rect
           x="424"
-          y="884"
+          y="968"
           width="28"
           height="12"
           rx="2"
@@ -830,7 +898,7 @@
         />
         <text
           x="460"
-          y="893"
+          y="977"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -839,7 +907,7 @@
         </text>
         <rect
           x="600"
-          y="884"
+          y="968"
           width="28"
           height="12"
           rx="2"
@@ -849,18 +917,18 @@
         />
         <text
           x="636"
-          y="893"
+          y="977"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
         </text>
-        <line x1="760" y1="890" x2="776" y2="890" stroke="#17212a" stroke-width="1" />
-        <circle cx="781" cy="890" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="760" y1="974" x2="776" y2="974" stroke="#17212a" stroke-width="1" />
+        <circle cx="781" cy="974" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="796"
-          y="893"
+          y="977"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

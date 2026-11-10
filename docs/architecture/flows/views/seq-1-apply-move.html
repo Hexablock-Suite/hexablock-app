@@ -63,7 +63,7 @@
       <p class="eyebrow">Use case flow · ApplyMove · sequence diagram</p>
       <h1>ApplyMove step by step: one move from the screen to the engine and back</h1>
       <svg
-        viewBox="0 0 1240 1212"
+        viewBox="0 0 1240 1244"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="seqmove-title seqmove-desc"
@@ -1412,18 +1412,38 @@
           move, ApplyMove returns Result.failure(error), and onMove() puts its message in
           GameViewModel.error (decision 28). No HTTP call runs.
         </text>
+        <text
+          x="24"
+          y="1116"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Inside tryPlay(), the rules change a copy of the state only through the methods of the
+          state, and the engine adds the points
+        </text>
+        <text
+          x="24"
+          y="1132"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          of the turn with addPoints(). The state is an entity of the GameEngine aggregate, and its
+          MatchId is its identity (decisions 7 and 26).
+        </text>
         <!-- Legend -->
         <line
           x1="24"
-          y1="1132"
+          y1="1164"
           x2="1216"
-          y2="1132"
+          y2="1164"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1150"
+          y="1182"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1433,16 +1453,16 @@
         </text>
         <line
           x1="24"
-          y1="1168"
+          y1="1200"
           x2="52"
-          y2="1168"
+          y2="1200"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqmove-call)"
         />
         <text
           x="60"
-          y="1171"
+          y="1203"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1451,9 +1471,9 @@
         </text>
         <line
           x1="224"
-          y1="1168"
+          y1="1200"
           x2="252"
-          y2="1168"
+          y2="1200"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
@@ -1461,7 +1481,7 @@
         />
         <text
           x="260"
-          y="1171"
+          y="1203"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1470,16 +1490,16 @@
         </text>
         <line
           x1="418"
-          y1="1161"
+          y1="1193"
           x2="418"
-          y2="1175"
+          y2="1207"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
         />
         <rect
           x="414"
-          y="1164"
+          y="1196"
           width="8"
           height="8"
           fill="#ffffff"
@@ -1488,7 +1508,7 @@
         />
         <text
           x="440"
-          y="1171"
+          y="1203"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1497,7 +1517,7 @@
         </text>
         <rect
           x="604"
-          y="1162"
+          y="1194"
           width="28"
           height="12"
           rx="1"
@@ -1507,7 +1527,7 @@
         />
         <text
           x="640"
-          y="1171"
+          y="1203"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1516,7 +1536,7 @@
         </text>
         <rect
           x="24"
-          y="1184"
+          y="1216"
           width="28"
           height="12"
           rx="2"
@@ -1526,7 +1546,7 @@
         />
         <text
           x="60"
-          y="1193"
+          y="1225"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1535,7 +1555,7 @@
         </text>
         <rect
           x="224"
-          y="1184"
+          y="1216"
           width="28"
           height="12"
           rx="2"
@@ -1545,7 +1565,7 @@
         />
         <text
           x="260"
-          y="1193"
+          y="1225"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1554,7 +1574,7 @@
         </text>
         <rect
           x="404"
-          y="1184"
+          y="1216"
           width="28"
           height="12"
           rx="2"
@@ -1564,7 +1584,7 @@
         />
         <text
           x="440"
-          y="1193"
+          y="1225"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1573,7 +1593,7 @@
         </text>
         <rect
           x="604"
-          y="1184"
+          y="1216"
           width="28"
           height="12"
           rx="2"
@@ -1583,7 +1603,7 @@
         />
         <text
           x="640"
-          y="1193"
+          y="1225"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

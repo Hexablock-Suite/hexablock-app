@@ -11,7 +11,7 @@ The layers themselves are in [layers.md](layers.md). The full class diagram is i
 
 ## Use case 1: apply a move
 
-`ApplyMove` (APP-FR-03) plays one move. The player taps a cell on `GameScreen`. `GamePresenter` calls the `UseCase` port, and `ApplyMove` takes the running `GameEngine` through the `RunningGameStore` port. The engine plays the turn with its `IGameRules` strategy. `ApplyMove` copies the cells of `Board` and the `payload` of `BoardState.view()` into a plain `MoveResult`, and the presenter maps each cell and the payload with its `StateMapper` into `GameViewModel`. No HTTP call runs.
+`ApplyMove` (APP-FR-03) plays one move. The player taps a cell on `GameScreen`. `GamePresenter` calls the `UseCase` port, and `ApplyMove` takes the running `GameEngine` through the `RunningGameStore` port. The engine plays the turn with its `IGameRules` strategy: the rules change a copy of the state only through the business methods of the state, and the engine adds the points of the turn with `BoardState.addPoints()` (decision 7 of [classes.md](classes.md)). `ApplyMove` copies the cells of `Board` and the `payload` of `BoardState.view()` into a plain `MoveResult`, and the presenter maps each cell and the payload with its `StateMapper` into `GameViewModel`. No HTTP call runs.
 
 View 3.2 of [classes.md](classes.md) shows `ApplyMove` with layers 2 and 1 only, and view 4.1 shows the presenter without the use case. So this view joins both slices and does not repeat either view.
 
@@ -44,17 +44,19 @@ The same endpoint is use case 1 of the API flows, in `hexablock-api/docs/archite
 
 ## Use case 3: start a game
 
-`StartGame` (APP-FR-01, APP-FR-03) opens a new game of the chosen variant. The player opens a game on `GameScreen`. `GamePresenter` calls the `UseCase` port, and `StartGame` asks its `IVariantFactory` for the rules, the scoring, the history and the first state. For an endless game, `LinesFactory` builds the board with `BoardBuilder`, and `BoardBuilder` asks its `GeometryFactory` for the topology. For a level game, a level builder asks `BoardBuilder` for the board. `StartGame` creates `GameEngine`, starts it, keeps it in `RunningGameStore` and returns a `MoveResult`. No HTTP call runs.
+`StartGame` (APP-FR-01, APP-FR-03) opens a new game of the chosen variant. The player opens a game on `GameScreen`. `GamePresenter` calls the `UseCase` port, and `StartGame` asks its `GameFactory` for the started game (decision 40 of [classes.md](classes.md)). `GameFactory` asks its `MatchIdGenerator` for a new `MatchId`, and its `IVariantFactory` for the rules, the scoring, the history and the first state. It gives the same `MatchId` to `createInitialState(matchId)` and to the new `GameEngine`, so the state takes its identity from the game (decision 26). For an endless game, `LinesFactory` builds the board with `BoardBuilder`, and `BoardBuilder` asks its `GeometryFactory` for the topology. For a level game, a level builder asks `BoardBuilder` for the board. `GameFactory` creates `GameEngine` and starts it. `StartGame` keeps it in `RunningGameStore` and returns a `MoveResult`. No HTTP call runs.
 
 Why this use case: it is the only path that builds a game. It shows the Abstract Factory of the variant, the Builder of the board and the geometry family in one call. So it shows why no class exists per game and figure (D11): the variant comes from the factory that the composition root injects, and the figure comes from the `GeometryFactory` that the factory and the builder keep.
 
 ### Class view
 
-![StartGame class view: GameScreen in layer 4; GamePresenter and InMemoryRunningGameStore in layer 3; UseCase, StartGame, StartGameRequest, MoveResult and the RunningGameStore port in layer 2; IVariantFactory, LinesFactory, BoardBuilder, GeometryFactory, GameEngine and Board in layer 1](classes/views/flow-3-start-game.png)
+![StartGame class view: GameScreen in layer 4; GamePresenter and InMemoryRunningGameStore in layer 3; UseCase, StartGame, StartGameRequest, MoveResult and the RunningGameStore port in layer 2; GameFactory, IVariantFactory, LinesFactory, BoardBuilder, GeometryFactory, GameEngine and Board in layer 1](classes/views/flow-3-start-game.png)
 
 ### Sequence diagram
 
 ![StartGame sequence: GameScreen calls onStart() on GamePresenter, which calls execute() on StartGame; StartGame calls createRules(), createScoring(), createHistory() and createInitialState() on IVariantFactory; an alt fragment shows BoardBuilder with GeometryFactory for an endless game and a ref to the level builder for a level game; StartGame creates and starts GameEngine, calls replace() on InMemoryRunningGameStore, reads the snapshot and the cells of Board, and returns a Result with a MoveResult](flows/views/seq-3-start-game.png)
+
+The sequence view still draws `StartGame` as it was before `GameFactory`: there, `StartGame` calls `IVariantFactory` and creates `GameEngine` itself. The text above and the class view give the current flow. The sequence view is redrawn apart.
 
 ## Use case 4: undo a move
 

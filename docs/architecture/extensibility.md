@@ -79,6 +79,8 @@ Each row is one extension point. Each cell names the class or the type argument 
 | `StateMapper` (layer 3)              | `LinesStateMapper`                         | `FitStateMapper`                                               | `SortStateMapper`                                   | `MergeStateMapper`                     | `FillStateMapper`                      |
 | `CellRenderer` (layer 4, Q8)         | `LinesCellRenderer`                        | `FitCellRenderer`                                              | `SortCellRenderer`                                  | `MergeCellRenderer`                    | `FillCellRenderer`                     |
 
+The `TState` of a variant implements `BoardState`: it is an entity with the `MatchId` of its game, and it changes only through its own business methods, so `FillState` would bring its own methods and its rules would call them (decisions 7 and 26 of [classes.md](classes.md)). `createInitialState(matchId)` gives the first state that identity.
+
 The capability classes `MoveHistory`, `RedoableHistory`, `LevelTimer` and `SeededPieceSource` live in the engine. A variant does not write them: its factory picks them (decision 3), and `GameEngine.undoable()`, `redoable()` and `timed()` give them to the use cases (decision 27). `HighScoreProgress` and `LevelProgress` live in the engine too.
 
 ## Render the images
