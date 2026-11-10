@@ -10,15 +10,14 @@ describe('ShapeGroup', () => {
 
     expect(group.area()).toBe(2);
     expect(group.cells()).toEqual([0, 1]);
-    expect(group.children).toHaveLength(2);
   });
 
-  it('should_throw_and_keep_the_area_when_a_caller_pushes_into_the_children_property', () => {
+  it('should_keep_its_cells_when_a_caller_changes_the_list_that_cells_returns', () => {
     const group = new ShapeGroup<number>([new CellNode(0), new CellNode(1)]);
-    // `readonly` holds only at compile time, so the cast stands for a caller that ignores it.
-    const children = group.children as ShapeNode<number>[];
 
-    expect(() => children.push(new CellNode(2))).toThrow(TypeError);
+    group.cells().push(2);
+
+    expect(group.cells()).toEqual([0, 1]);
     expect(group.area()).toBe(2);
   });
 });

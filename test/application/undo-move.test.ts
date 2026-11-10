@@ -67,7 +67,7 @@ function drawsOf(source: IPieceSource<NewTile<MergeTile>>): [number, number][] {
   const copy = source.clone();
   return Array.from({ length: 8 }, () => {
     const draw = copy.next();
-    return [draw.place, draw.tile.value];
+    return [draw.place, draw.tile.points()];
   });
 }
 

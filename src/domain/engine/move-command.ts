@@ -4,7 +4,7 @@
 // So `undo()` returns nothing, and the engine needs no public member that replaces its state.
 export class MoveCommand<TMove, TState> {
   constructor(
-    readonly move: TMove,
+    private readonly move: TMove,
     private readonly before: TState,
     private readonly restore: (memento: TState) => void,
   ) {}

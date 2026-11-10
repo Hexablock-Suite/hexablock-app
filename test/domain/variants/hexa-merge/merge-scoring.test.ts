@@ -4,7 +4,12 @@ import { MergeScoring } from '../../../../src/domain/variants/hexa-merge/merge-s
 import { mergeTileSource } from '../../../../src/domain/variants/hexa-merge/merge-tile-source';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
 import { Slide } from '../../../../src/domain/variants/hexa-merge/slide';
-import { mergeGame, mergeState, values } from '../../../support/variants/hexa-merge/merge-game';
+import {
+  mergeGame,
+  mergeState,
+  valueOf,
+  values,
+} from '../../../support/variants/hexa-merge/merge-game';
 
 // The scoring of Hexa Merge (issue 97, APP-FR-06, statement §1.4).
 // It codes the accepted rule of issue #59 (D22): a slide scores the sum of the values that its merges make,
@@ -39,14 +44,14 @@ describe('Hexa Merge scoring', () => {
   it('should_score_the_value_of_the_merged_tile_when_two_equal_tiles_merge', () => {
     const state = slideRow([2, 2]);
 
-    expect(state.merged.map((tile) => tile.value)).toEqual([4]);
+    expect(state.merged.map(valueOf)).toEqual([4]);
     expect(state.score).toBe(4);
   });
 
   it('should_score_the_sum_of_the_merged_values_when_one_slide_makes_two_merges', () => {
     const state = slideRow([2, 2, 4, 4]);
 
-    expect(state.merged.map((tile) => tile.value).sort()).toEqual([4, 8]);
+    expect(state.merged.map(valueOf).sort()).toEqual([4, 8]);
     expect(state.score).toBe(12);
   });
 
@@ -54,7 +59,7 @@ describe('Hexa Merge scoring', () => {
     // A tile merges at most once per move, so 2 2 2 2 gives two tiles of 4, not one 8.
     const state = slideRow([2, 2, 2, 2]);
 
-    expect(state.merged.map((tile) => tile.value)).toEqual([4, 4]);
+    expect(state.merged.map(valueOf)).toEqual([4, 4]);
     expect(state.score).toBe(8);
   });
 

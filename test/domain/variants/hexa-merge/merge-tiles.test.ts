@@ -125,7 +125,7 @@ describe('Merge new tiles', () => {
     // The default chance is 0.1: about one tile in ten is a 4.
     const source = mergeTileSource(2026);
     let fours = 0;
-    for (let i = 0; i < 1000; i += 1) if (source.next().tile.value === 4) fours += 1;
+    for (let i = 0; i < 1000; i += 1) if (source.next().tile.equals(MergeTile.of(4))) fours += 1;
     expect(DEFAULT_FOUR_CHANCE).toBe(0.1);
     expect(fours).toBeGreaterThan(70);
     expect(fours).toBeLessThan(130);

@@ -30,7 +30,7 @@ describe('SortFactory', () => {
     expect(factory.gameId.equals(GameId.of('hexa-sort'))).toBe(true);
     expect(factory.createBoard().shape.cells).toHaveLength(4);
     expect(names(initial.offered?.content)).toEqual(['red', 'red']);
-    expect(initial.goalsNeeded.value).toBe(5);
+    expect(initial.goalsNeeded.equals(GoalCount.of(5))).toBe(true);
     expect(outcome).toBe('playing');
     expect(chipsAt(engine, 0, 0)).toEqual(['red', 'red']);
     expect(names(engine.snapshot().offered?.content)).toEqual(['blue']);

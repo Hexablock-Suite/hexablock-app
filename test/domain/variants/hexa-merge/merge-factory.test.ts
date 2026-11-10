@@ -8,7 +8,7 @@ import {
 } from '../../../../src/domain/variants/hexa-merge/merge-factory';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
 import { firstValidMove, startVariant } from '../../../support/engine/variant-game';
-import { mergeFactory, values } from '../../../support/variants/hexa-merge/merge-game';
+import { mergeFactory, valueOf, values } from '../../../support/variants/hexa-merge/merge-game';
 
 // A Merge factory on a hexagon of `size` rings, with the target 2048.
 function sizedMergeFactory(size: number, fourChance?: number) {
@@ -39,7 +39,7 @@ describe('MergeFactory', () => {
     expect(outcome).toBe('playing');
     expect(values(after)).not.toEqual(values(initial));
     // The score is the sum of the merged values: the factory picks the Merge scoring.
-    expect(after.score).toBe(after.merged.reduce((sum, tile) => sum + tile.value, 0));
+    expect(after.score).toBe(after.merged.reduce((sum, tile) => sum + valueOf(tile), 0));
     expect(after.tiles.hasNext()).toBe(true);
     expect(publisher.events).toEqual([]);
   });

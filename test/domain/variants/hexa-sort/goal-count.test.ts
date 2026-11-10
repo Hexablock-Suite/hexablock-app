@@ -6,9 +6,17 @@ import { GoalCount } from '../../../../src/domain/variants/hexa-sort/goal-count'
 
 describe('GoalCount', () => {
   it('should_keep_the_value_when_the_goal_is_a_whole_number_of_one_or_more', () => {
-    expect(GoalCount.of(1).value).toBe(1);
-    expect(GoalCount.of(5).value).toBe(5);
-    expect(GoalCount.of(Number.MAX_SAFE_INTEGER).value).toBe(Number.MAX_SAFE_INTEGER);
+    // The goal shows its value through its operations: the field is private.
+    const reachedAt = (goal: number) => [
+      GoalCount.of(goal).isReachedBy(goal - 1),
+      GoalCount.of(goal).isReachedBy(goal),
+    ];
+
+    expect(reachedAt(1)).toEqual([false, true]);
+    expect(reachedAt(5)).toEqual([false, true]);
+    expect(reachedAt(Number.MAX_SAFE_INTEGER)).toEqual([false, true]);
+    expect(GoalCount.of(5).equals(GoalCount.of(5))).toBe(true);
+    expect(GoalCount.of(5).equals(GoalCount.of(6))).toBe(false);
   });
 
   it('should_throw_a_range_error_when_the_goal_is_below_one_or_not_a_safe_integer', () => {

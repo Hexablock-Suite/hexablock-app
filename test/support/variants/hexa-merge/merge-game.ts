@@ -50,12 +50,17 @@ export function mergeState(
   return new MergeState(board, source);
 }
 
+// The number of a tile. The field is private, and a tile is worth its value in points (issue #59).
+export function valueOf(tile: MergeTile): number {
+  return tile.points();
+}
+
 // The value of each filled cell, by the topology key of its coordinate.
 export function values<TAxis extends string>(
   state: MergeState<MergeTile, HexCoord, TAxis>,
 ): Record<string, number> {
   const out: Record<string, number> = {};
-  for (const [at, tile] of state.board.cells()) out[hexTopology.key(at)] = tile.value;
+  for (const [at, tile] of state.board.cells()) out[hexTopology.key(at)] = valueOf(tile);
   return out;
 }
 

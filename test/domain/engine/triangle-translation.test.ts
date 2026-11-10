@@ -147,7 +147,6 @@ describe('Nested shape groups and negative moves on the triangle topology double
         .cells()
         .map((c) => triangleTopology.translate(c, oddOffset)),
     );
-    expect(moved.children[0]).toBeInstanceOf(ShapeGroup);
     expect(moved.area()).toBe(3);
   });
 
@@ -159,7 +158,6 @@ describe('Nested shape groups and negative moves on the triangle topology double
         .cells()
         .map((c) => triangleTopology.rotate(c, Turns.of(1))),
     );
-    expect(turned.children[0]).toBeInstanceOf(ShapeGroup);
     expect(turned.area()).toBe(3);
   });
 

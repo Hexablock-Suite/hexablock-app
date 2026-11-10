@@ -2,6 +2,8 @@
 import { BoardShape } from '../../src/domain/engine/board-shape';
 import { Color } from '../../src/domain/engine/color';
 import { GameId } from '../../src/domain/engine/game-id';
+import { MoveCommand } from '../../src/domain/engine/move-command';
+import { MoveHistory } from '../../src/domain/engine/move-history';
 import { Piece } from '../../src/domain/engine/piece';
 import { GameResult, ProgressRecord } from '../../src/domain/engine/progress-model';
 import { Radius } from '../../src/domain/engine/radius';
@@ -219,5 +221,28 @@ describe('private fields of the value objects', () => {
     ];
 
     expect(readers).toHaveLength(7);
+  });
+
+  // Unit R17 of the redesign: six more fields that no production code reads.
+  it('should_reject_at_compile_time_when_a_caller_reads_a_field_of_the_second_batch', () => {
+    const leaf = new CellNode(square(0, 0));
+    const group = new ShapeGroup([leaf]);
+    const command = new MoveCommand('the move', 'the state before', () => undefined);
+    const readers = [
+      // @ts-expect-error `MergeTile.value` is private.
+      () => MergeTile.of(2).value,
+      // @ts-expect-error `GoalCount.value` is private.
+      () => GoalCount.of(1).value,
+      // @ts-expect-error `CellNode.at` is private.
+      () => leaf.at,
+      // @ts-expect-error `ShapeGroup.children` is private.
+      () => group.children,
+      // @ts-expect-error `MoveCommand.move` is private.
+      () => command.move,
+      // @ts-expect-error `MoveHistory.limit` is private.
+      () => new MoveHistory<string, string>(1).limit,
+    ];
+
+    expect(readers).toHaveLength(6);
   });
 });

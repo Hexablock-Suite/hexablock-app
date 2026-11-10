@@ -9,7 +9,7 @@ const GOAL_COUNTS = Range.ofNumbers(1, Number.MAX_SAFE_INTEGER);
 // A goal of 0 wins before the first move, and NaN never wins, so `of()` rejects both.
 // Any number that is not a safe integer of 1 or more throws a RangeError.
 export class GoalCount {
-  private constructor(readonly value: number) {}
+  private constructor(private readonly value: number) {}
 
   static of(value: number): GoalCount {
     if (!Number.isSafeInteger(value) || !GOAL_COUNTS.contains(value)) {

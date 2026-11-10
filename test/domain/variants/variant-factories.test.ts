@@ -28,7 +28,7 @@ import { SortFactory } from '../../../src/domain/variants/hexa-sort/sort-factory
 import { ManualClock } from '../../support/engine/manual-clock';
 import { firstValidMove, startVariant } from '../../support/engine/variant-game';
 import { variantIdOf } from '../../support/variants/variant-id';
-import { A, fitFactory } from '../../support/variants/hexa-fit/fit-game';
+import { A, fitFactory, threeDominoFitFactory } from '../../support/variants/hexa-fit/fit-game';
 import { linesFactory } from '../../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../../support/variants/hexa-merge/merge-game';
 import { sortFactory } from '../../support/variants/hexa-sort/sort-game';
@@ -72,6 +72,28 @@ function historyOf<
 >(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>) {
   const first = factory.createHistory();
   return { first, distinct: first !== factory.createHistory() };
+}
+
+// The count of moves that a game takes back after it plays `moves` moves.
+// The limit of a history is private, so the test reads it through the undo capability.
+function undosAfter<
+  TCell,
+  TCoord,
+  TMove,
+  TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
+  TPiece,
+>(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>, moves: number): number {
+  const { engine, rules } = startVariant(factory);
+  for (let played = 0; played < moves; played += 1) {
+    engine.play(firstValidMove(rules, engine.snapshot()));
+  }
+  const history = engine.undoable();
+  let undone = 0;
+  while (history?.canUndo()) {
+    history.undo();
+    undone += 1;
+  }
+  return undone;
 }
 
 // The #64 check (APP-FR-16). The settings hold no coordinate,
@@ -216,9 +238,9 @@ describe('IVariantFactory', () => {
     expect(lines.first).toBeUndefined();
     expect(sort.first).toBeUndefined();
     expect(fit.first).toBeInstanceOf(MoveHistory);
-    expect(fit.first?.limit).toBeUndefined();
+    expect(undosAfter(threeDominoFitFactory(), 3)).toBe(3);
     expect(merge.first).toBeInstanceOf(MoveHistory);
-    expect(merge.first?.limit).toBe(1);
+    expect(undosAfter(mergeFactory(), 3)).toBe(1);
     expect([fit.distinct, merge.distinct]).toEqual([true, true]);
   });
 

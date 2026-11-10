@@ -17,6 +17,7 @@ import {
   hexTopology,
   mergeGame,
   mergeState,
+  valueOf,
   values,
   type HexMergeState,
 } from '../../../support/variants/hexa-merge/merge-game';
@@ -32,8 +33,9 @@ function total(state: HexMergeState): number {
 
 describe('MergeTile', () => {
   it('should_wrap_the_value_when_it_is_a_power_of_two_of_two_or_more', () => {
-    expect(MergeTile.of(2).value).toBe(2);
-    expect(MergeTile.of(1024).value).toBe(1024);
+    expect(MergeTile.of(2).equals(MergeTile.of(2))).toBe(true);
+    expect(MergeTile.of(1024).equals(MergeTile.of(1024))).toBe(true);
+    expect(MergeTile.of(2).equals(MergeTile.of(1024))).toBe(false);
     for (const value of [0, 1, 3, 6, 2.5, -2, Number.NaN, Number.POSITIVE_INFINITY]) {
       expect(() => MergeTile.of(value)).toThrow(
         new RangeError(`A merge tile needs a power of two of 2 or more, not ${value}.`),
@@ -48,9 +50,9 @@ describe('MergeTile', () => {
     const merged = a.mergeWith(b);
 
     expect(a.canMergeWith(b)).toBe(true);
-    expect(merged.value).toBe(8);
-    expect(a.value).toBe(4);
-    expect(b.value).toBe(4);
+    expect(merged.equals(MergeTile.of(8))).toBe(true);
+    expect(a.equals(MergeTile.of(4))).toBe(true);
+    expect(b.equals(MergeTile.of(4))).toBe(true);
     expect(MergeTile.of(2).canMergeWith(MergeTile.of(4))).toBe(false);
     expect(() => MergeTile.of(2).mergeWith(MergeTile.of(4))).toThrow(
       new RangeError('A tile of 2 cannot merge with a tile of 4.'),
@@ -151,7 +153,7 @@ describe('MergeRules', () => {
     engine.play(Slide.of('r', 'backward'));
     const plain = engine.snapshot();
 
-    expect(merged.merged.map((tile) => tile.value).sort((a, b) => a - b)).toEqual([4, 8]);
+    expect(merged.merged.map(valueOf).sort((a, b) => a - b)).toEqual([4, 8]);
     expect(total(merged)).toBe(total(before));
     expect(plain.merged).toEqual([]);
     expect(total(plain)).toBe(total(before));

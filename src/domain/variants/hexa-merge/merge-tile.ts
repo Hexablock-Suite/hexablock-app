@@ -5,7 +5,7 @@ import type { IMergeable } from './mergeable';
 // `IMergeable`. A tile is 2 or 4 when it appears, and each merge doubles it (§1.4).
 // So a value is a power of two of 2 or more. Any other number throws a RangeError.
 export class MergeTile implements IMergeable<MergeTile> {
-  private constructor(readonly value: number) {}
+  private constructor(private readonly value: number) {}
 
   static of(value: number): MergeTile {
     if (!Number.isSafeInteger(value) || value < 2 || !Number.isInteger(Math.log2(value))) {

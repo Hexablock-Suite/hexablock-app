@@ -8,7 +8,7 @@ import type { IRedoable, IUndoable } from './undo-capabilities';
 export class MoveHistory<TMove, TState> implements IUndoable {
   private readonly done: MoveCommand<TMove, TState>[] = [];
 
-  constructor(readonly limit?: number) {
+  constructor(private readonly limit?: number) {
     if (limit !== undefined && (!Number.isSafeInteger(limit) || limit < 1)) {
       throw new RangeError(`A history limit needs a whole number of 1 or more, not ${limit}.`);
     }
