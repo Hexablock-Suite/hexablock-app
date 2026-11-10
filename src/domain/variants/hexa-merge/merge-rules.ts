@@ -1,10 +1,8 @@
-import { Board } from '../../engine/board';
-import type { CoordKey } from '../../engine/coord-key';
 import type { Outcome } from '../../engine/outcome';
 import { Resolution } from '../../engine/resolution';
 import { BaseGameRules } from '../../engine/rules';
 import type { IMergeable } from './mergeable';
-import { MergeState } from './merge-state';
+import type { MergeState } from './merge-state';
 import { SLIDE_SENSES, Slide } from './slide';
 
 // Strategy (D1): the rules of Hexa Merge (statement §1.4). It extends `BaseGameRules`,
@@ -17,6 +15,9 @@ import { SLIDE_SENSES, Slide } from './slide';
 // A slide that changes no cell is not valid. The game ends when no slide changes the board
 // after the new tile appears.
 // The target tile sets `targetReached` and does not end the game (A3).
+// The rules decide. The state changes itself in place: `MergeState.slide()` packs the tiles,
+// and `MergeState.addNewTile()` puts the new tile. The rules read the axes through the photo
+// of the state and ask `canSlide()`.
 export class MergeRules<
   TCell extends IMergeable<TCell>,
   TCoord,
@@ -29,11 +30,11 @@ export class MergeRules<
   }
 
   isValid(state: MergeState<TCell, TCoord, TAxis>, slide: Slide<TAxis>): boolean {
-    return this.slid(state, slide) !== undefined;
+    return state.canSlide(slide);
   }
 
   *validMoves(state: MergeState<TCell, TCoord, TAxis>): Iterable<Slide<TAxis>> {
-    for (const axis of state.board.topology.axes()) {
+    for (const axis of state.snapshot().board.topology.axes()) {
       for (const toward of SLIDE_SENSES) {
         const slide = Slide.of(axis, toward);
         if (this.isValid(state, slide)) yield slide;
@@ -45,9 +46,8 @@ export class MergeRules<
     state: MergeState<TCell, TCoord, TAxis>,
     slide: Slide<TAxis>,
   ): MergeState<TCell, TCoord, TAxis> {
-    const next = this.slid(state, slide);
-    if (next === undefined) throw new RangeError('The slide changes no cell of the board.');
-    return next;
+    state.slide(slide, this.target);
+    return state;
   }
 
   // A new tile appears on an empty cell after each accepted slide (§1.4, issue #95).
@@ -56,100 +56,12 @@ export class MergeRules<
   // «Propuesta, pendiente del equipo», fixes the rest: a 2 with 0.9 and a 4 with 0.1
   // (`mergeTileSource()`), and undo restores the cloned state, so the same tile comes back.
   // A board with no empty cell, or a source that has ended, gets no new tile.
-  resolve(state: MergeState<TCell, TCoord, TAxis>): Resolution<MergeState<TCell, TCoord, TAxis>> {
-    addNewTile(state);
-    return Resolution.resolved(state);
+  resolve(state: MergeState<TCell, TCoord, TAxis>): Resolution {
+    state.addNewTile();
+    return Resolution.resolved();
   }
 
   evaluate(state: MergeState<TCell, TCoord, TAxis>): Outcome {
     return this.noValidMove(state) ? 'game-over' : 'playing';
   }
-
-  // The state after the slide, or `undefined` when the slide changes no cell.
-  // The rules check the axis at runtime, because a cast passes the compiler.
-  private slid(
-    state: MergeState<TCell, TCoord, TAxis>,
-    slide: Slide<TAxis>,
-  ): MergeState<TCell, TCoord, TAxis> | undefined {
-    const { board } = state;
-    if (!board.topology.axes().includes(slide.axis)) return undefined;
-    const content = new Map<CoordKey, [TCoord, TCell]>();
-    const merged: TCell[] = [];
-    let changed = false;
-    for (const line of linesOf(board, slide.axis)) {
-      // The leading edge comes first.
-      const cells = slide.toward === 'forward' ? [...line].reverse() : line;
-      const packed = pack(
-        cells.flatMap((c) => tileAt(board, c)),
-        merged,
-      );
-      cells.forEach((c, i) => {
-        const cell = packed[i];
-        if (cell !== undefined) content.set(board.topology.key(c), [c, cell]);
-        if (board.get(c) !== cell) changed = true;
-      });
-    }
-    if (!changed) return undefined;
-    return new MergeState(
-      new Board(board.shape, board.topology, content),
-      state.tiles,
-      state.targetReached || merged.some((tile) => tile.canMergeWith(this.target)),
-      merged,
-      state.score,
-    );
-  }
-}
-
-// Puts the next tile of the source on an empty cell that the same draw picks.
-// A board with no empty cell, or a source that has ended, gets no new tile.
-// The rules call it after each slide, and `MergeFactory` calls it for the first tiles.
-export function addNewTile<TCell, TCoord, TAxis extends string>(
-  state: MergeState<TCell, TCoord, TAxis>,
-): void {
-  const { board, tiles } = state;
-  const empty = board.shape.cells.filter((c) => board.get(c) === undefined);
-  if (empty.length === 0 || !tiles.hasNext()) return;
-  const { place, tile } = tiles.next();
-  board.set(empty[Math.floor(place * empty.length)] as TCoord, tile);
-}
-
-function tileAt<TCell, TCoord>(board: Board<TCell, TCoord, string>, c: TCoord): TCell[] {
-  const cell = board.get(c);
-  return cell === undefined ? [] : [cell];
-}
-
-// Every line of the board on one axis, each one once, in the order of `Board.line()`.
-function linesOf<TCell, TCoord, TAxis extends string>(
-  board: Board<TCell, TCoord, TAxis>,
-  axis: TAxis,
-): TCoord[][] {
-  const covered = new Set<CoordKey>();
-  const lines: TCoord[][] = [];
-  for (const c of board.shape.cells) {
-    if (covered.has(board.topology.key(c))) continue;
-    const line = [...board.line(axis, c)];
-    for (const on of line) covered.add(board.topology.key(on));
-    lines.push(line);
-  }
-  return lines;
-}
-
-// Packs the tiles of one line toward its leading edge, the first tile first.
-// Two equal neighbors merge once, and the merged tile does not merge again in this move.
-// It adds each merged tile to `merged`.
-function pack<TCell extends IMergeable<TCell>>(tiles: readonly TCell[], merged: TCell[]): TCell[] {
-  const packed: TCell[] = [];
-  for (let i = 0; i < tiles.length; i += 1) {
-    const tile = tiles[i] as TCell;
-    const behind = tiles[i + 1];
-    if (behind !== undefined && tile.canMergeWith(behind)) {
-      const made = tile.mergeWith(behind);
-      merged.push(made);
-      packed.push(made);
-      i += 1;
-    } else {
-      packed.push(tile);
-    }
-  }
-  return packed;
 }

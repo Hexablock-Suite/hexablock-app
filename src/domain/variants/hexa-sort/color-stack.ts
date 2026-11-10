@@ -7,7 +7,7 @@ import type { Color } from '../../engine/color';
 // An empty stack is an empty cell. The board cannot remove a cell,
 // so a cleared stack becomes an empty stack.
 export class ColorStack {
-  readonly chips: readonly Color[];
+  private readonly chips: readonly Color[];
 
   private constructor(chips: readonly Color[]) {
     this.chips = Object.freeze([...chips]);
@@ -21,7 +21,8 @@ export class ColorStack {
     return new ColorStack([]);
   }
 
-  get size(): number {
+  // Tells how many tiles the stack holds.
+  tileCount(): number {
     return this.chips.length;
   }
 
@@ -49,5 +50,13 @@ export class ColorStack {
 
   withOnTop(run: readonly Color[]): ColorStack {
     return new ColorStack([...this.chips, ...run]);
+  }
+
+  // Two stacks are equal when they hold equal colors in the same order, from the bottom up.
+  equals(other: ColorStack): boolean {
+    return (
+      this.chips.length === other.chips.length &&
+      this.chips.every((chip, i) => other.chips[i]?.equals(chip) === true)
+    );
   }
 }

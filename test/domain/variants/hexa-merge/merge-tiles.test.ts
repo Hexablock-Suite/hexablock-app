@@ -1,6 +1,7 @@
 /** @jest-environment node */
 import { GameOver } from '../../../../src/domain/engine/game-events';
 import { GameId } from '../../../../src/domain/engine/game-id';
+import { PlayingPhase } from '../../../../src/domain/engine/game-phase';
 import { hex, type HexAxis } from '../../../../src/domain/engine/hex-topology';
 import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
 import type { RandomSource } from '../../../../src/domain/engine/random-source';
@@ -17,7 +18,9 @@ import {
   mergeState,
   values,
   type HexMergeState,
+  mergeStateOf,
 } from '../../../support/variants/hexa-merge/merge-game';
+import { MATCH_ID } from '../../../support/engine/match-id';
 
 // The new tiles of Hexa Merge (statement §1.4, APP-NFR-07, issue #95).
 // The tests play through `GameEngine.play()` and the rules contract, on the real hex geometry.
@@ -31,7 +34,7 @@ type Game = ReturnType<typeof mergeGame>;
 function playFirstSlides(game: Game, turns: number): Record<string, number>[] {
   const boards: Record<string, number>[] = [];
   for (let i = 0; i < turns; i += 1) {
-    const [slide] = game.rules.validMoves(game.engine.snapshot());
+    const [slide] = game.rules.validMoves(mergeStateOf(game.engine.snapshot()));
     if (slide === undefined) break;
     game.engine.play(slide);
     boards.push(values(game.engine.snapshot()));
@@ -67,10 +70,10 @@ describe('Merge new tiles', () => {
     const game = mergeGame(seeded(1234));
 
     for (let i = 0; i < 20; i += 1) {
-      const before = game.engine.snapshot();
+      const before = mergeStateOf(game.engine.snapshot());
       const [slide] = game.rules.validMoves(before);
       if (slide === undefined) break;
-      const slid = values(game.rules.apply(before.clone(), slide));
+      const slid = values(game.rules.apply(before.clone(), slide).snapshot());
 
       game.engine.play(slide);
       const after = values(game.engine.snapshot());
@@ -96,9 +99,10 @@ describe('Merge new tiles', () => {
       mergeTileSource(5),
     );
     const next = mergeTileSource(5).next();
-    const resolution = game.rules.resolve(full.clone());
-    expect(values(resolution.state)).toEqual(values(full));
-    expect(resolution.state.tiles.next()).toEqual(next);
+    const resolved = full.clone();
+    game.rules.resolve(resolved);
+    expect(values(resolved.snapshot())).toEqual(values(full.snapshot()));
+    expect(resolved.snapshot().tiles.clone().next()).toEqual(next);
   });
 
   it('should_draw_only_twos_or_only_fours_when_the_chance_of_a_four_is_zero_or_one', () => {
@@ -107,9 +111,11 @@ describe('Merge new tiles', () => {
       let before = values(game.engine.snapshot());
       const out: number[] = [];
       for (let i = 0; i < 10; i += 1) {
-        const [slide] = game.rules.validMoves(game.engine.snapshot());
+        const [slide] = game.rules.validMoves(mergeStateOf(game.engine.snapshot()));
         if (slide === undefined) break;
-        const slid = values(game.rules.apply(game.engine.snapshot(), slide));
+        const slid = values(
+          game.rules.apply(mergeStateOf(game.engine.snapshot()), slide).snapshot(),
+        );
         game.engine.play(slide);
         const after = values(game.engine.snapshot());
         out.push(...Object.values(added(slid, after)));
@@ -125,7 +131,7 @@ describe('Merge new tiles', () => {
     // The default chance is 0.1: about one tile in ten is a 4.
     const source = mergeTileSource(2026);
     let fours = 0;
-    for (let i = 0; i < 1000; i += 1) if (source.next().tile.value === 4) fours += 1;
+    for (let i = 0; i < 1000; i += 1) if (source.next().tile.equals(MergeTile.of(4))) fours += 1;
     expect(DEFAULT_FOUR_CHANCE).toBe(0.1);
     expect(fours).toBeGreaterThan(70);
     expect(fours).toBeLessThan(130);
@@ -140,7 +146,7 @@ describe('Merge new tiles', () => {
   it('should_give_the_same_new_tile_again_when_the_game_goes_back_to_a_cloned_state', () => {
     const game = mergeGame(seeded(31));
     playFirstSlides(game, 3);
-    const saved = game.engine.snapshot();
+    const saved = mergeStateOf(game.engine.snapshot());
     const slide = [...game.rules.validMoves(saved)][0] as Slide<HexAxis>;
 
     game.engine.play(slide);
@@ -150,9 +156,13 @@ describe('Merge new tiles', () => {
     game.engine.play(slide);
     const replayed = values(game.engine.snapshot());
 
-    const viaClone = values(game.rules.playTurn(saved.clone(), slide).state);
-    const viaOriginal = values(game.rules.playTurn(saved, slide).state);
-    const slid = values(game.rules.apply(saved.clone(), slide));
+    // The rules change the state that they get in place, and a `Resolution` holds no state.
+    const copy = saved.clone();
+    game.rules.playTurn(copy, slide);
+    const viaClone = values(copy.snapshot());
+    game.rules.playTurn(saved, slide);
+    const viaOriginal = values(saved.snapshot());
+    const slid = values(game.rules.apply(saved.clone(), slide).snapshot());
 
     expect(Object.keys(added(slid, played))).toHaveLength(1);
     expect(replayed).toEqual(played);
@@ -191,9 +201,11 @@ describe('Merge new tiles', () => {
       '-1,1': 4,
       '0,1': 8,
     });
-    expect([...rules.validMoves(engine.snapshot())]).toEqual([]);
-    expect(engine.phase.canPlay()).toBe(false);
-    expect(publisher.events).toEqual([new GameOver(GameId.of('hexa-merge'), 'game-over', 0)]);
+    expect([...rules.validMoves(mergeStateOf(engine.snapshot()))]).toEqual([]);
+    expect(engine.currentPhase().canPlay()).toBe(false);
+    expect(publisher.events).toEqual([
+      new GameOver(GameId.of('hexa-merge'), MATCH_ID, 'game-over', 0),
+    ]);
   });
 
   it('should_pass_the_domain_purity_gate_when_it_lints_the_merge_code', () => {
@@ -250,7 +262,7 @@ describe('Merge new tiles edge cases', () => {
     const { engine, publisher } = mergeGame(mergeState([[hex(0, 0), 2]], 3, source(true)));
 
     expect(() => engine.play(slide)).toThrow('The source failed.');
-    expect(engine.phase.name).toBe('playing');
+    expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(values(engine.snapshot())).toEqual({ '0,0': 2 });
 
     expect(engine.play(slide)).toBe('playing');

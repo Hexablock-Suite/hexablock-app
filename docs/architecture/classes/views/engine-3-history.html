@@ -74,7 +74,8 @@
           Class diagram of layer 1 showing MoveHistory as the Command invoker that keeps the done
           MoveCommand objects and implements IUndoable, RedoableHistory extending it with redo
           through IRedoable and keeping the undone MoveCommand objects, and LevelTimer implementing
-          the separate ITimed capability.
+          the separate ITimed capability. Each MoveCommand keeps a TMemento, the immutable photo of
+          the state before the move, which BoardState.snapshot() gives (view 1, decision 34).
         </desc>
         <defs>
           <marker
@@ -348,13 +349,13 @@
           MoveCommand
         </text>
         <text x="88" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + move: TMove
+          - move: TMove
         </text>
         <text x="88" y="172" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - before: TState {memento}
+          - before: TMemento {memento}
         </text>
         <text x="88" y="188" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - restore: (memento: TState) =&gt; void
+          - restore: (memento: TMemento) =&gt; void
         </text>
         <text x="88" y="212" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + undo(): void
@@ -404,10 +405,10 @@
           - done: MoveCommand[]
         </text>
         <text x="392" y="172" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + limit: number [0..1]
+          - limit: number [0..1]
         </text>
         <text x="392" y="196" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + record(command: MoveCommand&lt;TMove, TState&gt;): void
+          + record(command: MoveCommand&lt;TMove, TMemento&gt;): void
         </text>
         <text x="392" y="212" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + canUndo(): boolean
@@ -621,9 +622,9 @@
 
         <!-- UML template boxes: type parameters on the top-right corner -->
         <rect
-          x="240"
+          x="228"
           y="82"
-          width="84"
+          width="96"
           height="18"
           rx="2"
           fill="#ffffff"
@@ -632,19 +633,19 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="282"
+          x="276"
           y="94"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TMove, TState
+          TMove, TMemento
         </text>
         <rect
-          x="624"
+          x="612"
           y="82"
-          width="84"
+          width="96"
           height="18"
           rx="2"
           fill="#ffffff"
@@ -653,19 +654,19 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="666"
+          x="660"
           y="94"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TMove, TState
+          TMove, TMemento
         </text>
         <rect
-          x="888"
+          x="876"
           y="82"
-          width="84"
+          width="96"
           height="18"
           rx="2"
           fill="#ffffff"
@@ -674,14 +675,14 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="930"
+          x="924"
           y="94"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TMove, TState
+          TMove, TMemento
         </text>
 
         <!-- Footnote: classes the budget leaves out -->
@@ -702,8 +703,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          IRedoable is our addition (§3.2, ISP). GameEngine gives them through undoable(),
-          redoable() and timed(). LevelTimer reads time from the Clock interface (APP-NFR-07).
+          TMemento is BoardSnapshot, the photo of the state (view 1, decision 34). IRedoable is our
+          addition (§3.2, ISP). LevelTimer reads time from the Clock interface (APP-NFR-07).
         </text>
 
         <!-- Legend -->

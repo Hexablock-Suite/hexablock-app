@@ -3,7 +3,7 @@ import { coordKey, type CoordKey } from './coord-key';
 import type { GridTopology } from './grid-topology';
 import type { Radius } from './radius';
 import type { RegionSize } from './region-size';
-import type { Turns } from './turns';
+import { Turns } from './turns';
 
 // A coordinate is axial: `q` and `r`, and the third cube value is `s = -q - r`.
 // It only holds its values. `HexTopology` does every calculation (classes.md decision 16).
@@ -67,7 +67,9 @@ function distance(a: HexCoord, b: HexCoord): number {
 
 // Strategy (statement §3.3, D4): the real hexagonal topology. `HexGeometry` creates it.
 export class HexTopology implements GridTopology<HexCoord, HexAxis, HexDirection> {
-  readonly rotationSteps = 6;
+  fullTurn(): Turns {
+    return Turns.of(6);
+  }
 
   key(c: HexCoord): CoordKey {
     return coordKey(`${c.q},${c.r}`);
@@ -94,10 +96,7 @@ export class HexTopology implements GridTopology<HexCoord, HexAxis, HexDirection
 
   // A sixth of a turn maps (q, r) to (-r, q + r).
   rotate(c: HexCoord, turns: Turns): HexCoord {
-    const steps = ((turns.value % this.rotationSteps) + this.rotationSteps) % this.rotationSteps;
-    let turned = c;
-    for (let i = 0; i < steps; i += 1) turned = hex(-turned.r, turned.q + turned.r);
-    return turned;
+    return turns.applyTo(c, (turned) => hex(-turned.r, turned.q + turned.r), this);
   }
 
   translate(c: HexCoord, offset: HexCoord): HexCoord {

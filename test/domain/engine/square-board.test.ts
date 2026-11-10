@@ -10,10 +10,11 @@ import {
   type SquareAxis,
   type SquareCoord,
 } from '../../support/engine/square-topology';
+import { BOARD_ID } from '../../support/engine/entity-ids';
 
 // APP-NFR-13 (D4): the board runs with a cell type and a topology that exist only in test/.
 function newBoard(): Board<FakeCell, SquareCoord, SquareAxis> {
-  return new Board(squareTopology.region(RegionSize.of(3)), squareTopology);
+  return new Board(BOARD_ID, squareTopology.region(RegionSize.of(3)), squareTopology);
 }
 
 describe('Board with the square topology double', () => {
@@ -28,7 +29,7 @@ describe('Board with the square topology double', () => {
   it('should_read_the_fake_cell_back_when_it_was_set', () => {
     const board = newBoard();
 
-    board.set(square(1, 2), fakeCell(7));
+    board.occupy(square(1, 2), fakeCell(7));
 
     expect(board.get(square(1, 2))).toEqual(fakeCell(7));
     expect(board.get(square(2, 1))).toBeUndefined();
@@ -69,19 +70,17 @@ describe('Board with the square topology double', () => {
 
   it('should_keep_the_clone_unchanged_when_the_original_changes', () => {
     const board = newBoard();
-    board.set(square(0, 0), fakeCell(1));
+    board.occupy(square(0, 0), fakeCell(1));
 
     const copy = board.clone();
-    board.set(square(0, 0), fakeCell(2));
+    board.occupy(square(0, 0), fakeCell(2));
 
     expect(copy.get(square(0, 0))).toEqual(fakeCell(1));
   });
 
   it('should_rotate_a_quarter_turn_when_rotate_takes_one_step', () => {
     expect(squareTopology.rotate(square(1, 0), Turns.of(1))).toEqual(square(0, 1));
-    expect(squareTopology.rotate(square(1, 0), Turns.of(squareTopology.rotationSteps))).toEqual(
-      square(1, 0),
-    );
+    expect(squareTopology.rotate(square(1, 0), squareTopology.fullTurn())).toEqual(square(1, 0));
   });
 
   // A negative count turns the other way: one turn back equals three turns forward.

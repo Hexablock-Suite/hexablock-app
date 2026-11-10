@@ -1,5 +1,6 @@
 /** @jest-environment node */
 import { GameId } from '../../../src/domain/engine/game-id';
+import { MatchId } from '../../../src/domain/engine/match-id';
 import { GameOver } from '../../../src/domain/engine/game-events';
 import {
   GameOverPhase,
@@ -7,7 +8,19 @@ import {
   PlayingPhase,
   ResolvingPhase,
   VictoryPhase,
+  type GamePhase,
 } from '../../../src/domain/engine/game-phase';
+import { MATCH_ID } from '../../support/engine/match-id';
+
+// The value that `act` throws, or `undefined` when it throws nothing.
+function thrownBy(act: () => void): unknown {
+  try {
+    act();
+  } catch (error) {
+    return error;
+  }
+  return undefined;
+}
 
 describe('GamePhase', () => {
   it('should_allow_play_when_the_phase_is_playing', () => {
@@ -51,18 +64,73 @@ describe('GamePhase', () => {
     expect(VictoryPhase.instance.resume()).toBe(VictoryPhase.instance);
   });
 
-  it('should_name_each_phase_when_the_name_is_read', () => {
-    expect(PlayingPhase.instance.name).toBe('playing');
-    expect(ResolvingPhase.instance.name).toBe('resolving');
-    expect(PausedPhase.instance.name).toBe('paused');
-    expect(GameOverPhase.instance.name).toBe('game-over');
-    expect(VictoryPhase.instance.name).toBe('victory');
+  // Unit R18 of the redesign: the name of a phase is private. A phase names itself only
+  // in the error of a move or an undo that it refuses.
+  it('should_accept_a_move_and_an_undo_when_the_phase_is_playing', () => {
+    expect(PlayingPhase.instance.checkAcceptsMove()).toBeUndefined();
+    expect(PlayingPhase.instance.checkAcceptsUndo()).toBeUndefined();
+  });
+
+  it('should_throw_a_range_error_that_names_the_phase_when_a_phase_refuses_a_move', () => {
+    const refusals = [
+      ResolvingPhase.instance,
+      PausedPhase.instance,
+      GameOverPhase.instance,
+      VictoryPhase.instance,
+    ].map((phase) => thrownBy(() => phase.checkAcceptsMove()));
+
+    expect(refusals).toEqual([
+      new RangeError('The game cannot accept a move in the resolving phase.'),
+      new RangeError('The game cannot accept a move in the paused phase.'),
+      new RangeError('The game cannot accept a move in the game-over phase.'),
+      new RangeError('The game cannot accept a move in the victory phase.'),
+    ]);
+  });
+
+  it('should_throw_a_range_error_that_names_the_phase_when_a_phase_refuses_an_undo', () => {
+    const refusals = [
+      ResolvingPhase.instance,
+      PausedPhase.instance,
+      GameOverPhase.instance,
+      VictoryPhase.instance,
+    ].map((phase) => thrownBy(() => phase.checkAcceptsUndo()));
+
+    expect(refusals).toEqual([
+      new RangeError('The game cannot accept an undo in the resolving phase.'),
+      new RangeError('The game cannot accept an undo in the paused phase.'),
+      new RangeError('The game cannot accept an undo in the game-over phase.'),
+      new RangeError('The game cannot accept an undo in the victory phase.'),
+    ]);
+  });
+
+  // A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails when it compiles.
+  it('should_reject_at_compile_time_when_a_caller_reads_the_name_of_a_phase', () => {
+    const phase: GamePhase = PlayingPhase.instance;
+    const readers = [
+      // @ts-expect-error `GamePhase` has no public name.
+      () => phase.name,
+      // @ts-expect-error `PlayingPhase` has no public name.
+      () => PlayingPhase.instance.name,
+      // @ts-expect-error `ResolvingPhase.name` is private.
+      () => ResolvingPhase.instance.name,
+      // @ts-expect-error `PausedPhase.name` is private.
+      () => PausedPhase.instance.name,
+      // @ts-expect-error `GameOverPhase.name` is private.
+      () => GameOverPhase.instance.name,
+      // @ts-expect-error `VictoryPhase.name` is private.
+      () => VictoryPhase.instance.name,
+    ];
+
+    expect(readers).toHaveLength(6);
   });
 });
 
 describe('GameId', () => {
   it('should_keep_the_value_when_the_id_is_valid', () => {
-    expect(GameId.of('hexa-lines').value).toBe('hexa-lines');
+    const id = GameId.of('hexa-lines');
+
+    expect(id.equals(GameId.of('hexa-lines'))).toBe(true);
+    expect(id.equals(GameId.of('hexa-line'))).toBe(false);
   });
 
   it('should_throw_when_the_id_is_empty', () => {
@@ -97,7 +165,12 @@ describe('GameId', () => {
       'game2',
     ];
 
-    expect(valid.map((value) => GameId.of(value).value)).toEqual(valid);
+    for (const value of valid) {
+      expect(GameId.of(value).equals(GameId.of(value))).toBe(true);
+    }
+    // Each id keeps its own value, so no two ids of the list are equal.
+    const ids = valid.map((value) => GameId.of(value));
+    expect(ids.filter((id) => ids.filter((other) => other.equals(id)).length !== 1)).toEqual([]);
   });
 
   it('should_be_equal_when_two_ids_hold_the_same_value', () => {
@@ -107,11 +180,24 @@ describe('GameId', () => {
 });
 
 describe('GameOver event', () => {
-  it('should_carry_the_game_the_outcome_and_the_final_score_when_it_is_created', () => {
-    const event = new GameOver(GameId.of('hexa-lines'), 'game-over', 42);
+  it('should_carry_the_game_the_match_the_outcome_and_the_final_score_when_it_is_created', () => {
+    const event = new GameOver(GameId.of('hexa-lines'), MatchId.of('match-a'), 'game-over', 42);
 
-    expect(event.gameId.value).toBe('hexa-lines');
+    expect(event.gameId.equals(GameId.of('hexa-lines'))).toBe(true);
+    expect(event.matchId.equals(MatchId.of('match-a'))).toBe(true);
+    expect(event.matchId.equals(MatchId.of('match-b'))).toBe(false);
     expect(event.outcome).toBe('game-over');
     expect(event.finalScore).toBe(42);
+  });
+
+  it('should_throw_a_range_error_when_the_final_score_is_not_finite', () => {
+    const gameId = GameId.of('hexa-lines');
+
+    for (const score of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
+      expect(() => new GameOver(gameId, MATCH_ID, 'game-over', score)).toThrow(
+        new RangeError('A game over event needs a final score that is a finite number.'),
+      );
+    }
+    expect(new GameOver(gameId, MATCH_ID, 'game-over', -3).finalScore).toBe(-3);
   });
 });

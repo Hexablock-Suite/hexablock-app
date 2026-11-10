@@ -1,6 +1,6 @@
 /** @jest-environment node */
 import { GameId } from '../../../src/domain/engine/game-id';
-import { ProgressRecord } from '../../../src/domain/engine/progress-model';
+import { GameResult, ProgressRecord } from '../../../src/domain/engine/progress-model';
 
 // A progress record holds finite numbers. Stars stay decimal: no requirement says
 // that stars are whole numbers.
@@ -32,5 +32,30 @@ describe('ProgressRecord', () => {
     expect(record.stars).toBe(1.5);
     expect(record.levelId).toBe('l1');
     expect(ProgressRecord.of({ gameId, score: 0 }).stars).toBeUndefined();
+  });
+});
+
+// The level id comes from the level file. A game with no levels has none, and that is valid.
+describe('the level id of a progress value', () => {
+  const gameId = GameId.of('fake-game');
+
+  it('should_throw_a_range_error_when_a_game_result_has_a_blank_level_id', () => {
+    for (const levelId of ['', '   ']) {
+      expect(() => GameResult.of({ gameId, score: 1, moves: 1, levelId })).toThrow(
+        new RangeError('A game result needs a level id that is not blank.'),
+      );
+    }
+    expect(GameResult.of({ gameId, score: 1, moves: 1, levelId: 'l1' }).levelId).toBe('l1');
+    expect(GameResult.of({ gameId, score: 1, moves: 1 }).levelId).toBeUndefined();
+  });
+
+  it('should_throw_a_range_error_when_a_progress_record_has_a_blank_level_id', () => {
+    for (const levelId of ['', '   ']) {
+      expect(() => ProgressRecord.of({ gameId, score: 1, levelId })).toThrow(
+        new RangeError('A progress record needs a level id that is not blank.'),
+      );
+    }
+    expect(ProgressRecord.of({ gameId, score: 1, levelId: 'l1' }).levelId).toBe('l1');
+    expect(ProgressRecord.of({ gameId, score: 1 }).levelId).toBeUndefined();
   });
 });

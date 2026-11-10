@@ -77,7 +77,8 @@
           its seeded and fixed-list implementations, each with a clone() that copies its position,
           SeededPieceSource keeping the Mulberry32Random random source that it builds from its seed
           and clones, the IScoringPolicy strategy wrapped by the abstract ScoringDecorator, and the
-          IProgressModel strategy that records a GameResult and returns a ProgressRecord.
+          IProgressModel strategy that records a GameResult and returns a ProgressRecord. Range is
+          the value object of a closed interval, which checks the seed of Mulberry32Random.
         </desc>
         <defs>
           <marker
@@ -760,7 +761,84 @@
           + elapsedMs: number [0..1]
         </text>
 
+        <!-- Class: Range (value object) -->
+        <rect
+          x="640"
+          y="364"
+          width="328"
+          height="176"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="640" y1="412" x2="968" y2="412" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="804"
+          y="382"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="804"
+          y="400"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          Range
+        </text>
+        <text x="656" y="428" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - min: T
+        </text>
+        <text x="656" y="444" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - max: T
+        </text>
+        <text x="656" y="460" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - compare: Compare&lt;T&gt;
+        </text>
+        <line x1="640" y1="468" x2="968" y2="468" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="656" y="484" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + of(min: T, max: T, compare: Compare&lt;T&gt;): Range&lt;T&gt;
+        </text>
+        <text x="656" y="500" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + ofNumbers(min: number, max: number): Range&lt;number&gt;
+        </text>
+        <text x="656" y="516" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + contains(value: T): boolean
+        </text>
+        <text x="656" y="532" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: Range&lt;T&gt;): boolean
+        </text>
         <!-- UML template boxes: type parameters on the top-right corner -->
+        <rect
+          x="932"
+          y="354"
+          width="48"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="956"
+          y="366"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          T
+        </text>
         <rect
           x="404"
           y="82"

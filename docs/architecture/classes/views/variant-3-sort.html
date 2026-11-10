@@ -64,7 +64,7 @@
       <h1>Hexa Sort: stacks, cascades and levels</h1>
 
       <svg
-        viewBox="0 0 1040 856"
+        viewBox="0 0 1040 1116"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="sort-title sort-desc"
@@ -75,7 +75,10 @@
           SortRules and SortScoring strategies and holding a SortLevel that SortLevelBuilder builds
           step by step from a header, the board region, the goals and the piece source, with
           SortRules typed by SortState and SortState holding ColorStack cells, each variant class
-          marked with the engine interface it implements and its binding.
+          marked with the engine interface it implements and its binding. GoalCount is the value
+          object of the goal of a level. SortState is an entity inside the GameEngine aggregate: its
+          own GameStateId is its identity, it keeps the MatchId of its game, and it changes in place
+          only through its business methods.
         </desc>
         <defs>
           <marker
@@ -136,7 +139,7 @@
           x="24"
           y="24"
           width="992"
-          height="632"
+          height="892"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -349,7 +352,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «Concrete Factory»
+          «Concrete Factory» «factory»
         </text>
         <text
           x="176"
@@ -443,28 +446,37 @@
         >
           SortRules
         </text>
-        <text x="544" y="304" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - pieces: IPieceSource&lt;Piece&lt;ColorStack, TCoord&gt;&gt;
-        </text>
         <text x="544" y="320" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           cascade transfer, clears a stack of 10
         </text>
 
-        <!-- Class: SortState -->
+        <!-- Class: SortState (entity) -->
         <rect
           x="520"
           y="392"
-          width="240"
-          height="112"
+          width="220"
+          height="512"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="520" y1="432" x2="760" y2="432" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="520" y1="440" x2="740" y2="440" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="520" y1="616" x2="740" y2="616" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="640"
-          y="417"
+          x="630"
+          y="410"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «entity»
+        </text>
+        <text
+          x="630"
+          y="428"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -473,17 +485,144 @@
         >
           SortState
         </text>
-        <text x="536" y="448" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + board: Board&lt;ColorStack, TCoord&gt;
+        <text x="536" y="456" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - stateId: GameStateId
         </text>
-        <text x="536" y="464" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + tray: Piece&lt;ColorStack, TCoord&gt;[]
+        <text x="536" y="470" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - matchId: MatchId
         </text>
-        <text x="536" y="480" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + goalsDone: number
+        <text x="536" y="484" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - board: Board&lt;ColorStack, TCoord&gt;
         </text>
-        <text x="536" y="496" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + goalsNeeded: GoalCount
+        <text x="536" y="498" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - source: IPieceSource&lt;
+        </text>
+        <text x="544" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Piece&lt;ColorStack, TCoord&gt;&gt;
+        </text>
+        <text x="536" y="526" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - goalsNeeded: GoalCount
+        </text>
+        <text x="536" y="540" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - offered: Piece&lt;ColorStack,
+        </text>
+        <text x="544" y="554" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          TCoord&gt; | undefined
+        </text>
+        <text x="536" y="568" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - goalsDone: number
+        </text>
+        <text x="536" y="582" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - clearedTiles: number[]
+        </text>
+        <text x="536" y="596" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - placedAt: TCoord | undefined
+        </text>
+        <text x="536" y="610" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - score: number
+        </text>
+        <text
+          x="536"
+          y="632"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + start(values: { stateId:
+        </text>
+        <text
+          x="544"
+          y="646"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          GameStateId; matchId: MatchId;
+        </text>
+        <text
+          x="544"
+          y="660"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          board: Board&lt;ColorStack, TCoord&gt;;
+        </text>
+        <text
+          x="544"
+          y="674"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          source: IPieceSource&lt;Piece&lt;
+        </text>
+        <text
+          x="544"
+          y="688"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          ColorStack, TCoord&gt;&gt;; goalsNeeded:
+        </text>
+        <text
+          x="544"
+          y="702"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          GoalCount }): SortState&lt;TCoord&gt;
+        </text>
+        <text x="536" y="716" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + offerNext(): void
+        </text>
+        <text x="536" y="730" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + canPlace(at: TCoord): boolean
+        </text>
+        <text x="536" y="744" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + placeOfferedStack(at: TCoord): void
+        </text>
+        <text x="536" y="758" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + moveRun(from: TCoord, to: TCoord):
+        </text>
+        <text x="544" y="772" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          void
+        </text>
+        <text x="536" y="786" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + clearStack(at: TCoord): void
+        </text>
+        <text x="536" y="800" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + addPoints(points: number): void
+        </text>
+        <text x="536" y="814" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + belongsTo(match: MatchId): boolean
+        </text>
+        <text x="536" y="828" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: BoardState&lt;
+        </text>
+        <text x="544" y="842" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          ColorStack, TCoord&gt;): boolean
+        </text>
+        <text x="536" y="856" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + snapshot(): SortSnapshot&lt;TCoord&gt;
+        </text>
+        <text x="536" y="870" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + clone(): SortState&lt;TCoord&gt;
+        </text>
+
+        <text x="536" y="884" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + restore(snapshot:
+        </text>
+        <text x="544" y="898" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          SortSnapshot&lt;TCoord&gt;): void
         </text>
 
         <!-- Class: ColorStack (value object) -->
@@ -522,7 +661,7 @@
           ColorStack
         </text>
         <text x="832" y="464" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + chips: Color[]
+          - chips: Color[]
         </text>
         <text x="832" y="488" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + top(): Color
@@ -648,9 +787,9 @@
         <text x="555" y="222" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           IGameRules‹PlaceStack, SortState›
         </text>
-        <line x1="536" y1="504" x2="536" y2="520" stroke="#17212a" stroke-width="1" />
-        <circle cx="536" cy="525" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="547" y="528" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="740" y1="880" x2="756" y2="880" stroke="#17212a" stroke-width="1" />
+        <circle cx="761" cy="880" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="772" y="883" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           BoardState‹ColorStack, TCoord›
         </text>
         <line x1="80" y1="600" x2="80" y2="616" stroke="#17212a" stroke-width="1" />
@@ -659,6 +798,53 @@
           ILevelBuilder‹SortLevel‹TCoord››
         </text>
 
+        <!-- Class: GoalCount (value object) -->
+        <rect
+          x="744"
+          y="540"
+          width="256"
+          height="128"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="744" y1="588" x2="1000" y2="588" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="872"
+          y="558"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="872"
+          y="576"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GoalCount
+        </text>
+        <text x="760" y="604" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - value: number
+        </text>
+        <line x1="744" y1="612" x2="1000" y2="612" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="760" y="628" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + of(value: number): GoalCount
+        </text>
+        <text x="760" y="644" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: GoalCount): boolean
+        </text>
+        <text x="760" y="660" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + isReachedBy(goalsDone: number): boolean
+        </text>
         <!-- UML template boxes: type parameters on the top-right corner -->
         <rect
           x="268"
@@ -703,7 +889,7 @@
           TCoord
         </text>
         <rect
-          x="724"
+          x="704"
           y="382"
           width="48"
           height="18"
@@ -714,7 +900,7 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="748"
+          x="728"
           y="394"
           fill="#5b6873"
           font-size="8.5"
@@ -765,178 +951,189 @@
         >
           TCoord
         </text>
-        <!-- Footnote: classes the budget leaves out -->
-        <text
-          x="24"
-          y="680"
-          fill="#5b6873"
-          font-size="11"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Not drawn: PlaceStack (the move, at: TCoord) and StackMerged extends GameEvent. SortRules
-          extends BaseGameRules (Part 1, view 7).
-        </text>
-        <text
-          x="24"
-          y="696"
-          fill="#5b6873"
-          font-size="11"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          The piece source is seeded or fixed, chosen per level (A4). Progress: LevelProgress. No
-          undo.
-        </text>
+        <!-- The footnote and the legend sit below the zone, which grew by 56. -->
+        <g transform="translate(0 260)">
+          <!-- Footnote: classes the budget leaves out -->
+          <text
+            x="24"
+            y="680"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Not drawn: PlaceStack (the move, at: TCoord) and StackMerged extends GameEvent.
+            SortRules extends BaseGameRules (Part 1, view 7).
+          </text>
+          <text
+            x="24"
+            y="696"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            The piece source is seeded or fixed, chosen per level (A4). Progress: LevelProgress. No
+            undo.
+          </text>
 
-        <text
-          x="24"
-          y="712"
-          fill="#5b6873"
-          font-size="11"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          An adapter reads the level file, and SortLevelBuilder gets plain data. LevelHeader is the
-          common part of every level (Hexa Fit view). withRegion(radius) asks BoardBuilder for the
-          board.
-        </text>
-        <text
-          x="24"
-          y="728"
-          fill="#5b6873"
-          font-size="11"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Each with step returns the builder, and only build() returns the level (decision 15, D9).
-        </text>
-        <text
-          x="24"
-          y="744"
-          fill="#5b6873"
-          font-size="11"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          TCoord is the coordinate type of the geometry (decision 16), and each class that names it
-          declares it. In a binding, SortState stands for SortState‹TCoord›.
-        </text>
-        <!-- Legend -->
-        <line x1="24" y1="768" x2="1016" y2="768" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
-        <text
-          x="24"
-          y="786"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          letter-spacing="0.18em"
-        >
-          LEGEND
-        </text>
+          <text
+            x="24"
+            y="712"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            An adapter reads the level file, and SortLevelBuilder gets plain data. LevelHeader is
+            the common part of every level (Hexa Fit view). withRegion(radius) asks BoardBuilder for
+            the board.
+          </text>
+          <text
+            x="24"
+            y="728"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Each with step returns the builder, and only build() returns the level (decision 15,
+            D9).
+          </text>
+          <text
+            x="24"
+            y="744"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            TCoord is the coordinate type of the geometry (decision 16), and each class that names
+            it declares it. In a binding, SortState stands for SortState‹TCoord›.
+          </text>
+          <!-- Legend -->
+          <line
+            x1="24"
+            y1="768"
+            x2="1016"
+            y2="768"
+            stroke="rgba(23,33,42,0.10)"
+            stroke-width="0.8"
+          />
+          <text
+            x="24"
+            y="786"
+            fill="#5b6873"
+            font-size="8"
+            font-family="'IBM Plex Mono', monospace"
+            letter-spacing="0.18em"
+          >
+            LEGEND
+          </text>
 
-        <line
-          x1="24"
-          y1="804"
-          x2="52"
-          y2="804"
-          stroke="#5b6873"
-          stroke-width="1"
-          marker-end="url(#sort-open)"
-        />
-        <text
-          x="60"
-          y="808"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Use · attribute, parameter, return, local or new
-        </text>
-        <rect
-          x="24"
-          y="824"
-          width="28"
-          height="12"
-          rx="2"
-          fill="#f9f4dc"
-          stroke="rgba(180,83,9,0.45)"
-          stroke-width="1"
-        />
-        <text
-          x="60"
-          y="833"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Zone · Clean layer
-        </text>
-        <rect
-          x="184"
-          y="824"
-          width="28"
-          height="12"
-          rx="2"
-          fill="none"
-          stroke="rgba(91,104,115,0.55)"
-          stroke-width="1"
-          stroke-dasharray="4,4"
-        />
-        <text
-          x="220"
-          y="833"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Dashed frame · GoF pattern or principle
-        </text>
-        <rect
-          x="424"
-          y="824"
-          width="28"
-          height="12"
-          rx="2"
-          fill="rgba(15,111,116,0.10)"
-          stroke="#0f6f74"
-          stroke-width="1"
-        />
-        <text
-          x="460"
-          y="833"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Teal · focal class
-        </text>
-        <line x1="584" y1="830" x2="600" y2="830" stroke="#17212a" stroke-width="1" />
-        <circle cx="605" cy="830" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text
-          x="620"
-          y="833"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Lollipop · engine interface + binding
-        </text>
-        <rect
-          x="800"
-          y="824"
-          width="28"
-          height="12"
-          rx="2"
-          fill="#ffffff"
-          stroke="#5b6873"
-          stroke-width="0.8"
-          stroke-dasharray="4,3"
-        />
-        <text
-          x="836"
-          y="833"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Corner box · type parameters
-        </text>
+          <line
+            x1="24"
+            y1="804"
+            x2="52"
+            y2="804"
+            stroke="#5b6873"
+            stroke-width="1"
+            marker-end="url(#sort-open)"
+          />
+          <text
+            x="60"
+            y="808"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Use · attribute, parameter, return, local or new
+          </text>
+          <rect
+            x="24"
+            y="824"
+            width="28"
+            height="12"
+            rx="2"
+            fill="#f9f4dc"
+            stroke="rgba(180,83,9,0.45)"
+            stroke-width="1"
+          />
+          <text
+            x="60"
+            y="833"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Zone · Clean layer
+          </text>
+          <rect
+            x="184"
+            y="824"
+            width="28"
+            height="12"
+            rx="2"
+            fill="none"
+            stroke="rgba(91,104,115,0.55)"
+            stroke-width="1"
+            stroke-dasharray="4,4"
+          />
+          <text
+            x="220"
+            y="833"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Dashed frame · GoF pattern or principle
+          </text>
+          <rect
+            x="424"
+            y="824"
+            width="28"
+            height="12"
+            rx="2"
+            fill="rgba(15,111,116,0.10)"
+            stroke="#0f6f74"
+            stroke-width="1"
+          />
+          <text
+            x="460"
+            y="833"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Teal · focal class
+          </text>
+          <line x1="584" y1="830" x2="600" y2="830" stroke="#17212a" stroke-width="1" />
+          <circle cx="605" cy="830" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          <text
+            x="620"
+            y="833"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Lollipop · engine interface + binding
+          </text>
+          <rect
+            x="800"
+            y="824"
+            width="28"
+            height="12"
+            rx="2"
+            fill="#ffffff"
+            stroke="#5b6873"
+            stroke-width="0.8"
+            stroke-dasharray="4,3"
+          />
+          <text
+            x="836"
+            y="833"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Corner box · type parameters
+          </text>
+        </g>
       </svg>
     </div>
   </body>

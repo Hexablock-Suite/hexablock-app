@@ -4,7 +4,7 @@
 // It is a value object: it never changes. `of()` rejects an empty or blank name.
 // `of()` makes a new object on each call, so a caller compares two colors with `equals()`.
 export class Color {
-  private constructor(readonly name: string) {}
+  private constructor(private readonly name: string) {}
 
   static of(name: string): Color {
     if (name.trim() === '') throw new RangeError('A color needs a name.');

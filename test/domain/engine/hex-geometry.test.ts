@@ -2,6 +2,7 @@
 import type { GeometryFactory } from '../../../src/domain/engine/geometry-factory';
 import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
 import { hex, type HexCoord } from '../../../src/domain/engine/hex-topology';
+import { Turns } from '../../../src/domain/engine/turns';
 
 // `HexGeometry` is the real geometry family (issue 153, classes.md decision 17, D11).
 // The suite reads it only through the `GeometryFactory` contract.
@@ -52,7 +53,7 @@ describe('HexGeometry', () => {
   it('should_give_the_hexagonal_topology_when_the_topology_is_created', () => {
     const topology = geometry.createTopology();
 
-    expect(topology.rotationSteps).toBe(6);
+    expect(topology.fullTurn().equals(Turns.of(6))).toBe(true);
     expect(topology.axes()).toEqual(['q', 'r', 's']);
     expect(topology.neighbors(hex(0, 0))).toHaveLength(6);
   });

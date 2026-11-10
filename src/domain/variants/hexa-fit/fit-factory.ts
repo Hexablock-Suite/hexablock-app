@@ -1,10 +1,13 @@
 import type { Board } from '../../engine/board';
+import type { BoardId } from '../../engine/board-id';
 import { BoardBuilder } from '../../engine/board-builder';
 import type { BoardShape } from '../../engine/board-shape';
 import type { Clock } from '../../engine/clock';
 import { GameId } from '../../engine/game-id';
+import type { GameStateId } from '../../engine/game-state-id';
 import type { GeometryFactory, TopologyId } from '../../engine/geometry-factory';
 import { LevelTimer } from '../../engine/level-timer';
+import type { MatchId } from '../../engine/match-id';
 import { MoveHistory } from '../../engine/move-history';
 import type { Piece } from '../../engine/piece';
 import { FixedListPieceSource } from '../../engine/piece-source';
@@ -16,7 +19,7 @@ import type { IVariantFactory } from '../../engine/variant-factory';
 import type { FitMove } from './fit-move';
 import { FitRules } from './fit-rules';
 import { FitScoring } from './fit-scoring';
-import { FitState } from './fit-state';
+import { FitState, type FitSnapshot } from './fit-state';
 import type { PieceId } from './piece-id';
 
 // One Hexa Fit level: the id of its geometry family, the figure and its pieces.
@@ -68,18 +71,18 @@ export class FitFactory<TCoord> implements IVariantFactory<
 
   // The board is the figure: its shape holds only the figure cells.
   // `BoardBuilder` takes the figure as a tree of cells.
-  createBoard(): Board<PieceId, TCoord, string> {
+  createBoard(boardId: BoardId): Board<PieceId, TCoord, string> {
     const figure = new ShapeGroup(this.level.figure.cells.map((c) => new CellNode(c)));
-    return new BoardBuilder(this.geometry).withFigure(figure).build<PieceId>();
+    return new BoardBuilder(this.geometry).withFigure(figure).build<PieceId>(boardId);
   }
 
-  createInitialState(): FitState<TCoord> {
-    return FitState.start(this.createBoard(), this.createPieceSource());
+  createInitialState(matchId: MatchId, stateId: GameStateId, boardId: BoardId): FitState<TCoord> {
+    return FitState.start(stateId, matchId, this.createBoard(boardId), this.createPieceSource());
   }
 
   // Hexa Fit undoes with no limit (APP-FR-08, classes.md decision 3).
   // `RedoableHistory` adds the redo of Hexa Fit in Sprint 3.
-  createHistory(): MoveHistory<FitMove<TCoord>, FitState<TCoord>> {
+  createHistory(): MoveHistory<FitMove<TCoord>, FitSnapshot<TCoord>> {
     return new MoveHistory();
   }
 }

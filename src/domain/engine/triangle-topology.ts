@@ -3,7 +3,7 @@ import { coordKey, type CoordKey } from './coord-key';
 import type { GridTopology } from './grid-topology';
 import type { Radius } from './radius';
 import type { RegionSize } from './region-size';
-import type { Turns } from './turns';
+import { Turns } from './turns';
 
 // A triangle at (col, row) points up when col + row is even, and down when it is odd.
 // It only holds its values. `TriangleTopology` does every calculation.
@@ -90,7 +90,9 @@ export class TriangleTopology implements GridTopology<
   TriangleAxis,
   TriangleDirection
 > {
-  readonly rotationSteps = 6;
+  fullTurn(): Turns {
+    return Turns.of(6);
+  }
 
   key(c: TriangleCoord): CoordKey {
     return coordKey(`${c.col},${c.row}`);
@@ -121,10 +123,7 @@ export class TriangleTopology implements GridTopology<
   // Each step changes the orientation of the triangle, so no triangle stays in its place.
   // A caller places a turned piece with `translate()`, as on every other topology.
   rotate(c: TriangleCoord, turns: Turns): TriangleCoord {
-    const steps = ((turns.value % this.rotationSteps) + this.rotationSteps) % this.rotationSteps;
-    let [x, y, z] = toCube(c);
-    for (let i = 0; i < steps; i += 1) [x, y, z] = [1 - y, 1 - z, 1 - x];
-    return fromCube([x, y, z]);
+    return fromCube(turns.applyTo(toCube(c), ([x, y, z]): Cube => [1 - y, 1 - z, 1 - x], this));
   }
 
   // The offset counts lattice cells: one step of `col` is two triangles to the right,

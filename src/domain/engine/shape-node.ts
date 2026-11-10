@@ -13,7 +13,7 @@ export interface ShapeNode<TCoord> {
 
 // Leaf: one cell of a shape.
 export class CellNode<TCoord> implements ShapeNode<TCoord> {
-  constructor(readonly at: TCoord) {}
+  constructor(private readonly at: TCoord) {}
 
   cells(): TCoord[] {
     return [this.at];
@@ -36,7 +36,7 @@ export class CellNode<TCoord> implements ShapeNode<TCoord> {
 // The group copies the children array, so a change to the caller's array does not change the group.
 // The copy is frozen, because `readonly` holds only at compile time.
 export class ShapeGroup<TCoord> implements ShapeNode<TCoord> {
-  readonly children: readonly ShapeNode<TCoord>[];
+  private readonly children: readonly ShapeNode<TCoord>[];
 
   constructor(children: readonly ShapeNode<TCoord>[]) {
     if (children.length === 0) throw new RangeError('A shape group holds at least one child.');

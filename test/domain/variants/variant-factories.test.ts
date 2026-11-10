@@ -26,11 +26,14 @@ import { ColorStack } from '../../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../../src/domain/variants/hexa-sort/sort-factory';
 import { ManualClock } from '../../support/engine/manual-clock';
-import { firstValidMove, startVariant } from '../../support/engine/variant-game';
-import { A, fitFactory } from '../../support/variants/hexa-fit/fit-game';
+import { phaseNameOf } from '../../support/engine/phase-name';
+import { firstValidMove, startVariant, liveStateOf } from '../../support/engine/variant-game';
+import { variantIdOf } from '../../support/variants/variant-id';
+import { A, fitFactory, threeDominoFitFactory } from '../../support/variants/hexa-fit/fit-game';
 import { linesFactory } from '../../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../../support/variants/hexa-merge/merge-game';
 import { sortFactory } from '../../support/variants/hexa-sort/sort-game';
+import { BOARD_ID } from '../../support/engine/entity-ids';
 
 // The engine runs the four variants through one code path (issue 99, APP-FR-03).
 // `playOnce()` reads only `IVariantFactory`: it has no branch on the game id.
@@ -43,8 +46,12 @@ function playOnce<
   TPiece,
 >(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>) {
   const { engine, rules } = startVariant(factory);
-  const outcome = engine.play(firstValidMove(rules, engine.snapshot()));
-  return { gameId: factory.gameId.value, outcome, phase: engine.phase.name };
+  const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, engine.snapshot())));
+  return {
+    gameId: variantIdOf(factory.gameId),
+    outcome,
+    phase: phaseNameOf(engine.currentPhase()),
+  };
 }
 
 // Two boards of one factory, in plain facts that a test compares across the four variants.
@@ -55,8 +62,8 @@ function twoBoards<
   TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
   TPiece,
 >(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>) {
-  const first = factory.createBoard();
-  const second = factory.createBoard();
+  const first = factory.createBoard(BOARD_ID);
+  const second = factory.createBoard(BOARD_ID);
   return { distinct: first !== second, filled: first.cells().length + second.cells().length };
 }
 
@@ -73,6 +80,28 @@ function historyOf<
   return { first, distinct: first !== factory.createHistory() };
 }
 
+// The count of moves that a game takes back after it plays `moves` moves.
+// The limit of a history is private, so the test reads it through the undo capability.
+function undosAfter<
+  TCell,
+  TCoord,
+  TMove,
+  TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
+  TPiece,
+>(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>, moves: number): number {
+  const { engine, rules } = startVariant(factory);
+  for (let played = 0; played < moves; played += 1) {
+    engine.play(firstValidMove(rules, liveStateOf(factory, engine.snapshot())));
+  }
+  const history = engine.undoable();
+  let undone = 0;
+  while (history?.canUndo()) {
+    history.undo();
+    undone += 1;
+  }
+  return undone;
+}
+
 // The #64 check (APP-FR-16). The settings hold no coordinate,
 // so the argument of `startMerge()` is the only thing that changes between two figures.
 const mergeSettings: MergeSettings = {
@@ -82,10 +111,11 @@ const mergeSettings: MergeSettings = {
 };
 
 function startMerge<TCoord>(geometry: GeometryFactory<TCoord>) {
-  const { engine, rules } = startVariant(new MergeFactory(geometry, mergeSettings));
+  const factory = new MergeFactory(geometry, mergeSettings);
+  const { engine, rules } = startVariant(factory);
   const { board } = engine.snapshot();
   const tiles = board.cells().length;
-  const outcome = engine.play(firstValidMove(rules, engine.snapshot()));
+  const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, engine.snapshot())));
   return { cells: board.shape.cells.length, axes: board.topology.axes(), tiles, outcome };
 }
 
@@ -111,17 +141,16 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
 
   return () => {
     it('should_start_lines_on_the_region_of_the_geometry_when_the_lines_factory_gets_it', () => {
-      const { engine, rules } = startVariant(
-        new LinesFactory(geometry, {
-          size,
-          seed: 1,
-          shapes: [new CellNode(origin)],
-          colors: [Color.of('red')],
-        }),
-      );
+      const factory = new LinesFactory(geometry, {
+        size,
+        seed: 1,
+        shapes: [new CellNode(origin)],
+        colors: [Color.of('red')],
+      });
+      const { engine, rules } = startVariant(factory);
       const start = engine.snapshot();
 
-      const outcome = engine.play(firstValidMove(rules, start));
+      const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, start)));
 
       expect(region).toHaveLength(cellCount);
       expect(keys(start.board.shape.cells)).toEqual(region);
@@ -134,20 +163,19 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
 
     it('should_start_sort_on_the_region_of_the_geometry_when_the_sort_factory_gets_it', () => {
       const offered = new Piece(new CellNode(origin), ColorStack.of([Color.of('red')]));
-      const { engine, rules } = startVariant(
-        new SortFactory(geometry, {
-          size,
-          source: new FixedListPieceSource([offered, offered]),
-          goalsNeeded: GoalCount.of(5),
-        }),
-      );
+      const factory = new SortFactory(geometry, {
+        size,
+        source: new FixedListPieceSource([offered, offered]),
+        goalsNeeded: GoalCount.of(5),
+      });
+      const { engine, rules } = startVariant(factory);
       const start = engine.snapshot();
 
-      const outcome = engine.play(firstValidMove(rules, start));
+      const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, start)));
 
       expect(keys(start.board.shape.cells)).toEqual(region);
       expect(start.board.cells()).toEqual([]);
-      expect(start.offered?.content.chips.map((chip) => chip.name)).toEqual(['red']);
+      expect(start.offered?.content.equals(ColorStack.of([Color.of('red')]))).toBe(true);
       expect(outcome).toBe('playing');
       expect(engine.snapshot().board.cells()).toHaveLength(1);
     });
@@ -161,7 +189,7 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
       const outcome = engine.play(new PlaceFitPiece(A, Turns.of(0), origin));
 
       expect(keys(start.board.shape.cells)).toEqual(keys([origin, next]));
-      expect(start.remaining().map((piece) => piece.content.value)).toEqual(['a']);
+      expect(start.view().remaining.map((piece) => piece.content.value)).toEqual(['a']);
       expect(outcome).toBe('victory');
     });
 
@@ -215,10 +243,18 @@ describe('IVariantFactory', () => {
     expect(lines.first).toBeUndefined();
     expect(sort.first).toBeUndefined();
     expect(fit.first).toBeInstanceOf(MoveHistory);
-    expect(fit.first?.limit).toBeUndefined();
+    expect(undosAfter(threeDominoFitFactory(), 3)).toBe(3);
     expect(merge.first).toBeInstanceOf(MoveHistory);
-    expect(merge.first?.limit).toBe(1);
+    expect(undosAfter(mergeFactory(), 3)).toBe(1);
     expect([fit.distinct, merge.distinct]).toEqual([true, true]);
+  });
+
+  // The limit of a history is private, so no test reads «no limit» itself.
+  // A long Fit game takes back every move: far more than the limit of 1 that Merge has,
+  // the only limit that a variant uses.
+  it('should_take_back_every_move_of_a_long_fit_game_when_another_variant_stops_at_its_limit', () => {
+    expect(undosAfter(threeDominoFitFactory(), 50)).toBe(50);
+    expect(undosAfter(mergeFactory(), 3)).toBe(1);
   });
 
   it('should_give_a_new_empty_board_when_a_factory_is_asked_twice', () => {

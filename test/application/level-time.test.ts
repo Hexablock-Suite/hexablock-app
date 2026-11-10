@@ -9,7 +9,7 @@ import { fitStars } from '../../src/domain/variants/hexa-fit/fit-stars';
 import { gameUseCases, valueOf } from '../support/application/game-use-cases';
 import { ManualClock } from '../support/engine/manual-clock';
 import { square } from '../support/engine/square-topology';
-import { firstValidMove } from '../support/engine/variant-game';
+import { firstMoveOf } from '../support/engine/variant-game';
 import { A, B, C, threeDominoFitFactory } from '../support/variants/hexa-fit/fit-game';
 import { linesFactory } from '../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../support/variants/hexa-merge/merge-game';
@@ -106,9 +106,9 @@ async function firstTurnFields<
   TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
   TPiece,
 >(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>): Promise<string[]> {
-  const { games, startGame, applyMove } = gameUseCases(factory);
+  const { startGame, applyMove } = gameUseCases(factory);
   const started = valueOf(await startGame.execute({}));
-  const move = firstValidMove(factory.createRules(), games.running().snapshot());
+  const move = firstMoveOf(factory);
   const played = valueOf(await applyMove.execute({ move }));
   return [...Object.keys(started), ...Object.keys(played)];
 }

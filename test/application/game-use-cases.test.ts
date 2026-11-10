@@ -5,8 +5,14 @@ import { StartGame } from '../../src/application/start-game';
 import type { BoardState } from '../../src/domain/engine/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
 import { GameEngine } from '../../src/domain/engine/game-engine';
-import type { GameEvent, GameEventPublisher } from '../../src/domain/engine/game-events';
+import {
+  GameOver,
+  type GameEvent,
+  type GameEventPublisher,
+} from '../../src/domain/engine/game-events';
+import { GameFactory } from '../../src/domain/engine/game-factory';
 import { GameId } from '../../src/domain/engine/game-id';
+import { PlayingPhase, VictoryPhase } from '../../src/domain/engine/game-phase';
 import { MoveHistory } from '../../src/domain/engine/move-history';
 import type { Piece } from '../../src/domain/engine/piece';
 import { FixedListPieceSource, type IPieceSource } from '../../src/domain/engine/piece-source';
@@ -19,8 +25,10 @@ import { PlacePiece } from '../../src/domain/variants/hexa-lines/place-piece';
 import type { ColorStack } from '../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../src/domain/variants/hexa-sort/sort-factory';
+import { phaseNameOf } from '../support/engine/phase-name';
 import { square, type SquareCoord } from '../support/engine/square-topology';
-import { firstValidMove } from '../support/engine/variant-game';
+import { firstMoveOf } from '../support/engine/variant-game';
+import { variantIdOf } from '../support/variants/variant-id';
 import {
   errorOf,
   gameUseCases,
@@ -32,16 +40,25 @@ import type { UseCaseLogEntry } from '../../src/application/logger';
 import { fakeCell, type FakeCell } from '../support/engine/fake-cell';
 import {
   emptyState,
+  fakeGameFactory,
   FakeRules,
   OnePointScoring,
   RecordingPublisher,
   type FakeMove,
   type FakeState,
+  type FakeSnapshot,
 } from '../support/engine/fake-game';
-import { A, fitFactory } from '../support/variants/hexa-fit/fit-game';
+import { A, fitFactory, fitStateOf } from '../support/variants/hexa-fit/fit-game';
 import { linesFactory } from '../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../support/variants/hexa-merge/merge-game';
 import { sortFactory, stack, stackPiece } from '../support/variants/hexa-sort/sort-game';
+import { CountingMatchIds, MATCH_ID } from '../support/engine/match-id';
+import {
+  BOARD_ID,
+  CountingBoardIds,
+  CountingStateIds,
+  STATE_ID,
+} from '../support/engine/entity-ids';
 
 // `StartGame` and `ApplyMove` run the four variants through one code path (issue 100,
 // APP-FR-03, classes.md decisions 9, 28 and 29). The helper reads only `IVariantFactory`.
@@ -57,10 +74,10 @@ async function startAndPlayOnce<
   const started = valueOf(await startGame.execute({}));
   const startState = games.running().snapshot();
   const startCells = startState.board.cells();
-  const move = firstValidMove(factory.createRules(), games.running().snapshot());
+  const move = firstMoveOf(factory);
   const played = valueOf(await applyMove.execute({ move }));
   const after = games.running().snapshot();
-  return { gameId: factory.gameId.value, started, startState, startCells, played, after };
+  return { gameId: variantIdOf(factory.gameId), started, startState, startCells, played, after };
 }
 
 class ThrowingPublisher implements GameEventPublisher {
@@ -78,7 +95,7 @@ class BrokenLogger extends RecordingLogger {
 
 // Rules that throw in `resolve()`, before the engine saves the turn.
 class ResolveThrowingRules extends FakeRules {
-  override resolve(_state: FakeState): Resolution<FakeState> {
+  override resolve(_state: FakeState): Resolution {
     throw new Error('The rules broke.');
   }
 }
@@ -86,9 +103,9 @@ class ResolveThrowingRules extends FakeRules {
 // The answers to the first Fit move and to one more move, as code and message.
 async function twoMoves(events: GameEventPublisher) {
   const factory = fitFactory();
-  const { games, startGame, applyMove } = gameUseCases(factory, events);
+  const { startGame, applyMove } = gameUseCases(factory, events);
   valueOf(await startGame.execute({}));
-  const move = firstValidMove(factory.createRules(), games.running().snapshot());
+  const move = firstMoveOf(factory);
   const answers = [];
   for (let call = 0; call < 2; call += 1) {
     const result = await applyMove.execute({ move });
@@ -116,7 +133,7 @@ function brokenStart<
     createRules: () => factory.createRules(),
     createScoring: () => factory.createScoring(),
     createPieceSource: () => factory.createPieceSource(),
-    createBoard: () => factory.createBoard(),
+    createBoard: (boardId) => factory.createBoard(boardId),
     createInitialState: () => {
       throw new RangeError('The level is broken.');
     },
@@ -151,7 +168,11 @@ function runningGameOf<
   TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
 >(games: MemoryRunningGameStore<TCell, TCoord, TMove, TState>) {
   const engine = games.running();
-  return [engine.snapshot().board.cells(), engine.snapshot().score, engine.phase.name];
+  return [
+    engine.snapshot().board.cells(),
+    engine.snapshot().score,
+    phaseNameOf(engine.currentPhase()),
+  ];
 }
 
 // Starts one game and plays `undefined` and then `null` as the move.
@@ -256,7 +277,7 @@ describe('StartGame and ApplyMove', () => {
 
     const error = errorOf(await startGame.execute({}));
 
-    expect(() => factory.createInitialState()).toThrow(
+    expect(() => factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID)).toThrow(
       new RangeError('The level source cannot be copied.'),
     );
 
@@ -271,17 +292,85 @@ describe('StartGame and ApplyMove', () => {
   it('should_return_a_start_failed_failure_and_keep_the_old_game_when_the_factory_throws_while_a_game_runs', async () => {
     const { games, startGame, applyMove } = gameUseCases(linesFactory());
     valueOf(await startGame.execute({}));
-    const move = firstValidMove(linesFactory().createRules(), games.running().snapshot());
+    const move = firstMoveOf(linesFactory());
     valueOf(await applyMove.execute({ move }));
     const oldGame = games.running();
     const before = runningGameOf(games);
-    const broken = new StartGame(brokenStart(linesFactory()), games, new RecordingPublisher());
+    const broken = new StartGame(
+      new GameFactory(
+        brokenStart(linesFactory()),
+        new CountingMatchIds(),
+        new CountingStateIds(),
+        new CountingBoardIds(),
+        new RecordingPublisher(),
+      ),
+      games,
+    );
 
     const error = errorOf(await broken.execute({}));
 
     expect([error.code, error.message]).toEqual(['start-failed', 'The level is broken.']);
     expect(games.current()).toBe(oldGame);
     expect(runningGameOf(games)).toEqual(before);
+  });
+
+  // Unit R6 of the redesign: each game has its own `MatchId`, which an injected generator gives.
+  it('should_open_another_match_when_the_same_variant_starts_again', async () => {
+    const { games, startGame } = gameUseCases(linesFactory());
+    valueOf(await startGame.execute({}));
+    const first = games.running();
+
+    valueOf(await startGame.execute({}));
+    const second = games.running();
+
+    expect([first.equals(second), second.equals(first)]).toEqual([false, false]);
+    expect([first.equals(first), second.equals(second)]).toEqual([true, true]);
+  });
+
+  it('should_publish_game_over_with_the_id_of_the_generator_when_the_started_game_ends', async () => {
+    const publisher = new RecordingPublisher();
+    const factory = fitFactory();
+    const { startGame, applyMove } = gameUseCases(factory, publisher, new RecordingLogger(), {
+      next: () => MATCH_ID,
+    });
+    valueOf(await startGame.execute({}));
+    const move = firstMoveOf(factory);
+
+    const played = valueOf(await applyMove.execute({ move }));
+
+    expect(played.outcome).toBe('victory');
+    expect(publisher.events).toEqual([new GameOver(factory.gameId, MATCH_ID, 'victory', 0)]);
+  });
+
+  it('should_return_a_start_failed_failure_and_keep_the_old_game_when_the_id_generator_throws', async () => {
+    const working = gameUseCases(linesFactory());
+    valueOf(await working.startGame.execute({}));
+    const oldGame = working.games.running();
+    const before = runningGameOf(working.games);
+    const broken = new StartGame(
+      new GameFactory(
+        linesFactory(),
+        {
+          next: () => {
+            throw new Error('The generator has no id.');
+          },
+        },
+        new CountingStateIds(),
+        new CountingBoardIds(),
+        new RecordingPublisher(),
+      ),
+      working.games,
+    );
+
+    const error = errorOf(await broken.execute({}));
+
+    expect([error.code, error.message, error.retryable]).toEqual([
+      'start-failed',
+      'The generator has no id.',
+      false,
+    ]);
+    expect(working.games.current()).toBe(oldGame);
+    expect(runningGameOf(working.games)).toEqual(before);
   });
 
   it('should_return_a_failure_and_keep_the_game_when_the_request_holds_no_move', async () => {
@@ -314,9 +403,14 @@ describe('StartGame and ApplyMove', () => {
 
   it('should_return_a_start_failed_failure_when_the_store_throws_on_replace', async () => {
     const startGame = new StartGame(
-      linesFactory(),
+      new GameFactory(
+        linesFactory(),
+        new CountingMatchIds(),
+        new CountingStateIds(),
+        new CountingBoardIds(),
+        new RecordingPublisher(),
+      ),
       new ThrowingStore('replace'),
-      new RecordingPublisher(),
     );
 
     const error = errorOf(await startGame.execute({}));
@@ -342,7 +436,7 @@ describe('StartGame and ApplyMove', () => {
       before.score,
       before.tray,
     ]);
-    expect(games.running().phase.name).toBe('playing');
+    expect(games.running().currentPhase()).toBe(PlayingPhase.instance);
   });
 
   it('should_return_a_no_running_game_failure_when_apply_move_runs_before_start_game', async () => {
@@ -356,9 +450,9 @@ describe('StartGame and ApplyMove', () => {
   it('should_return_a_move_failed_failure_and_throw_nothing_when_the_engine_throws', async () => {
     // The game is over after the first Fit move, so a second move makes the engine throw.
     const factory = fitFactory();
-    const { games, startGame, applyMove } = gameUseCases(factory);
+    const { startGame, applyMove } = gameUseCases(factory);
     valueOf(await startGame.execute({}));
-    const move = firstValidMove(factory.createRules(), games.running().snapshot());
+    const move = firstMoveOf(factory);
     valueOf(await applyMove.execute({ move }));
 
     const error = errorOf(await applyMove.execute({ move }));
@@ -373,7 +467,7 @@ describe('StartGame and ApplyMove', () => {
     const factory = fitFactory();
     const { games, logger, startGame, applyMove } = gameUseCases(factory, new ThrowingPublisher());
     valueOf(await startGame.execute({}));
-    const move = firstValidMove(factory.createRules(), games.running().snapshot());
+    const move = firstMoveOf(factory);
 
     const played = valueOf(await applyMove.execute({ move }));
 
@@ -389,7 +483,7 @@ describe('StartGame and ApplyMove', () => {
       elapsedMs: 0,
     });
     expect(saved.board.cells()).not.toEqual([]);
-    expect(games.running().phase.name).toBe('victory');
+    expect(games.running().currentPhase()).toBe(VictoryPhase.instance);
     expect(logger.entries).toHaveLength(1);
     const [entry] = logger.entries;
     expect([entry.useCase, entry.outcome, entry.error?.code, entry.error?.message]).toEqual([
@@ -411,13 +505,13 @@ describe('StartGame and ApplyMove', () => {
       new BrokenLogger(),
     );
     valueOf(await startGame.execute({}));
-    const move = firstValidMove(factory.createRules(), games.running().snapshot());
+    const move = firstMoveOf(factory);
 
     const played = valueOf(await applyMove.execute({ move }));
 
     expect(played.outcome).toBe('victory');
     expect(played.cells).toEqual(games.running().snapshot().board.cells());
-    expect(games.running().phase.name).toBe('victory');
+    expect(games.running().currentPhase()).toBe(VictoryPhase.instance);
   });
 
   it('should_answer_the_next_move_as_a_finished_game_does_when_the_publisher_threw_on_the_last_turn', async () => {
@@ -436,6 +530,7 @@ describe('StartGame and ApplyMove', () => {
     const games = new MemoryRunningGameStore<FakeCell, SquareCoord, FakeMove, FakeState>();
     const publisher = new RecordingPublisher();
     const engine = new GameEngine(
+      MATCH_ID,
       GameId.of('fake-game'),
       new ResolveThrowingRules(),
       new OnePointScoring(),
@@ -457,7 +552,7 @@ describe('StartGame and ApplyMove', () => {
       false,
     ]);
     expect(engine.snapshot().board.cells()).toEqual([]);
-    expect([engine.snapshot().score, engine.phase.name]).toEqual([0, 'playing']);
+    expect([engine.snapshot().score, phaseNameOf(engine.currentPhase())]).toEqual([0, 'playing']);
     expect([logger.entries, publisher.events]).toEqual([[], []]);
   });
 
@@ -484,7 +579,7 @@ describe('StartGame and ApplyMove', () => {
 });
 
 // A history that can redo, as the factory of a redo variant gives it.
-class RedoingHistory extends MoveHistory<FakeMove, FakeState> implements IRedoable {
+class RedoingHistory extends MoveHistory<FakeMove, FakeSnapshot> implements IRedoable {
   override redoable(): IRedoable {
     return this;
   }
@@ -496,19 +591,6 @@ class RedoingHistory extends MoveHistory<FakeMove, FakeState> implements IRedoab
   redo(): void {
     return;
   }
-}
-
-// A game that the use cases cannot name. Its state gives its own view.
-function fakeGameFactory(): IVariantFactory<FakeCell, SquareCoord, FakeMove, FakeState, FakeCell> {
-  return {
-    gameId: GameId.of('fake-game'),
-    createRules: () => new FakeRules(),
-    createScoring: () => new OnePointScoring(),
-    createPieceSource: () => undefined,
-    createBoard: () => emptyState().board,
-    createInitialState: () => emptyState(),
-    createHistory: () => undefined,
-  };
 }
 
 // Tries to change each list and each field of a payload, in depth.
@@ -576,11 +658,14 @@ describe('the variant data of MoveResult', () => {
     expect(lines.played.payload.tray).toEqual(lines.after.tray);
 
     const fit = await startAndPlayOnce(fitFactory());
-    expect(fit.started.payload.remaining).toEqual(fit.startState.remaining());
-    expect(fit.started.payload.placed).toEqual(fit.startState.placed());
-    expect(fit.played.payload.remaining).toEqual(fit.after.remaining());
-    expect(fit.played.payload.placed).toEqual(fit.after.placed());
-    expect(fit.after.placed()).toEqual([A]);
+    // The photo has no business query, so a state built again from it answers them.
+    const fitStart = fitStateOf(fit.startState, fitFactory().createPieceSource());
+    const fitAfter = fitStateOf(fit.after, fitFactory().createPieceSource());
+    expect(fit.started.payload.remaining).toEqual(fitStart.remaining());
+    expect(fit.started.payload.placed).toEqual(fitStart.placed());
+    expect(fit.played.payload.remaining).toEqual(fitAfter.remaining());
+    expect(fit.played.payload.placed).toEqual(fitAfter.placed());
+    expect(fitAfter.placed()).toEqual([A]);
 
     const sort = await startAndPlayOnce(sortFactory());
     expect(sort.started.payload.offered).toEqual(sort.startState.offered);

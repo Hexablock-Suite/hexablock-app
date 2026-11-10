@@ -1,16 +1,19 @@
 import type { Board } from '../../engine/board';
+import type { BoardId } from '../../engine/board-id';
 import { BoardBuilder } from '../../engine/board-builder';
 import { GameId } from '../../engine/game-id';
+import type { GameStateId } from '../../engine/game-state-id';
 import type { GeometryFactory } from '../../engine/geometry-factory';
+import type { MatchId } from '../../engine/match-id';
 import { MoveHistory } from '../../engine/move-history';
 import type { SeededPieceSource } from '../../engine/piece-source';
 import type { RegionSize } from '../../engine/region-size';
 import type { IGameRules } from '../../engine/rules';
 import type { IScoringPolicy } from '../../engine/scoring-policy';
 import type { IVariantFactory } from '../../engine/variant-factory';
-import { addNewTile, MergeRules } from './merge-rules';
+import { MergeRules } from './merge-rules';
 import { MergeScoring } from './merge-scoring';
-import { MergeState } from './merge-state';
+import { MergeState, type MergeSnapshot } from './merge-state';
 import type { MergeTile } from './merge-tile';
 import { mergeTileSource } from './merge-tile-source';
 import type { NewTile } from './new-tile';
@@ -63,19 +66,28 @@ export class MergeFactory<TCoord> implements IVariantFactory<
     return mergeTileSource(this.settings.seed, this.settings.fourChance);
   }
 
-  createBoard(): Board<MergeTile, TCoord, string> {
-    return new BoardBuilder(this.geometry).withRegion(this.settings.size).build<MergeTile>();
+  createBoard(boardId: BoardId): Board<MergeTile, TCoord, string> {
+    return new BoardBuilder(this.geometry).withRegion(this.settings.size).build<MergeTile>(boardId);
   }
 
   // The first tiles come from the same source as the later tiles.
-  createInitialState(): MergeState<MergeTile, TCoord, string> {
-    const state = new MergeState(this.createBoard(), this.createPieceSource());
-    for (let i = 0; i < START_TILES; i += 1) addNewTile(state);
+  createInitialState(
+    matchId: MatchId,
+    stateId: GameStateId,
+    boardId: BoardId,
+  ): MergeState<MergeTile, TCoord, string> {
+    const state = new MergeState(
+      stateId,
+      matchId,
+      this.createBoard(boardId),
+      this.createPieceSource(),
+    );
+    for (let i = 0; i < START_TILES; i += 1) state.addNewTile();
     return state;
   }
 
   // Hexa Merge undoes one move (APP-FR-08, classes.md decision 3).
-  createHistory(): MoveHistory<Slide<string>, MergeState<MergeTile, TCoord, string>> {
+  createHistory(): MoveHistory<Slide<string>, MergeSnapshot<MergeTile, TCoord, string>> {
     return new MoveHistory(MERGE_UNDO_LIMIT);
   }
 }

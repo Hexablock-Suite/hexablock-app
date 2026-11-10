@@ -1,11 +1,13 @@
 /** @jest-environment node */
 import { Board } from '../../../../src/domain/engine/board';
+import { PlayingPhase } from '../../../../src/domain/engine/game-phase';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import type { RandomSource } from '../../../../src/domain/engine/random-source';
 import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
 import { BaseGameRules } from '../../../../src/domain/engine/rules';
 import type { ColorStack } from '../../../../src/domain/variants/hexa-sort/color-stack';
 import { SortRules } from '../../../../src/domain/variants/hexa-sort/sort-rules';
+import type { SortSnapshot, SortState } from '../../../../src/domain/variants/hexa-sort/sort-state';
 import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
 import {
   chipsAt,
@@ -18,6 +20,8 @@ import {
   stackPiece,
   tiles,
 } from '../../../support/variants/hexa-sort/sort-game';
+import { BOARD_ID } from '../../../support/engine/entity-ids';
+import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
 
 // The rules of issue #93 and the accepted rules of issue #56: a tie goes to the stack
 // whose coordinate key comes first in key order.
@@ -260,10 +264,11 @@ describe('SortRules edge cases', () => {
     content: readonly [SquareCoord, ColorStack][],
   ): Board<ColorStack, SquareCoord, string> {
     const board = new Board<ColorStack, SquareCoord, string>(
+      BOARD_ID,
       squareTopology.region(RegionSize.of(3)),
       squareTopology,
     );
-    for (const [at, cell] of content) board.set(at, cell);
+    for (const [at, cell] of content) board.occupy(at, cell);
     return board;
   }
 
@@ -366,10 +371,38 @@ describe('SortRules edge cases', () => {
     expect(() => game.play(place(0))).toThrow('The source failed.');
 
     const state = game.snapshot();
-    expect(game.phase.name).toBe('playing');
+    expect(game.currentPhase()).toBe(PlayingPhase.instance);
     expect(state.board.cells()).toEqual([]);
     expect(names(state.offered?.content)).toEqual(['red']);
     expect(state.placedAt).toBeUndefined();
     expect(state.goalsDone).toBe(0);
+  });
+});
+
+// R7: the engine plays a turn on a copy of its state. The Sort state changes in place,
+// so a turn that throws after the stack moved and cleared leaves the state of the game.
+describe('SortRules atomic turn', () => {
+  it('should_keep_the_snapshot_when_the_turn_throws_after_the_stack_changed_the_state', () => {
+    const failing: IScoringPolicy<SortState<SquareCoord>> = {
+      score: () => {
+        throw new Error('The scoring fails.');
+      },
+    };
+    const engine = sortGame(
+      sortState({ board: row(2), offered: [stack('red', 'red'), stack('blue')], goalsNeeded: 3 }),
+      failing,
+    );
+    const facts = (state: SortSnapshot<SquareCoord>) => ({
+      cells: state.board.cells(),
+      offered: state.offered,
+      goalsDone: state.goalsDone,
+      clearedTiles: [...state.clearedTiles],
+      placedAt: state.placedAt,
+      score: state.score,
+    });
+    const before = facts(engine.snapshot());
+
+    expect(() => engine.play({ at: square(0, 0) })).toThrow('The scoring fails.');
+    expect(facts(engine.snapshot())).toEqual(before);
   });
 });

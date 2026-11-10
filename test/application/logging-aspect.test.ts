@@ -11,7 +11,7 @@ import type { Cloneable } from '../../src/domain/engine/cloneable';
 import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
 import { PlacePiece } from '../../src/domain/variants/hexa-lines/place-piece';
 import { square } from '../support/engine/square-topology';
-import { firstValidMove } from '../support/engine/variant-game';
+import { firstMoveOf } from '../support/engine/variant-game';
 import { errorOf, gameUseCases, valueOf } from '../support/application/game-use-cases';
 import { RecordingLogger } from '../support/application/recording-logger';
 import { fitFactory } from '../support/variants/hexa-fit/fit-game';
@@ -30,11 +30,11 @@ async function startAndPlay<
   TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
   TPiece,
 >(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>, logger?: RecordingLogger) {
-  const { games, startGame, applyMove } = gameUseCases(factory);
+  const { startGame, applyMove } = gameUseCases(factory);
   const start = logger ? new LoggingAspect(startGame, logger, 'StartGame') : startGame;
   const play = logger ? new LoggingAspect(applyMove, logger, 'ApplyMove') : applyMove;
   const started = await start.execute({});
-  const move = firstValidMove(factory.createRules(), games.running().snapshot());
+  const move = firstMoveOf(factory);
   const played = await play.execute({ move });
   return { started, played };
 }
@@ -105,9 +105,9 @@ describe('LoggingAspect', () => {
   it('should_log_one_entry_for_each_undo_when_the_aspect_wraps_undo_move', async () => {
     const logger = new RecordingLogger();
     const factory = mergeFactory();
-    const { games, startGame, applyMove, undoMove } = gameUseCases(factory);
+    const { startGame, applyMove, undoMove } = gameUseCases(factory);
     await startGame.execute({});
-    const move = firstValidMove(factory.createRules(), games.running().snapshot());
+    const move = firstMoveOf(factory);
     await applyMove.execute({ move });
     const undo = new LoggingAspect(undoMove, logger, 'UndoMove');
 

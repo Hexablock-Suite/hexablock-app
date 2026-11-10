@@ -252,7 +252,7 @@ describe('README primitive types', () => {
   it('should_find_a_primitive_in_the_engine_when_the_code_is_scanned', () => {
     const uses = codeUses();
 
-    expect(uses).toContainEqual({ primitive: 'number', where: 'GridTopology.rotationSteps' });
+    expect(uses).toContainEqual({ primitive: 'number', where: 'Turns.of' });
     expect(uses).toContainEqual({ primitive: 'string', where: 'GameId.of' });
   });
 

@@ -74,10 +74,11 @@
           GamePresenter. In layer 3, GamePresenter uses the UseCase input port, and
           InMemoryRunningGameStore implements the RunningGameStore port and keeps the running
           GameEngine. In layer 2, StartGame implements UseCase, takes a StartGameRequest, keeps the
-          RunningGameStore port and the IVariantFactory, and builds a MoveResult. In layer 1,
-          LinesFactory implements IVariantFactory and builds the board with BoardBuilder; both hold
-          the GeometryFactory, and BoardBuilder creates Board. StartGame creates GameEngine and
-          reads the cells of Board. Every dependency between layers points down.
+          RunningGameStore port and the GameFactory, and builds a MoveResult. In layer 1,
+          GameFactory keeps the IVariantFactory and creates the started GameEngine. LinesFactory
+          implements IVariantFactory and builds the board with BoardBuilder; both hold the
+          GeometryFactory, and BoardBuilder creates Board. StartGame reads the cells of Board. Every
+          dependency between layers points down.
         </desc>
         <defs>
           <marker
@@ -275,9 +276,9 @@
           stroke-width="1"
           marker-end="url(#flowstart-open)"
         />
-        <!-- StartGame keeps the IVariantFactory it receives in an attribute: use, down from layer 2 to layer 1 -->
+        <!-- StartGame keeps the GameFactory it receives in an attribute: use, down from layer 2 to layer 1 -->
         <path
-          d="M320 696 V748 Q320 756 312 756 H188 Q180 756 180 764 V776"
+          d="M640 696 V916 Q640 924 648 924 H792 Q800 924 800 932 V960"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -291,9 +292,17 @@
           stroke-width="1"
           marker-end="url(#flowstart-open)"
         />
-        <!-- StartGame creates GameEngine: use, down from layer 2 to layer 1 -->
+        <!-- GameFactory creates GameEngine and starts it: use -->
         <path
-          d="M620 696 V740 Q620 748 628 748 H692 Q700 748 700 756 V776"
+          d="M830 960 V888"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#flowstart-open)"
+        />
+        <!-- GameFactory keeps the IVariantFactory it receives as variant: use -->
+        <path
+          d="M776 960 V956 Q776 948 768 948 H308 Q300 948 300 940 V928"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -301,7 +310,7 @@
         />
         <!-- LinesFactory implements IVariantFactory: realization -->
         <path
-          d="M160 960 V912"
+          d="M160 960 V928"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -377,10 +386,10 @@
         >
           CELLS()
         </text>
-        <rect x="622" y="735" width="44.96" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="834" y="915" width="44.94" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="626"
-          y="744"
+          x="838"
+          y="924"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -462,16 +471,28 @@
           game
           <tspan font-weight="600">0..1</tspan>
         </text>
-        <rect x="125.8" y="761" width="50.2" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="736" y="907" width="50.2" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="174"
-          y="770"
+          x="738"
+          y="916"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
-          text-anchor="end"
+          text-anchor="start"
         >
           factory
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <rect x="304" y="931" width="50.2" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="306"
+          y="940"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          variant
           <tspan font-weight="600">1</tspan>
         </text>
         <rect x="564" y="1115" width="55" height="12" rx="2" fill="#f9f4dc" />
@@ -832,7 +853,7 @@
         <line x1="300" y1="616" x2="660" y2="616" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <line x1="300" y1="656" x2="660" y2="656" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text x="316" y="632" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - factory: IVariantFactory&lt;TCell, TCoord, TMove, TState&gt;
+          - factory: GameFactory&lt;TCell, TCoord, TMove, TState&gt;
         </text>
         <text x="316" y="648" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - games: RunningGameStore&lt;TCell, TCoord, TMove, TState&gt;
@@ -848,7 +869,7 @@
           x="40"
           y="776"
           width="320"
-          height="136"
+          height="152"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -863,7 +884,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Abstract Factory»
+          «interface» «Abstract Factory» «factory»
         </text>
         <text
           x="200"
@@ -887,9 +908,12 @@
           + createHistory(): MoveHistory&lt;TMove, TState&gt; [0..1]
         </text>
         <text x="56" y="888" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + createInitialState(): TState
+          + createInitialState(matchId: MatchId, stateId:
         </text>
-        <text x="56" y="904" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="904" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          GameStateId, boardId: BoardId): TState
+        </text>
+        <text x="56" y="920" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           createBoard() and the others: view 5
         </text>
         <!-- Class: Board -->
@@ -965,7 +989,7 @@
         <line x1="660" y1="824" x2="940" y2="824" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <line x1="660" y1="848" x2="940" y2="848" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="676" y="840" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          rules, scoring, phase, history: view 1
+          matchId, rules, scoring, phase, history: view 1
         </text>
         <text x="676" y="864" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + start(initial: TState): void
@@ -993,7 +1017,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «Concrete Factory»
+          «Concrete Factory» «factory»
         </text>
         <text
           x="160"
@@ -1033,7 +1057,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «Builder» «DDD factory»
+          «Builder» «factory»
         </text>
         <text
           x="560"
@@ -1104,7 +1128,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Abstract Factory»
+          «interface» «Abstract Factory» «factory»
         </text>
         <text
           x="570"
@@ -1145,7 +1169,104 @@
         >
           + createPieceShapes(): ShapeNode&lt;TCoord&gt;[]
         </text>
+        <!-- Class: GameFactory (factory of the aggregate) -->
+        <rect
+          x="752"
+          y="960"
+          width="256"
+          height="112"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="880"
+          y="978"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «factory»
+        </text>
+        <text
+          x="880"
+          y="996"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GameFactory
+        </text>
+        <line
+          x1="752"
+          y1="1008"
+          x2="1008"
+          y2="1008"
+          stroke="rgba(23,33,42,0.22)"
+          stroke-width="1"
+        />
+        <line
+          x1="752"
+          y1="1032"
+          x2="1008"
+          y2="1032"
+          stroke="rgba(23,33,42,0.22)"
+          stroke-width="1"
+        />
+        <text
+          x="768"
+          y="1024"
+          fill="#5b6873"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          variant, the id generators, events: view 5
+        </text>
+        <text
+          x="768"
+          y="1048"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + createGame():
+        </text>
+        <text
+          x="784"
+          y="1064"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          GameEngine&lt;TCell, TCoord, TMove, TState&gt;
+        </text>
         <!-- UML template boxes: type parameters on the top-right corner -->
+        <rect
+          x="846"
+          y="950"
+          width="162"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="927"
+          y="962"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCell, TCoord, TMove, TState
+        </text>
         <rect
           x="332"
           y="214"

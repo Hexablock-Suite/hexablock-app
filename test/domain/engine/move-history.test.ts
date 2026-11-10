@@ -43,7 +43,6 @@ describe('MoveHistory', () => {
     history.undo();
     history.undo();
 
-    expect(history.limit).toBe(2);
     expect(restored).toEqual(['c', 'b']);
     expect(history.canUndo()).toBe(false);
   });
@@ -55,7 +54,6 @@ describe('MoveHistory', () => {
 
     while (history.canUndo()) history.undo();
 
-    expect(history.limit).toBeUndefined();
     expect(restored).toEqual([...states].reverse());
   });
 
@@ -111,7 +109,7 @@ describe('MoveHistory', () => {
     expect(new MoveHistory<string, string>().redoable()).toBeUndefined();
   });
 
-  it('should_keep_the_move_and_give_back_the_kept_state_when_a_command_is_undone', () => {
+  it('should_give_back_the_kept_state_when_a_command_is_undone', () => {
     const restored: string[] = [];
     const command = new MoveCommand('the move', 'the state before', (memento) => {
       restored.push(memento);
@@ -119,7 +117,6 @@ describe('MoveHistory', () => {
 
     command.undo();
 
-    expect(command.move).toBe('the move');
     expect(restored).toEqual(['the state before']);
   });
 });

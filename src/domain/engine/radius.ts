@@ -10,4 +10,9 @@ export class Radius {
     }
     return new Radius(value === 0 ? 0 : value);
   }
+
+  // Two radii are equal when they hold the same value.
+  equals(other: Radius): boolean {
+    return this.value === other.value;
+  }
 }

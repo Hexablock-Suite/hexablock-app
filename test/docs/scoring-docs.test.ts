@@ -5,8 +5,6 @@ import path from 'node:path';
 import { Board } from '../../src/domain/engine/board';
 import { FixedListPieceSource } from '../../src/domain/engine/piece-source';
 import { RegionSize } from '../../src/domain/engine/region-size';
-import { Resolution } from '../../src/domain/engine/resolution';
-import type { IScoringPolicy } from '../../src/domain/engine/scoring-policy';
 import { FIT_POINTS_PER_TURN } from '../../src/domain/variants/hexa-fit/fit-scoring';
 import { fitStars } from '../../src/domain/variants/hexa-fit/fit-stars';
 import { ComboMultiplierDecorator } from '../../src/domain/variants/hexa-lines/combo-multiplier-decorator';
@@ -29,6 +27,8 @@ import { squareTopology, type SquareCoord } from '../support/engine/square-topol
 import { repoRoot } from '../support/run-tool';
 import { linesState } from '../support/variants/hexa-lines/lines-game';
 import { mergeState } from '../support/variants/hexa-merge/merge-game';
+import { MATCH_ID } from '../support/engine/match-id';
+import { BOARD_ID, STATE_ID } from '../support/engine/entity-ids';
 
 // APP-FR-06 (issue 104): the README documents the scoring of each variant.
 // The gate reads the README section «Scoring» and checks it against the scoring code.
@@ -77,39 +77,51 @@ function brokenLinks(section: string): string[] {
     .filter((target) => !existsSync(path.join(repoRoot, target)));
 }
 
-// The points that a policy gives for the turn that ends in `state`.
-function turnScore<TState>(policy: IScoringPolicy<TState>, state: TState): number {
-  return policy.score(state, Resolution.resolved(state));
+// The points that a policy gives for the turn whose photo after the turn is `after`.
+// The policies read only the photo after the turn, so the photo before is the same photo.
+function turnScore<TPhoto>(
+  policy: { score(before: TPhoto, after: TPhoto): number },
+  after: TPhoto,
+): number {
+  return policy.score(after, after);
 }
 
 // The points of one Lines placement from the real base policy and its decorator.
+// A photo is plain data, so the test gives the facts of the placement in a copy of a photo.
 function linesPoints(cells: number, lines: number, streak: number): number {
-  const state = linesState(squareTopology, 1, { tray: [] });
-  state.cellsPlaced = cells;
-  state.linesCleared = lines;
-  state.streak = streak;
-  return turnScore(new ComboMultiplierDecorator(new LinesScoring<SquareCoord>()), state);
+  const photo = linesState(squareTopology, 1, { tray: [] }).snapshot();
+  const after = { ...photo, cellsPlaced: cells, linesCleared: lines, streak };
+  return turnScore(new ComboMultiplierDecorator(new LinesScoring<SquareCoord>()), after);
 }
 
 // The points of one Merge slide whose merges make the tiles of `values`.
 function mergePoints(values: number[]): number {
   const start = mergeState([]);
-  const state = new MergeState(start.board, start.tiles, false, values.map(MergeTile.of));
-  return turnScore(new MergeScoring(), state);
+  const state = new MergeState(
+    STATE_ID,
+    MATCH_ID,
+    start.snapshot().board.clone(),
+    start.snapshot().tiles.clone(),
+    false,
+    values.map(MergeTile.of),
+  );
+  return turnScore(new MergeScoring(), state.snapshot());
 }
 
 // The points of one Sort turn that clears stacks of the given tile counts.
 function sortPoints(stacks: number[]): number {
   const state = SortState.start({
+    stateId: STATE_ID,
+    matchId: MATCH_ID,
     board: new Board<ColorStack, SquareCoord, string>(
+      BOARD_ID,
       squareTopology.region(RegionSize.of(1)),
       squareTopology,
     ),
     source: new FixedListPieceSource([]),
     goalsNeeded: GoalCount.of(1),
   });
-  state.clearedTiles = stacks;
-  return turnScore(new SortScoring<SquareCoord>(), state);
+  return turnScore(new SortScoring<SquareCoord>(), { ...state.snapshot(), clearedTiles: stacks });
 }
 
 // Writes 60000 as «60 000», the way the README writes a number of milliseconds.

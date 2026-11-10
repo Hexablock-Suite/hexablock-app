@@ -1009,7 +1009,7 @@
           + playTurn(state: TState, move: TMove):
         </text>
         <text x="362" y="976" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          Resolution&lt;TState&gt;
+          Resolution
         </text>
         <!-- Class: GameEngine (aggregate root) -->
         <rect
@@ -1049,7 +1049,7 @@
           - rules: IGameRules&lt;TMove, TState&gt;
         </text>
         <text x="696" y="976" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          scoring, phase, history: view 1
+          matchId, scoring, phase, history: view 1
         </text>
         <line x1="680" y1="984" x2="980" y2="984" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
@@ -1068,7 +1068,7 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          + snapshot(): TState
+          + snapshot(): SnapshotOf&lt;TState&gt;
         </text>
         <text
           x="696"
@@ -1359,7 +1359,7 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           GameEngine from RunningGameStore, calls tryPlay() and snapshot(), and copies the cells of
-          Board and the payload of BoardState.view() into a MoveResult (decision 29).
+          the photo's Board and the payload of its view() into a MoveResult (decisions 29, 34).
         </text>
         <text
           x="24"

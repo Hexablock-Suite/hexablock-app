@@ -1,14 +1,17 @@
-import type { BoardState } from '../../../src/domain/engine/board-state';
+import type { BoardState, SnapshotOf } from '../../../src/domain/engine/board-state';
 import type { Cloneable } from '../../../src/domain/engine/cloneable';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
 import type { IGameRules } from '../../../src/domain/engine/rules';
 import type { IVariantFactory } from '../../../src/domain/engine/variant-factory';
 import { RecordingPublisher } from './fake-game';
+import { MATCH_ID } from './match-id';
+import { BOARD_ID, STATE_ID } from './entity-ids';
 
 // One code path for every variant: it reads only the `IVariantFactory` contract
 // (classes.md decision 31). It names no variant and never reads the game id to branch.
-// `StartGame` in `src/application/` holds this wiring for the app (issue 100).
-// This helper stays for the synchronous domain tests that read the rules and the publisher.
+// `GameFactory` in `src/domain/engine/` holds this wiring for the app (classes.md decision 40).
+// This helper stays for the synchronous domain tests that read the rules and the publisher
+// of the game. It gives every game the fixed `MATCH_ID`.
 export function startVariant<
   TCell,
   TCoord,
@@ -19,13 +22,14 @@ export function startVariant<
   const publisher = new RecordingPublisher();
   const rules = factory.createRules();
   const engine = new GameEngine<TCell, TCoord, TMove, TState>(
+    MATCH_ID,
     factory.gameId,
     rules,
     factory.createScoring(),
     publisher,
     factory.createHistory(),
   );
-  engine.start(factory.createInitialState());
+  engine.start(factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID));
   return { engine, rules, publisher };
 }
 
@@ -36,4 +40,39 @@ export function firstValidMove<TMove, TState>(
 ): TMove {
   for (const move of rules.validMoves(state)) return move;
   throw new RangeError('The state has no valid move.');
+}
+
+// The first valid move of a new game of `factory`. A new game starts from the first state
+// that the factory creates, so the rules read a new first state with the same content.
+// The engine never gives its state away: `GameEngine.snapshot()` gives a photo (decision 34).
+export function firstMoveOf<
+  TCell,
+  TCoord,
+  TMove,
+  TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
+  TPiece,
+>(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>): TMove {
+  return firstValidMove(
+    factory.createRules(),
+    factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID),
+  );
+}
+
+// A live state with the content of `photo`, a photo of a game that `startVariant` started.
+// The engine never gives its state away, so the rules cannot read a photo (decision 34).
+// `startVariant` gives every state `STATE_ID` and every board `BOARD_ID`. So a new first state
+// of the factory with the same ids takes the photo back with `restore()`.
+export function liveStateOf<
+  TCell,
+  TCoord,
+  TMove,
+  TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
+  TPiece,
+>(
+  factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>,
+  photo: SnapshotOf<TState>,
+): TState {
+  const state = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
+  state.restore(photo);
+  return state;
 }

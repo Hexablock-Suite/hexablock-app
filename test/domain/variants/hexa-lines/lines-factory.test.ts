@@ -1,10 +1,11 @@
 /** @jest-environment node */
+import { GameId } from '../../../../src/domain/engine/game-id';
 import type { Piece } from '../../../../src/domain/engine/piece';
 import { CellNode, ShapeGroup } from '../../../../src/domain/engine/shape-node';
 import type { Color } from '../../../../src/domain/engine/color';
 import { PlacePiece } from '../../../../src/domain/variants/hexa-lines/place-piece';
 import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
-import { firstValidMove, startVariant } from '../../../support/engine/variant-game';
+import { firstValidMove, startVariant, liveStateOf } from '../../../support/engine/variant-game';
 import {
   blue,
   filledKeys,
@@ -14,15 +15,19 @@ import {
   piece,
   red,
 } from '../../../support/variants/hexa-lines/lines-game';
+import { MATCH_ID } from '../../../support/engine/match-id';
+import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 
 // The Lines factory creates the whole family of Hexa Lines (issue 99, classes.md decision 31).
 
 const domino = new ShapeGroup([new CellNode(square(0, 0)), new CellNode(square(1, 0))]);
 
 // A piece as text: its color and the keys of its cells, so two pieces compare by value.
+// `Color` keeps its name private, so `equals()` names the color. These tests draw red or blue.
 function describe_(piece: Piece<Color, SquareCoord>): string {
   const keys = piece.shape.cells().map((c) => squareTopology.key(c));
-  return `${piece.content.name} ${keys.join(' ')}`;
+  const color = piece.content.equals(red) ? 'red' : 'blue';
+  return `${color} ${keys.join(' ')}`;
 }
 
 function firstPieces(seed: number, count: number): string[] {
@@ -43,14 +48,14 @@ describe('LinesFactory', () => {
   it('should_start_a_game_that_plays_one_move_when_the_lines_factory_builds_it', () => {
     const factory = linesFactory();
 
-    const initial = factory.createInitialState();
+    const initial = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
     const { engine, rules, publisher } = startVariant(factory);
-    const outcome = engine.play(firstValidMove(rules, engine.snapshot()));
+    const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, engine.snapshot())));
 
-    expect(factory.gameId.value).toBe('hexa-lines');
-    expect(factory.createBoard().shape.cells).toHaveLength(9);
-    expect(initial.board.cells()).toEqual([]);
-    expect(initial.tray).toHaveLength(3);
+    expect(factory.gameId.equals(GameId.of('hexa-lines'))).toBe(true);
+    expect(factory.createBoard(BOARD_ID).shape.cells).toHaveLength(9);
+    expect(initial.snapshot().board.cells()).toEqual([]);
+    expect(initial.snapshot().tray).toHaveLength(3);
     expect(outcome).toBe('playing');
     expect(filledKeys(engine.snapshot())).toEqual(['0,0']);
     expect(engine.snapshot().tray).toHaveLength(2);
@@ -66,8 +71,16 @@ describe('LinesFactory', () => {
     expect(firstPieces(43, 12)).not.toEqual(pieces);
     // The draw picks among the shapes and the colors of the settings.
     expect(new Set(pieces).size).toBeGreaterThan(1);
-    expect(linesFactory(42).createInitialState().tray.map(describe_)).toEqual(
-      linesFactory(42).createInitialState().tray.map(describe_),
+    expect(
+      linesFactory(42)
+        .createInitialState(MATCH_ID, STATE_ID, BOARD_ID)
+        .snapshot()
+        .tray.map(describe_),
+    ).toEqual(
+      linesFactory(42)
+        .createInitialState(MATCH_ID, STATE_ID, BOARD_ID)
+        .snapshot()
+        .tray.map(describe_),
     );
   });
 
@@ -94,7 +107,9 @@ describe('LinesFactory', () => {
       const message = `A seed must be an integer from 0 to 4294967295, not ${seed}.`;
 
       expect(() => linesFactory(seed).createPieceSource()).toThrow(new RangeError(message));
-      expect(() => linesFactory(seed).createInitialState()).toThrow(new RangeError(message));
+      expect(() => linesFactory(seed).createInitialState(MATCH_ID, STATE_ID, BOARD_ID)).toThrow(
+        new RangeError(message),
+      );
     }
   });
 

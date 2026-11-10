@@ -10,15 +10,26 @@ describe('ShapeGroup', () => {
 
     expect(group.area()).toBe(2);
     expect(group.cells()).toEqual([0, 1]);
-    expect(group.children).toHaveLength(2);
   });
 
-  it('should_throw_and_keep_the_area_when_a_caller_pushes_into_the_children_property', () => {
-    const group = new ShapeGroup<number>([new CellNode(0), new CellNode(1)]);
-    // `readonly` holds only at compile time, so the cast stands for a caller that ignores it.
-    const children = group.children as ShapeNode<number>[];
+  // The group keeps its own list, so no write to the caller's array reaches it.
+  it('should_keep_its_children_when_the_caller_replaces_and_removes_items_of_the_array', () => {
+    const children: ShapeNode<number>[] = [new CellNode(0), new CellNode(1)];
+    const group = new ShapeGroup(children);
 
-    expect(() => children.push(new CellNode(2))).toThrow(TypeError);
+    children[0] = new CellNode(7);
+    children.length = 0;
+
+    expect(group.cells()).toEqual([0, 1]);
+    expect(group.area()).toBe(2);
+  });
+
+  it('should_keep_its_cells_when_a_caller_changes_the_list_that_cells_returns', () => {
+    const group = new ShapeGroup<number>([new CellNode(0), new CellNode(1)]);
+
+    group.cells().push(2);
+
+    expect(group.cells()).toEqual([0, 1]);
     expect(group.area()).toBe(2);
   });
 });

@@ -28,7 +28,7 @@ export class TimedRulesDecorator<TMove, TState> implements IGameRules<TMove, TSt
     return this.inner.apply(state, move);
   }
 
-  resolve(state: TState): Resolution<TState> {
+  resolve(state: TState): Resolution {
     return this.inner.resolve(state);
   }
 
@@ -36,7 +36,7 @@ export class TimedRulesDecorator<TMove, TState> implements IGameRules<TMove, TSt
     return this.inner.evaluate(state);
   }
 
-  playTurn(state: TState, move: TMove): Resolution<TState> {
+  playTurn(state: TState, move: TMove): Resolution {
     const resolution = this.inner.playTurn(state, move);
     if (!resolution.accepted) return resolution;
     this.timer.start();

@@ -1,8 +1,9 @@
-import type { BoardState } from './board-state';
+import type { BoardSnapshot, BoardState, SnapshotOf } from './board-state';
 import type { Cloneable } from './cloneable';
 import { GameOver, type GameEventPublisher } from './game-events';
 import type { GameId } from './game-id';
 import { PlayingPhase, ResolvingPhase, type GamePhase } from './game-phase';
+import type { MatchId } from './match-id';
 import { MoveCommand } from './move-command';
 import type { MoveHistory } from './move-history';
 import type { Outcome } from './outcome';
@@ -27,13 +28,16 @@ export interface PublishFailure {
 }
 
 // The aggregate root of one game (classes.md decision 26).
+// It is an entity: its `MatchId` is its identity, and the id never changes.
+// `GameFactory` gives each new game the id of a generator. `gameId` only names the variant.
 // A game changes only through `play()` and through the undo capability, and both act only
-// while `phase.canPlay()` is true. `snapshot()` returns a clone, so no caller changes the board.
+// while `currentPhase().canPlay()` is true. `snapshot()` returns the photo of the state,
+// which is immutable, so no caller changes the game through it (classes.md decision 34).
 // The engine depends only on the interfaces of the rules and the scoring (Strategy, D1).
 // `TState` is a `BoardState` whose `clone()` returns `TState`, so each copy keeps the state type.
 // `history` is optional, because the variant factory decides it (classes.md decision 3).
-// The engine is the Memento originator (decision 34). Each saved turn keeps a clone of the
-// state before the move, and `restore()` takes that clone back.
+// The engine is the Memento originator (decision 34). Each saved turn keeps the photo of the
+// state before the move, and `restore()` gives that photo back to the state.
 export class GameEngine<
   TCell,
   TCoord,
@@ -44,20 +48,33 @@ export class GameEngine<
   private current: GamePhase = PlayingPhase.instance;
 
   constructor(
+    private readonly matchId: MatchId,
     private readonly gameId: GameId,
     private readonly rules: IGameRules<TMove, TState>,
     private readonly scoring: IScoringPolicy<TState>,
     private readonly events: GameEventPublisher,
-    private readonly history?: MoveHistory<TMove, TState>,
+    private readonly history?: MoveHistory<TMove, SnapshotOf<TState>>,
   ) {}
 
-  get phase(): GamePhase {
+  // Two engines are the same game when they have the same `MatchId`.
+  // The boards, the scores and the phases do not count.
+  equals(other: GameEngine<TCell, TCoord, TMove, TState>): boolean {
+    return this.matchId.equals(other.matchId);
+  }
+
+  // Tells which phase the game is in.
+  currentPhase(): GamePhase {
     return this.current;
   }
 
   // Starts a game from a copy of `initial`, so the caller keeps no reference to the board.
   // A new game has no move to undo.
+  // The state is an entity inside this aggregate, and its identity is the `MatchId` of the game.
+  // A state of another match throws a RangeError, and the game stays as it was.
   start(initial: TState): void {
+    if (!initial.belongsTo(this.matchId)) {
+      throw new RangeError('The first state belongs to another match.');
+    }
     this.state = copy(initial);
     this.current = PlayingPhase.instance;
     this.history?.clear();
@@ -93,11 +110,11 @@ export class GameEngine<
   // The rollback covers the whole state and the phase. A piece source lives in the state
   // (classes.md decision 31), and the state `clone()` clones it. So a turn that throws
   // after a draw leaves the source at its old position, and a retry draws the same piece.
+  // The rules change their copy in place (classes.md decision 7), and a `Resolution` holds
+  // no state. So the engine keeps the copy that it gave to the rules as the next state.
   tryPlay(move: TMove): TurnReport {
     const state = this.started();
-    if (!this.current.canPlay()) {
-      throw new RangeError(`The game cannot accept a move in the ${this.current.name} phase.`);
-    }
+    this.current.checkAcceptsMove();
     this.current = ResolvingPhase.instance;
     // The rules and the scoring work on copies. The engine keeps its state until the turn
     // and the next phase are known, so an exception leaves the board, the score and the phase.
@@ -120,7 +137,8 @@ export class GameEngine<
     // does not undo the turn. The report keeps its error apart from the outcome.
     if (turn.outcome !== 'playing') {
       try {
-        this.events.publish(new GameOver(this.gameId, turn.outcome, turn.next.score));
+        const { score } = turn.next.snapshot();
+        this.events.publish(new GameOver(this.gameId, this.matchId, turn.outcome, score));
       } catch (error) {
         return { accepted: true, outcome: turn.outcome, publishFailure: { error } };
       }
@@ -137,40 +155,49 @@ export class GameEngine<
     this.current = this.current.resume();
   }
 
-  snapshot(): TState {
-    return copy(this.started());
+  // The photo of the state now. It is immutable and holds a copy of the board,
+  // so a later move never changes it, and a change to it never changes the game.
+  snapshot(): SnapshotOf<TState> {
+    return photoOf(this.started());
   }
 
   // Runs the rules and the scoring, and computes the next phase. It changes no engine field.
   // It returns `undefined` for a rejected move.
-  // `before` is the Memento: a clone of the state before the move (classes.md decision 34).
-  // It is taken inside the turn, so a clone that throws leaves the turn unsaved.
-  // A variant with no history takes no clone.
+  // The rules play on a copy of the state. The scoring reads the photo before the move
+  // and the photo of the copy after the rules. The copy then takes the points.
+  // `before` is the Memento: the photo of the state before the move (classes.md decision 34).
+  // It is taken inside the turn, so a photo that throws leaves the turn unsaved.
   private resolveTurn(
     state: TState,
     move: TMove,
-  ): { next: TState; phase: GamePhase; outcome: Outcome; before: TState | undefined } | undefined {
-    const resolution = this.rules.playTurn(copy(state), move);
+  ): { next: TState; phase: GamePhase; outcome: Outcome; before: SnapshotOf<TState> } | undefined {
+    const next = copy(state);
+    const resolution = this.rules.playTurn(next, move);
     if (!resolution.accepted) return undefined;
-    const points = this.scoring.score(copy(state), resolution);
+    const before = photoOf(state);
+    const points = this.scoring.score(before, photoOf(next));
     if (!Number.isFinite(points)) {
       throw new RangeError(`The scoring policy returned a score that is not finite: ${points}.`);
     }
-    resolution.state.score += points;
+    next.addPoints(points);
     return {
-      next: resolution.state,
+      next,
       phase: this.current.after(resolution.outcome),
       outcome: resolution.outcome,
-      before: this.history === undefined ? undefined : copy(state),
+      before,
     };
   }
 
   // Keeps the undo of a saved turn. A finished game forgets its moves: the game over event
   // is already public, and an undo cannot take it back. The check reads the new phase.
-  private remember(move: TMove, before: TState | undefined): void {
-    if (before === undefined) return;
+  // A variant with no history keeps no command.
+  private remember(move: TMove, before: SnapshotOf<TState>): void {
     if (this.current.canPlay()) {
-      this.history?.record(new MoveCommand(move, before, (memento) => this.restore(memento)));
+      this.history?.record(
+        new MoveCommand<TMove, SnapshotOf<TState>>(move, before, (memento) =>
+          this.restore(memento),
+        ),
+      );
     } else {
       this.history?.clear();
     }
@@ -178,12 +205,10 @@ export class GameEngine<
 
   // The receiver of an undo (issue 159, classes.md decision 34). `MoveCommand.undo()` calls it.
   // It is private and reaches a command only as a function, so no caller can write the state.
-  // The stored states never change, because the rules work on copies, so the memento needs no copy.
-  private restore(memento: TState): void {
-    if (!this.current.canPlay()) {
-      throw new RangeError(`The game cannot accept an undo in the ${this.current.name} phase.`);
-    }
-    this.state = memento;
+  // The state takes its photo back in place. The photo is immutable, so it needs no copy.
+  private restore(memento: SnapshotOf<TState>): void {
+    this.current.checkAcceptsUndo();
+    this.started().restore(memento);
   }
 
   private started(): TState {
@@ -195,4 +220,13 @@ export class GameEngine<
 // The bound `Cloneable<TState>` makes `clone()` return `TState`, so the copy needs no cast.
 function copy<TState extends Cloneable<TState>>(state: TState): TState {
   return state.clone();
+}
+
+// The photo of a state with the type of its variant. The bound of `TState` gives
+// `snapshot()` the return type `BoardSnapshot`, and a variant state narrows it.
+// TypeScript cannot resolve `SnapshotOf<TState>` for an open `TState`, so the photo needs a cast.
+function photoOf<TCell, TCoord, TState extends BoardState<TCell, TCoord>>(
+  state: TState,
+): BoardSnapshot<TCell, TCoord> & SnapshotOf<TState> {
+  return state.snapshot() as BoardSnapshot<TCell, TCoord> & SnapshotOf<TState>;
 }

@@ -3,7 +3,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import * as ts from 'typescript';
 
-import { Board } from '../../src/domain/engine/board';
+import { Board, type ReadonlyBoard } from '../../src/domain/engine/board';
 import { hex, type HexAxis, type HexCoord } from '../../src/domain/engine/hex-topology';
 import { FixedListPieceSource } from '../../src/domain/engine/piece-source';
 import { Piece } from '../../src/domain/engine/piece';
@@ -22,6 +22,8 @@ import { square, squareTopology, type SquareCoord } from '../support/engine/squa
 import { linesState } from '../support/variants/hexa-lines/lines-game';
 import { mergeState } from '../support/variants/hexa-merge/merge-game';
 import { repoRoot } from '../support/run-tool';
+import { MATCH_ID } from '../support/engine/match-id';
+import { BOARD_ID, STATE_ID } from '../support/engine/entity-ids';
 
 // APP-NFR-01: the four variants use the engine `Board` with their own cell type,
 // and no variant has a board class of its own (issue #96).
@@ -203,55 +205,57 @@ describe('one board gate (APP-NFR-01)', () => {
   // The typed variables make `pnpm typecheck` fail when the cell type of a board changes.
   it('should_hold_an_engine_board_of_colors_when_a_lines_state_starts', () => {
     const state = linesState(squareTopology, 2, { filled: [square(0, 0)], tray: [] });
-    const board: Board<Color, SquareCoord, string> = state.board;
+    const board: ReadonlyBoard<Color, SquareCoord, string> = state.snapshot().board;
 
     expect(board.constructor).toBe(Board);
-    expect(state.clone().board.constructor).toBe(Board);
+    expect(state.clone().snapshot().board.constructor).toBe(Board);
     expect(board.get(square(0, 0))).toBeInstanceOf(Color);
   });
 
   it('should_hold_an_engine_board_of_piece_ids_when_a_fit_state_places_a_piece', () => {
     const id = PieceId.of('a');
     const figure = new Board<PieceId, SquareCoord, string>(
+      BOARD_ID,
       squareTopology.region(RegionSize.of(2)),
       squareTopology,
     );
     const piece = new Piece(new ShapeGroup([new CellNode(square(0, 0))]), id);
-    const state = FitState.start(figure, new FixedListPieceSource([piece])).place(
-      id,
-      Placement.of(Turns.of(0), square(0, 0), squareTopology),
-    );
-    const board: Board<PieceId, SquareCoord, string> = state.board;
+    const state = FitState.start(STATE_ID, MATCH_ID, figure, new FixedListPieceSource([piece]));
+    state.place(id, Placement.of(Turns.of(0), square(0, 0), squareTopology));
+    const board: ReadonlyBoard<PieceId, SquareCoord, string> = state.snapshot().board;
 
     expect(board.constructor).toBe(Board);
-    expect(state.clone().board.constructor).toBe(Board);
+    expect(state.clone().snapshot().board.constructor).toBe(Board);
     expect(board.get(square(0, 0))).toBeInstanceOf(PieceId);
   });
 
   it('should_hold_an_engine_board_of_color_stacks_when_a_sort_state_starts', () => {
     const start = new Board<ColorStack, SquareCoord, string>(
+      BOARD_ID,
       squareTopology.region(RegionSize.of(2)),
       squareTopology,
     );
-    start.set(square(0, 0), ColorStack.of([Color.of('red')]));
+    start.occupy(square(0, 0), ColorStack.of([Color.of('red')]));
     const state = SortState.start({
+      stateId: STATE_ID,
+      matchId: MATCH_ID,
       board: start,
       source: new FixedListPieceSource([]),
       goalsNeeded: GoalCount.of(1),
     });
-    const board: Board<ColorStack, SquareCoord, string> = state.board;
+    const board: ReadonlyBoard<ColorStack, SquareCoord, string> = state.snapshot().board;
 
     expect(board.constructor).toBe(Board);
-    expect(state.clone().board.constructor).toBe(Board);
+    expect(state.clone().snapshot().board.constructor).toBe(Board);
     expect(board.get(square(0, 0))).toBeInstanceOf(ColorStack);
   });
 
   it('should_hold_an_engine_board_of_merge_tiles_when_a_merge_state_starts', () => {
     const state = mergeState([[hex(0, 0), 2]]);
-    const board: Board<MergeTile, HexCoord, HexAxis> = state.board;
+    const board: ReadonlyBoard<MergeTile, HexCoord, HexAxis> = state.snapshot().board;
 
     expect(board.constructor).toBe(Board);
-    expect(state.clone().board.constructor).toBe(Board);
+    expect(state.clone().snapshot().board.constructor).toBe(Board);
     expect(board.get(hex(0, 0))).toBeInstanceOf(MergeTile);
   });
 });

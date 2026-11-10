@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { GameOverPhase, PlayingPhase } from '../../../../src/domain/engine/game-phase';
 import type { GridTopology } from '../../../../src/domain/engine/grid-topology';
 import { GameOver } from '../../../../src/domain/engine/game-events';
 import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
@@ -7,8 +8,12 @@ import { Color } from '../../../../src/domain/engine/color';
 import { ComboMultiplierDecorator } from '../../../../src/domain/variants/hexa-lines/combo-multiplier-decorator';
 import { LinesRules } from '../../../../src/domain/variants/hexa-lines/lines-rules';
 import { LinesScoring } from '../../../../src/domain/variants/hexa-lines/lines-scoring';
-import { LinesState } from '../../../../src/domain/variants/hexa-lines/lines-state';
+import {
+  LinesState,
+  type LinesSnapshot,
+} from '../../../../src/domain/variants/hexa-lines/lines-state';
 import { PlacePiece } from '../../../../src/domain/variants/hexa-lines/place-piece';
+import { phaseNameOf } from '../../../support/engine/phase-name';
 import {
   square,
   squareTopology,
@@ -19,10 +24,15 @@ import {
 import { triangle, triangleTopology } from '../../../support/engine/triangle-topology';
 import {
   filledKeys,
+  linesFactory,
   linesGame,
   linesState,
   piece,
 } from '../../../support/variants/hexa-lines/lines-game';
+import { MATCH_ID } from '../../../support/engine/match-id';
+import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
+import { firstValidMove } from '../../../support/engine/variant-game';
+import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
 
 // The rules suite of Hexa Lines (issue 91, APP-NFR-02, APP-NFR-12).
 // The combo and the streak follow the proposal on issue 58,
@@ -72,7 +82,7 @@ describe('Hexa Lines rules', () => {
 
     const state = engine.snapshot();
     expect(state.tray).toEqual([a, b, c]);
-    expect(state.source.next()).toBe(d);
+    expect(state.source.clone().next()).toBe(d);
   });
 
   it('should_reject_the_move_and_keep_the_state_when_the_piece_does_not_fit_or_names_no_tray_piece', () => {
@@ -95,7 +105,7 @@ describe('Hexa Lines rules', () => {
 
       const state = engine.snapshot();
       expect(outcome).toBe('playing');
-      expect(engine.phase.name).toBe('playing');
+      expect(engine.currentPhase()).toBe(PlayingPhase.instance);
       expect(filledKeys(state)).toEqual(keys([square(1, 1)]));
       expect(state.tray).toEqual([domino, one]);
     }
@@ -107,7 +117,7 @@ describe('Hexa Lines rules', () => {
 
     for (const axis of axes) {
       const probe = linesState(squareTopology, 3, { tray: [] });
-      const line = [...probe.board.line(axis, square(1, 1))];
+      const line = [...probe.snapshot().board.line(axis, square(1, 1))];
       const last = line[line.length - 1]!;
       const { engine } = linesGame(
         linesState(squareTopology, 3, { filled: line.slice(0, -1), tray: [one, one] }),
@@ -130,7 +140,7 @@ describe('Hexa Lines rules', () => {
 
     for (const axis of axes) {
       const probe = linesState(topology, 4, { tray: [] });
-      const line = [...probe.board.line(axis, triangle(4, 1))];
+      const line = [...probe.snapshot().board.line(axis, triangle(4, 1))];
       const last = line[line.length - 1]!;
       // The piece holds the last cell, and the zero offset leaves it there.
       const { engine } = linesGame(
@@ -212,13 +222,18 @@ describe('Hexa Lines rules', () => {
     const state = linesState(counting, 5, { tray: [one, piece(origin, square(1, 0))] });
     const rules = new LinesRules<SquareCoord>();
 
+    // The rules read the state through one photo, and the copy of the board in the photo
+    // reads each key of the shape once. The walk of the moves reads the keys after it.
+    reads.count = 0;
+    state.snapshot();
+    const photoReads = reads.count;
     reads.count = 0;
     const moves = rules.validMoves(state);
     const first = moves[Symbol.iterator]().next();
-    const firstReads = reads.count;
+    const firstReads = reads.count - photoReads;
     reads.count = 0;
     const all = [...rules.validMoves(state)];
-    const allReads = reads.count;
+    const allReads = reads.count - photoReads;
 
     expect(Array.isArray(moves)).toBe(false);
     expect(first.done).toBe(false);
@@ -235,7 +250,7 @@ describe('Hexa Lines rules', () => {
     const outcome = engine.play(new PlacePiece(0, square(1, 1)));
 
     expect(outcome).toBe('game-over');
-    expect(engine.phase.name).toBe('game-over');
+    expect(engine.currentPhase()).toBe(GameOverPhase.instance);
     expect(publisher.events).toEqual([expect.any(GameOver)]);
   });
 
@@ -258,14 +273,15 @@ describe('Hexa Lines rules', () => {
 
     expect(filledKeys(before)).toEqual([]);
     expect(before.tray).toEqual([one]);
-    expect(before.source.hasNext()).toBe(true);
-    expect(engine.snapshot().source.hasNext()).toBe(false);
+    expect(before.source.clone().hasNext()).toBe(true);
+    expect(engine.snapshot().source.clone().hasNext()).toBe(false);
   });
 });
 
 describe('Hexa Lines color', () => {
   it('should_keep_the_name_when_a_color_is_made_from_a_name', () => {
-    expect(Color.of('red').name).toBe('red');
+    expect(Color.of('red').equals(Color.of('red'))).toBe(true);
+    expect(Color.of('red').equals(Color.of('blue'))).toBe(false);
   });
 
   it('should_throw_a_range_error_when_the_color_name_is_blank', () => {
@@ -288,7 +304,7 @@ describe('Hexa Lines rules edge cases', () => {
     return {
       valid: new LinesRules<SquareCoord>().isValid(initial, move),
       outcome,
-      phase: engine.phase.name,
+      phase: phaseNameOf(engine.currentPhase()),
       filled: filledKeys(state),
       tray: state.tray,
       events: publisher.events,
@@ -343,7 +359,7 @@ describe('Hexa Lines rules edge cases', () => {
 
     const state = engine.snapshot();
     expect(outcome).toBe('game-over');
-    expect(engine.phase.name).toBe('game-over');
+    expect(engine.currentPhase()).toBe(GameOverPhase.instance);
     expect(state.tray).toEqual([]);
     expect(filledKeys(state)).toEqual(keys([square(1, 1)]));
     expect(publisher.events).toEqual([expect.any(GameOver)]);
@@ -364,7 +380,15 @@ describe('Hexa Lines rules edge cases', () => {
     };
     const games = [
       {
-        game: linesGame(new LinesState(base.board, base.tray, failingSource)),
+        game: linesGame(
+          new LinesState(
+            STATE_ID,
+            MATCH_ID,
+            base.snapshot().board.clone(),
+            base.snapshot().tray,
+            failingSource,
+          ),
+        ),
         error: 'The source failed.',
       },
       {
@@ -380,7 +404,7 @@ describe('Hexa Lines rules edge cases', () => {
       expect(() => engine.play(new PlacePiece(0, square(2, 2)))).toThrow(error);
 
       const state = engine.snapshot();
-      expect(engine.phase.name).toBe('playing');
+      expect(engine.currentPhase()).toBe(PlayingPhase.instance);
       expect(filledKeys(state)).toEqual([]);
       expect(state.tray).toEqual(tray);
       expect(state.streak).toBe(0);
@@ -408,12 +432,12 @@ describe('Hexa Lines rules edge cases', () => {
     engine.play(new PlacePiece(0, origin));
 
     const state = engine.snapshot();
-    expect(keys([...probe.board.line('col', square(1, 0))])).toEqual(
-      keys([...probe.board.line('col', origin)]),
+    expect(keys([...probe.snapshot().board.line('col', square(1, 0))])).toEqual(
+      keys([...probe.snapshot().board.line('col', origin)]),
     );
-    expect(probe.board.line('col', square(1, 0))[Symbol.iterator]().next().value).toEqual(
-      square(2, 0),
-    );
+    expect(
+      probe.snapshot().board.line('col', square(1, 0))[Symbol.iterator]().next().value,
+    ).toEqual(square(2, 0));
     expect(state.linesCleared).toBe(1);
     expect(state.streak).toBe(1);
     expect(filledKeys(state)).toEqual([]);
@@ -435,12 +459,39 @@ describe('Hexa Lines rules edge cases', () => {
 
     const state = engine.snapshot();
     for (const axis of squareTopology.axes()) {
-      expect(keys([...probe.board.line(axis, origin)])).toEqual(keys([origin]));
+      expect(keys([...probe.snapshot().board.line(axis, origin)])).toEqual(keys([origin]));
     }
     expect(state.linesCleared).toBe(1);
     expect(state.streak).toBe(1);
     expect(filledKeys(state)).toEqual([]);
     // One placed cell and one line with factor 1: 1 + 10.
     expect(state.score).toBe(11);
+  });
+});
+
+// R7: the engine plays a turn on a copy of its state. The Lines state changes in place,
+// so a turn that throws after the placement changed the copy leaves the state of the game.
+describe('LinesRules atomic turn', () => {
+  it('should_keep_the_snapshot_when_the_turn_throws_after_the_piece_changed_the_state', () => {
+    const failing: IScoringPolicy<LinesState<SquareCoord>> = {
+      score: () => {
+        throw new Error('The scoring fails.');
+      },
+    };
+    const start = linesFactory(5).createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
+    const { engine } = linesGame(start, failing);
+    const facts = (state: LinesSnapshot<SquareCoord>) => ({
+      cells: state.board.cells(),
+      tray: [...state.tray],
+      nextPiece: state.source.clone().next(),
+      counts: [state.streak, state.linesCleared, state.cellsPlaced],
+      score: state.score,
+    });
+    const before = facts(engine.snapshot());
+
+    expect(() => engine.play(firstValidMove(new LinesRules<SquareCoord>(), start))).toThrow(
+      'The scoring fails.',
+    );
+    expect(facts(engine.snapshot())).toEqual(before);
   });
 });

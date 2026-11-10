@@ -1,9 +1,9 @@
 /** @jest-environment node */
 import { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameId } from '../../../src/domain/engine/game-id';
+import { GameOverPhase, PlayingPhase } from '../../../src/domain/engine/game-phase';
 import { LevelTimer } from '../../../src/domain/engine/level-timer';
 import type { Outcome } from '../../../src/domain/engine/outcome';
-import type { Resolution } from '../../../src/domain/engine/resolution';
 import type { IScoringPolicy } from '../../../src/domain/engine/scoring-policy';
 import { TimedRulesDecorator } from '../../../src/domain/engine/timed-rules-decorator';
 import { fakeCell, type FakeCell } from '../../support/engine/fake-cell';
@@ -14,9 +14,12 @@ import {
   RecordingPublisher,
   type FakeMove,
   type FakeState,
+  type FakeSnapshot,
 } from '../../support/engine/fake-game';
 import { ManualClock } from '../../support/engine/manual-clock';
+import { phaseNameOf } from '../../support/engine/phase-name';
 import { square, squareTopology, type SquareCoord } from '../../support/engine/square-topology';
+import { MATCH_ID } from '../../support/engine/match-id';
 
 // `TimedRulesDecorator` times a game around any rules (issue 157, classes.md decision 19, D14).
 // `FakeRules` extends `BaseGameRules` and calls its own `evaluate()`, as a variant rules class does.
@@ -40,6 +43,7 @@ function timedGame(
   const timer = new LevelTimer(clock);
   const decorated = new TimedRulesDecorator(rules, timer);
   const engine = new GameEngine(
+    MATCH_ID,
     GameId.of('fake-game'),
     decorated,
     scoring,
@@ -53,8 +57,10 @@ function timedGame(
 class ThrowsOnFirstEnd implements IScoringPolicy<FakeState> {
   private thrown = false;
 
-  score(_before: FakeState, resolution: Resolution<FakeState>): number {
-    if (resolution.outcome !== 'playing' && !this.thrown) {
+  // The fake game ends when the board is full, so the photo after the turn shows the end.
+  score(_before: FakeSnapshot, after: FakeSnapshot): number {
+    const ended = after.board.cells().length === after.board.shape.cells.length;
+    if (ended && !this.thrown) {
       this.thrown = true;
       throw new Error('The scoring failed.');
     }
@@ -72,7 +78,7 @@ function factsOf(
   return {
     cells: state.board.cells().map(([at, cell]) => [squareTopology.key(at), cell.value]),
     score: state.score,
-    phase: engine.phase.name,
+    phase: phaseNameOf(engine.currentPhase()),
     log: rules.log,
     outcomes,
   };
@@ -160,14 +166,14 @@ describe('TimedRulesDecorator', () => {
     const { clock, timer, engine, decorated } = timedGame();
     engine.play(moveAt(0));
     const finished = emptyState(1);
-    finished.board.set(square(0, 0), fakeCell(1));
+    finished.board.occupy(square(0, 0), fakeCell(1));
 
     const outcome = decorated.evaluate(finished);
     clock.advance(SECOND);
 
     expect(outcome).toBe('game-over');
     expect(timer.elapsedMs()).toBe(SECOND);
-    expect(engine.phase.name).toBe('playing');
+    expect(engine.currentPhase()).toBe(PlayingPhase.instance);
   });
 
   it('should_time_the_retried_turn_when_the_engine_rolls_back_the_last_turn', () => {
@@ -184,7 +190,7 @@ describe('TimedRulesDecorator', () => {
 
     // The rollback keeps the game going, so the end of the game is the retried turn.
     expect(retried).toBe('game-over');
-    expect(engine.phase.name).toBe('game-over');
+    expect(engine.currentPhase()).toBe(GameOverPhase.instance);
     expect(timer.elapsedMs()).toBe(3 * SECOND);
   });
 
@@ -200,6 +206,7 @@ describe('TimedRulesDecorator', () => {
   it('should_play_the_same_game_as_the_inner_rules_when_the_rules_are_decorated', () => {
     const plainRules = new FakeRules();
     const plain = new GameEngine(
+      MATCH_ID,
       GameId.of('fake-game'),
       plainRules,
       new OnePointScoring(),
@@ -242,6 +249,7 @@ describe('GameEngine.timed', () => {
 
   it('should_return_undefined_when_the_rules_have_no_timer', () => {
     const engine = new GameEngine(
+      MATCH_ID,
       GameId.of('fake-game'),
       new FakeRules(),
       new OnePointScoring(),

@@ -56,7 +56,7 @@ describe('hex', () => {
 
 describe('HexTopology', () => {
   it('should_give_six_rotation_steps_and_its_closed_names_when_the_topology_is_read', () => {
-    expect(topology.rotationSteps).toBe(6);
+    expect(topology.fullTurn().equals(Turns.of(6))).toBe(true);
     expect(topology.axes()).toEqual(['q', 'r', 's']);
     expect(topology.directions()).toEqual([
       'east',
@@ -83,6 +83,17 @@ describe('HexTopology', () => {
       hex(1, 0),
       hex(2, 0),
     ]);
+  });
+
+  // `Turns` keeps its number private, so a negative zero shows only through an operation.
+  it('should_leave_a_coordinate_in_place_when_the_turn_count_is_a_negative_zero', () => {
+    const negativeZero = Turns.of(-0);
+
+    expect(negativeZero.equals(Turns.of(0))).toBe(true);
+    expect(topology.rotate(hex(1, 0), negativeZero)).toEqual(hex(1, 0));
+    expect(topology.rotate(hex(1, 0), negativeZero)).toEqual(
+      topology.rotate(hex(1, 0), Turns.of(0)),
+    );
   });
 
   it('should_turn_a_coordinate_one_sixth_per_step_when_it_rotates', () => {

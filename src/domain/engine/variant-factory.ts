@@ -1,7 +1,10 @@
 import type { Board } from './board';
-import type { BoardState } from './board-state';
+import type { BoardId } from './board-id';
+import type { BoardState, SnapshotOf } from './board-state';
 import type { Cloneable } from './cloneable';
 import type { GameId } from './game-id';
+import type { GameStateId } from './game-state-id';
+import type { MatchId } from './match-id';
 import type { MoveHistory } from './move-history';
 import type { Piece } from './piece';
 import type { IPieceSource } from './piece-source';
@@ -16,10 +19,13 @@ import type { IScoringPolicy } from './scoring-policy';
 // `createPieceSource()` returns `undefined` for a variant with no piece source.
 // `TPiece` is the item of the source. It is a `Piece` by default.
 // Hexa Merge draws a new tile and its cell (`NewTile`), so it binds `TPiece` to that type.
+// `createBoard()` gives a new empty board with the id `boardId` (classes.md decision 7).
 // `createInitialState()` puts a new board and a new piece source in the first state.
+// The first state takes its own id `stateId` and the `MatchId` of its game (decision 26),
+// and its board takes the id `boardId`. `GameFactory` asks the generators for the three ids.
 // So two calls give two games that share no board and no source.
 // `createHistory()` returns a new history for each game, or `undefined` for a variant
-// with no undo (classes.md decision 3).
+// with no undo (classes.md decision 3). The history keeps the photos of the state (decision 34).
 // The progress model of view 5 comes in Sprint 3.
 export interface IVariantFactory<
   TCell,
@@ -32,7 +38,7 @@ export interface IVariantFactory<
   createRules(): IGameRules<TMove, TState>;
   createScoring(): IScoringPolicy<TState>;
   createPieceSource(): IPieceSource<TPiece> | undefined;
-  createBoard(): Board<TCell, TCoord, string>;
-  createInitialState(): TState;
-  createHistory(): MoveHistory<TMove, TState> | undefined;
+  createBoard(boardId: BoardId): Board<TCell, TCoord, string>;
+  createInitialState(matchId: MatchId, stateId: GameStateId, boardId: BoardId): TState;
+  createHistory(): MoveHistory<TMove, SnapshotOf<TState>> | undefined;
 }

@@ -5,7 +5,7 @@
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 export class GameId {
-  private constructor(readonly value: string) {}
+  private constructor(private readonly value: string) {}
 
   static of(value: string): GameId {
     if (value.trim() === '') throw new RangeError('A game id cannot be empty.');

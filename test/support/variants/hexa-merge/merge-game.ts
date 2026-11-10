@@ -1,6 +1,8 @@
-import { Board } from '../../../../src/domain/engine/board';
+import { Board, type ReadonlyBoard } from '../../../../src/domain/engine/board';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
 import { GameId } from '../../../../src/domain/engine/game-id';
+import type { GameStateId } from '../../../../src/domain/engine/game-state-id';
+import type { MatchId } from '../../../../src/domain/engine/match-id';
 import { HexGeometry } from '../../../../src/domain/engine/hex-geometry';
 import type { HexAxis, HexCoord } from '../../../../src/domain/engine/hex-topology';
 import {
@@ -11,11 +13,16 @@ import { RegionSize } from '../../../../src/domain/engine/region-size';
 import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
 import { MergeFactory } from '../../../../src/domain/variants/hexa-merge/merge-factory';
 import { MergeRules } from '../../../../src/domain/variants/hexa-merge/merge-rules';
-import { MergeState } from '../../../../src/domain/variants/hexa-merge/merge-state';
+import {
+  MergeState,
+  type MergeSnapshot,
+} from '../../../../src/domain/variants/hexa-merge/merge-state';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
 import type { NewTile } from '../../../../src/domain/variants/hexa-merge/new-tile';
 import type { Slide } from '../../../../src/domain/variants/hexa-merge/slide';
 import { RecordingPublisher } from '../../engine/fake-game';
+import { MATCH_ID } from '../../engine/match-id';
+import { BOARD_ID, STATE_ID } from '../../engine/entity-ids';
 
 // The Merge game for the rules tests, on the real hexagonal geometry.
 // The rules tests score no points. The scoring tests pass their own policy.
@@ -41,21 +48,30 @@ export function mergeState(
   tiles: readonly [HexCoord, number][],
   size = 2,
   source: IPieceSource<NewTile<MergeTile>> = noNewTiles(),
+  matchId: MatchId = MATCH_ID,
+  stateId: GameStateId = STATE_ID,
 ): HexMergeState {
   const board = new Board<MergeTile, HexCoord, HexAxis>(
+    BOARD_ID,
     hexTopology.region(RegionSize.of(size)),
     hexTopology,
   );
-  for (const [at, value] of tiles) board.set(at, MergeTile.of(value));
-  return new MergeState(board, source);
+  for (const [at, value] of tiles) board.occupy(at, MergeTile.of(value));
+  return new MergeState(stateId, matchId, board, source);
+}
+
+// The number of a tile. The field is private, and a tile is worth its value in points (issue #59).
+export function valueOf(tile: MergeTile): number {
+  return tile.points();
 }
 
 // The value of each filled cell, by the topology key of its coordinate.
-export function values<TAxis extends string>(
-  state: MergeState<MergeTile, HexCoord, TAxis>,
-): Record<string, number> {
+// It takes a photo, because only the photo shows the board of a state.
+export function values<TAxis extends string>(state: {
+  readonly board: ReadonlyBoard<MergeTile, HexCoord, TAxis>;
+}): Record<string, number> {
   const out: Record<string, number> = {};
-  for (const [at, tile] of state.board.cells()) out[hexTopology.key(at)] = tile.value;
+  for (const [at, tile] of state.board.cells()) out[hexTopology.key(at)] = valueOf(tile);
   return out;
 }
 
@@ -67,6 +83,7 @@ export function mergeGame(
   const rules = new MergeRules<MergeTile, HexCoord, HexAxis>(target);
   const publisher = new RecordingPublisher();
   const engine = new GameEngine<MergeTile, HexCoord, Slide<HexAxis>, HexMergeState>(
+    MATCH_ID,
     GameId.of('hexa-merge'),
     rules,
     scoring,
@@ -83,4 +100,20 @@ export function mergeFactory(seed = 1): MergeFactory<HexCoord> {
     seed,
     target: MergeTile.of(2048),
   });
+}
+
+// A live state built again from a photo, so a test can ask the rules about the state that a game
+// shows. The engine never gives its state away. So the helper builds a new state with the ids,
+// the board and the source of the photo, and the state takes the photo back with `restore()`.
+export function mergeStateOf<TCoord, TAxis extends string>(
+  photo: MergeSnapshot<MergeTile, TCoord, TAxis>,
+): MergeState<MergeTile, TCoord, TAxis> {
+  const state = new MergeState(
+    photo.stateId,
+    photo.matchId,
+    photo.board.clone(),
+    photo.tiles.clone(),
+  );
+  state.restore(photo);
+  return state;
 }

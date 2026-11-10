@@ -9,12 +9,22 @@ const GOAL_COUNTS = Range.ofNumbers(1, Number.MAX_SAFE_INTEGER);
 // A goal of 0 wins before the first move, and NaN never wins, so `of()` rejects both.
 // Any number that is not a safe integer of 1 or more throws a RangeError.
 export class GoalCount {
-  private constructor(readonly value: number) {}
+  private constructor(private readonly value: number) {}
 
   static of(value: number): GoalCount {
     if (!Number.isSafeInteger(value) || !GOAL_COUNTS.contains(value)) {
       throw new RangeError(`A goal count needs a whole number of 1 or more, not ${value}.`);
     }
     return new GoalCount(value);
+  }
+
+  // Two goal counts are equal when they hold the same value.
+  equals(other: GoalCount): boolean {
+    return this.value === other.value;
+  }
+
+  // Tells if a count of cleared stacks reaches the goal. A count above the goal reaches it too.
+  isReachedBy(goalsDone: number): boolean {
+    return goalsDone >= this.value;
   }
 }

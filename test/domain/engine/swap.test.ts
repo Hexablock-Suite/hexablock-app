@@ -6,6 +6,7 @@ import {
   type GameEventPublisher,
 } from '../../../src/domain/engine/game-events';
 import { GameId } from '../../../src/domain/engine/game-id';
+import { GameOverPhase } from '../../../src/domain/engine/game-phase';
 import type { Outcome } from '../../../src/domain/engine/outcome';
 import type { IPieceSource } from '../../../src/domain/engine/piece-source';
 import {
@@ -13,11 +14,16 @@ import {
   ProgressRecord,
   type IProgressModel,
 } from '../../../src/domain/engine/progress-model';
-import { Resolution } from '../../../src/domain/engine/resolution';
 import type { IScoringPolicy } from '../../../src/domain/engine/scoring-policy';
 import { fakeCell, type FakeCell } from '../../support/engine/fake-cell';
-import { SourceRules, sourceState, type SourceState } from '../../support/engine/fake-game';
+import {
+  SourceRules,
+  sourceState,
+  type SourceSnapshot,
+  type SourceState,
+} from '../../support/engine/fake-game';
 import { square, type SquareCoord } from '../../support/engine/square-topology';
+import { MATCH_ID } from '../../support/engine/match-id';
 
 // APP-NFR-04: the piece source, the scoring policy and the progress model swap,
 // and no engine file changes. Every implementation here is a dummy that exists only in test/.
@@ -69,10 +75,8 @@ class OnePerMove implements IScoringPolicy<SourceState> {
 
 // The value of the cell that the move filled: the cell that `before` does not have.
 class CellValue implements IScoringPolicy<SourceState> {
-  score(before: SourceState, resolution: Resolution<SourceState>): number {
-    const placed = resolution.state.board
-      .cells()
-      .find(([at]) => before.board.get(at) === undefined);
+  score(before: SourceSnapshot, after: SourceSnapshot): number {
+    const placed = after.board.cells().find(([at]) => before.board.get(at) === undefined);
     return placed?.[1].value ?? 0;
   }
 }
@@ -144,7 +148,7 @@ function playGame(
 ) {
   let moves = 0;
   const subscriber = new ProgressSubscriber(progress, () => moves);
-  const engine = new GameEngine(GameId.of('fake-game'), rules, scoring, subscriber);
+  const engine = new GameEngine(MATCH_ID, GameId.of('fake-game'), rules, scoring, subscriber);
   engine.start(sourceState(source));
   let outcome: Outcome = 'playing';
   for (const at of sourceState(source).board.shape.cells) {
@@ -183,7 +187,7 @@ describe('swapping the piece source, the scoring policy and the progress model',
 
     expect(byScore.records.map((record) => record.score)).toEqual([36]);
     expect(byMoves.records.map((record) => record.score)).toEqual([4]);
-    expect(byMoves.records[0]?.gameId.value).toBe('fake-game');
+    expect(byMoves.records[0]?.gameId.equals(GameId.of('fake-game'))).toBe(true);
   });
 
   it('should_place_the_same_pieces_when_a_turn_throws_with_each_source', () => {
@@ -224,6 +228,7 @@ describe('swapping the piece source, the scoring policy and the progress model',
   it('should_reject_a_fifth_move_and_keep_the_state_when_the_board_is_full', () => {
     const subscriber = new ProgressSubscriber(new ScoreProgress(), () => 4);
     const engine = new GameEngine(
+      MATCH_ID,
       GameId.of('fake-game'),
       new SourceRules(),
       new OnePerMove(),
@@ -235,7 +240,7 @@ describe('swapping the piece source, the scoring policy and the progress model',
 
     expect(() => engine.play(square(0, 0))).toThrow(RangeError);
     expect(() => engine.play(square(0, 0))).toThrow('game-over phase');
-    expect(engine.phase.name).toBe('game-over');
+    expect(engine.currentPhase()).toBe(GameOverPhase.instance);
     expect(engine.snapshot().board.cells()).toEqual(full.board.cells());
     expect(engine.snapshot().score).toBe(full.score);
     expect(subscriber.records).toHaveLength(1);
