@@ -17,17 +17,16 @@ import { PlayingPhase, VictoryPhase } from '../../src/domain/engine/game-phase';
 import { MoveHistory } from '../../src/domain/engine/move-history';
 import type { Piece } from '../../src/domain/engine/piece';
 import { FixedListPieceSource, type IPieceSource } from '../../src/domain/engine/piece-source';
-import { RegionSize } from '../../src/domain/engine/region-size';
 import type { Resolution } from '../../src/domain/engine/resolution';
 import { ElapsedTime } from '../../src/domain/engine/elapsed-time';
 import { Score } from '../../src/domain/engine/score';
-import { SquareGeometry } from '../../src/domain/engine/square-geometry';
 import type { IRedoable } from '../../src/domain/engine/undo-capabilities';
 import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
 import { PlacePiece } from '../../src/domain/variants/hexa-lines/place-piece';
 import type { ColorStack } from '../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../src/domain/variants/hexa-sort/goal-count';
-import { SortFactory } from '../../src/domain/variants/hexa-sort/sort-factory';
+import type { PlaceStack } from '../../src/domain/variants/hexa-sort/place-stack';
+import { SortState } from '../../src/domain/variants/hexa-sort/sort-state';
 import { phaseNameOf } from '../support/engine/phase-name';
 import { square, type SquareCoord } from '../support/engine/square-topology';
 import { firstMoveOf } from '../support/engine/variant-game';
@@ -196,9 +195,16 @@ async function playNoMove<
   return { ok, before, after: runningGameOf(games) };
 }
 
-// A Sort level whose source throws in `take()`, as a broken level source would.
-// The real fixed list never throws before its end, so this double stands in for the level data.
-function sortLevelWithFailingSource(): SortFactory<SquareCoord> {
+// A Sort factory whose first state gets a source that throws in `take()`.
+// A `SortLevel` holds only data, and the source that `SortFactory` builds from it never throws
+// on the first draw. So this double gives `SortState.start()` a broken source itself.
+function sortFactoryWithFailingSource(): IVariantFactory<
+  ColorStack,
+  SquareCoord,
+  PlaceStack<SquareCoord>,
+  SortState<SquareCoord>
+> {
+  const factory = sortFactory();
   const pieces = new FixedListPieceSource([stack('red')].map(stackPiece));
   const source: IPieceSource<Piece<ColorStack, SquareCoord>> = {
     hasNext: () => pieces.hasNext(),
@@ -207,11 +213,22 @@ function sortLevelWithFailingSource(): SortFactory<SquareCoord> {
     },
     [Symbol.iterator]: () => pieces[Symbol.iterator](),
   };
-  return new SortFactory(new SquareGeometry(), {
-    size: RegionSize.of(2),
-    source,
-    goalsNeeded: GoalCount.of(1),
-  });
+  return {
+    gameId: factory.gameId,
+    createRules: () => factory.createRules(),
+    createScoring: () => factory.createScoring(),
+    createPieceSource: () => source,
+    createBoard: (boardId) => factory.createBoard(boardId),
+    createInitialState: (matchId, stateId, boardId) =>
+      SortState.start({
+        stateId,
+        matchId,
+        board: factory.createBoard(boardId),
+        source,
+        goalsNeeded: GoalCount.of(1),
+      }),
+    createHistory: () => factory.createHistory(),
+  };
 }
 
 describe('StartGame and ApplyMove', () => {
@@ -273,8 +290,8 @@ describe('StartGame and ApplyMove', () => {
   });
 
   it('should_return_a_start_failed_failure_and_keep_no_game_when_the_sort_level_source_throws_on_the_first_draw', async () => {
-    // `SortState.start()` draws the first stack of the level source, so the draw error stops the start.
-    const factory = sortLevelWithFailingSource();
+    // `SortState.start()` draws the first stack of its source, so the draw error stops the start.
+    const factory = sortFactoryWithFailingSource();
     const { games, startGame } = gameUseCases(factory);
 
     const error = errorOf(await startGame.execute({}));
