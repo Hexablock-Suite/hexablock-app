@@ -317,6 +317,46 @@ describe('README primitive types', () => {
     ]);
   });
 
+  // Issue #206: the three coordinates, `Radius` and `RegionSize` keep their numbers private.
+  // Only the factory methods, the operations of the two counts, the hex distance
+  // and the text of a coordinate keep a primitive.
+  it('should_find_no_public_value_of_a_coordinate_when_the_code_is_scanned', () => {
+    const uses = codeUses();
+    const places = uses.map((use) => use.where);
+
+    for (const place of [
+      'HexCoord.q',
+      'HexCoord.r',
+      'SquareCoord.col',
+      'SquareCoord.row',
+      'TriangleCoord.col',
+      'TriangleCoord.row',
+      'Radius.value',
+      'RegionSize.value',
+    ]) {
+      expect(places).not.toContain(place);
+    }
+    const ofCoordinates = uses.filter((use) =>
+      /^(HexCoord|SquareCoord|TriangleCoord|Radius|RegionSize)\./.test(use.where),
+    );
+    expect(ofCoordinates.map(key).sort()).toEqual([
+      'number HexCoord.distanceTo',
+      'number HexCoord.of',
+      'number Radius.measures',
+      'number Radius.of',
+      'number Radius.offsets',
+      'number RegionSize.holds',
+      'number RegionSize.indexes',
+      'number RegionSize.of',
+      'number RegionSize.offsets',
+      'number SquareCoord.of',
+      'number TriangleCoord.of',
+      'string HexCoord.toString',
+      'string SquareCoord.toString',
+      'string TriangleCoord.toString',
+    ]);
+  });
+
   it('should_skip_private_members_and_booleans_when_the_code_is_scanned', () => {
     const places = codeUses().map((use) => use.where);
 

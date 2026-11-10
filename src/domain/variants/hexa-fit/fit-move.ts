@@ -33,7 +33,7 @@ export class PlaceFitPiece<TCoord> {
 
   // Two place moves are equal when they have the same piece, the same rotation count
   // and the same offset. The move compares the counts as the player gave them.
-  // The topology compares the offsets, because `TCoord` has no `equals`.
+  // The topology compares the offsets, because `TCoord` has no bound (classes.md decision 16).
   equals(other: FitMove<TCoord>, topology: { key(c: TCoord): CoordKey }): boolean {
     return (
       other instanceof PlaceFitPiece &&

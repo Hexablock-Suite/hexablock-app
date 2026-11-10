@@ -76,8 +76,9 @@ describe('test double unions', () => {
 
 describe('Radius', () => {
   it('should_keep_the_value_when_the_radius_is_a_whole_number_of_zero_or_more', () => {
-    expect(Radius.of(0).value).toBe(0);
-    expect(Radius.of(3).value).toBe(3);
+    expect(Radius.of(0).measures(0)).toBe(true);
+    expect(Radius.of(3).measures(3)).toBe(true);
+    expect(Radius.of(3).measures(2)).toBe(false);
   });
 
   it('should_throw_a_range_error_when_the_radius_is_negative_or_not_a_whole_number', () => {
@@ -90,7 +91,8 @@ describe('Radius', () => {
   });
 
   it('should_store_zero_when_a_radius_is_negative_zero', () => {
-    expect(Radius.of(-0).value).toBe(0);
+    // `toEqual` tells 0 from a negative zero.
+    expect([...Radius.of(-0).offsets()]).toEqual([0]);
   });
 
   it('should_throw_a_range_error_when_a_radius_is_not_a_safe_integer', () => {
@@ -100,7 +102,7 @@ describe('Radius', () => {
         `A radius needs a whole number of zero or more, not ${value}.`,
       );
     }
-    expect(Radius.of(Number.MAX_SAFE_INTEGER).value).toBe(Number.MAX_SAFE_INTEGER);
+    expect(Radius.of(Number.MAX_SAFE_INTEGER).measures(Number.MAX_SAFE_INTEGER)).toBe(true);
   });
 
   it('should_give_the_center_when_a_board_ring_has_radius_zero', () => {
@@ -135,8 +137,8 @@ describe('Color', () => {
 
 describe('RegionSize', () => {
   it('should_keep_the_value_when_the_size_is_a_whole_number_of_one_or_more', () => {
-    expect(RegionSize.of(1).value).toBe(1);
-    expect(RegionSize.of(5).value).toBe(5);
+    expect([...RegionSize.of(1).indexes()]).toEqual([0]);
+    expect([...RegionSize.of(5).indexes()]).toEqual([0, 1, 2, 3, 4]);
   });
 
   it('should_throw_a_range_error_when_the_size_is_below_one_or_not_a_whole_number', () => {
@@ -155,7 +157,9 @@ describe('RegionSize', () => {
         `A region size needs a whole number of one or more, not ${value}.`,
       );
     }
-    expect(RegionSize.of(Number.MAX_SAFE_INTEGER).value).toBe(Number.MAX_SAFE_INTEGER);
+    const largest = RegionSize.of(Number.MAX_SAFE_INTEGER);
+    expect(largest.holds(Number.MAX_SAFE_INTEGER - 1)).toBe(true);
+    expect(largest.holds(Number.MAX_SAFE_INTEGER)).toBe(false);
   });
 
   it('should_cover_one_cell_when_the_region_size_is_one', () => {

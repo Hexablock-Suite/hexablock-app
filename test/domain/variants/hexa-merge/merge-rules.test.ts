@@ -90,7 +90,7 @@ describe('MergeRules', () => {
 
       expect(rules).toBeInstanceOf(BaseGameRules);
       expect(outcome).toBe('playing');
-      expect(values(engine.snapshot())).toEqual({ [`${edge.q},${edge.r}`]: 2 });
+      expect(values(engine.snapshot())).toEqual({ [hexTopology.key(edge)]: 2 });
     }
   });
 

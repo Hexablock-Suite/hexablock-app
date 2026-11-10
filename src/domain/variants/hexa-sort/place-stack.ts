@@ -17,7 +17,7 @@ export class PlaceStack<TCoord> {
   }
 
   // Two moves are equal when they name the same cell.
-  // The topology compares the cells, because `TCoord` has no `equals`.
+  // The topology compares the cells, because `TCoord` has no bound (classes.md decision 16).
   equals(other: PlaceStack<TCoord>, topology: { key(c: TCoord): CoordKey }): boolean {
     return topology.key(this.at) === topology.key(other.at);
   }

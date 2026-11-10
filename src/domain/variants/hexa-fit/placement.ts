@@ -33,7 +33,7 @@ export class Placement<TCoord> {
   }
 
   // Two placements are equal when they have the same rotation and the same offset.
-  // The topology compares the offsets, because `TCoord` has no `equals`.
+  // The topology compares the offsets, because `TCoord` has no bound (classes.md decision 16).
   equals(other: Placement<TCoord>, topology: { key(c: TCoord): CoordKey }): boolean {
     return this.rotation.equals(other.rotation) && topology.key(this.at) === topology.key(other.at);
   }

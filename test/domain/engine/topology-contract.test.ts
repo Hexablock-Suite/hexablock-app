@@ -375,20 +375,19 @@ describe('test support topologies', () => {
     expect(copy.fullTurn().equals(real.fullTurn())).toBe(true);
     expect(copy.neighbors(square(0, 0))).toEqual(real.neighbors(square(0, 0)));
     expect(copy.neighbor(square(0, 0), 'east')).toEqual(square(1, 0));
-    expect([...copy.line('col', square(0, 0), (c) => c.col < 2 && c.col >= 0)]).toEqual([
-      square(0, 0),
-      square(1, 0),
-    ]);
+    const inside = [square(0, 0), square(1, 0)];
+    const contains = (c: SquareCoord) => inside.some((cell) => cell.equals(c));
+    expect([...copy.line('col', square(0, 0), contains)]).toEqual(inside);
     expect(copy.rotate(square(1, 0), Turns.of(1))).toEqual(real.rotate(square(1, 0), Turns.of(1)));
   });
 
   it('should_throw_a_range_error_when_a_support_topology_gets_an_inherited_axis_name', () => {
     for (const name of missingNames) {
       const squareLine = () => [
-        ...squareTopology.line(name as SquareAxis, square(0, 0), (c) => c.col === 0),
+        ...squareTopology.line(name as SquareAxis, square(0, 0), (c) => c.equals(square(0, 0))),
       ];
       const triangleLine = () => [
-        ...triangleTopology.line(name as 'row', triangle(0, 0), (c) => c.col === 0),
+        ...triangleTopology.line(name as 'row', triangle(0, 0), (c) => c.equals(triangle(0, 0))),
       ];
 
       expect(squareLine).toThrow(RangeError);
