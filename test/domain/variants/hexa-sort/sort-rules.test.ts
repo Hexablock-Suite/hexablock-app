@@ -5,6 +5,7 @@ import { RegionSize } from '../../../../src/domain/engine/region-size';
 import type { RandomSource } from '../../../../src/domain/engine/random-source';
 import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
 import { BaseGameRules } from '../../../../src/domain/engine/rules';
+import { ClearedStacks } from '../../../../src/domain/variants/hexa-sort/cleared-stacks';
 import type { ColorStack } from '../../../../src/domain/variants/hexa-sort/color-stack';
 import { SortRules } from '../../../../src/domain/variants/hexa-sort/sort-rules';
 import type { SortSnapshot, SortState } from '../../../../src/domain/variants/hexa-sort/sort-state';
@@ -148,7 +149,7 @@ describe('SortRules goal', () => {
     const state = game.snapshot();
     expect(chipsAt(game, 0)).toEqual([]);
     expect(chipsAt(game, 1)).toEqual([]);
-    expect(state.goalsDone).toBe(1);
+    expect(state.goalsDone).toEqual(ClearedStacks.of(1));
     expect(state.clearedTiles).toEqual([11]);
   });
 
@@ -163,7 +164,7 @@ describe('SortRules goal', () => {
     game.play(place(1));
 
     expect(chipsAt(game, 0)).toEqual(tiles('red', 9));
-    expect(game.snapshot().goalsDone).toBe(0);
+    expect(game.snapshot().goalsDone).toEqual(ClearedStacks.of(0));
     expect(game.snapshot().clearedTiles).toEqual([]);
   });
 
@@ -178,7 +179,7 @@ describe('SortRules goal', () => {
     game.play(place(1));
     game.play(place(2));
 
-    expect(game.snapshot().goalsDone).toBe(1);
+    expect(game.snapshot().goalsDone).toEqual(ClearedStacks.of(1));
     expect(game.snapshot().clearedTiles).toEqual([]);
   });
 });
@@ -288,7 +289,7 @@ describe('SortRules edge cases', () => {
 
     // The green tile joins the nine greens on (1, 0), and the ten greens clear that stack.
     game.play(place(2));
-    expect(game.snapshot().goalsDone).toBe(1);
+    expect(game.snapshot().goalsDone).toEqual(ClearedStacks.of(1));
     expect(chipsAt(game, 1)).toEqual([]);
 
     // The placed red on (1, 0) ties with the red on (0, 0). The cell (1, 0) comes first
@@ -316,7 +317,7 @@ describe('SortRules edge cases', () => {
     const state = game.snapshot();
     expect(outcome).toBe('playing');
     expect(chipsAt(game, 1)).toEqual([]);
-    expect(state.goalsDone).toBe(1);
+    expect(state.goalsDone).toEqual(ClearedStacks.of(1));
     expect(state.clearedTiles).toEqual([13]);
     expect(names(state.offered?.content)).toEqual(['green']);
   });
@@ -375,7 +376,7 @@ describe('SortRules edge cases', () => {
     expect(state.board.cells()).toEqual([]);
     expect(names(state.offered?.content)).toEqual(['red']);
     expect(state.placedAt).toBeUndefined();
-    expect(state.goalsDone).toBe(0);
+    expect(state.goalsDone).toEqual(ClearedStacks.of(0));
   });
 });
 

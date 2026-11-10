@@ -1,11 +1,14 @@
 /** @jest-environment node */
 import type { BoardState } from '../../src/domain/engine/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
+import { ElapsedTime } from '../../src/domain/engine/elapsed-time';
+import { Moves } from '../../src/domain/engine/moves';
 import { GameResult } from '../../src/domain/engine/progress-model';
+import { Stars } from '../../src/domain/engine/stars';
 import { Turns } from '../../src/domain/engine/turns';
 import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
 import { PlaceFitPiece } from '../../src/domain/variants/hexa-fit/fit-move';
-import { fitStars } from '../../src/domain/variants/hexa-fit/fit-stars';
+import { FitPlay, FitStarThreshold, fitStars } from '../../src/domain/variants/hexa-fit/fit-stars';
 import { gameUseCases, valueOf } from '../support/application/game-use-cases';
 import { ManualClock } from '../support/engine/manual-clock';
 import { square } from '../support/engine/square-topology';
@@ -21,6 +24,10 @@ import { sortFactory } from '../support/variants/hexa-sort/sort-game';
 const placeA = new PlaceFitPiece(A, Turns.of(0), square(0, 0));
 const placeB = new PlaceFitPiece(B, Turns.of(0), square(2, 0));
 const placeC = new PlaceFitPiece(C, Turns.of(0), square(4, 0));
+
+// One star threshold: at most `maxMoves` moves and at most `maxMs` milliseconds.
+const star = (maxMoves: number, maxMs: number) =>
+  FitStarThreshold.of({ maxMoves: Moves.of(maxMoves), maxElapsedMs: ElapsedTime.ofMs(maxMs) });
 
 async function fitLevel() {
   const clock = new ManualClock();
@@ -51,20 +58,21 @@ describe('The time of a Fit level', () => {
       elapsedMs: last.elapsedMs,
     });
 
-    expect(started.elapsedMs).toBe(0);
-    expect(first.elapsedMs).toBe(0);
-    expect(second.elapsedMs).toBe(2_000);
-    expect(last.elapsedMs).toBe(5_000);
+    expect(started.elapsedMs).toEqual(ElapsedTime.ofMs(0));
+    expect(first.elapsedMs).toEqual(ElapsedTime.ofMs(0));
+    expect(second.elapsedMs).toEqual(ElapsedTime.ofMs(2_000));
+    expect(last.elapsedMs).toEqual(ElapsedTime.ofMs(5_000));
+    expect(last.elapsedMs).toBeInstanceOf(ElapsedTime);
     expect(last.outcome).toBe('victory');
-    expect(engine.timed()?.elapsedMs()).toBe(5_000);
-    expect(result.moves).toBe(3);
-    expect(result.elapsedMs).toBe(5_000);
+    expect(engine.timed()?.elapsedMs()).toEqual(ElapsedTime.ofMs(5_000));
+    expect(result.moves).toEqual(Moves.of(3));
+    expect(result.elapsedMs).toEqual(ElapsedTime.ofMs(5_000));
     expect(
-      fitStars({ moves: result.moves, elapsedMs: 5_000 }, [
-        { maxMoves: 3, maxElapsedMs: 5_000 },
-        { maxMoves: 3, maxElapsedMs: 4_999 },
+      fitStars(FitPlay.of({ moves: result.moves, elapsedMs: ElapsedTime.ofMs(5_000) }), [
+        star(3, 5_000),
+        star(3, 4_999),
       ]),
-    ).toBe(1);
+    ).toEqual(Stars.of(1));
   });
 
   it('should_keep_the_clock_running_when_a_move_is_undone', async () => {
@@ -79,10 +87,10 @@ describe('The time of a Fit level', () => {
     const replay = valueOf(await applyMove.execute({ move: placeB }));
 
     // The undo takes the move back and leaves the time.
-    expect(undone.elapsedMs).toBe(2_000);
+    expect(undone.elapsedMs).toEqual(ElapsedTime.ofMs(2_000));
     expect(undone.payload.placed.map((id) => id.value)).toEqual(['a']);
-    expect(replay.elapsedMs).toBe(3_000);
-    expect(games.running().snapshot().moves).toBe(2);
+    expect(replay.elapsedMs).toEqual(ElapsedTime.ofMs(3_000));
+    expect(games.running().snapshot().moves).toEqual(Moves.of(2));
   });
 
   it('should_give_no_elapsed_ms_field_when_the_variant_has_no_timer', async () => {

@@ -1,5 +1,6 @@
 /** @jest-environment node */
 import { Score } from '../../../../src/domain/engine/score';
+import { ClearedStacks } from '../../../../src/domain/variants/hexa-sort/cleared-stacks';
 import type { SortState } from '../../../../src/domain/variants/hexa-sort/sort-state';
 import { GameStateId } from '../../../../src/domain/engine/game-state-id';
 import { MatchId } from '../../../../src/domain/engine/match-id';
@@ -109,7 +110,7 @@ describe('SortState', () => {
 
     expect(names(state.snapshot().board.get(square(0, 0)))).toEqual(['blue']);
     expect(names(state.snapshot().board.get(square(1, 0)))).toEqual(['green', 'red', 'red', 'red']);
-    expect(state.snapshot().goalsDone).toBe(0);
+    expect(state.snapshot().goalsDone).toEqual(ClearedStacks.of(0));
     expect(state.snapshot().clearedTiles).toEqual([]);
   });
 
@@ -148,7 +149,7 @@ describe('SortState', () => {
 
     expect(state.snapshot().board.get(square(0, 0))?.isEmpty()).toBe(true);
     expect(state.snapshot().board.cells()).toHaveLength(2);
-    expect(state.snapshot().goalsDone).toBe(1);
+    expect(state.snapshot().goalsDone).toEqual(ClearedStacks.of(1));
     expect(state.snapshot().clearedTiles).toEqual([11]);
   });
 

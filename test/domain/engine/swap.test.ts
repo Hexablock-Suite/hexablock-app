@@ -1,5 +1,9 @@
 /** @jest-environment node */
 import { Score } from '../../../src/domain/engine/score';
+import { ElapsedTime } from '../../../src/domain/engine/elapsed-time';
+import { LevelId } from '../../../src/domain/engine/level-id';
+import { Moves } from '../../../src/domain/engine/moves';
+import { Stars } from '../../../src/domain/engine/stars';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
 import {
   GameOver,
@@ -91,7 +95,7 @@ class ScoreProgress implements IProgressModel {
 
 class MovesProgress implements IProgressModel {
   record(result: GameResult): ProgressRecord {
-    return ProgressRecord.of({ gameId: result.gameId, score: Score.of(result.moves) });
+    return ProgressRecord.of({ gameId: result.gameId, score: Score.of(result.moves.value) });
   }
 }
 
@@ -110,7 +114,7 @@ class ProgressSubscriber implements GameEventPublisher {
     const result = GameResult.of({
       gameId: event.gameId,
       score: event.finalScore,
-      moves: this.moves(),
+      moves: Moves.of(this.moves()),
     });
     this.records.push(this.progress.record(result));
   }
@@ -249,77 +253,92 @@ describe('swapping the piece source, the scoring policy and the progress model',
 });
 
 describe('GameResult and ProgressRecord', () => {
+  // A result and a record have no check of their own: each value object checks its value
+  // (issues #203 and #204).
+  const gameId = GameId.of('fake-game');
+  const noMoves = Moves.of(0);
+
   it('should_throw_when_a_result_has_negative_moves', () => {
-    expect(() =>
-      GameResult.of({ gameId: GameId.of('fake-game'), score: Score.of(0), moves: -1 }),
-    ).toThrow('moves');
+    expect(() => GameResult.of({ gameId, score: Score.of(0), moves: Moves.of(-1) })).toThrow(
+      'move count',
+    );
   });
 
   it('should_throw_when_a_result_has_a_negative_time', () => {
-    const gameId = GameId.of('fake-game');
+    const timed = (ms: number) =>
+      GameResult.of({
+        gameId,
+        score: Score.of(0),
+        moves: noMoves,
+        elapsedMs: ElapsedTime.ofMs(ms),
+      });
 
-    expect(() => GameResult.of({ gameId, score: Score.of(0), moves: 0, elapsedMs: -1 })).toThrow(
-      'milliseconds',
-    );
-    expect(GameResult.of({ gameId, score: Score.of(0), moves: 0, elapsedMs: 0 }).elapsedMs).toBe(0);
+    expect(() => timed(-1)).toThrow('milliseconds');
+    expect(timed(0).elapsedMs).toEqual(ElapsedTime.ofMs(0));
   });
 
   it('should_throw_a_range_error_when_a_result_has_a_decimal_number_of_moves', () => {
-    const gameId = GameId.of('fake-game');
+    const played = () => GameResult.of({ gameId, score: Score.of(0), moves: Moves.of(2.5) });
 
-    expect(() => GameResult.of({ gameId, score: Score.of(0), moves: 2.5 })).toThrow(RangeError);
-    expect(() => GameResult.of({ gameId, score: Score.of(0), moves: 2.5 })).toThrow('moves');
+    expect(played).toThrow(RangeError);
+    expect(played).toThrow('move count');
   });
 
   it('should_throw_a_range_error_when_a_result_has_a_score_that_is_not_a_number', () => {
-    const gameId = GameId.of('fake-game');
+    const scored = () => GameResult.of({ gameId, score: Score.of(Number.NaN), moves: noMoves });
 
-    expect(() => GameResult.of({ gameId, score: Score.of(Number.NaN), moves: 0 })).toThrow(
-      RangeError,
-    );
-    expect(() => GameResult.of({ gameId, score: Score.of(Number.NaN), moves: 0 })).toThrow('score');
+    expect(scored).toThrow(RangeError);
+    expect(scored).toThrow('score');
   });
 
   it('should_throw_a_range_error_when_a_result_has_a_time_that_is_not_a_number', () => {
-    const gameId = GameId.of('fake-game');
+    const timed = () =>
+      GameResult.of({
+        gameId,
+        score: Score.of(0),
+        moves: noMoves,
+        elapsedMs: ElapsedTime.ofMs(Number.NaN),
+      });
 
-    expect(() =>
-      GameResult.of({ gameId, score: Score.of(0), moves: 0, elapsedMs: Number.NaN }),
-    ).toThrow(RangeError);
-    expect(() =>
-      GameResult.of({ gameId, score: Score.of(0), moves: 0, elapsedMs: Number.NaN }),
-    ).toThrow('milliseconds');
+    expect(timed).toThrow(RangeError);
+    expect(timed).toThrow('milliseconds');
   });
 
   it('should_throw_a_range_error_when_a_result_has_an_infinite_score_or_time', () => {
-    const gameId = GameId.of('fake-game');
-
     for (const score of [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
-      expect(() => GameResult.of({ gameId, score: Score.of(score), moves: 0 })).toThrow('score');
+      expect(() => GameResult.of({ gameId, score: Score.of(score), moves: noMoves })).toThrow(
+        'score',
+      );
     }
     expect(() =>
-      GameResult.of({ gameId, score: Score.of(0), moves: 0, elapsedMs: Number.POSITIVE_INFINITY }),
+      GameResult.of({
+        gameId,
+        score: Score.of(0),
+        moves: noMoves,
+        elapsedMs: ElapsedTime.ofMs(Number.POSITIVE_INFINITY),
+      }),
     ).toThrow('milliseconds');
   });
 
   it('should_throw_a_range_error_when_a_record_has_negative_stars', () => {
-    const gameId = GameId.of('fake-game');
+    const starred = (stars: number) =>
+      ProgressRecord.of({ gameId, score: Score.of(0), stars: Stars.of(stars) });
 
-    expect(() => ProgressRecord.of({ gameId, score: Score.of(0), stars: -1 })).toThrow(RangeError);
-    expect(() => ProgressRecord.of({ gameId, score: Score.of(0), stars: -1 })).toThrow('stars');
-    expect(ProgressRecord.of({ gameId, score: Score.of(0), stars: 0 }).stars).toBe(0);
+    expect(() => starred(-1)).toThrow(RangeError);
+    expect(() => starred(-1)).toThrow('star count');
+    expect(starred(0).stars).toEqual(Stars.of(0));
   });
 
   it('should_keep_the_optional_fields_when_a_result_has_a_level_and_a_time', () => {
     const result = GameResult.of({
       gameId: GameId.of('hexa-fit'),
-      levelId: 'fit-01',
+      levelId: LevelId.of('fit-01'),
       score: Score.of(0),
-      moves: 12,
-      elapsedMs: 3000,
+      moves: Moves.of(12),
+      elapsedMs: ElapsedTime.ofMs(3000),
     });
 
-    expect(result.levelId).toBe('fit-01');
-    expect(result.elapsedMs).toBe(3000);
+    expect(result.levelId).toEqual(LevelId.of('fit-01'));
+    expect(result.elapsedMs).toEqual(ElapsedTime.ofMs(3000));
   });
 });

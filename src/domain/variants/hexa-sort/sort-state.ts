@@ -6,6 +6,7 @@ import type { MatchId } from '../../engine/match-id';
 import { Score } from '../../engine/score';
 import type { IPieceSource } from '../../engine/piece-source';
 import type { Piece } from '../../engine/piece';
+import { ClearedStacks } from './cleared-stacks';
 import { ColorStack } from './color-stack';
 import type { GoalCount } from './goal-count';
 
@@ -17,7 +18,7 @@ export interface PlaceStack<TCoord> {
 // The data that the Sort screen draws: the offered stack and the goal counts.
 export interface SortView<TCoord> {
   readonly offered: Piece<ColorStack, TCoord> | undefined;
-  readonly goalsDone: number;
+  readonly goalsDone: ClearedStacks;
   readonly goalsNeeded: GoalCount;
 }
 
@@ -27,7 +28,7 @@ export interface SortView<TCoord> {
 // `view()` gives the offered stack and the goal counts for the screen.
 export interface SortSnapshot<TCoord> extends BoardSnapshot<ColorStack, TCoord> {
   readonly offered: Piece<ColorStack, TCoord> | undefined;
-  readonly goalsDone: number;
+  readonly goalsDone: ClearedStacks;
   readonly goalsNeeded: GoalCount;
   readonly clearedTiles: readonly number[];
   readonly placedAt: TCoord | undefined;
@@ -46,7 +47,8 @@ export interface SortSnapshot<TCoord> extends BoardSnapshot<ColorStack, TCoord> 
 // The piece source lives in the state (classes.md decision 31). The level chooses it:
 // seeded random or a fixed list (A4). A Sort piece is one cell with a stack (decision 6).
 // `offered` is the stack that the player places next. It is `undefined` when the source ends.
-// `goalsDone` counts the cleared stacks. `goalsNeeded` is the goal of the level, a `GoalCount`.
+// `goalsDone` counts the cleared stacks, as a `ClearedStacks` (classes.md decision 42).
+// `goalsNeeded` is the goal of the level, a `GoalCount`.
 // `clearedTiles` holds the tile count of each stack that the last turn cleared,
 // so the Sort scoring (issue #98) can read it. `placedAt` is the cell of the last move.
 export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
@@ -57,7 +59,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
     private source: IPieceSource<Piece<ColorStack, TCoord>>,
     private readonly goalsNeeded: GoalCount,
     private offered: Piece<ColorStack, TCoord> | undefined,
-    private goalsDone: number,
+    private goalsDone: ClearedStacks,
     private clearedTiles: number[],
     private placedAt: TCoord | undefined,
     private score: Score,
@@ -78,7 +80,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
       values.source,
       values.goalsNeeded,
       undefined,
-      0,
+      ClearedStacks.of(0),
       [],
       undefined,
       Score.of(0),
@@ -140,7 +142,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
       throw new RangeError(`The cell ${this.board.topology.key(at)} has no stack to clear.`);
     }
     this.board.occupy(at, ColorStack.empty());
-    this.goalsDone += 1;
+    this.goalsDone = this.goalsDone.plusOne();
     this.clearedTiles.push(stack.tileCount());
   }
 

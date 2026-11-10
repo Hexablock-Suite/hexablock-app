@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Moves } from '../../../../src/domain/engine/moves';
 import { Score } from '../../../../src/domain/engine/score';
 import { Turns } from '../../../../src/domain/engine/turns';
 import { Placement } from '../../../../src/domain/variants/hexa-fit/placement';
@@ -98,9 +99,13 @@ describe('FitState', () => {
     expect(placed).toEqual({
       cells: ['2,0=a', '3,0=a', '0,0=b', '1,0=b'],
       placed: [A, B],
-      moves: 1,
+      moves: Moves.of(1),
     });
-    expect([keys(), state.placed(), state.snapshot().moves]).toEqual([['0,0=b', '1,0=b'], [B], 1]);
+    expect([keys(), state.placed(), state.snapshot().moves]).toEqual([
+      ['0,0=b', '1,0=b'],
+      [B],
+      Moves.of(1),
+    ]);
   });
 
   it('should_throw_a_range_error_and_keep_the_state_when_a_placed_piece_leaves_the_figure', () => {

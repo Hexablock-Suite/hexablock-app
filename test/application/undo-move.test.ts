@@ -8,6 +8,7 @@ import type { BoardState } from '../../src/domain/engine/board-state';
 import { PlayingPhase } from '../../src/domain/engine/game-phase';
 import type { IPieceSource } from '../../src/domain/engine/piece-source';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
+import { ElapsedTime } from '../../src/domain/engine/elapsed-time';
 import { Turns } from '../../src/domain/engine/turns';
 import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
 import { PlaceFitPiece } from '../../src/domain/variants/hexa-fit/fit-move';
@@ -92,7 +93,7 @@ describe('UndoMove', () => {
       hasUndo: true,
       payload: afterFirst.payload,
       // Fit is timed, and this clock does not move.
-      elapsedMs: 0,
+      elapsedMs: ElapsedTime.ofMs(0),
     });
     expect(games.running().snapshot().board.cells()).toEqual(afterFirst.cells);
     expect(games.running().currentPhase()).toBe(PlayingPhase.instance);

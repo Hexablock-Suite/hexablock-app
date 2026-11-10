@@ -1,6 +1,7 @@
 /** @jest-environment node */
 import { FixedListPieceSource } from '../../../src/domain/engine/piece-source';
 import { MergeState } from '../../../src/domain/variants/hexa-merge/merge-state';
+import { ClearedStacks } from '../../../src/domain/variants/hexa-sort/cleared-stacks';
 import { GoalCount } from '../../../src/domain/variants/hexa-sort/goal-count';
 import { SortState } from '../../../src/domain/variants/hexa-sort/sort-state';
 import { square, squareTopology } from '../../support/engine/square-topology';
@@ -56,16 +57,16 @@ describe('the view of each variant state', () => {
 
     const view = state.snapshot().view();
 
-    expect(view).toStrictEqual({ offered, goalsDone: 1, goalsNeeded });
+    expect(view).toStrictEqual({ offered, goalsDone: ClearedStacks.of(1), goalsNeeded });
     expectFrozen(view);
 
     // The source ends, so the next offer is none. A later change must not reach this view.
     state.offerNext();
 
-    expect(view).toStrictEqual({ offered, goalsDone: 1, goalsNeeded });
+    expect(view).toStrictEqual({ offered, goalsDone: ClearedStacks.of(1), goalsNeeded });
     expect(state.snapshot().view()).toStrictEqual({
       offered: undefined,
-      goalsDone: 1,
+      goalsDone: ClearedStacks.of(1),
       goalsNeeded,
     });
   });

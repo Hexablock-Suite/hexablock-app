@@ -1,4 +1,5 @@
 import { Range } from '../../engine/range';
+import { ClearedStacks } from './cleared-stacks';
 
 // The goal counts that a level can ask: 1 or more. No source names an upper bound,
 // so the bound is the largest safe integer (decision on issue #129).
@@ -24,7 +25,8 @@ export class GoalCount {
   }
 
   // Tells if a count of cleared stacks reaches the goal. A count above the goal reaches it too.
-  isReachedBy(goalsDone: number): boolean {
-    return goalsDone >= this.value;
+  // The goal is itself a count of stacks, so `ClearedStacks` compares the two counts.
+  isReachedBy(goalsDone: ClearedStacks): boolean {
+    return goalsDone.isAtLeast(ClearedStacks.of(this.value));
   }
 }

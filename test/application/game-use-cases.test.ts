@@ -18,6 +18,7 @@ import type { Piece } from '../../src/domain/engine/piece';
 import { FixedListPieceSource, type IPieceSource } from '../../src/domain/engine/piece-source';
 import { RegionSize } from '../../src/domain/engine/region-size';
 import type { Resolution } from '../../src/domain/engine/resolution';
+import { ElapsedTime } from '../../src/domain/engine/elapsed-time';
 import { Score } from '../../src/domain/engine/score';
 import { SquareGeometry } from '../../src/domain/engine/square-geometry';
 import type { IRedoable } from '../../src/domain/engine/undo-capabilities';
@@ -232,7 +233,7 @@ describe('StartGame and ApplyMove', () => {
       // Fit wins with its one move, so only the Merge game keeps a move to undo.
       const hasUndo = run.gameId === 'hexa-fit' || run.gameId === 'hexa-merge';
       // Only Fit is timed, and this clock does not move.
-      const time = run.gameId === 'hexa-fit' ? { elapsedMs: 0 } : {};
+      const time = run.gameId === 'hexa-fit' ? { elapsedMs: ElapsedTime.ofMs(0) } : {};
       expect(run.started).toEqual({
         cells: run.startCells,
         score: Score.of(0),
@@ -483,7 +484,7 @@ describe('StartGame and ApplyMove', () => {
       canRedo: false,
       hasUndo: true,
       payload: saved.view(),
-      elapsedMs: 0,
+      elapsedMs: ElapsedTime.ofMs(0),
     });
     expect(saved.board.cells()).not.toEqual([]);
     expect(games.running().currentPhase()).toBe(VictoryPhase.instance);
@@ -675,10 +676,10 @@ describe('the variant data of MoveResult', () => {
 
     const sort = await startAndPlayOnce(sortFactory());
     expect(sort.started.payload.offered).toEqual(sort.startState.offered);
-    expect(sort.started.payload.goalsDone).toBe(sort.startState.goalsDone);
+    expect(sort.started.payload.goalsDone).toEqual(sort.startState.goalsDone);
     expect(sort.started.payload.goalsNeeded).toEqual(sort.startState.goalsNeeded);
     expect(sort.played.payload.offered).toEqual(sort.after.offered);
-    expect(sort.played.payload.goalsDone).toBe(sort.after.goalsDone);
+    expect(sort.played.payload.goalsDone).toEqual(sort.after.goalsDone);
     expect(sort.played.payload.goalsNeeded).toEqual(sort.after.goalsNeeded);
     expect(sort.after.offered).not.toEqual(sort.startState.offered);
 

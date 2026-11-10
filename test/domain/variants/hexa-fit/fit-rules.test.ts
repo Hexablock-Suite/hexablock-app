@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Moves } from '../../../../src/domain/engine/moves';
 import { Score } from '../../../../src/domain/engine/score';
 import { Board } from '../../../../src/domain/engine/board';
 import { BoardShape } from '../../../../src/domain/engine/board-shape';
@@ -534,7 +535,7 @@ describe('FitRules move count', () => {
       counts.push(engine.snapshot().moves);
     }
 
-    expect(counts).toEqual([0, 1, 2, 3]);
+    expect(counts).toEqual([0, 1, 2, 3].map((count) => Moves.of(count)));
   });
 
   it('should_keep_the_move_count_when_a_move_is_rejected', () => {
@@ -549,7 +550,7 @@ describe('FitRules move count', () => {
     ];
 
     expect(reports.map((r) => r.accepted)).toEqual([false, false, false]);
-    expect(engine.snapshot().moves).toBe(1);
+    expect(engine.snapshot().moves).toEqual(Moves.of(1));
     expect(cellsOf(engine.snapshot())).toEqual(['0,1=a', '1,1=a']);
   });
 
@@ -565,9 +566,9 @@ describe('FitRules move count', () => {
     const kept = [before.snapshot().moves, cellsOf(before)];
     const replayed = played(rules, before, new RemoveFitPiece(A));
 
-    expect(removed.snapshot().moves).toBe(2);
-    expect(kept).toEqual([1, ['0,0=a', '1,0=a']]);
-    expect(replayed.snapshot().moves).toBe(2);
+    expect(removed.snapshot().moves).toEqual(Moves.of(2));
+    expect(kept).toEqual([Moves.of(1), ['0,0=a', '1,0=a']]);
+    expect(replayed.snapshot().moves).toEqual(Moves.of(2));
   });
 });
 
@@ -589,9 +590,9 @@ describe('FitRules in place', () => {
     }
 
     expect(seen).toEqual([
-      { same: true, cells: ['0,0=a', '1,0=a'], moves: 1 },
-      { same: true, cells: ['0,0=a', '0,1=a'], moves: 2 },
-      { same: true, cells: [], moves: 3 },
+      { same: true, cells: ['0,0=a', '1,0=a'], moves: Moves.of(1) },
+      { same: true, cells: ['0,0=a', '0,1=a'], moves: Moves.of(2) },
+      { same: true, cells: [], moves: Moves.of(3) },
     ]);
     // The board keeps its id: the same board changes in place.
     expect(state.snapshot().board.equals(board)).toBe(true);

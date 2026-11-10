@@ -1,4 +1,5 @@
 import type { Clock } from './clock';
+import { ElapsedTime } from './elapsed-time';
 import type { ITimed } from './timed';
 
 // Times one game with the injected `Clock` (rule R-domain-determinism, APP-NFR-07).
@@ -22,9 +23,12 @@ export class LevelTimer implements ITimed {
     this.stoppedAt = this.clock.now();
   }
 
-  // A clock that goes back gives 0: `GameResult.of()` and `fitStars()` reject a negative time.
-  elapsedMs(): number {
-    if (this.startedAt === undefined) return 0;
-    return Math.max(0, (this.stoppedAt ?? this.clock.now()) - this.startedAt);
+  // The time of play as an `ElapsedTime`: a whole number of milliseconds of 0 or more.
+  // A clock that goes back gives 0, because an `ElapsedTime` is never negative.
+  // A clock can give a fraction of a millisecond, and the timer drops that fraction.
+  elapsedMs(): ElapsedTime {
+    if (this.startedAt === undefined) return ElapsedTime.ofMs(0);
+    const passed = (this.stoppedAt ?? this.clock.now()) - this.startedAt;
+    return ElapsedTime.ofMs(Math.max(0, Math.floor(passed)));
   }
 }

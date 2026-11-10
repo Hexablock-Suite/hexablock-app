@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { ElapsedTime } from '../../../../src/domain/engine/elapsed-time';
 import { Score } from '../../../../src/domain/engine/score';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -100,7 +101,7 @@ describe('FitFactory', () => {
 
     expect(rules).toBeInstanceOf(TimedRulesDecorator);
     expect(new FitRules<SquareCoord>().timed()).toBeUndefined();
-    expect(rules.timed()?.elapsedMs()).toBe(0);
+    expect(rules.timed()?.elapsedMs()).toEqual(ElapsedTime.ofMs(0));
   });
 
   it('should_give_each_game_its_own_timer_when_the_fit_factory_starts_two_games', () => {
@@ -112,8 +113,8 @@ describe('FitFactory', () => {
     first.engine.play(new PlaceFitPiece(A, Turns.of(0), square(0, 0)));
     clock.advance(1_000);
 
-    expect(first.engine.timed()?.elapsedMs()).toBe(1_000);
-    expect(second.engine.timed()?.elapsedMs()).toBe(0);
+    expect(first.engine.timed()?.elapsedMs()).toEqual(ElapsedTime.ofMs(1_000));
+    expect(second.engine.timed()?.elapsedMs()).toEqual(ElapsedTime.ofMs(0));
   });
 
   it('should_hold_no_timer_code_when_the_fit_rules_source_is_read', () => {
