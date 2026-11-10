@@ -88,8 +88,8 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
     const piece = move.pieceIn(this.tray);
     if (piece === undefined) throw move.missingPiece();
     const cells = this.cellsOf(piece, move);
-    if (!this.fits(cells)) throw move.misfit(this.board.topology);
-    for (const c of cells) this.board.occupy(c, piece.content);
+    if (!this.fits(cells)) throw move.misfit(this.board);
+    for (const c of cells) this.board.occupy(c, piece.cell());
     this.cellsPlaced = cells.length;
     this.tray = move.trayWithout(this.tray);
     if (this.tray.length === 0) this.drawTray();
@@ -103,9 +103,9 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
     const cleared = new Map<CoordKey, TCoord>();
     for (const c of lines.flat()) {
       if (this.board.get(c) === undefined) {
-        throw new RangeError(`A cleared line holds the free cell ${this.board.topology.key(c)}.`);
+        throw new RangeError(`A cleared line holds the free cell ${this.board.key(c)}.`);
       }
-      cleared.set(this.board.topology.key(c), c);
+      cleared.set(this.board.key(c), c);
     }
     for (const c of cleared.values()) this.board.vacate(c);
     this.streak = lines.length > 0 ? this.streak + 1 : 0;
@@ -194,7 +194,7 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
 
   // The board cells that the piece covers at the offset of the move.
   private cellsOf(piece: Piece<Color, TCoord>, move: PlacePiece<TCoord>): TCoord[] {
-    return move.cells(piece, this.board.topology);
+    return move.cells(piece, this.board);
   }
 
   // A piece fits when each of its cells lies inside the board on a free cell.

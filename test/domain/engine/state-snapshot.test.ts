@@ -104,8 +104,7 @@ describe('the photo of a state', () => {
 
   it('should_hold_the_fit_data_in_a_frozen_photo_when_a_fit_state_takes_its_snapshot', () => {
     const state = fitFactory().createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
-    const { topology } = state.snapshot().board;
-    const placement = Placement.of(Turns.of(0), square(0, 0), topology);
+    const placement = Placement.of(Turns.of(0), square(0, 0), state.snapshot().board);
     state.place(A, placement);
     state.countMove();
 
@@ -116,7 +115,7 @@ describe('the photo of a state', () => {
     expect(photo.moves).toBeInstanceOf(Moves);
     expect(photo.moves.equals(Moves.of(1))).toBe(true);
     expect(
-      photo.placements.map(([id, at]) => [id.equals(A), at.equals(placement, topology)]),
+      photo.placements.map(([id, at]) => [id.equals(A), at.equals(placement, photo.board)]),
     ).toEqual([[true, true]]);
     expect(json(photo.view())).toBe(json({ remaining: [], placed: [A] }));
   });
@@ -253,7 +252,7 @@ describe('the restore of a state from its photo', () => {
   it('should_give_back_the_placements_and_the_moves_when_fit_restores', () => {
     const state = fitFactory().createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
     const photo = state.snapshot();
-    state.place(A, Placement.of(Turns.of(0), square(0, 0), photo.board.topology));
+    state.place(A, Placement.of(Turns.of(0), square(0, 0), photo.board));
     state.countMove();
 
     state.restore(photo);

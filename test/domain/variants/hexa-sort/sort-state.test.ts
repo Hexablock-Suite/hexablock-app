@@ -18,7 +18,7 @@ function facts(state: SortState<SquareCoord>) {
       .snapshot()
       .board.cells()
       .map(([at, cell]) => [at, names(cell)]),
-    offered: offered === undefined ? undefined : names(offered.content),
+    offered: offered === undefined ? undefined : names(offered.cell()),
     left: state.snapshot().source.hasNext(),
     goalsDone: state.snapshot().goalsDone,
     clearedTiles: [...state.snapshot().clearedTiles],
@@ -36,7 +36,7 @@ describe('SortState', () => {
     expect(names(state.snapshot().board.get(square(1, 0)))).toEqual(['red']);
     expect(state.snapshot().placedAt).toEqual(square(1, 0));
     expect(state.snapshot().clearedTiles).toEqual([]);
-    expect(names(state.snapshot().offered?.content)).toEqual(['blue', 'blue']);
+    expect(names(state.snapshot().offered?.cell())).toEqual(['blue', 'blue']);
     expect(state.snapshot().source.hasNext()).toBe(false);
   });
 

@@ -7,6 +7,7 @@ import { Score } from '../../engine/score';
 import type { Piece } from '../../engine/piece';
 import type { IPieceSource } from '../../engine/piece-source';
 import type { PieceId } from './piece-id';
+import { PieceRegister } from './piece-register';
 import type { Placement } from './placement';
 
 // The data that the Fit screen draws: the tray and the pieces on the figure.
@@ -30,7 +31,10 @@ export interface FitSnapshot<TCoord> extends BoardSnapshot<PieceId, TCoord> {
 // The board is the figure: its shape holds only the figure cells (REQUIREMENTS.md §1).
 // The pieces come from the `FixedListPieceSource` of the `FitLevel`. The state reads it once at start,
 // because the player picks the tray pieces in any order.
-// The maps use the text of the piece id as key, because a Map compares a string by value.
+// The pieces and the placements live in two `PieceRegister` collections, which find an entry
+// by `PieceId.equals()` (classes.md decision 49). No text of an id is a key.
+// A register is a value: a placement or a removal replaces the register of the placements.
+// The register of the placements holds the id object of the level piece.
 // `moves` counts the accepted moves of the game for the stars (issue #60).
 // It is a `Moves` value object, which checks its own value (classes.md decision 42).
 // It is an entity inside the `GameEngine` aggregate (classes.md decisions 7 and 26).
@@ -45,8 +49,8 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
     private readonly stateId: GameStateId,
     private readonly matchId: MatchId,
     private readonly board: Board<PieceId, TCoord>,
-    private readonly pieces: ReadonlyMap<string, Piece<PieceId, TCoord>>,
-    private readonly placements: Map<string, Placement<TCoord>>,
+    private readonly pieces: PieceRegister<Piece<PieceId, TCoord>>,
+    private placements: PieceRegister<Placement<TCoord>>,
     private moves: Moves = Moves.of(0),
     private score: Score = Score.of(0),
   ) {}
@@ -59,44 +63,47 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
     figure: Board<PieceId, TCoord>,
     source: IPieceSource<Piece<PieceId, TCoord>>,
   ): FitState<TCoord> {
-    const pieces = new Map<string, Piece<PieceId, TCoord>>();
-    for (const piece of source) pieces.set(piece.content.value, piece);
-    return new FitState(stateId, matchId, figure.clone(), pieces, new Map());
+    let pieces = PieceRegister.empty<Piece<PieceId, TCoord>>();
+    for (const piece of source) pieces = pieces.with(piece.cell(), piece);
+    return new FitState(stateId, matchId, figure.clone(), pieces, PieceRegister.empty());
   }
 
   piece(id: PieceId): Piece<PieceId, TCoord> | undefined {
-    return this.pieces.get(id.value);
+    return this.pieces.find(id);
   }
 
   placementOf(id: PieceId): Placement<TCoord> | undefined {
-    return this.placements.get(id.value);
+    return this.placements.find(id);
   }
 
   // The tray: the pieces that are not on the figure, in the order of the source.
   remaining(): Piece<PieceId, TCoord>[] {
-    return [...this.pieces.values()].filter((p) => !this.placements.has(p.content.value));
+    return this.pieces
+      .entries()
+      .filter(([id]) => !this.placements.has(id))
+      .map(([, piece]) => piece);
   }
 
   // The placed pieces, in the order of the source.
   placed(): PieceId[] {
-    return [...this.pieces.values()]
-      .map((p) => p.content)
-      .filter((id) => this.placements.has(id.value));
+    return this.pieces
+      .entries()
+      .map(([id]) => id)
+      .filter((id) => this.placements.has(id));
   }
 
   // Puts the piece on the cells of `placement`. The rules check the move before.
   // An unknown piece, or a cell outside the figure, throws a RangeError before any change.
   place(id: PieceId, placement: Placement<TCoord>): void {
-    const piece = this.pieces.get(id.value);
-    if (piece === undefined) throw new RangeError(`The level has no piece ${id.value}.`);
-    const cells = placement.cells(piece, this.board.topology);
+    const piece = this.pieceOf(id);
+    const cells = placement.cells(piece, this.board);
     for (const c of cells) {
       if (!this.board.contains(c)) {
-        throw new RangeError(`The coordinate ${this.board.topology.key(c)} is outside the board.`);
+        throw new RangeError(`The coordinate ${this.board.key(c)} is outside the board.`);
       }
     }
     for (const c of cells) this.board.occupy(c, id);
-    this.placements.set(id.value, placement);
+    this.placements = this.placements.with(piece.cell(), placement);
   }
 
   // Takes the piece off the figure: the board vacates each cell of the piece.
@@ -104,7 +111,7 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
     for (const [c, cell] of this.board.cells()) {
       if (cell.equals(id)) this.board.vacate(c);
     }
-    this.placements.delete(id.value);
+    this.placements = this.placements.without(id);
   }
 
   // Adds one move, in place. The rules call it once for each accepted move.
@@ -134,9 +141,7 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
   // so the photo shares them. It holds frozen lists and a copy of the board.
   snapshot(): FitSnapshot<TCoord> {
     const placements = Object.freeze(
-      [...this.placements].map(([key, placement]) =>
-        Object.freeze([this.idOf(key), placement] as const),
-      ),
+      this.placements.entries().map(([id, placement]) => Object.freeze([id, placement] as const)),
     );
     const view = Object.freeze({
       remaining: Object.freeze(this.remaining()),
@@ -158,25 +163,24 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
   // The move count of a photo is a `Moves`, which is valid when it exists.
   restore(snapshot: FitSnapshot<TCoord>): void {
     checkOwnSnapshot(this.stateId, this.board, snapshot);
-    for (const [id] of snapshot.placements) {
-      if (!this.pieces.has(id.value)) throw new RangeError(`The level has no piece ${id.value}.`);
+    let placements = PieceRegister.empty<Placement<TCoord>>();
+    for (const [id, placement] of snapshot.placements) {
+      placements = placements.with(this.pieceOf(id).cell(), placement);
     }
     this.board.restore(snapshot.board);
-    this.placements.clear();
-    for (const [id, placement] of snapshot.placements) this.placements.set(id.value, placement);
+    this.placements = placements;
     this.moves = snapshot.moves;
     this.score = snapshot.score;
   }
 
-  // The id of the piece whose id text is `key`. Each key of `placements` names a piece.
-  private idOf(key: string): PieceId {
-    const piece = this.pieces.get(key);
-    if (piece === undefined) throw new RangeError(`The level has no piece ${key}.`);
-    return piece.content;
+  // The level piece of the id. An id of no level piece throws a RangeError.
+  private pieceOf(id: PieceId): Piece<PieceId, TCoord> {
+    const piece = this.pieces.find(id);
+    if (piece === undefined) throw new RangeError(`The level has no piece ${id}.`);
+    return piece;
   }
 
-  // A piece and a placement never change, so the clone shares them.
-  // The map of the placements changes in place, so the clone takes its own copy of the map.
+  // A piece, a placement and a register never change, so the clone shares them.
   // The clone keeps the ids and the move count, so undo gives back the count before the move.
   clone(): FitState<TCoord> {
     return new FitState(
@@ -184,7 +188,7 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
       this.matchId,
       this.board.clone(),
       this.pieces,
-      new Map(this.placements),
+      this.placements,
       this.moves,
       this.score,
     );

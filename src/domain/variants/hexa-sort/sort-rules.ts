@@ -27,7 +27,7 @@ export class SortRules<TCoord> extends BaseGameRules<PlaceStack<TCoord>, SortSta
   *validMoves(state: SortState<TCoord>): Iterable<PlaceStack<TCoord>> {
     const { offered, board } = state.snapshot();
     if (offered === undefined) return;
-    for (const at of board.shape.cells) {
+    for (const at of board.coordinates()) {
       if (state.canPlace(at)) yield PlaceStack.on(at);
     }
   }
@@ -72,7 +72,7 @@ function transfer<TCoord>(state: SortState<TCoord>, at: TCoord): TCoord[] {
   const target = targetOf(board, at, matches);
   // When `at` is the target, every matching neighbor gives its run to it.
   // Otherwise only `at` gives its run, because the other neighbors can lie away from the target.
-  const key = (c: TCoord) => board.topology.key(c);
+  const key = (c: TCoord) => board.key(c);
   const givers = key(target) === key(at) ? matches : [at];
   for (const giver of givers) state.moveRun(giver, target);
   clearIfGoal(state, target);
@@ -90,7 +90,7 @@ function targetOf<TCoord>(
   others: readonly TCoord[],
 ): TCoord {
   const run = (c: TCoord) => board.get(c)?.topRun().length ?? 0;
-  const key = (c: TCoord) => board.topology.key(c);
+  const key = (c: TCoord) => board.key(c);
   return others.reduce((best, c) => {
     const longer = run(c) - run(best);
     return longer > 0 || (longer === 0 && key(c) < key(best)) ? c : best;

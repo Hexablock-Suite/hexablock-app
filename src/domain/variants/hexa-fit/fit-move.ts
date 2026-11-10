@@ -1,5 +1,4 @@
 import type { CoordKey } from '../../engine/coord-key';
-import type { GridTopology } from '../../engine/grid-topology';
 import type { Turns } from '../../engine/turns';
 import type { PieceId } from './piece-id';
 import { Placement } from './placement';
@@ -26,8 +25,9 @@ export class PlaceFitPiece<TCoord> {
     return this.pieceId;
   }
 
-  // Where this move puts the piece: its rotation and its offset on the topology.
-  placement(topology: GridTopology<TCoord>): Placement<TCoord> {
+  // Where this move puts the piece: its rotation and its offset.
+  // A topology or a board gives the full turn that shortens the rotation.
+  placement(topology: { fullTurn(): Turns }): Placement<TCoord> {
     return Placement.of(this.rotation, this.at, topology);
   }
 
@@ -72,7 +72,7 @@ export class RotateFitPiece {
   }
 
   // The placement after this move turns the piece that lies at `placement`.
-  turn<TCoord>(placement: Placement<TCoord>, topology: GridTopology<TCoord>): Placement<TCoord> {
+  turn<TCoord>(placement: Placement<TCoord>, topology: { fullTurn(): Turns }): Placement<TCoord> {
     return placement.turned(this.steps, topology);
   }
 

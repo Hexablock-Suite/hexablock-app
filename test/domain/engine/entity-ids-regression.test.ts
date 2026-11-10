@@ -362,7 +362,8 @@ describe('aliasing of earlier snapshots (T18 probe)', () => {
 describe('atomicity of the state methods (T18 probe)', () => {
   it('should_keep_the_fit_state_when_a_fit_method_throws', () => {
     const state = threeDominoFitFactory().createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
-    const { topology } = state.snapshot().board;
+    // The board gives the full turn that a placement needs.
+    const topology = state.snapshot().board;
     const shown = () => shownByFit(state);
 
     const result = allKept([

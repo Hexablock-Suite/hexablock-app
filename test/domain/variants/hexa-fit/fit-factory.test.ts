@@ -36,11 +36,13 @@ describe('FitFactory', () => {
     const outcome = engine.play(new PlaceFitPiece(A, Turns.of(0), square(0, 0)));
 
     expect(factory.gameId.equals(GameId.of('hexa-fit'))).toBe(true);
-    expect(factory.createBoard(BOARD_ID).shape.cells.map((c) => squareTopology.key(c))).toEqual([
-      '0,0',
-      '1,0',
-    ]);
-    expect(initial.remaining().map((p) => p.content.value)).toEqual(['a']);
+    expect(
+      factory
+        .createBoard(BOARD_ID)
+        .coordinates()
+        .map((c) => squareTopology.key(c)),
+    ).toEqual(['0,0', '1,0']);
+    expect(initial.remaining().map((p) => String(p.cell()))).toEqual(['a']);
     expect(outcome).toBe(Outcome.victory);
     expect(engine.snapshot().score).toEqual(Score.of(0));
     expect(publisher.events).toEqual([
@@ -51,8 +53,8 @@ describe('FitFactory', () => {
   it('should_give_a_new_source_of_the_level_pieces_when_the_fit_factory_is_asked_twice', () => {
     const factory = fitFactory();
 
-    const first = [...factory.createPieceSource()].map((p) => p.content.value);
-    const second = [...factory.createPieceSource()].map((p) => p.content.value);
+    const first = [...factory.createPieceSource()].map((p) => String(p.cell()));
+    const second = [...factory.createPieceSource()].map((p) => String(p.cell()));
 
     expect(first).toEqual(['a']);
     expect(second).toEqual(['a']);

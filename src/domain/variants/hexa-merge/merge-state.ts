@@ -71,7 +71,7 @@ export class MergeState<
   // A board with no empty cell, or a source that has ended, gets no new tile.
   // The rules call it after each slide, and `MergeFactory` calls it for the first tiles.
   addNewTile(): void {
-    const empty = this.board.shape.cells.filter((c) => this.board.get(c) === undefined);
+    const empty = this.board.coordinates().filter((c) => this.board.get(c) === undefined);
     if (empty.length === 0 || !this.tiles.hasNext()) return;
     const { piece, rest } = this.tiles.take();
     const [at, tile] = piece.appearsOn(empty);
@@ -164,7 +164,7 @@ export class MergeState<
   // a slide reads each line from its leading edge, and a tile merges at most once per move.
   private planOf(slide: Slide<TAxis>): { cells: [TCoord, TCell][]; merged: TCell[] } | undefined {
     const { board } = this;
-    if (!slide.isAlong(board.topology.axes())) return undefined;
+    if (!slide.isAlong(board.axes())) return undefined;
     const cells: [TCoord, TCell][] = [];
     const merged: TCell[] = [];
     let changed = false;
@@ -207,10 +207,10 @@ function linesOf<TCell, TCoord, TAxis extends GridAxis>(
 ): TCoord[][] {
   const covered = new Set<CoordKey>();
   const lines: TCoord[][] = [];
-  for (const c of board.shape.cells) {
-    if (covered.has(board.topology.key(c))) continue;
+  for (const c of board.coordinates()) {
+    if (covered.has(board.key(c))) continue;
     const line = [...slide.lineThrough(board, c)];
-    for (const on of line) covered.add(board.topology.key(on));
+    for (const on of line) covered.add(board.key(on));
     lines.push(line);
   }
   return lines;

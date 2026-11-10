@@ -109,9 +109,9 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
     if (this.offered === undefined) throw new RangeError('No stack is on offer.');
     this.checkInside(at);
     if (!this.isFree(at)) {
-      throw new RangeError(`The cell ${this.board.topology.key(at)} already holds a stack.`);
+      throw new RangeError(`The cell ${this.board.key(at)} already holds a stack.`);
     }
-    this.board.occupy(at, this.offered.content);
+    this.board.occupy(at, this.offered.cell());
     this.placedAt = at;
     this.clearedTiles = [];
     this.offerNext();
@@ -124,11 +124,11 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
   moveRun(from: TCoord, to: TCoord): void {
     const giver = this.board.get(from);
     if (giver === undefined || giver.isEmpty()) {
-      throw new RangeError(`The cell ${this.board.topology.key(from)} has no stack to move.`);
+      throw new RangeError(`The cell ${this.board.key(from)} has no stack to move.`);
     }
     this.checkInside(to);
-    if (this.board.topology.key(from) === this.board.topology.key(to)) {
-      throw new RangeError(`A run cannot move to its own cell ${this.board.topology.key(to)}.`);
+    if (this.board.key(from) === this.board.key(to)) {
+      throw new RangeError(`A run cannot move to its own cell ${this.board.key(to)}.`);
     }
     const receiver = this.board.get(to) ?? ColorStack.empty();
     this.board.occupy(from, giver.withoutTopRun());
@@ -141,7 +141,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
   clearStack(at: TCoord): void {
     const stack = this.board.get(at);
     if (stack === undefined || stack.isEmpty()) {
-      throw new RangeError(`The cell ${this.board.topology.key(at)} has no stack to clear.`);
+      throw new RangeError(`The cell ${this.board.key(at)} has no stack to clear.`);
     }
     this.board.occupy(at, ColorStack.empty());
     this.goalsDone = this.goalsDone.plusOne();
@@ -210,7 +210,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
 
   private checkInside(at: TCoord): void {
     if (!this.board.contains(at)) {
-      throw new RangeError(`The coordinate ${this.board.topology.key(at)} is outside the board.`);
+      throw new RangeError(`The coordinate ${this.board.key(at)} is outside the board.`);
     }
   }
 

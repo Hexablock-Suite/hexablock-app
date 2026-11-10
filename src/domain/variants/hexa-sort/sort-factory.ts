@@ -81,10 +81,8 @@ export class SortFactory<TCoord> implements IVariantFactory<
 
   // The cell of every Sort piece: the first cell of the level region.
   // The player names the cell of a placement, so the rules never read the cell of the piece.
-  // A region has one cell or more, because a `RegionSize` is 1 or more.
+  // A shape holds one coordinate or more, so the region always has a first cell.
   private pieceCell(): TCoord {
-    const [cell] = this.geometry.createTopology().region(this.level.boardSize()).cells;
-    if (cell === undefined) throw new RangeError('The region of the Sort level has no cell.');
-    return cell;
+    return this.geometry.createTopology().region(this.level.boardSize()).first();
   }
 }

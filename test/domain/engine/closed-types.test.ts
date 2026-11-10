@@ -85,7 +85,7 @@ describe('test double axes and directions', () => {
     const state: BoardState<FakeCell, SquareCoord> = emptyState(2);
 
     expect([...board.line(SquareAxis.col, square(0, 1))]).toEqual([square(0, 1), square(1, 1)]);
-    expect(state.snapshot().board.shape.cells).toHaveLength(4);
+    expect(state.snapshot().board.coordinates()).toHaveLength(4);
   });
 });
 
@@ -178,7 +178,7 @@ describe('RegionSize', () => {
   });
 
   it('should_cover_one_cell_when_the_region_size_is_one', () => {
-    expect(squareTopology.region(RegionSize.of(1)).cells).toEqual([square(0, 0)]);
+    expect(squareTopology.region(RegionSize.of(1)).coordinates()).toEqual([square(0, 0)]);
   });
 });
 

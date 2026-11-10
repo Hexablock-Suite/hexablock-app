@@ -152,8 +152,8 @@ describe('Board', () => {
 
     expect(copy.get(1)).toBe('red');
     expect(copy.get(2)).toBeUndefined();
-    expect(copy.shape).toBe(board.shape);
-    expect(copy.topology).toBe(board.topology);
+    expect(copy.coordinates()).toEqual(board.coordinates());
+    expect(copy.axes()).toEqual(board.axes());
   });
 
   it('should_walk_the_whole_axis_inside_the_shape_when_line_is_read', () => {
@@ -358,24 +358,18 @@ describe('Board occupy and vacate', () => {
 });
 
 describe('Board shape invariants', () => {
-  // A value object never lets a mutable object out: the shape freezes its copy of the list.
-  // A frozen list throws on `push()`. A write by index throws only in strict mode,
-  // so the test accepts a throw and then reads the cells.
+  // A value object never lets a mutable object out: the shape keeps its own copy of the list,
+  // and `coordinates()` gives a new list on each call (classes.md decision 49).
   it('should_keep_its_cells_when_a_caller_changes_the_list_of_a_shape', () => {
     const source = [0, 1];
     const shape = BoardShape.of(source);
-    const cells = shape.cells as number[];
+    const cells = shape.coordinates();
 
-    expect(() => cells.push(2)).toThrow(TypeError);
-    try {
-      cells[0] = 9;
-    } catch {
-      // The frozen list rejected the write.
-    }
+    cells.push(2);
+    cells[0] = 9;
     source.push(3);
 
-    expect(Object.isFrozen(shape.cells)).toBe(true);
-    expect(shape.cells).toEqual([0, 1]);
+    expect(shape.coordinates()).toEqual([0, 1]);
   });
 
   it('should_throw_a_range_error_when_the_shape_is_empty', () => {
@@ -408,7 +402,7 @@ describe('Board shape invariants', () => {
   it('should_keep_every_coordinate_when_the_shape_has_no_repeated_key', () => {
     const board = new Board(BOARD_ID, BoardShape.of([4, 2, 0]), stripTopology);
 
-    expect(board.shape.cells).toEqual([4, 2, 0]);
+    expect(board.coordinates()).toEqual([4, 2, 0]);
     expect([0, 2, 4].every((c) => board.contains(c))).toBe(true);
   });
 });

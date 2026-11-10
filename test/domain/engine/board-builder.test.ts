@@ -25,7 +25,7 @@ describe('BoardBuilder', () => {
     const board = hexBuilder().withRegion(RegionSize.of(2)).build<string>(BOARD_ID);
 
     expect(board).toBeInstanceOf(Board);
-    expect(board.shape.cells).toHaveLength(7);
+    expect(board.coordinates()).toHaveLength(7);
     expect(board.contains(hex(1, -1))).toBe(true);
     expect(board.contains(hex(2, 0))).toBe(false);
     expect([...board.neighborhood(hex(0, 0))]).toHaveLength(6);
@@ -40,7 +40,7 @@ describe('BoardBuilder', () => {
       .build<string>(BOARD_ID);
 
     expect(board).toBeInstanceOf(Board);
-    expect(board.shape.cells).toEqual(cells);
+    expect(board.coordinates()).toEqual(cells);
     expect(board.contains(hex(1, 1))).toBe(true);
     expect(board.contains(hex(0, 1))).toBe(false);
     expect(board.cells()).toEqual([]);
@@ -80,8 +80,8 @@ describe('BoardBuilder', () => {
       .withRegion(RegionSize.of(2))
       .build(BOARD_ID);
 
-    expect(fromFigure.shape.cells).toEqual([hex(0, 0)]);
-    expect(fromRegion.shape.cells).toHaveLength(7);
+    expect(fromFigure.coordinates()).toEqual([hex(0, 0)]);
+    expect(fromRegion.coordinates()).toHaveLength(7);
   });
 
   it('should_give_two_boards_that_share_no_cells_when_build_runs_twice', () => {
@@ -106,7 +106,8 @@ describe('BoardBuilder', () => {
 
     const board = new BoardBuilder(geometry).withRegion(RegionSize.of(2)).build<string>(BOARD_ID);
 
-    expect(board.topology).toBe(squareTopology);
-    expect(board.shape.cells).toEqual([square(0, 0), square(1, 0), square(0, 1), square(1, 1)]);
+    expect(board.axes()).toEqual(squareTopology.axes());
+    expect(board.fullTurn()).toEqual(squareTopology.fullTurn());
+    expect(board.coordinates()).toEqual([square(0, 0), square(1, 0), square(0, 1), square(1, 1)]);
   });
 });

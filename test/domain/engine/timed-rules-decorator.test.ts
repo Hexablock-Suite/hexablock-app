@@ -63,7 +63,7 @@ class ThrowsOnFirstEnd implements IScoringPolicy<FakeState> {
 
   // The fake game ends when the board is full, so the photo after the turn shows the end.
   score(_before: FakeSnapshot, after: FakeSnapshot): Score {
-    const ended = after.board.cells().length === after.board.shape.cells.length;
+    const ended = after.board.cells().length === after.board.coordinates().length;
     if (ended && !this.thrown) {
       this.thrown = true;
       throw new Error('The scoring failed.');

@@ -92,7 +92,7 @@ export function filledKeys<TCoord>(state: {
 }): string[] {
   return state.board
     .cells()
-    .map(([c]) => state.board.topology.key(c))
+    .map(([c]) => state.board.key(c))
     .sort();
 }
 

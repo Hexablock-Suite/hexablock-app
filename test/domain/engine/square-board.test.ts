@@ -21,7 +21,7 @@ describe('Board with the square topology double', () => {
   it('should_cover_nine_cells_when_the_region_size_is_three', () => {
     const board = newBoard();
 
-    expect(board.shape.cells).toHaveLength(9);
+    expect(board.coordinates()).toHaveLength(9);
     expect(board.contains(square(2, 2))).toBe(true);
     expect(board.contains(square(3, 0))).toBe(false);
   });

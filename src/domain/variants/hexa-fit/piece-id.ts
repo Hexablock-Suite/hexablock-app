@@ -2,8 +2,10 @@
 // It is a value object: it never changes. Two ids are equal when their values are equal.
 // The value stays a string, because a level file names each piece with a text id.
 // An empty id, or an id of only spaces, throws a RangeError.
+// The value is private (classes.md decision 49). `toString()` gives the text back,
+// for the error that names a piece. A collection finds an id with `equals()`.
 export class PieceId {
-  private constructor(readonly value: string) {}
+  private constructor(private readonly value: string) {}
 
   static of(value: string): PieceId {
     if (value.trim() === '') throw new RangeError('A piece id cannot be empty.');
@@ -12,5 +14,9 @@ export class PieceId {
 
   equals(other: PieceId): boolean {
     return this.value === other.value;
+  }
+
+  toString(): string {
+    return this.value;
   }
 }
