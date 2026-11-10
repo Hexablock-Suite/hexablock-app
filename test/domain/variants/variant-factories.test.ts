@@ -11,7 +11,6 @@ import { TopologyId, type GeometryFactory } from '../../../src/domain/engine/geo
 import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
 import { MoveHistory } from '../../../src/domain/engine/move-history';
 import { Piece } from '../../../src/domain/engine/piece';
-import { FixedListPieceSource } from '../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../src/domain/engine/region-size';
 import { CellNode, ShapeGroup } from '../../../src/domain/engine/shape-node';
 import { SquareGeometry } from '../../../src/domain/engine/square-geometry';
@@ -30,6 +29,7 @@ import { MergeTile } from '../../../src/domain/variants/hexa-merge/merge-tile';
 import { ColorStack } from '../../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../../src/domain/variants/hexa-sort/sort-factory';
+import { SortLevel } from '../../../src/domain/variants/hexa-sort/sort-level';
 import { ManualClock } from '../../support/engine/manual-clock';
 import { phaseNameOf } from '../../support/engine/phase-name';
 import { firstValidMove, startVariant, liveStateOf } from '../../support/engine/variant-game';
@@ -163,12 +163,11 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
     });
 
     it('should_start_sort_on_the_region_of_the_geometry_when_the_sort_factory_gets_it', () => {
-      const offered = new Piece(new CellNode(origin), ColorStack.of([Color.of('red')]));
-      const factory = new SortFactory(geometry, {
-        size,
-        source: new FixedListPieceSource([offered, offered]),
-        goalsNeeded: GoalCount.of(5),
-      });
+      const offered = ColorStack.of([Color.of('red')]);
+      const factory = new SortFactory(
+        geometry,
+        SortLevel.fixed(size, GoalCount.of(5), [offered, offered]),
+      );
       const { engine, rules } = startVariant(factory);
       const start = engine.snapshot();
 

@@ -19,6 +19,7 @@ import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
 import { ColorStack } from '../../../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../../../src/domain/variants/hexa-sort/sort-factory';
+import { SortLevel } from '../../../../src/domain/variants/hexa-sort/sort-level';
 import { SortRules } from '../../../../src/domain/variants/hexa-sort/sort-rules';
 import { PlaceStack } from '../../../../src/domain/variants/hexa-sort/place-stack';
 import { SortState, type SortSnapshot } from '../../../../src/domain/variants/hexa-sort/sort-state';
@@ -140,11 +141,10 @@ export function sortFactory(
   offered: readonly ColorStack[] = [stack('red'), stack('blue')],
   goalsNeeded = 5,
 ): SortFactory<SquareCoord> {
-  return new SortFactory(new SquareGeometry(), {
-    size: RegionSize.of(2),
-    source: new FixedListPieceSource(offered.map(stackPiece)),
-    goalsNeeded: GoalCount.of(goalsNeeded),
-  });
+  return new SortFactory(
+    new SquareGeometry(),
+    SortLevel.fixed(RegionSize.of(2), GoalCount.of(goalsNeeded), offered),
+  );
 }
 
 // A live state built again from a photo, so a test can ask the rules about the state that a game

@@ -64,7 +64,7 @@
       <h1>Hexa Sort: stacks, cascades and levels</h1>
 
       <svg
-        viewBox="0 0 1040 1192"
+        viewBox="0 0 1040 1336"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="sort-title sort-desc"
@@ -73,7 +73,10 @@
         <desc id="sort-desc">
           Class diagram of the Hexa Sort variant in layer 1 showing SortFactory creating the
           SortRules and SortScoring strategies and holding a SortLevel that SortLevelBuilder builds
-          step by step from a header, the board region, the goals and the piece source, with
+          step by step from a header, the board region, the goals and the piece source. SortLevel is
+          a value object with private fields: the size of its board region, its goal and the data of
+          its piece source, which is the seed with its colors or the fixed list of stacks. It holds
+          no piece source, and SortFactory builds a new source from that data for each game, with
           SortRules typed by SortState and SortState holding ColorStack cells, each variant class
           marked with the engine interface it implements and its binding. GoalCount is the value
           object of the goal of a level, and ClearedStacks is the value object of the count of
@@ -141,7 +144,7 @@
           x="24"
           y="24"
           width="992"
-          height="936"
+          height="1080"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -210,7 +213,7 @@
           x="48"
           y="240"
           width="440"
-          height="400"
+          height="544"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -261,9 +264,9 @@
         <!-- SortLevelBuilder creates SortLevel: use «create» -->
         <line
           x1="184"
-          y1="440"
+          y1="584"
           x2="184"
-          y2="392"
+          y2="536"
           stroke-width="1"
           marker-end="url(#sort-open)"
           stroke="#5b6873"
@@ -306,10 +309,10 @@
         >
           level
         </text>
-        <rect x="192" y="410" width="56" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="192" y="554" width="56" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="220"
-          y="419"
+          y="563"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -371,7 +374,7 @@
           - geometry: GeometryFactory&lt;TCoord&gt;
         </text>
         <text x="80" y="200" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - level: SortLevel&lt;TCoord&gt;
+          - level: SortLevel
         </text>
 
         <!-- Class: SortScoring (concrete strategy) -->
@@ -672,20 +675,20 @@
           + topRun(): Color[]
         </text>
 
-        <!-- Class: SortLevel (value object) -->
+        <!-- Class: SortLevel (value object, decision 47) -->
         <rect
           x="64"
           y="272"
-          width="240"
-          height="120"
+          width="408"
+          height="264"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="64" y1="320" x2="304" y2="320" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="64" y1="320" x2="472" y2="320" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="184"
+          x="268"
           y="290"
           fill="#5b6873"
           font-size="8"
@@ -696,7 +699,7 @@
           «value object»
         </text>
         <text
-          x="184"
+          x="268"
           y="308"
           fill="#17212a"
           font-size="12"
@@ -706,23 +709,78 @@
         >
           SortLevel
         </text>
-        <text x="80" y="352" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + board: Board&lt;ColorStack, TCoord&gt;
-        </text>
-        <text x="80" y="368" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + goals: GoalCount
-        </text>
-        <text x="80" y="384" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + source: "seeded" | "fixed"
-        </text>
-
         <text x="80" y="336" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + header: LevelHeader
+        </text>
+        <text x="80" y="352" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - size: RegionSize
+        </text>
+        <text x="80" y="368" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - goalsNeeded: GoalCount
+        </text>
+        <text x="80" y="384" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - supply: { seed: number, colors: Color[] }
+        </text>
+        <text x="88" y="398" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          | { stacks: ColorStack[] }
+        </text>
+        <line x1="64" y1="406" x2="472" y2="406" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="80"
+          y="422"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + seeded(size: RegionSize, goalsNeeded: GoalCount, seed: number,
+        </text>
+        <text
+          x="88"
+          y="436"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          colors: Color[]): SortLevel
+        </text>
+        <text
+          x="80"
+          y="450"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + fixed(size: RegionSize, goalsNeeded: GoalCount,
+        </text>
+        <text
+          x="88"
+          y="464"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          stacks: ColorStack[]): SortLevel
+        </text>
+        <text x="80" y="478" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + boardSize(): RegionSize
+        </text>
+        <text x="80" y="492" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + goal(): GoalCount
+        </text>
+        <text x="80" y="506" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + sourceWith(builders: SortSourceBuilders&lt;TSource&gt;): TSource
+        </text>
+        <text x="80" y="520" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: SortLevel): boolean
         </text>
         <!-- Class: SortLevelBuilder (concrete builder) -->
         <rect
           x="64"
-          y="440"
+          y="584"
           width="408"
           height="160"
           rx="6"
@@ -730,11 +788,11 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="64" y1="488" x2="472" y2="488" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="64" y1="512" x2="472" y2="512" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="64" y1="632" x2="472" y2="632" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="64" y1="656" x2="472" y2="656" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="268"
-          y="458"
+          y="602"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -745,7 +803,7 @@
         </text>
         <text
           x="268"
-          y="476"
+          y="620"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -754,23 +812,23 @@
         >
           SortLevelBuilder
         </text>
-        <text x="80" y="504" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="648" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - boards: BoardBuilder&lt;TCoord&gt;
         </text>
-        <text x="80" y="528" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="672" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + withHeader(header: LevelHeader): SortLevelBuilder&lt;TCoord&gt;
         </text>
-        <text x="80" y="544" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="688" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + withRegion(radius: number): SortLevelBuilder&lt;TCoord&gt;
         </text>
-        <text x="80" y="560" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="704" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + withGoals(goals: number): SortLevelBuilder&lt;TCoord&gt;
         </text>
-        <text x="80" y="576" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="720" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + withSource(source: "seeded" | "fixed"): SortLevelBuilder&lt;TCoord&gt;
         </text>
-        <text x="80" y="592" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + build(): SortLevel&lt;TCoord&gt;
+        <text x="80" y="736" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + build(): SortLevel
         </text>
 
         <!-- Lollipops: engine interface each variant class implements, with its binding -->
@@ -794,16 +852,16 @@
         <text x="772" y="883" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           BoardState‹ColorStack, TCoord›
         </text>
-        <line x1="80" y1="600" x2="80" y2="616" stroke="#17212a" stroke-width="1" />
-        <circle cx="80" cy="621" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="91" y="624" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          ILevelBuilder‹SortLevel‹TCoord››
+        <line x1="80" y1="744" x2="80" y2="760" stroke="#17212a" stroke-width="1" />
+        <circle cx="80" cy="765" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="91" y="768" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          ILevelBuilder‹SortLevel›
         </text>
 
         <!-- Class: ClearedStacks (value object, decision 42) -->
         <rect
           x="48"
-          y="656"
+          y="800"
           width="264"
           height="144"
           rx="6"
@@ -811,10 +869,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="48" y1="704" x2="312" y2="704" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="48" y1="848" x2="312" y2="848" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="180"
-          y="674"
+          y="818"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -825,7 +883,7 @@
         </text>
         <text
           x="180"
-          y="692"
+          y="836"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -834,13 +892,13 @@
         >
           ClearedStacks
         </text>
-        <text x="64" y="720" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="864" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + value: number {readOnly}
         </text>
-        <line x1="48" y1="728" x2="312" y2="728" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="48" y1="872" x2="312" y2="872" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="64"
-          y="744"
+          y="888"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -848,19 +906,19 @@
         >
           + of(value: number): ClearedStacks
         </text>
-        <text x="64" y="760" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="904" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: ClearedStacks): boolean
         </text>
-        <text x="64" y="776" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="920" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + plusOne(): ClearedStacks
         </text>
-        <text x="64" y="792" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="936" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + isAtLeast(other: ClearedStacks): boolean
         </text>
         <!-- Class: SortPlay (value object, decision 42) -->
         <rect
           x="328"
-          y="656"
+          y="800"
           width="176"
           height="128"
           rx="6"
@@ -868,10 +926,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="328" y1="704" x2="504" y2="704" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="328" y1="848" x2="504" y2="848" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="416"
-          y="674"
+          y="818"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -882,7 +940,7 @@
         </text>
         <text
           x="416"
-          y="692"
+          y="836"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -891,13 +949,13 @@
         >
           SortPlay
         </text>
-        <text x="344" y="720" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="344" y="864" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + moves: Moves
         </text>
-        <line x1="328" y1="728" x2="504" y2="728" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="328" y1="872" x2="504" y2="872" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="344"
-          y="744"
+          y="888"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -905,16 +963,16 @@
         >
           + of(moves: Moves): SortPlay
         </text>
-        <text x="344" y="760" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="344" y="904" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: SortPlay):
         </text>
-        <text x="355" y="776" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="355" y="920" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           boolean
         </text>
         <!-- Class: SortStarThreshold (value object, decision 42) -->
         <rect
           x="48"
-          y="816"
+          y="960"
           width="264"
           height="128"
           rx="6"
@@ -922,10 +980,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="48" y1="864" x2="312" y2="864" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="48" y1="1008" x2="312" y2="1008" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="180"
-          y="834"
+          y="978"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -936,7 +994,7 @@
         </text>
         <text
           x="180"
-          y="852"
+          y="996"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -945,13 +1003,13 @@
         >
           SortStarThreshold
         </text>
-        <text x="64" y="880" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="1024" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - maxMoves: Moves
         </text>
-        <line x1="48" y1="888" x2="312" y2="888" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="48" y1="1032" x2="312" y2="1032" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="64"
-          y="904"
+          y="1048"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -959,10 +1017,10 @@
         >
           + of(maxMoves: Moves): SortStarThreshold
         </text>
-        <text x="64" y="920" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="1064" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: SortStarThreshold): boolean
         </text>
-        <text x="64" y="936" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="1080" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + isMetBy(play: SortPlay): boolean
         </text>
         <!-- Class: GoalCount (value object) -->
@@ -1099,29 +1157,8 @@
           TCoord
         </text>
         <rect
-          x="268"
-          y="262"
-          width="48"
-          height="18"
-          rx="2"
-          fill="#ffffff"
-          stroke="#5b6873"
-          stroke-width="0.8"
-          stroke-dasharray="4,3"
-        />
-        <text
-          x="292"
-          y="274"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          TCoord
-        </text>
-        <rect
           x="436"
-          y="430"
+          y="574"
           width="48"
           height="18"
           rx="2"
@@ -1132,7 +1169,7 @@
         />
         <text
           x="460"
-          y="442"
+          y="586"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1203,8 +1240,8 @@
         >
           TCoord
         </text>
-        <!-- The footnote and the legend sit below the zone, which grew by 100. -->
-        <g transform="translate(0 304)">
+        <!-- The footnote and the legend sit below the zone, which grew by 100 and then by 144. -->
+        <g transform="translate(0 448)">
           <!-- Footnote: classes the budget leaves out -->
           <text
             x="24"
@@ -1224,7 +1261,8 @@
             font-family="'IBM Plex Sans', sans-serif"
           >
             The piece source is seeded or fixed, chosen per level (A4). Progress: LevelProgress. No
-            undo.
+            undo. SortLevel holds the data of its source, and SortFactory builds the source for each
+            game (decision 47).
           </text>
 
           <text
@@ -1246,7 +1284,7 @@
             font-family="'IBM Plex Sans', sans-serif"
           >
             Each with step returns the builder, and only build() returns the level (decision 15,
-            D9).
+            D9). The header of SortLevel is the planned design of #167.
           </text>
           <text
             x="24"
