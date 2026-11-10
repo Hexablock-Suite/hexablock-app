@@ -303,17 +303,23 @@ describe('FitRules', () => {
     expect(moves).toContainEqual(new RemoveFitPiece(A));
   });
 
-  it('should_throw_a_range_error_when_the_piece_source_repeats_a_piece_id', () => {
+  it('should_keep_one_piece_of_an_id_when_a_piece_source_repeats_a_piece_id', () => {
+    // `FitLevel.of()` refuses two pieces with one id (issue 208, classes.md decision 46),
+    // and `FitFactory` gives the state only the pieces of a level.
+    // So the state does not check the ids again. This test pins what a loose source gives.
     const shape = squareTopology.region(RegionSize.of(2));
+    const first = piece(A, [square(0, 0)]);
+    const last = piece(A, [square(0, 0), square(1, 0)]);
 
-    expect(() =>
-      FitState.start(
-        STATE_ID,
-        MATCH_ID,
-        figure(squareTopology, shape),
-        new FixedListPieceSource([piece(A, [square(0, 0)]), piece(A, [square(0, 0)])]),
-      ),
-    ).toThrow(RangeError);
+    const state = FitState.start(
+      STATE_ID,
+      MATCH_ID,
+      figure(squareTopology, shape),
+      new FixedListPieceSource([first, last]),
+    );
+
+    expect(state.remaining()).toEqual([last]);
+    expect(state.piece(A)).toBe(last);
   });
 
   it('should_throw_a_range_error_when_a_piece_id_is_empty', () => {

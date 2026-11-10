@@ -8,15 +8,13 @@ import { join } from 'node:path';
 import { BoardShape } from '../../../../src/domain/engine/board-shape';
 import { GameOver } from '../../../../src/domain/engine/game-events';
 import { GameId } from '../../../../src/domain/engine/game-id';
-import { Piece } from '../../../../src/domain/engine/piece';
 import { TimedRulesDecorator } from '../../../../src/domain/engine/timed-rules-decorator';
-import { CellNode, ShapeGroup } from '../../../../src/domain/engine/shape-node';
 import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
 import { Turns } from '../../../../src/domain/engine/turns';
 import { FitFactory } from '../../../../src/domain/variants/hexa-fit/fit-factory';
+import { FitLevel } from '../../../../src/domain/variants/hexa-fit/fit-level';
 import { PlaceFitPiece } from '../../../../src/domain/variants/hexa-fit/fit-move';
 import { FitRules } from '../../../../src/domain/variants/hexa-fit/fit-rules';
-import type { PieceId } from '../../../../src/domain/variants/hexa-fit/piece-id';
 import { ManualClock } from '../../../support/engine/manual-clock';
 import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
 import { startVariant } from '../../../support/engine/variant-game';
@@ -58,36 +56,11 @@ describe('FitFactory', () => {
     expect(second).toEqual(['a']);
   });
 
-  it('should_throw_a_range_error_when_the_fit_level_pieces_hold_undefined', () => {
-    // Only a cast or a sparse list puts `undefined` in the pieces, as a broken level file would.
-    const cell = new Piece(new ShapeGroup([new CellNode(square(0, 0))]), A);
-    const pieces = [cell, undefined] as unknown as Piece<PieceId, SquareCoord>[];
-    const factory = new FitFactory(
-      new SquareGeometry(),
-      {
-        topology: TopologyId.square,
-        figure: BoardShape.of([square(0, 0), square(1, 0)]),
-        pieces,
-      },
-      new ManualClock(),
-    );
-    const message = 'A piece list cannot hold undefined.';
-
-    expect(() => factory.createPieceSource()).toThrow(new RangeError(message));
-    expect(() => factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID)).toThrow(
-      new RangeError(message),
-    );
-  });
-
   it('should_throw_a_range_error_when_the_fit_figure_repeats_a_coordinate', () => {
     // `BoardShape` keeps a repeated cell, and the board rejects it by its topology key.
     const factory = new FitFactory(
       new SquareGeometry(),
-      {
-        topology: TopologyId.square,
-        figure: BoardShape.of([square(0, 0), square(0, 0)]),
-        pieces: [],
-      },
+      FitLevel.of(TopologyId.square, BoardShape.of([square(0, 0), square(0, 0)]), []),
       new ManualClock(),
     );
     const message = 'Two coordinates of the shape have the same key.';
