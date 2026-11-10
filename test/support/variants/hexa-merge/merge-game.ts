@@ -51,7 +51,9 @@ export function mergeState(
 }
 
 // The value of each filled cell, by the topology key of its coordinate.
-export function values(state: HexMergeState): Record<string, number> {
+export function values<TAxis extends string>(
+  state: MergeState<MergeTile, HexCoord, TAxis>,
+): Record<string, number> {
   const out: Record<string, number> = {};
   for (const [at, tile] of state.board.cells()) out[hexTopology.key(at)] = tile.value;
   return out;
@@ -75,8 +77,8 @@ export function mergeGame(
 }
 
 // A Merge factory on a hexagon of 2 rings, with the target 2048.
-export function mergeFactory(seed = 1): MergeFactory<HexCoord, HexAxis> {
-  return new MergeFactory(hexTopology, {
+export function mergeFactory(seed = 1): MergeFactory<HexCoord> {
+  return new MergeFactory(new HexGeometry(), {
     size: RegionSize.of(2),
     seed,
     target: MergeTile.of(2048),

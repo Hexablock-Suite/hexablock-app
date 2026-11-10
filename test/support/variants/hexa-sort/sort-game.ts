@@ -12,6 +12,7 @@ import {
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
 import { CellNode } from '../../../../src/domain/engine/shape-node';
+import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
 import { ColorStack } from '../../../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../../../src/domain/variants/hexa-sort/sort-factory';
@@ -116,7 +117,7 @@ export function sortFactory(
   offered: readonly ColorStack[] = [stack('red'), stack('blue')],
   goalsNeeded = 5,
 ): SortFactory<SquareCoord> {
-  return new SortFactory(squareTopology, {
+  return new SortFactory(new SquareGeometry(), {
     size: RegionSize.of(2),
     source: new FixedListPieceSource(offered.map(stackPiece)),
     goalsNeeded: GoalCount.of(goalsNeeded),

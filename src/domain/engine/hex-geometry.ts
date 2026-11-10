@@ -17,6 +17,8 @@ const pieces: readonly (readonly HexCoord[])[] = [
 
 // Concrete Factory (classes.md decision 17, D11): the real hexagonal family.
 export class HexGeometry implements GeometryFactory<HexCoord> {
+  readonly id = 'hex';
+
   // `values` holds `q` and then `r`.
   createCoord(values: number[]): HexCoord {
     const [q, r] = values;

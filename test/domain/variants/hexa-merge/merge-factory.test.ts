@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { HexGeometry } from '../../../../src/domain/engine/hex-geometry';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import {
   MergeFactory,
@@ -6,11 +7,11 @@ import {
 } from '../../../../src/domain/variants/hexa-merge/merge-factory';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
 import { firstValidMove, startVariant } from '../../../support/engine/variant-game';
-import { hexTopology, mergeFactory, values } from '../../../support/variants/hexa-merge/merge-game';
+import { mergeFactory, values } from '../../../support/variants/hexa-merge/merge-game';
 
 // A Merge factory on a hexagon of `size` rings, with the target 2048.
 function sizedMergeFactory(size: number, fourChance?: number) {
-  return new MergeFactory(hexTopology, {
+  return new MergeFactory(new HexGeometry(), {
     size: RegionSize.of(size),
     seed: 1,
     target: MergeTile.of(2048),

@@ -97,6 +97,7 @@ describe('BoardBuilder', () => {
 
   it('should_use_the_topology_of_its_geometry_when_the_geometry_is_not_hexagonal', () => {
     const geometry: GeometryFactory<SquareCoord> = {
+      id: 'square',
       createCoord: ([col = 0, row = 0]) => square(col, row),
       createTopology: () => squareTopology,
       createPieceShapes: () => [],

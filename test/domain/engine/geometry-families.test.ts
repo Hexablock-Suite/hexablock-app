@@ -1,5 +1,6 @@
 /** @jest-environment node */
 import type { GeometryFactory } from '../../../src/domain/engine/geometry-factory';
+import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
 import { SquareGeometry } from '../../../src/domain/engine/square-geometry';
 import { SquareTopology } from '../../../src/domain/engine/square-topology';
 import { TriangleGeometry } from '../../../src/domain/engine/triangle-geometry';
@@ -146,6 +147,16 @@ const families = [
 
 describe.each(families)('%s', (_name, tests) => {
   tests();
+});
+
+describe('GeometryFactory id', () => {
+  it('should_give_the_id_that_a_level_file_names_when_a_geometry_is_asked_for_its_id', () => {
+    expect([new HexGeometry().id, new SquareGeometry().id, new TriangleGeometry().id]).toEqual([
+      'hex',
+      'square',
+      'triangle',
+    ]);
+  });
 });
 
 describe('TriangleGeometry piece orientation', () => {
