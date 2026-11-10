@@ -22,4 +22,9 @@ export class GoalCount {
   equals(other: GoalCount): boolean {
     return this.value === other.value;
   }
+
+  // Tells if a count of cleared stacks reaches the goal. A count above the goal reaches it too.
+  isReachedBy(goalsDone: number): boolean {
+    return goalsDone >= this.value;
+  }
 }

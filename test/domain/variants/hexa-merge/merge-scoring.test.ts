@@ -30,6 +30,12 @@ function total(state: ReturnType<typeof slideRow>): number {
 }
 
 describe('Hexa Merge scoring', () => {
+  // The tile owns its points, so the scoring does not read its number.
+  it('should_be_worth_its_value_in_points_when_a_tile_is_asked', () => {
+    expect(MergeTile.of(2).points()).toBe(2);
+    expect(MergeTile.of(2048).points()).toBe(2048);
+  });
+
   it('should_score_the_value_of_the_merged_tile_when_two_equal_tiles_merge', () => {
     const state = slideRow([2, 2]);
 

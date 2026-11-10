@@ -15,4 +15,12 @@ export class Turns {
   equals(other: Turns): boolean {
     return this.value === other.value;
   }
+
+  // The same turn as a count from 0 to `rotationSteps - 1` of the topology.
+  // A full turn brings a cell back to its place, so the count drops every full turn.
+  // A negative count becomes the forward count that ends at the same place.
+  normalized(topology: { readonly rotationSteps: number }): Turns {
+    const steps = topology.rotationSteps;
+    return Turns.of(((this.value % steps) + steps) % steps);
+  }
 }

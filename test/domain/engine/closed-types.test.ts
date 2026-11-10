@@ -186,6 +186,29 @@ describe('Turns', () => {
   it('should_rotate_backward_when_the_count_is_negative', () => {
     expect(squareTopology.rotate(square(1, 0), Turns.of(-1))).toEqual(square(0, -1));
   });
+
+  // The square topology has 4 rotation steps, and the triangle topology has 6.
+  it('should_give_the_same_turn_inside_one_full_turn_when_a_count_is_normalized', () => {
+    const normalized = (count: number) => Turns.of(count).normalized(squareTopology);
+
+    expect(normalized(0).equals(Turns.of(0))).toBe(true);
+    expect(normalized(3).equals(Turns.of(3))).toBe(true);
+    expect(normalized(4).equals(Turns.of(0))).toBe(true);
+    expect(normalized(5).equals(Turns.of(1))).toBe(true);
+    expect(normalized(-1).equals(Turns.of(3))).toBe(true);
+    expect(normalized(-4).equals(Turns.of(0))).toBe(true);
+    expect(normalized(-9).equals(Turns.of(3))).toBe(true);
+    expect(Turns.of(7).normalized(triangleTopology).equals(Turns.of(1))).toBe(true);
+    expect(Turns.of(-1).normalized(triangleTopology).equals(Turns.of(5))).toBe(true);
+  });
+
+  it('should_keep_the_first_count_when_a_count_is_normalized', () => {
+    const turns = Turns.of(-1);
+
+    turns.normalized(squareTopology);
+
+    expect(turns.equals(Turns.of(-1))).toBe(true);
+  });
 });
 
 describe('CoordKey', () => {

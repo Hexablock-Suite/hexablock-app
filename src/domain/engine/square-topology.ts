@@ -78,7 +78,7 @@ export class SquareTopology implements GridTopology<SquareCoord, SquareAxis, Squ
 
   // A quarter turn maps (col, row) to (-row, col).
   rotate(c: SquareCoord, turns: Turns): SquareCoord {
-    const steps = ((turns.value % this.rotationSteps) + this.rotationSteps) % this.rotationSteps;
+    const steps = turns.normalized(this).value;
     let turned = c;
     for (let i = 0; i < steps; i += 1) turned = square(-turned.row, turned.col);
     return turned;

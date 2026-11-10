@@ -49,7 +49,7 @@ export class SortRules<TCoord> extends BaseGameRules<PlaceStack<TCoord>, SortSta
 
   // The goals reached win. A board with no empty cell, or no stack left to place, loses.
   evaluate(state: SortState<TCoord>): Outcome {
-    if (state.goalsDone >= state.goalsNeeded.value) return 'victory';
+    if (state.goalsNeeded.isReachedBy(state.goalsDone)) return 'victory';
     return this.noValidMove(state) ? 'game-over' : 'playing';
   }
 }

@@ -28,4 +28,14 @@ describe('GoalCount', () => {
       );
     }
   });
+
+  // The goal owns the comparison, so the rules do not read its number.
+  it('should_be_reached_when_the_goals_done_are_the_goal_or_more', () => {
+    const goal = GoalCount.of(3);
+
+    expect(goal.isReachedBy(2)).toBe(false);
+    expect(goal.isReachedBy(3)).toBe(true);
+    expect(goal.isReachedBy(4)).toBe(true);
+    expect(GoalCount.of(1).isReachedBy(0)).toBe(false);
+  });
 });

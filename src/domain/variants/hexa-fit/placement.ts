@@ -18,13 +18,13 @@ export class Placement<TCoord> {
     at: TCoord,
     topology: GridTopology<TCoord, string, string>,
   ): Placement<TCoord> {
-    return new Placement(normalized(rotation.value, topology), at);
+    return new Placement(rotation.normalized(topology), at);
   }
 
   // The same offset, turned by `steps` more.
   turned(steps: Turns, topology: GridTopology<TCoord, string, string>): Placement<TCoord> {
-    const extra = normalized(steps.value, topology).value;
-    return new Placement(normalized(this.rotation.value + extra, topology), this.at);
+    const sum = Turns.of(this.rotation.value + steps.normalized(topology).value);
+    return new Placement(sum.normalized(topology), this.at);
   }
 
   // The figure cells that the piece covers: the topology turns it and then moves it.
@@ -37,9 +37,4 @@ export class Placement<TCoord> {
   equals(other: Placement<TCoord>, topology: { key(c: TCoord): CoordKey }): boolean {
     return this.rotation.equals(other.rotation) && topology.key(this.at) === topology.key(other.at);
   }
-}
-
-function normalized(steps: number, topology: GridTopology<unknown, string, string>): Turns {
-  const n = topology.rotationSteps;
-  return Turns.of(((steps % n) + n) % n);
 }

@@ -30,4 +30,9 @@ export class MergeTile implements IMergeable<MergeTile> {
     }
     return MergeTile.of(this.value * 2);
   }
+
+  // The points that a merge scores when it makes this tile: its value (issue #59, D22).
+  points(): number {
+    return this.value;
+  }
 }

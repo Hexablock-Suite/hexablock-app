@@ -15,6 +15,6 @@ export class MergeScoring<TCoord, TAxis extends string> implements IScoringPolic
     _before: MergeState<MergeTile, TCoord, TAxis>,
     resolution: Resolution<MergeState<MergeTile, TCoord, TAxis>>,
   ): number {
-    return resolution.state.merged.reduce((sum, tile) => sum + tile.value, 0);
+    return resolution.state.merged.reduce((sum, tile) => sum + tile.points(), 0);
   }
 }

@@ -94,7 +94,7 @@ export class HexTopology implements GridTopology<HexCoord, HexAxis, HexDirection
 
   // A sixth of a turn maps (q, r) to (-r, q + r).
   rotate(c: HexCoord, turns: Turns): HexCoord {
-    const steps = ((turns.value % this.rotationSteps) + this.rotationSteps) % this.rotationSteps;
+    const steps = turns.normalized(this).value;
     let turned = c;
     for (let i = 0; i < steps; i += 1) turned = hex(-turned.r, turned.q + turned.r);
     return turned;

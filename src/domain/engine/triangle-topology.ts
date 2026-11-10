@@ -121,7 +121,7 @@ export class TriangleTopology implements GridTopology<
   // Each step changes the orientation of the triangle, so no triangle stays in its place.
   // A caller places a turned piece with `translate()`, as on every other topology.
   rotate(c: TriangleCoord, turns: Turns): TriangleCoord {
-    const steps = ((turns.value % this.rotationSteps) + this.rotationSteps) % this.rotationSteps;
+    const steps = turns.normalized(this).value;
     let [x, y, z] = toCube(c);
     for (let i = 0; i < steps; i += 1) [x, y, z] = [1 - y, 1 - z, 1 - x];
     return fromCube([x, y, z]);
