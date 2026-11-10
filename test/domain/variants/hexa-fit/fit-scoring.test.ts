@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Score } from '../../../../src/domain/engine/score';
 import { Board } from '../../../../src/domain/engine/board';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
 import { GameId } from '../../../../src/domain/engine/game-id';
@@ -71,7 +72,7 @@ describe('FitScoring', () => {
 
     expect(outcome).toBe('victory');
     expect(FIT_POINTS_PER_TURN).toBe(0);
-    expect(engine.snapshot().score).toBe(0);
+    expect(engine.snapshot().score).toEqual(Score.of(0));
   });
 });
 

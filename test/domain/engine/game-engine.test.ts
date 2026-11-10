@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Score } from '../../../src/domain/engine/score';
 import type { Board, ReadonlyBoard } from '../../../src/domain/engine/board';
 import type { BoardState } from '../../../src/domain/engine/board-state';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
@@ -57,7 +58,7 @@ class FailingOnceRules extends FakeRules {
 // A scoring policy that fails once.
 class FailingOnceScoring extends OnePointScoring {
   private failed = false;
-  override score(before: FakeSnapshot, after: FakeSnapshot): number {
+  override score(before: FakeSnapshot, after: FakeSnapshot): Score {
     if (!this.failed) {
       this.failed = true;
       throw new Error('score failed');
@@ -101,7 +102,7 @@ class ReentrantScoring extends OnePointScoring {
   engine: GameEngine<FakeCell, SquareCoord, FakeMove, FakeState> | undefined;
   innerError: unknown;
 
-  override score(before: FakeSnapshot, after: FakeSnapshot): number {
+  override score(before: FakeSnapshot, after: FakeSnapshot): Score {
     try {
       this.engine?.play(place(1, 0));
     } catch (error) {
@@ -134,7 +135,7 @@ describe('GameEngine.play()', () => {
 
     expect(outcome).toBe('playing');
     expect(engine.snapshot().board.get(square(1, 0))).toEqual(fakeCell(7));
-    expect(engine.snapshot().score).toBe(1);
+    expect(engine.snapshot().score).toEqual(Score.of(1));
   });
 
   it('should_keep_the_board_and_the_score_when_the_move_is_invalid', () => {
@@ -146,7 +147,7 @@ describe('GameEngine.play()', () => {
 
     expect(outcome).toBe('playing');
     expect(engine.snapshot().board.get(square(0, 0))).toEqual(fakeCell(1));
-    expect(engine.snapshot().score).toBe(1);
+    expect(engine.snapshot().score).toEqual(Score.of(1));
     expect(engine.currentPhase().canPlay()).toBe(true);
   });
 
@@ -165,7 +166,7 @@ describe('GameEngine.play()', () => {
 
     expect(outcome).toBe('playing');
     expect(engine.snapshot().board.get(square(0, 0))).toBeUndefined();
-    expect(engine.snapshot().score).toBe(0);
+    expect(engine.snapshot().score).toEqual(Score.of(0));
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(publisher.events).toEqual([]);
   });
@@ -184,7 +185,7 @@ describe('GameEngine.play()', () => {
     expect(event).toBeInstanceOf(GameOver);
     expect(event.gameId.equals(GameId.of('fake-game'))).toBe(true);
     expect(event.outcome).toBe('game-over');
-    expect(event.finalScore).toBe(4);
+    expect(event.finalScore).toEqual(Score.of(4));
   });
 
   it('should_publish_nothing_when_the_game_goes_on', () => {
@@ -241,7 +242,7 @@ describe('GameEngine.play()', () => {
     expect(Reflect.set(copy, 'score', 99)).toBe(false);
 
     expect(engine.snapshot().board.get(square(0, 0))).toBeUndefined();
-    expect(engine.snapshot().score).toBe(0);
+    expect(engine.snapshot().score).toEqual(Score.of(0));
   });
 
   it('should_keep_the_engine_unchanged_when_the_initial_state_is_changed_after_start', () => {
@@ -268,7 +269,7 @@ describe('GameEngine.play()', () => {
 
     expect(engine.currentPhase().canPlay()).toBe(true);
     expect(engine.snapshot().board.get(square(0, 0))).toBeUndefined();
-    expect(engine.snapshot().score).toBe(0);
+    expect(engine.snapshot().score).toEqual(Score.of(0));
     expect(engine.play(place(0, 0))).toBe('playing');
     expect(engine.snapshot().board.get(square(0, 0))).toEqual(fakeCell(1));
   });
@@ -287,9 +288,9 @@ describe('GameEngine.play()', () => {
 
     expect(engine.currentPhase().canPlay()).toBe(true);
     expect(engine.snapshot().board.get(square(0, 0))).toBeUndefined();
-    expect(engine.snapshot().score).toBe(0);
+    expect(engine.snapshot().score).toEqual(Score.of(0));
     expect(engine.play(place(0, 0))).toBe('playing');
-    expect(engine.snapshot().score).toBe(1);
+    expect(engine.snapshot().score).toEqual(Score.of(1));
   });
 });
 
@@ -300,11 +301,11 @@ class BaseCloneState implements BoardState<FakeCell, SquareCoord> {
 
   constructor(
     readonly board: Board<FakeCell, SquareCoord, SquareAxis>,
-    public score = 0,
+    public score: Score = Score.of(0),
   ) {}
 
-  addPoints(points: number): void {
-    this.score += points;
+  addPoints(points: Score): void {
+    this.score = this.score.add(points);
   }
 
   belongsTo(match: MatchId): boolean {
@@ -362,7 +363,7 @@ function summary(engine: GameEngine<FakeCell, SquareCoord, FakeMove, FakeState>)
   };
 }
 
-const afterOneMove = { cells: [[square(0, 0), fakeCell(1)]], score: 1, phase: 'playing' };
+const afterOneMove = { cells: [[square(0, 0), fakeCell(1)]], score: Score.of(1), phase: 'playing' };
 
 describe('GameEngine edge cases', () => {
   it('should_keep_the_board_the_score_and_the_phase_when_apply_throws', () => {
@@ -418,7 +419,7 @@ describe('GameEngine edge cases', () => {
 
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(engine.snapshot().board.cells()).toEqual([]);
-    expect(engine.snapshot().score).toBe(0);
+    expect(engine.snapshot().score).toEqual(Score.of(0));
     expect(engine.play(place(0, 0))).toBe('game-over');
     expect(publisher.events).toHaveLength(2);
   });
@@ -446,21 +447,22 @@ class FixedOutcomeRules extends FakeRules {
   }
 }
 
-// A scoring policy that returns `points` for every move.
+// A scoring policy that builds the score of every move from `points`.
+// `Score.of()` refuses a value that is not a valid score, so the policy throws inside the turn.
 class FixedScoring extends OnePointScoring {
   constructor(private readonly points: number) {
     super();
   }
 
-  override score(): number {
-    return this.points;
+  override score(): Score {
+    return Score.of(this.points);
   }
 }
 
 // A scoring policy that changes the photo it receives, then throws.
 // The photo is frozen, so a cast reaches only its copy of the board.
 class MutatingThrowingScoring extends OnePointScoring {
-  override score(before: FakeSnapshot): number {
+  override score(before: FakeSnapshot): Score {
     (before.board as Board<FakeCell, SquareCoord, SquareAxis>).occupy(square(1, 1), fakeCell(9));
     throw new Error('score failed');
   }
@@ -503,7 +505,7 @@ function sourceGame(rules: SourceRules) {
     MATCH_ID,
     GameId.of('fake-game'),
     rules,
-    { score: () => 1 },
+    { score: () => Score.of(1) },
     new RecordingPublisher(),
   );
   engine.start(sourceState(new FixedListPieceSource([fakeCell(1), fakeCell(2), fakeCell(3)])));
@@ -520,7 +522,7 @@ function gameWith(
   return { engine, publisher };
 }
 
-const initial = { cells: [], score: 0, phase: 'playing' };
+const initial = { cells: [], score: Score.of(0), phase: 'playing' };
 
 describe('GameEngine review findings', () => {
   it('should_return_playing_when_the_rules_return_a_rejected_resolution_with_a_final_outcome', () => {
@@ -546,17 +548,26 @@ describe('GameEngine review findings', () => {
     expect(publisher.events).toEqual([]);
   });
 
-  it('should_throw_and_keep_the_state_when_the_scoring_returns_a_non_finite_number', () => {
-    for (const points of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
+  it('should_throw_and_keep_the_state_when_the_scoring_gives_a_score_that_is_not_valid', () => {
+    for (const points of [Number.NaN, Number.POSITIVE_INFINITY, -1, 0.5]) {
       const { engine, publisher } = gameWith(new FakeRules(), new FixedScoring(points));
 
       expect(() => engine.play(place(0, 0))).toThrow(
-        new RangeError(`The scoring policy returned a score that is not finite: ${points}.`),
+        new RangeError(`A score needs a whole number of 0 or more, not ${points}.`),
       );
 
       expect(summary(engine)).toEqual(initial);
       expect(publisher.events).toEqual([]);
     }
+  });
+
+  it('should_add_the_points_when_the_scoring_gives_a_valid_score', () => {
+    const { engine } = gameWith(new FakeRules(), new FixedScoring(7));
+
+    engine.play(place(0, 0));
+    engine.play(place(0, 1));
+
+    expect(engine.snapshot().score).toEqual(Score.of(14));
   });
 
   it('should_throw_a_range_error_and_keep_the_state_when_the_rules_return_an_unknown_outcome', () => {
@@ -615,7 +626,7 @@ describe('GameEngine review findings', () => {
 
     expect(() => engine.play(square(0, 0))).toThrow('apply failed');
     expect(engine.snapshot().board.cells()).toEqual([]);
-    expect(engine.snapshot().score).toBe(0);
+    expect(engine.snapshot().score).toEqual(Score.of(0));
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
 
     expect(engine.play(square(0, 0))).toBe('playing');
@@ -648,7 +659,7 @@ describe('GameEngine review findings', () => {
     expect(event).toBeInstanceOf(GameOver);
     expect(event.gameId.equals(GameId.of('fake-game'))).toBe(true);
     expect(event.outcome).toBe('victory');
-    expect(event.finalScore).toBe(1);
+    expect(event.finalScore).toEqual(Score.of(1));
   });
 
   it('should_throw_when_pause_is_called_before_start', () => {
@@ -747,7 +758,7 @@ describe('GameEngine identity', () => {
       new RangeError('The first state belongs to another match.'),
     );
     expect(engine.snapshot().board.cells()).toEqual(before.board.cells());
-    expect(engine.snapshot().score).toBe(1);
+    expect(engine.snapshot().score).toEqual(Score.of(1));
     expect(engine.snapshot().matchId.equals(MatchId.of('match-a'))).toBe(true);
   });
 

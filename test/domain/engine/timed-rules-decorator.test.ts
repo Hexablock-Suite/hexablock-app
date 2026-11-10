@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Score } from '../../../src/domain/engine/score';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameId } from '../../../src/domain/engine/game-id';
 import { GameOverPhase, PlayingPhase } from '../../../src/domain/engine/game-phase';
@@ -58,13 +59,13 @@ class ThrowsOnFirstEnd implements IScoringPolicy<FakeState> {
   private thrown = false;
 
   // The fake game ends when the board is full, so the photo after the turn shows the end.
-  score(_before: FakeSnapshot, after: FakeSnapshot): number {
+  score(_before: FakeSnapshot, after: FakeSnapshot): Score {
     const ended = after.board.cells().length === after.board.shape.cells.length;
     if (ended && !this.thrown) {
       this.thrown = true;
       throw new Error('The scoring failed.');
     }
-    return 0;
+    return Score.of(0);
   }
 }
 

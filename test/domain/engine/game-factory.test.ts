@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Score } from '../../../src/domain/engine/score';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameOver } from '../../../src/domain/engine/game-events';
 import { GameFactory } from '../../../src/domain/engine/game-factory';
@@ -55,7 +56,7 @@ describe('GameFactory', () => {
     expect(game.snapshot().board.cells()).toEqual([]);
     expect(game.undoable()).toBeUndefined();
     expect(game.play(moveAt(0))).toBe('playing');
-    expect(game.snapshot().score).toBe(1);
+    expect(game.snapshot().score).toEqual(Score.of(1));
   });
 
   it('should_give_two_games_with_different_ids_and_boards_when_one_variant_starts_twice', () => {
@@ -120,7 +121,7 @@ describe('GameFactory', () => {
     expect(ids.calls).toBe(1);
     expect(game.equals(sameMatch)).toBe(true);
     expect(publisher.events).toEqual([
-      new GameOver(GameId.of('fake-game'), MATCH_ID, 'game-over', 1),
+      new GameOver(GameId.of('fake-game'), MATCH_ID, 'game-over', Score.of(1)),
     ]);
   });
 

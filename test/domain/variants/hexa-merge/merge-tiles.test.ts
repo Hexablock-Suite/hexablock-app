@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Score } from '../../../../src/domain/engine/score';
 import { GameOver } from '../../../../src/domain/engine/game-events';
 import { GameId } from '../../../../src/domain/engine/game-id';
 import { PlayingPhase } from '../../../../src/domain/engine/game-phase';
@@ -204,7 +205,7 @@ describe('Merge new tiles', () => {
     expect([...rules.validMoves(mergeStateOf(engine.snapshot()))]).toEqual([]);
     expect(engine.currentPhase().canPlay()).toBe(false);
     expect(publisher.events).toEqual([
-      new GameOver(GameId.of('hexa-merge'), MATCH_ID, 'game-over', 0),
+      new GameOver(GameId.of('hexa-merge'), MATCH_ID, 'game-over', Score.of(0)),
     ]);
   });
 

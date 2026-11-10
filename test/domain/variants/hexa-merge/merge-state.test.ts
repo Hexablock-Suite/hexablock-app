@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Score } from '../../../../src/domain/engine/score';
 import { hex, type HexAxis } from '../../../../src/domain/engine/hex-topology';
 import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
 import { GameStateId } from '../../../../src/domain/engine/game-state-id';
@@ -36,10 +37,10 @@ function facts(state: HexMergeState) {
     board: state
       .snapshot()
       .board.cells()
-      .map(([at, tile]) => [hexTopology.key(at), tile.points()]),
+      .map(([at, tile]) => [hexTopology.key(at), tile.points().value]),
     left: state.snapshot().tiles.clone().hasNext(),
     targetReached: state.snapshot().targetReached,
-    merged: state.snapshot().merged.map((tile) => tile.points()),
+    merged: state.snapshot().merged.map((tile) => tile.points().value),
     score: state.snapshot().score,
   };
 }
@@ -170,25 +171,29 @@ describe('MergeState', () => {
     expect(facts(state)).toEqual(before);
   });
 
-  it('should_add_the_points_and_refuse_points_that_are_not_finite_when_points_are_added', () => {
+  it('should_add_the_points_and_refuse_a_total_above_the_largest_safe_integer_when_points_are_added', () => {
     const state = mergeState([]);
 
-    state.addPoints(4);
-    state.addPoints(8);
+    state.addPoints(Score.of(4));
+    state.addPoints(Score.of(8));
 
-    expect(state.snapshot().score).toBe(12);
-    expect(() => state.addPoints(Number.NEGATIVE_INFINITY)).toThrow(
-      new RangeError('The points of a turn must be a finite number, not -Infinity.'),
+    expect(state.snapshot().score).toEqual(Score.of(12));
+    expect(() => state.addPoints(Score.of(Number.MAX_SAFE_INTEGER))).toThrow(
+      new RangeError('The sum of two scores cannot pass the largest safe integer.'),
     );
-    expect(state.snapshot().score).toBe(12);
+    expect(state.snapshot().score).toEqual(Score.of(12));
   });
 
-  it('should_throw_a_range_error_when_a_state_is_built_with_a_score_that_is_not_finite', () => {
+  // The state has no check of its own: a `Score` is valid when it exists (issue #203).
+  it('should_keep_the_score_when_a_state_is_built_with_a_score', () => {
     const board = mergeState([]).snapshot().board.clone();
 
-    expect(
-      () => new MergeState(STATE_ID, MATCH_ID, board, noNewTiles(), false, [], Number.NaN),
-    ).toThrow(new RangeError('The score of a state must be a finite number, not NaN.'));
+    const state = new MergeState(STATE_ID, MATCH_ID, board, noNewTiles(), false, [], Score.of(7));
+
+    expect(state.snapshot().score).toEqual(Score.of(7));
+    expect(new MergeState(STATE_ID, MATCH_ID, board, noNewTiles()).snapshot().score).toEqual(
+      Score.of(0),
+    );
   });
 
   // The state has its own `GameStateId`, and it still knows its match (classes.md decision 26).

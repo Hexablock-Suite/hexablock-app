@@ -1,3 +1,4 @@
+import { Score } from '../../../../src/domain/engine/score';
 import { Board, type ReadonlyBoard } from '../../../../src/domain/engine/board';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
 import { GameId } from '../../../../src/domain/engine/game-id';
@@ -32,8 +33,8 @@ export const hexTopology = new HexGeometry().createTopology();
 export type HexMergeState = MergeState<MergeTile, HexCoord, HexAxis>;
 
 export class NoPointScoring implements IScoringPolicy<HexMergeState> {
-  score(): number {
-    return 0;
+  score(): Score {
+    return Score.of(0);
   }
 }
 
@@ -62,7 +63,7 @@ export function mergeState(
 
 // The number of a tile. The field is private, and a tile is worth its value in points (issue #59).
 export function valueOf(tile: MergeTile): number {
-  return tile.points();
+  return tile.points().value;
 }
 
 // The value of each filled cell, by the topology key of its coordinate.

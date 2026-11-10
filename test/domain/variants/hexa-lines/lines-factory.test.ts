@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Score } from '../../../../src/domain/engine/score';
 import { GameId } from '../../../../src/domain/engine/game-id';
 import type { Piece } from '../../../../src/domain/engine/piece';
 import { CellNode, ShapeGroup } from '../../../../src/domain/engine/shape-node';
@@ -60,7 +61,7 @@ describe('LinesFactory', () => {
     expect(filledKeys(engine.snapshot())).toEqual(['0,0']);
     expect(engine.snapshot().tray).toHaveLength(2);
     // One placed cell gives 1 point: the factory picks the Lines scoring.
-    expect(engine.snapshot().score).toBe(1);
+    expect(engine.snapshot().score).toEqual(Score.of(1));
     expect(publisher.events).toEqual([]);
   });
 
@@ -99,7 +100,7 @@ describe('LinesFactory', () => {
 
     expect(engine.snapshot().linesCleared).toBe(2);
     // 1 cell + 10 × 2 lines × (2 + 1 - 1). The base scoring alone gives 21.
-    expect(engine.snapshot().score).toBe(41);
+    expect(engine.snapshot().score).toEqual(Score.of(41));
   });
 
   it('should_throw_a_range_error_when_the_lines_settings_hold_a_seed_that_is_not_a_32_bit_integer', () => {

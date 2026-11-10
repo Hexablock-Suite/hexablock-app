@@ -2,6 +2,7 @@ import type { ReadonlyBoard } from './board';
 import type { Cloneable } from './cloneable';
 import type { GameStateId } from './game-state-id';
 import type { MatchId } from './match-id';
+import type { Score } from './score';
 
 // The photo of one state at one moment (classes.md decisions 7, 29 and 34).
 // It is the Memento of the state: `BoardState.snapshot()` gives it, and `restore()` takes it back.
@@ -16,7 +17,7 @@ export interface BoardSnapshot<TCell, TCoord> {
   readonly stateId: GameStateId;
   readonly matchId: MatchId;
   readonly board: ReadonlyBoard<TCell, TCoord, string>;
-  readonly score: number;
+  readonly score: Score;
   view(): unknown;
 }
 
@@ -35,7 +36,8 @@ export type SnapshotOf<TState> = TState extends { snapshot(): infer TSnapshot } 
 // The rules call them, and the engine calls `addPoints()`. No other class writes a field.
 // Every field of a state is private, so no other class reads a field either:
 // a reader reads the photo of `snapshot()`, or asks a query with a business name.
-// `addPoints()` adds the points of one turn. Points that are not finite throw a RangeError,
+// `addPoints()` adds the points of one turn. The points and the score are `Score` values
+// (classes.md decision 41). A total above the largest safe integer throws a RangeError,
 // and the score stays as it was.
 // The board changes in place. `clone()` gives the copy on which the engine plays a turn
 // (classes.md decision 7). `clone()` of a variant state returns that variant state.
@@ -45,7 +47,7 @@ export type SnapshotOf<TState> = TState extends { snapshot(): infer TSnapshot } 
 // and the state stays as it was.
 // The board takes any axis union, so the state needs no axis type parameter (issue 86).
 export interface BoardState<TCell, TCoord> extends Cloneable<BoardState<TCell, TCoord>> {
-  addPoints(points: number): void;
+  addPoints(points: Score): void;
   belongsTo(match: MatchId): boolean;
   equals(other: BoardState<TCell, TCoord>): boolean;
   snapshot(): BoardSnapshot<TCell, TCoord>;

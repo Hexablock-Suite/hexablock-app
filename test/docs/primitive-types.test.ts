@@ -5,8 +5,9 @@ import ts from 'typescript';
 
 import { repoRoot } from '../support/run-tool';
 
-// APP-NFR-25: the primitive types of the engine design tend to zero, and each one
-// that stays has a reason. Every `number` and `string` in a public signature of
+// APP-NFR-25: no primitive type stays in the domain model, except a `boolean`, a private field
+// and the factory method of a value object. The redesign reaches the rule one unit at a time.
+// Until a unit lands, each primitive that stays has a reason. Every `number` and `string` in a public signature of
 // `src/domain/engine/` needs a row in the README table «Primitive types».
 // A `boolean` needs no row. The scan reads exported classes, interfaces, type aliases,
 // functions and variables (`export const`, `export let`). It reads the written type of each
@@ -254,6 +255,31 @@ describe('README primitive types', () => {
 
     expect(uses).toContainEqual({ primitive: 'number', where: 'Turns.of' });
     expect(uses).toContainEqual({ primitive: 'string', where: 'GameId.of' });
+  });
+
+  // Issue #203: `Score` replaces the number of every score in the engine.
+  // Only the factory, the readable value and the factor of `Score.times()` keep a number.
+  it('should_find_no_score_of_type_number_when_the_code_is_scanned', () => {
+    const numbers = codeUses()
+      .filter((use) => use.primitive === 'number')
+      .map((use) => use.where);
+
+    for (const place of [
+      'BoardSnapshot.score',
+      'BoardState.addPoints',
+      'IScoringPolicy.score',
+      'ScoringDecorator.score',
+      'GameOver.finalScore',
+      'GameResult.score',
+      'ProgressRecord.score',
+    ]) {
+      expect(numbers).not.toContain(place);
+    }
+    expect(numbers.filter((place) => place.startsWith('Score.'))).toEqual([
+      'Score.value',
+      'Score.of',
+      'Score.times',
+    ]);
   });
 
   it('should_skip_private_members_and_booleans_when_the_code_is_scanned', () => {

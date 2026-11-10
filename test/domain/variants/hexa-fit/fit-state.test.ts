@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Score } from '../../../../src/domain/engine/score';
 import { Turns } from '../../../../src/domain/engine/turns';
 import { Placement } from '../../../../src/domain/variants/hexa-fit/placement';
 import { square, squareTopology } from '../../../support/engine/square-topology';
@@ -13,17 +14,24 @@ import { MATCH_ID } from '../../../support/engine/match-id';
 // R7: the Fit state is an entity. The engine adds the points of a turn through `addPoints()`.
 
 describe('FitState', () => {
-  it('should_add_the_points_and_refuse_points_that_are_not_finite_when_points_are_added', () => {
+  it('should_add_the_points_of_each_turn_when_points_are_added', () => {
     const state = fitFactory().createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
 
-    state.addPoints(3);
-    state.addPoints(-1);
+    state.addPoints(Score.of(3));
+    state.addPoints(Score.of(0));
+    state.addPoints(Score.of(2));
 
-    expect(state.snapshot().score).toBe(2);
-    expect(() => state.addPoints(Number.POSITIVE_INFINITY)).toThrow(
-      new RangeError('The points of a turn must be a finite number, not Infinity.'),
+    expect(state.snapshot().score).toEqual(Score.of(5));
+  });
+
+  it('should_throw_and_keep_the_score_when_the_total_passes_the_largest_safe_integer', () => {
+    const state = fitFactory().createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
+    state.addPoints(Score.of(Number.MAX_SAFE_INTEGER));
+
+    expect(() => state.addPoints(Score.of(1))).toThrow(
+      new RangeError('The sum of two scores cannot pass the largest safe integer.'),
     );
-    expect(state.snapshot().score).toBe(2);
+    expect(state.snapshot().score).toEqual(Score.of(Number.MAX_SAFE_INTEGER));
   });
 
   // The state has its own `GameStateId`, and it still knows its match (classes.md decision 26).

@@ -4,6 +4,7 @@ import type { Cloneable } from '../../engine/cloneable';
 import type { Color } from '../../engine/color';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { MatchId } from '../../engine/match-id';
+import { Score } from '../../engine/score';
 import type { CoordKey } from '../../engine/coord-key';
 import type { Piece } from '../../engine/piece';
 import type { IPieceSource } from '../../engine/piece-source';
@@ -44,7 +45,7 @@ export interface LinesSnapshot<TCoord> extends BoardSnapshot<Color, TCoord> {
 // `cellsPlaced` is the count of cells that the last placement put on the board.
 // The scoring of issue 97 reads the three fields, because the policy keeps no game data.
 // The constructor checks its values: a tray of at most `TRAY_SIZE` pieces, three counts
-// that are whole numbers of 0 or more, and a finite score.
+// that are whole numbers of 0 or more. The score is a `Score`, which checks its own value.
 export class LinesState<TCoord> implements BoardState<Color, TCoord> {
   constructor(
     private readonly stateId: GameStateId,
@@ -55,10 +56,9 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
     private streak = 0,
     private linesCleared = 0,
     private cellsPlaced = 0,
-    private score = 0,
+    private score: Score = Score.of(0),
   ) {
     checkValues(tray, streak, linesCleared, cellsPlaced);
-    checkScore(score);
   }
 
   // A new game: the board and a full tray from the source.
@@ -117,11 +117,10 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
     this.linesCleared = lines.length;
   }
 
-  addPoints(points: number): void {
-    if (!Number.isFinite(points)) {
-      throw new RangeError(`The points of a turn must be a finite number, not ${points}.`);
-    }
-    this.score += points;
+  // The engine adds the points of a turn in place. `Score.add()` refuses a total
+  // above the largest safe integer, and the score stays as it was.
+  addPoints(points: Score): void {
+    this.score = this.score.add(points);
   }
 
   // True when this state is the state of the match `match`.
@@ -159,7 +158,6 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
   restore(snapshot: LinesSnapshot<TCoord>): void {
     checkOwnSnapshot(this.stateId, this.board, snapshot);
     checkValues(snapshot.tray, snapshot.streak, snapshot.linesCleared, snapshot.cellsPlaced);
-    checkScore(snapshot.score);
     this.board.restore(snapshot.board);
     this.tray = [...snapshot.tray];
     this.source = snapshot.source.clone();
@@ -219,12 +217,6 @@ function checkValues(
   checkCount('streak', streak);
   checkCount('linesCleared', linesCleared);
   checkCount('cellsPlaced', cellsPlaced);
-}
-
-function checkScore(score: number): void {
-  if (!Number.isFinite(score)) {
-    throw new RangeError(`The score of a state must be a finite number, not ${score}.`);
-  }
 }
 
 // A count of the state is a whole number of 0 or more.

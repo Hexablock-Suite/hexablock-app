@@ -10,6 +10,7 @@ import { Radius } from '../../src/domain/engine/radius';
 import { Range, type Compare } from '../../src/domain/engine/range';
 import { RegionSize } from '../../src/domain/engine/region-size';
 import { CellNode, ShapeGroup } from '../../src/domain/engine/shape-node';
+import { Score } from '../../src/domain/engine/score';
 import { Turns } from '../../src/domain/engine/turns';
 import { Placement } from '../../src/domain/variants/hexa-fit/placement';
 import { MergeTile } from '../../src/domain/variants/hexa-merge/merge-tile';
@@ -73,14 +74,14 @@ describe('equals of the whole number value objects', () => {
 describe('equals of the progress values', () => {
   it('should_be_equal_when_two_game_results_hold_the_same_fields', () => {
     const same: Same<GameResult> = (left, right) => left.equals(right);
-    const fields = { gameId: FIT, score: 10, moves: 3, levelId: 'a', elapsedMs: 500 };
+    const fields = { gameId: FIT, score: Score.of(10), moves: 3, levelId: 'a', elapsedMs: 500 };
     const result = GameResult.of(fields);
     const changed = (change: Partial<typeof fields>) => GameResult.of({ ...fields, ...change });
-    const withoutExtras = GameResult.of({ gameId: FIT, score: 10, moves: 3 });
+    const withoutExtras = GameResult.of({ gameId: FIT, score: Score.of(10), moves: 3 });
 
     expect(bothWays(same, result, changed({ gameId: GameId.of('hexa-fit') }))).toEqual(EQUAL);
     expect(bothWays(same, result, changed({ gameId: SORT }))).toEqual(DIFFERENT);
-    expect(bothWays(same, result, changed({ score: 11 }))).toEqual(DIFFERENT);
+    expect(bothWays(same, result, changed({ score: Score.of(11) }))).toEqual(DIFFERENT);
     expect(bothWays(same, result, changed({ moves: 4 }))).toEqual(DIFFERENT);
     expect(bothWays(same, result, changed({ levelId: 'b' }))).toEqual(DIFFERENT);
     expect(bothWays(same, result, changed({ elapsedMs: 501 }))).toEqual(DIFFERENT);
@@ -89,14 +90,14 @@ describe('equals of the progress values', () => {
 
   it('should_be_equal_when_two_progress_records_hold_the_same_fields', () => {
     const same: Same<ProgressRecord> = (left, right) => left.equals(right);
-    const fields = { gameId: FIT, score: 10, levelId: 'a', stars: 2 };
+    const fields = { gameId: FIT, score: Score.of(10), levelId: 'a', stars: 2 };
     const record = ProgressRecord.of(fields);
     const changed = (change: Partial<typeof fields>) => ProgressRecord.of({ ...fields, ...change });
-    const withoutExtras = ProgressRecord.of({ gameId: FIT, score: 10 });
+    const withoutExtras = ProgressRecord.of({ gameId: FIT, score: Score.of(10) });
 
     expect(bothWays(same, record, changed({ gameId: GameId.of('hexa-fit') }))).toEqual(EQUAL);
     expect(bothWays(same, record, changed({ gameId: SORT }))).toEqual(DIFFERENT);
-    expect(bothWays(same, record, changed({ score: 11 }))).toEqual(DIFFERENT);
+    expect(bothWays(same, record, changed({ score: Score.of(11) }))).toEqual(DIFFERENT);
     expect(bothWays(same, record, changed({ levelId: 'b' }))).toEqual(DIFFERENT);
     expect(bothWays(same, record, changed({ stars: 3 }))).toEqual(DIFFERENT);
     expect(bothWays(same, record, withoutExtras)).toEqual(DIFFERENT);

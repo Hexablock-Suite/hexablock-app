@@ -1,3 +1,4 @@
+import type { Score } from '../../engine/score';
 import { ScoringDecorator } from '../../engine/scoring-decorator';
 import type { LinesScoring } from './lines-scoring';
 import type { LinesSnapshot, LinesState } from './lines-state';
@@ -9,17 +10,21 @@ import type { LinesSnapshot, LinesState } from './lines-state';
 // has streak 2. It extends the engine `ScoringDecorator` with `LinesScoring` as its inner
 // policy (view variant-1-lines), because it reads `inner.lineBonus()`.
 // It reads the photo after the turn, as the base policy does.
+// A placement that clears no line has no bonus, so the decorator adds nothing to the inner score.
+// `Score.times()` multiplies the bonus, so no number of a score leaves its value object.
 export class ComboMultiplierDecorator<TCoord> extends ScoringDecorator<
   LinesState<TCoord>,
   LinesScoring<TCoord>
 > {
-  score(before: LinesSnapshot<TCoord>, after: LinesSnapshot<TCoord>): number {
-    const extra = this.inner.lineBonus(after) * (multiplier(after) - 1);
-    return super.score(before, after) + extra;
+  score(before: LinesSnapshot<TCoord>, after: LinesSnapshot<TCoord>): Score {
+    const base = super.score(before, after);
+    if (after.linesCleared === 0) return base;
+    return base.add(this.inner.lineBonus(after).times(multiplier(after) - 1));
   }
 }
 
-// A placement that clears no line has no bonus, so its multiplier has no effect.
+// The multiplier of a placement that clears a line. The streak counts that placement,
+// so the multiplier is 1 or more.
 function multiplier<TCoord>(after: LinesSnapshot<TCoord>): number {
   return after.linesCleared + after.streak - 1;
 }

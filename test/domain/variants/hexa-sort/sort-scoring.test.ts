@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Score } from '../../../../src/domain/engine/score';
 import { square } from '../../../support/engine/square-topology';
 import {
   place,
@@ -34,7 +35,7 @@ describe('SortScoring', () => {
 
     expect(SORT_POINTS_PER_TILE).toBe(10);
     expect(game.snapshot().goalsDone).toBe(1);
-    expect(game.snapshot().score).toBe(110);
+    expect(game.snapshot().score).toEqual(Score.of(110));
   });
 
   it('should_score_no_points_and_keep_the_score_when_the_turn_clears_no_stack', () => {
@@ -50,6 +51,6 @@ describe('SortScoring', () => {
     expect(game.play(place(2))).toBe('playing');
 
     expect(game.snapshot().goalsDone).toBe(1);
-    expect(game.snapshot().score).toBe(110);
+    expect(game.snapshot().score).toEqual(Score.of(110));
   });
 });

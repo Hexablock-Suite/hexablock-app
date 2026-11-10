@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Score } from '../../../src/domain/engine/score';
 import type { Board, ReadonlyBoard } from '../../../src/domain/engine/board';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameOver } from '../../../src/domain/engine/game-events';
@@ -85,7 +86,7 @@ class PhotoOnBudgetState extends FakeState {
   constructor(
     board: FakeState['board'],
     private readonly budget: { left: number },
-    score = 0,
+    score: Score = Score.of(0),
   ) {
     super(board, score);
   }
@@ -107,7 +108,7 @@ class UndoingScoring extends OnePointScoring {
   undoable: IUndoable | undefined;
   innerError: unknown;
 
-  override score(before: FakeSnapshot, after: FakeSnapshot): number {
+  override score(before: FakeSnapshot, after: FakeSnapshot): Score {
     try {
       this.undoable?.undo();
     } catch (error) {
@@ -149,7 +150,7 @@ describe('GameEngine undo capability', () => {
     undoable.undo();
 
     expect(factsOf(engine)).toEqual(afterFirst);
-    expect(afterFirst).toEqual({ cells: [['0,0', 1]], score: 1, phase: 'playing' });
+    expect(afterFirst).toEqual({ cells: [['0,0', 1]], score: Score.of(1), phase: 'playing' });
     expect(undoable.canUndo()).toBe(true);
   });
 
@@ -161,7 +162,7 @@ describe('GameEngine undo capability', () => {
       MATCH_ID,
       GameId.of('fake-game'),
       new SourceRules(),
-      { score: () => 0 },
+      { score: () => Score.of(0) },
       publisher,
       history,
     );
@@ -185,7 +186,7 @@ describe('GameEngine undo capability', () => {
     (photo.board as Board<FakeCell, SquareCoord, SquareAxis>).occupy(square(1, 1), fakeCell(9));
     undoable.undo();
 
-    expect(factsOf(engine)).toEqual({ cells: [], score: 0, phase: 'playing' });
+    expect(factsOf(engine)).toEqual({ cells: [], score: Score.of(0), phase: 'playing' });
   });
 
   it('should_record_nothing_when_the_rules_reject_the_move', () => {
@@ -204,7 +205,7 @@ describe('GameEngine undo capability', () => {
     expect(() => engine.play(moveAt(0))).toThrow('resolve failed');
 
     expect(undoable.canUndo()).toBe(false);
-    expect(factsOf(engine)).toEqual({ cells: [], score: 0, phase: 'playing' });
+    expect(factsOf(engine)).toEqual({ cells: [], score: Score.of(0), phase: 'playing' });
   });
 
   it('should_save_no_turn_when_the_photo_for_the_undo_throws', () => {
@@ -218,7 +219,7 @@ describe('GameEngine undo capability', () => {
 
     budget.left = Number.POSITIVE_INFINITY;
     expect(undoable.canUndo()).toBe(false);
-    expect(factsOf(engine)).toEqual({ cells: [], score: 0, phase: 'playing' });
+    expect(factsOf(engine)).toEqual({ cells: [], score: Score.of(0), phase: 'playing' });
     expect(engine.play(moveAt(0))).toBe('playing');
     expect(undoable.canUndo()).toBe(true);
   });
@@ -233,7 +234,7 @@ describe('GameEngine undo capability', () => {
     expect(() => undoable.undo()).toThrow(new RangeError('The history has no move to undo.'));
     expect(factsOf(engine)).toEqual(finished);
     expect(publisher.events).toEqual([
-      new GameOver(GameId.of('fake-game'), MATCH_ID, 'game-over', 1),
+      new GameOver(GameId.of('fake-game'), MATCH_ID, 'game-over', Score.of(1)),
     ]);
   });
 
@@ -253,7 +254,7 @@ describe('GameEngine undo capability', () => {
     engine.resume();
     undoable.undo();
 
-    expect(factsOf(engine)).toEqual({ cells: [], score: 0, phase: 'playing' });
+    expect(factsOf(engine)).toEqual({ cells: [], score: Score.of(0), phase: 'playing' });
   });
 
   // `play()` enters the resolving phase before it calls the scoring.
@@ -283,14 +284,14 @@ describe('GameEngine undo capability', () => {
         ['0,0', 1],
         ['1,0', 2],
       ],
-      score: 2,
+      score: Score.of(2),
       phase: 'playing',
     });
     // The refused undo kept its command: both moves still come back.
     scoring.undoable = undefined;
     engine.undoable()?.undo();
     engine.undoable()?.undo();
-    expect(factsOf(engine)).toEqual({ cells: [], score: 0, phase: 'playing' });
+    expect(factsOf(engine)).toEqual({ cells: [], score: Score.of(0), phase: 'playing' });
   });
 
   it('should_forget_the_moves_of_the_old_game_when_the_engine_starts_again', () => {
@@ -300,7 +301,7 @@ describe('GameEngine undo capability', () => {
     engine.start(emptyState());
 
     expect(undoable.canUndo()).toBe(false);
-    expect(factsOf(engine)).toEqual({ cells: [], score: 0, phase: 'playing' });
+    expect(factsOf(engine)).toEqual({ cells: [], score: Score.of(0), phase: 'playing' });
   });
 
   it('should_play_the_same_turns_when_the_engine_has_a_history', () => {

@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Score } from '../../../../src/domain/engine/score';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { BoardShape } from '../../../../src/domain/engine/board-shape';
@@ -38,8 +39,10 @@ describe('FitFactory', () => {
     ]);
     expect(initial.remaining().map((p) => p.content.value)).toEqual(['a']);
     expect(outcome).toBe('victory');
-    expect(engine.snapshot().score).toBe(0);
-    expect(publisher.events).toEqual([new GameOver(factory.gameId, MATCH_ID, 'victory', 0)]);
+    expect(engine.snapshot().score).toEqual(Score.of(0));
+    expect(publisher.events).toEqual([
+      new GameOver(factory.gameId, MATCH_ID, 'victory', Score.of(0)),
+    ]);
   });
 
   it('should_give_a_new_source_of_the_level_pieces_when_the_fit_factory_is_asked_twice', () => {

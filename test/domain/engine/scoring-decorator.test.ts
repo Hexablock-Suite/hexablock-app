@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Score } from '../../../src/domain/engine/score';
 import { ScoringDecorator } from '../../../src/domain/engine/scoring-decorator';
 import type { IScoringPolicy } from '../../../src/domain/engine/scoring-policy';
 
@@ -18,9 +19,9 @@ interface CounterState {
 class RecordingScoring implements IScoringPolicy<CounterState> {
   readonly calls: [CounterPhoto, CounterPhoto][] = [];
 
-  score(before: CounterPhoto, after: CounterPhoto): number {
+  score(before: CounterPhoto, after: CounterPhoto): Score {
     this.calls.push([before, after]);
-    return after.points;
+    return Score.of(after.points);
   }
 }
 
@@ -29,8 +30,8 @@ class PassThroughScoring extends ScoringDecorator<CounterState> {}
 
 // A decorator that adds one bonus point to the inner score.
 class BonusScoring extends ScoringDecorator<CounterState> {
-  score(before: CounterPhoto, after: CounterPhoto): number {
-    return super.score(before, after) + 1;
+  score(before: CounterPhoto, after: CounterPhoto): Score {
+    return super.score(before, after).add(Score.of(1));
   }
 }
 
@@ -42,7 +43,7 @@ describe('ScoringDecorator', () => {
     const inner = new RecordingScoring();
     const scoring: IScoringPolicy<CounterState> = new PassThroughScoring(inner);
 
-    expect(scoring.score(before, after)).toBe(7);
+    expect(scoring.score(before, after)).toEqual(Score.of(7));
     expect(inner.calls).toHaveLength(1);
     expect(inner.calls[0]?.[0]).toBe(before);
     expect(inner.calls[0]?.[1]).toBe(after);
@@ -53,7 +54,7 @@ describe('ScoringDecorator', () => {
     const scoring = new BonusScoring(new PassThroughScoring(new BonusScoring(inner)));
 
     // 7 from the base policy, plus 1 from each bonus decorator.
-    expect(scoring.score(before, after)).toBe(9);
+    expect(scoring.score(before, after)).toEqual(Score.of(9));
     expect(inner.calls).toEqual([[before, after]]);
   });
 });

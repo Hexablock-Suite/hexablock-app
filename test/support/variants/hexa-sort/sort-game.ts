@@ -1,3 +1,4 @@
+import { Score } from '../../../../src/domain/engine/score';
 import { Board } from '../../../../src/domain/engine/board';
 import { BoardShape } from '../../../../src/domain/engine/board-shape';
 import { Color } from '../../../../src/domain/engine/color';
@@ -87,8 +88,8 @@ export function row(
 
 // No points: the rules tests check the board, not the score.
 export class NoScoring implements IScoringPolicy<SortState<SquareCoord>> {
-  score(): number {
-    return 0;
+  score(): Score {
+    return Score.of(0);
   }
 }
 

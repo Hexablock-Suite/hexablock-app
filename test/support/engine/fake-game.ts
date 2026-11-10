@@ -10,6 +10,7 @@ import type { IPieceSource } from '../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../src/domain/engine/region-size';
 import { Resolution } from '../../../src/domain/engine/resolution';
 import { BaseGameRules } from '../../../src/domain/engine/rules';
+import { Score } from '../../../src/domain/engine/score';
 import type { IScoringPolicy } from '../../../src/domain/engine/scoring-policy';
 import type { IVariantFactory } from '../../../src/domain/engine/variant-factory';
 import type { FakeCell } from './fake-cell';
@@ -36,7 +37,7 @@ export interface FakeSnapshot extends BoardSnapshot<FakeCell, SquareCoord> {
 export class FakeState implements BoardState<FakeCell, SquareCoord> {
   constructor(
     readonly board: Board<FakeCell, SquareCoord, SquareAxis>,
-    public score = 0,
+    public score: Score = Score.of(0),
     private readonly matchId: MatchId = MATCH_ID,
     private readonly stateId: GameStateId = STATE_ID,
   ) {}
@@ -49,8 +50,8 @@ export class FakeState implements BoardState<FakeCell, SquareCoord> {
     return other instanceof FakeState && this.stateId.equals(other.stateId);
   }
 
-  addPoints(points: number): void {
-    this.score += points;
+  addPoints(points: Score): void {
+    this.score = this.score.add(points);
   }
 
   clone(): FakeState {
@@ -84,7 +85,7 @@ export function emptyState(
 ): FakeState {
   return new FakeState(
     new Board(boardId, squareTopology.region(RegionSize.of(size)), squareTopology),
-    0,
+    Score.of(0),
     matchId,
     stateId,
   );
@@ -104,7 +105,7 @@ export class SourceState implements BoardState<FakeCell, SquareCoord> {
   constructor(
     readonly board: Board<FakeCell, SquareCoord, SquareAxis>,
     public source: IPieceSource<FakeCell>,
-    public score = 0,
+    public score: Score = Score.of(0),
     private readonly matchId: MatchId = MATCH_ID,
     private readonly stateId: GameStateId = STATE_ID,
   ) {}
@@ -117,8 +118,8 @@ export class SourceState implements BoardState<FakeCell, SquareCoord> {
     return other.belongsTo(this.matchId);
   }
 
-  addPoints(points: number): void {
-    this.score += points;
+  addPoints(points: Score): void {
+    this.score = this.score.add(points);
   }
 
   clone(): SourceState {
@@ -221,9 +222,9 @@ export class FakeRules extends BaseGameRules<FakeMove, FakeState> {
 export class OnePointScoring implements IScoringPolicy<FakeState> {
   constructor(readonly log: string[] = []) {}
 
-  score(_before: FakeSnapshot, _after: FakeSnapshot): number {
+  score(_before: FakeSnapshot, _after: FakeSnapshot): Score {
     this.log.push('score');
-    return 1;
+    return Score.of(1);
   }
 }
 

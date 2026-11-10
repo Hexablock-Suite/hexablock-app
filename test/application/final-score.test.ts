@@ -2,8 +2,9 @@
 import { ApplyMove } from '../../src/application/apply-move';
 import { GameEngine } from '../../src/domain/engine/game-engine';
 import { GameId } from '../../src/domain/engine/game-id';
-import { GameOverPhase } from '../../src/domain/engine/game-phase';
-import { MemoryRunningGameStore, valueOf } from '../support/application/game-use-cases';
+import { PlayingPhase } from '../../src/domain/engine/game-phase';
+import { Score } from '../../src/domain/engine/score';
+import { errorOf, MemoryRunningGameStore } from '../support/application/game-use-cases';
 import { RecordingLogger } from '../support/application/recording-logger';
 import { fakeCell, type FakeCell } from '../support/engine/fake-cell';
 import {
@@ -17,14 +18,11 @@ import {
 import { square, type SquareCoord } from '../support/engine/square-topology';
 import { MATCH_ID } from '../support/engine/match-id';
 
-// The points of each turn are finite, but their total can pass the largest number.
-class HugeScoring extends OnePointScoring {
-  override score(): number {
-    return Number.MAX_VALUE;
-  }
-}
+// The score of the state is the largest safe integer, so one more point passes it.
+const FULL = Score.of(Number.MAX_SAFE_INTEGER);
 
-// One cell and the largest score: the only move ends the game with a total that is not finite.
+// One cell and the largest score: the only move would end the game with a total
+// that is not a valid score.
 function overflowingGame() {
   const games = new MemoryRunningGameStore<FakeCell, SquareCoord, FakeMove, FakeState>();
   const publisher = new RecordingPublisher();
@@ -32,11 +30,11 @@ function overflowingGame() {
     MATCH_ID,
     GameId.of('fake-game'),
     new FakeRules(),
-    new HugeScoring(),
+    new OnePointScoring(),
     publisher,
   );
   const state = emptyState(1);
-  state.score = Number.MAX_VALUE;
+  state.addPoints(FULL);
   engine.start(state);
   games.replace(engine);
   const logger = new RecordingLogger();
@@ -45,31 +43,43 @@ function overflowingGame() {
 
 const MOVE: FakeMove = { at: square(0, 0), cell: fakeCell(1) };
 
-describe('a final score that is not finite', () => {
-  it('should_return_the_same_move_result_when_the_total_score_passes_the_largest_number', async () => {
+// Before issue #203 the total became `Infinity`, the turn stayed saved and the `GameOver`
+// event threw. A `Score` checks its sum, so the turn now throws before the engine saves it.
+describe('a total score that passes the largest safe integer', () => {
+  it('should_return_a_move_failed_error_when_the_points_of_the_turn_pass_the_largest_safe_integer', async () => {
     const { applyMove } = overflowingGame();
 
-    const played = valueOf(await applyMove.execute({ move: MOVE }));
+    const error = errorOf(await applyMove.execute({ move: MOVE }));
 
-    expect(played).toEqual({
-      cells: [[square(0, 0), fakeCell(1)]],
-      score: Number.POSITIVE_INFINITY,
-      outcome: 'game-over',
-      canUndo: false,
-      canRedo: false,
-      hasUndo: false,
-      payload: { filled: 1 },
-    });
+    expect([error.code, error.message]).toEqual([
+      'move-failed',
+      'The sum of two scores cannot pass the largest safe integer.',
+    ]);
   });
 
-  it('should_log_a_publish_failure_and_keep_the_turn_when_the_total_score_passes_the_largest_number', async () => {
+  it('should_leave_the_turn_unsaved_when_the_points_of_the_turn_pass_the_largest_safe_integer', async () => {
     const { engine, publisher, logger, applyMove } = overflowingGame();
 
     await applyMove.execute({ move: MOVE });
 
+    const after = engine.snapshot();
+    expect(after.board.cells()).toEqual([]);
+    expect(after.score).toEqual(FULL);
+    expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(publisher.events).toEqual([]);
-    expect(logger.entries.map((entry) => entry.error?.code)).toEqual(['publish-failed']);
-    expect(engine.snapshot().score).toBe(Number.POSITIVE_INFINITY);
-    expect(engine.currentPhase()).toBe(GameOverPhase.instance);
+    expect(logger.entries).toEqual([]);
+  });
+
+  it('should_throw_a_range_error_and_keep_the_game_when_the_engine_plays_that_turn', () => {
+    const { engine, publisher } = overflowingGame();
+
+    expect(() => engine.play(MOVE)).toThrow(
+      new RangeError('The sum of two scores cannot pass the largest safe integer.'),
+    );
+
+    expect(engine.snapshot().score).toEqual(FULL);
+    expect(engine.snapshot().board.cells()).toEqual([]);
+    expect(engine.currentPhase()).toBe(PlayingPhase.instance);
+    expect(publisher.events).toEqual([]);
   });
 });

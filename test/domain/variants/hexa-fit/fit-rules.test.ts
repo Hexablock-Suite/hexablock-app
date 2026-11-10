@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Score } from '../../../../src/domain/engine/score';
 import { Board } from '../../../../src/domain/engine/board';
 import { BoardShape } from '../../../../src/domain/engine/board-shape';
 import { GameOver } from '../../../../src/domain/engine/game-events';
@@ -43,7 +44,7 @@ const NO_TURN = Turns.of(0);
 
 // These tests give no points. The Fit scoring, the accepted rule of issue #59 (D22),
 // has its own suite.
-const noPoints: IScoringPolicy<FitState<SquareCoord>> = { score: () => 0 };
+const noPoints: IScoringPolicy<FitState<SquareCoord>> = { score: () => Score.of(0) };
 
 function piece<TCoord>(id: PieceId, cells: TCoord[]): Piece<PieceId, TCoord> {
   return new Piece(new ShapeGroup(cells.map((c) => new CellNode(c))), id);

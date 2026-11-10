@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Score } from '../../../../src/domain/engine/score';
 import { GameOverPhase, PlayingPhase } from '../../../../src/domain/engine/game-phase';
 import type { GridTopology } from '../../../../src/domain/engine/grid-topology';
 import { GameOver } from '../../../../src/domain/engine/game-events';
@@ -442,7 +443,7 @@ describe('Hexa Lines rules edge cases', () => {
     expect(state.streak).toBe(1);
     expect(filledKeys(state)).toEqual([]);
     // One placed cell and one line with factor 1: 1 + 10.
-    expect(state.score).toBe(11);
+    expect(state.score).toEqual(Score.of(11));
   });
 
   it('should_count_one_line_and_score_one_line_when_a_full_cell_lies_alone_on_two_axes', () => {
@@ -465,7 +466,7 @@ describe('Hexa Lines rules edge cases', () => {
     expect(state.streak).toBe(1);
     expect(filledKeys(state)).toEqual([]);
     // One placed cell and one line with factor 1: 1 + 10.
-    expect(state.score).toBe(11);
+    expect(state.score).toEqual(Score.of(11));
   });
 });
 

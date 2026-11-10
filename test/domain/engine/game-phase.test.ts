@@ -1,6 +1,7 @@
 /** @jest-environment node */
 import { GameId } from '../../../src/domain/engine/game-id';
 import { MatchId } from '../../../src/domain/engine/match-id';
+import { Score } from '../../../src/domain/engine/score';
 import { GameOver } from '../../../src/domain/engine/game-events';
 import {
   GameOverPhase,
@@ -181,23 +182,32 @@ describe('GameId', () => {
 
 describe('GameOver event', () => {
   it('should_carry_the_game_the_match_the_outcome_and_the_final_score_when_it_is_created', () => {
-    const event = new GameOver(GameId.of('hexa-lines'), MatchId.of('match-a'), 'game-over', 42);
+    const event = new GameOver(
+      GameId.of('hexa-lines'),
+      MatchId.of('match-a'),
+      'game-over',
+      Score.of(42),
+    );
 
     expect(event.gameId.equals(GameId.of('hexa-lines'))).toBe(true);
     expect(event.matchId.equals(MatchId.of('match-a'))).toBe(true);
     expect(event.matchId.equals(MatchId.of('match-b'))).toBe(false);
     expect(event.outcome).toBe('game-over');
-    expect(event.finalScore).toBe(42);
+    expect(event.finalScore).toBeInstanceOf(Score);
+    expect(event.finalScore.equals(Score.of(42))).toBe(true);
   });
 
-  it('should_throw_a_range_error_when_the_final_score_is_not_finite', () => {
+  // The event has no check of its own: a `Score` is valid when it exists (issue #203).
+  it('should_take_no_final_score_when_the_value_is_not_a_valid_score', () => {
     const gameId = GameId.of('hexa-lines');
 
-    for (const score of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
-      expect(() => new GameOver(gameId, MATCH_ID, 'game-over', score)).toThrow(
-        new RangeError('A game over event needs a final score that is a finite number.'),
+    for (const score of [Number.NaN, Number.POSITIVE_INFINITY, -3, 0.5]) {
+      expect(() => new GameOver(gameId, MATCH_ID, 'game-over', Score.of(score))).toThrow(
+        new RangeError(`A score needs a whole number of 0 or more, not ${score}.`),
       );
     }
-    expect(new GameOver(gameId, MATCH_ID, 'game-over', -3).finalScore).toBe(-3);
+    expect(
+      new GameOver(gameId, MATCH_ID, 'game-over', Score.of(0)).finalScore.equals(Score.of(0)),
+    ).toBe(true);
   });
 });

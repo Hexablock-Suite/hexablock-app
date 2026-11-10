@@ -18,6 +18,7 @@ import type { Piece } from '../../src/domain/engine/piece';
 import { FixedListPieceSource, type IPieceSource } from '../../src/domain/engine/piece-source';
 import { RegionSize } from '../../src/domain/engine/region-size';
 import type { Resolution } from '../../src/domain/engine/resolution';
+import { Score } from '../../src/domain/engine/score';
 import { SquareGeometry } from '../../src/domain/engine/square-geometry';
 import type { IRedoable } from '../../src/domain/engine/undo-capabilities';
 import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
@@ -234,7 +235,7 @@ describe('StartGame and ApplyMove', () => {
       const time = run.gameId === 'hexa-fit' ? { elapsedMs: 0 } : {};
       expect(run.started).toEqual({
         cells: run.startCells,
-        score: 0,
+        score: Score.of(0),
         outcome: 'playing',
         canUndo: false,
         canRedo: false,
@@ -339,7 +340,9 @@ describe('StartGame and ApplyMove', () => {
     const played = valueOf(await applyMove.execute({ move }));
 
     expect(played.outcome).toBe('victory');
-    expect(publisher.events).toEqual([new GameOver(factory.gameId, MATCH_ID, 'victory', 0)]);
+    expect(publisher.events).toEqual([
+      new GameOver(factory.gameId, MATCH_ID, 'victory', Score.of(0)),
+    ]);
   });
 
   it('should_return_a_start_failed_failure_and_keep_the_old_game_when_the_id_generator_throws', async () => {
@@ -552,7 +555,10 @@ describe('StartGame and ApplyMove', () => {
       false,
     ]);
     expect(engine.snapshot().board.cells()).toEqual([]);
-    expect([engine.snapshot().score, phaseNameOf(engine.currentPhase())]).toEqual([0, 'playing']);
+    expect([engine.snapshot().score, phaseNameOf(engine.currentPhase())]).toEqual([
+      Score.of(0),
+      'playing',
+    ]);
     expect([logger.entries, publisher.events]).toEqual([[], []]);
   });
 
