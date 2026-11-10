@@ -522,20 +522,20 @@
           TAxis&gt;): void
         </text>
 
-        <!-- Class: Slide (value object) -->
+        <!-- Class: Slide (value object, decision 43) -->
         <rect
           x="616"
           y="448"
-          width="160"
-          height="86"
+          width="372"
+          height="192"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="616" y1="496" x2="776" y2="496" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="616" y1="496" x2="988" y2="496" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="696"
+          x="802"
           y="466"
           fill="#5b6873"
           font-size="8"
@@ -546,7 +546,7 @@
           «value object»
         </text>
         <text
-          x="696"
+          x="802"
           y="484"
           fill="#17212a"
           font-size="12"
@@ -557,10 +557,36 @@
           Slide
         </text>
         <text x="632" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + axis: TAxis
+          - axis: TAxis
         </text>
-        <text x="632" y="526" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + toward: SlideSense
+        <text x="632" y="528" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - toward: SlideSense
+        </text>
+        <line x1="616" y1="536" x2="988" y2="536" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="632"
+          y="552"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + of(axis: TAxis, toward: SlideSense): Slide&lt;TAxis&gt;
+        </text>
+        <text x="632" y="568" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + isAlong(axes: TAxis[]): boolean
+        </text>
+        <text x="632" y="584" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + lineThrough(board: { line(axis: TAxis, through: TCoord):
+        </text>
+        <text x="643" y="600" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Iterable&lt;TCoord&gt; }, through: TCoord): Iterable&lt;TCoord&gt;
+        </text>
+        <text x="632" y="616" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + fromLeadingEdge(line: TCoord[]): TCoord[]
+        </text>
+        <text x="632" y="632" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: Slide&lt;TAxis&gt;): boolean
         </text>
 
         <!-- Class: IMergeable (engine interface, the bound) -->
@@ -665,6 +691,27 @@
         </text>
 
         <!-- UML template boxes: type parameters on the top-right corner -->
+        <rect
+          x="952"
+          y="438"
+          width="48"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="976"
+          y="450"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TAxis
+        </text>
         <rect
           x="420"
           y="262"

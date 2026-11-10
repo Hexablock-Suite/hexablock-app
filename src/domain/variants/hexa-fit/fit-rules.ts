@@ -6,7 +6,7 @@ import { Turns } from '../../engine/turns';
 import { PlaceFitPiece, RemoveFitPiece, RotateFitPiece, type FitMove } from './fit-move';
 import type { FitSnapshot, FitState } from './fit-state';
 import type { PieceId } from './piece-id';
-import { Placement } from './placement';
+import type { Placement } from './placement';
 
 const NO_TURN = Turns.of(0);
 
@@ -19,6 +19,8 @@ const NO_TURN = Turns.of(0);
 // The rules stay generic over `TCoord`, so they run on any topology (classes.md decision 16).
 // The rules read the board through the photo of the state, and they ask the state
 // `piece()`, `placementOf()`, `placed()` and `remaining()`.
+// The rules read no field of a move (classes.md decision 43). The class of the move tells
+// its kind, and the rules ask the move for its piece and for the placement that it gives.
 export class FitRules<TCoord> extends BaseGameRules<FitMove<TCoord>, FitState<TCoord>> {
   isValid(state: FitState<TCoord>, move: FitMove<TCoord>): boolean {
     return isValidOn(state, state.snapshot(), move);
@@ -75,49 +77,45 @@ function isValidOn<TCoord>(
   move: FitMove<TCoord>,
 ): boolean {
   const { board } = photo;
-  switch (move.kind) {
-    case 'place':
-      return (
-        state.placementOf(move.pieceId) === undefined &&
-        fits(state, board, move.pieceId, Placement.of(move.rotation, move.at, board.topology))
-      );
-    case 'remove':
-      return state.placementOf(move.pieceId) !== undefined;
-    case 'rotate': {
-      const placement = state.placementOf(move.pieceId);
-      return (
-        placement !== undefined &&
-        fits(state, board, move.pieceId, placement.turned(move.steps, board.topology))
-      );
-    }
-    default:
-      return unknownMove(move);
+  if (move instanceof PlaceFitPiece) {
+    return (
+      state.placementOf(move.piece()) === undefined &&
+      fits(state, board, move.piece(), move.placement(board.topology))
+    );
   }
+  if (move instanceof RemoveFitPiece) return state.placementOf(move.piece()) !== undefined;
+  if (move instanceof RotateFitPiece) {
+    const placement = state.placementOf(move.piece());
+    return (
+      placement !== undefined &&
+      fits(state, board, move.piece(), move.turn(placement, board.topology))
+    );
+  }
+  return unknownMove(move);
 }
 
 // Changes the state by the move, before the rules count it.
 // A rotation removes the piece and places it again, turned.
 function changeBy<TCoord>(state: FitState<TCoord>, move: FitMove<TCoord>): void {
   const { topology } = state.snapshot().board;
-  switch (move.kind) {
-    case 'place':
-      state.place(move.pieceId, Placement.of(move.rotation, move.at, topology));
-      return;
-    case 'remove':
-      state.remove(move.pieceId);
-      return;
-    case 'rotate': {
-      const placement = state.placementOf(move.pieceId);
-      if (placement === undefined) {
-        throw new RangeError(`The piece ${move.pieceId.value} is not on the figure.`);
-      }
-      state.remove(move.pieceId);
-      state.place(move.pieceId, placement.turned(move.steps, topology));
-      return;
-    }
-    default:
-      unknownMove(move);
+  if (move instanceof PlaceFitPiece) {
+    state.place(move.piece(), move.placement(topology));
+    return;
   }
+  if (move instanceof RemoveFitPiece) {
+    state.remove(move.piece());
+    return;
+  }
+  if (move instanceof RotateFitPiece) {
+    const placement = state.placementOf(move.piece());
+    if (placement === undefined) {
+      throw new RangeError(`The piece ${move.piece().value} is not on the figure.`);
+    }
+    state.remove(move.piece());
+    state.place(move.piece(), move.turn(placement, topology));
+    return;
+  }
+  unknownMove(move);
 }
 
 // True when every cell of the placed piece lies inside the figure and is free or
@@ -138,6 +136,7 @@ function fits<TCoord>(
 }
 
 // A value outside the `FitMove` union reaches this function only through a cast.
+// It is an object of no move class, so the message names the `kind` text that it carries.
 function unknownMove(move: never): never {
   throw new RangeError(`Unknown Fit move: ${String((move as { kind?: unknown }).kind)}.`);
 }

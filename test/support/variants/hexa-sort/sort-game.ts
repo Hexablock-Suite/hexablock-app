@@ -20,11 +20,8 @@ import { ColorStack } from '../../../../src/domain/variants/hexa-sort/color-stac
 import { GoalCount } from '../../../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../../../src/domain/variants/hexa-sort/sort-factory';
 import { SortRules } from '../../../../src/domain/variants/hexa-sort/sort-rules';
-import {
-  SortState,
-  type PlaceStack,
-  type SortSnapshot,
-} from '../../../../src/domain/variants/hexa-sort/sort-state';
+import { PlaceStack } from '../../../../src/domain/variants/hexa-sort/place-stack';
+import { SortState, type SortSnapshot } from '../../../../src/domain/variants/hexa-sort/sort-state';
 import { RecordingPublisher } from '../../engine/fake-game';
 import { square, squareTopology, type SquareCoord } from '../../engine/square-topology';
 import { MATCH_ID } from '../../engine/match-id';
@@ -128,7 +125,7 @@ export function sortGame(
 }
 
 export function place(col: number, row = 0): PlaceStack<SquareCoord> {
-  return { at: square(col, row) };
+  return PlaceStack.on(square(col, row));
 }
 
 // The color names of the cell `(col, row)`, from the bottom to the top.

@@ -104,14 +104,14 @@ describe('LinesState', () => {
     expect(state.canPlace(new PlacePiece(0, square(2, 0)))).toBe(false);
     expect(state.canPlace(new PlacePiece(1, square(1, 1)))).toBe(false);
     expect(state.canPlace(new PlacePiece(2, square(0, 0)))).toBe(false);
-    expect(state.canPlace(new PlacePiece(0.5, square(0, 0)))).toBe(false);
   });
 
   it('should_throw_a_range_error_and_keep_the_state_when_the_tray_has_no_piece_at_the_index', () => {
     const state = linesState(squareTopology, 3, { tray: [one], source: [one] });
     const before = facts(state);
 
-    for (const index of [1, -1, 0.5, Number.NaN]) {
+    // A tray index that is negative or not whole builds no move (issue #205, moves.test.ts).
+    for (const index of [1, 2, Number.MAX_SAFE_INTEGER]) {
       expect(() => state.placePiece(new PlacePiece(index, square(0, 0)))).toThrow(
         new RangeError(`The tray has no piece at index ${index}.`),
       );

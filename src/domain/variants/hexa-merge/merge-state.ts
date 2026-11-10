@@ -153,18 +153,19 @@ export class MergeState<
 
   // The cells after the slide, line by line, and the tiles that the merges make.
   // It returns `undefined` when the slide changes no cell. It checks the axis at runtime,
-  // because a cast passes the compiler.
+  // because a cast passes the compiler. The state reads no field of the slide: it asks
+  // the slide for its lines and for the order of each line (classes.md decision 43).
   // The proposal on issue #57, «Propuesta, pendiente del equipo», fixes the packing:
   // a slide reads each line from its leading edge, and a tile merges at most once per move.
   private planOf(slide: Slide<TAxis>): { cells: [TCoord, TCell][]; merged: TCell[] } | undefined {
     const { board } = this;
-    if (!board.topology.axes().includes(slide.axis)) return undefined;
+    if (!slide.isAlong(board.topology.axes())) return undefined;
     const cells: [TCoord, TCell][] = [];
     const merged: TCell[] = [];
     let changed = false;
-    for (const line of linesOf(board, slide.axis)) {
+    for (const line of linesOf(board, slide)) {
       // The leading edge comes first.
-      const ordered = slide.toward === 'forward' ? [...line].reverse() : line;
+      const ordered = slide.fromLeadingEdge(line);
       const packed = pack(
         ordered.flatMap((c) => tileAt(board, c)),
         merged,
@@ -194,16 +195,16 @@ function tileAt<TCell, TCoord>(board: Board<TCell, TCoord, string>, c: TCoord): 
   return cell === undefined ? [] : [cell];
 }
 
-// Every line of the board on one axis, each one once, in the order of `Board.line()`.
+// Every line of the board on the axis of the slide, each one once, in the order of `Board.line()`.
 function linesOf<TCell, TCoord, TAxis extends string>(
   board: Board<TCell, TCoord, TAxis>,
-  axis: TAxis,
+  slide: Slide<TAxis>,
 ): TCoord[][] {
   const covered = new Set<CoordKey>();
   const lines: TCoord[][] = [];
   for (const c of board.shape.cells) {
     if (covered.has(board.topology.key(c))) continue;
-    const line = [...board.line(axis, c)];
+    const line = [...slide.lineThrough(board, c)];
     for (const on of line) covered.add(board.topology.key(on));
     lines.push(line);
   }

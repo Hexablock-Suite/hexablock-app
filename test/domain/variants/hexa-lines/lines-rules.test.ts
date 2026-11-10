@@ -88,13 +88,12 @@ describe('Hexa Lines rules', () => {
 
   it('should_reject_the_move_and_keep_the_state_when_the_piece_does_not_fit_or_names_no_tray_piece', () => {
     const domino = piece(origin, square(1, 0));
-    // An overlap, a cell outside the board, and a tray index that is negative, past the tray or not whole.
+    // An overlap, a cell outside the board, and a tray index past the tray.
+    // A tray index that is negative or not whole builds no move (issue #205, moves.test.ts).
     const moves = [
       new PlacePiece(0, square(1, 1)),
       new PlacePiece(0, square(2, 1)),
-      new PlacePiece(-1, square(0, 0)),
       new PlacePiece(2, square(0, 0)),
-      new PlacePiece(0.5, square(0, 0)),
     ];
 
     for (const move of moves) {
@@ -322,16 +321,26 @@ describe('Hexa Lines rules edge cases', () => {
     events: [],
   };
 
-  it('should_reject_the_move_and_keep_the_state_when_the_tray_index_is_not_a_finite_number', () => {
-    // The tray index names a tray piece, so it is a whole number (lines-rules.ts, `isValid()`).
-    for (const index of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
-      expect(playOnce(new PlacePiece(index, square(0, 0)))).toEqual(rejected);
+  it('should_build_no_move_for_the_rules_when_the_tray_index_is_not_a_whole_number_of_0_or_more', () => {
+    // The tray index names a tray piece. `PlacePiece` checks it (issue #205), so the rules
+    // never see such a move, and `isValid()` does not repeat the check.
+    for (const index of [
+      Number.NaN,
+      Number.POSITIVE_INFINITY,
+      Number.NEGATIVE_INFINITY,
+      Number.MAX_SAFE_INTEGER + 1,
+      -1,
+      0.5,
+    ]) {
+      expect(() => new PlacePiece(index, square(0, 0))).toThrow(RangeError);
     }
   });
 
-  it('should_reject_the_move_and_keep_the_state_when_the_tray_index_is_past_the_safe_integers', () => {
-    // 2^53 is a whole number, but no tray piece has that index.
-    expect(playOnce(new PlacePiece(Number.MAX_SAFE_INTEGER + 1, square(0, 0)))).toEqual(rejected);
+  it('should_reject_the_move_and_keep_the_state_when_the_tray_index_is_past_the_tray', () => {
+    // The largest whole number is a tray index, but no tray piece has that index.
+    for (const index of [2, 3, Number.MAX_SAFE_INTEGER]) {
+      expect(playOnce(new PlacePiece(index, square(0, 0)))).toEqual(rejected);
+    }
   });
 
   it('should_place_the_first_tray_piece_when_the_tray_index_is_negative_zero', () => {
