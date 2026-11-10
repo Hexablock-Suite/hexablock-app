@@ -1,6 +1,8 @@
 import { Board } from '../../../../src/domain/engine/board';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
 import { GameId } from '../../../../src/domain/engine/game-id';
+import { HexGeometry } from '../../../../src/domain/engine/hex-geometry';
+import type { HexAxis, HexCoord } from '../../../../src/domain/engine/hex-topology';
 import {
   FixedListPieceSource,
   type IPieceSource,
@@ -14,10 +16,11 @@ import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile
 import type { NewTile } from '../../../../src/domain/variants/hexa-merge/new-tile';
 import type { Slide } from '../../../../src/domain/variants/hexa-merge/slide';
 import { RecordingPublisher } from '../../engine/fake-game';
-import { hexTopology, type HexAxis, type HexCoord } from './hex-topology';
 
-// The Merge game for the rules tests, on the hexagonal double.
+// The Merge game for the rules tests, on the real hexagonal geometry.
 // The rules tests score no points. The scoring tests pass their own policy.
+
+export const hexTopology = new HexGeometry().createTopology();
 
 export type HexMergeState = MergeState<MergeTile, HexCoord, HexAxis>;
 
