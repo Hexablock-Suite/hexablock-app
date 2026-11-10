@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { ElapsedTime } from '../../../src/domain/engine/elapsed-time';
 import { Score } from '../../../src/domain/engine/score';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameId } from '../../../src/domain/engine/game-id';
@@ -91,7 +92,7 @@ describe('TimedRulesDecorator', () => {
 
     clock.advance(5 * SECOND);
 
-    expect(timer.elapsedMs()).toBe(0);
+    expect(timer.elapsedMs()).toEqual(ElapsedTime.ofMs(0));
   });
 
   it('should_time_the_game_from_the_first_turn_when_the_clock_moves_between_turns', () => {
@@ -106,9 +107,9 @@ describe('TimedRulesDecorator', () => {
     engine.play(moveAt(1));
     clock.advance(SECOND);
 
-    expect(atFirstTurn).toBe(0);
-    expect(afterOneSecond).toBe(SECOND);
-    expect(timer.elapsedMs()).toBe(2 * SECOND);
+    expect(atFirstTurn).toEqual(ElapsedTime.ofMs(0));
+    expect(afterOneSecond).toEqual(ElapsedTime.ofMs(SECOND));
+    expect(timer.elapsedMs()).toEqual(ElapsedTime.ofMs(2 * SECOND));
   });
 
   it('should_stop_the_timer_and_keep_the_time_when_the_turn_ends_the_game', () => {
@@ -122,7 +123,7 @@ describe('TimedRulesDecorator', () => {
     game.clock.advance(4 * SECOND);
 
     expect(last).toBe('game-over');
-    expect(game.timer.elapsedMs()).toBe(3 * SECOND);
+    expect(game.timer.elapsedMs()).toEqual(ElapsedTime.ofMs(3 * SECOND));
   });
 
   it('should_read_zero_when_one_turn_starts_and_ends_the_game', () => {
@@ -132,7 +133,7 @@ describe('TimedRulesDecorator', () => {
     clock.advance(SECOND);
 
     expect(outcome).toBe('game-over');
-    expect(timer.elapsedMs()).toBe(0);
+    expect(timer.elapsedMs()).toEqual(ElapsedTime.ofMs(0));
   });
 
   it('should_leave_the_timer_alone_when_the_first_move_is_rejected', () => {
@@ -146,9 +147,9 @@ describe('TimedRulesDecorator', () => {
     clock.advance(SECOND);
 
     expect(turn.accepted).toBe(false);
-    expect(afterRejected).toBe(0);
+    expect(afterRejected).toEqual(ElapsedTime.ofMs(0));
     // The first accepted turn starts the timer.
-    expect(timer.elapsedMs()).toBe(SECOND);
+    expect(timer.elapsedMs()).toEqual(ElapsedTime.ofMs(SECOND));
   });
 
   it('should_keep_the_timer_running_when_a_later_move_is_rejected', () => {
@@ -160,7 +161,7 @@ describe('TimedRulesDecorator', () => {
     clock.advance(SECOND);
 
     expect(turn.accepted).toBe(false);
-    expect(timer.elapsedMs()).toBe(2 * SECOND);
+    expect(timer.elapsedMs()).toEqual(ElapsedTime.ofMs(2 * SECOND));
   });
 
   it('should_keep_the_timer_running_when_evaluate_reads_a_finished_state_outside_a_turn', () => {
@@ -173,7 +174,7 @@ describe('TimedRulesDecorator', () => {
     clock.advance(SECOND);
 
     expect(outcome).toBe('game-over');
-    expect(timer.elapsedMs()).toBe(SECOND);
+    expect(timer.elapsedMs()).toEqual(ElapsedTime.ofMs(SECOND));
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
   });
 
@@ -192,7 +193,29 @@ describe('TimedRulesDecorator', () => {
     // The rollback keeps the game going, so the end of the game is the retried turn.
     expect(retried).toBe('game-over');
     expect(engine.currentPhase()).toBe(GameOverPhase.instance);
-    expect(timer.elapsedMs()).toBe(3 * SECOND);
+    expect(timer.elapsedMs()).toEqual(ElapsedTime.ofMs(3 * SECOND));
+  });
+
+  // A clock can give a fraction of a millisecond. An `ElapsedTime` is a whole number
+  // of milliseconds, so the timer drops the fraction (issue #204).
+  it('should_read_whole_milliseconds_when_the_clock_gives_a_fraction', () => {
+    const { clock, timer, engine } = timedGame();
+    engine.play(moveAt(0));
+
+    clock.advance(1_500.75);
+
+    expect(timer.elapsedMs()).toEqual(ElapsedTime.ofMs(1_500));
+  });
+
+  it('should_give_an_elapsed_time_value_object_when_the_timer_is_read', () => {
+    const { clock, timer, engine } = timedGame();
+    const before = timer.elapsedMs();
+    engine.play(moveAt(0));
+    clock.advance(SECOND);
+
+    expect(before).toBeInstanceOf(ElapsedTime);
+    expect(timer.elapsedMs()).toBeInstanceOf(ElapsedTime);
+    expect(timer.elapsedMs().equals(ElapsedTime.ofMs(SECOND))).toBe(true);
   });
 
   it('should_read_zero_and_never_a_negative_time_when_the_clock_goes_back', () => {
@@ -201,7 +224,7 @@ describe('TimedRulesDecorator', () => {
 
     clock.advance(-SECOND);
 
-    expect(timer.elapsedMs()).toBe(0);
+    expect(timer.elapsedMs()).toEqual(ElapsedTime.ofMs(0));
   });
 
   it('should_play_the_same_game_as_the_inner_rules_when_the_rules_are_decorated', () => {

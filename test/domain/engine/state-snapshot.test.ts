@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Moves } from '../../../src/domain/engine/moves';
 import { Score } from '../../../src/domain/engine/score';
 import type { Board } from '../../../src/domain/engine/board';
 import { BoardId } from '../../../src/domain/engine/board-id';
@@ -13,6 +14,7 @@ import { PlacePiece } from '../../../src/domain/variants/hexa-lines/place-piece'
 import { MergeScoring } from '../../../src/domain/variants/hexa-merge/merge-scoring';
 import { MergeTile } from '../../../src/domain/variants/hexa-merge/merge-tile';
 import { Slide } from '../../../src/domain/variants/hexa-merge/slide';
+import { ClearedStacks } from '../../../src/domain/variants/hexa-sort/cleared-stacks';
 import { SortScoring } from '../../../src/domain/variants/hexa-sort/sort-scoring';
 import { BOARD_ID, CountingBoardIds, CountingStateIds } from '../../support/engine/entity-ids';
 import { RecordingPublisher } from '../../support/engine/fake-game';
@@ -67,11 +69,16 @@ describe('the photo of a state', () => {
     expect(Object.isFrozen(photo)).toBe(true);
     expect(Object.isFrozen(photo.clearedTiles)).toBe(true);
     expect(json([photo.offered, photo.goalsDone, photo.clearedTiles, photo.placedAt])).toBe(
-      json([state.snapshot().offered, 0, [], square(1, 0)]),
+      json([state.snapshot().offered, ClearedStacks.of(0), [], square(1, 0)]),
     );
-    expect(photo.goalsNeeded.isReachedBy(5)).toBe(true);
+    expect(photo.goalsDone).toBeInstanceOf(ClearedStacks);
+    expect(photo.goalsNeeded.isReachedBy(ClearedStacks.of(5))).toBe(true);
     expect(json(photo.view())).toBe(
-      json({ offered: photo.offered, goalsDone: 0, goalsNeeded: photo.goalsNeeded }),
+      json({
+        offered: photo.offered,
+        goalsDone: ClearedStacks.of(0),
+        goalsNeeded: photo.goalsNeeded,
+      }),
     );
   });
 
@@ -105,7 +112,8 @@ describe('the photo of a state', () => {
 
     expect(Object.isFrozen(photo)).toBe(true);
     expect(Object.isFrozen(photo.placements)).toBe(true);
-    expect(photo.moves).toBe(1);
+    expect(photo.moves).toBeInstanceOf(Moves);
+    expect(photo.moves.equals(Moves.of(1))).toBe(true);
     expect(
       photo.placements.map(([id, at]) => [id.equals(A), at.equals(placement, topology)]),
     ).toEqual([[true, true]]);

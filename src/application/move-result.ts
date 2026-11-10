@@ -1,5 +1,6 @@
 import type { BoardSnapshot, BoardState, SnapshotOf } from '../domain/engine/board-state';
 import type { Cloneable } from '../domain/engine/cloneable';
+import type { ElapsedTime } from '../domain/engine/elapsed-time';
 import type { GameEngine } from '../domain/engine/game-engine';
 import type { Outcome } from '../domain/engine/outcome';
 import type { Score } from '../domain/engine/score';
@@ -20,6 +21,7 @@ export type ViewOf<TState> = SnapshotOf<TState> extends { view(): infer TView } 
 // `payload` is the variant data of the `view()` of the photo, typed by the state.
 // `TView` defaults to `unknown`, so a signature that does not read the payload need not name it.
 // `elapsedMs` exists only for a timed game. It reads the timer when the response is built.
+// It carries the `ElapsedTime` value object of the timer, by the same rule as `score` (issue #204).
 export interface MoveResult<TCell, TCoord, TView = unknown> {
   readonly cells: [TCoord, TCell][];
   readonly score: Score;
@@ -28,7 +30,7 @@ export interface MoveResult<TCell, TCoord, TView = unknown> {
   readonly canRedo: boolean;
   readonly hasUndo: boolean;
   readonly payload: TView;
-  readonly elapsedMs?: number;
+  readonly elapsedMs?: ElapsedTime;
 }
 
 // Builds the response from the engine: the photo of the state and the undo capabilities.

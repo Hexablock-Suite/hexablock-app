@@ -2,8 +2,8 @@ import type { Board } from '../../engine/board';
 import { checkOwnSnapshot, type BoardSnapshot, type BoardState } from '../../engine/board-state';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { MatchId } from '../../engine/match-id';
+import { Moves } from '../../engine/moves';
 import { Score } from '../../engine/score';
-import { checkMoveCount } from '../../engine/move-count';
 import type { Piece } from '../../engine/piece';
 import type { IPieceSource } from '../../engine/piece-source';
 import type { PieceId } from './piece-id';
@@ -21,7 +21,7 @@ export interface FitView<TCoord> {
 // `view()` gives the tray and the placed pieces for the screen.
 export interface FitSnapshot<TCoord> extends BoardSnapshot<PieceId, TCoord> {
   readonly placements: readonly (readonly [PieceId, Placement<TCoord>])[];
-  readonly moves: number;
+  readonly moves: Moves;
   view(): FitView<TCoord>;
 }
 
@@ -32,6 +32,7 @@ export interface FitSnapshot<TCoord> extends BoardSnapshot<PieceId, TCoord> {
 // because the player picks the tray pieces in any order.
 // The maps use the text of the piece id as key, because a Map compares a string by value.
 // `moves` counts the accepted moves of the game for the stars (issue #60).
+// It is a `Moves` value object, which checks its own value (classes.md decision 42).
 // It is an entity inside the `GameEngine` aggregate (classes.md decisions 7 and 26).
 // Its identity is its own `GameStateId`, and `equals()` compares only that identity.
 // It also keeps the `MatchId` of its game, and `belongsTo()` reads it.
@@ -46,7 +47,7 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
     private readonly board: Board<PieceId, TCoord, string>,
     private readonly pieces: ReadonlyMap<string, Piece<PieceId, TCoord>>,
     private readonly placements: Map<string, Placement<TCoord>>,
-    private moves = 0,
+    private moves: Moves = Moves.of(0),
     private score: Score = Score.of(0),
   ) {}
 
@@ -110,9 +111,10 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
     this.placements.delete(id.value);
   }
 
-  // Adds one move. The rules call it once for each accepted move.
+  // Adds one move, in place. The rules call it once for each accepted move.
+  // The state replaces its `Moves` with the next count.
   countMove(): void {
-    this.moves += 1;
+    this.moves = this.moves.plusOne();
   }
 
   // The engine adds the points of a turn in place. `Score.add()` refuses a total
@@ -155,14 +157,14 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
     });
   }
 
-  // Takes back a photo of this state, in place. A photo of another state, of another board,
-  // of a piece that the level does not have, or with a wrong count changes nothing.
+  // Takes back a photo of this state, in place. A photo of another state, of another board
+  // or of a piece that the level does not have changes nothing.
+  // The move count of a photo is a `Moves`, which is valid when it exists.
   restore(snapshot: FitSnapshot<TCoord>): void {
     checkOwnSnapshot(this.stateId, this.board, snapshot);
     for (const [id] of snapshot.placements) {
       if (!this.pieces.has(id.value)) throw new RangeError(`The level has no piece ${id.value}.`);
     }
-    checkMoveCount(snapshot.moves);
     this.board.restore(snapshot.board);
     this.placements.clear();
     for (const [id, placement] of snapshot.placements) this.placements.set(id.value, placement);

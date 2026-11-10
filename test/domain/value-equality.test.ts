@@ -1,9 +1,12 @@
 /** @jest-environment node */
 import { BoardShape } from '../../src/domain/engine/board-shape';
 import { Color } from '../../src/domain/engine/color';
+import { ElapsedTime } from '../../src/domain/engine/elapsed-time';
 import { GameId } from '../../src/domain/engine/game-id';
+import { LevelId } from '../../src/domain/engine/level-id';
 import { MoveCommand } from '../../src/domain/engine/move-command';
 import { MoveHistory } from '../../src/domain/engine/move-history';
+import { Moves } from '../../src/domain/engine/moves';
 import { Piece } from '../../src/domain/engine/piece';
 import { GameResult, ProgressRecord } from '../../src/domain/engine/progress-model';
 import { Radius } from '../../src/domain/engine/radius';
@@ -11,6 +14,7 @@ import { Range, type Compare } from '../../src/domain/engine/range';
 import { RegionSize } from '../../src/domain/engine/region-size';
 import { CellNode, ShapeGroup } from '../../src/domain/engine/shape-node';
 import { Score } from '../../src/domain/engine/score';
+import { Stars } from '../../src/domain/engine/stars';
 import { Turns } from '../../src/domain/engine/turns';
 import { Placement } from '../../src/domain/variants/hexa-fit/placement';
 import { MergeTile } from '../../src/domain/variants/hexa-merge/merge-tile';
@@ -74,32 +78,62 @@ describe('equals of the whole number value objects', () => {
 describe('equals of the progress values', () => {
   it('should_be_equal_when_two_game_results_hold_the_same_fields', () => {
     const same: Same<GameResult> = (left, right) => left.equals(right);
-    const fields = { gameId: FIT, score: Score.of(10), moves: 3, levelId: 'a', elapsedMs: 500 };
+    const fields = {
+      gameId: FIT,
+      score: Score.of(10),
+      moves: Moves.of(3),
+      levelId: LevelId.of('a'),
+      elapsedMs: ElapsedTime.ofMs(500),
+    };
     const result = GameResult.of(fields);
     const changed = (change: Partial<typeof fields>) => GameResult.of({ ...fields, ...change });
-    const withoutExtras = GameResult.of({ gameId: FIT, score: Score.of(10), moves: 3 });
+    const withoutExtras = GameResult.of({ gameId: FIT, score: Score.of(10), moves: Moves.of(3) });
+    // A result of new value objects with the same values, so `equals` cannot compare instances.
+    const again = GameResult.of({
+      gameId: FIT,
+      score: Score.of(10),
+      moves: Moves.of(3),
+      levelId: LevelId.of('a'),
+      elapsedMs: ElapsedTime.ofMs(500),
+    });
 
+    expect(bothWays(same, result, again)).toEqual(EQUAL);
     expect(bothWays(same, result, changed({ gameId: GameId.of('hexa-fit') }))).toEqual(EQUAL);
     expect(bothWays(same, result, changed({ gameId: SORT }))).toEqual(DIFFERENT);
     expect(bothWays(same, result, changed({ score: Score.of(11) }))).toEqual(DIFFERENT);
-    expect(bothWays(same, result, changed({ moves: 4 }))).toEqual(DIFFERENT);
-    expect(bothWays(same, result, changed({ levelId: 'b' }))).toEqual(DIFFERENT);
-    expect(bothWays(same, result, changed({ elapsedMs: 501 }))).toEqual(DIFFERENT);
+    expect(bothWays(same, result, changed({ moves: Moves.of(4) }))).toEqual(DIFFERENT);
+    expect(bothWays(same, result, changed({ levelId: LevelId.of('b') }))).toEqual(DIFFERENT);
+    expect(bothWays(same, result, changed({ elapsedMs: ElapsedTime.ofMs(501) }))).toEqual(
+      DIFFERENT,
+    );
     expect(bothWays(same, result, withoutExtras)).toEqual(DIFFERENT);
   });
 
   it('should_be_equal_when_two_progress_records_hold_the_same_fields', () => {
     const same: Same<ProgressRecord> = (left, right) => left.equals(right);
-    const fields = { gameId: FIT, score: Score.of(10), levelId: 'a', stars: 2 };
+    const fields = {
+      gameId: FIT,
+      score: Score.of(10),
+      levelId: LevelId.of('a'),
+      stars: Stars.of(2),
+    };
     const record = ProgressRecord.of(fields);
     const changed = (change: Partial<typeof fields>) => ProgressRecord.of({ ...fields, ...change });
     const withoutExtras = ProgressRecord.of({ gameId: FIT, score: Score.of(10) });
+    // A record of new value objects with the same values, so `equals` cannot compare instances.
+    const again = ProgressRecord.of({
+      gameId: FIT,
+      score: Score.of(10),
+      levelId: LevelId.of('a'),
+      stars: Stars.of(2),
+    });
 
+    expect(bothWays(same, record, again)).toEqual(EQUAL);
     expect(bothWays(same, record, changed({ gameId: GameId.of('hexa-fit') }))).toEqual(EQUAL);
     expect(bothWays(same, record, changed({ gameId: SORT }))).toEqual(DIFFERENT);
     expect(bothWays(same, record, changed({ score: Score.of(11) }))).toEqual(DIFFERENT);
-    expect(bothWays(same, record, changed({ levelId: 'b' }))).toEqual(DIFFERENT);
-    expect(bothWays(same, record, changed({ stars: 3 }))).toEqual(DIFFERENT);
+    expect(bothWays(same, record, changed({ levelId: LevelId.of('b') }))).toEqual(DIFFERENT);
+    expect(bothWays(same, record, changed({ stars: Stars.of(3) }))).toEqual(DIFFERENT);
     expect(bothWays(same, record, withoutExtras)).toEqual(DIFFERENT);
   });
 });

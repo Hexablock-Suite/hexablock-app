@@ -1,5 +1,6 @@
 /** @jest-environment node */
 import { Score } from '../../../../src/domain/engine/score';
+import { ClearedStacks } from '../../../../src/domain/variants/hexa-sort/cleared-stacks';
 import { square } from '../../../support/engine/square-topology';
 import {
   place,
@@ -34,7 +35,7 @@ describe('SortScoring', () => {
     expect(game.play(place(1))).toBe('playing');
 
     expect(SORT_POINTS_PER_TILE).toBe(10);
-    expect(game.snapshot().goalsDone).toBe(1);
+    expect(game.snapshot().goalsDone).toEqual(ClearedStacks.of(1));
     expect(game.snapshot().score).toEqual(Score.of(110));
   });
 
@@ -50,7 +51,7 @@ describe('SortScoring', () => {
 
     expect(game.play(place(2))).toBe('playing');
 
-    expect(game.snapshot().goalsDone).toBe(1);
+    expect(game.snapshot().goalsDone).toEqual(ClearedStacks.of(1));
     expect(game.snapshot().score).toEqual(Score.of(110));
   });
 });

@@ -831,7 +831,7 @@
           + gameId: GameId
         </text>
         <text x="456" y="976" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + levelId: string [0..1]
+          + levelId: LevelId [0..1]
         </text>
         <text x="456" y="992" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + score: Score
@@ -843,7 +843,7 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          + moves: number
+          + moves: Moves
         </text>
         <text
           x="456"
@@ -852,7 +852,7 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          + elapsedMs: number [0..1]
+          + elapsedMs: ElapsedTime [0..1]
         </text>
         <!-- Reference box: ProgressRecord, detailed in part 1 · map -->
         <rect

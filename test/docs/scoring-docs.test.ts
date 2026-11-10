@@ -1,5 +1,8 @@
 /** @jest-environment node */
+import { ElapsedTime } from '../../src/domain/engine/elapsed-time';
+import { Moves } from '../../src/domain/engine/moves';
 import { Score } from '../../src/domain/engine/score';
+import { Stars } from '../../src/domain/engine/stars';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
@@ -7,7 +10,7 @@ import { Board } from '../../src/domain/engine/board';
 import { FixedListPieceSource } from '../../src/domain/engine/piece-source';
 import { RegionSize } from '../../src/domain/engine/region-size';
 import { FIT_POINTS_PER_TURN } from '../../src/domain/variants/hexa-fit/fit-scoring';
-import { fitStars } from '../../src/domain/variants/hexa-fit/fit-stars';
+import { FitPlay, FitStarThreshold, fitStars } from '../../src/domain/variants/hexa-fit/fit-stars';
 import { ComboMultiplierDecorator } from '../../src/domain/variants/hexa-lines/combo-multiplier-decorator';
 import {
   LinesScoring,
@@ -143,16 +146,22 @@ function workedExamples(): string[] {
       `\`${cells * POINTS_PER_CELL} + ${POINTS_PER_LINE} × ${cleared} × ${cleared + streak - 1}\` = ` +
       `${linesPoints(cells, cleared, streak)}`,
   );
-  const star = { maxMoves: 10, maxElapsedMs: 60_000 };
+  // The limits of the worked example. The threshold keeps them private.
+  const maxMs = 60_000;
+  const star = FitStarThreshold.of({
+    maxMoves: Moves.of(10),
+    maxElapsedMs: ElapsedTime.ofMs(maxMs),
+  });
   const fit = [60_000, 60_001].map((elapsedMs) => {
-    const stars = fitStars({ moves: 10, elapsedMs }, [star]);
-    return `play of 10 moves and ${grouped(elapsedMs)} ms gets ${stars === 1 ? 'the star' : 'no star'}`;
+    const play = FitPlay.of({ moves: Moves.of(10), elapsedMs: ElapsedTime.ofMs(elapsedMs) });
+    const stars = fitStars(play, [star]);
+    return `play of 10 moves and ${grouped(elapsedMs)} ms gets ${stars.equals(Stars.of(1)) ? 'the star' : 'no star'}`;
   });
   return [
     ...lines,
     `\`4 + 8\` = ${mergePoints([4, 8])}`,
     `\`11 × ${SORT_POINTS_PER_TILE}\` = ${sortPoints([11])}`,
-    `one star of 10 moves and ${grouped(star.maxElapsedMs)} ms`,
+    `one star of 10 moves and ${grouped(maxMs)} ms`,
     ...fit,
   ];
 }

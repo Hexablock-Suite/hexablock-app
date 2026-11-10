@@ -282,6 +282,41 @@ describe('README primitive types', () => {
     ]);
   });
 
+  // Issue #204: `Moves`, `ElapsedTime`, `Stars` and `LevelId` replace the numbers and the text
+  // of the counters in the engine. Only the factory and the readable value of each one keep
+  // a primitive.
+  it('should_find_no_counter_of_a_primitive_type_when_the_code_is_scanned', () => {
+    const places = codeUses().map((use) => use.where);
+
+    for (const place of [
+      'GameResult.moves',
+      'GameResult.elapsedMs',
+      'GameResult.levelId',
+      'GameResult.of',
+      'ProgressRecord.stars',
+      'ProgressRecord.levelId',
+      'ProgressRecord.of',
+      'ITimed.elapsedMs',
+      'LevelTimer.elapsedMs',
+      'checkMoveCount',
+    ]) {
+      expect(places).not.toContain(place);
+    }
+    const ofCounters = codeUses().filter((use) =>
+      /^(Moves|ElapsedTime|Stars|LevelId)\./.test(use.where),
+    );
+    expect(ofCounters).toEqual([
+      { primitive: 'number', where: 'ElapsedTime.value' },
+      { primitive: 'number', where: 'ElapsedTime.ofMs' },
+      { primitive: 'string', where: 'LevelId.value' },
+      { primitive: 'string', where: 'LevelId.of' },
+      { primitive: 'number', where: 'Moves.value' },
+      { primitive: 'number', where: 'Moves.of' },
+      { primitive: 'number', where: 'Stars.value' },
+      { primitive: 'number', where: 'Stars.of' },
+    ]);
+  });
+
   it('should_skip_private_members_and_booleans_when_the_code_is_scanned', () => {
     const places = codeUses().map((use) => use.where);
 
