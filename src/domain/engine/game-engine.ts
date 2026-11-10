@@ -165,6 +165,8 @@ export class GameEngine<
   // It returns `undefined` for a rejected move.
   // The rules play on a copy of the state. The scoring reads the photo before the move
   // and the photo of the copy after the rules. The copy then takes the points.
+  // The points are a `Score`. A policy that gives no valid score throws, and so does a total
+  // above the largest safe integer. Both leave the turn unsaved (classes.md decision 41).
   // `before` is the Memento: the photo of the state before the move (classes.md decision 34).
   // It is taken inside the turn, so a photo that throws leaves the turn unsaved.
   private resolveTurn(
@@ -175,11 +177,7 @@ export class GameEngine<
     const resolution = this.rules.playTurn(next, move);
     if (!resolution.accepted) return undefined;
     const before = photoOf(state);
-    const points = this.scoring.score(before, photoOf(next));
-    if (!Number.isFinite(points)) {
-      throw new RangeError(`The scoring policy returned a score that is not finite: ${points}.`);
-    }
-    next.addPoints(points);
+    next.addPoints(this.scoring.score(before, photoOf(next)));
     return {
       next,
       phase: this.current.after(resolution.outcome),

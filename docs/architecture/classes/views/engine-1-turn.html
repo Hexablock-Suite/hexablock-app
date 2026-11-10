@@ -83,7 +83,8 @@
           BoardSnapshot, the immutable photo with the Memento role and no tactical stereotype:
           GameEngine.snapshot() returns it, IScoringPolicy reads two of them, and MoveHistory keeps
           them for the undo. Resolution is a value object: it holds no state, and equals() compares
-          accepted and outcome.
+          accepted and outcome. Score is the value object of the score and of the points of a turn:
+          IScoringPolicy returns one, BoardState adds it, and BoardSnapshot carries the score.
         </desc>
         <defs>
           <marker
@@ -744,7 +745,7 @@
           + score(before: SnapshotOf&lt;TState&gt;,
         </text>
         <text x="84" y="468" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          after: SnapshotOf&lt;TState&gt;): number
+          after: SnapshotOf&lt;TState&gt;): Score
         </text>
 
         <!-- Class: GamePhase (interface) -->
@@ -873,7 +874,7 @@
           BoardState
         </text>
         <text x="412" y="668" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + addPoints(points: number): void
+          + addPoints(points: Score): void
         </text>
         <text x="412" y="684" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + belongsTo(match: MatchId): boolean
@@ -1024,7 +1025,7 @@
           + board: ReadonlyBoard&lt;TCell, TCoord, string&gt;
         </text>
         <text x="68" y="786" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + score: number
+          + score: Score
         </text>
         <text x="68" y="808" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + view(): unknown
@@ -1062,6 +1063,76 @@
           «create»
         </text>
 
+        <!-- Class: Score (value object, decision 41) -->
+        <rect
+          x="752"
+          y="660"
+          width="236"
+          height="160"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="752" y1="708" x2="988" y2="708" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="870"
+          y="678"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="870"
+          y="696"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          Score
+        </text>
+        <text x="768" y="724" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + value: number {readOnly}
+        </text>
+        <line x1="752" y1="732" x2="988" y2="732" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="768"
+          y="748"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + of(value: number): Score
+        </text>
+        <text x="768" y="764" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + add(points: Score): Score
+        </text>
+        <text x="768" y="780" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + times(factor: number): Score
+        </text>
+        <text x="768" y="796" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: Score): boolean
+        </text>
+        <text x="768" y="812" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + isHigherThan(other: Score): boolean
+        </text>
+        <!-- BoardState adds the points of a turn as a Score, and BoardSnapshot, IScoringPolicy and GameOver carry one: use -->
+        <line
+          x1="644"
+          y1="700"
+          x2="752"
+          y2="700"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#t-open)"
+        />
         <!-- Class: Outcome (literal union) -->
         <rect
           x="760"

@@ -1,13 +1,15 @@
 import type { GameId } from './game-id';
+import type { Score } from './score';
 
 // The result of one finished game. It is a value object (view 4).
 // `levelId` exists only for games with levels, and `elapsedMs` only for timed games.
-// A decimal or negative move count, a score or a time that is not finite, and a negative time, throw a RangeError.
+// The score is a `Score`, which checks its own value (classes.md decision 41).
+// A decimal or negative move count, a time that is not finite, and a negative time, throw a RangeError.
 // A blank level id throws a RangeError.
 export class GameResult {
   private constructor(
     readonly gameId: GameId,
-    readonly score: number,
+    readonly score: Score,
     readonly moves: number,
     readonly levelId?: string,
     readonly elapsedMs?: number,
@@ -15,16 +17,13 @@ export class GameResult {
 
   static of(values: {
     gameId: GameId;
-    score: number;
+    score: Score;
     moves: number;
     levelId?: string;
     elapsedMs?: number;
   }): GameResult {
     if (!Number.isInteger(values.moves) || values.moves < 0) {
       throw new RangeError('A game result needs zero or more moves.');
-    }
-    if (!Number.isFinite(values.score)) {
-      throw new RangeError('A game result needs a score that is a finite number.');
     }
     if (
       values.elapsedMs !== undefined &&
@@ -48,7 +47,7 @@ export class GameResult {
   // The game id comes last, so no condition of this method depends on it (APP-NFR-08).
   equals(other: GameResult): boolean {
     return (
-      this.score === other.score &&
+      this.score.equals(other.score) &&
       this.moves === other.moves &&
       this.levelId === other.levelId &&
       this.elapsedMs === other.elapsedMs &&
@@ -60,27 +59,24 @@ export class GameResult {
 // What a progress model keeps for one game or one level. It is a value object.
 // Draft: DS-5 fixes the fields the backend receives, and the real models
 // (`HighScoreProgress`, `LevelProgress`) can add fields in Sprint 3.
-// A score that is not finite throws a RangeError.
+// The score is a `Score`, which checks its own value (classes.md decision 41).
 // Stars that are not finite or are negative throw a RangeError.
 // Stars can be decimal: no requirement says that they are whole numbers.
 // A blank level id throws a RangeError.
 export class ProgressRecord {
   private constructor(
     readonly gameId: GameId,
-    readonly score: number,
+    readonly score: Score,
     readonly levelId?: string,
     readonly stars?: number,
   ) {}
 
   static of(values: {
     gameId: GameId;
-    score: number;
+    score: Score;
     levelId?: string;
     stars?: number;
   }): ProgressRecord {
-    if (!Number.isFinite(values.score)) {
-      throw new RangeError('A progress record needs a score that is a finite number.');
-    }
     if (values.stars !== undefined && !(Number.isFinite(values.stars) && values.stars >= 0)) {
       throw new RangeError('A progress record needs a finite number of zero or more stars.');
     }
@@ -94,7 +90,7 @@ export class ProgressRecord {
   // The game id comes last, so no condition of this method depends on it (APP-NFR-08).
   equals(other: ProgressRecord): boolean {
     return (
-      this.score === other.score &&
+      this.score.equals(other.score) &&
       this.levelId === other.levelId &&
       this.stars === other.stars &&
       this.gameId.equals(other.gameId)

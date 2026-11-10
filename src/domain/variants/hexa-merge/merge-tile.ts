@@ -1,3 +1,4 @@
+import { Score } from '../../engine/score';
 import type { IMergeable } from './mergeable';
 
 // The cell of Hexa Merge: a value object that wraps an integer (assumption A1).
@@ -32,7 +33,8 @@ export class MergeTile implements IMergeable<MergeTile> {
   }
 
   // The points that a merge scores when it makes this tile: its value (issue #59, D22).
-  points(): number {
-    return this.value;
+  // They are a `Score` (classes.md decision 41).
+  points(): Score {
+    return Score.of(this.value);
   }
 }

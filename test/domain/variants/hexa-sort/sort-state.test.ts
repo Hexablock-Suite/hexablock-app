@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Score } from '../../../../src/domain/engine/score';
 import type { SortState } from '../../../../src/domain/variants/hexa-sort/sort-state';
 import { GameStateId } from '../../../../src/domain/engine/game-state-id';
 import { MatchId } from '../../../../src/domain/engine/match-id';
@@ -166,17 +167,17 @@ describe('SortState', () => {
     expect(facts(state)).toEqual(before);
   });
 
-  it('should_add_the_points_and_refuse_points_that_are_not_finite_when_points_are_added', () => {
+  it('should_add_the_points_and_refuse_a_total_above_the_largest_safe_integer_when_points_are_added', () => {
     const state = sortState({ board: row(2) });
 
-    state.addPoints(100);
-    state.addPoints(10);
+    state.addPoints(Score.of(100));
+    state.addPoints(Score.of(10));
 
-    expect(state.snapshot().score).toBe(110);
-    expect(() => state.addPoints(Number.NaN)).toThrow(
-      new RangeError('The points of a turn must be a finite number, not NaN.'),
+    expect(state.snapshot().score).toEqual(Score.of(110));
+    expect(() => state.addPoints(Score.of(Number.MAX_SAFE_INTEGER))).toThrow(
+      new RangeError('The sum of two scores cannot pass the largest safe integer.'),
     );
-    expect(state.snapshot().score).toBe(110);
+    expect(state.snapshot().score).toEqual(Score.of(110));
   });
 
   // The state has its own `GameStateId`, and it still knows its match (classes.md decision 26).

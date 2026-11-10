@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Score } from '../../../../src/domain/engine/score';
 import { GameId } from '../../../../src/domain/engine/game-id';
 import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
@@ -36,7 +37,7 @@ describe('SortFactory', () => {
     expect(outcome).toBe('playing');
     expect(chipsAt(engine, 0, 0)).toEqual(['red', 'red']);
     expect(names(engine.snapshot().offered?.content)).toEqual(['blue']);
-    expect(engine.snapshot().score).toBe(0);
+    expect(engine.snapshot().score).toEqual(Score.of(0));
     expect(publisher.events).toEqual([]);
   });
 

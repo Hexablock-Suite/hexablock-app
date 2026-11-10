@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Score } from '../../../src/domain/engine/score';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
 import {
   GameOver,
@@ -68,16 +69,16 @@ class ConstantSource implements IPieceSource<FakeCell> {
 
 // Dummy scoring policies.
 class OnePerMove implements IScoringPolicy<SourceState> {
-  score(): number {
-    return 1;
+  score(): Score {
+    return Score.of(1);
   }
 }
 
 // The value of the cell that the move filled: the cell that `before` does not have.
 class CellValue implements IScoringPolicy<SourceState> {
-  score(before: SourceSnapshot, after: SourceSnapshot): number {
+  score(before: SourceSnapshot, after: SourceSnapshot): Score {
     const placed = after.board.cells().find(([at]) => before.board.get(at) === undefined);
-    return placed?.[1].value ?? 0;
+    return Score.of(placed?.[1].value ?? 0);
   }
 }
 
@@ -90,7 +91,7 @@ class ScoreProgress implements IProgressModel {
 
 class MovesProgress implements IProgressModel {
   record(result: GameResult): ProgressRecord {
-    return ProgressRecord.of({ gameId: result.gameId, score: result.moves });
+    return ProgressRecord.of({ gameId: result.gameId, score: Score.of(result.moves) });
   }
 }
 
@@ -177,16 +178,16 @@ describe('swapping the piece source, the scoring policy and the progress model',
     const perMove = playGame(sources.counting(), new OnePerMove(), new ScoreProgress());
     const byValue = playGame(sources.counting(), new CellValue(), new ScoreProgress());
 
-    expect(perMove.state.score).toBe(4);
-    expect(byValue.state.score).toBe(1 + 2 + 3 + 4);
+    expect(perMove.state.score).toEqual(Score.of(4));
+    expect(byValue.state.score).toEqual(Score.of(1 + 2 + 3 + 4));
   });
 
   it('should_give_the_record_of_each_model_when_the_progress_model_is_swapped', () => {
     const byScore = playGame(sources.constant(), new CellValue(), new ScoreProgress());
     const byMoves = playGame(sources.constant(), new CellValue(), new MovesProgress());
 
-    expect(byScore.records.map((record) => record.score)).toEqual([36]);
-    expect(byMoves.records.map((record) => record.score)).toEqual([4]);
+    expect(byScore.records.map((record) => record.score)).toEqual([Score.of(36)]);
+    expect(byMoves.records.map((record) => record.score)).toEqual([Score.of(4)]);
     expect(byMoves.records[0]?.gameId.equals(GameId.of('fake-game'))).toBe(true);
   });
 
@@ -201,8 +202,8 @@ describe('swapping the piece source, the scoring policy and the progress model',
       );
 
       expect(retried.state.board.cells()).toEqual(plain.state.board.cells());
-      expect(retried.state.score).toBe(plain.state.score);
-      expect(retried.records.map((record) => record.score)).toEqual([4]);
+      expect(retried.state.score).toEqual(plain.state.score);
+      expect(retried.records.map((record) => record.score)).toEqual([Score.of(4)]);
     }
   });
 
@@ -242,76 +243,78 @@ describe('swapping the piece source, the scoring policy and the progress model',
     expect(() => engine.play(square(0, 0))).toThrow('game-over phase');
     expect(engine.currentPhase()).toBe(GameOverPhase.instance);
     expect(engine.snapshot().board.cells()).toEqual(full.board.cells());
-    expect(engine.snapshot().score).toBe(full.score);
+    expect(engine.snapshot().score).toEqual(full.score);
     expect(subscriber.records).toHaveLength(1);
   });
 });
 
 describe('GameResult and ProgressRecord', () => {
   it('should_throw_when_a_result_has_negative_moves', () => {
-    expect(() => GameResult.of({ gameId: GameId.of('fake-game'), score: 0, moves: -1 })).toThrow(
-      'moves',
-    );
+    expect(() =>
+      GameResult.of({ gameId: GameId.of('fake-game'), score: Score.of(0), moves: -1 }),
+    ).toThrow('moves');
   });
 
   it('should_throw_when_a_result_has_a_negative_time', () => {
     const gameId = GameId.of('fake-game');
 
-    expect(() => GameResult.of({ gameId, score: 0, moves: 0, elapsedMs: -1 })).toThrow(
+    expect(() => GameResult.of({ gameId, score: Score.of(0), moves: 0, elapsedMs: -1 })).toThrow(
       'milliseconds',
     );
-    expect(GameResult.of({ gameId, score: 0, moves: 0, elapsedMs: 0 }).elapsedMs).toBe(0);
+    expect(GameResult.of({ gameId, score: Score.of(0), moves: 0, elapsedMs: 0 }).elapsedMs).toBe(0);
   });
 
   it('should_throw_a_range_error_when_a_result_has_a_decimal_number_of_moves', () => {
     const gameId = GameId.of('fake-game');
 
-    expect(() => GameResult.of({ gameId, score: 0, moves: 2.5 })).toThrow(RangeError);
-    expect(() => GameResult.of({ gameId, score: 0, moves: 2.5 })).toThrow('moves');
+    expect(() => GameResult.of({ gameId, score: Score.of(0), moves: 2.5 })).toThrow(RangeError);
+    expect(() => GameResult.of({ gameId, score: Score.of(0), moves: 2.5 })).toThrow('moves');
   });
 
   it('should_throw_a_range_error_when_a_result_has_a_score_that_is_not_a_number', () => {
     const gameId = GameId.of('fake-game');
 
-    expect(() => GameResult.of({ gameId, score: Number.NaN, moves: 0 })).toThrow(RangeError);
-    expect(() => GameResult.of({ gameId, score: Number.NaN, moves: 0 })).toThrow('score');
+    expect(() => GameResult.of({ gameId, score: Score.of(Number.NaN), moves: 0 })).toThrow(
+      RangeError,
+    );
+    expect(() => GameResult.of({ gameId, score: Score.of(Number.NaN), moves: 0 })).toThrow('score');
   });
 
   it('should_throw_a_range_error_when_a_result_has_a_time_that_is_not_a_number', () => {
     const gameId = GameId.of('fake-game');
 
-    expect(() => GameResult.of({ gameId, score: 0, moves: 0, elapsedMs: Number.NaN })).toThrow(
-      RangeError,
-    );
-    expect(() => GameResult.of({ gameId, score: 0, moves: 0, elapsedMs: Number.NaN })).toThrow(
-      'milliseconds',
-    );
+    expect(() =>
+      GameResult.of({ gameId, score: Score.of(0), moves: 0, elapsedMs: Number.NaN }),
+    ).toThrow(RangeError);
+    expect(() =>
+      GameResult.of({ gameId, score: Score.of(0), moves: 0, elapsedMs: Number.NaN }),
+    ).toThrow('milliseconds');
   });
 
   it('should_throw_a_range_error_when_a_result_has_an_infinite_score_or_time', () => {
     const gameId = GameId.of('fake-game');
 
     for (const score of [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
-      expect(() => GameResult.of({ gameId, score, moves: 0 })).toThrow('score');
+      expect(() => GameResult.of({ gameId, score: Score.of(score), moves: 0 })).toThrow('score');
     }
     expect(() =>
-      GameResult.of({ gameId, score: 0, moves: 0, elapsedMs: Number.POSITIVE_INFINITY }),
+      GameResult.of({ gameId, score: Score.of(0), moves: 0, elapsedMs: Number.POSITIVE_INFINITY }),
     ).toThrow('milliseconds');
   });
 
   it('should_throw_a_range_error_when_a_record_has_negative_stars', () => {
     const gameId = GameId.of('fake-game');
 
-    expect(() => ProgressRecord.of({ gameId, score: 0, stars: -1 })).toThrow(RangeError);
-    expect(() => ProgressRecord.of({ gameId, score: 0, stars: -1 })).toThrow('stars');
-    expect(ProgressRecord.of({ gameId, score: 0, stars: 0 }).stars).toBe(0);
+    expect(() => ProgressRecord.of({ gameId, score: Score.of(0), stars: -1 })).toThrow(RangeError);
+    expect(() => ProgressRecord.of({ gameId, score: Score.of(0), stars: -1 })).toThrow('stars');
+    expect(ProgressRecord.of({ gameId, score: Score.of(0), stars: 0 }).stars).toBe(0);
   });
 
   it('should_keep_the_optional_fields_when_a_result_has_a_level_and_a_time', () => {
     const result = GameResult.of({
       gameId: GameId.of('hexa-fit'),
       levelId: 'fit-01',
-      score: 0,
+      score: Score.of(0),
       moves: 12,
       elapsedMs: 3000,
     });

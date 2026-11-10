@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Score } from '../../src/domain/engine/score';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
@@ -79,11 +80,12 @@ function brokenLinks(section: string): string[] {
 
 // The points that a policy gives for the turn whose photo after the turn is `after`.
 // The policies read only the photo after the turn, so the photo before is the same photo.
+// The README writes each score as a number, so this test reads the value of the `Score`.
 function turnScore<TPhoto>(
-  policy: { score(before: TPhoto, after: TPhoto): number },
+  policy: { score(before: TPhoto, after: TPhoto): Score },
   after: TPhoto,
 ): number {
-  return policy.score(after, after);
+  return policy.score(after, after).value;
 }
 
 // The points of one Lines placement from the real base policy and its decorator.

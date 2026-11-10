@@ -1,3 +1,4 @@
+import { Score } from '../../../../src/domain/engine/score';
 import { Board, type ReadonlyBoard } from '../../../../src/domain/engine/board';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
 import { GameId } from '../../../../src/domain/engine/game-id';
@@ -62,8 +63,8 @@ export function linesState<TCoord>(
 
 // The rules tests give no points. The scoring tests pass their own policy.
 class NoScoring<TCoord> implements IScoringPolicy<LinesState<TCoord>> {
-  score(): number {
-    return 0;
+  score(): Score {
+    return Score.of(0);
   }
 }
 

@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Score } from '../../../src/domain/engine/score';
 import type { Board } from '../../../src/domain/engine/board';
 import { BoardId } from '../../../src/domain/engine/board-id';
 import { GameStateId } from '../../../src/domain/engine/game-state-id';
@@ -51,7 +52,7 @@ describe('the photo of a state', () => {
       true,
     ]);
     expect(json([photo.board.cells(), photo.score, photo.tray.length])).toBe(
-      json([[[square(0, 0), red]], 0, 2]),
+      json([[[square(0, 0), red]], Score.of(0), 2]),
     );
     expect([photo.streak, photo.linesCleared, photo.cellsPlaced]).toEqual([0, 0, 1]);
     expect(json(photo.view())).toBe(json({ tray: photo.tray }));
@@ -86,7 +87,10 @@ describe('the photo of a state', () => {
 
     expect(Object.isFrozen(photo)).toBe(true);
     expect(Object.isFrozen(photo.merged)).toBe(true);
-    expect([photo.targetReached, photo.merged.map((tile) => tile.points())]).toEqual([true, [4]]);
+    expect([photo.targetReached, photo.merged.map((tile) => tile.points().value)]).toEqual([
+      true,
+      [4],
+    ]);
     expect(json(photo.view())).toBe(json({ targetReached: true }));
   });
 
@@ -114,7 +118,7 @@ describe('the photo of a state', () => {
     const before = json([photo.board.cells(), photo.tray, photo.score]);
 
     state.placePiece(new PlacePiece(0, square(0, 0)));
-    state.addPoints(7);
+    state.addPoints(Score.of(7));
     expect(json([photo.board.cells(), photo.tray, photo.score])).toBe(before);
 
     const later = state.snapshot();
@@ -131,7 +135,7 @@ describe('the restore of a state from its photo', () => {
     // The third piece empties the tray, so the source draws three new pieces.
     for (const col of [0, 1, 2]) state.placePiece(new PlacePiece(0, square(col, 0)));
     state.clearLines([[square(0, 0), square(1, 0), square(2, 0)]]);
-    state.addPoints(13);
+    state.addPoints(Score.of(13));
 
     state.restore(photo);
 
@@ -147,7 +151,7 @@ describe('the restore of a state from its photo', () => {
     const state = sortFactory().createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
     const photo = state.snapshot();
     state.placeOfferedStack(square(0, 0));
-    state.addPoints(4);
+    state.addPoints(Score.of(4));
 
     state.restore(photo);
 
@@ -166,7 +170,7 @@ describe('the restore of a state from its photo', () => {
     const photo = state.snapshot();
     state.addNewTile();
     state.addNewTile();
-    state.addPoints(8);
+    state.addPoints(Score.of(8));
 
     state.restore(photo);
 
@@ -272,14 +276,16 @@ describe('the photo outside the state', () => {
 
     const fit = fitFactory().createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
 
-    expect(new LinesScoring<ReturnType<typeof square>>().score(linesBefore, lines.snapshot())).toBe(
-      1,
+    expect(
+      new LinesScoring<ReturnType<typeof square>>().score(linesBefore, lines.snapshot()),
+    ).toEqual(Score.of(1));
+    expect(new SortScoring<ReturnType<typeof square>>().score(sortBefore, sort.snapshot())).toEqual(
+      Score.of(100),
     );
-    expect(new SortScoring<ReturnType<typeof square>>().score(sortBefore, sort.snapshot())).toBe(
-      100,
+    expect(new MergeScoring<HexCoord, HexAxis>().score(mergeBefore, merge.snapshot())).toEqual(
+      Score.of(4),
     );
-    expect(new MergeScoring<HexCoord, HexAxis>().score(mergeBefore, merge.snapshot())).toBe(4);
-    expect(new FitScoring().score(fit.snapshot(), fit.snapshot())).toBe(0);
+    expect(new FitScoring().score(fit.snapshot(), fit.snapshot())).toEqual(Score.of(0));
   });
 });
 

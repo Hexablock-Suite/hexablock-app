@@ -3,6 +3,7 @@ import { checkOwnSnapshot, type BoardSnapshot, type BoardState } from '../../eng
 import type { Cloneable } from '../../engine/cloneable';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { MatchId } from '../../engine/match-id';
+import { Score } from '../../engine/score';
 import type { IPieceSource } from '../../engine/piece-source';
 import type { Piece } from '../../engine/piece';
 import { ColorStack } from './color-stack';
@@ -59,7 +60,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
     private goalsDone: number,
     private clearedTiles: number[],
     private placedAt: TCoord | undefined,
-    private score: number,
+    private score: Score,
   ) {}
 
   // A new game: no goal done, no score, and the first stack of the source on offer.
@@ -80,7 +81,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
       0,
       [],
       undefined,
-      0,
+      Score.of(0),
     );
     state.offerNext();
     return state;
@@ -143,11 +144,10 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
     this.clearedTiles.push(stack.tileCount());
   }
 
-  addPoints(points: number): void {
-    if (!Number.isFinite(points)) {
-      throw new RangeError(`The points of a turn must be a finite number, not ${points}.`);
-    }
-    this.score += points;
+  // The engine adds the points of a turn in place. `Score.add()` refuses a total
+  // above the largest safe integer, and the score stays as it was.
+  addPoints(points: Score): void {
+    this.score = this.score.add(points);
   }
 
   // The photo of the state now. A piece, a goal count and a coordinate never change,
@@ -174,13 +174,10 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
   }
 
   // Takes back a photo of this state, in place. The goal of the level never changes,
-  // so the state keeps its own goal. A photo of another state, of another board,
-  // or with a score that is not finite changes nothing.
+  // so the state keeps its own goal. A photo of another state or of another board
+  // changes nothing.
   restore(snapshot: SortSnapshot<TCoord>): void {
     checkOwnSnapshot(this.stateId, this.board, snapshot);
-    if (!Number.isFinite(snapshot.score)) {
-      throw new RangeError(`The score of a state must be a finite number, not ${snapshot.score}.`);
-    }
     this.board.restore(snapshot.board);
     this.source = snapshot.source.clone();
     this.offered = snapshot.offered;

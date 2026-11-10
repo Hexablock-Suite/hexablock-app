@@ -1,3 +1,4 @@
+import { Score } from '../../engine/score';
 import type { IScoringPolicy } from '../../engine/scoring-policy';
 import type { SortSnapshot, SortState } from './sort-state';
 
@@ -10,10 +11,11 @@ export const SORT_POINTS_PER_TILE = 10;
 // clears gives `SORT_POINTS_PER_TILE`, and a turn that clears nothing gives 0.
 // A won Sort level also gets stars by moves (`sortStars`).
 // The rules reset `clearedTiles` on each turn, so the photo after the turn holds only this turn.
+// The policy gives the points as a `Score` (classes.md decision 41).
 // The scoring keeps no game data (classes.md decision 26).
 export class SortScoring<TCoord> implements IScoringPolicy<SortState<TCoord>> {
-  score(_before: SortSnapshot<TCoord>, after: SortSnapshot<TCoord>): number {
+  score(_before: SortSnapshot<TCoord>, after: SortSnapshot<TCoord>): Score {
     const tiles = after.clearedTiles.reduce((sum, size) => sum + size, 0);
-    return tiles * SORT_POINTS_PER_TILE;
+    return Score.of(tiles * SORT_POINTS_PER_TILE);
   }
 }

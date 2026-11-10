@@ -78,7 +78,8 @@
           implements, and the three id generator interfaces that give the MatchId of each new match,
           the GameStateId of its first state and the BoardId of its board, all value objects.
           GameFactory keeps an IVariantFactory, the three generators and a GameEventPublisher and
-          creates the started GameEngine, and GameOver carries the GameId and the MatchId.
+          creates the started GameEngine, and GameOver carries the GameId, the MatchId and the final
+          Score, a value object.
         </desc>
         <defs>
           <marker
@@ -185,7 +186,7 @@
           x="496"
           y="64"
           width="496"
-          height="260"
+          height="272"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -581,9 +582,79 @@
           + outcome: Outcome
         </text>
         <text x="808" y="292" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + finalScore: number
+          + finalScore: Score
         </text>
 
+        <!-- Class: Score (value object, decision 41) -->
+        <rect
+          x="508"
+          y="170"
+          width="232"
+          height="160"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="508" y1="218" x2="740" y2="218" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="624"
+          y="188"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="624"
+          y="206"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          Score
+        </text>
+        <text x="524" y="234" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + value: number {readOnly}
+        </text>
+        <line x1="508" y1="242" x2="740" y2="242" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="524"
+          y="258"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + of(value: number): Score
+        </text>
+        <text x="524" y="274" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + add(points: Score): Score
+        </text>
+        <text x="524" y="290" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + times(factor: number): Score
+        </text>
+        <text x="524" y="306" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: Score): boolean
+        </text>
+        <text x="524" y="322" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + isHigherThan(other: Score): boolean
+        </text>
+        <!-- GameOver carries the final Score: use -->
+        <line
+          x1="792"
+          y1="228"
+          x2="740"
+          y2="228"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#factory-open)"
+        />
         <!-- Class: ILevelBuilder (interface, builder) -->
         <rect
           x="156"

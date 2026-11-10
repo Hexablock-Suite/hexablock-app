@@ -2,6 +2,7 @@ import type { Board } from '../../engine/board';
 import { checkOwnSnapshot, type BoardSnapshot, type BoardState } from '../../engine/board-state';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { MatchId } from '../../engine/match-id';
+import { Score } from '../../engine/score';
 import { checkMoveCount } from '../../engine/move-count';
 import type { Piece } from '../../engine/piece';
 import type { IPieceSource } from '../../engine/piece-source';
@@ -46,7 +47,7 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
     private readonly pieces: ReadonlyMap<string, Piece<PieceId, TCoord>>,
     private readonly placements: Map<string, Placement<TCoord>>,
     private moves = 0,
-    private score = 0,
+    private score: Score = Score.of(0),
   ) {}
 
   // Two pieces with the same id throw a RangeError, because a move names its piece by id.
@@ -114,12 +115,10 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
     this.moves += 1;
   }
 
-  // The engine adds the points of a turn in place. Points that are not finite throw a RangeError.
-  addPoints(points: number): void {
-    if (!Number.isFinite(points)) {
-      throw new RangeError(`The points of a turn must be a finite number, not ${points}.`);
-    }
-    this.score += points;
+  // The engine adds the points of a turn in place. `Score.add()` refuses a total
+  // above the largest safe integer, and the score stays as it was.
+  addPoints(points: Score): void {
+    this.score = this.score.add(points);
   }
 
   // True when this state is the state of the match `match`.
@@ -164,9 +163,6 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
       if (!this.pieces.has(id.value)) throw new RangeError(`The level has no piece ${id.value}.`);
     }
     checkMoveCount(snapshot.moves);
-    if (!Number.isFinite(snapshot.score)) {
-      throw new RangeError(`The score of a state must be a finite number, not ${snapshot.score}.`);
-    }
     this.board.restore(snapshot.board);
     this.placements.clear();
     for (const [id, placement] of snapshot.placements) this.placements.set(id.value, placement);

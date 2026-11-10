@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Score } from '../../../../src/domain/engine/score';
 import { hex, type HexAxis, type HexCoord } from '../../../../src/domain/engine/hex-topology';
 import { MergeScoring } from '../../../../src/domain/variants/hexa-merge/merge-scoring';
 import { mergeTileSource } from '../../../../src/domain/variants/hexa-merge/merge-tile-source';
@@ -37,22 +38,22 @@ function total(state: ReturnType<typeof slideRow>): number {
 describe('Hexa Merge scoring', () => {
   // The tile owns its points, so the scoring does not read its number.
   it('should_be_worth_its_value_in_points_when_a_tile_is_asked', () => {
-    expect(MergeTile.of(2).points()).toBe(2);
-    expect(MergeTile.of(2048).points()).toBe(2048);
+    expect(MergeTile.of(2).points()).toEqual(Score.of(2));
+    expect(MergeTile.of(2048).points()).toEqual(Score.of(2048));
   });
 
   it('should_score_the_value_of_the_merged_tile_when_two_equal_tiles_merge', () => {
     const state = slideRow([2, 2]);
 
     expect(state.merged.map(valueOf)).toEqual([4]);
-    expect(state.score).toBe(4);
+    expect(state.score).toEqual(Score.of(4));
   });
 
   it('should_score_the_sum_of_the_merged_values_when_one_slide_makes_two_merges', () => {
     const state = slideRow([2, 2, 4, 4]);
 
     expect(state.merged.map(valueOf).sort()).toEqual([4, 8]);
-    expect(state.score).toBe(12);
+    expect(state.score).toEqual(Score.of(12));
   });
 
   it('should_score_each_merge_when_one_slide_makes_two_merges_of_the_same_value', () => {
@@ -60,14 +61,14 @@ describe('Hexa Merge scoring', () => {
     const state = slideRow([2, 2, 2, 2]);
 
     expect(state.merged.map(valueOf)).toEqual([4, 4]);
-    expect(state.score).toBe(8);
+    expect(state.score).toEqual(Score.of(8));
   });
 
   it('should_score_zero_when_the_slide_moves_tiles_but_merges_none', () => {
     const state = slideRow([2, 4]);
 
     expect(state.merged).toEqual([]);
-    expect(state.score).toBe(0);
+    expect(state.score).toEqual(Score.of(0));
   });
 
   it('should_add_nothing_for_the_new_tile_when_a_tile_appears_after_the_slide', () => {
@@ -76,8 +77,8 @@ describe('Hexa Merge scoring', () => {
     const moved = slideRow([2], 1);
 
     expect(total(merged)).toBe(8);
-    expect(merged.score).toBe(4);
+    expect(merged.score).toEqual(Score.of(4));
     expect(total(moved)).toBe(6);
-    expect(moved.score).toBe(0);
+    expect(moved.score).toEqual(Score.of(0));
   });
 });

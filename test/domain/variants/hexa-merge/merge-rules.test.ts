@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Score } from '../../../../src/domain/engine/score';
 import { Board } from '../../../../src/domain/engine/board';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
 import { GameId } from '../../../../src/domain/engine/game-id';
@@ -313,7 +314,7 @@ describe('Merge edge cases', () => {
         MATCH_ID,
         GameId.of('hexa-merge'),
         new MergeRules<Chip, HexCoord, HexAxis>(chip('aaaa')),
-        { score: () => 0 },
+        { score: () => Score.of(0) },
         new RecordingPublisher(),
       );
       engine.start(

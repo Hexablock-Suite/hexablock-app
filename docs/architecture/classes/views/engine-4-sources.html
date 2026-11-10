@@ -78,7 +78,9 @@
           SeededPieceSource keeping the Mulberry32Random random source that it builds from its seed
           and clones, the IScoringPolicy strategy wrapped by the abstract ScoringDecorator, and the
           IProgressModel strategy that records a GameResult and returns a ProgressRecord. Range is
-          the value object of a closed interval, which checks the seed of Mulberry32Random.
+          the value object of a closed interval, which checks the seed of Mulberry32Random. Score is
+          the value object of a score: IScoringPolicy returns one, and GameResult and ProgressRecord
+          hold one.
         </desc>
         <defs>
           <marker
@@ -480,7 +482,7 @@
           IScoringPolicy
         </text>
         <text x="600" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + score(before: TState, resolution: Resolution&lt;TState&gt;): number
+          + score(before: TState, resolution: Resolution&lt;TState&gt;): Score
         </text>
 
         <!-- Class: ScoringDecorator (abstract, decorator, focal) -->
@@ -702,7 +704,7 @@
           + gameId: GameId
         </text>
         <text x="248" y="768" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + score: number
+          + score: Score
         </text>
         <text x="248" y="784" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + levelId: string [0..1]
@@ -752,7 +754,7 @@
           + levelId: string [0..1]
         </text>
         <text x="624" y="672" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + score: number
+          + score: Score
         </text>
         <text x="624" y="688" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + moves: number
@@ -761,6 +763,85 @@
           + elapsedMs: number [0..1]
         </text>
 
+        <!-- Class: Score (value object, decision 41) -->
+        <rect
+          x="828"
+          y="572"
+          width="180"
+          height="208"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="828" y1="620" x2="1008" y2="620" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="918"
+          y="590"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="918"
+          y="608"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          Score
+        </text>
+        <text x="844" y="636" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + value: number {readOnly}
+        </text>
+        <line x1="828" y1="644" x2="1008" y2="644" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="844"
+          y="660"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + of(value: number): Score
+        </text>
+        <text x="844" y="676" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + add(points: Score): Score
+        </text>
+        <text x="844" y="692" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + times(factor: number):
+        </text>
+        <text x="855" y="708" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Score
+        </text>
+        <text x="844" y="724" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: Score):
+        </text>
+        <text x="855" y="740" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          boolean
+        </text>
+        <text x="844" y="756" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + isHigherThan(other: Score):
+        </text>
+        <text x="855" y="772" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          boolean
+        </text>
+        <!-- GameResult and ProgressRecord hold the score as a Score: use -->
+        <line
+          x1="808"
+          y1="596"
+          x2="828"
+          y2="596"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#sources-open)"
+        />
         <!-- Class: Range (value object) -->
         <rect
           x="640"

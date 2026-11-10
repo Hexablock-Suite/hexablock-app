@@ -4,6 +4,7 @@ import type { Cloneable } from '../../engine/cloneable';
 import type { CoordKey } from '../../engine/coord-key';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { MatchId } from '../../engine/match-id';
+import { Score } from '../../engine/score';
 import type { IPieceSource } from '../../engine/piece-source';
 import type { IMergeable } from './mergeable';
 import type { NewTile } from './new-tile';
@@ -47,7 +48,7 @@ export interface MergeSnapshot<
 // The Merge scoring (issue #97) reads it.
 // A cell is a value, so `clone()` shares the cell objects and copies the list.
 // The bound `IMergeable` lets the state merge two tiles (§3.1, decision 8).
-// The constructor checks that the score is a finite number.
+// The score is a `Score`, which checks its own value.
 export class MergeState<
   TCell extends IMergeable<TCell>,
   TCoord,
@@ -60,12 +61,8 @@ export class MergeState<
     private tiles: IPieceSource<NewTile<TCell>>,
     private targetReached = false,
     private merged: readonly TCell[] = [],
-    private score = 0,
-  ) {
-    if (!Number.isFinite(score)) {
-      throw new RangeError(`The score of a state must be a finite number, not ${score}.`);
-    }
-  }
+    private score: Score = Score.of(0),
+  ) {}
 
   // Puts the next tile of the source on an empty cell that the same draw picks.
   // A board with no empty cell, or a source that has ended, gets no new tile.
@@ -98,11 +95,10 @@ export class MergeState<
     this.merged = plan.merged;
   }
 
-  addPoints(points: number): void {
-    if (!Number.isFinite(points)) {
-      throw new RangeError(`The points of a turn must be a finite number, not ${points}.`);
-    }
-    this.score += points;
+  // The engine adds the points of a turn in place. `Score.add()` refuses a total
+  // above the largest safe integer, and the score stays as it was.
+  addPoints(points: Score): void {
+    this.score = this.score.add(points);
   }
 
   // True when this state is the state of the match `match`.
@@ -132,13 +128,10 @@ export class MergeState<
     });
   }
 
-  // Takes back a photo of this state, in place. A photo of another state, of another board,
-  // or with a score that is not finite changes nothing.
+  // Takes back a photo of this state, in place. A photo of another state or of another board
+  // changes nothing.
   restore(snapshot: MergeSnapshot<TCell, TCoord, TAxis>): void {
     checkOwnSnapshot(this.stateId, this.board, snapshot);
-    if (!Number.isFinite(snapshot.score)) {
-      throw new RangeError(`The score of a state must be a finite number, not ${snapshot.score}.`);
-    }
     this.board.restore(snapshot.board);
     this.tiles = snapshot.tiles.clone();
     this.targetReached = snapshot.targetReached;

@@ -1,4 +1,5 @@
 import type { SnapshotOf } from './board-state';
+import type { Score } from './score';
 import type { IScoringPolicy } from './scoring-policy';
 
 // The abstract Decorator of the scoring (classes.md patterns table, view engine-4, issue 146).
@@ -14,7 +15,7 @@ export abstract class ScoringDecorator<
 
   // A bonus overrides it and calls `super.score()` to get the inner score.
   // This base returns the inner score unchanged.
-  score(before: SnapshotOf<TState>, after: SnapshotOf<TState>): number {
+  score(before: SnapshotOf<TState>, after: SnapshotOf<TState>): Score {
     return this.inner.score(before, after);
   }
 }

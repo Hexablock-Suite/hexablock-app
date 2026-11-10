@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Score } from '../../../../src/domain/engine/score';
 import { GameId } from '../../../../src/domain/engine/game-id';
 import { HexGeometry } from '../../../../src/domain/engine/hex-geometry';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
@@ -46,7 +47,9 @@ describe('MergeFactory', () => {
     expect(outcome).toBe('playing');
     expect(values(after)).not.toEqual(values(initial.snapshot()));
     // The score is the sum of the merged values: the factory picks the Merge scoring.
-    expect(after.score).toBe(after.merged.reduce((sum, tile) => sum + valueOf(tile), 0));
+    expect(after.score).toEqual(
+      Score.of(after.merged.reduce((sum, tile) => sum + valueOf(tile), 0)),
+    );
     expect(after.tiles.clone().hasNext()).toBe(true);
     expect(publisher.events).toEqual([]);
   });

@@ -70,7 +70,7 @@ function drawsOf(source: Cloneable<IPieceSource<NewTile<MergeTile>>>): [number, 
   const copy = source.clone();
   return Array.from({ length: 8 }, () => {
     const draw = copy.next();
-    return [draw.place, draw.tile.points()];
+    return [draw.place, draw.tile.points().value];
   });
 }
 
@@ -117,7 +117,7 @@ describe('UndoMove', () => {
     expect([undone.score, undone.outcome]).toEqual([before.score, 'playing']);
     // The same slide draws the same new tile again.
     expect(replay.cells).toEqual(firstPlay.cells);
-    expect(replay.score).toBe(firstPlay.score);
+    expect(replay.score).toEqual(firstPlay.score);
   });
 
   it('should_return_a_failure_and_change_nothing_when_the_variant_has_no_history', async () => {

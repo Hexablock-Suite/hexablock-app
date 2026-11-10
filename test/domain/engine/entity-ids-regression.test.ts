@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Score } from '../../../src/domain/engine/score';
 import { BoardId } from '../../../src/domain/engine/board-id';
 import type { BoardIdGenerator } from '../../../src/domain/engine/board-id-generator';
 import type { BoardState, SnapshotOf } from '../../../src/domain/engine/board-state';
@@ -140,7 +141,7 @@ function aliasingOf<TCell, TCoord, TMove, TState extends AnyState<TCell, TCoord,
   const scoreBefore = game.snapshot().score;
   // The photo is frozen, so a write to it fails and changes neither the photo nor the game.
   const changed = game.snapshot();
-  const writeRefused = !Reflect.set(changed, 'score', scoreBefore + 5);
+  const writeRefused = !Reflect.set(changed, 'score', scoreBefore.add(Score.of(5)));
   return {
     taken,
     now,
@@ -369,7 +370,7 @@ describe('atomicity of the state methods (T18 probe)', () => {
       throwOf(shown, () =>
         state.place(PieceId.of('nope'), Placement.of(Turns.of(0), square(0, 0), topology)),
       ),
-      throwOf(shown, () => state.addPoints(Number.NaN)),
+      throwOf(shown, () => state.addPoints(Score.of(Number.NaN))),
     ]);
 
     expect(result.rangeErrors).toEqual([true, true, true]);

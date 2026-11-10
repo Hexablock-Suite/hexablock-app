@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Score } from '../../../../src/domain/engine/score';
 import { Board } from '../../../../src/domain/engine/board';
 import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
 import { GameStateId } from '../../../../src/domain/engine/game-state-id';
@@ -87,7 +88,12 @@ describe('LinesState', () => {
 
     expect(state.snapshot().tray).toEqual([one, domino, one]);
     expect(state.snapshot().source.clone().hasNext()).toBe(true);
-    expect(facts(state)).toMatchObject({ streak: 0, linesCleared: 0, cellsPlaced: 0, score: 0 });
+    expect(facts(state)).toMatchObject({
+      streak: 0,
+      linesCleared: 0,
+      cellsPlaced: 0,
+      score: Score.of(0),
+    });
   });
 
   it('should_tell_whether_a_tray_piece_fits_when_a_placement_is_asked', () => {
@@ -181,23 +187,21 @@ describe('LinesState', () => {
   it('should_add_the_points_to_the_score_when_points_are_added', () => {
     const state = linesState(squareTopology, 2, { tray: [] });
 
-    state.addPoints(12);
-    state.addPoints(0);
-    state.addPoints(3);
+    state.addPoints(Score.of(12));
+    state.addPoints(Score.of(0));
+    state.addPoints(Score.of(3));
 
-    expect(state.snapshot().score).toBe(15);
+    expect(state.snapshot().score).toEqual(Score.of(15));
   });
 
-  it('should_throw_a_range_error_and_keep_the_score_when_the_points_are_not_finite', () => {
+  it('should_throw_a_range_error_and_keep_the_score_when_the_total_passes_the_largest_safe_integer', () => {
     const state = linesState(squareTopology, 2, { tray: [] });
-    state.addPoints(5);
+    state.addPoints(Score.of(5));
 
-    for (const points of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
-      expect(() => state.addPoints(points)).toThrow(
-        new RangeError(`The points of a turn must be a finite number, not ${points}.`),
-      );
-    }
-    expect(state.snapshot().score).toBe(5);
+    expect(() => state.addPoints(Score.of(Number.MAX_SAFE_INTEGER))).toThrow(
+      new RangeError('The sum of two scores cannot pass the largest safe integer.'),
+    );
+    expect(state.snapshot().score).toEqual(Score.of(5));
   });
 
   it('should_throw_a_range_error_when_a_state_is_built_in_an_invalid_form', () => {
@@ -221,16 +225,12 @@ describe('LinesState', () => {
       ),
     );
     expect(
-      () =>
-        new LinesState(STATE_ID, MATCH_ID, board, [], source, 0, 0, 0, Number.POSITIVE_INFINITY),
-    ).toThrow(new RangeError('The score of a state must be a finite number, not Infinity.'));
-    expect(
-      new LinesState(STATE_ID, MATCH_ID, board, [one, domino], source, 2, 1, 3, 7),
+      new LinesState(STATE_ID, MATCH_ID, board, [one, domino], source, 2, 1, 3, Score.of(7)),
     ).toMatchObject({
       streak: 2,
       linesCleared: 1,
       cellsPlaced: 3,
-      score: 7,
+      score: Score.of(7),
     });
   });
 
@@ -245,7 +245,7 @@ describe('LinesState', () => {
       tray: [],
       stateId: GameStateId.of('state-a'),
     });
-    first.addPoints(9);
+    first.addPoints(Score.of(9));
 
     expect([first.equals(second), second.equals(first), first.equals(first.clone())]).toEqual([
       true,
