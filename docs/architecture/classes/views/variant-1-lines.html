@@ -64,7 +64,7 @@
       <h1>Hexa Lines: a Decorator over the scoring strategy</h1>
 
       <svg
-        viewBox="0 0 1040 822"
+        viewBox="0 0 1040 896"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="lines-title lines-desc"
@@ -77,7 +77,8 @@
           and PlacePiece as TMove. Lollipops show the engine interface each variant class
           implements, with its binding. LinesState is an entity inside the GameEngine aggregate: its
           own GameStateId is its identity, it keeps the MatchId of its game, and it changes in place
-          only through its business methods.
+          only through its business methods. LinesSettings is a value object that LinesFactory
+          holds: the board size, the Seed, and the shapes and the colors that a draw picks from.
         </desc>
         <defs>
           <marker
@@ -138,7 +139,7 @@
           x="24"
           y="24"
           width="992"
-          height="630"
+          height="704"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -868,19 +869,168 @@
           TCoord
         </text>
         <!-- Footnote: classes the budget leaves out -->
+        <!-- LinesFactory holds its LinesSettings: use -->
+        <polyline
+          points="888,180 936,180 936,440"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#lines-open)"
+        />
+        <rect x="942" y="321" width="48" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="966"
+          y="330"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          settings
+        </text>
+        <rect x="918" y="425" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="924"
+          y="434"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          1
+        </text>
+        <!-- Class: LinesSettings (value object, decision 48) -->
+        <rect
+          x="652"
+          y="440"
+          width="340"
+          height="272"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="652" y1="488" x2="992" y2="488" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="822"
+          y="458"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="822"
+          y="476"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          LinesSettings
+        </text>
+        <text x="668" y="504" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - size: RegionSize
+        </text>
+        <text x="668" y="520" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - seed: Seed
+        </text>
+        <text x="668" y="536" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - shapes: ShapeNode&lt;TCoord&gt;[]
+        </text>
+        <text x="668" y="552" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - colors: Color[]
+        </text>
+        <line x1="652" y1="560" x2="992" y2="560" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="668"
+          y="576"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + of(size: RegionSize, seed: Seed,
+        </text>
+        <text
+          x="679"
+          y="592"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          shapes: ShapeNode&lt;TCoord&gt;[], colors: Color[]):
+        </text>
+        <text
+          x="679"
+          y="608"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          LinesSettings&lt;TCoord&gt;
+        </text>
+        <text x="668" y="624" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + boardSize(): RegionSize
+        </text>
+        <text x="668" y="640" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + pieceSeed(): Seed
+        </text>
+        <text x="668" y="656" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + drawPiece(random: RandomSource):
+        </text>
+        <text x="679" y="672" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Piece&lt;Color, TCoord&gt;
+        </text>
+        <text x="668" y="688" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: LinesSettings&lt;TCoord&gt;,
+        </text>
+        <text x="679" y="704" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          topology: { key(c: TCoord): CoordKey }): boolean
+        </text>
+        <rect
+          x="944"
+          y="430"
+          width="48"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="968"
+          y="442"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCoord
+        </text>
         <text
           x="24"
-          y="678"
+          y="752"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Not drawn: LineCleared extends GameEvent (Observer). Pieces come from SeededPieceSource.
-          Progress: HighScoreProgress.
+          Not drawn: LineCleared extends GameEvent (Observer). Pieces come from SeededPieceSource:
+          LinesSettings gives its Seed and draws each piece (decision 48). Progress:
+          HighScoreProgress.
         </text>
         <text
           x="24"
-          y="694"
+          y="768"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -891,7 +1041,7 @@
 
         <text
           x="24"
-          y="710"
+          y="784"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -901,10 +1051,10 @@
           LinesState‹TCoord›.
         </text>
         <!-- Legend -->
-        <line x1="24" y1="734" x2="1016" y2="734" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <line x1="24" y1="808" x2="1016" y2="808" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="752"
+          y="826"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -915,16 +1065,16 @@
 
         <line
           x1="24"
-          y1="770"
+          y1="844"
           x2="52"
-          y2="770"
+          y2="844"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#lines-triangle)"
         />
         <text
           x="60"
-          y="774"
+          y="848"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -933,16 +1083,16 @@
         </text>
         <line
           x1="144"
-          y1="770"
+          y1="844"
           x2="172"
-          y2="770"
+          y2="844"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#lines-diamond-hollow)"
         />
         <text
           x="180"
-          y="774"
+          y="848"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -951,16 +1101,16 @@
         </text>
         <line
           x1="384"
-          y1="770"
+          y1="844"
           x2="412"
-          y2="770"
+          y2="844"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#lines-open)"
         />
         <text
           x="420"
-          y="774"
+          y="848"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -969,7 +1119,7 @@
         </text>
         <rect
           x="24"
-          y="790"
+          y="864"
           width="28"
           height="12"
           rx="2"
@@ -979,7 +1129,7 @@
         />
         <text
           x="60"
-          y="799"
+          y="873"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -988,7 +1138,7 @@
         </text>
         <rect
           x="184"
-          y="790"
+          y="864"
           width="28"
           height="12"
           rx="2"
@@ -999,7 +1149,7 @@
         />
         <text
           x="220"
-          y="799"
+          y="873"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1008,7 +1158,7 @@
         </text>
         <rect
           x="424"
-          y="790"
+          y="864"
           width="28"
           height="12"
           rx="2"
@@ -1019,7 +1169,7 @@
         />
         <text
           x="460"
-          y="799"
+          y="873"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1028,7 +1178,7 @@
         </text>
         <rect
           x="600"
-          y="790"
+          y="864"
           width="28"
           height="12"
           rx="2"
@@ -1038,18 +1188,18 @@
         />
         <text
           x="636"
-          y="799"
+          y="873"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
         </text>
-        <line x1="760" y1="796" x2="776" y2="796" stroke="#17212a" stroke-width="1" />
-        <circle cx="781" cy="796" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="760" y1="870" x2="776" y2="870" stroke="#17212a" stroke-width="1" />
+        <circle cx="781" cy="870" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="796"
-          y="799"
+          y="873"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
