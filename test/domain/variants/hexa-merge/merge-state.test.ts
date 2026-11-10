@@ -1,6 +1,7 @@
 /** @jest-environment node */
 import { hex, type HexAxis } from '../../../../src/domain/engine/hex-topology';
 import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
+import { GameStateId } from '../../../../src/domain/engine/game-state-id';
 import { MatchId } from '../../../../src/domain/engine/match-id';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import { MergeState } from '../../../../src/domain/variants/hexa-merge/merge-state';
@@ -15,6 +16,7 @@ import {
   type HexMergeState,
 } from '../../../support/variants/hexa-merge/merge-game';
 import { MATCH_ID } from '../../../support/engine/match-id';
+import { STATE_ID } from '../../../support/engine/entity-ids';
 
 // R7: the Merge state is an entity. A new tile changes it in place. A slide gives the state
 // after the slide, as the Fit moves do, and leaves the state before it unchanged.
@@ -153,16 +155,16 @@ describe('MergeState', () => {
   it('should_throw_a_range_error_when_a_state_is_built_with_a_score_that_is_not_finite', () => {
     const board = mergeState([]).board;
 
-    expect(() => new MergeState(MATCH_ID, board, noNewTiles(), false, [], Number.NaN)).toThrow(
-      new RangeError('The score of a state must be a finite number, not NaN.'),
-    );
+    expect(
+      () => new MergeState(STATE_ID, MATCH_ID, board, noNewTiles(), false, [], Number.NaN),
+    ).toThrow(new RangeError('The score of a state must be a finite number, not NaN.'));
   });
 
-  // The identity of the state is the identity of its match (classes.md decision 26).
-  // A slide gives a new object of the same state, so it keeps the identity.
-  it('should_be_the_same_state_when_two_states_belong_to_one_match_whatever_they_hold', () => {
-    const first = mergeState([[hex(1, 0), 2]], 2, noNewTiles(), MatchId.of('m-a'));
-    const second = mergeState([], 2, noNewTiles(), MatchId.of('m-a'));
+  // The state has its own `GameStateId`, and it still knows its match (classes.md decision 26).
+  it('should_be_the_same_state_when_two_states_have_one_state_id_whatever_they_hold', () => {
+    const stateId = GameStateId.of('state-a');
+    const first = mergeState([[hex(1, 0), 2]], 2, noNewTiles(), MATCH_ID, stateId);
+    const second = mergeState([], 2, noNewTiles(), MATCH_ID, stateId);
     const slid = first.slide(Slide.of<HexAxis>('q', 'backward'), MergeTile.of(16));
 
     expect([first.equals(second), second.equals(first), first.equals(first.clone())]).toEqual([
@@ -170,14 +172,19 @@ describe('MergeState', () => {
       true,
       true,
     ]);
-    expect([slid.equals(first), slid.belongsTo(MatchId.of('m-a'))]).toEqual([true, true]);
+    expect([slid.equals(first), slid.belongsTo(MATCH_ID)]).toEqual([true, true]);
   });
 
-  it('should_be_another_state_when_two_states_belong_to_different_matches', () => {
-    const first = mergeState([], 2, noNewTiles(), MatchId.of('m-a'));
-    const second = mergeState([], 2, noNewTiles(), MatchId.of('m-b'));
+  it('should_be_another_state_when_two_states_of_one_match_have_different_state_ids', () => {
+    const matchId = MatchId.of('m-a');
+    const first = mergeState([], 2, noNewTiles(), matchId, GameStateId.of('state-a'));
+    const second = mergeState([], 2, noNewTiles(), matchId, GameStateId.of('state-b'));
 
     expect([first.equals(second), second.equals(first)]).toEqual([false, false]);
-    expect(first.belongsTo(MatchId.of('m-b'))).toBe(false);
+    expect([
+      first.belongsTo(MatchId.of('m-a')),
+      second.belongsTo(MatchId.of('m-a')),
+      first.belongsTo(MatchId.of('m-b')),
+    ]).toEqual([true, true, false]);
   });
 });

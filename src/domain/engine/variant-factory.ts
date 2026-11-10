@@ -1,7 +1,9 @@
 import type { Board } from './board';
+import type { BoardId } from './board-id';
 import type { BoardState } from './board-state';
 import type { Cloneable } from './cloneable';
 import type { GameId } from './game-id';
+import type { GameStateId } from './game-state-id';
 import type { MatchId } from './match-id';
 import type { MoveHistory } from './move-history';
 import type { Piece } from './piece';
@@ -17,8 +19,10 @@ import type { IScoringPolicy } from './scoring-policy';
 // `createPieceSource()` returns `undefined` for a variant with no piece source.
 // `TPiece` is the item of the source. It is a `Piece` by default.
 // Hexa Merge draws a new tile and its cell (`NewTile`), so it binds `TPiece` to that type.
+// `createBoard()` gives a new empty board with the id `boardId` (classes.md decision 7).
 // `createInitialState()` puts a new board and a new piece source in the first state.
-// The first state takes the `MatchId` of its game as its identity (classes.md decision 26).
+// The first state takes its own id `stateId` and the `MatchId` of its game (decision 26),
+// and its board takes the id `boardId`. `GameFactory` asks the generators for the three ids.
 // So two calls give two games that share no board and no source.
 // `createHistory()` returns a new history for each game, or `undefined` for a variant
 // with no undo (classes.md decision 3).
@@ -34,7 +38,7 @@ export interface IVariantFactory<
   createRules(): IGameRules<TMove, TState>;
   createScoring(): IScoringPolicy<TState>;
   createPieceSource(): IPieceSource<TPiece> | undefined;
-  createBoard(): Board<TCell, TCoord, string>;
-  createInitialState(matchId: MatchId): TState;
+  createBoard(boardId: BoardId): Board<TCell, TCoord, string>;
+  createInitialState(matchId: MatchId, stateId: GameStateId, boardId: BoardId): TState;
   createHistory(): MoveHistory<TMove, TState> | undefined;
 }

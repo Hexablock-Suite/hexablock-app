@@ -23,6 +23,7 @@ import {
   type HexMergeState,
 } from '../../../support/variants/hexa-merge/merge-game';
 import { MATCH_ID } from '../../../support/engine/match-id';
+import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 
 // The rules suite of Hexa Merge (statement §1.4, APP-NFR-12).
 // The tests play through `GameEngine.play()` and the rules contract, on the real hex geometry.
@@ -290,6 +291,7 @@ describe('Merge edge cases', () => {
     }
     function chipGame(cells: readonly [HexCoord, Chip][]) {
       const board = new Board<Chip, HexCoord, HexAxis>(
+        BOARD_ID,
         hexTopology.region(RegionSize.of(3)),
         hexTopology,
       );
@@ -306,7 +308,9 @@ describe('Merge edge cases', () => {
         { score: () => 0 },
         new RecordingPublisher(),
       );
-      engine.start(new MergeState(MATCH_ID, board, new FixedListPieceSource<NewTile<Chip>>([])));
+      engine.start(
+        new MergeState(STATE_ID, MATCH_ID, board, new FixedListPieceSource<NewTile<Chip>>([])),
+      );
       return engine;
     }
     function labels(engine: ReturnType<typeof chipGame>): Record<string, string> {

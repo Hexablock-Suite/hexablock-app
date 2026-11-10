@@ -11,6 +11,7 @@ import { GameFactory } from '../../../src/domain/engine/game-factory';
 import type { MatchIdGenerator } from '../../../src/domain/engine/match-id-generator';
 import type { IVariantFactory } from '../../../src/domain/engine/variant-factory';
 import { RecordingPublisher } from '../engine/fake-game';
+import { CountingBoardIds, CountingStateIds } from '../engine/entity-ids';
 import { CountingMatchIds } from '../engine/match-id';
 import { RecordingLogger } from './recording-logger';
 
@@ -43,7 +44,8 @@ export class MemoryRunningGameStore<
 
 // The game use cases of one variant over one shared store.
 // `ApplyMove` writes a publisher failure to `logger` (issue 132).
-// `ids` gives the id of each game that `StartGame` opens.
+// `ids` gives the id of each game that `StartGame` opens. The first state of each game
+// takes its own id and the id of its board from two counting generators.
 export function gameUseCases<
   TCell,
   TCoord,
@@ -60,7 +62,10 @@ export function gameUseCases<
   return {
     games,
     logger,
-    startGame: new StartGame(new GameFactory(factory, ids, events), games),
+    startGame: new StartGame(
+      new GameFactory(factory, ids, new CountingStateIds(), new CountingBoardIds(), events),
+      games,
+    ),
     applyMove: new ApplyMove(games, logger),
     undoMove: new UndoMove(games),
   };

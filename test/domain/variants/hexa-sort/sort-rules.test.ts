@@ -19,6 +19,7 @@ import {
   stackPiece,
   tiles,
 } from '../../../support/variants/hexa-sort/sort-game';
+import { BOARD_ID } from '../../../support/engine/entity-ids';
 
 // The rules of issue #93 and the accepted rules of issue #56: a tie goes to the stack
 // whose coordinate key comes first in key order.
@@ -261,6 +262,7 @@ describe('SortRules edge cases', () => {
     content: readonly [SquareCoord, ColorStack][],
   ): Board<ColorStack, SquareCoord, string> {
     const board = new Board<ColorStack, SquareCoord, string>(
+      BOARD_ID,
       squareTopology.region(RegionSize.of(3)),
       squareTopology,
     );

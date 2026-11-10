@@ -30,6 +30,7 @@ import { repoRoot } from '../support/run-tool';
 import { linesState } from '../support/variants/hexa-lines/lines-game';
 import { mergeState } from '../support/variants/hexa-merge/merge-game';
 import { MATCH_ID } from '../support/engine/match-id';
+import { BOARD_ID, STATE_ID } from '../support/engine/entity-ids';
 
 // APP-FR-06 (issue 104): the README documents the scoring of each variant.
 // The gate reads the README section «Scoring» and checks it against the scoring code.
@@ -95,15 +96,24 @@ function linesPoints(cells: number, lines: number, streak: number): number {
 // The points of one Merge slide whose merges make the tiles of `values`.
 function mergePoints(values: number[]): number {
   const start = mergeState([]);
-  const state = new MergeState(MATCH_ID, start.board, start.tiles, false, values.map(MergeTile.of));
+  const state = new MergeState(
+    STATE_ID,
+    MATCH_ID,
+    start.board,
+    start.tiles,
+    false,
+    values.map(MergeTile.of),
+  );
   return turnScore(new MergeScoring(), state);
 }
 
 // The points of one Sort turn that clears stacks of the given tile counts.
 function sortPoints(stacks: number[]): number {
   const state = SortState.start({
+    stateId: STATE_ID,
     matchId: MATCH_ID,
     board: new Board<ColorStack, SquareCoord, string>(
+      BOARD_ID,
       squareTopology.region(RegionSize.of(1)),
       squareTopology,
     ),

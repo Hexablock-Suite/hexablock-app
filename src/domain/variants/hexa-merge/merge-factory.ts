@@ -1,6 +1,8 @@
 import type { Board } from '../../engine/board';
+import type { BoardId } from '../../engine/board-id';
 import { BoardBuilder } from '../../engine/board-builder';
 import { GameId } from '../../engine/game-id';
+import type { GameStateId } from '../../engine/game-state-id';
 import type { GeometryFactory } from '../../engine/geometry-factory';
 import type { MatchId } from '../../engine/match-id';
 import { MoveHistory } from '../../engine/move-history';
@@ -64,13 +66,22 @@ export class MergeFactory<TCoord> implements IVariantFactory<
     return mergeTileSource(this.settings.seed, this.settings.fourChance);
   }
 
-  createBoard(): Board<MergeTile, TCoord, string> {
-    return new BoardBuilder(this.geometry).withRegion(this.settings.size).build<MergeTile>();
+  createBoard(boardId: BoardId): Board<MergeTile, TCoord, string> {
+    return new BoardBuilder(this.geometry).withRegion(this.settings.size).build<MergeTile>(boardId);
   }
 
   // The first tiles come from the same source as the later tiles.
-  createInitialState(matchId: MatchId): MergeState<MergeTile, TCoord, string> {
-    const state = new MergeState(matchId, this.createBoard(), this.createPieceSource());
+  createInitialState(
+    matchId: MatchId,
+    stateId: GameStateId,
+    boardId: BoardId,
+  ): MergeState<MergeTile, TCoord, string> {
+    const state = new MergeState(
+      stateId,
+      matchId,
+      this.createBoard(boardId),
+      this.createPieceSource(),
+    );
     for (let i = 0; i < START_TILES; i += 1) state.addNewTile();
     return state;
   }

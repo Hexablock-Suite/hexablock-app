@@ -2,7 +2,9 @@
 import { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameOver } from '../../../src/domain/engine/game-events';
 import { GameFactory } from '../../../src/domain/engine/game-factory';
+import { BoardId } from '../../../src/domain/engine/board-id';
 import { GameId } from '../../../src/domain/engine/game-id';
+import { GameStateId } from '../../../src/domain/engine/game-state-id';
 import { MatchId } from '../../../src/domain/engine/match-id';
 import type { MatchIdGenerator } from '../../../src/domain/engine/match-id-generator';
 import { MoveHistory } from '../../../src/domain/engine/move-history';
@@ -12,9 +14,11 @@ import {
   FakeRules,
   OnePointScoring,
   RecordingPublisher,
+  emptyState,
   type FakeMove,
   type FakeState,
 } from '../../support/engine/fake-game';
+import { CountingBoardIds, CountingStateIds } from '../../support/engine/entity-ids';
 import { CountingMatchIds, MATCH_ID } from '../../support/engine/match-id';
 import { phaseNameOf } from '../../support/engine/phase-name';
 import { square } from '../../support/engine/square-topology';
@@ -40,6 +44,8 @@ describe('GameFactory', () => {
     const games = new GameFactory(
       fakeGameFactory(),
       new CountingMatchIds(),
+      new CountingStateIds(),
+      new CountingBoardIds(),
       new RecordingPublisher(),
     );
 
@@ -56,6 +62,8 @@ describe('GameFactory', () => {
     const games = new GameFactory(
       fakeGameFactory(),
       new CountingMatchIds(),
+      new CountingStateIds(),
+      new CountingBoardIds(),
       new RecordingPublisher(),
     );
 
@@ -71,6 +79,8 @@ describe('GameFactory', () => {
     const games = new GameFactory(
       fakeGameFactory(),
       new CountingMatchIds(),
+      new CountingStateIds(),
+      new CountingBoardIds(),
       new RecordingPublisher(),
     );
 
@@ -87,7 +97,13 @@ describe('GameFactory', () => {
   it('should_give_the_engine_and_its_game_over_event_the_id_of_the_generator_when_the_generator_is_fixed', () => {
     const publisher = new RecordingPublisher();
     const ids = new FixedMatchId();
-    const game = new GameFactory(fakeGameFactory(1), ids, publisher).createGame();
+    const game = new GameFactory(
+      fakeGameFactory(1),
+      ids,
+      new CountingStateIds(),
+      new CountingBoardIds(),
+      publisher,
+    ).createGame();
     const sameMatch = new GameEngine(
       MATCH_ID,
       GameId.of('another-game'),
@@ -107,7 +123,13 @@ describe('GameFactory', () => {
 
   it('should_ask_the_generator_once_when_each_game_is_created', () => {
     const ids = new FixedMatchId();
-    const games = new GameFactory(fakeGameFactory(), ids, new RecordingPublisher());
+    const games = new GameFactory(
+      fakeGameFactory(),
+      ids,
+      new CountingStateIds(),
+      new CountingBoardIds(),
+      new RecordingPublisher(),
+    );
 
     games.createGame();
     games.createGame();
@@ -120,7 +142,13 @@ describe('GameFactory', () => {
       ...fakeGameFactory(),
       createHistory: () => new MoveHistory<FakeMove, FakeState>(),
     };
-    const games = new GameFactory(withUndo, new CountingMatchIds(), new RecordingPublisher());
+    const games = new GameFactory(
+      withUndo,
+      new CountingMatchIds(),
+      new CountingStateIds(),
+      new CountingBoardIds(),
+      new RecordingPublisher(),
+    );
     const first = games.createGame();
     const second = games.createGame();
 
@@ -139,9 +167,61 @@ describe('GameFactory', () => {
           throw new Error('The generator has no id.');
         },
       },
+      new CountingStateIds(),
+      new CountingBoardIds(),
       new RecordingPublisher(),
     );
 
     expect(() => games.createGame()).toThrow('The generator has no id.');
+  });
+  // The state and its board are entities with their own ids (classes.md decisions 7 and 26).
+  it('should_give_the_first_state_and_its_board_the_ids_of_their_generators_when_a_game_is_created', () => {
+    const games = new GameFactory(
+      fakeGameFactory(),
+      new FixedMatchId(),
+      new CountingStateIds(),
+      new CountingBoardIds(),
+      new RecordingPublisher(),
+    );
+
+    const first = games.createGame().snapshot();
+    const second = games.createGame().snapshot();
+    const expected = emptyState(2, MATCH_ID, GameStateId.of('state-1'), BoardId.of('board-1'));
+
+    expect([first.belongsTo(MATCH_ID), second.belongsTo(MATCH_ID)]).toEqual([true, true]);
+    expect([first.equals(expected), first.board.equals(expected.board)]).toEqual([true, true]);
+    expect([first.equals(second), second.equals(first)]).toEqual([false, false]);
+    expect([first.board.equals(second.board), second.board.equals(first.board)]).toEqual([
+      false,
+      false,
+    ]);
+  });
+
+  it('should_ask_each_generator_once_when_each_game_is_created', () => {
+    const calls = { states: 0, boards: 0 };
+    const states = new CountingStateIds();
+    const boards = new CountingBoardIds();
+    const games = new GameFactory(
+      fakeGameFactory(),
+      new CountingMatchIds(),
+      {
+        next: () => {
+          calls.states += 1;
+          return states.next();
+        },
+      },
+      {
+        next: () => {
+          calls.boards += 1;
+          return boards.next();
+        },
+      },
+      new RecordingPublisher(),
+    );
+
+    games.createGame();
+    games.createGame();
+
+    expect(calls).toEqual({ states: 2, boards: 2 });
   });
 });

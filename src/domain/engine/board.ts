@@ -1,3 +1,4 @@
+import type { BoardId } from './board-id';
 import type { BoardShape } from './board-shape';
 import type { Cloneable } from './cloneable';
 import type { CoordKey } from './coord-key';
@@ -63,8 +64,11 @@ export class BoardSpace<TCell, TCoord> implements Cloneable<BoardSpace<TCell, TC
 // A cell is a value. The board copies the references to the cells, never the cells.
 // So `clone()` copies each space and shares the cell objects with the original board.
 // A caller must not change a cell object. To change a cell, a new cell occupies the coordinate.
-// The board is an entity inside the state (classes.md decision 7). It changes in place,
-// and only through two business intentions: `occupy()` and `vacate()`.
+// The board is an entity inside the state (classes.md decision 7). Its `BoardId` is its identity.
+// The id never changes, and `equals()` compares two boards by it. The cells do not count.
+// A `BoardIdGenerator` gives the id of each new board, and `clone()` keeps it:
+// the copy is the same board at an earlier moment.
+// The board changes in place, and only through two business intentions: `occupy()` and `vacate()`.
 // A space exists from its first write. So `cells()` lists the cells in first-write order.
 // A vacated space is free. When a cell occupies it again, that write counts as a first write.
 // So `cells()` gives the same order as a board built again from the cells that stay.
@@ -80,6 +84,7 @@ export class Board<TCell, TCoord, TAxis extends string> implements Cloneable<
   private readonly content: Map<CoordKey, BoardSpace<TCell, TCoord>>;
 
   constructor(
+    private readonly identity: BoardId,
     readonly shape: BoardShape<TCoord>,
     readonly topology: GridTopology<TCoord, TAxis, string>,
     content: ReadonlyMap<CoordKey, [TCoord, TCell]> = new Map(),
@@ -101,6 +106,11 @@ export class Board<TCell, TCoord, TAxis extends string> implements Cloneable<
       }
       this.occupySpace(expected, c, cell);
     }
+  }
+
+  // Two boards with one id are the same board. Their cells and their objects do not count.
+  equals(other: Board<TCell, TCoord, TAxis>): boolean {
+    return this.identity.equals(other.identity);
   }
 
   contains(c: TCoord): boolean {
@@ -155,7 +165,7 @@ export class Board<TCell, TCoord, TAxis extends string> implements Cloneable<
   }
 
   clone(): Board<TCell, TCoord, TAxis> {
-    const copy = new Board<TCell, TCoord, TAxis>(this.shape, this.topology);
+    const copy = new Board<TCell, TCoord, TAxis>(this.identity, this.shape, this.topology);
     for (const [key, space] of this.content) copy.content.set(key, space.clone());
     return copy;
   }

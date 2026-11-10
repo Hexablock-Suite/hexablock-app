@@ -1,7 +1,9 @@
 import { Board } from '../../../src/domain/engine/board';
+import type { BoardId } from '../../../src/domain/engine/board-id';
 import type { BoardState } from '../../../src/domain/engine/board-state';
 import type { GameEvent, GameEventPublisher } from '../../../src/domain/engine/game-events';
 import { GameId } from '../../../src/domain/engine/game-id';
+import type { GameStateId } from '../../../src/domain/engine/game-state-id';
 import type { MatchId } from '../../../src/domain/engine/match-id';
 import type { Outcome } from '../../../src/domain/engine/outcome';
 import type { IPieceSource } from '../../../src/domain/engine/piece-source';
@@ -13,6 +15,7 @@ import type { IVariantFactory } from '../../../src/domain/engine/variant-factory
 import type { FakeCell } from './fake-cell';
 import { MATCH_ID } from './match-id';
 import { squareTopology, type SquareAxis, type SquareCoord } from './square-topology';
+import { BOARD_ID, STATE_ID } from './entity-ids';
 
 // A fake game that exists only in test/ (APP-NFR-13). No variant uses these classes.
 
@@ -21,12 +24,14 @@ export interface FakeMove {
   readonly cell: FakeCell;
 }
 
-// Its identity is the `MatchId` of its game, as in a variant state. The default is `MATCH_ID`.
+// Its identity is its own `GameStateId`, as in a variant state, and it keeps the `MatchId`
+// of its game. The defaults are `STATE_ID` and `MATCH_ID`.
 export class FakeState implements BoardState<FakeCell, SquareCoord> {
   constructor(
     readonly board: Board<FakeCell, SquareCoord, SquareAxis>,
     public score = 0,
     private readonly matchId: MatchId = MATCH_ID,
+    private readonly stateId: GameStateId = STATE_ID,
   ) {}
 
   belongsTo(match: MatchId): boolean {
@@ -34,7 +39,7 @@ export class FakeState implements BoardState<FakeCell, SquareCoord> {
   }
 
   equals(other: BoardState<FakeCell, SquareCoord>): boolean {
-    return other.belongsTo(this.matchId);
+    return other instanceof FakeState && this.stateId.equals(other.stateId);
   }
 
   addPoints(points: number): void {
@@ -42,7 +47,7 @@ export class FakeState implements BoardState<FakeCell, SquareCoord> {
   }
 
   clone(): FakeState {
-    return new FakeState(this.board.clone(), this.score, this.matchId);
+    return new FakeState(this.board.clone(), this.score, this.matchId, this.stateId);
   }
 
   // The count of filled cells, so a test sees the view of each state.
@@ -51,12 +56,18 @@ export class FakeState implements BoardState<FakeCell, SquareCoord> {
   }
 }
 
-// A square board of size × size empty cells, the state of the match `matchId`.
-export function emptyState(size = 2, matchId: MatchId = MATCH_ID): FakeState {
+// A square board of size × size empty cells, the state `stateId` of the match `matchId`.
+export function emptyState(
+  size = 2,
+  matchId: MatchId = MATCH_ID,
+  stateId: GameStateId = STATE_ID,
+  boardId: BoardId = BOARD_ID,
+): FakeState {
   return new FakeState(
-    new Board(squareTopology.region(RegionSize.of(size)), squareTopology),
+    new Board(boardId, squareTopology.region(RegionSize.of(size)), squareTopology),
     0,
     matchId,
+    stateId,
   );
 }
 
@@ -94,7 +105,7 @@ export class SourceState implements BoardState<FakeCell, SquareCoord> {
 // A square board of size × size empty cells, with `source` in the state.
 export function sourceState(source: IPieceSource<FakeCell>, size = 2): SourceState {
   return new SourceState(
-    new Board(squareTopology.region(RegionSize.of(size)), squareTopology),
+    new Board(BOARD_ID, squareTopology.region(RegionSize.of(size)), squareTopology),
     source,
   );
 }
@@ -190,8 +201,8 @@ export function fakeGameFactory(
     createRules: () => new FakeRules(),
     createScoring: () => new OnePointScoring(),
     createPieceSource: () => undefined,
-    createBoard: () => emptyState(size).board,
-    createInitialState: (matchId) => emptyState(size, matchId),
+    createBoard: (boardId) => emptyState(size, MATCH_ID, STATE_ID, boardId).board,
+    createInitialState: (matchId, stateId, boardId) => emptyState(size, matchId, stateId, boardId),
     createHistory: () => undefined,
   };
 }

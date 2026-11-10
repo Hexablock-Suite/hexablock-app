@@ -23,6 +23,7 @@ import { linesState } from '../support/variants/hexa-lines/lines-game';
 import { mergeState } from '../support/variants/hexa-merge/merge-game';
 import { repoRoot } from '../support/run-tool';
 import { MATCH_ID } from '../support/engine/match-id';
+import { BOARD_ID, STATE_ID } from '../support/engine/entity-ids';
 
 // APP-NFR-01: the four variants use the engine `Board` with their own cell type,
 // and no variant has a board class of its own (issue #96).
@@ -214,14 +215,17 @@ describe('one board gate (APP-NFR-01)', () => {
   it('should_hold_an_engine_board_of_piece_ids_when_a_fit_state_places_a_piece', () => {
     const id = PieceId.of('a');
     const figure = new Board<PieceId, SquareCoord, string>(
+      BOARD_ID,
       squareTopology.region(RegionSize.of(2)),
       squareTopology,
     );
     const piece = new Piece(new ShapeGroup([new CellNode(square(0, 0))]), id);
-    const state = FitState.start(MATCH_ID, figure, new FixedListPieceSource([piece])).place(
-      id,
-      Placement.of(Turns.of(0), square(0, 0), squareTopology),
-    );
+    const state = FitState.start(
+      STATE_ID,
+      MATCH_ID,
+      figure,
+      new FixedListPieceSource([piece]),
+    ).place(id, Placement.of(Turns.of(0), square(0, 0), squareTopology));
     const board: Board<PieceId, SquareCoord, string> = state.board;
 
     expect(board.constructor).toBe(Board);
@@ -231,11 +235,13 @@ describe('one board gate (APP-NFR-01)', () => {
 
   it('should_hold_an_engine_board_of_color_stacks_when_a_sort_state_starts', () => {
     const start = new Board<ColorStack, SquareCoord, string>(
+      BOARD_ID,
       squareTopology.region(RegionSize.of(2)),
       squareTopology,
     );
     start.occupy(square(0, 0), ColorStack.of([Color.of('red')]));
     const state = SortState.start({
+      stateId: STATE_ID,
       matchId: MATCH_ID,
       board: start,
       source: new FixedListPieceSource([]),

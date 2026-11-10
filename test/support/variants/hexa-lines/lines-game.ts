@@ -1,6 +1,7 @@
 import { Board } from '../../../../src/domain/engine/board';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
 import { GameId } from '../../../../src/domain/engine/game-id';
+import type { GameStateId } from '../../../../src/domain/engine/game-state-id';
 import type { MatchId } from '../../../../src/domain/engine/match-id';
 import type { GridTopology } from '../../../../src/domain/engine/grid-topology';
 import { Piece } from '../../../../src/domain/engine/piece';
@@ -17,6 +18,7 @@ import type { PlacePiece } from '../../../../src/domain/variants/hexa-lines/plac
 import { RecordingPublisher } from '../../engine/fake-game';
 import { square, type SquareCoord } from '../../engine/square-topology';
 import { MATCH_ID } from '../../engine/match-id';
+import { BOARD_ID, STATE_ID } from '../../engine/entity-ids';
 
 // Builders for the Hexa Lines rules tests. They exist only in test/.
 
@@ -37,11 +39,17 @@ export function linesState<TCoord>(
     tray: Piece<Color, TCoord>[];
     source?: readonly Piece<Color, TCoord>[];
     matchId?: MatchId;
+    stateId?: GameStateId;
   },
 ): LinesState<TCoord> {
-  const board = new Board<Color, TCoord, string>(topology.region(RegionSize.of(size)), topology);
+  const board = new Board<Color, TCoord, string>(
+    BOARD_ID,
+    topology.region(RegionSize.of(size)),
+    topology,
+  );
   for (const c of values.filled ?? []) board.occupy(c, red);
   return new LinesState(
+    values.stateId ?? STATE_ID,
     values.matchId ?? MATCH_ID,
     board,
     values.tray,

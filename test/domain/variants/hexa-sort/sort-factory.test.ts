@@ -17,6 +17,7 @@ import {
   stackPiece,
 } from '../../../support/variants/hexa-sort/sort-game';
 import { MATCH_ID } from '../../../support/engine/match-id';
+import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 
 // The Sort factory creates the whole family of Hexa Sort (issue 99, classes.md decision 31).
 
@@ -24,12 +25,12 @@ describe('SortFactory', () => {
   it('should_start_the_level_and_place_one_stack_when_the_sort_factory_builds_it', () => {
     const factory = sortFactory([stack('red', 'red'), stack('blue')]);
 
-    const initial = factory.createInitialState(MATCH_ID);
+    const initial = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
     const { engine, publisher } = startVariant(factory);
     const outcome = engine.play(place(0, 0));
 
     expect(factory.gameId.equals(GameId.of('hexa-sort'))).toBe(true);
-    expect(factory.createBoard().shape.cells).toHaveLength(4);
+    expect(factory.createBoard(BOARD_ID).shape.cells).toHaveLength(4);
     expect(names(initial.offered?.content)).toEqual(['red', 'red']);
     expect(initial.goalsNeeded.equals(GoalCount.of(5))).toBe(true);
     expect(outcome).toBe('playing');
@@ -58,8 +59,8 @@ describe('SortFactory', () => {
       goalsNeeded: GoalCount.of(1),
     });
 
-    const first = factory.createInitialState(MATCH_ID);
-    const second = factory.createInitialState(MATCH_ID);
+    const first = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
+    const second = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
 
     expect(names(first.offered?.content)).toEqual(['red']);
     expect(names(second.offered?.content)).toEqual(['red']);

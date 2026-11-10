@@ -1,6 +1,7 @@
 import { Board } from '../../../../src/domain/engine/board';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
 import { GameId } from '../../../../src/domain/engine/game-id';
+import type { GameStateId } from '../../../../src/domain/engine/game-state-id';
 import type { MatchId } from '../../../../src/domain/engine/match-id';
 import { HexGeometry } from '../../../../src/domain/engine/hex-geometry';
 import type { HexAxis, HexCoord } from '../../../../src/domain/engine/hex-topology';
@@ -18,6 +19,7 @@ import type { NewTile } from '../../../../src/domain/variants/hexa-merge/new-til
 import type { Slide } from '../../../../src/domain/variants/hexa-merge/slide';
 import { RecordingPublisher } from '../../engine/fake-game';
 import { MATCH_ID } from '../../engine/match-id';
+import { BOARD_ID, STATE_ID } from '../../engine/entity-ids';
 
 // The Merge game for the rules tests, on the real hexagonal geometry.
 // The rules tests score no points. The scoring tests pass their own policy.
@@ -44,13 +46,15 @@ export function mergeState(
   size = 2,
   source: IPieceSource<NewTile<MergeTile>> = noNewTiles(),
   matchId: MatchId = MATCH_ID,
+  stateId: GameStateId = STATE_ID,
 ): HexMergeState {
   const board = new Board<MergeTile, HexCoord, HexAxis>(
+    BOARD_ID,
     hexTopology.region(RegionSize.of(size)),
     hexTopology,
   );
   for (const [at, value] of tiles) board.occupy(at, MergeTile.of(value));
-  return new MergeState(matchId, board, source);
+  return new MergeState(stateId, matchId, board, source);
 }
 
 // The number of a tile. The field is private, and a tile is worth its value in points (issue #59).

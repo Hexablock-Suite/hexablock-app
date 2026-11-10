@@ -2,11 +2,12 @@
 import { Board, BoardSpace } from '../../../src/domain/engine/board';
 import { RegionSize } from '../../../src/domain/engine/region-size';
 import { square, squareTopology } from '../../support/engine/square-topology';
+import { BOARD_ID } from '../../support/engine/entity-ids';
 
 // Probes for F0 (S5): the entity is private to Board, clone copies it, order is first-write.
 const region = () => squareTopology.region(RegionSize.of(2));
 const newBoard = () =>
-  new Board<string, ReturnType<typeof square>, string>(region(), squareTopology);
+  new Board<string, ReturnType<typeof square>, string>(BOARD_ID, region(), squareTopology);
 
 describe('Board with BoardSpace entities (probes)', () => {
   it('should_leave_the_original_unchanged_when_the_clone_is_changed', () => {

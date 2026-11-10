@@ -16,6 +16,7 @@ import {
   red,
 } from '../../../support/variants/hexa-lines/lines-game';
 import { MATCH_ID } from '../../../support/engine/match-id';
+import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 
 // The Lines factory creates the whole family of Hexa Lines (issue 99, classes.md decision 31).
 
@@ -47,12 +48,12 @@ describe('LinesFactory', () => {
   it('should_start_a_game_that_plays_one_move_when_the_lines_factory_builds_it', () => {
     const factory = linesFactory();
 
-    const initial = factory.createInitialState(MATCH_ID);
+    const initial = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
     const { engine, rules, publisher } = startVariant(factory);
     const outcome = engine.play(firstValidMove(rules, engine.snapshot()));
 
     expect(factory.gameId.equals(GameId.of('hexa-lines'))).toBe(true);
-    expect(factory.createBoard().shape.cells).toHaveLength(9);
+    expect(factory.createBoard(BOARD_ID).shape.cells).toHaveLength(9);
     expect(initial.board.cells()).toEqual([]);
     expect(initial.tray).toHaveLength(3);
     expect(outcome).toBe('playing');
@@ -70,8 +71,10 @@ describe('LinesFactory', () => {
     expect(firstPieces(43, 12)).not.toEqual(pieces);
     // The draw picks among the shapes and the colors of the settings.
     expect(new Set(pieces).size).toBeGreaterThan(1);
-    expect(linesFactory(42).createInitialState(MATCH_ID).tray.map(describe_)).toEqual(
-      linesFactory(42).createInitialState(MATCH_ID).tray.map(describe_),
+    expect(
+      linesFactory(42).createInitialState(MATCH_ID, STATE_ID, BOARD_ID).tray.map(describe_),
+    ).toEqual(
+      linesFactory(42).createInitialState(MATCH_ID, STATE_ID, BOARD_ID).tray.map(describe_),
     );
   });
 
@@ -98,7 +101,7 @@ describe('LinesFactory', () => {
       const message = `A seed must be an integer from 0 to 4294967295, not ${seed}.`;
 
       expect(() => linesFactory(seed).createPieceSource()).toThrow(new RangeError(message));
-      expect(() => linesFactory(seed).createInitialState(MATCH_ID)).toThrow(
+      expect(() => linesFactory(seed).createInitialState(MATCH_ID, STATE_ID, BOARD_ID)).toThrow(
         new RangeError(message),
       );
     }

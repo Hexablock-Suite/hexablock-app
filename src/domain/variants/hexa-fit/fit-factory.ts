@@ -1,8 +1,10 @@
 import type { Board } from '../../engine/board';
+import type { BoardId } from '../../engine/board-id';
 import { BoardBuilder } from '../../engine/board-builder';
 import type { BoardShape } from '../../engine/board-shape';
 import type { Clock } from '../../engine/clock';
 import { GameId } from '../../engine/game-id';
+import type { GameStateId } from '../../engine/game-state-id';
 import type { GeometryFactory, TopologyId } from '../../engine/geometry-factory';
 import { LevelTimer } from '../../engine/level-timer';
 import type { MatchId } from '../../engine/match-id';
@@ -69,13 +71,13 @@ export class FitFactory<TCoord> implements IVariantFactory<
 
   // The board is the figure: its shape holds only the figure cells.
   // `BoardBuilder` takes the figure as a tree of cells.
-  createBoard(): Board<PieceId, TCoord, string> {
+  createBoard(boardId: BoardId): Board<PieceId, TCoord, string> {
     const figure = new ShapeGroup(this.level.figure.cells.map((c) => new CellNode(c)));
-    return new BoardBuilder(this.geometry).withFigure(figure).build<PieceId>();
+    return new BoardBuilder(this.geometry).withFigure(figure).build<PieceId>(boardId);
   }
 
-  createInitialState(matchId: MatchId): FitState<TCoord> {
-    return FitState.start(matchId, this.createBoard(), this.createPieceSource());
+  createInitialState(matchId: MatchId, stateId: GameStateId, boardId: BoardId): FitState<TCoord> {
+    return FitState.start(stateId, matchId, this.createBoard(boardId), this.createPieceSource());
   }
 
   // Hexa Fit undoes with no limit (APP-FR-08, classes.md decision 3).

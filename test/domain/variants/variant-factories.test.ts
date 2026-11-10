@@ -33,6 +33,7 @@ import { A, fitFactory, threeDominoFitFactory } from '../../support/variants/hex
 import { linesFactory } from '../../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../../support/variants/hexa-merge/merge-game';
 import { sortFactory } from '../../support/variants/hexa-sort/sort-game';
+import { BOARD_ID } from '../../support/engine/entity-ids';
 
 // The engine runs the four variants through one code path (issue 99, APP-FR-03).
 // `playOnce()` reads only `IVariantFactory`: it has no branch on the game id.
@@ -61,8 +62,8 @@ function twoBoards<
   TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
   TPiece,
 >(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>) {
-  const first = factory.createBoard();
-  const second = factory.createBoard();
+  const first = factory.createBoard(BOARD_ID);
+  const second = factory.createBoard(BOARD_ID);
   return { distinct: first !== second, filled: first.cells().length + second.cells().length };
 }
 

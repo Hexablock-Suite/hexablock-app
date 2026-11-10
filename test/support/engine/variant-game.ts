@@ -5,6 +5,7 @@ import type { IGameRules } from '../../../src/domain/engine/rules';
 import type { IVariantFactory } from '../../../src/domain/engine/variant-factory';
 import { RecordingPublisher } from './fake-game';
 import { MATCH_ID } from './match-id';
+import { BOARD_ID, STATE_ID } from './entity-ids';
 
 // One code path for every variant: it reads only the `IVariantFactory` contract
 // (classes.md decision 31). It names no variant and never reads the game id to branch.
@@ -28,7 +29,7 @@ export function startVariant<
     publisher,
     factory.createHistory(),
   );
-  engine.start(factory.createInitialState(MATCH_ID));
+  engine.start(factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID));
   return { engine, rules, publisher };
 }
 

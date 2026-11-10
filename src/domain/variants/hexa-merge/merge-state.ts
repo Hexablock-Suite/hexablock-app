@@ -1,6 +1,7 @@
 import type { Board } from '../../engine/board';
 import type { BoardState } from '../../engine/board-state';
 import type { CoordKey } from '../../engine/coord-key';
+import type { GameStateId } from '../../engine/game-state-id';
 import type { MatchId } from '../../engine/match-id';
 import type { IPieceSource } from '../../engine/piece-source';
 import type { IMergeable } from './mergeable';
@@ -14,7 +15,8 @@ export interface MergeView {
 
 // The state of one Hexa Merge game. It narrows `board` to the board of its topology.
 // It is an entity inside the `GameEngine` aggregate (classes.md decisions 7 and 26).
-// Its identity is the `MatchId` of its game. The state after a slide keeps it.
+// Its identity is its own `GameStateId`, and `equals()` compares only that identity.
+// It also keeps the `MatchId` of its game, and `belongsTo()` reads it. The state after a slide keeps both.
 // It changes only through its own methods. `addNewTile()` and `addPoints()` change it in place.
 // `slide()` gives the state after the slide and leaves this state unchanged, as the Fit moves do.
 // So `targetReached` and `merged` stay read-only. The rules decide when to call each method.
@@ -35,6 +37,7 @@ export class MergeState<
   TAxis extends string,
 > implements BoardState<TCell, TCoord> {
   constructor(
+    private readonly stateId: GameStateId,
     private readonly matchId: MatchId,
     readonly board: Board<TCell, TCoord, TAxis>,
     readonly tiles: IPieceSource<NewTile<TCell>>,
@@ -73,6 +76,7 @@ export class MergeState<
     for (const [c] of this.board.cells()) board.vacate(c);
     for (const [c, cell] of plan.cells) board.occupy(c, cell);
     return new MergeState(
+      this.stateId,
       this.matchId,
       board,
       this.tiles,
@@ -94,10 +98,10 @@ export class MergeState<
     return this.matchId.equals(match);
   }
 
-  // Two states are the same state when they belong to the same match.
-  // Their boards, their scores and their other values do not count.
+  // Two states with one `GameStateId` are the same state.
+  // Their matches, their boards, their scores and their other values do not count.
   equals(other: BoardState<TCell, TCoord>): boolean {
-    return other.belongsTo(this.matchId);
+    return other instanceof MergeState && this.stateId.equals(other.stateId);
   }
 
   view(): MergeView {
@@ -106,6 +110,7 @@ export class MergeState<
 
   clone(): MergeState<TCell, TCoord, TAxis> {
     return new MergeState(
+      this.stateId,
       this.matchId,
       this.board.clone(),
       this.tiles.clone(),

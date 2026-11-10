@@ -30,6 +30,7 @@ import {
   type TriangleCoord,
 } from '../../../support/engine/triangle-topology';
 import { MATCH_ID } from '../../../support/engine/match-id';
+import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 
 // The Fit rules suite (APP-NFR-12: one rules suite per variant).
 // The square double keeps the coordinates easy to read. The triangle double has
@@ -51,7 +52,7 @@ function figure<TCoord>(
   topology: GridTopology<TCoord, string, string>,
   shape: BoardShape<TCoord>,
 ): Board<PieceId, TCoord, string> {
-  return new Board<PieceId, TCoord, string>(shape, topology);
+  return new Board<PieceId, TCoord, string>(BOARD_ID, shape, topology);
 }
 
 // A 2 × 2 square figure and two horizontal dominoes: they cover it exactly.
@@ -59,6 +60,7 @@ function dominoLevel(): FitState<SquareCoord> {
   const shape = squareTopology.region(RegionSize.of(2));
   const domino = [square(0, 0), square(1, 0)];
   return FitState.start(
+    STATE_ID,
     MATCH_ID,
     figure(squareTopology, shape),
     new FixedListPieceSource([piece(A, domino), piece(B, domino)]),
@@ -166,6 +168,7 @@ describe('FitRules', () => {
     // One step of 60° around their shared vertex maps (0,0) to (1,0).
     const rules = new FitRules<TriangleCoord>();
     const start = FitState.start(
+      STATE_ID,
       MATCH_ID,
       figure(triangleTopology, triangleTopology.region(RegionSize.of(1))),
       new FixedListPieceSource([piece(A, [triangle(0, 0)])]),
@@ -245,6 +248,7 @@ describe('FitRules', () => {
     const shape = BoardShape.of([square(0, 0), square(1, 0), square(2, 0)]);
     const engine = engineOn(
       FitState.start(
+        STATE_ID,
         MATCH_ID,
         figure(squareTopology, shape),
         new FixedListPieceSource([
@@ -280,6 +284,7 @@ describe('FitRules', () => {
 
     expect(() =>
       FitState.start(
+        STATE_ID,
         MATCH_ID,
         figure(squareTopology, shape),
         new FixedListPieceSource([piece(A, [square(0, 0)]), piece(A, [square(0, 0)])]),
@@ -339,6 +344,7 @@ describe('FitRules edge cases', () => {
     const source = new FixedListPieceSource([piece(A, domino), piece(B, domino)]);
 
     const state = FitState.start(
+      STATE_ID,
       MATCH_ID,
       figure(squareTopology, squareTopology.region(RegionSize.of(2))),
       source,
@@ -355,6 +361,7 @@ describe('FitRules edge cases', () => {
     // A level without pieces never covers its figure.
     const rules = new FitRules<SquareCoord>();
     const empty = FitState.start(
+      STATE_ID,
       MATCH_ID,
       figure(squareTopology, squareTopology.region(RegionSize.of(2))),
       new FixedListPieceSource<Piece<PieceId, SquareCoord>>([]),
@@ -377,6 +384,7 @@ describe('FitRules edge cases', () => {
     board.occupy(square(0, 0), PieceId.of('x'));
     const domino = [square(0, 0), square(1, 0)];
     const start = FitState.start(
+      STATE_ID,
       MATCH_ID,
       board,
       new FixedListPieceSource([piece(A, domino), piece(B, domino)]),
@@ -443,6 +451,7 @@ describe('FitRules edge cases', () => {
     const domino = [square(0, 0), square(1, 0)];
     const engine = engineOn(
       FitState.start(
+        STATE_ID,
         MATCH_ID,
         figure(failing, failing.region(RegionSize.of(2))),
         new FixedListPieceSource([piece(A, domino), piece(B, domino)]),
@@ -470,6 +479,7 @@ describe('FitRules edge cases', () => {
     const domino = [square(0, 0), square(1, 0)];
     const engine = engineOn(
       FitState.start(
+        STATE_ID,
         MATCH_ID,
         figure(outward, outward.region(RegionSize.of(2))),
         new FixedListPieceSource([piece(A, domino), piece(B, domino)]),

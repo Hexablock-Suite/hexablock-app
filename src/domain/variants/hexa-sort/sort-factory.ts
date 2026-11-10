@@ -1,6 +1,8 @@
 import type { Board } from '../../engine/board';
+import type { BoardId } from '../../engine/board-id';
 import { BoardBuilder } from '../../engine/board-builder';
 import { GameId } from '../../engine/game-id';
+import type { GameStateId } from '../../engine/game-state-id';
 import type { GeometryFactory } from '../../engine/geometry-factory';
 import type { MatchId } from '../../engine/match-id';
 import type { Piece } from '../../engine/piece';
@@ -53,14 +55,15 @@ export class SortFactory<TCoord> implements IVariantFactory<
     return this.level.source.clone();
   }
 
-  createBoard(): Board<ColorStack, TCoord, string> {
-    return new BoardBuilder(this.geometry).withRegion(this.level.size).build<ColorStack>();
+  createBoard(boardId: BoardId): Board<ColorStack, TCoord, string> {
+    return new BoardBuilder(this.geometry).withRegion(this.level.size).build<ColorStack>(boardId);
   }
 
-  createInitialState(matchId: MatchId): SortState<TCoord> {
+  createInitialState(matchId: MatchId, stateId: GameStateId, boardId: BoardId): SortState<TCoord> {
     return SortState.start({
+      stateId,
       matchId,
-      board: this.createBoard(),
+      board: this.createBoard(boardId),
       source: this.createPieceSource(),
       goalsNeeded: this.level.goalsNeeded,
     });

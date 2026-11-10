@@ -25,6 +25,7 @@ import {
   type TriangleAxis,
   type TriangleDirection,
 } from '../../support/engine/triangle-topology';
+import { BOARD_ID } from '../../support/engine/entity-ids';
 
 // Issue 86: the engine signatures take closed types, not free primitives.
 // A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails
@@ -32,7 +33,7 @@ import {
 
 describe('closed axis unions', () => {
   it('should_reject_at_compile_time_when_a_board_line_names_an_axis_the_topology_lacks', () => {
-    const board = new Board(squareTopology.region(RegionSize.of(2)), squareTopology);
+    const board = new Board(BOARD_ID, squareTopology.region(RegionSize.of(2)), squareTopology);
 
     // @ts-expect-error `diagonal` is not an axis of the square topology.
     expect(() => [...board.line('diagonal', square(0, 0))]).toThrow(RangeError);
@@ -44,7 +45,7 @@ describe('closed axis unions', () => {
   });
 
   it('should_reject_at_compile_time_when_a_board_line_has_a_misspelled_axis', () => {
-    const board = new Board(triangleTopology.region(RegionSize.of(2)), triangleTopology);
+    const board = new Board(BOARD_ID, triangleTopology.region(RegionSize.of(2)), triangleTopology);
 
     // @ts-expect-error `rwo` is not an axis of the triangle topology.
     expect(() => [...board.line('rwo', triangle(0, 0))]).toThrow(RangeError);
@@ -103,7 +104,7 @@ describe('Radius', () => {
   });
 
   it('should_give_the_center_when_a_board_ring_has_radius_zero', () => {
-    const board = new Board(squareTopology.region(RegionSize.of(3)), squareTopology);
+    const board = new Board(BOARD_ID, squareTopology.region(RegionSize.of(3)), squareTopology);
 
     expect([...board.ring(square(1, 1), Radius.of(0))]).toEqual([square(1, 1)]);
   });

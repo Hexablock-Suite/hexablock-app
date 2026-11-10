@@ -1,4 +1,5 @@
 import { Board } from './board';
+import type { BoardId } from './board-id';
 import { BoardShape } from './board-shape';
 import type { GeometryFactory } from './geometry-factory';
 import type { RegionSize } from './region-size';
@@ -25,11 +26,12 @@ export class BoardBuilder<TCoord> {
     return this;
   }
 
-  // Each call gives a new empty board. Two boards share only the shape, which never changes.
-  build<TCell>(): Board<TCell, TCoord, string> {
+  // Each call gives a new empty board with the id `id`.
+  // Two boards share only the shape, which never changes.
+  build<TCell>(id: BoardId): Board<TCell, TCoord, string> {
     if (this.shape === undefined) {
       throw new RangeError('A board builder needs a region or a figure.');
     }
-    return new Board<TCell, TCoord, string>(this.shape, this.geometry.createTopology());
+    return new Board<TCell, TCoord, string>(id, this.shape, this.geometry.createTopology());
   }
 }

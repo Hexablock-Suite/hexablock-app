@@ -1,7 +1,9 @@
 import type { Board } from '../../engine/board';
+import type { BoardId } from '../../engine/board-id';
 import { BoardBuilder } from '../../engine/board-builder';
 import type { Color } from '../../engine/color';
 import { GameId } from '../../engine/game-id';
+import type { GameStateId } from '../../engine/game-state-id';
 import type { GeometryFactory } from '../../engine/geometry-factory';
 import type { MatchId } from '../../engine/match-id';
 import { Piece } from '../../engine/piece';
@@ -60,12 +62,12 @@ export class LinesFactory<TCoord> implements IVariantFactory<
     );
   }
 
-  createBoard(): Board<Color, TCoord, string> {
-    return new BoardBuilder(this.geometry).withRegion(this.settings.size).build<Color>();
+  createBoard(boardId: BoardId): Board<Color, TCoord, string> {
+    return new BoardBuilder(this.geometry).withRegion(this.settings.size).build<Color>(boardId);
   }
 
-  createInitialState(matchId: MatchId): LinesState<TCoord> {
-    return LinesState.start(matchId, this.createBoard(), this.createPieceSource());
+  createInitialState(matchId: MatchId, stateId: GameStateId, boardId: BoardId): LinesState<TCoord> {
+    return LinesState.start(stateId, matchId, this.createBoard(boardId), this.createPieceSource());
   }
 
   // Hexa Lines has no undo (APP-FR-08, classes.md decision 3).

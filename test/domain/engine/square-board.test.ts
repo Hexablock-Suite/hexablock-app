@@ -10,10 +10,11 @@ import {
   type SquareAxis,
   type SquareCoord,
 } from '../../support/engine/square-topology';
+import { BOARD_ID } from '../../support/engine/entity-ids';
 
 // APP-NFR-13 (D4): the board runs with a cell type and a topology that exist only in test/.
 function newBoard(): Board<FakeCell, SquareCoord, SquareAxis> {
-  return new Board(squareTopology.region(RegionSize.of(3)), squareTopology);
+  return new Board(BOARD_ID, squareTopology.region(RegionSize.of(3)), squareTopology);
 }
 
 describe('Board with the square topology double', () => {

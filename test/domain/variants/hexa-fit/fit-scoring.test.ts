@@ -19,6 +19,7 @@ import { PieceId } from '../../../../src/domain/variants/hexa-fit/piece-id';
 import { RecordingPublisher } from '../../../support/engine/fake-game';
 import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
 import { MATCH_ID } from '../../../support/engine/match-id';
+import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 
 // The Fit scoring of issue #98. It codes the accepted rule of issue #59 (D22):
 // no points per turn, and a star needs both of its thresholds (moves and time).
@@ -35,8 +36,10 @@ function dominoLevel(): FitState<SquareCoord> {
   const domino = [square(0, 0), square(1, 0)];
   const piece = (id: PieceId) => new Piece(new ShapeGroup(domino.map((c) => new CellNode(c))), id);
   return FitState.start(
+    STATE_ID,
     MATCH_ID,
     new Board<PieceId, SquareCoord, string>(
+      BOARD_ID,
       squareTopology.region(RegionSize.of(2)),
       squareTopology,
     ),

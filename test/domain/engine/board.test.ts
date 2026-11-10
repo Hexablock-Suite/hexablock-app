@@ -1,5 +1,6 @@
 /** @jest-environment node */
 import { Board, BoardSpace } from '../../../src/domain/engine/board';
+import { BoardId } from '../../../src/domain/engine/board-id';
 import { BoardShape } from '../../../src/domain/engine/board-shape';
 import { coordKey, type CoordKey } from '../../../src/domain/engine/coord-key';
 import type { GridTopology } from '../../../src/domain/engine/grid-topology';
@@ -7,6 +8,7 @@ import { Radius } from '../../../src/domain/engine/radius';
 import { RegionSize } from '../../../src/domain/engine/region-size';
 import { Turns } from '../../../src/domain/engine/turns';
 import { ColorStack } from '../../../src/domain/variants/hexa-sort/color-stack';
+import { BOARD_ID } from '../../support/engine/entity-ids';
 
 // A one-dimensional topology: a coordinate is an integer on a strip.
 // It exists only in this test, so the board test needs no real geometry.
@@ -31,7 +33,7 @@ const stripTopology: GridTopology<number, 'x', 'left' | 'right'> = {
 
 // The board covers the cells 0 to 4.
 function newBoard(): Board<string, number, 'x'> {
-  return new Board(stripTopology.region(RegionSize.of(5)), stripTopology);
+  return new Board(BOARD_ID, stripTopology.region(RegionSize.of(5)), stripTopology);
 }
 
 describe('Board', () => {
@@ -77,6 +79,7 @@ describe('Board', () => {
     board.occupy(1, 'blue');
     board.occupy(3, 'green');
     const initial = new Board<string, number, 'x'>(
+      BOARD_ID,
       stripTopology.region(RegionSize.of(5)),
       stripTopology,
       new Map<CoordKey, [number, string]>([
@@ -100,6 +103,7 @@ describe('Board', () => {
   // Sort marks a free cell with an empty stack. Every other variant leaves the coordinate unset.
   it('should_keep_both_forms_of_a_free_cell_when_the_board_is_read', () => {
     const board = new Board<ColorStack, number, 'x'>(
+      BOARD_ID,
       stripTopology.region(RegionSize.of(5)),
       stripTopology,
     );
@@ -114,6 +118,7 @@ describe('Board', () => {
 
   it('should_list_an_undefined_cell_when_it_occupies_a_coordinate', () => {
     const board = new Board<string | undefined, number, 'x'>(
+      BOARD_ID,
       stripTopology.region(RegionSize.of(5)),
       stripTopology,
     );
@@ -160,6 +165,7 @@ describe('Board', () => {
   // A cell is a value: the clone holds the same cell objects, and never copies them.
   it('should_share_the_cell_objects_when_the_board_is_cloned', () => {
     const board = new Board<{ color: string }, number, 'x'>(
+      BOARD_ID,
       stripTopology.region(RegionSize.of(5)),
       stripTopology,
     );
@@ -210,6 +216,41 @@ describe('Board', () => {
 });
 
 // R7: the board changes only through `occupy` and `vacate`, two business intentions.
+// The board is an entity inside the state (classes.md decision 7). Its `BoardId` is its identity.
+describe('Board identity', () => {
+  it('should_be_the_same_board_when_two_boards_have_one_id_whatever_they_hold', () => {
+    const board = newBoard();
+    const copy = board.clone();
+    const sameId = new Board<string, number, 'x'>(BOARD_ID, BoardShape.of([7]), stripTopology);
+
+    board.occupy(1, 'red');
+    copy.occupy(2, 'blue');
+    copy.vacate(2);
+
+    expect([board.equals(copy), copy.equals(board), board.equals(board)]).toEqual([
+      true,
+      true,
+      true,
+    ]);
+    expect([board.equals(sameId), sameId.equals(board)]).toEqual([true, true]);
+  });
+
+  it('should_be_another_board_when_two_boards_have_different_ids_and_the_same_cells', () => {
+    const board = newBoard();
+    const other = new Board<string, number, 'x'>(
+      BoardId.of('board-b'),
+      stripTopology.region(RegionSize.of(5)),
+      stripTopology,
+    );
+    board.occupy(1, 'red');
+    other.occupy(1, 'red');
+
+    expect(board.cells()).toEqual(other.cells());
+    expect([board.equals(other), other.equals(board)]).toEqual([false, false]);
+    expect([board.clone().equals(other), other.clone().equals(board)]).toEqual([false, false]);
+  });
+});
+
 describe('Board occupy and vacate', () => {
   it('should_hold_the_cell_when_a_cell_occupies_a_coordinate', () => {
     const board = newBoard();
@@ -334,8 +375,8 @@ describe('Board shape invariants', () => {
   it('should_throw_a_range_error_when_the_shape_repeats_a_coordinate', () => {
     const shape = BoardShape.of([0, 1, 1]);
 
-    expect(() => new Board(shape, stripTopology)).toThrow(RangeError);
-    expect(() => new Board(shape, stripTopology)).toThrow('the same key');
+    expect(() => new Board(BOARD_ID, shape, stripTopology)).toThrow(RangeError);
+    expect(() => new Board(BOARD_ID, shape, stripTopology)).toThrow('the same key');
   });
 
   it('should_throw_a_range_error_when_the_topology_gives_two_coordinates_the_same_key', () => {
@@ -344,16 +385,16 @@ describe('Board shape invariants', () => {
       key: (c) => coordKey(String(c % 2)),
     };
 
-    expect(() => new Board(stripTopology.region(RegionSize.of(3)), collidingTopology)).toThrow(
-      RangeError,
-    );
-    expect(() => new Board(stripTopology.region(RegionSize.of(3)), collidingTopology)).toThrow(
-      'the same key',
-    );
+    expect(
+      () => new Board(BOARD_ID, stripTopology.region(RegionSize.of(3)), collidingTopology),
+    ).toThrow(RangeError);
+    expect(
+      () => new Board(BOARD_ID, stripTopology.region(RegionSize.of(3)), collidingTopology),
+    ).toThrow('the same key');
   });
 
   it('should_keep_every_coordinate_when_the_shape_has_no_repeated_key', () => {
-    const board = new Board(BoardShape.of([4, 2, 0]), stripTopology);
+    const board = new Board(BOARD_ID, BoardShape.of([4, 2, 0]), stripTopology);
 
     expect(board.shape.cells).toEqual([4, 2, 0]);
     expect([0, 2, 4].every((c) => board.contains(c))).toBe(true);
@@ -369,8 +410,8 @@ describe('Board initial content', () => {
     const shape = stripTopology.region(RegionSize.of(5));
     const content = contentOf([coordKey('7'), [7, 'red']]);
 
-    expect(() => new Board(shape, stripTopology, content)).toThrow(RangeError);
-    expect(() => new Board(shape, stripTopology, content)).toThrow(
+    expect(() => new Board(BOARD_ID, shape, stripTopology, content)).toThrow(RangeError);
+    expect(() => new Board(BOARD_ID, shape, stripTopology, content)).toThrow(
       'The coordinate 7 is outside the board.',
     );
   });
@@ -379,8 +420,8 @@ describe('Board initial content', () => {
     const shape = stripTopology.region(RegionSize.of(5));
     const content = contentOf([coordKey('3'), [1, 'red']]);
 
-    expect(() => new Board(shape, stripTopology, content)).toThrow(RangeError);
-    expect(() => new Board(shape, stripTopology, content)).toThrow(
+    expect(() => new Board(BOARD_ID, shape, stripTopology, content)).toThrow(RangeError);
+    expect(() => new Board(BOARD_ID, shape, stripTopology, content)).toThrow(
       'The key 3 does not match the key 1 of its coordinate.',
     );
   });
@@ -388,6 +429,7 @@ describe('Board initial content', () => {
   it('should_keep_the_board_unchanged_when_the_caller_changes_an_initial_tuple', () => {
     const tuple: [number, string] = [1, 'red'];
     const board = new Board(
+      BOARD_ID,
       stripTopology.region(RegionSize.of(5)),
       stripTopology,
       contentOf([coordKey('1'), tuple]),
@@ -404,6 +446,7 @@ describe('Board initial content', () => {
 
   it('should_keep_the_initial_cells_when_the_content_matches_the_shape', () => {
     const board = new Board(
+      BOARD_ID,
       stripTopology.region(RegionSize.of(5)),
       stripTopology,
       contentOf([coordKey('0'), [0, 'red']], [coordKey('4'), [4, 'blue']]),

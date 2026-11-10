@@ -11,6 +11,7 @@ import {
   triangleTopology,
   type TriangleCoord,
 } from '../../support/engine/triangle-topology';
+import { BOARD_ID } from '../../support/engine/entity-ids';
 
 // Classes.md decision 16: a triangle points up or down by the parity of column plus row.
 // An engine that adds two coordinates one component at a time flips that parity
@@ -103,7 +104,7 @@ describe('Piece translation on the triangle topology double', () => {
   });
 
   it('should_walk_the_strip_when_a_board_line_follows_the_row_axis', () => {
-    const board = new Board(triangleTopology.region(RegionSize.of(2)), triangleTopology);
+    const board = new Board(BOARD_ID, triangleTopology.region(RegionSize.of(2)), triangleTopology);
 
     expect([...board.line('row', triangle(2, 0))]).toEqual([
       triangle(0, 0),
@@ -114,7 +115,7 @@ describe('Piece translation on the triangle topology double', () => {
   });
 
   it('should_zigzag_inside_the_board_when_a_board_line_follows_a_diagonal_axis', () => {
-    const board = new Board(triangleTopology.region(RegionSize.of(2)), triangleTopology);
+    const board = new Board(BOARD_ID, triangleTopology.region(RegionSize.of(2)), triangleTopology);
 
     expect([...board.line('down-right', triangle(1, 0))]).toEqual([
       triangle(1, 0),

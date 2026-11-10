@@ -52,6 +52,12 @@ import { linesFactory } from '../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../support/variants/hexa-merge/merge-game';
 import { sortFactory, stack, stackPiece } from '../support/variants/hexa-sort/sort-game';
 import { CountingMatchIds, MATCH_ID } from '../support/engine/match-id';
+import {
+  BOARD_ID,
+  CountingBoardIds,
+  CountingStateIds,
+  STATE_ID,
+} from '../support/engine/entity-ids';
 
 // `StartGame` and `ApplyMove` run the four variants through one code path (issue 100,
 // APP-FR-03, classes.md decisions 9, 28 and 29). The helper reads only `IVariantFactory`.
@@ -126,7 +132,7 @@ function brokenStart<
     createRules: () => factory.createRules(),
     createScoring: () => factory.createScoring(),
     createPieceSource: () => factory.createPieceSource(),
-    createBoard: () => factory.createBoard(),
+    createBoard: (boardId) => factory.createBoard(boardId),
     createInitialState: () => {
       throw new RangeError('The level is broken.');
     },
@@ -270,7 +276,7 @@ describe('StartGame and ApplyMove', () => {
 
     const error = errorOf(await startGame.execute({}));
 
-    expect(() => factory.createInitialState(MATCH_ID)).toThrow(
+    expect(() => factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID)).toThrow(
       new RangeError('The level source cannot be copied.'),
     );
 
@@ -293,6 +299,8 @@ describe('StartGame and ApplyMove', () => {
       new GameFactory(
         brokenStart(linesFactory()),
         new CountingMatchIds(),
+        new CountingStateIds(),
+        new CountingBoardIds(),
         new RecordingPublisher(),
       ),
       games,
@@ -351,6 +359,8 @@ describe('StartGame and ApplyMove', () => {
             throw new Error('The generator has no id.');
           },
         },
+        new CountingStateIds(),
+        new CountingBoardIds(),
         new RecordingPublisher(),
       ),
       working.games,
@@ -397,7 +407,13 @@ describe('StartGame and ApplyMove', () => {
 
   it('should_return_a_start_failed_failure_when_the_store_throws_on_replace', async () => {
     const startGame = new StartGame(
-      new GameFactory(linesFactory(), new CountingMatchIds(), new RecordingPublisher()),
+      new GameFactory(
+        linesFactory(),
+        new CountingMatchIds(),
+        new CountingStateIds(),
+        new CountingBoardIds(),
+        new RecordingPublisher(),
+      ),
       new ThrowingStore('replace'),
     );
 

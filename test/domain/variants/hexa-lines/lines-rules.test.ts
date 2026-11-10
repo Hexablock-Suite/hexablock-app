@@ -26,6 +26,7 @@ import {
   piece,
 } from '../../../support/variants/hexa-lines/lines-game';
 import { MATCH_ID } from '../../../support/engine/match-id';
+import { STATE_ID } from '../../../support/engine/entity-ids';
 
 // The rules suite of Hexa Lines (issue 91, APP-NFR-02, APP-NFR-12).
 // The combo and the streak follow the proposal on issue 58,
@@ -368,7 +369,7 @@ describe('Hexa Lines rules edge cases', () => {
     };
     const games = [
       {
-        game: linesGame(new LinesState(MATCH_ID, base.board, base.tray, failingSource)),
+        game: linesGame(new LinesState(STATE_ID, MATCH_ID, base.board, base.tray, failingSource)),
         error: 'The source failed.',
       },
       {
