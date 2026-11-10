@@ -332,9 +332,9 @@
           1
         </text>
         <!-- Lollipops: engine interface and its binding -->
-        <line x1="260" y1="630" x2="276" y2="630" stroke="#17212a" stroke-width="1" />
-        <circle cx="281" cy="630" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="292" y="633" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="56" y1="534" x2="56" y2="545" stroke="#17212a" stroke-width="1" />
+        <circle cx="56" cy="550" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="67" y="553" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           BoardState‹Color, TCoord›
         </text>
         <line x1="316" y1="104" x2="316" y2="120" stroke="#17212a" stroke-width="1" />
@@ -353,21 +353,21 @@
           IVariantFactory‹Color, TCoord, PlacePiece, LinesState›
         </text>
 
-        <!-- Class: PlacePiece (value object) -->
+        <!-- Class: PlacePiece (value object, decision 43) -->
         <rect
-          x="36"
-          y="64"
-          width="204"
-          height="88"
+          x="292"
+          y="344"
+          width="328"
+          height="256"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="36" y1="112" x2="240" y2="112" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="292" y1="392" x2="620" y2="392" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="138"
-          y="82"
+          x="456"
+          y="362"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -377,8 +377,8 @@
           «value object»
         </text>
         <text
-          x="138"
-          y="100"
+          x="456"
+          y="380"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -387,17 +387,48 @@
         >
           PlacePiece
         </text>
-        <text x="52" y="128" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + trayIndex: number
+        <text x="308" y="408" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - trayIndex: number
         </text>
-        <text x="52" y="144" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + at: TCoord
+        <text x="308" y="424" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - at: TCoord
+        </text>
+        <line x1="292" y1="432" x2="620" y2="432" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="308" y="448" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + PlacePiece(trayIndex: number, at: TCoord)
+        </text>
+        <text x="308" y="464" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + pieceIn(tray: TPiece[]): TPiece | undefined
+        </text>
+        <text x="308" y="480" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + trayWithout(tray: TPiece[]): TPiece[]
+        </text>
+        <text x="308" y="496" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + cells(piece: Piece&lt;TCell, TCoord&gt;, topology:
+        </text>
+        <text x="319" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          GridTopology&lt;TCoord, string, string&gt;): TCoord[]
+        </text>
+        <text x="308" y="528" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + missingPiece(): RangeError
+        </text>
+        <text x="308" y="544" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + misfit(topology: { key(c: TCoord): CoordKey }):
+        </text>
+        <text x="319" y="560" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          RangeError
+        </text>
+        <text x="308" y="576" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: PlacePiece&lt;TCoord&gt;, topology:
+        </text>
+        <text x="319" y="592" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          { key(c: TCoord): CoordKey }): boolean
         </text>
 
         <!-- Class: LinesState (entity) -->
         <rect
           x="36"
-          y="172"
+          y="64"
           width="224"
           height="470"
           rx="6"
@@ -405,11 +436,11 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="36" y1="220" x2="260" y2="220" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="36" y1="368" x2="260" y2="368" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="36" y1="112" x2="260" y2="112" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="36" y1="260" x2="260" y2="260" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="148"
-          y="190"
+          y="82"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -420,7 +451,7 @@
         </text>
         <text
           x="148"
-          y="208"
+          y="100"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -429,39 +460,39 @@
         >
           LinesState
         </text>
-        <text x="52" y="236" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="52" y="128" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - stateId: GameStateId
         </text>
-        <text x="52" y="250" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="52" y="142" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - matchId: MatchId
         </text>
-        <text x="52" y="264" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="52" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - board: Board&lt;Color, TCoord&gt;
         </text>
-        <text x="52" y="278" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="52" y="170" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - tray: Piece&lt;Color, TCoord&gt;[]
         </text>
-        <text x="52" y="292" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="52" y="184" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - source:
         </text>
-        <text x="60" y="306" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="60" y="198" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           IPieceSource&lt;Piece&lt;Color, TCoord&gt;&gt;
         </text>
-        <text x="52" y="320" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="52" y="212" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - streak: number
         </text>
-        <text x="52" y="334" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="52" y="226" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - linesCleared: number
         </text>
-        <text x="52" y="348" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="52" y="240" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - cellsPlaced: number
         </text>
-        <text x="52" y="362" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="52" y="254" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - score: Score
         </text>
         <text
           x="52"
-          y="384"
+          y="276"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -471,7 +502,7 @@
         </text>
         <text
           x="60"
-          y="398"
+          y="290"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -481,7 +512,7 @@
         </text>
         <text
           x="60"
-          y="412"
+          y="304"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -491,7 +522,7 @@
         </text>
         <text
           x="60"
-          y="426"
+          y="318"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -501,7 +532,7 @@
         </text>
         <text
           x="60"
-          y="440"
+          y="332"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -509,47 +540,47 @@
         >
           TCoord&gt;&gt;): LinesState&lt;TCoord&gt;
         </text>
-        <text x="52" y="454" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="52" y="346" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + canPlace(move: PlacePiece&lt;TCoord&gt;):
         </text>
-        <text x="60" y="468" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="60" y="360" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           boolean
         </text>
-        <text x="52" y="482" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="52" y="374" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + placePiece(move:
         </text>
-        <text x="60" y="496" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="60" y="388" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           PlacePiece&lt;TCoord&gt;): void
         </text>
-        <text x="52" y="510" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="52" y="402" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + clearLines(lines: TCoord[][]): void
         </text>
-        <text x="52" y="524" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="52" y="416" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + addPoints(points: Score): void
         </text>
-        <text x="52" y="538" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="52" y="430" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + belongsTo(match: MatchId): boolean
         </text>
-        <text x="52" y="552" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="52" y="444" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: BoardState&lt;Color,
         </text>
-        <text x="60" y="566" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="60" y="458" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           TCoord&gt;): boolean
         </text>
-        <text x="52" y="580" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="52" y="472" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + snapshot(): LinesSnapshot&lt;TCoord&gt;
         </text>
-        <text x="52" y="594" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="52" y="486" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + clone(): LinesState&lt;TCoord&gt;
         </text>
-        <text x="52" y="636" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="52" y="528" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - drawTray(): void
         </text>
 
-        <text x="52" y="608" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="52" y="500" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + restore(snapshot:
         </text>
-        <text x="60" y="622" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="60" y="514" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           LinesSnapshot&lt;TCoord&gt;): void
         </text>
 
@@ -753,7 +784,28 @@
         </text>
 
         <rect
-          x="204"
+          x="584"
+          y="334"
+          width="48"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="608"
+          y="346"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCoord
+        </text>
+        <rect
+          x="224"
           y="54"
           width="48"
           height="18"
@@ -764,29 +816,8 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="228"
-          y="66"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          TCoord
-        </text>
-        <rect
-          x="224"
-          y="162"
-          width="48"
-          height="18"
-          rx="2"
-          fill="#ffffff"
-          stroke="#5b6873"
-          stroke-width="0.8"
-          stroke-dasharray="4,3"
-        />
-        <text
           x="248"
-          y="174"
+          y="66"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
