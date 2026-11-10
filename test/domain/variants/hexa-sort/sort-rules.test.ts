@@ -264,7 +264,7 @@ describe('SortRules edge cases', () => {
       squareTopology.region(RegionSize.of(3)),
       squareTopology,
     );
-    for (const [at, cell] of content) board.set(at, cell);
+    for (const [at, cell] of content) board.occupy(at, cell);
     return board;
   }
 

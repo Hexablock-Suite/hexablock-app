@@ -169,7 +169,7 @@ describe('GameEngine undo capability', () => {
     const { engine, undoable } = historyGame();
     engine.play(moveAt(0));
 
-    engine.snapshot().board.set(square(1, 1), fakeCell(9));
+    engine.snapshot().board.occupy(square(1, 1), fakeCell(9));
     undoable.undo();
 
     expect(factsOf(engine)).toEqual({ cells: [], score: 0, phase: 'playing' });

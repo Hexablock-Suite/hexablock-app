@@ -47,7 +47,7 @@ export function mergeState(
     hexTopology.region(RegionSize.of(size)),
     hexTopology,
   );
-  for (const [at, value] of tiles) board.set(at, MergeTile.of(value));
+  for (const [at, value] of tiles) board.occupy(at, MergeTile.of(value));
   return new MergeState(board, source);
 }
 

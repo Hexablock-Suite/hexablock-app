@@ -234,7 +234,7 @@ describe('GameEngine.play()', () => {
     engine.start(emptyState());
 
     const copy = engine.snapshot();
-    copy.board.set(square(0, 0), fakeCell(5));
+    copy.board.occupy(square(0, 0), fakeCell(5));
     copy.score = 99;
 
     expect(engine.snapshot().board.get(square(0, 0))).toBeUndefined();
@@ -246,7 +246,7 @@ describe('GameEngine.play()', () => {
     const initial = emptyState();
     engine.start(initial);
 
-    initial.board.set(square(0, 0), fakeCell(5));
+    initial.board.occupy(square(0, 0), fakeCell(5));
 
     expect(engine.snapshot().board.get(square(0, 0))).toBeUndefined();
   });
@@ -433,7 +433,7 @@ class FixedScoring extends OnePointScoring {
 // A scoring policy that changes the state it receives, then throws.
 class MutatingThrowingScoring extends OnePointScoring {
   override score(before: FakeState): number {
-    before.board.set(square(1, 1), fakeCell(9));
+    before.board.occupy(square(1, 1), fakeCell(9));
     before.score = 99;
     throw new Error('score failed');
   }

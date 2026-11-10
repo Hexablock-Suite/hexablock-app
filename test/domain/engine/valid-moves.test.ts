@@ -34,7 +34,7 @@ class AdjacentRules extends BaseGameRules<SquareCoord, FakeState> {
   }
 
   apply(state: FakeState, at: SquareCoord): FakeState {
-    state.board.set(at, fakeCell(1));
+    state.board.occupy(at, fakeCell(1));
     return state;
   }
 
@@ -89,7 +89,7 @@ function countingMoves(counter: { reads: number }): () => Iterable<number> {
 // A 5 × 5 board with one filled cell.
 function stateWithOneCell(at: SquareCoord): FakeState {
   const state = emptyState(5);
-  state.board.set(at, fakeCell(1));
+  state.board.occupy(at, fakeCell(1));
   return state;
 }
 
@@ -143,7 +143,8 @@ describe('validMoves() and the no-valid-move end check', () => {
   it('should_end_the_game_when_the_board_is_full', () => {
     const rules = new AdjacentRules();
     const state = emptyState(2);
-    for (const c of squareTopology.region(RegionSize.of(2)).cells) state.board.set(c, fakeCell(1));
+    for (const c of squareTopology.region(RegionSize.of(2)).cells)
+      state.board.occupy(c, fakeCell(1));
 
     expect(rules.evaluate(state)).toBe('game-over');
   });

@@ -180,6 +180,26 @@ describe('FitRules', () => {
     expect(cellsOf(back.state)).toEqual(['0,0=a']);
   });
 
+  // The board lists its cells in the order of their writes. A removed piece frees its cells,
+  // so the piece that comes back is listed after the pieces that stayed.
+  it('should_list_a_placed_again_piece_after_the_other_pieces_when_it_was_removed', () => {
+    const rules = new FitRules<SquareCoord>();
+    const both = [
+      new PlaceFitPiece(A, NO_TURN, square(0, 0)),
+      new PlaceFitPiece(B, NO_TURN, square(0, 1)),
+    ].reduce((state, move) => rules.playTurn(state, move).state, dominoLevel());
+
+    const removed = rules.playTurn(both, new RemoveFitPiece(A)).state;
+    const again = rules.playTurn(removed, new PlaceFitPiece(A, NO_TURN, square(0, 0))).state;
+
+    expect(again.board.cells()).toEqual([
+      [square(0, 1), B],
+      [square(1, 1), B],
+      [square(0, 0), A],
+      [square(1, 0), A],
+    ]);
+  });
+
   it('should_turn_the_piece_over_its_own_cell_when_the_turned_piece_keeps_that_cell', () => {
     const engine = engineOn(dominoLevel());
     engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)));
@@ -348,7 +368,7 @@ describe('FitRules edge cases', () => {
   it('should_keep_the_filled_figure_cells_and_reject_a_piece_on_them_when_the_figure_starts_with_content', () => {
     // A piece fits only on free cells of the figure (fit-rules.ts). The state copies the figure.
     const board = figure(squareTopology, squareTopology.region(RegionSize.of(2)));
-    board.set(square(0, 0), PieceId.of('x'));
+    board.occupy(square(0, 0), PieceId.of('x'));
     const domino = [square(0, 0), square(1, 0)];
     const start = FitState.start(
       board,

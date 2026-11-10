@@ -164,7 +164,7 @@ describe('TimedRulesDecorator', () => {
     const { clock, timer, engine, decorated } = timedGame();
     engine.play(moveAt(0));
     const finished = emptyState(1);
-    finished.board.set(square(0, 0), fakeCell(1));
+    finished.board.occupy(square(0, 0), fakeCell(1));
 
     const outcome = decorated.evaluate(finished);
     clock.advance(SECOND);

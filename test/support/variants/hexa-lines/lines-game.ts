@@ -38,7 +38,7 @@ export function linesState<TCoord>(
   },
 ): LinesState<TCoord> {
   const board = new Board<Color, TCoord, string>(topology.region(RegionSize.of(size)), topology);
-  for (const c of values.filled ?? []) board.set(c, red);
+  for (const c of values.filled ?? []) board.occupy(c, red);
   return new LinesState(board, values.tray, new FixedListPieceSource(values.source ?? []));
 }
 

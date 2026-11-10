@@ -88,7 +88,7 @@ describe('BoardBuilder', () => {
     const first = builder.build<string>();
     const second = builder.build<string>();
 
-    first.set(hex(0, 0), 'x');
+    first.occupy(hex(0, 0), 'x');
 
     expect(second).not.toBe(first);
     expect(second.get(hex(0, 0))).toBeUndefined();

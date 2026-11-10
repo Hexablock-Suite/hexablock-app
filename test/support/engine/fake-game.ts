@@ -78,7 +78,7 @@ export class SourceRules extends BaseGameRules<SquareCoord, SourceState> {
   }
 
   apply(state: SourceState, at: SquareCoord): SourceState {
-    state.board.set(at, state.source.next());
+    state.board.occupy(at, state.source.next());
     return state;
   }
 
@@ -111,7 +111,7 @@ export class FakeRules extends BaseGameRules<FakeMove, FakeState> {
 
   apply(state: FakeState, move: FakeMove): FakeState {
     this.log.push('apply');
-    state.board.set(move.at, move.cell);
+    state.board.occupy(move.at, move.cell);
     return state;
   }
 

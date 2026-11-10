@@ -28,7 +28,7 @@ describe('Board with the square topology double', () => {
   it('should_read_the_fake_cell_back_when_it_was_set', () => {
     const board = newBoard();
 
-    board.set(square(1, 2), fakeCell(7));
+    board.occupy(square(1, 2), fakeCell(7));
 
     expect(board.get(square(1, 2))).toEqual(fakeCell(7));
     expect(board.get(square(2, 1))).toBeUndefined();
@@ -69,10 +69,10 @@ describe('Board with the square topology double', () => {
 
   it('should_keep_the_clone_unchanged_when_the_original_changes', () => {
     const board = newBoard();
-    board.set(square(0, 0), fakeCell(1));
+    board.occupy(square(0, 0), fakeCell(1));
 
     const copy = board.clone();
-    board.set(square(0, 0), fakeCell(2));
+    board.occupy(square(0, 0), fakeCell(2));
 
     expect(copy.get(square(0, 0))).toEqual(fakeCell(1));
   });

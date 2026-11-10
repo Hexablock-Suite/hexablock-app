@@ -28,7 +28,7 @@ export class SortRules<TCoord> extends BaseGameRules<PlaceStack<TCoord>, SortSta
 
   apply(state: SortState<TCoord>, move: PlaceStack<TCoord>): SortState<TCoord> {
     if (state.offered === undefined) throw new RangeError('No stack is on offer.');
-    state.board.set(move.at, state.offered.content);
+    state.board.occupy(move.at, state.offered.content);
     state.placedAt = move.at;
     state.clearedTiles = [];
     state.offerNext();
@@ -77,9 +77,9 @@ function transfer<TCoord>(state: SortState<TCoord>, at: TCoord): TCoord[] {
   for (const giver of givers) {
     const from = board.get(giver) ?? ColorStack.empty();
     receiver = receiver.withOnTop(from.topRun());
-    board.set(giver, from.withoutTopRun());
+    board.occupy(giver, from.withoutTopRun());
   }
-  board.set(target, receiver);
+  board.occupy(target, receiver);
   clearIfGoal(state, target);
   return [...givers, target];
 }
@@ -108,7 +108,7 @@ function targetOf<TCoord>(
 function clearIfGoal<TCoord>(state: SortState<TCoord>, at: TCoord): void {
   const cell = state.board.get(at);
   if (cell === undefined || cell.topRun().length < GOAL_RUN) return;
-  state.board.set(at, ColorStack.empty());
+  state.board.occupy(at, ColorStack.empty());
   state.goalsDone += 1;
   state.clearedTiles.push(cell.tileCount());
 }

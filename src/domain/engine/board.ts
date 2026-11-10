@@ -35,6 +35,14 @@ export class BoardSpace<TCell, TCoord> implements Cloneable<BoardSpace<TCell, TC
     this.occupant = { cell };
   }
 
+  // An occupied space becomes free. A free space throws a RangeError and stays free.
+  vacate(): void {
+    if (this.occupant === undefined) {
+      throw new RangeError(`The space ${this.identity} is already free.`);
+    }
+    this.occupant = undefined;
+  }
+
   // Tells who occupies this space: a new pair of the coordinate and the cell, or none when free.
   // A caller cannot change the space through the pair.
   occupation(): [TCoord, TCell] | undefined {
@@ -54,10 +62,14 @@ export class BoardSpace<TCell, TCoord> implements Cloneable<BoardSpace<TCell, TC
 // Each written coordinate has one `BoardSpace`. The board gives no caller a space.
 // A cell is a value. The board copies the references to the cells, never the cells.
 // So `clone()` copies each space and shares the cell objects with the original board.
-// A caller must not change a cell object. To change a cell, the caller sets a new cell.
+// A caller must not change a cell object. To change a cell, a new cell occupies the coordinate.
+// The board is an entity inside the state (classes.md decision 7). It changes in place,
+// and only through two business intentions: `occupy()` and `vacate()`.
 // A space exists from its first write. So `cells()` lists the cells in first-write order.
+// A vacated space is free. When a cell occupies it again, that write counts as a first write.
+// So `cells()` gives the same order as a board built again from the cells that stay.
 // Each coordinate of the shape has its own topology key. Two equal keys are an error.
-// The initial content is checked like `set()`: each entry lies inside the shape,
+// The initial content is checked like `occupy()`: each entry lies inside the shape,
 // and its key is the topology key of its coordinate. The board keeps no pair of a caller.
 // `TAxis` is the axis union of the topology. The board reads no direction,
 // so it takes a topology with any direction union.
@@ -99,12 +111,21 @@ export class Board<TCell, TCoord, TAxis extends string> implements Cloneable<
     return this.content.get(this.topology.key(at))?.occupation()?.[1];
   }
 
-  // Changes the board in place. A coordinate outside the shape is an error.
-  set(c: TCoord, cell: TCell): void {
-    if (!this.contains(c)) {
-      throw new RangeError(`The coordinate ${this.topology.key(c)} is outside the board.`);
+  // The cell occupies the coordinate, free or occupied. A coordinate outside the shape
+  // throws a RangeError and leaves the board unchanged.
+  occupy(c: TCoord, cell: TCell): void {
+    this.occupySpace(this.insideKey(c), c, cell);
+  }
+
+  // The coordinate becomes free. A coordinate outside the shape, or a free coordinate,
+  // throws a RangeError and leaves the board unchanged.
+  vacate(c: TCoord): void {
+    const key = this.insideKey(c);
+    const space = this.content.get(key);
+    if (space?.occupation() === undefined) {
+      throw new RangeError(`The coordinate ${key} is already free.`);
     }
-    this.occupySpace(this.topology.key(c), c, cell);
+    space.vacate();
   }
 
   // The filled cells as new pairs, so a caller cannot change the board through them.
@@ -139,9 +160,18 @@ export class Board<TCell, TCoord, TAxis extends string> implements Cloneable<
     return copy;
   }
 
+  // The key of a coordinate inside the shape. Any other coordinate throws a RangeError.
+  private insideKey(c: TCoord): CoordKey {
+    const key = this.topology.key(c);
+    if (!this.inside.has(key)) throw new RangeError(`The coordinate ${key} is outside the board.`);
+    return key;
+  }
+
   // `Map.set` keeps the place of a key that exists. So the first write fixes the order.
+  // A free space leaves the map before it takes the cell, so it goes to the end of the order.
   private occupySpace(key: CoordKey, c: TCoord, cell: TCell): void {
     const space = this.content.get(key) ?? BoardSpace.free<TCell, TCoord>(c, this.topology);
+    if (space.occupation() === undefined) this.content.delete(key);
     space.occupy(cell);
     this.content.set(key, space);
   }

@@ -1,6 +1,5 @@
-import { Board } from '../../engine/board';
+import type { Board } from '../../engine/board';
 import type { BoardState } from '../../engine/board-state';
-import type { CoordKey } from '../../engine/coord-key';
 import type { Piece } from '../../engine/piece';
 import type { IPieceSource } from '../../engine/piece-source';
 import type { PieceId } from './piece-id';
@@ -69,22 +68,19 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
     const piece = this.pieces.get(id.value);
     if (piece === undefined) throw new RangeError(`The level has no piece ${id.value}.`);
     const board = this.board.clone();
-    for (const c of placement.cells(piece, board.topology)) board.set(c, id);
+    for (const c of placement.cells(piece, board.topology)) board.occupy(c, id);
     const placements = new Map(this.placements).set(id.value, placement);
     return new FitState(board, this.pieces, placements, this.moves, this.score);
   }
 
-  // Takes the piece off the figure. The board has no erase, so the state builds
-  // a new board from the other cells.
+  // Takes the piece off the figure: a copy of the board vacates each cell of the piece.
   remove(id: PieceId): FitState<TCoord> {
-    const { shape, topology } = this.board;
-    const content = new Map<CoordKey, [TCoord, PieceId]>();
+    const board = this.board.clone();
     for (const [c, cell] of this.board.cells()) {
-      if (!cell.equals(id)) content.set(topology.key(c), [c, cell]);
+      if (cell.equals(id)) board.vacate(c);
     }
     const placements = new Map(this.placements);
     placements.delete(id.value);
-    const board = new Board(shape, topology, content);
     return new FitState(board, this.pieces, placements, this.moves, this.score);
   }
 

@@ -117,7 +117,7 @@ export function addNewTile<TCell, TCoord, TAxis extends string>(
   const empty = board.shape.cells.filter((c) => board.get(c) === undefined);
   if (empty.length === 0 || !tiles.hasNext()) return;
   const { place, tile } = tiles.next();
-  board.set(empty[Math.floor(place * empty.length)] as TCoord, tile);
+  board.occupy(empty[Math.floor(place * empty.length)] as TCoord, tile);
 }
 
 function tileAt<TCell, TCoord>(board: Board<TCell, TCoord, string>, c: TCoord): TCell[] {

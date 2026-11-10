@@ -233,7 +233,7 @@ describe('one board gate (APP-NFR-01)', () => {
       squareTopology.region(RegionSize.of(2)),
       squareTopology,
     );
-    start.set(square(0, 0), ColorStack.of([Color.of('red')]));
+    start.occupy(square(0, 0), ColorStack.of([Color.of('red')]));
     const state = SortState.start({
       board: start,
       source: new FixedListPieceSource([]),

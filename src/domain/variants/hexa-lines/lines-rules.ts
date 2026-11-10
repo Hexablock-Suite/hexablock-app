@@ -33,7 +33,7 @@ export class LinesRules<TCoord> extends BaseGameRules<PlacePiece<TCoord>, LinesS
   apply(state: LinesState<TCoord>, move: PlacePiece<TCoord>): LinesState<TCoord> {
     const piece = state.tray[move.trayIndex]!;
     const cells = cellsOf(state.board, piece, move.at);
-    for (const c of cells) state.board.set(c, piece.content);
+    for (const c of cells) state.board.occupy(c, piece.content);
     state.cellsPlaced = cells.length;
     state.tray = state.tray.filter((_, i) => i !== move.trayIndex);
     if (state.tray.length === 0) state.tray = drawTray(state.source);

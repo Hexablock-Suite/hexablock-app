@@ -293,7 +293,7 @@ describe('Merge edge cases', () => {
         hexTopology.region(RegionSize.of(3)),
         hexTopology,
       );
-      for (const [at, cell] of cells) board.set(at, cell);
+      for (const [at, cell] of cells) board.occupy(at, cell);
       const engine = new GameEngine<
         Chip,
         HexCoord,
