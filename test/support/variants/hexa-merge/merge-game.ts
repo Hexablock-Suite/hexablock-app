@@ -12,8 +12,12 @@ import {
   type IPieceSource,
 } from '../../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
+import { Seed } from '../../../../src/domain/engine/seed';
 import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
-import { MergeFactory } from '../../../../src/domain/variants/hexa-merge/merge-factory';
+import {
+  MergeFactory,
+  MergeSettings,
+} from '../../../../src/domain/variants/hexa-merge/merge-factory';
 import { MergeRules } from '../../../../src/domain/variants/hexa-merge/merge-rules';
 import {
   MergeState,
@@ -97,11 +101,10 @@ export function mergeGame(
 
 // A Merge factory on a hexagon of 2 rings, with the target 2048.
 export function mergeFactory(seed = 1): MergeFactory<HexCoord> {
-  return new MergeFactory(new HexGeometry(), {
-    size: RegionSize.of(2),
-    seed,
-    target: MergeTile.of(2048),
-  });
+  return new MergeFactory(
+    new HexGeometry(),
+    MergeSettings.of(RegionSize.of(2), Seed.of(seed), MergeTile.of(2048)),
+  );
 }
 
 // A live state built again from a photo, so a test can ask the rules about the state that a game

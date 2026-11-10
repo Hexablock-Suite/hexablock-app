@@ -19,7 +19,9 @@ export interface ApplyMoveRequest<TMove> {
 // - `move-failed`: the engine throws before it saves the turn, for example after the game ends.
 // The engine saves the turn before it publishes. So a publisher failure gives a success
 // built from the saved state (decision 29), and `logger` gets a `publish-failed` entry
-// (issue 132). `ApplyMove` logs nothing else: the logging aspect logs each call.
+// (issue 132). `tryPlay()` returns the `Resolution` of the turn, a domain value. The publisher
+// failure is no domain concept (decision 48): the engine gives it to the handler
+// that `ApplyMove` passes. `ApplyMove` logs nothing else: the logging aspect logs each call.
 export class ApplyMove<
   TCell,
   TCoord,
@@ -39,12 +41,9 @@ export class ApplyMove<
       if (engine === undefined) {
         return Result.failure(new UseCaseError('no-running-game', 'No game is running.'));
       }
-      const turn = engine.tryPlay(request.move);
+      const turn = engine.tryPlay(request.move, (error) => this.logPublishFailure(error));
       if (!turn.accepted) {
         return Result.failure(new UseCaseError('move-rejected', 'The rules rejected the move.'));
-      }
-      if (turn.publishFailure !== undefined) {
-        this.logPublishFailure(turn.publishFailure.error);
       }
       return Result.success(moveResultOf(engine, turn.outcome));
     } catch (thrown) {

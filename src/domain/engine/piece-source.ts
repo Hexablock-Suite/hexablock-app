@@ -1,6 +1,7 @@
 import type { RandomSource } from './random-source';
 import type { IRandomSeeded } from './random-seeded';
 import { Mulberry32Random } from './mulberry32-random';
+import type { Seed } from './seed';
 
 // One draw of a source: the piece, and the source that gives the pieces after it.
 export interface PieceDraw<TPiece> {
@@ -36,6 +37,7 @@ export function* piecesFrom<TPiece>(source: IPieceSource<TPiece>): Iterator<TPie
 }
 
 // An endless source: `hasNext()` is always true. The seed fixes the sequence.
+// The seed is a `Seed`, which checks its own range (classes.md decision 48).
 // So `[...source]` and `Array.from(source)` never return: a caller reads it with
 // `for...of` and `break`, or with `take()`.
 // `draw` turns the random source into one piece, so the variant decides what a piece is.
@@ -45,10 +47,10 @@ export class SeededPieceSource<TPiece> implements IPieceSource<TPiece>, IRandomS
   private random: RandomSource;
 
   constructor(
-    readonly seed: number,
+    readonly seed: Seed,
     private readonly draw: (random: RandomSource) => TPiece,
   ) {
-    this.random = new Mulberry32Random(seed);
+    this.random = Mulberry32Random.from(seed);
   }
 
   hasNext(): boolean {

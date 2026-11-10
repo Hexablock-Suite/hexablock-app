@@ -5,6 +5,7 @@ import { PlayingPhase } from '../../../../src/domain/engine/game-phase';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import type { RandomSource } from '../../../../src/domain/engine/random-source';
 import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
+import { Seed } from '../../../../src/domain/engine/seed';
 import { BaseGameRules } from '../../../../src/domain/engine/rules';
 import { ClearedStacks } from '../../../../src/domain/variants/hexa-sort/cleared-stacks';
 import type { ColorStack } from '../../../../src/domain/variants/hexa-sort/color-stack';
@@ -245,7 +246,9 @@ describe('SortRules piece source (A4)', () => {
     const draw = (random: RandomSource) =>
       stackPiece(stack(colors[Math.floor(random.next() * colors.length)] ?? 'red'));
     const play = () => {
-      const game = sortGame(sortState({ board: row(4), source: new SeededPieceSource(7, draw) }));
+      const game = sortGame(
+        sortState({ board: row(4), source: new SeededPieceSource(Seed.of(7), draw) }),
+      );
       game.play(place(0));
       game.play(place(3));
       return [chipsAt(game, 0), chipsAt(game, 3)];
@@ -361,7 +364,7 @@ describe('SortRules edge cases', () => {
   it('should_throw_and_keep_the_game_when_the_source_throws_on_the_next_stack', () => {
     // The rollback covers the whole state and the phase (classes.md decision 21).
     let draws = 0;
-    const source = new SeededPieceSource(1, () => {
+    const source = new SeededPieceSource(Seed.of(1), () => {
       draws += 1;
       if (draws > 1) throw new Error('The source failed.');
       return stackPiece(stack('red'));

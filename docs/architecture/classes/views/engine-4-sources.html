@@ -78,11 +78,12 @@
           next source, SeededPieceSource keeping the Mulberry32Random random source that it builds
           from its seed and clones before each draw, the IScoringPolicy strategy wrapped by the
           abstract ScoringDecorator, and the IProgressModel strategy that records a GameResult and
-          returns a ProgressRecord. Range is the value object of a closed interval, which checks the
-          seed of Mulberry32Random. Score is the value object of a score: IScoringPolicy returns
-          one, and GameResult and ProgressRecord hold one. Moves, ElapsedTime, Stars and LevelId are
-          the value objects of the counters: GameResult holds a Moves, a LevelId and an ElapsedTime,
-          and ProgressRecord holds a LevelId and Stars.
+          returns a ProgressRecord. Range is the value object of a closed interval. Seed is the
+          value object of a seed: it checks its range once, SeededPieceSource holds one, and
+          Mulberry32Random starts from one. Score is the value object of a score: IScoringPolicy
+          returns one, and GameResult and ProgressRecord hold one. Moves, ElapsedTime, Stars and
+          LevelId are the value objects of the counters: GameResult holds a Moves, a LevelId and an
+          ElapsedTime, and ProgressRecord holds a LevelId and Stars.
         </desc>
         <defs>
           <marker
@@ -412,7 +413,7 @@
           SeededPieceSource
         </text>
         <text x="84" y="284" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + seed: number
+          + seed: Seed
         </text>
         <text x="84" y="300" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - random: RandomSource
@@ -620,6 +621,102 @@
           1
         </text>
 
+        <!-- SeededPieceSource holds its Seed: use -->
+        <polyline
+          points="320,340 320,358 452,358 452,384"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#sources-open)"
+        />
+        <rect x="372" y="345" width="28" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="386"
+          y="354"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          seed
+        </text>
+        <rect x="456" y="365" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="462"
+          y="374"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          1
+        </text>
+        <!-- Mulberry32Random.from() reads the first state of the Seed: use -->
+        <line
+          x1="332"
+          y1="464"
+          x2="352"
+          y2="464"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#sources-open)"
+        />
+        <!-- Class: Seed (value object, decision 48) -->
+        <rect
+          x="352"
+          y="384"
+          width="200"
+          height="128"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="352" y1="432" x2="552" y2="432" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="452"
+          y="402"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="452"
+          y="420"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          Seed
+        </text>
+        <text x="368" y="448" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - value: number
+        </text>
+        <line x1="352" y1="456" x2="552" y2="456" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="368"
+          y="472"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + of(value: number): Seed
+        </text>
+        <text x="368" y="488" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: Seed): boolean
+        </text>
+        <text x="368" y="504" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + generatorState(): number
+        </text>
         <!-- Class: Mulberry32Random -->
         <rect
           x="68"
@@ -647,8 +744,15 @@
         <text x="84" y="432" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - state: number
         </text>
-        <text x="84" y="456" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + constructor(seed: number)
+        <text
+          x="84"
+          y="456"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + from(seed: Seed): Mulberry32Random
         </text>
         <text x="84" y="472" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + next(): number
@@ -1298,8 +1402,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          SeededPieceSource builds a Mulberry32Random from its seed (§1.4, APP-NFR-07). RandomSource
-          extends Cloneable: take() clones the generator and draws from the clone.
+          SeededPieceSource builds a Mulberry32Random from its Seed (§1.4, APP-NFR-07, decision 48).
+          RandomSource extends Cloneable: take() clones the generator and draws from the clone.
         </text>
 
         <text

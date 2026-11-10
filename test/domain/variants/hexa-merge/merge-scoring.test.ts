@@ -1,7 +1,9 @@
 /** @jest-environment node */
 import { Score } from '../../../../src/domain/engine/score';
+import { Seed } from '../../../../src/domain/engine/seed';
 import { hex, HexAxis, type HexCoord } from '../../../../src/domain/engine/hex-topology';
 import { MergeScoring } from '../../../../src/domain/variants/hexa-merge/merge-scoring';
+import { Chance } from '../../../../src/domain/variants/hexa-merge/chance';
 import { mergeTileSource } from '../../../../src/domain/variants/hexa-merge/merge-tile-source';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
 import { SlideSense, Slide } from '../../../../src/domain/variants/hexa-merge/slide';
@@ -20,10 +22,10 @@ const east = Slide.of(HexAxis.q, SlideSense.forward);
 
 // Plays one east slide on row r = 0 with the given tiles from the west edge,
 // with new tiles from a fixed seed, and returns the state after it.
-function slideRow(tiles: readonly number[], fourChance?: number) {
+function slideRow(tiles: readonly number[], fourChance?: Chance) {
   const row: [HexCoord, number][] = tiles.map((value, i) => [hex(i - 2, 0), value]);
   const { engine } = mergeGame(
-    mergeState(row, 3, mergeTileSource(2026, fourChance)),
+    mergeState(row, 3, mergeTileSource(Seed.of(2026), fourChance)),
     MergeTile.of(2048),
     new MergeScoring<HexCoord, HexAxis>(),
   );
@@ -73,8 +75,8 @@ describe('Hexa Merge scoring', () => {
 
   it('should_add_nothing_for_the_new_tile_when_a_tile_appears_after_the_slide', () => {
     // A chance of 1 makes the new tile a 4, so the board total grows by 4 and the score does not.
-    const merged = slideRow([2, 2], 1);
-    const moved = slideRow([2], 1);
+    const merged = slideRow([2, 2], Chance.of(1));
+    const moved = slideRow([2], Chance.of(1));
 
     expect(total(merged)).toBe(8);
     expect(merged.score).toEqual(Score.of(4));

@@ -2,6 +2,7 @@
 import { Color } from '../../../../src/domain/engine/color';
 import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
+import { Seed } from '../../../../src/domain/engine/seed';
 import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
 import type { ColorStack } from '../../../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../../../src/domain/variants/hexa-sort/goal-count';
@@ -38,8 +39,8 @@ describe('SortLevel', () => {
   it('should_be_equal_when_two_levels_hold_the_same_data', () => {
     const one = fixed(stack('red', 'blue'), stack('green'));
     const other = fixed(stack('red', 'blue'), stack('green'));
-    const seeded = SortLevel.seeded(SIZE, GOAL, 7, [red, blue]);
-    const sameSeeded = SortLevel.seeded(RegionSize.of(2), GoalCount.of(3), 7, [
+    const seeded = SortLevel.seeded(SIZE, GOAL, Seed.of(7), [red, blue]);
+    const sameSeeded = SortLevel.seeded(RegionSize.of(2), GoalCount.of(3), Seed.of(7), [
       Color.of('red'),
       Color.of('blue'),
     ]);
@@ -60,7 +61,7 @@ describe('SortLevel', () => {
       fixed(stack('red', 'blue'), stack('blue')),
       // The source gives the stacks in the order of the level, so the order counts.
       fixed(stack('green'), stack('red', 'blue')),
-      SortLevel.seeded(SIZE, GOAL, 7, [red, blue]),
+      SortLevel.seeded(SIZE, GOAL, Seed.of(7), [red, blue]),
     ];
 
     for (const other of others) {
@@ -70,13 +71,13 @@ describe('SortLevel', () => {
   });
 
   it('should_not_be_equal_when_two_seeded_levels_differ_in_the_seed_or_the_colors', () => {
-    const level = SortLevel.seeded(SIZE, GOAL, 7, [red, blue]);
+    const level = SortLevel.seeded(SIZE, GOAL, Seed.of(7), [red, blue]);
     const others = [
-      SortLevel.seeded(SIZE, GOAL, 8, [red, blue]),
-      SortLevel.seeded(SIZE, GOAL, 7, [red]),
-      SortLevel.seeded(SIZE, GOAL, 7, [red, green]),
+      SortLevel.seeded(SIZE, GOAL, Seed.of(8), [red, blue]),
+      SortLevel.seeded(SIZE, GOAL, Seed.of(7), [red]),
+      SortLevel.seeded(SIZE, GOAL, Seed.of(7), [red, green]),
       // A draw picks a color by its place in the list, so the order counts.
-      SortLevel.seeded(SIZE, GOAL, 7, [blue, red]),
+      SortLevel.seeded(SIZE, GOAL, Seed.of(7), [blue, red]),
     ];
 
     for (const other of others) {
@@ -85,22 +86,26 @@ describe('SortLevel', () => {
     }
   });
 
-  it('should_throw_the_range_error_of_the_seeded_source_when_the_seed_is_outside_0_to_4294967295', () => {
+  // Since issue 210 the seed is a `Seed`, the one place that checks the range.
+  // So the level and the seeded source take no wrong seed, and neither one checks it again.
+  it('should_throw_the_range_error_of_the_seed_when_the_seed_is_outside_0_to_4294967295', () => {
     for (const seed of [-1, 4294967296, 1.5, Number.NaN, Number.POSITIVE_INFINITY]) {
       const message = `A seed must be an integer from 0 to 4294967295, not ${seed}.`;
 
-      expect(() => new SeededPieceSource(seed, () => stack('red'))).toThrow(
+      expect(() => new SeededPieceSource(Seed.of(seed), () => stack('red'))).toThrow(
         new RangeError(message),
       );
-      expect(() => SortLevel.seeded(SIZE, GOAL, seed, [red])).toThrow(new RangeError(message));
+      expect(() => SortLevel.seeded(SIZE, GOAL, Seed.of(seed), [red])).toThrow(
+        new RangeError(message),
+      );
     }
   });
 
   it('should_build_the_level_when_the_seed_is_at_a_limit_of_the_range', () => {
     for (const seed of [0, 4294967295]) {
-      const level = SortLevel.seeded(SIZE, GOAL, seed, [red]);
+      const level = SortLevel.seeded(SIZE, GOAL, Seed.of(seed), [red]);
 
-      expect(level.equals(SortLevel.seeded(SIZE, GOAL, seed, [red]))).toBe(true);
+      expect(level.equals(SortLevel.seeded(SIZE, GOAL, Seed.of(seed), [red]))).toBe(true);
       expect(firstStacks(level, 2)).toEqual([['red'], ['red']]);
     }
   });
@@ -110,10 +115,10 @@ describe('SortLevel', () => {
     const none = [] as unknown as [Color];
     const sparse = [red, undefined] as unknown as [Color];
 
-    expect(() => SortLevel.seeded(SIZE, GOAL, 7, none)).toThrow(
+    expect(() => SortLevel.seeded(SIZE, GOAL, Seed.of(7), none)).toThrow(
       new RangeError('A seeded Sort level needs one color or more.'),
     );
-    expect(() => SortLevel.seeded(SIZE, GOAL, 7, sparse)).toThrow(
+    expect(() => SortLevel.seeded(SIZE, GOAL, Seed.of(7), sparse)).toThrow(
       new RangeError('A piece list cannot hold undefined.'),
     );
   });
@@ -131,7 +136,7 @@ describe('SortLevel', () => {
     const stacks = [stack('red')];
     const colors: [Color, ...Color[]] = [red];
     const level = SortLevel.fixed(SIZE, GOAL, stacks);
-    const seeded = SortLevel.seeded(SIZE, GOAL, 7, colors);
+    const seeded = SortLevel.seeded(SIZE, GOAL, Seed.of(7), colors);
 
     stacks.push(stack('green'));
     stacks[0] = stack('blue');
@@ -140,7 +145,7 @@ describe('SortLevel', () => {
     expect(firstStacks(level, 5)).toEqual([['red']]);
     expect(level.equals(fixed(stack('red')))).toBe(true);
     expect(firstStacks(seeded, 3)).toEqual([['red'], ['red'], ['red']]);
-    expect(seeded.equals(SortLevel.seeded(SIZE, GOAL, 7, [red]))).toBe(true);
+    expect(seeded.equals(SortLevel.seeded(SIZE, GOAL, Seed.of(7), [red]))).toBe(true);
   });
 
   it('should_refuse_a_write_when_a_caller_changes_the_level', () => {
@@ -153,7 +158,7 @@ describe('SortLevel', () => {
   });
 
   it('should_draw_one_tile_of_a_level_color_when_a_seeded_level_gives_a_stack', () => {
-    const level = SortLevel.seeded(SIZE, GOAL, 42, [red, blue, green]);
+    const level = SortLevel.seeded(SIZE, GOAL, Seed.of(42), [red, blue, green]);
 
     const stacks = firstStacks(level, 30);
 
@@ -164,9 +169,11 @@ describe('SortLevel', () => {
     }
     // The seed fixes the sequence, and a sequence of 30 draws holds each color.
     expect(new Set(stacks.map((tiles) => tiles[0])).size).toBe(3);
-    expect(firstStacks(SortLevel.seeded(SIZE, GOAL, 42, [red, blue, green]), 30)).toEqual(stacks);
-    expect(firstStacks(SortLevel.seeded(SIZE, GOAL, 43, [red, blue, green]), 30)).not.toEqual(
+    expect(firstStacks(SortLevel.seeded(SIZE, GOAL, Seed.of(42), [red, blue, green]), 30)).toEqual(
       stacks,
     );
+    expect(
+      firstStacks(SortLevel.seeded(SIZE, GOAL, Seed.of(43), [red, blue, green]), 30),
+    ).not.toEqual(stacks);
   });
 });

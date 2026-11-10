@@ -67,13 +67,15 @@ export class MergeState<
   ) {}
 
   // Puts the next tile of the source on an empty cell that the same draw picks.
+  // The draw is a `NewTile`: it picks the cell among the empty cells, in the order of the board shape.
   // A board with no empty cell, or a source that has ended, gets no new tile.
   // The rules call it after each slide, and `MergeFactory` calls it for the first tiles.
   addNewTile(): void {
     const empty = this.board.shape.cells.filter((c) => this.board.get(c) === undefined);
     if (empty.length === 0 || !this.tiles.hasNext()) return;
     const { piece, rest } = this.tiles.take();
-    this.board.occupy(empty[Math.floor(piece.place * empty.length)] as TCoord, piece.tile);
+    const [at, tile] = piece.appearsOn(empty);
+    this.board.occupy(at, tile);
     this.tiles = rest;
   }
 

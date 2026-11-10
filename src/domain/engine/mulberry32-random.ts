@@ -1,22 +1,16 @@
 import type { RandomSource } from './random-source';
-import { Range } from './range';
-
-// The seeds of the generator: the unsigned 32-bit integers.
-const SEEDS = Range.ofNumbers(0, 0xffffffff);
+import type { Seed } from './seed';
 
 // A random source that a seed fixes (APP-NFR-07): the same seed gives the same numbers.
 // It uses the Mulberry32 generator: pure 32-bit integer arithmetic, no ambient randomness.
-// The seed is an unsigned 32-bit integer. Any other number throws a RangeError,
-// because `>>> 0` would truncate it and two different seeds would give the same game.
+// `from()` starts the generator from a `Seed`. The seed checks its own range
+// (classes.md decision 48), so the generator makes no check.
 // `clone()` copies the generator state. It does not replay the numbers.
 export class Mulberry32Random implements RandomSource {
-  private state: number;
+  private constructor(private state: number) {}
 
-  constructor(seed: number) {
-    if (!Number.isInteger(seed) || !SEEDS.contains(seed)) {
-      throw new RangeError(`A seed must be an integer from 0 to 4294967295, not ${seed}.`);
-    }
-    this.state = seed >>> 0;
+  static from(seed: Seed): Mulberry32Random {
+    return new Mulberry32Random(seed.generatorState());
   }
 
   next(): number {
@@ -28,8 +22,6 @@ export class Mulberry32Random implements RandomSource {
   }
 
   clone(): Mulberry32Random {
-    const copy = new Mulberry32Random(0);
-    copy.state = this.state;
-    return copy;
+    return new Mulberry32Random(this.state);
   }
 }

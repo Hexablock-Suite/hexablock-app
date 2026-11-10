@@ -7,12 +7,14 @@ import { PlayingPhase } from '../../../../src/domain/engine/game-phase';
 import { hex, HexAxis } from '../../../../src/domain/engine/hex-topology';
 import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
 import type { RandomSource } from '../../../../src/domain/engine/random-source';
+import { Seed } from '../../../../src/domain/engine/seed';
+import { Chance } from '../../../../src/domain/variants/hexa-merge/chance';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
 import {
   DEFAULT_FOUR_CHANCE,
   mergeTileSource,
 } from '../../../../src/domain/variants/hexa-merge/merge-tile-source';
-import type { NewTile } from '../../../../src/domain/variants/hexa-merge/new-tile';
+import { NewTile } from '../../../../src/domain/variants/hexa-merge/new-tile';
 import { SlideSense, Slide } from '../../../../src/domain/variants/hexa-merge/slide';
 import { lintFixture } from '../../../support/run-tool';
 import {
@@ -52,8 +54,8 @@ function added(
   return Object.fromEntries(Object.entries(after).filter(([key]) => !(key in before)));
 }
 
-function seeded(seed: number, fourChance?: number): HexMergeState {
-  return mergeState([[hex(0, 0), 2]], 3, mergeTileSource(seed, fourChance));
+function seeded(seed: number, fourChance?: Chance): HexMergeState {
+  return mergeState([[hex(0, 0), 2]], 3, mergeTileSource(Seed.of(seed), fourChance));
 }
 
 describe('Merge new tiles', () => {
@@ -98,9 +100,9 @@ describe('Merge new tiles', () => {
         [hex(0, 1), 8],
       ],
       2,
-      mergeTileSource(5),
+      mergeTileSource(Seed.of(5)),
     );
-    const next = mergeTileSource(5).take().piece;
+    const next = mergeTileSource(Seed.of(5)).take().piece;
     const resolved = full.clone();
     game.rules.resolve(resolved);
     expect(values(resolved.snapshot())).toEqual(values(full.snapshot()));
@@ -109,7 +111,7 @@ describe('Merge new tiles', () => {
 
   it('should_draw_only_twos_or_only_fours_when_the_chance_of_a_four_is_zero_or_one', () => {
     const newValues = (fourChance: number): number[] => {
-      const game = mergeGame(seeded(99, fourChance));
+      const game = mergeGame(seeded(99, Chance.of(fourChance)));
       let before = values(game.engine.snapshot());
       const out: number[] = [];
       for (let i = 0; i < 10; i += 1) {
@@ -133,17 +135,20 @@ describe('Merge new tiles', () => {
     // The default chance is 0.1: about one tile in ten is a 4.
     let fours = 0;
     let read = 0;
-    for (const draw of mergeTileSource(2026)) {
-      if (draw.tile.equals(MergeTile.of(4))) fours += 1;
+    for (const draw of mergeTileSource(Seed.of(2026))) {
+      // A draw shows its tile only where it appears: both of its fields are private.
+      const [, tile] = draw.appearsOn(['any cell']);
+      if (tile.equals(MergeTile.of(4))) fours += 1;
       read += 1;
       if (read === 1000) break;
     }
-    expect(DEFAULT_FOUR_CHANCE).toBe(0.1);
+    expect(DEFAULT_FOUR_CHANCE.equals(Chance.of(0.1))).toBe(true);
     expect(fours).toBeGreaterThan(70);
     expect(fours).toBeLessThan(130);
 
+    // Since issue 210 the chance is a `Chance`, which checks its own range.
     for (const bad of [-0.1, 1.1, Number.NaN]) {
-      expect(() => mergeTileSource(1, bad)).toThrow(
+      expect(() => mergeTileSource(Seed.of(1), Chance.of(bad))).toThrow(
         new RangeError(`The chance of a 4 must be a number from 0 to 1, not ${bad}.`),
       );
     }
@@ -191,7 +196,7 @@ describe('Merge new tiles', () => {
           [hex(0, 1), 4],
         ],
         2,
-        mergeTileSource(3, 1),
+        mergeTileSource(Seed.of(3), Chance.of(1)),
       ),
     );
 
@@ -222,13 +227,39 @@ describe('Merge new tiles', () => {
   });
 });
 
+// Issue 210: the seed is a `Seed`, the chance is a `Chance` and a draw is a `NewTile`.
+// The draws of a seed stay the draws that the number of that seed gave before.
+describe('Merge new tiles of a seed', () => {
+  // The first 24 draws on six empty cells, each as the cell and the value of the tile.
+  function draws(seed: number): string {
+    const cells = ['a', 'b', 'c', 'd', 'e', 'f'];
+    const out: string[] = [];
+    for (const draw of mergeTileSource(Seed.of(seed))) {
+      const [cell, tile] = draw.appearsOn(cells);
+      out.push(`${cell}${tile.points().value}`);
+      if (out.length === 24) break;
+    }
+    return out.join(' ');
+  }
+
+  it('should_draw_the_same_new_tiles_as_before_when_the_seed_is_a_value_object', () => {
+    // The two lists come from the code before issue 210, with the seeds 5 and 2026 as numbers.
+    expect(draws(5)).toBe(
+      'e2 b2 a2 e2 f2 e2 d4 c2 f2 e2 b4 e2 b2 c2 b4 f2 c2 b2 b2 e2 d2 d2 d2 b2',
+    );
+    expect(draws(2026)).toBe(
+      'c2 d2 a2 e2 b4 a2 c2 b2 c2 d4 b2 e2 f2 b2 c2 d2 b2 a4 c2 e2 f2 d2 a2 b2',
+    );
+  });
+});
+
 // Edge cases of the walkthrough of PR #111 (issue #120).
 describe('Merge new tiles edge cases', () => {
   it('should_throw_a_range_error_when_the_chance_of_a_four_is_infinite', () => {
-    // A `fourChance` outside [0, 1] throws a RangeError (merge-tile-source.ts).
+    // A chance outside [0, 1] throws a RangeError when the `Chance` is created (chance.ts).
     for (const bad of [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
-      expect(() => mergeTileSource(1, bad)).toThrow(RangeError);
-      expect(() => mergeTileSource(1, bad)).toThrow(
+      expect(() => mergeTileSource(Seed.of(1), Chance.of(bad))).toThrow(RangeError);
+      expect(() => mergeTileSource(Seed.of(1), Chance.of(bad))).toThrow(
         `The chance of a 4 must be a number from 0 to 1, not ${bad}.`,
       );
     }
@@ -236,14 +267,15 @@ describe('Merge new tiles edge cases', () => {
 
   it('should_throw_a_range_error_when_the_seed_is_not_an_unsigned_32_bit_integer', () => {
     // The seed is an integer from 0 to 4294967295, and any other number throws
-    // (classes.md, issue #86). The tile source passes its seed to the engine source.
+    // (classes.md, issue #86). Since issue 210 the `Seed` makes that check when it is created,
+    // and the tile source passes the seed to the engine source.
     for (const seed of [Number.NaN, 1.5, -1, 2 ** 32, 2 ** 53]) {
-      expect(() => mergeTileSource(seed)).toThrow(RangeError);
-      expect(() => mergeTileSource(seed)).toThrow(
+      expect(() => mergeTileSource(Seed.of(seed))).toThrow(RangeError);
+      expect(() => mergeTileSource(Seed.of(seed))).toThrow(
         `A seed must be an integer from 0 to 4294967295, not ${seed}.`,
       );
     }
-    expect(mergeTileSource(0xffffffff).seed).toBe(0xffffffff);
+    expect(mergeTileSource(Seed.of(0xffffffff)).seed.equals(Seed.of(0xffffffff))).toBe(true);
   });
 
   it('should_throw_and_draw_the_same_new_tile_on_a_retry_when_the_source_throws_once', () => {
@@ -253,13 +285,13 @@ describe('Merge new tiles edge cases', () => {
     // so a draw that the rollback misses moves the new tile.
     function source(failOnce: boolean): SeededPieceSource<NewTile<MergeTile>> {
       let failed = !failOnce;
-      return new SeededPieceSource(12, (random: RandomSource) => {
+      return new SeededPieceSource(Seed.of(12), (random: RandomSource) => {
         const place = random.next();
         if (!failed) {
           failed = true;
           throw new Error('The source failed.');
         }
-        return { place, tile: MergeTile.of(2) };
+        return NewTile.of(place, MergeTile.of(2));
       });
     }
     const slide = Slide.of(HexAxis.q, SlideSense.forward);
