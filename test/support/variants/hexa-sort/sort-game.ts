@@ -19,7 +19,11 @@ import { ColorStack } from '../../../../src/domain/variants/hexa-sort/color-stac
 import { GoalCount } from '../../../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../../../src/domain/variants/hexa-sort/sort-factory';
 import { SortRules } from '../../../../src/domain/variants/hexa-sort/sort-rules';
-import { SortState, type PlaceStack } from '../../../../src/domain/variants/hexa-sort/sort-state';
+import {
+  SortState,
+  type PlaceStack,
+  type SortSnapshot,
+} from '../../../../src/domain/variants/hexa-sort/sort-state';
 import { RecordingPublisher } from '../../engine/fake-game';
 import { square, squareTopology, type SquareCoord } from '../../engine/square-topology';
 import { MATCH_ID } from '../../engine/match-id';
@@ -143,4 +147,19 @@ export function sortFactory(
     source: new FixedListPieceSource(offered.map(stackPiece)),
     goalsNeeded: GoalCount.of(goalsNeeded),
   });
+}
+
+// A live state built again from a photo, so a test can ask the rules about the state that a game
+// shows. The engine never gives its state away. So the helper builds a new state with the ids,
+// the board and the source of the photo, and the state takes the photo back with `restore()`.
+export function sortStateOf<TCoord>(photo: SortSnapshot<TCoord>): SortState<TCoord> {
+  const state = SortState.start({
+    stateId: photo.stateId,
+    matchId: photo.matchId,
+    board: photo.board.clone(),
+    source: photo.source.clone(),
+    goalsNeeded: photo.goalsNeeded,
+  });
+  state.restore(photo);
+  return state;
 }

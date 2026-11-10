@@ -1,4 +1,4 @@
-import type { BoardState } from '../../../src/domain/engine/board-state';
+import type { BoardState, SnapshotOf } from '../../../src/domain/engine/board-state';
 import type { Cloneable } from '../../../src/domain/engine/cloneable';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
 import type { IGameRules } from '../../../src/domain/engine/rules';
@@ -40,4 +40,39 @@ export function firstValidMove<TMove, TState>(
 ): TMove {
   for (const move of rules.validMoves(state)) return move;
   throw new RangeError('The state has no valid move.');
+}
+
+// The first valid move of a new game of `factory`. A new game starts from the first state
+// that the factory creates, so the rules read a new first state with the same content.
+// The engine never gives its state away: `GameEngine.snapshot()` gives a photo (decision 34).
+export function firstMoveOf<
+  TCell,
+  TCoord,
+  TMove,
+  TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
+  TPiece,
+>(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>): TMove {
+  return firstValidMove(
+    factory.createRules(),
+    factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID),
+  );
+}
+
+// A live state with the content of `photo`, a photo of a game that `startVariant` started.
+// The engine never gives its state away, so the rules cannot read a photo (decision 34).
+// `startVariant` gives every state `STATE_ID` and every board `BOARD_ID`. So a new first state
+// of the factory with the same ids takes the photo back with `restore()`.
+export function liveStateOf<
+  TCell,
+  TCoord,
+  TMove,
+  TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
+  TPiece,
+>(
+  factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>,
+  photo: SnapshotOf<TState>,
+): TState {
+  const state = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
+  state.restore(photo);
+  return state;
 }

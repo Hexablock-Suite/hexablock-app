@@ -27,7 +27,7 @@ import { GoalCount } from '../../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../../src/domain/variants/hexa-sort/sort-factory';
 import { ManualClock } from '../../support/engine/manual-clock';
 import { phaseNameOf } from '../../support/engine/phase-name';
-import { firstValidMove, startVariant } from '../../support/engine/variant-game';
+import { firstValidMove, startVariant, liveStateOf } from '../../support/engine/variant-game';
 import { variantIdOf } from '../../support/variants/variant-id';
 import { A, fitFactory, threeDominoFitFactory } from '../../support/variants/hexa-fit/fit-game';
 import { linesFactory } from '../../support/variants/hexa-lines/lines-game';
@@ -46,7 +46,7 @@ function playOnce<
   TPiece,
 >(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>) {
   const { engine, rules } = startVariant(factory);
-  const outcome = engine.play(firstValidMove(rules, engine.snapshot()));
+  const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, engine.snapshot())));
   return {
     gameId: variantIdOf(factory.gameId),
     outcome,
@@ -91,7 +91,7 @@ function undosAfter<
 >(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>, moves: number): number {
   const { engine, rules } = startVariant(factory);
   for (let played = 0; played < moves; played += 1) {
-    engine.play(firstValidMove(rules, engine.snapshot()));
+    engine.play(firstValidMove(rules, liveStateOf(factory, engine.snapshot())));
   }
   const history = engine.undoable();
   let undone = 0;
@@ -111,10 +111,11 @@ const mergeSettings: MergeSettings = {
 };
 
 function startMerge<TCoord>(geometry: GeometryFactory<TCoord>) {
-  const { engine, rules } = startVariant(new MergeFactory(geometry, mergeSettings));
+  const factory = new MergeFactory(geometry, mergeSettings);
+  const { engine, rules } = startVariant(factory);
   const { board } = engine.snapshot();
   const tiles = board.cells().length;
-  const outcome = engine.play(firstValidMove(rules, engine.snapshot()));
+  const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, engine.snapshot())));
   return { cells: board.shape.cells.length, axes: board.topology.axes(), tiles, outcome };
 }
 
@@ -140,17 +141,16 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
 
   return () => {
     it('should_start_lines_on_the_region_of_the_geometry_when_the_lines_factory_gets_it', () => {
-      const { engine, rules } = startVariant(
-        new LinesFactory(geometry, {
-          size,
-          seed: 1,
-          shapes: [new CellNode(origin)],
-          colors: [Color.of('red')],
-        }),
-      );
+      const factory = new LinesFactory(geometry, {
+        size,
+        seed: 1,
+        shapes: [new CellNode(origin)],
+        colors: [Color.of('red')],
+      });
+      const { engine, rules } = startVariant(factory);
       const start = engine.snapshot();
 
-      const outcome = engine.play(firstValidMove(rules, start));
+      const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, start)));
 
       expect(region).toHaveLength(cellCount);
       expect(keys(start.board.shape.cells)).toEqual(region);
@@ -163,16 +163,15 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
 
     it('should_start_sort_on_the_region_of_the_geometry_when_the_sort_factory_gets_it', () => {
       const offered = new Piece(new CellNode(origin), ColorStack.of([Color.of('red')]));
-      const { engine, rules } = startVariant(
-        new SortFactory(geometry, {
-          size,
-          source: new FixedListPieceSource([offered, offered]),
-          goalsNeeded: GoalCount.of(5),
-        }),
-      );
+      const factory = new SortFactory(geometry, {
+        size,
+        source: new FixedListPieceSource([offered, offered]),
+        goalsNeeded: GoalCount.of(5),
+      });
+      const { engine, rules } = startVariant(factory);
       const start = engine.snapshot();
 
-      const outcome = engine.play(firstValidMove(rules, start));
+      const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, start)));
 
       expect(keys(start.board.shape.cells)).toEqual(region);
       expect(start.board.cells()).toEqual([]);
@@ -190,7 +189,7 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
       const outcome = engine.play(new PlaceFitPiece(A, Turns.of(0), origin));
 
       expect(keys(start.board.shape.cells)).toEqual(keys([origin, next]));
-      expect(start.remaining().map((piece) => piece.content.value)).toEqual(['a']);
+      expect(start.view().remaining.map((piece) => piece.content.value)).toEqual(['a']);
       expect(outcome).toBe('victory');
     });
 

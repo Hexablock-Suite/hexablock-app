@@ -1,6 +1,6 @@
 import type { Board } from './board';
 import type { BoardId } from './board-id';
-import type { BoardState } from './board-state';
+import type { BoardState, SnapshotOf } from './board-state';
 import type { Cloneable } from './cloneable';
 import type { GameId } from './game-id';
 import type { GameStateId } from './game-state-id';
@@ -25,7 +25,7 @@ import type { IScoringPolicy } from './scoring-policy';
 // and its board takes the id `boardId`. `GameFactory` asks the generators for the three ids.
 // So two calls give two games that share no board and no source.
 // `createHistory()` returns a new history for each game, or `undefined` for a variant
-// with no undo (classes.md decision 3).
+// with no undo (classes.md decision 3). The history keeps the photos of the state (decision 34).
 // The progress model of view 5 comes in Sprint 3.
 export interface IVariantFactory<
   TCell,
@@ -40,5 +40,5 @@ export interface IVariantFactory<
   createPieceSource(): IPieceSource<TPiece> | undefined;
   createBoard(boardId: BoardId): Board<TCell, TCoord, string>;
   createInitialState(matchId: MatchId, stateId: GameStateId, boardId: BoardId): TState;
-  createHistory(): MoveHistory<TMove, TState> | undefined;
+  createHistory(): MoveHistory<TMove, SnapshotOf<TState>> | undefined;
 }

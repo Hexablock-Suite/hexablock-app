@@ -1,4 +1,4 @@
-import type { Board } from '../../engine/board';
+import type { ReadonlyBoard } from '../../engine/board';
 import type { Color } from '../../engine/color';
 import type { Outcome } from '../../engine/outcome';
 import { Resolution } from '../../engine/resolution';
@@ -10,6 +10,7 @@ import { PlacePiece } from './place-piece';
 // so they never hard-code 3 axes or 6 directions (D4).
 // Hexa Lines has no gravity (REQUIREMENTS.md §8). A cleared cell stays empty, and no cell moves.
 // The rules decide. The state changes itself: the rules call `placePiece()` and `clearLines()`.
+// The rules read the state through its photo and through `canPlace()`, never through a field.
 export class LinesRules<TCoord> extends BaseGameRules<PlacePiece<TCoord>, LinesState<TCoord>> {
   isValid(state: LinesState<TCoord>, move: PlacePiece<TCoord>): boolean {
     if (!Number.isInteger(move.trayIndex)) return false;
@@ -19,8 +20,9 @@ export class LinesRules<TCoord> extends BaseGameRules<PlacePiece<TCoord>, LinesS
   // A lazy generator: each tray piece at each offset that a board cell gives.
   // The «no tray piece fits» end reads only its first move (classes.md decision 33).
   *validMoves(state: LinesState<TCoord>): Iterable<PlacePiece<TCoord>> {
-    for (const trayIndex of state.tray.keys()) {
-      for (const at of state.board.shape.cells) {
+    const { tray, board } = state.snapshot();
+    for (const trayIndex of tray.keys()) {
+      for (const at of board.shape.cells) {
         const move = new PlacePiece(trayIndex, at);
         if (state.canPlace(move)) yield move;
       }
@@ -39,9 +41,9 @@ export class LinesRules<TCoord> extends BaseGameRules<PlacePiece<TCoord>, LinesS
   // The rules find every full line first and then clear their union, so a shared cell clears once.
   // The streak counts the placements in a row that clear at least one line.
   // The first placement that clears no line sets it back to 0.
-  resolve(state: LinesState<TCoord>): Resolution<LinesState<TCoord>> {
-    state.clearLines(fullLines(state.board));
-    return Resolution.resolved(state);
+  resolve(state: LinesState<TCoord>): Resolution {
+    state.clearLines(fullLines(state.snapshot().board));
+    return Resolution.resolved();
   }
 
   // The game ends when no tray piece fits (statement §1.1).
@@ -56,7 +58,7 @@ export class LinesRules<TCoord> extends BaseGameRules<PlacePiece<TCoord>, LinesS
 // The same line from either end gives the same name and counts once.
 // A line of one cell can lie on several axes. It is one cell, so it counts once (issue #140).
 // Each line keeps the cell order of the first walk that found it.
-function fullLines<TCoord>(board: Board<Color, TCoord, string>): TCoord[][] {
+function fullLines<TCoord>(board: ReadonlyBoard<Color, TCoord, string>): TCoord[][] {
   const seen = new Set<string>();
   const full: TCoord[][] = [];
   for (const axis of board.topology.axes()) {
@@ -74,7 +76,10 @@ function fullLines<TCoord>(board: Board<Color, TCoord, string>): TCoord[][] {
 // The name of one line: the sorted topology keys of its cells, without the axis (issue #140).
 // A line of two or more cells lies on one axis, so the axis adds nothing to its name.
 // JSON keeps the keys apart, so no key text can join two keys into one.
-function lineId<TCoord>(board: Board<Color, TCoord, string>, line: readonly TCoord[]): string {
+function lineId<TCoord>(
+  board: ReadonlyBoard<Color, TCoord, string>,
+  line: readonly TCoord[],
+): string {
   const keys = line.map((c) => board.topology.key(c)).sort();
   return JSON.stringify(keys);
 }

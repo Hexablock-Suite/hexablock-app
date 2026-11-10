@@ -5,9 +5,9 @@ import { join } from 'node:path';
 import type { RunningGameStore } from '../../src/application/running-game-store';
 import { UndoMove } from '../../src/application/undo-move';
 import type { BoardState } from '../../src/domain/engine/board-state';
-import type { Cloneable } from '../../src/domain/engine/cloneable';
 import { PlayingPhase } from '../../src/domain/engine/game-phase';
 import type { IPieceSource } from '../../src/domain/engine/piece-source';
+import type { Cloneable } from '../../src/domain/engine/cloneable';
 import { Turns } from '../../src/domain/engine/turns';
 import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
 import { PlaceFitPiece } from '../../src/domain/variants/hexa-fit/fit-move';
@@ -19,11 +19,11 @@ import {
   type MemoryRunningGameStore,
   valueOf,
 } from '../support/application/game-use-cases';
-import { firstValidMove } from '../support/engine/variant-game';
+import { firstMoveOf, firstValidMove } from '../support/engine/variant-game';
 import { square } from '../support/engine/square-topology';
 import { A, B, threeDominoFitFactory } from '../support/variants/hexa-fit/fit-game';
 import { linesFactory } from '../support/variants/hexa-lines/lines-game';
-import { mergeFactory } from '../support/variants/hexa-merge/merge-game';
+import { mergeFactory, mergeStateOf } from '../support/variants/hexa-merge/merge-game';
 import { sortFactory } from '../support/variants/hexa-sort/sort-game';
 import { repoRoot } from '../support/run-tool';
 
@@ -65,7 +65,8 @@ function factsOf<
 
 // The next draws of a seeded source. They read a clone, so the source stays where it is.
 // A `toEqual` on the source itself would never end, because the source is an endless iterator.
-function drawsOf(source: IPieceSource<NewTile<MergeTile>>): [number, number][] {
+// The photo shows the source only through `clone()`, so the helper reads a copy.
+function drawsOf(source: Cloneable<IPieceSource<NewTile<MergeTile>>>): [number, number][] {
   const copy = source.clone();
   return Array.from({ length: 8 }, () => {
     const draw = copy.next();
@@ -101,7 +102,7 @@ describe('UndoMove', () => {
     const factory = mergeFactory(7);
     const { games, applyMove, undoMove } = await started(factory);
     const before = games.running().snapshot();
-    const slide = firstValidMove(factory.createRules(), before);
+    const slide = firstValidMove(factory.createRules(), mergeStateOf(before));
     const firstPlay = valueOf(await applyMove.execute({ move: slide }));
     const afterPlay = games.running().snapshot();
 
@@ -154,7 +155,7 @@ describe('UndoMove', () => {
 
     const atStart = errorOf(await undoMove.execute({}));
     const start = factsOf(games);
-    const slide = firstValidMove(factory.createRules(), games.running().snapshot());
+    const slide = firstMoveOf(factory);
     valueOf(await applyMove.execute({ move: slide }));
     const undone = valueOf(await undoMove.execute({}));
     const beforeSecond = factsOf(games);
@@ -171,7 +172,7 @@ describe('UndoMove', () => {
     const factory = mergeFactory(7);
     const { games, applyMove, undoMove } = await started(factory);
     const play = async () => {
-      const move = firstValidMove(factory.createRules(), games.running().snapshot());
+      const move = firstValidMove(factory.createRules(), mergeStateOf(games.running().snapshot()));
       valueOf(await applyMove.execute({ move }));
     };
     await play();
@@ -237,7 +238,7 @@ async function noHistoryRun<
   TPiece,
 >(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>) {
   const { games, applyMove, undoMove } = await started(factory);
-  const move = firstValidMove(factory.createRules(), games.running().snapshot());
+  const move = firstMoveOf(factory);
   valueOf(await applyMove.execute({ move }));
   const before = factsOf(games);
   const error = errorOf(await undoMove.execute({}));

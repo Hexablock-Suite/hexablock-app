@@ -1,4 +1,4 @@
-import type { Resolution } from './resolution';
+import type { SnapshotOf } from './board-state';
 import type { IScoringPolicy } from './scoring-policy';
 
 // The abstract Decorator of the scoring (classes.md patterns table, view engine-4, issue 146).
@@ -14,7 +14,7 @@ export abstract class ScoringDecorator<
 
   // A bonus overrides it and calls `super.score()` to get the inner score.
   // This base returns the inner score unchanged.
-  score(before: TState, resolution: Resolution<TState>): number {
-    return this.inner.score(before, resolution);
+  score(before: SnapshotOf<TState>, after: SnapshotOf<TState>): number {
+    return this.inner.score(before, after);
   }
 }

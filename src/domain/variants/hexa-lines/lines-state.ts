@@ -1,5 +1,6 @@
 import type { Board } from '../../engine/board';
-import type { BoardState } from '../../engine/board-state';
+import { checkOwnSnapshot, type BoardSnapshot, type BoardState } from '../../engine/board-state';
+import type { Cloneable } from '../../engine/cloneable';
 import type { Color } from '../../engine/color';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { MatchId } from '../../engine/match-id';
@@ -16,13 +17,26 @@ export interface LinesView<TCoord> {
   readonly tray: readonly Piece<Color, TCoord>[];
 }
 
+// The photo of a Lines state (classes.md decision 34): the board, the score, the tray,
+// the three facts of the last placement and a copy of the piece source at its position.
+// The source shows only `clone()`, so a reader cannot draw from the photo,
+// and `restore()` gives the state its own copy. `view()` gives the tray for the screen.
+export interface LinesSnapshot<TCoord> extends BoardSnapshot<Color, TCoord> {
+  readonly tray: readonly Piece<Color, TCoord>[];
+  readonly streak: number;
+  readonly linesCleared: number;
+  readonly cellsPlaced: number;
+  readonly source: Cloneable<IPieceSource<Piece<Color, TCoord>>>;
+  view(): LinesView<TCoord>;
+}
+
 // The state of one Hexa Lines game: the board of colors, the tray and the piece source.
 // It is an entity inside the `GameEngine` aggregate (classes.md decisions 7 and 26).
 // Its identity is its own `GameStateId`, and `equals()` compares only that identity.
 // It also keeps the `MatchId` of its game, and `belongsTo()` reads it.
-// It changes only through `placePiece()`, `clearLines()` and `addPoints()`.
+// It changes only through `placePiece()`, `clearLines()`, `addPoints()` and `restore()`.
 // A refused input throws a RangeError and leaves the whole state as it was.
-// The fields stay public, because the scoring, the rules and the use cases read them.
+// The scoring, the rules and the use cases read the photo of `snapshot()`, never a field.
 // The source lives in the state, so the engine copy and rollback cover it (classes.md decision 31).
 // `streak` and `linesCleared` follow the proposal on issue 58, «Propuesta, pendiente del equipo».
 // `linesCleared` is the combo of the last placement: the count of distinct full lines it cleared.
@@ -37,21 +51,14 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
     private readonly matchId: MatchId,
     readonly board: Board<Color, TCoord, string>,
     public tray: readonly Piece<Color, TCoord>[],
-    readonly source: IPieceSource<Piece<Color, TCoord>>,
+    public source: IPieceSource<Piece<Color, TCoord>>,
     public streak = 0,
     public linesCleared = 0,
     public cellsPlaced = 0,
     public score = 0,
   ) {
-    if (tray.length > TRAY_SIZE) {
-      throw new RangeError(`A Lines tray holds at most ${TRAY_SIZE} pieces, not ${tray.length}.`);
-    }
-    checkCount('streak', streak);
-    checkCount('linesCleared', linesCleared);
-    checkCount('cellsPlaced', cellsPlaced);
-    if (!Number.isFinite(score)) {
-      throw new RangeError(`The score of a state must be a finite number, not ${score}.`);
-    }
+    checkValues(tray, streak, linesCleared, cellsPlaced);
+    checkScore(score);
   }
 
   // A new game: the board and a full tray from the source.
@@ -128,10 +135,38 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
     return other instanceof LinesState && this.stateId.equals(other.stateId);
   }
 
-  // Pieces never change, so the view shares them. `tray` is public and mutable,
-  // so the view holds a frozen copy of the list.
-  view(): LinesView<TCoord> {
-    return Object.freeze({ tray: Object.freeze([...this.tray]) });
+  // The photo of the state now. Pieces never change, so the photo shares them.
+  // The tray, the board and the source change, so the photo holds a frozen list and copies.
+  snapshot(): LinesSnapshot<TCoord> {
+    const tray = Object.freeze([...this.tray]);
+    const view = Object.freeze({ tray });
+    return Object.freeze({
+      stateId: this.stateId,
+      matchId: this.matchId,
+      board: this.board.clone(),
+      score: this.score,
+      tray,
+      streak: this.streak,
+      linesCleared: this.linesCleared,
+      cellsPlaced: this.cellsPlaced,
+      source: this.source.clone(),
+      view: () => view,
+    });
+  }
+
+  // Takes back a photo of this state, in place. The checks of the constructor run first,
+  // so a photo of another state, of another board or with a wrong value changes nothing.
+  restore(snapshot: LinesSnapshot<TCoord>): void {
+    checkOwnSnapshot(this.stateId, this.board, snapshot);
+    checkValues(snapshot.tray, snapshot.streak, snapshot.linesCleared, snapshot.cellsPlaced);
+    checkScore(snapshot.score);
+    this.board.restore(snapshot.board);
+    this.tray = [...snapshot.tray];
+    this.source = snapshot.source.clone();
+    this.streak = snapshot.streak;
+    this.linesCleared = snapshot.linesCleared;
+    this.cellsPlaced = snapshot.cellsPlaced;
+    this.score = snapshot.score;
   }
 
   // Pieces never change, so the tray copy shares them.
@@ -168,6 +203,27 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
     return this.cellsOf(piece, at).every(
       (c) => this.board.contains(c) && this.board.get(c) === undefined,
     );
+  }
+}
+
+// The checks of the constructor: a tray of at most `TRAY_SIZE` pieces and three counts.
+function checkValues(
+  tray: readonly unknown[],
+  streak: number,
+  linesCleared: number,
+  cellsPlaced: number,
+): void {
+  if (tray.length > TRAY_SIZE) {
+    throw new RangeError(`A Lines tray holds at most ${TRAY_SIZE} pieces, not ${tray.length}.`);
+  }
+  checkCount('streak', streak);
+  checkCount('linesCleared', linesCleared);
+  checkCount('cellsPlaced', cellsPlaced);
+}
+
+function checkScore(score: number): void {
+  if (!Number.isFinite(score)) {
+    throw new RangeError(`The score of a state must be a finite number, not ${score}.`);
   }
 }
 

@@ -4,7 +4,6 @@ import { GameId } from '../../../src/domain/engine/game-id';
 import { GameOverPhase, PlayingPhase } from '../../../src/domain/engine/game-phase';
 import { LevelTimer } from '../../../src/domain/engine/level-timer';
 import type { Outcome } from '../../../src/domain/engine/outcome';
-import type { Resolution } from '../../../src/domain/engine/resolution';
 import type { IScoringPolicy } from '../../../src/domain/engine/scoring-policy';
 import { TimedRulesDecorator } from '../../../src/domain/engine/timed-rules-decorator';
 import { fakeCell, type FakeCell } from '../../support/engine/fake-cell';
@@ -15,6 +14,7 @@ import {
   RecordingPublisher,
   type FakeMove,
   type FakeState,
+  type FakeSnapshot,
 } from '../../support/engine/fake-game';
 import { ManualClock } from '../../support/engine/manual-clock';
 import { phaseNameOf } from '../../support/engine/phase-name';
@@ -57,8 +57,10 @@ function timedGame(
 class ThrowsOnFirstEnd implements IScoringPolicy<FakeState> {
   private thrown = false;
 
-  score(_before: FakeState, resolution: Resolution<FakeState>): number {
-    if (resolution.outcome !== 'playing' && !this.thrown) {
+  // The fake game ends when the board is full, so the photo after the turn shows the end.
+  score(_before: FakeSnapshot, after: FakeSnapshot): number {
+    const ended = after.board.cells().length === after.board.shape.cells.length;
+    if (ended && !this.thrown) {
       this.thrown = true;
       throw new Error('The scoring failed.');
     }

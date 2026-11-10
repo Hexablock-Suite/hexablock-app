@@ -5,8 +5,10 @@ import { BaseGameRules, type IGameRules } from '../../../src/domain/engine/rules
 
 // A fake rules subclass that exists only in this test. Its state is a number,
 // a move is a number, and it writes the name of each step it runs.
+// A `Resolution` holds no state, so `seen` keeps the state that `resolve()` and `evaluate()` get.
 class RecordingRules extends BaseGameRules<number, number> {
   readonly steps: string[] = [];
+  readonly seen: number[] = [];
 
   isValid(_state: number, move: number): boolean {
     this.steps.push('isValid');
@@ -22,22 +24,25 @@ class RecordingRules extends BaseGameRules<number, number> {
     return state + move;
   }
 
-  resolve(state: number): Resolution<number> {
+  resolve(state: number): Resolution {
     this.steps.push('resolve');
-    return Resolution.resolved(state * 10);
+    this.seen.push(state);
+    return Resolution.resolved();
   }
 
   evaluate(state: number): Outcome {
     this.steps.push('evaluate');
+    this.seen.push(state);
     return state >= 100 ? 'victory' : 'playing';
   }
 }
 
 // Rules whose `resolve()` refuses the move after `apply()` has changed the state.
 class RejectingRules extends RecordingRules {
-  override resolve(state: number): Resolution<number> {
+  override resolve(state: number): Resolution {
     this.steps.push('resolve');
-    return Resolution.rejected(state);
+    this.seen.push(state);
+    return Resolution.rejected();
   }
 }
 
@@ -49,7 +54,7 @@ describe('BaseGameRules.playTurn()', () => {
 
     expect(rules.steps).toEqual(['isValid', 'apply', 'resolve']);
     expect(resolution.accepted).toBe(false);
-    expect(resolution.state).toBe(3);
+    expect(rules.seen).toEqual([3]);
     expect(resolution.outcome).toBe('playing');
   });
 
@@ -69,11 +74,12 @@ describe('BaseGameRules.playTurn()', () => {
     expect(rules.steps).toEqual(['isValid', 'apply', 'resolve', 'evaluate']);
   });
 
-  it('should_return_the_resolved_state_and_its_outcome_when_the_move_is_valid', () => {
-    const resolution = new RecordingRules().playTurn(5, 5);
+  it('should_resolve_and_evaluate_the_applied_state_and_return_its_outcome_when_the_move_is_valid', () => {
+    const rules = new RecordingRules();
+    const resolution = rules.playTurn(5, 95);
 
     expect(resolution.accepted).toBe(true);
-    expect(resolution.state).toBe(100);
+    expect(rules.seen).toEqual([100, 100]);
     expect(resolution.outcome).toBe('victory');
   });
 
@@ -84,7 +90,7 @@ describe('BaseGameRules.playTurn()', () => {
 
     expect(rules.steps).toEqual(['isValid']);
     expect(resolution.accepted).toBe(false);
-    expect(resolution.state).toBe(1);
+    expect(rules.seen).toEqual([]);
     expect(resolution.outcome).toBe('playing');
   });
 });

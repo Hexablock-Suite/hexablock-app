@@ -16,7 +16,7 @@ import {
   RecordingPublisher,
   emptyState,
   type FakeMove,
-  type FakeState,
+  type FakeSnapshot,
 } from '../../support/engine/fake-game';
 import { CountingBoardIds, CountingStateIds } from '../../support/engine/entity-ids';
 import { CountingMatchIds, MATCH_ID } from '../../support/engine/match-id';
@@ -88,10 +88,13 @@ describe('GameFactory', () => {
     const second = games.createGame().snapshot();
 
     expect([
-      first.belongsTo(MatchId.of('match-1')),
-      second.belongsTo(MatchId.of('match-2')),
+      first.matchId.equals(MatchId.of('match-1')),
+      second.matchId.equals(MatchId.of('match-2')),
     ]).toEqual([true, true]);
-    expect([first.equals(second), first.belongsTo(MatchId.of('match-2'))]).toEqual([false, false]);
+    expect([
+      first.stateId.equals(second.stateId),
+      first.matchId.equals(MatchId.of('match-2')),
+    ]).toEqual([false, false]);
   });
 
   it('should_give_the_engine_and_its_game_over_event_the_id_of_the_generator_when_the_generator_is_fixed', () => {
@@ -140,7 +143,7 @@ describe('GameFactory', () => {
   it('should_give_each_game_its_own_history_when_the_variant_has_undo', () => {
     const withUndo = {
       ...fakeGameFactory(),
-      createHistory: () => new MoveHistory<FakeMove, FakeState>(),
+      createHistory: () => new MoveHistory<FakeMove, FakeSnapshot>(),
     };
     const games = new GameFactory(
       withUndo,
@@ -188,9 +191,15 @@ describe('GameFactory', () => {
     const second = games.createGame().snapshot();
     const expected = emptyState(2, MATCH_ID, GameStateId.of('state-1'), BoardId.of('board-1'));
 
-    expect([first.belongsTo(MATCH_ID), second.belongsTo(MATCH_ID)]).toEqual([true, true]);
-    expect([first.equals(expected), first.board.equals(expected.board)]).toEqual([true, true]);
-    expect([first.equals(second), second.equals(first)]).toEqual([false, false]);
+    expect([first.matchId.equals(MATCH_ID), second.matchId.equals(MATCH_ID)]).toEqual([true, true]);
+    expect([
+      first.stateId.equals(expected.snapshot().stateId),
+      first.board.equals(expected.board),
+    ]).toEqual([true, true]);
+    expect([first.stateId.equals(second.stateId), second.stateId.equals(first.stateId)]).toEqual([
+      false,
+      false,
+    ]);
     expect([first.board.equals(second.board), second.board.equals(first.board)]).toEqual([
       false,
       false,

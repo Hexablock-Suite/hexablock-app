@@ -56,6 +56,23 @@ export class BoardSpace<TCell, TCoord> implements Cloneable<BoardSpace<TCell, TC
   }
 }
 
+// The read-only side of a board. The photo of a state holds its board through this type
+// (classes.md decision 34), so a reader of the photo can ask the board questions and cannot
+// change it. The photo holds a copy, so a change through a cast never reaches the state.
+// `clone()` gives a new board that the caller owns.
+export interface ReadonlyBoard<TCell, TCoord, TAxis extends string> {
+  readonly shape: BoardShape<TCoord>;
+  readonly topology: GridTopology<TCoord, TAxis, string>;
+  equals(other: ReadonlyBoard<TCell, TCoord, TAxis>): boolean;
+  contains(c: TCoord): boolean;
+  get(at: TCoord): TCell | undefined;
+  cells(): [TCoord, TCell][];
+  line(axis: TAxis, through: TCoord): Iterable<TCoord>;
+  ring(center: TCoord, radius: Radius): Iterable<TCoord>;
+  neighborhood(c: TCoord): Iterable<TCoord>;
+  clone(): Board<TCell, TCoord, TAxis>;
+}
+
 // The generic board: the `HexBoard<TCell>` of statement §3.1 with a generic coordinate.
 // Iterator: `line()`, `ring()` and `neighborhood()` walk the board lazily.
 // Prototype: `clone()` takes the snapshot for undo (classes.md decision 7).
@@ -69,6 +86,7 @@ export class BoardSpace<TCell, TCoord> implements Cloneable<BoardSpace<TCell, TC
 // A `BoardIdGenerator` gives the id of each new board, and `clone()` keeps it:
 // the copy is the same board at an earlier moment.
 // The board changes in place, and only through two business intentions: `occupy()` and `vacate()`.
+// `restore()` takes back the cells of an earlier copy of the same board, for the undo.
 // A space exists from its first write. So `cells()` lists the cells in first-write order.
 // A vacated space is free. When a cell occupies it again, that write counts as a first write.
 // So `cells()` gives the same order as a board built again from the cells that stay.
@@ -77,9 +95,9 @@ export class BoardSpace<TCell, TCoord> implements Cloneable<BoardSpace<TCell, TC
 // and its key is the topology key of its coordinate. The board keeps no pair of a caller.
 // `TAxis` is the axis union of the topology. The board reads no direction,
 // so it takes a topology with any direction union.
-export class Board<TCell, TCoord, TAxis extends string> implements Cloneable<
-  Board<TCell, TCoord, TAxis>
-> {
+export class Board<TCell, TCoord, TAxis extends string>
+  implements ReadonlyBoard<TCell, TCoord, TAxis>, Cloneable<Board<TCell, TCoord, TAxis>>
+{
   private readonly inside: ReadonlySet<CoordKey>;
   private readonly content: Map<CoordKey, BoardSpace<TCell, TCoord>>;
 
@@ -109,8 +127,8 @@ export class Board<TCell, TCoord, TAxis extends string> implements Cloneable<
   }
 
   // Two boards with one id are the same board. Their cells and their objects do not count.
-  equals(other: Board<TCell, TCoord, TAxis>): boolean {
-    return this.identity.equals(other.identity);
+  equals(other: ReadonlyBoard<TCell, TCoord, TAxis>): boolean {
+    return other instanceof Board && this.identity.equals(other.identity);
   }
 
   contains(c: TCoord): boolean {
@@ -136,6 +154,22 @@ export class Board<TCell, TCoord, TAxis extends string> implements Cloneable<
       throw new RangeError(`The coordinate ${key} is already free.`);
     }
     space.vacate();
+  }
+
+  // Takes back the cells of `earlier`, an earlier copy of this board, in their order.
+  // Every space becomes free, and then each cell of `earlier` occupies its coordinate again.
+  // So `cells()` gives the cells of `earlier` in the same order.
+  // A copy of another board, or a cell outside the shape, throws a RangeError before any change.
+  restore(earlier: ReadonlyBoard<TCell, TCoord, TAxis>): void {
+    if (!this.equals(earlier)) {
+      throw new RangeError('A board takes back only the cells of its own copy.');
+    }
+    const cells = earlier.cells();
+    const keys = cells.map(([c]) => this.insideKey(c));
+    for (const space of this.content.values()) {
+      if (space.occupation() !== undefined) space.vacate();
+    }
+    cells.forEach(([c, cell], i) => this.occupySpace(keys[i] as CoordKey, c, cell));
   }
 
   // The filled cells as new pairs, so a caller cannot change the board through them.

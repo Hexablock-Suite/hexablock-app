@@ -1,4 +1,4 @@
-import type { Board } from '../../engine/board';
+import type { ReadonlyBoard } from '../../engine/board';
 import type { Outcome } from '../../engine/outcome';
 import { Resolution } from '../../engine/resolution';
 import { BaseGameRules } from '../../engine/rules';
@@ -15,15 +15,17 @@ export const GOAL_RUN = 10;
 // in cascade, to the stack with most of that color.
 // The rules ask the topology for the neighbors, so they run on any geometry (D4).
 // The rules decide. The state changes itself: the rules call `placeOfferedStack()`,
-// `moveRun()` and `clearStack()`.
+// `moveRun()` and `clearStack()`. The rules read the state through its photo and `canPlace()`.
+// A photo never changes, so the rules take a new photo after each change of the state.
 export class SortRules<TCoord> extends BaseGameRules<PlaceStack<TCoord>, SortState<TCoord>> {
   isValid(state: SortState<TCoord>, move: PlaceStack<TCoord>): boolean {
     return state.canPlace(move.at);
   }
 
   *validMoves(state: SortState<TCoord>): Iterable<PlaceStack<TCoord>> {
-    if (state.offered === undefined) return;
-    for (const at of state.board.shape.cells) {
+    const { offered, board } = state.snapshot();
+    if (offered === undefined) return;
+    for (const at of board.shape.cells) {
       if (state.canPlace(at)) yield { at };
     }
   }
@@ -36,26 +38,29 @@ export class SortRules<TCoord> extends BaseGameRules<PlaceStack<TCoord>, SortSta
   // The cascade starts at the placed stack. Each transfer changes the stacks it touches,
   // so the cascade checks them again. Each transfer joins two runs into one,
   // so the number of runs on the board falls and the cascade ends.
-  resolve(state: SortState<TCoord>): Resolution<SortState<TCoord>> {
-    const pending: TCoord[] = state.placedAt === undefined ? [] : [state.placedAt];
+  resolve(state: SortState<TCoord>): Resolution {
+    const { placedAt } = state.snapshot();
+    const pending: TCoord[] = placedAt === undefined ? [] : [placedAt];
     for (let at = pending.shift(); at !== undefined; at = pending.shift()) {
       clearIfGoal<TCoord>(state, at);
       pending.push(...transfer<TCoord>(state, at));
     }
-    return Resolution.resolved(state);
+    return Resolution.resolved();
   }
 
   // The goals reached win. A board with no empty cell, or no stack left to place, loses.
   evaluate(state: SortState<TCoord>): Outcome {
-    if (state.goalsNeeded.isReachedBy(state.goalsDone)) return 'victory';
+    const { goalsNeeded, goalsDone } = state.snapshot();
+    if (goalsNeeded.isReachedBy(goalsDone)) return 'victory';
     return this.noValidMove(state) ? 'game-over' : 'playing';
   }
 }
 
 // Moves top runs between the stack at `at` and its neighbors with the same top color.
 // It returns the cells that changed, or none when no neighbor shares the color.
+// It reads one photo before the moves. The moves change only the stacks of `givers` and `target`.
 function transfer<TCoord>(state: SortState<TCoord>, at: TCoord): TCoord[] {
-  const board = state.board;
+  const { board } = state.snapshot();
   const color = board.get(at)?.top();
   if (color === undefined) return [];
   const matches = [...board.neighborhood(at)].filter(
@@ -78,7 +83,7 @@ function transfer<TCoord>(state: SortState<TCoord>, at: TCoord): TCoord[] {
 // `localeCompare`, so the order is the same on every device and locale.
 // The key order does not depend on when a cell was filled or emptied (gap G108.3).
 function targetOf<TCoord>(
-  board: Board<ColorStack, TCoord, string>,
+  board: ReadonlyBoard<ColorStack, TCoord, string>,
   first: TCoord,
   others: readonly TCoord[],
 ): TCoord {
@@ -94,7 +99,7 @@ function targetOf<TCoord>(
 // the whole stack and counts one goal. `SortState.clearStack()` keeps an empty stack
 // on the cell and the size for the scoring (#98).
 function clearIfGoal<TCoord>(state: SortState<TCoord>, at: TCoord): void {
-  const cell = state.board.get(at);
+  const cell = state.snapshot().board.get(at);
   if (cell === undefined || cell.topRun().length < GOAL_RUN) return;
   state.clearStack(at);
 }

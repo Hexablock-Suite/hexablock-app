@@ -3,7 +3,9 @@ import type { Clock } from '../../../../src/domain/engine/clock';
 import { Piece } from '../../../../src/domain/engine/piece';
 import { CellNode, ShapeGroup } from '../../../../src/domain/engine/shape-node';
 import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
+import type { IPieceSource } from '../../../../src/domain/engine/piece-source';
 import { FitFactory } from '../../../../src/domain/variants/hexa-fit/fit-factory';
+import { FitState, type FitSnapshot } from '../../../../src/domain/variants/hexa-fit/fit-state';
 import { PieceId } from '../../../../src/domain/variants/hexa-fit/piece-id';
 import { ManualClock } from '../../engine/manual-clock';
 import { square, type SquareCoord } from '../../engine/square-topology';
@@ -44,4 +46,18 @@ export function threeDominoFitFactory(clock: Clock = new ManualClock()): FitFact
     },
     clock,
   );
+}
+
+// A live state built again from a photo, so a test can ask the rules about the state that a game
+// shows. The engine never gives its state away. So the helper builds a new state with the ids,
+// the board and the source of the photo, and the state takes the photo back with `restore()`.
+// A Fit photo does not hold the pieces of the level, so `pieces` gives them,
+// for example `fitFactory().createPieceSource()`.
+export function fitStateOf<TCoord>(
+  photo: FitSnapshot<TCoord>,
+  pieces: IPieceSource<Piece<PieceId, TCoord>>,
+): FitState<TCoord> {
+  const state = FitState.start(photo.stateId, photo.matchId, photo.board.clone(), pieces);
+  state.restore(photo);
+  return state;
 }

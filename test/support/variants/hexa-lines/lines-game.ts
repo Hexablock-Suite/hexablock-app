@@ -1,4 +1,4 @@
-import { Board } from '../../../../src/domain/engine/board';
+import { Board, type ReadonlyBoard } from '../../../../src/domain/engine/board';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
 import { GameId } from '../../../../src/domain/engine/game-id';
 import type { GameStateId } from '../../../../src/domain/engine/game-state-id';
@@ -13,7 +13,10 @@ import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
 import { Color } from '../../../../src/domain/engine/color';
 import { LinesFactory } from '../../../../src/domain/variants/hexa-lines/lines-factory';
 import { LinesRules } from '../../../../src/domain/variants/hexa-lines/lines-rules';
-import { LinesState } from '../../../../src/domain/variants/hexa-lines/lines-state';
+import {
+  LinesState,
+  type LinesSnapshot,
+} from '../../../../src/domain/variants/hexa-lines/lines-state';
 import type { PlacePiece } from '../../../../src/domain/variants/hexa-lines/place-piece';
 import { RecordingPublisher } from '../../engine/fake-game';
 import { square, type SquareCoord } from '../../engine/square-topology';
@@ -82,7 +85,10 @@ export function linesGame<TCoord>(
 }
 
 // The keys of the filled cells, sorted, so a test compares boards by value.
-export function filledKeys<TCoord>(state: LinesState<TCoord>): string[] {
+// It takes a photo, because only the photo shows the board of a state.
+export function filledKeys<TCoord>(state: {
+  readonly board: ReadonlyBoard<Color, TCoord, string>;
+}): string[] {
   return state.board
     .cells()
     .map(([c]) => state.board.topology.key(c))
@@ -98,4 +104,19 @@ export function linesFactory(
   colors: readonly [Color, ...Color[]] = [red],
 ): LinesFactory<SquareCoord> {
   return new LinesFactory(new SquareGeometry(), { size: RegionSize.of(3), seed, shapes, colors });
+}
+
+// A live state built again from a photo, so a test can ask the rules about the state that a game
+// shows. The engine never gives its state away. So the helper builds a new state with the ids,
+// the board and the source of the photo, and the state takes the photo back with `restore()`.
+export function linesStateOf<TCoord>(photo: LinesSnapshot<TCoord>): LinesState<TCoord> {
+  const state = new LinesState(
+    photo.stateId,
+    photo.matchId,
+    photo.board.clone(),
+    [],
+    photo.source.clone(),
+  );
+  state.restore(photo);
+  return state;
 }

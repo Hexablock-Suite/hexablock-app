@@ -13,7 +13,7 @@ import type { IScoringPolicy } from '../../engine/scoring-policy';
 import type { IVariantFactory } from '../../engine/variant-factory';
 import { MergeRules } from './merge-rules';
 import { MergeScoring } from './merge-scoring';
-import { MergeState } from './merge-state';
+import { MergeState, type MergeSnapshot } from './merge-state';
 import type { MergeTile } from './merge-tile';
 import { mergeTileSource } from './merge-tile-source';
 import type { NewTile } from './new-tile';
@@ -87,7 +87,7 @@ export class MergeFactory<TCoord> implements IVariantFactory<
   }
 
   // Hexa Merge undoes one move (APP-FR-08, classes.md decision 3).
-  createHistory(): MoveHistory<Slide<string>, MergeState<MergeTile, TCoord, string>> {
+  createHistory(): MoveHistory<Slide<string>, MergeSnapshot<MergeTile, TCoord, string>> {
     return new MoveHistory(MERGE_UNDO_LIMIT);
   }
 }

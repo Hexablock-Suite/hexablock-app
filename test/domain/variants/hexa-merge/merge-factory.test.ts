@@ -8,7 +8,12 @@ import {
 } from '../../../../src/domain/variants/hexa-merge/merge-factory';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
 import { firstValidMove, startVariant } from '../../../support/engine/variant-game';
-import { mergeFactory, valueOf, values } from '../../../support/variants/hexa-merge/merge-game';
+import {
+  mergeFactory,
+  mergeStateOf,
+  valueOf,
+  values,
+} from '../../../support/variants/hexa-merge/merge-game';
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 
@@ -30,19 +35,19 @@ describe('MergeFactory', () => {
 
     const initial = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
     const { engine, rules, publisher } = startVariant(factory);
-    const slide = firstValidMove(rules, engine.snapshot());
+    const slide = firstValidMove(rules, mergeStateOf(engine.snapshot()));
     const outcome = engine.play(slide);
     const after = engine.snapshot();
 
     expect(factory.gameId.equals(GameId.of('hexa-merge'))).toBe(true);
     expect(factory.createBoard(BOARD_ID).shape.cells).toHaveLength(7);
-    expect(Object.values(values(initial))).toHaveLength(2);
-    expect(Object.values(values(initial)).every((v) => v === 2 || v === 4)).toBe(true);
+    expect(Object.values(values(initial.snapshot()))).toHaveLength(2);
+    expect(Object.values(values(initial.snapshot())).every((v) => v === 2 || v === 4)).toBe(true);
     expect(outcome).toBe('playing');
-    expect(values(after)).not.toEqual(values(initial));
+    expect(values(after)).not.toEqual(values(initial.snapshot()));
     // The score is the sum of the merged values: the factory picks the Merge scoring.
     expect(after.score).toBe(after.merged.reduce((sum, tile) => sum + valueOf(tile), 0));
-    expect(after.tiles.hasNext()).toBe(true);
+    expect(after.tiles.clone().hasNext()).toBe(true);
     expect(publisher.events).toEqual([]);
   });
 
@@ -50,7 +55,7 @@ describe('MergeFactory', () => {
     const play = (seed: number) => {
       const { engine, rules } = startVariant(mergeFactory(seed));
       const start = values(engine.snapshot());
-      engine.play(firstValidMove(rules, engine.snapshot()));
+      engine.play(firstValidMove(rules, mergeStateOf(engine.snapshot())));
       return [start, values(engine.snapshot())];
     };
 

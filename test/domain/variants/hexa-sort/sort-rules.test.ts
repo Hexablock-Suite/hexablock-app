@@ -7,7 +7,7 @@ import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
 import { BaseGameRules } from '../../../../src/domain/engine/rules';
 import type { ColorStack } from '../../../../src/domain/variants/hexa-sort/color-stack';
 import { SortRules } from '../../../../src/domain/variants/hexa-sort/sort-rules';
-import type { SortState } from '../../../../src/domain/variants/hexa-sort/sort-state';
+import type { SortSnapshot, SortState } from '../../../../src/domain/variants/hexa-sort/sort-state';
 import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
 import {
   chipsAt,
@@ -392,7 +392,7 @@ describe('SortRules atomic turn', () => {
       sortState({ board: row(2), offered: [stack('red', 'red'), stack('blue')], goalsNeeded: 3 }),
       failing,
     );
-    const facts = (state: SortState<SquareCoord>) => ({
+    const facts = (state: SortSnapshot<SquareCoord>) => ({
       cells: state.board.cells(),
       offered: state.offered,
       goalsDone: state.goalsDone,

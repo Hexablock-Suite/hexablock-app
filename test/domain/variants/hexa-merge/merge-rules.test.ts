@@ -8,7 +8,10 @@ import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import { BaseGameRules } from '../../../../src/domain/engine/rules';
 import { MergeRules } from '../../../../src/domain/variants/hexa-merge/merge-rules';
-import { MergeState } from '../../../../src/domain/variants/hexa-merge/merge-state';
+import {
+  MergeState,
+  type MergeSnapshot,
+} from '../../../../src/domain/variants/hexa-merge/merge-state';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
 import type { IMergeable } from '../../../../src/domain/variants/hexa-merge/mergeable';
 import type { NewTile } from '../../../../src/domain/variants/hexa-merge/new-tile';
@@ -21,6 +24,7 @@ import {
   valueOf,
   values,
   type HexMergeState,
+  mergeStateOf,
 } from '../../../support/variants/hexa-merge/merge-game';
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
@@ -33,7 +37,8 @@ import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-polic
 // They code against the proposal on issue #57, «Propuesta, pendiente del equipo»:
 // a slide merges from the leading edge, and a tile merges at most once per move.
 
-function total(state: HexMergeState): number {
+function total(state: HexMergeState | MergeSnapshot<MergeTile, HexCoord, HexAxis>): number {
+  if (state instanceof MergeState) return total(state.snapshot());
   return Object.values(values(state)).reduce((sum, value) => sum + value, 0);
 }
 
@@ -197,10 +202,10 @@ describe('MergeRules', () => {
 
     const outcome = engine.play(slide);
 
-    expect(rules.isValid(engine.snapshot(), slide)).toBe(false);
+    expect(rules.isValid(mergeStateOf(engine.snapshot()), slide)).toBe(false);
     expect(outcome).toBe('playing');
     expect(values(engine.snapshot())).toEqual({ '2,0': 2 });
-    expect(rules.isValid(engine.snapshot(), Slide.of('q', 'backward'))).toBe(true);
+    expect(rules.isValid(mergeStateOf(engine.snapshot()), Slide.of('q', 'backward'))).toBe(true);
   });
 
   it('should_reject_the_slide_when_its_axis_is_not_an_axis_of_the_topology', () => {
@@ -210,7 +215,7 @@ describe('MergeRules', () => {
 
     const outcome = engine.play(slide);
 
-    expect(rules.isValid(engine.snapshot(), slide)).toBe(false);
+    expect(rules.isValid(mergeStateOf(engine.snapshot()), slide)).toBe(false);
     expect(outcome).toBe('playing');
     expect(values(engine.snapshot())).toEqual({ '0,0': 2 });
   });
@@ -394,7 +399,7 @@ describe('MergeRules in place', () => {
       mergeTileSource(3),
     );
     const { engine, rules } = mergeGame(start, MergeTile.of(2048), failing);
-    const facts = (state: HexMergeState) => ({
+    const facts = (state: MergeSnapshot<MergeTile, HexCoord, HexAxis>) => ({
       cells: state.board.cells(),
       merged: state.merged,
       targetReached: state.targetReached,
@@ -403,7 +408,7 @@ describe('MergeRules in place', () => {
     });
     const before = facts(engine.snapshot());
 
-    expect(() => engine.play(firstValidMove(rules, engine.snapshot()))).toThrow(
+    expect(() => engine.play(firstValidMove(rules, mergeStateOf(engine.snapshot())))).toThrow(
       'The scoring fails.',
     );
     expect(facts(engine.snapshot())).toEqual(before);

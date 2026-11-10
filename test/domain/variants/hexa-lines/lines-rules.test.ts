@@ -8,7 +8,10 @@ import { Color } from '../../../../src/domain/engine/color';
 import { ComboMultiplierDecorator } from '../../../../src/domain/variants/hexa-lines/combo-multiplier-decorator';
 import { LinesRules } from '../../../../src/domain/variants/hexa-lines/lines-rules';
 import { LinesScoring } from '../../../../src/domain/variants/hexa-lines/lines-scoring';
-import { LinesState } from '../../../../src/domain/variants/hexa-lines/lines-state';
+import {
+  LinesState,
+  type LinesSnapshot,
+} from '../../../../src/domain/variants/hexa-lines/lines-state';
 import { PlacePiece } from '../../../../src/domain/variants/hexa-lines/place-piece';
 import { phaseNameOf } from '../../../support/engine/phase-name';
 import {
@@ -79,7 +82,7 @@ describe('Hexa Lines rules', () => {
 
     const state = engine.snapshot();
     expect(state.tray).toEqual([a, b, c]);
-    expect(state.source.next()).toBe(d);
+    expect(state.source.clone().next()).toBe(d);
   });
 
   it('should_reject_the_move_and_keep_the_state_when_the_piece_does_not_fit_or_names_no_tray_piece', () => {
@@ -219,13 +222,18 @@ describe('Hexa Lines rules', () => {
     const state = linesState(counting, 5, { tray: [one, piece(origin, square(1, 0))] });
     const rules = new LinesRules<SquareCoord>();
 
+    // The rules read the state through one photo, and the copy of the board in the photo
+    // reads each key of the shape once. The walk of the moves reads the keys after it.
+    reads.count = 0;
+    state.snapshot();
+    const photoReads = reads.count;
     reads.count = 0;
     const moves = rules.validMoves(state);
     const first = moves[Symbol.iterator]().next();
-    const firstReads = reads.count;
+    const firstReads = reads.count - photoReads;
     reads.count = 0;
     const all = [...rules.validMoves(state)];
-    const allReads = reads.count;
+    const allReads = reads.count - photoReads;
 
     expect(Array.isArray(moves)).toBe(false);
     expect(first.done).toBe(false);
@@ -265,8 +273,8 @@ describe('Hexa Lines rules', () => {
 
     expect(filledKeys(before)).toEqual([]);
     expect(before.tray).toEqual([one]);
-    expect(before.source.hasNext()).toBe(true);
-    expect(engine.snapshot().source.hasNext()).toBe(false);
+    expect(before.source.clone().hasNext()).toBe(true);
+    expect(engine.snapshot().source.clone().hasNext()).toBe(false);
   });
 });
 
@@ -464,7 +472,7 @@ describe('LinesRules atomic turn', () => {
     };
     const start = linesFactory(5).createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
     const { engine } = linesGame(start, failing);
-    const facts = (state: LinesState<SquareCoord>) => ({
+    const facts = (state: LinesSnapshot<SquareCoord>) => ({
       cells: state.board.cells(),
       tray: [...state.tray],
       nextPiece: state.source.clone().next(),

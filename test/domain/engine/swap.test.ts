@@ -14,10 +14,14 @@ import {
   ProgressRecord,
   type IProgressModel,
 } from '../../../src/domain/engine/progress-model';
-import { Resolution } from '../../../src/domain/engine/resolution';
 import type { IScoringPolicy } from '../../../src/domain/engine/scoring-policy';
 import { fakeCell, type FakeCell } from '../../support/engine/fake-cell';
-import { SourceRules, sourceState, type SourceState } from '../../support/engine/fake-game';
+import {
+  SourceRules,
+  sourceState,
+  type SourceSnapshot,
+  type SourceState,
+} from '../../support/engine/fake-game';
 import { square, type SquareCoord } from '../../support/engine/square-topology';
 import { MATCH_ID } from '../../support/engine/match-id';
 
@@ -71,10 +75,8 @@ class OnePerMove implements IScoringPolicy<SourceState> {
 
 // The value of the cell that the move filled: the cell that `before` does not have.
 class CellValue implements IScoringPolicy<SourceState> {
-  score(before: SourceState, resolution: Resolution<SourceState>): number {
-    const placed = resolution.state.board
-      .cells()
-      .find(([at]) => before.board.get(at) === undefined);
+  score(before: SourceSnapshot, after: SourceSnapshot): number {
+    const placed = after.board.cells().find(([at]) => before.board.get(at) === undefined);
     return placed?.[1].value ?? 0;
   }
 }

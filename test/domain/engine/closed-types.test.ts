@@ -70,7 +70,7 @@ describe('test double unions', () => {
     const state: BoardState<FakeCell, SquareCoord> = emptyState(2);
 
     expect([...board.line('col', square(0, 1))]).toEqual([square(0, 1), square(1, 1)]);
-    expect(state.board.shape.cells).toHaveLength(4);
+    expect(state.snapshot().board.shape.cells).toHaveLength(4);
   });
 });
 

@@ -1,9 +1,10 @@
+import type { ReadonlyBoard } from '../../engine/board';
 import type { Outcome } from '../../engine/outcome';
 import { Resolution } from '../../engine/resolution';
 import { BaseGameRules } from '../../engine/rules';
 import { Turns } from '../../engine/turns';
 import { PlaceFitPiece, RemoveFitPiece, RotateFitPiece, type FitMove } from './fit-move';
-import type { FitState } from './fit-state';
+import type { FitSnapshot, FitState } from './fit-state';
 import type { PieceId } from './piece-id';
 import { Placement } from './placement';
 
@@ -16,46 +17,33 @@ const NO_TURN = Turns.of(0);
 // Each accepted move adds one to `FitState.moves`: place, rotate and remove (issue #60).
 // `playTurn()` applies only a valid move, so a rejected move counts nothing.
 // The rules stay generic over `TCoord`, so they run on any topology (classes.md decision 16).
+// The rules read the board through the photo of the state, and they ask the state
+// `piece()`, `placementOf()`, `placed()` and `remaining()`.
 export class FitRules<TCoord> extends BaseGameRules<FitMove<TCoord>, FitState<TCoord>> {
   isValid(state: FitState<TCoord>, move: FitMove<TCoord>): boolean {
-    switch (move.kind) {
-      case 'place':
-        return (
-          state.placementOf(move.pieceId) === undefined &&
-          fits(state, move.pieceId, Placement.of(move.rotation, move.at, state.board.topology))
-        );
-      case 'remove':
-        return state.placementOf(move.pieceId) !== undefined;
-      case 'rotate': {
-        const placement = state.placementOf(move.pieceId);
-        return (
-          placement !== undefined &&
-          fits(state, move.pieceId, placement.turned(move.steps, state.board.topology))
-        );
-      }
-      default:
-        return unknownMove(move);
-    }
+    return isValidOn(state, state.snapshot(), move);
   }
 
   // Remove and rotate moves of the placed pieces first, then the place moves of the tray.
   // A place move takes each figure cell as its offset. That covers every placement when
   // the topology adds coordinates and each piece holds its origin, as on hexagons and squares.
+  // The generator takes one photo, and every check of a move reads it.
   *validMoves(state: FitState<TCoord>): Iterable<FitMove<TCoord>> {
-    const { topology } = state.board;
+    const photo = state.snapshot();
+    const { topology } = photo.board;
     for (const id of state.placed()) {
       yield new RemoveFitPiece(id);
       for (const steps of topology.fullTurn().shorter()) {
         const move = new RotateFitPiece(id, steps);
         // A rotation of no step changes nothing, so it is not a move.
-        if (!steps.equals(NO_TURN) && this.isValid(state, move)) yield move;
+        if (!steps.equals(NO_TURN) && isValidOn(state, photo, move)) yield move;
       }
     }
     for (const piece of state.remaining()) {
       for (const rotation of topology.fullTurn().shorter()) {
-        for (const at of state.board.shape.cells) {
+        for (const at of photo.board.shape.cells) {
           const move = new PlaceFitPiece(piece.content, rotation, at);
-          if (this.isValid(state, move)) yield move;
+          if (isValidOn(state, photo, move)) yield move;
         }
       }
     }
@@ -69,21 +57,48 @@ export class FitRules<TCoord> extends BaseGameRules<FitMove<TCoord>, FitState<TC
   }
 
   // Fit has no resolution: the move only places, removes or turns a piece.
-  resolve(state: FitState<TCoord>): Resolution<FitState<TCoord>> {
-    return Resolution.resolved(state);
+  resolve(_state: FitState<TCoord>): Resolution {
+    return Resolution.resolved();
   }
 
   // A piece goes only on free figure cells, so a full figure is an exact cover.
   evaluate(state: FitState<TCoord>): Outcome {
-    const { board } = state;
+    const { board } = state.snapshot();
     return board.cells().length === board.shape.cells.length ? 'victory' : 'playing';
+  }
+}
+
+// Whether the move is valid on the state that `photo` shows now.
+function isValidOn<TCoord>(
+  state: FitState<TCoord>,
+  photo: FitSnapshot<TCoord>,
+  move: FitMove<TCoord>,
+): boolean {
+  const { board } = photo;
+  switch (move.kind) {
+    case 'place':
+      return (
+        state.placementOf(move.pieceId) === undefined &&
+        fits(state, board, move.pieceId, Placement.of(move.rotation, move.at, board.topology))
+      );
+    case 'remove':
+      return state.placementOf(move.pieceId) !== undefined;
+    case 'rotate': {
+      const placement = state.placementOf(move.pieceId);
+      return (
+        placement !== undefined &&
+        fits(state, board, move.pieceId, placement.turned(move.steps, board.topology))
+      );
+    }
+    default:
+      return unknownMove(move);
   }
 }
 
 // Changes the state by the move, before the rules count it.
 // A rotation removes the piece and places it again, turned.
 function changeBy<TCoord>(state: FitState<TCoord>, move: FitMove<TCoord>): void {
-  const { topology } = state.board;
+  const { topology } = state.snapshot().board;
   switch (move.kind) {
     case 'place':
       state.place(move.pieceId, Placement.of(move.rotation, move.at, topology));
@@ -107,12 +122,17 @@ function changeBy<TCoord>(state: FitState<TCoord>, move: FitMove<TCoord>): void 
 
 // True when every cell of the placed piece lies inside the figure and is free or
 // already holds this piece. The second case lets a placed piece turn over its own cells.
-function fits<TCoord>(state: FitState<TCoord>, id: PieceId, placement: Placement<TCoord>): boolean {
+function fits<TCoord>(
+  state: FitState<TCoord>,
+  board: ReadonlyBoard<PieceId, TCoord, string>,
+  id: PieceId,
+  placement: Placement<TCoord>,
+): boolean {
   const piece = state.piece(id);
   if (piece === undefined) return false;
-  return placement.cells(piece, state.board.topology).every((c) => {
-    if (!state.board.contains(c)) return false;
-    const cell = state.board.get(c);
+  return placement.cells(piece, board.topology).every((c) => {
+    if (!board.contains(c)) return false;
+    const cell = board.get(c);
     return cell === undefined || cell.equals(id);
   });
 }

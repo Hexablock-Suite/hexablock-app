@@ -1,5 +1,6 @@
-import type { Board } from '../../engine/board';
-import type { BoardState } from '../../engine/board-state';
+import type { Board, ReadonlyBoard } from '../../engine/board';
+import { checkOwnSnapshot, type BoardSnapshot, type BoardState } from '../../engine/board-state';
+import type { Cloneable } from '../../engine/cloneable';
 import type { CoordKey } from '../../engine/coord-key';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { MatchId } from '../../engine/match-id';
@@ -13,12 +14,29 @@ export interface MergeView {
   readonly targetReached: boolean;
 }
 
+// The photo of a Merge state (classes.md decision 34): the board of its topology, the score,
+// whether the target exists, the tiles of the last merges and a copy of the tile source
+// at its position. The source shows only `clone()`, so a reader cannot draw from the photo.
+// `view()` gives whether the target exists for the screen.
+export interface MergeSnapshot<
+  TCell extends IMergeable<TCell>,
+  TCoord,
+  TAxis extends string,
+> extends BoardSnapshot<TCell, TCoord> {
+  readonly board: ReadonlyBoard<TCell, TCoord, TAxis>;
+  readonly targetReached: boolean;
+  readonly merged: readonly TCell[];
+  readonly tiles: Cloneable<IPieceSource<NewTile<TCell>>>;
+  view(): MergeView;
+}
+
 // The state of one Hexa Merge game. It narrows `board` to the board of its topology.
 // It is an entity inside the `GameEngine` aggregate (classes.md decisions 7 and 26).
 // Its identity is its own `GameStateId`, and `equals()` compares only that identity.
 // It also keeps the `MatchId` of its game, and `belongsTo()` reads it.
 // It changes only through its own methods. The state keeps its object, so `addNewTile()`,
-// `slide()` and `addPoints()` change it in place. The rules decide when to call each method.
+// `slide()`, `addPoints()` and `restore()` change it in place. The rules decide when to call
+// each method. The scoring, the rules and the use cases read the photo of `snapshot()`.
 // A refused input throws a RangeError and leaves the whole state as it was.
 // `tiles` is the source of the new tiles. It lives in the state (classes.md decision 31),
 // so `clone()` clones it, and the rollback of `GameEngine.play()` covers each draw.
@@ -39,7 +57,7 @@ export class MergeState<
     private readonly stateId: GameStateId,
     private readonly matchId: MatchId,
     readonly board: Board<TCell, TCoord, TAxis>,
-    readonly tiles: IPieceSource<NewTile<TCell>>,
+    public tiles: IPieceSource<NewTile<TCell>>,
     public targetReached = false,
     public merged: readonly TCell[] = [],
     public score = 0,
@@ -98,8 +116,34 @@ export class MergeState<
     return other instanceof MergeState && this.stateId.equals(other.stateId);
   }
 
-  view(): MergeView {
-    return Object.freeze({ targetReached: this.targetReached });
+  // The photo of the state now. A tile is a value, so the photo shares the tiles.
+  // It holds a frozen list and copies of the board and the tile source.
+  snapshot(): MergeSnapshot<TCell, TCoord, TAxis> {
+    const view = Object.freeze({ targetReached: this.targetReached });
+    return Object.freeze({
+      stateId: this.stateId,
+      matchId: this.matchId,
+      board: this.board.clone(),
+      score: this.score,
+      targetReached: this.targetReached,
+      merged: Object.freeze([...this.merged]),
+      tiles: this.tiles.clone(),
+      view: () => view,
+    });
+  }
+
+  // Takes back a photo of this state, in place. A photo of another state, of another board,
+  // or with a score that is not finite changes nothing.
+  restore(snapshot: MergeSnapshot<TCell, TCoord, TAxis>): void {
+    checkOwnSnapshot(this.stateId, this.board, snapshot);
+    if (!Number.isFinite(snapshot.score)) {
+      throw new RangeError(`The score of a state must be a finite number, not ${snapshot.score}.`);
+    }
+    this.board.restore(snapshot.board);
+    this.tiles = snapshot.tiles.clone();
+    this.targetReached = snapshot.targetReached;
+    this.merged = [...snapshot.merged];
+    this.score = snapshot.score;
   }
 
   clone(): MergeState<TCell, TCoord, TAxis> {

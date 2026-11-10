@@ -38,8 +38,8 @@ class AdjacentRules extends BaseGameRules<SquareCoord, FakeState> {
     return state;
   }
 
-  resolve(state: FakeState): Resolution<FakeState> {
-    return Resolution.resolved(state);
+  resolve(_state: FakeState): Resolution {
+    return Resolution.resolved();
   }
 
   evaluate(state: FakeState): Outcome {
@@ -65,8 +65,8 @@ class GivenMovesRules extends BaseGameRules<number, FakeState> {
     return state;
   }
 
-  resolve(state: FakeState): Resolution<FakeState> {
-    return Resolution.resolved(state);
+  resolve(_state: FakeState): Resolution {
+    return Resolution.resolved();
   }
 
   evaluate(state: FakeState): Outcome {

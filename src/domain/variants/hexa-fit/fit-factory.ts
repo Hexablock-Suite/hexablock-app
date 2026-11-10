@@ -19,7 +19,7 @@ import type { IVariantFactory } from '../../engine/variant-factory';
 import type { FitMove } from './fit-move';
 import { FitRules } from './fit-rules';
 import { FitScoring } from './fit-scoring';
-import { FitState } from './fit-state';
+import { FitState, type FitSnapshot } from './fit-state';
 import type { PieceId } from './piece-id';
 
 // One Hexa Fit level: the id of its geometry family, the figure and its pieces.
@@ -82,7 +82,7 @@ export class FitFactory<TCoord> implements IVariantFactory<
 
   // Hexa Fit undoes with no limit (APP-FR-08, classes.md decision 3).
   // `RedoableHistory` adds the redo of Hexa Fit in Sprint 3.
-  createHistory(): MoveHistory<FitMove<TCoord>, FitState<TCoord>> {
+  createHistory(): MoveHistory<FitMove<TCoord>, FitSnapshot<TCoord>> {
     return new MoveHistory();
   }
 }

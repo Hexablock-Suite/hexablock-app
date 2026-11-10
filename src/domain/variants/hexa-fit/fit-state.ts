@@ -1,7 +1,8 @@
 import type { Board } from '../../engine/board';
-import type { BoardState } from '../../engine/board-state';
+import { checkOwnSnapshot, type BoardSnapshot, type BoardState } from '../../engine/board-state';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { MatchId } from '../../engine/match-id';
+import { checkMoveCount } from '../../engine/move-count';
 import type { Piece } from '../../engine/piece';
 import type { IPieceSource } from '../../engine/piece-source';
 import type { PieceId } from './piece-id';
@@ -11,6 +12,16 @@ import type { Placement } from './placement';
 export interface FitView<TCoord> {
   readonly remaining: readonly Piece<PieceId, TCoord>[];
   readonly placed: readonly PieceId[];
+}
+
+// The photo of a Fit state (classes.md decision 34): the board, the score, the move count
+// and the placement of each piece on the figure, in the order of the placements.
+// The pieces of the level never change, so the photo does not hold them.
+// `view()` gives the tray and the placed pieces for the screen.
+export interface FitSnapshot<TCoord> extends BoardSnapshot<PieceId, TCoord> {
+  readonly placements: readonly (readonly [PieceId, Placement<TCoord>])[];
+  readonly moves: number;
+  view(): FitView<TCoord>;
 }
 
 // The state of one Hexa Fit game: the figure board, the pieces of the level,
@@ -24,8 +35,9 @@ export interface FitView<TCoord> {
 // Its identity is its own `GameStateId`, and `equals()` compares only that identity.
 // It also keeps the `MatchId` of its game, and `belongsTo()` reads it.
 // The state keeps its object, so every business method changes it in place and returns nothing:
-// `place()`, `remove()`, `countMove()` and `addPoints()`. The engine calls them on its copy.
+// `place()`, `remove()`, `countMove()`, `addPoints()` and `restore()`. The engine calls them.
 // A refused input throws a RangeError and leaves the whole state as it was.
+// The rules read the photo of `snapshot()` and ask `piece()` and `placementOf()`.
 export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
   private constructor(
     private readonly stateId: GameStateId,
@@ -121,13 +133,52 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
     return other instanceof FitState && this.stateId.equals(other.stateId);
   }
 
-  // A piece and an id never change, so the view shares them. `remaining()` and `placed()`
-  // build new lists, and the view freezes them.
-  view(): FitView<TCoord> {
-    return Object.freeze({
+  // The photo of the state now. A piece, an id and a placement never change,
+  // so the photo shares them. It holds frozen lists and a copy of the board.
+  snapshot(): FitSnapshot<TCoord> {
+    const placements = Object.freeze(
+      [...this.placements].map(([key, placement]) =>
+        Object.freeze([this.idOf(key), placement] as const),
+      ),
+    );
+    const view = Object.freeze({
       remaining: Object.freeze(this.remaining()),
       placed: Object.freeze(this.placed()),
     });
+    return Object.freeze({
+      stateId: this.stateId,
+      matchId: this.matchId,
+      board: this.board.clone(),
+      score: this.score,
+      placements,
+      moves: this.moves,
+      view: () => view,
+    });
+  }
+
+  // Takes back a photo of this state, in place. A photo of another state, of another board,
+  // of a piece that the level does not have, or with a wrong count changes nothing.
+  restore(snapshot: FitSnapshot<TCoord>): void {
+    checkOwnSnapshot(this.stateId, this.board, snapshot);
+    for (const [id] of snapshot.placements) {
+      if (!this.pieces.has(id.value)) throw new RangeError(`The level has no piece ${id.value}.`);
+    }
+    checkMoveCount(snapshot.moves);
+    if (!Number.isFinite(snapshot.score)) {
+      throw new RangeError(`The score of a state must be a finite number, not ${snapshot.score}.`);
+    }
+    this.board.restore(snapshot.board);
+    this.placements.clear();
+    for (const [id, placement] of snapshot.placements) this.placements.set(id.value, placement);
+    this.moves = snapshot.moves;
+    this.score = snapshot.score;
+  }
+
+  // The id of the piece whose id text is `key`. Each key of `placements` names a piece.
+  private idOf(key: string): PieceId {
+    const piece = this.pieces.get(key);
+    if (piece === undefined) throw new RangeError(`The level has no piece ${key}.`);
+    return piece.content;
   }
 
   // A piece and a placement never change, so the clone shares them.

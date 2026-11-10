@@ -16,7 +16,8 @@ import { SLIDE_SENSES, Slide } from './slide';
 // after the new tile appears.
 // The target tile sets `targetReached` and does not end the game (A3).
 // The rules decide. The state changes itself in place: `MergeState.slide()` packs the tiles,
-// and `MergeState.addNewTile()` puts the new tile.
+// and `MergeState.addNewTile()` puts the new tile. The rules read the axes through the photo
+// of the state and ask `canSlide()`.
 export class MergeRules<
   TCell extends IMergeable<TCell>,
   TCoord,
@@ -33,7 +34,7 @@ export class MergeRules<
   }
 
   *validMoves(state: MergeState<TCell, TCoord, TAxis>): Iterable<Slide<TAxis>> {
-    for (const axis of state.board.topology.axes()) {
+    for (const axis of state.snapshot().board.topology.axes()) {
       for (const toward of SLIDE_SENSES) {
         const slide = Slide.of(axis, toward);
         if (this.isValid(state, slide)) yield slide;
@@ -55,9 +56,9 @@ export class MergeRules<
   // «Propuesta, pendiente del equipo», fixes the rest: a 2 with 0.9 and a 4 with 0.1
   // (`mergeTileSource()`), and undo restores the cloned state, so the same tile comes back.
   // A board with no empty cell, or a source that has ended, gets no new tile.
-  resolve(state: MergeState<TCell, TCoord, TAxis>): Resolution<MergeState<TCell, TCoord, TAxis>> {
+  resolve(state: MergeState<TCell, TCoord, TAxis>): Resolution {
     state.addNewTile();
-    return Resolution.resolved(state);
+    return Resolution.resolved();
   }
 
   evaluate(state: MergeState<TCell, TCoord, TAxis>): Outcome {

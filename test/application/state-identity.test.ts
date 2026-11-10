@@ -1,15 +1,15 @@
 /** @jest-environment node */
 import { BoardId } from '../../src/domain/engine/board-id';
-import type { BoardState } from '../../src/domain/engine/board-state';
+import type { BoardSnapshot, BoardState } from '../../src/domain/engine/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
 import { GameStateId } from '../../src/domain/engine/game-state-id';
 import { MatchId } from '../../src/domain/engine/match-id';
 import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
 import { gameUseCases, valueOf } from '../support/application/game-use-cases';
-import { firstValidMove } from '../support/engine/variant-game';
+import { firstMoveOf, firstValidMove } from '../support/engine/variant-game';
 import { fitFactory } from '../support/variants/hexa-fit/fit-game';
 import { linesFactory } from '../support/variants/hexa-lines/lines-game';
-import { mergeFactory } from '../support/variants/hexa-merge/merge-game';
+import { mergeFactory, mergeStateOf } from '../support/variants/hexa-merge/merge-game';
 import { sortFactory } from '../support/variants/hexa-sort/sort-game';
 
 // R7: the state of a game and its board are entities (classes.md decisions 7 and 26).
@@ -22,18 +22,19 @@ const STATE = GameStateId.of('state-1');
 const BOARD = BoardId.of('board-1');
 
 // The identity of the running state: its match, its own id and the id of its board.
+// The engine gives only a photo, and the photo holds the two ids and a copy of the board.
 function identityOf<TCell, TCoord>(
-  state: BoardState<TCell, TCoord>,
+  photo: BoardSnapshot<TCell, TCoord>,
   reference: BoardState<TCell, TCoord>,
   other: BoardState<TCell, TCoord>,
 ) {
   return {
-    ofTheMatch: state.belongsTo(MATCH),
-    ofAnotherMatch: state.belongsTo(MatchId.of('match-2')),
-    sameState: state.equals(reference),
-    anotherState: state.equals(other),
-    sameBoard: state.board.equals(reference.board),
-    anotherBoard: state.board.equals(other.board),
+    ofTheMatch: photo.matchId.equals(MATCH),
+    ofAnotherMatch: photo.matchId.equals(MatchId.of('match-2')),
+    sameState: photo.stateId.equals(reference.snapshot().stateId),
+    anotherState: photo.stateId.equals(other.snapshot().stateId),
+    sameBoard: photo.board.equals(reference.snapshot().board),
+    anotherBoard: photo.board.equals(other.snapshot().board),
   };
 }
 
@@ -61,7 +62,7 @@ async function playAndUndo<
   const identity = () => identityOf(games.running().snapshot(), reference, other);
   valueOf(await startGame.execute({}));
   const started = identity();
-  const move = firstValidMove(factory.createRules(), games.running().snapshot());
+  const move = firstMoveOf(factory);
   valueOf(await applyMove.execute({ move }));
   const moved = identity();
   const undone = factory.createHistory() === undefined ? undefined : await undoMove.execute({});
@@ -98,7 +99,7 @@ describe('The identity of the running state', () => {
     const seen = [];
 
     for (let turn = 0; turn < 5; turn += 1) {
-      const move = firstValidMove(factory.createRules(), games.running().snapshot());
+      const move = firstValidMove(factory.createRules(), mergeStateOf(games.running().snapshot()));
       valueOf(await applyMove.execute({ move }));
       seen.push(identityOf(games.running().snapshot(), reference, other));
     }
@@ -118,6 +119,6 @@ describe('The identity of the running state', () => {
       new RangeError('The first state belongs to another match.'),
     );
     expect(engine.snapshot().board.cells()).toEqual(before);
-    expect(engine.snapshot().belongsTo(MATCH)).toBe(true);
+    expect(engine.snapshot().matchId.equals(MATCH)).toBe(true);
   });
 });

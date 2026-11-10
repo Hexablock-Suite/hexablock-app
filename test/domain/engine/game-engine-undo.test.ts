@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import type { Board } from '../../../src/domain/engine/board';
+import type { Board, ReadonlyBoard } from '../../../src/domain/engine/board';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameOver } from '../../../src/domain/engine/game-events';
 import { GameId } from '../../../src/domain/engine/game-id';
@@ -17,10 +17,16 @@ import {
   SourceRules,
   sourceState,
   type FakeMove,
-  type SourceState,
+  type FakeSnapshot,
+  type SourceSnapshot,
 } from '../../support/engine/fake-game';
 import { phaseNameOf } from '../../support/engine/phase-name';
-import { square, squareTopology, type SquareCoord } from '../../support/engine/square-topology';
+import {
+  square,
+  squareTopology,
+  type SquareAxis,
+  type SquareCoord,
+} from '../../support/engine/square-topology';
 import { MATCH_ID } from '../../support/engine/match-id';
 
 // `GameEngine` takes the state back through the undo capability (classes.md decisions 27 and 34).
@@ -32,13 +38,13 @@ const moveAt = (col: number, row = 0): FakeMove => ({
 });
 
 // The filled cells of a board in plain facts: its key and the fake cell value.
-function filled(board: Board<FakeCell, SquareCoord, string>): [string, number][] {
+function filled(board: ReadonlyBoard<FakeCell, SquareCoord, string>): [string, number][] {
   return board.cells().map(([at, cell]) => [squareTopology.key(at), cell.value]);
 }
 
 function historyGame(rules = new FakeRules(), size = 2) {
   const publisher = new RecordingPublisher();
-  const history = new MoveHistory<FakeMove, FakeState>();
+  const history = new MoveHistory<FakeMove, FakeSnapshot>();
   const engine = new GameEngine(
     MATCH_ID,
     GameId.of('fake-game'),
@@ -67,14 +73,15 @@ function factsOf(engine: GameEngine<FakeCell, SquareCoord, FakeMove, FakeState>)
 class ArmedRules extends FakeRules {
   armed = false;
 
-  override resolve(state: FakeState): Resolution<FakeState> {
+  override resolve(state: FakeState): Resolution {
     if (this.armed) throw new Error('resolve failed');
     return super.resolve(state);
   }
 }
 
 // A state that shares a budget of clones with its copies, so a test picks the failing clone.
-class ClonedOnBudgetState extends FakeState {
+// A state that takes photos only while its budget lasts. Each copy shares the budget.
+class PhotoOnBudgetState extends FakeState {
   constructor(
     board: FakeState['board'],
     private readonly budget: { left: number },
@@ -83,10 +90,14 @@ class ClonedOnBudgetState extends FakeState {
     super(board, score);
   }
 
-  override clone(): ClonedOnBudgetState {
-    if (this.budget.left === 0) throw new Error('clone failed');
+  override clone(): PhotoOnBudgetState {
+    return new PhotoOnBudgetState(this.board.clone(), this.budget, this.score);
+  }
+
+  override snapshot(): FakeSnapshot {
+    if (this.budget.left === 0) throw new Error('photo failed');
     this.budget.left -= 1;
-    return new ClonedOnBudgetState(this.board.clone(), this.budget, this.score);
+    return super.snapshot();
   }
 }
 
@@ -96,13 +107,13 @@ class UndoingScoring extends OnePointScoring {
   undoable: IUndoable | undefined;
   innerError: unknown;
 
-  override score(before: FakeState, resolution: Resolution<FakeState>): number {
+  override score(before: FakeSnapshot, after: FakeSnapshot): number {
     try {
       this.undoable?.undo();
     } catch (error) {
       this.innerError = error;
     }
-    return super.score(before, resolution);
+    return super.score(before, after);
   }
 }
 
@@ -145,7 +156,7 @@ describe('GameEngine undo capability', () => {
   it('should_put_the_piece_source_back_when_the_undone_move_drew_a_piece', () => {
     const publisher = new RecordingPublisher();
     const pieces = [fakeCell(1), fakeCell(2), fakeCell(3)];
-    const history = new MoveHistory<SquareCoord, SourceState>();
+    const history = new MoveHistory<SquareCoord, SourceSnapshot>();
     const engine = new GameEngine(
       MATCH_ID,
       GameId.of('fake-game'),
@@ -169,7 +180,9 @@ describe('GameEngine undo capability', () => {
     const { engine, undoable } = historyGame();
     engine.play(moveAt(0));
 
-    engine.snapshot().board.occupy(square(1, 1), fakeCell(9));
+    // The photo shows a read-only board. A cast reaches its copy of the board.
+    const photo = engine.snapshot();
+    (photo.board as Board<FakeCell, SquareCoord, SquareAxis>).occupy(square(1, 1), fakeCell(9));
     undoable.undo();
 
     expect(factsOf(engine)).toEqual({ cells: [], score: 0, phase: 'playing' });
@@ -194,14 +207,14 @@ describe('GameEngine undo capability', () => {
     expect(factsOf(engine)).toEqual({ cells: [], score: 0, phase: 'playing' });
   });
 
-  it('should_save_no_turn_when_the_clone_for_the_undo_throws', () => {
+  it('should_save_no_turn_when_the_photo_for_the_undo_throws', () => {
     const budget = { left: Number.POSITIVE_INFINITY };
     const { engine, undoable } = historyGame();
-    engine.start(new ClonedOnBudgetState(emptyState().board, budget));
-    // The rules and the scoring take one clone each. The third clone is the Memento.
-    budget.left = 2;
+    engine.start(new PhotoOnBudgetState(emptyState().board, budget));
+    // After the rules, the first photo is the Memento: the photo of the state before the move.
+    budget.left = 0;
 
-    expect(() => engine.play(moveAt(0))).toThrow('clone failed');
+    expect(() => engine.play(moveAt(0))).toThrow('photo failed');
 
     budget.left = Number.POSITIVE_INFINITY;
     expect(undoable.canUndo()).toBe(false);
@@ -253,7 +266,7 @@ describe('GameEngine undo capability', () => {
       new FakeRules(),
       scoring,
       new RecordingPublisher(),
-      new MoveHistory<FakeMove, FakeState>(),
+      new MoveHistory<FakeMove, FakeSnapshot>(),
     );
     engine.start(emptyState());
     engine.play(moveAt(0));
@@ -293,7 +306,7 @@ describe('GameEngine undo capability', () => {
   it('should_play_the_same_turns_when_the_engine_has_a_history', () => {
     const run = (withHistory: boolean) => {
       const publisher = new RecordingPublisher();
-      const history = withHistory ? new MoveHistory<FakeMove, FakeState>() : undefined;
+      const history = withHistory ? new MoveHistory<FakeMove, FakeSnapshot>() : undefined;
       const engine = new GameEngine(
         MATCH_ID,
         GameId.of('fake-game'),

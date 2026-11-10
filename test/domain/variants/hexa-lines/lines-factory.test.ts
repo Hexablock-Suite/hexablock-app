@@ -5,7 +5,7 @@ import { CellNode, ShapeGroup } from '../../../../src/domain/engine/shape-node';
 import type { Color } from '../../../../src/domain/engine/color';
 import { PlacePiece } from '../../../../src/domain/variants/hexa-lines/place-piece';
 import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
-import { firstValidMove, startVariant } from '../../../support/engine/variant-game';
+import { firstValidMove, startVariant, liveStateOf } from '../../../support/engine/variant-game';
 import {
   blue,
   filledKeys,
@@ -50,12 +50,12 @@ describe('LinesFactory', () => {
 
     const initial = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
     const { engine, rules, publisher } = startVariant(factory);
-    const outcome = engine.play(firstValidMove(rules, engine.snapshot()));
+    const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, engine.snapshot())));
 
     expect(factory.gameId.equals(GameId.of('hexa-lines'))).toBe(true);
     expect(factory.createBoard(BOARD_ID).shape.cells).toHaveLength(9);
-    expect(initial.board.cells()).toEqual([]);
-    expect(initial.tray).toHaveLength(3);
+    expect(initial.snapshot().board.cells()).toEqual([]);
+    expect(initial.snapshot().tray).toHaveLength(3);
     expect(outcome).toBe('playing');
     expect(filledKeys(engine.snapshot())).toEqual(['0,0']);
     expect(engine.snapshot().tray).toHaveLength(2);

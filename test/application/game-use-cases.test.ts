@@ -27,7 +27,7 @@ import { GoalCount } from '../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../src/domain/variants/hexa-sort/sort-factory';
 import { phaseNameOf } from '../support/engine/phase-name';
 import { square, type SquareCoord } from '../support/engine/square-topology';
-import { firstValidMove } from '../support/engine/variant-game';
+import { firstMoveOf } from '../support/engine/variant-game';
 import { variantIdOf } from '../support/variants/variant-id';
 import {
   errorOf,
@@ -46,8 +46,9 @@ import {
   RecordingPublisher,
   type FakeMove,
   type FakeState,
+  type FakeSnapshot,
 } from '../support/engine/fake-game';
-import { A, fitFactory } from '../support/variants/hexa-fit/fit-game';
+import { A, fitFactory, fitStateOf } from '../support/variants/hexa-fit/fit-game';
 import { linesFactory } from '../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../support/variants/hexa-merge/merge-game';
 import { sortFactory, stack, stackPiece } from '../support/variants/hexa-sort/sort-game';
@@ -73,7 +74,7 @@ async function startAndPlayOnce<
   const started = valueOf(await startGame.execute({}));
   const startState = games.running().snapshot();
   const startCells = startState.board.cells();
-  const move = firstValidMove(factory.createRules(), games.running().snapshot());
+  const move = firstMoveOf(factory);
   const played = valueOf(await applyMove.execute({ move }));
   const after = games.running().snapshot();
   return { gameId: variantIdOf(factory.gameId), started, startState, startCells, played, after };
@@ -94,7 +95,7 @@ class BrokenLogger extends RecordingLogger {
 
 // Rules that throw in `resolve()`, before the engine saves the turn.
 class ResolveThrowingRules extends FakeRules {
-  override resolve(_state: FakeState): Resolution<FakeState> {
+  override resolve(_state: FakeState): Resolution {
     throw new Error('The rules broke.');
   }
 }
@@ -102,9 +103,9 @@ class ResolveThrowingRules extends FakeRules {
 // The answers to the first Fit move and to one more move, as code and message.
 async function twoMoves(events: GameEventPublisher) {
   const factory = fitFactory();
-  const { games, startGame, applyMove } = gameUseCases(factory, events);
+  const { startGame, applyMove } = gameUseCases(factory, events);
   valueOf(await startGame.execute({}));
-  const move = firstValidMove(factory.createRules(), games.running().snapshot());
+  const move = firstMoveOf(factory);
   const answers = [];
   for (let call = 0; call < 2; call += 1) {
     const result = await applyMove.execute({ move });
@@ -291,7 +292,7 @@ describe('StartGame and ApplyMove', () => {
   it('should_return_a_start_failed_failure_and_keep_the_old_game_when_the_factory_throws_while_a_game_runs', async () => {
     const { games, startGame, applyMove } = gameUseCases(linesFactory());
     valueOf(await startGame.execute({}));
-    const move = firstValidMove(linesFactory().createRules(), games.running().snapshot());
+    const move = firstMoveOf(linesFactory());
     valueOf(await applyMove.execute({ move }));
     const oldGame = games.running();
     const before = runningGameOf(games);
@@ -329,16 +330,11 @@ describe('StartGame and ApplyMove', () => {
   it('should_publish_game_over_with_the_id_of_the_generator_when_the_started_game_ends', async () => {
     const publisher = new RecordingPublisher();
     const factory = fitFactory();
-    const { games, startGame, applyMove } = gameUseCases(
-      factory,
-      publisher,
-      new RecordingLogger(),
-      {
-        next: () => MATCH_ID,
-      },
-    );
+    const { startGame, applyMove } = gameUseCases(factory, publisher, new RecordingLogger(), {
+      next: () => MATCH_ID,
+    });
     valueOf(await startGame.execute({}));
-    const move = firstValidMove(factory.createRules(), games.running().snapshot());
+    const move = firstMoveOf(factory);
 
     const played = valueOf(await applyMove.execute({ move }));
 
@@ -454,9 +450,9 @@ describe('StartGame and ApplyMove', () => {
   it('should_return_a_move_failed_failure_and_throw_nothing_when_the_engine_throws', async () => {
     // The game is over after the first Fit move, so a second move makes the engine throw.
     const factory = fitFactory();
-    const { games, startGame, applyMove } = gameUseCases(factory);
+    const { startGame, applyMove } = gameUseCases(factory);
     valueOf(await startGame.execute({}));
-    const move = firstValidMove(factory.createRules(), games.running().snapshot());
+    const move = firstMoveOf(factory);
     valueOf(await applyMove.execute({ move }));
 
     const error = errorOf(await applyMove.execute({ move }));
@@ -471,7 +467,7 @@ describe('StartGame and ApplyMove', () => {
     const factory = fitFactory();
     const { games, logger, startGame, applyMove } = gameUseCases(factory, new ThrowingPublisher());
     valueOf(await startGame.execute({}));
-    const move = firstValidMove(factory.createRules(), games.running().snapshot());
+    const move = firstMoveOf(factory);
 
     const played = valueOf(await applyMove.execute({ move }));
 
@@ -509,7 +505,7 @@ describe('StartGame and ApplyMove', () => {
       new BrokenLogger(),
     );
     valueOf(await startGame.execute({}));
-    const move = firstValidMove(factory.createRules(), games.running().snapshot());
+    const move = firstMoveOf(factory);
 
     const played = valueOf(await applyMove.execute({ move }));
 
@@ -583,7 +579,7 @@ describe('StartGame and ApplyMove', () => {
 });
 
 // A history that can redo, as the factory of a redo variant gives it.
-class RedoingHistory extends MoveHistory<FakeMove, FakeState> implements IRedoable {
+class RedoingHistory extends MoveHistory<FakeMove, FakeSnapshot> implements IRedoable {
   override redoable(): IRedoable {
     return this;
   }
@@ -662,11 +658,14 @@ describe('the variant data of MoveResult', () => {
     expect(lines.played.payload.tray).toEqual(lines.after.tray);
 
     const fit = await startAndPlayOnce(fitFactory());
-    expect(fit.started.payload.remaining).toEqual(fit.startState.remaining());
-    expect(fit.started.payload.placed).toEqual(fit.startState.placed());
-    expect(fit.played.payload.remaining).toEqual(fit.after.remaining());
-    expect(fit.played.payload.placed).toEqual(fit.after.placed());
-    expect(fit.after.placed()).toEqual([A]);
+    // The photo has no business query, so a state built again from it answers them.
+    const fitStart = fitStateOf(fit.startState, fitFactory().createPieceSource());
+    const fitAfter = fitStateOf(fit.after, fitFactory().createPieceSource());
+    expect(fit.started.payload.remaining).toEqual(fitStart.remaining());
+    expect(fit.started.payload.placed).toEqual(fitStart.placed());
+    expect(fit.played.payload.remaining).toEqual(fitAfter.remaining());
+    expect(fit.played.payload.placed).toEqual(fitAfter.placed());
+    expect(fitAfter.placed()).toEqual([A]);
 
     const sort = await startAndPlayOnce(sortFactory());
     expect(sort.started.payload.offered).toEqual(sort.startState.offered);

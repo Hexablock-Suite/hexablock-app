@@ -1,6 +1,6 @@
-import { Board } from '../../../src/domain/engine/board';
+import { Board, type ReadonlyBoard } from '../../../src/domain/engine/board';
 import type { BoardId } from '../../../src/domain/engine/board-id';
-import type { BoardState } from '../../../src/domain/engine/board-state';
+import type { BoardSnapshot, BoardState } from '../../../src/domain/engine/board-state';
 import type { GameEvent, GameEventPublisher } from '../../../src/domain/engine/game-events';
 import { GameId } from '../../../src/domain/engine/game-id';
 import type { GameStateId } from '../../../src/domain/engine/game-state-id';
@@ -24,8 +24,15 @@ export interface FakeMove {
   readonly cell: FakeCell;
 }
 
+// The photo of a fake state: its board, its score, its ids and the count of filled cells.
+export interface FakeSnapshot extends BoardSnapshot<FakeCell, SquareCoord> {
+  readonly board: ReadonlyBoard<FakeCell, SquareCoord, SquareAxis>;
+  view(): { readonly filled: number };
+}
+
 // Its identity is its own `GameStateId`, as in a variant state, and it keeps the `MatchId`
 // of its game. The defaults are `STATE_ID` and `MATCH_ID`.
+// A test double keeps its fields public, so the fake rules can change it directly.
 export class FakeState implements BoardState<FakeCell, SquareCoord> {
   constructor(
     readonly board: Board<FakeCell, SquareCoord, SquareAxis>,
@@ -50,9 +57,21 @@ export class FakeState implements BoardState<FakeCell, SquareCoord> {
     return new FakeState(this.board.clone(), this.score, this.matchId, this.stateId);
   }
 
-  // The count of filled cells, so a test sees the view of each state.
-  view(): { readonly filled: number } {
-    return Object.freeze({ filled: this.board.cells().length });
+  // The view holds the count of filled cells, so a test sees the view of each state.
+  snapshot(): FakeSnapshot {
+    const view = Object.freeze({ filled: this.board.cells().length });
+    return Object.freeze({
+      stateId: this.stateId,
+      matchId: this.matchId,
+      board: this.board.clone(),
+      score: this.score,
+      view: () => view,
+    });
+  }
+
+  restore(snapshot: FakeSnapshot): void {
+    this.board.restore(snapshot.board);
+    this.score = snapshot.score;
   }
 }
 
@@ -71,14 +90,23 @@ export function emptyState(
   );
 }
 
+// The photo of a state with a source: a copy of the source at its position.
+export interface SourceSnapshot extends BoardSnapshot<FakeCell, SquareCoord> {
+  readonly board: ReadonlyBoard<FakeCell, SquareCoord, SquareAxis>;
+  readonly source: IPieceSource<FakeCell>;
+  view(): undefined;
+}
+
 // A state that holds a piece source, as a variant state does (classes.md decision 31).
 // `clone()` clones the source, so the engine copy and rollback cover its position.
+// `snapshot()` holds a copy of the source, and `restore()` takes a copy of that copy back.
 export class SourceState implements BoardState<FakeCell, SquareCoord> {
   constructor(
     readonly board: Board<FakeCell, SquareCoord, SquareAxis>,
-    readonly source: IPieceSource<FakeCell>,
+    public source: IPieceSource<FakeCell>,
     public score = 0,
     private readonly matchId: MatchId = MATCH_ID,
+    private readonly stateId: GameStateId = STATE_ID,
   ) {}
 
   belongsTo(match: MatchId): boolean {
@@ -94,11 +122,30 @@ export class SourceState implements BoardState<FakeCell, SquareCoord> {
   }
 
   clone(): SourceState {
-    return new SourceState(this.board.clone(), this.source.clone(), this.score, this.matchId);
+    return new SourceState(
+      this.board.clone(),
+      this.source.clone(),
+      this.score,
+      this.matchId,
+      this.stateId,
+    );
   }
 
-  view(): undefined {
-    return undefined;
+  snapshot(): SourceSnapshot {
+    return Object.freeze({
+      stateId: this.stateId,
+      matchId: this.matchId,
+      board: this.board.clone(),
+      score: this.score,
+      source: this.source.clone(),
+      view: () => undefined,
+    });
+  }
+
+  restore(snapshot: SourceSnapshot): void {
+    this.board.restore(snapshot.board);
+    this.source = snapshot.source.clone();
+    this.score = snapshot.score;
   }
 }
 
@@ -126,8 +173,8 @@ export class SourceRules extends BaseGameRules<SquareCoord, SourceState> {
     return state;
   }
 
-  resolve(state: SourceState): Resolution<SourceState> {
-    return Resolution.resolved(state);
+  resolve(_state: SourceState): Resolution {
+    return Resolution.resolved();
   }
 
   evaluate(state: SourceState): Outcome {
@@ -159,9 +206,9 @@ export class FakeRules extends BaseGameRules<FakeMove, FakeState> {
     return state;
   }
 
-  resolve(state: FakeState): Resolution<FakeState> {
+  resolve(_state: FakeState): Resolution {
     this.log.push('resolve');
-    return Resolution.resolved(state);
+    return Resolution.resolved();
   }
 
   evaluate(state: FakeState): Outcome {
@@ -170,13 +217,13 @@ export class FakeRules extends BaseGameRules<FakeMove, FakeState> {
   }
 }
 
-// One point for each accepted move.
+// One point for each accepted move. The engine scores only an accepted move.
 export class OnePointScoring implements IScoringPolicy<FakeState> {
   constructor(readonly log: string[] = []) {}
 
-  score(_before: FakeState, resolution: Resolution<FakeState>): number {
+  score(_before: FakeSnapshot, _after: FakeSnapshot): number {
     this.log.push('score');
-    return resolution.accepted ? 1 : 0;
+    return 1;
   }
 }
 

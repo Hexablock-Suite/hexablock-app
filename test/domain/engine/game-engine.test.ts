@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import type { Board } from '../../../src/domain/engine/board';
+import type { Board, ReadonlyBoard } from '../../../src/domain/engine/board';
 import type { BoardState } from '../../../src/domain/engine/board-state';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameOver } from '../../../src/domain/engine/game-events';
@@ -19,8 +19,10 @@ import {
   SourceRules,
   sourceState,
   type FakeMove,
+  type FakeSnapshot,
   type SourceState,
 } from '../../support/engine/fake-game';
+import { STATE_ID } from '../../support/engine/entity-ids';
 import { phaseNameOf } from '../../support/engine/phase-name';
 import { square, type SquareAxis, type SquareCoord } from '../../support/engine/square-topology';
 import { MATCH_ID } from '../../support/engine/match-id';
@@ -43,7 +45,7 @@ function newGame(log: string[] = []) {
 // Rules that fail once in `resolve()`, after `apply()` has put the cell on the board.
 class FailingOnceRules extends FakeRules {
   private failed = false;
-  override resolve(state: FakeState): Resolution<FakeState> {
+  override resolve(state: FakeState): Resolution {
     if (!this.failed) {
       this.failed = true;
       throw new Error('resolve failed');
@@ -55,20 +57,20 @@ class FailingOnceRules extends FakeRules {
 // A scoring policy that fails once.
 class FailingOnceScoring extends OnePointScoring {
   private failed = false;
-  override score(before: FakeState, resolution: Resolution<FakeState>): number {
+  override score(before: FakeSnapshot, after: FakeSnapshot): number {
     if (!this.failed) {
       this.failed = true;
       throw new Error('score failed');
     }
-    return super.score(before, resolution);
+    return super.score(before, after);
   }
 }
 
 // Rules whose `resolve()` refuses the move after `apply()` has put the cell on the copy.
 class RejectingResolveRules extends FakeRules {
-  override resolve(state: FakeState): Resolution<FakeState> {
+  override resolve(state: FakeState): Resolution {
     this.log.push('resolve');
-    return Resolution.rejected(state);
+    return Resolution.rejected();
   }
 }
 
@@ -99,13 +101,13 @@ class ReentrantScoring extends OnePointScoring {
   engine: GameEngine<FakeCell, SquareCoord, FakeMove, FakeState> | undefined;
   innerError: unknown;
 
-  override score(before: FakeState, resolution: Resolution<FakeState>): number {
+  override score(before: FakeSnapshot, after: FakeSnapshot): number {
     try {
       this.engine?.play(place(1, 0));
     } catch (error) {
       this.innerError = error;
     }
-    return super.score(before, resolution);
+    return super.score(before, after);
   }
 }
 
@@ -234,8 +236,9 @@ describe('GameEngine.play()', () => {
     engine.start(emptyState());
 
     const copy = engine.snapshot();
-    copy.board.occupy(square(0, 0), fakeCell(5));
-    copy.score = 99;
+    // The photo shows a read-only board and is frozen. A cast reaches its copy of the board.
+    (copy.board as Board<FakeCell, SquareCoord, SquareAxis>).occupy(square(0, 0), fakeCell(5));
+    expect(Reflect.set(copy, 'score', 99)).toBe(false);
 
     expect(engine.snapshot().board.get(square(0, 0))).toBeUndefined();
     expect(engine.snapshot().score).toBe(0);
@@ -316,8 +319,20 @@ class BaseCloneState implements BoardState<FakeCell, SquareCoord> {
     return new FakeState(this.board.clone(), this.score);
   }
 
-  view(): undefined {
-    return undefined;
+  snapshot(): FakeSnapshot {
+    const view = Object.freeze({ filled: this.board.cells().length });
+    return Object.freeze({
+      stateId: STATE_ID,
+      matchId: MATCH_ID,
+      board: this.board.clone(),
+      score: this.score,
+      view: () => view,
+    });
+  }
+
+  restore(snapshot: FakeSnapshot): void {
+    this.board.restore(snapshot.board as ReadonlyBoard<FakeCell, SquareCoord, SquareAxis>);
+    this.score = snapshot.score;
   }
 }
 
@@ -411,11 +426,11 @@ describe('GameEngine edge cases', () => {
 
 // Rules whose `playTurn()` returns `resolution` for every move.
 class FixedResolutionRules extends FakeRules {
-  constructor(private readonly resolution: (state: FakeState) => Resolution<FakeState>) {
+  constructor(private readonly resolution: (state: FakeState) => Resolution) {
     super();
   }
 
-  override playTurn(state: FakeState): Resolution<FakeState> {
+  override playTurn(state: FakeState): Resolution {
     return this.resolution(state);
   }
 }
@@ -442,11 +457,11 @@ class FixedScoring extends OnePointScoring {
   }
 }
 
-// A scoring policy that changes the state it receives, then throws.
+// A scoring policy that changes the photo it receives, then throws.
+// The photo is frozen, so a cast reaches only its copy of the board.
 class MutatingThrowingScoring extends OnePointScoring {
-  override score(before: FakeState): number {
-    before.board.occupy(square(1, 1), fakeCell(9));
-    before.score = 99;
+  override score(before: FakeSnapshot): number {
+    (before.board as Board<FakeCell, SquareCoord, SquareAxis>).occupy(square(1, 1), fakeCell(9));
     throw new Error('score failed');
   }
 }
@@ -477,8 +492,8 @@ class DrawingRules extends SourceRules {
 class RejectingDrawRules extends SourceRules {
   rejecting = true;
 
-  override resolve(state: SourceState): Resolution<SourceState> {
-    return this.rejecting ? Resolution.rejected(state) : super.resolve(state);
+  override resolve(state: SourceState): Resolution {
+    return this.rejecting ? Resolution.rejected() : super.resolve(state);
   }
 }
 
@@ -511,8 +526,7 @@ describe('GameEngine review findings', () => {
   it('should_return_playing_when_the_rules_return_a_rejected_resolution_with_a_final_outcome', () => {
     // `Resolution.evaluated()` refuses a rejected resolution, so a structural copy stands in
     // for a custom `IGameRules` that returns a rejected resolution with a final outcome.
-    const forged = (state: FakeState) =>
-      ({ state, accepted: false, outcome: 'victory' }) as unknown as Resolution<FakeState>;
+    const forged = () => ({ accepted: false, outcome: 'victory' }) as unknown as Resolution;
     const { engine, publisher } = gameWith(new FixedResolutionRules(forged));
 
     const outcome = engine.play(place(0, 0));
@@ -734,7 +748,7 @@ describe('GameEngine identity', () => {
     );
     expect(engine.snapshot().board.cells()).toEqual(before.board.cells());
     expect(engine.snapshot().score).toBe(1);
-    expect(engine.snapshot().belongsTo(MatchId.of('match-a'))).toBe(true);
+    expect(engine.snapshot().matchId.equals(MatchId.of('match-a'))).toBe(true);
   });
 
   it('should_keep_the_identity_of_the_match_in_every_state_when_the_game_plays', () => {
@@ -743,8 +757,10 @@ describe('GameEngine identity', () => {
     engine.play(place(0, 0));
     engine.play(place(1, 0));
 
-    expect(engine.snapshot().belongsTo(MatchId.of('match-a'))).toBe(true);
-    expect(engine.snapshot().equals(emptyState(2, MatchId.of('match-a')))).toBe(true);
+    expect(engine.snapshot().matchId.equals(MatchId.of('match-a'))).toBe(true);
+    expect(
+      engine.snapshot().stateId.equals(emptyState(2, MatchId.of('match-a')).snapshot().stateId),
+    ).toBe(true);
   });
 
   it('should_publish_game_over_with_the_variant_id_and_the_match_id_when_the_game_ends', () => {

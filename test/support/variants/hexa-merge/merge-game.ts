@@ -1,4 +1,4 @@
-import { Board } from '../../../../src/domain/engine/board';
+import { Board, type ReadonlyBoard } from '../../../../src/domain/engine/board';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
 import { GameId } from '../../../../src/domain/engine/game-id';
 import type { GameStateId } from '../../../../src/domain/engine/game-state-id';
@@ -13,7 +13,10 @@ import { RegionSize } from '../../../../src/domain/engine/region-size';
 import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
 import { MergeFactory } from '../../../../src/domain/variants/hexa-merge/merge-factory';
 import { MergeRules } from '../../../../src/domain/variants/hexa-merge/merge-rules';
-import { MergeState } from '../../../../src/domain/variants/hexa-merge/merge-state';
+import {
+  MergeState,
+  type MergeSnapshot,
+} from '../../../../src/domain/variants/hexa-merge/merge-state';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
 import type { NewTile } from '../../../../src/domain/variants/hexa-merge/new-tile';
 import type { Slide } from '../../../../src/domain/variants/hexa-merge/slide';
@@ -63,9 +66,10 @@ export function valueOf(tile: MergeTile): number {
 }
 
 // The value of each filled cell, by the topology key of its coordinate.
-export function values<TAxis extends string>(
-  state: MergeState<MergeTile, HexCoord, TAxis>,
-): Record<string, number> {
+// It takes a photo, because only the photo shows the board of a state.
+export function values<TAxis extends string>(state: {
+  readonly board: ReadonlyBoard<MergeTile, HexCoord, TAxis>;
+}): Record<string, number> {
   const out: Record<string, number> = {};
   for (const [at, tile] of state.board.cells()) out[hexTopology.key(at)] = valueOf(tile);
   return out;
@@ -96,4 +100,20 @@ export function mergeFactory(seed = 1): MergeFactory<HexCoord> {
     seed,
     target: MergeTile.of(2048),
   });
+}
+
+// A live state built again from a photo, so a test can ask the rules about the state that a game
+// shows. The engine never gives its state away. So the helper builds a new state with the ids,
+// the board and the source of the photo, and the state takes the photo back with `restore()`.
+export function mergeStateOf<TCoord, TAxis extends string>(
+  photo: MergeSnapshot<MergeTile, TCoord, TAxis>,
+): MergeState<MergeTile, TCoord, TAxis> {
+  const state = new MergeState(
+    photo.stateId,
+    photo.matchId,
+    photo.board.clone(),
+    photo.tiles.clone(),
+  );
+  state.restore(photo);
+  return state;
 }
