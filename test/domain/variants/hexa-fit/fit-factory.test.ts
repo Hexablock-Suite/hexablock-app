@@ -8,6 +8,8 @@ import { join } from 'node:path';
 import { BoardShape } from '../../../../src/domain/engine/board-shape';
 import { GameOver } from '../../../../src/domain/engine/game-events';
 import { GameId } from '../../../../src/domain/engine/game-id';
+import { LevelTimer } from '../../../../src/domain/engine/level-timer';
+import { LevelTimerId } from '../../../../src/domain/engine/level-timer-id';
 import { TimedRulesDecorator } from '../../../../src/domain/engine/timed-rules-decorator';
 import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
 import { Turns } from '../../../../src/domain/engine/turns';
@@ -21,7 +23,7 @@ import { startVariant } from '../../../support/engine/variant-game';
 import { A, fitFactory, threeDominoFitFactory } from '../../../support/variants/hexa-fit/fit-game';
 import { repoRoot } from '../../../support/run-tool';
 import { MATCH_ID } from '../../../support/engine/match-id';
-import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
+import { BOARD_ID, CountingTimerIds, STATE_ID } from '../../../support/engine/entity-ids';
 
 // The Fit factory creates the whole family of Hexa Fit (issue 99, classes.md decision 31).
 
@@ -62,6 +64,7 @@ describe('FitFactory', () => {
       new SquareGeometry(),
       FitLevel.of(TopologyId.square, BoardShape.of([square(0, 0), square(0, 0)]), []),
       new ManualClock(),
+      new CountingTimerIds(),
     );
     const message = 'Two coordinates of the shape have the same key.';
 
@@ -90,6 +93,57 @@ describe('FitFactory', () => {
 
     expect(first.engine.timed()?.elapsedMs()).toEqual(ElapsedTime.ofMs(1_000));
     expect(second.engine.timed()?.elapsedMs()).toEqual(ElapsedTime.ofMs(0));
+  });
+
+  // The timer is an entity with an id of its own (issue #214, classes.md decisions 19 and 26).
+  // `createRules()` gives the timer as `ITimed`, and `ITimed` shows no id.
+  // So the test compares the timer with a timer that holds the expected id.
+  it('should_ask_the_generator_once_and_give_its_id_to_the_timer_when_the_fit_factory_creates_the_rules', () => {
+    const clock = new ManualClock();
+    const timerIds = new CountingTimerIds();
+    const factory = fitFactory(clock, timerIds);
+
+    const timer = factory.createRules().timed();
+
+    expect(timer).toBeInstanceOf(LevelTimer);
+    expect((timer as LevelTimer).equals(new LevelTimer(LevelTimerId.of('timer-1'), clock))).toBe(
+      true,
+    );
+    // The generator gave one id, so its next id is the second one.
+    expect(timerIds.next().equals(LevelTimerId.of('timer-2'))).toBe(true);
+  });
+
+  it('should_ask_no_timer_id_when_the_fit_factory_creates_the_other_parts', () => {
+    const timerIds = new CountingTimerIds();
+    const factory = fitFactory(new ManualClock(), timerIds);
+
+    factory.createScoring();
+    factory.createPieceSource();
+    factory.createHistory();
+    factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
+
+    expect(timerIds.next().equals(LevelTimerId.of('timer-1'))).toBe(true);
+  });
+
+  it('should_give_two_timers_with_different_ids_and_separate_readings_when_the_rules_are_created_twice', () => {
+    const clock = new ManualClock();
+    const factory = threeDominoFitFactory(clock, new CountingTimerIds());
+    const firstRules = factory.createRules();
+    const secondRules = factory.createRules();
+    const first = firstRules.timed() as LevelTimer;
+    const second = secondRules.timed() as LevelTimer;
+
+    firstRules.playTurn(
+      factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID),
+      new PlaceFitPiece(A, Turns.of(0), square(0, 0)),
+    );
+    clock.advance(1_000);
+
+    expect([first.equals(second), second.equals(first)]).toEqual([false, false]);
+    expect(first.equals(new LevelTimer(LevelTimerId.of('timer-1'), clock))).toBe(true);
+    expect(second.equals(new LevelTimer(LevelTimerId.of('timer-2'), clock))).toBe(true);
+    expect(first.elapsedMs()).toEqual(ElapsedTime.ofMs(1_000));
+    expect(second.elapsedMs()).toEqual(ElapsedTime.ofMs(0));
   });
 
   it('should_hold_no_timer_code_when_the_fit_rules_source_is_read', () => {

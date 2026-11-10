@@ -64,7 +64,7 @@
       <h1>Wiring a variant: Abstract Factory, Builder, Observer and injected interfaces</h1>
 
       <svg
-        viewBox="0 0 1040 1128"
+        viewBox="0 0 1040 1296"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="factory-title factory-desc"
@@ -75,8 +75,9 @@
           rules, piece source, scoring, board, progress model, initial state and optional history of
           a variant, the ILevelBuilder builder, the GameEventPublisher interface that publishes
           GameEvent values such as GameOver, the Clock and RandomSource interfaces that layer 4
-          implements, and the three id generator interfaces that give the MatchId of each new match,
-          the GameStateId of its first state and the BoardId of its board, all value objects.
+          implements, and the four id generator interfaces that give the MatchId of each new match,
+          the GameStateId of its first state, the BoardId of its board and the LevelTimerId of the
+          timer of a timed game, all value objects. FitFactory takes the LevelTimerIdGenerator.
           GameFactory keeps an IVariantFactory, the three generators and a GameEventPublisher and
           creates the started GameEngine, and GameOver carries the GameId, the MatchId and the final
           Score, a value object.
@@ -140,7 +141,7 @@
           x="24"
           y="24"
           width="992"
-          height="940"
+          height="1092"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -279,7 +280,7 @@
           x="496"
           y="508"
           width="496"
-          height="436"
+          height="588"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -295,7 +296,7 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.14em"
         >
-          IDENTITY · DECISIONS 7, 25, 26, 30
+          IDENTITY · DECISIONS 7, 19, 25, 26, 30
         </text>
         <!-- Relationships (drawn before boxes) -->
         <!-- GameFactory keeps the IVariantFactory it receives as variant: use with role and multiplicity -->
@@ -890,6 +891,28 @@
           boardIds
           <tspan font-weight="600">1</tspan>
         </text>
+        <!-- LevelTimerIdGenerator gives a LevelTimerId: use with a verb -->
+        <line
+          x1="712"
+          y1="980"
+          x2="776"
+          y2="980"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#factory-open)"
+        />
+        <rect x="726.5" y="960" width="35" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="744"
+          y="969"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          GIVES
+        </text>
         <!-- GameStateIdGenerator gives a GameStateId, and BoardIdGenerator gives a BoardId: use with a verb -->
         <line
           x1="712"
@@ -1098,6 +1121,120 @@
         <text x="792" y="912" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: BoardId): boolean
         </text>
+        <!-- Class: LevelTimerIdGenerator (interface of the engine) -->
+        <rect
+          x="512"
+          y="944"
+          width="200"
+          height="72"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="512" y1="992" x2="712" y2="992" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="612"
+          y="962"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface»
+        </text>
+        <text
+          x="612"
+          y="980"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          LevelTimerIdGenerator
+        </text>
+        <text
+          x="528"
+          y="1008"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + next(): LevelTimerId
+        </text>
+        <!-- Class: LevelTimerId (value object) -->
+        <rect
+          x="776"
+          y="944"
+          width="200"
+          height="128"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="776" y1="992" x2="976" y2="992" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="876"
+          y="962"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="876"
+          y="980"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          LevelTimerId
+        </text>
+        <text
+          x="792"
+          y="1008"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          - value: string
+        </text>
+        <line x1="776" y1="1016" x2="976" y2="1016" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="792"
+          y="1032"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + of(value: string): LevelTimerId
+        </text>
+        <text
+          x="792"
+          y="1048"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + equals(other: LevelTimerId):
+        </text>
+        <text
+          x="800"
+          y="1064"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          boolean
+        </text>
         <!-- Class: GameFactory (factory of the aggregate) -->
         <rect
           x="56"
@@ -1216,8 +1353,8 @@
           TLevel
         </text>
 
-        <!-- The footnote and the legend sit below the zone, which grew by 488. -->
-        <g transform="translate(0 488)">
+        <!-- The footnote and the legend sit below the zone, which grew by 640. -->
+        <g transform="translate(0 640)">
           <!-- Footnote: classes the budget leaves out -->
           <text
             x="24"
@@ -1248,22 +1385,33 @@
             font-family="'IBM Plex Sans', sans-serif"
           >
             GameEventBus in layer 3 implements GameEventPublisher, and layer 4 implements Clock,
-            RandomSource and the three id generators. They are engine interfaces: ports live in
-            layer 2.
+            RandomSource and the four id generators. They are engine interfaces: ports live in layer
+            2.
+          </text>
+
+          <text
+            x="24"
+            y="548"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            GameFactory keeps no LevelTimerIdGenerator: FitFactory takes it next to the Clock and
+            gives each new LevelTimer its LevelTimerId (view 3, the Hexa Fit view).
           </text>
 
           <!-- Legend -->
           <line
             x1="24"
-            y1="552"
+            y1="568"
             x2="1016"
-            y2="552"
+            y2="568"
             stroke="rgba(23,33,42,0.10)"
             stroke-width="0.8"
           />
           <text
             x="24"
-            y="570"
+            y="586"
             fill="#5b6873"
             font-size="8"
             font-family="'IBM Plex Mono', monospace"
@@ -1274,16 +1422,16 @@
 
           <line
             x1="24"
-            y1="588"
+            y1="604"
             x2="52"
-            y2="588"
+            y2="604"
             stroke="#17212a"
             stroke-width="1"
             marker-end="url(#factory-triangle)"
           />
           <text
             x="60"
-            y="592"
+            y="608"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1292,16 +1440,16 @@
           </text>
           <line
             x1="144"
-            y1="588"
+            y1="604"
             x2="172"
-            y2="588"
+            y2="604"
             stroke="#5b6873"
             stroke-width="1"
             marker-end="url(#factory-open)"
           />
           <text
             x="180"
-            y="592"
+            y="608"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1310,7 +1458,7 @@
           </text>
           <rect
             x="24"
-            y="608"
+            y="624"
             width="28"
             height="12"
             rx="2"
@@ -1320,7 +1468,7 @@
           />
           <text
             x="60"
-            y="617"
+            y="633"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1329,7 +1477,7 @@
           </text>
           <rect
             x="184"
-            y="608"
+            y="624"
             width="28"
             height="12"
             rx="2"
@@ -1340,7 +1488,7 @@
           />
           <text
             x="220"
-            y="617"
+            y="633"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1349,7 +1497,7 @@
           </text>
           <rect
             x="424"
-            y="608"
+            y="624"
             width="28"
             height="12"
             rx="2"
@@ -1360,7 +1508,7 @@
           />
           <text
             x="460"
-            y="617"
+            y="633"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1369,7 +1517,7 @@
           </text>
           <rect
             x="600"
-            y="608"
+            y="624"
             width="28"
             height="12"
             rx="2"
@@ -1379,7 +1527,7 @@
           />
           <text
             x="636"
-            y="617"
+            y="633"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"

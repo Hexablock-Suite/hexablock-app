@@ -6,6 +6,7 @@ import { GameId } from '../../engine/game-id';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { GeometryFactory } from '../../engine/geometry-factory';
 import { LevelTimer } from '../../engine/level-timer';
+import type { LevelTimerIdGenerator } from '../../engine/level-timer-id-generator';
 import type { MatchId } from '../../engine/match-id';
 import { MoveHistory } from '../../engine/move-history';
 import type { Piece } from '../../engine/piece';
@@ -36,6 +37,7 @@ export class FitFactory<TCoord> implements IVariantFactory<
     private readonly geometry: GeometryFactory<TCoord>,
     private readonly level: FitLevel<TCoord>,
     private readonly clock: Clock,
+    private readonly timerIds: LevelTimerIdGenerator,
   ) {
     // A level file has no compile-time types, so the check runs when the game starts.
     // The level checks itself when it is created (classes.md decision 46).
@@ -45,8 +47,11 @@ export class FitFactory<TCoord> implements IVariantFactory<
 
   // Fit stars use time (D14, classes.md decision 19). `FitRules` holds no timer code.
   // Each call gives a new timer, so two games share only the `Clock`.
+  // The timer is an entity (classes.md decision 26). Each call asks the generator for one id,
+  // so each timer has its own `LevelTimerId`.
   createRules(): IGameRules<FitMove<TCoord>, FitState<TCoord>> {
-    return new TimedRulesDecorator(new FitRules<TCoord>(), new LevelTimer(this.clock));
+    const timer = new LevelTimer(this.timerIds.next(), this.clock);
+    return new TimedRulesDecorator(new FitRules<TCoord>(), timer);
   }
 
   createScoring(): IScoringPolicy<FitState<TCoord>> {
