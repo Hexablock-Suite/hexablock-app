@@ -153,7 +153,7 @@ function playGame(
   const engine = new GameEngine(MATCH_ID, GameId.of('fake-game'), rules, scoring, subscriber);
   engine.start(sourceState(source));
   let outcome: Outcome = Outcome.playing;
-  for (const at of sourceState(source).board.shape.cells) {
+  for (const at of sourceState(source).board.coordinates()) {
     // The count includes this move, because `play()` publishes `GameOver` before it returns.
     moves += 1;
     // A turn that throws is played once more.
@@ -237,7 +237,7 @@ describe('swapping the piece source, the scoring policy and the progress model',
       subscriber,
     );
     engine.start(sourceState(sources.counting()));
-    for (const at of sourceState(sources.counting()).board.shape.cells) engine.play(at);
+    for (const at of sourceState(sources.counting()).board.coordinates()) engine.play(at);
     const full = engine.snapshot();
 
     expect(() => engine.play(square(0, 0))).toThrow(RangeError);

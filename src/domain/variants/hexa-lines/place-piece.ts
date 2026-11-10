@@ -1,5 +1,5 @@
 import type { CoordKey } from '../../engine/coord-key';
-import type { GridTopology } from '../../engine/grid-topology';
+import type { ReadonlyBoard } from '../../engine/board';
 import type { Piece } from '../../engine/piece';
 
 // The Hexa Lines move: put the tray piece at `trayIndex` on the board.
@@ -31,9 +31,10 @@ export class PlacePiece<TCoord> {
     return tray.filter((_, index) => index !== this.trayIndex);
   }
 
-  // The board cells that the piece covers when the topology moves it by the offset of this move.
-  cells<TCell>(piece: Piece<TCell, TCoord>, topology: GridTopology<TCoord>): TCoord[] {
-    return piece.translated(this.at, topology).shape.cells();
+  // The cells that the piece covers when the board moves it by the offset of this move.
+  // The board does not cut the piece, so a cell can lie outside the board.
+  cells<TCell>(piece: Piece<TCell, TCoord>, board: ReadonlyBoard<TCell, TCoord>): TCoord[] {
+    return board.moved(piece, this.at).cells();
   }
 
   // The error of a tray that has no piece at the index of this move.

@@ -29,7 +29,7 @@ function firstStacks(level: SortLevel, count: number): string[][] {
   let source = new SortFactory(new SquareGeometry(), level).createPieceSource();
   while (found.length < count && source.hasNext()) {
     const { piece, rest } = source.take();
-    found.push(names(piece.content));
+    found.push(names(piece.cell()));
     source = rest;
   }
   return found;

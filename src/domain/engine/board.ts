@@ -3,7 +3,9 @@ import type { BoardShape } from './board-shape';
 import type { Cloneable } from './cloneable';
 import type { CoordKey } from './coord-key';
 import type { GridAxis, GridTopology } from './grid-topology';
+import type { Piece } from './piece';
 import type { Radius } from './radius';
+import type { Turns } from './turns';
 
 // A space of the board: the place that a player sees as free or as occupied.
 // It is an entity (classes.md decision 39). The key of its coordinate is its identity.
@@ -60,13 +62,20 @@ export class BoardSpace<TCell, TCoord> implements Cloneable<BoardSpace<TCell, TC
 // (classes.md decision 34), so a reader of the photo can ask the board questions and cannot
 // change it. The photo holds a copy, so a change through a cast never reaches the state.
 // `clone()` gives a new board that the caller owns.
+// It shows no field (classes.md decision 49): a reader asks the board for its coordinates,
+// its axes, the key of a coordinate, its full turn and a piece that it turns or moves.
 export interface ReadonlyBoard<TCell, TCoord, TAxis extends GridAxis = GridAxis> {
-  readonly shape: BoardShape<TCoord>;
-  readonly topology: GridTopology<TCoord, TAxis>;
   equals(other: ReadonlyBoard<TCell, TCoord, TAxis>): boolean;
   contains(c: TCoord): boolean;
   get(at: TCoord): TCell | undefined;
   cells(): [TCoord, TCell][];
+  coordinates(): TCoord[];
+  isFull(): boolean;
+  key(c: TCoord): CoordKey;
+  axes(): TAxis[];
+  fullTurn(): Turns;
+  turned(piece: Piece<TCell, TCoord>, turns: Turns): Piece<TCell, TCoord>;
+  moved(piece: Piece<TCell, TCoord>, offset: TCoord): Piece<TCell, TCoord>;
   line(axis: TAxis, through: TCoord): Iterable<TCoord>;
   ring(center: TCoord, radius: Radius): Iterable<TCoord>;
   neighborhood(c: TCoord): Iterable<TCoord>;
@@ -96,6 +105,9 @@ export interface ReadonlyBoard<TCell, TCoord, TAxis extends GridAxis = GridAxis>
 // `TAxis` is the axis class of the topology (classes.md decision 45). It defaults to `GridAxis`,
 // so `Board<TCell, TCoord>` is a board with any axis. The board reads no direction,
 // so it takes a topology with any direction.
+// The shape and the topology are private (classes.md decision 49). A reader asks the board:
+// `coordinates()` and `isFull()` answer for the shape, and `key()`, `axes()`, `fullTurn()`,
+// `turned()` and `moved()` answer with the topology. No reader holds the topology of a board.
 export class Board<TCell, TCoord, TAxis extends GridAxis = GridAxis>
   implements ReadonlyBoard<TCell, TCoord, TAxis>, Cloneable<Board<TCell, TCoord, TAxis>>
 {
@@ -104,12 +116,13 @@ export class Board<TCell, TCoord, TAxis extends GridAxis = GridAxis>
 
   constructor(
     private readonly identity: BoardId,
-    readonly shape: BoardShape<TCoord>,
-    readonly topology: GridTopology<TCoord, TAxis>,
+    private readonly shape: BoardShape<TCoord>,
+    private readonly topology: GridTopology<TCoord, TAxis>,
     content: ReadonlyMap<CoordKey, [TCoord, TCell]> = new Map(),
   ) {
-    this.inside = new Set(shape.cells.map((c) => topology.key(c)));
-    if (this.inside.size !== shape.cells.length) {
+    const keys = shape.keys(topology);
+    this.inside = new Set(keys);
+    if (this.inside.size !== keys.length) {
       throw new RangeError('Two coordinates of the shape have the same key.');
     }
     this.content = new Map();
@@ -179,6 +192,44 @@ export class Board<TCell, TCoord, TAxis extends GridAxis = GridAxis>
       const occupation = space.occupation();
       return occupation === undefined ? [] : [occupation];
     });
+  }
+
+  // Every coordinate of the board, free or occupied, in the order of its shape.
+  // Each call gives a new list, so a caller cannot change the board through it.
+  coordinates(): TCoord[] {
+    return this.shape.coordinates();
+  }
+
+  // True when a cell occupies every coordinate of the board.
+  isFull(): boolean {
+    return this.cells().length === this.inside.size;
+  }
+
+  // The key of a coordinate on this board, as the topology gives it.
+  // It also names a coordinate outside the board, for the error that refuses it.
+  key(c: TCoord): CoordKey {
+    return this.topology.key(c);
+  }
+
+  // The axes of the lines of this board, as the topology gives them.
+  axes(): TAxis[] {
+    return this.topology.axes();
+  }
+
+  // One full turn of a piece on this board: the rotation steps that bring it back.
+  fullTurn(): Turns {
+    return this.topology.fullTurn();
+  }
+
+  // The piece, turned by `turns` around its own origin. The piece and the board do not change.
+  turned(piece: Piece<TCell, TCoord>, turns: Turns): Piece<TCell, TCoord> {
+    return piece.rotated(turns, this.topology);
+  }
+
+  // The piece, moved by `offset`. The piece and the board do not change.
+  // The board does not cut the piece: a cell of the moved piece can lie outside the board.
+  moved(piece: Piece<TCell, TCoord>, offset: TCoord): Piece<TCell, TCoord> {
+    return piece.translated(offset, this.topology);
   }
 
   // A line through a coordinate outside the shape is empty.

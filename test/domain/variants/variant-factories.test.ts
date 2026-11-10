@@ -115,7 +115,7 @@ function startMerge<TCoord>(geometry: GeometryFactory<TCoord>) {
   const { board } = engine.snapshot();
   const tiles = board.cells().length;
   const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, engine.snapshot())));
-  return { cells: board.shape.cells.length, axes: board.topology.axes(), tiles, outcome };
+  return { cells: board.coordinates().length, axes: board.axes(), tiles, outcome };
 }
 
 // Gives the tests of one figure. The result keeps the coordinate type inside it.
@@ -126,7 +126,7 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
   const next = geometry.createCoord([1, 0]);
   const topology = geometry.createTopology();
   const keys = (cells: readonly TCoord[]) => cells.map((c) => topology.key(c));
-  const region = keys(topology.region(size).cells);
+  const region = keys(topology.region(size).coordinates());
 
   // A level of two cells and one domino that covers them.
   function fitLevel(named: TopologyId): FitLevel<TCoord> {
@@ -146,7 +146,7 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
       const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, start)));
 
       expect(region).toHaveLength(cellCount);
-      expect(keys(start.board.shape.cells)).toEqual(region);
+      expect(keys(start.board.coordinates())).toEqual(region);
       expect(start.board.cells()).toEqual([]);
       expect(start.tray).toHaveLength(3);
       expect(outcome).toBe(Outcome.playing);
@@ -165,9 +165,9 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
 
       const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, start)));
 
-      expect(keys(start.board.shape.cells)).toEqual(region);
+      expect(keys(start.board.coordinates())).toEqual(region);
       expect(start.board.cells()).toEqual([]);
-      expect(start.offered?.content.equals(ColorStack.of([Color.of('red')]))).toBe(true);
+      expect(start.offered?.cell().equals(ColorStack.of([Color.of('red')]))).toBe(true);
       expect(outcome).toBe(Outcome.playing);
       expect(engine.snapshot().board.cells()).toHaveLength(1);
     });
@@ -180,8 +180,8 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
 
       const outcome = engine.play(new PlaceFitPiece(A, Turns.of(0), origin));
 
-      expect(keys(start.board.shape.cells)).toEqual(keys([origin, next]));
-      expect(start.view().remaining.map((piece) => piece.content.value)).toEqual(['a']);
+      expect(keys(start.board.coordinates())).toEqual(keys([origin, next]));
+      expect(start.view().remaining.map((piece) => String(piece.cell()))).toEqual(['a']);
       expect(outcome).toBe(Outcome.victory);
     });
 

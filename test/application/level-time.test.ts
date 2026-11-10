@@ -89,7 +89,7 @@ describe('The time of a Fit level', () => {
 
     // The undo takes the move back and leaves the time.
     expect(undone.elapsedMs).toEqual(ElapsedTime.ofMs(2_000));
-    expect(undone.payload.placed.map((id) => id.value)).toEqual(['a']);
+    expect(undone.payload.placed.map((id) => String(id))).toEqual(['a']);
     expect(replay.elapsedMs).toEqual(ElapsedTime.ofMs(3_000));
     expect(games.running().snapshot().moves).toEqual(Moves.of(2));
   });

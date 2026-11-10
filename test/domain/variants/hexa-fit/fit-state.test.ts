@@ -84,7 +84,7 @@ describe('FitState', () => {
       state
         .snapshot()
         .board.cells()
-        .map(([c, id]) => `${squareTopology.key(c)}=${id.value}`);
+        .map(([c, id]) => `${squareTopology.key(c)}=${id}`);
     const results: unknown[] = [];
 
     results.push(state.place(A, Placement.of(Turns.of(0), square(2, 0), squareTopology)));

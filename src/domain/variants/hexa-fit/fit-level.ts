@@ -35,13 +35,12 @@ export class FitLevel<TCoord> {
     pieces: readonly Piece<PieceId, TCoord>[],
   ): FitLevel<TCoord> {
     const copy = [...new FixedListPieceSource(pieces)];
-    const seen = new Set<string>();
-    for (const piece of copy) {
-      if (seen.has(piece.content.value)) {
-        throw new RangeError(`The level has two pieces with the id ${piece.content.value}.`);
+    copy.forEach((piece, index) => {
+      const id = piece.cell();
+      if (copy.slice(0, index).some((earlier) => earlier.cell().equals(id))) {
+        throw new RangeError(`The level has two pieces with the id ${id}.`);
       }
-      seen.add(piece.content.value);
-    }
+    });
     return new FitLevel(topology, figure, Object.freeze(copy));
   }
 
@@ -60,7 +59,7 @@ export class FitLevel<TCoord> {
 
   // The figure as a tree of cells, as `BoardBuilder` takes it. Each call gives a new tree.
   figureTree(): ShapeGroup<TCoord> {
-    return new ShapeGroup(this.figure.cells.map((c) => new CellNode(c)));
+    return new ShapeGroup(this.figure.coordinates().map((c) => new CellNode(c)));
   }
 
   // The pieces of the tray at the start, in the order of the level. The list is frozen.

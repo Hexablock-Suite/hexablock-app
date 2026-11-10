@@ -17,7 +17,12 @@ const topology = new HexTopology();
 
 // True for the cells of a hexagon of `size` rings around the origin.
 function inside(size: number): (c: HexCoord) => boolean {
-  const keys = new Set(topology.region(RegionSize.of(size)).cells.map((c) => topology.key(c)));
+  const keys = new Set(
+    topology
+      .region(RegionSize.of(size))
+      .coordinates()
+      .map((c) => topology.key(c)),
+  );
   return (c) => keys.has(topology.key(c));
 }
 
@@ -203,14 +208,14 @@ describe('HexTopology', () => {
   });
 
   it('should_give_the_cells_of_a_centered_hexagon_when_a_region_is_read', () => {
-    expect(topology.region(RegionSize.of(1)).cells).toEqual([hex(0, 0)]);
+    expect(topology.region(RegionSize.of(1)).coordinates()).toEqual([hex(0, 0)]);
     // Size 3 is the Sort board (radius 2), and size 5 is the Lines board (radius 4).
     for (const [size, count] of [
       [2, 7],
       [3, 19],
       [5, 61],
     ] as const) {
-      const { cells } = topology.region(RegionSize.of(size));
+      const cells = topology.region(RegionSize.of(size)).coordinates();
 
       expect(cells).toHaveLength(count);
       expect(new Set(cells.map((c) => topology.key(c))).size).toBe(count);

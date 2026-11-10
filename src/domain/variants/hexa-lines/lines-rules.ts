@@ -22,8 +22,9 @@ export class LinesRules<TCoord> extends BaseGameRules<PlacePiece<TCoord>, LinesS
   // The «no tray piece fits» end reads only its first move (classes.md decision 33).
   *validMoves(state: LinesState<TCoord>): Iterable<PlacePiece<TCoord>> {
     const { tray, board } = state.snapshot();
+    const offsets = board.coordinates();
     for (const trayIndex of tray.keys()) {
-      for (const at of board.shape.cells) {
+      for (const at of offsets) {
         const move = new PlacePiece(trayIndex, at);
         if (state.canPlace(move)) yield move;
       }
@@ -62,8 +63,9 @@ export class LinesRules<TCoord> extends BaseGameRules<PlacePiece<TCoord>, LinesS
 function fullLines<TCoord>(board: ReadonlyBoard<Color, TCoord>): TCoord[][] {
   const seen = new Set<string>();
   const full: TCoord[][] = [];
-  for (const axis of board.topology.axes()) {
-    for (const through of board.shape.cells) {
+  const coordinates = board.coordinates();
+  for (const axis of board.axes()) {
+    for (const through of coordinates) {
       const line = [...board.line(axis, through)];
       const id = lineId(board, line);
       if (seen.has(id)) continue;
@@ -78,6 +80,6 @@ function fullLines<TCoord>(board: ReadonlyBoard<Color, TCoord>): TCoord[][] {
 // A line of two or more cells lies on one axis, so the axis adds nothing to its name.
 // JSON keeps the keys apart, so no key text can join two keys into one.
 function lineId<TCoord>(board: ReadonlyBoard<Color, TCoord>, line: readonly TCoord[]): string {
-  const keys = line.map((c) => board.topology.key(c)).sort();
+  const keys = line.map((c) => board.key(c)).sort();
   return JSON.stringify(keys);
 }

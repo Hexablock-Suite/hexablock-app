@@ -24,7 +24,7 @@ function row(length: number): BoardShape<SquareCoord> {
 }
 
 function ids(level: FitLevel<SquareCoord>): string[] {
-  return level.trayPieces().map((piece) => piece.content.value);
+  return level.trayPieces().map((piece) => String(piece.cell()));
 }
 
 describe('FitLevel', () => {

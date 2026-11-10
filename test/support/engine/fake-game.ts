@@ -167,7 +167,7 @@ export class SourceRules extends BaseGameRules<SquareCoord, SourceState> {
   }
 
   *validMoves(state: SourceState): Iterable<SquareCoord> {
-    for (const at of state.board.shape.cells) if (this.isValid(state, at)) yield at;
+    for (const at of state.board.coordinates()) if (this.isValid(state, at)) yield at;
   }
 
   apply(state: SourceState, at: SquareCoord): SourceState {
@@ -197,7 +197,7 @@ export class FakeRules extends BaseGameRules<FakeMove, FakeState> {
   }
 
   *validMoves(state: FakeState): Iterable<FakeMove> {
-    for (const at of state.board.shape.cells) {
+    for (const at of state.board.coordinates()) {
       if (state.board.get(at) === undefined) yield { at, cell: { kind: 'fake', value: 0 } };
     }
   }
@@ -215,7 +215,7 @@ export class FakeRules extends BaseGameRules<FakeMove, FakeState> {
 
   evaluate(state: FakeState): Outcome {
     this.log.push('evaluate');
-    return state.board.cells().length === state.board.shape.cells.length
+    return state.board.cells().length === state.board.coordinates().length
       ? Outcome.gameOver
       : Outcome.playing;
   }

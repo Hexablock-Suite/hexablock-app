@@ -80,7 +80,7 @@ function contract<TCoord>(row: Row<TCoord>): () => void {
   const sortedKeys = (cells: Iterable<TCoord>) => [...cells].map(keyOf).toSorted();
   const areNeighbors = (a: TCoord, b: TCoord) =>
     topology.neighbors(a).map(keyOf).includes(keyOf(b));
-  const regionOf = (size: number) => topology.region(RegionSize.of(size)).cells;
+  const regionOf = (size: number) => topology.region(RegionSize.of(size)).coordinates();
 
   function insideRegion(size: number): (c: TCoord) => boolean {
     const keys = new Set(regionOf(size).map(keyOf));

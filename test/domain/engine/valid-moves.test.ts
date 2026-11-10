@@ -148,7 +148,7 @@ describe('validMoves() and the no-valid-move end check', () => {
   it('should_end_the_game_when_the_board_is_full', () => {
     const rules = new AdjacentRules();
     const state = emptyState(2);
-    for (const c of squareTopology.region(RegionSize.of(2)).cells)
+    for (const c of squareTopology.region(RegionSize.of(2)).coordinates())
       state.board.occupy(c, fakeCell(1));
 
     expect(rules.evaluate(state)).toBe(Outcome.gameOver);

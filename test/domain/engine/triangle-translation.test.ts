@@ -33,13 +33,13 @@ describe('Piece translation on the triangle topology double', () => {
   it('should_move_each_cell_through_the_topology_when_the_offset_is_odd', () => {
     const moved = rhombus().translated(oddOffset, triangleTopology);
 
-    expect(moved.shape.cells()).toEqual([triangle(2, 0), triangle(3, 0)]);
+    expect(moved.cells()).toEqual([triangle(2, 0), triangle(3, 0)]);
   });
 
   it('should_keep_every_cell_orientation_when_the_offset_is_odd', () => {
-    const before = rhombus().shape.cells();
+    const before = rhombus().cells();
 
-    const after = rhombus().translated(oddOffset, triangleTopology).shape.cells();
+    const after = rhombus().translated(oddOffset, triangleTopology).cells();
 
     expect(after.map(isUp)).toEqual(before.map(isUp));
   });
@@ -58,12 +58,15 @@ describe('Piece translation on the triangle topology double', () => {
 
     const moved = piece.translated(oddOffset, triangleTopology);
 
-    expect(moved.content).toEqual(fakeCell(1));
-    expect(piece.shape.cells()).toEqual([triangle(0, 0), triangle(1, 0)]);
+    expect(moved.cell()).toEqual(fakeCell(1));
+    expect(piece.cells()).toEqual([triangle(0, 0), triangle(1, 0)]);
   });
 
   it('should_count_two_cells_when_the_area_of_the_rhombus_is_read', () => {
-    expect(rhombus().shape.area()).toBe(2);
+    const shape = new ShapeGroup([new CellNode(triangle(0, 0)), new CellNode(triangle(1, 0))]);
+
+    expect(shape.area()).toBe(2);
+    expect(rhombus().cells()).toHaveLength(2);
   });
 
   it('should_throw_when_a_shape_group_has_no_child', () => {
@@ -76,14 +79,14 @@ describe('Piece translation on the triangle topology double', () => {
     const copy = piece.clone();
 
     expect(copy).not.toBe(piece);
-    expect(copy.shape.cells()).toEqual(piece.shape.cells());
-    expect(copy.content).toEqual(piece.content);
+    expect(copy.cells()).toEqual(piece.cells());
+    expect(copy.cell()).toEqual(piece.cell());
   });
 
   it('should_return_to_the_start_when_a_piece_rotates_a_full_turn', () => {
     const turned = rhombus().rotated(triangleTopology.fullTurn(), triangleTopology);
 
-    expect(turned.shape.cells()).toEqual(rhombus().shape.cells());
+    expect(turned.cells()).toEqual(rhombus().cells());
   });
 
   it('should_flip_the_orientation_when_a_triangle_rotates_one_step', () => {
@@ -165,9 +168,9 @@ describe('Nested shape groups and negative moves on the triangle topology double
 
   it('should_keep_every_cell_orientation_when_the_offset_is_negative', () => {
     const negativeOffset = triangle(-1, 0);
-    const before = rhombus().shape.cells();
+    const before = rhombus().cells();
 
-    const after = rhombus().translated(negativeOffset, triangleTopology).shape.cells();
+    const after = rhombus().translated(negativeOffset, triangleTopology).cells();
 
     expect(after).toEqual([triangle(-2, 0), triangle(-1, 0)]);
     expect(after.map(isUp)).toEqual(before.map(isUp));
@@ -176,9 +179,7 @@ describe('Nested shape groups and negative moves on the triangle topology double
   it('should_return_to_the_start_when_a_piece_rotates_back_one_step_and_forward_one_step', () => {
     const back = rhombus().rotated(Turns.of(-1), triangleTopology);
 
-    expect(back.shape.cells()).not.toEqual(rhombus().shape.cells());
-    expect(back.rotated(Turns.of(1), triangleTopology).shape.cells()).toEqual(
-      rhombus().shape.cells(),
-    );
+    expect(back.cells()).not.toEqual(rhombus().cells());
+    expect(back.rotated(Turns.of(1), triangleTopology).cells()).toEqual(rhombus().cells());
   });
 });

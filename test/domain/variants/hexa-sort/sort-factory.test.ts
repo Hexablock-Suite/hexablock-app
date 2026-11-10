@@ -29,10 +29,10 @@ import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 // The two cells are not neighbors, so no run moves.
 function offeredInGame(factory: SortFactory<SquareCoord>): string[][] {
   const { engine } = startVariant(factory);
-  const offered = [names(engine.snapshot().offered?.content)];
+  const offered = [names(engine.snapshot().offered?.cell())];
   for (const move of [place(0, 0), place(1, 1)]) {
     engine.play(move);
-    offered.push(names(engine.snapshot().offered?.content));
+    offered.push(names(engine.snapshot().offered?.cell()));
   }
   return offered;
 }
@@ -46,12 +46,12 @@ describe('SortFactory', () => {
     const outcome = engine.play(place(0, 0));
 
     expect(factory.gameId.equals(GameId.of('hexa-sort'))).toBe(true);
-    expect(factory.createBoard(BOARD_ID).shape.cells).toHaveLength(4);
-    expect(names(initial.snapshot().offered?.content)).toEqual(['red', 'red']);
+    expect(factory.createBoard(BOARD_ID).coordinates()).toHaveLength(4);
+    expect(names(initial.snapshot().offered?.cell())).toEqual(['red', 'red']);
     expect(initial.snapshot().goalsNeeded.equals(GoalCount.of(5))).toBe(true);
     expect(outcome).toBe(Outcome.playing);
     expect(chipsAt(engine, 0, 0)).toEqual(['red', 'red']);
-    expect(names(engine.snapshot().offered?.content)).toEqual(['blue']);
+    expect(names(engine.snapshot().offered?.cell())).toEqual(['blue']);
     expect(engine.snapshot().score).toEqual(Score.of(0));
     expect(publisher.events).toEqual([]);
   });
@@ -114,16 +114,16 @@ describe('SortFactory', () => {
       const factory = new SortFactory(new SquareGeometry(), level);
       const { engine: first } = startVariant(factory);
       const { engine: second } = startVariant(factory);
-      const start = names(second.snapshot().offered?.content);
+      const start = names(second.snapshot().offered?.cell());
       const sourceAtStart = second.snapshot().source;
 
       first.play(place(0, 0));
       first.play(place(1, 1));
 
-      expect(names(first.snapshot().offered?.content)).not.toEqual([]);
-      expect(names(second.snapshot().offered?.content)).toEqual(start);
+      expect(names(first.snapshot().offered?.cell())).not.toEqual([]);
+      expect(names(second.snapshot().offered?.cell())).toEqual(start);
       expect(second.snapshot().source).toBe(sourceAtStart);
-      expect(names(startVariant(factory).engine.snapshot().offered?.content)).toEqual(start);
+      expect(names(startVariant(factory).engine.snapshot().offered?.cell())).toEqual(start);
     }
   });
 
@@ -136,9 +136,9 @@ describe('SortFactory', () => {
 
     // The level holds no source, so each call builds one, and both give the stacks of the level.
     expect(one).not.toBe(other);
-    expect([...one].map((piece) => names(piece.content))).toEqual([['red'], ['blue']]);
-    expect([...other].map((piece) => names(piece.content))).toEqual([['red'], ['blue']]);
+    expect([...one].map((piece) => names(piece.cell()))).toEqual([['red'], ['blue']]);
+    expect([...other].map((piece) => names(piece.cell()))).toEqual([['red'], ['blue']]);
     // A Sort piece is one cell with a stack: the first cell of the level region.
-    expect([...one].map((piece) => piece.shape.cells())).toEqual([[square(0, 0)], [square(0, 0)]]);
+    expect([...one].map((piece) => piece.cells())).toEqual([[square(0, 0)], [square(0, 0)]]);
   });
 });

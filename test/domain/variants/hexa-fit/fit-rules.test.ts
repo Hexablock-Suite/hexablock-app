@@ -108,14 +108,14 @@ function cellsOf<TCoord>(state: FitState<TCoord> | FitSnapshot<TCoord>): string[
   const { board } = photoOf(state);
   return board
     .cells()
-    .map(([c, id]) => `${board.topology.key(c)}=${id.value}`)
+    .map(([c, id]) => `${board.key(c)}=${id}`)
     .sort();
 }
 
 function trayOf<TCoord>(state: FitState<TCoord> | FitSnapshot<TCoord>): string[] {
   return photoOf(state)
     .view()
-    .remaining.map((p) => p.content.value);
+    .remaining.map((p) => String(p.cell()));
 }
 
 describe('FitRules', () => {
@@ -381,7 +381,7 @@ describe('FitRules edge cases', () => {
     );
 
     expect(source.hasNext()).toBe(true);
-    expect([...source].map((p) => p.content.value)).toEqual(['a', 'b']);
+    expect([...source].map((p) => String(p.cell()))).toEqual(['a', 'b']);
     expect(trayOf(state)).toEqual(['a', 'b']);
     expect(trayOf(state.clone())).toEqual(['a', 'b']);
   });

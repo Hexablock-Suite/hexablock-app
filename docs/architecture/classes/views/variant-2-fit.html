@@ -64,7 +64,7 @@
       <h1>Hexa Fit: levels built and checked by a Builder</h1>
 
       <svg
-        viewBox="0 0 1040 1782"
+        viewBox="0 0 1040 2002"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="fit-title fit-desc"
@@ -76,10 +76,12 @@
           and FitScoring. FitRules uses FitMove as TMove and FitState as TState. Lollipops show the
           engine interface each variant class implements, with its binding. PieceId, the cell
           content, and Placement, the rotation and the offset of a placed piece, are value objects.
-          FitState is an entity inside the GameEngine aggregate: its own GameStateId is its
-          identity, it keeps the MatchId of its game, and it changes in place only through its
-          business methods. FitPlay holds the Moves and the ElapsedTime of one won level, and
-          FitStarThreshold tells whether a play meets its two limits. Both are value objects.
+          PieceRegister is the value object that holds the pieces and the placements of FitState and
+          finds an entry with PieceId.equals(). FitState is an entity inside the GameEngine
+          aggregate: its own GameStateId is its identity, it keeps the MatchId of its game, and it
+          changes in place only through its business methods. FitPlay holds the Moves and the
+          ElapsedTime of one won level, and FitStarThreshold tells whether a play meets its two
+          limits. Both are value objects.
         </desc>
         <defs>
           <marker
@@ -140,7 +142,7 @@
           x="24"
           y="24"
           width="992"
-          height="1558"
+          height="1778"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -449,13 +451,13 @@
           - board: Board&lt;PieceId, TCoord&gt;
         </text>
         <text x="56" y="314" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - pieces: ReadonlyMap&lt;string,
+          - pieces: PieceRegister&lt;
         </text>
         <text x="64" y="328" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Piece&lt;PieceId, TCoord&gt;&gt;
         </text>
         <text x="56" y="342" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - placements: Map&lt;string, Placement&lt;TCoord&gt;&gt;
+          - placements: PieceRegister&lt;Placement&lt;TCoord&gt;&gt;
         </text>
         <text x="56" y="356" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - moves: Moves
@@ -1008,7 +1010,7 @@
           x="40"
           y="1162"
           width="256"
-          height="112"
+          height="128"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1038,7 +1040,7 @@
           PieceId
         </text>
         <text x="56" y="1226" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + value: string
+          - value: string
         </text>
         <line x1="40" y1="1234" x2="296" y2="1234" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="56" y="1250" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
@@ -1046,6 +1048,9 @@
         </text>
         <text x="56" y="1266" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: PieceId): boolean
+        </text>
+        <text x="56" y="1282" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + toString(): string
         </text>
         <!-- Class: Placement (value object) -->
         <rect
@@ -1107,7 +1112,7 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          + of(rotation: Turns, at: TCoord, topology: GridTopology&lt;TCoord&gt;):
+          + of(rotation: Turns, at: TCoord, topology: { fullTurn(): Turns }):
           Placement&lt;TCoord&gt;
         </text>
         <text
@@ -1117,7 +1122,7 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          + turned(steps: Turns, topology: GridTopology&lt;TCoord&gt;): Placement&lt;TCoord&gt;
+          + turned(steps: Turns, topology: { fullTurn(): Turns }): Placement&lt;TCoord&gt;
         </text>
         <text
           x="352"
@@ -1126,7 +1131,7 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          + cells(piece: Piece&lt;PieceId, TCoord&gt;, topology: GridTopology&lt;TCoord&gt;):
+          + cells(piece: Piece&lt;PieceId, TCoord&gt;, board: ReadonlyBoard&lt;PieceId, TCoord&gt;):
           TCoord[]
         </text>
         <text
@@ -1192,7 +1197,7 @@
           + piece(): PieceId
         </text>
         <text x="56" y="1510" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + placement(topology: GridTopology&lt;TCoord&gt;):
+          + placement(topology: { fullTurn(): Turns }):
         </text>
         <text x="67" y="1526" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Placement&lt;TCoord&gt;
@@ -1377,7 +1382,7 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          GridTopology&lt;TCoord&gt;): Placement&lt;TCoord&gt;
+          { fullTurn(): Turns }): Placement&lt;TCoord&gt;
         </text>
         <text
           x="678"
@@ -1389,6 +1394,91 @@
           + equals(other: FitMove&lt;unknown&gt;): boolean
         </text>
 
+        <!-- Class: PieceRegister (value object, decision 49) -->
+        <rect
+          x="40"
+          y="1590"
+          width="600"
+          height="196"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="40" y1="1638" x2="640" y2="1638" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="340"
+          y="1608"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="340"
+          y="1626"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          PieceRegister
+        </text>
+        <text x="56" y="1654" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - kept: [PieceId, TEntry][]
+        </text>
+        <line x1="40" y1="1662" x2="640" y2="1662" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="56"
+          y="1678"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + empty(): PieceRegister&lt;TEntry&gt;
+        </text>
+        <text x="56" y="1694" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + find(id: PieceId): TEntry | undefined
+        </text>
+        <text x="56" y="1710" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + has(id: PieceId): boolean
+        </text>
+        <text x="56" y="1726" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + with(id: PieceId, entry: TEntry): PieceRegister&lt;TEntry&gt;
+        </text>
+        <text x="56" y="1742" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + without(id: PieceId): PieceRegister&lt;TEntry&gt;
+        </text>
+        <text x="56" y="1758" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + entries(): [PieceId, TEntry][]
+        </text>
+        <text x="56" y="1774" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: PieceRegister&lt;TEntry&gt;, sameEntry: (left: TEntry, right: TEntry)
+          =&gt; boolean): boolean
+        </text>
+        <text
+          x="656"
+          y="1654"
+          fill="#5b6873"
+          font-size="9"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          FitState keeps its pieces and its placements in two registers.
+        </text>
+        <text
+          x="656"
+          y="1670"
+          fill="#5b6873"
+          font-size="9"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          A register finds an entry with PieceId.equals(), not by a text key.
+        </text>
         <!-- UML template boxes: type parameters on the top-right corner -->
         <rect
           x="350"
@@ -1410,6 +1500,27 @@
           text-anchor="middle"
         >
           TCoord
+        </text>
+        <rect
+          x="604"
+          y="1580"
+          width="48"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="628"
+          y="1592"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TEntry
         </text>
         <rect
           x="945"
@@ -1537,8 +1648,8 @@
         >
           TCoord
         </text>
-        <!-- The footnote and the legend sit below the zone, which grew by 652. -->
-        <g transform="translate(0 652)">
+        <!-- The footnote and the legend sit below the zone, which grew by 872. -->
+        <g transform="translate(0 872)">
           <!-- Footnote: classes the budget leaves out -->
           <text
             x="24"

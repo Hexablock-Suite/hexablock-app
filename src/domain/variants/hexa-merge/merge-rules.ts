@@ -35,7 +35,7 @@ export class MergeRules<
   }
 
   *validMoves(state: MergeState<TCell, TCoord, TAxis>): Iterable<Slide<TAxis>> {
-    for (const axis of state.snapshot().board.topology.axes()) {
+    for (const axis of state.snapshot().board.axes()) {
       for (const toward of SLIDE_SENSES) {
         const slide = Slide.of(axis, toward);
         if (this.isValid(state, slide)) yield slide;

@@ -43,7 +43,7 @@ describe('SortRules placement', () => {
     expect(game.play(place(0))).toBe(Outcome.playing);
 
     expect(chipsAt(game, 0)).toEqual(['red']);
-    expect(names(game.snapshot().offered?.content)).toEqual(['blue']);
+    expect(names(game.snapshot().offered?.cell())).toEqual(['blue']);
   });
 
   it('should_reject_the_move_and_keep_the_state_when_the_cell_holds_a_stack', () => {
@@ -54,7 +54,7 @@ describe('SortRules placement', () => {
     expect(game.play(place(0))).toBe(Outcome.playing);
 
     expect(chipsAt(game, 0)).toEqual(['green']);
-    expect(names(game.snapshot().offered?.content)).toEqual(['red']);
+    expect(names(game.snapshot().offered?.cell())).toEqual(['red']);
   });
 
   it('should_reject_the_move_when_the_cell_is_outside_the_board', () => {
@@ -63,7 +63,7 @@ describe('SortRules placement', () => {
     expect(game.play(place(5))).toBe(Outcome.playing);
 
     expect(game.snapshot().board.cells()).toEqual([]);
-    expect(names(game.snapshot().offered?.content)).toEqual(['red']);
+    expect(names(game.snapshot().offered?.cell())).toEqual(['red']);
   });
 });
 
@@ -321,7 +321,7 @@ describe('SortRules edge cases', () => {
     expect(chipsAt(game, 1)).toEqual([]);
     expect(state.goalsDone).toEqual(ClearedStacks.of(1));
     expect(state.clearedTiles).toEqual([13]);
-    expect(names(state.offered?.content)).toEqual(['green']);
+    expect(names(state.offered?.cell())).toEqual(['green']);
   });
 
   it('should_take_the_top_runs_of_every_matching_neighbor_when_the_placed_stack_has_the_longest_run', () => {
@@ -376,7 +376,7 @@ describe('SortRules edge cases', () => {
     const state = game.snapshot();
     expect(game.currentPhase()).toBe(PlayingPhase.instance);
     expect(state.board.cells()).toEqual([]);
-    expect(names(state.offered?.content)).toEqual(['red']);
+    expect(names(state.offered?.cell())).toEqual(['red']);
     expect(state.placedAt).toBeUndefined();
     expect(state.goalsDone).toEqual(ClearedStacks.of(0));
   });

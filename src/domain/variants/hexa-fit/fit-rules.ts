@@ -19,6 +19,8 @@ const NO_TURN = Turns.of(0);
 // The rules stay generic over `TCoord`, so they run on any topology (classes.md decision 16).
 // The rules read the board through the photo of the state, and they ask the state
 // `piece()`, `placementOf()`, `placed()` and `remaining()`.
+// The rules read no field of the board or of a piece (classes.md decision 49).
+// They ask the board for its coordinates and its full turn, and they pass the board on.
 // The rules read no field of a move (classes.md decision 43). The class of the move tells
 // its kind, and the rules ask the move for its piece and for the placement that it gives.
 export class FitRules<TCoord> extends BaseGameRules<FitMove<TCoord>, FitState<TCoord>> {
@@ -32,19 +34,20 @@ export class FitRules<TCoord> extends BaseGameRules<FitMove<TCoord>, FitState<TC
   // The generator takes one photo, and every check of a move reads it.
   *validMoves(state: FitState<TCoord>): Iterable<FitMove<TCoord>> {
     const photo = state.snapshot();
-    const { topology } = photo.board;
+    const { board } = photo;
+    const offsets = board.coordinates();
     for (const id of state.placed()) {
       yield new RemoveFitPiece(id);
-      for (const steps of topology.fullTurn().shorter()) {
+      for (const steps of board.fullTurn().shorter()) {
         const move = new RotateFitPiece(id, steps);
         // A rotation of no step changes nothing, so it is not a move.
         if (!steps.equals(NO_TURN) && isValidOn(state, photo, move)) yield move;
       }
     }
     for (const piece of state.remaining()) {
-      for (const rotation of topology.fullTurn().shorter()) {
-        for (const at of photo.board.shape.cells) {
-          const move = new PlaceFitPiece(piece.content, rotation, at);
+      for (const rotation of board.fullTurn().shorter()) {
+        for (const at of offsets) {
+          const move = new PlaceFitPiece(piece.cell(), rotation, at);
           if (isValidOn(state, photo, move)) yield move;
         }
       }
@@ -65,8 +68,7 @@ export class FitRules<TCoord> extends BaseGameRules<FitMove<TCoord>, FitState<TC
 
   // A piece goes only on free figure cells, so a full figure is an exact cover.
   evaluate(state: FitState<TCoord>): Outcome {
-    const { board } = state.snapshot();
-    return board.cells().length === board.shape.cells.length ? Outcome.victory : Outcome.playing;
+    return state.snapshot().board.isFull() ? Outcome.victory : Outcome.playing;
   }
 }
 
@@ -80,16 +82,13 @@ function isValidOn<TCoord>(
   if (move instanceof PlaceFitPiece) {
     return (
       state.placementOf(move.piece()) === undefined &&
-      fits(state, board, move.piece(), move.placement(board.topology))
+      fits(state, board, move.piece(), move.placement(board))
     );
   }
   if (move instanceof RemoveFitPiece) return state.placementOf(move.piece()) !== undefined;
   if (move instanceof RotateFitPiece) {
     const placement = state.placementOf(move.piece());
-    return (
-      placement !== undefined &&
-      fits(state, board, move.piece(), move.turn(placement, board.topology))
-    );
+    return placement !== undefined && fits(state, board, move.piece(), move.turn(placement, board));
   }
   return unknownMove(move);
 }
@@ -97,9 +96,9 @@ function isValidOn<TCoord>(
 // Changes the state by the move, before the rules count it.
 // A rotation removes the piece and places it again, turned.
 function changeBy<TCoord>(state: FitState<TCoord>, move: FitMove<TCoord>): void {
-  const { topology } = state.snapshot().board;
+  const { board } = state.snapshot();
   if (move instanceof PlaceFitPiece) {
-    state.place(move.piece(), move.placement(topology));
+    state.place(move.piece(), move.placement(board));
     return;
   }
   if (move instanceof RemoveFitPiece) {
@@ -109,10 +108,10 @@ function changeBy<TCoord>(state: FitState<TCoord>, move: FitMove<TCoord>): void 
   if (move instanceof RotateFitPiece) {
     const placement = state.placementOf(move.piece());
     if (placement === undefined) {
-      throw new RangeError(`The piece ${move.piece().value} is not on the figure.`);
+      throw new RangeError(`The piece ${move.piece()} is not on the figure.`);
     }
     state.remove(move.piece());
-    state.place(move.piece(), move.turn(placement, topology));
+    state.place(move.piece(), move.turn(placement, board));
     return;
   }
   unknownMove(move);
@@ -128,7 +127,7 @@ function fits<TCoord>(
 ): boolean {
   const piece = state.piece(id);
   if (piece === undefined) return false;
-  return placement.cells(piece, board.topology).every((c) => {
+  return placement.cells(piece, board).every((c) => {
     if (!board.contains(c)) return false;
     const cell = board.get(c);
     return cell === undefined || cell.equals(id);
