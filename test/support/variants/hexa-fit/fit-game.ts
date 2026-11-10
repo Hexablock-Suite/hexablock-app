@@ -1,6 +1,7 @@
 import { TopologyId } from '../../../../src/domain/engine/geometry-factory';
 import { BoardShape } from '../../../../src/domain/engine/board-shape';
 import type { Clock } from '../../../../src/domain/engine/clock';
+import type { LevelTimerIdGenerator } from '../../../../src/domain/engine/level-timer-id-generator';
 import { Piece } from '../../../../src/domain/engine/piece';
 import { CellNode, ShapeGroup } from '../../../../src/domain/engine/shape-node';
 import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
@@ -9,6 +10,7 @@ import { FitFactory } from '../../../../src/domain/variants/hexa-fit/fit-factory
 import { FitLevel } from '../../../../src/domain/variants/hexa-fit/fit-level';
 import { FitState, type FitSnapshot } from '../../../../src/domain/variants/hexa-fit/fit-state';
 import { PieceId } from '../../../../src/domain/variants/hexa-fit/piece-id';
+import { CountingTimerIds } from '../../engine/entity-ids';
 import { ManualClock } from '../../engine/manual-clock';
 import { square, type SquareCoord } from '../../engine/square-topology';
 
@@ -19,7 +21,11 @@ export const B = PieceId.of('b');
 export const C = PieceId.of('c');
 
 // A level of two cells, (0, 0) and (1, 0), and one domino that covers them.
-export function fitFactory(clock: Clock = new ManualClock()): FitFactory<SquareCoord> {
+// `timerIds` gives the id of the timer of each game: `timer-1`, `timer-2` and so on.
+export function fitFactory(
+  clock: Clock = new ManualClock(),
+  timerIds: LevelTimerIdGenerator = new CountingTimerIds(),
+): FitFactory<SquareCoord> {
   const domino = new Piece(
     new ShapeGroup([new CellNode(square(0, 0)), new CellNode(square(1, 0))]),
     A,
@@ -28,11 +34,15 @@ export function fitFactory(clock: Clock = new ManualClock()): FitFactory<SquareC
     new SquareGeometry(),
     FitLevel.of(TopologyId.square, BoardShape.of([square(0, 0), square(1, 0)]), [domino]),
     clock,
+    timerIds,
   );
 }
 
 // A level of one row of six cells and three dominoes, so two placed dominoes do not win it.
-export function threeDominoFitFactory(clock: Clock = new ManualClock()): FitFactory<SquareCoord> {
+export function threeDominoFitFactory(
+  clock: Clock = new ManualClock(),
+  timerIds: LevelTimerIdGenerator = new CountingTimerIds(),
+): FitFactory<SquareCoord> {
   const domino = (id: PieceId) =>
     new Piece(new ShapeGroup([new CellNode(square(0, 0)), new CellNode(square(1, 0))]), id);
   return new FitFactory(
@@ -43,6 +53,7 @@ export function threeDominoFitFactory(clock: Clock = new ManualClock()): FitFact
       [domino(A), domino(B), domino(C)],
     ),
     clock,
+    timerIds,
   );
 }
 

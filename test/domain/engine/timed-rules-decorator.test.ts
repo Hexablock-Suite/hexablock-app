@@ -5,6 +5,7 @@ import { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameId } from '../../../src/domain/engine/game-id';
 import { GameOverPhase, PlayingPhase } from '../../../src/domain/engine/game-phase';
 import { LevelTimer } from '../../../src/domain/engine/level-timer';
+import { LevelTimerId } from '../../../src/domain/engine/level-timer-id';
 import { Outcome } from '../../../src/domain/engine/outcome';
 import type { IScoringPolicy } from '../../../src/domain/engine/scoring-policy';
 import { TimedRulesDecorator } from '../../../src/domain/engine/timed-rules-decorator';
@@ -22,6 +23,7 @@ import { ManualClock } from '../../support/engine/manual-clock';
 import { phaseNameOf } from '../../support/engine/phase-name';
 import { square, squareTopology, type SquareCoord } from '../../support/engine/square-topology';
 import { MATCH_ID } from '../../support/engine/match-id';
+import { TIMER_ID } from '../../support/engine/entity-ids';
 
 // `TimedRulesDecorator` times a game around any rules (issue 157, classes.md decision 19, D14).
 // `FakeRules` extends `BaseGameRules` and calls its own `evaluate()`, as a variant rules class does.
@@ -42,7 +44,7 @@ function timedGame(
   rules = new FakeRules(),
 ) {
   const clock = new ManualClock();
-  const timer = new LevelTimer(clock);
+  const timer = new LevelTimer(TIMER_ID, clock);
   const decorated = new TimedRulesDecorator(rules, timer);
   const engine = new GameEngine(
     MATCH_ID,
@@ -261,6 +263,51 @@ describe('TimedRulesDecorator', () => {
     );
     expect(decorated.resolve(state).accepted).toBe(true);
     expect(decorated.evaluate(state)).toBe(Outcome.playing);
+  });
+});
+
+// The timer is an entity inside the aggregate (issue #214, classes.md decisions 19 and 26).
+// Its `LevelTimerId` is its identity, so the readings of the clock do not count.
+describe('LevelTimer.equals', () => {
+  it('should_be_equal_in_both_directions_when_two_timers_hold_one_id_and_only_one_is_started', () => {
+    const clock = new ManualClock();
+    const started = new LevelTimer(LevelTimerId.of('timer-a'), clock);
+    const idle = new LevelTimer(LevelTimerId.of('timer-a'), new ManualClock());
+    started.start();
+    clock.advance(SECOND);
+
+    expect(started.elapsedMs()).toEqual(ElapsedTime.ofMs(SECOND));
+    expect(idle.elapsedMs()).toEqual(ElapsedTime.ofMs(0));
+    expect([started.equals(idle), idle.equals(started), started.equals(started)]).toEqual([
+      true,
+      true,
+      true,
+    ]);
+  });
+
+  it('should_be_different_in_both_directions_when_two_timers_hold_different_ids_and_read_one_clock', () => {
+    const clock = new ManualClock();
+    const first = new LevelTimer(LevelTimerId.of('timer-a'), clock);
+    const second = new LevelTimer(LevelTimerId.of('timer-b'), clock);
+    first.start();
+    second.start();
+    clock.advance(SECOND);
+
+    expect(first.elapsedMs()).toEqual(second.elapsedMs());
+    expect([first.equals(second), second.equals(first)]).toEqual([false, false]);
+  });
+
+  it('should_keep_its_identity_when_the_timer_starts_and_stops', () => {
+    const clock = new ManualClock();
+    const timer = new LevelTimer(LevelTimerId.of('timer-a'), clock);
+    const same = new LevelTimer(LevelTimerId.of('timer-a'), clock);
+    const other = new LevelTimer(LevelTimerId.of('timer-b'), clock);
+
+    timer.start();
+    clock.advance(SECOND);
+    timer.stop();
+
+    expect([timer.equals(same), timer.equals(other)]).toEqual([true, false]);
   });
 });
 

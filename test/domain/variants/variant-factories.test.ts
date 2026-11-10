@@ -38,7 +38,7 @@ import { A, fitFactory, threeDominoFitFactory } from '../../support/variants/hex
 import { linesFactory } from '../../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../../support/variants/hexa-merge/merge-game';
 import { sortFactory } from '../../support/variants/hexa-sort/sort-game';
-import { BOARD_ID } from '../../support/engine/entity-ids';
+import { BOARD_ID, CountingTimerIds } from '../../support/engine/entity-ids';
 
 // The engine runs the four variants through one code path (issue 99, APP-FR-03).
 // `playOnce()` reads only `IVariantFactory`: it has no branch on the game id.
@@ -183,7 +183,7 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
 
     it('should_start_and_win_the_fit_level_when_its_topology_names_the_geometry', () => {
       const { engine } = startVariant(
-        new FitFactory(geometry, fitLevel(geometry.id), new ManualClock()),
+        new FitFactory(geometry, fitLevel(geometry.id), new ManualClock(), new CountingTimerIds()),
       );
       const start = engine.snapshot();
 
@@ -201,7 +201,8 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
 
       // Only a cast puts a free string here, as a broken level file would.
       for (const named of [...others, 'hexagon' as unknown as TopologyId]) {
-        const create = () => new FitFactory(geometry, fitLevel(named), new ManualClock());
+        const create = () =>
+          new FitFactory(geometry, fitLevel(named), new ManualClock(), new CountingTimerIds());
 
         expect(create).toThrow(RangeError);
         expect(create).toThrow(
