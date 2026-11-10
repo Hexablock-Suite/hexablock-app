@@ -4,6 +4,7 @@ import { BoardShape } from '../../../../src/domain/engine/board-shape';
 import { GameOver } from '../../../../src/domain/engine/game-events';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
 import { GameId } from '../../../../src/domain/engine/game-id';
+import { PlayingPhase, VictoryPhase } from '../../../../src/domain/engine/game-phase';
 import type { GridTopology } from '../../../../src/domain/engine/grid-topology';
 import { Piece } from '../../../../src/domain/engine/piece';
 import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
@@ -207,7 +208,7 @@ describe('FitRules', () => {
     const outcome = engine.play(new PlaceFitPiece(B, NO_TURN, square(0, 1)));
 
     expect(outcome).toBe('victory');
-    expect(engine.currentPhase().name).toBe('victory');
+    expect(engine.currentPhase()).toBe(VictoryPhase.instance);
     expect(trayOf(engine.snapshot())).toEqual([]);
     expect(publisher.events).toHaveLength(1);
     expect(publisher.events[0]).toBeInstanceOf(GameOver);
@@ -231,7 +232,7 @@ describe('FitRules', () => {
     const outcome = engine.play(new PlaceFitPiece(A, NO_TURN, square(1, 0)));
 
     expect(outcome).toBe('playing');
-    expect(engine.currentPhase().name).toBe('playing');
+    expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     const moves = [...new FitRules<SquareCoord>().validMoves(engine.snapshot())];
     expect(moves.filter((move) => move.kind === 'place')).toEqual([]);
     expect(moves).toContainEqual(new RemoveFitPiece(A));
@@ -338,7 +339,7 @@ describe('FitRules edge cases', () => {
     expect(rules.evaluate(empty)).toBe('playing');
     expect([...rules.validMoves(empty)]).toEqual([]);
     expect(outcome).toBe('playing');
-    expect(engine.currentPhase().name).toBe('playing');
+    expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(cellsOf(engine.snapshot())).toEqual([]);
   });
 
@@ -374,7 +375,7 @@ describe('FitRules edge cases', () => {
     expect(() => rules.apply(dominoLevel(), jump)).toThrow(RangeError);
     expect(() => rules.apply(dominoLevel(), jump)).toThrow('Unknown Fit move: jump.');
     expect(() => engine.play(jump)).toThrow(RangeError);
-    expect(engine.currentPhase().name).toBe('playing');
+    expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(cellsOf(engine.snapshot())).toEqual([]);
     expect(trayOf(engine.snapshot())).toEqual(['a', 'b']);
   });
@@ -422,7 +423,7 @@ describe('FitRules edge cases', () => {
       'The topology failed.',
     );
 
-    expect(engine.currentPhase().name).toBe('playing');
+    expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(cellsOf(engine.snapshot())).toEqual([]);
     expect(trayOf(engine.snapshot())).toEqual(['a', 'b']);
     expect(engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)))).toBe('playing');
@@ -447,7 +448,7 @@ describe('FitRules edge cases', () => {
     const outcome = engine.play(new RotateFitPiece(A, Turns.of(1)));
 
     expect(outcome).toBe('playing');
-    expect(engine.currentPhase().name).toBe('playing');
+    expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(cellsOf(engine.snapshot())).toEqual(['0,0=a', '1,0=a']);
     expect(isPlaced(engine.snapshot(), A, 0, square(0, 0))).toBe(true);
   });

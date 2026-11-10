@@ -1,5 +1,6 @@
 /** @jest-environment node */
 import { Board } from '../../../../src/domain/engine/board';
+import { PlayingPhase } from '../../../../src/domain/engine/game-phase';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import type { RandomSource } from '../../../../src/domain/engine/random-source';
 import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
@@ -366,7 +367,7 @@ describe('SortRules edge cases', () => {
     expect(() => game.play(place(0))).toThrow('The source failed.');
 
     const state = game.snapshot();
-    expect(game.currentPhase().name).toBe('playing');
+    expect(game.currentPhase()).toBe(PlayingPhase.instance);
     expect(state.board.cells()).toEqual([]);
     expect(names(state.offered?.content)).toEqual(['red']);
     expect(state.placedAt).toBeUndefined();

@@ -2,6 +2,7 @@
 import { Board } from '../../../../src/domain/engine/board';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
 import { GameId } from '../../../../src/domain/engine/game-id';
+import { PlayingPhase } from '../../../../src/domain/engine/game-phase';
 import { hex, type HexAxis, type HexCoord } from '../../../../src/domain/engine/hex-topology';
 import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
@@ -266,7 +267,7 @@ describe('Merge edge cases', () => {
     // The rollback of a turn keeps the board and the phase (classes.md decision 21).
     expect(() => engine.play(Slide.of('q', 'forward'))).toThrow(tooBig);
     expect(values(engine.snapshot())).toEqual({ '1,0': 2 ** 52, '2,0': 2 ** 52 });
-    expect(engine.currentPhase().name).toBe('playing');
+    expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(publisher.events).toEqual([]);
   });
 
@@ -326,7 +327,7 @@ describe('Merge edge cases', () => {
     expect(merged).toBe('playing');
     expect(labels(merging)).toEqual({ '2,0': 'aa' });
     expect(() => failing.play(Slide.of('q', 'forward'))).toThrow('The merge failed.');
-    expect(failing.currentPhase().name).toBe('playing');
+    expect(failing.currentPhase()).toBe(PlayingPhase.instance);
     expect(labels(failing)).toEqual({ '1,0': 'a', '2,0': 'a' });
     // A slide on the axis r moves no chip into another, so no merge runs.
     expect(failing.play(Slide.of('r', 'forward'))).toBe('playing');

@@ -7,7 +7,18 @@ import {
   PlayingPhase,
   ResolvingPhase,
   VictoryPhase,
+  type GamePhase,
 } from '../../../src/domain/engine/game-phase';
+
+// The value that `act` throws, or `undefined` when it throws nothing.
+function thrownBy(act: () => void): unknown {
+  try {
+    act();
+  } catch (error) {
+    return error;
+  }
+  return undefined;
+}
 
 describe('GamePhase', () => {
   it('should_allow_play_when_the_phase_is_playing', () => {
@@ -51,12 +62,64 @@ describe('GamePhase', () => {
     expect(VictoryPhase.instance.resume()).toBe(VictoryPhase.instance);
   });
 
-  it('should_name_each_phase_when_the_name_is_read', () => {
-    expect(PlayingPhase.instance.name).toBe('playing');
-    expect(ResolvingPhase.instance.name).toBe('resolving');
-    expect(PausedPhase.instance.name).toBe('paused');
-    expect(GameOverPhase.instance.name).toBe('game-over');
-    expect(VictoryPhase.instance.name).toBe('victory');
+  // Unit R18 of the redesign: the name of a phase is private. A phase names itself only
+  // in the error of a move or an undo that it refuses.
+  it('should_accept_a_move_and_an_undo_when_the_phase_is_playing', () => {
+    expect(PlayingPhase.instance.checkAcceptsMove()).toBeUndefined();
+    expect(PlayingPhase.instance.checkAcceptsUndo()).toBeUndefined();
+  });
+
+  it('should_throw_a_range_error_that_names_the_phase_when_a_phase_refuses_a_move', () => {
+    const refusals = [
+      ResolvingPhase.instance,
+      PausedPhase.instance,
+      GameOverPhase.instance,
+      VictoryPhase.instance,
+    ].map((phase) => thrownBy(() => phase.checkAcceptsMove()));
+
+    expect(refusals).toEqual([
+      new RangeError('The game cannot accept a move in the resolving phase.'),
+      new RangeError('The game cannot accept a move in the paused phase.'),
+      new RangeError('The game cannot accept a move in the game-over phase.'),
+      new RangeError('The game cannot accept a move in the victory phase.'),
+    ]);
+  });
+
+  it('should_throw_a_range_error_that_names_the_phase_when_a_phase_refuses_an_undo', () => {
+    const refusals = [
+      ResolvingPhase.instance,
+      PausedPhase.instance,
+      GameOverPhase.instance,
+      VictoryPhase.instance,
+    ].map((phase) => thrownBy(() => phase.checkAcceptsUndo()));
+
+    expect(refusals).toEqual([
+      new RangeError('The game cannot accept an undo in the resolving phase.'),
+      new RangeError('The game cannot accept an undo in the paused phase.'),
+      new RangeError('The game cannot accept an undo in the game-over phase.'),
+      new RangeError('The game cannot accept an undo in the victory phase.'),
+    ]);
+  });
+
+  // A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails when it compiles.
+  it('should_reject_at_compile_time_when_a_caller_reads_the_name_of_a_phase', () => {
+    const phase: GamePhase = PlayingPhase.instance;
+    const readers = [
+      // @ts-expect-error `GamePhase` has no public name.
+      () => phase.name,
+      // @ts-expect-error `PlayingPhase` has no public name.
+      () => PlayingPhase.instance.name,
+      // @ts-expect-error `ResolvingPhase.name` is private.
+      () => ResolvingPhase.instance.name,
+      // @ts-expect-error `PausedPhase.name` is private.
+      () => PausedPhase.instance.name,
+      // @ts-expect-error `GameOverPhase.name` is private.
+      () => GameOverPhase.instance.name,
+      // @ts-expect-error `VictoryPhase.name` is private.
+      () => VictoryPhase.instance.name,
+    ];
+
+    expect(readers).toHaveLength(6);
   });
 });
 

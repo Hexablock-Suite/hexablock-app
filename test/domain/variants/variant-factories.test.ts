@@ -26,6 +26,7 @@ import { ColorStack } from '../../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../../src/domain/variants/hexa-sort/sort-factory';
 import { ManualClock } from '../../support/engine/manual-clock';
+import { phaseNameOf } from '../../support/engine/phase-name';
 import { firstValidMove, startVariant } from '../../support/engine/variant-game';
 import { variantIdOf } from '../../support/variants/variant-id';
 import { A, fitFactory, threeDominoFitFactory } from '../../support/variants/hexa-fit/fit-game';
@@ -45,7 +46,11 @@ function playOnce<
 >(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>) {
   const { engine, rules } = startVariant(factory);
   const outcome = engine.play(firstValidMove(rules, engine.snapshot()));
-  return { gameId: variantIdOf(factory.gameId), outcome, phase: engine.currentPhase().name };
+  return {
+    gameId: variantIdOf(factory.gameId),
+    outcome,
+    phase: phaseNameOf(engine.currentPhase()),
+  };
 }
 
 // Two boards of one factory, in plain facts that a test compares across the four variants.

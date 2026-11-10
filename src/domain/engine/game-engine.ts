@@ -96,9 +96,7 @@ export class GameEngine<
   // after a draw leaves the source at its old position, and a retry draws the same piece.
   tryPlay(move: TMove): TurnReport {
     const state = this.started();
-    if (!this.current.canPlay()) {
-      throw new RangeError(`The game cannot accept a move in the ${this.current.name} phase.`);
-    }
+    this.current.checkAcceptsMove();
     this.current = ResolvingPhase.instance;
     // The rules and the scoring work on copies. The engine keeps its state until the turn
     // and the next phase are known, so an exception leaves the board, the score and the phase.
@@ -181,9 +179,7 @@ export class GameEngine<
   // It is private and reaches a command only as a function, so no caller can write the state.
   // The stored states never change, because the rules work on copies, so the memento needs no copy.
   private restore(memento: TState): void {
-    if (!this.current.canPlay()) {
-      throw new RangeError(`The game cannot accept an undo in the ${this.current.name} phase.`);
-    }
+    this.current.checkAcceptsUndo();
     this.state = memento;
   }
 

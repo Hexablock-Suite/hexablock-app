@@ -1,6 +1,7 @@
 /** @jest-environment node */
 import { GameOver } from '../../../../src/domain/engine/game-events';
 import { GameId } from '../../../../src/domain/engine/game-id';
+import { PlayingPhase } from '../../../../src/domain/engine/game-phase';
 import { hex, type HexAxis } from '../../../../src/domain/engine/hex-topology';
 import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
 import type { RandomSource } from '../../../../src/domain/engine/random-source';
@@ -250,7 +251,7 @@ describe('Merge new tiles edge cases', () => {
     const { engine, publisher } = mergeGame(mergeState([[hex(0, 0), 2]], 3, source(true)));
 
     expect(() => engine.play(slide)).toThrow('The source failed.');
-    expect(engine.currentPhase().name).toBe('playing');
+    expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(values(engine.snapshot())).toEqual({ '0,0': 2 });
 
     expect(engine.play(slide)).toBe('playing');

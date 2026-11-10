@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { GameOverPhase, PlayingPhase } from '../../../../src/domain/engine/game-phase';
 import type { GridTopology } from '../../../../src/domain/engine/grid-topology';
 import { GameOver } from '../../../../src/domain/engine/game-events';
 import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
@@ -9,6 +10,7 @@ import { LinesRules } from '../../../../src/domain/variants/hexa-lines/lines-rul
 import { LinesScoring } from '../../../../src/domain/variants/hexa-lines/lines-scoring';
 import { LinesState } from '../../../../src/domain/variants/hexa-lines/lines-state';
 import { PlacePiece } from '../../../../src/domain/variants/hexa-lines/place-piece';
+import { phaseNameOf } from '../../../support/engine/phase-name';
 import {
   square,
   squareTopology,
@@ -95,7 +97,7 @@ describe('Hexa Lines rules', () => {
 
       const state = engine.snapshot();
       expect(outcome).toBe('playing');
-      expect(engine.currentPhase().name).toBe('playing');
+      expect(engine.currentPhase()).toBe(PlayingPhase.instance);
       expect(filledKeys(state)).toEqual(keys([square(1, 1)]));
       expect(state.tray).toEqual([domino, one]);
     }
@@ -235,7 +237,7 @@ describe('Hexa Lines rules', () => {
     const outcome = engine.play(new PlacePiece(0, square(1, 1)));
 
     expect(outcome).toBe('game-over');
-    expect(engine.currentPhase().name).toBe('game-over');
+    expect(engine.currentPhase()).toBe(GameOverPhase.instance);
     expect(publisher.events).toEqual([expect.any(GameOver)]);
   });
 
@@ -289,7 +291,7 @@ describe('Hexa Lines rules edge cases', () => {
     return {
       valid: new LinesRules<SquareCoord>().isValid(initial, move),
       outcome,
-      phase: engine.currentPhase().name,
+      phase: phaseNameOf(engine.currentPhase()),
       filled: filledKeys(state),
       tray: state.tray,
       events: publisher.events,
@@ -344,7 +346,7 @@ describe('Hexa Lines rules edge cases', () => {
 
     const state = engine.snapshot();
     expect(outcome).toBe('game-over');
-    expect(engine.currentPhase().name).toBe('game-over');
+    expect(engine.currentPhase()).toBe(GameOverPhase.instance);
     expect(state.tray).toEqual([]);
     expect(filledKeys(state)).toEqual(keys([square(1, 1)]));
     expect(publisher.events).toEqual([expect.any(GameOver)]);
@@ -381,7 +383,7 @@ describe('Hexa Lines rules edge cases', () => {
       expect(() => engine.play(new PlacePiece(0, square(2, 2)))).toThrow(error);
 
       const state = engine.snapshot();
-      expect(engine.currentPhase().name).toBe('playing');
+      expect(engine.currentPhase()).toBe(PlayingPhase.instance);
       expect(filledKeys(state)).toEqual([]);
       expect(state.tray).toEqual(tray);
       expect(state.streak).toBe(0);

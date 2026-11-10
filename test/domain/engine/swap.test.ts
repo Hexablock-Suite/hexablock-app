@@ -6,6 +6,7 @@ import {
   type GameEventPublisher,
 } from '../../../src/domain/engine/game-events';
 import { GameId } from '../../../src/domain/engine/game-id';
+import { GameOverPhase } from '../../../src/domain/engine/game-phase';
 import type { Outcome } from '../../../src/domain/engine/outcome';
 import type { IPieceSource } from '../../../src/domain/engine/piece-source';
 import {
@@ -235,7 +236,7 @@ describe('swapping the piece source, the scoring policy and the progress model',
 
     expect(() => engine.play(square(0, 0))).toThrow(RangeError);
     expect(() => engine.play(square(0, 0))).toThrow('game-over phase');
-    expect(engine.currentPhase().name).toBe('game-over');
+    expect(engine.currentPhase()).toBe(GameOverPhase.instance);
     expect(engine.snapshot().board.cells()).toEqual(full.board.cells());
     expect(engine.snapshot().score).toBe(full.score);
     expect(subscriber.records).toHaveLength(1);

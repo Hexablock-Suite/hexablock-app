@@ -18,6 +18,7 @@ import {
   type FakeMove,
   type SourceState,
 } from '../../support/engine/fake-game';
+import { phaseNameOf } from '../../support/engine/phase-name';
 import { square, squareTopology, type SquareCoord } from '../../support/engine/square-topology';
 
 // `GameEngine` takes the state back through the undo capability (classes.md decisions 27 and 34).
@@ -52,7 +53,11 @@ function historyGame(rules = new FakeRules(), size = 2) {
 // The plain facts of a game for a comparison of two runs.
 function factsOf(engine: GameEngine<FakeCell, SquareCoord, FakeMove, FakeState>) {
   const state = engine.snapshot();
-  return { cells: filled(state.board), score: state.score, phase: engine.currentPhase().name };
+  return {
+    cells: filled(state.board),
+    score: state.score,
+    phase: phaseNameOf(engine.currentPhase()),
+  };
 }
 
 // Rules that throw in `resolve()` while `armed` is true, after `apply()` has run on the copy.

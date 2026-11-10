@@ -1,10 +1,12 @@
 /** @jest-environment node */
+import { phaseNameOf } from '../support/engine/phase-name';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { RunningGameStore } from '../../src/application/running-game-store';
 import { UndoMove } from '../../src/application/undo-move';
 import type { BoardState } from '../../src/domain/engine/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
+import { PlayingPhase } from '../../src/domain/engine/game-phase';
 import type { IPieceSource } from '../../src/domain/engine/piece-source';
 import { Turns } from '../../src/domain/engine/turns';
 import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
@@ -56,7 +58,7 @@ function factsOf<
   return {
     cells: state.board.cells(),
     score: state.score,
-    phase: engine.currentPhase().name,
+    phase: phaseNameOf(engine.currentPhase()),
     view: state.view(),
   };
 }
@@ -92,7 +94,7 @@ describe('UndoMove', () => {
       elapsedMs: 0,
     });
     expect(games.running().snapshot().board.cells()).toEqual(afterFirst.cells);
-    expect(games.running().currentPhase().name).toBe('playing');
+    expect(games.running().currentPhase()).toBe(PlayingPhase.instance);
   });
 
   it('should_give_back_the_same_source_position_when_a_variant_with_a_random_source_undoes_a_move', async () => {

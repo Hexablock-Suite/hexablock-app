@@ -2,6 +2,7 @@
 import { ApplyMove } from '../../src/application/apply-move';
 import { GameEngine } from '../../src/domain/engine/game-engine';
 import { GameId } from '../../src/domain/engine/game-id';
+import { GameOverPhase } from '../../src/domain/engine/game-phase';
 import { MemoryRunningGameStore, valueOf } from '../support/application/game-use-cases';
 import { RecordingLogger } from '../support/application/recording-logger';
 import { fakeCell, type FakeCell } from '../support/engine/fake-cell';
@@ -67,6 +68,6 @@ describe('a final score that is not finite', () => {
     expect(publisher.events).toEqual([]);
     expect(logger.entries.map((entry) => entry.error?.code)).toEqual(['publish-failed']);
     expect(engine.snapshot().score).toBe(Number.POSITIVE_INFINITY);
-    expect(engine.currentPhase().name).toBe('game-over');
+    expect(engine.currentPhase()).toBe(GameOverPhase.instance);
   });
 });

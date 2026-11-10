@@ -7,6 +7,7 @@ import type { Cloneable } from '../../src/domain/engine/cloneable';
 import { GameEngine } from '../../src/domain/engine/game-engine';
 import type { GameEvent, GameEventPublisher } from '../../src/domain/engine/game-events';
 import { GameId } from '../../src/domain/engine/game-id';
+import { PlayingPhase, VictoryPhase } from '../../src/domain/engine/game-phase';
 import { MoveHistory } from '../../src/domain/engine/move-history';
 import type { Piece } from '../../src/domain/engine/piece';
 import { FixedListPieceSource, type IPieceSource } from '../../src/domain/engine/piece-source';
@@ -19,6 +20,7 @@ import { PlacePiece } from '../../src/domain/variants/hexa-lines/place-piece';
 import type { ColorStack } from '../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../src/domain/variants/hexa-sort/sort-factory';
+import { phaseNameOf } from '../support/engine/phase-name';
 import { square, type SquareCoord } from '../support/engine/square-topology';
 import { firstValidMove } from '../support/engine/variant-game';
 import { variantIdOf } from '../support/variants/variant-id';
@@ -152,7 +154,11 @@ function runningGameOf<
   TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
 >(games: MemoryRunningGameStore<TCell, TCoord, TMove, TState>) {
   const engine = games.running();
-  return [engine.snapshot().board.cells(), engine.snapshot().score, engine.currentPhase().name];
+  return [
+    engine.snapshot().board.cells(),
+    engine.snapshot().score,
+    phaseNameOf(engine.currentPhase()),
+  ];
 }
 
 // Starts one game and plays `undefined` and then `null` as the move.
@@ -343,7 +349,7 @@ describe('StartGame and ApplyMove', () => {
       before.score,
       before.tray,
     ]);
-    expect(games.running().currentPhase().name).toBe('playing');
+    expect(games.running().currentPhase()).toBe(PlayingPhase.instance);
   });
 
   it('should_return_a_no_running_game_failure_when_apply_move_runs_before_start_game', async () => {
@@ -390,7 +396,7 @@ describe('StartGame and ApplyMove', () => {
       elapsedMs: 0,
     });
     expect(saved.board.cells()).not.toEqual([]);
-    expect(games.running().currentPhase().name).toBe('victory');
+    expect(games.running().currentPhase()).toBe(VictoryPhase.instance);
     expect(logger.entries).toHaveLength(1);
     const [entry] = logger.entries;
     expect([entry.useCase, entry.outcome, entry.error?.code, entry.error?.message]).toEqual([
@@ -418,7 +424,7 @@ describe('StartGame and ApplyMove', () => {
 
     expect(played.outcome).toBe('victory');
     expect(played.cells).toEqual(games.running().snapshot().board.cells());
-    expect(games.running().currentPhase().name).toBe('victory');
+    expect(games.running().currentPhase()).toBe(VictoryPhase.instance);
   });
 
   it('should_answer_the_next_move_as_a_finished_game_does_when_the_publisher_threw_on_the_last_turn', async () => {
@@ -458,7 +464,7 @@ describe('StartGame and ApplyMove', () => {
       false,
     ]);
     expect(engine.snapshot().board.cells()).toEqual([]);
-    expect([engine.snapshot().score, engine.currentPhase().name]).toEqual([0, 'playing']);
+    expect([engine.snapshot().score, phaseNameOf(engine.currentPhase())]).toEqual([0, 'playing']);
     expect([logger.entries, publisher.events]).toEqual([[], []]);
   });
 
