@@ -63,7 +63,7 @@
       <p class="eyebrow">Use case flow · UndoMove · sequence diagram</p>
       <h1>UndoMove step by step: one undo from the screen to the history and back</h1>
       <svg
-        viewBox="0 0 1240 1156"
+        viewBox="0 0 1240 1216"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="sequndo-title sequndo-desc"
@@ -100,7 +100,7 @@
             orient="auto"
             markerUnits="userSpaceOnUse"
           >
-            <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
+            <path d="M 0 0 L 9 4 L 0 8" fill="none" stroke="#5b6873" stroke-width="1" />
           </marker>
         </defs>
         <rect width="100%" height="100%" fill="#f3f5f6" />
@@ -536,7 +536,7 @@
           x1="66"
           y1="88"
           x2="66"
-          y2="970"
+          y2="1030"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -545,7 +545,7 @@
           x1="190"
           y1="88"
           x2="190"
-          y2="970"
+          y2="1030"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -554,7 +554,7 @@
           x1="323"
           y1="88"
           x2="323"
-          y2="970"
+          y2="1030"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -563,7 +563,7 @@
           x1="456"
           y1="88"
           x2="456"
-          y2="970"
+          y2="1030"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -572,7 +572,7 @@
           x1="610"
           y1="88"
           x2="610"
-          y2="970"
+          y2="1030"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -581,7 +581,7 @@
           x1="764"
           y1="88"
           x2="764"
-          y2="970"
+          y2="1030"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -590,7 +590,7 @@
           x1="897"
           y1="88"
           x2="897"
-          y2="970"
+          y2="1030"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -599,7 +599,7 @@
           x1="1030"
           y1="88"
           x2="1030"
-          y2="970"
+          y2="1030"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -608,7 +608,7 @@
           x1="1164"
           y1="88"
           x2="1164"
-          y2="970"
+          y2="1030"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -618,13 +618,18 @@
           x="283"
           y="318"
           width="945"
-          height="506"
+          height="566"
           rx="1"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
         />
-        <path d="M283 332 H315 L321 326 V318" fill="#ffffff" stroke="#5b6873" stroke-width="1" />
+        <path
+          d="M 283 332 H 315 L 321 326 V 318"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="1"
+        />
         <text
           x="288"
           y="328"
@@ -750,7 +755,7 @@
           x="452"
           y="174"
           width="8"
-          height="640"
+          height="700"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
@@ -759,7 +764,7 @@
           x="319"
           y="144"
           width="8"
-          height="746"
+          height="806"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
@@ -768,7 +773,7 @@
           x="186"
           y="114"
           width="8"
-          height="826"
+          height="886"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
@@ -776,7 +781,7 @@
         <!-- Interaction use: ref map the Result into GameViewModel -->
         <rect
           x="283"
-          y="830"
+          y="890"
           width="243"
           height="36"
           rx="1"
@@ -784,10 +789,15 @@
           stroke="#5b6873"
           stroke-width="1"
         />
-        <path d="M283 844 H309 L315 838 V830" fill="#ffffff" stroke="#5b6873" stroke-width="1" />
+        <path
+          d="M 283 904 H 309 L 315 898 V 890"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="1"
+        />
         <text
           x="288"
-          y="840"
+          y="900"
           fill="#17212a"
           font-size="8.5"
           font-weight="600"
@@ -797,7 +807,7 @@
         </text>
         <text
           x="423.5"
-          y="846"
+          y="906"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -807,7 +817,7 @@
         </text>
         <text
           x="423.5"
-          y="859"
+          y="919"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1244,40 +1254,92 @@
         >
           IRedoable | undefined
         </text>
-        <!-- Self message: undo -->
-        <path
-          d="M460 764 H488 V778 H468"
-          fill="none"
+        <rect
+          x="760"
+          y="762"
+          width="8"
+          height="36"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <!-- Message: undo to game -->
+        <line
+          x1="460"
+          y1="764"
+          x2="760"
+          y2="764"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#sequndo-call)"
         />
-        <rect x="490" y="764" width="289" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="580.25" y="750" width="59.5" height="13" rx="2" fill="#f3f5f6" />
         <text
-          x="494"
-          y="774"
+          x="610"
+          y="760"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
+          text-anchor="middle"
         >
-          new MoveResult(cells, score, outcome, canUndo, canRedo, hasUndo, payload)
+          timed()
         </text>
-        <!-- Reply: undo to presenter -->
+        <!-- Reply: game to undo -->
         <line
-          x1="452"
-          y1="804"
-          x2="327"
-          y2="804"
+          x1="760"
+          y1="794"
+          x2="460"
+          y2="794"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#sequndo-reply)"
         />
-        <rect x="331" y="790" width="176.8" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="552.2" y="780" width="115.6" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="610"
+          y="790"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          ITimed | undefined
+        </text>
+        <!-- Self message: undo -->
+        <path
+          d="M 460 824 H 488 V 838 H 468"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#sequndo-call)"
+        />
+        <rect x="490" y="824" width="336.76" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="494"
+          y="834"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          new MoveResult(cells, score, outcome, canUndo, canRedo, hasUndo, payload, elapsedMs?)
+        </text>
+        <!-- Reply: undo to presenter -->
+        <line
+          x1="452"
+          y1="864"
+          x2="327"
+          y2="864"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#sequndo-reply)"
+        />
+        <rect x="331" y="850" width="176.8" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="335"
-          y="800"
+          y="860"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1288,18 +1350,18 @@
         <!-- Reply: presenter to screen -->
         <line
           x1="319"
-          y1="886"
+          y1="946"
           x2="194"
-          y2="886"
+          y2="946"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#sequndo-reply)"
         />
-        <rect x="198" y="872" width="120.7" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="198" y="932" width="120.7" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="202"
-          y="882"
+          y="942"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1309,16 +1371,16 @@
         </text>
         <!-- Self message: screen -->
         <path
-          d="M194 916 H222 V930 H202"
+          d="M 194 976 H 222 V 990 H 202"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#sequndo-call)"
         />
-        <rect x="224" y="916" width="95.2" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="224" y="976" width="95.2" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="228"
-          y="926"
+          y="986"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1329,7 +1391,7 @@
         <!-- Footnote -->
         <text
           x="24"
-          y="998"
+          y="1058"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1339,7 +1401,7 @@
         </text>
         <text
           x="24"
-          y="1014"
+          y="1074"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1349,7 +1411,7 @@
         </text>
         <text
           x="24"
-          y="1030"
+          y="1090"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1359,7 +1421,7 @@
         </text>
         <text
           x="24"
-          y="1046"
+          y="1106"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1370,15 +1432,15 @@
         <!-- Legend -->
         <line
           x1="24"
-          y1="1078"
+          y1="1138"
           x2="1216"
-          y2="1078"
+          y2="1138"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1096"
+          y="1156"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1388,16 +1450,16 @@
         </text>
         <line
           x1="24"
-          y1="1114"
+          y1="1174"
           x2="52"
-          y2="1114"
+          y2="1174"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#sequndo-call)"
         />
         <text
           x="60"
-          y="1117"
+          y="1177"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1406,9 +1468,9 @@
         </text>
         <line
           x1="245.0"
-          y1="1114"
+          y1="1174"
           x2="273.0"
-          y2="1114"
+          y2="1174"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
@@ -1416,7 +1478,7 @@
         />
         <text
           x="281"
-          y="1117"
+          y="1177"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1425,16 +1487,16 @@
         </text>
         <line
           x1="447.1"
-          y1="1107"
+          y1="1167"
           x2="447.1"
-          y2="1121"
+          y2="1181"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
         />
         <rect
           x="443.1"
-          y="1110"
+          y="1170"
           width="8"
           height="8"
           fill="#ffffff"
@@ -1443,7 +1505,7 @@
         />
         <text
           x="469.1"
-          y="1117"
+          y="1177"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1452,7 +1514,7 @@
         </text>
         <rect
           x="644.7"
-          y="1108"
+          y="1168"
           width="28"
           height="12"
           rx="1"
@@ -1462,7 +1524,7 @@
         />
         <text
           x="680.7"
-          y="1117"
+          y="1177"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1471,7 +1533,7 @@
         </text>
         <rect
           x="24"
-          y="1130"
+          y="1190"
           width="28"
           height="12"
           rx="2"
@@ -1481,7 +1543,7 @@
         />
         <text
           x="60"
-          y="1139"
+          y="1199"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1490,7 +1552,7 @@
         </text>
         <rect
           x="179.2"
-          y="1130"
+          y="1190"
           width="28"
           height="12"
           rx="2"
@@ -1500,7 +1562,7 @@
         />
         <text
           x="215.2"
-          y="1139"
+          y="1199"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1509,7 +1571,7 @@
         </text>
         <rect
           x="334.4"
-          y="1130"
+          y="1190"
           width="28"
           height="12"
           rx="2"
@@ -1519,7 +1581,7 @@
         />
         <text
           x="370.4"
-          y="1139"
+          y="1199"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1528,7 +1590,7 @@
         </text>
         <rect
           x="489.59999999999997"
-          y="1130"
+          y="1190"
           width="28"
           height="12"
           rx="2"
@@ -1538,7 +1600,7 @@
         />
         <text
           x="525.6"
-          y="1139"
+          y="1199"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

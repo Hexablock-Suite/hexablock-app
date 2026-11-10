@@ -209,6 +209,8 @@ describe('StartGame and ApplyMove', () => {
     for (const run of runs) {
       // Fit wins with its one move, so only the Merge game keeps a move to undo.
       const hasUndo = run.gameId === 'hexa-fit' || run.gameId === 'hexa-merge';
+      // Only Fit is timed, and this clock does not move.
+      const time = run.gameId === 'hexa-fit' ? { elapsedMs: 0 } : {};
       expect(run.started).toEqual({
         cells: run.startCells,
         score: 0,
@@ -217,6 +219,7 @@ describe('StartGame and ApplyMove', () => {
         canRedo: false,
         hasUndo,
         payload: run.startState.view(),
+        ...time,
       });
       expect(run.played).toEqual({
         cells: run.after.board.cells(),
@@ -226,6 +229,7 @@ describe('StartGame and ApplyMove', () => {
         canRedo: false,
         hasUndo,
         payload: run.after.view(),
+        ...time,
       });
     }
     // Merge starts with two tiles, so the start result carries the cells of the board.
@@ -382,6 +386,7 @@ describe('StartGame and ApplyMove', () => {
       canRedo: false,
       hasUndo: true,
       payload: saved.view(),
+      elapsedMs: 0,
     });
     expect(saved.board.cells()).not.toEqual([]);
     expect(games.running().phase.name).toBe('victory');

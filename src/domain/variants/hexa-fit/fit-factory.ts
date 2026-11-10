@@ -1,14 +1,17 @@
 import type { Board } from '../../engine/board';
 import { BoardBuilder } from '../../engine/board-builder';
 import type { BoardShape } from '../../engine/board-shape';
+import type { Clock } from '../../engine/clock';
 import { GameId } from '../../engine/game-id';
 import type { GeometryFactory, TopologyId } from '../../engine/geometry-factory';
+import { LevelTimer } from '../../engine/level-timer';
 import { MoveHistory } from '../../engine/move-history';
 import type { Piece } from '../../engine/piece';
 import { FixedListPieceSource } from '../../engine/piece-source';
 import type { IGameRules } from '../../engine/rules';
 import type { IScoringPolicy } from '../../engine/scoring-policy';
 import { CellNode, ShapeGroup } from '../../engine/shape-node';
+import { TimedRulesDecorator } from '../../engine/timed-rules-decorator';
 import type { IVariantFactory } from '../../engine/variant-factory';
 import type { FitMove } from './fit-move';
 import { FitRules } from './fit-rules';
@@ -27,7 +30,6 @@ export interface FitLevel<TCoord> {
 // Abstract Factory (classes.md decision 31): the whole family of one Hexa Fit level.
 // The geometry comes by composition (APP-FR-16, D11).
 // A level runs only on the figure that its `topology` names (S3-08).
-// `TimedRulesDecorator` is Sprint 3 work (D14), so the rules are the plain `FitRules` today.
 export class FitFactory<TCoord> implements IVariantFactory<
   PieceId,
   TCoord,
@@ -39,6 +41,7 @@ export class FitFactory<TCoord> implements IVariantFactory<
   constructor(
     private readonly geometry: GeometryFactory<TCoord>,
     private readonly level: FitLevel<TCoord>,
+    private readonly clock: Clock,
   ) {
     // A level file has no compile-time types, so the check runs when the game starts.
     if (level.topology !== geometry.id) {
@@ -48,8 +51,10 @@ export class FitFactory<TCoord> implements IVariantFactory<
     }
   }
 
+  // Fit stars use time (D14, classes.md decision 19). `FitRules` holds no timer code.
+  // Each call gives a new timer, so two games share only the `Clock`.
   createRules(): IGameRules<FitMove<TCoord>, FitState<TCoord>> {
-    return new FitRules<TCoord>();
+    return new TimedRulesDecorator(new FitRules<TCoord>(), new LevelTimer(this.clock));
   }
 
   createScoring(): IScoringPolicy<FitState<TCoord>> {

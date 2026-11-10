@@ -25,6 +25,7 @@ import { MergeTile } from '../../../src/domain/variants/hexa-merge/merge-tile';
 import { ColorStack } from '../../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../../src/domain/variants/hexa-sort/sort-factory';
+import { ManualClock } from '../../support/engine/manual-clock';
 import { firstValidMove, startVariant } from '../../support/engine/variant-game';
 import { A, fitFactory } from '../../support/variants/hexa-fit/fit-game';
 import { linesFactory } from '../../support/variants/hexa-lines/lines-game';
@@ -152,7 +153,9 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
     });
 
     it('should_start_and_win_the_fit_level_when_its_topology_names_the_geometry', () => {
-      const { engine } = startVariant(new FitFactory(geometry, fitLevel(geometry.id)));
+      const { engine } = startVariant(
+        new FitFactory(geometry, fitLevel(geometry.id), new ManualClock()),
+      );
       const start = engine.snapshot();
 
       const outcome = engine.play(new PlaceFitPiece(A, Turns.of(0), origin));
@@ -167,7 +170,7 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
 
       // Only a cast puts a free string here, as a broken level file would.
       for (const named of [...others, 'hexagon' as TopologyId]) {
-        const create = () => new FitFactory(geometry, fitLevel(named));
+        const create = () => new FitFactory(geometry, fitLevel(named), new ManualClock());
 
         expect(create).toThrow(RangeError);
         expect(create).toThrow(

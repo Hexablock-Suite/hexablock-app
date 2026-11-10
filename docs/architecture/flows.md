@@ -21,7 +21,7 @@ View 3.2 of [classes.md](classes.md) shows `ApplyMove` with layers 2 and 1 only,
 
 ### Sequence diagram
 
-![ApplyMove sequence: GameScreen calls onMove() on GamePresenter, which calls execute() on ApplyMove; ApplyMove takes the GameEngine from InMemoryRunningGameStore, calls tryPlay(), snapshot(), cells(), undoable() and redoable(), and returns a Result with a MoveResult; GamePresenter maps each cell with StateMapper and builds GameViewModel](flows/views/seq-1-apply-move.png)
+![ApplyMove sequence: GameScreen calls onMove() on GamePresenter, which calls execute() on ApplyMove; ApplyMove takes the GameEngine from InMemoryRunningGameStore, calls tryPlay(), snapshot(), cells(), undoable(), redoable() and timed(), and returns a Result with a MoveResult; GamePresenter maps each cell with StateMapper and builds GameViewModel](flows/views/seq-1-apply-move.png)
 
 ## Use case 2: save progress
 
@@ -68,7 +68,7 @@ Why this use case: it is the only path through the Command pattern and the capab
 
 ### Sequence diagram
 
-![UndoMove sequence: GameScreen calls onUndo() on GamePresenter, which calls execute() on UndoMove; UndoMove calls current() on InMemoryRunningGameStore and undoable() on GameEngine; an alt fragment returns Result.failure(error) when undoable() is undefined, and otherwise calls undo() on MoveHistory, which calls undo() on MoveCommand, which calls restore() on GameEngine, then reads snapshot(), the cells of Board, canUndo() and redoable(), and returns a Result with a MoveResult](flows/views/seq-4-undo-move.png)
+![UndoMove sequence: GameScreen calls onUndo() on GamePresenter, which calls execute() on UndoMove; UndoMove calls current() on InMemoryRunningGameStore and undoable() on GameEngine; an alt fragment returns Result.failure(error) when undoable() is undefined, and otherwise calls undo() on MoveHistory, which calls undo() on MoveCommand, which calls restore() on GameEngine, then reads snapshot(), the cells of Board, canUndo(), redoable() and timed(), and returns a Result with a MoveResult](flows/views/seq-4-undo-move.png)
 
 ## Use case 5: sign in
 
