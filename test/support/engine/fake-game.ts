@@ -91,7 +91,7 @@ export function emptyState(
   );
 }
 
-// The photo of a state with a source: a copy of the source at its position.
+// The photo of a state with a source: the source at its position.
 export interface SourceSnapshot extends BoardSnapshot<FakeCell, SquareCoord> {
   readonly board: ReadonlyBoard<FakeCell, SquareCoord, SquareAxis>;
   readonly source: IPieceSource<FakeCell>;
@@ -99,12 +99,12 @@ export interface SourceSnapshot extends BoardSnapshot<FakeCell, SquareCoord> {
 }
 
 // A state that holds a piece source, as a variant state does (classes.md decision 31).
-// `clone()` clones the source, so the engine copy and rollback cover its position.
-// `snapshot()` holds a copy of the source, and `restore()` takes a copy of that copy back.
+// The source is a value, so `clone()`, `snapshot()` and `restore()` share it.
+// `draw()` replaces it with the next source, so the engine copy and rollback cover its position.
 export class SourceState implements BoardState<FakeCell, SquareCoord> {
   constructor(
     readonly board: Board<FakeCell, SquareCoord, SquareAxis>,
-    public source: IPieceSource<FakeCell>,
+    private source: IPieceSource<FakeCell>,
     public score: Score = Score.of(0),
     private readonly matchId: MatchId = MATCH_ID,
     private readonly stateId: GameStateId = STATE_ID,
@@ -122,14 +122,15 @@ export class SourceState implements BoardState<FakeCell, SquareCoord> {
     this.score = this.score.add(points);
   }
 
+  // Takes the next piece, and keeps the next source in place of the source.
+  draw(): FakeCell {
+    const { piece, rest } = this.source.take();
+    this.source = rest;
+    return piece;
+  }
+
   clone(): SourceState {
-    return new SourceState(
-      this.board.clone(),
-      this.source.clone(),
-      this.score,
-      this.matchId,
-      this.stateId,
-    );
+    return new SourceState(this.board.clone(), this.source, this.score, this.matchId, this.stateId);
   }
 
   snapshot(): SourceSnapshot {
@@ -138,14 +139,14 @@ export class SourceState implements BoardState<FakeCell, SquareCoord> {
       matchId: this.matchId,
       board: this.board.clone(),
       score: this.score,
-      source: this.source.clone(),
+      source: this.source,
       view: () => undefined,
     });
   }
 
   restore(snapshot: SourceSnapshot): void {
     this.board.restore(snapshot.board);
-    this.source = snapshot.source.clone();
+    this.source = snapshot.source;
     this.score = snapshot.score;
   }
 }
@@ -158,7 +159,7 @@ export function sourceState(source: IPieceSource<FakeCell>, size = 2): SourceSta
   );
 }
 
-// The move is the chosen cell. `apply()` puts the next piece of `state.source` on it.
+// The move is the chosen cell. `apply()` puts the next piece of the state source on it.
 // A move is valid on an empty cell inside the board. The game ends when no valid move is left.
 export class SourceRules extends BaseGameRules<SquareCoord, SourceState> {
   isValid(state: SourceState, at: SquareCoord): boolean {
@@ -170,7 +171,7 @@ export class SourceRules extends BaseGameRules<SquareCoord, SourceState> {
   }
 
   apply(state: SourceState, at: SquareCoord): SourceState {
-    state.board.occupy(at, state.source.next());
+    state.board.occupy(at, state.draw());
     return state;
   }
 

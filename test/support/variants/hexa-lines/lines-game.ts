@@ -107,13 +107,7 @@ export function linesFactory(
 // shows. The engine never gives its state away. So the helper builds a new state with the ids,
 // the board and the source of the photo, and the state takes the photo back with `restore()`.
 export function linesStateOf<TCoord>(photo: LinesSnapshot<TCoord>): LinesState<TCoord> {
-  const state = new LinesState(
-    photo.stateId,
-    photo.matchId,
-    photo.board.clone(),
-    [],
-    photo.source.clone(),
-  );
+  const state = new LinesState(photo.stateId, photo.matchId, photo.board.clone(), [], photo.source);
   state.restore(photo);
   return state;
 }

@@ -38,7 +38,7 @@ function facts(state: HexMergeState) {
       .snapshot()
       .board.cells()
       .map(([at, tile]) => [hexTopology.key(at), tile.points().value]),
-    left: state.snapshot().tiles.clone().hasNext(),
+    left: state.snapshot().tiles.hasNext(),
     targetReached: state.snapshot().targetReached,
     merged: state.snapshot().merged.map((tile) => tile.points().value),
     score: state.snapshot().score,
@@ -60,7 +60,7 @@ describe('MergeState', () => {
       [hexTopology.key(first)]: 4,
       [hexTopology.key(last)]: 2,
     });
-    expect(state.snapshot().tiles.clone().hasNext()).toBe(false);
+    expect(state.snapshot().tiles.hasNext()).toBe(false);
   });
 
   it('should_keep_the_board_when_the_source_has_ended_and_a_new_tile_is_asked', () => {
@@ -84,7 +84,7 @@ describe('MergeState', () => {
     full.addNewTile();
 
     expect(facts(full)).toEqual(before);
-    expect(full.snapshot().tiles.clone().hasNext()).toBe(true);
+    expect(full.snapshot().tiles.hasNext()).toBe(true);
   });
 
   it('should_merge_the_tiles_in_place_and_keep_the_board_and_the_source_when_tiles_slide', () => {
@@ -107,7 +107,7 @@ describe('MergeState', () => {
     expect(state.snapshot().targetReached).toBe(false);
     // The board keeps its id, and the source keeps its position: the slide draws nothing.
     expect(state.snapshot().board.equals(board)).toBe(true);
-    expect(state.snapshot().tiles.clone().hasNext()).toBe(tiles.clone().hasNext());
+    expect(state.snapshot().tiles === tiles).toBe(true);
     expect(values(before.snapshot())).toEqual({ [key(-1, 0)]: 2, [key(0, 0)]: 2, [key(0, 1)]: 4 });
   });
 

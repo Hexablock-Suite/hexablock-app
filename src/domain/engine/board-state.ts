@@ -44,7 +44,7 @@ export type SnapshotOf<TState> = TState extends { snapshot(): infer TSnapshot } 
 // (classes.md decision 7). `clone()` of a variant state returns that variant state.
 // `snapshot()` gives the photo of the state, and a variant state narrows its type.
 // `restore()` takes back a photo of this same state: the board, the score, the variant data
-// and the position of the piece source. A photo of another state throws a RangeError,
+// and the piece source at its position. A photo of another state throws a RangeError,
 // and the state stays as it was.
 // The board takes any axis, so the state needs no axis type parameter (issue 86).
 export interface BoardState<TCell, TCoord> extends Cloneable<BoardState<TCell, TCoord>> {

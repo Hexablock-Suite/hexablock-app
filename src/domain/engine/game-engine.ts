@@ -109,8 +109,9 @@ export class GameEngine<
   // The same turn as `play()`. The report also says whether the rules accepted the move,
   // so the `ApplyMove` use case can return a failure for a rejected move (issue 100).
   // The rollback covers the whole state and the phase. A piece source lives in the state
-  // (classes.md decision 31), and the state `clone()` clones it. So a turn that throws
-  // after a draw leaves the source at its old position, and a retry draws the same piece.
+  // (classes.md decision 31), and a draw replaces it only in the copy of the turn
+  // (classes.md decision 51). So a turn that throws after a draw leaves the source
+  // at its old position, and a retry draws the same piece.
   // The rules change their copy in place (classes.md decision 7), and a `Resolution` holds
   // no state. So the engine keeps the copy that it gave to the rules as the next state.
   tryPlay(move: TMove): TurnReport {

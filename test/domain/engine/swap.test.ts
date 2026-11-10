@@ -13,7 +13,11 @@ import {
 import { GameId } from '../../../src/domain/engine/game-id';
 import { GameOverPhase } from '../../../src/domain/engine/game-phase';
 import { Outcome } from '../../../src/domain/engine/outcome';
-import type { IPieceSource } from '../../../src/domain/engine/piece-source';
+import {
+  piecesFrom,
+  type IPieceSource,
+  type PieceDraw,
+} from '../../../src/domain/engine/piece-source';
 import {
   GameResult,
   ProgressRecord,
@@ -38,21 +42,17 @@ import { MATCH_ID } from '../../support/engine/match-id';
 // `GameOver` event gives a `GameResult` to the progress model.
 
 // Dummy piece sources: both endless, each with its own sequence of cell values.
-// `clone()` copies the position, so a clone gives the same next pieces.
+// Each one is a value: `take()` returns the piece and the next source, and changes nothing.
 class CountingSource implements IPieceSource<FakeCell> {
-  constructor(private value = 0) {}
+  constructor(private readonly value = 0) {}
   hasNext(): boolean {
     return true;
   }
-  next(): FakeCell {
-    this.value += 1;
-    return fakeCell(this.value);
+  take(): PieceDraw<FakeCell> {
+    return { piece: fakeCell(this.value + 1), rest: new CountingSource(this.value + 1) };
   }
-  clone(): CountingSource {
-    return new CountingSource(this.value);
-  }
-  *[Symbol.iterator](): Iterator<FakeCell> {
-    while (this.hasNext()) yield this.next();
+  [Symbol.iterator](): Iterator<FakeCell> {
+    return piecesFrom(this);
   }
 }
 
@@ -60,14 +60,11 @@ class ConstantSource implements IPieceSource<FakeCell> {
   hasNext(): boolean {
     return true;
   }
-  next(): FakeCell {
-    return fakeCell(9);
+  take(): PieceDraw<FakeCell> {
+    return { piece: fakeCell(9), rest: this };
   }
-  clone(): ConstantSource {
-    return new ConstantSource();
-  }
-  *[Symbol.iterator](): Iterator<FakeCell> {
-    while (this.hasNext()) yield this.next();
+  [Symbol.iterator](): Iterator<FakeCell> {
+    return piecesFrom(this);
   }
 }
 

@@ -110,12 +110,7 @@ export function mergeFactory(seed = 1): MergeFactory<HexCoord> {
 export function mergeStateOf<TCoord, TAxis extends GridAxis>(
   photo: MergeSnapshot<MergeTile, TCoord, TAxis>,
 ): MergeState<MergeTile, TCoord, TAxis> {
-  const state = new MergeState(
-    photo.stateId,
-    photo.matchId,
-    photo.board.clone(),
-    photo.tiles.clone(),
-  );
+  const state = new MergeState(photo.stateId, photo.matchId, photo.board.clone(), photo.tiles);
   state.restore(photo);
   return state;
 }

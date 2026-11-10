@@ -155,7 +155,7 @@ export function sortStateOf<TCoord>(photo: SortSnapshot<TCoord>): SortState<TCoo
     stateId: photo.stateId,
     matchId: photo.matchId,
     board: photo.board.clone(),
-    source: photo.source.clone(),
+    source: photo.source,
     goalsNeeded: photo.goalsNeeded,
   });
   state.restore(photo);

@@ -55,7 +55,7 @@ export class MergeRules<
   // It comes from the source in the state (classes.md decision 31), so the cell and the
   // value both come from one seeded source (APP-NFR-07). The proposal on issue #57,
   // «Propuesta, pendiente del equipo», fixes the rest: a 2 with 0.9 and a 4 with 0.1
-  // (`mergeTileSource()`), and undo restores the cloned state, so the same tile comes back.
+  // (`mergeTileSource()`), and undo restores the photo with its source, so the same tile comes back.
   // A board with no empty cell, or a source that has ended, gets no new tile.
   resolve(state: MergeState<TCell, TCoord, TAxis>): Resolution {
     state.addNewTile();
