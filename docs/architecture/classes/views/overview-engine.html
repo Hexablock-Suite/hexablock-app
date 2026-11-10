@@ -71,7 +71,7 @@
       >
         <title id="ovengine-title">HexaBlock generic engine map · UML class diagram</title>
         <desc id="ovengine-desc">
-          Overview map of the 64 layer 1 engine classes in 14 groups. Each line joins two classes:
+          Overview map of the 66 layer 1 engine classes in 15 groups. Each line joins two classes:
           GameEngine keeps its GamePhase, its optional MoveHistory and its IScoringPolicy and
           notifies through GameEventPublisher, BoardState keeps its Board, IVariantFactory creates
           the IGameRules and GeometryFactory creates the piece shapes. No line touches a group
@@ -275,6 +275,41 @@
         <text
           x="604"
           y="190"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+          letter-spacing="0.14em"
+        >
+          VIEW 5
+        </text>
+        <!-- Group: match -->
+        <rect
+          x="56"
+          y="176"
+          width="344"
+          height="78"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="68"
+          y="192"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          MATCH · IDENTITY
+        </text>
+        <text
+          x="388"
+          y="192"
           fill="#1d4ed8"
           font-size="8"
           font-weight="500"
@@ -975,6 +1010,63 @@
           <text x="528" y="227" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               GameOver
+            </tspan>
+          </text>
+        </g>
+        <!-- Chips: match -->
+        <g data-class="MatchIdGenerator">
+          <rect
+            x="172"
+            y="204"
+            width="132"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="238"
+            y="216"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="238" y="229" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              MatchIdGenerator
+            </tspan>
+          </text>
+        </g>
+        <g data-class="MatchId">
+          <rect
+            x="312"
+            y="204"
+            width="76"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="350"
+            y="216"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="350" y="229" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              MatchId
             </tspan>
           </text>
         </g>
