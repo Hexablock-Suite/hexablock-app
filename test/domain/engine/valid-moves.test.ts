@@ -1,11 +1,16 @@
 /** @jest-environment node */
-import type { Outcome } from '../../../src/domain/engine/outcome';
+import { Outcome } from '../../../src/domain/engine/outcome';
 import { RegionSize } from '../../../src/domain/engine/region-size';
 import { Resolution } from '../../../src/domain/engine/resolution';
 import { BaseGameRules } from '../../../src/domain/engine/rules';
 import { fakeCell } from '../../support/engine/fake-cell';
 import { emptyState, type FakeState } from '../../support/engine/fake-game';
-import { square, squareTopology, type SquareCoord } from '../../support/engine/square-topology';
+import {
+  SquareAxis,
+  square,
+  squareTopology,
+  type SquareCoord,
+} from '../../support/engine/square-topology';
 
 // Classes.md decision 33: `validMoves()` is a lazy generator, and the end condition
 // «no valid move» asks for the first move only. These rules exist only in test/.
@@ -16,8 +21,8 @@ class AdjacentRules extends BaseGameRules<SquareCoord, FakeState> {
 
   *validMoves(state: FakeState): Iterable<SquareCoord> {
     const { board } = state;
-    for (const rowStart of board.line('row', square(0, 0))) {
-      for (const c of board.line('col', rowStart)) {
+    for (const rowStart of board.line(SquareAxis.row, square(0, 0))) {
+      for (const c of board.line(SquareAxis.col, rowStart)) {
         this.visited += 1;
         if (this.isValid(state, c)) yield c;
       }
@@ -43,7 +48,7 @@ class AdjacentRules extends BaseGameRules<SquareCoord, FakeState> {
   }
 
   evaluate(state: FakeState): Outcome {
-    return this.noValidMove(state) ? 'game-over' : 'playing';
+    return this.noValidMove(state) ? Outcome.gameOver : Outcome.playing;
   }
 }
 
@@ -70,7 +75,7 @@ class GivenMovesRules extends BaseGameRules<number, FakeState> {
   }
 
   evaluate(state: FakeState): Outcome {
-    return this.noValidMove(state) ? 'game-over' : 'playing';
+    return this.noValidMove(state) ? Outcome.gameOver : Outcome.playing;
   }
 }
 
@@ -100,7 +105,7 @@ describe('validMoves() and the no-valid-move end check', () => {
 
     const outcome = rules.evaluate(state);
 
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     // (0, 0) is the first cell of the walk, and it touches (1, 0).
     expect(rules.visited).toBe(1);
   });
@@ -111,7 +116,7 @@ describe('validMoves() and the no-valid-move end check', () => {
 
     const outcome = rules.evaluate(state);
 
-    expect(outcome).toBe('game-over');
+    expect(outcome).toBe(Outcome.gameOver);
     expect(rules.visited).toBe(25);
   });
 
@@ -146,14 +151,14 @@ describe('validMoves() and the no-valid-move end check', () => {
     for (const c of squareTopology.region(RegionSize.of(2)).cells)
       state.board.occupy(c, fakeCell(1));
 
-    expect(rules.evaluate(state)).toBe('game-over');
+    expect(rules.evaluate(state)).toBe(Outcome.gameOver);
   });
 
   it('should_read_one_move_only_when_the_end_check_runs_on_a_counting_generator', () => {
     const counter = { reads: 0 };
     const rules = new GivenMovesRules(countingMoves(counter));
 
-    expect(rules.evaluate(emptyState(2))).toBe('playing');
+    expect(rules.evaluate(emptyState(2))).toBe(Outcome.playing);
     expect(counter.reads).toBe(1);
   });
 
@@ -163,6 +168,6 @@ describe('validMoves() and the no-valid-move end check', () => {
       throw new Error('The end check read past the first move.');
     });
 
-    expect(rules.evaluate(emptyState(2))).toBe('playing');
+    expect(rules.evaluate(emptyState(2))).toBe(Outcome.playing);
   });
 });

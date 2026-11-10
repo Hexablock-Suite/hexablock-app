@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Outcome } from '../../../../src/domain/engine/outcome';
 import { Board } from '../../../../src/domain/engine/board';
 import { PlayingPhase } from '../../../../src/domain/engine/game-phase';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
@@ -38,7 +39,7 @@ describe('SortRules placement', () => {
   it('should_put_the_offered_stack_on_the_cell_and_offer_the_next_when_the_cell_is_empty', () => {
     const game = sortGame(sortState({ board: row(3), offered: [stack('red'), stack('blue')] }));
 
-    expect(game.play(place(0))).toBe('playing');
+    expect(game.play(place(0))).toBe(Outcome.playing);
 
     expect(chipsAt(game, 0)).toEqual(['red']);
     expect(names(game.snapshot().offered?.content)).toEqual(['blue']);
@@ -49,7 +50,7 @@ describe('SortRules placement', () => {
       sortState({ board: row(3, [[square(0, 0), stack('green')]]), offered: [stack('red')] }),
     );
 
-    expect(game.play(place(0))).toBe('playing');
+    expect(game.play(place(0))).toBe(Outcome.playing);
 
     expect(chipsAt(game, 0)).toEqual(['green']);
     expect(names(game.snapshot().offered?.content)).toEqual(['red']);
@@ -58,7 +59,7 @@ describe('SortRules placement', () => {
   it('should_reject_the_move_when_the_cell_is_outside_the_board', () => {
     const game = sortGame(sortState({ board: row(2), offered: [stack('red')] }));
 
-    expect(game.play(place(5))).toBe('playing');
+    expect(game.play(place(5))).toBe(Outcome.playing);
 
     expect(game.snapshot().board.cells()).toEqual([]);
     expect(names(game.snapshot().offered?.content)).toEqual(['red']);
@@ -144,7 +145,7 @@ describe('SortRules goal', () => {
       }),
     );
 
-    expect(game.play(place(1))).toBe('playing');
+    expect(game.play(place(1))).toBe(Outcome.playing);
 
     const state = game.snapshot();
     expect(chipsAt(game, 0)).toEqual([]);
@@ -194,7 +195,7 @@ describe('SortRules end of the game', () => {
       }),
     );
 
-    expect(game.play(place(1))).toBe('victory');
+    expect(game.play(place(1))).toBe(Outcome.victory);
   });
 
   it('should_lose_when_the_board_is_full', () => {
@@ -202,14 +203,14 @@ describe('SortRules end of the game', () => {
       sortState({ board: row(2), offered: [stack('red'), stack('blue'), stack('green')] }),
     );
 
-    expect(game.play(place(0))).toBe('playing');
-    expect(game.play(place(1))).toBe('game-over');
+    expect(game.play(place(0))).toBe(Outcome.playing);
+    expect(game.play(place(1))).toBe(Outcome.gameOver);
   });
 
   it('should_lose_when_the_fixed_list_has_no_stack_left', () => {
     const game = sortGame(sortState({ board: row(3), offered: [stack('red')] }));
 
-    expect(game.play(place(0))).toBe('game-over');
+    expect(game.play(place(0))).toBe(Outcome.gameOver);
     expect(game.snapshot().offered).toBeUndefined();
   });
 });
@@ -261,10 +262,8 @@ describe('SortRules piece source (A4)', () => {
 // Edge cases of the walkthrough of PR #108 (issue #120).
 describe('SortRules edge cases', () => {
   // A 3 × 3 square board with the given stacks, in the order of the list.
-  function grid(
-    content: readonly [SquareCoord, ColorStack][],
-  ): Board<ColorStack, SquareCoord, string> {
-    const board = new Board<ColorStack, SquareCoord, string>(
+  function grid(content: readonly [SquareCoord, ColorStack][]): Board<ColorStack, SquareCoord> {
+    const board = new Board<ColorStack, SquareCoord>(
       BOARD_ID,
       squareTopology.region(RegionSize.of(3)),
       squareTopology,
@@ -315,7 +314,7 @@ describe('SortRules edge cases', () => {
     const outcome = game.play(place(1));
 
     const state = game.snapshot();
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(chipsAt(game, 1)).toEqual([]);
     expect(state.goalsDone).toEqual(ClearedStacks.of(1));
     expect(state.clearedTiles).toEqual([13]);

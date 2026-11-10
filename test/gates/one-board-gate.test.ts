@@ -205,7 +205,7 @@ describe('one board gate (APP-NFR-01)', () => {
   // The typed variables make `pnpm typecheck` fail when the cell type of a board changes.
   it('should_hold_an_engine_board_of_colors_when_a_lines_state_starts', () => {
     const state = linesState(squareTopology, 2, { filled: [square(0, 0)], tray: [] });
-    const board: ReadonlyBoard<Color, SquareCoord, string> = state.snapshot().board;
+    const board: ReadonlyBoard<Color, SquareCoord> = state.snapshot().board;
 
     expect(board.constructor).toBe(Board);
     expect(state.clone().snapshot().board.constructor).toBe(Board);
@@ -214,7 +214,7 @@ describe('one board gate (APP-NFR-01)', () => {
 
   it('should_hold_an_engine_board_of_piece_ids_when_a_fit_state_places_a_piece', () => {
     const id = PieceId.of('a');
-    const figure = new Board<PieceId, SquareCoord, string>(
+    const figure = new Board<PieceId, SquareCoord>(
       BOARD_ID,
       squareTopology.region(RegionSize.of(2)),
       squareTopology,
@@ -222,7 +222,7 @@ describe('one board gate (APP-NFR-01)', () => {
     const piece = new Piece(new ShapeGroup([new CellNode(square(0, 0))]), id);
     const state = FitState.start(STATE_ID, MATCH_ID, figure, new FixedListPieceSource([piece]));
     state.place(id, Placement.of(Turns.of(0), square(0, 0), squareTopology));
-    const board: ReadonlyBoard<PieceId, SquareCoord, string> = state.snapshot().board;
+    const board: ReadonlyBoard<PieceId, SquareCoord> = state.snapshot().board;
 
     expect(board.constructor).toBe(Board);
     expect(state.clone().snapshot().board.constructor).toBe(Board);
@@ -230,7 +230,7 @@ describe('one board gate (APP-NFR-01)', () => {
   });
 
   it('should_hold_an_engine_board_of_color_stacks_when_a_sort_state_starts', () => {
-    const start = new Board<ColorStack, SquareCoord, string>(
+    const start = new Board<ColorStack, SquareCoord>(
       BOARD_ID,
       squareTopology.region(RegionSize.of(2)),
       squareTopology,
@@ -243,7 +243,7 @@ describe('one board gate (APP-NFR-01)', () => {
       source: new FixedListPieceSource([]),
       goalsNeeded: GoalCount.of(1),
     });
-    const board: ReadonlyBoard<ColorStack, SquareCoord, string> = state.snapshot().board;
+    const board: ReadonlyBoard<ColorStack, SquareCoord> = state.snapshot().board;
 
     expect(board.constructor).toBe(Board);
     expect(state.clone().snapshot().board.constructor).toBe(Board);

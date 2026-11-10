@@ -5,7 +5,7 @@ import { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameId } from '../../../src/domain/engine/game-id';
 import { GameOverPhase, PlayingPhase } from '../../../src/domain/engine/game-phase';
 import { LevelTimer } from '../../../src/domain/engine/level-timer';
-import type { Outcome } from '../../../src/domain/engine/outcome';
+import { Outcome } from '../../../src/domain/engine/outcome';
 import type { IScoringPolicy } from '../../../src/domain/engine/scoring-policy';
 import { TimedRulesDecorator } from '../../../src/domain/engine/timed-rules-decorator';
 import { fakeCell, type FakeCell } from '../../support/engine/fake-cell';
@@ -122,7 +122,7 @@ describe('TimedRulesDecorator', () => {
     const last = game.engine.play(moveAt(1, 1));
     game.clock.advance(4 * SECOND);
 
-    expect(last).toBe('game-over');
+    expect(last).toBe(Outcome.gameOver);
     expect(game.timer.elapsedMs()).toEqual(ElapsedTime.ofMs(3 * SECOND));
   });
 
@@ -132,7 +132,7 @@ describe('TimedRulesDecorator', () => {
     const outcome = engine.play(moveAt(0));
     clock.advance(SECOND);
 
-    expect(outcome).toBe('game-over');
+    expect(outcome).toBe(Outcome.gameOver);
     expect(timer.elapsedMs()).toEqual(ElapsedTime.ofMs(0));
   });
 
@@ -173,7 +173,7 @@ describe('TimedRulesDecorator', () => {
     const outcome = decorated.evaluate(finished);
     clock.advance(SECOND);
 
-    expect(outcome).toBe('game-over');
+    expect(outcome).toBe(Outcome.gameOver);
     expect(timer.elapsedMs()).toEqual(ElapsedTime.ofMs(SECOND));
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
   });
@@ -191,7 +191,7 @@ describe('TimedRulesDecorator', () => {
     clock.advance(SECOND);
 
     // The rollback keeps the game going, so the end of the game is the retried turn.
-    expect(retried).toBe('game-over');
+    expect(retried).toBe(Outcome.gameOver);
     expect(engine.currentPhase()).toBe(GameOverPhase.instance);
     expect(timer.elapsedMs()).toEqual(ElapsedTime.ofMs(3 * SECOND));
   });
@@ -260,7 +260,7 @@ describe('TimedRulesDecorator', () => {
       rules.apply(emptyState(), move).board.cells(),
     );
     expect(decorated.resolve(state).accepted).toBe(true);
-    expect(decorated.evaluate(state)).toBe('playing');
+    expect(decorated.evaluate(state)).toBe(Outcome.playing);
   });
 });
 

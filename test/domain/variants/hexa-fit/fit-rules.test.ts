@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Outcome } from '../../../../src/domain/engine/outcome';
 import { Moves } from '../../../../src/domain/engine/moves';
 import { Score } from '../../../../src/domain/engine/score';
 import { Board } from '../../../../src/domain/engine/board';
@@ -52,10 +53,10 @@ function piece<TCoord>(id: PieceId, cells: TCoord[]): Piece<PieceId, TCoord> {
 }
 
 function figure<TCoord>(
-  topology: GridTopology<TCoord, string, string>,
+  topology: GridTopology<TCoord>,
   shape: BoardShape<TCoord>,
-): Board<PieceId, TCoord, string> {
-  return new Board<PieceId, TCoord, string>(BOARD_ID, shape, topology);
+): Board<PieceId, TCoord> {
+  return new Board<PieceId, TCoord>(BOARD_ID, shape, topology);
 }
 
 // The two horizontal dominoes of `dominoLevel()`.
@@ -123,7 +124,7 @@ describe('FitRules', () => {
 
     const outcome = engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)));
 
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(cellsOf(engine.snapshot())).toEqual(['0,0=a', '1,0=a']);
     expect(trayOf(engine.snapshot())).toEqual(['b']);
   });
@@ -135,7 +136,7 @@ describe('FitRules', () => {
     // Both cells lie inside the figure, and both hold the piece a.
     const outcome = engine.play(new PlaceFitPiece(B, NO_TURN, square(0, 0)));
 
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(cellsOf(engine.snapshot())).toEqual(['0,0=a', '1,0=a']);
     expect(trayOf(engine.snapshot())).toEqual(['b']);
   });
@@ -145,7 +146,7 @@ describe('FitRules', () => {
 
     const outcome = engine.play(new PlaceFitPiece(A, NO_TURN, square(1, 1)));
 
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(cellsOf(engine.snapshot())).toEqual([]);
     expect(trayOf(engine.snapshot())).toEqual(['a', 'b']);
   });
@@ -175,7 +176,7 @@ describe('FitRules', () => {
 
     const outcome = engine.play(new RemoveFitPiece(A));
 
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(cellsOf(engine.snapshot())).toEqual([]);
     expect(trayOf(engine.snapshot())).toEqual(['a', 'b']);
   });
@@ -240,7 +241,7 @@ describe('FitRules', () => {
     // A quarter turn keeps the cell (0,0), which the piece a already holds.
     const outcome = engine.play(new RotateFitPiece(A, Turns.of(1)));
 
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(cellsOf(engine.snapshot())).toEqual(['0,0=a', '0,1=a']);
   });
 
@@ -251,7 +252,7 @@ describe('FitRules', () => {
     // A quarter turn would put the second cell on (0,2), below the figure.
     const outcome = engine.play(new RotateFitPiece(A, Turns.of(1)));
 
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(cellsOf(engine.snapshot())).toEqual(['0,1=a', '1,1=a']);
   });
 
@@ -262,12 +263,12 @@ describe('FitRules', () => {
 
     const outcome = engine.play(new PlaceFitPiece(B, NO_TURN, square(0, 1)));
 
-    expect(outcome).toBe('victory');
+    expect(outcome).toBe(Outcome.victory);
     expect(engine.currentPhase()).toBe(VictoryPhase.instance);
     expect(trayOf(engine.snapshot())).toEqual([]);
     expect(publisher.events).toHaveLength(1);
     expect(publisher.events[0]).toBeInstanceOf(GameOver);
-    expect((publisher.events[0] as GameOver).outcome).toBe('victory');
+    expect((publisher.events[0] as GameOver).outcome).toBe(Outcome.victory);
   });
 
   it('should_keep_playing_and_never_lose_when_no_tray_piece_fits', () => {
@@ -282,7 +283,7 @@ describe('FitRules', () => {
 
     const outcome = engine.play(new PlaceFitPiece(A, NO_TURN, square(1, 0)));
 
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     const live = fitStateOf(engine.snapshot(), pieces());
     const moves = [...new FitRules<SquareCoord>().validMoves(live)];
@@ -394,9 +395,9 @@ describe('FitRules edge cases', () => {
     const outcome = engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)));
 
     expect(trayOf(empty)).toEqual([]);
-    expect(rules.evaluate(empty)).toBe('playing');
+    expect(rules.evaluate(empty)).toBe(Outcome.playing);
     expect([...rules.validMoves(empty)]).toEqual([]);
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(cellsOf(engine.snapshot())).toEqual([]);
   });
@@ -418,8 +419,8 @@ describe('FitRules edge cases', () => {
     const free = engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 1)));
 
     expect(cellsOf(start)).toEqual(['0,0=x']);
-    expect(overlap).toBe('playing');
-    expect(free).toBe('playing');
+    expect(overlap).toBe(Outcome.playing);
+    expect(free).toBe(Outcome.playing);
     expect(cellsOf(engine.snapshot())).toEqual(['0,0=x', '0,1=a', '1,1=a']);
     expect(trayOf(engine.snapshot())).toEqual(['b']);
   });
@@ -464,7 +465,7 @@ describe('FitRules edge cases', () => {
 
   it('should_throw_and_keep_the_game_when_the_topology_throws_during_a_move', () => {
     // An exception leaves the board, the score and the phase (game-engine.ts).
-    const failing: GridTopology<SquareCoord, string, string> = {
+    const failing: GridTopology<SquareCoord> = {
       ...squareTopology,
       rotate: (c, turns) => {
         if (turns.equals(Turns.of(2))) throw new Error('The topology failed.');
@@ -488,13 +489,13 @@ describe('FitRules edge cases', () => {
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(cellsOf(engine.snapshot())).toEqual([]);
     expect(trayOf(engine.snapshot())).toEqual(['a', 'b']);
-    expect(engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)))).toBe('playing');
+    expect(engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)))).toBe(Outcome.playing);
     expect(cellsOf(engine.snapshot())).toEqual(['0,0=a', '1,0=a']);
   });
 
   it('should_reject_the_rotation_and_keep_the_board_when_the_topology_turns_a_cell_outside_the_figure', () => {
     // Every cell of a placed piece lies inside the figure (fit-rules.ts, `fits()`).
-    const outward: GridTopology<SquareCoord, string, string> = {
+    const outward: GridTopology<SquareCoord> = {
       ...squareTopology,
       rotate: (c, turns) =>
         turns.equals(Turns.of(1)) ? square(9, 9) : squareTopology.rotate(c, turns),
@@ -512,7 +513,7 @@ describe('FitRules edge cases', () => {
 
     const outcome = engine.play(new RotateFitPiece(A, Turns.of(1)));
 
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(cellsOf(engine.snapshot())).toEqual(['0,0=a', '1,0=a']);
     expect(isPlaced(engine.snapshot(), A, 0, square(0, 0))).toBe(true);

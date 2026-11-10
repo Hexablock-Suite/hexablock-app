@@ -1,4 +1,4 @@
-import type { Outcome } from './outcome';
+import { Outcome } from './outcome';
 
 // State (statement §3.3, D2): the phase of one game. Each phase is one class.
 // A phase holds no data, so each class has one shared instance.
@@ -16,20 +16,14 @@ export interface GamePhase {
   resume(): GamePhase;
 }
 
+// The phase asks each outcome of the closed set with `equals()`. It reads no text
+// (classes.md decision 45). It calls no method of `outcome`, so a cast value reaches the error.
 function phaseOf(outcome: Outcome): GamePhase {
-  switch (outcome) {
-    case 'playing':
-      return PlayingPhase.instance;
-    case 'victory':
-      return VictoryPhase.instance;
-    case 'game-over':
-      return GameOverPhase.instance;
-    default: {
-      // A value outside the `Outcome` union reaches this branch only through a cast.
-      const unknown: never = outcome;
-      throw new RangeError(`Unknown outcome: ${String(unknown)}.`);
-    }
-  }
+  if (Outcome.playing.equals(outcome)) return PlayingPhase.instance;
+  if (Outcome.victory.equals(outcome)) return VictoryPhase.instance;
+  if (Outcome.gameOver.equals(outcome)) return GameOverPhase.instance;
+  // A value outside the closed set of `Outcome` reaches this line only through a cast.
+  throw new RangeError(`Unknown outcome: ${String(outcome)}.`);
 }
 
 export class PlayingPhase implements GamePhase {

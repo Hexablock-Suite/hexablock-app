@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Outcome } from '../../src/domain/engine/outcome';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { Logger, UseCaseLogEntry } from '../../src/application/logger';
@@ -98,7 +99,7 @@ describe('LoggingAspect', () => {
         { useCase: 'ApplyMove', outcome: 'success' },
       ]);
       expect(run.wrapped).toEqual(run.plain);
-      expect(run.started).toBe('playing');
+      expect(run.started).toBe(Outcome.playing);
     }
   });
 

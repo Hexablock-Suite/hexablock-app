@@ -6,6 +6,7 @@ import { CellNode, ShapeGroup } from '../../../src/domain/engine/shape-node';
 import { Turns } from '../../../src/domain/engine/turns';
 import { fakeCell } from '../../support/engine/fake-cell';
 import {
+  TriangleAxis,
   isUp,
   triangle,
   triangleTopology,
@@ -106,7 +107,7 @@ describe('Piece translation on the triangle topology double', () => {
   it('should_walk_the_strip_when_a_board_line_follows_the_row_axis', () => {
     const board = new Board(BOARD_ID, triangleTopology.region(RegionSize.of(2)), triangleTopology);
 
-    expect([...board.line('row', triangle(2, 0))]).toEqual([
+    expect([...board.line(TriangleAxis.row, triangle(2, 0))]).toEqual([
       triangle(0, 0),
       triangle(1, 0),
       triangle(2, 0),
@@ -117,7 +118,7 @@ describe('Piece translation on the triangle topology double', () => {
   it('should_zigzag_inside_the_board_when_a_board_line_follows_a_diagonal_axis', () => {
     const board = new Board(BOARD_ID, triangleTopology.region(RegionSize.of(2)), triangleTopology);
 
-    expect([...board.line('down-right', triangle(1, 0))]).toEqual([
+    expect([...board.line(TriangleAxis.downRight, triangle(1, 0))]).toEqual([
       triangle(1, 0),
       triangle(2, 0),
       triangle(2, 1),

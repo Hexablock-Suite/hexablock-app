@@ -1,10 +1,10 @@
 /** @jest-environment node */
 import { Score } from '../../../../src/domain/engine/score';
-import { hex, type HexAxis, type HexCoord } from '../../../../src/domain/engine/hex-topology';
+import { hex, HexAxis, type HexCoord } from '../../../../src/domain/engine/hex-topology';
 import { MergeScoring } from '../../../../src/domain/variants/hexa-merge/merge-scoring';
 import { mergeTileSource } from '../../../../src/domain/variants/hexa-merge/merge-tile-source';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
-import { Slide } from '../../../../src/domain/variants/hexa-merge/slide';
+import { SlideSense, Slide } from '../../../../src/domain/variants/hexa-merge/slide';
 import {
   mergeGame,
   mergeState,
@@ -16,7 +16,7 @@ import {
 // It codes the accepted rule of issue #59 (D22): a slide scores the sum of the values that its merges make,
 // and the new tile adds nothing. The tests play through `GameEngine.play()` with a fixed seed.
 
-const east = Slide.of<HexAxis>('q', 'forward');
+const east = Slide.of(HexAxis.q, SlideSense.forward);
 
 // Plays one east slide on row r = 0 with the given tiles from the west edge,
 // with new tiles from a fixed seed, and returns the state after it.

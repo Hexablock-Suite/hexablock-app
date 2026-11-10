@@ -1,5 +1,5 @@
 import type { ReadonlyBoard } from '../../engine/board';
-import type { Outcome } from '../../engine/outcome';
+import { Outcome } from '../../engine/outcome';
 import { Resolution } from '../../engine/resolution';
 import { BaseGameRules } from '../../engine/rules';
 import { Turns } from '../../engine/turns';
@@ -66,7 +66,7 @@ export class FitRules<TCoord> extends BaseGameRules<FitMove<TCoord>, FitState<TC
   // A piece goes only on free figure cells, so a full figure is an exact cover.
   evaluate(state: FitState<TCoord>): Outcome {
     const { board } = state.snapshot();
-    return board.cells().length === board.shape.cells.length ? 'victory' : 'playing';
+    return board.cells().length === board.shape.cells.length ? Outcome.victory : Outcome.playing;
   }
 }
 
@@ -122,7 +122,7 @@ function changeBy<TCoord>(state: FitState<TCoord>, move: FitMove<TCoord>): void 
 // already holds this piece. The second case lets a placed piece turn over its own cells.
 function fits<TCoord>(
   state: FitState<TCoord>,
-  board: ReadonlyBoard<PieceId, TCoord, string>,
+  board: ReadonlyBoard<PieceId, TCoord>,
   id: PieceId,
   placement: Placement<TCoord>,
 ): boolean {

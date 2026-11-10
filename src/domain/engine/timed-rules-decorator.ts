@@ -40,7 +40,7 @@ export class TimedRulesDecorator<TMove, TState> implements IGameRules<TMove, TSt
     const resolution = this.inner.playTurn(state, move);
     if (!resolution.accepted) return resolution;
     this.timer.start();
-    if (resolution.outcome !== 'playing') this.timer.stop();
+    if (resolution.outcome.endsTheGame()) this.timer.stop();
     return resolution;
   }
 

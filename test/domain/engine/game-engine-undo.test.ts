@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Outcome } from '../../../src/domain/engine/outcome';
 import { Score } from '../../../src/domain/engine/score';
 import type { Board, ReadonlyBoard } from '../../../src/domain/engine/board';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
@@ -39,7 +40,7 @@ const moveAt = (col: number, row = 0): FakeMove => ({
 });
 
 // The filled cells of a board in plain facts: its key and the fake cell value.
-function filled(board: ReadonlyBoard<FakeCell, SquareCoord, string>): [string, number][] {
+function filled(board: ReadonlyBoard<FakeCell, SquareCoord>): [string, number][] {
   return board.cells().map(([at, cell]) => [squareTopology.key(at), cell.value]);
 }
 
@@ -220,7 +221,7 @@ describe('GameEngine undo capability', () => {
     budget.left = Number.POSITIVE_INFINITY;
     expect(undoable.canUndo()).toBe(false);
     expect(factsOf(engine)).toEqual({ cells: [], score: Score.of(0), phase: 'playing' });
-    expect(engine.play(moveAt(0))).toBe('playing');
+    expect(engine.play(moveAt(0))).toBe(Outcome.playing);
     expect(undoable.canUndo()).toBe(true);
   });
 
@@ -234,7 +235,7 @@ describe('GameEngine undo capability', () => {
     expect(() => undoable.undo()).toThrow(new RangeError('The history has no move to undo.'));
     expect(factsOf(engine)).toEqual(finished);
     expect(publisher.events).toEqual([
-      new GameOver(GameId.of('fake-game'), MATCH_ID, 'game-over', Score.of(1)),
+      new GameOver(GameId.of('fake-game'), MATCH_ID, Outcome.gameOver, Score.of(1)),
     ]);
   });
 

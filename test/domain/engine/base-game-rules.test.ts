@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import type { Outcome } from '../../../src/domain/engine/outcome';
+import { Outcome } from '../../../src/domain/engine/outcome';
 import { Resolution } from '../../../src/domain/engine/resolution';
 import { BaseGameRules, type IGameRules } from '../../../src/domain/engine/rules';
 
@@ -33,7 +33,7 @@ class RecordingRules extends BaseGameRules<number, number> {
   evaluate(state: number): Outcome {
     this.steps.push('evaluate');
     this.seen.push(state);
-    return state >= 100 ? 'victory' : 'playing';
+    return state >= 100 ? Outcome.victory : Outcome.playing;
   }
 }
 
@@ -55,7 +55,7 @@ describe('BaseGameRules.playTurn()', () => {
     expect(rules.steps).toEqual(['isValid', 'apply', 'resolve']);
     expect(resolution.accepted).toBe(false);
     expect(rules.seen).toEqual([3]);
-    expect(resolution.outcome).toBe('playing');
+    expect(resolution.outcome).toBe(Outcome.playing);
   });
 
   it('should_skip_evaluate_and_keep_playing_when_resolve_rejects_a_winning_move', () => {
@@ -63,7 +63,7 @@ describe('BaseGameRules.playTurn()', () => {
     const resolution = new RejectingRules().playTurn(1, 200);
 
     expect(resolution.accepted).toBe(false);
-    expect(resolution.outcome).toBe('playing');
+    expect(resolution.outcome).toBe(Outcome.playing);
   });
 
   it('should_call_the_four_steps_in_order_when_the_move_is_valid', () => {
@@ -80,7 +80,7 @@ describe('BaseGameRules.playTurn()', () => {
 
     expect(resolution.accepted).toBe(true);
     expect(rules.seen).toEqual([100, 100]);
-    expect(resolution.outcome).toBe('victory');
+    expect(resolution.outcome).toBe(Outcome.victory);
   });
 
   it('should_stop_after_isvalid_when_the_move_is_invalid', () => {
@@ -91,7 +91,7 @@ describe('BaseGameRules.playTurn()', () => {
     expect(rules.steps).toEqual(['isValid']);
     expect(resolution.accepted).toBe(false);
     expect(rules.seen).toEqual([]);
-    expect(resolution.outcome).toBe('playing');
+    expect(resolution.outcome).toBe(Outcome.playing);
   });
 });
 

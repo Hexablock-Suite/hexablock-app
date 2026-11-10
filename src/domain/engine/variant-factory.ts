@@ -38,7 +38,7 @@ export interface IVariantFactory<
   createRules(): IGameRules<TMove, TState>;
   createScoring(): IScoringPolicy<TState>;
   createPieceSource(): IPieceSource<TPiece> | undefined;
-  createBoard(boardId: BoardId): Board<TCell, TCoord, string>;
+  createBoard(boardId: BoardId): Board<TCell, TCoord>;
   createInitialState(matchId: MatchId, stateId: GameStateId, boardId: BoardId): TState;
   createHistory(): MoveHistory<TMove, SnapshotOf<TState>> | undefined;
 }

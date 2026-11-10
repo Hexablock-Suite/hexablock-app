@@ -1,9 +1,13 @@
 /** @jest-environment node */
+import { TriangleAxis } from '../../../src/domain/engine/triangle-topology';
+import { SquareAxis } from '../../../src/domain/engine/square-topology';
+import { HexAxis } from '../../../src/domain/engine/hex-topology';
+import { Outcome } from '../../../src/domain/engine/outcome';
 import { BoardShape } from '../../../src/domain/engine/board-shape';
 import type { BoardState } from '../../../src/domain/engine/board-state';
 import type { Cloneable } from '../../../src/domain/engine/cloneable';
 import { Color } from '../../../src/domain/engine/color';
-import type { GeometryFactory, TopologyId } from '../../../src/domain/engine/geometry-factory';
+import { TopologyId, type GeometryFactory } from '../../../src/domain/engine/geometry-factory';
 import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
 import { MoveHistory } from '../../../src/domain/engine/move-history';
 import { Piece } from '../../../src/domain/engine/piece';
@@ -156,7 +160,7 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
       expect(keys(start.board.shape.cells)).toEqual(region);
       expect(start.board.cells()).toEqual([]);
       expect(start.tray).toHaveLength(3);
-      expect(outcome).toBe('playing');
+      expect(outcome).toBe(Outcome.playing);
       expect(engine.snapshot().cellsPlaced).toBe(1);
       expect(engine.snapshot().tray).toHaveLength(2);
     });
@@ -176,7 +180,7 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
       expect(keys(start.board.shape.cells)).toEqual(region);
       expect(start.board.cells()).toEqual([]);
       expect(start.offered?.content.equals(ColorStack.of([Color.of('red')]))).toBe(true);
-      expect(outcome).toBe('playing');
+      expect(outcome).toBe(Outcome.playing);
       expect(engine.snapshot().board.cells()).toHaveLength(1);
     });
 
@@ -190,19 +194,21 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
 
       expect(keys(start.board.shape.cells)).toEqual(keys([origin, next]));
       expect(start.view().remaining.map((piece) => piece.content.value)).toEqual(['a']);
-      expect(outcome).toBe('victory');
+      expect(outcome).toBe(Outcome.victory);
     });
 
     it('should_throw_a_range_error_when_the_fit_level_names_another_topology', () => {
-      const others = (['hex', 'square', 'triangle'] as const).filter((id) => id !== geometry.id);
+      const others = [TopologyId.hex, TopologyId.square, TopologyId.triangle].filter(
+        (id) => !id.equals(geometry.id),
+      );
 
       // Only a cast puts a free string here, as a broken level file would.
-      for (const named of [...others, 'hexagon' as TopologyId]) {
+      for (const named of [...others, 'hexagon' as unknown as TopologyId]) {
         const create = () => new FitFactory(geometry, fitLevel(named), new ManualClock());
 
         expect(create).toThrow(RangeError);
         expect(create).toThrow(
-          `A Fit level of topology ${named} cannot start on the ${geometry.id} geometry.`,
+          `A Fit level of topology ${String(named)} cannot start on the ${String(geometry.id)} geometry.`,
         );
       }
     });
@@ -225,10 +231,10 @@ describe('IVariantFactory', () => {
     ];
 
     expect(results.map((r) => [r.gameId, r.outcome])).toEqual([
-      ['hexa-lines', 'playing'],
-      ['hexa-fit', 'victory'],
-      ['hexa-sort', 'playing'],
-      ['hexa-merge', 'playing'],
+      ['hexa-lines', Outcome.playing],
+      ['hexa-fit', Outcome.victory],
+      ['hexa-sort', Outcome.playing],
+      ['hexa-merge', Outcome.playing],
     ]);
     expect(new Set(results.map((r) => r.gameId)).size).toBe(4);
   });
@@ -274,9 +280,14 @@ describe('IVariantFactory', () => {
       startMerge(new SquareGeometry()),
       startMerge(new TriangleGeometry()),
     ]).toEqual([
-      { cells: 7, axes: ['q', 'r', 's'], tiles: 2, outcome: 'playing' },
-      { cells: 4, axes: ['col', 'row'], tiles: 2, outcome: 'playing' },
-      { cells: 8, axes: ['row', 'down-right', 'down-left'], tiles: 2, outcome: 'playing' },
+      { cells: 7, axes: [HexAxis.q, HexAxis.r, HexAxis.s], tiles: 2, outcome: Outcome.playing },
+      { cells: 4, axes: [SquareAxis.col, SquareAxis.row], tiles: 2, outcome: Outcome.playing },
+      {
+        cells: 8,
+        axes: [TriangleAxis.row, TriangleAxis.downRight, TriangleAxis.downLeft],
+        tiles: 2,
+        outcome: Outcome.playing,
+      },
     ]);
   });
 });

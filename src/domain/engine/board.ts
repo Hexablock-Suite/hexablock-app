@@ -2,7 +2,7 @@ import type { BoardId } from './board-id';
 import type { BoardShape } from './board-shape';
 import type { Cloneable } from './cloneable';
 import type { CoordKey } from './coord-key';
-import type { GridTopology } from './grid-topology';
+import type { GridAxis, GridTopology } from './grid-topology';
 import type { Radius } from './radius';
 
 // A space of the board: the place that a player sees as free or as occupied.
@@ -60,9 +60,9 @@ export class BoardSpace<TCell, TCoord> implements Cloneable<BoardSpace<TCell, TC
 // (classes.md decision 34), so a reader of the photo can ask the board questions and cannot
 // change it. The photo holds a copy, so a change through a cast never reaches the state.
 // `clone()` gives a new board that the caller owns.
-export interface ReadonlyBoard<TCell, TCoord, TAxis extends string> {
+export interface ReadonlyBoard<TCell, TCoord, TAxis extends GridAxis = GridAxis> {
   readonly shape: BoardShape<TCoord>;
-  readonly topology: GridTopology<TCoord, TAxis, string>;
+  readonly topology: GridTopology<TCoord, TAxis>;
   equals(other: ReadonlyBoard<TCell, TCoord, TAxis>): boolean;
   contains(c: TCoord): boolean;
   get(at: TCoord): TCell | undefined;
@@ -93,9 +93,10 @@ export interface ReadonlyBoard<TCell, TCoord, TAxis extends string> {
 // Each coordinate of the shape has its own topology key. Two equal keys are an error.
 // The initial content is checked like `occupy()`: each entry lies inside the shape,
 // and its key is the topology key of its coordinate. The board keeps no pair of a caller.
-// `TAxis` is the axis union of the topology. The board reads no direction,
-// so it takes a topology with any direction union.
-export class Board<TCell, TCoord, TAxis extends string>
+// `TAxis` is the axis class of the topology (classes.md decision 45). It defaults to `GridAxis`,
+// so `Board<TCell, TCoord>` is a board with any axis. The board reads no direction,
+// so it takes a topology with any direction.
+export class Board<TCell, TCoord, TAxis extends GridAxis = GridAxis>
   implements ReadonlyBoard<TCell, TCoord, TAxis>, Cloneable<Board<TCell, TCoord, TAxis>>
 {
   private readonly inside: ReadonlySet<CoordKey>;
@@ -104,7 +105,7 @@ export class Board<TCell, TCoord, TAxis extends string>
   constructor(
     private readonly identity: BoardId,
     readonly shape: BoardShape<TCoord>,
-    readonly topology: GridTopology<TCoord, TAxis, string>,
+    readonly topology: GridTopology<TCoord, TAxis>,
     content: ReadonlyMap<CoordKey, [TCoord, TCell]> = new Map(),
   ) {
     this.inside = new Set(shape.cells.map((c) => topology.key(c)));

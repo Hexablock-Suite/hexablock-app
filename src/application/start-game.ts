@@ -1,6 +1,7 @@
 import type { BoardState } from '../domain/engine/board-state';
 import type { Cloneable } from '../domain/engine/cloneable';
 import type { GameFactory } from '../domain/engine/game-factory';
+import { Outcome } from '../domain/engine/outcome';
 import { moveResultOf, type MoveResult, type ViewOf } from './move-result';
 import { caughtError, Result } from './result';
 import type { RunningGameStore } from './running-game-store';
@@ -33,7 +34,7 @@ export class StartGame<
     try {
       const engine = this.factory.createGame();
       this.games.replace(engine);
-      return Result.success(moveResultOf(engine, 'playing'));
+      return Result.success(moveResultOf(engine, Outcome.playing));
     } catch (thrown) {
       return Result.failure(caughtError('start-failed', thrown));
     }

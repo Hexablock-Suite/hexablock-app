@@ -75,7 +75,7 @@ export function stackPiece(content: ColorStack): Piece<ColorStack, SquareCoord> 
 export function row(
   length: number,
   content: readonly [SquareCoord, ColorStack][] = [],
-): Board<ColorStack, SquareCoord, string> {
+): Board<ColorStack, SquareCoord> {
   const shape = BoardShape.of(Array.from({ length }, (_, col) => square(col, 0)));
   const cells = new Map<CoordKey, [SquareCoord, ColorStack]>(
     content.map(([at, cell]) => [squareTopology.key(at), [at, cell]]),
@@ -92,7 +92,7 @@ export class NoScoring implements IScoringPolicy<SortState<SquareCoord>> {
 
 // `goalsNeeded` is a number, and the helper wraps it in a `GoalCount`, so 0 throws.
 export function sortState(values: {
-  board: Board<ColorStack, SquareCoord, string>;
+  board: Board<ColorStack, SquareCoord>;
   offered?: readonly ColorStack[];
   source?: IPieceSource<Piece<ColorStack, SquareCoord>>;
   goalsNeeded?: number;

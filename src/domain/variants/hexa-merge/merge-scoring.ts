@@ -1,3 +1,4 @@
+import type { GridAxis } from '../../engine/grid-topology';
 import { Score } from '../../engine/score';
 import type { IScoringPolicy } from '../../engine/scoring-policy';
 import type { MergeSnapshot, MergeState } from './merge-state';
@@ -9,7 +10,7 @@ import type { MergeTile } from './merge-tile';
 // `merged` of the photo holds only the merged tiles, so the new tile of the turn adds nothing.
 // It reads the turn facts from the photo after the turn, so it keeps no game data
 // (classes.md decision 26). It gives the points as a `Score` (decision 41).
-export class MergeScoring<TCoord, TAxis extends string> implements IScoringPolicy<
+export class MergeScoring<TCoord, TAxis extends GridAxis> implements IScoringPolicy<
   MergeState<MergeTile, TCoord, TAxis>
 > {
   score(

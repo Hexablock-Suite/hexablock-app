@@ -27,7 +27,7 @@ export class PlaceFitPiece<TCoord> {
   }
 
   // Where this move puts the piece: its rotation and its offset on the topology.
-  placement(topology: GridTopology<TCoord, string, string>): Placement<TCoord> {
+  placement(topology: GridTopology<TCoord>): Placement<TCoord> {
     return Placement.of(this.rotation, this.at, topology);
   }
 
@@ -72,10 +72,7 @@ export class RotateFitPiece {
   }
 
   // The placement after this move turns the piece that lies at `placement`.
-  turn<TCoord>(
-    placement: Placement<TCoord>,
-    topology: GridTopology<TCoord, string, string>,
-  ): Placement<TCoord> {
+  turn<TCoord>(placement: Placement<TCoord>, topology: GridTopology<TCoord>): Placement<TCoord> {
     return placement.turned(this.steps, topology);
   }
 

@@ -12,13 +12,22 @@ import { BOARD_ID } from '../../support/engine/entity-ids';
 
 // A one-dimensional topology: a coordinate is an integer on a strip.
 // It exists only in this test, so the board test needs no real geometry.
-const stripTopology: GridTopology<number, 'x', 'left' | 'right'> = {
+// The strip has one axis and two directions. Each one has `equals()`, as the engine asks.
+function named(name: string): { readonly name: string; equals(other: unknown): boolean } {
+  const value = { name, equals: (other: unknown) => other === value };
+  return value;
+}
+const X = named('x');
+const LEFT = named('left');
+const RIGHT = named('right');
+
+const stripTopology: GridTopology<number> = {
   fullTurn: () => Turns.of(2),
   key: (c) => coordKey(String(c)),
   neighbors: (c) => [c - 1, c + 1],
-  neighbor: (c, direction) => (direction === 'left' ? c - 1 : c + 1),
-  directions: () => ['left', 'right'],
-  axes: () => ['x'],
+  neighbor: (c, direction) => (direction.equals(LEFT) ? c - 1 : c + 1),
+  directions: () => [LEFT, RIGHT],
+  axes: () => [X],
   rotate: (c, turns) => turns.applyTo(c, (at) => -at, stripTopology),
   translate: (c, offset) => c + offset,
   *line(_axis, through, contains) {
@@ -35,7 +44,7 @@ const stripTopology: GridTopology<number, 'x', 'left' | 'right'> = {
 };
 
 // The board covers the cells 0 to 4.
-function newBoard(): Board<string, number, 'x'> {
+function newBoard(): Board<string, number> {
   return new Board(BOARD_ID, stripTopology.region(RegionSize.of(5)), stripTopology);
 }
 
@@ -81,7 +90,7 @@ describe('Board', () => {
     board.occupy(3, 'red');
     board.occupy(1, 'blue');
     board.occupy(3, 'green');
-    const initial = new Board<string, number, 'x'>(
+    const initial = new Board<string, number>(
       BOARD_ID,
       stripTopology.region(RegionSize.of(5)),
       stripTopology,
@@ -105,7 +114,7 @@ describe('Board', () => {
 
   // Sort marks a free cell with an empty stack. Every other variant leaves the coordinate unset.
   it('should_keep_both_forms_of_a_free_cell_when_the_board_is_read', () => {
-    const board = new Board<ColorStack, number, 'x'>(
+    const board = new Board<ColorStack, number>(
       BOARD_ID,
       stripTopology.region(RegionSize.of(5)),
       stripTopology,
@@ -120,7 +129,7 @@ describe('Board', () => {
   });
 
   it('should_list_an_undefined_cell_when_it_occupies_a_coordinate', () => {
-    const board = new Board<string | undefined, number, 'x'>(
+    const board = new Board<string | undefined, number>(
       BOARD_ID,
       stripTopology.region(RegionSize.of(5)),
       stripTopology,
@@ -148,7 +157,7 @@ describe('Board', () => {
   });
 
   it('should_walk_the_whole_axis_inside_the_shape_when_line_is_read', () => {
-    expect([...newBoard().line('x', 2)]).toEqual([0, 1, 2, 3, 4]);
+    expect([...newBoard().line(X, 2)]).toEqual([0, 1, 2, 3, 4]);
   });
 
   it('should_drop_ring_cells_outside_the_shape_when_ring_is_read', () => {
@@ -167,7 +176,7 @@ describe('Board', () => {
 
   // A cell is a value: the clone holds the same cell objects, and never copies them.
   it('should_share_the_cell_objects_when_the_board_is_cloned', () => {
-    const board = new Board<{ color: string }, number, 'x'>(
+    const board = new Board<{ color: string }, number>(
       BOARD_ID,
       stripTopology.region(RegionSize.of(5)),
       stripTopology,
@@ -184,13 +193,13 @@ describe('Board', () => {
   it('should_yield_nothing_when_a_line_starts_outside_the_board', () => {
     const board = newBoard();
 
-    expect([...board.line('x', 5)]).toEqual([]);
-    expect([...board.line('x', -1)]).toEqual([]);
+    expect([...board.line(X, 5)]).toEqual([]);
+    expect([...board.line(X, -1)]).toEqual([]);
   });
 
   // The walks are one-shot iterables: a second loop over the same iterable gives nothing.
   it('should_yield_nothing_the_second_time_when_a_line_is_iterated_twice', () => {
-    const line = newBoard().line('x', 2);
+    const line = newBoard().line(X, 2);
 
     expect([...line]).toEqual([0, 1, 2, 3, 4]);
     expect([...line]).toEqual([]);
@@ -224,7 +233,7 @@ describe('Board identity', () => {
   it('should_be_the_same_board_when_two_boards_have_one_id_whatever_they_hold', () => {
     const board = newBoard();
     const copy = board.clone();
-    const sameId = new Board<string, number, 'x'>(BOARD_ID, BoardShape.of([7]), stripTopology);
+    const sameId = new Board<string, number>(BOARD_ID, BoardShape.of([7]), stripTopology);
 
     board.occupy(1, 'red');
     copy.occupy(2, 'blue');
@@ -240,7 +249,7 @@ describe('Board identity', () => {
 
   it('should_be_another_board_when_two_boards_have_different_ids_and_the_same_cells', () => {
     const board = newBoard();
-    const other = new Board<string, number, 'x'>(
+    const other = new Board<string, number>(
       BoardId.of('board-b'),
       stripTopology.region(RegionSize.of(5)),
       stripTopology,
@@ -383,7 +392,7 @@ describe('Board shape invariants', () => {
   });
 
   it('should_throw_a_range_error_when_the_topology_gives_two_coordinates_the_same_key', () => {
-    const collidingTopology: GridTopology<number, 'x', 'left' | 'right'> = {
+    const collidingTopology: GridTopology<number> = {
       ...stripTopology,
       key: (c) => coordKey(String(c % 2)),
     };

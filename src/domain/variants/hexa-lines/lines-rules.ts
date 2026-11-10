@@ -1,6 +1,6 @@
 import type { ReadonlyBoard } from '../../engine/board';
 import type { Color } from '../../engine/color';
-import type { Outcome } from '../../engine/outcome';
+import { Outcome } from '../../engine/outcome';
 import { Resolution } from '../../engine/resolution';
 import { BaseGameRules } from '../../engine/rules';
 import type { LinesState } from './lines-state';
@@ -49,7 +49,7 @@ export class LinesRules<TCoord> extends BaseGameRules<PlacePiece<TCoord>, LinesS
 
   // The game ends when no tray piece fits (statement §1.1).
   evaluate(state: LinesState<TCoord>): Outcome {
-    return this.noValidMove(state) ? 'game-over' : 'playing';
+    return this.noValidMove(state) ? Outcome.gameOver : Outcome.playing;
   }
 }
 
@@ -59,7 +59,7 @@ export class LinesRules<TCoord> extends BaseGameRules<PlacePiece<TCoord>, LinesS
 // The same line from either end gives the same name and counts once.
 // A line of one cell can lie on several axes. It is one cell, so it counts once (issue #140).
 // Each line keeps the cell order of the first walk that found it.
-function fullLines<TCoord>(board: ReadonlyBoard<Color, TCoord, string>): TCoord[][] {
+function fullLines<TCoord>(board: ReadonlyBoard<Color, TCoord>): TCoord[][] {
   const seen = new Set<string>();
   const full: TCoord[][] = [];
   for (const axis of board.topology.axes()) {
@@ -77,10 +77,7 @@ function fullLines<TCoord>(board: ReadonlyBoard<Color, TCoord, string>): TCoord[
 // The name of one line: the sorted topology keys of its cells, without the axis (issue #140).
 // A line of two or more cells lies on one axis, so the axis adds nothing to its name.
 // JSON keeps the keys apart, so no key text can join two keys into one.
-function lineId<TCoord>(
-  board: ReadonlyBoard<Color, TCoord, string>,
-  line: readonly TCoord[],
-): string {
+function lineId<TCoord>(board: ReadonlyBoard<Color, TCoord>, line: readonly TCoord[]): string {
   const keys = line.map((c) => board.topology.key(c)).sort();
   return JSON.stringify(keys);
 }

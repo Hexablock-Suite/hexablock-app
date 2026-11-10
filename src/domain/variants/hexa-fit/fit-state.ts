@@ -44,7 +44,7 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
   private constructor(
     private readonly stateId: GameStateId,
     private readonly matchId: MatchId,
-    private readonly board: Board<PieceId, TCoord, string>,
+    private readonly board: Board<PieceId, TCoord>,
     private readonly pieces: ReadonlyMap<string, Piece<PieceId, TCoord>>,
     private readonly placements: Map<string, Placement<TCoord>>,
     private moves: Moves = Moves.of(0),
@@ -55,7 +55,7 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
   static start<TCoord>(
     stateId: GameStateId,
     matchId: MatchId,
-    figure: Board<PieceId, TCoord, string>,
+    figure: Board<PieceId, TCoord>,
     source: IPieceSource<Piece<PieceId, TCoord>>,
   ): FitState<TCoord> {
     const pieces = new Map<string, Piece<PieceId, TCoord>>();

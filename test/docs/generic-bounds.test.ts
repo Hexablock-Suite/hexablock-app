@@ -205,6 +205,7 @@ describe('README generic bounds', () => {
       ]);
     });
 
+    // Issue #207: the axis of a topology is a class, so the bound is `GridAxis`, not `string`.
     it('should_find_the_merge_bounds_when_the_variants_are_scanned', () => {
       const bounds = variantBounds();
 
@@ -213,10 +214,10 @@ describe('README generic bounds', () => {
         bound: 'IMergeable<TCell>',
         place: 'MergeRules',
       });
-      expect(bounds).toContainEqual({ parameter: 'TAxis', bound: 'string', place: 'MergeRules' });
-      expect(bounds).toContainEqual({ parameter: 'TAxis', bound: 'string', place: 'MergeState' });
-      expect(bounds).toContainEqual({ parameter: 'TAxis', bound: 'string', place: 'Slide' });
-      expect(bounds).toContainEqual({ parameter: 'TAxis', bound: 'string', place: 'linesOf' });
+      expect(bounds).toContainEqual({ parameter: 'TAxis', bound: 'GridAxis', place: 'MergeRules' });
+      expect(bounds).toContainEqual({ parameter: 'TAxis', bound: 'GridAxis', place: 'MergeState' });
+      expect(bounds).toContainEqual({ parameter: 'TAxis', bound: 'GridAxis', place: 'Slide' });
+      expect(bounds).toContainEqual({ parameter: 'TAxis', bound: 'GridAxis', place: 'linesOf' });
     });
 
     it('should_report_the_bound_when_no_code_row_names_its_place_with_the_same_bound', () => {

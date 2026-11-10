@@ -1,10 +1,11 @@
 /** @jest-environment node */
+import { Outcome } from '../../../../src/domain/engine/outcome';
 import { Score } from '../../../../src/domain/engine/score';
 import { Board } from '../../../../src/domain/engine/board';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
 import { GameId } from '../../../../src/domain/engine/game-id';
 import { PlayingPhase } from '../../../../src/domain/engine/game-phase';
-import { hex, type HexAxis, type HexCoord } from '../../../../src/domain/engine/hex-topology';
+import { hex, HexAxis, type HexCoord } from '../../../../src/domain/engine/hex-topology';
 import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import { BaseGameRules } from '../../../../src/domain/engine/rules';
@@ -16,7 +17,7 @@ import {
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
 import type { IMergeable } from '../../../../src/domain/variants/hexa-merge/mergeable';
 import type { NewTile } from '../../../../src/domain/variants/hexa-merge/new-tile';
-import { Slide, type SlideSense } from '../../../../src/domain/variants/hexa-merge/slide';
+import { Slide, SlideSense } from '../../../../src/domain/variants/hexa-merge/slide';
 import { RecordingPublisher } from '../../../support/engine/fake-game';
 import {
   hexTopology,
@@ -75,12 +76,12 @@ describe('MergeTile', () => {
 describe('MergeRules', () => {
   it('should_move_the_tile_to_the_edge_when_it_slides_in_each_of_the_six_directions', () => {
     const cases: [HexAxis, SlideSense, HexCoord][] = [
-      ['q', 'forward', hex(2, 0)],
-      ['q', 'backward', hex(-2, 0)],
-      ['r', 'forward', hex(0, 2)],
-      ['r', 'backward', hex(0, -2)],
-      ['s', 'forward', hex(2, -2)],
-      ['s', 'backward', hex(-2, 2)],
+      [HexAxis.q, SlideSense.forward, hex(2, 0)],
+      [HexAxis.q, SlideSense.backward, hex(-2, 0)],
+      [HexAxis.r, SlideSense.forward, hex(0, 2)],
+      [HexAxis.r, SlideSense.backward, hex(0, -2)],
+      [HexAxis.s, SlideSense.forward, hex(2, -2)],
+      [HexAxis.s, SlideSense.backward, hex(-2, 2)],
     ];
 
     for (const [axis, toward, edge] of cases) {
@@ -89,7 +90,7 @@ describe('MergeRules', () => {
       const outcome = engine.play(Slide.of(axis, toward));
 
       expect(rules).toBeInstanceOf(BaseGameRules);
-      expect(outcome).toBe('playing');
+      expect(outcome).toBe(Outcome.playing);
       expect(values(engine.snapshot())).toEqual({ [hexTopology.key(edge)]: 2 });
     }
   });
@@ -107,7 +108,7 @@ describe('MergeRules', () => {
       ),
     );
 
-    engine.play(Slide.of('q', 'forward'));
+    engine.play(Slide.of(HexAxis.q, SlideSense.forward));
 
     expect(values(engine.snapshot())).toEqual({ '2,0': 4, '1,1': 4, '0,1': 2 });
   });
@@ -134,7 +135,7 @@ describe('MergeRules', () => {
       ),
     );
 
-    engine.play(Slide.of('q', 'forward'));
+    engine.play(Slide.of(HexAxis.q, SlideSense.forward));
 
     expect(values(engine.snapshot())).toEqual({
       '2,0': 4,
@@ -160,9 +161,9 @@ describe('MergeRules', () => {
     );
     const before = engine.snapshot();
 
-    engine.play(Slide.of('q', 'forward'));
+    engine.play(Slide.of(HexAxis.q, SlideSense.forward));
     const merged = engine.snapshot();
-    engine.play(Slide.of('r', 'backward'));
+    engine.play(Slide.of(HexAxis.r, SlideSense.backward));
     const plain = engine.snapshot();
 
     expect(merged.merged.map(valueOf).sort((a, b) => a - b)).toEqual([4, 8]);
@@ -183,14 +184,14 @@ describe('MergeRules', () => {
       MergeTile.of(8),
     );
 
-    const outcome = engine.play(Slide.of('q', 'forward'));
+    const outcome = engine.play(Slide.of(HexAxis.q, SlideSense.forward));
     const reached = engine.snapshot();
-    const next = engine.play(Slide.of('q', 'backward'));
+    const next = engine.play(Slide.of(HexAxis.q, SlideSense.backward));
 
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(reached.targetReached).toBe(true);
     expect(values(reached)).toEqual({ '2,0': 8 });
-    expect(next).toBe('playing');
+    expect(next).toBe(Outcome.playing);
     expect(values(engine.snapshot())).toEqual({ '-2,0': 8 });
     expect(engine.snapshot().targetReached).toBe(true);
     expect(engine.currentPhase().canPlay()).toBe(true);
@@ -199,25 +200,27 @@ describe('MergeRules', () => {
 
   it('should_reject_the_slide_and_keep_the_board_when_no_tile_moves_that_way', () => {
     const { engine, rules } = mergeGame(mergeState([[hex(2, 0), 2]], 3));
-    const slide = Slide.of<HexAxis>('q', 'forward');
+    const slide = Slide.of(HexAxis.q, SlideSense.forward);
 
     const outcome = engine.play(slide);
 
     expect(rules.isValid(mergeStateOf(engine.snapshot()), slide)).toBe(false);
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(values(engine.snapshot())).toEqual({ '2,0': 2 });
-    expect(rules.isValid(mergeStateOf(engine.snapshot()), Slide.of('q', 'backward'))).toBe(true);
+    expect(
+      rules.isValid(mergeStateOf(engine.snapshot()), Slide.of(HexAxis.q, SlideSense.backward)),
+    ).toBe(true);
   });
 
   it('should_reject_the_slide_when_its_axis_is_not_an_axis_of_the_topology', () => {
     const { engine, rules } = mergeGame(mergeState([[hex(0, 0), 2]], 3));
     // A cast passes the compiler, so the rules check the axis at runtime.
-    const slide = Slide.of('t' as HexAxis, 'forward');
+    const slide = Slide.of('t' as unknown as HexAxis, SlideSense.forward);
 
     const outcome = engine.play(slide);
 
     expect(rules.isValid(mergeStateOf(engine.snapshot()), slide)).toBe(false);
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(values(engine.snapshot())).toEqual({ '0,0': 2 });
   });
 
@@ -235,13 +238,13 @@ describe('MergeRules', () => {
     const open = mergeState([[hex(0, 0), 2]]);
     const { engine, rules } = mergeGame(stuck);
 
-    const outcome = engine.play(Slide.of('q', 'forward'));
+    const outcome = engine.play(Slide.of(HexAxis.q, SlideSense.forward));
 
     expect([...rules.validMoves(stuck)]).toEqual([]);
-    expect(rules.evaluate(stuck)).toBe('game-over');
-    expect(rules.evaluate(open)).toBe('playing');
+    expect(rules.evaluate(stuck)).toBe(Outcome.gameOver);
+    expect(rules.evaluate(open)).toBe(Outcome.playing);
     expect([...rules.validMoves(open)]).toHaveLength(6);
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(values(engine.snapshot())).toEqual(values(stuck.snapshot()));
   });
 });
@@ -276,7 +279,7 @@ describe('Merge edge cases', () => {
     expect(() => MergeTile.of(2 ** 53)).toThrow(tooBig);
     expect(() => big.mergeWith(MergeTile.of(2 ** 52))).toThrow(tooBig);
     // The rollback of a turn keeps the board and the phase (classes.md decision 21).
-    expect(() => engine.play(Slide.of('q', 'forward'))).toThrow(tooBig);
+    expect(() => engine.play(Slide.of(HexAxis.q, SlideSense.forward))).toThrow(tooBig);
     expect(values(engine.snapshot())).toEqual({ '1,0': 2 ** 52, '2,0': 2 ** 52 });
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(publisher.events).toEqual([]);
@@ -337,15 +340,17 @@ describe('Merge edge cases', () => {
       [hex(2, 0), chip('a', true)],
     ]);
 
-    const merged = merging.play(Slide.of('q', 'forward'));
+    const merged = merging.play(Slide.of(HexAxis.q, SlideSense.forward));
 
-    expect(merged).toBe('playing');
+    expect(merged).toBe(Outcome.playing);
     expect(labels(merging)).toEqual({ '2,0': 'aa' });
-    expect(() => failing.play(Slide.of('q', 'forward'))).toThrow('The merge failed.');
+    expect(() => failing.play(Slide.of(HexAxis.q, SlideSense.forward))).toThrow(
+      'The merge failed.',
+    );
     expect(failing.currentPhase()).toBe(PlayingPhase.instance);
     expect(labels(failing)).toEqual({ '1,0': 'a', '2,0': 'a' });
     // A slide on the axis r moves no chip into another, so no merge runs.
-    expect(failing.play(Slide.of('r', 'forward'))).toBe('playing');
+    expect(failing.play(Slide.of(HexAxis.r, SlideSense.forward))).toBe(Outcome.playing);
     expect(labels(failing)).toEqual({ '1,1': 'a', '2,0': 'a' });
   });
 
@@ -355,11 +360,11 @@ describe('Merge edge cases', () => {
     const empty = mergeState([], 2);
     const { engine, rules, publisher } = mergeGame(empty);
 
-    const outcome = engine.play(Slide.of('q', 'forward'));
+    const outcome = engine.play(Slide.of(HexAxis.q, SlideSense.forward));
 
-    expect(rules.evaluate(empty)).toBe('game-over');
+    expect(rules.evaluate(empty)).toBe(Outcome.gameOver);
     expect([...rules.validMoves(empty)]).toEqual([]);
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(values(engine.snapshot())).toEqual({});
     expect(publisher.events).toEqual([]);
   });
@@ -375,7 +380,7 @@ describe('MergeRules in place', () => {
     ]);
     const board = state.snapshot().board;
 
-    const result = rules.apply(state, Slide.of<HexAxis>('q', 'backward'));
+    const result = rules.apply(state, Slide.of(HexAxis.q, SlideSense.backward));
 
     expect(result).toBe(state);
     // The board keeps its id: the same board changes in place.

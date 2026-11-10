@@ -36,7 +36,7 @@ export function piece<TCoord>(...cells: TCoord[]): Piece<Color, TCoord> {
 
 // A region of the topology with `filled` cells, the tray and the pieces left in the source.
 export function linesState<TCoord>(
-  topology: GridTopology<TCoord, string, string>,
+  topology: GridTopology<TCoord>,
   size: number,
   values: {
     filled?: readonly TCoord[];
@@ -46,11 +46,7 @@ export function linesState<TCoord>(
     stateId?: GameStateId;
   },
 ): LinesState<TCoord> {
-  const board = new Board<Color, TCoord, string>(
-    BOARD_ID,
-    topology.region(RegionSize.of(size)),
-    topology,
-  );
+  const board = new Board<Color, TCoord>(BOARD_ID, topology.region(RegionSize.of(size)), topology);
   for (const c of values.filled ?? []) board.occupy(c, red);
   return new LinesState(
     values.stateId ?? STATE_ID,
@@ -88,7 +84,7 @@ export function linesGame<TCoord>(
 // The keys of the filled cells, sorted, so a test compares boards by value.
 // It takes a photo, because only the photo shows the board of a state.
 export function filledKeys<TCoord>(state: {
-  readonly board: ReadonlyBoard<Color, TCoord, string>;
+  readonly board: ReadonlyBoard<Color, TCoord>;
 }): string[] {
   return state.board
     .cells()

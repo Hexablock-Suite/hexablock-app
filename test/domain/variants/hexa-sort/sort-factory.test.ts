@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Outcome } from '../../../../src/domain/engine/outcome';
 import { Score } from '../../../../src/domain/engine/score';
 import { GameId } from '../../../../src/domain/engine/game-id';
 import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
@@ -34,7 +35,7 @@ describe('SortFactory', () => {
     expect(factory.createBoard(BOARD_ID).shape.cells).toHaveLength(4);
     expect(names(initial.snapshot().offered?.content)).toEqual(['red', 'red']);
     expect(initial.snapshot().goalsNeeded.equals(GoalCount.of(5))).toBe(true);
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(chipsAt(engine, 0, 0)).toEqual(['red', 'red']);
     expect(names(engine.snapshot().offered?.content)).toEqual(['blue']);
     expect(engine.snapshot().score).toEqual(Score.of(0));

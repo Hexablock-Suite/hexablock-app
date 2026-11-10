@@ -47,7 +47,8 @@ export class FitFactory<TCoord> implements IVariantFactory<
     private readonly clock: Clock,
   ) {
     // A level file has no compile-time types, so the check runs when the game starts.
-    if (level.topology !== geometry.id) {
+    // The geometry asks, so a text that a cast puts in the level still reaches the error.
+    if (!geometry.id.equals(level.topology)) {
       throw new RangeError(
         `A Fit level of topology ${level.topology} cannot start on the ${geometry.id} geometry.`,
       );
@@ -71,7 +72,7 @@ export class FitFactory<TCoord> implements IVariantFactory<
 
   // The board is the figure: its shape holds only the figure cells.
   // `BoardBuilder` takes the figure as a tree of cells.
-  createBoard(boardId: BoardId): Board<PieceId, TCoord, string> {
+  createBoard(boardId: BoardId): Board<PieceId, TCoord> {
     const figure = new ShapeGroup(this.level.figure.cells.map((c) => new CellNode(c)));
     return new BoardBuilder(this.geometry).withFigure(figure).build<PieceId>(boardId);
   }

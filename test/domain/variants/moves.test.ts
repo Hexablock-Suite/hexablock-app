@@ -7,9 +7,9 @@ import {
 } from '../../../src/domain/variants/hexa-fit/fit-move';
 import { PieceId } from '../../../src/domain/variants/hexa-fit/piece-id';
 import { PlacePiece } from '../../../src/domain/variants/hexa-lines/place-piece';
-import { Slide } from '../../../src/domain/variants/hexa-merge/slide';
+import { SlideSense, Slide } from '../../../src/domain/variants/hexa-merge/slide';
 import { PlaceStack } from '../../../src/domain/variants/hexa-sort/place-stack';
-import { square, squareTopology } from '../../support/engine/square-topology';
+import { square, SquareAxis, squareTopology } from '../../support/engine/square-topology';
 
 // Issue #205, classes.md decision 43: every move of the four variants is a value object.
 // Two moves with the same parts are the same move, and a move keeps its parts private.
@@ -36,15 +36,15 @@ describe('equals of the moves', () => {
   });
 
   it('should_be_equal_only_when_two_slides_hold_the_same_axis_and_sense', () => {
-    const same = (left: Slide<string>, right: Slide<string>) => [
+    const same = (left: Slide<SquareAxis>, right: Slide<SquareAxis>) => [
       left.equals(right),
       right.equals(left),
     ];
-    const slide = Slide.of('row', 'forward');
+    const slide = Slide.of(SquareAxis.row, SlideSense.forward);
 
-    expect(same(slide, Slide.of('row', 'forward'))).toEqual(EQUAL);
-    expect(same(slide, Slide.of('column', 'forward'))).toEqual(DIFFERENT);
-    expect(same(slide, Slide.of('row', 'backward'))).toEqual(DIFFERENT);
+    expect(same(slide, Slide.of(SquareAxis.row, SlideSense.forward))).toEqual(EQUAL);
+    expect(same(slide, Slide.of(SquareAxis.col, SlideSense.forward))).toEqual(DIFFERENT);
+    expect(same(slide, Slide.of(SquareAxis.row, SlideSense.backward))).toEqual(DIFFERENT);
   });
 
   it('should_be_equal_only_when_two_fit_placements_hold_the_same_piece_rotation_and_offset', () => {
@@ -146,7 +146,7 @@ describe('the tray index of a Lines placement', () => {
 describe('private fields of the moves', () => {
   it('should_reject_at_compile_time_when_a_caller_reads_a_field_of_a_move', () => {
     const placePiece = new PlacePiece(0, square(0, 0));
-    const slide = Slide.of('row', 'forward');
+    const slide = Slide.of(SquareAxis.row, SlideSense.forward);
     const placeFit = new PlaceFitPiece(A, Turns.of(0), square(0, 0));
     const removeFit = new RemoveFitPiece(A);
     const rotateFit = new RotateFitPiece(A, Turns.of(1));

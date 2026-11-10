@@ -1,6 +1,7 @@
 import type { ReadonlyBoard } from './board';
 import type { Cloneable } from './cloneable';
 import type { GameStateId } from './game-state-id';
+import type { GridAxis } from './grid-topology';
 import type { MatchId } from './match-id';
 import type { Score } from './score';
 
@@ -16,7 +17,7 @@ import type { Score } from './score';
 export interface BoardSnapshot<TCell, TCoord> {
   readonly stateId: GameStateId;
   readonly matchId: MatchId;
-  readonly board: ReadonlyBoard<TCell, TCoord, string>;
+  readonly board: ReadonlyBoard<TCell, TCoord>;
   readonly score: Score;
   view(): unknown;
 }
@@ -45,7 +46,7 @@ export type SnapshotOf<TState> = TState extends { snapshot(): infer TSnapshot } 
 // `restore()` takes back a photo of this same state: the board, the score, the variant data
 // and the position of the piece source. A photo of another state throws a RangeError,
 // and the state stays as it was.
-// The board takes any axis union, so the state needs no axis type parameter (issue 86).
+// The board takes any axis, so the state needs no axis type parameter (issue 86).
 export interface BoardState<TCell, TCoord> extends Cloneable<BoardState<TCell, TCoord>> {
   addPoints(points: Score): void;
   belongsTo(match: MatchId): boolean;
@@ -56,7 +57,7 @@ export interface BoardState<TCell, TCoord> extends Cloneable<BoardState<TCell, T
 
 // A state takes back only its own photo: a photo with the id of the state and a copy of its board.
 // Any other photo throws a RangeError. Each state calls it before `restore()` writes anything.
-export function checkOwnSnapshot<TCell, TCoord, TAxis extends string>(
+export function checkOwnSnapshot<TCell, TCoord, TAxis extends GridAxis>(
   stateId: GameStateId,
   board: ReadonlyBoard<TCell, TCoord, TAxis>,
   snapshot: { readonly stateId: GameStateId; readonly board: ReadonlyBoard<TCell, TCoord, TAxis> },

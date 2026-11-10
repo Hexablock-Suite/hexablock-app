@@ -56,7 +56,7 @@ export class SortFactory<TCoord> implements IVariantFactory<
     return this.level.source.clone();
   }
 
-  createBoard(boardId: BoardId): Board<ColorStack, TCoord, string> {
+  createBoard(boardId: BoardId): Board<ColorStack, TCoord> {
     return new BoardBuilder(this.geometry).withRegion(this.level.size).build<ColorStack>(boardId);
   }
 

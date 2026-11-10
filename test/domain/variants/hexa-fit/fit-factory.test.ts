@@ -1,4 +1,6 @@
 /** @jest-environment node */
+import { TopologyId } from '../../../../src/domain/engine/geometry-factory';
+import { Outcome } from '../../../../src/domain/engine/outcome';
 import { ElapsedTime } from '../../../../src/domain/engine/elapsed-time';
 import { Score } from '../../../../src/domain/engine/score';
 import { readFileSync } from 'node:fs';
@@ -39,10 +41,10 @@ describe('FitFactory', () => {
       '1,0',
     ]);
     expect(initial.remaining().map((p) => p.content.value)).toEqual(['a']);
-    expect(outcome).toBe('victory');
+    expect(outcome).toBe(Outcome.victory);
     expect(engine.snapshot().score).toEqual(Score.of(0));
     expect(publisher.events).toEqual([
-      new GameOver(factory.gameId, MATCH_ID, 'victory', Score.of(0)),
+      new GameOver(factory.gameId, MATCH_ID, Outcome.victory, Score.of(0)),
     ]);
   });
 
@@ -63,7 +65,7 @@ describe('FitFactory', () => {
     const factory = new FitFactory(
       new SquareGeometry(),
       {
-        topology: 'square',
+        topology: TopologyId.square,
         figure: BoardShape.of([square(0, 0), square(1, 0)]),
         pieces,
       },
@@ -82,7 +84,7 @@ describe('FitFactory', () => {
     const factory = new FitFactory(
       new SquareGeometry(),
       {
-        topology: 'square',
+        topology: TopologyId.square,
         figure: BoardShape.of([square(0, 0), square(0, 0)]),
         pieces: [],
       },

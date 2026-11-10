@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { Board } from '../../../src/domain/engine/board';
 import { BoardBuilder } from '../../../src/domain/engine/board-builder';
-import type { GeometryFactory } from '../../../src/domain/engine/geometry-factory';
+import { TopologyId, type GeometryFactory } from '../../../src/domain/engine/geometry-factory';
 import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
 import { hex, type HexCoord } from '../../../src/domain/engine/hex-topology';
 import { RegionSize } from '../../../src/domain/engine/region-size';
@@ -98,7 +98,7 @@ describe('BoardBuilder', () => {
 
   it('should_use_the_topology_of_its_geometry_when_the_geometry_is_not_hexagonal', () => {
     const geometry: GeometryFactory<SquareCoord> = {
-      id: 'square',
+      id: TopologyId.square,
       createCoord: ([col = 0, row = 0]) => square(col, row),
       createTopology: () => squareTopology,
       createPieceShapes: () => [],

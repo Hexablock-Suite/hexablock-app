@@ -1,5 +1,5 @@
 import type { ReadonlyBoard } from '../../engine/board';
-import type { Outcome } from '../../engine/outcome';
+import { Outcome } from '../../engine/outcome';
 import { Resolution } from '../../engine/resolution';
 import { BaseGameRules } from '../../engine/rules';
 import type { ColorStack } from './color-stack';
@@ -53,8 +53,8 @@ export class SortRules<TCoord> extends BaseGameRules<PlaceStack<TCoord>, SortSta
   // The goals reached win. A board with no empty cell, or no stack left to place, loses.
   evaluate(state: SortState<TCoord>): Outcome {
     const { goalsNeeded, goalsDone } = state.snapshot();
-    if (goalsNeeded.isReachedBy(goalsDone)) return 'victory';
-    return this.noValidMove(state) ? 'game-over' : 'playing';
+    if (goalsNeeded.isReachedBy(goalsDone)) return Outcome.victory;
+    return this.noValidMove(state) ? Outcome.gameOver : Outcome.playing;
   }
 }
 
@@ -85,7 +85,7 @@ function transfer<TCoord>(state: SortState<TCoord>, at: TCoord): TCoord[] {
 // `localeCompare`, so the order is the same on every device and locale.
 // The key order does not depend on when a cell was filled or emptied (gap G108.3).
 function targetOf<TCoord>(
-  board: ReadonlyBoard<ColorStack, TCoord, string>,
+  board: ReadonlyBoard<ColorStack, TCoord>,
   first: TCoord,
   others: readonly TCoord[],
 ): TCoord {

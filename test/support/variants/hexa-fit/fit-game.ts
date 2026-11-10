@@ -1,3 +1,4 @@
+import { TopologyId } from '../../../../src/domain/engine/geometry-factory';
 import { BoardShape } from '../../../../src/domain/engine/board-shape';
 import type { Clock } from '../../../../src/domain/engine/clock';
 import { Piece } from '../../../../src/domain/engine/piece';
@@ -25,7 +26,7 @@ export function fitFactory(clock: Clock = new ManualClock()): FitFactory<SquareC
   return new FitFactory(
     new SquareGeometry(),
     {
-      topology: 'square',
+      topology: TopologyId.square,
       figure: BoardShape.of([square(0, 0), square(1, 0)]),
       pieces: [domino],
     },
@@ -40,7 +41,7 @@ export function threeDominoFitFactory(clock: Clock = new ManualClock()): FitFact
   return new FitFactory(
     new SquareGeometry(),
     {
-      topology: 'square',
+      topology: TopologyId.square,
       figure: BoardShape.of(Array.from({ length: 6 }, (_, col) => square(col, 0))),
       pieces: [domino(A), domino(B), domino(C)],
     },

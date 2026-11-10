@@ -5,7 +5,7 @@ import type { GameEvent, GameEventPublisher } from '../../../src/domain/engine/g
 import { GameId } from '../../../src/domain/engine/game-id';
 import type { GameStateId } from '../../../src/domain/engine/game-state-id';
 import type { MatchId } from '../../../src/domain/engine/match-id';
-import type { Outcome } from '../../../src/domain/engine/outcome';
+import { Outcome } from '../../../src/domain/engine/outcome';
 import type { IPieceSource } from '../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../src/domain/engine/region-size';
 import { Resolution } from '../../../src/domain/engine/resolution';
@@ -179,7 +179,7 @@ export class SourceRules extends BaseGameRules<SquareCoord, SourceState> {
   }
 
   evaluate(state: SourceState): Outcome {
-    return this.noValidMove(state) ? 'game-over' : 'playing';
+    return this.noValidMove(state) ? Outcome.gameOver : Outcome.playing;
   }
 }
 
@@ -214,7 +214,9 @@ export class FakeRules extends BaseGameRules<FakeMove, FakeState> {
 
   evaluate(state: FakeState): Outcome {
     this.log.push('evaluate');
-    return state.board.cells().length === state.board.shape.cells.length ? 'game-over' : 'playing';
+    return state.board.cells().length === state.board.shape.cells.length
+      ? Outcome.gameOver
+      : Outcome.playing;
   }
 }
 
