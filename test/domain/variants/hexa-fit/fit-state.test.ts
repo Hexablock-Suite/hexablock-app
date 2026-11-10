@@ -19,11 +19,11 @@ describe('FitState', () => {
     state.addPoints(3);
     state.addPoints(-1);
 
-    expect(state.score).toBe(2);
+    expect(state.snapshot().score).toBe(2);
     expect(() => state.addPoints(Number.POSITIVE_INFINITY)).toThrow(
       new RangeError('The points of a turn must be a finite number, not Infinity.'),
     );
-    expect(state.score).toBe(2);
+    expect(state.snapshot().score).toBe(2);
   });
 
   // The state has its own `GameStateId`, and it still knows its match (classes.md decision 26).
@@ -70,34 +70,39 @@ describe('FitState', () => {
   // The state keeps its object: `place()`, `remove()` and `countMove()` change it in place.
   it('should_change_the_state_in_place_when_a_piece_is_placed_counted_and_removed', () => {
     const state = threeDominoFitFactory().createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
-    const board = state.board;
-    const keys = () => state.board.cells().map(([c, id]) => `${squareTopology.key(c)}=${id.value}`);
+    const board = state.snapshot().board;
+    const keys = () =>
+      state
+        .snapshot()
+        .board.cells()
+        .map(([c, id]) => `${squareTopology.key(c)}=${id.value}`);
     const results: unknown[] = [];
 
     results.push(state.place(A, Placement.of(Turns.of(0), square(2, 0), squareTopology)));
     results.push(state.place(B, Placement.of(Turns.of(0), square(0, 0), squareTopology)));
     results.push(state.countMove());
-    const placed = { cells: keys(), placed: state.placed(), moves: state.moves };
+    const placed = { cells: keys(), placed: state.placed(), moves: state.snapshot().moves };
     results.push(state.remove(A));
 
     expect(results).toEqual([undefined, undefined, undefined, undefined]);
-    expect(state.board).toBe(board);
+    // The board keeps its id: the same board changes in place.
+    expect(state.snapshot().board.equals(board)).toBe(true);
     expect(placed).toEqual({
       cells: ['2,0=a', '3,0=a', '0,0=b', '1,0=b'],
       placed: [A, B],
       moves: 1,
     });
-    expect([keys(), state.placed(), state.moves]).toEqual([['0,0=b', '1,0=b'], [B], 1]);
+    expect([keys(), state.placed(), state.snapshot().moves]).toEqual([['0,0=b', '1,0=b'], [B], 1]);
   });
 
   it('should_throw_a_range_error_and_keep_the_state_when_a_placed_piece_leaves_the_figure', () => {
     const state = threeDominoFitFactory().createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
     state.place(B, Placement.of(Turns.of(0), square(0, 0), squareTopology));
-    const before = { cells: state.board.cells(), placed: state.placed() };
+    const before = { cells: state.snapshot().board.cells(), placed: state.placed() };
 
     expect(() => state.place(A, Placement.of(Turns.of(0), square(5, 0), squareTopology))).toThrow(
       new RangeError('The coordinate 6,0 is outside the board.'),
     );
-    expect({ cells: state.board.cells(), placed: state.placed() }).toEqual(before);
+    expect({ cells: state.snapshot().board.cells(), placed: state.placed() }).toEqual(before);
   });
 });

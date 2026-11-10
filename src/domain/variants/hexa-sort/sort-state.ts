@@ -52,14 +52,14 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
   private constructor(
     private readonly stateId: GameStateId,
     private readonly matchId: MatchId,
-    readonly board: Board<ColorStack, TCoord, string>,
-    public source: IPieceSource<Piece<ColorStack, TCoord>>,
-    readonly goalsNeeded: GoalCount,
-    public offered: Piece<ColorStack, TCoord> | undefined,
-    public goalsDone: number,
-    public clearedTiles: number[],
-    public placedAt: TCoord | undefined,
-    public score: number,
+    private readonly board: Board<ColorStack, TCoord, string>,
+    private source: IPieceSource<Piece<ColorStack, TCoord>>,
+    private readonly goalsNeeded: GoalCount,
+    private offered: Piece<ColorStack, TCoord> | undefined,
+    private goalsDone: number,
+    private clearedTiles: number[],
+    private placedAt: TCoord | undefined,
+    private score: number,
   ) {}
 
   // A new game: no goal done, no score, and the first stack of the source on offer.

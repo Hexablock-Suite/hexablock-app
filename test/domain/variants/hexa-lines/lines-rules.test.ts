@@ -117,7 +117,7 @@ describe('Hexa Lines rules', () => {
 
     for (const axis of axes) {
       const probe = linesState(squareTopology, 3, { tray: [] });
-      const line = [...probe.board.line(axis, square(1, 1))];
+      const line = [...probe.snapshot().board.line(axis, square(1, 1))];
       const last = line[line.length - 1]!;
       const { engine } = linesGame(
         linesState(squareTopology, 3, { filled: line.slice(0, -1), tray: [one, one] }),
@@ -140,7 +140,7 @@ describe('Hexa Lines rules', () => {
 
     for (const axis of axes) {
       const probe = linesState(topology, 4, { tray: [] });
-      const line = [...probe.board.line(axis, triangle(4, 1))];
+      const line = [...probe.snapshot().board.line(axis, triangle(4, 1))];
       const last = line[line.length - 1]!;
       // The piece holds the last cell, and the zero offset leaves it there.
       const { engine } = linesGame(
@@ -380,7 +380,15 @@ describe('Hexa Lines rules edge cases', () => {
     };
     const games = [
       {
-        game: linesGame(new LinesState(STATE_ID, MATCH_ID, base.board, base.tray, failingSource)),
+        game: linesGame(
+          new LinesState(
+            STATE_ID,
+            MATCH_ID,
+            base.snapshot().board.clone(),
+            base.snapshot().tray,
+            failingSource,
+          ),
+        ),
         error: 'The source failed.',
       },
       {
@@ -424,12 +432,12 @@ describe('Hexa Lines rules edge cases', () => {
     engine.play(new PlacePiece(0, origin));
 
     const state = engine.snapshot();
-    expect(keys([...probe.board.line('col', square(1, 0))])).toEqual(
-      keys([...probe.board.line('col', origin)]),
+    expect(keys([...probe.snapshot().board.line('col', square(1, 0))])).toEqual(
+      keys([...probe.snapshot().board.line('col', origin)]),
     );
-    expect(probe.board.line('col', square(1, 0))[Symbol.iterator]().next().value).toEqual(
-      square(2, 0),
-    );
+    expect(
+      probe.snapshot().board.line('col', square(1, 0))[Symbol.iterator]().next().value,
+    ).toEqual(square(2, 0));
     expect(state.linesCleared).toBe(1);
     expect(state.streak).toBe(1);
     expect(filledKeys(state)).toEqual([]);
@@ -451,7 +459,7 @@ describe('Hexa Lines rules edge cases', () => {
 
     const state = engine.snapshot();
     for (const axis of squareTopology.axes()) {
-      expect(keys([...probe.board.line(axis, origin)])).toEqual(keys([origin]));
+      expect(keys([...probe.snapshot().board.line(axis, origin)])).toEqual(keys([origin]));
     }
     expect(state.linesCleared).toBe(1);
     expect(state.streak).toBe(1);

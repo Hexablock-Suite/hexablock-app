@@ -33,6 +33,8 @@ export type SnapshotOf<TState> = TState extends { snapshot(): infer TSnapshot } 
 // is the state of a match, so `GameEngine.start()` can refuse a state of another match.
 // It changes only through its own methods, which have business names.
 // The rules call them, and the engine calls `addPoints()`. No other class writes a field.
+// Every field of a state is private, so no other class reads a field either:
+// a reader reads the photo of `snapshot()`, or asks a query with a business name.
 // `addPoints()` adds the points of one turn. Points that are not finite throw a RangeError,
 // and the score stays as it was.
 // The board changes in place. `clone()` gives the copy on which the engine plays a turn

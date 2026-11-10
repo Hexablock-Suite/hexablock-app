@@ -13,7 +13,14 @@ import { repoRoot } from '../support/run-tool';
 //   A class may write a field that it declares on another object of its own class,
 //   as `clone()` does on its copy. TypeScript allows this for a private field too.
 // - a call of `occupy()` or `vacate()` outside `Board` and the variant states.
+// - a call of `Object.assign()` whose target is not `this` or a field of `this`.
 // So the rules, the scoring and the engine change a state only through its methods.
+// R8 makes every field of the four variant states private, and a reader reads the photo
+// that `snapshot()` gives. The scan of the state files reports a field that is not private.
+// The compiler then refuses what the scan of the writes cannot see on a state: an array change
+// such as `state.clearedTiles.push()`, a draw such as `state.tiles.next()`, and a write from
+// a class that declares a field of the same name. `test/domain/engine/state-snapshot.test.ts`
+// proves it at compile time, so this gate keeps no case for it.
 
 const scanned = ['src/domain', 'src/application'];
 
@@ -65,6 +72,12 @@ function ownFields(node: ts.Node): Set<string> {
   return names;
 }
 
+// The first argument of a call of `Object.assign()`, or `undefined` for any other node.
+function assignTarget(node: ts.Node): ts.Expression | undefined {
+  if (!ts.isCallExpression(node) || node.expression.getText() !== 'Object.assign') return undefined;
+  return node.arguments[0];
+}
+
 // A field of another object, such as `state.score` or `state['score']`.
 function isForeignField(node: ts.Expression): boolean {
   if (ts.isPropertyAccessExpression(node)) {
@@ -105,10 +118,62 @@ function scanSource(file: string, text: string): string[] {
     ) {
       report(node, `calls ${node.expression.getText()}()`);
     }
+    const target = node.kind === ts.SyntaxKind.CallExpression ? assignTarget(node) : undefined;
+    if (target !== undefined && !startsAtThis(target) && !ts.isObjectLiteralExpression(target)) {
+      report(node, `assigns into ${target.getText()}`);
+    }
     ts.forEachChild(node, visit);
   };
   visit(source);
   return found;
+}
+
+// A field that a class declares or that its constructor declares as a parameter property.
+// A field is private when it has the `private` modifier or a `#` name.
+function isPrivateField(member: ts.PropertyDeclaration | ts.ParameterDeclaration): boolean {
+  if (ts.isPrivateIdentifier(member.name)) return true;
+  return (ts.getModifiers(member) ?? []).some((m) => m.kind === ts.SyntaxKind.PrivateKeyword);
+}
+
+// The fields of the classes of one state file that are not private.
+function publicFieldsOf(file: string, text: string): string[] {
+  const source = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true);
+  const found: string[] = [];
+  const report = (node: ts.Node, name: string) => {
+    const line = source.getLineAndCharacterOfPosition(node.getStart()).line + 1;
+    found.push(`${file}:${line}: public field ${name}`);
+  };
+  const visit = (node: ts.Node): void => {
+    if (ts.isClassLike(node)) {
+      for (const member of node.members) {
+        if (ts.isPropertyDeclaration(member) && !isPrivateField(member)) {
+          report(member, member.name.getText());
+        }
+        if (ts.isConstructorDeclaration(member)) {
+          for (const parameter of member.parameters) {
+            if (
+              ts.isParameterPropertyDeclaration(parameter, member) &&
+              !isPrivateField(parameter)
+            ) {
+              report(parameter, parameter.name.getText());
+            }
+          }
+        }
+      }
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(source);
+  return found;
+}
+
+// The state file of each variant: `src/domain/variants/<variant>/<name>-state.ts`.
+function stateFiles(): string[] {
+  const variants = path.join(repoRoot, 'src/domain/variants');
+  return readdirSync(variants, { recursive: true, encoding: 'utf8' })
+    .map((file) => path.posix.join('src/domain/variants', file.split(path.sep).join('/')))
+    .filter((file) => /^src\/domain\/variants\/[^/]+\/[^/]+-state\.ts$/.test(file))
+    .sort();
 }
 
 function sourceFiles(): string[] {
@@ -119,7 +184,7 @@ function sourceFiles(): string[] {
   );
 }
 
-describe('state writes gate (R7)', () => {
+describe('state writes gate (R7 and R8)', () => {
   it('should_report_each_foreign_write_when_a_source_changes_another_object', () => {
     const text = [
       'state.score += points;',
@@ -169,6 +234,52 @@ describe('state writes gate (R7)', () => {
       'src/domain/engine/game-engine.ts:2: calls this.board.vacate()',
       'src/domain/engine/game-engine.ts:3: calls space.vacate()',
     ]);
+  });
+
+  it('should_report_object_assign_when_a_source_assigns_into_another_object', () => {
+    const text = [
+      'Object.assign(state, { score: 1 });',
+      'Object.assign(this, values);',
+      'Object.assign({}, state);',
+    ].join('\n');
+
+    expect(scanSource('src/domain/variants/hexa-sort/sort-rules.ts', text)).toEqual([
+      'src/domain/variants/hexa-sort/sort-rules.ts:1: assigns into state',
+    ]);
+  });
+
+  it('should_report_each_public_field_when_a_variant_state_declares_one', () => {
+    const text = [
+      'class LinesState {',
+      '  readonly tray: Piece[] = [];',
+      '  public streak = 0;',
+      '  private score = 0;',
+      '  #hidden = 0;',
+      '  constructor(readonly board: Board, public source: Source, private readonly id: Id) {}',
+      '}',
+    ].join('\n');
+
+    expect(publicFieldsOf('src/domain/variants/hexa-lines/lines-state.ts', text)).toEqual([
+      'src/domain/variants/hexa-lines/lines-state.ts:2: public field tray',
+      'src/domain/variants/hexa-lines/lines-state.ts:3: public field streak',
+      'src/domain/variants/hexa-lines/lines-state.ts:6: public field board',
+      'src/domain/variants/hexa-lines/lines-state.ts:6: public field source',
+    ]);
+  });
+
+  it('should_find_no_public_field_when_the_four_variant_states_are_scanned', () => {
+    const files = stateFiles();
+    const fields = files.flatMap((file) =>
+      publicFieldsOf(file, readFileSync(path.join(repoRoot, file), 'utf8')),
+    );
+
+    expect(files).toEqual([
+      'src/domain/variants/hexa-fit/fit-state.ts',
+      'src/domain/variants/hexa-lines/lines-state.ts',
+      'src/domain/variants/hexa-merge/merge-state.ts',
+      'src/domain/variants/hexa-sort/sort-state.ts',
+    ]);
+    expect(fields).toEqual([]);
   });
 
   it('should_find_no_foreign_write_when_the_domain_and_the_use_cases_are_scanned', () => {

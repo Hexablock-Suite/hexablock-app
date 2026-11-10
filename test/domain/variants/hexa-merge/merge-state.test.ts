@@ -33,11 +33,14 @@ function draws(...made: [number, number][]) {
 // Everything that a refused input must leave unchanged.
 function facts(state: HexMergeState) {
   return {
-    board: state.board.cells().map(([at, tile]) => [hexTopology.key(at), tile.points()]),
-    left: state.tiles.hasNext(),
-    targetReached: state.targetReached,
-    merged: state.merged.map((tile) => tile.points()),
-    score: state.score,
+    board: state
+      .snapshot()
+      .board.cells()
+      .map(([at, tile]) => [hexTopology.key(at), tile.points()]),
+    left: state.snapshot().tiles.clone().hasNext(),
+    targetReached: state.snapshot().targetReached,
+    merged: state.snapshot().merged.map((tile) => tile.points()),
+    score: state.snapshot().score,
   };
 }
 
@@ -53,12 +56,12 @@ describe('MergeState', () => {
 
     const first = empty[0]!;
     const last = empty[empty.length - 1]!;
-    expect(values(state)).toEqual({
+    expect(values(state.snapshot())).toEqual({
       [key(0, 0)]: 2,
       [hexTopology.key(first)]: 4,
       [hexTopology.key(last)]: 2,
     });
-    expect(state.tiles.hasNext()).toBe(false);
+    expect(state.snapshot().tiles.clone().hasNext()).toBe(false);
   });
 
   it('should_keep_the_board_when_the_source_has_ended_and_a_new_tile_is_asked', () => {
@@ -82,7 +85,7 @@ describe('MergeState', () => {
     full.addNewTile();
 
     expect(facts(full)).toEqual(before);
-    expect(full.tiles.hasNext()).toBe(true);
+    expect(full.snapshot().tiles.clone().hasNext()).toBe(true);
   });
 
   it('should_merge_the_tiles_in_place_and_keep_the_board_and_the_source_when_tiles_slide', () => {
@@ -91,19 +94,19 @@ describe('MergeState', () => {
       [hex(0, 0), 2],
       [hex(0, 1), 4],
     ]);
-    const { board, tiles } = state;
+    const { board, tiles } = state.snapshot();
     const before = state.clone();
 
     const result: unknown = state.slide(Slide.of<HexAxis>('q', 'forward'), MergeTile.of(2048));
 
     expect(result).toBeUndefined();
-    expect(values(state)).toEqual({ [key(1, 0)]: 4, [key(0, 1)]: 4 });
-    expect(state.merged).toEqual([MergeTile.of(4)]);
-    expect(state.targetReached).toBe(false);
-    expect([state.board, state.tiles]).toEqual([board, tiles]);
-    expect(state.board).toBe(board);
-    expect(state.tiles).toBe(tiles);
-    expect(values(before)).toEqual({ [key(-1, 0)]: 2, [key(0, 0)]: 2, [key(0, 1)]: 4 });
+    expect(values(state.snapshot())).toEqual({ [key(1, 0)]: 4, [key(0, 1)]: 4 });
+    expect(state.snapshot().merged).toEqual([MergeTile.of(4)]);
+    expect(state.snapshot().targetReached).toBe(false);
+    // The board keeps its id, and the source keeps its position: the slide draws nothing.
+    expect(state.snapshot().board.equals(board)).toBe(true);
+    expect(state.snapshot().tiles.clone().hasNext()).toBe(tiles.clone().hasNext());
+    expect(values(before.snapshot())).toEqual({ [key(-1, 0)]: 2, [key(0, 0)]: 2, [key(0, 1)]: 4 });
   });
 
   // `Board.cells()` lists the cells in first-write order, and `MoveResult.cells` shows it.
@@ -117,7 +120,12 @@ describe('MergeState', () => {
 
     state.slide(Slide.of<HexAxis>('q', 'backward'), MergeTile.of(2048));
 
-    expect(state.board.cells().map(([at, tile]) => [hexTopology.key(at), valueOf(tile)])).toEqual([
+    expect(
+      state
+        .snapshot()
+        .board.cells()
+        .map(([at, tile]) => [hexTopology.key(at), valueOf(tile)]),
+    ).toEqual([
       [key(-1, 0), 4],
       [key(-1, 1), 8],
       [key(0, -1), 2],
@@ -134,11 +142,11 @@ describe('MergeState', () => {
     const later = mergeState([[hex(0, 0), 2]]);
     later.slide(Slide.of<HexAxis>('q', 'forward'), MergeTile.of(16));
 
-    expect(state.targetReached).toBe(true);
-    expect(state.merged).toEqual([MergeTile.of(16)]);
-    expect(later.targetReached).toBe(false);
+    expect(state.snapshot().targetReached).toBe(true);
+    expect(state.snapshot().merged).toEqual([MergeTile.of(16)]);
+    expect(later.snapshot().targetReached).toBe(false);
     state.slide(Slide.of<HexAxis>('q', 'forward'), MergeTile.of(16));
-    expect([state.targetReached, state.merged]).toEqual([true, []]);
+    expect([state.snapshot().targetReached, state.snapshot().merged]).toEqual([true, []]);
   });
 
   it('should_tell_whether_a_slide_changes_the_board_when_a_slide_is_asked', () => {
@@ -168,15 +176,15 @@ describe('MergeState', () => {
     state.addPoints(4);
     state.addPoints(8);
 
-    expect(state.score).toBe(12);
+    expect(state.snapshot().score).toBe(12);
     expect(() => state.addPoints(Number.NEGATIVE_INFINITY)).toThrow(
       new RangeError('The points of a turn must be a finite number, not -Infinity.'),
     );
-    expect(state.score).toBe(12);
+    expect(state.snapshot().score).toBe(12);
   });
 
   it('should_throw_a_range_error_when_a_state_is_built_with_a_score_that_is_not_finite', () => {
-    const board = mergeState([]).board;
+    const board = mergeState([]).snapshot().board.clone();
 
     expect(
       () => new MergeState(STATE_ID, MATCH_ID, board, noNewTiles(), false, [], Number.NaN),
@@ -196,7 +204,10 @@ describe('MergeState', () => {
       true,
       true,
     ]);
-    expect([first.belongsTo(MATCH_ID), first.board.equals(before.board)]).toEqual([true, true]);
+    expect([
+      first.belongsTo(MATCH_ID),
+      first.snapshot().board.equals(before.snapshot().board),
+    ]).toEqual([true, true]);
   });
 
   it('should_be_another_state_when_two_states_of_one_match_have_different_state_ids', () => {

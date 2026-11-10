@@ -72,9 +72,15 @@ describe('LinesFactory', () => {
     // The draw picks among the shapes and the colors of the settings.
     expect(new Set(pieces).size).toBeGreaterThan(1);
     expect(
-      linesFactory(42).createInitialState(MATCH_ID, STATE_ID, BOARD_ID).tray.map(describe_),
+      linesFactory(42)
+        .createInitialState(MATCH_ID, STATE_ID, BOARD_ID)
+        .snapshot()
+        .tray.map(describe_),
     ).toEqual(
-      linesFactory(42).createInitialState(MATCH_ID, STATE_ID, BOARD_ID).tray.map(describe_),
+      linesFactory(42)
+        .createInitialState(MATCH_ID, STATE_ID, BOARD_ID)
+        .snapshot()
+        .tray.map(describe_),
     );
   });
 

@@ -49,13 +49,13 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
   constructor(
     private readonly stateId: GameStateId,
     private readonly matchId: MatchId,
-    readonly board: Board<Color, TCoord, string>,
-    public tray: readonly Piece<Color, TCoord>[],
-    public source: IPieceSource<Piece<Color, TCoord>>,
-    public streak = 0,
-    public linesCleared = 0,
-    public cellsPlaced = 0,
-    public score = 0,
+    private readonly board: Board<Color, TCoord, string>,
+    private tray: readonly Piece<Color, TCoord>[],
+    private source: IPieceSource<Piece<Color, TCoord>>,
+    private streak = 0,
+    private linesCleared = 0,
+    private cellsPlaced = 0,
+    private score = 0,
   ) {
     checkValues(tray, streak, linesCleared, cellsPlaced);
     checkScore(score);

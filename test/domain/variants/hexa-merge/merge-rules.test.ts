@@ -241,7 +241,7 @@ describe('MergeRules', () => {
     expect(rules.evaluate(open)).toBe('playing');
     expect([...rules.validMoves(open)]).toHaveLength(6);
     expect(outcome).toBe('playing');
-    expect(values(engine.snapshot())).toEqual(values(stuck));
+    expect(values(engine.snapshot())).toEqual(values(stuck.snapshot()));
   });
 });
 
@@ -372,14 +372,15 @@ describe('MergeRules in place', () => {
       [hex(0, 0), 2],
       [hex(1, 0), 2],
     ]);
-    const board = state.board;
+    const board = state.snapshot().board;
 
     const result = rules.apply(state, Slide.of<HexAxis>('q', 'backward'));
 
     expect(result).toBe(state);
-    expect(state.board).toBe(board);
-    expect(values(state)).toEqual({ [hexTopology.key(hex(-1, 0))]: 4 });
-    expect(state.merged).toEqual([MergeTile.of(4)]);
+    // The board keeps its id: the same board changes in place.
+    expect(state.snapshot().board.equals(board)).toBe(true);
+    expect(values(state.snapshot())).toEqual({ [hexTopology.key(hex(-1, 0))]: 4 });
+    expect(state.snapshot().merged).toEqual([MergeTile.of(4)]);
   });
 
   // The engine plays a turn on a copy of its state. So a turn that throws after the slide

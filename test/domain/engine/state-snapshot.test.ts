@@ -282,3 +282,64 @@ describe('the photo outside the state', () => {
     expect(new FitScoring().score(fit.snapshot(), fit.snapshot())).toBe(0);
   });
 });
+
+// R8: the fields of the four states are private. A reader outside a state reads its photo.
+// So the compiler refuses a read, a write, an array change or a draw on a field of a state.
+describe('the fields of a state', () => {
+  it('should_reject_at_compile_time_when_a_caller_reads_or_changes_a_field_of_a_state', () => {
+    const lines = linesFactory().createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
+    const fit = fitFactory().createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
+    const sort = sortFactory().createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
+    const merge = mergeFactory().createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
+    const readers = [
+      // @ts-expect-error `LinesState.board` is private.
+      () => lines.board,
+      // @ts-expect-error `LinesState.tray` is private.
+      () => lines.tray,
+      // @ts-expect-error `LinesState.source` is private.
+      () => lines.source.next(),
+      // @ts-expect-error `LinesState.streak` is private.
+      () => lines.streak,
+      // @ts-expect-error `LinesState.linesCleared` is private.
+      () => lines.linesCleared,
+      // @ts-expect-error `LinesState.cellsPlaced` is private.
+      () => lines.cellsPlaced,
+      // @ts-expect-error `LinesState.score` is private.
+      () => (lines.score = 1),
+      // @ts-expect-error `FitState.board` is private.
+      () => fit.board,
+      // @ts-expect-error `FitState.moves` is private.
+      () => (fit.moves += 1),
+      // @ts-expect-error `FitState.score` is private.
+      () => fit.score,
+      // @ts-expect-error `SortState.board` is private.
+      () => sort.board,
+      // @ts-expect-error `SortState.source` is private.
+      () => sort.source.next(),
+      // @ts-expect-error `SortState.goalsNeeded` is private.
+      () => sort.goalsNeeded,
+      // @ts-expect-error `SortState.offered` is private.
+      () => sort.offered,
+      // @ts-expect-error `SortState.goalsDone` is private.
+      () => sort.goalsDone,
+      // @ts-expect-error `SortState.clearedTiles` is private.
+      () => sort.clearedTiles.push(1),
+      // @ts-expect-error `SortState.placedAt` is private.
+      () => sort.placedAt,
+      // @ts-expect-error `SortState.score` is private.
+      () => sort.score,
+      // @ts-expect-error `MergeState.board` is private.
+      () => merge.board,
+      // @ts-expect-error `MergeState.tiles` is private.
+      () => merge.tiles.next(),
+      // @ts-expect-error `MergeState.targetReached` is private.
+      () => merge.targetReached,
+      // @ts-expect-error `MergeState.merged` is private.
+      () => merge.merged,
+      // @ts-expect-error `MergeState.score` is private.
+      () => merge.score,
+    ];
+
+    expect(readers).toHaveLength(23);
+  });
+});

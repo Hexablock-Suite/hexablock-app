@@ -42,11 +42,11 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
   private constructor(
     private readonly stateId: GameStateId,
     private readonly matchId: MatchId,
-    readonly board: Board<PieceId, TCoord, string>,
+    private readonly board: Board<PieceId, TCoord, string>,
     private readonly pieces: ReadonlyMap<string, Piece<PieceId, TCoord>>,
     private readonly placements: Map<string, Placement<TCoord>>,
-    public moves = 0,
-    public score = 0,
+    private moves = 0,
+    private score = 0,
   ) {}
 
   // Two pieces with the same id throw a RangeError, because a move names its piece by id.

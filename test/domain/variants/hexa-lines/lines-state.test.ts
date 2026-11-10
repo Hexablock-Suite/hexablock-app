@@ -26,13 +26,13 @@ const domino = piece(square(0, 0), square(1, 0));
 // Everything that a refused input must leave unchanged.
 function facts(state: LinesState<SquareCoord>) {
   return {
-    filled: filledKeys(state),
-    tray: [...state.tray],
-    left: state.source.hasNext(),
-    streak: state.streak,
-    linesCleared: state.linesCleared,
-    cellsPlaced: state.cellsPlaced,
-    score: state.score,
+    filled: filledKeys(state.snapshot()),
+    tray: [...state.snapshot().tray],
+    left: state.snapshot().source.clone().hasNext(),
+    streak: state.snapshot().streak,
+    linesCleared: state.snapshot().linesCleared,
+    cellsPlaced: state.snapshot().cellsPlaced,
+    score: state.snapshot().score,
   };
 }
 
@@ -50,11 +50,11 @@ describe('LinesState', () => {
 
     state.placePiece(new PlacePiece(0, square(1, 2)));
 
-    expect(filledKeys(state)).toEqual(['1,2', '2,2']);
-    expect(state.board.get(square(1, 2))).toBe(red);
-    expect(state.cellsPlaced).toBe(2);
-    expect(state.tray).toEqual([one]);
-    expect(state.source.hasNext()).toBe(true);
+    expect(filledKeys(state.snapshot())).toEqual(['1,2', '2,2']);
+    expect(state.snapshot().board.get(square(1, 2))).toBe(red);
+    expect(state.snapshot().cellsPlaced).toBe(2);
+    expect(state.snapshot().tray).toEqual([one]);
+    expect(state.snapshot().source.clone().hasNext()).toBe(true);
   });
 
   it('should_fill_the_tray_from_the_source_when_the_last_tray_piece_is_placed', () => {
@@ -63,9 +63,9 @@ describe('LinesState', () => {
 
     state.placePiece(new PlacePiece(0, square(0, 0)));
 
-    expect(state.tray).toEqual([a, b, c]);
-    expect(state.source.hasNext()).toBe(true);
-    expect(state.cellsPlaced).toBe(1);
+    expect(state.snapshot().tray).toEqual([a, b, c]);
+    expect(state.snapshot().source.clone().hasNext()).toBe(true);
+    expect(state.snapshot().cellsPlaced).toBe(1);
   });
 
   it('should_fill_the_tray_with_fewer_pieces_when_the_source_ends_first', () => {
@@ -73,8 +73,8 @@ describe('LinesState', () => {
 
     state.placePiece(new PlacePiece(0, square(0, 0)));
 
-    expect(state.tray).toEqual([domino]);
-    expect(state.source.hasNext()).toBe(false);
+    expect(state.snapshot().tray).toEqual([domino]);
+    expect(state.snapshot().source.clone().hasNext()).toBe(false);
   });
 
   it('should_draw_a_full_tray_when_a_game_starts', () => {
@@ -85,8 +85,8 @@ describe('LinesState', () => {
       new FixedListPieceSource([one, domino, one, domino]),
     );
 
-    expect(state.tray).toEqual([one, domino, one]);
-    expect(state.source.hasNext()).toBe(true);
+    expect(state.snapshot().tray).toEqual([one, domino, one]);
+    expect(state.snapshot().source.clone().hasNext()).toBe(true);
     expect(facts(state)).toMatchObject({ streak: 0, linesCleared: 0, cellsPlaced: 0, score: 0 });
   });
 
@@ -137,15 +137,15 @@ describe('LinesState', () => {
     // The two lines share the cell (0,0). It is vacated once.
     state.clearLines([row, column]);
 
-    expect(filledKeys(state)).toEqual(['2,2']);
-    expect(state.linesCleared).toBe(2);
-    expect(state.streak).toBe(1);
+    expect(filledKeys(state.snapshot())).toEqual(['2,2']);
+    expect(state.snapshot().linesCleared).toBe(2);
+    expect(state.snapshot().streak).toBe(1);
 
     state.clearLines([]);
 
-    expect(filledKeys(state)).toEqual(['2,2']);
-    expect(state.linesCleared).toBe(0);
-    expect(state.streak).toBe(0);
+    expect(filledKeys(state.snapshot())).toEqual(['2,2']);
+    expect(state.snapshot().linesCleared).toBe(0);
+    expect(state.snapshot().streak).toBe(0);
   });
 
   it('should_add_one_to_the_streak_when_two_placements_in_a_row_clear_a_line', () => {
@@ -157,9 +157,9 @@ describe('LinesState', () => {
     state.clearLines([[square(0, 0), square(1, 0)]]);
     state.clearLines([[square(0, 1), square(1, 1)]]);
 
-    expect(state.streak).toBe(2);
-    expect(state.linesCleared).toBe(1);
-    expect(filledKeys(state)).toEqual([]);
+    expect(state.snapshot().streak).toBe(2);
+    expect(state.snapshot().linesCleared).toBe(1);
+    expect(filledKeys(state.snapshot())).toEqual([]);
   });
 
   it('should_throw_a_range_error_and_keep_the_state_when_a_cleared_line_holds_a_free_cell', () => {
@@ -185,7 +185,7 @@ describe('LinesState', () => {
     state.addPoints(0);
     state.addPoints(3);
 
-    expect(state.score).toBe(15);
+    expect(state.snapshot().score).toBe(15);
   });
 
   it('should_throw_a_range_error_and_keep_the_score_when_the_points_are_not_finite', () => {
@@ -197,7 +197,7 @@ describe('LinesState', () => {
         new RangeError(`The points of a turn must be a finite number, not ${points}.`),
       );
     }
-    expect(state.score).toBe(5);
+    expect(state.snapshot().score).toBe(5);
   });
 
   it('should_throw_a_range_error_when_a_state_is_built_in_an_invalid_form', () => {

@@ -56,11 +56,11 @@ export class MergeState<
   constructor(
     private readonly stateId: GameStateId,
     private readonly matchId: MatchId,
-    readonly board: Board<TCell, TCoord, TAxis>,
-    public tiles: IPieceSource<NewTile<TCell>>,
-    public targetReached = false,
-    public merged: readonly TCell[] = [],
-    public score = 0,
+    private readonly board: Board<TCell, TCoord, TAxis>,
+    private tiles: IPieceSource<NewTile<TCell>>,
+    private targetReached = false,
+    private merged: readonly TCell[] = [],
+    private score = 0,
   ) {
     if (!Number.isFinite(score)) {
       throw new RangeError(`The score of a state must be a finite number, not ${score}.`);

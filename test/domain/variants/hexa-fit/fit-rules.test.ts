@@ -223,7 +223,7 @@ describe('FitRules', () => {
     const removed = played(rules, both, new RemoveFitPiece(A));
     const again = played(rules, removed, new PlaceFitPiece(A, NO_TURN, square(0, 0)));
 
-    expect(again.board.cells()).toEqual([
+    expect(again.snapshot().board.cells()).toEqual([
       [square(0, 1), B],
       [square(1, 1), B],
       [square(0, 0), A],

@@ -10,14 +10,18 @@ import { names, row, sortState, stack, tiles } from '../../../support/variants/h
 
 // Everything that a refused input must leave unchanged.
 function facts(state: SortState<SquareCoord>) {
+  const { offered } = state.snapshot();
   return {
-    board: state.board.cells().map(([at, cell]) => [at, names(cell)]),
-    offered: state.offered === undefined ? undefined : names(state.offered.content),
-    left: state.source.hasNext(),
-    goalsDone: state.goalsDone,
-    clearedTiles: [...state.clearedTiles],
-    placedAt: state.placedAt,
-    score: state.score,
+    board: state
+      .snapshot()
+      .board.cells()
+      .map(([at, cell]) => [at, names(cell)]),
+    offered: offered === undefined ? undefined : names(offered.content),
+    left: state.snapshot().source.clone().hasNext(),
+    goalsDone: state.snapshot().goalsDone,
+    clearedTiles: [...state.snapshot().clearedTiles],
+    placedAt: state.snapshot().placedAt,
+    score: state.snapshot().score,
   };
 }
 
@@ -27,11 +31,11 @@ describe('SortState', () => {
 
     state.placeOfferedStack(square(1, 0));
 
-    expect(names(state.board.get(square(1, 0)))).toEqual(['red']);
-    expect(state.placedAt).toEqual(square(1, 0));
-    expect(state.clearedTiles).toEqual([]);
-    expect(names(state.offered?.content)).toEqual(['blue', 'blue']);
-    expect(state.source.hasNext()).toBe(false);
+    expect(names(state.snapshot().board.get(square(1, 0)))).toEqual(['red']);
+    expect(state.snapshot().placedAt).toEqual(square(1, 0));
+    expect(state.snapshot().clearedTiles).toEqual([]);
+    expect(names(state.snapshot().offered?.content)).toEqual(['blue', 'blue']);
+    expect(state.snapshot().source.clone().hasNext()).toBe(false);
   });
 
   it('should_offer_no_stack_when_the_last_stack_is_placed', () => {
@@ -39,7 +43,7 @@ describe('SortState', () => {
 
     state.placeOfferedStack(square(0, 0));
 
-    expect(state.offered).toBeUndefined();
+    expect(state.snapshot().offered).toBeUndefined();
   });
 
   it('should_place_the_stack_when_the_cell_holds_an_empty_stack', () => {
@@ -50,7 +54,7 @@ describe('SortState', () => {
 
     state.placeOfferedStack(square(0, 0));
 
-    expect(names(state.board.get(square(0, 0)))).toEqual(['red']);
+    expect(names(state.snapshot().board.get(square(0, 0)))).toEqual(['red']);
   });
 
   it('should_tell_whether_the_offered_stack_can_go_on_a_cell_when_a_cell_is_asked', () => {
@@ -102,10 +106,10 @@ describe('SortState', () => {
 
     state.moveRun(square(0, 0), square(1, 0));
 
-    expect(names(state.board.get(square(0, 0)))).toEqual(['blue']);
-    expect(names(state.board.get(square(1, 0)))).toEqual(['green', 'red', 'red', 'red']);
-    expect(state.goalsDone).toBe(0);
-    expect(state.clearedTiles).toEqual([]);
+    expect(names(state.snapshot().board.get(square(0, 0)))).toEqual(['blue']);
+    expect(names(state.snapshot().board.get(square(1, 0)))).toEqual(['green', 'red', 'red', 'red']);
+    expect(state.snapshot().goalsDone).toBe(0);
+    expect(state.snapshot().clearedTiles).toEqual([]);
   });
 
   it('should_throw_a_range_error_and_keep_the_state_when_the_run_cannot_move', () => {
@@ -141,10 +145,10 @@ describe('SortState', () => {
 
     state.clearStack(square(0, 0));
 
-    expect(state.board.get(square(0, 0))?.isEmpty()).toBe(true);
-    expect(state.board.cells()).toHaveLength(2);
-    expect(state.goalsDone).toBe(1);
-    expect(state.clearedTiles).toEqual([11]);
+    expect(state.snapshot().board.get(square(0, 0))?.isEmpty()).toBe(true);
+    expect(state.snapshot().board.cells()).toHaveLength(2);
+    expect(state.snapshot().goalsDone).toBe(1);
+    expect(state.snapshot().clearedTiles).toEqual([11]);
   });
 
   it('should_throw_a_range_error_and_keep_the_state_when_the_cell_has_no_stack_to_clear', () => {
@@ -168,11 +172,11 @@ describe('SortState', () => {
     state.addPoints(100);
     state.addPoints(10);
 
-    expect(state.score).toBe(110);
+    expect(state.snapshot().score).toBe(110);
     expect(() => state.addPoints(Number.NaN)).toThrow(
       new RangeError('The points of a turn must be a finite number, not NaN.'),
     );
-    expect(state.score).toBe(110);
+    expect(state.snapshot().score).toBe(110);
   });
 
   // The state has its own `GameStateId`, and it still knows its match (classes.md decision 26).

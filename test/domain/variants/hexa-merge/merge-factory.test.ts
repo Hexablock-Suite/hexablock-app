@@ -77,9 +77,9 @@ describe('MergeFactory', () => {
   });
 
   it('should_give_the_game_of_seed_zero_when_the_merge_settings_hold_a_negative_zero_seed', () => {
-    expect(values(mergeFactory(-0).createInitialState(MATCH_ID, STATE_ID, BOARD_ID))).toEqual(
-      values(mergeFactory(0).createInitialState(MATCH_ID, STATE_ID, BOARD_ID)),
-    );
+    expect(
+      values(mergeFactory(-0).createInitialState(MATCH_ID, STATE_ID, BOARD_ID).snapshot()),
+    ).toEqual(values(mergeFactory(0).createInitialState(MATCH_ID, STATE_ID, BOARD_ID).snapshot()));
   });
 
   it('should_throw_a_range_error_when_the_merge_settings_hold_a_chance_of_a_four_that_is_not_a_number', () => {
@@ -100,7 +100,7 @@ describe('MergeFactory', () => {
 
     expect(START_TILES).toBe(2);
     expect(factory.createBoard(BOARD_ID).shape.cells).toHaveLength(1);
-    expect(Object.keys(values(initial))).toEqual(['0,0']);
-    expect([2, 4]).toContain(values(initial)['0,0']);
+    expect(Object.keys(values(initial.snapshot()))).toEqual(['0,0']);
+    expect([2, 4]).toContain(values(initial.snapshot())['0,0']);
   });
 });

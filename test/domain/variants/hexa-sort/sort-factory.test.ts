@@ -31,8 +31,8 @@ describe('SortFactory', () => {
 
     expect(factory.gameId.equals(GameId.of('hexa-sort'))).toBe(true);
     expect(factory.createBoard(BOARD_ID).shape.cells).toHaveLength(4);
-    expect(names(initial.offered?.content)).toEqual(['red', 'red']);
-    expect(initial.goalsNeeded.equals(GoalCount.of(5))).toBe(true);
+    expect(names(initial.snapshot().offered?.content)).toEqual(['red', 'red']);
+    expect(initial.snapshot().goalsNeeded.equals(GoalCount.of(5))).toBe(true);
     expect(outcome).toBe('playing');
     expect(chipsAt(engine, 0, 0)).toEqual(['red', 'red']);
     expect(names(engine.snapshot().offered?.content)).toEqual(['blue']);
@@ -62,8 +62,8 @@ describe('SortFactory', () => {
     const first = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
     const second = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
 
-    expect(names(first.offered?.content)).toEqual(['red']);
-    expect(names(second.offered?.content)).toEqual(['red']);
+    expect(names(first.snapshot().offered?.content)).toEqual(['red']);
+    expect(names(second.snapshot().offered?.content)).toEqual(['red']);
     expect(names(source.next().content)).toEqual(['red']);
   });
 });
