@@ -18,7 +18,8 @@ import { SquareGeometry } from '../../../src/domain/engine/square-geometry';
 import { TriangleGeometry } from '../../../src/domain/engine/triangle-geometry';
 import { Turns } from '../../../src/domain/engine/turns';
 import type { IVariantFactory } from '../../../src/domain/engine/variant-factory';
-import { FitFactory, type FitLevel } from '../../../src/domain/variants/hexa-fit/fit-factory';
+import { FitFactory } from '../../../src/domain/variants/hexa-fit/fit-factory';
+import { FitLevel } from '../../../src/domain/variants/hexa-fit/fit-level';
 import { PlaceFitPiece } from '../../../src/domain/variants/hexa-fit/fit-move';
 import { LinesFactory } from '../../../src/domain/variants/hexa-lines/lines-factory';
 import {
@@ -136,11 +137,7 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
   // A level of two cells and one domino that covers them.
   function fitLevel(named: TopologyId): FitLevel<TCoord> {
     const domino = new ShapeGroup([new CellNode(origin), new CellNode(next)]);
-    return {
-      topology: named,
-      figure: BoardShape.of([origin, next]),
-      pieces: [new Piece(domino, A)],
-    };
+    return FitLevel.of(named, BoardShape.of([origin, next]), [new Piece(domino, A)]);
   }
 
   return () => {

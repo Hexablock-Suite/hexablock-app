@@ -64,7 +64,7 @@
       <h1>Hexa Fit: levels built and checked by a Builder</h1>
 
       <svg
-        viewBox="0 0 1040 1574"
+        viewBox="0 0 1040 1782"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="fit-title fit-desc"
@@ -140,7 +140,7 @@
           x="24"
           y="24"
           width="992"
-          height="1350"
+          height="1558"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -209,7 +209,7 @@
           x="192"
           y="706"
           width="752"
-          height="200"
+          height="408"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -681,7 +681,7 @@
           x="696"
           y="734"
           width="232"
-          height="120"
+          height="328"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -710,18 +710,112 @@
         >
           FitLevel
         </text>
-        <text x="712" y="814" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + figure: ShapeGroup&lt;TCoord&gt;
-        </text>
-        <text x="712" y="830" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + pieces: Piece&lt;PieceId, TCoord&gt;[]
-        </text>
-        <text x="712" y="846" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + witness: Placement&lt;TCoord&gt;[]
-        </text>
-
         <text x="712" y="798" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + header: LevelHeader
+        </text>
+        <text x="712" y="814" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - topology: TopologyId
+        </text>
+        <text x="712" y="830" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - figure: BoardShape&lt;TCoord&gt;
+        </text>
+        <text x="712" y="846" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - pieces: Piece&lt;PieceId, TCoord&gt;[]
+        </text>
+        <text x="712" y="862" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + witness: Placement&lt;TCoord&gt;[]
+        </text>
+        <line x1="696" y1="870" x2="928" y2="870" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="712"
+          y="886"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + of(topology: TopologyId, figure:
+        </text>
+        <text
+          x="720"
+          y="900"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          BoardShape&lt;TCoord&gt;, pieces:
+        </text>
+        <text
+          x="720"
+          y="914"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          Piece&lt;PieceId, TCoord&gt;[]):
+        </text>
+        <text
+          x="720"
+          y="928"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          FitLevel&lt;TCoord&gt;
+        </text>
+        <text x="712" y="942" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + isOf(family: TopologyId): boolean
+        </text>
+        <text x="712" y="956" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + wrongFamily(family: TopologyId):
+        </text>
+        <text x="720" y="970" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          RangeError
+        </text>
+        <text x="712" y="984" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + figureTree(): ShapeGroup&lt;TCoord&gt;
+        </text>
+        <text x="712" y="998" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + trayPieces(): Piece&lt;PieceId,
+        </text>
+        <text
+          x="720"
+          y="1012"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          TCoord&gt;[]
+        </text>
+        <text
+          x="712"
+          y="1026"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + equals(other: FitLevel&lt;TCoord&gt;,
+        </text>
+        <text
+          x="720"
+          y="1040"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          topology: { key(c: TCoord):
+        </text>
+        <text
+          x="720"
+          y="1054"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          CoordKey }): boolean
         </text>
         <!-- Class: FitLevelBuilder (focal, Concrete Builder) -->
         <rect
@@ -909,7 +1003,7 @@
         <!-- Class: PieceId (value object) -->
         <rect
           x="40"
-          y="954"
+          y="1162"
           width="256"
           height="112"
           rx="6"
@@ -917,10 +1011,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="40" y1="1002" x2="296" y2="1002" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="40" y1="1210" x2="296" y2="1210" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="168"
-          y="972"
+          y="1180"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -931,7 +1025,7 @@
         </text>
         <text
           x="168"
-          y="990"
+          y="1198"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -940,20 +1034,20 @@
         >
           PieceId
         </text>
-        <text x="56" y="1018" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="56" y="1226" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + value: string
         </text>
-        <line x1="40" y1="1026" x2="296" y2="1026" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="56" y="1042" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="40" y1="1234" x2="296" y2="1234" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="56" y="1250" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + of(value: string): PieceId
         </text>
-        <text x="56" y="1058" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="56" y="1266" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: PieceId): boolean
         </text>
         <!-- Class: Placement (value object) -->
         <rect
           x="336"
-          y="954"
+          y="1162"
           width="648"
           height="160"
           rx="6"
@@ -961,10 +1055,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="336" y1="1002" x2="984" y2="1002" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="336" y1="1210" x2="984" y2="1210" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="660"
-          y="972"
+          y="1180"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -975,7 +1069,7 @@
         </text>
         <text
           x="660"
-          y="990"
+          y="1198"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -986,7 +1080,7 @@
         </text>
         <text
           x="352"
-          y="1018"
+          y="1226"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -995,17 +1089,17 @@
         </text>
         <text
           x="352"
-          y="1034"
+          y="1242"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
           - at: TCoord
         </text>
-        <line x1="336" y1="1042" x2="984" y2="1042" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="336" y1="1250" x2="984" y2="1250" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="352"
-          y="1058"
+          y="1266"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1015,7 +1109,7 @@
         </text>
         <text
           x="352"
-          y="1074"
+          y="1282"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1024,7 +1118,7 @@
         </text>
         <text
           x="352"
-          y="1090"
+          y="1298"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1034,7 +1128,7 @@
         </text>
         <text
           x="352"
-          y="1106"
+          y="1314"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1044,7 +1138,7 @@
         <!-- Class: PlaceFitPiece (value object, decision 43) -->
         <rect
           x="40"
-          y="1134"
+          y="1342"
           width="346"
           height="224"
           rx="6"
@@ -1052,10 +1146,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="40" y1="1182" x2="386" y2="1182" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="40" y1="1390" x2="386" y2="1390" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="213"
-          y="1152"
+          y="1360"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1066,7 +1160,7 @@
         </text>
         <text
           x="213"
-          y="1170"
+          y="1378"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1075,42 +1169,42 @@
         >
           PlaceFitPiece
         </text>
-        <text x="56" y="1198" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="56" y="1406" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - pieceId: PieceId
         </text>
-        <text x="56" y="1214" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="56" y="1422" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - rotation: Turns
         </text>
-        <text x="56" y="1230" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="56" y="1438" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - at: TCoord
         </text>
-        <line x1="40" y1="1238" x2="386" y2="1238" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="56" y="1254" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="40" y1="1446" x2="386" y2="1446" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="56" y="1462" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + PlaceFitPiece(pieceId: PieceId, rotation: Turns,
         </text>
-        <text x="67" y="1270" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="67" y="1478" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           at: TCoord)
         </text>
-        <text x="56" y="1286" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="56" y="1494" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + piece(): PieceId
         </text>
-        <text x="56" y="1302" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="56" y="1510" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + placement(topology: GridTopology&lt;TCoord&gt;):
         </text>
-        <text x="67" y="1318" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="67" y="1526" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Placement&lt;TCoord&gt;
         </text>
-        <text x="56" y="1334" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="56" y="1542" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: FitMove&lt;TCoord&gt;, topology: { key(c: TCoord):
         </text>
-        <text x="67" y="1350" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="67" y="1558" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           CoordKey }): boolean
         </text>
 
         <!-- Class: RemoveFitPiece (value object, decision 43) -->
         <rect
           x="400"
-          y="1134"
+          y="1342"
           width="250"
           height="128"
           rx="6"
@@ -1118,10 +1212,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="400" y1="1182" x2="650" y2="1182" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="400" y1="1390" x2="650" y2="1390" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="525"
-          y="1152"
+          y="1360"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1132,7 +1226,7 @@
         </text>
         <text
           x="525"
-          y="1170"
+          y="1378"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1143,17 +1237,17 @@
         </text>
         <text
           x="416"
-          y="1198"
+          y="1406"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
           - pieceId: PieceId
         </text>
-        <line x1="400" y1="1206" x2="650" y2="1206" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="400" y1="1414" x2="650" y2="1414" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="416"
-          y="1222"
+          y="1430"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1162,7 +1256,7 @@
         </text>
         <text
           x="416"
-          y="1238"
+          y="1446"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1171,7 +1265,7 @@
         </text>
         <text
           x="416"
-          y="1254"
+          y="1462"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1182,7 +1276,7 @@
         <!-- Class: RotateFitPiece (value object, decision 43) -->
         <rect
           x="662"
-          y="1134"
+          y="1342"
           width="338"
           height="176"
           rx="6"
@@ -1192,15 +1286,15 @@
         />
         <line
           x1="662"
-          y1="1182"
+          y1="1390"
           x2="1000"
-          y2="1182"
+          y2="1390"
           stroke="rgba(23,33,42,0.22)"
           stroke-width="1"
         />
         <text
           x="831"
-          y="1152"
+          y="1360"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1211,7 +1305,7 @@
         </text>
         <text
           x="831"
-          y="1170"
+          y="1378"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1222,7 +1316,7 @@
         </text>
         <text
           x="678"
-          y="1198"
+          y="1406"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1231,7 +1325,7 @@
         </text>
         <text
           x="678"
-          y="1214"
+          y="1422"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1240,15 +1334,15 @@
         </text>
         <line
           x1="662"
-          y1="1222"
+          y1="1430"
           x2="1000"
-          y2="1222"
+          y2="1430"
           stroke="rgba(23,33,42,0.22)"
           stroke-width="1"
         />
         <text
           x="678"
-          y="1238"
+          y="1446"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1257,7 +1351,7 @@
         </text>
         <text
           x="678"
-          y="1254"
+          y="1462"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1266,7 +1360,7 @@
         </text>
         <text
           x="678"
-          y="1270"
+          y="1478"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1275,7 +1369,7 @@
         </text>
         <text
           x="689"
-          y="1286"
+          y="1494"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1284,7 +1378,7 @@
         </text>
         <text
           x="678"
-          y="1302"
+          y="1510"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1295,7 +1389,7 @@
         <!-- UML template boxes: type parameters on the top-right corner -->
         <rect
           x="350"
-          y="1124"
+          y="1332"
           width="48"
           height="18"
           rx="2"
@@ -1306,7 +1400,7 @@
         />
         <text
           x="374"
-          y="1136"
+          y="1344"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1316,7 +1410,7 @@
         </text>
         <rect
           x="945"
-          y="944"
+          y="1152"
           width="51"
           height="18"
           rx="2"
@@ -1327,7 +1421,7 @@
         />
         <text
           x="970.5"
-          y="956"
+          y="1164"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1440,8 +1534,8 @@
         >
           TCoord
         </text>
-        <!-- The footnote and the legend sit below the zone, which grew by 444. -->
-        <g transform="translate(0 444)">
+        <!-- The footnote and the legend sit below the zone, which grew by 652. -->
+        <g transform="translate(0 652)">
           <!-- Footnote: classes the budget leaves out -->
           <text
             x="24"

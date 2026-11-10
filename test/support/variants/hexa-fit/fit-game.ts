@@ -6,6 +6,7 @@ import { CellNode, ShapeGroup } from '../../../../src/domain/engine/shape-node';
 import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
 import type { IPieceSource } from '../../../../src/domain/engine/piece-source';
 import { FitFactory } from '../../../../src/domain/variants/hexa-fit/fit-factory';
+import { FitLevel } from '../../../../src/domain/variants/hexa-fit/fit-level';
 import { FitState, type FitSnapshot } from '../../../../src/domain/variants/hexa-fit/fit-state';
 import { PieceId } from '../../../../src/domain/variants/hexa-fit/piece-id';
 import { ManualClock } from '../../engine/manual-clock';
@@ -25,11 +26,7 @@ export function fitFactory(clock: Clock = new ManualClock()): FitFactory<SquareC
   );
   return new FitFactory(
     new SquareGeometry(),
-    {
-      topology: TopologyId.square,
-      figure: BoardShape.of([square(0, 0), square(1, 0)]),
-      pieces: [domino],
-    },
+    FitLevel.of(TopologyId.square, BoardShape.of([square(0, 0), square(1, 0)]), [domino]),
     clock,
   );
 }
@@ -40,11 +37,11 @@ export function threeDominoFitFactory(clock: Clock = new ManualClock()): FitFact
     new Piece(new ShapeGroup([new CellNode(square(0, 0)), new CellNode(square(1, 0))]), id);
   return new FitFactory(
     new SquareGeometry(),
-    {
-      topology: TopologyId.square,
-      figure: BoardShape.of(Array.from({ length: 6 }, (_, col) => square(col, 0))),
-      pieces: [domino(A), domino(B), domino(C)],
-    },
+    FitLevel.of(
+      TopologyId.square,
+      BoardShape.of(Array.from({ length: 6 }, (_, col) => square(col, 0))),
+      [domino(A), domino(B), domino(C)],
+    ),
     clock,
   );
 }

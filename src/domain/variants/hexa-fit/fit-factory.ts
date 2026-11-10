@@ -1,11 +1,10 @@
 import type { Board } from '../../engine/board';
 import type { BoardId } from '../../engine/board-id';
 import { BoardBuilder } from '../../engine/board-builder';
-import type { BoardShape } from '../../engine/board-shape';
 import type { Clock } from '../../engine/clock';
 import { GameId } from '../../engine/game-id';
 import type { GameStateId } from '../../engine/game-state-id';
-import type { GeometryFactory, TopologyId } from '../../engine/geometry-factory';
+import type { GeometryFactory } from '../../engine/geometry-factory';
 import { LevelTimer } from '../../engine/level-timer';
 import type { MatchId } from '../../engine/match-id';
 import { MoveHistory } from '../../engine/move-history';
@@ -13,22 +12,14 @@ import type { Piece } from '../../engine/piece';
 import { FixedListPieceSource } from '../../engine/piece-source';
 import type { IGameRules } from '../../engine/rules';
 import type { IScoringPolicy } from '../../engine/scoring-policy';
-import { CellNode, ShapeGroup } from '../../engine/shape-node';
 import { TimedRulesDecorator } from '../../engine/timed-rules-decorator';
 import type { IVariantFactory } from '../../engine/variant-factory';
+import type { FitLevel } from './fit-level';
 import type { FitMove } from './fit-move';
 import { FitRules } from './fit-rules';
 import { FitScoring } from './fit-scoring';
 import { FitState, type FitSnapshot } from './fit-state';
 import type { PieceId } from './piece-id';
-
-// One Hexa Fit level: the id of its geometry family, the figure and its pieces.
-// `FitLevelBuilder` builds it in Sprint 3.
-export interface FitLevel<TCoord> {
-  readonly topology: TopologyId;
-  readonly figure: BoardShape<TCoord>;
-  readonly pieces: readonly Piece<PieceId, TCoord>[];
-}
 
 // Abstract Factory (classes.md decision 31): the whole family of one Hexa Fit level.
 // The geometry comes by composition (APP-FR-16, D11).
@@ -47,12 +38,9 @@ export class FitFactory<TCoord> implements IVariantFactory<
     private readonly clock: Clock,
   ) {
     // A level file has no compile-time types, so the check runs when the game starts.
-    // The geometry asks, so a text that a cast puts in the level still reaches the error.
-    if (!geometry.id.equals(level.topology)) {
-      throw new RangeError(
-        `A Fit level of topology ${level.topology} cannot start on the ${geometry.id} geometry.`,
-      );
-    }
+    // The level checks itself when it is created (classes.md decision 46).
+    // Only this check needs the geometry, so the factory keeps it and asks the level.
+    if (!level.isOf(geometry.id)) throw level.wrongFamily(geometry.id);
   }
 
   // Fit stars use time (D14, classes.md decision 19). `FitRules` holds no timer code.
@@ -67,14 +55,15 @@ export class FitFactory<TCoord> implements IVariantFactory<
 
   // A finite source of the level pieces, so the Fit tray is finite (classes.md decision 32).
   createPieceSource(): FixedListPieceSource<Piece<PieceId, TCoord>> {
-    return new FixedListPieceSource(this.level.pieces);
+    return new FixedListPieceSource(this.level.trayPieces());
   }
 
   // The board is the figure: its shape holds only the figure cells.
-  // `BoardBuilder` takes the figure as a tree of cells.
+  // `BoardBuilder` takes the figure as a tree of cells, and the level gives that tree.
   createBoard(boardId: BoardId): Board<PieceId, TCoord> {
-    const figure = new ShapeGroup(this.level.figure.cells.map((c) => new CellNode(c)));
-    return new BoardBuilder(this.geometry).withFigure(figure).build<PieceId>(boardId);
+    return new BoardBuilder(this.geometry)
+      .withFigure(this.level.figureTree())
+      .build<PieceId>(boardId);
   }
 
   createInitialState(matchId: MatchId, stateId: GameStateId, boardId: BoardId): FitState<TCoord> {

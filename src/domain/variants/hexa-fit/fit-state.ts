@@ -28,7 +28,7 @@ export interface FitSnapshot<TCoord> extends BoardSnapshot<PieceId, TCoord> {
 // The state of one Hexa Fit game: the figure board, the pieces of the level,
 // and the placement of each piece on the figure.
 // The board is the figure: its shape holds only the figure cells (REQUIREMENTS.md §1).
-// The pieces come from the level's `FixedListPieceSource`. The state reads it once at start,
+// The pieces come from the `FixedListPieceSource` of the `FitLevel`. The state reads it once at start,
 // because the player picks the tray pieces in any order.
 // The maps use the text of the piece id as key, because a Map compares a string by value.
 // `moves` counts the accepted moves of the game for the stars (issue #60).
@@ -51,7 +51,8 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
     private score: Score = Score.of(0),
   ) {}
 
-  // Two pieces with the same id throw a RangeError, because a move names its piece by id.
+  // The source gives the pieces of a `FitLevel`, and a level never holds two pieces
+  // with one id (classes.md decision 46). So the state does not check the ids again.
   static start<TCoord>(
     stateId: GameStateId,
     matchId: MatchId,
@@ -59,12 +60,7 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
     source: IPieceSource<Piece<PieceId, TCoord>>,
   ): FitState<TCoord> {
     const pieces = new Map<string, Piece<PieceId, TCoord>>();
-    for (const piece of source) {
-      if (pieces.has(piece.content.value)) {
-        throw new RangeError(`The level has two pieces with the id ${piece.content.value}.`);
-      }
-      pieces.set(piece.content.value, piece);
-    }
+    for (const piece of source) pieces.set(piece.content.value, piece);
     return new FitState(stateId, matchId, figure.clone(), pieces, new Map());
   }
 
