@@ -249,6 +249,14 @@ describe('IVariantFactory', () => {
     expect([fit.distinct, merge.distinct]).toEqual([true, true]);
   });
 
+  // The limit of a history is private, so no test reads «no limit» itself.
+  // A long Fit game takes back every move: far more than the limit of 1 that Merge has,
+  // the only limit that a variant uses.
+  it('should_take_back_every_move_of_a_long_fit_game_when_another_variant_stops_at_its_limit', () => {
+    expect(undosAfter(threeDominoFitFactory(), 50)).toBe(50);
+    expect(undosAfter(mergeFactory(), 3)).toBe(1);
+  });
+
   it('should_give_a_new_empty_board_when_a_factory_is_asked_twice', () => {
     const fresh = { distinct: true, filled: 0 };
 

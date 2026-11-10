@@ -6,6 +6,7 @@ import { GameId } from '../../../src/domain/engine/game-id';
 import { MoveHistory } from '../../../src/domain/engine/move-history';
 import { FixedListPieceSource } from '../../../src/domain/engine/piece-source';
 import { Resolution } from '../../../src/domain/engine/resolution';
+import type { IUndoable } from '../../../src/domain/engine/undo-capabilities';
 import { fakeCell, type FakeCell } from '../../support/engine/fake-cell';
 import {
   emptyState,
@@ -84,6 +85,22 @@ class ClonedOnBudgetState extends FakeState {
     if (this.budget.left === 0) throw new Error('clone failed');
     this.budget.left -= 1;
     return new ClonedOnBudgetState(this.board.clone(), this.budget, this.score);
+  }
+}
+
+// A scoring policy that asks for an undo from `score()`, a reentrant call.
+// It keeps the error of the undo and scores the turn.
+class UndoingScoring extends OnePointScoring {
+  undoable: IUndoable | undefined;
+  innerError: unknown;
+
+  override score(before: FakeState, resolution: Resolution<FakeState>): number {
+    try {
+      this.undoable?.undo();
+    } catch (error) {
+      this.innerError = error;
+    }
+    return super.score(before, resolution);
   }
 }
 
@@ -217,6 +234,42 @@ describe('GameEngine undo capability', () => {
     engine.resume();
     undoable.undo();
 
+    expect(factsOf(engine)).toEqual({ cells: [], score: 0, phase: 'playing' });
+  });
+
+  // `play()` enters the resolving phase before it calls the scoring.
+  // The resolving phase refuses an undo, so the turn of the reentrant call stays whole.
+  it('should_refuse_a_reentrant_undo_and_keep_both_moves_when_the_scoring_asks_for_it_in_a_turn', () => {
+    const scoring = new UndoingScoring();
+    const engine = new GameEngine(
+      GameId.of('fake-game'),
+      new FakeRules(),
+      scoring,
+      new RecordingPublisher(),
+      new MoveHistory<FakeMove, FakeState>(),
+    );
+    engine.start(emptyState());
+    engine.play(moveAt(0));
+    scoring.undoable = engine.undoable();
+
+    engine.play(moveAt(1));
+
+    expect(scoring.innerError).toBeInstanceOf(RangeError);
+    expect(scoring.innerError).toEqual(
+      new RangeError('The game cannot accept an undo in the resolving phase.'),
+    );
+    expect(factsOf(engine)).toEqual({
+      cells: [
+        ['0,0', 1],
+        ['1,0', 2],
+      ],
+      score: 2,
+      phase: 'playing',
+    });
+    // The refused undo kept its command: both moves still come back.
+    scoring.undoable = undefined;
+    engine.undoable()?.undo();
+    engine.undoable()?.undo();
     expect(factsOf(engine)).toEqual({ cells: [], score: 0, phase: 'playing' });
   });
 

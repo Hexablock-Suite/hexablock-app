@@ -233,6 +233,14 @@ describe('Turns', () => {
     );
   });
 
+  // The positive side of the same guard is in the test above.
+  it('should_throw_a_range_error_when_a_sum_of_two_counts_goes_below_the_safe_range', () => {
+    const below = () => Turns.of(Number.MIN_SAFE_INTEGER).plus(Turns.of(-1));
+
+    expect(below).toThrow(RangeError);
+    expect(below).toThrow('A turn count needs a whole number, not -9007199254740992.');
+  });
+
   it('should_apply_one_step_for_each_step_of_the_normalized_count_when_a_turn_is_applied', () => {
     const stepsOf = (count: number) =>
       Turns.of(count).applyTo(0, (steps) => steps + 1, squareTopology);

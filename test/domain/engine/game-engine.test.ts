@@ -201,7 +201,10 @@ describe('GameEngine.play()', () => {
     engine.start(emptyState());
     engine.pause();
 
-    expect(() => engine.play(place(0, 0))).toThrow('cannot accept a move');
+    expect(() => engine.play(place(0, 0))).toThrow(RangeError);
+    expect(() => engine.play(place(0, 0))).toThrow(
+      new RangeError('The game cannot accept a move in the paused phase.'),
+    );
     expect(engine.snapshot().board.cells()).toEqual([]);
   });
 
@@ -364,7 +367,9 @@ describe('GameEngine edge cases', () => {
     const outcome = engine.play(place(0, 0));
 
     expect(scoring.innerError).toBeInstanceOf(RangeError);
-    expect(String(scoring.innerError)).toContain('cannot accept a move in the resolving phase');
+    expect(scoring.innerError).toEqual(
+      new RangeError('The game cannot accept a move in the resolving phase.'),
+    );
     expect(outcome).toBe('playing');
     expect(summary(engine)).toEqual(afterOneMove);
   });
