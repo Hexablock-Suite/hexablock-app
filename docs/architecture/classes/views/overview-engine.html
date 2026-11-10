@@ -71,7 +71,7 @@
       >
         <title id="ovengine-title">HexaBlock generic engine map · UML class diagram</title>
         <desc id="ovengine-desc">
-          Overview map of the 73 layer 1 engine classes in 15 groups. Each line joins two classes:
+          Overview map of the 75 layer 1 engine classes in 15 groups. Each line joins two classes:
           GameEngine keeps its GamePhase, its optional MoveHistory and its IScoringPolicy and
           notifies through GameEventPublisher, BoardState keeps its Board and gives its photo, a
           BoardSnapshot that holds a ReadonlyBoard, IVariantFactory creates the IGameRules and
@@ -570,7 +570,7 @@
           x="712"
           y="1028"
           width="272"
-          height="178"
+          height="228"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -598,7 +598,7 @@
           text-anchor="end"
           letter-spacing="0.14em"
         >
-          VIEW 3
+          VIEWS 3, 5
         </text>
         <!-- Group: turn -->
         <rect
@@ -2219,9 +2219,76 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="912" y="1177" fill="#17212a" text-anchor="middle">
+          <text
+            x="912"
+            y="1168"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            entity
+          </text>
+          <text x="912" y="1181" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               LevelTimer
+            </tspan>
+          </text>
+        </g>
+        <g data-class="LevelTimerIdGenerator">
+          <rect
+            x="728"
+            y="1206"
+            width="136"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="796"
+            y="1218"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="796" y="1231" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              LevelTimerIdGenerator
+            </tspan>
+          </text>
+        </g>
+        <g data-class="LevelTimerId">
+          <rect
+            x="872"
+            y="1206"
+            width="96"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="920"
+            y="1218"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="920" y="1231" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              LevelTimerId
             </tspan>
           </text>
         </g>

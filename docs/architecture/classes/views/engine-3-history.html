@@ -64,7 +64,7 @@
       <h1>Undo and redo: Command and segregated capabilities</h1>
 
       <svg
-        viewBox="0 0 1040 628"
+        viewBox="0 0 1040 732"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="history-title history-desc"
@@ -74,8 +74,10 @@
           Class diagram of layer 1 showing MoveHistory as the Command invoker that keeps the done
           MoveCommand objects and implements IUndoable, RedoableHistory extending it with redo
           through IRedoable and keeping the undone MoveCommand objects, and LevelTimer implementing
-          the separate ITimed capability. Each MoveCommand keeps a TMemento, the immutable photo of
-          the state before the move, which BoardState.snapshot() gives (view 1, decision 34).
+          the separate ITimed capability. LevelTimer is an entity inside the GameEngine aggregate:
+          its LevelTimerId is its identity, and equals() compares two timers by that id. Each
+          MoveCommand keeps a TMemento, the immutable photo of the state before the move, which
+          BoardState.snapshot() gives (view 1, decision 34).
         </desc>
         <defs>
           <marker
@@ -136,7 +138,7 @@
           x="24"
           y="24"
           width="992"
-          height="452"
+          height="540"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -182,7 +184,7 @@
           x="56"
           y="296"
           width="920"
-          height="148"
+          height="252"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -457,22 +459,33 @@
           + redo(): void
         </text>
 
-        <!-- Class: LevelTimer -->
+        <!-- Class: LevelTimer (entity) -->
         <rect
           x="72"
           y="324"
           width="176"
-          height="152"
+          height="208"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="72" y1="364" x2="248" y2="364" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="72" y1="420" x2="248" y2="420" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="72" y1="372" x2="248" y2="372" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="72" y1="444" x2="248" y2="444" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="160"
-          y="349"
+          y="342"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «entity»
+        </text>
+        <text
+          x="160"
+          y="360"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -481,23 +494,32 @@
         >
           LevelTimer
         </text>
-        <text x="88" y="380" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="388" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - identity: LevelTimerId
+        </text>
+        <text x="88" y="404" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - clock: Clock
         </text>
-        <text x="88" y="396" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="420" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - startedAt: number
         </text>
-        <text x="88" y="412" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="436" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - stoppedAt: number
         </text>
-        <text x="88" y="436" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="460" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: LevelTimer):
+        </text>
+        <text x="88" y="492" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + start(): void
         </text>
-        <text x="88" y="452" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="508" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + stop(): void
         </text>
-        <text x="88" y="468" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="524" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + elapsedMs(): ElapsedTime
+        </text>
+        <text x="99" y="476" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          boolean
         </text>
 
         <!-- Class: ITimed (interface) -->
@@ -688,7 +710,7 @@
         <!-- Footnote: classes the budget leaves out -->
         <text
           x="24"
-          y="504"
+          y="592"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -698,7 +720,7 @@
         </text>
         <text
           x="24"
-          y="520"
+          y="608"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -707,11 +729,22 @@
           addition (§3.2, ISP). LevelTimer reads time from the Clock interface (APP-NFR-07).
         </text>
 
-        <!-- Legend -->
-        <line x1="24" y1="540" x2="1016" y2="540" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="558"
+          y="624"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          LevelTimer is an entity inside the GameEngine aggregate: its LevelTimerId is its identity,
+          and equals() compares two timers by it (decisions 19 and 26, view 5).
+        </text>
+
+        <!-- Legend -->
+        <line x1="24" y1="644" x2="1016" y2="644" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <text
+          x="24"
+          y="662"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -722,16 +755,16 @@
 
         <line
           x1="24"
-          y1="576"
+          y1="680"
           x2="52"
-          y2="576"
+          y2="680"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#history-triangle)"
         />
         <text
           x="60"
-          y="580"
+          y="684"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -740,9 +773,9 @@
         </text>
         <line
           x1="144"
-          y1="576"
+          y1="680"
           x2="172"
-          y2="576"
+          y2="680"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -750,7 +783,7 @@
         />
         <text
           x="180"
-          y="580"
+          y="684"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -759,16 +792,16 @@
         </text>
         <line
           x1="264"
-          y1="576"
+          y1="680"
           x2="292"
-          y2="576"
+          y2="680"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#history-diamond-hollow)"
         />
         <text
           x="300"
-          y="580"
+          y="684"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -777,7 +810,7 @@
         </text>
         <rect
           x="24"
-          y="596"
+          y="700"
           width="28"
           height="12"
           rx="2"
@@ -787,7 +820,7 @@
         />
         <text
           x="60"
-          y="605"
+          y="709"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -796,7 +829,7 @@
         </text>
         <rect
           x="184"
-          y="596"
+          y="700"
           width="28"
           height="12"
           rx="2"
@@ -807,7 +840,7 @@
         />
         <text
           x="220"
-          y="605"
+          y="709"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -816,7 +849,7 @@
         </text>
         <rect
           x="424"
-          y="596"
+          y="700"
           width="28"
           height="12"
           rx="2"
@@ -827,7 +860,7 @@
         />
         <text
           x="460"
-          y="605"
+          y="709"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -836,7 +869,7 @@
         </text>
         <rect
           x="624"
-          y="596"
+          y="700"
           width="28"
           height="12"
           rx="2"
@@ -846,7 +879,7 @@
         />
         <text
           x="660"
-          y="605"
+          y="709"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
