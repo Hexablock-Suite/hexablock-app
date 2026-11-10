@@ -64,7 +64,7 @@
       <h1>Hexa Fit: levels built and checked by a Builder</h1>
 
       <svg
-        viewBox="0 0 1040 1314"
+        viewBox="0 0 1040 1330"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="fit-title fit-desc"
@@ -77,7 +77,9 @@
           implements, with its binding. PieceId, the cell content, and Placement, the rotation and
           the offset of a placed piece, are value objects. FitState is an entity inside the
           GameEngine aggregate: its own GameStateId is its identity, it keeps the MatchId of its
-          game, and it changes in place only through its business methods.
+          game, and it changes in place only through its business methods. FitPlay holds the Moves
+          and the ElapsedTime of one won level, and FitStarThreshold tells whether a play meets its
+          two limits. Both are value objects.
         </desc>
         <defs>
           <marker
@@ -462,7 +464,7 @@
           - placements: Map&lt;string, Placement&lt;TCoord&gt;&gt;
         </text>
         <text x="56" y="356" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - moves: number
+          - moves: Moves
         </text>
         <text x="56" y="370" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - score: Score
@@ -779,6 +781,137 @@
         <text x="216" y="798" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + withHeader(header: LevelHeader): FitLevelBuilder&lt;TCoord&gt;
         </text>
+        <!-- FitStarThreshold compares a FitPlay in isMetBy(): use -->
+        <line
+          x1="524"
+          y1="504"
+          x2="524"
+          y2="488"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#fit-open)"
+        />
+        <!-- Class: FitPlay (value object, decision 42) -->
+        <rect
+          x="328"
+          y="360"
+          width="392"
+          height="128"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="328" y1="408" x2="720" y2="408" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="524"
+          y="378"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="524"
+          y="396"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          FitPlay
+        </text>
+        <text x="344" y="424" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + moves: Moves
+        </text>
+        <text x="344" y="440" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + elapsedMs: ElapsedTime
+        </text>
+        <line x1="328" y1="448" x2="720" y2="448" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="344"
+          y="464"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + of(values: { moves: Moves; elapsedMs: ElapsedTime }): FitPlay
+        </text>
+        <text x="344" y="480" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: FitPlay): boolean
+        </text>
+        <!-- Class: FitStarThreshold (value object, decision 42) -->
+        <rect
+          x="328"
+          y="504"
+          width="392"
+          height="160"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="328" y1="552" x2="720" y2="552" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="524"
+          y="522"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="524"
+          y="540"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          FitStarThreshold
+        </text>
+        <text x="344" y="568" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - maxMoves: Moves
+        </text>
+        <text x="344" y="584" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - maxElapsedMs: ElapsedTime
+        </text>
+        <line x1="328" y1="592" x2="720" y2="592" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="344"
+          y="608"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + of(values: { maxMoves: Moves; maxElapsedMs: ElapsedTime }):
+        </text>
+        <text
+          x="355"
+          y="624"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          FitStarThreshold
+        </text>
+        <text x="344" y="640" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: FitStarThreshold): boolean
+        </text>
+        <text x="344" y="656" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + isMetBy(play: FitPlay): boolean
+        </text>
         <!-- Class: PieceId (value object) -->
         <rect
           x="40"
@@ -1087,18 +1220,28 @@
             it declares it. In a binding, FitMove and FitState stand for FitMove‹TCoord› and
             FitState‹TCoord›.
           </text>
+          <text
+            x="24"
+            y="1018"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            fitStars(play, thresholds) counts the leading thresholds that the play meets and returns
+            Stars (decision 42). Moves, ElapsedTime and Stars: Part 1, view 4.
+          </text>
           <!-- Legend -->
           <line
             x1="24"
-            y1="1026"
+            y1="1042"
             x2="1016"
-            y2="1026"
+            y2="1042"
             stroke="rgba(23,33,42,0.10)"
             stroke-width="0.8"
           />
           <text
             x="24"
-            y="1044"
+            y="1060"
             fill="#5b6873"
             font-size="8"
             font-family="'IBM Plex Mono', monospace"
@@ -1109,16 +1252,16 @@
 
           <line
             x1="24"
-            y1="1062"
+            y1="1078"
             x2="52"
-            y2="1062"
+            y2="1078"
             stroke="#5b6873"
             stroke-width="1"
             marker-end="url(#fit-open)"
           />
           <text
             x="60"
-            y="1066"
+            y="1082"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1127,7 +1270,7 @@
           </text>
           <rect
             x="24"
-            y="1082"
+            y="1098"
             width="28"
             height="12"
             rx="2"
@@ -1137,7 +1280,7 @@
           />
           <text
             x="60"
-            y="1091"
+            y="1107"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1146,7 +1289,7 @@
           </text>
           <rect
             x="184"
-            y="1082"
+            y="1098"
             width="28"
             height="12"
             rx="2"
@@ -1157,7 +1300,7 @@
           />
           <text
             x="220"
-            y="1091"
+            y="1107"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1166,7 +1309,7 @@
           </text>
           <rect
             x="424"
-            y="1082"
+            y="1098"
             width="28"
             height="12"
             rx="2"
@@ -1177,7 +1320,7 @@
           />
           <text
             x="460"
-            y="1091"
+            y="1107"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1186,7 +1329,7 @@
           </text>
           <rect
             x="600"
-            y="1082"
+            y="1098"
             width="28"
             height="12"
             rx="2"
@@ -1196,18 +1339,18 @@
           />
           <text
             x="636"
-            y="1091"
+            y="1107"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
           >
             Teal · focal class
           </text>
-          <line x1="760" y1="1088" x2="776" y2="1088" stroke="#17212a" stroke-width="1" />
-          <circle cx="781" cy="1088" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          <line x1="760" y1="1104" x2="776" y2="1104" stroke="#17212a" stroke-width="1" />
+          <circle cx="781" cy="1104" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
           <text
             x="796"
-            y="1091"
+            y="1107"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
