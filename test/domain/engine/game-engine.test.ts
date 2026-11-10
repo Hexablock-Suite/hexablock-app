@@ -593,31 +593,72 @@ describe('GameEngine review findings', () => {
   });
 
   // `tryPlay()` keeps the publisher failure apart from the outcome (issue 132, G117.2).
-  it('should_report_the_publisher_failure_apart_from_the_outcome_when_try_play_saves_the_turn', () => {
+  // Since issue 210 it returns the `Resolution` of the turn, a domain value, and the publisher
+  // failure goes to the handler of the caller (classes.md decision 48).
+  it('should_return_the_resolution_and_give_the_publisher_failure_to_the_handler_when_try_play_saves_the_turn', () => {
+    const { engine } = gameWith(
+      new FixedOutcomeRules(Outcome.gameOver),
+      new OnePointScoring(),
+      new ThrowingPublisher(),
+    );
+    const failures: unknown[] = [];
+
+    const turn = engine.tryPlay(place(0, 0), (error) => failures.push(error));
+
+    expect(turn).toBeInstanceOf(Resolution);
+    expect(turn.equals(Resolution.resolved().evaluated(Outcome.gameOver))).toBe(true);
+    expect(failures).toEqual([new Error('publish failed')]);
+    expect(summary(engine)).toEqual({ ...afterOneMove, phase: 'game-over' });
+  });
+
+  it('should_commit_the_turn_and_rethrow_when_the_publisher_throws_and_try_play_has_no_handler', () => {
     const { engine } = gameWith(
       new FixedOutcomeRules(Outcome.gameOver),
       new OnePointScoring(),
       new ThrowingPublisher(),
     );
 
-    const report = engine.tryPlay(place(0, 0));
+    expect(() => engine.tryPlay(place(0, 0))).toThrow('publish failed');
 
-    expect(report).toEqual({
-      accepted: true,
-      outcome: Outcome.gameOver,
-      publishFailure: { error: new Error('publish failed') },
-    });
     expect(summary(engine)).toEqual({ ...afterOneMove, phase: 'game-over' });
   });
 
-  it('should_report_no_publisher_failure_when_the_publisher_works', () => {
+  it('should_commit_the_turn_and_let_the_error_out_when_the_handler_of_try_play_throws', () => {
+    const { engine } = gameWith(
+      new FixedOutcomeRules(Outcome.gameOver),
+      new OnePointScoring(),
+      new ThrowingPublisher(),
+    );
+    const handler = () => {
+      throw new Error('handler failed');
+    };
+
+    expect(() => engine.tryPlay(place(0, 0), handler)).toThrow('handler failed');
+
+    expect(summary(engine)).toEqual({ ...afterOneMove, phase: 'game-over' });
+  });
+
+  it('should_not_call_the_handler_when_the_publisher_works', () => {
     const { engine, publisher } = gameWith(new FixedOutcomeRules(Outcome.gameOver));
+    const failures: unknown[] = [];
 
-    const report = engine.tryPlay(place(0, 0));
+    const turn = engine.tryPlay(place(0, 0), (error) => failures.push(error));
 
-    expect(Object.keys(report).sort()).toEqual(['accepted', 'outcome']);
-    expect(report).toEqual({ accepted: true, outcome: Outcome.gameOver });
+    expect(turn).toBeInstanceOf(Resolution);
+    expect([turn.accepted, turn.outcome]).toEqual([true, Outcome.gameOver]);
+    expect(failures).toEqual([]);
     expect(publisher.events).toHaveLength(1);
+  });
+
+  it('should_return_a_rejected_resolution_and_call_no_handler_when_the_rules_reject_the_move', () => {
+    const { engine, publisher } = gameWith(new RejectingResolveRules());
+    const failures: unknown[] = [];
+
+    const turn = engine.tryPlay(place(0, 0), (error) => failures.push(error));
+
+    expect(turn).toBeInstanceOf(Resolution);
+    expect(turn.equals(Resolution.rejected())).toBe(true);
+    expect([failures, publisher.events]).toEqual([[], []]);
   });
 
   // The rollback covers the board, the score, the phase and the piece source in the state.

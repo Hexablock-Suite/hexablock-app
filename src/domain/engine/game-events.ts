@@ -29,3 +29,7 @@ export class GameOver extends GameEvent {
 export interface GameEventPublisher {
   publish(event: GameEvent): void;
 }
+
+// What `GameEngine.tryPlay()` calls when the publisher throws after the engine saves the turn.
+// It takes the thrown value. The turn and its outcome stay valid (issue 132).
+export type PublishFailureHandler = (error: unknown) => void;

@@ -1,32 +1,17 @@
 import type { BoardSnapshot, BoardState, SnapshotOf } from './board-state';
 import type { Cloneable } from './cloneable';
-import { GameOver, type GameEventPublisher } from './game-events';
+import { GameOver, type GameEventPublisher, type PublishFailureHandler } from './game-events';
 import type { GameId } from './game-id';
 import { PlayingPhase, ResolvingPhase, type GamePhase } from './game-phase';
 import type { MatchId } from './match-id';
 import { MoveCommand } from './move-command';
 import type { MoveHistory } from './move-history';
-import { Outcome } from './outcome';
+import type { Outcome } from './outcome';
+import { Resolution } from './resolution';
 import type { IGameRules } from './rules';
 import type { IScoringPolicy } from './scoring-policy';
 import type { ITimed } from './timed';
 import type { IRedoable, IUndoable } from './undo-capabilities';
-
-// The report of one turn: whether the rules accepted the move, and the outcome.
-// `outcome` carries the `Outcome` value object, not a text (issue #207).
-// A rejected move always has the outcome `playing`.
-// `publishFailure` is set only when the publisher throws after the engine saves the turn.
-// It holds the thrown value. The turn and its outcome stay valid (issue 132).
-export interface TurnReport {
-  readonly accepted: boolean;
-  readonly outcome: Outcome;
-  readonly publishFailure?: PublishFailure;
-}
-
-// The value that the event publisher threw after a saved turn.
-export interface PublishFailure {
-  readonly error: unknown;
-}
 
 // The aggregate root of one game (classes.md decision 26).
 // It is an entity: its `MatchId` is its identity, and the id never changes.
@@ -101,20 +86,25 @@ export class GameEngine<
   // A rejected move returns `playing`. Call `tryPlay()` to tell it from an accepted move.
   // A publisher that throws does not undo the turn, and `play()` rethrows its error.
   play(move: TMove): Outcome {
-    const turn = this.tryPlay(move);
-    if (turn.publishFailure !== undefined) throw turn.publishFailure.error;
-    return turn.outcome;
+    return this.tryPlay(move).outcome;
   }
 
-  // The same turn as `play()`. The report also says whether the rules accepted the move,
-  // so the `ApplyMove` use case can return a failure for a rejected move (issue 100).
+  // The same turn as `play()`. It returns the `Resolution` of the turn, which also says
+  // whether the rules accepted the move. So the `ApplyMove` use case can return a failure
+  // for a rejected move (issue 100). A rejected move always has the outcome `playing`.
+  // The engine saves the turn before it publishes `GameOver` (classes.md decision 29).
+  // A publisher failure is not a concept of the game, so the resolution does not carry it
+  // (classes.md decision 48). When the publisher throws after the saved turn, the engine
+  // gives the thrown value to `onPublishFailure` and still returns the resolution (issue 132).
+  // With no handler the engine rethrows the thrown value, as `play()` does.
+  // An error that the handler throws leaves `tryPlay()`, and the turn stays saved.
   // The rollback covers the whole state and the phase. A piece source lives in the state
   // (classes.md decision 31), and a draw replaces it only in the copy of the turn
   // (classes.md decision 51). So a turn that throws after a draw leaves the source
   // at its old position, and a retry draws the same piece.
   // The rules change their copy in place (classes.md decision 7), and a `Resolution` holds
   // no state. So the engine keeps the copy that it gave to the rules as the next state.
-  tryPlay(move: TMove): TurnReport {
+  tryPlay(move: TMove, onPublishFailure?: PublishFailureHandler): Resolution {
     const state = this.started();
     this.current.checkAcceptsMove();
     this.current = ResolvingPhase.instance;
@@ -130,22 +120,24 @@ export class GameEngine<
     // A rejected move ends no game, whatever outcome the rules give it.
     if (turn === undefined) {
       this.current = PlayingPhase.instance;
-      return { accepted: false, outcome: Outcome.playing };
+      return Resolution.rejected();
     }
     this.state = turn.next;
     this.current = turn.phase;
     this.remember(move, turn.before);
     // The turn is committed before the engine publishes. A publisher that throws
-    // does not undo the turn. The report keeps its error apart from the outcome.
+    // does not undo the turn. The handler takes its error, apart from the outcome.
     if (turn.outcome.endsTheGame()) {
       try {
         const { score } = turn.next.snapshot();
         this.events.publish(new GameOver(this.gameId, this.matchId, turn.outcome, score));
       } catch (error) {
-        return { accepted: true, outcome: turn.outcome, publishFailure: { error } };
+        if (onPublishFailure === undefined) throw error;
+        onPublishFailure(error);
       }
     }
-    return { accepted: true, outcome: turn.outcome };
+    // The engine builds the resolution, so the caller gets a real `Resolution` from any rules.
+    return Resolution.resolved().evaluated(turn.outcome);
   }
 
   pause(): void {
