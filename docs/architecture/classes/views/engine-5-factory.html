@@ -64,7 +64,7 @@
       <h1>Wiring a variant: Abstract Factory, Builder, Observer and injected interfaces</h1>
 
       <svg
-        viewBox="0 0 1040 828"
+        viewBox="0 0 1040 840"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="factory-title factory-desc"
@@ -76,7 +76,9 @@
           a variant, the ILevelBuilder builder, the GameEventPublisher interface that publishes
           GameEvent values such as GameOver, the Clock and RandomSource interfaces that layer 4
           implements, and the MatchIdGenerator interface that gives the MatchId value object of each
-          new match.
+          new match. GameFactory keeps an IVariantFactory, a MatchIdGenerator and a
+          GameEventPublisher and creates the started GameEngine, and GameOver carries the GameId and
+          the MatchId.
         </desc>
         <defs>
           <marker
@@ -137,7 +139,7 @@
           x="24"
           y="24"
           width="992"
-          height="640"
+          height="652"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -248,12 +250,35 @@
           TIME AND RANDOMNESS · APP-NFR-07
         </text>
 
+        <!-- Pattern group: the factory of the aggregate -->
+        <rect
+          x="40"
+          y="492"
+          width="432"
+          height="164"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="52"
+          y="508"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          FACTORY OF THE AGGREGATE · DECISION 40
+        </text>
         <!-- Pattern group: the identity of a match -->
         <rect
           x="496"
           y="492"
           width="496"
-          height="156"
+          height="164"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -272,6 +297,26 @@
           MATCH IDENTITY · DECISIONS 25, 30
         </text>
         <!-- Relationships (drawn before boxes) -->
+        <!-- GameFactory keeps the IVariantFactory it receives as variant: use with role and multiplicity -->
+        <line
+          x1="420"
+          y1="520"
+          x2="420"
+          y2="284"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#factory-open)"
+        />
+        <!-- GameFactory keeps the MatchIdGenerator it receives as ids: use with role and multiplicity -->
+        <line
+          x1="456"
+          y1="556"
+          x2="512"
+          y2="556"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#factory-open)"
+        />
         <!-- MatchIdGenerator gives a MatchId in next(): use with a verb -->
         <line
           x1="712"
@@ -295,7 +340,7 @@
         <!-- GameOver extends GameEvent: generalization -->
         <line
           x1="884"
-          y1="212"
+          y1="204"
           x2="884"
           y2="164"
           stroke="#17212a"
@@ -304,6 +349,30 @@
         />
 
         <!-- Arrow labels -->
+        <rect x="364" y="290" width="50.2" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="366"
+          y="299"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          variant
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <rect x="466" y="540" width="31" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="468"
+          y="549"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          ids
+          <tspan font-weight="600">1</tspan>
+        </text>
         <rect x="726.5" y="536" width="35" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="744"
@@ -471,18 +540,18 @@
         <!-- Class: GameOver (domain event) -->
         <rect
           x="792"
-          y="212"
+          y="204"
           width="184"
-          height="80"
+          height="96"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="792" y1="252" x2="976" y2="252" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="792" y1="244" x2="976" y2="244" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="884"
-          y="227"
+          y="219"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -493,7 +562,7 @@
         </text>
         <text
           x="884"
-          y="243"
+          y="235"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -502,10 +571,13 @@
         >
           GameOver
         </text>
-        <text x="808" y="268" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="808" y="260" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + matchId: MatchId
+        </text>
+        <text x="808" y="276" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + outcome: Outcome
         </text>
-        <text x="808" y="284" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="808" y="292" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + finalScore: number
         </text>
 
@@ -704,7 +776,75 @@
         <text x="792" y="624" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: MatchId): boolean
         </text>
+        <!-- Class: GameFactory (factory of the aggregate) -->
+        <rect
+          x="56"
+          y="520"
+          width="400"
+          height="128"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="56" y1="568" x2="456" y2="568" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="256"
+          y="538"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «factory»
+        </text>
+        <text
+          x="256"
+          y="556"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GameFactory
+        </text>
+        <text x="72" y="584" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - variant: IVariantFactory&lt;TCell, TCoord, TMove, TState&gt;
+        </text>
+        <text x="72" y="600" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - ids: MatchIdGenerator
+        </text>
+        <text x="72" y="616" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - events: GameEventPublisher
+        </text>
+        <line x1="56" y1="624" x2="456" y2="624" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="72" y="640" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + createGame(): GameEngine&lt;TCell, TCoord, TMove, TState&gt;
+        </text>
         <!-- UML template boxes: type parameters on the top-right corner -->
+        <rect
+          x="303"
+          y="510"
+          width="165"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="385.5"
+          y="522"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCell, TCoord, TMove, TState
+        </text>
         <rect
           x="312"
           y="82"
@@ -748,8 +888,8 @@
           TLevel
         </text>
 
-        <!-- The footnote and the legend sit below the zone, which grew by 188. -->
-        <g transform="translate(0 188)">
+        <!-- The footnote and the legend sit below the zone, which grew by 200. -->
+        <g transform="translate(0 200)">
           <!-- Footnote: classes the budget leaves out -->
           <text
             x="24"
@@ -769,7 +909,8 @@
             font-family="'IBM Plex Sans', sans-serif"
           >
             createRules() gives the rules the piece source of createPieceSource().
-            createInitialState() puts the board of createBoard() in the first state.
+            createInitialState() puts the board of createBoard() in the first state. GameFactory
+            creates the started GameEngine (view 1).
           </text>
           <text
             x="24"

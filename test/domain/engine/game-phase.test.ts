@@ -1,5 +1,6 @@
 /** @jest-environment node */
 import { GameId } from '../../../src/domain/engine/game-id';
+import { MatchId } from '../../../src/domain/engine/match-id';
 import { GameOver } from '../../../src/domain/engine/game-events';
 import {
   GameOverPhase,
@@ -9,6 +10,7 @@ import {
   VictoryPhase,
   type GamePhase,
 } from '../../../src/domain/engine/game-phase';
+import { MATCH_ID } from '../../support/engine/match-id';
 
 // The value that `act` throws, or `undefined` when it throws nothing.
 function thrownBy(act: () => void): unknown {
@@ -178,10 +180,12 @@ describe('GameId', () => {
 });
 
 describe('GameOver event', () => {
-  it('should_carry_the_game_the_outcome_and_the_final_score_when_it_is_created', () => {
-    const event = new GameOver(GameId.of('hexa-lines'), 'game-over', 42);
+  it('should_carry_the_game_the_match_the_outcome_and_the_final_score_when_it_is_created', () => {
+    const event = new GameOver(GameId.of('hexa-lines'), MatchId.of('match-a'), 'game-over', 42);
 
     expect(event.gameId.equals(GameId.of('hexa-lines'))).toBe(true);
+    expect(event.matchId.equals(MatchId.of('match-a'))).toBe(true);
+    expect(event.matchId.equals(MatchId.of('match-b'))).toBe(false);
     expect(event.outcome).toBe('game-over');
     expect(event.finalScore).toBe(42);
   });
@@ -190,10 +194,10 @@ describe('GameOver event', () => {
     const gameId = GameId.of('hexa-lines');
 
     for (const score of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
-      expect(() => new GameOver(gameId, 'game-over', score)).toThrow(
+      expect(() => new GameOver(gameId, MATCH_ID, 'game-over', score)).toThrow(
         new RangeError('A game over event needs a final score that is a finite number.'),
       );
     }
-    expect(new GameOver(gameId, 'game-over', -3).finalScore).toBe(-3);
+    expect(new GameOver(gameId, MATCH_ID, 'game-over', -3).finalScore).toBe(-3);
   });
 });

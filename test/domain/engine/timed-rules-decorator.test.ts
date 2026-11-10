@@ -19,6 +19,7 @@ import {
 import { ManualClock } from '../../support/engine/manual-clock';
 import { phaseNameOf } from '../../support/engine/phase-name';
 import { square, squareTopology, type SquareCoord } from '../../support/engine/square-topology';
+import { MATCH_ID } from '../../support/engine/match-id';
 
 // `TimedRulesDecorator` times a game around any rules (issue 157, classes.md decision 19, D14).
 // `FakeRules` extends `BaseGameRules` and calls its own `evaluate()`, as a variant rules class does.
@@ -42,6 +43,7 @@ function timedGame(
   const timer = new LevelTimer(clock);
   const decorated = new TimedRulesDecorator(rules, timer);
   const engine = new GameEngine(
+    MATCH_ID,
     GameId.of('fake-game'),
     decorated,
     scoring,
@@ -202,6 +204,7 @@ describe('TimedRulesDecorator', () => {
   it('should_play_the_same_game_as_the_inner_rules_when_the_rules_are_decorated', () => {
     const plainRules = new FakeRules();
     const plain = new GameEngine(
+      MATCH_ID,
       GameId.of('fake-game'),
       plainRules,
       new OnePointScoring(),
@@ -244,6 +247,7 @@ describe('GameEngine.timed', () => {
 
   it('should_return_undefined_when_the_rules_have_no_timer', () => {
     const engine = new GameEngine(
+      MATCH_ID,
       GameId.of('fake-game'),
       new FakeRules(),
       new OnePointScoring(),

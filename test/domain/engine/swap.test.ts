@@ -19,6 +19,7 @@ import type { IScoringPolicy } from '../../../src/domain/engine/scoring-policy';
 import { fakeCell, type FakeCell } from '../../support/engine/fake-cell';
 import { SourceRules, sourceState, type SourceState } from '../../support/engine/fake-game';
 import { square, type SquareCoord } from '../../support/engine/square-topology';
+import { MATCH_ID } from '../../support/engine/match-id';
 
 // APP-NFR-04: the piece source, the scoring policy and the progress model swap,
 // and no engine file changes. Every implementation here is a dummy that exists only in test/.
@@ -145,7 +146,7 @@ function playGame(
 ) {
   let moves = 0;
   const subscriber = new ProgressSubscriber(progress, () => moves);
-  const engine = new GameEngine(GameId.of('fake-game'), rules, scoring, subscriber);
+  const engine = new GameEngine(MATCH_ID, GameId.of('fake-game'), rules, scoring, subscriber);
   engine.start(sourceState(source));
   let outcome: Outcome = 'playing';
   for (const at of sourceState(source).board.shape.cells) {
@@ -225,6 +226,7 @@ describe('swapping the piece source, the scoring policy and the progress model',
   it('should_reject_a_fifth_move_and_keep_the_state_when_the_board_is_full', () => {
     const subscriber = new ProgressSubscriber(new ScoreProgress(), () => 4);
     const engine = new GameEngine(
+      MATCH_ID,
       GameId.of('fake-game'),
       new SourceRules(),
       new OnePerMove(),

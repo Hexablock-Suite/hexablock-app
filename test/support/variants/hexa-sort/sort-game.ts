@@ -20,6 +20,7 @@ import { SortRules } from '../../../../src/domain/variants/hexa-sort/sort-rules'
 import { SortState, type PlaceStack } from '../../../../src/domain/variants/hexa-sort/sort-state';
 import { RecordingPublisher } from '../../engine/fake-game';
 import { square, squareTopology, type SquareCoord } from '../../engine/square-topology';
+import { MATCH_ID } from '../../engine/match-id';
 
 // Hexa Sort test helpers. The board uses the square topology double (D4), so the tests
 // prove that the Sort rules ask the topology for the neighbors and assume no hexagon.
@@ -104,6 +105,7 @@ export function sortGame(
   scoring: IScoringPolicy<SortState<SquareCoord>> = new NoScoring(),
 ): SortGame {
   const engine: SortGame = new GameEngine(
+    MATCH_ID,
     GameId.of('hexa-sort'),
     new SortRules<SquareCoord>(),
     scoring,

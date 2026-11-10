@@ -5,7 +5,12 @@ import { StartGame } from '../../src/application/start-game';
 import type { BoardState } from '../../src/domain/engine/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
 import { GameEngine } from '../../src/domain/engine/game-engine';
-import type { GameEvent, GameEventPublisher } from '../../src/domain/engine/game-events';
+import {
+  GameOver,
+  type GameEvent,
+  type GameEventPublisher,
+} from '../../src/domain/engine/game-events';
+import { GameFactory } from '../../src/domain/engine/game-factory';
 import { GameId } from '../../src/domain/engine/game-id';
 import { PlayingPhase, VictoryPhase } from '../../src/domain/engine/game-phase';
 import { MoveHistory } from '../../src/domain/engine/move-history';
@@ -35,6 +40,7 @@ import type { UseCaseLogEntry } from '../../src/application/logger';
 import { fakeCell, type FakeCell } from '../support/engine/fake-cell';
 import {
   emptyState,
+  fakeGameFactory,
   FakeRules,
   OnePointScoring,
   RecordingPublisher,
@@ -45,6 +51,7 @@ import { A, fitFactory } from '../support/variants/hexa-fit/fit-game';
 import { linesFactory } from '../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../support/variants/hexa-merge/merge-game';
 import { sortFactory, stack, stackPiece } from '../support/variants/hexa-sort/sort-game';
+import { CountingMatchIds, MATCH_ID } from '../support/engine/match-id';
 
 // `StartGame` and `ApplyMove` run the four variants through one code path (issue 100,
 // APP-FR-03, classes.md decisions 9, 28 and 29). The helper reads only `IVariantFactory`.
@@ -282,13 +289,82 @@ describe('StartGame and ApplyMove', () => {
     valueOf(await applyMove.execute({ move }));
     const oldGame = games.running();
     const before = runningGameOf(games);
-    const broken = new StartGame(brokenStart(linesFactory()), games, new RecordingPublisher());
+    const broken = new StartGame(
+      new GameFactory(
+        brokenStart(linesFactory()),
+        new CountingMatchIds(),
+        new RecordingPublisher(),
+      ),
+      games,
+    );
 
     const error = errorOf(await broken.execute({}));
 
     expect([error.code, error.message]).toEqual(['start-failed', 'The level is broken.']);
     expect(games.current()).toBe(oldGame);
     expect(runningGameOf(games)).toEqual(before);
+  });
+
+  // Unit R6 of the redesign: each game has its own `MatchId`, which an injected generator gives.
+  it('should_open_another_match_when_the_same_variant_starts_again', async () => {
+    const { games, startGame } = gameUseCases(linesFactory());
+    valueOf(await startGame.execute({}));
+    const first = games.running();
+
+    valueOf(await startGame.execute({}));
+    const second = games.running();
+
+    expect([first.equals(second), second.equals(first)]).toEqual([false, false]);
+    expect([first.equals(first), second.equals(second)]).toEqual([true, true]);
+  });
+
+  it('should_publish_game_over_with_the_id_of_the_generator_when_the_started_game_ends', async () => {
+    const publisher = new RecordingPublisher();
+    const factory = fitFactory();
+    const { games, startGame, applyMove } = gameUseCases(
+      factory,
+      publisher,
+      new RecordingLogger(),
+      {
+        next: () => MATCH_ID,
+      },
+    );
+    valueOf(await startGame.execute({}));
+    const move = firstValidMove(factory.createRules(), games.running().snapshot());
+
+    const played = valueOf(await applyMove.execute({ move }));
+
+    expect(played.outcome).toBe('victory');
+    expect(publisher.events).toEqual([new GameOver(factory.gameId, MATCH_ID, 'victory', 0)]);
+  });
+
+  it('should_return_a_start_failed_failure_and_keep_the_old_game_when_the_id_generator_throws', async () => {
+    const working = gameUseCases(linesFactory());
+    valueOf(await working.startGame.execute({}));
+    const oldGame = working.games.running();
+    const before = runningGameOf(working.games);
+    const broken = new StartGame(
+      new GameFactory(
+        linesFactory(),
+        {
+          next: () => {
+            throw new Error('The generator has no id.');
+          },
+        },
+        new RecordingPublisher(),
+      ),
+      working.games,
+    );
+
+    const error = errorOf(await broken.execute({}));
+
+    expect([error.code, error.message, error.retryable]).toEqual([
+      'start-failed',
+      'The generator has no id.',
+      false,
+    ]);
+    expect(working.games.current()).toBe(oldGame);
+    expect(runningGameOf(working.games)).toEqual(before);
   });
 
   it('should_return_a_failure_and_keep_the_game_when_the_request_holds_no_move', async () => {
@@ -321,9 +397,8 @@ describe('StartGame and ApplyMove', () => {
 
   it('should_return_a_start_failed_failure_when_the_store_throws_on_replace', async () => {
     const startGame = new StartGame(
-      linesFactory(),
+      new GameFactory(linesFactory(), new CountingMatchIds(), new RecordingPublisher()),
       new ThrowingStore('replace'),
-      new RecordingPublisher(),
     );
 
     const error = errorOf(await startGame.execute({}));
@@ -443,6 +518,7 @@ describe('StartGame and ApplyMove', () => {
     const games = new MemoryRunningGameStore<FakeCell, SquareCoord, FakeMove, FakeState>();
     const publisher = new RecordingPublisher();
     const engine = new GameEngine(
+      MATCH_ID,
       GameId.of('fake-game'),
       new ResolveThrowingRules(),
       new OnePointScoring(),
@@ -503,19 +579,6 @@ class RedoingHistory extends MoveHistory<FakeMove, FakeState> implements IRedoab
   redo(): void {
     return;
   }
-}
-
-// A game that the use cases cannot name. Its state gives its own view.
-function fakeGameFactory(): IVariantFactory<FakeCell, SquareCoord, FakeMove, FakeState, FakeCell> {
-  return {
-    gameId: GameId.of('fake-game'),
-    createRules: () => new FakeRules(),
-    createScoring: () => new OnePointScoring(),
-    createPieceSource: () => undefined,
-    createBoard: () => emptyState().board,
-    createInitialState: () => emptyState(),
-    createHistory: () => undefined,
-  };
 }
 
 // Tries to change each list and each field of a payload, in depth.

@@ -15,6 +15,7 @@ import {
   type FakeState,
 } from '../support/engine/fake-game';
 import { square, type SquareCoord } from '../support/engine/square-topology';
+import { MATCH_ID } from '../support/engine/match-id';
 
 // The points of each turn are finite, but their total can pass the largest number.
 class HugeScoring extends OnePointScoring {
@@ -28,6 +29,7 @@ function overflowingGame() {
   const games = new MemoryRunningGameStore<FakeCell, SquareCoord, FakeMove, FakeState>();
   const publisher = new RecordingPublisher();
   const engine = new GameEngine(
+    MATCH_ID,
     GameId.of('fake-game'),
     new FakeRules(),
     new HugeScoring(),

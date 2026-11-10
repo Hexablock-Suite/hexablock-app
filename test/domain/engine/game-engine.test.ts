@@ -4,6 +4,7 @@ import type { BoardState } from '../../../src/domain/engine/board-state';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameOver } from '../../../src/domain/engine/game-events';
 import { GameId } from '../../../src/domain/engine/game-id';
+import { MatchId } from '../../../src/domain/engine/match-id';
 import { GameOverPhase, PlayingPhase, VictoryPhase } from '../../../src/domain/engine/game-phase';
 import type { Outcome } from '../../../src/domain/engine/outcome';
 import { FixedListPieceSource } from '../../../src/domain/engine/piece-source';
@@ -22,6 +23,7 @@ import {
 } from '../../support/engine/fake-game';
 import { phaseNameOf } from '../../support/engine/phase-name';
 import { square, type SquareAxis, type SquareCoord } from '../../support/engine/square-topology';
+import { MATCH_ID } from '../../support/engine/match-id';
 
 // The turn cycle (statement §3.1): start, receive, validate, apply, resolve, evaluate, notify.
 // The cell type, the rules and the scoring exist only in test/ (APP-NFR-13).
@@ -29,6 +31,7 @@ import { square, type SquareAxis, type SquareCoord } from '../../support/engine/
 function newGame(log: string[] = []) {
   const publisher = new RecordingPublisher(log);
   const engine = new GameEngine(
+    MATCH_ID,
     GameId.of('fake-game'),
     new FakeRules(log),
     new OnePointScoring(log),
@@ -148,6 +151,7 @@ describe('GameEngine.play()', () => {
   it('should_keep_the_old_board_when_resolve_rejects_the_move_after_apply', () => {
     const publisher = new RecordingPublisher();
     const engine = new GameEngine(
+      MATCH_ID,
       GameId.of('fake-game'),
       new RejectingResolveRules(),
       new OnePointScoring(),
@@ -249,6 +253,7 @@ describe('GameEngine.play()', () => {
 
   it('should_keep_the_board_and_accept_the_next_move_when_the_rules_throw', () => {
     const engine = new GameEngine(
+      MATCH_ID,
       GameId.of('fake-game'),
       new FailingOnceRules(),
       new OnePointScoring(),
@@ -267,6 +272,7 @@ describe('GameEngine.play()', () => {
 
   it('should_keep_the_board_and_accept_the_next_move_when_the_scoring_throws', () => {
     const engine = new GameEngine(
+      MATCH_ID,
       GameId.of('fake-game'),
       new FakeRules(),
       new FailingOnceScoring(),
@@ -307,6 +313,7 @@ class BaseCloneState implements BoardState<FakeCell, SquareCoord> {
 function armedGame(step: 'apply' | 'evaluate') {
   const rules = new ThrowingStepRules(step);
   const engine = new GameEngine(
+    MATCH_ID,
     GameId.of('fake-game'),
     rules,
     new OnePointScoring(),
@@ -356,6 +363,7 @@ describe('GameEngine edge cases', () => {
   it('should_reject_a_reentrant_play_when_the_scoring_calls_play_during_a_turn', () => {
     const scoring = new ReentrantScoring();
     const engine = new GameEngine(
+      MATCH_ID,
       GameId.of('fake-game'),
       new FakeRules(),
       scoring,
@@ -465,6 +473,7 @@ class RejectingDrawRules extends SourceRules {
 // A game whose state holds a fixed list of three pieces.
 function sourceGame(rules: SourceRules) {
   const engine = new GameEngine(
+    MATCH_ID,
     GameId.of('fake-game'),
     rules,
     { score: () => 1 },
@@ -479,7 +488,7 @@ function gameWith(
   scoring: OnePointScoring = new OnePointScoring(),
   publisher: RecordingPublisher = new RecordingPublisher(),
 ) {
-  const engine = new GameEngine(GameId.of('fake-game'), rules, scoring, publisher);
+  const engine = new GameEngine(MATCH_ID, GameId.of('fake-game'), rules, scoring, publisher);
   engine.start(emptyState());
   return { engine, publisher };
 }
@@ -651,5 +660,66 @@ describe('GameEngine.currentPhase()', () => {
     expect(engine.currentPhase()).toBe(GameOverPhase.instance);
     expect(engine.currentPhase().canPlay()).toBe(false);
     expect('phase' in engine).toBe(false);
+  });
+});
+
+// The identity of the aggregate root (classes.md decisions 26 and 30). `GameId` names the variant,
+// so two matches of one variant have the same `GameId`, and only the `MatchId` tells them apart.
+function matchOf(id: MatchId, size = 2) {
+  const publisher = new RecordingPublisher();
+  const engine = new GameEngine(
+    id,
+    GameId.of('fake-game'),
+    new FakeRules(),
+    new OnePointScoring(),
+    publisher,
+  );
+  engine.start(emptyState(size));
+  return { engine, publisher };
+}
+
+describe('GameEngine identity', () => {
+  it('should_be_the_same_game_when_two_engines_have_the_same_match_id_whatever_their_boards_hold', () => {
+    const first = matchOf(MatchId.of('match-a')).engine;
+    const second = matchOf(MatchId.of('match-a'), 3).engine;
+    first.play(place(0, 0));
+
+    expect(first.snapshot().board.cells()).not.toEqual(second.snapshot().board.cells());
+    expect([first.equals(second), second.equals(first), first.equals(first)]).toEqual([
+      true,
+      true,
+      true,
+    ]);
+  });
+
+  it('should_be_another_game_when_two_engines_of_one_variant_have_different_match_ids', () => {
+    const first = matchOf(MatchId.of('match-a')).engine;
+    const second = matchOf(MatchId.of('match-b')).engine;
+
+    expect(first.snapshot().board.cells()).toEqual(second.snapshot().board.cells());
+    expect([first.equals(second), second.equals(first)]).toEqual([false, false]);
+  });
+
+  it('should_keep_its_identity_when_the_game_plays_pauses_and_starts_again', () => {
+    const { engine } = matchOf(MatchId.of('match-a'));
+    const same = matchOf(MatchId.of('match-a')).engine;
+
+    engine.play(place(0, 0));
+    engine.pause();
+    engine.start(emptyState());
+
+    expect(engine.equals(same)).toBe(true);
+  });
+
+  it('should_publish_game_over_with_the_variant_id_and_the_match_id_when_the_game_ends', () => {
+    const { engine, publisher } = matchOf(MatchId.of('match-a'), 1);
+
+    engine.play(place(0, 0));
+
+    const event = publisher.events[0] as GameOver;
+    expect(publisher.events).toHaveLength(1);
+    expect(event.gameId.equals(GameId.of('fake-game'))).toBe(true);
+    expect(event.matchId.equals(MatchId.of('match-a'))).toBe(true);
+    expect(event.matchId.equals(MatchId.of('match-b'))).toBe(false);
   });
 });

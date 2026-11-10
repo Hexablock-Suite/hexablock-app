@@ -19,6 +19,7 @@ import {
   values,
   type HexMergeState,
 } from '../../../support/variants/hexa-merge/merge-game';
+import { MATCH_ID } from '../../../support/engine/match-id';
 
 // The new tiles of Hexa Merge (statement §1.4, APP-NFR-07, issue #95).
 // The tests play through `GameEngine.play()` and the rules contract, on the real hex geometry.
@@ -194,7 +195,9 @@ describe('Merge new tiles', () => {
     });
     expect([...rules.validMoves(engine.snapshot())]).toEqual([]);
     expect(engine.currentPhase().canPlay()).toBe(false);
-    expect(publisher.events).toEqual([new GameOver(GameId.of('hexa-merge'), 'game-over', 0)]);
+    expect(publisher.events).toEqual([
+      new GameOver(GameId.of('hexa-merge'), MATCH_ID, 'game-over', 0),
+    ]);
   });
 
   it('should_pass_the_domain_purity_gate_when_it_lints_the_merge_code', () => {

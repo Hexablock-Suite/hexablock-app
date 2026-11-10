@@ -1,12 +1,14 @@
 import { Board } from '../../../src/domain/engine/board';
 import type { BoardState } from '../../../src/domain/engine/board-state';
 import type { GameEvent, GameEventPublisher } from '../../../src/domain/engine/game-events';
+import { GameId } from '../../../src/domain/engine/game-id';
 import type { Outcome } from '../../../src/domain/engine/outcome';
 import type { IPieceSource } from '../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../src/domain/engine/region-size';
 import { Resolution } from '../../../src/domain/engine/resolution';
 import { BaseGameRules } from '../../../src/domain/engine/rules';
 import type { IScoringPolicy } from '../../../src/domain/engine/scoring-policy';
+import type { IVariantFactory } from '../../../src/domain/engine/variant-factory';
 import type { FakeCell } from './fake-cell';
 import { squareTopology, type SquareAxis, type SquareCoord } from './square-topology';
 
@@ -143,4 +145,20 @@ export class RecordingPublisher implements GameEventPublisher {
     this.log.push('publish');
     this.events.push(event);
   }
+}
+
+// The variant factory of the fake game, on a board of size × size cells. It has no undo.
+// The use cases and the game factory cannot name this game.
+export function fakeGameFactory(
+  size = 2,
+): IVariantFactory<FakeCell, SquareCoord, FakeMove, FakeState, FakeCell> {
+  return {
+    gameId: GameId.of('fake-game'),
+    createRules: () => new FakeRules(),
+    createScoring: () => new OnePointScoring(),
+    createPieceSource: () => undefined,
+    createBoard: () => emptyState(size).board,
+    createInitialState: () => emptyState(size),
+    createHistory: () => undefined,
+  };
 }

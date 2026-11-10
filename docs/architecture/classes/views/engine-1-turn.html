@@ -64,7 +64,7 @@
       <h1>The turn: Template Method over Strategy</h1>
 
       <svg
-        viewBox="0 0 1040 948"
+        viewBox="0 0 1040 980"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="engine-turn-title engine-turn-desc"
@@ -138,7 +138,7 @@
           x="24"
           y="24"
           width="992"
-          height="712"
+          height="744"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -274,7 +274,7 @@
 
         <rect
           x="380"
-          y="536"
+          y="568"
           width="280"
           height="172"
           rx="8"
@@ -285,7 +285,7 @@
         />
         <text
           x="392"
-          y="552"
+          y="584"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -367,7 +367,7 @@
         />
         <!-- Resolution keeps its Outcome as outcome: use with role and multiplicity -->
         <path
-          d="M210,688 V712 H870 V652"
+          d="M210,688 V748 H870 V652"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -541,7 +541,7 @@
           x="380"
           y="216"
           width="300"
-          height="304"
+          height="336"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -574,22 +574,22 @@
           GameEngine
         </text>
         <text x="396" y="280" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - gameId: GameId
+          - matchId: MatchId
         </text>
         <text x="396" y="296" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - rules: IGameRules&lt;TMove, TState&gt;
+          - gameId: GameId
         </text>
         <text x="396" y="312" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - scoring: IScoringPolicy&lt;TState&gt;
+          - rules: IGameRules&lt;TMove, TState&gt;
         </text>
         <text x="396" y="328" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - events: GameEventPublisher
+          - scoring: IScoringPolicy&lt;TState&gt;
         </text>
         <text x="396" y="344" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - history: MoveHistory&lt;TMove, TState&gt;
+          - events: GameEventPublisher
         </text>
-        <text x="412" y="360" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          [0..1]
+        <text x="396" y="360" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - history: MoveHistory&lt;TMove, TState&gt; [0..1]
         </text>
         <text x="396" y="384" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + start(initial: TState): void
@@ -617,6 +617,12 @@
         </text>
         <text x="396" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + timed(): ITimed | undefined
+        </text>
+        <text x="396" y="528" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: GameEngine&lt;TCell, TCoord,
+        </text>
+        <text x="412" y="544" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          TMove, TState&gt;): boolean
         </text>
 
         <!-- Class: IGameRules (interface) -->
@@ -812,7 +818,7 @@
         <!-- Class: BoardState (interface) -->
         <rect
           x="396"
-          y="564"
+          y="596"
           width="248"
           height="128"
           rx="6"
@@ -820,11 +826,11 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="396" y1="612" x2="644" y2="612" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="396" y1="652" x2="644" y2="652" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="396" y1="644" x2="644" y2="644" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="396" y1="684" x2="644" y2="684" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="520"
-          y="582"
+          y="614"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -835,7 +841,7 @@
         </text>
         <text
           x="520"
-          y="600"
+          y="632"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -844,16 +850,16 @@
         >
           BoardState
         </text>
-        <text x="412" y="628" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="412" y="660" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + board: Board&lt;TCell, TCoord, string&gt;
         </text>
-        <text x="412" y="644" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="412" y="676" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + score: number
         </text>
-        <text x="412" y="668" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="412" y="700" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + clone(): BoardState&lt;TCell, TCoord&gt;
         </text>
-        <text x="412" y="684" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="412" y="716" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + view(): unknown
         </text>
 
@@ -1091,7 +1097,7 @@
         </text>
         <rect
           x="572"
-          y="554"
+          y="586"
           width="84"
           height="18"
           rx="2"
@@ -1102,7 +1108,7 @@
         />
         <text
           x="614"
-          y="566"
+          y="598"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1132,222 +1138,231 @@
           TState
         </text>
 
-        <!-- Footnote -->
-        <text
-          x="24"
-          y="752"
-          fill="#5b6873"
-          font-size="11"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          playTurn() is the template method of the abstract BaseGameRules (view 7). GameEngine
-          depends only on IGameRules, so the Strategy stays (D1).
-        </text>
-        <text
-          x="24"
-          y="768"
-          fill="#5b6873"
-          font-size="11"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          GameEngine declares TCoord and bounds TState by BoardState&lt;TCell, TCoord&gt; &amp;
-          Cloneable&lt;TState&gt; in its corner box (decision 16).
-        </text>
-        <text
-          x="24"
-          y="784"
-          fill="#5b6873"
-          font-size="11"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Aggregate root: a game changes only through play(), which applies a move only while
-          currentPhase().canPlay() is true. snapshot() returns a clone for the use cases (decision
-          26).
-        </text>
-        <text
-          x="24"
-          y="800"
-          fill="#5b6873"
-          font-size="11"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          From Sprint 3, undoable(), redoable() and timed() return the capability that the variant
-          factory gave, or undefined, so no use case asks for a concrete type (decision 27).
-        </text>
-        <text
-          x="24"
-          y="816"
-          fill="#5b6873"
-          font-size="11"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          IGameRules.evaluate(), GameEngine.play() and GamePhase.after() also use Outcome. The view
-          draws only the outcome attribute of Resolution.
-        </text>
-        <!-- Legend -->
-        <line x1="24" y1="840" x2="1016" y2="840" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
-        <text
-          x="24"
-          y="858"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          letter-spacing="0.18em"
-        >
-          LEGEND
-        </text>
+        <!-- The footnote and the legend sit below the zone, which grew by 32. -->
+        <g transform="translate(0 32)">
+          <!-- Footnote -->
+          <text
+            x="24"
+            y="752"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            playTurn() is the template method of the abstract BaseGameRules (view 7). GameEngine
+            depends only on IGameRules, so the Strategy stays (D1).
+          </text>
+          <text
+            x="24"
+            y="768"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            GameEngine declares TCoord and bounds TState by BoardState&lt;TCell, TCoord&gt; &amp;
+            Cloneable&lt;TState&gt; in its corner box (decision 16).
+          </text>
+          <text
+            x="24"
+            y="784"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Aggregate root: MatchId is its identity. A game changes only through play(), and only
+            while currentPhase().canPlay() is true. snapshot() returns a clone (decision 26).
+          </text>
+          <text
+            x="24"
+            y="800"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            From Sprint 3, undoable(), redoable() and timed() return the capability that the variant
+            factory gave, or undefined, so no use case asks for a concrete type (decision 27).
+          </text>
+          <text
+            x="24"
+            y="816"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            IGameRules.evaluate(), GameEngine.play() and GamePhase.after() also use Outcome. The
+            view draws only the outcome attribute of Resolution.
+          </text>
+          <!-- Legend -->
+          <line
+            x1="24"
+            y1="840"
+            x2="1016"
+            y2="840"
+            stroke="rgba(23,33,42,0.10)"
+            stroke-width="0.8"
+          />
+          <text
+            x="24"
+            y="858"
+            fill="#5b6873"
+            font-size="8"
+            font-family="'IBM Plex Mono', monospace"
+            letter-spacing="0.18em"
+          >
+            LEGEND
+          </text>
 
-        <line
-          x1="24"
-          y1="876"
-          x2="52"
-          y2="876"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#t-diamond-filled)"
-        />
-        <text
-          x="60"
-          y="880"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Composition · in-layer pattern
-        </text>
-        <line
-          x1="264"
-          y1="876"
-          x2="292"
-          y2="876"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#t-diamond-hollow)"
-        />
-        <text
-          x="300"
-          y="880"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Aggregation · in-layer pattern
-        </text>
-        <line
-          x1="504"
-          y1="876"
-          x2="532"
-          y2="876"
-          stroke="#5b6873"
-          stroke-width="1"
-          marker-end="url(#t-open)"
-        />
-        <text
-          x="540"
-          y="880"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Use · attribute, parameter, return, local or new
-        </text>
-        <rect
-          x="24"
-          y="896"
-          width="28"
-          height="12"
-          rx="2"
-          fill="#f9f4dc"
-          stroke="rgba(180,83,9,0.45)"
-          stroke-width="1"
-        />
-        <text
-          x="60"
-          y="905"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Zone · Clean layer
-        </text>
-        <rect
-          x="184"
-          y="896"
-          width="28"
-          height="12"
-          rx="2"
-          fill="none"
-          stroke="rgba(91,104,115,0.55)"
-          stroke-width="1"
-          stroke-dasharray="4,4"
-        />
-        <text
-          x="220"
-          y="905"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Dashed frame · GoF pattern
-        </text>
-        <rect
-          x="344"
-          y="896"
-          width="28"
-          height="12"
-          rx="2"
-          fill="#ffffff"
-          stroke="#5b6873"
-          stroke-width="0.8"
-          stroke-dasharray="4,3"
-        />
-        <text
-          x="380"
-          y="905"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Corner box · type parameters
-        </text>
-        <rect
-          x="504"
-          y="896"
-          width="28"
-          height="12"
-          rx="2"
-          fill="rgba(15,111,116,0.10)"
-          stroke="#0f6f74"
-          stroke-width="1"
-        />
-        <text
-          x="540"
-          y="905"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Teal · focal class
-        </text>
-        <text
-          x="24"
-          y="928"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          «Sprint N»
-        </text>
-        <text
-          x="92"
-          y="928"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Planned design, not in the code yet · N is the docs/ROADMAP.md sprint of the requirement
-          it serves · a planned class carries it once, for its members and arrows
-        </text>
+          <line
+            x1="24"
+            y1="876"
+            x2="52"
+            y2="876"
+            stroke="#17212a"
+            stroke-width="1"
+            marker-start="url(#t-diamond-filled)"
+          />
+          <text
+            x="60"
+            y="880"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Composition · in-layer pattern
+          </text>
+          <line
+            x1="264"
+            y1="876"
+            x2="292"
+            y2="876"
+            stroke="#17212a"
+            stroke-width="1"
+            marker-start="url(#t-diamond-hollow)"
+          />
+          <text
+            x="300"
+            y="880"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Aggregation · in-layer pattern
+          </text>
+          <line
+            x1="504"
+            y1="876"
+            x2="532"
+            y2="876"
+            stroke="#5b6873"
+            stroke-width="1"
+            marker-end="url(#t-open)"
+          />
+          <text
+            x="540"
+            y="880"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Use · attribute, parameter, return, local or new
+          </text>
+          <rect
+            x="24"
+            y="896"
+            width="28"
+            height="12"
+            rx="2"
+            fill="#f9f4dc"
+            stroke="rgba(180,83,9,0.45)"
+            stroke-width="1"
+          />
+          <text
+            x="60"
+            y="905"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Zone · Clean layer
+          </text>
+          <rect
+            x="184"
+            y="896"
+            width="28"
+            height="12"
+            rx="2"
+            fill="none"
+            stroke="rgba(91,104,115,0.55)"
+            stroke-width="1"
+            stroke-dasharray="4,4"
+          />
+          <text
+            x="220"
+            y="905"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Dashed frame · GoF pattern
+          </text>
+          <rect
+            x="344"
+            y="896"
+            width="28"
+            height="12"
+            rx="2"
+            fill="#ffffff"
+            stroke="#5b6873"
+            stroke-width="0.8"
+            stroke-dasharray="4,3"
+          />
+          <text
+            x="380"
+            y="905"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Corner box · type parameters
+          </text>
+          <rect
+            x="504"
+            y="896"
+            width="28"
+            height="12"
+            rx="2"
+            fill="rgba(15,111,116,0.10)"
+            stroke="#0f6f74"
+            stroke-width="1"
+          />
+          <text
+            x="540"
+            y="905"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Teal · focal class
+          </text>
+          <text
+            x="24"
+            y="928"
+            fill="#17212a"
+            font-size="8.5"
+            font-family="'IBM Plex Mono', monospace"
+          >
+            «Sprint N»
+          </text>
+          <text
+            x="92"
+            y="928"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Planned design, not in the code yet · N is the docs/ROADMAP.md sprint of the requirement
+            it serves · a planned class carries it once, for its members and arrows
+          </text>
+        </g>
       </svg>
     </div>
   </body>

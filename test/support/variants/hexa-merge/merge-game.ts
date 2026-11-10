@@ -16,6 +16,7 @@ import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile
 import type { NewTile } from '../../../../src/domain/variants/hexa-merge/new-tile';
 import type { Slide } from '../../../../src/domain/variants/hexa-merge/slide';
 import { RecordingPublisher } from '../../engine/fake-game';
+import { MATCH_ID } from '../../engine/match-id';
 
 // The Merge game for the rules tests, on the real hexagonal geometry.
 // The rules tests score no points. The scoring tests pass their own policy.
@@ -72,6 +73,7 @@ export function mergeGame(
   const rules = new MergeRules<MergeTile, HexCoord, HexAxis>(target);
   const publisher = new RecordingPublisher();
   const engine = new GameEngine<MergeTile, HexCoord, Slide<HexAxis>, HexMergeState>(
+    MATCH_ID,
     GameId.of('hexa-merge'),
     rules,
     scoring,

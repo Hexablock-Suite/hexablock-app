@@ -18,6 +18,7 @@ import { FitState } from '../../../../src/domain/variants/hexa-fit/fit-state';
 import { PieceId } from '../../../../src/domain/variants/hexa-fit/piece-id';
 import { RecordingPublisher } from '../../../support/engine/fake-game';
 import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
+import { MATCH_ID } from '../../../support/engine/match-id';
 
 // The Fit scoring of issue #98. It codes the accepted rule of issue #59 (D22):
 // no points per turn, and a star needs both of its thresholds (moves and time).
@@ -53,6 +54,7 @@ describe('FitScoring', () => {
       FitMove<SquareCoord>,
       FitState<SquareCoord>
     >(
+      MATCH_ID,
       GameId.of('hexa-fit'),
       new FitRules<SquareCoord>(),
       new FitScoring<SquareCoord>(),

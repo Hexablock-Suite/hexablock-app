@@ -15,6 +15,7 @@ import { LinesState } from '../../../../src/domain/variants/hexa-lines/lines-sta
 import type { PlacePiece } from '../../../../src/domain/variants/hexa-lines/place-piece';
 import { RecordingPublisher } from '../../engine/fake-game';
 import { square, type SquareCoord } from '../../engine/square-topology';
+import { MATCH_ID } from '../../engine/match-id';
 
 // Builders for the Hexa Lines rules tests. They exist only in test/.
 
@@ -55,6 +56,7 @@ export function linesGame<TCoord>(
 ) {
   const publisher = new RecordingPublisher();
   const engine = new GameEngine<Color, TCoord, PlacePiece<TCoord>, LinesState<TCoord>>(
+    MATCH_ID,
     GameId.of('hexa-lines'),
     new LinesRules<TCoord>(),
     scoring,

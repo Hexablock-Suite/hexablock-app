@@ -3,6 +3,7 @@ import type { Cloneable } from './cloneable';
 import { GameOver, type GameEventPublisher } from './game-events';
 import type { GameId } from './game-id';
 import { PlayingPhase, ResolvingPhase, type GamePhase } from './game-phase';
+import type { MatchId } from './match-id';
 import { MoveCommand } from './move-command';
 import type { MoveHistory } from './move-history';
 import type { Outcome } from './outcome';
@@ -27,6 +28,8 @@ export interface PublishFailure {
 }
 
 // The aggregate root of one game (classes.md decision 26).
+// It is an entity: its `MatchId` is its identity, and the id never changes.
+// `GameFactory` gives each new game the id of a generator. `gameId` only names the variant.
 // A game changes only through `play()` and through the undo capability, and both act only
 // while `currentPhase().canPlay()` is true. `snapshot()` returns a clone, so no caller changes the board.
 // The engine depends only on the interfaces of the rules and the scoring (Strategy, D1).
@@ -44,12 +47,19 @@ export class GameEngine<
   private current: GamePhase = PlayingPhase.instance;
 
   constructor(
+    private readonly matchId: MatchId,
     private readonly gameId: GameId,
     private readonly rules: IGameRules<TMove, TState>,
     private readonly scoring: IScoringPolicy<TState>,
     private readonly events: GameEventPublisher,
     private readonly history?: MoveHistory<TMove, TState>,
   ) {}
+
+  // Two engines are the same game when they have the same `MatchId`.
+  // The boards, the scores and the phases do not count.
+  equals(other: GameEngine<TCell, TCoord, TMove, TState>): boolean {
+    return this.matchId.equals(other.matchId);
+  }
 
   // Tells which phase the game is in.
   currentPhase(): GamePhase {
@@ -119,7 +129,7 @@ export class GameEngine<
     // does not undo the turn. The report keeps its error apart from the outcome.
     if (turn.outcome !== 'playing') {
       try {
-        this.events.publish(new GameOver(this.gameId, turn.outcome, turn.next.score));
+        this.events.publish(new GameOver(this.gameId, this.matchId, turn.outcome, turn.next.score));
       } catch (error) {
         return { accepted: true, outcome: turn.outcome, publishFailure: { error } };
       }

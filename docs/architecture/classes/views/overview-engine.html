@@ -71,7 +71,7 @@
       >
         <title id="ovengine-title">HexaBlock generic engine map · UML class diagram</title>
         <desc id="ovengine-desc">
-          Overview map of the 66 layer 1 engine classes in 15 groups. Each line joins two classes:
+          Overview map of the 67 layer 1 engine classes in 15 groups. Each line joins two classes:
           GameEngine keeps its GamePhase, its optional MoveHistory and its IScoringPolicy and
           notifies through GameEventPublisher, BoardState keeps its Board, IVariantFactory creates
           the IGameRules and GeometryFactory creates the piece shapes. No line touches a group
@@ -305,7 +305,7 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.14em"
         >
-          MATCH · IDENTITY
+          MATCH · FACTORY · IDENTITY
         </text>
         <text
           x="388"
@@ -1014,6 +1014,34 @@
           </text>
         </g>
         <!-- Chips: match -->
+        <g data-class="GameFactory">
+          <rect
+            x="68"
+            y="204"
+            width="96"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="116"
+            y="216"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            factory
+          </text>
+          <text x="116" y="229" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              GameFactory
+            </tspan>
+          </text>
+        </g>
         <g data-class="MatchIdGenerator">
           <rect
             x="172"

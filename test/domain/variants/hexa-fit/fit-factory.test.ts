@@ -18,6 +18,7 @@ import { square, squareTopology, type SquareCoord } from '../../../support/engin
 import { startVariant } from '../../../support/engine/variant-game';
 import { A, fitFactory, threeDominoFitFactory } from '../../../support/variants/hexa-fit/fit-game';
 import { repoRoot } from '../../../support/run-tool';
+import { MATCH_ID } from '../../../support/engine/match-id';
 
 // The Fit factory creates the whole family of Hexa Fit (issue 99, classes.md decision 31).
 
@@ -37,7 +38,7 @@ describe('FitFactory', () => {
     expect(initial.remaining().map((p) => p.content.value)).toEqual(['a']);
     expect(outcome).toBe('victory');
     expect(engine.snapshot().score).toBe(0);
-    expect(publisher.events).toEqual([new GameOver(factory.gameId, 'victory', 0)]);
+    expect(publisher.events).toEqual([new GameOver(factory.gameId, MATCH_ID, 'victory', 0)]);
   });
 
   it('should_give_a_new_source_of_the_level_pieces_when_the_fit_factory_is_asked_twice', () => {

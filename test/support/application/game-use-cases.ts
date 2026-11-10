@@ -7,8 +7,11 @@ import type { BoardState } from '../../../src/domain/engine/board-state';
 import type { Cloneable } from '../../../src/domain/engine/cloneable';
 import type { GameEngine } from '../../../src/domain/engine/game-engine';
 import type { GameEventPublisher } from '../../../src/domain/engine/game-events';
+import { GameFactory } from '../../../src/domain/engine/game-factory';
+import type { MatchIdGenerator } from '../../../src/domain/engine/match-id-generator';
 import type { IVariantFactory } from '../../../src/domain/engine/variant-factory';
 import { RecordingPublisher } from '../engine/fake-game';
+import { CountingMatchIds } from '../engine/match-id';
 import { RecordingLogger } from './recording-logger';
 
 // Helpers for the game use case tests. They exist only in test/.
@@ -40,6 +43,7 @@ export class MemoryRunningGameStore<
 
 // The game use cases of one variant over one shared store.
 // `ApplyMove` writes a publisher failure to `logger` (issue 132).
+// `ids` gives the id of each game that `StartGame` opens.
 export function gameUseCases<
   TCell,
   TCoord,
@@ -50,12 +54,13 @@ export function gameUseCases<
   factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>,
   events: GameEventPublisher = new RecordingPublisher(),
   logger: RecordingLogger = new RecordingLogger(),
+  ids: MatchIdGenerator = new CountingMatchIds(),
 ) {
   const games = new MemoryRunningGameStore<TCell, TCoord, TMove, TState>();
   return {
     games,
     logger,
-    startGame: new StartGame(factory, games, events),
+    startGame: new StartGame(new GameFactory(factory, ids, events), games),
     applyMove: new ApplyMove(games, logger),
     undoMove: new UndoMove(games),
   };

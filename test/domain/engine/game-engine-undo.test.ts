@@ -21,6 +21,7 @@ import {
 } from '../../support/engine/fake-game';
 import { phaseNameOf } from '../../support/engine/phase-name';
 import { square, squareTopology, type SquareCoord } from '../../support/engine/square-topology';
+import { MATCH_ID } from '../../support/engine/match-id';
 
 // `GameEngine` takes the state back through the undo capability (classes.md decisions 27 and 34).
 // The engine is the Memento originator: it clones the state and restores it.
@@ -39,6 +40,7 @@ function historyGame(rules = new FakeRules(), size = 2) {
   const publisher = new RecordingPublisher();
   const history = new MoveHistory<FakeMove, FakeState>();
   const engine = new GameEngine(
+    MATCH_ID,
     GameId.of('fake-game'),
     rules,
     new OnePointScoring(),
@@ -107,6 +109,7 @@ class UndoingScoring extends OnePointScoring {
 describe('GameEngine undo capability', () => {
   it('should_give_no_capability_when_the_engine_has_no_history', () => {
     const engine = new GameEngine(
+      MATCH_ID,
       GameId.of('fake-game'),
       new FakeRules(),
       new OnePointScoring(),
@@ -144,6 +147,7 @@ describe('GameEngine undo capability', () => {
     const pieces = [fakeCell(1), fakeCell(2), fakeCell(3)];
     const history = new MoveHistory<SquareCoord, SourceState>();
     const engine = new GameEngine(
+      MATCH_ID,
       GameId.of('fake-game'),
       new SourceRules(),
       { score: () => 0 },
@@ -215,7 +219,9 @@ describe('GameEngine undo capability', () => {
     expect(undoable.canUndo()).toBe(false);
     expect(() => undoable.undo()).toThrow(new RangeError('The history has no move to undo.'));
     expect(factsOf(engine)).toEqual(finished);
-    expect(publisher.events).toEqual([new GameOver(GameId.of('fake-game'), 'game-over', 1)]);
+    expect(publisher.events).toEqual([
+      new GameOver(GameId.of('fake-game'), MATCH_ID, 'game-over', 1),
+    ]);
   });
 
   it('should_refuse_the_undo_and_change_nothing_when_the_game_is_paused', () => {
@@ -242,6 +248,7 @@ describe('GameEngine undo capability', () => {
   it('should_refuse_a_reentrant_undo_and_keep_both_moves_when_the_scoring_asks_for_it_in_a_turn', () => {
     const scoring = new UndoingScoring();
     const engine = new GameEngine(
+      MATCH_ID,
       GameId.of('fake-game'),
       new FakeRules(),
       scoring,
@@ -288,6 +295,7 @@ describe('GameEngine undo capability', () => {
       const publisher = new RecordingPublisher();
       const history = withHistory ? new MoveHistory<FakeMove, FakeState>() : undefined;
       const engine = new GameEngine(
+        MATCH_ID,
         GameId.of('fake-game'),
         new FakeRules(),
         new OnePointScoring(),

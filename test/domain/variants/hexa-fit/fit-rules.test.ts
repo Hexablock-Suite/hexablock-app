@@ -29,6 +29,7 @@ import {
   triangleTopology,
   type TriangleCoord,
 } from '../../../support/engine/triangle-topology';
+import { MATCH_ID } from '../../../support/engine/match-id';
 
 // The Fit rules suite (APP-NFR-12: one rules suite per variant).
 // The square double keeps the coordinates easy to read. The triangle double has
@@ -65,6 +66,7 @@ function dominoLevel(): FitState<SquareCoord> {
 
 function engineOn(initial: FitState<SquareCoord>, publisher = new RecordingPublisher()) {
   const engine = new GameEngine<PieceId, SquareCoord, FitMove<SquareCoord>, FitState<SquareCoord>>(
+    MATCH_ID,
     GameId.of('hexa-fit'),
     new FitRules<SquareCoord>(),
     noPoints,

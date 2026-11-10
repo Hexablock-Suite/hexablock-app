@@ -22,6 +22,7 @@ import {
   values,
   type HexMergeState,
 } from '../../../support/variants/hexa-merge/merge-game';
+import { MATCH_ID } from '../../../support/engine/match-id';
 
 // The rules suite of Hexa Merge (statement §1.4, APP-NFR-12).
 // The tests play through `GameEngine.play()` and the rules contract, on the real hex geometry.
@@ -299,6 +300,7 @@ describe('Merge edge cases', () => {
         Slide<HexAxis>,
         MergeState<Chip, HexCoord, HexAxis>
       >(
+        MATCH_ID,
         GameId.of('hexa-merge'),
         new MergeRules<Chip, HexCoord, HexAxis>(chip('aaaa')),
         { score: () => 0 },

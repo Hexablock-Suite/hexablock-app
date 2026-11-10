@@ -1,4 +1,5 @@
 import type { GameId } from './game-id';
+import type { MatchId } from './match-id';
 import type { Outcome } from './outcome';
 
 // Observer (statement §3.3). An event that the engine publishes. It is a domain event.
@@ -8,9 +9,12 @@ export abstract class GameEvent {
 
 // `GameEngine` builds this event after it saves the turn. So a final score that is not finite
 // reaches the caller as a publish failure, and the turn stays saved.
+// The event carries two ids: `gameId` says which game ended, and `matchId` says which match
+// of that game (classes.md decision 30). So a listener tells two matches of one game apart.
 export class GameOver extends GameEvent {
   constructor(
     gameId: GameId,
+    readonly matchId: MatchId,
     readonly outcome: Outcome,
     readonly finalScore: number,
   ) {
