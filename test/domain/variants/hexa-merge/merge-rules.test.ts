@@ -1,5 +1,6 @@
 /** @jest-environment node */
 import { Outcome } from '../../../../src/domain/engine/outcome';
+import { Seed } from '../../../../src/domain/engine/seed';
 import { Score } from '../../../../src/domain/engine/score';
 import { Board } from '../../../../src/domain/engine/board';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
@@ -403,7 +404,7 @@ describe('MergeRules in place', () => {
         [hex(1, 0), 2],
       ],
       2,
-      mergeTileSource(3),
+      mergeTileSource(Seed.of(3)),
     );
     const { engine, rules } = mergeGame(start, MergeTile.of(2048), failing);
     const facts = (state: MergeSnapshot<MergeTile, HexCoord, HexAxis>) => ({

@@ -4,6 +4,7 @@ import { Score } from '../../../../src/domain/engine/score';
 import { GameId } from '../../../../src/domain/engine/game-id';
 import { Color } from '../../../../src/domain/engine/color';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
+import { Seed } from '../../../../src/domain/engine/seed';
 import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
 import { GoalCount } from '../../../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../../../src/domain/variants/hexa-sort/sort-factory';
@@ -74,7 +75,7 @@ describe('SortFactory', () => {
         stack('green'),
         stack('yellow'),
       ]),
-      SortLevel.seeded(RegionSize.of(2), GoalCount.of(5), 7, [
+      SortLevel.seeded(RegionSize.of(2), GoalCount.of(5), Seed.of(7), [
         Color.of('red'),
         Color.of('blue'),
         Color.of('green'),
@@ -102,7 +103,7 @@ describe('SortFactory', () => {
         stack('blue'),
         stack('green'),
       ]),
-      SortLevel.seeded(RegionSize.of(2), GoalCount.of(5), 7, [
+      SortLevel.seeded(RegionSize.of(2), GoalCount.of(5), Seed.of(7), [
         Color.of('red'),
         Color.of('blue'),
         Color.of('green'),

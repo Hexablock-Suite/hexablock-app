@@ -14,9 +14,11 @@ import { Range, type Compare } from '../../src/domain/engine/range';
 import { RegionSize } from '../../src/domain/engine/region-size';
 import { CellNode, ShapeGroup } from '../../src/domain/engine/shape-node';
 import { Score } from '../../src/domain/engine/score';
+import { Seed } from '../../src/domain/engine/seed';
 import { Stars } from '../../src/domain/engine/stars';
 import { Turns } from '../../src/domain/engine/turns';
 import { Placement } from '../../src/domain/variants/hexa-fit/placement';
+import { Chance } from '../../src/domain/variants/hexa-merge/chance';
 import { MergeTile } from '../../src/domain/variants/hexa-merge/merge-tile';
 import { ColorStack } from '../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../src/domain/variants/hexa-sort/goal-count';
@@ -72,6 +74,25 @@ describe('equals of the whole number value objects', () => {
 
     expect(bothWays(same, MergeTile.of(4), MergeTile.of(4))).toEqual(EQUAL);
     expect(bothWays(same, MergeTile.of(4), MergeTile.of(8))).toEqual(DIFFERENT);
+  });
+});
+
+// Issue 210: the seed and the chance of a 4 are value objects.
+describe('equals of the seed and the chance', () => {
+  it('should_be_equal_when_two_seeds_hold_the_same_value', () => {
+    const same: Same<Seed> = (left, right) => left.equals(right);
+
+    expect(bothWays(same, Seed.of(42), Seed.of(42))).toEqual(EQUAL);
+    expect(bothWays(same, Seed.of(0), Seed.of(-0))).toEqual(EQUAL);
+    expect(bothWays(same, Seed.of(42), Seed.of(43))).toEqual(DIFFERENT);
+  });
+
+  it('should_be_equal_when_two_chances_hold_the_same_value', () => {
+    const same: Same<Chance> = (left, right) => left.equals(right);
+
+    expect(bothWays(same, Chance.of(0.1), Chance.of(0.1))).toEqual(EQUAL);
+    expect(bothWays(same, Chance.of(0), Chance.of(-0))).toEqual(EQUAL);
+    expect(bothWays(same, Chance.of(0.1), Chance.of(0.9))).toEqual(DIFFERENT);
   });
 });
 

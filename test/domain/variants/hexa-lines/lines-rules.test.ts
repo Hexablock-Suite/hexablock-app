@@ -5,6 +5,7 @@ import { GameOverPhase, PlayingPhase } from '../../../../src/domain/engine/game-
 import type { GridTopology } from '../../../../src/domain/engine/grid-topology';
 import { GameOver } from '../../../../src/domain/engine/game-events';
 import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
+import { Seed } from '../../../../src/domain/engine/seed';
 import { BaseGameRules, type IGameRules } from '../../../../src/domain/engine/rules';
 import { Color } from '../../../../src/domain/engine/color';
 import { ComboMultiplierDecorator } from '../../../../src/domain/variants/hexa-lines/combo-multiplier-decorator';
@@ -383,7 +384,7 @@ describe('Hexa Lines rules edge cases', () => {
   it('should_throw_and_keep_the_game_when_the_source_or_the_topology_throws_during_a_move', () => {
     // The rollback covers the whole state and the phase (classes.md decision 21).
     const base = linesState(squareTopology, 3, { tray: [one] });
-    const failingSource = new SeededPieceSource<typeof one>(1, () => {
+    const failingSource = new SeededPieceSource<typeof one>(Seed.of(1), () => {
       throw new Error('The source failed.');
     });
     const failingTopology: GridTopology<SquareCoord, SquareAxis, SquareDirection> = {

@@ -67,10 +67,12 @@ function factsOf<
 
 // The next draws of a seeded source. The read is pure, so the source stays where it is.
 // A `toEqual` on the source itself would never end, because the source is an endless iterator.
-function drawsOf(source: IPieceSource<NewTile<MergeTile>>): [number, number][] {
-  const draws: [number, number][] = [];
+// A draw keeps its fields private (issue 210), so the list holds the draws themselves,
+// and `toEqual` compares two draws by their fields.
+function drawsOf(source: IPieceSource<NewTile<MergeTile>>): NewTile<MergeTile>[] {
+  const draws: NewTile<MergeTile>[] = [];
   for (const draw of source) {
-    draws.push([draw.place, draw.tile.points().value]);
+    draws.push(draw);
     if (draws.length === 8) break;
   }
   return draws;

@@ -12,6 +12,7 @@ import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
 import { MoveHistory } from '../../../src/domain/engine/move-history';
 import { Piece } from '../../../src/domain/engine/piece';
 import { RegionSize } from '../../../src/domain/engine/region-size';
+import { Seed } from '../../../src/domain/engine/seed';
 import { CellNode, ShapeGroup } from '../../../src/domain/engine/shape-node';
 import { SquareGeometry } from '../../../src/domain/engine/square-geometry';
 import { TriangleGeometry } from '../../../src/domain/engine/triangle-geometry';
@@ -20,11 +21,8 @@ import type { IVariantFactory } from '../../../src/domain/engine/variant-factory
 import { FitFactory } from '../../../src/domain/variants/hexa-fit/fit-factory';
 import { FitLevel } from '../../../src/domain/variants/hexa-fit/fit-level';
 import { PlaceFitPiece } from '../../../src/domain/variants/hexa-fit/fit-move';
-import { LinesFactory } from '../../../src/domain/variants/hexa-lines/lines-factory';
-import {
-  MergeFactory,
-  type MergeSettings,
-} from '../../../src/domain/variants/hexa-merge/merge-factory';
+import { LinesFactory, LinesSettings } from '../../../src/domain/variants/hexa-lines/lines-factory';
+import { MergeFactory, MergeSettings } from '../../../src/domain/variants/hexa-merge/merge-factory';
 import { MergeTile } from '../../../src/domain/variants/hexa-merge/merge-tile';
 import { ColorStack } from '../../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../../src/domain/variants/hexa-sort/goal-count';
@@ -109,11 +107,7 @@ function undosAfter<
 
 // The #64 check (APP-FR-16). The settings hold no coordinate,
 // so the argument of `startMerge()` is the only thing that changes between two figures.
-const mergeSettings: MergeSettings = {
-  size: RegionSize.of(2),
-  seed: 7,
-  target: MergeTile.of(2048),
-};
+const mergeSettings = MergeSettings.of(RegionSize.of(2), Seed.of(7), MergeTile.of(2048));
 
 function startMerge<TCoord>(geometry: GeometryFactory<TCoord>) {
   const factory = new MergeFactory(geometry, mergeSettings);
@@ -142,12 +136,10 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
 
   return () => {
     it('should_start_lines_on_the_region_of_the_geometry_when_the_lines_factory_gets_it', () => {
-      const factory = new LinesFactory(geometry, {
-        size,
-        seed: 1,
-        shapes: [new CellNode(origin)],
-        colors: [Color.of('red')],
-      });
+      const factory = new LinesFactory(
+        geometry,
+        LinesSettings.of(size, Seed.of(1), [new CellNode(origin)], [Color.of('red')]),
+      );
       const { engine, rules } = startVariant(factory);
       const start = engine.snapshot();
 

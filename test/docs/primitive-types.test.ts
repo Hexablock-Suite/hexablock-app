@@ -421,6 +421,26 @@ describe('README primitive types', () => {
     ]);
   });
 
+  // Issue #210, classes.md decision 48: a seed is a `Seed`, not a number.
+  // Only the factory of `Seed` and the first state of a generator keep a row.
+  it('should_find_no_seed_of_type_number_when_the_code_is_scanned', () => {
+    const uses = codeUses();
+    const places = uses.map((use) => use.where);
+
+    for (const place of [
+      'IRandomSeeded.seed',
+      'SeededPieceSource.seed',
+      'SeededPieceSource.constructor',
+      'Mulberry32Random.constructor',
+      'Mulberry32Random.from',
+      'Seed.value',
+    ]) {
+      expect(places).not.toContain(place);
+    }
+    const ofSeed = uses.filter((use) => use.where.startsWith('Seed.'));
+    expect(ofSeed.map(key).sort()).toEqual(['number Seed.generatorState', 'number Seed.of']);
+  });
+
   it('should_list_a_literal_type_as_its_primitive_when_a_signature_names_a_closed_union', () => {
     const source = [
       "export type Outcome = 'playing' | 'victory';",

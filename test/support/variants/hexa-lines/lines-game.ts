@@ -8,11 +8,15 @@ import type { GridTopology } from '../../../../src/domain/engine/grid-topology';
 import { Piece } from '../../../../src/domain/engine/piece';
 import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
+import { Seed } from '../../../../src/domain/engine/seed';
 import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
 import { CellNode, ShapeGroup, type ShapeNode } from '../../../../src/domain/engine/shape-node';
 import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
 import { Color } from '../../../../src/domain/engine/color';
-import { LinesFactory } from '../../../../src/domain/variants/hexa-lines/lines-factory';
+import {
+  LinesFactory,
+  LinesSettings,
+} from '../../../../src/domain/variants/hexa-lines/lines-factory';
 import { LinesRules } from '../../../../src/domain/variants/hexa-lines/lines-rules';
 import {
   LinesState,
@@ -100,7 +104,10 @@ export function linesFactory(
   ],
   colors: readonly [Color, ...Color[]] = [red],
 ): LinesFactory<SquareCoord> {
-  return new LinesFactory(new SquareGeometry(), { size: RegionSize.of(3), seed, shapes, colors });
+  return new LinesFactory(
+    new SquareGeometry(),
+    LinesSettings.of(RegionSize.of(3), Seed.of(seed), shapes, colors),
+  );
 }
 
 // A live state built again from a photo, so a test can ask the rules about the state that a game

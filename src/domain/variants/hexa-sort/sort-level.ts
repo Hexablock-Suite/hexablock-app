@@ -1,8 +1,8 @@
 import type { Color } from '../../engine/color';
-import { Mulberry32Random } from '../../engine/mulberry32-random';
 import { FixedListPieceSource } from '../../engine/piece-source';
 import type { RandomSource } from '../../engine/random-source';
 import type { RegionSize } from '../../engine/region-size';
+import type { Seed } from '../../engine/seed';
 import { ColorStack } from './color-stack';
 import type { GoalCount } from './goal-count';
 
@@ -10,13 +10,13 @@ import type { GoalCount } from './goal-count';
 // A seeded supply holds the seed and the colors that a draw picks from.
 // A fixed supply holds the stacks in the order of the level.
 type StackSupply =
-  | { readonly seed: number; readonly colors: readonly Color[] }
+  | { readonly seed: Seed; readonly colors: readonly Color[] }
   | { readonly stacks: readonly ColorStack[] };
 
 // What `sourceWith()` asks of its caller: one builder for each kind of supply.
 // `draw` turns a random source into one stack of the level.
 export interface SortSourceBuilders<TSource> {
-  seeded(seed: number, draw: (random: RandomSource) => ColorStack): TSource;
+  seeded(seed: Seed, draw: (random: RandomSource) => ColorStack): TSource;
   fixed(stacks: readonly ColorStack[]): TSource;
 }
 
@@ -26,11 +26,11 @@ export interface SortSourceBuilders<TSource> {
 // The level holds data only: the seed, or the fixed list of stacks. It holds no `IPieceSource`.
 // `SortFactory` builds a new source from that data for each game.
 // The goal is a `GoalCount`, so a level cannot ask for 0 goals (issue #129).
-// The level guards its own invariant. Each factory method makes every check of its data,
+// The level guards its own invariant. Each factory method makes every check of its data.
+// The seed is a `Seed`, which checks its own range (classes.md decision 48, issue #210),
 // so a level with a wrong seed cannot exist.
 // Each factory method copies its list and freezes the copy, and the object is frozen.
 // So a change to the array of the caller does not change the level.
-// The seed is a number until issue #210 turns it into a `Seed`.
 // `SortLevelBuilder` builds the level through a factory method in Sprint 3 (#167).
 export class SortLevel {
   private constructor(
@@ -42,17 +42,14 @@ export class SortLevel {
   }
 
   // A level whose source draws stacks at random from `seed`, and never ends.
-  // The seed is a whole number from 0 to 4294967295. Any other number throws a RangeError.
-  // `Mulberry32Random` holds that check, so the level and the seeded source refuse the same seeds.
   // `FixedListPieceSource` holds the check of `undefined`, so the level reads its copy.
   // A list with no color throws a RangeError, because a draw needs a color to pick.
   static seeded(
     size: RegionSize,
     goalsNeeded: GoalCount,
-    seed: number,
+    seed: Seed,
     colors: readonly [Color, ...Color[]],
   ): SortLevel {
-    new Mulberry32Random(seed);
     const copy = [...new FixedListPieceSource<Color>(colors)];
     if (copy.length === 0) throw new RangeError('A seeded Sort level needs one color or more.');
     return new SortLevel(size, goalsNeeded, Object.freeze({ seed, colors: Object.freeze(copy) }));
@@ -115,7 +112,7 @@ function sameSupply(left: StackSupply, right: StackSupply): boolean {
   }
   return (
     !('stacks' in right) &&
-    left.seed === right.seed &&
+    left.seed.equals(right.seed) &&
     left.colors.length === right.colors.length &&
     left.colors.every((color, i) => right.colors[i]?.equals(color) === true)
   );

@@ -104,14 +104,13 @@ describe('LinesFactory', () => {
     expect(engine.snapshot().score).toEqual(Score.of(41));
   });
 
-  it('should_throw_a_range_error_when_the_lines_settings_hold_a_seed_that_is_not_a_32_bit_integer', () => {
+  // Since issue 210 the seed checks itself, so the error comes when the settings are built,
+  // before any factory exists. Before, it came when the factory created the piece source.
+  it('should_throw_a_range_error_when_the_lines_settings_get_a_seed_that_is_not_a_32_bit_integer', () => {
     for (const seed of [Number.NaN, Number.POSITIVE_INFINITY, 1.5, -1, 2 ** 53]) {
       const message = `A seed must be an integer from 0 to 4294967295, not ${seed}.`;
 
-      expect(() => linesFactory(seed).createPieceSource()).toThrow(new RangeError(message));
-      expect(() => linesFactory(seed).createInitialState(MATCH_ID, STATE_ID, BOARD_ID)).toThrow(
-        new RangeError(message),
-      );
+      expect(() => linesFactory(seed)).toThrow(new RangeError(message));
     }
   });
 
