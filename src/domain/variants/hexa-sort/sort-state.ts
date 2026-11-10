@@ -10,11 +10,6 @@ import { ClearedStacks } from './cleared-stacks';
 import { ColorStack } from './color-stack';
 import type { GoalCount } from './goal-count';
 
-// The move of Hexa Sort: place the offered stack on the cell `at` (statement §1.3).
-export interface PlaceStack<TCoord> {
-  readonly at: TCoord;
-}
-
 // The data that the Sort screen draws: the offered stack and the goal counts.
 export interface SortView<TCoord> {
   readonly offered: Piece<ColorStack, TCoord> | undefined;

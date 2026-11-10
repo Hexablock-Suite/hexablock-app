@@ -15,7 +15,8 @@ import type { ColorStack } from './color-stack';
 import type { GoalCount } from './goal-count';
 import { SortRules } from './sort-rules';
 import { SortScoring } from './sort-scoring';
-import { SortState, type PlaceStack } from './sort-state';
+import type { PlaceStack } from './place-stack';
+import { SortState } from './sort-state';
 
 // One Hexa Sort level: the board region, the source of its stacks and its goal.
 // The goal is a `GoalCount`, so a level cannot ask for 0 goals (issue #129).

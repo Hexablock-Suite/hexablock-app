@@ -403,7 +403,7 @@ describe('SortRules atomic turn', () => {
     });
     const before = facts(engine.snapshot());
 
-    expect(() => engine.play({ at: square(0, 0) })).toThrow('The scoring fails.');
+    expect(() => engine.play(place(0, 0))).toThrow('The scoring fails.');
     expect(facts(engine.snapshot())).toEqual(before);
   });
 });

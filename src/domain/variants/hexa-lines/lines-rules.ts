@@ -11,9 +11,10 @@ import { PlacePiece } from './place-piece';
 // Hexa Lines has no gravity (REQUIREMENTS.md §8). A cleared cell stays empty, and no cell moves.
 // The rules decide. The state changes itself: the rules call `placePiece()` and `clearLines()`.
 // The rules read the state through its photo and through `canPlace()`, never through a field.
+// The rules read no field of a move: they pass the move to the state (classes.md decision 43).
+// `PlacePiece` checks its own tray index, so the rules do not check it again.
 export class LinesRules<TCoord> extends BaseGameRules<PlacePiece<TCoord>, LinesState<TCoord>> {
   isValid(state: LinesState<TCoord>, move: PlacePiece<TCoord>): boolean {
-    if (!Number.isInteger(move.trayIndex)) return false;
     return state.canPlace(move);
   }
 

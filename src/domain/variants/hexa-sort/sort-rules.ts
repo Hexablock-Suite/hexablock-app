@@ -3,7 +3,8 @@ import type { Outcome } from '../../engine/outcome';
 import { Resolution } from '../../engine/resolution';
 import { BaseGameRules } from '../../engine/rules';
 import type { ColorStack } from './color-stack';
-import type { PlaceStack, SortState } from './sort-state';
+import { PlaceStack } from './place-stack';
+import type { SortState } from './sort-state';
 
 // A top run of this many tiles of one color clears its stack (statement §1.3).
 // The accepted rule of issue #56: a top run of 10 or more removes the whole stack,
@@ -17,21 +18,22 @@ export const GOAL_RUN = 10;
 // The rules decide. The state changes itself: the rules call `placeOfferedStack()`,
 // `moveRun()` and `clearStack()`. The rules read the state through its photo and `canPlace()`.
 // A photo never changes, so the rules take a new photo after each change of the state.
+// The rules read no field of a move: they ask the move for its cell (classes.md decision 43).
 export class SortRules<TCoord> extends BaseGameRules<PlaceStack<TCoord>, SortState<TCoord>> {
   isValid(state: SortState<TCoord>, move: PlaceStack<TCoord>): boolean {
-    return state.canPlace(move.at);
+    return state.canPlace(move.cell());
   }
 
   *validMoves(state: SortState<TCoord>): Iterable<PlaceStack<TCoord>> {
     const { offered, board } = state.snapshot();
     if (offered === undefined) return;
     for (const at of board.shape.cells) {
-      if (state.canPlace(at)) yield { at };
+      if (state.canPlace(at)) yield PlaceStack.on(at);
     }
   }
 
   apply(state: SortState<TCoord>, move: PlaceStack<TCoord>): SortState<TCoord> {
-    state.placeOfferedStack(move.at);
+    state.placeOfferedStack(move.cell());
     return state;
   }
 

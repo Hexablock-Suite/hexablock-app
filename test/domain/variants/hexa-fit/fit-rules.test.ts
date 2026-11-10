@@ -286,7 +286,7 @@ describe('FitRules', () => {
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     const live = fitStateOf(engine.snapshot(), pieces());
     const moves = [...new FitRules<SquareCoord>().validMoves(live)];
-    expect(moves.filter((move) => move.kind === 'place')).toEqual([]);
+    expect(moves.filter((move) => move instanceof PlaceFitPiece)).toEqual([]);
     expect(moves).toContainEqual(new RemoveFitPiece(A));
   });
 

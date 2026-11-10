@@ -73,30 +73,25 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
     return state;
   }
 
-  // True when the tray has a piece at the index of the move, and each cell of that piece
-  // at the offset `at` lies inside the board on a free cell.
+  // True when the tray has the piece that the move names, and each cell of that piece
+  // at the offset of the move lies inside the board on a free cell.
+  // The state reads no field of the move: it asks the move (classes.md decision 43).
   canPlace(move: PlacePiece<TCoord>): boolean {
-    const piece = this.tray[move.trayIndex];
-    return piece !== undefined && this.fits(piece, move.at);
+    const piece = move.pieceIn(this.tray);
+    return piece !== undefined && this.fits(this.cellsOf(piece, move));
   }
 
   // Puts the tray piece on the board and takes it from the tray.
   // When the tray is empty, the next pieces of the source fill it.
   // A missing tray piece, or a piece that does not fit, throws a RangeError.
   placePiece(move: PlacePiece<TCoord>): void {
-    const piece = this.tray[move.trayIndex];
-    if (piece === undefined) {
-      throw new RangeError(`The tray has no piece at index ${move.trayIndex}.`);
-    }
-    if (!this.fits(piece, move.at)) {
-      throw new RangeError(
-        `The piece at tray index ${move.trayIndex} does not fit at ${this.board.topology.key(move.at)}.`,
-      );
-    }
-    const cells = this.cellsOf(piece, move.at);
+    const piece = move.pieceIn(this.tray);
+    if (piece === undefined) throw move.missingPiece();
+    const cells = this.cellsOf(piece, move);
+    if (!this.fits(cells)) throw move.misfit(this.board.topology);
     for (const c of cells) this.board.occupy(c, piece.content);
     this.cellsPlaced = cells.length;
-    this.tray = this.tray.filter((_, i) => i !== move.trayIndex);
+    this.tray = move.trayWithout(this.tray);
     if (this.tray.length === 0) this.drawTray();
   }
 
@@ -192,15 +187,14 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
     this.tray = pieces;
   }
 
-  private cellsOf(piece: Piece<Color, TCoord>, at: TCoord): TCoord[] {
-    return piece.translated(at, this.board.topology).shape.cells();
+  // The board cells that the piece covers at the offset of the move.
+  private cellsOf(piece: Piece<Color, TCoord>, move: PlacePiece<TCoord>): TCoord[] {
+    return move.cells(piece, this.board.topology);
   }
 
   // A piece fits when each of its cells lies inside the board on a free cell.
-  private fits(piece: Piece<Color, TCoord>, at: TCoord): boolean {
-    return this.cellsOf(piece, at).every(
-      (c) => this.board.contains(c) && this.board.get(c) === undefined,
-    );
+  private fits(cells: readonly TCoord[]): boolean {
+    return cells.every((c) => this.board.contains(c) && this.board.get(c) === undefined);
   }
 }
 
