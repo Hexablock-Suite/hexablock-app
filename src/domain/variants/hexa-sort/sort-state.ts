@@ -1,6 +1,5 @@
 import type { Board } from '../../engine/board';
 import { checkOwnSnapshot, type BoardSnapshot, type BoardState } from '../../engine/board-state';
-import type { Cloneable } from '../../engine/cloneable';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { MatchId } from '../../engine/match-id';
 import { Score } from '../../engine/score';
@@ -18,8 +17,9 @@ export interface SortView<TCoord> {
 }
 
 // The photo of a Sort state (classes.md decision 34): the board, the score, the offered stack,
-// the goals, the facts of the last turn and a copy of the piece source at its position.
-// The source shows only `clone()`, so a reader cannot draw from the photo.
+// the goals, the facts of the last turn and the piece source at its position.
+// The source is a value (classes.md decision 51), so the photo shares it with the state,
+// and a reader that draws from it changes nothing.
 // `view()` gives the offered stack and the goal counts for the screen.
 export interface SortSnapshot<TCoord> extends BoardSnapshot<ColorStack, TCoord> {
   readonly offered: Piece<ColorStack, TCoord> | undefined;
@@ -27,7 +27,7 @@ export interface SortSnapshot<TCoord> extends BoardSnapshot<ColorStack, TCoord> 
   readonly goalsNeeded: GoalCount;
   readonly clearedTiles: readonly number[];
   readonly placedAt: TCoord | undefined;
-  readonly source: Cloneable<IPieceSource<Piece<ColorStack, TCoord>>>;
+  readonly source: IPieceSource<Piece<ColorStack, TCoord>>;
   view(): SortView<TCoord>;
 }
 
@@ -85,8 +85,15 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
   }
 
   // Draws the next stack from the source, or offers none when the source ends.
+  // A draw gives the next source, and the state keeps it in place of its source.
   offerNext(): void {
-    this.offered = this.source.hasNext() ? this.source.next() : undefined;
+    if (!this.source.hasNext()) {
+      this.offered = undefined;
+      return;
+    }
+    const { piece, rest } = this.source.take();
+    this.offered = piece;
+    this.source = rest;
   }
 
   // True when a stack is on offer and the cell lies inside the board with no stack,
@@ -148,7 +155,8 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
   }
 
   // The photo of the state now. A piece, a goal count and a coordinate never change,
-  // so the photo shares them. It holds a frozen list and copies of the board and the source.
+  // and the source is a value, so the photo shares them.
+  // It holds a frozen list and a copy of the board.
   snapshot(): SortSnapshot<TCoord> {
     const view = Object.freeze({
       offered: this.offered,
@@ -165,7 +173,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
       goalsNeeded: this.goalsNeeded,
       clearedTiles: Object.freeze([...this.clearedTiles]),
       placedAt: this.placedAt,
-      source: this.source.clone(),
+      source: this.source,
       view: () => view,
     });
   }
@@ -176,7 +184,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
   restore(snapshot: SortSnapshot<TCoord>): void {
     checkOwnSnapshot(this.stateId, this.board, snapshot);
     this.board.restore(snapshot.board);
-    this.source = snapshot.source.clone();
+    this.source = snapshot.source;
     this.offered = snapshot.offered;
     this.goalsDone = snapshot.goalsDone;
     this.clearedTiles = [...snapshot.clearedTiles];
@@ -206,12 +214,13 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
     }
   }
 
+  // The source is a value, so the copy shares it.
   clone(): SortState<TCoord> {
     return new SortState(
       this.stateId,
       this.matchId,
       this.board.clone(),
-      this.source.clone(),
+      this.source,
       this.goalsNeeded,
       this.offered,
       this.goalsDone,

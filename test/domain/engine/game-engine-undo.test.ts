@@ -175,7 +175,7 @@ describe('GameEngine undo capability', () => {
 
     // The draw of the undone move comes back, so the new move gets the same piece.
     expect(filled(engine.snapshot().board)).toEqual([['1,0', 1]]);
-    expect(engine.snapshot().source.next()).toEqual(fakeCell(2));
+    expect(engine.snapshot().source.take().piece).toEqual(fakeCell(2));
   });
 
   it('should_keep_the_old_state_when_a_caller_changes_a_snapshot_after_a_move', () => {

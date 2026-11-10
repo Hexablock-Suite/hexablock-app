@@ -50,10 +50,10 @@ export class SortFactory<TCoord> implements IVariantFactory<
     return new SortScoring<TCoord>();
   }
 
-  // Prototype (classes.md decision 7): a clone of the level source at its position.
-  // So each game draws the same stacks, and the level source stays unread.
+  // The source of the level. It is a value (classes.md decision 51), so every game shares it:
+  // each game draws the same stacks, and no draw changes the level source.
   createPieceSource(): IPieceSource<Piece<ColorStack, TCoord>> {
-    return this.level.source.clone();
+    return this.level.source;
   }
 
   createBoard(boardId: BoardId): Board<ColorStack, TCoord> {

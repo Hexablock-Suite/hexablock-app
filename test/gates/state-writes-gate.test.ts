@@ -18,7 +18,7 @@ import { repoRoot } from '../support/run-tool';
 // R8 makes every field of the four variant states private, and a reader reads the photo
 // that `snapshot()` gives. The scan of the state files reports a field that is not private.
 // The compiler then refuses what the scan of the writes cannot see on a state: an array change
-// such as `state.clearedTiles.push()`, a draw such as `state.tiles.next()`, and a write from
+// such as `state.clearedTiles.push()`, a draw such as `state.tiles.take()`, and a write from
 // a class that declares a field of the same name. `test/domain/engine/state-snapshot.test.ts`
 // proves it at compile time, so this gate keeps no case for it.
 

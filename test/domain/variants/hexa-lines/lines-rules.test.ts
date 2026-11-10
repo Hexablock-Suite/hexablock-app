@@ -88,7 +88,7 @@ describe('Hexa Lines rules', () => {
 
     const state = engine.snapshot();
     expect(state.tray).toEqual([a, b, c]);
-    expect(state.source.clone().next()).toBe(d);
+    expect(state.source.take().piece).toBe(d);
   });
 
   it('should_reject_the_move_and_keep_the_state_when_the_piece_does_not_fit_or_names_no_tray_piece', () => {
@@ -278,8 +278,8 @@ describe('Hexa Lines rules', () => {
 
     expect(filledKeys(before)).toEqual([]);
     expect(before.tray).toEqual([one]);
-    expect(before.source.clone().hasNext()).toBe(true);
-    expect(engine.snapshot().source.clone().hasNext()).toBe(false);
+    expect(before.source.hasNext()).toBe(true);
+    expect(engine.snapshot().source.hasNext()).toBe(false);
   });
 });
 
@@ -499,7 +499,7 @@ describe('LinesRules atomic turn', () => {
     const facts = (state: LinesSnapshot<SquareCoord>) => ({
       cells: state.board.cells(),
       tray: [...state.tray],
-      nextPiece: state.source.clone().next(),
+      nextPiece: state.source.take().piece,
       counts: [state.streak, state.linesCleared, state.cellsPlaced],
       score: state.score,
     });

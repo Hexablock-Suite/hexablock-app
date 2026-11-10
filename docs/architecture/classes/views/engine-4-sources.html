@@ -73,16 +73,16 @@
           HexaBlock piece sources, scoring and progress · UML class diagram
         </title>
         <desc id="sources-desc">
-          Class diagram of layer 1 showing the IPieceSource strategy, iterator and prototype with
-          its seeded and fixed-list implementations, each with a clone() that copies its position,
-          SeededPieceSource keeping the Mulberry32Random random source that it builds from its seed
-          and clones, the IScoringPolicy strategy wrapped by the abstract ScoringDecorator, and the
-          IProgressModel strategy that records a GameResult and returns a ProgressRecord. Range is
-          the value object of a closed interval, which checks the seed of Mulberry32Random. Score is
-          the value object of a score: IScoringPolicy returns one, and GameResult and ProgressRecord
-          hold one. Moves, ElapsedTime, Stars and LevelId are the value objects of the counters:
-          GameResult holds a Moves, a LevelId and an ElapsedTime, and ProgressRecord holds a LevelId
-          and Stars.
+          Class diagram of layer 1 showing the IPieceSource strategy and iterator with its seeded
+          and fixed-list implementations, both value objects whose take() returns the piece and the
+          next source, SeededPieceSource keeping the Mulberry32Random random source that it builds
+          from its seed and clones before each draw, the IScoringPolicy strategy wrapped by the
+          abstract ScoringDecorator, and the IProgressModel strategy that records a GameResult and
+          returns a ProgressRecord. Range is the value object of a closed interval, which checks the
+          seed of Mulberry32Random. Score is the value object of a score: IScoringPolicy returns
+          one, and GameResult and ProgressRecord hold one. Moves, ElapsedTime, Stars and LevelId are
+          the value objects of the counters: GameResult holds a Moves, a LevelId and an ElapsedTime,
+          and ProgressRecord holds a LevelId and Stars.
         </desc>
         <defs>
           <marker
@@ -235,9 +235,9 @@
         <!-- SeededPieceSource implements IPieceSource: realization -->
         <line
           x1="256"
-          y1="228"
+          y1="220"
           x2="256"
-          y2="212"
+          y2="196"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -246,9 +246,9 @@
         <!-- FixedListPieceSource implements IPieceSource: realization -->
         <line
           x1="380"
-          y1="228"
+          y1="220"
           x2="380"
-          y2="212"
+          y2="196"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -338,7 +338,7 @@
           x="176"
           y="92"
           width="264"
-          height="120"
+          height="104"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -371,21 +371,18 @@
           + hasNext(): boolean
         </text>
         <text x="192" y="172" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + next(): TPiece
+          + take(): PieceDraw&lt;TPiece&gt;
         </text>
         <text x="192" y="188" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + [Symbol.iterator](): Iterator&lt;TPiece&gt;
-        </text>
-        <text x="192" y="204" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + clone(): IPieceSource&lt;TPiece&gt;
         </text>
 
         <!-- Class: SeededPieceSource -->
         <rect
           x="68"
-          y="228"
+          y="220"
           width="264"
-          height="112"
+          height="120"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -394,7 +391,18 @@
         <line x1="68" y1="268" x2="332" y2="268" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="200"
-          y="253"
+          y="238"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="200"
+          y="256"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -413,15 +421,15 @@
           - draw: (random: RandomSource) =&gt; TPiece
         </text>
         <text x="84" y="332" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + clone(): SeededPieceSource
+          + take(): PieceDraw&lt;TPiece&gt;
         </text>
 
         <!-- Class: FixedListPieceSource -->
         <rect
           x="344"
-          y="228"
+          y="220"
           width="216"
-          height="96"
+          height="104"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -430,7 +438,18 @@
         <line x1="344" y1="268" x2="560" y2="268" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="452"
-          y="253"
+          y="238"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="452"
+          y="256"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -446,7 +465,7 @@
           - index: number
         </text>
         <text x="360" y="316" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + clone(): FixedListPieceSource
+          + take(): PieceDraw&lt;TPiece&gt;
         </text>
 
         <!-- Class: IScoringPolicy (interface, strategy) -->
@@ -1178,7 +1197,7 @@
         </text>
         <rect
           x="296"
-          y="218"
+          y="210"
           width="48"
           height="18"
           rx="2"
@@ -1189,7 +1208,7 @@
         />
         <text
           x="320"
-          y="230"
+          y="222"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1199,7 +1218,7 @@
         </text>
         <rect
           x="524"
-          y="218"
+          y="210"
           width="48"
           height="18"
           rx="2"
@@ -1210,7 +1229,7 @@
         />
         <text
           x="548"
-          y="230"
+          y="222"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1269,8 +1288,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          A variant state holds its piece source, and the state clone() clones it, so the rollback
-          of a turn covers the source (decision 31). No clone() replays the draws.
+          A piece source is a value object: take() returns { piece, rest }, the piece and the next
+          source, and changes nothing. A state keeps rest after a draw (decisions 31 and 51).
         </text>
         <text
           x="24"
@@ -1280,7 +1299,7 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           SeededPieceSource builds a Mulberry32Random from its seed (§1.4, APP-NFR-07). RandomSource
-          extends Cloneable, so Mulberry32Random.clone() copies the generator state.
+          extends Cloneable: take() clones the generator and draws from the clone.
         </text>
 
         <text

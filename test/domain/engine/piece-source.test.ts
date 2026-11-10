@@ -12,7 +12,8 @@ const colors = ['red', 'green', 'blue', 'yellow'];
 const drawColor = (random: RandomSource): string =>
   colors[Math.floor(random.next() * colors.length)] ?? 'red';
 
-function take<T>(source: IPieceSource<T>, count: number): T[] {
+// The first `count` pieces of a source. The read is pure, so the source stays where it is.
+function first<T>(source: IPieceSource<T>, count: number): T[] {
   const pieces: T[] = [];
   for (const piece of source) {
     pieces.push(piece);
@@ -24,36 +25,67 @@ function take<T>(source: IPieceSource<T>, count: number): T[] {
 describe('FixedListPieceSource', () => {
   it('should_end_after_the_last_piece_when_read_with_for_of', () => {
     const source = new FixedListPieceSource(['a', 'b', 'c']);
+    const end = source.take().rest.take().rest.take().rest;
 
     expect([...source]).toEqual(['a', 'b', 'c']);
-    expect(source.hasNext()).toBe(false);
+    expect(source.hasNext()).toBe(true);
+    expect(end.hasNext()).toBe(false);
+    expect([...end]).toEqual([]);
   });
 
-  it('should_throw_when_next_runs_after_the_last_piece', () => {
-    const source = new FixedListPieceSource(['a']);
-    source.next();
+  it('should_throw_a_range_error_when_take_runs_after_the_last_piece', () => {
+    const end = new FixedListPieceSource(['a']).take().rest;
 
-    expect(() => source.next()).toThrow('no piece left');
+    expect(() => end.take()).toThrow(new RangeError('The piece source has no piece left.'));
+    expect(() => new FixedListPieceSource<string>([]).take()).toThrow(RangeError);
   });
 
   it('should_keep_its_pieces_when_the_caller_changes_the_list', () => {
     const list = ['a', 'b'];
     const source = new FixedListPieceSource(list);
+    const rest = source.take().rest;
 
     list.push('c');
+    list[1] = 'z';
 
     expect([...source]).toEqual(['a', 'b']);
+    expect([...rest]).toEqual(['b']);
   });
 
   it('should_end_at_once_when_the_list_is_empty', () => {
     expect([...new FixedListPieceSource<string>([])]).toEqual([]);
+    expect(new FixedListPieceSource<string>([]).hasNext()).toBe(false);
   });
 
-  it('should_give_nothing_the_second_time_when_the_source_is_read_twice', () => {
+  it('should_give_the_same_pieces_the_second_time_when_the_source_is_read_twice', () => {
     const source = new FixedListPieceSource(['a', 'b']);
 
     expect([...source]).toEqual(['a', 'b']);
-    expect([...source]).toEqual([]);
+    expect([...source]).toEqual(['a', 'b']);
+  });
+
+  it('should_give_the_same_pieces_when_two_sources_are_built_from_the_same_list', () => {
+    expect([...new FixedListPieceSource(['a', 'b'])]).toEqual([
+      ...new FixedListPieceSource(['a', 'b']),
+    ]);
+  });
+
+  it('should_return_the_piece_and_the_next_source_and_stay_at_its_position_when_take_runs', () => {
+    const source = new FixedListPieceSource(['a', 'b', 'c']);
+
+    const { piece, rest } = source.take();
+
+    expect(piece).toBe('a');
+    expect(rest === source).toBe(false);
+    expect([...rest]).toEqual(['b', 'c']);
+    expect([...source]).toEqual(['a', 'b', 'c']);
+  });
+
+  it('should_give_the_same_piece_twice_when_take_runs_twice_on_one_source', () => {
+    const source = new FixedListPieceSource(['a', 'b']);
+
+    expect([source.take().piece, source.take().piece]).toEqual(['a', 'a']);
+    expect([...source.take().rest]).toEqual([...source.take().rest]);
   });
 
   it('should_throw_a_range_error_when_the_list_holds_undefined', () => {
@@ -68,23 +100,23 @@ describe('FixedListPieceSource', () => {
 
 describe('SeededPieceSource', () => {
   it('should_repeat_the_same_sequence_when_two_sources_share_the_seed', () => {
-    const first = take(new SeededPieceSource(42, drawColor), 20);
-    const second = take(new SeededPieceSource(42, drawColor), 20);
+    const one = first(new SeededPieceSource(42, drawColor), 20);
+    const other = first(new SeededPieceSource(42, drawColor), 20);
 
-    expect(second).toEqual(first);
+    expect(other).toEqual(one);
   });
 
   it('should_give_another_sequence_when_the_seed_differs', () => {
-    const first = take(new SeededPieceSource(42, drawColor), 20);
-    const other = take(new SeededPieceSource(7, drawColor), 20);
+    const one = first(new SeededPieceSource(42, drawColor), 20);
+    const other = first(new SeededPieceSource(7, drawColor), 20);
 
-    expect(other).not.toEqual(first);
+    expect(other).not.toEqual(one);
   });
 
   it('should_never_end_when_many_pieces_are_read', () => {
     const source = new SeededPieceSource(1, drawColor);
 
-    expect(take(source, 1000)).toHaveLength(1000);
+    expect(first(source, 1000)).toHaveLength(1000);
     expect(source.hasNext()).toBe(true);
   });
 
@@ -106,15 +138,46 @@ describe('SeededPieceSource', () => {
     expect(new SeededPieceSource(4294967295, drawColor).seed).toBe(4294967295);
   });
 
-  it('should_continue_the_sequence_when_a_seeded_source_is_read_in_two_loops', () => {
+  it('should_give_the_same_pieces_the_second_time_when_a_seeded_source_is_read_in_two_loops', () => {
     const source = new SeededPieceSource(42, drawColor);
-    const expected = take(new SeededPieceSource(42, drawColor), 10);
 
-    const first = take(source, 5);
-    const second = take(source, 5);
+    const one = first(source, 5);
+    const again = first(source, 5);
 
-    expect([...first, ...second]).toEqual(expected);
-    expect(second).not.toEqual(expected.slice(0, 5));
+    expect(again).toEqual(one);
+    expect(one).toEqual(first(new SeededPieceSource(42, drawColor), 5));
+  });
+
+  it('should_return_the_piece_and_the_next_source_and_stay_at_its_position_when_take_runs', () => {
+    const source = new SeededPieceSource(42, drawColor);
+    const expected = first(new SeededPieceSource(42, drawColor), 10);
+
+    const { piece, rest } = source.take();
+
+    expect(piece).toBe(expected[0]);
+    expect(rest === source).toBe(false);
+    expect(rest.seed).toBe(42);
+    expect(first(source, 10)).toEqual(expected);
+  });
+
+  it('should_give_the_same_piece_twice_when_take_runs_twice_on_one_source', () => {
+    // Seed 42 gives two different first pieces, so a source that moves fails here.
+    const source = new SeededPieceSource(42, drawColor);
+    const [one, two] = first(new SeededPieceSource(42, drawColor), 2);
+
+    expect(one).not.toBe(two);
+    expect([source.take().piece, source.take().piece]).toEqual([one, one]);
+    expect([source.take().rest.take().piece, source.take().rest.take().piece]).toEqual([two, two]);
+  });
+
+  it('should_continue_the_sequence_of_the_seed_when_the_next_source_is_read', () => {
+    const expected = first(new SeededPieceSource(42, drawColor), 12);
+
+    const second = new SeededPieceSource(42, drawColor).take().rest;
+    const third = second.take().rest;
+
+    expect(first(second, 11)).toEqual(expected.slice(1));
+    expect(first(third, 10)).toEqual(expected.slice(2));
   });
 
   it('should_expose_its_seed_when_the_seed_is_read', () => {
@@ -131,43 +194,28 @@ describe('Mulberry32Random', () => {
   });
 });
 
-// Prototype (classes.md decision 7). A clone copies the position or the generator state.
-// So the engine copy of a state that holds a source also covers the source.
-describe('cloning a source', () => {
-  it('should_give_the_same_sequence_when_a_seeded_source_is_cloned', () => {
-    const source = new SeededPieceSource(42, drawColor);
-    take(source, 3);
+// Prototype (classes.md decision 7). `RandomSource` stays `Cloneable`: a clone copies
+// the generator state. The seeded piece source draws from a clone, so it never moves.
+describe('cloning a random source', () => {
+  it('should_give_the_same_numbers_when_a_random_source_is_cloned', () => {
     const random = new Mulberry32Random(7);
     random.next();
 
-    const clone = source.clone();
     const randomClone = random.clone();
 
-    expect(clone.seed).toBe(42);
-    expect(take(clone, 10)).toEqual(take(source, 10));
-    expect(take(clone, 10)).toEqual(take(new SeededPieceSource(42, drawColor), 23).slice(13));
     expect(Array.from({ length: 10 }, () => randomClone.next())).toEqual(
       Array.from({ length: 10 }, () => random.next()),
     );
   });
 
   it('should_keep_the_original_unchanged_when_a_clone_draws', () => {
-    const seeded = new SeededPieceSource(42, drawColor);
-    const seededExpected = take(new SeededPieceSource(42, drawColor), 5);
-    const fixed = new FixedListPieceSource(['a', 'b', 'c']);
-    fixed.next();
     const random = new Mulberry32Random(7);
     const fresh = new Mulberry32Random(7);
-    const randomExpected = Array.from({ length: 5 }, () => fresh.next());
+    const expected = Array.from({ length: 5 }, () => fresh.next());
 
-    take(seeded.clone(), 5);
-    expect([...fixed.clone()]).toEqual(['b', 'c']);
     const randomClone = random.clone();
     for (let i = 0; i < 5; i += 1) randomClone.next();
 
-    expect(take(seeded, 5)).toEqual(seededExpected);
-    expect(fixed.hasNext()).toBe(true);
-    expect([...fixed]).toEqual(['b', 'c']);
-    expect(Array.from({ length: 5 }, () => random.next())).toEqual(randomExpected);
+    expect(Array.from({ length: 5 }, () => random.next())).toEqual(expected);
   });
 });

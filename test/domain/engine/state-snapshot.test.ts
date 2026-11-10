@@ -153,7 +153,7 @@ describe('the restore of a state from its photo', () => {
       json([photo.board.cells(), photo.score, photo.tray, photo.streak]),
     );
     expect([back.linesCleared, back.cellsPlaced]).toEqual([photo.linesCleared, photo.cellsPlaced]);
-    expect(json(back.source.clone().next())).toBe(json(photo.source.clone().next()));
+    expect(json(back.source.take().piece)).toBe(json(photo.source.take().piece));
   });
 
   it('should_give_back_the_offered_stack_and_the_source_when_sort_restores', () => {
@@ -171,7 +171,7 @@ describe('the restore of a state from its photo', () => {
     expect(json([back.clearedTiles, back.placedAt])).toBe(
       json([photo.clearedTiles, photo.placedAt]),
     );
-    expect(json(back.source.clone().next())).toBe(json(photo.source.clone().next()));
+    expect(json(back.source.take().piece)).toBe(json(photo.source.take().piece));
   });
 
   it('should_give_back_the_tiles_and_the_tile_source_when_merge_restores', () => {
@@ -187,7 +187,67 @@ describe('the restore of a state from its photo', () => {
     expect(json([back.board.cells(), back.score, back.targetReached, back.merged])).toBe(
       json([photo.board.cells(), photo.score, photo.targetReached, photo.merged]),
     );
-    expect(json(back.tiles.clone().next())).toBe(json(photo.tiles.clone().next()));
+    expect(json(back.tiles.take().piece)).toBe(json(photo.tiles.take().piece));
+  });
+
+  // Issue 215: a piece source is a value. A draw replaces the source of the state,
+  // and `restore()` takes back the source of the photo itself, with no copy.
+  // Each test compares two sources with `===`: a failed `toBe` would print an endless source.
+  it('should_draw_the_same_tray_again_when_lines_draws_and_then_restores_its_photo', () => {
+    const state = linesFactory().createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
+    const photo = state.snapshot();
+    const refill = (): string => {
+      for (const col of [0, 1, 2]) state.placePiece(new PlacePiece(0, square(col, 0)));
+      return json(state.snapshot().tray);
+    };
+    const first = refill();
+    expect(state.snapshot().source === photo.source).toBe(false);
+
+    state.restore(photo);
+
+    expect(state.snapshot().source === photo.source).toBe(true);
+    expect(refill()).toBe(first);
+  });
+
+  it('should_offer_the_same_stack_again_when_sort_draws_and_then_restores_its_photo', () => {
+    const state = sortFactory().createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
+    const photo = state.snapshot();
+    state.placeOfferedStack(square(0, 0));
+    const first = json(state.snapshot().offered);
+    expect(first).not.toBe(json(photo.offered));
+
+    state.restore(photo);
+
+    expect(state.snapshot().source === photo.source).toBe(true);
+    state.placeOfferedStack(square(0, 0));
+    expect(json(state.snapshot().offered)).toBe(first);
+  });
+
+  it('should_add_the_same_tile_again_when_merge_draws_and_then_restores_its_photo', () => {
+    const state = mergeFactory(5).createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
+    const photo = state.snapshot();
+    state.addNewTile();
+    const first = json(state.snapshot().board.cells());
+    expect(first).not.toBe(json(photo.board.cells()));
+
+    state.restore(photo);
+
+    expect(state.snapshot().tiles === photo.tiles).toBe(true);
+    state.addNewTile();
+    expect(json(state.snapshot().board.cells())).toBe(first);
+  });
+
+  it('should_keep_the_next_tile_of_the_state_when_a_reader_draws_from_the_source_of_a_photo', () => {
+    const state = mergeFactory(5).createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
+    const twin = mergeFactory(5).createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
+    const photo = state.snapshot();
+
+    const drawn = [photo.tiles.take().piece, photo.tiles.take().rest.take().piece];
+
+    expect(json(drawn[0])).toBe(json(state.snapshot().tiles.take().piece));
+    state.addNewTile();
+    twin.addNewTile();
+    expect(json(state.snapshot().board.cells())).toBe(json(twin.snapshot().board.cells()));
   });
 
   it('should_give_back_the_placements_and_the_moves_when_fit_restores', () => {
@@ -312,7 +372,7 @@ describe('the fields of a state', () => {
       // @ts-expect-error `LinesState.tray` is private.
       () => lines.tray,
       // @ts-expect-error `LinesState.source` is private.
-      () => lines.source.next(),
+      () => lines.source.take(),
       // @ts-expect-error `LinesState.streak` is private.
       () => lines.streak,
       // @ts-expect-error `LinesState.linesCleared` is private.
@@ -330,7 +390,7 @@ describe('the fields of a state', () => {
       // @ts-expect-error `SortState.board` is private.
       () => sort.board,
       // @ts-expect-error `SortState.source` is private.
-      () => sort.source.next(),
+      () => sort.source.take(),
       // @ts-expect-error `SortState.goalsNeeded` is private.
       () => sort.goalsNeeded,
       // @ts-expect-error `SortState.offered` is private.
@@ -346,7 +406,7 @@ describe('the fields of a state', () => {
       // @ts-expect-error `MergeState.board` is private.
       () => merge.board,
       // @ts-expect-error `MergeState.tiles` is private.
-      () => merge.tiles.next(),
+      () => merge.tiles.take(),
       // @ts-expect-error `MergeState.targetReached` is private.
       () => merge.targetReached,
       // @ts-expect-error `MergeState.merged` is private.

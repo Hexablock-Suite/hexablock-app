@@ -1,6 +1,5 @@
 import type { Board } from '../../engine/board';
 import { checkOwnSnapshot, type BoardSnapshot, type BoardState } from '../../engine/board-state';
-import type { Cloneable } from '../../engine/cloneable';
 import type { Color } from '../../engine/color';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { MatchId } from '../../engine/match-id';
@@ -19,15 +18,15 @@ export interface LinesView<TCoord> {
 }
 
 // The photo of a Lines state (classes.md decision 34): the board, the score, the tray,
-// the three facts of the last placement and a copy of the piece source at its position.
-// The source shows only `clone()`, so a reader cannot draw from the photo,
-// and `restore()` gives the state its own copy. `view()` gives the tray for the screen.
+// the three facts of the last placement and the piece source at its position.
+// The source is a value (classes.md decision 51), so the photo shares it with the state,
+// and a reader that draws from it changes nothing. `view()` gives the tray for the screen.
 export interface LinesSnapshot<TCoord> extends BoardSnapshot<Color, TCoord> {
   readonly tray: readonly Piece<Color, TCoord>[];
   readonly streak: number;
   readonly linesCleared: number;
   readonly cellsPlaced: number;
-  readonly source: Cloneable<IPieceSource<Piece<Color, TCoord>>>;
+  readonly source: IPieceSource<Piece<Color, TCoord>>;
   view(): LinesView<TCoord>;
 }
 
@@ -39,6 +38,7 @@ export interface LinesSnapshot<TCoord> extends BoardSnapshot<Color, TCoord> {
 // A refused input throws a RangeError and leaves the whole state as it was.
 // The scoring, the rules and the use cases read the photo of `snapshot()`, never a field.
 // The source lives in the state, so the engine copy and rollback cover it (classes.md decision 31).
+// The source is a value: a draw replaces it with the next source (classes.md decision 51).
 // `streak` and `linesCleared` follow the proposal on issue 58, «Propuesta, pendiente del equipo».
 // `linesCleared` is the combo of the last placement: the count of distinct full lines it cleared.
 // `streak` counts the placements in a row that cleared at least one line.
@@ -130,7 +130,8 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
   }
 
   // The photo of the state now. Pieces never change, so the photo shares them.
-  // The tray, the board and the source change, so the photo holds a frozen list and copies.
+  // The source is a value, so the photo shares it too.
+  // The tray and the board change, so the photo holds a frozen list and a copy of the board.
   snapshot(): LinesSnapshot<TCoord> {
     const tray = Object.freeze([...this.tray]);
     const view = Object.freeze({ tray });
@@ -143,7 +144,7 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
       streak: this.streak,
       linesCleared: this.linesCleared,
       cellsPlaced: this.cellsPlaced,
-      source: this.source.clone(),
+      source: this.source,
       view: () => view,
     });
   }
@@ -155,21 +156,21 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
     checkValues(snapshot.tray, snapshot.streak, snapshot.linesCleared, snapshot.cellsPlaced);
     this.board.restore(snapshot.board);
     this.tray = [...snapshot.tray];
-    this.source = snapshot.source.clone();
+    this.source = snapshot.source;
     this.streak = snapshot.streak;
     this.linesCleared = snapshot.linesCleared;
     this.cellsPlaced = snapshot.cellsPlaced;
     this.score = snapshot.score;
   }
 
-  // Pieces never change, so the tray copy shares them.
+  // Pieces and the source never change, so the copy shares them.
   clone(): LinesState<TCoord> {
     return new LinesState(
       this.stateId,
       this.matchId,
       this.board.clone(),
       [...this.tray],
-      this.source.clone(),
+      this.source,
       this.streak,
       this.linesCleared,
       this.cellsPlaced,
@@ -178,13 +179,17 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
   }
 
   // Fills the tray with up to `TRAY_SIZE` pieces from the source. A finite source can give fewer.
+  // Each draw gives the next source, and the state keeps the source after the last draw.
   private drawTray(): void {
     const pieces: Piece<Color, TCoord>[] = [];
-    for (const piece of this.source) {
+    let source = this.source;
+    while (pieces.length < TRAY_SIZE && source.hasNext()) {
+      const { piece, rest } = source.take();
       pieces.push(piece);
-      if (pieces.length === TRAY_SIZE) break;
+      source = rest;
     }
     this.tray = pieces;
+    this.source = source;
   }
 
   // The board cells that the piece covers at the offset of the move.

@@ -20,10 +20,11 @@ import type { IScoringPolicy } from './scoring-policy';
 // `TPiece` is the item of the source. It is a `Piece` by default.
 // Hexa Merge draws a new tile and its cell (`NewTile`), so it binds `TPiece` to that type.
 // `createBoard()` gives a new empty board with the id `boardId` (classes.md decision 7).
-// `createInitialState()` puts a new board and a new piece source in the first state.
+// `createInitialState()` puts a new board and the piece source in the first state.
 // The first state takes its own id `stateId` and the `MatchId` of its game (decision 26),
 // and its board takes the id `boardId`. `GameFactory` asks the generators for the three ids.
-// So two calls give two games that share no board and no source.
+// So two calls give two games that share no board. A piece source is a value
+// (classes.md decision 51), so two games can share one source, and no draw changes it.
 // `createHistory()` returns a new history for each game, or `undefined` for a variant
 // with no undo (classes.md decision 3). The history keeps the photos of the state (decision 34).
 // The progress model of view 5 comes in Sprint 3.

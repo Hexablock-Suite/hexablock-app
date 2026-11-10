@@ -53,7 +53,7 @@ describe('SortFactory', () => {
     );
   });
 
-  it('should_leave_the_level_source_unread_when_the_sort_factory_starts_two_games', () => {
+  it('should_share_the_level_source_and_leave_it_unchanged_when_the_sort_factory_starts_two_games', () => {
     const source = new FixedListPieceSource([stack('red'), stack('blue')].map(stackPiece));
     const factory = new SortFactory(new SquareGeometry(), {
       size: RegionSize.of(2),
@@ -66,6 +66,8 @@ describe('SortFactory', () => {
 
     expect(names(first.snapshot().offered?.content)).toEqual(['red']);
     expect(names(second.snapshot().offered?.content)).toEqual(['red']);
-    expect(names(source.next().content)).toEqual(['red']);
+    // The source is a value: the factory gives the level source itself, and a draw changes nothing.
+    expect(factory.createPieceSource() === source).toBe(true);
+    expect([...source].map((piece) => names(piece.content))).toEqual([['red'], ['blue']]);
   });
 });

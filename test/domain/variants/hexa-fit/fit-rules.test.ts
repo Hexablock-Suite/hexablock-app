@@ -367,9 +367,9 @@ describe('FitRules edge cases', () => {
     expect(cellsOf(state)).toEqual(['0,1=a', '1,1=a']);
   });
 
-  it('should_keep_the_tray_and_leave_the_source_read_when_the_state_starts_from_a_fixed_list', () => {
-    // The state reads the source once at start (fit-state.ts), and a fixed list
-    // gives its pieces only once (piece-source.ts).
+  it('should_keep_the_tray_and_leave_the_source_unchanged_when_the_state_starts_from_a_fixed_list', () => {
+    // The state reads the whole source at start (fit-state.ts), and a read changes
+    // no source (piece-source.ts).
     const domino = [square(0, 0), square(1, 0)];
     const source = new FixedListPieceSource([piece(A, domino), piece(B, domino)]);
 
@@ -380,8 +380,8 @@ describe('FitRules edge cases', () => {
       source,
     );
 
-    expect(source.hasNext()).toBe(false);
-    expect([...source]).toEqual([]);
+    expect(source.hasNext()).toBe(true);
+    expect([...source].map((p) => p.content.value)).toEqual(['a', 'b']);
     expect(trayOf(state)).toEqual(['a', 'b']);
     expect(trayOf(state.clone())).toEqual(['a', 'b']);
   });

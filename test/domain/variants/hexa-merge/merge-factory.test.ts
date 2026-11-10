@@ -51,7 +51,7 @@ describe('MergeFactory', () => {
     expect(after.score).toEqual(
       Score.of(after.merged.reduce((sum, tile) => sum + valueOf(tile), 0)),
     );
-    expect(after.tiles.clone().hasNext()).toBe(true);
+    expect(after.tiles.hasNext()).toBe(true);
     expect(publisher.events).toEqual([]);
   });
 
@@ -64,8 +64,8 @@ describe('MergeFactory', () => {
     };
 
     expect(play(9)).toEqual(play(9));
-    expect(mergeFactory(9).createPieceSource().next()).toEqual(
-      mergeFactory(9).createPieceSource().next(),
+    expect(mergeFactory(9).createPieceSource().take().piece).toEqual(
+      mergeFactory(9).createPieceSource().take().piece,
     );
   });
 

@@ -65,15 +65,15 @@ function factsOf<
   };
 }
 
-// The next draws of a seeded source. They read a clone, so the source stays where it is.
+// The next draws of a seeded source. The read is pure, so the source stays where it is.
 // A `toEqual` on the source itself would never end, because the source is an endless iterator.
-// The photo shows the source only through `clone()`, so the helper reads a copy.
-function drawsOf(source: Cloneable<IPieceSource<NewTile<MergeTile>>>): [number, number][] {
-  const copy = source.clone();
-  return Array.from({ length: 8 }, () => {
-    const draw = copy.next();
-    return [draw.place, draw.tile.points().value];
-  });
+function drawsOf(source: IPieceSource<NewTile<MergeTile>>): [number, number][] {
+  const draws: [number, number][] = [];
+  for (const draw of source) {
+    draws.push([draw.place, draw.tile.points().value]);
+    if (draws.length === 8) break;
+  }
+  return draws;
 }
 
 describe('UndoMove', () => {

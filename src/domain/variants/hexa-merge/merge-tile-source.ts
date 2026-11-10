@@ -13,7 +13,7 @@ export const DEFAULT_FOUR_CHANCE = 0.1;
 const CHANCES = Range.ofNumbers(0, 1);
 
 // The source of the new Merge tiles (APP-NFR-07). It reuses the engine `SeededPieceSource`,
-// so the same seed gives the same tiles, and `clone()` copies the generator state.
+// so the same seed gives the same tiles, and a draw changes no source.
 // Each draw reads two numbers: the first picks the empty cell, the second picks 2 or 4.
 // A `fourChance` outside [0, 1] throws a RangeError.
 export function mergeTileSource(

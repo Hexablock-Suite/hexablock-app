@@ -196,17 +196,16 @@ async function playNoMove<
   return { ok, before, after: runningGameOf(games) };
 }
 
-// A Sort level whose source throws in `clone()`, as a broken level source would.
-// The real sources never throw there, so this double stands in for the level data.
-function sortLevelWithUncloneableSource(): SortFactory<SquareCoord> {
+// A Sort level whose source throws in `take()`, as a broken level source would.
+// The real fixed list never throws before its end, so this double stands in for the level data.
+function sortLevelWithFailingSource(): SortFactory<SquareCoord> {
   const pieces = new FixedListPieceSource([stack('red')].map(stackPiece));
   const source: IPieceSource<Piece<ColorStack, SquareCoord>> = {
     hasNext: () => pieces.hasNext(),
-    next: () => pieces.next(),
-    [Symbol.iterator]: () => pieces[Symbol.iterator](),
-    clone: () => {
-      throw new RangeError('The level source cannot be copied.');
+    take: () => {
+      throw new RangeError('The level source cannot be read.');
     },
+    [Symbol.iterator]: () => pieces[Symbol.iterator](),
   };
   return new SortFactory(new SquareGeometry(), {
     size: RegionSize.of(2),
@@ -273,20 +272,20 @@ describe('StartGame and ApplyMove', () => {
     expect(games.current()).toBeUndefined();
   });
 
-  it('should_return_a_start_failed_failure_and_keep_no_game_when_the_sort_level_source_cannot_be_cloned', async () => {
-    // `SortFactory` clones the level source for each game, so the clone error stops the start.
-    const factory = sortLevelWithUncloneableSource();
+  it('should_return_a_start_failed_failure_and_keep_no_game_when_the_sort_level_source_throws_on_the_first_draw', async () => {
+    // `SortState.start()` draws the first stack of the level source, so the draw error stops the start.
+    const factory = sortLevelWithFailingSource();
     const { games, startGame } = gameUseCases(factory);
 
     const error = errorOf(await startGame.execute({}));
 
     expect(() => factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID)).toThrow(
-      new RangeError('The level source cannot be copied.'),
+      new RangeError('The level source cannot be read.'),
     );
 
     expect([error.code, error.message, error.retryable]).toEqual([
       'start-failed',
-      'The level source cannot be copied.',
+      'The level source cannot be read.',
       false,
     ]);
     expect(games.current()).toBeUndefined();

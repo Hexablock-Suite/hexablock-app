@@ -106,7 +106,7 @@ function mergePoints(values: number[]): number {
     STATE_ID,
     MATCH_ID,
     start.snapshot().board.clone(),
-    start.snapshot().tiles.clone(),
+    start.snapshot().tiles,
     false,
     values.map(MergeTile.of),
   );

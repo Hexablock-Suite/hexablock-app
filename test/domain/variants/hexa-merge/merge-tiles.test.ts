@@ -100,11 +100,11 @@ describe('Merge new tiles', () => {
       2,
       mergeTileSource(5),
     );
-    const next = mergeTileSource(5).next();
+    const next = mergeTileSource(5).take().piece;
     const resolved = full.clone();
     game.rules.resolve(resolved);
     expect(values(resolved.snapshot())).toEqual(values(full.snapshot()));
-    expect(resolved.snapshot().tiles.clone().next()).toEqual(next);
+    expect(resolved.snapshot().tiles.take().piece).toEqual(next);
   });
 
   it('should_draw_only_twos_or_only_fours_when_the_chance_of_a_four_is_zero_or_one', () => {
@@ -131,9 +131,13 @@ describe('Merge new tiles', () => {
     expect(newValues(1)).toEqual(Array(10).fill(4));
 
     // The default chance is 0.1: about one tile in ten is a 4.
-    const source = mergeTileSource(2026);
     let fours = 0;
-    for (let i = 0; i < 1000; i += 1) if (source.next().tile.equals(MergeTile.of(4))) fours += 1;
+    let read = 0;
+    for (const draw of mergeTileSource(2026)) {
+      if (draw.tile.equals(MergeTile.of(4))) fours += 1;
+      read += 1;
+      if (read === 1000) break;
+    }
     expect(DEFAULT_FOUR_CHANCE).toBe(0.1);
     expect(fours).toBeGreaterThan(70);
     expect(fours).toBeLessThan(130);
@@ -153,7 +157,7 @@ describe('Merge new tiles', () => {
 
     game.engine.play(slide);
     const played = values(game.engine.snapshot());
-    // Undo restores the cloned state, so the same slide gives the same new tile.
+    // Undo restores the state with its source, so the same slide gives the same new tile.
     game.engine.start(saved);
     game.engine.play(slide);
     const replayed = values(game.engine.snapshot());

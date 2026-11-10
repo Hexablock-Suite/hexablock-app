@@ -1,6 +1,5 @@
 import type { Board, ReadonlyBoard } from '../../engine/board';
 import { checkOwnSnapshot, type BoardSnapshot, type BoardState } from '../../engine/board-state';
-import type { Cloneable } from '../../engine/cloneable';
 import type { CoordKey } from '../../engine/coord-key';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { GridAxis } from '../../engine/grid-topology';
@@ -17,8 +16,9 @@ export interface MergeView {
 }
 
 // The photo of a Merge state (classes.md decision 34): the board of its topology, the score,
-// whether the target exists, the tiles of the last merges and a copy of the tile source
-// at its position. The source shows only `clone()`, so a reader cannot draw from the photo.
+// whether the target exists, the tiles of the last merges and the tile source
+// at its position. The source is a value (classes.md decision 51), so the photo shares it
+// with the state, and a reader that draws from it changes nothing.
 // `view()` gives whether the target exists for the screen.
 export interface MergeSnapshot<
   TCell extends IMergeable<TCell>,
@@ -28,7 +28,7 @@ export interface MergeSnapshot<
   readonly board: ReadonlyBoard<TCell, TCoord, TAxis>;
   readonly targetReached: boolean;
   readonly merged: readonly TCell[];
-  readonly tiles: Cloneable<IPieceSource<NewTile<TCell>>>;
+  readonly tiles: IPieceSource<NewTile<TCell>>;
   view(): MergeView;
 }
 
@@ -41,7 +41,8 @@ export interface MergeSnapshot<
 // each method. The scoring, the rules and the use cases read the photo of `snapshot()`.
 // A refused input throws a RangeError and leaves the whole state as it was.
 // `tiles` is the source of the new tiles. It lives in the state (classes.md decision 31),
-// so `clone()` clones it, and the rollback of `GameEngine.play()` covers each draw.
+// and it is a value (classes.md decision 51): a draw replaces it with the next source.
+// So `clone()` shares it, and the rollback of `GameEngine.play()` covers each draw.
 // `targetReached` turns true when a merge makes the target tile, and it stays true:
 // the target is an event, not the end of the game (A3).
 // `merged` holds the tiles that the last move made, one per merge. The gain of the move
@@ -71,8 +72,9 @@ export class MergeState<
   addNewTile(): void {
     const empty = this.board.shape.cells.filter((c) => this.board.get(c) === undefined);
     if (empty.length === 0 || !this.tiles.hasNext()) return;
-    const { place, tile } = this.tiles.next();
-    this.board.occupy(empty[Math.floor(place * empty.length)] as TCoord, tile);
+    const { piece, rest } = this.tiles.take();
+    this.board.occupy(empty[Math.floor(piece.place * empty.length)] as TCoord, piece.tile);
+    this.tiles = rest;
   }
 
   // True when the slide changes at least one cell of the board.
@@ -113,8 +115,8 @@ export class MergeState<
     return other instanceof MergeState && this.stateId.equals(other.stateId);
   }
 
-  // The photo of the state now. A tile is a value, so the photo shares the tiles.
-  // It holds a frozen list and copies of the board and the tile source.
+  // The photo of the state now. A tile and the tile source are values, so the photo shares them.
+  // It holds a frozen list and a copy of the board.
   snapshot(): MergeSnapshot<TCell, TCoord, TAxis> {
     const view = Object.freeze({ targetReached: this.targetReached });
     return Object.freeze({
@@ -124,7 +126,7 @@ export class MergeState<
       score: this.score,
       targetReached: this.targetReached,
       merged: Object.freeze([...this.merged]),
-      tiles: this.tiles.clone(),
+      tiles: this.tiles,
       view: () => view,
     });
   }
@@ -134,7 +136,7 @@ export class MergeState<
   restore(snapshot: MergeSnapshot<TCell, TCoord, TAxis>): void {
     checkOwnSnapshot(this.stateId, this.board, snapshot);
     this.board.restore(snapshot.board);
-    this.tiles = snapshot.tiles.clone();
+    this.tiles = snapshot.tiles;
     this.targetReached = snapshot.targetReached;
     this.merged = [...snapshot.merged];
     this.score = snapshot.score;
@@ -145,7 +147,7 @@ export class MergeState<
       this.stateId,
       this.matchId,
       this.board.clone(),
-      this.tiles.clone(),
+      this.tiles,
       this.targetReached,
       [...this.merged],
       this.score,

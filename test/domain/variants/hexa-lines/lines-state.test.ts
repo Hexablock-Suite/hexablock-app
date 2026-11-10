@@ -29,7 +29,7 @@ function facts(state: LinesState<SquareCoord>) {
   return {
     filled: filledKeys(state.snapshot()),
     tray: [...state.snapshot().tray],
-    left: state.snapshot().source.clone().hasNext(),
+    left: state.snapshot().source.hasNext(),
     streak: state.snapshot().streak,
     linesCleared: state.snapshot().linesCleared,
     cellsPlaced: state.snapshot().cellsPlaced,
@@ -55,7 +55,7 @@ describe('LinesState', () => {
     expect(state.snapshot().board.get(square(1, 2))).toBe(red);
     expect(state.snapshot().cellsPlaced).toBe(2);
     expect(state.snapshot().tray).toEqual([one]);
-    expect(state.snapshot().source.clone().hasNext()).toBe(true);
+    expect(state.snapshot().source.hasNext()).toBe(true);
   });
 
   it('should_fill_the_tray_from_the_source_when_the_last_tray_piece_is_placed', () => {
@@ -65,7 +65,7 @@ describe('LinesState', () => {
     state.placePiece(new PlacePiece(0, square(0, 0)));
 
     expect(state.snapshot().tray).toEqual([a, b, c]);
-    expect(state.snapshot().source.clone().hasNext()).toBe(true);
+    expect(state.snapshot().source.hasNext()).toBe(true);
     expect(state.snapshot().cellsPlaced).toBe(1);
   });
 
@@ -75,7 +75,7 @@ describe('LinesState', () => {
     state.placePiece(new PlacePiece(0, square(0, 0)));
 
     expect(state.snapshot().tray).toEqual([domino]);
-    expect(state.snapshot().source.clone().hasNext()).toBe(false);
+    expect(state.snapshot().source.hasNext()).toBe(false);
   });
 
   it('should_draw_a_full_tray_when_a_game_starts', () => {
@@ -87,7 +87,7 @@ describe('LinesState', () => {
     );
 
     expect(state.snapshot().tray).toEqual([one, domino, one]);
-    expect(state.snapshot().source.clone().hasNext()).toBe(true);
+    expect(state.snapshot().source.hasNext()).toBe(true);
     expect(facts(state)).toMatchObject({
       streak: 0,
       linesCleared: 0,

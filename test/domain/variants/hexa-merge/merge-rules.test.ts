@@ -410,7 +410,7 @@ describe('MergeRules in place', () => {
       cells: state.board.cells(),
       merged: state.merged,
       targetReached: state.targetReached,
-      nextTile: state.tiles.clone().next(),
+      nextTile: state.tiles.take().piece,
       score: state.score,
     });
     const before = facts(engine.snapshot());
