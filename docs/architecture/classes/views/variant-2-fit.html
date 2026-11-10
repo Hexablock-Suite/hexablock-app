@@ -1010,7 +1010,7 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          + of(rotation: Turns, at: TCoord, topology: GridTopology&lt;TCoord, string, string&gt;):
+          + of(rotation: Turns, at: TCoord, topology: GridTopology&lt;TCoord&gt;):
           Placement&lt;TCoord&gt;
         </text>
         <text
@@ -1020,8 +1020,7 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          + turned(steps: Turns, topology: GridTopology&lt;TCoord, string, string&gt;):
-          Placement&lt;TCoord&gt;
+          + turned(steps: Turns, topology: GridTopology&lt;TCoord&gt;): Placement&lt;TCoord&gt;
         </text>
         <text
           x="352"
@@ -1030,8 +1029,8 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          + cells(piece: Piece&lt;PieceId, TCoord&gt;, topology: GridTopology&lt;TCoord, string,
-          string&gt;): TCoord[]
+          + cells(piece: Piece&lt;PieceId, TCoord&gt;, topology: GridTopology&lt;TCoord&gt;):
+          TCoord[]
         </text>
         <text
           x="352"
@@ -1096,7 +1095,7 @@
           + piece(): PieceId
         </text>
         <text x="56" y="1302" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + placement(topology: GridTopology&lt;TCoord, string, string&gt;):
+          + placement(topology: GridTopology&lt;TCoord&gt;):
         </text>
         <text x="67" y="1318" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Placement&lt;TCoord&gt;
@@ -1281,7 +1280,7 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          GridTopology&lt;TCoord, string, string&gt;): Placement&lt;TCoord&gt;
+          GridTopology&lt;TCoord&gt;): Placement&lt;TCoord&gt;
         </text>
         <text
           x="678"
