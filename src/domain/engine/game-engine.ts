@@ -3,9 +3,12 @@ import type { Cloneable } from './cloneable';
 import { GameOver, type GameEventPublisher } from './game-events';
 import type { GameId } from './game-id';
 import { PlayingPhase, ResolvingPhase, type GamePhase } from './game-phase';
+import { MoveCommand } from './move-command';
+import type { MoveHistory } from './move-history';
 import type { Outcome } from './outcome';
 import type { IGameRules } from './rules';
 import type { IScoringPolicy } from './scoring-policy';
+import type { IRedoable, IUndoable } from './undo-capabilities';
 
 // The report of one turn: whether the rules accepted the move, and the outcome.
 // A rejected move always has the outcome `playing`.
@@ -23,10 +26,13 @@ export interface PublishFailure {
 }
 
 // The aggregate root of one game (classes.md decision 26).
-// A game changes only through `play()`, and `play()` applies a move only while
-// `phase.canPlay()` is true. `snapshot()` returns a clone, so no caller changes the board.
+// A game changes only through `play()` and through the undo capability, and both act only
+// while `phase.canPlay()` is true. `snapshot()` returns a clone, so no caller changes the board.
 // The engine depends only on the interfaces of the rules and the scoring (Strategy, D1).
 // `TState` is a `BoardState` whose `clone()` returns `TState`, so each copy keeps the state type.
+// `history` is optional, because the variant factory decides it (classes.md decision 3).
+// The engine is the Memento originator (decision 34). Each saved turn keeps a clone of the
+// state before the move, and `restore()` takes that clone back.
 export class GameEngine<
   TCell,
   TCoord,
@@ -41,6 +47,7 @@ export class GameEngine<
     private readonly rules: IGameRules<TMove, TState>,
     private readonly scoring: IScoringPolicy<TState>,
     private readonly events: GameEventPublisher,
+    private readonly history?: MoveHistory<TMove, TState>,
   ) {}
 
   get phase(): GamePhase {
@@ -48,9 +55,21 @@ export class GameEngine<
   }
 
   // Starts a game from a copy of `initial`, so the caller keeps no reference to the board.
+  // A new game has no move to undo.
   start(initial: TState): void {
     this.state = copy(initial);
     this.current = PlayingPhase.instance;
+    this.history?.clear();
+  }
+
+  // The undo capability that the variant factory gave, or `undefined` (classes.md decision 27).
+  undoable(): IUndoable | undefined {
+    return this.history;
+  }
+
+  // The redo capability of the history, or `undefined`.
+  redoable(): IRedoable | undefined {
+    return this.history?.redoable();
   }
 
   // One turn: receive the move, let the rules validate, apply, resolve and evaluate it
@@ -90,6 +109,7 @@ export class GameEngine<
     }
     this.state = turn.next;
     this.current = turn.phase;
+    this.remember(move, turn.before);
     // The turn is committed before the engine publishes. A publisher that throws
     // does not undo the turn. The report keeps its error apart from the outcome.
     if (turn.outcome !== 'playing') {
@@ -117,10 +137,13 @@ export class GameEngine<
 
   // Runs the rules and the scoring, and computes the next phase. It changes no engine field.
   // It returns `undefined` for a rejected move.
+  // `before` is the Memento: a clone of the state before the move (classes.md decision 34).
+  // It is taken inside the turn, so a clone that throws leaves the turn unsaved.
+  // A variant with no history takes no clone.
   private resolveTurn(
     state: TState,
     move: TMove,
-  ): { next: TState; phase: GamePhase; outcome: Outcome } | undefined {
+  ): { next: TState; phase: GamePhase; outcome: Outcome; before: TState | undefined } | undefined {
     const resolution = this.rules.playTurn(copy(state), move);
     if (!resolution.accepted) return undefined;
     const points = this.scoring.score(copy(state), resolution);
@@ -132,7 +155,29 @@ export class GameEngine<
       next: resolution.state,
       phase: this.current.after(resolution.outcome),
       outcome: resolution.outcome,
+      before: this.history === undefined ? undefined : copy(state),
     };
+  }
+
+  // Keeps the undo of a saved turn. A finished game forgets its moves: the game over event
+  // is already public, and an undo cannot take it back. The check reads the new phase.
+  private remember(move: TMove, before: TState | undefined): void {
+    if (before === undefined) return;
+    if (this.current.canPlay()) {
+      this.history?.record(new MoveCommand(move, before, (memento) => this.restore(memento)));
+    } else {
+      this.history?.clear();
+    }
+  }
+
+  // The receiver of an undo (issue 159, classes.md decision 34). `MoveCommand.undo()` calls it.
+  // It is private and reaches a command only as a function, so no caller can write the state.
+  // The stored states never change, because the rules work on copies, so the memento needs no copy.
+  private restore(memento: TState): void {
+    if (!this.current.canPlay()) {
+      throw new RangeError(`The game cannot accept an undo in the ${this.current.name} phase.`);
+    }
+    this.state = memento;
   }
 
   private started(): TState {

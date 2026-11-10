@@ -102,6 +102,26 @@ describe('LoggingAspect', () => {
     }
   });
 
+  it('should_log_one_entry_for_each_undo_when_the_aspect_wraps_undo_move', async () => {
+    const logger = new RecordingLogger();
+    const factory = mergeFactory();
+    const { games, startGame, applyMove, undoMove } = gameUseCases(factory);
+    await startGame.execute({});
+    const move = firstValidMove(factory.createRules(), games.running().snapshot());
+    await applyMove.execute({ move });
+    const undo = new LoggingAspect(undoMove, logger, 'UndoMove');
+
+    const undone = await undo.execute({});
+    const refused = await undo.execute({});
+
+    expect(valueOf(undone).canUndo).toBe(false);
+    expect(errorOf(refused).code).toBe('nothing-to-undo');
+    expect(logger.entries.map(({ useCase, outcome }) => [useCase, outcome])).toEqual([
+      ['UndoMove', 'success'],
+      ['UndoMove', 'failure'],
+    ]);
+  });
+
   it('should_log_a_failure_entry_with_the_use_case_error_when_the_inner_use_case_fails', async () => {
     const logger = new RecordingLogger();
     const { applyMove } = gameUseCases(linesFactory());

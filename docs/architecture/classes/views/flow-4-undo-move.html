@@ -301,7 +301,7 @@
         />
         <!-- GameEngine holds zero or one MoveHistory it receives as history: aggregation, kept because Command holds it: MoveHistory is the Command invoker -->
         <path
-          d="M700 920 V960"
+          d="M700 936 V960"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -845,7 +845,7 @@
           x="660"
           y="776"
           width="280"
-          height="144"
+          height="160"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -890,6 +890,9 @@
         <text x="676" y="912" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + snapshot(): TState
         </text>
+        <text x="676" y="928" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - restore(memento: TState): void
+        </text>
         <!-- Class: MoveCommand (Command) -->
         <rect
           x="40"
@@ -932,13 +935,13 @@
           - before: TState {memento}
         </text>
         <text x="56" y="1056" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - after: TState
+          - restore: (memento: TState) =&gt; void
         </text>
         <text x="56" y="1080" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + undo(): TState
+          + undo(): void
         </text>
         <text x="56" y="1096" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + redo(): TState
+          + redo(): void
         </text>
         <!-- Class: MoveHistory (Invoker, Caretaker) -->
         <rect
@@ -1279,8 +1282,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          last MoveCommand, whose before state is the memento (decision 34). UndoMove never names
-          the history class (decision 27).
+          last MoveCommand, whose before state is the memento (decision 34). The command gives it
+          back through GameEngine.restore(). UndoMove never names the history class (decision 27).
         </text>
         <text
           x="24"

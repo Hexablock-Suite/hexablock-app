@@ -158,7 +158,7 @@
           x="56"
           y="64"
           width="920"
-          height="188"
+          height="214"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -223,7 +223,7 @@
         />
         <!-- MoveHistory implements IUndoable: realization, with a hop over the undone line -->
         <path
-          d="M616 236 V264 a 8,8 0 0,1 0,16 V324"
+          d="M616 268 a 8,8 0 0,1 0,16 V324"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -354,13 +354,13 @@
           - before: TState {memento}
         </text>
         <text x="88" y="188" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - after: TState
+          - restore: (memento: TState) =&gt; void
         </text>
         <text x="88" y="212" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + undo(): TState
+          + undo(): void
         </text>
         <text x="88" y="228" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + redo(): TState
+          + redo(): void
         </text>
 
         <!-- Class: MoveHistory (focal, Invoker) -->
@@ -368,7 +368,7 @@
           x="376"
           y="92"
           width="320"
-          height="144"
+          height="176"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -414,6 +414,12 @@
         </text>
         <text x="392" y="228" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + undo(): void
+        </text>
+        <text x="392" y="244" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + clear(): void
+        </text>
+        <text x="392" y="260" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + redoable(): IRedoable | undefined
         </text>
 
         <!-- Class: RedoableHistory -->

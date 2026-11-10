@@ -23,6 +23,7 @@ export function startVariant<
     rules,
     factory.createScoring(),
     publisher,
+    factory.createHistory(),
   );
   engine.start(factory.createInitialState());
   return { engine, rules, publisher };

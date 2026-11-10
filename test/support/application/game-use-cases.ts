@@ -2,6 +2,7 @@ import { ApplyMove } from '../../../src/application/apply-move';
 import type { Result, UseCaseError } from '../../../src/application/result';
 import type { RunningGameStore } from '../../../src/application/running-game-store';
 import { StartGame } from '../../../src/application/start-game';
+import { UndoMove } from '../../../src/application/undo-move';
 import type { BoardState } from '../../../src/domain/engine/board-state';
 import type { Cloneable } from '../../../src/domain/engine/cloneable';
 import type { GameEngine } from '../../../src/domain/engine/game-engine';
@@ -37,7 +38,7 @@ export class MemoryRunningGameStore<
   }
 }
 
-// The two game use cases of one variant over one shared store.
+// The game use cases of one variant over one shared store.
 // `ApplyMove` writes a publisher failure to `logger` (issue 132).
 export function gameUseCases<
   TCell,
@@ -56,6 +57,7 @@ export function gameUseCases<
     logger,
     startGame: new StartGame(factory, games, events),
     applyMove: new ApplyMove(games, logger),
+    undoMove: new UndoMove(games),
   };
 }
 

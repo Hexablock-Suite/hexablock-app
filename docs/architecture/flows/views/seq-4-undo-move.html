@@ -75,9 +75,9 @@
           the running GameEngine from InMemoryRunningGameStore through the RunningGameStore port and
           asks it for its IUndoable capability. When the capability is undefined, UndoMove returns a
           failed Result. Otherwise MoveHistory, which implements IUndoable, undoes the last
-          MoveCommand, which gives back its before state. UndoMove reads the snapshot, the cells of
-          Board and the undo and redo flags, and returns a Result with a MoveResult. GamePresenter
-          maps it as in flow 1 and GameScreen renders the board.
+          MoveCommand, which gives its before state back to GameEngine through restore(). UndoMove
+          reads the snapshot, the cells of Board and the undo and redo flags, and returns a Result
+          with a MoveResult. GamePresenter maps it as in flow 1 and GameScreen renders the board.
         </desc>
         <defs>
           <marker
@@ -666,6 +666,15 @@
         </text>
         <!-- Activation bars -->
         <rect
+          x="760"
+          y="456"
+          width="8"
+          height="28"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
           x="606"
           y="204"
           width="8"
@@ -1020,27 +1029,26 @@
         >
           undo()
         </text>
-        <!-- Reply: command to history -->
+        <!-- Message: command to engine, the receiver of the undo -->
         <line
           x1="1026"
           y1="464"
-          x2="901"
+          x2="768"
           y2="464"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#sequndo-reply)"
+          marker-end="url(#sequndo-call)"
         />
-        <rect x="905" y="450" width="146.2" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="790" y="450" width="80" height="13" rx="2" fill="#f3f5f6" />
         <text
-          x="909"
+          x="830"
           y="460"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
+          text-anchor="middle"
         >
-          TState · the before memento
+          restore(before)
         </text>
         <!-- Reply: history to undo -->
         <line
@@ -1346,8 +1354,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          MoveHistory is the Command invoker and the caretaker: MoveCommand.undo() gives back the
-          before state, the memento (decision 34).
+          MoveHistory is the Command invoker and the caretaker: MoveCommand.undo() gives the before
+          state, the memento (decision 34), back to the engine through GameEngine.restore().
         </text>
         <text
           x="24"
