@@ -64,7 +64,7 @@
       <h1>Hexa Sort: stacks, cascades and levels</h1>
 
       <svg
-        viewBox="0 0 1040 1088"
+        viewBox="0 0 1040 1116"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="sort-title sort-desc"
@@ -77,7 +77,8 @@
           SortRules typed by SortState and SortState holding ColorStack cells, each variant class
           marked with the engine interface it implements and its binding. GoalCount is the value
           object of the goal of a level. SortState is an entity inside the GameEngine aggregate: its
-          MatchId is its identity, and it changes only through its business methods.
+          own GameStateId is its identity, it keeps the MatchId of its game, and it changes in place
+          only through its business methods.
         </desc>
         <defs>
           <marker
@@ -138,7 +139,7 @@
           x="24"
           y="24"
           width="992"
-          height="864"
+          height="892"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -454,14 +455,14 @@
           x="520"
           y="392"
           width="220"
-          height="456"
+          height="484"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
         <line x1="520" y1="440" x2="740" y2="440" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="520" y1="602" x2="740" y2="602" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="520" y1="616" x2="740" y2="616" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="630"
           y="410"
@@ -485,57 +486,50 @@
           SortState
         </text>
         <text x="536" y="456" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - matchId: MatchId
+          - stateId: GameStateId
         </text>
         <text x="536" y="470" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + board: Board&lt;ColorStack, TCoord&gt;
+          - matchId: MatchId
         </text>
         <text x="536" y="484" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + board: Board&lt;ColorStack, TCoord&gt;
+        </text>
+        <text x="536" y="498" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + source: IPieceSource&lt;
         </text>
-        <text x="544" y="498" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="544" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Piece&lt;ColorStack, TCoord&gt;&gt;
         </text>
-        <text x="536" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="536" y="526" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + goalsNeeded: GoalCount
         </text>
-        <text x="536" y="526" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="536" y="540" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + offered: Piece&lt;ColorStack,
         </text>
-        <text x="544" y="540" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="544" y="554" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           TCoord&gt; | undefined
         </text>
-        <text x="536" y="554" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="536" y="568" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + goalsDone: number
         </text>
-        <text x="536" y="568" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="536" y="582" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + clearedTiles: number[]
         </text>
-        <text x="536" y="582" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="536" y="596" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + placedAt: TCoord | undefined
         </text>
-        <text x="536" y="596" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="536" y="610" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + score: number
         </text>
         <text
           x="536"
-          y="618"
-          fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-          text-decoration="underline"
-        >
-          + start(values: { matchId: MatchId;
-        </text>
-        <text
-          x="544"
           y="632"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
           text-decoration="underline"
         >
-          board: Board&lt;ColorStack, TCoord&gt;;
+          + start(values: { stateId:
         </text>
         <text
           x="544"
@@ -545,7 +539,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-decoration="underline"
         >
-          source: IPieceSource&lt;Piece&lt;
+          GameStateId; matchId: MatchId;
         </text>
         <text
           x="544"
@@ -555,7 +549,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-decoration="underline"
         >
-          ColorStack, TCoord&gt;&gt;; goalsNeeded:
+          board: Board&lt;ColorStack, TCoord&gt;;
         </text>
         <text
           x="544"
@@ -565,42 +559,62 @@
           font-family="'IBM Plex Mono', monospace"
           text-decoration="underline"
         >
+          source: IPieceSource&lt;Piece&lt;
+        </text>
+        <text
+          x="544"
+          y="688"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          ColorStack, TCoord&gt;&gt;; goalsNeeded:
+        </text>
+        <text
+          x="544"
+          y="702"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
           GoalCount }): SortState&lt;TCoord&gt;
         </text>
-        <text x="536" y="688" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="536" y="716" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + offerNext(): void
         </text>
-        <text x="536" y="702" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="536" y="730" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + canPlace(at: TCoord): boolean
         </text>
-        <text x="536" y="716" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="536" y="744" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + placeOfferedStack(at: TCoord): void
         </text>
-        <text x="536" y="730" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="536" y="758" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + moveRun(from: TCoord, to: TCoord):
         </text>
-        <text x="544" y="744" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="544" y="772" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           void
         </text>
-        <text x="536" y="758" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="536" y="786" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + clearStack(at: TCoord): void
         </text>
-        <text x="536" y="772" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="536" y="800" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + addPoints(points: number): void
         </text>
-        <text x="536" y="786" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="536" y="814" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + belongsTo(match: MatchId): boolean
         </text>
-        <text x="536" y="800" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="536" y="828" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: BoardState&lt;
         </text>
-        <text x="544" y="814" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="544" y="842" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           ColorStack, TCoord&gt;): boolean
         </text>
-        <text x="536" y="828" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="536" y="856" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + view(): SortView&lt;TCoord&gt;
         </text>
-        <text x="536" y="842" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="536" y="870" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + clone(): SortState&lt;TCoord&gt;
         </text>
 
@@ -766,9 +780,9 @@
         <text x="555" y="222" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           IGameRules‹PlaceStack, SortState›
         </text>
-        <line x1="536" y1="848" x2="536" y2="864" stroke="#17212a" stroke-width="1" />
-        <circle cx="536" cy="869" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="547" y="872" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="536" y1="876" x2="536" y2="892" stroke="#17212a" stroke-width="1" />
+        <circle cx="536" cy="897" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="547" y="900" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           BoardState‹ColorStack, TCoord›
         </text>
         <line x1="80" y1="600" x2="80" y2="616" stroke="#17212a" stroke-width="1" />
@@ -930,8 +944,8 @@
         >
           TCoord
         </text>
-        <!-- The footnote and the legend sit below the zone, which grew by 28. -->
-        <g transform="translate(0 232)">
+        <!-- The footnote and the legend sit below the zone, which grew by 56. -->
+        <g transform="translate(0 260)">
           <!-- Footnote: classes the budget leaves out -->
           <text
             x="24"

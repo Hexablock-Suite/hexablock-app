@@ -77,9 +77,10 @@
           IScoringPolicy strategy, holding a GamePhase state, notifying through the
           GameEventPublisher interface, and bounding its TState parameter by BoardState and
           Cloneable of TState in its template box. The optional MoveHistory gives the undoable() and
-          redoable() capabilities. BoardState is an entity inside the GameEngine aggregate: its
-          MatchId is its identity, and it changes only through its business methods. Resolution has
-          no tactical stereotype, because it holds the state.
+          redoable() capabilities. BoardState is an entity inside the GameEngine aggregate: its own
+          GameStateId is its identity, it keeps the MatchId of its game, and it changes in place
+          only through its business methods. Resolution has no tactical stereotype, because it holds
+          the state.
         </desc>
         <defs>
           <marker

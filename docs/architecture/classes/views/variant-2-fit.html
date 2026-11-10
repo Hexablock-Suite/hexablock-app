@@ -76,8 +76,8 @@
           as TMove and FitState as TState. Lollipops show the engine interface each variant class
           implements, with its binding. PieceId, the cell content, and Placement, the rotation and
           the offset of a placed piece, are value objects. FitState is an entity inside the
-          GameEngine aggregate: its MatchId is its identity, and it changes only through its
-          business methods.
+          GameEngine aggregate: its own GameStateId is its identity, it keeps the MatchId of its
+          game, and it changes in place only through its business methods.
         </desc>
         <defs>
           <marker
@@ -444,22 +444,22 @@
           FitState
         </text>
         <text x="56" y="272" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - matchId: MatchId
+          - stateId: GameStateId
         </text>
         <text x="56" y="286" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + board: Board&lt;PieceId, TCoord&gt;
+          - matchId: MatchId
         </text>
         <text x="56" y="300" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + board: Board&lt;PieceId, TCoord&gt;
+        </text>
+        <text x="56" y="314" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - pieces: ReadonlyMap&lt;string,
         </text>
-        <text x="64" y="314" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="328" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Piece&lt;PieceId, TCoord&gt;&gt;
         </text>
-        <text x="56" y="328" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - placements: ReadonlyMap&lt;string,
-        </text>
-        <text x="64" y="342" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          Placement&lt;TCoord&gt;&gt;
+        <text x="56" y="342" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - placements: Map&lt;string, Placement&lt;TCoord&gt;&gt;
         </text>
         <text x="56" y="356" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + moves: number
@@ -475,7 +475,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-decoration="underline"
         >
-          + start(matchId: MatchId,
+          + start(stateId: GameStateId, matchId:
         </text>
         <text
           x="64"
@@ -485,7 +485,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-decoration="underline"
         >
-          figure: Board&lt;PieceId, TCoord&gt;,
+          MatchId, figure: Board&lt;PieceId, TCoord&gt;,
         </text>
         <text
           x="64"
@@ -529,13 +529,13 @@
           + place(id: PieceId, placement:
         </text>
         <text x="64" y="546" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          Placement&lt;TCoord&gt;): FitState&lt;TCoord&gt;
+          Placement&lt;TCoord&gt;): void
         </text>
         <text x="56" y="560" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + remove(id: PieceId): FitState&lt;TCoord&gt;
+          + remove(id: PieceId): void
         </text>
         <text x="56" y="574" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + countMove(): FitState&lt;TCoord&gt;
+          + countMove(): void
         </text>
         <text x="56" y="588" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + addPoints(points: number): void

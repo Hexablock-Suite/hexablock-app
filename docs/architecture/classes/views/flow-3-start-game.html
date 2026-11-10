@@ -302,7 +302,7 @@
         />
         <!-- GameFactory keeps the IVariantFactory it receives as variant: use -->
         <path
-          d="M776 960 V948 Q776 940 768 940 H308 Q300 940 300 932 V912"
+          d="M776 960 V956 Q776 948 768 948 H308 Q300 948 300 940 V928"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -310,7 +310,7 @@
         />
         <!-- LinesFactory implements IVariantFactory: realization -->
         <path
-          d="M160 960 V912"
+          d="M160 960 V928"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -483,10 +483,10 @@
           factory
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="304" y="915" width="50.2" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="304" y="931" width="50.2" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="306"
-          y="924"
+          y="940"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -869,7 +869,7 @@
           x="40"
           y="776"
           width="320"
-          height="136"
+          height="152"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -908,9 +908,12 @@
           + createHistory(): MoveHistory&lt;TMove, TState&gt; [0..1]
         </text>
         <text x="56" y="888" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + createInitialState(matchId: MatchId): TState
+          + createInitialState(matchId: MatchId, stateId:
         </text>
-        <text x="56" y="904" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="904" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          GameStateId, boardId: BoardId): TState
+        </text>
+        <text x="56" y="920" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           createBoard() and the others: view 5
         </text>
         <!-- Class: Board -->
@@ -1222,7 +1225,7 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          variant, ids, events: view 5
+          variant, the id generators, events: view 5
         </text>
         <text
           x="768"

@@ -76,8 +76,8 @@
           bound to MergeTile, MergeRules typed by MergeState and Slide, and MergeFactory binding
           TCell to MergeTile on MergeRules and creating MergeScoring, each variant class marked with
           the engine interface it implements and its binding. MergeState is an entity inside the
-          GameEngine aggregate: its MatchId is its identity, and it changes only through its
-          business methods.
+          GameEngine aggregate: its own GameStateId is its identity, it keeps the MatchId of its
+          game, and it changes in place only through its business methods.
         </desc>
         <defs>
           <marker
@@ -426,7 +426,7 @@
           stroke-width="1"
         />
         <line x1="384" y1="496" x2="600" y2="496" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="384" y1="602" x2="600" y2="602" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="384" y1="616" x2="600" y2="616" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="492"
           y="466"
@@ -450,43 +450,43 @@
           MergeState
         </text>
         <text x="400" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - matchId: MatchId
+          - stateId: GameStateId
         </text>
         <text x="400" y="526" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + board: Board&lt;TCell, TCoord, TAxis&gt;
+          - matchId: MatchId
         </text>
         <text x="400" y="540" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + board: Board&lt;TCell, TCoord, TAxis&gt;
+        </text>
+        <text x="400" y="554" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + tiles:
         </text>
-        <text x="408" y="554" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="408" y="568" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           IPieceSource&lt;NewTile&lt;TCell&gt;&gt;
         </text>
-        <text x="400" y="568" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="400" y="582" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + targetReached: boolean
         </text>
-        <text x="400" y="582" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="400" y="596" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + merged: TCell[]
         </text>
-        <text x="400" y="596" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="400" y="610" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + score: number
         </text>
-        <text x="400" y="618" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="400" y="632" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + addNewTile(): void
         </text>
-        <text x="400" y="632" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="400" y="646" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + canSlide(slide: Slide&lt;TAxis&gt;):
         </text>
-        <text x="408" y="646" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="408" y="660" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           boolean
         </text>
-        <text x="400" y="660" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="400" y="674" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + slide(slide: Slide&lt;TAxis&gt;, target:
         </text>
-        <text x="408" y="674" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          TCell): MergeState&lt;TCell, TCoord,
-        </text>
         <text x="408" y="688" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          TAxis&gt;
+          TCell): void
         </text>
         <text x="400" y="702" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + addPoints(points: number): void
@@ -515,7 +515,7 @@
           x="616"
           y="448"
           width="160"
-          height="72"
+          height="86"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -545,7 +545,10 @@
           Slide
         </text>
         <text x="632" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + direction: Direction
+          + axis: TAxis
+        </text>
+        <text x="632" y="526" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + toward: SlideSense
         </text>
 
         <!-- Class: IMergeable (engine interface, the bound) -->
