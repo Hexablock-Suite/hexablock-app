@@ -78,9 +78,11 @@
           GameEventPublisher interface, and bounding its TState parameter by BoardState and
           Cloneable of TState in its template box. The optional MoveHistory gives the undoable() and
           redoable() capabilities. BoardState is an entity inside the GameEngine aggregate: its own
-          GameStateId is its identity, it keeps the MatchId of its game, and it changes in place
-          only through its business methods. Resolution has no tactical stereotype, because it holds
-          the state.
+          GameStateId is its identity, it keeps the MatchId of its game, its fields are private, and
+          it changes in place only through its business methods. Its snapshot() creates a
+          BoardSnapshot, the immutable photo with the Memento role and no tactical stereotype:
+          GameEngine.snapshot() returns it, IScoringPolicy reads two of them, and MoveHistory keeps
+          them for the undo. Resolution holds no state and has no tactical stereotype.
         </desc>
         <defs>
           <marker
@@ -358,19 +360,27 @@
           stroke-width="1"
           marker-end="url(#t-open)"
         />
-        <!-- IScoringPolicy reads a Resolution: use, through the resolution parameter of score() -->
+        <!-- IScoringPolicy reads two BoardSnapshot photos: use, through the parameters of score() -->
+        <path
+          d="M332,460 H372 V716 H368"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#t-open)"
+        />
+        <!-- BoardState creates its BoardSnapshot in snapshot(): use with a verb -->
         <line
-          x1="192"
-          y1="476"
-          x2="192"
-          y2="528"
+          x1="396"
+          y1="772"
+          x2="368"
+          y2="772"
           stroke-width="1"
           marker-end="url(#t-open)"
           stroke="#5b6873"
         />
         <!-- Resolution keeps its Outcome as outcome: use with role and multiplicity -->
         <path
-          d="M210,688 V808 H870 V652"
+          d="M368,560 H720 V612 H760"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -439,10 +449,10 @@
         >
           history
         </text>
-        <rect x="876" y="664" width="40" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="712" y="616" width="40" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="896"
-          y="673"
+          x="732"
+          y="625"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -592,7 +602,7 @@
           - events: GameEventPublisher
         </text>
         <text x="396" y="360" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - history: MoveHistory&lt;TMove, TState&gt; [0..1]
+          - history: MoveHistory&lt;TMove, SnapshotOf&lt;TState&gt;&gt; [0..1]
         </text>
         <text x="396" y="384" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + start(initial: TState): void
@@ -607,7 +617,7 @@
           + resume(): void
         </text>
         <text x="396" y="448" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + snapshot(): TState
+          + snapshot(): SnapshotOf&lt;TState&gt;
         </text>
         <text x="396" y="464" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + currentPhase(): GamePhase
@@ -672,7 +682,7 @@
           + apply(state: TState, move: TMove): TState
         </text>
         <text x="68" y="312" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + resolve(state: TState): Resolution&lt;TState&gt;
+          + resolve(state: TState): Resolution
         </text>
         <text x="68" y="328" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + evaluate(state: TState): Outcome
@@ -682,7 +692,7 @@
           + playTurn(state: TState, move: TMove):
         </text>
         <text x="84" y="360" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          Resolution&lt;TState&gt;
+          Resolution
         </text>
         <text x="68" y="376" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + timed(): ITimed | undefined
@@ -722,10 +732,10 @@
           IScoringPolicy
         </text>
         <text x="68" y="452" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + score(before: TState,
+          + score(before: SnapshotOf&lt;TState&gt;,
         </text>
         <text x="84" y="468" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          resolution: Resolution&lt;TState&gt;): number
+          after: SnapshotOf&lt;TState&gt;): number
         </text>
 
         <!-- Class: GamePhase (interface) -->
@@ -815,7 +825,7 @@
           + record(command:
         </text>
         <text x="784" y="524" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          MoveCommand&lt;TMove, TState&gt;): void
+          MoveCommand&lt;TMove, TMemento&gt;): void
         </text>
 
         <!-- Class: BoardState (interface, entity) -->
@@ -830,7 +840,7 @@
           stroke-width="1"
         />
         <line x1="396" y1="644" x2="644" y2="644" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="396" y1="684" x2="644" y2="684" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="396" y1="652" x2="644" y2="652" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="520"
           y="614"
@@ -853,36 +863,36 @@
         >
           BoardState
         </text>
-        <text x="412" y="660" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + board: Board&lt;TCell, TCoord, string&gt;
-        </text>
-        <text x="412" y="676" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + score: number {readOnly}
-        </text>
-        <text x="412" y="700" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="412" y="668" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + addPoints(points: number): void
         </text>
-        <text x="412" y="716" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="412" y="684" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + belongsTo(match: MatchId): boolean
         </text>
-        <text x="412" y="732" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="412" y="700" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: BoardState&lt;TCell,
         </text>
-        <text x="420" y="748" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="420" y="716" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           TCoord&gt;): boolean
         </text>
-        <text x="412" y="764" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="412" y="732" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + clone(): BoardState&lt;TCell, TCoord&gt;
         </text>
-        <text x="412" y="780" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + view(): unknown
+        <text x="412" y="748" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + snapshot(): BoardSnapshot&lt;TCell, TCoord&gt;
+        </text>
+        <text x="412" y="764" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + restore(snapshot:
+        </text>
+        <text x="420" y="780" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          SnapshotOf&lt;this&gt;): void
         </text>
 
         <!-- Multiplicity: Resolution keeps one Outcome -->
-        <rect x="854" y="664" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="742" y="596" width="12" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="860"
-          y="673"
+          x="748"
+          y="605"
           fill="#17212a"
           font-size="8"
           font-weight="600"
@@ -892,19 +902,19 @@
           1
         </text>
 
-        <!-- Class: Resolution (no tactical stereotype: it holds the state, an entity) -->
+        <!-- Class: Resolution (no tactical stereotype: it holds no state since R8) -->
         <rect
           x="52"
           y="528"
           width="316"
-          height="160"
+          height="144"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
         <line x1="52" y1="576" x2="368" y2="576" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="52" y1="632" x2="368" y2="632" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="52" y1="616" x2="368" y2="616" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="210"
           y="564"
@@ -917,13 +927,20 @@
           Resolution
         </text>
         <text x="68" y="592" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + state: TState {readOnly}
-        </text>
-        <text x="68" y="608" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + accepted: boolean {readOnly}
         </text>
-        <text x="68" y="624" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="608" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + outcome: Outcome {readOnly}
+        </text>
+        <text
+          x="68"
+          y="632"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + rejected(): Resolution
         </text>
         <text
           x="68"
@@ -933,20 +950,93 @@
           font-family="'IBM Plex Mono', monospace"
           text-decoration="underline"
         >
-          + rejected(state: TState): Resolution&lt;TState&gt;
+          + resolved(): Resolution
+        </text>
+        <text x="68" y="664" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + evaluated(outcome: Outcome): Resolution
+        </text>
+
+        <!-- Class: BoardSnapshot (interface, the photo: Memento role, no tactical stereotype) -->
+        <rect
+          x="52"
+          y="684"
+          width="316"
+          height="132"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="52" y1="724" x2="368" y2="724" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="52" y1="792" x2="368" y2="792" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="210"
+          y="700"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «Memento»
         </text>
         <text
-          x="68"
-          y="664"
+          x="210"
+          y="716"
           fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-          text-decoration="underline"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
         >
-          + resolved(state: TState): Resolution&lt;TState&gt;
+          BoardSnapshot
         </text>
-        <text x="68" y="680" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + evaluated(outcome: Outcome): Resolution&lt;TState&gt;
+        <text x="68" y="738" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + stateId: GameStateId
+        </text>
+        <text x="68" y="754" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + matchId: MatchId
+        </text>
+        <text x="68" y="770" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + board: ReadonlyBoard&lt;TCell, TCoord, string&gt;
+        </text>
+        <text x="68" y="786" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + score: number
+        </text>
+        <text x="68" y="808" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + view(): unknown
+        </text>
+        <rect
+          x="292"
+          y="676"
+          width="72"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="328"
+          y="688"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCell, TCoord
+        </text>
+        <rect x="374" y="752" width="20" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="384"
+          y="761"
+          fill="#7d8a94"
+          font-size="6"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          «create»
         </text>
 
         <!-- Class: Outcome (literal union) -->
@@ -1097,7 +1187,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TMove, TState
+          TMove, TMemento
         </text>
         <rect
           x="572"
@@ -1173,7 +1263,7 @@
             font-family="'IBM Plex Sans', sans-serif"
           >
             Aggregate root: MatchId is its identity. A game changes only through play(), and only
-            while currentPhase().canPlay() is true. snapshot() returns a clone (decision 26).
+            while currentPhase().canPlay() is true. snapshot() returns the photo (decisions 26, 34).
           </text>
           <text
             x="24"
@@ -1192,8 +1282,8 @@
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            IGameRules.evaluate(), GameEngine.play() and GamePhase.after() also use Outcome. The
-            view draws only the outcome attribute of Resolution.
+            IGameRules.evaluate(), GameEngine.play() and GamePhase.after() also use Outcome. Every
+            attribute of BoardSnapshot is read-only, and the photo is frozen (decision 34).
           </text>
           <!-- Legend -->
           <line

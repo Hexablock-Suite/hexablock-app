@@ -879,7 +879,7 @@
         <line x1="660" y1="824" x2="940" y2="824" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <line x1="660" y1="864" x2="940" y2="864" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="676" y="840" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - history: MoveHistory&lt;TMove, TState&gt; [0..1]
+          - history: MoveHistory&lt;TMove, SnapshotOf&lt;TState&gt;&gt; [0..1]
         </text>
         <text x="676" y="856" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           matchId, rules, scoring, phase: view 1
@@ -891,10 +891,10 @@
           + redoable(): IRedoable | undefined
         </text>
         <text x="676" y="912" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + snapshot(): TState
+          + snapshot(): SnapshotOf&lt;TState&gt;
         </text>
         <text x="676" y="928" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - restore(memento: TState): void
+          - restore(memento: SnapshotOf&lt;TState&gt;): void
         </text>
         <!-- Class: MoveCommand (Command) -->
         <rect
@@ -935,10 +935,10 @@
           - move: TMove
         </text>
         <text x="56" y="1040" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - before: TState {memento}
+          - before: TMemento {memento}
         </text>
         <text x="56" y="1056" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - restore: (memento: TState) =&gt; void
+          - restore: (memento: TMemento) =&gt; void
         </text>
         <text x="56" y="1080" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + undo(): void
@@ -1006,7 +1006,7 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          + record(command: MoveCommand&lt;TMove, TState&gt;): void
+          + record(command: MoveCommand&lt;TMove, TMemento&gt;): void
         </text>
         <text
           x="576"
@@ -1234,7 +1234,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TMove, TState
+          TMove, TMemento
         </text>
         <rect
           x="787.7"
@@ -1255,7 +1255,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TMove, TState
+          TMove, TMemento
         </text>
         <!-- Footnote -->
         <text
@@ -1285,8 +1285,9 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          last MoveCommand, whose before state is the memento (decision 34). The command gives it
-          back through GameEngine.restore(). UndoMove never names the history class (decision 27).
+          last MoveCommand, whose photo of the state is the memento (decision 34). The command gives
+          it back through GameEngine.restore(). UndoMove never names the history class (decision
+          27).
         </text>
         <text
           x="24"

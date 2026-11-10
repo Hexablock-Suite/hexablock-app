@@ -74,7 +74,7 @@
           GamePresenter in layer 3 calls execute() on ApplyMove in layer 2 through the UseCase port.
           ApplyMove takes the running GameEngine from InMemoryRunningGameStore in layer 3 through
           the RunningGameStore port, plays the move on GameEngine in layer 1, which runs playTurn()
-          on IGameRules, reads the snapshot and the cells of Board, and returns a Result with a
+          on IGameRules, reads the photo of the state and its cells, and returns a Result with a
           MoveResult. GamePresenter maps each cell with StateMapper, builds GameViewModel and
           GameScreen renders it.
         </desc>
@@ -936,7 +936,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          Resolution&lt;TState&gt;
+          Resolution
         </text>
         <!-- Reply: game returns to apply -->
         <line
@@ -1001,7 +1001,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TState
+          SnapshotOf&lt;TState&gt;
         </text>
         <!-- Message: apply calls board -->
         <line
@@ -1022,7 +1022,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          cells() · state.board
+          cells() · photo.board
         </text>
         <!-- Reply: board returns to apply -->
         <line

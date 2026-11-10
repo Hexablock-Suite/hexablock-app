@@ -399,7 +399,7 @@
           x="36"
           y="172"
           width="224"
-          height="442"
+          height="470"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -436,28 +436,28 @@
           - matchId: MatchId
         </text>
         <text x="52" y="264" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + board: Board&lt;Color, TCoord&gt;
+          - board: Board&lt;Color, TCoord&gt;
         </text>
         <text x="52" y="278" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + tray: Piece&lt;Color, TCoord&gt;[]
+          - tray: Piece&lt;Color, TCoord&gt;[]
         </text>
         <text x="52" y="292" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + source:
+          - source:
         </text>
         <text x="60" y="306" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           IPieceSource&lt;Piece&lt;Color, TCoord&gt;&gt;
         </text>
         <text x="52" y="320" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + streak: number
+          - streak: number
         </text>
         <text x="52" y="334" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + linesCleared: number
+          - linesCleared: number
         </text>
         <text x="52" y="348" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + cellsPlaced: number
+          - cellsPlaced: number
         </text>
         <text x="52" y="362" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + score: number
+          - score: number
         </text>
         <text
           x="52"
@@ -537,13 +537,20 @@
           TCoord&gt;): boolean
         </text>
         <text x="52" y="580" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + view(): LinesView&lt;TCoord&gt;
+          + snapshot(): LinesSnapshot&lt;TCoord&gt;
         </text>
         <text x="52" y="594" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + clone(): LinesState&lt;TCoord&gt;
         </text>
         <text x="52" y="608" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - drawTray(): void
+        </text>
+
+        <text x="52" y="608" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + restore(snapshot:
+        </text>
+        <text x="60" y="622" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          LinesSnapshot&lt;TCoord&gt;): void
         </text>
 
         <!-- Class: LinesRules (Concrete Strategy) -->

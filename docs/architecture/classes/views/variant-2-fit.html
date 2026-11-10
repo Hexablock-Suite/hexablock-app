@@ -413,7 +413,7 @@
           x="40"
           y="208"
           width="270"
-          height="456"
+          height="470"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -450,7 +450,7 @@
           - matchId: MatchId
         </text>
         <text x="56" y="300" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + board: Board&lt;PieceId, TCoord&gt;
+          - board: Board&lt;PieceId, TCoord&gt;
         </text>
         <text x="56" y="314" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - pieces: ReadonlyMap&lt;string,
@@ -462,10 +462,10 @@
           - placements: Map&lt;string, Placement&lt;TCoord&gt;&gt;
         </text>
         <text x="56" y="356" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + moves: number
+          - moves: number
         </text>
         <text x="56" y="370" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + score: number
+          - score: number
         </text>
         <text
           x="56"
@@ -550,10 +550,14 @@
           TCoord&gt;): boolean
         </text>
         <text x="56" y="644" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + view(): FitView&lt;TCoord&gt;
+          + snapshot(): FitSnapshot&lt;TCoord&gt;
         </text>
         <text x="56" y="658" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + clone(): FitState&lt;TCoord&gt;
+        </text>
+
+        <text x="56" y="672" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + restore(snapshot: FitSnapshot&lt;TCoord&gt;): void
         </text>
 
         <!-- Class: FitRules (Concrete Strategy) -->

@@ -455,7 +455,7 @@
           x="520"
           y="392"
           width="220"
-          height="484"
+          height="512"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -492,34 +492,34 @@
           - matchId: MatchId
         </text>
         <text x="536" y="484" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + board: Board&lt;ColorStack, TCoord&gt;
+          - board: Board&lt;ColorStack, TCoord&gt;
         </text>
         <text x="536" y="498" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + source: IPieceSource&lt;
+          - source: IPieceSource&lt;
         </text>
         <text x="544" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Piece&lt;ColorStack, TCoord&gt;&gt;
         </text>
         <text x="536" y="526" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + goalsNeeded: GoalCount
+          - goalsNeeded: GoalCount
         </text>
         <text x="536" y="540" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + offered: Piece&lt;ColorStack,
+          - offered: Piece&lt;ColorStack,
         </text>
         <text x="544" y="554" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           TCoord&gt; | undefined
         </text>
         <text x="536" y="568" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + goalsDone: number
+          - goalsDone: number
         </text>
         <text x="536" y="582" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + clearedTiles: number[]
+          - clearedTiles: number[]
         </text>
         <text x="536" y="596" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + placedAt: TCoord | undefined
+          - placedAt: TCoord | undefined
         </text>
         <text x="536" y="610" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + score: number
+          - score: number
         </text>
         <text
           x="536"
@@ -612,10 +612,17 @@
           ColorStack, TCoord&gt;): boolean
         </text>
         <text x="536" y="856" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + view(): SortView&lt;TCoord&gt;
+          + snapshot(): SortSnapshot&lt;TCoord&gt;
         </text>
         <text x="536" y="870" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + clone(): SortState&lt;TCoord&gt;
+        </text>
+
+        <text x="536" y="884" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + restore(snapshot:
+        </text>
+        <text x="544" y="898" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          SortSnapshot&lt;TCoord&gt;): void
         </text>
 
         <!-- Class: ColorStack (value object) -->

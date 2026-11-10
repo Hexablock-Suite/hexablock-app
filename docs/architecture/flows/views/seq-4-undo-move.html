@@ -75,9 +75,9 @@
           the running GameEngine from InMemoryRunningGameStore through the RunningGameStore port and
           asks it for its IUndoable capability. When the capability is undefined, UndoMove returns a
           failed Result. Otherwise MoveHistory, which implements IUndoable, undoes the last
-          MoveCommand, which gives its before state back to GameEngine through restore(). UndoMove
-          reads the snapshot, the cells of Board and the undo and redo flags, and returns a Result
-          with a MoveResult. GamePresenter maps it as in flow 1 and GameScreen renders the board.
+          MoveCommand, which gives its photo of the state back to GameEngine through restore().
+          UndoMove reads the photo, its cells and the undo and redo flags, and returns a Result with
+          a MoveResult. GamePresenter maps it as in flow 1 and GameScreen renders the board.
         </desc>
         <defs>
           <marker
@@ -1123,7 +1123,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TState
+          SnapshotOf&lt;TState&gt;
         </text>
         <!-- Message: undo to board -->
         <line
@@ -1144,7 +1144,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          cells() · state.board
+          cells() · photo.board
         </text>
         <!-- Reply: board to undo -->
         <line
@@ -1416,8 +1416,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          MoveHistory is the Command invoker and the caretaker: MoveCommand.undo() gives the before
-          state, the memento (decision 34), back to the engine through GameEngine.restore().
+          MoveHistory is the Command invoker and the caretaker: MoveCommand.undo() gives the photo
+          of the state, the memento (decision 34), back to the engine through GameEngine.restore().
         </text>
         <text
           x="24"
