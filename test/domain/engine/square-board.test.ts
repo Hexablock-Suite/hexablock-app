@@ -79,9 +79,7 @@ describe('Board with the square topology double', () => {
 
   it('should_rotate_a_quarter_turn_when_rotate_takes_one_step', () => {
     expect(squareTopology.rotate(square(1, 0), Turns.of(1))).toEqual(square(0, 1));
-    expect(squareTopology.rotate(square(1, 0), Turns.of(squareTopology.rotationSteps))).toEqual(
-      square(1, 0),
-    );
+    expect(squareTopology.rotate(square(1, 0), squareTopology.fullTurn())).toEqual(square(1, 0));
   });
 
   // A negative count turns the other way: one turn back equals three turns forward.

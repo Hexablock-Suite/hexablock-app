@@ -7,6 +7,8 @@ import type { FitState } from './fit-state';
 import type { PieceId } from './piece-id';
 import { Placement } from './placement';
 
+const NO_TURN = Turns.of(0);
+
 // The rules of Hexa Fit (REQUIREMENTS.md §1, statement §1.2).
 // A piece fits only on free cells of the figure. A rotation counts steps of the topology (A5).
 // Fit has no resolution step. The game is won when the pieces cover the figure exactly,
@@ -43,15 +45,16 @@ export class FitRules<TCoord> extends BaseGameRules<FitMove<TCoord>, FitState<TC
     const { topology } = state.board;
     for (const id of state.placed()) {
       yield new RemoveFitPiece(id);
-      for (let step = 1; step < topology.rotationSteps; step += 1) {
-        const move = new RotateFitPiece(id, Turns.of(step));
-        if (this.isValid(state, move)) yield move;
+      for (const steps of topology.fullTurn().shorter()) {
+        const move = new RotateFitPiece(id, steps);
+        // A rotation of no step changes nothing, so it is not a move.
+        if (!steps.equals(NO_TURN) && this.isValid(state, move)) yield move;
       }
     }
     for (const piece of state.remaining()) {
-      for (let step = 0; step < topology.rotationSteps; step += 1) {
+      for (const rotation of topology.fullTurn().shorter()) {
         for (const at of state.board.shape.cells) {
-          const move = new PlaceFitPiece(piece.content, Turns.of(step), at);
+          const move = new PlaceFitPiece(piece.content, rotation, at);
           if (this.isValid(state, move)) yield move;
         }
       }

@@ -5,18 +5,19 @@ import { coordKey, type CoordKey } from '../../../src/domain/engine/coord-key';
 import type { GridTopology } from '../../../src/domain/engine/grid-topology';
 import { Radius } from '../../../src/domain/engine/radius';
 import { RegionSize } from '../../../src/domain/engine/region-size';
+import { Turns } from '../../../src/domain/engine/turns';
 import { ColorStack } from '../../../src/domain/variants/hexa-sort/color-stack';
 
 // A one-dimensional topology: a coordinate is an integer on a strip.
 // It exists only in this test, so the board test needs no real geometry.
 const stripTopology: GridTopology<number, 'x', 'left' | 'right'> = {
-  rotationSteps: 2,
+  fullTurn: () => Turns.of(2),
   key: (c) => coordKey(String(c)),
   neighbors: (c) => [c - 1, c + 1],
   neighbor: (c, direction) => (direction === 'left' ? c - 1 : c + 1),
   directions: () => ['left', 'right'],
   axes: () => ['x'],
-  rotate: (c, turns) => (turns.value % 2 === 0 ? c : -c),
+  rotate: (c, turns) => turns.applyTo(c, (at) => -at, stripTopology),
   translate: (c, offset) => c + offset,
   *line(_axis, through, contains) {
     let start = through;

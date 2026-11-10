@@ -79,7 +79,7 @@ describe('Piece translation on the triangle topology double', () => {
   });
 
   it('should_return_to_the_start_when_a_piece_rotates_a_full_turn', () => {
-    const turned = rhombus().rotated(Turns.of(triangleTopology.rotationSteps), triangleTopology);
+    const turned = rhombus().rotated(triangleTopology.fullTurn(), triangleTopology);
 
     expect(turned.shape.cells()).toEqual(rhombus().shape.cells());
   });

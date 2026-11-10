@@ -56,7 +56,7 @@ describe('hex', () => {
 
 describe('HexTopology', () => {
   it('should_give_six_rotation_steps_and_its_closed_names_when_the_topology_is_read', () => {
-    expect(topology.rotationSteps).toBe(6);
+    expect(topology.fullTurn().equals(Turns.of(6))).toBe(true);
     expect(topology.axes()).toEqual(['q', 'r', 's']);
     expect(topology.directions()).toEqual([
       'east',

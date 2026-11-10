@@ -3,7 +3,7 @@ import { coordKey, type CoordKey } from './coord-key';
 import type { GridTopology } from './grid-topology';
 import type { Radius } from './radius';
 import type { RegionSize } from './region-size';
-import type { Turns } from './turns';
+import { Turns } from './turns';
 
 // A coordinate holds a column and a row.
 // It only holds its values. `SquareTopology` does every calculation (classes.md decision 16).
@@ -51,7 +51,9 @@ function minus(c: SquareCoord): SquareCoord {
 
 // Strategy (statement §3.3, D4): the real square topology. `SquareGeometry` creates it.
 export class SquareTopology implements GridTopology<SquareCoord, SquareAxis, SquareDirection> {
-  readonly rotationSteps = 4;
+  fullTurn(): Turns {
+    return Turns.of(4);
+  }
 
   key(c: SquareCoord): CoordKey {
     return coordKey(`${c.col},${c.row}`);
@@ -78,10 +80,7 @@ export class SquareTopology implements GridTopology<SquareCoord, SquareAxis, Squ
 
   // A quarter turn maps (col, row) to (-row, col).
   rotate(c: SquareCoord, turns: Turns): SquareCoord {
-    const steps = turns.normalized(this).value;
-    let turned = c;
-    for (let i = 0; i < steps; i += 1) turned = square(-turned.row, turned.col);
-    return turned;
+    return turns.applyTo(c, (turned) => square(-turned.row, turned.col), this);
   }
 
   translate(c: SquareCoord, offset: SquareCoord): SquareCoord {

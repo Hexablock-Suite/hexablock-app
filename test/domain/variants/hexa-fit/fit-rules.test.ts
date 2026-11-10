@@ -172,7 +172,7 @@ describe('FitRules', () => {
 
     expect(turned.accepted).toBe(true);
     expect(cellsOf(turned.state)).toEqual(['1,0=a']);
-    expect(triangleTopology.rotationSteps).toBe(6);
+    expect(triangleTopology.fullTurn().equals(Turns.of(6))).toBe(true);
     // Five more steps complete the six steps of a full turn.
     const back = rules.playTurn(turned.state, new RotateFitPiece(A, Turns.of(5)));
     expect(cellsOf(back.state)).toEqual(['0,0=a']);
@@ -282,7 +282,7 @@ describe('FitRules edge cases', () => {
   }
 
   it('should_store_the_rotation_from_zero_to_three_when_a_move_counts_negative_or_huge_steps', () => {
-    // `Placement` stores a count from 0 to `rotationSteps - 1` (placement.ts),
+    // `Placement` stores a count that is shorter than the full turn (placement.ts),
     // and a negative count turns the other way (turns.ts).
     const rules = new FitRules<SquareCoord>();
 
@@ -407,7 +407,7 @@ describe('FitRules edge cases', () => {
     const failing: GridTopology<SquareCoord, string, string> = {
       ...squareTopology,
       rotate: (c, turns) => {
-        if (turns.value === 2) throw new Error('The topology failed.');
+        if (turns.equals(Turns.of(2))) throw new Error('The topology failed.');
         return squareTopology.rotate(c, turns);
       },
     };
@@ -434,7 +434,8 @@ describe('FitRules edge cases', () => {
     // Every cell of a placed piece lies inside the figure (fit-rules.ts, `fits()`).
     const outward: GridTopology<SquareCoord, string, string> = {
       ...squareTopology,
-      rotate: (c, turns) => (turns.value === 1 ? square(9, 9) : squareTopology.rotate(c, turns)),
+      rotate: (c, turns) =>
+        turns.equals(Turns.of(1)) ? square(9, 9) : squareTopology.rotate(c, turns),
     };
     const domino = [square(0, 0), square(1, 0)];
     const engine = engineOn(

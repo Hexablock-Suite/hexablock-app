@@ -91,7 +91,7 @@ function contract<TCoord>(row: Row<TCoord>): () => void {
 
   return () => {
     it('should_declare_its_rotation_steps_axes_and_directions_when_it_is_read', () => {
-      expect(topology.rotationSteps).toBe(row.rotationSteps);
+      expect(topology.fullTurn().equals(Turns.of(row.rotationSteps))).toBe(true);
       expect(topology.axes()).toEqual(row.axes);
       expect(topology.directions()).toEqual(row.directions);
     });
@@ -372,7 +372,7 @@ describe('test support topologies', () => {
     const copy: GridTopology<SquareCoord, SquareAxis, SquareDirection> = { ...squareTopology };
     const real = new SquareTopology();
 
-    expect(copy.rotationSteps).toBe(real.rotationSteps);
+    expect(copy.fullTurn().equals(real.fullTurn())).toBe(true);
     expect(copy.neighbors(square(0, 0))).toEqual(real.neighbors(square(0, 0)));
     expect(copy.neighbor(square(0, 0), 'east')).toEqual(square(1, 0));
     expect([...copy.line('col', square(0, 0), (c) => c.col < 2 && c.col >= 0)]).toEqual([

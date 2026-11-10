@@ -3,8 +3,12 @@ import { Board } from '../../../src/domain/engine/board';
 import type { BoardState } from '../../../src/domain/engine/board-state';
 import { Color } from '../../../src/domain/engine/color';
 import { coordKey, type CoordKey } from '../../../src/domain/engine/coord-key';
+import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
+import { HexTopology } from '../../../src/domain/engine/hex-topology';
 import { Radius } from '../../../src/domain/engine/radius';
 import { RegionSize } from '../../../src/domain/engine/region-size';
+import { SquareTopology } from '../../../src/domain/engine/square-topology';
+import { TriangleTopology } from '../../../src/domain/engine/triangle-topology';
 import { Turns } from '../../../src/domain/engine/turns';
 import type { FakeCell } from '../../support/engine/fake-cell';
 import { emptyState } from '../../support/engine/fake-game';
@@ -160,9 +164,11 @@ describe('RegionSize', () => {
 
 describe('Turns', () => {
   it('should_keep_the_value_when_the_count_is_any_whole_number', () => {
-    expect(Turns.of(-2).value).toBe(-2);
-    expect(Turns.of(0).value).toBe(0);
-    expect(Turns.of(7).value).toBe(7);
+    // The count is private, so the test reads it through `equals()` and `plus()`.
+    expect(Turns.of(-2).equals(Turns.of(-2))).toBe(true);
+    expect(Turns.of(-2).equals(Turns.of(2))).toBe(false);
+    expect(Turns.of(0).equals(Turns.of(0))).toBe(true);
+    expect(Turns.of(7).plus(Turns.of(-7)).equals(Turns.of(0))).toBe(true);
   });
 
   it('should_throw_a_range_error_when_the_count_is_not_a_whole_number', () => {
@@ -177,11 +183,13 @@ describe('Turns', () => {
       expect(() => Turns.of(value)).toThrow(RangeError);
       expect(() => Turns.of(value)).toThrow(`A turn count needs a whole number, not ${value}.`);
     }
-    expect(Turns.of(Number.MIN_SAFE_INTEGER).value).toBe(Number.MIN_SAFE_INTEGER);
+    const lowest = Turns.of(Number.MIN_SAFE_INTEGER);
+    expect(lowest.plus(Turns.of(Number.MAX_SAFE_INTEGER)).equals(Turns.of(0))).toBe(true);
   });
 
   it('should_store_zero_when_a_turn_count_is_negative_zero', () => {
-    expect(Turns.of(-0).value).toBe(0);
+    // `toEqual` tells 0 from a negative zero, so it fails when the count keeps the sign.
+    expect(Turns.of(-0)).toEqual(Turns.of(0));
   });
 
   it('should_rotate_backward_when_the_count_is_negative', () => {
@@ -209,6 +217,66 @@ describe('Turns', () => {
     turns.normalized(squareTopology);
 
     expect(turns.equals(Turns.of(-1))).toBe(true);
+  });
+
+  // Unit R19 of the redesign: the count stays inside `Turns`, and the topology gives its
+  // full turn as a `Turns`. The square topology has 4 rotation steps.
+  it('should_give_the_sum_and_keep_both_counts_when_two_counts_are_added', () => {
+    const two = Turns.of(2);
+    const three = Turns.of(3);
+
+    expect(two.plus(three).equals(Turns.of(5))).toBe(true);
+    expect(two.plus(Turns.of(-5)).equals(Turns.of(-3))).toBe(true);
+    expect([two.equals(Turns.of(2)), three.equals(Turns.of(3))]).toEqual([true, true]);
+    expect(() => Turns.of(Number.MAX_SAFE_INTEGER).plus(Turns.of(1))).toThrow(
+      new RangeError(`A turn count needs a whole number, not ${2 ** 53}.`),
+    );
+  });
+
+  it('should_apply_one_step_for_each_step_of_the_normalized_count_when_a_turn_is_applied', () => {
+    const stepsOf = (count: number) =>
+      Turns.of(count).applyTo(0, (steps) => steps + 1, squareTopology);
+
+    expect([0, 1, 3, 4, 5, -1, -9].map(stepsOf)).toEqual([0, 1, 3, 0, 1, 3, 3]);
+    expect(Turns.of(7).applyTo('', (path) => `${path}.`, triangleTopology)).toBe('.');
+  });
+
+  it('should_give_each_shorter_count_from_zero_when_the_shorter_turns_are_listed', () => {
+    const shorter = [...Turns.of(4).shorter()];
+    const expected = [0, 1, 2, 3].map((count) => Turns.of(count));
+
+    expect(shorter).toHaveLength(4);
+    expect(shorter.map((turns, index) => turns.equals(expected[index] as Turns))).toEqual([
+      true,
+      true,
+      true,
+      true,
+    ]);
+    expect([...Turns.of(0).shorter()]).toEqual([]);
+    expect([...Turns.of(-2).shorter()]).toEqual([]);
+  });
+
+  it('should_give_its_full_turn_as_a_turn_count_when_a_topology_is_asked', () => {
+    expect(squareTopology.fullTurn().equals(Turns.of(4))).toBe(true);
+    expect(triangleTopology.fullTurn().equals(Turns.of(6))).toBe(true);
+    expect(new HexGeometry().createTopology().fullTurn().equals(Turns.of(6))).toBe(true);
+  });
+
+  it('should_reject_at_compile_time_when_a_caller_reads_the_number_of_a_turn_count', () => {
+    const readers = [
+      // @ts-expect-error `Turns.value` is private.
+      () => Turns.of(1).value,
+      // @ts-expect-error `GridTopology` has no `rotationSteps` number.
+      () => squareTopology.rotationSteps,
+      // @ts-expect-error `SquareTopology` has no `rotationSteps` number.
+      () => new SquareTopology().rotationSteps,
+      // @ts-expect-error `TriangleTopology` has no `rotationSteps` number.
+      () => new TriangleTopology().rotationSteps,
+      // @ts-expect-error `HexTopology` has no `rotationSteps` number.
+      () => new HexTopology().rotationSteps,
+    ];
+
+    expect(readers).toHaveLength(5);
   });
 });
 

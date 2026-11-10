@@ -1,11 +1,11 @@
 import type { CoordKey } from '../../engine/coord-key';
 import type { GridTopology } from '../../engine/grid-topology';
 import type { Piece } from '../../engine/piece';
-import { Turns } from '../../engine/turns';
+import type { Turns } from '../../engine/turns';
 import type { PieceId } from './piece-id';
 
 // Where a piece lies on the figure: its rotation and its offset. It is a value object.
-// The rotation is stored as a count from 0 to `rotationSteps - 1` of the topology,
+// The rotation is stored as a count that is shorter than the full turn of the topology,
 // so a long series of rotations never leaves the safe integer range.
 export class Placement<TCoord> {
   private constructor(
@@ -23,7 +23,7 @@ export class Placement<TCoord> {
 
   // The same offset, turned by `steps` more.
   turned(steps: Turns, topology: GridTopology<TCoord, string, string>): Placement<TCoord> {
-    const sum = Turns.of(this.rotation.value + steps.normalized(topology).value);
+    const sum = this.rotation.plus(steps.normalized(topology));
     return new Placement(sum.normalized(topology), this.at);
   }
 
