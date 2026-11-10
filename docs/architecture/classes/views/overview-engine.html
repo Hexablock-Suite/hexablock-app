@@ -71,12 +71,13 @@
       >
         <title id="ovengine-title">HexaBlock generic engine map · UML class diagram</title>
         <desc id="ovengine-desc">
-          Overview map of the 67 layer 1 engine classes in 15 groups. Each line joins two classes:
+          Overview map of the 73 layer 1 engine classes in 15 groups. Each line joins two classes:
           GameEngine keeps its GamePhase, its optional MoveHistory and its IScoringPolicy and
-          notifies through GameEventPublisher, BoardState keeps its Board, IVariantFactory creates
-          the IGameRules and GeometryFactory creates the piece shapes. No line touches a group
-          frame. Each group names the view that shows its members. A class that the code does not
-          have yet carries «Sprint N»: the docs/ROADMAP.md sprint of the requirement it serves.
+          notifies through GameEventPublisher, BoardState keeps its Board and gives its photo, a
+          BoardSnapshot that holds a ReadonlyBoard, IVariantFactory creates the IGameRules and
+          GeometryFactory creates the piece shapes. No line touches a group frame. Each group names
+          the view that shows its members. A class that the code does not have yet carries «Sprint
+          N»: the docs/ROADMAP.md sprint of the requirement it serves.
         </desc>
         <defs>
           <marker
@@ -394,7 +395,7 @@
           x="56"
           y="676"
           width="288"
-          height="278"
+          height="328"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -1569,6 +1570,34 @@
           </text>
         </g>
 
+        <g data-class="ReadonlyBoard">
+          <rect
+            x="76"
+            y="954"
+            width="248"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="200"
+            y="966"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="200" y="979" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              ReadonlyBoard
+            </tspan>
+          </text>
+        </g>
         <!-- Chips: scoring -->
         <g data-class="IScoringPolicy">
           <rect
@@ -2292,7 +2321,18 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="138" y="541" fill="#17212a" text-anchor="middle">
+          <text
+            x="138"
+            y="532"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="138" y="545" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               Resolution
             </tspan>
@@ -2420,18 +2460,46 @@
             </tspan>
           </text>
         </g>
-        <g data-class="TimedRulesDecorator">
+        <g data-class="BoardSnapshot">
           <rect
             x="692"
             y="570"
-            width="268"
+            width="120"
             height="34"
             rx="4"
             fill="#ffffff"
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="826" y="591" fill="#17212a" text-anchor="middle">
+          <text
+            x="752"
+            y="582"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface · Memento
+          </text>
+          <text x="752" y="595" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              BoardSnapshot
+            </tspan>
+          </text>
+        </g>
+        <g data-class="TimedRulesDecorator">
+          <rect
+            x="828"
+            y="570"
+            width="132"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="894" y="591" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               TimedRulesDecorator
             </tspan>
