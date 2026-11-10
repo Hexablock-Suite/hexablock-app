@@ -41,7 +41,15 @@ const axisSteps: ReadonlyMap<string, HexCoord> = new Map([
   ['s', hex(1, -1)],
 ]);
 
-const neighborSteps = [hex(1, 0), hex(1, -1), hex(0, -1), hex(-1, 0), hex(-1, 1), hex(0, 1)];
+// One step per direction, in the order of `neighbors()`.
+const directionSteps: ReadonlyMap<string, HexCoord> = new Map([
+  ['east', hex(1, 0)],
+  ['north-east', hex(1, -1)],
+  ['north-west', hex(0, -1)],
+  ['west', hex(-1, 0)],
+  ['south-west', hex(-1, 1)],
+  ['south-east', hex(0, 1)],
+]);
 
 function add(a: HexCoord, b: HexCoord): HexCoord {
   return hex(a.q + b.q, a.r + b.r);
@@ -66,7 +74,14 @@ export class HexTopology implements GridTopology<HexCoord, HexAxis, HexDirection
   }
 
   neighbors(c: HexCoord): HexCoord[] {
-    return neighborSteps.map((step) => add(c, step));
+    return [...directionSteps.values()].map((step) => add(c, step));
+  }
+
+  neighbor(c: HexCoord, direction: HexDirection): HexCoord {
+    // The check still runs when a caller casts a free string to a direction.
+    const step = directionSteps.get(direction);
+    if (step === undefined) throw new RangeError(`The hex grid has no direction ${direction}.`);
+    return add(c, step);
   }
 
   directions(): HexDirection[] {

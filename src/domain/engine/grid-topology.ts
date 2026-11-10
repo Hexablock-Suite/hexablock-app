@@ -10,14 +10,16 @@ import type { Turns } from './turns';
 // Each topology declares its axes and its directions as closed unions of names,
 // for example `'q' | 'r' | 's'`. So the compiler rejects an axis that the topology lacks.
 // A cast such as `'nort' as SquareAxis` passes the compiler.
-// So each topology checks the axis in `line()` at runtime and throws a `RangeError`.
-// No method takes a direction, so a topology has no direction to check.
+// So each topology checks the axis in `line()` and the direction in `neighbor()` at runtime.
+// A name that the topology lacks is a `RangeError`.
 export interface GridTopology<TCoord, TAxis extends string, TDirection extends string> {
   // The number of rotation steps of a full turn: 6 for a hexagon, 4 for a square.
   readonly rotationSteps: number;
   // A unique key for a coordinate. The board stores its cells by this key.
   key(c: TCoord): CoordKey;
   neighbors(c: TCoord): TCoord[];
+  // The neighbor of `c` in one direction. `neighbors()` holds one cell per direction.
+  neighbor(c: TCoord, direction: TDirection): TCoord;
   directions(): TDirection[];
   axes(): TAxis[];
   rotate(c: TCoord, turns: Turns): TCoord;

@@ -12,6 +12,7 @@ const stripTopology: GridTopology<number, 'x', 'left' | 'right'> = {
   rotationSteps: 2,
   key: (c) => coordKey(String(c)),
   neighbors: (c) => [c - 1, c + 1],
+  neighbor: (c, direction) => (direction === 'left' ? c - 1 : c + 1),
   directions: () => ['left', 'right'],
   axes: () => ['x'],
   rotate: (c, turns) => (turns.value % 2 === 0 ? c : -c),
