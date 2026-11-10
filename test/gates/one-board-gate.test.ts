@@ -220,12 +220,8 @@ describe('one board gate (APP-NFR-01)', () => {
       squareTopology,
     );
     const piece = new Piece(new ShapeGroup([new CellNode(square(0, 0))]), id);
-    const state = FitState.start(
-      STATE_ID,
-      MATCH_ID,
-      figure,
-      new FixedListPieceSource([piece]),
-    ).place(id, Placement.of(Turns.of(0), square(0, 0), squareTopology));
+    const state = FitState.start(STATE_ID, MATCH_ID, figure, new FixedListPieceSource([piece]));
+    state.place(id, Placement.of(Turns.of(0), square(0, 0), squareTopology));
     const board: Board<PieceId, SquareCoord, string> = state.board;
 
     expect(board.constructor).toBe(Board);

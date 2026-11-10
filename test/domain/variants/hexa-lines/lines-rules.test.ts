@@ -21,12 +21,15 @@ import {
 import { triangle, triangleTopology } from '../../../support/engine/triangle-topology';
 import {
   filledKeys,
+  linesFactory,
   linesGame,
   linesState,
   piece,
 } from '../../../support/variants/hexa-lines/lines-game';
 import { MATCH_ID } from '../../../support/engine/match-id';
-import { STATE_ID } from '../../../support/engine/entity-ids';
+import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
+import { firstValidMove } from '../../../support/engine/variant-game';
+import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
 
 // The rules suite of Hexa Lines (issue 91, APP-NFR-02, APP-NFR-12).
 // The combo and the streak follow the proposal on issue 58,
@@ -447,5 +450,32 @@ describe('Hexa Lines rules edge cases', () => {
     expect(filledKeys(state)).toEqual([]);
     // One placed cell and one line with factor 1: 1 + 10.
     expect(state.score).toBe(11);
+  });
+});
+
+// R7: the engine plays a turn on a copy of its state. The Lines state changes in place,
+// so a turn that throws after the placement changed the copy leaves the state of the game.
+describe('LinesRules atomic turn', () => {
+  it('should_keep_the_snapshot_when_the_turn_throws_after_the_piece_changed_the_state', () => {
+    const failing: IScoringPolicy<LinesState<SquareCoord>> = {
+      score: () => {
+        throw new Error('The scoring fails.');
+      },
+    };
+    const start = linesFactory(5).createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
+    const { engine } = linesGame(start, failing);
+    const facts = (state: LinesState<SquareCoord>) => ({
+      cells: state.board.cells(),
+      tray: [...state.tray],
+      nextPiece: state.source.clone().next(),
+      counts: [state.streak, state.linesCleared, state.cellsPlaced],
+      score: state.score,
+    });
+    const before = facts(engine.snapshot());
+
+    expect(() => engine.play(firstValidMove(new LinesRules<SquareCoord>(), start))).toThrow(
+      'The scoring fails.',
+    );
+    expect(facts(engine.snapshot())).toEqual(before);
   });
 });

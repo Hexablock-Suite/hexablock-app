@@ -67,12 +67,16 @@ function dominoLevel(): FitState<SquareCoord> {
   );
 }
 
-function engineOn(initial: FitState<SquareCoord>, publisher = new RecordingPublisher()) {
+function engineOn(
+  initial: FitState<SquareCoord>,
+  publisher = new RecordingPublisher(),
+  scoring: IScoringPolicy<FitState<SquareCoord>> = noPoints,
+) {
   const engine = new GameEngine<PieceId, SquareCoord, FitMove<SquareCoord>, FitState<SquareCoord>>(
     MATCH_ID,
     GameId.of('hexa-fit'),
     new FitRules<SquareCoord>(),
-    noPoints,
+    scoring,
     publisher,
   );
   engine.start(initial);
@@ -538,12 +542,67 @@ describe('FitRules move count', () => {
     const placed = rules.playTurn(dominoLevel(), new PlaceFitPiece(A, NO_TURN, square(0, 0))).state;
     const before = placed.clone();
 
+    // A move changes its state in place, so the test reads the clone before it replays the clone.
     const removed = rules.playTurn(placed, new RemoveFitPiece(A)).state;
+    const kept = [before.moves, cellsOf(before)];
     const replayed = rules.playTurn(before, new RemoveFitPiece(A)).state;
 
     expect(removed.moves).toBe(2);
-    expect(before.moves).toBe(1);
-    expect(cellsOf(before)).toEqual(['0,0=a', '1,0=a']);
+    expect(kept).toEqual([1, ['0,0=a', '1,0=a']]);
     expect(replayed.moves).toBe(2);
+  });
+});
+
+// R7: the Fit state is an entity, so it keeps its object. A move changes it in place.
+describe('FitRules in place', () => {
+  it('should_change_the_same_state_object_when_a_place_a_rotate_or_a_remove_is_applied', () => {
+    const rules = new FitRules<SquareCoord>();
+    const state = dominoLevel();
+    const board = state.board;
+    const seen = [];
+
+    for (const move of [
+      new PlaceFitPiece(A, NO_TURN, square(0, 0)),
+      new RotateFitPiece(A, Turns.of(1)),
+      new RemoveFitPiece(A),
+    ]) {
+      const result = rules.apply(state, move);
+      seen.push({ same: result === state, cells: cellsOf(state), moves: state.moves });
+    }
+
+    expect(seen).toEqual([
+      { same: true, cells: ['0,0=a', '1,0=a'], moves: 1 },
+      { same: true, cells: ['0,0=a', '0,1=a'], moves: 2 },
+      { same: true, cells: [], moves: 3 },
+    ]);
+    expect(state.board).toBe(board);
+  });
+
+  // The engine plays a turn on a copy of its state. So a turn that throws after the move
+  // changed the copy leaves the state of the game as it was (classes.md decision 34).
+  it('should_keep_the_snapshot_when_the_turn_throws_after_the_move_changed_the_state', () => {
+    const failing: IScoringPolicy<FitState<SquareCoord>> = {
+      score: () => {
+        throw new Error('The scoring fails.');
+      },
+    };
+    const engine = engineOn(dominoLevel(), new RecordingPublisher(), failing);
+    const playing = engineOn(dominoLevel());
+    playing.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)));
+    const placed = engineOn(playing.snapshot(), new RecordingPublisher(), failing);
+    const facts = (state: FitState<SquareCoord>) => ({
+      cells: cellsOf(state),
+      tray: trayOf(state),
+      moves: state.moves,
+      score: state.score,
+    });
+    const before = [facts(engine.snapshot()), facts(placed.snapshot())];
+
+    expect(() => engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)))).toThrow(
+      'The scoring fails.',
+    );
+    expect(() => placed.play(new RotateFitPiece(A, Turns.of(1)))).toThrow('The scoring fails.');
+    expect(() => placed.play(new RemoveFitPiece(A))).toThrow('The scoring fails.');
+    expect([facts(engine.snapshot()), facts(placed.snapshot())]).toEqual(before);
   });
 });

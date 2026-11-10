@@ -3,6 +3,7 @@ import { Resolution } from './resolution';
 import type { ITimed } from './timed';
 
 // Strategy (D1): the rules of one variant. `GameEngine` depends only on this interface.
+// The state is an entity, so `apply()` changes it in place and returns the same object.
 // No member names a cell or a coordinate, so it takes two type parameters (classes.md decision 16).
 export interface IGameRules<TMove, TState> {
   isValid(state: TState, move: TMove): boolean;

@@ -15,7 +15,7 @@ import { SLIDE_SENSES, Slide } from './slide';
 // A slide that changes no cell is not valid. The game ends when no slide changes the board
 // after the new tile appears.
 // The target tile sets `targetReached` and does not end the game (A3).
-// The rules decide. The state changes itself: `MergeState.slide()` packs the tiles,
+// The rules decide. The state changes itself in place: `MergeState.slide()` packs the tiles,
 // and `MergeState.addNewTile()` puts the new tile.
 export class MergeRules<
   TCell extends IMergeable<TCell>,
@@ -45,7 +45,8 @@ export class MergeRules<
     state: MergeState<TCell, TCoord, TAxis>,
     slide: Slide<TAxis>,
   ): MergeState<TCell, TCoord, TAxis> {
-    return state.slide(slide, this.target);
+    state.slide(slide, this.target);
+    return state;
   }
 
   // A new tile appears on an empty cell after each accepted slide (§1.4, issue #95).

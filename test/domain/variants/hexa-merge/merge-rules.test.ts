@@ -24,6 +24,9 @@ import {
 } from '../../../support/variants/hexa-merge/merge-game';
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
+import { mergeTileSource } from '../../../../src/domain/variants/hexa-merge/merge-tile-source';
+import { firstValidMove } from '../../../support/engine/variant-game';
+import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
 
 // The rules suite of Hexa Merge (statement §1.4, APP-NFR-12).
 // The tests play through `GameEngine.play()` and the rules contract, on the real hex geometry.
@@ -353,5 +356,56 @@ describe('Merge edge cases', () => {
     expect(outcome).toBe('playing');
     expect(values(engine.snapshot())).toEqual({});
     expect(publisher.events).toEqual([]);
+  });
+});
+
+// R7: the Merge state is an entity, so it keeps its object. A slide changes it in place.
+describe('MergeRules in place', () => {
+  it('should_change_the_same_state_object_when_a_slide_is_applied', () => {
+    const rules = new MergeRules<MergeTile, HexCoord, HexAxis>(MergeTile.of(2048));
+    const state = mergeState([
+      [hex(0, 0), 2],
+      [hex(1, 0), 2],
+    ]);
+    const board = state.board;
+
+    const result = rules.apply(state, Slide.of<HexAxis>('q', 'backward'));
+
+    expect(result).toBe(state);
+    expect(state.board).toBe(board);
+    expect(values(state)).toEqual({ [hexTopology.key(hex(-1, 0))]: 4 });
+    expect(state.merged).toEqual([MergeTile.of(4)]);
+  });
+
+  // The engine plays a turn on a copy of its state. So a turn that throws after the slide
+  // and the new tile changed the copy leaves the state of the game as it was.
+  it('should_keep_the_snapshot_when_the_turn_throws_after_the_slide_changed_the_state', () => {
+    const failing: IScoringPolicy<HexMergeState> = {
+      score: () => {
+        throw new Error('The scoring fails.');
+      },
+    };
+    const start = mergeState(
+      [
+        [hex(0, 0), 2],
+        [hex(1, 0), 2],
+      ],
+      2,
+      mergeTileSource(3),
+    );
+    const { engine, rules } = mergeGame(start, MergeTile.of(2048), failing);
+    const facts = (state: HexMergeState) => ({
+      cells: state.board.cells(),
+      merged: state.merged,
+      targetReached: state.targetReached,
+      nextTile: state.tiles.clone().next(),
+      score: state.score,
+    });
+    const before = facts(engine.snapshot());
+
+    expect(() => engine.play(firstValidMove(rules, engine.snapshot()))).toThrow(
+      'The scoring fails.',
+    );
+    expect(facts(engine.snapshot())).toEqual(before);
   });
 });

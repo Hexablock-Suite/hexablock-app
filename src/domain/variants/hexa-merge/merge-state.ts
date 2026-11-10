@@ -16,10 +16,9 @@ export interface MergeView {
 // The state of one Hexa Merge game. It narrows `board` to the board of its topology.
 // It is an entity inside the `GameEngine` aggregate (classes.md decisions 7 and 26).
 // Its identity is its own `GameStateId`, and `equals()` compares only that identity.
-// It also keeps the `MatchId` of its game, and `belongsTo()` reads it. The state after a slide keeps both.
-// It changes only through its own methods. `addNewTile()` and `addPoints()` change it in place.
-// `slide()` gives the state after the slide and leaves this state unchanged, as the Fit moves do.
-// So `targetReached` and `merged` stay read-only. The rules decide when to call each method.
+// It also keeps the `MatchId` of its game, and `belongsTo()` reads it.
+// It changes only through its own methods. The state keeps its object, so `addNewTile()`,
+// `slide()` and `addPoints()` change it in place. The rules decide when to call each method.
 // A refused input throws a RangeError and leaves the whole state as it was.
 // `tiles` is the source of the new tiles. It lives in the state (classes.md decision 31),
 // so `clone()` clones it, and the rollback of `GameEngine.play()` covers each draw.
@@ -41,8 +40,8 @@ export class MergeState<
     private readonly matchId: MatchId,
     readonly board: Board<TCell, TCoord, TAxis>,
     readonly tiles: IPieceSource<NewTile<TCell>>,
-    readonly targetReached = false,
-    readonly merged: readonly TCell[] = [],
+    public targetReached = false,
+    public merged: readonly TCell[] = [],
     public score = 0,
   ) {
     if (!Number.isFinite(score)) {
@@ -65,25 +64,20 @@ export class MergeState<
     return this.planOf(slide) !== undefined;
   }
 
-  // The state after the slide. Its board is a copy of this board with the tiles packed
-  // toward the leading edge of each line. It keeps the tile source and the score.
-  // A merge that makes `target` sets `targetReached`.
-  // A slide that changes no cell, or a slide on an axis of another topology, throws a RangeError.
-  slide(slide: Slide<TAxis>, target: TCell): MergeState<TCell, TCoord, TAxis> {
+  // Packs the tiles of the board toward the leading edge of each line, in place.
+  // The board vacates every tile, then takes the packed tiles line by line.
+  // So `cells()` lists the tiles in the order of the packed lines.
+  // `merged` takes the tiles that the merges of this slide make.
+  // A merge that makes `target` sets `targetReached`. The tile source and the score do not change.
+  // A slide that changes no cell, or a slide on an axis of another topology, throws a RangeError
+  // before any change.
+  slide(slide: Slide<TAxis>, target: TCell): void {
     const plan = this.planOf(slide);
     if (plan === undefined) throw new RangeError('The slide changes no cell of the board.');
-    const board = this.board.clone();
-    for (const [c] of this.board.cells()) board.vacate(c);
-    for (const [c, cell] of plan.cells) board.occupy(c, cell);
-    return new MergeState(
-      this.stateId,
-      this.matchId,
-      board,
-      this.tiles,
-      this.targetReached || plan.merged.some((tile) => tile.canMergeWith(target)),
-      plan.merged,
-      this.score,
-    );
+    for (const [c] of this.board.cells()) this.board.vacate(c);
+    for (const [c, cell] of plan.cells) this.board.occupy(c, cell);
+    this.targetReached ||= plan.merged.some((tile) => tile.canMergeWith(target));
+    this.merged = plan.merged;
   }
 
   addPoints(points: number): void {

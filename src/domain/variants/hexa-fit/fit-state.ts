@@ -22,17 +22,18 @@ export interface FitView<TCoord> {
 // `moves` counts the accepted moves of the game for the stars (issue #60).
 // It is an entity inside the `GameEngine` aggregate (classes.md decisions 7 and 26).
 // Its identity is its own `GameStateId`, and `equals()` compares only that identity.
-// It also keeps the `MatchId` of its game, and `belongsTo()` reads it. Each new state of a move keeps both.
-// `place()`, `remove()` and `countMove()` change nothing in place: each one returns a new state.
-// `addPoints()` adds the points of a turn in place, because the engine calls it on its copy.
+// It also keeps the `MatchId` of its game, and `belongsTo()` reads it.
+// The state keeps its object, so every business method changes it in place and returns nothing:
+// `place()`, `remove()`, `countMove()` and `addPoints()`. The engine calls them on its copy.
+// A refused input throws a RangeError and leaves the whole state as it was.
 export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
   private constructor(
     private readonly stateId: GameStateId,
     private readonly matchId: MatchId,
     readonly board: Board<PieceId, TCoord, string>,
     private readonly pieces: ReadonlyMap<string, Piece<PieceId, TCoord>>,
-    private readonly placements: ReadonlyMap<string, Placement<TCoord>>,
-    readonly moves = 0,
+    private readonly placements: Map<string, Placement<TCoord>>,
+    public moves = 0,
     public score = 0,
   ) {}
 
@@ -74,53 +75,31 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
   }
 
   // Puts the piece on the cells of `placement`. The rules check the move before.
-  place(id: PieceId, placement: Placement<TCoord>): FitState<TCoord> {
+  // An unknown piece, or a cell outside the figure, throws a RangeError before any change.
+  place(id: PieceId, placement: Placement<TCoord>): void {
     const piece = this.pieces.get(id.value);
     if (piece === undefined) throw new RangeError(`The level has no piece ${id.value}.`);
-    const board = this.board.clone();
-    for (const c of placement.cells(piece, board.topology)) board.occupy(c, id);
-    const placements = new Map(this.placements).set(id.value, placement);
-    return new FitState(
-      this.stateId,
-      this.matchId,
-      board,
-      this.pieces,
-      placements,
-      this.moves,
-      this.score,
-    );
-  }
-
-  // Takes the piece off the figure: a copy of the board vacates each cell of the piece.
-  remove(id: PieceId): FitState<TCoord> {
-    const board = this.board.clone();
-    for (const [c, cell] of this.board.cells()) {
-      if (cell.equals(id)) board.vacate(c);
+    const cells = placement.cells(piece, this.board.topology);
+    for (const c of cells) {
+      if (!this.board.contains(c)) {
+        throw new RangeError(`The coordinate ${this.board.topology.key(c)} is outside the board.`);
+      }
     }
-    const placements = new Map(this.placements);
-    placements.delete(id.value);
-    return new FitState(
-      this.stateId,
-      this.matchId,
-      board,
-      this.pieces,
-      placements,
-      this.moves,
-      this.score,
-    );
+    for (const c of cells) this.board.occupy(c, id);
+    this.placements.set(id.value, placement);
   }
 
-  // The same state with one more move. The rules call it once for each accepted move.
-  countMove(): FitState<TCoord> {
-    return new FitState(
-      this.stateId,
-      this.matchId,
-      this.board,
-      this.pieces,
-      this.placements,
-      this.moves + 1,
-      this.score,
-    );
+  // Takes the piece off the figure: the board vacates each cell of the piece.
+  remove(id: PieceId): void {
+    for (const [c, cell] of this.board.cells()) {
+      if (cell.equals(id)) this.board.vacate(c);
+    }
+    this.placements.delete(id.value);
+  }
+
+  // Adds one move. The rules call it once for each accepted move.
+  countMove(): void {
+    this.moves += 1;
   }
 
   // The engine adds the points of a turn in place. Points that are not finite throw a RangeError.
@@ -151,15 +130,16 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
     });
   }
 
-  // A piece never changes, so the clone shares the pieces and the placements.
-  // The clone keeps the move count, so undo gives back the count before the move.
+  // A piece and a placement never change, so the clone shares them.
+  // The map of the placements changes in place, so the clone takes its own copy of the map.
+  // The clone keeps the ids and the move count, so undo gives back the count before the move.
   clone(): FitState<TCoord> {
     return new FitState(
       this.stateId,
       this.matchId,
       this.board.clone(),
       this.pieces,
-      this.placements,
+      new Map(this.placements),
       this.moves,
       this.score,
     );

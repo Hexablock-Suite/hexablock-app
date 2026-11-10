@@ -61,8 +61,11 @@ export class FitRules<TCoord> extends BaseGameRules<FitMove<TCoord>, FitState<TC
     }
   }
 
+  // The move changes the state in place, and the rules return the same state object.
   apply(state: FitState<TCoord>, move: FitMove<TCoord>): FitState<TCoord> {
-    return moved(state, move).countMove();
+    changeBy(state, move);
+    state.countMove();
+    return state;
   }
 
   // Fit has no resolution: the move only places, removes or turns a piece.
@@ -77,23 +80,28 @@ export class FitRules<TCoord> extends BaseGameRules<FitMove<TCoord>, FitState<TC
   }
 }
 
-// The state after the move, before the rules count it.
-function moved<TCoord>(state: FitState<TCoord>, move: FitMove<TCoord>): FitState<TCoord> {
+// Changes the state by the move, before the rules count it.
+// A rotation removes the piece and places it again, turned.
+function changeBy<TCoord>(state: FitState<TCoord>, move: FitMove<TCoord>): void {
   const { topology } = state.board;
   switch (move.kind) {
     case 'place':
-      return state.place(move.pieceId, Placement.of(move.rotation, move.at, topology));
+      state.place(move.pieceId, Placement.of(move.rotation, move.at, topology));
+      return;
     case 'remove':
-      return state.remove(move.pieceId);
+      state.remove(move.pieceId);
+      return;
     case 'rotate': {
       const placement = state.placementOf(move.pieceId);
       if (placement === undefined) {
         throw new RangeError(`The piece ${move.pieceId.value} is not on the figure.`);
       }
-      return state.remove(move.pieceId).place(move.pieceId, placement.turned(move.steps, topology));
+      state.remove(move.pieceId);
+      state.place(move.pieceId, placement.turned(move.steps, topology));
+      return;
     }
     default:
-      return unknownMove(move);
+      unknownMove(move);
   }
 }
 

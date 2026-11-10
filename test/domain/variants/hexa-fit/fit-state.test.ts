@@ -1,4 +1,8 @@
 /** @jest-environment node */
+import { Turns } from '../../../../src/domain/engine/turns';
+import { Placement } from '../../../../src/domain/variants/hexa-fit/placement';
+import { square, squareTopology } from '../../../support/engine/square-topology';
+import { A, B } from '../../../support/variants/hexa-fit/fit-game';
 import { fitFactory, threeDominoFitFactory } from '../../../support/variants/hexa-fit/fit-game';
 import { firstValidMove } from '../../../support/engine/variant-game';
 import { GameStateId } from '../../../../src/domain/engine/game-state-id';
@@ -61,5 +65,39 @@ describe('FitState', () => {
       second.belongsTo(MatchId.of('m-a')),
       first.belongsTo(MatchId.of('m-b')),
     ]).toEqual([true, true, false]);
+  });
+
+  // The state keeps its object: `place()`, `remove()` and `countMove()` change it in place.
+  it('should_change_the_state_in_place_when_a_piece_is_placed_counted_and_removed', () => {
+    const state = threeDominoFitFactory().createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
+    const board = state.board;
+    const keys = () => state.board.cells().map(([c, id]) => `${squareTopology.key(c)}=${id.value}`);
+    const results: unknown[] = [];
+
+    results.push(state.place(A, Placement.of(Turns.of(0), square(2, 0), squareTopology)));
+    results.push(state.place(B, Placement.of(Turns.of(0), square(0, 0), squareTopology)));
+    results.push(state.countMove());
+    const placed = { cells: keys(), placed: state.placed(), moves: state.moves };
+    results.push(state.remove(A));
+
+    expect(results).toEqual([undefined, undefined, undefined, undefined]);
+    expect(state.board).toBe(board);
+    expect(placed).toEqual({
+      cells: ['2,0=a', '3,0=a', '0,0=b', '1,0=b'],
+      placed: [A, B],
+      moves: 1,
+    });
+    expect([keys(), state.placed(), state.moves]).toEqual([['0,0=b', '1,0=b'], [B], 1]);
+  });
+
+  it('should_throw_a_range_error_and_keep_the_state_when_a_placed_piece_leaves_the_figure', () => {
+    const state = threeDominoFitFactory().createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
+    state.place(B, Placement.of(Turns.of(0), square(0, 0), squareTopology));
+    const before = { cells: state.board.cells(), placed: state.placed() };
+
+    expect(() => state.place(A, Placement.of(Turns.of(0), square(5, 0), squareTopology))).toThrow(
+      new RangeError('The coordinate 6,0 is outside the board.'),
+    );
+    expect({ cells: state.board.cells(), placed: state.placed() }).toEqual(before);
   });
 });

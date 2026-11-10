@@ -13,13 +13,13 @@ import {
   mergeState,
   noNewTiles,
   values,
+  valueOf,
   type HexMergeState,
 } from '../../../support/variants/hexa-merge/merge-game';
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { STATE_ID } from '../../../support/engine/entity-ids';
 
-// R7: the Merge state is an entity. A new tile changes it in place. A slide gives the state
-// after the slide, as the Fit moves do, and leaves the state before it unchanged.
+// R7: the Merge state is an entity. It keeps its object: a new tile and a slide change it in place.
 // A refused input leaves the whole state as it was.
 
 const key = (q: number, r: number) => hexTopology.key(hex(q, r));
@@ -85,21 +85,43 @@ describe('MergeState', () => {
     expect(full.tiles.hasNext()).toBe(true);
   });
 
-  it('should_give_the_merged_state_and_keep_the_state_before_when_tiles_slide', () => {
+  it('should_merge_the_tiles_in_place_and_keep_the_board_and_the_source_when_tiles_slide', () => {
     const state = mergeState([
       [hex(-1, 0), 2],
       [hex(0, 0), 2],
       [hex(0, 1), 4],
     ]);
-    const before = facts(state);
+    const { board, tiles } = state;
+    const before = state.clone();
 
-    const after = state.slide(Slide.of<HexAxis>('q', 'forward'), MergeTile.of(2048));
+    const result: unknown = state.slide(Slide.of<HexAxis>('q', 'forward'), MergeTile.of(2048));
 
-    expect(values(after)).toEqual({ [key(1, 0)]: 4, [key(0, 1)]: 4 });
-    expect(after.merged).toEqual([MergeTile.of(4)]);
-    expect(after.targetReached).toBe(false);
-    expect(after.tiles).toBe(state.tiles);
-    expect(facts(state)).toEqual(before);
+    expect(result).toBeUndefined();
+    expect(values(state)).toEqual({ [key(1, 0)]: 4, [key(0, 1)]: 4 });
+    expect(state.merged).toEqual([MergeTile.of(4)]);
+    expect(state.targetReached).toBe(false);
+    expect([state.board, state.tiles]).toEqual([board, tiles]);
+    expect(state.board).toBe(board);
+    expect(state.tiles).toBe(tiles);
+    expect(values(before)).toEqual({ [key(-1, 0)]: 2, [key(0, 0)]: 2, [key(0, 1)]: 4 });
+  });
+
+  // `Board.cells()` lists the cells in first-write order, and `MoveResult.cells` shows it.
+  // A slide vacates every tile and then writes the packed tiles line by line.
+  it('should_list_the_cells_in_the_order_of_the_packed_lines_when_tiles_slide_in_place', () => {
+    const state = mergeState([
+      [hex(1, -1), 2],
+      [hex(-1, 0), 4],
+      [hex(0, 1), 8],
+    ]);
+
+    state.slide(Slide.of<HexAxis>('q', 'backward'), MergeTile.of(2048));
+
+    expect(state.board.cells().map(([at, tile]) => [hexTopology.key(at), valueOf(tile)])).toEqual([
+      [key(-1, 0), 4],
+      [key(-1, 1), 8],
+      [key(0, -1), 2],
+    ]);
   });
 
   it('should_set_the_target_flag_when_a_merge_makes_the_target_tile', () => {
@@ -108,14 +130,15 @@ describe('MergeState', () => {
       [hex(1, 0), 8],
     ]);
 
-    const after = state.slide(Slide.of<HexAxis>('q', 'backward'), MergeTile.of(16));
+    state.slide(Slide.of<HexAxis>('q', 'backward'), MergeTile.of(16));
     const later = mergeState([[hex(0, 0), 2]]);
+    later.slide(Slide.of<HexAxis>('q', 'forward'), MergeTile.of(16));
 
-    expect(after.targetReached).toBe(true);
-    expect(after.merged).toEqual([MergeTile.of(16)]);
-    expect(later.slide(Slide.of<HexAxis>('q', 'forward'), MergeTile.of(16)).targetReached).toBe(
-      false,
-    );
+    expect(state.targetReached).toBe(true);
+    expect(state.merged).toEqual([MergeTile.of(16)]);
+    expect(later.targetReached).toBe(false);
+    state.slide(Slide.of<HexAxis>('q', 'forward'), MergeTile.of(16));
+    expect([state.targetReached, state.merged]).toEqual([true, []]);
   });
 
   it('should_tell_whether_a_slide_changes_the_board_when_a_slide_is_asked', () => {
@@ -165,14 +188,15 @@ describe('MergeState', () => {
     const stateId = GameStateId.of('state-a');
     const first = mergeState([[hex(1, 0), 2]], 2, noNewTiles(), MATCH_ID, stateId);
     const second = mergeState([], 2, noNewTiles(), MATCH_ID, stateId);
-    const slid = first.slide(Slide.of<HexAxis>('q', 'backward'), MergeTile.of(16));
+    const before = first.clone();
+    first.slide(Slide.of<HexAxis>('q', 'backward'), MergeTile.of(16));
 
-    expect([first.equals(second), second.equals(first), first.equals(first.clone())]).toEqual([
+    expect([first.equals(second), second.equals(first), first.equals(before)]).toEqual([
       true,
       true,
       true,
     ]);
-    expect([slid.equals(first), slid.belongsTo(MATCH_ID)]).toEqual([true, true]);
+    expect([first.belongsTo(MATCH_ID), first.board.equals(before.board)]).toEqual([true, true]);
   });
 
   it('should_be_another_state_when_two_states_of_one_match_have_different_state_ids', () => {
