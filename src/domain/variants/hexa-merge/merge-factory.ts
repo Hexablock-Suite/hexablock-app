@@ -8,7 +8,7 @@ import type { RegionSize } from '../../engine/region-size';
 import type { IGameRules } from '../../engine/rules';
 import type { IScoringPolicy } from '../../engine/scoring-policy';
 import type { IVariantFactory } from '../../engine/variant-factory';
-import { addNewTile, MergeRules } from './merge-rules';
+import { MergeRules } from './merge-rules';
 import { MergeScoring } from './merge-scoring';
 import { MergeState } from './merge-state';
 import type { MergeTile } from './merge-tile';
@@ -70,7 +70,7 @@ export class MergeFactory<TCoord> implements IVariantFactory<
   // The first tiles come from the same source as the later tiles.
   createInitialState(): MergeState<MergeTile, TCoord, string> {
     const state = new MergeState(this.createBoard(), this.createPieceSource());
-    for (let i = 0; i < START_TILES; i += 1) addNewTile(state);
+    for (let i = 0; i < START_TILES; i += 1) state.addNewTile();
     return state;
   }
 

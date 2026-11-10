@@ -300,6 +300,10 @@ class BaseCloneState implements BoardState<FakeCell, SquareCoord> {
     public score = 0,
   ) {}
 
+  addPoints(points: number): void {
+    this.score += points;
+  }
+
   clone(): BoardState<FakeCell, SquareCoord> {
     return new FakeState(this.board.clone(), this.score);
   }

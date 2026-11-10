@@ -2,7 +2,7 @@ import type { Board } from '../../engine/board';
 import type { Outcome } from '../../engine/outcome';
 import { Resolution } from '../../engine/resolution';
 import { BaseGameRules } from '../../engine/rules';
-import { ColorStack } from './color-stack';
+import type { ColorStack } from './color-stack';
 import type { PlaceStack, SortState } from './sort-state';
 
 // A top run of this many tiles of one color clears its stack (statement §1.3).
@@ -14,24 +14,22 @@ export const GOAL_RUN = 10;
 // empty cell. Then the top tiles of neighbor stacks with the same top color move,
 // in cascade, to the stack with most of that color.
 // The rules ask the topology for the neighbors, so they run on any geometry (D4).
+// The rules decide. The state changes itself: the rules call `placeOfferedStack()`,
+// `moveRun()` and `clearStack()`.
 export class SortRules<TCoord> extends BaseGameRules<PlaceStack<TCoord>, SortState<TCoord>> {
   isValid(state: SortState<TCoord>, move: PlaceStack<TCoord>): boolean {
-    return state.offered !== undefined && isEmptyCell(state.board, move.at);
+    return state.canPlace(move.at);
   }
 
   *validMoves(state: SortState<TCoord>): Iterable<PlaceStack<TCoord>> {
     if (state.offered === undefined) return;
     for (const at of state.board.shape.cells) {
-      if (isEmptyCell(state.board, at)) yield { at };
+      if (state.canPlace(at)) yield { at };
     }
   }
 
   apply(state: SortState<TCoord>, move: PlaceStack<TCoord>): SortState<TCoord> {
-    if (state.offered === undefined) throw new RangeError('No stack is on offer.');
-    state.board.occupy(move.at, state.offered.content);
-    state.placedAt = move.at;
-    state.clearedTiles = [];
-    state.offerNext();
+    state.placeOfferedStack(move.at);
     return state;
   }
 
@@ -54,10 +52,6 @@ export class SortRules<TCoord> extends BaseGameRules<PlaceStack<TCoord>, SortSta
   }
 }
 
-function isEmptyCell<TCoord>(board: Board<ColorStack, TCoord, string>, at: TCoord): boolean {
-  return board.contains(at) && (board.get(at)?.isEmpty() ?? true);
-}
-
 // Moves top runs between the stack at `at` and its neighbors with the same top color.
 // It returns the cells that changed, or none when no neighbor shares the color.
 function transfer<TCoord>(state: SortState<TCoord>, at: TCoord): TCoord[] {
@@ -73,13 +67,7 @@ function transfer<TCoord>(state: SortState<TCoord>, at: TCoord): TCoord[] {
   // Otherwise only `at` gives its run, because the other neighbors can lie away from the target.
   const key = (c: TCoord) => board.topology.key(c);
   const givers = key(target) === key(at) ? matches : [at];
-  let receiver = board.get(target) ?? ColorStack.empty();
-  for (const giver of givers) {
-    const from = board.get(giver) ?? ColorStack.empty();
-    receiver = receiver.withOnTop(from.topRun());
-    board.occupy(giver, from.withoutTopRun());
-  }
-  board.occupy(target, receiver);
+  for (const giver of givers) state.moveRun(giver, target);
   clearIfGoal(state, target);
   return [...givers, target];
 }
@@ -103,12 +91,10 @@ function targetOf<TCoord>(
 }
 
 // The accepted rule of issue #56: a top run of `GOAL_RUN` or more removes
-// the whole stack and counts one goal. The board cannot remove a cell,
-// so the cell gets an empty stack. `clearedTiles` keeps the size for the scoring (#98).
+// the whole stack and counts one goal. `SortState.clearStack()` keeps an empty stack
+// on the cell and the size for the scoring (#98).
 function clearIfGoal<TCoord>(state: SortState<TCoord>, at: TCoord): void {
   const cell = state.board.get(at);
   if (cell === undefined || cell.topRun().length < GOAL_RUN) return;
-  state.board.occupy(at, ColorStack.empty());
-  state.goalsDone += 1;
-  state.clearedTiles.push(cell.tileCount());
+  state.clearStack(at);
 }

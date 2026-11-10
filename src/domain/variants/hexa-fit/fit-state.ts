@@ -18,7 +18,9 @@ export interface FitView<TCoord> {
 // because the player picks the tray pieces in any order.
 // The maps use the text of the piece id as key, because a Map compares a string by value.
 // `moves` counts the accepted moves of the game for the stars (issue #60).
+// It is an entity inside the `GameEngine` aggregate (classes.md decisions 7 and 26).
 // `place()`, `remove()` and `countMove()` change nothing in place: each one returns a new state.
+// `addPoints()` adds the points of a turn in place, because the engine calls it on its copy.
 export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
   private constructor(
     readonly board: Board<PieceId, TCoord, string>,
@@ -87,6 +89,14 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
   // The same state with one more move. The rules call it once for each accepted move.
   countMove(): FitState<TCoord> {
     return new FitState(this.board, this.pieces, this.placements, this.moves + 1, this.score);
+  }
+
+  // The engine adds the points of a turn in place. Points that are not finite throw a RangeError.
+  addPoints(points: number): void {
+    if (!Number.isFinite(points)) {
+      throw new RangeError(`The points of a turn must be a finite number, not ${points}.`);
+    }
+    this.score += points;
   }
 
   // A piece and an id never change, so the view shares them. `remaining()` and `placed()`

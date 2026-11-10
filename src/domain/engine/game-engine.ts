@@ -165,7 +165,7 @@ export class GameEngine<
     if (!Number.isFinite(points)) {
       throw new RangeError(`The scoring policy returned a score that is not finite: ${points}.`);
     }
-    resolution.state.score += points;
+    resolution.state.addPoints(points);
     return {
       next: resolution.state,
       phase: this.current.after(resolution.outcome),

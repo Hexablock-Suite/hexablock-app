@@ -25,6 +25,10 @@ export class FakeState implements BoardState<FakeCell, SquareCoord> {
     public score = 0,
   ) {}
 
+  addPoints(points: number): void {
+    this.score += points;
+  }
+
   clone(): FakeState {
     return new FakeState(this.board.clone(), this.score);
   }
@@ -48,6 +52,10 @@ export class SourceState implements BoardState<FakeCell, SquareCoord> {
     readonly source: IPieceSource<FakeCell>,
     public score = 0,
   ) {}
+
+  addPoints(points: number): void {
+    this.score += points;
+  }
 
   clone(): SourceState {
     return new SourceState(this.board.clone(), this.source.clone(), this.score);
