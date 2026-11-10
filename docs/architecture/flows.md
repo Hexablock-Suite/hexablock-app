@@ -11,7 +11,7 @@ The layers themselves are in [layers.md](layers.md). The full class diagram is i
 
 ## Use case 1: apply a move
 
-`ApplyMove` (APP-FR-03) plays one move. The player taps a cell on `GameScreen`. `GamePresenter` calls the `UseCase` port, and `ApplyMove` takes the running `GameEngine` through the `RunningGameStore` port. The engine plays the turn with its `IGameRules` strategy. `ApplyMove` copies the cells of `Board` into a plain `MoveResult`, and the presenter maps each cell with its `StateMapper` into `GameViewModel`. No HTTP call runs.
+`ApplyMove` (APP-FR-03) plays one move. The player taps a cell on `GameScreen`. `GamePresenter` calls the `UseCase` port, and `ApplyMove` takes the running `GameEngine` through the `RunningGameStore` port. The engine plays the turn with its `IGameRules` strategy. `ApplyMove` copies the cells of `Board` and the `payload` of `BoardState.view()` into a plain `MoveResult`, and the presenter maps each cell and the payload with its `StateMapper` into `GameViewModel`. No HTTP call runs.
 
 View 3.2 of [classes.md](classes.md) shows `ApplyMove` with layers 2 and 1 only, and view 4.1 shows the presenter without the use case. So this view joins both slices and does not repeat either view.
 

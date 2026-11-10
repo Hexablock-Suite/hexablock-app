@@ -48,6 +48,13 @@ describe('architecture gate (dependency-cruiser)', () => {
     expect(result.output).toContain('application-imports-only-domain');
   });
 
+  it('should_fail_arch_when_application_imports_a_variant', () => {
+    const result = cruise('application-imports-variant');
+
+    expect(result.status).not.toBe(0);
+    expect(result.output).toContain('application-no-variants');
+  });
+
   it('should_fail_arch_when_adapter_imports_infrastructure', () => {
     const result = cruise('adapters-imports-outside');
 

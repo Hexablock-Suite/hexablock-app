@@ -73,8 +73,8 @@
         <desc id="ucresult-desc">
           Class diagram of layer 2 showing the UseCase input port returning the generic Result value
           object, which carries either a value or an error whose type defaults to UseCaseError, and
-          ApplyMove building MoveResult, the plain response model with the cells, score, outcome and
-          undo flags of a game.
+          ApplyMove building MoveResult, the plain response model with the cells, score, outcome,
+          undo flags and variant payload of a game.
         </desc>
         <defs>
           <marker
@@ -437,18 +437,18 @@
         <!-- Class: MoveResult (value object, response model) -->
         <rect
           x="360"
-          y="300"
+          y="278"
           width="320"
-          height="136"
+          height="168"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="360" y1="348" x2="680" y2="348" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="360" y1="326" x2="680" y2="326" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="520"
-          y="318"
+          y="296"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -459,7 +459,7 @@
         </text>
         <text
           x="520"
-          y="336"
+          y="314"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -468,20 +468,26 @@
         >
           MoveResult
         </text>
-        <text x="376" y="364" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="376" y="342" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + cells: [TCoord, TCell][]
         </text>
-        <text x="376" y="380" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="376" y="358" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + score: number
         </text>
-        <text x="376" y="396" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="376" y="374" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + outcome: Outcome
         </text>
-        <text x="376" y="412" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="376" y="390" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + canUndo: boolean
         </text>
-        <text x="376" y="428" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="376" y="406" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + canRedo: boolean
+        </text>
+        <text x="376" y="422" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + hasUndo: boolean
+        </text>
+        <text x="376" y="438" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + payload: TView
         </text>
 
         <!-- UML template boxes: type parameters on the top-right corner -->
@@ -507,9 +513,9 @@
           T, E = UseCaseError
         </text>
         <rect
-          x="608"
-          y="290"
-          width="84"
+          x="524"
+          y="268"
+          width="168"
           height="18"
           rx="2"
           fill="#ffffff"
@@ -518,14 +524,14 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="650"
-          y="302"
+          x="608"
+          y="280"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TCell, TCoord
+          TCell, TCoord, TView = unknown
         </text>
 
         <!-- Footnote -->
@@ -566,8 +572,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          MoveResult is plain data: it copies the cells, so no Board and no engine reach a presenter
-          in layer 3 (decision 29).
+          MoveResult is plain data: it copies the cells and the payload of BoardState.view(), so no
+          Board and no engine reach a presenter in layer 3 (decision 29).
         </text>
 
         <!-- Legend -->

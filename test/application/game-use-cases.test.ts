@@ -36,7 +36,7 @@ import {
   type FakeMove,
   type FakeState,
 } from '../support/engine/fake-game';
-import { fitFactory } from '../support/variants/hexa-fit/fit-game';
+import { A, fitFactory } from '../support/variants/hexa-fit/fit-game';
 import { linesFactory } from '../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../support/variants/hexa-merge/merge-game';
 import { sortFactory, stack, stackPiece } from '../support/variants/hexa-sort/sort-game';
@@ -53,11 +53,12 @@ async function startAndPlayOnce<
 >(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>) {
   const { games, startGame, applyMove } = gameUseCases(factory);
   const started = valueOf(await startGame.execute({}));
-  const startCells = games.running().snapshot().board.cells();
+  const startState = games.running().snapshot();
+  const startCells = startState.board.cells();
   const move = firstValidMove(factory.createRules(), games.running().snapshot());
   const played = valueOf(await applyMove.execute({ move }));
   const after = games.running().snapshot();
-  return { gameId: factory.gameId.value, started, startCells, played, after };
+  return { gameId: factory.gameId.value, started, startState, startCells, played, after };
 }
 
 class ThrowingPublisher implements GameEventPublisher {
@@ -209,6 +210,8 @@ describe('StartGame and ApplyMove', () => {
         outcome: 'playing',
         canUndo: false,
         canRedo: false,
+        hasUndo: false,
+        payload: run.startState.view(),
       });
       expect(run.played).toEqual({
         cells: run.after.board.cells(),
@@ -216,6 +219,8 @@ describe('StartGame and ApplyMove', () => {
         outcome: run.played.outcome,
         canUndo: false,
         canRedo: false,
+        hasUndo: false,
+        payload: run.after.view(),
       });
     }
     // Merge starts with two tiles, so the start result carries the cells of the board.
@@ -370,6 +375,8 @@ describe('StartGame and ApplyMove', () => {
       outcome: 'victory',
       canUndo: false,
       canRedo: false,
+      hasUndo: false,
+      payload: saved.view(),
     });
     expect(saved.board.cells()).not.toEqual([]);
     expect(games.running().phase.name).toBe('victory');
@@ -458,8 +465,135 @@ describe('StartGame and ApplyMove', () => {
       'canRedo',
       'canUndo',
       'cells',
+      'hasUndo',
       'outcome',
+      'payload',
       'score',
+    ]);
+  });
+});
+
+// A game that the use cases cannot name. Its state gives its own view.
+function fakeGameFactory(): IVariantFactory<FakeCell, SquareCoord, FakeMove, FakeState, FakeCell> {
+  return {
+    gameId: GameId.of('fake-game'),
+    createRules: () => new FakeRules(),
+    createScoring: () => new OnePointScoring(),
+    createPieceSource: () => undefined,
+    createBoard: () => emptyState().board,
+    createInitialState: () => emptyState(),
+  };
+}
+
+// Tries to change each list and each field of a payload, in depth.
+// A frozen part refuses the write: a list method throws, and a field write does nothing
+// because jest-expo compiles in sloppy mode. A class instance is a value object that never
+// changes (classes.md decisions 6 and 29), so this function does not go inside it.
+function tryToChange(payload: unknown): void {
+  if (Array.isArray(payload)) {
+    payload.forEach(tryToChange);
+    try {
+      payload.pop();
+    } catch {
+      return;
+    }
+    return;
+  }
+  if (typeof payload !== 'object' || payload === null) return;
+  if (Object.getPrototypeOf(payload) !== Object.prototype) return;
+  const fields = payload as Record<string, unknown>;
+  for (const name of Object.keys(fields)) {
+    tryToChange(fields[name]);
+    try {
+      fields[name] = 'changed';
+    } catch {
+      continue;
+    }
+  }
+}
+
+// Starts one game, tries to change the payload of the answer and reads the running game.
+async function changedPayloadRun<
+  TCell,
+  TCoord,
+  TMove,
+  TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
+  TPiece,
+>(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>) {
+  const { games, startGame } = gameUseCases(factory);
+  const started = valueOf(await startGame.execute({}));
+  const read = () => [runningGameOf(games), games.running().snapshot().view()];
+  const before = read();
+  tryToChange(started.payload);
+  return { before, after: read() };
+}
+
+// The variant data of `MoveResult` (issue 158, classes.md decisions 14 and 29).
+describe('the variant data of MoveResult', () => {
+  it('should_copy_the_view_of_the_saved_state_into_the_payload_when_the_use_cases_answer_a_game_they_do_not_name', async () => {
+    const { games, startGame, applyMove } = gameUseCases(fakeGameFactory());
+
+    const started = valueOf(await startGame.execute({}));
+    const played = valueOf(
+      await applyMove.execute({ move: { at: square(0, 0), cell: fakeCell(1) } }),
+    );
+
+    expect(started.payload).toEqual({ filled: 0 });
+    expect(played.payload).toEqual({ filled: 1 });
+    expect(played.payload).toEqual(games.running().snapshot().view());
+  });
+
+  it('should_give_each_payload_field_the_value_of_the_state_when_each_variant_starts_and_plays', async () => {
+    // Each field is read by name, so `pnpm typecheck` also proves that the state types the payload.
+    const lines = await startAndPlayOnce(linesFactory());
+    expect(lines.started.payload.tray).toEqual(lines.startState.tray);
+    expect(lines.played.payload.tray).toEqual(lines.after.tray);
+
+    const fit = await startAndPlayOnce(fitFactory());
+    expect(fit.started.payload.remaining).toEqual(fit.startState.remaining());
+    expect(fit.started.payload.placed).toEqual(fit.startState.placed());
+    expect(fit.played.payload.remaining).toEqual(fit.after.remaining());
+    expect(fit.played.payload.placed).toEqual(fit.after.placed());
+    expect(fit.after.placed()).toEqual([A]);
+
+    const sort = await startAndPlayOnce(sortFactory());
+    expect(sort.started.payload.offered).toEqual(sort.startState.offered);
+    expect(sort.started.payload.goalsDone).toBe(sort.startState.goalsDone);
+    expect(sort.started.payload.goalsNeeded).toEqual(sort.startState.goalsNeeded);
+    expect(sort.played.payload.offered).toEqual(sort.after.offered);
+    expect(sort.played.payload.goalsDone).toBe(sort.after.goalsDone);
+    expect(sort.played.payload.goalsNeeded).toEqual(sort.after.goalsNeeded);
+    expect(sort.after.offered).not.toEqual(sort.startState.offered);
+
+    const merge = await startAndPlayOnce(mergeFactory());
+    expect(merge.started.payload.targetReached).toBe(merge.startState.targetReached);
+    expect(merge.played.payload.targetReached).toBe(merge.after.targetReached);
+  });
+
+  it('should_keep_the_running_game_when_a_caller_changes_the_payload_of_a_move_result', async () => {
+    const runs = [
+      await changedPayloadRun(linesFactory()),
+      await changedPayloadRun(fitFactory()),
+      await changedPayloadRun(sortFactory()),
+      await changedPayloadRun(mergeFactory()),
+    ];
+
+    for (const run of runs) expect(run.after).toEqual(run.before);
+  });
+
+  it('should_report_no_undo_for_every_variant_when_no_variant_has_a_history', async () => {
+    const runs = [
+      await startAndPlayOnce(linesFactory()),
+      await startAndPlayOnce(fitFactory()),
+      await startAndPlayOnce(sortFactory()),
+      await startAndPlayOnce(mergeFactory()),
+    ];
+
+    expect(runs.map((run) => [run.gameId, run.started.hasUndo, run.played.hasUndo])).toEqual([
+      ['hexa-lines', false, false],
+      ['hexa-fit', false, false],
+      ['hexa-sort', false, false],
+      ['hexa-merge', false, false],
     ]);
   });
 });

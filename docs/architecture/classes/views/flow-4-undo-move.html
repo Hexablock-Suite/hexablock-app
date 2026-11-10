@@ -651,9 +651,9 @@
         <!-- Class: MoveResult (value object, response model) -->
         <rect
           x="40"
-          y="556"
+          y="540"
           width="200"
-          height="136"
+          height="168"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -661,7 +661,7 @@
         />
         <text
           x="140"
-          y="574"
+          y="558"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -672,7 +672,7 @@
         </text>
         <text
           x="140"
-          y="592"
+          y="576"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -681,21 +681,27 @@
         >
           MoveResult
         </text>
-        <line x1="40" y1="604" x2="240" y2="604" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="56" y="620" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="40" y1="588" x2="240" y2="588" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="56" y="604" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + cells: [TCoord, TCell][]
         </text>
-        <text x="56" y="636" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="56" y="620" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + score: number
         </text>
-        <text x="56" y="652" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="56" y="636" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + outcome: Outcome
         </text>
-        <text x="56" y="668" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="56" y="652" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + canUndo: boolean
         </text>
-        <text x="56" y="684" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="56" y="668" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + canRedo: boolean
+        </text>
+        <text x="56" y="684" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + hasUndo: boolean
+        </text>
+        <text x="56" y="700" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + payload: TView
         </text>
         <!-- Class: UndoMove (focal, use case) -->
         <rect
@@ -1100,9 +1106,9 @@
           TCell, TCoord, TMove, TState
         </text>
         <rect
-          x="167.7"
-          y="546"
-          width="84.3"
+          x="87.7"
+          y="530"
+          width="164.3"
           height="18"
           rx="2"
           fill="#ffffff"
@@ -1111,14 +1117,14 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="209.85"
-          y="558"
+          x="169.85"
+          y="542"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TCell, TCoord
+          TCell, TCoord, TView = unknown
         </text>
         <rect
           x="511.2"

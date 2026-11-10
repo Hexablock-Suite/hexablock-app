@@ -7,6 +7,11 @@ import type { IPieceSource } from '../../engine/piece-source';
 // The tray holds 3 pieces (statement §1.1).
 export const TRAY_SIZE = 3;
 
+// The data that the Lines screen draws: the pieces of the tray.
+export interface LinesView<TCoord> {
+  readonly tray: readonly Piece<Color, TCoord>[];
+}
+
 // The state of one Hexa Lines game: the board of colors, the tray and the piece source.
 // The source lives in the state, so the engine copy and rollback cover it (classes.md decision 31).
 // `streak` and `linesCleared` follow the proposal on issue 58, «Propuesta, pendiente del equipo».
@@ -31,6 +36,12 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
     source: IPieceSource<Piece<Color, TCoord>>,
   ): LinesState<TCoord> {
     return new LinesState(board, drawTray(source), source);
+  }
+
+  // Pieces never change, so the view shares them. `tray` is public and mutable,
+  // so the view holds a frozen copy of the list.
+  view(): LinesView<TCoord> {
+    return Object.freeze({ tray: Object.freeze([...this.tray]) });
   }
 
   // Pieces never change, so the tray copy shares them.

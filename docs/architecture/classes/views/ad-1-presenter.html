@@ -73,9 +73,9 @@
         <desc id="adpresenter-desc">
           Class diagram across layers 4, 3 and 2 showing the GameScreen route using GamePresenter
           and rendering BoardView, BoardView reading GameViewModel, GamePresenter building
-          GameViewModel, mapping each cell of the plain MoveResult through the StateMapper strategy
-          that LinesStateMapper implements, and calling the UseCase input port of layer 2, which
-          returns a Result.
+          GameViewModel, mapping each cell and the payload of the plain MoveResult through the
+          StateMapper strategy that LinesStateMapper implements, and calling the UseCase input port
+          of layer 2, which returns a Result.
         </desc>
         <defs>
           <marker
@@ -249,7 +249,7 @@
           x="328"
           y="252"
           width="672"
-          height="192"
+          height="208"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -324,7 +324,7 @@
           x1="96"
           y1="412"
           x2="96"
-          y2="356"
+          y2="372"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -389,6 +389,17 @@
           letter-spacing="0.06em"
         >
           «bind» TCell → Color
+        </text>
+        <text
+          x="176"
+          y="398"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          TView → LinesView
         </text>
 
         <!-- Role names and multiplicities at the part end -->
@@ -578,7 +589,7 @@
           x="832"
           y="284"
           width="160"
-          height="152"
+          height="168"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -625,13 +636,16 @@
         <text x="848" y="428" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + error: string [0..1]
         </text>
+        <text x="848" y="444" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + payload: PayloadView
+        </text>
 
         <!-- Class: StateMapper (interface, strategy) -->
         <rect
           x="44"
           y="284"
           width="236"
-          height="72"
+          height="88"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -662,6 +676,9 @@
         </text>
         <text x="60" y="348" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + toView(cell: TCell): CellView
+        </text>
+        <text x="60" y="364" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + toPayload(p: TView): PayloadView
         </text>
 
         <!-- Class: LinesStateMapper -->
@@ -746,9 +763,9 @@
           TCell, TCoord, TMove
         </text>
         <rect
-          x="244"
+          x="168"
           y="274"
-          width="48"
+          width="124"
           height="18"
           rx="2"
           fill="#ffffff"
@@ -757,14 +774,14 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="268"
+          x="230"
           y="286"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TCell
+          TCell, TView = unknown
         </text>
 
         <rect

@@ -26,6 +26,11 @@ export class FakeState implements BoardState<FakeCell, SquareCoord> {
   clone(): FakeState {
     return new FakeState(this.board.clone(), this.score);
   }
+
+  // The count of filled cells, so a test sees the view of each state.
+  view(): { readonly filled: number } {
+    return Object.freeze({ filled: this.board.cells().length });
+  }
 }
 
 // A square board of size × size empty cells.
@@ -44,6 +49,10 @@ export class SourceState implements BoardState<FakeCell, SquareCoord> {
 
   clone(): SourceState {
     return new SourceState(this.board.clone(), this.source.clone(), this.score);
+  }
+
+  view(): undefined {
+    return undefined;
   }
 }
 

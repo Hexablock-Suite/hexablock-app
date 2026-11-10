@@ -1,4 +1,4 @@
-// Right example: a use case imports the domain.
-import { hexaLinesRules } from '../domain/variants/hexa-lines/rules';
+// Right example: a use case imports the generic engine and no variant.
+import { engine } from '../domain/engine/game-engine';
 
-export const startGame = hexaLinesRules;
+export const startGame = engine;

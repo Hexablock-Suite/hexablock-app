@@ -3,7 +3,7 @@ import type { Cloneable } from '../domain/engine/cloneable';
 import { GameEngine } from '../domain/engine/game-engine';
 import type { GameEventPublisher } from '../domain/engine/game-events';
 import type { IVariantFactory } from '../domain/engine/variant-factory';
-import { moveResultOf, type MoveResult } from './move-result';
+import { moveResultOf, type MoveResult, type ViewOf } from './move-result';
 import { caughtError, Result } from './result';
 import type { RunningGameStore } from './running-game-store';
 import type { UseCase } from './use-case';
@@ -23,14 +23,16 @@ export class StartGame<
   TMove,
   TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
   TPiece = unknown,
-> implements UseCase<StartGameRequest, MoveResult<TCell, TCoord>> {
+> implements UseCase<StartGameRequest, MoveResult<TCell, TCoord, ViewOf<TState>>> {
   constructor(
     private readonly factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>,
     private readonly games: RunningGameStore<TCell, TCoord, TMove, TState>,
     private readonly events: GameEventPublisher,
   ) {}
 
-  async execute(_request: StartGameRequest): Promise<Result<MoveResult<TCell, TCoord>>> {
+  async execute(
+    _request: StartGameRequest,
+  ): Promise<Result<MoveResult<TCell, TCoord, ViewOf<TState>>>> {
     try {
       const engine = new GameEngine<TCell, TCoord, TMove, TState>(
         this.factory.gameId,
@@ -40,7 +42,7 @@ export class StartGame<
       );
       engine.start(this.factory.createInitialState());
       this.games.replace(engine);
-      return Result.success(moveResultOf(engine.snapshot(), 'playing'));
+      return Result.success(moveResultOf<TCell, TCoord, TState>(engine.snapshot(), 'playing'));
     } catch (thrown) {
       return Result.failure(caughtError('start-failed', thrown));
     }
