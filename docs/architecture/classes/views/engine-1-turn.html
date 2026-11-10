@@ -82,7 +82,8 @@
           it changes in place only through its business methods. Its snapshot() creates a
           BoardSnapshot, the immutable photo with the Memento role and no tactical stereotype:
           GameEngine.snapshot() returns it, IScoringPolicy reads two of them, and MoveHistory keeps
-          them for the undo. Resolution holds no state and has no tactical stereotype.
+          them for the undo. Resolution is a value object: it holds no state, and equals() compares
+          accepted and outcome.
         </desc>
         <defs>
           <marker
@@ -910,22 +911,33 @@
           1
         </text>
 
-        <!-- Class: Resolution (no tactical stereotype: it holds no state since R8) -->
+        <!-- Class: Resolution (value object: equals() compares accepted and outcome) -->
         <rect
           x="52"
-          y="528"
+          y="512"
           width="316"
-          height="144"
+          height="160"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="52" y1="576" x2="368" y2="576" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="52" y1="616" x2="368" y2="616" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="52" y1="560" x2="368" y2="560" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="52" y1="600" x2="368" y2="600" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="210"
-          y="564"
+          y="530"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="210"
+          y="548"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -934,15 +946,15 @@
         >
           Resolution
         </text>
-        <text x="68" y="592" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="576" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + accepted: boolean {readOnly}
         </text>
-        <text x="68" y="608" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="592" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + outcome: Outcome {readOnly}
         </text>
         <text
           x="68"
-          y="632"
+          y="616"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -952,7 +964,7 @@
         </text>
         <text
           x="68"
-          y="648"
+          y="632"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -960,8 +972,11 @@
         >
           + resolved(): Resolution
         </text>
-        <text x="68" y="664" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="648" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + evaluated(outcome: Outcome): Resolution
+        </text>
+        <text x="68" y="664" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: Resolution): boolean
         </text>
 
         <!-- Class: BoardSnapshot (interface, the photo: Memento role, no tactical stereotype) -->
@@ -1217,27 +1232,6 @@
           text-anchor="middle"
         >
           TCell, TCoord
-        </text>
-        <rect
-          x="332"
-          y="518"
-          width="48"
-          height="18"
-          rx="2"
-          fill="#ffffff"
-          stroke="#5b6873"
-          stroke-width="0.8"
-          stroke-dasharray="4,3"
-        />
-        <text
-          x="356"
-          y="530"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          TState
         </text>
 
         <!-- The footnote and the legend sit below the zone, which grew by 32. -->

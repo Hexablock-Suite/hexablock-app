@@ -73,9 +73,10 @@
         <desc id="rules-desc">
           Class diagram of layer 1 showing the abstract BaseGameRules, which implements the
           IGameRules strategy and holds playTurn() as a template method over abstract steps, both
-          returning a Resolution, LinesRules and FitRules extending it (planned for Sprint 2), and
-          TimedRulesDecorator, which implements IGameRules, wraps an inner IGameRules and times the
-          game with a LevelTimer.
+          returning a Resolution, the value object that holds whether the rules accepted the move
+          and the Outcome and no state, LinesRules and FitRules extending it (planned for Sprint 2),
+          and TimedRulesDecorator, which implements IGameRules, wraps an inner IGameRules and times
+          the game with a LevelTimer.
         </desc>
         <defs>
           <marker
@@ -426,7 +427,7 @@
           + apply(state: TState, move: TMove): TState
         </text>
         <text x="312" y="212" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + resolve(state: TState): Resolution&lt;TState&gt;
+          + resolve(state: TState): Resolution
         </text>
         <text x="312" y="228" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + evaluate(state: TState): Outcome
@@ -435,7 +436,7 @@
           + playTurn(state: TState, move: TMove):
         </text>
         <text x="328" y="260" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          Resolution&lt;TState&gt;
+          Resolution
         </text>
         <text x="312" y="276" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + timed(): ITimed | undefined
@@ -495,7 +496,7 @@
           font-family="'IBM Plex Mono', monospace"
           font-weight="600"
         >
-          Resolution&lt;TState&gt; {template}
+          Resolution {template}
         </text>
         <text
           x="300"
@@ -535,7 +536,7 @@
           font-family="'IBM Plex Mono', monospace"
           font-style="italic"
         >
-          + resolve(state: TState): Resolution&lt;TState&gt;
+          + resolve(state: TState): Resolution
         </text>
         <text
           x="300"
@@ -598,7 +599,7 @@
           + playTurn(state: TState, move: TMove):
         </text>
         <text x="736" y="456" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          Resolution&lt;TState&gt;
+          Resolution
         </text>
         <text x="720" y="472" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + evaluate(state: TState): Outcome
@@ -748,19 +749,30 @@
         >
           LevelTimer
         </text>
-        <!-- Class: Resolution (no tactical stereotype: it holds the state, an entity) -->
+        <!-- Class: Resolution (value object: it holds no state; equals() compares accepted and outcome) -->
         <rect
           x="32"
           y="232"
           width="196"
-          height="216"
+          height="200"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
         <line x1="32" y1="280" x2="228" y2="280" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="32" y1="336" x2="228" y2="336" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="32" y1="320" x2="228" y2="320" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="130"
+          y="250"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
         <text
           x="130"
           y="268"
@@ -773,13 +785,20 @@
           Resolution
         </text>
         <text x="44" y="296" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + state: TState {readOnly}
-        </text>
-        <text x="44" y="312" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + accepted: boolean {readOnly}
         </text>
-        <text x="44" y="328" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="44" y="312" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + outcome: Outcome {readOnly}
+        </text>
+        <text
+          x="44"
+          y="336"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + rejected(): Resolution
         </text>
         <text
           x="44"
@@ -789,64 +808,19 @@
           font-family="'IBM Plex Mono', monospace"
           text-decoration="underline"
         >
-          + rejected(state: TState):
+          + resolved(): Resolution
         </text>
-        <text
-          x="60"
-          y="368"
-          fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-          text-decoration="underline"
-        >
-          Resolution&lt;TState&gt;
-        </text>
-        <text
-          x="44"
-          y="384"
-          fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-          text-decoration="underline"
-        >
-          + resolved(state: TState):
-        </text>
-        <text
-          x="60"
-          y="400"
-          fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-          text-decoration="underline"
-        >
-          Resolution&lt;TState&gt;
-        </text>
-        <text x="44" y="416" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="44" y="368" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + evaluated(outcome: Outcome):
         </text>
-        <text x="60" y="432" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          Resolution&lt;TState&gt;
+        <text x="60" y="384" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Resolution
         </text>
-        <rect
-          x="192"
-          y="222"
-          width="48"
-          height="18"
-          rx="2"
-          fill="#ffffff"
-          stroke="#5b6873"
-          stroke-width="0.8"
-          stroke-dasharray="4,3"
-        />
-        <text
-          x="216"
-          y="234"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          TState
+        <text x="44" y="400" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: Resolution):
+        </text>
+        <text x="60" y="416" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          boolean
         </text>
 
         <!-- UML template boxes: type parameters on the top-right corner -->

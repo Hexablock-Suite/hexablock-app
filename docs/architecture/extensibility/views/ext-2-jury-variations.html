@@ -75,8 +75,8 @@
           Three columns, one per jury variation of statement §3.1. A new board size is configuration
           data passed to BoardBuilder.withRegion(size). A new scoring policy is a class that
           implements IScoringPolicy or extends ScoringDecorator. A new piece shape is data, a
-          ShapeGroup of CellNode cells. Below them, GameEngine does not change. BoardBuilder is
-          planned for Sprint 3.
+          ShapeGroup of CellNode cells. Below them, GameEngine does not change. The policy reads two
+          photos of the state, before and after the move.
         </desc>
         <defs>
           <marker
@@ -470,7 +470,6 @@
           stroke-width="1"
         />
         <text
-          data-requirement="APP-FR-16"
           x="184.0"
           y="270"
           fill="#5b6873"
@@ -479,7 +478,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «Builder» «DDD factory» · D9 «Sprint 3»
+          «Builder» «factory» · D9
         </text>
         <text
           x="184.0"
@@ -500,7 +499,7 @@
           BoardBuilder&lt;TCoord&gt;
         </text>
         <text x="80" y="350" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + build&lt;TCell&gt;():
+          + build&lt;TCell&gt;(id: BoardId):
         </text>
         <text x="96" y="366" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           Board&lt;TCell, TCoord, string&gt;
@@ -560,10 +559,10 @@
         </text>
         <line x1="392" y1="300" x2="632" y2="300" stroke="#17212a" stroke-width="1" />
         <text x="408" y="318" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + score(before: TState, resolution:
+          + score(before: SnapshotOf&lt;TState&gt;,
         </text>
         <text x="424" y="334" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          Resolution&lt;TState&gt;): number
+          after: SnapshotOf&lt;TState&gt;): number
         </text>
         <text x="408" y="350" fill="#7d8a94" font-size="9" font-family="'IBM Plex Mono', monospace">
           the variant factory creates it
@@ -922,25 +921,6 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
-        </text>
-        <text
-          x="24"
-          y="756"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          «Sprint N»
-        </text>
-        <text
-          x="92"
-          y="756"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Planned design, not in the code yet · N is the docs/ROADMAP.md sprint of the requirement
-          it serves · a planned class carries it once, for its members and arrows
         </text>
       </svg>
     </div>
