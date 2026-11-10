@@ -9,8 +9,8 @@ import type { PieceId } from './piece-id';
 // so a long series of rotations never leaves the safe integer range.
 export class Placement<TCoord> {
   private constructor(
-    readonly rotation: Turns,
-    readonly at: TCoord,
+    private readonly rotation: Turns,
+    private readonly at: TCoord,
   ) {}
 
   static of<TCoord>(

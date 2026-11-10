@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { BoardShape } from '../../../../src/domain/engine/board-shape';
 import { GameOver } from '../../../../src/domain/engine/game-events';
+import { GameId } from '../../../../src/domain/engine/game-id';
 import { Piece } from '../../../../src/domain/engine/piece';
 import { TimedRulesDecorator } from '../../../../src/domain/engine/timed-rules-decorator';
 import { CellNode, ShapeGroup } from '../../../../src/domain/engine/shape-node';
@@ -28,7 +29,7 @@ describe('FitFactory', () => {
     const { engine, publisher } = startVariant(factory);
     const outcome = engine.play(new PlaceFitPiece(A, Turns.of(0), square(0, 0)));
 
-    expect(factory.gameId.value).toBe('hexa-fit');
+    expect(factory.gameId.equals(GameId.of('hexa-fit'))).toBe(true);
     expect(factory.createBoard().shape.cells.map((c) => squareTopology.key(c))).toEqual([
       '0,0',
       '1,0',

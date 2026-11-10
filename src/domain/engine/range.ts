@@ -8,8 +8,8 @@ export type Compare<T> = (left: T, right: T) => number;
 // The limits of the domain that have two sides use it, such as a seed or the goal of a level.
 export class Range<T> {
   private constructor(
-    readonly min: T,
-    readonly max: T,
+    private readonly min: T,
+    private readonly max: T,
     private readonly compare: Compare<T>,
   ) {}
 

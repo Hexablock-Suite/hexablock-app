@@ -26,11 +26,18 @@ describe('Range', () => {
     expect(range.contains(-1)).toBe(false);
   });
 
-  it('should_expose_the_bounds_when_a_range_is_created', () => {
+  it('should_keep_the_bounds_when_a_range_is_created', () => {
     const range = Range.ofNumbers(8, 128);
 
-    expect(range.min).toBe(8);
-    expect(range.max).toBe(128);
+    expect(range.equals(Range.ofNumbers(8, 128))).toBe(true);
+    expect(range.equals(Range.ofNumbers(8, 127))).toBe(false);
+    expect(range.equals(Range.ofNumbers(9, 128))).toBe(false);
+    expect([7, 8, 128, 129].map((value) => range.contains(value))).toEqual([
+      false,
+      true,
+      true,
+      false,
+    ]);
   });
 
   it('should_contain_only_the_bound_when_min_equals_max', () => {

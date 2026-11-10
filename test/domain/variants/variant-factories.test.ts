@@ -27,6 +27,7 @@ import { GoalCount } from '../../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../../src/domain/variants/hexa-sort/sort-factory';
 import { ManualClock } from '../../support/engine/manual-clock';
 import { firstValidMove, startVariant } from '../../support/engine/variant-game';
+import { variantIdOf } from '../../support/variants/variant-id';
 import { A, fitFactory } from '../../support/variants/hexa-fit/fit-game';
 import { linesFactory } from '../../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../../support/variants/hexa-merge/merge-game';
@@ -44,7 +45,7 @@ function playOnce<
 >(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>) {
   const { engine, rules } = startVariant(factory);
   const outcome = engine.play(firstValidMove(rules, engine.snapshot()));
-  return { gameId: factory.gameId.value, outcome, phase: engine.currentPhase().name };
+  return { gameId: variantIdOf(factory.gameId), outcome, phase: engine.currentPhase().name };
 }
 
 // Two boards of one factory, in plain facts that a test compares across the four variants.
@@ -147,7 +148,7 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
 
       expect(keys(start.board.shape.cells)).toEqual(region);
       expect(start.board.cells()).toEqual([]);
-      expect(start.offered?.content.chips.map((chip) => chip.name)).toEqual(['red']);
+      expect(start.offered?.content.equals(ColorStack.of([Color.of('red')]))).toBe(true);
       expect(outcome).toBe('playing');
       expect(engine.snapshot().board.cells()).toHaveLength(1);
     });

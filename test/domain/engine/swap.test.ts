@@ -183,7 +183,7 @@ describe('swapping the piece source, the scoring policy and the progress model',
 
     expect(byScore.records.map((record) => record.score)).toEqual([36]);
     expect(byMoves.records.map((record) => record.score)).toEqual([4]);
-    expect(byMoves.records[0]?.gameId.value).toBe('fake-game');
+    expect(byMoves.records[0]?.gameId.equals(GameId.of('fake-game'))).toBe(true);
   });
 
   it('should_place_the_same_pieces_when_a_turn_throws_with_each_source', () => {

@@ -174,7 +174,7 @@ describe('GameEngine.play()', () => {
     expect(publisher.events).toHaveLength(1);
     const event = publisher.events[0] as GameOver;
     expect(event).toBeInstanceOf(GameOver);
-    expect(event.gameId.value).toBe('fake-game');
+    expect(event.gameId.equals(GameId.of('fake-game'))).toBe(true);
     expect(event.outcome).toBe('game-over');
     expect(event.finalScore).toBe(4);
   });
@@ -600,7 +600,7 @@ describe('GameEngine review findings', () => {
     expect(publisher.events).toHaveLength(1);
     const event = publisher.events[0] as GameOver;
     expect(event).toBeInstanceOf(GameOver);
-    expect(event.gameId.value).toBe('fake-game');
+    expect(event.gameId.equals(GameId.of('fake-game'))).toBe(true);
     expect(event.outcome).toBe('victory');
     expect(event.finalScore).toBe(1);
   });

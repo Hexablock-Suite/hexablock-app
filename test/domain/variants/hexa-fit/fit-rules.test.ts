@@ -18,6 +18,7 @@ import {
   type FitMove,
 } from '../../../../src/domain/variants/hexa-fit/fit-move';
 import { FitRules } from '../../../../src/domain/variants/hexa-fit/fit-rules';
+import { Placement } from '../../../../src/domain/variants/hexa-fit/placement';
 import { FitState } from '../../../../src/domain/variants/hexa-fit/fit-state';
 import { PieceId } from '../../../../src/domain/variants/hexa-fit/piece-id';
 import { RecordingPublisher } from '../../../support/engine/fake-game';
@@ -267,9 +268,16 @@ describe('FitRules', () => {
 
 // Edge cases of the walkthrough of PR #106 (issue #120).
 describe('FitRules edge cases', () => {
-  // The rotation of the placed piece, as a count of topology steps.
-  function rotationOf(state: FitState<SquareCoord>, id: PieceId): number | undefined {
-    return state.placementOf(id)?.rotation.value;
+  // Tells if the piece lies at `at` with a rotation of `turns` topology steps.
+  // `Placement` keeps its fields private, so `equals()` compares the two placements.
+  function isPlaced(
+    state: FitState<SquareCoord>,
+    id: PieceId,
+    turns: number,
+    at: SquareCoord,
+  ): boolean {
+    const expected = Placement.of(Turns.of(turns), at, squareTopology);
+    return state.placementOf(id)?.equals(expected, squareTopology) === true;
   }
 
   it('should_store_the_rotation_from_zero_to_three_when_a_move_counts_negative_or_huge_steps', () => {
@@ -281,7 +289,8 @@ describe('FitRules edge cases', () => {
     const placed = rules.playTurn(dominoLevel(), new PlaceFitPiece(A, Turns.of(-1), square(1, 1)));
 
     expect(placed.accepted).toBe(true);
-    expect(rotationOf(placed.state, A)).toBe(3);
+    expect(isPlaced(placed.state, A, 3, square(1, 1))).toBe(true);
+    expect(isPlaced(placed.state, A, 2, square(1, 1))).toBe(false);
     expect(cellsOf(placed.state)).toEqual(['1,0=a', '1,1=a']);
 
     // 2^53 - 1 is 3 modulo 4. Three steps more than 3 is a half turn.
@@ -291,7 +300,8 @@ describe('FitRules edge cases', () => {
     );
 
     expect(turned.accepted).toBe(true);
-    expect(rotationOf(turned.state, A)).toBe(2);
+    expect(isPlaced(turned.state, A, 2, square(1, 1))).toBe(true);
+    expect(isPlaced(turned.state, A, 3, square(1, 1))).toBe(false);
     expect(cellsOf(turned.state)).toEqual(['0,1=a', '1,1=a']);
   });
 
@@ -439,7 +449,7 @@ describe('FitRules edge cases', () => {
     expect(outcome).toBe('playing');
     expect(engine.currentPhase().name).toBe('playing');
     expect(cellsOf(engine.snapshot())).toEqual(['0,0=a', '1,0=a']);
-    expect(rotationOf(engine.snapshot(), A)).toBe(0);
+    expect(isPlaced(engine.snapshot(), A, 0, square(0, 0))).toBe(true);
   });
 });
 

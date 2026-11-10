@@ -107,8 +107,9 @@ describe('Radius', () => {
 
 describe('Color', () => {
   // Issue #129: Lines and Sort share the engine `Color` (classes.md decision 5).
-  it('should_keep_the_name_when_a_color_is_made_from_a_name', () => {
-    expect(Color.of('red').name).toBe('red');
+  it('should_keep_the_name_as_written_when_a_color_is_made_from_a_name', () => {
+    expect(Color.of('red').equals(Color.of('red'))).toBe(true);
+    expect(Color.of(' red').equals(Color.of('red'))).toBe(false);
   });
 
   it('should_throw_a_range_error_when_the_color_name_is_empty_or_blank', () => {

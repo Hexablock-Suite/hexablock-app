@@ -37,9 +37,21 @@ export function stack(...names: string[]): ColorStack {
   return ColorStack.of(names.map((name) => Color.of(name)));
 }
 
+// The color names that the Sort tests use.
+const PALETTE = ['red', 'blue', 'green', 'yellow'];
+
 // The color names of a stack, from the bottom to the top. No stack gives `[]`.
+// `ColorStack` and `Color` keep their fields private, so the helper reads the stack
+// through its operations: it names the top color with `equals()` and removes the top run.
 export function names(content: ColorStack | undefined): string[] {
-  return content?.chips.map((chip) => chip.name) ?? [];
+  const found: string[] = [];
+  for (let rest = content; rest?.isEmpty() === false; rest = rest.withoutTopRun()) {
+    const run = rest.topRun();
+    const name = PALETTE.find((candidate) => run[0]?.equals(Color.of(candidate)) === true);
+    if (name === undefined) throw new Error(`The stack has a color outside ${PALETTE.join(', ')}.`);
+    found.unshift(...run.map(() => name));
+  }
+  return found;
 }
 
 // `count` tiles of one color, by name.

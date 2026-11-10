@@ -62,7 +62,10 @@ describe('GamePhase', () => {
 
 describe('GameId', () => {
   it('should_keep_the_value_when_the_id_is_valid', () => {
-    expect(GameId.of('hexa-lines').value).toBe('hexa-lines');
+    const id = GameId.of('hexa-lines');
+
+    expect(id.equals(GameId.of('hexa-lines'))).toBe(true);
+    expect(id.equals(GameId.of('hexa-line'))).toBe(false);
   });
 
   it('should_throw_when_the_id_is_empty', () => {
@@ -97,7 +100,12 @@ describe('GameId', () => {
       'game2',
     ];
 
-    expect(valid.map((value) => GameId.of(value).value)).toEqual(valid);
+    for (const value of valid) {
+      expect(GameId.of(value).equals(GameId.of(value))).toBe(true);
+    }
+    // Each id keeps its own value, so no two ids of the list are equal.
+    const ids = valid.map((value) => GameId.of(value));
+    expect(ids.filter((id) => ids.filter((other) => other.equals(id)).length !== 1)).toEqual([]);
   });
 
   it('should_be_equal_when_two_ids_hold_the_same_value', () => {
@@ -110,7 +118,7 @@ describe('GameOver event', () => {
   it('should_carry_the_game_the_outcome_and_the_final_score_when_it_is_created', () => {
     const event = new GameOver(GameId.of('hexa-lines'), 'game-over', 42);
 
-    expect(event.gameId.value).toBe('hexa-lines');
+    expect(event.gameId.equals(GameId.of('hexa-lines'))).toBe(true);
     expect(event.outcome).toBe('game-over');
     expect(event.finalScore).toBe(42);
   });

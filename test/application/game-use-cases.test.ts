@@ -21,6 +21,7 @@ import { GoalCount } from '../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../src/domain/variants/hexa-sort/sort-factory';
 import { square, type SquareCoord } from '../support/engine/square-topology';
 import { firstValidMove } from '../support/engine/variant-game';
+import { variantIdOf } from '../support/variants/variant-id';
 import {
   errorOf,
   gameUseCases,
@@ -60,7 +61,7 @@ async function startAndPlayOnce<
   const move = firstValidMove(factory.createRules(), games.running().snapshot());
   const played = valueOf(await applyMove.execute({ move }));
   const after = games.running().snapshot();
-  return { gameId: factory.gameId.value, started, startState, startCells, played, after };
+  return { gameId: variantIdOf(factory.gameId), started, startState, startCells, played, after };
 }
 
 class ThrowingPublisher implements GameEventPublisher {

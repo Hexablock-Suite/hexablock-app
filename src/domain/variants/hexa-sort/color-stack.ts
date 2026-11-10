@@ -7,7 +7,7 @@ import type { Color } from '../../engine/color';
 // An empty stack is an empty cell. The board cannot remove a cell,
 // so a cleared stack becomes an empty stack.
 export class ColorStack {
-  readonly chips: readonly Color[];
+  private readonly chips: readonly Color[];
 
   private constructor(chips: readonly Color[]) {
     this.chips = Object.freeze([...chips]);

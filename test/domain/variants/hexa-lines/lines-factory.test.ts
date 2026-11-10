@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { GameId } from '../../../../src/domain/engine/game-id';
 import type { Piece } from '../../../../src/domain/engine/piece';
 import { CellNode, ShapeGroup } from '../../../../src/domain/engine/shape-node';
 import type { Color } from '../../../../src/domain/engine/color';
@@ -20,9 +21,11 @@ import {
 const domino = new ShapeGroup([new CellNode(square(0, 0)), new CellNode(square(1, 0))]);
 
 // A piece as text: its color and the keys of its cells, so two pieces compare by value.
+// `Color` keeps its name private, so `equals()` names the color. These tests draw red or blue.
 function describe_(piece: Piece<Color, SquareCoord>): string {
   const keys = piece.shape.cells().map((c) => squareTopology.key(c));
-  return `${piece.content.name} ${keys.join(' ')}`;
+  const color = piece.content.equals(red) ? 'red' : 'blue';
+  return `${color} ${keys.join(' ')}`;
 }
 
 function firstPieces(seed: number, count: number): string[] {
@@ -47,7 +50,7 @@ describe('LinesFactory', () => {
     const { engine, rules, publisher } = startVariant(factory);
     const outcome = engine.play(firstValidMove(rules, engine.snapshot()));
 
-    expect(factory.gameId.value).toBe('hexa-lines');
+    expect(factory.gameId.equals(GameId.of('hexa-lines'))).toBe(true);
     expect(factory.createBoard().shape.cells).toHaveLength(9);
     expect(initial.board.cells()).toEqual([]);
     expect(initial.tray).toHaveLength(3);

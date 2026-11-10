@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { GameId } from '../../../../src/domain/engine/game-id';
 import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
@@ -26,7 +27,7 @@ describe('SortFactory', () => {
     const { engine, publisher } = startVariant(factory);
     const outcome = engine.play(place(0, 0));
 
-    expect(factory.gameId.value).toBe('hexa-sort');
+    expect(factory.gameId.equals(GameId.of('hexa-sort'))).toBe(true);
     expect(factory.createBoard().shape.cells).toHaveLength(4);
     expect(names(initial.offered?.content)).toEqual(['red', 'red']);
     expect(initial.goalsNeeded.value).toBe(5);

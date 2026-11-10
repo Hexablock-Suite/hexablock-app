@@ -193,3 +193,31 @@ describe('equals of ColorStack', () => {
     expect(bothWays(same, ColorStack.of([RED]), ColorStack.empty())).toEqual(DIFFERENT);
   });
 });
+
+// The class of 2026-11-09: the attributes of a value object are private.
+// A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails
+// when the line compiles, because then the directive is unused.
+describe('private fields of the value objects', () => {
+  it('should_reject_at_compile_time_when_a_caller_reads_a_field_that_no_production_code_reads', () => {
+    const range = Range.ofNumbers(1, 2);
+    const placement = Placement.of(Turns.of(1), square(0, 0), squareTopology);
+    const readers = [
+      // @ts-expect-error `Color.name` is private.
+      () => Color.of('red').name,
+      // @ts-expect-error `GameId.value` is private.
+      () => FIT.value,
+      // @ts-expect-error `Range.min` is private.
+      () => range.min,
+      // @ts-expect-error `Range.max` is private.
+      () => range.max,
+      // @ts-expect-error `Placement.rotation` is private.
+      () => placement.rotation,
+      // @ts-expect-error `Placement.at` is private.
+      () => placement.at,
+      // @ts-expect-error `ColorStack.chips` is private.
+      () => ColorStack.empty().chips,
+    ];
+
+    expect(readers).toHaveLength(7);
+  });
+});

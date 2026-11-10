@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { GameId } from '../../../../src/domain/engine/game-id';
 import { HexGeometry } from '../../../../src/domain/engine/hex-geometry';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import {
@@ -31,7 +32,7 @@ describe('MergeFactory', () => {
     const outcome = engine.play(slide);
     const after = engine.snapshot();
 
-    expect(factory.gameId.value).toBe('hexa-merge');
+    expect(factory.gameId.equals(GameId.of('hexa-merge'))).toBe(true);
     expect(factory.createBoard().shape.cells).toHaveLength(7);
     expect(Object.values(values(initial))).toHaveLength(2);
     expect(Object.values(values(initial)).every((v) => v === 2 || v === 4)).toBe(true);
