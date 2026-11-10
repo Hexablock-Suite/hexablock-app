@@ -6,10 +6,59 @@ import type { RegionSize } from './region-size';
 import { Turns } from './turns';
 
 // A coordinate is axial: `q` and `r`, and the third cube value is `s = -q - r`.
-// It only holds its values. `HexTopology` does every calculation (classes.md decision 16).
-export interface HexCoord {
-  readonly q: number;
-  readonly r: number;
+// It is a value object (classes.md decisions 16 and 44, issue #206): it never changes,
+// and two coordinates are equal when their values are equal.
+// The values are private. The coordinate does every calculation on its own values.
+// `HexTopology` does what belongs to the grid: the neighbors, the lines, the rings and the regions.
+export class HexCoord {
+  private constructor(
+    private readonly q: number,
+    private readonly r: number,
+  ) {
+    // The object is frozen, because `private` and `readonly` hold only at compile time.
+    Object.freeze(this);
+  }
+
+  // Creates a coordinate. A value that is not a safe integer is an error.
+  static of(q: number, r: number): HexCoord {
+    if (!Number.isSafeInteger(q) || !Number.isSafeInteger(r)) {
+      throw new RangeError(`A hex coordinate needs whole numbers, not ${q}, ${r}.`);
+    }
+    // `0 + x` stores a negative zero as 0, so two equal coordinates have one key.
+    return new HexCoord(0 + q, 0 + r);
+  }
+
+  // Two coordinates are equal when they hold the same values.
+  equals(other: HexCoord): boolean {
+    return this.q === other.q && this.r === other.r;
+  }
+
+  // The sum of two coordinates, one value at a time. Neither coordinate changes.
+  plus(other: HexCoord): HexCoord {
+    return HexCoord.of(this.q + other.q, this.r + other.r);
+  }
+
+  // The coordinate on the other side of the origin.
+  opposite(): HexCoord {
+    return HexCoord.of(-this.q, -this.r);
+  }
+
+  // The count of steps between this cell and `other`.
+  distanceTo(other: HexCoord): number {
+    const dq = this.q - other.q;
+    const dr = this.r - other.r;
+    return (Math.abs(dq) + Math.abs(dr) + Math.abs(dq + dr)) / 2;
+  }
+
+  // This coordinate after a sixth of a turn around the origin: (q, r) becomes (-r, q + r).
+  turned(): HexCoord {
+    return HexCoord.of(-this.r, this.q + this.r);
+  }
+
+  // The text of the coordinate: `q,r`. `HexTopology` brands it as its key.
+  toString(): string {
+    return `${this.q},${this.r}`;
+  }
 }
 
 // Three axes. Each axis gives two slide directions, so the board has six.
@@ -22,14 +71,9 @@ export type HexDirection =
   | 'south-west'
   | 'north-east';
 
-// Creates a coordinate. A value that is not a safe integer is an error.
-// The object is frozen, because `readonly` holds only at compile time.
+// Creates a coordinate. It is the short name of `HexCoord.of()`, which checks the values.
 export function hex(q: number, r: number): HexCoord {
-  if (!Number.isSafeInteger(q) || !Number.isSafeInteger(r)) {
-    throw new RangeError(`A hex coordinate needs whole numbers, not ${q}, ${r}.`);
-  }
-  // `0 + x` stores a negative zero as 0, so two equal coordinates have one key.
-  return Object.freeze({ q: 0 + q, r: 0 + r });
+  return HexCoord.of(q, r);
 }
 
 // One step forward along each axis. The axis `q` keeps `r`, the axis `r` keeps `q`,
@@ -51,20 +95,6 @@ const directionSteps: ReadonlyMap<string, HexCoord> = new Map([
   ['south-east', hex(0, 1)],
 ]);
 
-function add(a: HexCoord, b: HexCoord): HexCoord {
-  return hex(a.q + b.q, a.r + b.r);
-}
-
-function minus(c: HexCoord): HexCoord {
-  return hex(-c.q, -c.r);
-}
-
-function distance(a: HexCoord, b: HexCoord): number {
-  const dq = a.q - b.q;
-  const dr = a.r - b.r;
-  return (Math.abs(dq) + Math.abs(dr) + Math.abs(dq + dr)) / 2;
-}
-
 // Strategy (statement §3.3, D4): the real hexagonal topology. `HexGeometry` creates it.
 export class HexTopology implements GridTopology<HexCoord, HexAxis, HexDirection> {
   fullTurn(): Turns {
@@ -72,18 +102,18 @@ export class HexTopology implements GridTopology<HexCoord, HexAxis, HexDirection
   }
 
   key(c: HexCoord): CoordKey {
-    return coordKey(`${c.q},${c.r}`);
+    return coordKey(c.toString());
   }
 
   neighbors(c: HexCoord): HexCoord[] {
-    return [...directionSteps.values()].map((step) => add(c, step));
+    return [...directionSteps.values()].map((step) => c.plus(step));
   }
 
   neighbor(c: HexCoord, direction: HexDirection): HexCoord {
     // The check still runs when a caller casts a free string to a direction.
     const step = directionSteps.get(direction);
     if (step === undefined) throw new RangeError(`The hex grid has no direction ${direction}.`);
-    return add(c, step);
+    return c.plus(step);
   }
 
   directions(): HexDirection[] {
@@ -94,40 +124,42 @@ export class HexTopology implements GridTopology<HexCoord, HexAxis, HexDirection
     return ['q', 'r', 's'];
   }
 
-  // A sixth of a turn maps (q, r) to (-r, q + r).
+  // One rotation step is a sixth of a turn.
   rotate(c: HexCoord, turns: Turns): HexCoord {
-    return turns.applyTo(c, (turned) => hex(-turned.r, turned.q + turned.r), this);
+    return turns.applyTo(c, (from) => from.turned(), this);
   }
 
   translate(c: HexCoord, offset: HexCoord): HexCoord {
-    return add(c, offset);
+    return c.plus(offset);
   }
 
   *line(axis: HexAxis, through: HexCoord, contains: (c: HexCoord) => boolean): Iterable<HexCoord> {
     // The check still runs when a caller casts a free string to an axis.
     const step = axisSteps.get(axis);
     if (step === undefined) throw new RangeError(`The hex grid has no axis ${axis}.`);
-    const back = minus(step);
+    const back = step.opposite();
     let start = through;
-    while (contains(add(start, back))) start = add(start, back);
-    for (let c = start; contains(c); c = add(c, step)) yield c;
+    while (contains(start.plus(back))) start = start.plus(back);
+    for (let c = start; contains(c); c = c.plus(step)) yield c;
   }
 
-  *ring(center: HexCoord, { value: radius }: Radius): Iterable<HexCoord> {
-    for (let dq = -radius; dq <= radius; dq += 1) {
-      for (let dr = -radius; dr <= radius; dr += 1) {
-        const c = add(center, hex(dq, dr));
-        if (distance(c, center) === radius) yield c;
+  *ring(center: HexCoord, radius: Radius): Iterable<HexCoord> {
+    for (const dq of radius.offsets()) {
+      for (const dr of radius.offsets()) {
+        const c = center.plus(hex(dq, dr));
+        if (radius.measures(c.distanceTo(center))) yield c;
       }
     }
   }
 
   // A hexagon: the cells at distance `size - 1` or less from the origin.
-  region({ value: size }: RegionSize): BoardShape<HexCoord> {
+  region(size: RegionSize): BoardShape<HexCoord> {
+    const origin = hex(0, 0);
     const cells: HexCoord[] = [];
-    for (let q = 1 - size; q < size; q += 1) {
-      for (let r = 1 - size; r < size; r += 1) {
-        if (distance(hex(q, r), hex(0, 0)) < size) cells.push(hex(q, r));
+    for (const q of size.offsets()) {
+      for (const r of size.offsets()) {
+        const c = hex(q, r);
+        if (size.holds(c.distanceTo(origin))) cells.push(c);
       }
     }
     return BoardShape.of(cells);

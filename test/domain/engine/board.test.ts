@@ -26,9 +26,12 @@ const stripTopology: GridTopology<number, 'x', 'left' | 'right'> = {
     while (contains(start - 1)) start -= 1;
     for (let c = start; contains(c); c += 1) yield c;
   },
-  ring: (center, { value: radius }) =>
-    radius === 0 ? [center] : [center - radius, center + radius],
-  region: ({ value: size }) => BoardShape.of(Array.from({ length: size }, (_, i) => i)),
+  // The offsets at the distance of the radius: one for radius 0, and two for any other radius.
+  ring: (center, radius) =>
+    [...radius.offsets()]
+      .filter((offset) => radius.measures(Math.abs(offset)))
+      .map((offset) => center + offset),
+  region: (size) => BoardShape.of([...size.indexes()]),
 };
 
 // The board covers the cells 0 to 4.

@@ -20,10 +20,18 @@ function inside(size: number): (c: HexCoord) => boolean {
   return (c) => keys.has(topology.key(c));
 }
 
+// The two values of a coordinate, read from its key. A coordinate keeps them private.
+function valuesOf(c: HexCoord): [number, number] {
+  const [q = Number.NaN, r = Number.NaN] = topology.key(c).split(',').map(Number);
+  return [q, r];
+}
+
 // The hex distance. The test has its own copy, so it does not trust the code that it checks.
 function distance(a: HexCoord, b: HexCoord): number {
-  const dq = a.q - b.q;
-  const dr = a.r - b.r;
+  const [aq, ar] = valuesOf(a);
+  const [bq, br] = valuesOf(b);
+  const dq = aq - bq;
+  const dr = ar - br;
   return (Math.abs(dq) + Math.abs(dr) + Math.abs(dq + dr)) / 2;
 }
 
@@ -31,8 +39,9 @@ describe('hex', () => {
   it('should_store_zero_when_a_value_is_a_negative_zero', () => {
     const c = hex(-0, -0);
 
-    expect(Object.is(c.q, 0)).toBe(true);
-    expect(Object.is(c.r, 0)).toBe(true);
+    // The values are private. `Reflect.get` stands for a caller that ignores it.
+    expect(Object.is(Reflect.get(c, 'q'), 0)).toBe(true);
+    expect(Object.is(Reflect.get(c, 'r'), 0)).toBe(true);
     expect(topology.key(c)).toBe(topology.key(hex(0, 0)));
   });
 

@@ -45,9 +45,9 @@ describe('Piece translation on the triangle topology double', () => {
 
   it('should_flip_the_orientation_when_coordinates_are_added_one_component_at_a_time', () => {
     // This is the coupling the engine must avoid. It shows that the odd offset detects it.
-    const naive = rhombus()
-      .shape.cells()
-      .map((c) => triangle(c.col + oddOffset.col, c.row + oddOffset.row));
+    // A coordinate keeps its values private and has no such sum, so the test adds the numbers:
+    // the rhombus cells (0, 0) and (1, 0), plus the odd offset (1, 0).
+    const naive = [triangle(0 + 1, 0 + 0), triangle(1 + 1, 0 + 0)];
 
     expect(naive.map(isUp)).toEqual([false, true]);
   });

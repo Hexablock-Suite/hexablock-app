@@ -47,9 +47,7 @@ function facts(state: HexMergeState) {
 
 describe('MergeState', () => {
   it('should_put_the_drawn_tile_on_the_empty_cell_that_the_draw_picks_when_a_new_tile_is_added', () => {
-    const empty = hexTopology
-      .region(RegionSize.of(2))
-      .cells.filter((c) => key(c.q, c.r) !== key(0, 0));
+    const empty = hexTopology.region(RegionSize.of(2)).cells.filter((c) => !c.equals(hex(0, 0)));
     const state = mergeState([[hex(0, 0), 2]], 2, draws([0, 4], [0.999, 2]));
 
     state.addNewTile();

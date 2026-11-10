@@ -335,7 +335,7 @@ describe('SortRules edge cases', () => {
     game.play(place(1, 1));
 
     expect(chipsAt(game, 1, 1)).toEqual(tiles('red', 6));
-    for (const at of ring) expect(chipsAt(game, at.col, at.row)).toEqual(['blue']);
+    for (const at of ring) expect(names(game.snapshot().board.get(at))).toEqual(['blue']);
   });
 
   it('should_give_only_the_placed_run_when_a_neighbor_has_the_longest_run', () => {
@@ -356,7 +356,7 @@ describe('SortRules edge cases', () => {
 
     expect(chipsAt(game, 1, 0)).toEqual(tiles('red', 5));
     expect(chipsAt(game, 1, 1)).toEqual([]);
-    for (const at of others) expect(chipsAt(game, at.col, at.row)).toEqual(['blue', 'red']);
+    for (const at of others) expect(names(game.snapshot().board.get(at))).toEqual(['blue', 'red']);
   });
 
   it('should_throw_and_keep_the_game_when_the_source_throws_on_the_next_stack', () => {

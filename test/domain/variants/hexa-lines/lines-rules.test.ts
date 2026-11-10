@@ -22,7 +22,11 @@ import {
   type SquareCoord,
   type SquareDirection,
 } from '../../../support/engine/square-topology';
-import { triangle, triangleTopology } from '../../../support/engine/triangle-topology';
+import {
+  triangle,
+  triangleTopology,
+  type TriangleCoord,
+} from '../../../support/engine/triangle-topology';
 import {
   filledKeys,
   linesFactory,
@@ -134,7 +138,7 @@ describe('Hexa Lines rules', () => {
   });
 
   it('should_clear_the_full_line_on_each_of_the_three_axes_when_the_topology_is_triangular', () => {
-    const topology: GridTopology<{ col: number; row: number }, string, string> = triangleTopology;
+    const topology: GridTopology<TriangleCoord, string, string> = triangleTopology;
     const axes = topology.axes();
     expect(axes).toHaveLength(3);
 
@@ -384,7 +388,7 @@ describe('Hexa Lines rules edge cases', () => {
     const failingTopology: GridTopology<SquareCoord, SquareAxis, SquareDirection> = {
       ...squareTopology,
       translate: (c, offset) => {
-        if (offset.col === 2) throw new Error('The topology failed.');
+        if (offset.equals(square(2, 2))) throw new Error('The topology failed.');
         return squareTopology.translate(c, offset);
       },
     };
@@ -429,7 +433,8 @@ describe('Hexa Lines rules edge cases', () => {
       ...squareTopology,
       *line(axis, through, contains) {
         const cells = [...squareTopology.line(axis, through, contains)];
-        const index = axis === 'col' ? through.col : through.row;
+        // The line starts at the edge of the board, so the place of `through` is its index.
+        const index = cells.findIndex((c) => c.equals(through));
         yield* index % 2 === 0 ? cells : cells.reverse();
       },
     };

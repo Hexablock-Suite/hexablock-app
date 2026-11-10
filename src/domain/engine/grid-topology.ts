@@ -4,9 +4,11 @@ import type { Radius } from './radius';
 import type { RegionSize } from './region-size';
 import type { Turns } from './turns';
 
-// Strategy (statement §3.3, D4). The topology does every coordinate calculation,
+// Strategy (statement §3.3, D4). The engine asks the topology for every coordinate calculation,
 // so one board serves hexagons, triangles and squares (classes.md decision 16).
-// A coordinate only holds its values. No engine code adds two coordinates itself.
+// `TCoord` has no bound, so no engine code reads or adds the values of a coordinate itself.
+// A coordinate is a value object that does the calculations on its own values (decision 44).
+// The topology does what belongs to the grid: the neighbors, the lines, the rings and the regions.
 // Each topology declares its axes and its directions as closed unions of names,
 // for example `'q' | 'r' | 's'`. So the compiler rejects an axis that the topology lacks.
 // A cast such as `'nort' as SquareAxis` passes the compiler.
