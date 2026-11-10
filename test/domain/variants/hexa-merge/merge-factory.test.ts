@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Outcome } from '../../../../src/domain/engine/outcome';
 import { Score } from '../../../../src/domain/engine/score';
 import { GameId } from '../../../../src/domain/engine/game-id';
 import { HexGeometry } from '../../../../src/domain/engine/hex-geometry';
@@ -44,7 +45,7 @@ describe('MergeFactory', () => {
     expect(factory.createBoard(BOARD_ID).shape.cells).toHaveLength(7);
     expect(Object.values(values(initial.snapshot()))).toHaveLength(2);
     expect(Object.values(values(initial.snapshot())).every((v) => v === 2 || v === 4)).toBe(true);
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(values(after)).not.toEqual(values(initial.snapshot()));
     // The score is the sum of the merged values: the factory picks the Merge scoring.
     expect(after.score).toEqual(

@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Outcome } from '../../src/domain/engine/outcome';
 import { phaseNameOf } from '../support/engine/phase-name';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -87,7 +88,7 @@ describe('UndoMove', () => {
     expect(undone).toEqual({
       cells: afterFirst.cells,
       score: afterFirst.score,
-      outcome: 'playing',
+      outcome: Outcome.playing,
       canUndo: true,
       canRedo: false,
       hasUndo: true,
@@ -115,7 +116,7 @@ describe('UndoMove', () => {
     expect(drawsOf(afterPlay.tiles)).not.toEqual(drawsOf(before.tiles));
     expect(drawsOf(after.tiles)).toEqual(drawsOf(before.tiles));
     expect(undone.cells).toEqual(before.board.cells());
-    expect([undone.score, undone.outcome]).toEqual([before.score, 'playing']);
+    expect([undone.score, undone.outcome]).toEqual([before.score, Outcome.playing]);
     // The same slide draws the same new tile again.
     expect(replay.cells).toEqual(firstPlay.cells);
     expect(replay.score).toEqual(firstPlay.score);

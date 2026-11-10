@@ -1,4 +1,4 @@
-import type { GeometryFactory } from './geometry-factory';
+import { TopologyId, type GeometryFactory } from './geometry-factory';
 import { CellNode, ShapeGroup, type ShapeNode } from './shape-node';
 import { square, SquareTopology, type SquareCoord } from './square-topology';
 
@@ -19,7 +19,7 @@ const pieces: readonly (readonly SquareCoord[])[] = [
 
 // Concrete Factory (classes.md decision 17, D11): the real square family.
 export class SquareGeometry implements GeometryFactory<SquareCoord> {
-  readonly id = 'square';
+  readonly id = TopologyId.square;
 
   // `values` holds `col` and then `row`.
   createCoord(values: number[]): SquareCoord {

@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Outcome } from '../../../src/domain/engine/outcome';
 import { Score } from '../../../src/domain/engine/score';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameOver } from '../../../src/domain/engine/game-events';
@@ -55,7 +56,7 @@ describe('GameFactory', () => {
     expect(phaseNameOf(game.currentPhase())).toBe('playing');
     expect(game.snapshot().board.cells()).toEqual([]);
     expect(game.undoable()).toBeUndefined();
-    expect(game.play(moveAt(0))).toBe('playing');
+    expect(game.play(moveAt(0))).toBe(Outcome.playing);
     expect(game.snapshot().score).toEqual(Score.of(1));
   });
 
@@ -121,7 +122,7 @@ describe('GameFactory', () => {
     expect(ids.calls).toBe(1);
     expect(game.equals(sameMatch)).toBe(true);
     expect(publisher.events).toEqual([
-      new GameOver(GameId.of('fake-game'), MATCH_ID, 'game-over', Score.of(1)),
+      new GameOver(GameId.of('fake-game'), MATCH_ID, Outcome.gameOver, Score.of(1)),
     ]);
   });
 

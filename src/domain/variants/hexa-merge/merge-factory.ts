@@ -4,6 +4,7 @@ import { BoardBuilder } from '../../engine/board-builder';
 import { GameId } from '../../engine/game-id';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { GeometryFactory } from '../../engine/geometry-factory';
+import type { GridAxis } from '../../engine/grid-topology';
 import type { MatchId } from '../../engine/match-id';
 import { MoveHistory } from '../../engine/move-history';
 import type { SeededPieceSource } from '../../engine/piece-source';
@@ -38,13 +39,13 @@ export interface MergeSettings {
 // The bound `IMergeable` of `MergeRules` is bound here to `MergeTile` (decision 8).
 // The piece source gives `NewTile` draws, so the factory binds `TPiece` to `NewTile<MergeTile>`.
 // The geometry comes by composition (APP-FR-16, D11), so the factory runs on any figure.
-// The contract of the geometry names its axes as `string`, so the slides do too.
+// The contract of the geometry gives a topology with any axis, so a slide takes any `GridAxis`.
 // The seed comes by injection (R-domain-determinism).
 export class MergeFactory<TCoord> implements IVariantFactory<
   MergeTile,
   TCoord,
-  Slide<string>,
-  MergeState<MergeTile, TCoord, string>,
+  Slide<GridAxis>,
+  MergeState<MergeTile, TCoord, GridAxis>,
   NewTile<MergeTile>
 > {
   readonly gameId = GameId.of('hexa-merge');
@@ -54,19 +55,19 @@ export class MergeFactory<TCoord> implements IVariantFactory<
     private readonly settings: MergeSettings,
   ) {}
 
-  createRules(): IGameRules<Slide<string>, MergeState<MergeTile, TCoord, string>> {
-    return new MergeRules<MergeTile, TCoord, string>(this.settings.target);
+  createRules(): IGameRules<Slide<GridAxis>, MergeState<MergeTile, TCoord, GridAxis>> {
+    return new MergeRules<MergeTile, TCoord, GridAxis>(this.settings.target);
   }
 
-  createScoring(): IScoringPolicy<MergeState<MergeTile, TCoord, string>> {
-    return new MergeScoring<TCoord, string>();
+  createScoring(): IScoringPolicy<MergeState<MergeTile, TCoord, GridAxis>> {
+    return new MergeScoring<TCoord, GridAxis>();
   }
 
   createPieceSource(): SeededPieceSource<NewTile<MergeTile>> {
     return mergeTileSource(this.settings.seed, this.settings.fourChance);
   }
 
-  createBoard(boardId: BoardId): Board<MergeTile, TCoord, string> {
+  createBoard(boardId: BoardId): Board<MergeTile, TCoord> {
     return new BoardBuilder(this.geometry).withRegion(this.settings.size).build<MergeTile>(boardId);
   }
 
@@ -75,7 +76,7 @@ export class MergeFactory<TCoord> implements IVariantFactory<
     matchId: MatchId,
     stateId: GameStateId,
     boardId: BoardId,
-  ): MergeState<MergeTile, TCoord, string> {
+  ): MergeState<MergeTile, TCoord, GridAxis> {
     const state = new MergeState(
       stateId,
       matchId,
@@ -87,7 +88,7 @@ export class MergeFactory<TCoord> implements IVariantFactory<
   }
 
   // Hexa Merge undoes one move (APP-FR-08, classes.md decision 3).
-  createHistory(): MoveHistory<Slide<string>, MergeSnapshot<MergeTile, TCoord, string>> {
+  createHistory(): MoveHistory<Slide<GridAxis>, MergeSnapshot<MergeTile, TCoord, GridAxis>> {
     return new MoveHistory(MERGE_UNDO_LIMIT);
   }
 }

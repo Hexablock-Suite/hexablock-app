@@ -13,11 +13,11 @@ export class Piece<TCell, TCoord> implements Cloneable<Piece<TCell, TCoord>> {
     readonly content: TCell,
   ) {}
 
-  rotated(turns: Turns, topology: GridTopology<TCoord, string, string>): Piece<TCell, TCoord> {
+  rotated(turns: Turns, topology: GridTopology<TCoord>): Piece<TCell, TCoord> {
     return new Piece(this.shape.rotated(turns, topology), this.content);
   }
 
-  translated(offset: TCoord, topology: GridTopology<TCoord, string, string>): Piece<TCell, TCoord> {
+  translated(offset: TCoord, topology: GridTopology<TCoord>): Piece<TCell, TCoord> {
     return new Piece(this.shape.translated(offset, topology), this.content);
   }
 

@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Outcome } from '../../../../src/domain/engine/outcome';
 import { Score } from '../../../../src/domain/engine/score';
 import { GameId } from '../../../../src/domain/engine/game-id';
 import type { Piece } from '../../../../src/domain/engine/piece';
@@ -57,7 +58,7 @@ describe('LinesFactory', () => {
     expect(factory.createBoard(BOARD_ID).shape.cells).toHaveLength(9);
     expect(initial.snapshot().board.cells()).toEqual([]);
     expect(initial.snapshot().tray).toHaveLength(3);
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(filledKeys(engine.snapshot())).toEqual(['0,0']);
     expect(engine.snapshot().tray).toHaveLength(2);
     // One placed cell gives 1 point: the factory picks the Lines scoring.

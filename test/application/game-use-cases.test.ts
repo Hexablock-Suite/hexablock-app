@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Outcome } from '../../src/domain/engine/outcome';
 import { ApplyMove } from '../../src/application/apply-move';
 import type { RunningGameStore } from '../../src/application/running-game-store';
 import { StartGame } from '../../src/application/start-game';
@@ -224,10 +225,10 @@ describe('StartGame and ApplyMove', () => {
     ];
 
     expect(runs.map((r) => [r.gameId, r.started.outcome, r.played.outcome])).toEqual([
-      ['hexa-lines', 'playing', 'playing'],
-      ['hexa-fit', 'playing', 'victory'],
-      ['hexa-sort', 'playing', 'playing'],
-      ['hexa-merge', 'playing', 'playing'],
+      ['hexa-lines', Outcome.playing, Outcome.playing],
+      ['hexa-fit', Outcome.playing, Outcome.victory],
+      ['hexa-sort', Outcome.playing, Outcome.playing],
+      ['hexa-merge', Outcome.playing, Outcome.playing],
     ]);
     for (const run of runs) {
       // Fit wins with its one move, so only the Merge game keeps a move to undo.
@@ -237,7 +238,7 @@ describe('StartGame and ApplyMove', () => {
       expect(run.started).toEqual({
         cells: run.startCells,
         score: Score.of(0),
-        outcome: 'playing',
+        outcome: Outcome.playing,
         canUndo: false,
         canRedo: false,
         hasUndo,
@@ -340,9 +341,9 @@ describe('StartGame and ApplyMove', () => {
 
     const played = valueOf(await applyMove.execute({ move }));
 
-    expect(played.outcome).toBe('victory');
+    expect(played.outcome).toBe(Outcome.victory);
     expect(publisher.events).toEqual([
-      new GameOver(factory.gameId, MATCH_ID, 'victory', Score.of(0)),
+      new GameOver(factory.gameId, MATCH_ID, Outcome.victory, Score.of(0)),
     ]);
   });
 
@@ -479,7 +480,7 @@ describe('StartGame and ApplyMove', () => {
     expect(played).toEqual({
       cells: saved.board.cells(),
       score: saved.score,
-      outcome: 'victory',
+      outcome: Outcome.victory,
       canUndo: false,
       canRedo: false,
       hasUndo: true,
@@ -513,7 +514,7 @@ describe('StartGame and ApplyMove', () => {
 
     const played = valueOf(await applyMove.execute({ move }));
 
-    expect(played.outcome).toBe('victory');
+    expect(played.outcome).toBe(Outcome.victory);
     expect(played.cells).toEqual(games.running().snapshot().board.cells());
     expect(games.running().currentPhase()).toBe(VictoryPhase.instance);
   });
@@ -525,7 +526,7 @@ describe('StartGame and ApplyMove', () => {
 
     expect(withThrowingPublisher).toEqual(withWorkingPublisher);
     expect(withWorkingPublisher).toEqual([
-      ['success', 'victory'],
+      ['success', Outcome.victory],
       ['failure', 'move-failed', 'The game cannot accept a move in the victory phase.'],
     ]);
   });

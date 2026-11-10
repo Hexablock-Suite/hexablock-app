@@ -32,10 +32,7 @@ export class PlacePiece<TCoord> {
   }
 
   // The board cells that the piece covers when the topology moves it by the offset of this move.
-  cells<TCell>(
-    piece: Piece<TCell, TCoord>,
-    topology: GridTopology<TCoord, string, string>,
-  ): TCoord[] {
+  cells<TCell>(piece: Piece<TCell, TCoord>, topology: GridTopology<TCoord>): TCoord[] {
     return piece.translated(this.at, topology).shape.cells();
   }
 

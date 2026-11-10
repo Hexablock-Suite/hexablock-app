@@ -1,3 +1,4 @@
+import type { GridAxis } from '../../../../src/domain/engine/grid-topology';
 import { Score } from '../../../../src/domain/engine/score';
 import { Board, type ReadonlyBoard } from '../../../../src/domain/engine/board';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
@@ -68,7 +69,7 @@ export function valueOf(tile: MergeTile): number {
 
 // The value of each filled cell, by the topology key of its coordinate.
 // It takes a photo, because only the photo shows the board of a state.
-export function values<TAxis extends string>(state: {
+export function values<TAxis extends GridAxis>(state: {
   readonly board: ReadonlyBoard<MergeTile, HexCoord, TAxis>;
 }): Record<string, number> {
   const out: Record<string, number> = {};
@@ -106,7 +107,7 @@ export function mergeFactory(seed = 1): MergeFactory<HexCoord> {
 // A live state built again from a photo, so a test can ask the rules about the state that a game
 // shows. The engine never gives its state away. So the helper builds a new state with the ids,
 // the board and the source of the photo, and the state takes the photo back with `restore()`.
-export function mergeStateOf<TCoord, TAxis extends string>(
+export function mergeStateOf<TCoord, TAxis extends GridAxis>(
   photo: MergeSnapshot<MergeTile, TCoord, TAxis>,
 ): MergeState<MergeTile, TCoord, TAxis> {
   const state = new MergeState(

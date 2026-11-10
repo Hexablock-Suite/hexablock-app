@@ -50,7 +50,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
   private constructor(
     private readonly stateId: GameStateId,
     private readonly matchId: MatchId,
-    private readonly board: Board<ColorStack, TCoord, string>,
+    private readonly board: Board<ColorStack, TCoord>,
     private source: IPieceSource<Piece<ColorStack, TCoord>>,
     private readonly goalsNeeded: GoalCount,
     private offered: Piece<ColorStack, TCoord> | undefined,
@@ -64,7 +64,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
   static start<TCoord>(values: {
     stateId: GameStateId;
     matchId: MatchId;
-    board: Board<ColorStack, TCoord, string>;
+    board: Board<ColorStack, TCoord>;
     source: IPieceSource<Piece<ColorStack, TCoord>>;
     goalsNeeded: GoalCount;
   }): SortState<TCoord> {

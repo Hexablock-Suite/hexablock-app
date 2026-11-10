@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Outcome } from '../../src/domain/engine/outcome';
 import type { BoardState } from '../../src/domain/engine/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
 import { ElapsedTime } from '../../src/domain/engine/elapsed-time';
@@ -63,7 +64,7 @@ describe('The time of a Fit level', () => {
     expect(second.elapsedMs).toEqual(ElapsedTime.ofMs(2_000));
     expect(last.elapsedMs).toEqual(ElapsedTime.ofMs(5_000));
     expect(last.elapsedMs).toBeInstanceOf(ElapsedTime);
-    expect(last.outcome).toBe('victory');
+    expect(last.outcome).toBe(Outcome.victory);
     expect(engine.timed()?.elapsedMs()).toEqual(ElapsedTime.ofMs(5_000));
     expect(result.moves).toEqual(Moves.of(3));
     expect(result.elapsedMs).toEqual(ElapsedTime.ofMs(5_000));

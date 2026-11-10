@@ -72,7 +72,7 @@
         <title id="board-title">HexaBlock board and pieces · UML class diagram</title>
         <desc id="board-desc">
           Class diagram of layer 1 showing Board, generic over the cell, the coordinate and the axis
-          union, keeping one BoardSpace entity for each written coordinate, using its BoardShape and
+          class, keeping one BoardSpace entity for each written coordinate, using its BoardShape and
           taking its geometry from the GridTopology strategy, the ShapeNode composite of CellNode
           leaves and ShapeGroup children, and Piece using a ShapeNode as a prototype that clones
           itself. Board is an entity: its BoardId is its identity, and equals() compares two boards
@@ -504,7 +504,7 @@
           + shape: BoardShape&lt;TCoord&gt;
         </text>
         <text x="88" y="172" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + topology: GridTopology&lt;TCoord, TAxis, string&gt;
+          + topology: GridTopology&lt;TCoord, TAxis&gt;
         </text>
         <text x="88" y="188" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - identity: BoardId
@@ -766,13 +766,13 @@
           + rotated(turns: Turns, topology:
         </text>
         <text x="608" y="560" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          GridTopology&lt;TCoord, string, string&gt;): Piece&lt;TCell, TCoord&gt;
+          GridTopology&lt;TCoord&gt;): Piece&lt;TCell, TCoord&gt;
         </text>
         <text x="592" y="576" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + translated(offset: TCoord, topology:
         </text>
         <text x="608" y="592" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          GridTopology&lt;TCoord, string, string&gt;): Piece&lt;TCell, TCoord&gt;
+          GridTopology&lt;TCoord&gt;): Piece&lt;TCell, TCoord&gt;
         </text>
         <text x="592" y="612" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + clone(): Piece&lt;TCell, TCoord&gt;
@@ -822,13 +822,13 @@
           + rotated(turns: Turns, topology:
         </text>
         <text x="288" y="784" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          GridTopology&lt;TCoord, string, string&gt;): ShapeNode&lt;TCoord&gt;
+          GridTopology&lt;TCoord&gt;): ShapeNode&lt;TCoord&gt;
         </text>
         <text x="272" y="800" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + translated(offset: TCoord, topology:
         </text>
         <text x="288" y="816" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          GridTopology&lt;TCoord, string, string&gt;): ShapeNode&lt;TCoord&gt;
+          GridTopology&lt;TCoord&gt;): ShapeNode&lt;TCoord&gt;
         </text>
 
         <!-- Class: CellNode (Leaf) -->
@@ -909,9 +909,9 @@
 
         <!-- UML template boxes: type parameters on the top-right corner -->
         <rect
-          x="344"
+          x="264"
           y="82"
-          width="116"
+          width="196"
           height="18"
           rx="2"
           fill="#ffffff"
@@ -920,14 +920,14 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="402"
+          x="362"
           y="94"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TCell, TCoord, TAxis
+          TCell, TCoord, TAxis extends GridAxis
         </text>
         <rect
           x="874"
@@ -952,10 +952,10 @@
         </text>
 
         <rect
-          x="856"
-          y="82"
-          width="140"
-          height="18"
+          x="820"
+          y="68"
+          width="176"
+          height="30"
           rx="2"
           fill="#ffffff"
           stroke="#5b6873"
@@ -963,14 +963,24 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="926"
-          y="94"
+          x="908"
+          y="80"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TCoord, TAxis, TDirection
+          TCoord, TAxis extends GridAxis,
+        </text>
+        <text
+          x="908"
+          y="91"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TDirection extends GridDirection
         </text>
         <rect
           x="396"
@@ -1108,7 +1118,7 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           A ShapeGroup holds at least one child. Radius, RegionSize and Turns check a safe whole
-          number in of(); each topology binds TAxis and TDirection to closed unions.
+          number in of(). Each topology binds TAxis and TDirection to its own classes (view 6).
         </text>
         <!-- Legend -->
         <line x1="24" y1="952" x2="1016" y2="952" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />

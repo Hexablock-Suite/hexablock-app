@@ -9,9 +9,9 @@ import { withOwnMethods } from './own-methods';
 
 export {
   square,
-  type SquareAxis,
+  SquareAxis,
   type SquareCoord,
-  type SquareDirection,
+  SquareDirection,
 } from '../../../src/domain/engine/square-topology';
 
 // The real square topology (issue 160). The tests keep this name.

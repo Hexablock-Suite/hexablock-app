@@ -2,7 +2,8 @@
 import {
   hex,
   HexTopology,
-  type HexAxis,
+  HexAxis,
+  HexDirection,
   type HexCoord,
 } from '../../../src/domain/engine/hex-topology';
 import { Radius } from '../../../src/domain/engine/radius';
@@ -66,8 +67,17 @@ describe('hex', () => {
 describe('HexTopology', () => {
   it('should_give_six_rotation_steps_and_its_closed_names_when_the_topology_is_read', () => {
     expect(topology.fullTurn().equals(Turns.of(6))).toBe(true);
-    expect(topology.axes()).toEqual(['q', 'r', 's']);
+    expect(topology.axes()).toEqual([HexAxis.q, HexAxis.r, HexAxis.s]);
     expect(topology.directions()).toEqual([
+      HexDirection.east,
+      HexDirection.west,
+      HexDirection.southEast,
+      HexDirection.northWest,
+      HexDirection.southWest,
+      HexDirection.northEast,
+    ]);
+    expect(topology.axes().map(String)).toEqual(['q', 'r', 's']);
+    expect(topology.directions().map(String)).toEqual([
       'east',
       'west',
       'south-east',
@@ -128,21 +138,21 @@ describe('HexTopology', () => {
   it('should_walk_each_axis_from_edge_to_edge_when_a_line_goes_through_the_center', () => {
     const contains = inside(3);
 
-    expect([...topology.line('q', hex(0, 0), contains)]).toEqual([
+    expect([...topology.line(HexAxis.q, hex(0, 0), contains)]).toEqual([
       hex(-2, 0),
       hex(-1, 0),
       hex(0, 0),
       hex(1, 0),
       hex(2, 0),
     ]);
-    expect([...topology.line('r', hex(0, 0), contains)]).toEqual([
+    expect([...topology.line(HexAxis.r, hex(0, 0), contains)]).toEqual([
       hex(0, -2),
       hex(0, -1),
       hex(0, 0),
       hex(0, 1),
       hex(0, 2),
     ]);
-    expect([...topology.line('s', hex(0, 0), contains)]).toEqual([
+    expect([...topology.line(HexAxis.s, hex(0, 0), contains)]).toEqual([
       hex(-2, 2),
       hex(-1, 1),
       hex(0, 0),
@@ -152,7 +162,7 @@ describe('HexTopology', () => {
   });
 
   it('should_start_at_the_edge_when_a_line_goes_through_an_outer_cell', () => {
-    expect([...topology.line('q', hex(1, 1), inside(3))]).toEqual([
+    expect([...topology.line(HexAxis.q, hex(1, 1), inside(3))]).toEqual([
       hex(-2, 1),
       hex(-1, 1),
       hex(0, 1),
@@ -161,7 +171,7 @@ describe('HexTopology', () => {
   });
 
   it('should_throw_a_range_error_when_a_cast_names_an_axis_that_the_grid_lacks', () => {
-    const read = () => [...topology.line('nort' as HexAxis, hex(0, 0), inside(2))];
+    const read = () => [...topology.line('nort' as unknown as HexAxis, hex(0, 0), inside(2))];
 
     expect(read).toThrow(RangeError);
     expect(read).toThrow('The hex grid has no axis nort.');
@@ -169,7 +179,7 @@ describe('HexTopology', () => {
 
   it('should_throw_a_range_error_when_a_cast_names_an_object_prototype_member', () => {
     for (const name of ['constructor', 'toString', '__proto__']) {
-      const read = () => [...topology.line(name as HexAxis, hex(0, 0), inside(2))];
+      const read = () => [...topology.line(name as unknown as HexAxis, hex(0, 0), inside(2))];
 
       expect(read).toThrow(RangeError);
       expect(read).toThrow(`The hex grid has no axis ${name}.`);

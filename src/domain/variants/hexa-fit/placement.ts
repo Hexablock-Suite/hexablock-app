@@ -16,19 +16,19 @@ export class Placement<TCoord> {
   static of<TCoord>(
     rotation: Turns,
     at: TCoord,
-    topology: GridTopology<TCoord, string, string>,
+    topology: GridTopology<TCoord>,
   ): Placement<TCoord> {
     return new Placement(rotation.normalized(topology), at);
   }
 
   // The same offset, turned by `steps` more.
-  turned(steps: Turns, topology: GridTopology<TCoord, string, string>): Placement<TCoord> {
+  turned(steps: Turns, topology: GridTopology<TCoord>): Placement<TCoord> {
     const sum = this.rotation.plus(steps.normalized(topology));
     return new Placement(sum.normalized(topology), this.at);
   }
 
   // The figure cells that the piece covers: the topology turns it and then moves it.
-  cells(piece: Piece<PieceId, TCoord>, topology: GridTopology<TCoord, string, string>): TCoord[] {
+  cells(piece: Piece<PieceId, TCoord>, topology: GridTopology<TCoord>): TCoord[] {
     return piece.rotated(this.rotation, topology).translated(this.at, topology).shape.cells();
   }
 

@@ -3,6 +3,7 @@ import { checkOwnSnapshot, type BoardSnapshot, type BoardState } from '../../eng
 import type { Cloneable } from '../../engine/cloneable';
 import type { CoordKey } from '../../engine/coord-key';
 import type { GameStateId } from '../../engine/game-state-id';
+import type { GridAxis } from '../../engine/grid-topology';
 import type { MatchId } from '../../engine/match-id';
 import { Score } from '../../engine/score';
 import type { IPieceSource } from '../../engine/piece-source';
@@ -22,7 +23,7 @@ export interface MergeView {
 export interface MergeSnapshot<
   TCell extends IMergeable<TCell>,
   TCoord,
-  TAxis extends string,
+  TAxis extends GridAxis,
 > extends BoardSnapshot<TCell, TCoord> {
   readonly board: ReadonlyBoard<TCell, TCoord, TAxis>;
   readonly targetReached: boolean;
@@ -52,7 +53,7 @@ export interface MergeSnapshot<
 export class MergeState<
   TCell extends IMergeable<TCell>,
   TCoord,
-  TAxis extends string,
+  TAxis extends GridAxis,
 > implements BoardState<TCell, TCoord> {
   constructor(
     private readonly stateId: GameStateId,
@@ -190,13 +191,13 @@ function isSameCell<TCell extends IMergeable<TCell>>(
   return left.canMergeWith(right);
 }
 
-function tileAt<TCell, TCoord>(board: Board<TCell, TCoord, string>, c: TCoord): TCell[] {
+function tileAt<TCell, TCoord>(board: Board<TCell, TCoord>, c: TCoord): TCell[] {
   const cell = board.get(c);
   return cell === undefined ? [] : [cell];
 }
 
 // Every line of the board on the axis of the slide, each one once, in the order of `Board.line()`.
-function linesOf<TCell, TCoord, TAxis extends string>(
+function linesOf<TCell, TCoord, TAxis extends GridAxis>(
   board: Board<TCell, TCoord, TAxis>,
   slide: Slide<TAxis>,
 ): TCoord[][] {

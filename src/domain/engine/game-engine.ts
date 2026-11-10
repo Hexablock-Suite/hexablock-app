@@ -6,13 +6,14 @@ import { PlayingPhase, ResolvingPhase, type GamePhase } from './game-phase';
 import type { MatchId } from './match-id';
 import { MoveCommand } from './move-command';
 import type { MoveHistory } from './move-history';
-import type { Outcome } from './outcome';
+import { Outcome } from './outcome';
 import type { IGameRules } from './rules';
 import type { IScoringPolicy } from './scoring-policy';
 import type { ITimed } from './timed';
 import type { IRedoable, IUndoable } from './undo-capabilities';
 
 // The report of one turn: whether the rules accepted the move, and the outcome.
+// `outcome` carries the `Outcome` value object, not a text (issue #207).
 // A rejected move always has the outcome `playing`.
 // `publishFailure` is set only when the publisher throws after the engine saves the turn.
 // It holds the thrown value. The turn and its outcome stay valid (issue 132).
@@ -128,14 +129,14 @@ export class GameEngine<
     // A rejected move ends no game, whatever outcome the rules give it.
     if (turn === undefined) {
       this.current = PlayingPhase.instance;
-      return { accepted: false, outcome: 'playing' };
+      return { accepted: false, outcome: Outcome.playing };
     }
     this.state = turn.next;
     this.current = turn.phase;
     this.remember(move, turn.before);
     // The turn is committed before the engine publishes. A publisher that throws
     // does not undo the turn. The report keeps its error apart from the outcome.
-    if (turn.outcome !== 'playing') {
+    if (turn.outcome.endsTheGame()) {
       try {
         const { score } = turn.next.snapshot();
         this.events.publish(new GameOver(this.gameId, this.matchId, turn.outcome, score));

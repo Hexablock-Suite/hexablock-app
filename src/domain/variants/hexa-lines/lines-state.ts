@@ -50,7 +50,7 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
   constructor(
     private readonly stateId: GameStateId,
     private readonly matchId: MatchId,
-    private readonly board: Board<Color, TCoord, string>,
+    private readonly board: Board<Color, TCoord>,
     private tray: readonly Piece<Color, TCoord>[],
     private source: IPieceSource<Piece<Color, TCoord>>,
     private streak = 0,
@@ -65,7 +65,7 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
   static start<TCoord>(
     stateId: GameStateId,
     matchId: MatchId,
-    board: Board<Color, TCoord, string>,
+    board: Board<Color, TCoord>,
     source: IPieceSource<Piece<Color, TCoord>>,
   ): LinesState<TCoord> {
     const state = new LinesState(stateId, matchId, board, [], source);

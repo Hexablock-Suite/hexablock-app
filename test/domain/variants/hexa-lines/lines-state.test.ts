@@ -37,8 +37,8 @@ function facts(state: LinesState<SquareCoord>) {
   };
 }
 
-function emptyBoard(size: number): Board<Color, SquareCoord, string> {
-  return new Board<Color, SquareCoord, string>(
+function emptyBoard(size: number): Board<Color, SquareCoord> {
+  return new Board<Color, SquareCoord>(
     BOARD_ID,
     squareTopology.region(RegionSize.of(size)),
     squareTopology,

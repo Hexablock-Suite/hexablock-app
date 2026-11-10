@@ -15,6 +15,7 @@ export type ViewOf<TState> = SnapshotOf<TState> extends { view(): infer TView } 
 // `cells` are new pairs from `Board.cells()`. A cell is an immutable value object.
 // `score` carries the `Score` value object of the photo. A use case never opens a domain object:
 // the presenter of layer 3 asks the score for its number (issue #203).
+// `outcome` carries the `Outcome` value object of the turn, by the same rule (issue #207).
 // `canUndo` and `canRedo` read the capabilities of the engine (decision 27).
 // `hasUndo` says whether the variant has undo at all. A false `canUndo` alone cannot
 // separate «no undo» from «undo used».

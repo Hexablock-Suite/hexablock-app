@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import type { GridAxis } from '../../../src/domain/engine/grid-topology';
 import { Score } from '../../../src/domain/engine/score';
 import { BoardId } from '../../../src/domain/engine/board-id';
 import type { BoardIdGenerator } from '../../../src/domain/engine/board-id-generator';
@@ -21,7 +22,7 @@ import { PieceId } from '../../../src/domain/variants/hexa-fit/piece-id';
 import { Placement } from '../../../src/domain/variants/hexa-fit/placement';
 import { PlacePiece } from '../../../src/domain/variants/hexa-lines/place-piece';
 import { MergeTile } from '../../../src/domain/variants/hexa-merge/merge-tile';
-import { Slide } from '../../../src/domain/variants/hexa-merge/slide';
+import { SlideSense, Slide } from '../../../src/domain/variants/hexa-merge/slide';
 import type { ColorStack } from '../../../src/domain/variants/hexa-sort/color-stack';
 import {
   BOARD_ID,
@@ -404,7 +405,7 @@ describe('atomicity of the state methods (T18 probe)', () => {
 
     const result = throwOf(
       () => shownBy(state),
-      () => state.slide(Slide.of('zz', 'forward'), MergeTile.of(8)),
+      () => state.slide(Slide.of('zz' as unknown as GridAxis, SlideSense.forward), MergeTile.of(8)),
     );
 
     expect(result.rangeError).toBe(true);

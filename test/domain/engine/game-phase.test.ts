@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Outcome } from '../../../src/domain/engine/outcome';
 import { GameId } from '../../../src/domain/engine/game-id';
 import { MatchId } from '../../../src/domain/engine/match-id';
 import { Score } from '../../../src/domain/engine/score';
@@ -42,9 +43,9 @@ describe('GamePhase', () => {
   it('should_follow_the_outcome_when_a_turn_resolves', () => {
     const resolving = ResolvingPhase.instance;
 
-    expect(resolving.after('playing')).toBe(PlayingPhase.instance);
-    expect(resolving.after('victory')).toBe(VictoryPhase.instance);
-    expect(resolving.after('game-over')).toBe(GameOverPhase.instance);
+    expect(resolving.after(Outcome.playing)).toBe(PlayingPhase.instance);
+    expect(resolving.after(Outcome.victory)).toBe(VictoryPhase.instance);
+    expect(resolving.after(Outcome.gameOver)).toBe(GameOverPhase.instance);
   });
 
   it('should_pause_and_resume_when_the_game_is_playing', () => {
@@ -185,14 +186,14 @@ describe('GameOver event', () => {
     const event = new GameOver(
       GameId.of('hexa-lines'),
       MatchId.of('match-a'),
-      'game-over',
+      Outcome.gameOver,
       Score.of(42),
     );
 
     expect(event.gameId.equals(GameId.of('hexa-lines'))).toBe(true);
     expect(event.matchId.equals(MatchId.of('match-a'))).toBe(true);
     expect(event.matchId.equals(MatchId.of('match-b'))).toBe(false);
-    expect(event.outcome).toBe('game-over');
+    expect(event.outcome).toBe(Outcome.gameOver);
     expect(event.finalScore).toBeInstanceOf(Score);
     expect(event.finalScore.equals(Score.of(42))).toBe(true);
   });
@@ -202,12 +203,12 @@ describe('GameOver event', () => {
     const gameId = GameId.of('hexa-lines');
 
     for (const score of [Number.NaN, Number.POSITIVE_INFINITY, -3, 0.5]) {
-      expect(() => new GameOver(gameId, MATCH_ID, 'game-over', Score.of(score))).toThrow(
+      expect(() => new GameOver(gameId, MATCH_ID, Outcome.gameOver, Score.of(score))).toThrow(
         new RangeError(`A score needs a whole number of 0 or more, not ${score}.`),
       );
     }
     expect(
-      new GameOver(gameId, MATCH_ID, 'game-over', Score.of(0)).finalScore.equals(Score.of(0)),
+      new GameOver(gameId, MATCH_ID, Outcome.gameOver, Score.of(0)).finalScore.equals(Score.of(0)),
     ).toBe(true);
   });
 });

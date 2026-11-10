@@ -118,7 +118,7 @@ function sortPoints(stacks: number[]): number {
   const state = SortState.start({
     stateId: STATE_ID,
     matchId: MATCH_ID,
-    board: new Board<ColorStack, SquareCoord, string>(
+    board: new Board<ColorStack, SquareCoord>(
       BOARD_ID,
       squareTopology.region(RegionSize.of(1)),
       squareTopology,

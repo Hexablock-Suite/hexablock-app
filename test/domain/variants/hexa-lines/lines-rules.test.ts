@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Outcome } from '../../../../src/domain/engine/outcome';
 import { Score } from '../../../../src/domain/engine/score';
 import { GameOverPhase, PlayingPhase } from '../../../../src/domain/engine/game-phase';
 import type { GridTopology } from '../../../../src/domain/engine/grid-topology';
@@ -18,7 +19,7 @@ import { phaseNameOf } from '../../../support/engine/phase-name';
 import {
   square,
   squareTopology,
-  type SquareAxis,
+  SquareAxis,
   type SquareCoord,
   type SquareDirection,
 } from '../../../support/engine/square-topology';
@@ -68,7 +69,7 @@ describe('Hexa Lines rules', () => {
     const outcome = engine.play(new PlacePiece(0, square(1, 2)));
 
     const state = engine.snapshot();
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(filledKeys(state)).toEqual(keys([square(1, 2), square(2, 2)]));
     expect(state.tray).toEqual([one]);
     expect(state.streak).toBe(0);
@@ -108,7 +109,7 @@ describe('Hexa Lines rules', () => {
       const outcome = engine.play(move);
 
       const state = engine.snapshot();
-      expect(outcome).toBe('playing');
+      expect(outcome).toBe(Outcome.playing);
       expect(engine.currentPhase()).toBe(PlayingPhase.instance);
       expect(filledKeys(state)).toEqual(keys([square(1, 1)]));
       expect(state.tray).toEqual([domino, one]);
@@ -138,7 +139,7 @@ describe('Hexa Lines rules', () => {
   });
 
   it('should_clear_the_full_line_on_each_of_the_three_axes_when_the_topology_is_triangular', () => {
-    const topology: GridTopology<TriangleCoord, string, string> = triangleTopology;
+    const topology: GridTopology<TriangleCoord> = triangleTopology;
     const axes = topology.axes();
     expect(axes).toHaveLength(3);
 
@@ -174,7 +175,7 @@ describe('Hexa Lines rules', () => {
     const outcome = engine.play(new PlacePiece(0, origin));
 
     const state = engine.snapshot();
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(state.linesCleared).toBe(2);
     expect(filledKeys(state)).toEqual(keys([square(2, 2)]));
   });
@@ -253,7 +254,7 @@ describe('Hexa Lines rules', () => {
 
     const outcome = engine.play(new PlacePiece(0, square(1, 1)));
 
-    expect(outcome).toBe('game-over');
+    expect(outcome).toBe(Outcome.gameOver);
     expect(engine.currentPhase()).toBe(GameOverPhase.instance);
     expect(publisher.events).toEqual([expect.any(GameOver)]);
   });
@@ -263,7 +264,7 @@ describe('Hexa Lines rules', () => {
 
     const outcome = engine.play(new PlacePiece(0, square(1, 1)));
 
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(publisher.events).toEqual([]);
   });
 
@@ -318,7 +319,7 @@ describe('Hexa Lines rules edge cases', () => {
   // A rejected move keeps the board, the tray and the phase, and publishes nothing.
   const rejected = {
     valid: false,
-    outcome: 'playing',
+    outcome: Outcome.playing,
     phase: 'playing',
     filled: keys([square(1, 1)]),
     tray: [domino, one],
@@ -354,7 +355,7 @@ describe('Hexa Lines rules edge cases', () => {
     const outcome = engine.play(new PlacePiece(-0, square(1, 2)));
 
     const state = engine.snapshot();
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(filledKeys(state)).toEqual(keys([square(1, 2), square(2, 2)]));
     expect(state.tray).toEqual([one]);
   });
@@ -372,7 +373,7 @@ describe('Hexa Lines rules edge cases', () => {
     const outcome = engine.play(new PlacePiece(0, square(1, 1)));
 
     const state = engine.snapshot();
-    expect(outcome).toBe('game-over');
+    expect(outcome).toBe(Outcome.gameOver);
     expect(engine.currentPhase()).toBe(GameOverPhase.instance);
     expect(state.tray).toEqual([]);
     expect(filledKeys(state)).toEqual(keys([square(1, 1)]));
@@ -447,11 +448,11 @@ describe('Hexa Lines rules edge cases', () => {
     engine.play(new PlacePiece(0, origin));
 
     const state = engine.snapshot();
-    expect(keys([...probe.snapshot().board.line('col', square(1, 0))])).toEqual(
-      keys([...probe.snapshot().board.line('col', origin)]),
+    expect(keys([...probe.snapshot().board.line(SquareAxis.col, square(1, 0))])).toEqual(
+      keys([...probe.snapshot().board.line(SquareAxis.col, origin)]),
     );
     expect(
-      probe.snapshot().board.line('col', square(1, 0))[Symbol.iterator]().next().value,
+      probe.snapshot().board.line(SquareAxis.col, square(1, 0))[Symbol.iterator]().next().value,
     ).toEqual(square(2, 0));
     expect(state.linesCleared).toBe(1);
     expect(state.streak).toBe(1);

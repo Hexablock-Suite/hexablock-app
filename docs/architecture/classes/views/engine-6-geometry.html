@@ -64,7 +64,7 @@
       <h1>Geometry and board: Abstract Factory and Builder</h1>
 
       <svg
-        viewBox="0 0 1040 1040"
+        viewBox="0 0 1040 1524"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="geometry-title geometry-desc"
@@ -77,8 +77,10 @@
           coordinate, the topology and the piece shapes of one geometry, with HexGeometry creating
           HexCoord and HexTopology and SquareGeometry creating SquareCoord, the three coordinate
           value objects HexCoord, SquareCoord and TriangleCoord with private values and their own
-          operations, and BoardBuilder, the builder that the class calls a DDD factory, holding a
-          GeometryFactory and creating the Board.
+          operations, the value object TopologyId that names a family, the axis and direction value
+          objects of the three topologies, each a closed set of instances that implements GridAxis
+          or GridDirection, and BoardBuilder, the builder that the class calls a DDD factory,
+          holding a GeometryFactory and creating the Board.
         </desc>
         <defs>
           <marker
@@ -138,7 +140,7 @@
           x="24"
           y="24"
           width="992"
-          height="816"
+          height="1284"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -269,7 +271,28 @@
           marker-end="url(#geo-open)"
           stroke="#5b6873"
         />
+        <!-- GeometryFactory names its family with a TopologyId as id: use with role and multiplicity -->
+        <path
+          d="M448 190 H544 Q552 190 552 198 V412 Q552 420 560 420 H640"
+          fill="none"
+          stroke-width="1"
+          marker-end="url(#geo-open)"
+          stroke="#5b6873"
+        />
         <!-- Arrow labels -->
+        <rect x="584" y="404" width="20" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="594"
+          y="413"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          id
+        </text>
+
         <rect x="180" y="228" width="148" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="254"
@@ -355,6 +378,19 @@
           «create»
         </text>
         <!-- Multiplicities -->
+        <rect x="622" y="426" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="628"
+          y="435"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          1
+        </text>
+
         <rect x="454" y="158" width="12" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="460"
@@ -405,7 +441,7 @@
           + createCoord(values: number[]): TCoord
         </text>
         <text x="88" y="180" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + createTopology(): GridTopology&lt;TCoord, string, string&gt;
+          + createTopology(): GridTopology&lt;TCoord&gt;
         </text>
         <text x="88" y="196" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createPieceShapes(): ShapeNode&lt;TCoord&gt;[]
@@ -762,7 +798,7 @@
           + withFigure(figure: ShapeNode&lt;TCoord&gt;): BoardBuilder&lt;TCoord&gt;
         </text>
         <text x="600" y="220" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + build&lt;TCell&gt;(): Board&lt;TCell, TCoord, string&gt;
+          + build&lt;TCell&gt;(): Board&lt;TCell, TCoord&gt;
         </text>
         <!-- Reference box: Board, detailed in part 1 · view 2 -->
         <rect
@@ -798,6 +834,602 @@
           text-anchor="middle"
         >
           Board
+        </text>
+        <!-- Class: TopologyId (value object): a closed set of three instances (decision 45) -->
+        <rect
+          x="640"
+          y="356"
+          width="280"
+          height="144"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="640" y1="404" x2="920" y2="404" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="780"
+          y="374"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="780"
+          y="392"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          TopologyId
+        </text>
+        <text x="656" y="420" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - name: string
+        </text>
+        <text
+          x="656"
+          y="436"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + hex, square, triangle: TopologyId
+        </text>
+        <line x1="640" y1="444" x2="920" y2="444" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="656"
+          y="460"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + of(name: string): TopologyId
+        </text>
+        <text x="656" y="476" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: TopologyId): boolean
+        </text>
+        <text x="656" y="492" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + toString(): string
+        </text>
+        <!-- Class: HexAxis (value object): a closed set of instances that steps along itself (decision 45) -->
+        <rect
+          x="72"
+          y="836"
+          width="248"
+          height="176"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="72" y1="884" x2="320" y2="884" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="196"
+          y="854"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="196"
+          y="872"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          HexAxis
+        </text>
+        <text x="88" y="900" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - name: string
+        </text>
+        <text x="88" y="916" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - step: HexCoord
+        </text>
+        <text
+          x="88"
+          y="932"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + q, r, s: HexAxis
+        </text>
+        <line x1="72" y1="940" x2="320" y2="940" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="88" y="956" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: GridAxis): boolean
+        </text>
+        <text x="88" y="972" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + forward(from: HexCoord): HexCoord
+        </text>
+        <text x="88" y="988" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + backward(from: HexCoord): HexCoord
+        </text>
+        <text x="88" y="1004" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + toString(): string
+        </text>
+        <!-- Class: SquareAxis (value object): a closed set of instances that steps along itself (decision 45) -->
+        <rect
+          x="344"
+          y="836"
+          width="264"
+          height="176"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="344" y1="884" x2="608" y2="884" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="476"
+          y="854"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="476"
+          y="872"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          SquareAxis
+        </text>
+        <text x="360" y="900" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - name: string
+        </text>
+        <text x="360" y="916" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - step: SquareCoord
+        </text>
+        <text
+          x="360"
+          y="932"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + col, row: SquareAxis
+        </text>
+        <line x1="344" y1="940" x2="608" y2="940" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="360" y="956" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: GridAxis): boolean
+        </text>
+        <text x="360" y="972" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + forward(from: SquareCoord): SquareCoord
+        </text>
+        <text x="360" y="988" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + backward(from: SquareCoord): SquareCoord
+        </text>
+        <text
+          x="360"
+          y="1004"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + toString(): string
+        </text>
+        <!-- Class: TriangleAxis (value object): a closed set of instances that steps along itself (decision 45) -->
+        <rect
+          x="632"
+          y="836"
+          width="320"
+          height="192"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="632" y1="884" x2="952" y2="884" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="792"
+          y="854"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="792"
+          y="872"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          TriangleAxis
+        </text>
+        <text x="648" y="900" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - name: string
+        </text>
+        <text x="648" y="916" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - ahead: OrientedStep
+        </text>
+        <text x="648" y="932" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - behind: OrientedStep
+        </text>
+        <text
+          x="648"
+          y="948"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + row, downRight, downLeft: TriangleAxis
+        </text>
+        <line x1="632" y1="956" x2="952" y2="956" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="648" y="972" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: GridAxis): boolean
+        </text>
+        <text x="648" y="988" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + forward(from: TriangleCoord): TriangleCoord
+        </text>
+        <text
+          x="648"
+          y="1004"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + backward(from: TriangleCoord): TriangleCoord
+        </text>
+        <text
+          x="648"
+          y="1020"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + toString(): string
+        </text>
+        <!-- Lollipop: HexAxis implements the engine interface GridAxis -->
+        <line x1="96" y1="1012" x2="96" y2="1028" stroke="#17212a" stroke-width="1" />
+        <circle cx="96" cy="1033" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text
+          x="107"
+          y="1036"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          GridAxis
+        </text>
+        <!-- Lollipop: SquareAxis implements the engine interface GridAxis -->
+        <line x1="368" y1="1012" x2="368" y2="1028" stroke="#17212a" stroke-width="1" />
+        <circle cx="368" cy="1033" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text
+          x="379"
+          y="1036"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          GridAxis
+        </text>
+        <!-- Lollipop: TriangleAxis implements the engine interface GridAxis -->
+        <line x1="656" y1="1028" x2="656" y2="1044" stroke="#17212a" stroke-width="1" />
+        <circle cx="656" cy="1049" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text
+          x="667"
+          y="1052"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          GridAxis
+        </text>
+        <!-- Class: HexDirection (value object): a closed set of instances that gives the neighbor of a cell (decision 45) -->
+        <rect
+          x="72"
+          y="1076"
+          width="248"
+          height="176"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="72" y1="1124" x2="320" y2="1124" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="196"
+          y="1094"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="196"
+          y="1112"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          HexDirection
+        </text>
+        <text x="88" y="1140" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - name: string
+        </text>
+        <text x="88" y="1156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - step: HexCoord
+        </text>
+        <text
+          x="88"
+          y="1172"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + east, west, southEast, northWest,
+        </text>
+        <text
+          x="99"
+          y="1188"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          southWest, northEast: HexDirection
+        </text>
+        <line x1="72" y1="1196" x2="320" y2="1196" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="88" y="1212" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: GridDirection): boolean
+        </text>
+        <text x="88" y="1228" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + neighborOf(c: HexCoord): HexCoord
+        </text>
+        <text x="88" y="1244" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + toString(): string
+        </text>
+        <!-- Class: SquareDirection (value object): a closed set of instances that gives the neighbor of a cell (decision 45) -->
+        <rect
+          x="344"
+          y="1076"
+          width="264"
+          height="160"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="344" y1="1124" x2="608" y2="1124" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="476"
+          y="1094"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="476"
+          y="1112"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          SquareDirection
+        </text>
+        <text
+          x="360"
+          y="1140"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          - name: string
+        </text>
+        <text
+          x="360"
+          y="1156"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          - step: SquareCoord
+        </text>
+        <text
+          x="360"
+          y="1172"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + north, east, south, west: SquareDirection
+        </text>
+        <line x1="344" y1="1180" x2="608" y2="1180" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="360"
+          y="1196"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + equals(other: GridDirection): boolean
+        </text>
+        <text
+          x="360"
+          y="1212"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + neighborOf(c: SquareCoord): SquareCoord
+        </text>
+        <text
+          x="360"
+          y="1228"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + toString(): string
+        </text>
+        <!-- Class: TriangleDirection (value object): a closed set of instances that gives the neighbor of a cell (decision 45) -->
+        <rect
+          x="632"
+          y="1076"
+          width="320"
+          height="160"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="632" y1="1124" x2="952" y2="1124" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="792"
+          y="1094"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="792"
+          y="1112"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          TriangleDirection
+        </text>
+        <text
+          x="648"
+          y="1140"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          - name: string
+        </text>
+        <text
+          x="648"
+          y="1156"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          - step: OrientedStep
+        </text>
+        <text
+          x="648"
+          y="1172"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + left, right, vertical: TriangleDirection
+        </text>
+        <line x1="632" y1="1180" x2="952" y2="1180" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="648"
+          y="1196"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + equals(other: GridDirection): boolean
+        </text>
+        <text
+          x="648"
+          y="1212"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + neighborOf(c: TriangleCoord): TriangleCoord
+        </text>
+        <text
+          x="648"
+          y="1228"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + toString(): string
+        </text>
+        <!-- Lollipop: HexDirection implements the engine interface GridDirection -->
+        <line x1="96" y1="1252" x2="96" y2="1268" stroke="#17212a" stroke-width="1" />
+        <circle cx="96" cy="1273" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text
+          x="107"
+          y="1276"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          GridDirection
+        </text>
+        <!-- Lollipop: SquareDirection implements the engine interface GridDirection -->
+        <line x1="368" y1="1236" x2="368" y2="1252" stroke="#17212a" stroke-width="1" />
+        <circle cx="368" cy="1257" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text
+          x="379"
+          y="1260"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          GridDirection
+        </text>
+        <!-- Lollipop: TriangleDirection implements the engine interface GridDirection -->
+        <line x1="656" y1="1236" x2="656" y2="1252" stroke="#17212a" stroke-width="1" />
+        <circle cx="656" cy="1257" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text
+          x="667"
+          y="1260"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          GridDirection
         </text>
         <!-- Lollipop: HexTopology implements the engine interface GridTopology -->
         <line x1="320" y1="480" x2="320" y2="496" stroke="#17212a" stroke-width="1" />
@@ -851,7 +1483,7 @@
         <!-- Footnote: classes the budget leaves out -->
         <text
           x="24"
-          y="864"
+          y="1332"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -862,7 +1494,7 @@
         </text>
         <text
           x="24"
-          y="880"
+          y="1348"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -872,7 +1504,7 @@
         </text>
         <text
           x="24"
-          y="896"
+          y="1364"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -882,19 +1514,36 @@
         </text>
         <text
           x="24"
-          y="912"
+          y="1380"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          HexTopology binds TAxis and TDirection of GridTopology to closed unions of names (issue
-          #86). createTopology() and build() take string for the unions they do not read.
+          HexTopology binds TAxis and TDirection of GridTopology to HexAxis and HexDirection
+          (decision 45). An axis steps along itself, and a direction gives the neighbor of a cell.
         </text>
-        <!-- Legend -->
-        <line x1="24" y1="932" x2="1016" y2="932" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="950"
+          y="1396"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Each closed set has one frozen instance per value, so equals() compares by identity. A
+          level file keeps the text of a TopologyId, and of() refuses an unknown text.
+        </text>
+        <!-- Legend -->
+        <line
+          x1="24"
+          y1="1416"
+          x2="1016"
+          y2="1416"
+          stroke="rgba(23,33,42,0.10)"
+          stroke-width="0.8"
+        />
+        <text
+          x="24"
+          y="1434"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -904,9 +1553,9 @@
         </text>
         <line
           x1="24"
-          y1="968"
+          y1="1452"
           x2="52"
-          y2="968"
+          y2="1452"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -914,7 +1563,7 @@
         />
         <text
           x="60"
-          y="972"
+          y="1456"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -923,16 +1572,16 @@
         </text>
         <line
           x1="144"
-          y1="968"
+          y1="1452"
           x2="172"
-          y2="968"
+          y2="1452"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#geo-diamond-hollow)"
         />
         <text
           x="180"
-          y="972"
+          y="1456"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -941,16 +1590,16 @@
         </text>
         <line
           x1="384"
-          y1="968"
+          y1="1452"
           x2="412"
-          y2="968"
+          y2="1452"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#geo-open)"
         />
         <text
           x="420"
-          y="972"
+          y="1456"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -959,7 +1608,7 @@
         </text>
         <rect
           x="24"
-          y="988"
+          y="1472"
           width="28"
           height="12"
           rx="2"
@@ -969,7 +1618,7 @@
         />
         <text
           x="60"
-          y="997"
+          y="1481"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -978,7 +1627,7 @@
         </text>
         <rect
           x="184"
-          y="988"
+          y="1472"
           width="28"
           height="12"
           rx="2"
@@ -989,7 +1638,7 @@
         />
         <text
           x="220"
-          y="997"
+          y="1481"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -998,7 +1647,7 @@
         </text>
         <rect
           x="440"
-          y="988"
+          y="1472"
           width="28"
           height="12"
           rx="2"
@@ -1009,7 +1658,7 @@
         />
         <text
           x="476"
-          y="997"
+          y="1481"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1018,7 +1667,7 @@
         </text>
         <rect
           x="648"
-          y="988"
+          y="1472"
           width="28"
           height="12"
           rx="2"
@@ -1029,7 +1678,7 @@
         />
         <text
           x="684"
-          y="997"
+          y="1481"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1038,7 +1687,7 @@
         </text>
         <rect
           x="24"
-          y="1012"
+          y="1496"
           width="28"
           height="12"
           rx="2"
@@ -1048,18 +1697,18 @@
         />
         <text
           x="60"
-          y="1021"
+          y="1505"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
         </text>
-        <line x1="184" y1="1018" x2="200" y2="1018" stroke="#17212a" stroke-width="1" />
-        <circle cx="205" cy="1018" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="184" y1="1502" x2="200" y2="1502" stroke="#17212a" stroke-width="1" />
+        <circle cx="205" cy="1502" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="220"
-          y="1021"
+          y="1505"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

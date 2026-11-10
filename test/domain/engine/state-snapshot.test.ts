@@ -1,10 +1,11 @@
 /** @jest-environment node */
+import { Outcome } from '../../../src/domain/engine/outcome';
 import { Moves } from '../../../src/domain/engine/moves';
 import { Score } from '../../../src/domain/engine/score';
 import type { Board } from '../../../src/domain/engine/board';
 import { BoardId } from '../../../src/domain/engine/board-id';
 import { GameStateId } from '../../../src/domain/engine/game-state-id';
-import { hex, type HexAxis, type HexCoord } from '../../../src/domain/engine/hex-topology';
+import { hex, HexAxis, type HexCoord } from '../../../src/domain/engine/hex-topology';
 import { Resolution } from '../../../src/domain/engine/resolution';
 import { Turns } from '../../../src/domain/engine/turns';
 import { FitScoring } from '../../../src/domain/variants/hexa-fit/fit-scoring';
@@ -13,7 +14,7 @@ import { LinesScoring } from '../../../src/domain/variants/hexa-lines/lines-scor
 import { PlacePiece } from '../../../src/domain/variants/hexa-lines/place-piece';
 import { MergeScoring } from '../../../src/domain/variants/hexa-merge/merge-scoring';
 import { MergeTile } from '../../../src/domain/variants/hexa-merge/merge-tile';
-import { Slide } from '../../../src/domain/variants/hexa-merge/slide';
+import { SlideSense, Slide } from '../../../src/domain/variants/hexa-merge/slide';
 import { ClearedStacks } from '../../../src/domain/variants/hexa-sort/cleared-stacks';
 import { SortScoring } from '../../../src/domain/variants/hexa-sort/sort-scoring';
 import { BOARD_ID, CountingBoardIds, CountingStateIds } from '../../support/engine/entity-ids';
@@ -87,7 +88,7 @@ describe('the photo of a state', () => {
       [hex(0, 0), 2],
       [hex(1, 0), 2],
     ]);
-    const slide = Slide.of<HexAxis>('q', 'forward');
+    const slide = Slide.of(HexAxis.q, SlideSense.forward);
     state.slide(slide, MergeTile.of(4));
 
     const photo = state.snapshot();
@@ -131,7 +132,7 @@ describe('the photo of a state', () => {
 
     const later = state.snapshot();
     const shown = json(later.board.cells());
-    (later.board as Board<typeof red, ReturnType<typeof square>, string>).occupy(square(2, 2), red);
+    (later.board as Board<typeof red, ReturnType<typeof square>>).occupy(square(2, 2), red);
     expect(json(state.snapshot().board.cells())).toBe(shown);
   });
 });
@@ -255,9 +256,9 @@ describe('the photo outside the state', () => {
     const rejected = Resolution.rejected();
 
     expect('state' in resolved).toBe(false);
-    expect([resolved.accepted, resolved.outcome]).toEqual([true, 'playing']);
-    expect([rejected.accepted, rejected.outcome]).toEqual([false, 'playing']);
-    expect(resolved.evaluated('victory').outcome).toBe('victory');
+    expect([resolved.accepted, resolved.outcome]).toEqual([true, Outcome.playing]);
+    expect([rejected.accepted, rejected.outcome]).toEqual([false, Outcome.playing]);
+    expect(resolved.evaluated(Outcome.victory).outcome).toBe(Outcome.victory);
   });
 
   it('should_score_from_the_photos_when_a_policy_gets_the_photos_before_and_after_a_turn', () => {
@@ -280,7 +281,7 @@ describe('the photo outside the state', () => {
       [hex(1, 0), 2],
     ]);
     const mergeBefore = merge.snapshot();
-    merge.slide(Slide.of<HexAxis>('q', 'forward'), MergeTile.of(2048));
+    merge.slide(Slide.of(HexAxis.q, SlideSense.forward), MergeTile.of(2048));
 
     const fit = fitFactory().createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
 

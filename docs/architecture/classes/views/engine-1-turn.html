@@ -64,7 +64,7 @@
       <h1>The turn: Template Method over Strategy</h1>
 
       <svg
-        viewBox="0 0 1040 1036"
+        viewBox="0 0 1040 1116"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="engine-turn-title engine-turn-desc"
@@ -145,7 +145,7 @@
           x="24"
           y="24"
           width="992"
-          height="800"
+          height="880"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -382,7 +382,7 @@
         />
         <!-- Resolution keeps its Outcome as outcome: use with role and multiplicity -->
         <path
-          d="M368,560 H720 V612 H760"
+          d="M368,560 H720 V612 H752"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -1022,7 +1022,7 @@
           + matchId: MatchId
         </text>
         <text x="68" y="770" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + board: ReadonlyBoard&lt;TCell, TCoord, string&gt;
+          + board: ReadonlyBoard&lt;TCell, TCoord&gt;
         </text>
         <text x="68" y="786" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + score: Score
@@ -1066,7 +1066,7 @@
         <!-- Class: Score (value object, decision 41) -->
         <rect
           x="752"
-          y="660"
+          y="740"
           width="236"
           height="160"
           rx="6"
@@ -1074,10 +1074,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="752" y1="708" x2="988" y2="708" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="752" y1="788" x2="988" y2="788" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="870"
-          y="678"
+          y="758"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1088,7 +1088,7 @@
         </text>
         <text
           x="870"
-          y="696"
+          y="776"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1097,13 +1097,13 @@
         >
           Score
         </text>
-        <text x="768" y="724" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="768" y="804" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + value: number {readOnly}
         </text>
-        <line x1="752" y1="732" x2="988" y2="732" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="752" y1="812" x2="988" y2="812" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="768"
-          y="748"
+          y="828"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1111,40 +1111,40 @@
         >
           + of(value: number): Score
         </text>
-        <text x="768" y="764" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="768" y="844" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + add(points: Score): Score
         </text>
-        <text x="768" y="780" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="768" y="860" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + times(factor: number): Score
         </text>
-        <text x="768" y="796" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="768" y="876" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: Score): boolean
         </text>
-        <text x="768" y="812" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="768" y="892" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + isHigherThan(other: Score): boolean
         </text>
         <!-- BoardState adds the points of a turn as a Score, and BoardSnapshot, IScoringPolicy and GameOver carry one: use -->
         <line
           x1="644"
-          y1="700"
+          y1="780"
           x2="752"
-          y2="700"
+          y2="780"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#t-open)"
         />
-        <!-- Class: Outcome (literal union) -->
+        <!-- Class: Outcome (value object: a closed set of three instances, decision 45) -->
         <rect
-          x="760"
+          x="752"
           y="572"
-          width="220"
-          height="80"
+          width="236"
+          height="160"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="760" y1="620" x2="980" y2="620" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="752" y1="620" x2="988" y2="620" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="870"
           y="590"
@@ -1154,7 +1154,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «literal union»
+          «value object»
         </text>
         <text
           x="870"
@@ -1167,15 +1167,38 @@
         >
           Outcome
         </text>
+        <text x="768" y="636" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - name: string
+        </text>
         <text
-          x="870"
-          y="640"
+          x="768"
+          y="652"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
+          text-decoration="underline"
         >
-          'playing' | 'victory' | 'game-over'
+          + playing, victory, gameOver: Outcome
+        </text>
+        <line x1="752" y1="660" x2="988" y2="660" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="768"
+          y="676"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + of(name: string): Outcome
+        </text>
+        <text x="768" y="692" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: Outcome): boolean
+        </text>
+        <text x="768" y="708" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + endsTheGame(): boolean
+        </text>
+        <text x="768" y="724" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + toString(): string
         </text>
 
         <!-- UML template boxes: type parameters on the top-right corner -->
@@ -1305,8 +1328,8 @@
           TCell, TCoord
         </text>
 
-        <!-- The footnote and the legend sit below the zone, which grew by 32. -->
-        <g transform="translate(0 88)">
+        <!-- The footnote and the legend sit below the zone, which grew by 32 and then by 80 for the Outcome box (#207). -->
+        <g transform="translate(0 168)">
           <!-- Footnote -->
           <text
             x="24"

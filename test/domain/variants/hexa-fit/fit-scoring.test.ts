@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Outcome } from '../../../../src/domain/engine/outcome';
 import { ElapsedTime } from '../../../../src/domain/engine/elapsed-time';
 import { Moves } from '../../../../src/domain/engine/moves';
 import { Score } from '../../../../src/domain/engine/score';
@@ -46,7 +47,7 @@ function dominoLevel(): FitState<SquareCoord> {
   return FitState.start(
     STATE_ID,
     MATCH_ID,
-    new Board<PieceId, SquareCoord, string>(
+    new Board<PieceId, SquareCoord>(
       BOARD_ID,
       squareTopology.region(RegionSize.of(2)),
       squareTopology,
@@ -85,7 +86,7 @@ describe('FitScoring', () => {
     engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)));
     const outcome = engine.play(new PlaceFitPiece(B, NO_TURN, square(0, 1)));
 
-    expect(outcome).toBe('victory');
+    expect(outcome).toBe(Outcome.victory);
     expect(FIT_POINTS_PER_TURN).toBe(0);
     expect(engine.snapshot().score).toEqual(Score.of(0));
   });

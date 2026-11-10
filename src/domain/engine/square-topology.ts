@@ -1,6 +1,6 @@
 import { BoardShape } from './board-shape';
 import { coordKey, type CoordKey } from './coord-key';
-import type { GridTopology } from './grid-topology';
+import type { GridAxis, GridDirection, GridTopology } from './grid-topology';
 import type { Radius } from './radius';
 import type { RegionSize } from './region-size';
 import { Turns } from './turns';
@@ -54,29 +54,99 @@ export class SquareCoord {
   }
 }
 
-// Two axes and four directions. A square has no diagonal neighbor.
-export type SquareAxis = 'col' | 'row';
-export type SquareDirection = 'north' | 'east' | 'south' | 'west';
-
 // Creates a coordinate. It is the short name of `SquareCoord.of()`, which checks the values.
 export function square(col: number, row: number): SquareCoord {
   return SquareCoord.of(col, row);
 }
 
-// One step forward along each axis. A `Map` has no inherited keys,
-// so a cast name such as `constructor` finds no step.
-const axisSteps: ReadonlyMap<string, SquareCoord> = new Map([
-  ['col', square(1, 0)],
-  ['row', square(0, 1)],
-]);
+// An axis of the square grid. Two axes exist.
+// It is a value object with a closed set of instances (classes.md decision 45, issue #207).
+// Each axis has one shared instance, which is frozen, so `equals()` compares by identity.
+// An axis holds its step forward. It steps along itself from a cell
+// with `forward()` and `backward()`.
+export class SquareAxis implements GridAxis {
+  static readonly col = new SquareAxis('col', square(1, 0));
+  static readonly row = new SquareAxis('row', square(0, 1));
 
-// One step per direction, in the order of `neighbors()`.
-const directionSteps: ReadonlyMap<string, SquareCoord> = new Map([
-  ['north', square(0, -1)],
-  ['east', square(1, 0)],
-  ['south', square(0, 1)],
-  ['west', square(-1, 0)],
-]);
+  // The closed set, in the order of `SquareTopology.axes()`.
+  static readonly all: readonly SquareAxis[] = Object.freeze([SquareAxis.col, SquareAxis.row]);
+
+  private constructor(
+    private readonly name: string,
+    private readonly step: SquareCoord,
+  ) {
+    // `private` holds only at compile time. The set exists after the last instance,
+    // so the constructor refuses every later call.
+    if (SquareAxis.all !== undefined) throw new RangeError('The set of square axes is closed.');
+    Object.freeze(this);
+  }
+
+  // Two axes are equal when they are the same instance.
+  equals(other: GridAxis): boolean {
+    return this === other;
+  }
+
+  // The next cell along this axis.
+  forward(from: SquareCoord): SquareCoord {
+    return from.plus(this.step);
+  }
+
+  // The previous cell along this axis.
+  backward(from: SquareCoord): SquareCoord {
+    return from.plus(this.step.opposite());
+  }
+
+  // The name of the axis.
+  toString(): string {
+    return this.name;
+  }
+}
+
+// A direction of the square grid: the way from a cell to one of its four neighbors.
+// A square has no diagonal neighbor.
+// It is a value object with a closed set of instances, as `SquareAxis` is.
+// A direction holds its step, and `neighborOf()` gives the neighbor of a cell.
+export class SquareDirection implements GridDirection {
+  static readonly north = new SquareDirection('north', square(0, -1));
+  static readonly east = new SquareDirection('east', square(1, 0));
+  static readonly south = new SquareDirection('south', square(0, 1));
+  static readonly west = new SquareDirection('west', square(-1, 0));
+
+  // The closed set, in the order of `SquareTopology.directions()` and of `neighbors()`.
+  static readonly all: readonly SquareDirection[] = Object.freeze([
+    SquareDirection.north,
+    SquareDirection.east,
+    SquareDirection.south,
+    SquareDirection.west,
+  ]);
+
+  private constructor(
+    private readonly name: string,
+    private readonly step: SquareCoord,
+  ) {
+    // `private` holds only at compile time. The set exists after the last instance,
+    // so the constructor refuses every later call.
+    if (SquareDirection.all !== undefined) {
+      throw new RangeError('The set of square directions is closed.');
+    }
+    Object.freeze(this);
+  }
+
+  // Two directions are equal when they are the same instance.
+  equals(other: GridDirection): boolean {
+    return this === other;
+  }
+
+  // The neighbor of `c` in this direction.
+  neighborOf(c: SquareCoord): SquareCoord {
+    return c.plus(this.step);
+  }
+
+  // The name of the direction.
+  toString(): string {
+    return this.name;
+  }
+}
 
 // Strategy (statement §3.3, D4): the real square topology. `SquareGeometry` creates it.
 export class SquareTopology implements GridTopology<SquareCoord, SquareAxis, SquareDirection> {
@@ -89,22 +159,24 @@ export class SquareTopology implements GridTopology<SquareCoord, SquareAxis, Squ
   }
 
   neighbors(c: SquareCoord): SquareCoord[] {
-    return [...directionSteps.values()].map((step) => c.plus(step));
+    return SquareDirection.all.map((direction) => direction.neighborOf(c));
   }
 
   neighbor(c: SquareCoord, direction: SquareDirection): SquareCoord {
-    // The check still runs when a caller casts a free string to a direction.
-    const step = directionSteps.get(direction);
-    if (step === undefined) throw new RangeError(`The square grid has no direction ${direction}.`);
-    return c.plus(step);
+    // The check still runs when a caller casts another value to a direction.
+    if (!(direction instanceof SquareDirection)) {
+      throw new RangeError(`The square grid has no direction ${String(direction)}.`);
+    }
+    return direction.neighborOf(c);
   }
 
+  // Each call gives a new list, so a change by one caller stays with that caller.
   directions(): SquareDirection[] {
-    return ['north', 'east', 'south', 'west'];
+    return [...SquareDirection.all];
   }
 
   axes(): SquareAxis[] {
-    return ['col', 'row'];
+    return [...SquareAxis.all];
   }
 
   // One rotation step is a quarter turn.
@@ -121,13 +193,13 @@ export class SquareTopology implements GridTopology<SquareCoord, SquareAxis, Squ
     through: SquareCoord,
     contains: (c: SquareCoord) => boolean,
   ): Iterable<SquareCoord> {
-    // The check still runs when a caller casts a free string to an axis.
-    const step = axisSteps.get(axis);
-    if (step === undefined) throw new RangeError(`The square grid has no axis ${axis}.`);
-    const back = step.opposite();
+    // The check still runs when a caller casts another value to an axis.
+    if (!(axis instanceof SquareAxis)) {
+      throw new RangeError(`The square grid has no axis ${String(axis)}.`);
+    }
     let start = through;
-    while (contains(start.plus(back))) start = start.plus(back);
-    for (let c = start; contains(c); c = c.plus(step)) yield c;
+    while (contains(axis.backward(start))) start = axis.backward(start);
+    for (let c = start; contains(c); c = axis.forward(c)) yield c;
   }
 
   // The cells at Manhattan distance `radius`, the distance of the four neighbors.

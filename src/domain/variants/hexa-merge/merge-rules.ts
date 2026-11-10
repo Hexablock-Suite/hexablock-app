@@ -1,4 +1,5 @@
-import type { Outcome } from '../../engine/outcome';
+import type { GridAxis } from '../../engine/grid-topology';
+import { Outcome } from '../../engine/outcome';
 import { Resolution } from '../../engine/resolution';
 import { BaseGameRules } from '../../engine/rules';
 import type { IMergeable } from './mergeable';
@@ -21,7 +22,7 @@ import { SLIDE_SENSES, Slide } from './slide';
 export class MergeRules<
   TCell extends IMergeable<TCell>,
   TCoord,
-  TAxis extends string,
+  TAxis extends GridAxis,
 > extends BaseGameRules<Slide<TAxis>, MergeState<TCell, TCoord, TAxis>> {
   // The rules compare a tile with the target by `canMergeWith()`: two tiles merge
   // exactly when they are equal (§1.4).
@@ -62,6 +63,6 @@ export class MergeRules<
   }
 
   evaluate(state: MergeState<TCell, TCoord, TAxis>): Outcome {
-    return this.noValidMove(state) ? 'game-over' : 'playing';
+    return this.noValidMove(state) ? Outcome.gameOver : Outcome.playing;
   }
 }

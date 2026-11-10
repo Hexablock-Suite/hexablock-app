@@ -1,9 +1,10 @@
 /** @jest-environment node */
+import { Outcome } from '../../../../src/domain/engine/outcome';
 import { Score } from '../../../../src/domain/engine/score';
 import { GameOver } from '../../../../src/domain/engine/game-events';
 import { GameId } from '../../../../src/domain/engine/game-id';
 import { PlayingPhase } from '../../../../src/domain/engine/game-phase';
-import { hex, type HexAxis } from '../../../../src/domain/engine/hex-topology';
+import { hex, HexAxis } from '../../../../src/domain/engine/hex-topology';
 import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
 import type { RandomSource } from '../../../../src/domain/engine/random-source';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
@@ -12,7 +13,7 @@ import {
   mergeTileSource,
 } from '../../../../src/domain/variants/hexa-merge/merge-tile-source';
 import type { NewTile } from '../../../../src/domain/variants/hexa-merge/new-tile';
-import { Slide } from '../../../../src/domain/variants/hexa-merge/slide';
+import { SlideSense, Slide } from '../../../../src/domain/variants/hexa-merge/slide';
 import { lintFixture } from '../../../support/run-tool';
 import {
   mergeGame,
@@ -190,9 +191,9 @@ describe('Merge new tiles', () => {
       ),
     );
 
-    const outcome = engine.play(Slide.of('q', 'forward'));
+    const outcome = engine.play(Slide.of(HexAxis.q, SlideSense.forward));
 
-    expect(outcome).toBe('game-over');
+    expect(outcome).toBe(Outcome.gameOver);
     expect(values(engine.snapshot())).toEqual({
       '0,0': 2,
       '1,0': 4,
@@ -205,7 +206,7 @@ describe('Merge new tiles', () => {
     expect([...rules.validMoves(mergeStateOf(engine.snapshot()))]).toEqual([]);
     expect(engine.currentPhase().canPlay()).toBe(false);
     expect(publisher.events).toEqual([
-      new GameOver(GameId.of('hexa-merge'), MATCH_ID, 'game-over', Score.of(0)),
+      new GameOver(GameId.of('hexa-merge'), MATCH_ID, Outcome.gameOver, Score.of(0)),
     ]);
   });
 
@@ -257,7 +258,7 @@ describe('Merge new tiles edge cases', () => {
         return { place, tile: MergeTile.of(2) };
       });
     }
-    const slide = Slide.of<HexAxis>('q', 'forward');
+    const slide = Slide.of(HexAxis.q, SlideSense.forward);
     const reference = mergeGame(mergeState([[hex(0, 0), 2]], 3, source(false)));
     reference.engine.play(slide);
     const { engine, publisher } = mergeGame(mergeState([[hex(0, 0), 2]], 3, source(true)));
@@ -266,7 +267,7 @@ describe('Merge new tiles edge cases', () => {
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(values(engine.snapshot())).toEqual({ '0,0': 2 });
 
-    expect(engine.play(slide)).toBe('playing');
+    expect(engine.play(slide)).toBe(Outcome.playing);
     expect(Object.keys(values(engine.snapshot()))).toHaveLength(2);
     expect(values(engine.snapshot())).toEqual(values(reference.engine.snapshot()));
     expect(publisher.events).toEqual([]);

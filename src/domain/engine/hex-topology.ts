@@ -1,6 +1,6 @@
 import { BoardShape } from './board-shape';
 import { coordKey, type CoordKey } from './coord-key';
-import type { GridTopology } from './grid-topology';
+import type { GridAxis, GridDirection, GridTopology } from './grid-topology';
 import type { Radius } from './radius';
 import type { RegionSize } from './region-size';
 import { Turns } from './turns';
@@ -61,39 +61,114 @@ export class HexCoord {
   }
 }
 
-// Three axes. Each axis gives two slide directions, so the board has six.
-export type HexAxis = 'q' | 'r' | 's';
-export type HexDirection =
-  | 'east'
-  | 'west'
-  | 'south-east'
-  | 'north-west'
-  | 'south-west'
-  | 'north-east';
-
 // Creates a coordinate. It is the short name of `HexCoord.of()`, which checks the values.
 export function hex(q: number, r: number): HexCoord {
   return HexCoord.of(q, r);
 }
 
-// One step forward along each axis. The axis `q` keeps `r`, the axis `r` keeps `q`,
-// and the axis `s` keeps `s`. A `Map` has no inherited keys,
-// so a cast name such as `constructor` finds no step.
-const axisSteps: ReadonlyMap<string, HexCoord> = new Map([
-  ['q', hex(1, 0)],
-  ['r', hex(0, 1)],
-  ['s', hex(1, -1)],
-]);
+// An axis of the hex grid. Three axes exist. Each axis gives two slide directions,
+// so the board has six.
+// It is a value object with a closed set of instances (classes.md decision 45, issue #207).
+// Each axis has one shared instance, which is frozen, so `equals()` compares by identity.
+// An axis holds its step forward: the axis `q` keeps `r`, the axis `r` keeps `q`,
+// and the axis `s` keeps `s`. It steps along itself from a cell with `forward()` and `backward()`.
+export class HexAxis implements GridAxis {
+  static readonly q = new HexAxis('q', hex(1, 0));
+  static readonly r = new HexAxis('r', hex(0, 1));
+  static readonly s = new HexAxis('s', hex(1, -1));
 
-// One step per direction, in the order of `neighbors()`.
-const directionSteps: ReadonlyMap<string, HexCoord> = new Map([
-  ['east', hex(1, 0)],
-  ['north-east', hex(1, -1)],
-  ['north-west', hex(0, -1)],
-  ['west', hex(-1, 0)],
-  ['south-west', hex(-1, 1)],
-  ['south-east', hex(0, 1)],
-]);
+  // The closed set, in the order of `HexTopology.axes()`.
+  static readonly all: readonly HexAxis[] = Object.freeze([HexAxis.q, HexAxis.r, HexAxis.s]);
+
+  private constructor(
+    private readonly name: string,
+    private readonly step: HexCoord,
+  ) {
+    // `private` holds only at compile time. The set exists after the last instance,
+    // so the constructor refuses every later call.
+    if (HexAxis.all !== undefined) throw new RangeError('The set of hex axes is closed.');
+    Object.freeze(this);
+  }
+
+  // Two axes are equal when they are the same instance.
+  equals(other: GridAxis): boolean {
+    return this === other;
+  }
+
+  // The next cell along this axis.
+  forward(from: HexCoord): HexCoord {
+    return from.plus(this.step);
+  }
+
+  // The previous cell along this axis.
+  backward(from: HexCoord): HexCoord {
+    return from.plus(this.step.opposite());
+  }
+
+  // The name of the axis.
+  toString(): string {
+    return this.name;
+  }
+}
+
+// A direction of the hex grid: the way from a cell to one of its six neighbors.
+// It is a value object with a closed set of instances, as `HexAxis` is.
+// A direction holds its step, and `neighborOf()` gives the neighbor of a cell.
+export class HexDirection implements GridDirection {
+  static readonly east = new HexDirection('east', hex(1, 0));
+  static readonly west = new HexDirection('west', hex(-1, 0));
+  static readonly southEast = new HexDirection('south-east', hex(0, 1));
+  static readonly northWest = new HexDirection('north-west', hex(0, -1));
+  static readonly southWest = new HexDirection('south-west', hex(-1, 1));
+  static readonly northEast = new HexDirection('north-east', hex(1, -1));
+
+  // The closed set, in the order of `HexTopology.directions()`.
+  static readonly all: readonly HexDirection[] = Object.freeze([
+    HexDirection.east,
+    HexDirection.west,
+    HexDirection.southEast,
+    HexDirection.northWest,
+    HexDirection.southWest,
+    HexDirection.northEast,
+  ]);
+
+  private constructor(
+    private readonly name: string,
+    private readonly step: HexCoord,
+  ) {
+    // `private` holds only at compile time. The set exists after the last instance,
+    // so the constructor refuses every later call.
+    if (HexDirection.all !== undefined) {
+      throw new RangeError('The set of hex directions is closed.');
+    }
+    Object.freeze(this);
+  }
+
+  // Two directions are equal when they are the same instance.
+  equals(other: GridDirection): boolean {
+    return this === other;
+  }
+
+  // The neighbor of `c` in this direction.
+  neighborOf(c: HexCoord): HexCoord {
+    return c.plus(this.step);
+  }
+
+  // The name of the direction.
+  toString(): string {
+    return this.name;
+  }
+}
+
+// The directions in the order of `neighbors()`: around the cell, from the east.
+const around: readonly HexDirection[] = [
+  HexDirection.east,
+  HexDirection.northEast,
+  HexDirection.northWest,
+  HexDirection.west,
+  HexDirection.southWest,
+  HexDirection.southEast,
+];
 
 // Strategy (statement §3.3, D4): the real hexagonal topology. `HexGeometry` creates it.
 export class HexTopology implements GridTopology<HexCoord, HexAxis, HexDirection> {
@@ -106,22 +181,24 @@ export class HexTopology implements GridTopology<HexCoord, HexAxis, HexDirection
   }
 
   neighbors(c: HexCoord): HexCoord[] {
-    return [...directionSteps.values()].map((step) => c.plus(step));
+    return around.map((direction) => direction.neighborOf(c));
   }
 
   neighbor(c: HexCoord, direction: HexDirection): HexCoord {
-    // The check still runs when a caller casts a free string to a direction.
-    const step = directionSteps.get(direction);
-    if (step === undefined) throw new RangeError(`The hex grid has no direction ${direction}.`);
-    return c.plus(step);
+    // The check still runs when a caller casts another value to a direction.
+    if (!(direction instanceof HexDirection)) {
+      throw new RangeError(`The hex grid has no direction ${String(direction)}.`);
+    }
+    return direction.neighborOf(c);
   }
 
+  // Each call gives a new list, so a change by one caller stays with that caller.
   directions(): HexDirection[] {
-    return ['east', 'west', 'south-east', 'north-west', 'south-west', 'north-east'];
+    return [...HexDirection.all];
   }
 
   axes(): HexAxis[] {
-    return ['q', 'r', 's'];
+    return [...HexAxis.all];
   }
 
   // One rotation step is a sixth of a turn.
@@ -134,13 +211,12 @@ export class HexTopology implements GridTopology<HexCoord, HexAxis, HexDirection
   }
 
   *line(axis: HexAxis, through: HexCoord, contains: (c: HexCoord) => boolean): Iterable<HexCoord> {
-    // The check still runs when a caller casts a free string to an axis.
-    const step = axisSteps.get(axis);
-    if (step === undefined) throw new RangeError(`The hex grid has no axis ${axis}.`);
-    const back = step.opposite();
+    // The check still runs when a caller casts another value to an axis.
+    if (!(axis instanceof HexAxis))
+      throw new RangeError(`The hex grid has no axis ${String(axis)}.`);
     let start = through;
-    while (contains(start.plus(back))) start = start.plus(back);
-    for (let c = start; contains(c); c = c.plus(step)) yield c;
+    while (contains(axis.backward(start))) start = axis.backward(start);
+    for (let c = start; contains(c); c = axis.forward(c)) yield c;
   }
 
   *ring(center: HexCoord, radius: Radius): Iterable<HexCoord> {

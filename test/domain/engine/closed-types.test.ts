@@ -15,23 +15,24 @@ import { emptyState } from '../../support/engine/fake-game';
 import {
   square,
   squareTopology,
-  type SquareAxis,
+  SquareAxis,
   type SquareCoord,
-  type SquareDirection,
+  SquareDirection,
 } from '../../support/engine/square-topology';
 import {
   triangle,
   triangleTopology,
-  type TriangleAxis,
-  type TriangleDirection,
+  TriangleAxis,
+  TriangleDirection,
 } from '../../support/engine/triangle-topology';
 import { BOARD_ID } from '../../support/engine/entity-ids';
 
 // Issue 86: the engine signatures take closed types, not free primitives.
+// Issue #207: an axis and a direction are instances of a closed class, so a text does not compile.
 // A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails
 // when the line compiles, because then the directive is unused.
 
-describe('closed axis unions', () => {
+describe('closed axis classes', () => {
   it('should_reject_at_compile_time_when_a_board_line_names_an_axis_the_topology_lacks', () => {
     const board = new Board(BOARD_ID, squareTopology.region(RegionSize.of(2)), squareTopology);
 
@@ -40,8 +41,13 @@ describe('closed axis unions', () => {
   });
 
   it('should_reject_at_compile_time_when_a_topology_line_names_an_axis_of_another_topology', () => {
-    // @ts-expect-error `col` is an axis of the square topology, not of the triangle topology.
+    // @ts-expect-error `col` is a text, not an axis of the triangle topology.
     expect(() => [...triangleTopology.line('col', triangle(0, 0), () => true)]).toThrow(RangeError);
+    const squareAxisOnTriangles = () => [
+      // @ts-expect-error `SquareAxis.col` is an axis of the square topology.
+      ...triangleTopology.line(SquareAxis.col, triangle(0, 0), () => true),
+    ];
+    expect(squareAxisOnTriangles).toThrow(new RangeError('The triangle grid has no axis col.'));
   });
 
   it('should_reject_at_compile_time_when_a_board_line_has_a_misspelled_axis', () => {
@@ -52,24 +58,33 @@ describe('closed axis unions', () => {
   });
 });
 
-describe('test double unions', () => {
+describe('test double axes and directions', () => {
   it('should_declare_their_own_axes_and_directions_when_the_doubles_are_read', () => {
     const squareAxes: SquareAxis[] = squareTopology.axes();
     const squareDirections: SquareDirection[] = squareTopology.directions();
     const triangleAxes: TriangleAxis[] = triangleTopology.axes();
     const triangleDirections: TriangleDirection[] = triangleTopology.directions();
 
-    expect(squareAxes).toEqual(['col', 'row']);
-    expect(squareDirections).toEqual(['north', 'east', 'south', 'west']);
-    expect(triangleAxes).toEqual(['row', 'down-right', 'down-left']);
-    expect(triangleDirections).toEqual(['left', 'right', 'vertical']);
+    expect(squareAxes).toEqual([SquareAxis.col, SquareAxis.row]);
+    expect(squareDirections).toEqual([
+      SquareDirection.north,
+      SquareDirection.east,
+      SquareDirection.south,
+      SquareDirection.west,
+    ]);
+    expect(triangleAxes).toEqual([TriangleAxis.row, TriangleAxis.downRight, TriangleAxis.downLeft]);
+    expect(triangleDirections).toEqual([
+      TriangleDirection.left,
+      TriangleDirection.right,
+      TriangleDirection.vertical,
+    ]);
   });
 
-  it('should_hold_a_board_with_an_axis_union_when_a_board_state_is_typed', () => {
+  it('should_hold_a_board_with_an_axis_class_when_a_board_state_is_typed', () => {
     const board: Board<FakeCell, SquareCoord, SquareAxis> = emptyState(2).board;
     const state: BoardState<FakeCell, SquareCoord> = emptyState(2);
 
-    expect([...board.line('col', square(0, 1))]).toEqual([square(0, 1), square(1, 1)]);
+    expect([...board.line(SquareAxis.col, square(0, 1))]).toEqual([square(0, 1), square(1, 1)]);
     expect(state.snapshot().board.shape.cells).toHaveLength(4);
   });
 });

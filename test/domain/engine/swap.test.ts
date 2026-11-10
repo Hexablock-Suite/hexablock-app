@@ -12,7 +12,7 @@ import {
 } from '../../../src/domain/engine/game-events';
 import { GameId } from '../../../src/domain/engine/game-id';
 import { GameOverPhase } from '../../../src/domain/engine/game-phase';
-import type { Outcome } from '../../../src/domain/engine/outcome';
+import { Outcome } from '../../../src/domain/engine/outcome';
 import type { IPieceSource } from '../../../src/domain/engine/piece-source';
 import {
   GameResult,
@@ -155,7 +155,7 @@ function playGame(
   const subscriber = new ProgressSubscriber(progress, () => moves);
   const engine = new GameEngine(MATCH_ID, GameId.of('fake-game'), rules, scoring, subscriber);
   engine.start(sourceState(source));
-  let outcome: Outcome = 'playing';
+  let outcome: Outcome = Outcome.playing;
   for (const at of sourceState(source).board.shape.cells) {
     // The count includes this move, because `play()` publishes `GameOver` before it returns.
     moves += 1;
@@ -225,7 +225,7 @@ describe('swapping the piece source, the scoring policy and the progress model',
         progress === 'score' ? new ScoreProgress() : new MovesProgress(),
       );
 
-      expect(game.outcome).toBe('game-over');
+      expect(game.outcome).toBe(Outcome.gameOver);
       expect(game.records).toHaveLength(1);
     });
   }

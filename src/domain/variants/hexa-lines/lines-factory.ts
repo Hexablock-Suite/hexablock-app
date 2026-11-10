@@ -62,7 +62,7 @@ export class LinesFactory<TCoord> implements IVariantFactory<
     );
   }
 
-  createBoard(boardId: BoardId): Board<Color, TCoord, string> {
+  createBoard(boardId: BoardId): Board<Color, TCoord> {
     return new BoardBuilder(this.geometry).withRegion(this.settings.size).build<Color>(boardId);
   }
 

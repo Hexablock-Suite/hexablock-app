@@ -7,7 +7,7 @@ import { GameOver } from '../../../src/domain/engine/game-events';
 import { GameId } from '../../../src/domain/engine/game-id';
 import { MatchId } from '../../../src/domain/engine/match-id';
 import { GameOverPhase, PlayingPhase, VictoryPhase } from '../../../src/domain/engine/game-phase';
-import type { Outcome } from '../../../src/domain/engine/outcome';
+import { Outcome } from '../../../src/domain/engine/outcome';
 import { FixedListPieceSource } from '../../../src/domain/engine/piece-source';
 import { Resolution } from '../../../src/domain/engine/resolution';
 import { fakeCell, type FakeCell } from '../../support/engine/fake-cell';
@@ -133,7 +133,7 @@ describe('GameEngine.play()', () => {
 
     const outcome = engine.play(place(1, 0, 7));
 
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(engine.snapshot().board.get(square(1, 0))).toEqual(fakeCell(7));
     expect(engine.snapshot().score).toEqual(Score.of(1));
   });
@@ -145,7 +145,7 @@ describe('GameEngine.play()', () => {
 
     const outcome = engine.play(place(0, 0, 9));
 
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(engine.snapshot().board.get(square(0, 0))).toEqual(fakeCell(1));
     expect(engine.snapshot().score).toEqual(Score.of(1));
     expect(engine.currentPhase().canPlay()).toBe(true);
@@ -164,7 +164,7 @@ describe('GameEngine.play()', () => {
 
     const outcome = engine.play(place(0, 0));
 
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(engine.snapshot().board.get(square(0, 0))).toBeUndefined();
     expect(engine.snapshot().score).toEqual(Score.of(0));
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
@@ -178,13 +178,13 @@ describe('GameEngine.play()', () => {
     [place(0, 0), place(1, 0), place(0, 1)].forEach((move) => engine.play(move));
     const outcome = engine.play(place(1, 1));
 
-    expect(outcome).toBe('game-over');
+    expect(outcome).toBe(Outcome.gameOver);
     expect(engine.currentPhase()).toBe(GameOverPhase.instance);
     expect(publisher.events).toHaveLength(1);
     const event = publisher.events[0] as GameOver;
     expect(event).toBeInstanceOf(GameOver);
     expect(event.gameId.equals(GameId.of('fake-game'))).toBe(true);
-    expect(event.outcome).toBe('game-over');
+    expect(event.outcome).toBe(Outcome.gameOver);
     expect(event.finalScore).toEqual(Score.of(4));
   });
 
@@ -221,7 +221,7 @@ describe('GameEngine.play()', () => {
     engine.pause();
     engine.resume();
 
-    expect(engine.play(place(0, 0))).toBe('playing');
+    expect(engine.play(place(0, 0))).toBe(Outcome.playing);
   });
 
   it('should_throw_when_a_move_comes_after_game_over', () => {
@@ -270,7 +270,7 @@ describe('GameEngine.play()', () => {
     expect(engine.currentPhase().canPlay()).toBe(true);
     expect(engine.snapshot().board.get(square(0, 0))).toBeUndefined();
     expect(engine.snapshot().score).toEqual(Score.of(0));
-    expect(engine.play(place(0, 0))).toBe('playing');
+    expect(engine.play(place(0, 0))).toBe(Outcome.playing);
     expect(engine.snapshot().board.get(square(0, 0))).toEqual(fakeCell(1));
   });
 
@@ -289,7 +289,7 @@ describe('GameEngine.play()', () => {
     expect(engine.currentPhase().canPlay()).toBe(true);
     expect(engine.snapshot().board.get(square(0, 0))).toBeUndefined();
     expect(engine.snapshot().score).toEqual(Score.of(0));
-    expect(engine.play(place(0, 0))).toBe('playing');
+    expect(engine.play(place(0, 0))).toBe(Outcome.playing);
     expect(engine.snapshot().score).toEqual(Score.of(1));
   });
 });
@@ -373,7 +373,7 @@ describe('GameEngine edge cases', () => {
 
     expect(summary(engine)).toEqual(afterOneMove);
     rules.armed = false;
-    expect(engine.play(place(1, 0))).toBe('playing');
+    expect(engine.play(place(1, 0))).toBe(Outcome.playing);
   });
 
   it('should_keep_the_board_the_score_and_the_phase_when_evaluate_throws', () => {
@@ -383,7 +383,7 @@ describe('GameEngine edge cases', () => {
 
     expect(summary(engine)).toEqual(afterOneMove);
     rules.armed = false;
-    expect(engine.play(place(1, 0))).toBe('playing');
+    expect(engine.play(place(1, 0))).toBe(Outcome.playing);
   });
 
   // `play()` enters the resolving phase before it calls the rules and the scoring.
@@ -406,7 +406,7 @@ describe('GameEngine edge cases', () => {
     expect(scoring.innerError).toEqual(
       new RangeError('The game cannot accept a move in the resolving phase.'),
     );
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(summary(engine)).toEqual(afterOneMove);
   });
 
@@ -420,7 +420,7 @@ describe('GameEngine edge cases', () => {
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(engine.snapshot().board.cells()).toEqual([]);
     expect(engine.snapshot().score).toEqual(Score.of(0));
-    expect(engine.play(place(0, 0))).toBe('game-over');
+    expect(engine.play(place(0, 0))).toBe(Outcome.gameOver);
     expect(publisher.events).toHaveLength(2);
   });
 });
@@ -528,15 +528,15 @@ describe('GameEngine review findings', () => {
   it('should_return_playing_when_the_rules_return_a_rejected_resolution_with_a_final_outcome', () => {
     // `Resolution.evaluated()` refuses a rejected resolution, so a structural copy stands in
     // for a custom `IGameRules` that returns a rejected resolution with a final outcome.
-    const forged = () => ({ accepted: false, outcome: 'victory' }) as unknown as Resolution;
+    const forged = () => ({ accepted: false, outcome: Outcome.victory }) as unknown as Resolution;
     const { engine, publisher } = gameWith(new FixedResolutionRules(forged));
 
     const outcome = engine.play(place(0, 0));
 
-    expect(outcome).toBe('playing');
+    expect(outcome).toBe(Outcome.playing);
     expect(summary(engine)).toEqual(initial);
     expect(publisher.events).toEqual([]);
-    expect(engine.play(place(0, 0))).toBe('playing');
+    expect(engine.play(place(0, 0))).toBe(Outcome.playing);
   });
 
   it('should_keep_the_state_when_the_scoring_mutates_before_and_throws', () => {
@@ -571,7 +571,7 @@ describe('GameEngine review findings', () => {
   });
 
   it('should_throw_a_range_error_and_keep_the_state_when_the_rules_return_an_unknown_outcome', () => {
-    const { engine, publisher } = gameWith(new FixedOutcomeRules('draw' as Outcome));
+    const { engine, publisher } = gameWith(new FixedOutcomeRules('draw' as unknown as Outcome));
 
     expect(() => engine.play(place(0, 0))).toThrow(new RangeError('Unknown outcome: draw.'));
 
@@ -582,7 +582,7 @@ describe('GameEngine review findings', () => {
   // The engine commits the turn before it publishes. A throwing publisher cannot undo it.
   it('should_commit_the_turn_and_rethrow_when_the_publisher_throws', () => {
     const { engine } = gameWith(
-      new FixedOutcomeRules('game-over'),
+      new FixedOutcomeRules(Outcome.gameOver),
       new OnePointScoring(),
       new ThrowingPublisher(),
     );
@@ -595,7 +595,7 @@ describe('GameEngine review findings', () => {
   // `tryPlay()` keeps the publisher failure apart from the outcome (issue 132, G117.2).
   it('should_report_the_publisher_failure_apart_from_the_outcome_when_try_play_saves_the_turn', () => {
     const { engine } = gameWith(
-      new FixedOutcomeRules('game-over'),
+      new FixedOutcomeRules(Outcome.gameOver),
       new OnePointScoring(),
       new ThrowingPublisher(),
     );
@@ -604,19 +604,19 @@ describe('GameEngine review findings', () => {
 
     expect(report).toEqual({
       accepted: true,
-      outcome: 'game-over',
+      outcome: Outcome.gameOver,
       publishFailure: { error: new Error('publish failed') },
     });
     expect(summary(engine)).toEqual({ ...afterOneMove, phase: 'game-over' });
   });
 
   it('should_report_no_publisher_failure_when_the_publisher_works', () => {
-    const { engine, publisher } = gameWith(new FixedOutcomeRules('game-over'));
+    const { engine, publisher } = gameWith(new FixedOutcomeRules(Outcome.gameOver));
 
     const report = engine.tryPlay(place(0, 0));
 
     expect(Object.keys(report).sort()).toEqual(['accepted', 'outcome']);
-    expect(report).toEqual({ accepted: true, outcome: 'game-over' });
+    expect(report).toEqual({ accepted: true, outcome: Outcome.gameOver });
     expect(publisher.events).toHaveLength(1);
   });
 
@@ -629,7 +629,7 @@ describe('GameEngine review findings', () => {
     expect(engine.snapshot().score).toEqual(Score.of(0));
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
 
-    expect(engine.play(square(0, 0))).toBe('playing');
+    expect(engine.play(square(0, 0))).toBe(Outcome.playing);
     expect(engine.snapshot().board.get(square(0, 0))).toEqual(fakeCell(1));
     expect([...engine.snapshot().source]).toEqual([fakeCell(2), fakeCell(3)]);
   });
@@ -638,27 +638,27 @@ describe('GameEngine review findings', () => {
     const rules = new RejectingDrawRules();
     const engine = sourceGame(rules);
 
-    expect(engine.play(square(0, 0))).toBe('playing');
+    expect(engine.play(square(0, 0))).toBe(Outcome.playing);
     expect(engine.snapshot().board.cells()).toEqual([]);
     expect([...engine.snapshot().source]).toEqual([fakeCell(1), fakeCell(2), fakeCell(3)]);
 
     rules.rejecting = false;
-    expect(engine.play(square(0, 0))).toBe('playing');
+    expect(engine.play(square(0, 0))).toBe(Outcome.playing);
     expect(engine.snapshot().board.get(square(0, 0))).toEqual(fakeCell(1));
   });
 
   it('should_publish_game_over_with_the_victory_outcome_when_the_rules_return_victory', () => {
-    const { engine, publisher } = gameWith(new FixedOutcomeRules('victory'));
+    const { engine, publisher } = gameWith(new FixedOutcomeRules(Outcome.victory));
 
     const outcome = engine.play(place(0, 0));
 
-    expect(outcome).toBe('victory');
+    expect(outcome).toBe(Outcome.victory);
     expect(engine.currentPhase()).toBe(VictoryPhase.instance);
     expect(publisher.events).toHaveLength(1);
     const event = publisher.events[0] as GameOver;
     expect(event).toBeInstanceOf(GameOver);
     expect(event.gameId.equals(GameId.of('fake-game'))).toBe(true);
-    expect(event.outcome).toBe('victory');
+    expect(event.outcome).toBe(Outcome.victory);
     expect(event.finalScore).toEqual(Score.of(1));
   });
 

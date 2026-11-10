@@ -7,7 +7,7 @@ import { fakeCell, type FakeCell } from '../../support/engine/fake-cell';
 import {
   square,
   squareTopology,
-  type SquareAxis,
+  SquareAxis,
   type SquareCoord,
 } from '../../support/engine/square-topology';
 import { BOARD_ID } from '../../support/engine/entity-ids';
@@ -36,7 +36,7 @@ describe('Board with the square topology double', () => {
   });
 
   it('should_walk_the_row_when_line_follows_the_col_axis', () => {
-    expect([...newBoard().line('col', square(1, 1))]).toEqual([
+    expect([...newBoard().line(SquareAxis.col, square(1, 1))]).toEqual([
       square(0, 1),
       square(1, 1),
       square(2, 1),
@@ -44,7 +44,7 @@ describe('Board with the square topology double', () => {
   });
 
   it('should_walk_the_column_when_line_follows_the_row_axis', () => {
-    expect([...newBoard().line('row', square(2, 0))]).toEqual([
+    expect([...newBoard().line(SquareAxis.row, square(2, 0))]).toEqual([
       square(2, 0),
       square(2, 1),
       square(2, 2),

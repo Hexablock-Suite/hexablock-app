@@ -1,4 +1,4 @@
-import type { GeometryFactory } from './geometry-factory';
+import { TopologyId, type GeometryFactory } from './geometry-factory';
 import { CellNode, ShapeGroup, type ShapeNode } from './shape-node';
 import { triangle, TriangleTopology, type TriangleCoord } from './triangle-topology';
 
@@ -21,7 +21,7 @@ const pieces: readonly (readonly TriangleCoord[])[] = [
 
 // Concrete Factory (classes.md decision 17, D11): the real triangle family.
 export class TriangleGeometry implements GeometryFactory<TriangleCoord> {
-  readonly id = 'triangle';
+  readonly id = TopologyId.triangle;
 
   // `values` holds `col` and then `row`.
   createCoord(values: number[]): TriangleCoord {

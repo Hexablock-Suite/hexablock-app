@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Outcome } from '../../../../src/domain/engine/outcome';
 import { Score } from '../../../../src/domain/engine/score';
 import { ClearedStacks } from '../../../../src/domain/variants/hexa-sort/cleared-stacks';
 import { square } from '../../../support/engine/square-topology';
@@ -32,7 +33,7 @@ describe('SortScoring', () => {
       new SortScoring<SquareCoord>(),
     );
 
-    expect(game.play(place(1))).toBe('playing');
+    expect(game.play(place(1))).toBe(Outcome.playing);
 
     expect(SORT_POINTS_PER_TILE).toBe(10);
     expect(game.snapshot().goalsDone).toEqual(ClearedStacks.of(1));
@@ -49,7 +50,7 @@ describe('SortScoring', () => {
     );
     game.play(place(1));
 
-    expect(game.play(place(2))).toBe('playing');
+    expect(game.play(place(2))).toBe(Outcome.playing);
 
     expect(game.snapshot().goalsDone).toEqual(ClearedStacks.of(1));
     expect(game.snapshot().score).toEqual(Score.of(110));

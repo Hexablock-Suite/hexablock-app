@@ -12,7 +12,11 @@ import { repoRoot } from '../support/run-tool';
 // A `boolean` needs no row. The scan reads exported classes, interfaces, type aliases,
 // functions and variables (`export const`, `export let`). It reads the written type of each
 // member. When a member has no written type, the scan reads the type that the TypeScript
-// checker infers. A literal type, such as `'playing'`, is not a primitive.
+// checker infers.
+// A literal type, such as `'playing'`, is a primitive too (issue #207, classes.md decision 45).
+// A closed union of texts is a `string` with a name, so the scan lists each text literal
+// as a `string` and each number literal as a `number`. A class with a closed set of instances
+// replaces such a union.
 
 const engineDir = path.join(repoRoot, 'src/domain/engine');
 const readme = readFileSync(path.join(repoRoot, 'README.md'), 'utf8');
@@ -22,12 +26,25 @@ type Use = { primitive: Primitive; where: string };
 
 const key = (use: Use) => `${use.primitive} ${use.where}`;
 
-// The primitive keywords inside a type, a parameter list or a type parameter list.
+// The primitive of a literal type: `'playing'` is a `string`, and `3` or `-1` is a `number`.
+// `true`, `false` and `null` are not primitives of this gate.
+function literalPrimitive(node: ts.Node): Primitive | undefined {
+  if (!ts.isLiteralTypeNode(node)) return undefined;
+  const { literal } = node;
+  if (ts.isStringLiteral(literal) || ts.isNoSubstitutionTemplateLiteral(literal)) return 'string';
+  if (ts.isNumericLiteral(literal) || ts.isPrefixUnaryExpression(literal)) return 'number';
+  return undefined;
+}
+
+// The primitive keywords and the literal types inside a type, a parameter list
+// or a type parameter list.
 function primitivesIn(nodes: readonly (ts.Node | undefined)[]): Primitive[] {
   const found = new Set<Primitive>();
   const visit = (node: ts.Node): void => {
     if (node.kind === ts.SyntaxKind.NumberKeyword) found.add('number');
     if (node.kind === ts.SyntaxKind.StringKeyword) found.add('string');
+    const literal = literalPrimitive(node);
+    if (literal !== undefined) found.add(literal);
     ts.forEachChild(node, visit);
   };
   nodes.forEach((node) => node && visit(node));
@@ -357,6 +374,78 @@ describe('README primitive types', () => {
     ]);
   });
 
+  // Issue #207: the closed unions of texts are classes with a closed set of instances.
+  // Only the two factories and the text of each class keep a `string`.
+  it('should_find_no_closed_union_of_texts_when_the_code_is_scanned', () => {
+    const uses = codeUses();
+    const places = uses.map((use) => use.where);
+
+    for (const place of [
+      'Outcome',
+      'TopologyId',
+      'HexAxis',
+      'HexDirection',
+      'SquareAxis',
+      'SquareDirection',
+      'TriangleAxis',
+      'TriangleDirection',
+      'GeometryFactory.id',
+      'HexGeometry.id',
+      'SquareGeometry.id',
+      'TriangleGeometry.id',
+      'GridTopology<TAxis>',
+      'GridTopology<TDirection>',
+      'Board<TAxis>',
+      'ReadonlyBoard<TAxis>',
+      'checkOwnSnapshot<TAxis>',
+      'TurnReport.outcome',
+      'GameOver.outcome',
+      'Resolution.outcome',
+    ]) {
+      expect(places).not.toContain(place);
+    }
+    const ofClosedSets = uses.filter((use) =>
+      /^(Outcome|TopologyId|(Hex|Square|Triangle)(Axis|Direction))\./.test(use.where),
+    );
+    expect(ofClosedSets.map(key).sort()).toEqual([
+      'string HexAxis.toString',
+      'string HexDirection.toString',
+      'string Outcome.of',
+      'string Outcome.toString',
+      'string SquareAxis.toString',
+      'string SquareDirection.toString',
+      'string TopologyId.of',
+      'string TopologyId.toString',
+      'string TriangleAxis.toString',
+      'string TriangleDirection.toString',
+    ]);
+  });
+
+  it('should_list_a_literal_type_as_its_primitive_when_a_signature_names_a_closed_union', () => {
+    const source = [
+      "export type Outcome = 'playing' | 'victory';",
+      'export type Sides = 3 | 4 | 6;',
+      "export interface Topology<TAxis extends 'q' | 'r'> {",
+      "  readonly id: 'hex';",
+      "  line(axis: TAxis, toward: 'forward' | 'backward'): boolean;",
+      '}',
+      'export class Family {',
+      "  readonly id = 'hex';",
+      "  private readonly hidden = 'x';",
+      '  done = true;',
+      '}',
+    ].join('\n');
+
+    expect(usesIn({ [path.join(engineDir, 'fixture-unions.ts')]: source })).toEqual([
+      { primitive: 'string', where: 'Outcome' },
+      { primitive: 'number', where: 'Sides' },
+      { primitive: 'string', where: 'Topology<TAxis>' },
+      { primitive: 'string', where: 'Topology.id' },
+      { primitive: 'string', where: 'Topology.line' },
+      { primitive: 'string', where: 'Family.id' },
+    ]);
+  });
+
   it('should_skip_private_members_and_booleans_when_the_code_is_scanned', () => {
     const places = codeUses().map((use) => use.where);
 
@@ -385,6 +474,7 @@ describe('README primitive types', () => {
     expect(usesIn({ [path.join(engineDir, 'counter.ts')]: source })).toEqual([
       { primitive: 'number', where: 'Counter.count' },
       { primitive: 'string', where: 'Counter.title' },
+      { primitive: 'string', where: 'Counter.phase' },
       { primitive: 'number', where: 'Counter.size' },
       { primitive: 'string', where: 'label' },
     ]);
@@ -420,6 +510,7 @@ describe('README primitive types', () => {
       { primitive: 'string', where: 'label' },
       { primitive: 'number', where: 'first' },
       { primitive: 'number', where: 'total' },
+      { primitive: 'string', where: 'phase' },
     ]);
   });
 

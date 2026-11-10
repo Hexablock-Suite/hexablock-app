@@ -10,9 +10,9 @@ import { withOwnMethods } from './own-methods';
 export {
   isUp,
   triangle,
-  type TriangleAxis,
+  TriangleAxis,
   type TriangleCoord,
-  type TriangleDirection,
+  TriangleDirection,
 } from '../../../src/domain/engine/triangle-topology';
 
 // The real triangle topology (issue 160). The tests keep this name.
