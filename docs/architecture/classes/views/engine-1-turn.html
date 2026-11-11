@@ -64,7 +64,7 @@
       <h1>The turn: Template Method over Strategy</h1>
 
       <svg
-        viewBox="0 0 1040 1116"
+        viewBox="0 0 1040 1148"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="engine-turn-title engine-turn-desc"
@@ -145,7 +145,7 @@
           x="24"
           y="24"
           width="992"
-          height="880"
+          height="912"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -1068,7 +1068,7 @@
           x="752"
           y="740"
           width="236"
-          height="160"
+          height="192"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1098,7 +1098,7 @@
           Score
         </text>
         <text x="768" y="804" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + value: number {readOnly}
+          - value: number
         </text>
         <line x1="752" y1="812" x2="988" y2="812" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
@@ -1122,6 +1122,12 @@
         </text>
         <text x="768" y="892" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + isHigherThan(other: Score): boolean
+        </text>
+        <text x="768" y="908" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + deliverTo(receiver:
+        </text>
+        <text x="779" y="924" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          ValueReceiver&lt;number&gt;): void
         </text>
         <!-- BoardState adds the points of a turn as a Score, and BoardSnapshot, IScoringPolicy and GameOver carry one: use -->
         <line
@@ -1328,8 +1334,8 @@
           TCell, TCoord
         </text>
 
-        <!-- The footnote and the legend sit below the zone, which grew by 32 and then by 80 for the Outcome box (#207). -->
-        <g transform="translate(0 168)">
+        <!-- The footnote and the legend sit below the zone, which grew by 32 and then by 80 for the Outcome box (#207). It grew by 32 more for the delivery operation of Score (#228). -->
+        <g transform="translate(0 200)">
           <!-- Footnote -->
           <text
             x="24"
