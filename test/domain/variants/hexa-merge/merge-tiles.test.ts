@@ -21,6 +21,7 @@ import {
   mergeGame,
   mergeState,
   values,
+  valueOf,
   type HexMergeState,
   mergeStateOf,
 } from '../../../support/variants/hexa-merge/merge-game';
@@ -236,7 +237,7 @@ describe('Merge new tiles of a seed', () => {
     const out: string[] = [];
     for (const draw of mergeTileSource(Seed.of(seed))) {
       const [cell, tile] = draw.appearsOn(cells);
-      out.push(`${cell}${tile.points().value}`);
+      out.push(`${cell}${valueOf(tile)}`);
       if (out.length === 24) break;
     }
     return out.join(' ');

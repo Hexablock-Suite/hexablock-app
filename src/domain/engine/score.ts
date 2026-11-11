@@ -1,14 +1,16 @@
+import type { ValueReceiver } from './value-receiver';
+
 // The score of a game, and the points of one turn (classes.md decision 41, issue #203).
 // It is a value object: it never changes, and two scores are equal when their values are equal.
 // A score is a safe integer of 0 or more. It is the rule of the backend `Score`,
 // so the app never keeps a score that the backend refuses.
 // Any other number throws a RangeError. A negative zero is stored as 0.
 // Each operation returns a new `Score`. The object is frozen, so no caller writes the value.
-// `value` stays readable, as in the backend `Score`. The name of the operation that gives
-// the number to an adapter is an open question (README table «Primitive types»).
-// Only an adapter of the edge reads `value`: the domain and the use cases call the operations.
+// The value is private (issue #228). `deliverTo()` gives the number to a receiver,
+// and no operation returns it. Only an adapter of the edge calls `deliverTo()`:
+// the domain and the use cases call the operations.
 export class Score {
-  private constructor(readonly value: number) {
+  private constructor(private readonly value: number) {
     Object.freeze(this);
   }
 
@@ -22,6 +24,11 @@ export class Score {
   // Two scores are equal when they hold the same value.
   equals(other: Score): boolean {
     return this.value === other.value;
+  }
+
+  // Gives the number of this score to `receiver`. It returns nothing.
+  deliverTo(receiver: ValueReceiver<number>): void {
+    receiver.receive(this.value);
   }
 
   // The sum of two scores. Neither score changes.

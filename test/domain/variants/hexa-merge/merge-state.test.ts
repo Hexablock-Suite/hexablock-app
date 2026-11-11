@@ -37,10 +37,10 @@ function facts(state: HexMergeState) {
     board: state
       .snapshot()
       .board.cells()
-      .map(([at, tile]) => [hexTopology.key(at), tile.points().value]),
+      .map(([at, tile]) => [hexTopology.key(at), valueOf(tile)]),
     left: state.snapshot().tiles.hasNext(),
     targetReached: state.snapshot().targetReached,
-    merged: state.snapshot().merged.map((tile) => tile.points().value),
+    merged: state.snapshot().merged.map(valueOf),
     score: state.snapshot().score,
   };
 }

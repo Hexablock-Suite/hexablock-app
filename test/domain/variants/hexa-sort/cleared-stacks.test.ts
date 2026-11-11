@@ -1,5 +1,6 @@
 /** @jest-environment node */
 import { ClearedStacks } from '../../../../src/domain/variants/hexa-sort/cleared-stacks';
+import { deliveries, RecordingReceiver } from '../../../support/engine/value-receiver';
 
 // The count of stacks that a Sort game cleared (classes.md decision 42, issue #204).
 // It is a counter: a safe integer of 0 or more, as `Moves` is.
@@ -10,7 +11,7 @@ const refusal = (value: number) =>
 describe('ClearedStacks', () => {
   it('should_accept_the_value_when_it_is_a_safe_integer_of_zero_or_more', () => {
     for (const value of [0, 1, 7, Number.MAX_SAFE_INTEGER]) {
-      expect(ClearedStacks.of(value).value).toBe(value);
+      expect(deliveries(ClearedStacks.of(value))).toEqual([value]);
     }
   });
 
@@ -41,7 +42,9 @@ describe('ClearedStacks', () => {
   it('should_hold_zero_when_the_value_is_a_negative_zero', () => {
     const cleared = ClearedStacks.of(-0);
 
-    expect(Object.is(cleared.value, 0)).toBe(true);
+    const [held] = deliveries(cleared);
+
+    expect(Object.is(held, 0)).toBe(true);
     expect(cleared.equals(ClearedStacks.of(0))).toBe(true);
   });
 
@@ -77,6 +80,27 @@ describe('ClearedStacks', () => {
     expect(ClearedStacks.of(2).isAtLeast(ClearedStacks.of(3))).toBe(false);
     expect(ClearedStacks.of(3).isAtLeast(ClearedStacks.of(3))).toBe(true);
     expect(ClearedStacks.of(4).isAtLeast(ClearedStacks.of(3))).toBe(true);
+  });
+
+  // The value leaves the object only through a receiver (issue #228).
+  it('should_deliver_its_value_once_and_return_nothing_when_a_receiver_takes_it', () => {
+    const receiver = new RecordingReceiver<number>();
+
+    const returned: void = ClearedStacks.of(7).deliverTo(receiver);
+
+    expect(returned).toBeUndefined();
+    expect(receiver.received()).toEqual([7]);
+  });
+
+  // A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails
+  // when the line compiles, because then the directive is unused.
+  it('should_reject_at_compile_time_when_a_caller_reads_the_value', () => {
+    const readers = [
+      // @ts-expect-error `ClearedStacks.value` is private.
+      () => ClearedStacks.of(7).value,
+    ];
+
+    expect(readers).toHaveLength(1);
   });
 
   it('should_be_frozen_when_a_caller_tries_to_write_the_value', () => {

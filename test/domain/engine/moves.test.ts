@@ -1,5 +1,6 @@
 /** @jest-environment node */
 import { Moves } from '../../../src/domain/engine/moves';
+import { deliveries, RecordingReceiver } from '../../support/engine/value-receiver';
 
 // The move count of one play (classes.md decision 42, issue #204).
 // The rule of the backend `Moves` (hexablock-api#88): a safe integer of 0 or more.
@@ -10,7 +11,7 @@ const refusal = (value: number) =>
 describe('Moves', () => {
   it('should_accept_the_value_when_it_is_a_safe_integer_of_zero_or_more', () => {
     for (const value of [0, 1, 41, Number.MAX_SAFE_INTEGER]) {
-      expect(Moves.of(value).value).toBe(value);
+      expect(deliveries(Moves.of(value))).toEqual([value]);
     }
   });
 
@@ -41,7 +42,9 @@ describe('Moves', () => {
   it('should_hold_zero_when_the_value_is_a_negative_zero', () => {
     const moves = Moves.of(-0);
 
-    expect(Object.is(moves.value, 0)).toBe(true);
+    const [held] = deliveries(moves);
+
+    expect(Object.is(held, 0)).toBe(true);
     expect(moves.equals(Moves.of(0))).toBe(true);
   });
 
@@ -83,6 +86,27 @@ describe('Moves', () => {
     const most = Moves.of(Number.MAX_SAFE_INTEGER);
 
     expect(() => most.plusOne()).toThrow(refusal(2 ** 53));
+  });
+
+  // The value leaves the object only through a receiver (issue #228).
+  it('should_deliver_its_value_once_and_return_nothing_when_a_receiver_takes_it', () => {
+    const receiver = new RecordingReceiver<number>();
+
+    const returned: void = Moves.of(41).deliverTo(receiver);
+
+    expect(returned).toBeUndefined();
+    expect(receiver.received()).toEqual([41]);
+  });
+
+  // A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails
+  // when the line compiles, because then the directive is unused.
+  it('should_reject_at_compile_time_when_a_caller_reads_the_value', () => {
+    const readers = [
+      // @ts-expect-error `Moves.value` is private.
+      () => Moves.of(41).value,
+    ];
+
+    expect(readers).toHaveLength(1);
   });
 
   it('should_be_frozen_when_a_caller_tries_to_write_the_value', () => {
