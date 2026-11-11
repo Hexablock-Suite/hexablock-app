@@ -48,7 +48,40 @@ const noAmbientNondeterminism = defineRule({
   },
 });
 
+// Tells if a member expression names `deliverTo`, as `score.deliverTo` or `score['deliverTo']`.
+function namesDelivery(node) {
+  const { property } = node;
+  if (!node.computed) return property.type === 'Identifier' && property.name === 'deliverTo';
+  return property.type === 'Literal' && property.value === 'deliverTo';
+}
+
+// A value object keeps its value private and delivers it to a receiver of the edge.
+// Domain and application code compare with equals() or call a business operation.
+// A reference without a call counts too, because bind() and call() make the call later.
+// The declaration of the operation in a value object is not a member expression.
+const noDeliveryCall = defineRule({
+  meta: {
+    type: 'problem',
+    messages: {
+      deliveryCall:
+        'Domain and application code must not call deliverTo. Compare with equals() or call a business operation. Only an adapter receives the value.',
+    },
+  },
+  create(context) {
+    return {
+      MemberExpression(node) {
+        if (namesDelivery(node)) {
+          context.report({ node, messageId: 'deliveryCall' });
+        }
+      },
+    };
+  },
+});
+
 export default definePlugin({
   meta: { name: 'hexablock' },
-  rules: { 'no-ambient-nondeterminism': noAmbientNondeterminism },
+  rules: {
+    'no-ambient-nondeterminism': noAmbientNondeterminism,
+    'no-delivery-call': noDeliveryCall,
+  },
 });
