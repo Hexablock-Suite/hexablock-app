@@ -30,9 +30,18 @@ describe('delivery gate (Oxlint)', () => {
     expect(result.output.split(message)).toHaveLength(2);
   });
 
+  it('should_fail_lint_when_application_code_destructures_a_delivery_operation', () => {
+    const result = lintFixture('test/fixtures/lint/src/application/delivery-destructuring.ts');
+
+    // A shorthand key, a key with an alias and a key in a parameter.
+    expect(result.status).not.toBe(0);
+    expect(result.output.split(message)).toHaveLength(4);
+  });
+
   it('should_pass_lint_when_an_adapter_calls_a_delivery_operation', () => {
     const result = lintFixture('test/fixtures/lint/src/adapters/score-presenter.ts');
 
+    // The fixture holds a plain call and a destructuring of the operation.
     expect(result.output).not.toContain(rule);
     expect(result.status).toBe(0);
   });

@@ -48,17 +48,28 @@ const noAmbientNondeterminism = defineRule({
   },
 });
 
+// Tells if a key names `deliverTo`, as the identifier `deliverTo` or the text `'deliverTo'`.
+function isDeliveryKey(key, computed) {
+  if (!computed && key.type === 'Identifier') return key.name === 'deliverTo';
+  return key.type === 'Literal' && key.value === 'deliverTo';
+}
+
 // Tells if a member expression names `deliverTo`, as `score.deliverTo` or `score['deliverTo']`.
 function namesDelivery(node) {
-  const { property } = node;
-  if (!node.computed) return property.type === 'Identifier' && property.name === 'deliverTo';
-  return property.type === 'Literal' && property.value === 'deliverTo';
+  return isDeliveryKey(node.property, node.computed);
+}
+
+// Tells if a property of an object pattern takes `deliverTo`, as `{ deliverTo }` or `{ deliverTo: d }`.
+function takesDelivery(property) {
+  return property.type === 'Property' && isDeliveryKey(property.key, property.computed);
 }
 
 // A value object keeps its value private and delivers it to a receiver of the edge.
 // Domain and application code compare with equals() or call a business operation.
 // A reference without a call counts too, because bind() and call() make the call later.
-// The declaration of the operation in a value object is not a member expression.
+// A destructuring counts too, because `const { deliverTo } = score` takes the same reference.
+// The declaration of the operation in a value object is not a member expression or a pattern.
+// The rule cannot see a key that the code builds at run time: `x[n]`, `Reflect.get` or a template literal.
 const noDeliveryCall = defineRule({
   meta: {
     type: 'problem',
@@ -72,6 +83,13 @@ const noDeliveryCall = defineRule({
       MemberExpression(node) {
         if (namesDelivery(node)) {
           context.report({ node, messageId: 'deliveryCall' });
+        }
+      },
+      ObjectPattern(node) {
+        for (const property of node.properties) {
+          if (takesDelivery(property)) {
+            context.report({ node: property, messageId: 'deliveryCall' });
+          }
         }
       },
     };

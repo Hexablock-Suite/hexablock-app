@@ -7,3 +7,11 @@ export function present(score: Score): string {
   score.deliverTo({ receive: (value) => void (points = value) });
   return `${points} points`;
 }
+
+// An adapter may also take the delivery operation by destructuring.
+export function presentDetached(score: Score): string {
+  let points = 0;
+  const { deliverTo } = score;
+  deliverTo.call(score, { receive: (value) => void (points = value) });
+  return `${points} points`;
+}
