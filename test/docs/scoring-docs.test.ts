@@ -33,6 +33,7 @@ import { linesState } from '../support/variants/hexa-lines/lines-game';
 import { mergeState } from '../support/variants/hexa-merge/merge-game';
 import { MATCH_ID } from '../support/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../support/engine/entity-ids';
+import { delivered } from '../support/engine/value-receiver';
 
 // APP-FR-06 (issue 104): the README documents the scoring of each variant.
 // The gate reads the README section «Scoring» and checks it against the scoring code.
@@ -83,12 +84,12 @@ function brokenLinks(section: string): string[] {
 
 // The points that a policy gives for the turn whose photo after the turn is `after`.
 // The policies read only the photo after the turn, so the photo before is the same photo.
-// The README writes each score as a number, so this test reads the value of the `Score`.
+// The README writes each score as a number, so this test receives the value of the `Score`.
 function turnScore<TPhoto>(
   policy: { score(before: TPhoto, after: TPhoto): Score },
   after: TPhoto,
 ): number {
-  return policy.score(after, after).value;
+  return delivered(policy.score(after, after));
 }
 
 // The points of one Lines placement from the real base policy and its decorator.

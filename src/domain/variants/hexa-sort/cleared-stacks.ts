@@ -1,14 +1,16 @@
+import type { ValueReceiver } from '../../engine/value-receiver';
+
 // The count of stacks that one Hexa Sort game cleared (classes.md decision 42, issue #204).
 // Each cleared stack counts one goal, and `GoalCount.isReachedBy()` reads the count.
 // It is a value object: it never changes, and two counts are equal when their values are equal.
 // A count of cleared stacks is a safe integer of 0 or more. Any other number throws a RangeError.
 // A negative zero is stored as 0.
 // Each operation returns a new `ClearedStacks`. The object is frozen, so no caller writes the value.
-// `value` stays readable, because the Sort screen shows it. The name of the operation that gives
-// the number to an adapter is an open question (README table «Primitive types»).
-// Only an adapter of the edge reads `value`: the domain and the use cases call the operations.
+// The value is private (issue #228). `deliverTo()` gives the number to a receiver,
+// and no operation returns it. Only an adapter of the edge calls `deliverTo()`:
+// the domain and the use cases call the operations.
 export class ClearedStacks {
-  private constructor(readonly value: number) {
+  private constructor(private readonly value: number) {
     Object.freeze(this);
   }
 
@@ -24,6 +26,11 @@ export class ClearedStacks {
   // Two counts are equal when they hold the same value.
   equals(other: ClearedStacks): boolean {
     return this.value === other.value;
+  }
+
+  // Gives the number of this count to `receiver`. It returns nothing.
+  deliverTo(receiver: ValueReceiver<number>): void {
+    receiver.receive(this.value);
   }
 
   // The count after one more cleared stack. This count does not change.

@@ -33,6 +33,7 @@ import {
 } from '../../support/engine/fake-game';
 import { square, type SquareCoord } from '../../support/engine/square-topology';
 import { MATCH_ID } from '../../support/engine/match-id';
+import { delivered } from '../../support/engine/value-receiver';
 
 // APP-NFR-04: the piece source, the scoring policy and the progress model swap,
 // and no engine file changes. Every implementation here is a dummy that exists only in test/.
@@ -92,7 +93,7 @@ class ScoreProgress implements IProgressModel {
 
 class MovesProgress implements IProgressModel {
   record(result: GameResult): ProgressRecord {
-    return ProgressRecord.of({ gameId: result.gameId, score: Score.of(result.moves.value) });
+    return ProgressRecord.of({ gameId: result.gameId, score: Score.of(delivered(result.moves)) });
   }
 }
 

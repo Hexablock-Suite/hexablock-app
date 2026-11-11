@@ -32,7 +32,10 @@ export default defineConfig({
       {
         // Matches src/domain/ and src/application/ at any depth, so fixtures follow the same rule.
         files: ['**/src/domain/**', '**/src/application/**'],
-        rules: { 'hexablock/no-ambient-nondeterminism': 'error' },
+        rules: {
+          'hexablock/no-ambient-nondeterminism': 'error',
+          'hexablock/no-delivery-call': 'error',
+        },
       },
     ],
   },

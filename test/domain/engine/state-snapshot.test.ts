@@ -23,7 +23,7 @@ import { CountingMatchIds, MATCH_ID } from '../../support/engine/match-id';
 import { square } from '../../support/engine/square-topology';
 import { A, fitFactory } from '../../support/variants/hexa-fit/fit-game';
 import { linesFactory, red } from '../../support/variants/hexa-lines/lines-game';
-import { mergeFactory, mergeState } from '../../support/variants/hexa-merge/merge-game';
+import { mergeFactory, mergeState, valueOf } from '../../support/variants/hexa-merge/merge-game';
 import {
   row,
   sortFactory,
@@ -95,10 +95,7 @@ describe('the photo of a state', () => {
 
     expect(Object.isFrozen(photo)).toBe(true);
     expect(Object.isFrozen(photo.merged)).toBe(true);
-    expect([photo.targetReached, photo.merged.map((tile) => tile.points().value)]).toEqual([
-      true,
-      [4],
-    ]);
+    expect([photo.targetReached, photo.merged.map(valueOf)]).toEqual([true, [4]]);
     expect(json(photo.view())).toBe(json({ targetReached: true }));
   });
 

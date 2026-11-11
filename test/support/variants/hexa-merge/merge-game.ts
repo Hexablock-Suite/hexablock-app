@@ -29,6 +29,7 @@ import type { Slide } from '../../../../src/domain/variants/hexa-merge/slide';
 import { RecordingPublisher } from '../../engine/fake-game';
 import { MATCH_ID } from '../../engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../engine/entity-ids';
+import { delivered } from '../../engine/value-receiver';
 
 // The Merge game for the rules tests, on the real hexagonal geometry.
 // The rules tests score no points. The scoring tests pass their own policy.
@@ -67,8 +68,9 @@ export function mergeState(
 }
 
 // The number of a tile. The field is private, and a tile is worth its value in points (issue #59).
+// The points are a `Score`, which delivers its number to a receiver (issue #228).
 export function valueOf(tile: MergeTile): number {
-  return tile.points().value;
+  return delivered(tile.points());
 }
 
 // The value of each filled cell, by the topology key of its coordinate.

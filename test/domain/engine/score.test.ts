@@ -1,5 +1,6 @@
 /** @jest-environment node */
 import { Score } from '../../../src/domain/engine/score';
+import { deliveries, RecordingReceiver } from '../../support/engine/value-receiver';
 
 // The score of a game and the points of one turn (classes.md decision 41, issue #203).
 // One rule for both, the rule of the backend `Score`: a safe integer of 0 or more.
@@ -10,7 +11,7 @@ const refusal = (value: number) =>
 describe('Score', () => {
   it('should_accept_the_value_when_it_is_a_safe_integer_of_zero_or_more', () => {
     for (const value of [0, 1, 41, Number.MAX_SAFE_INTEGER]) {
-      expect(Score.of(value).value).toBe(value);
+      expect(deliveries(Score.of(value))).toEqual([value]);
     }
   });
 
@@ -41,7 +42,9 @@ describe('Score', () => {
   it('should_hold_zero_when_the_value_is_a_negative_zero', () => {
     const score = Score.of(-0);
 
-    expect(Object.is(score.value, 0)).toBe(true);
+    const [held] = deliveries(score);
+
+    expect(Object.is(held, 0)).toBe(true);
     expect(score.equals(Score.of(0))).toBe(true);
   });
 
@@ -118,7 +121,7 @@ describe('Score', () => {
     expect(bonus.equals(Score.of(20))).toBe(true);
     expect(bonus.times(1).equals(bonus)).toBe(true);
     expect(bonus.times(0).equals(Score.of(0))).toBe(true);
-    expect(Object.is(Score.of(0).times(-0).value, 0)).toBe(true);
+    expect(deliveries(Score.of(0).times(-0)).map((held) => Object.is(held, 0))).toEqual([true]);
   });
 
   it('should_throw_a_range_error_when_the_factor_is_not_a_safe_integer_of_zero_or_more', () => {
@@ -141,6 +144,27 @@ describe('Score', () => {
     expect(
       Score.of(Number.MAX_SAFE_INTEGER).times(1).equals(Score.of(Number.MAX_SAFE_INTEGER)),
     ).toBe(true);
+  });
+
+  // The value leaves the object only through a receiver (issue #228).
+  it('should_deliver_its_value_once_and_return_nothing_when_a_receiver_takes_it', () => {
+    const receiver = new RecordingReceiver<number>();
+
+    const returned: void = Score.of(41).deliverTo(receiver);
+
+    expect(returned).toBeUndefined();
+    expect(receiver.received()).toEqual([41]);
+  });
+
+  // A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails
+  // when the line compiles, because then the directive is unused.
+  it('should_reject_at_compile_time_when_a_caller_reads_the_value', () => {
+    const readers = [
+      // @ts-expect-error `Score.value` is private.
+      () => Score.of(41).value,
+    ];
+
+    expect(readers).toHaveLength(1);
   });
 
   it('should_be_frozen_when_a_caller_tries_to_write_the_value', () => {

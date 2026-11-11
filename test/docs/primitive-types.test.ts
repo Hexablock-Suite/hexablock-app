@@ -275,7 +275,8 @@ describe('README primitive types', () => {
   });
 
   // Issue #203: `Score` replaces the number of every score in the engine.
-  // Only the factory, the readable value and the factor of `Score.times()` keep a number.
+  // Only the factory, the delivery to a receiver and the factor of `Score.times()` keep a number.
+  // The value is private (issue #228), so the scan finds no `Score.value`.
   it('should_find_no_score_of_type_number_when_the_code_is_scanned', () => {
     const numbers = codeUses()
       .filter((use) => use.primitive === 'number')
@@ -293,15 +294,15 @@ describe('README primitive types', () => {
       expect(numbers).not.toContain(place);
     }
     expect(numbers.filter((place) => place.startsWith('Score.'))).toEqual([
-      'Score.value',
       'Score.of',
+      'Score.deliverTo',
       'Score.times',
     ]);
   });
 
   // Issue #204: `Moves`, `ElapsedTime`, `Stars` and `LevelId` replace the numbers and the text
-  // of the counters in the engine. Only the factory and the readable value of each one keep
-  // a primitive.
+  // of the counters in the engine. Only the factory and the delivery to a receiver of each one
+  // keep a primitive. Each value is private (issue #228), so the scan finds no `value`.
   it('should_find_no_counter_of_a_primitive_type_when_the_code_is_scanned', () => {
     const places = codeUses().map((use) => use.where);
 
@@ -323,14 +324,14 @@ describe('README primitive types', () => {
       /^(Moves|ElapsedTime|Stars|LevelId)\./.test(use.where),
     );
     expect(ofCounters).toEqual([
-      { primitive: 'number', where: 'ElapsedTime.value' },
       { primitive: 'number', where: 'ElapsedTime.ofMs' },
-      { primitive: 'string', where: 'LevelId.value' },
+      { primitive: 'number', where: 'ElapsedTime.deliverTo' },
       { primitive: 'string', where: 'LevelId.of' },
-      { primitive: 'number', where: 'Moves.value' },
+      { primitive: 'string', where: 'LevelId.deliverTo' },
       { primitive: 'number', where: 'Moves.of' },
-      { primitive: 'number', where: 'Stars.value' },
+      { primitive: 'number', where: 'Moves.deliverTo' },
       { primitive: 'number', where: 'Stars.of' },
+      { primitive: 'number', where: 'Stars.deliverTo' },
     ]);
   });
 

@@ -1,5 +1,6 @@
 /** @jest-environment node */
 import { Stars } from '../../../src/domain/engine/stars';
+import { deliveries, RecordingReceiver } from '../../support/engine/value-receiver';
 
 // The stars of one won level (classes.md decision 42, issue #204).
 // The rule of the backend `Stars` (hexablock-api#88): a safe integer of 0 or more.
@@ -10,7 +11,7 @@ const refusal = (value: number) =>
 describe('Stars', () => {
   it('should_accept_the_value_when_it_is_a_safe_integer_of_zero_or_more', () => {
     for (const value of [0, 1, 3, Number.MAX_SAFE_INTEGER]) {
-      expect(Stars.of(value).value).toBe(value);
+      expect(deliveries(Stars.of(value))).toEqual([value]);
     }
   });
 
@@ -41,7 +42,9 @@ describe('Stars', () => {
   it('should_hold_zero_when_the_value_is_a_negative_zero', () => {
     const stars = Stars.of(-0);
 
-    expect(Object.is(stars.value, 0)).toBe(true);
+    const [held] = deliveries(stars);
+
+    expect(Object.is(held, 0)).toBe(true);
     expect(stars.equals(Stars.of(0))).toBe(true);
   });
 
@@ -62,6 +65,27 @@ describe('Stars', () => {
     const second = Stars.of(3);
 
     expect([first.equals(second), second.equals(first)]).toEqual([false, false]);
+  });
+
+  // The value leaves the object only through a receiver (issue #228).
+  it('should_deliver_its_value_once_and_return_nothing_when_a_receiver_takes_it', () => {
+    const receiver = new RecordingReceiver<number>();
+
+    const returned: void = Stars.of(3).deliverTo(receiver);
+
+    expect(returned).toBeUndefined();
+    expect(receiver.received()).toEqual([3]);
+  });
+
+  // A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails
+  // when the line compiles, because then the directive is unused.
+  it('should_reject_at_compile_time_when_a_caller_reads_the_value', () => {
+    const readers = [
+      // @ts-expect-error `Stars.value` is private.
+      () => Stars.of(3).value,
+    ];
+
+    expect(readers).toHaveLength(1);
   });
 
   it('should_be_frozen_when_a_caller_tries_to_write_the_value', () => {
