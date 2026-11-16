@@ -10,7 +10,7 @@ const four = MergeTile.of(4);
 
 describe('NewTile', () => {
   it('should_throw_a_range_error_when_the_place_is_not_a_number_from_0_up_to_1', () => {
-    const bad = [-0.1, 1, 1.5, Number.NaN, Number.POSITIVE_INFINITY];
+    const bad = [-0.1, 1, 1.5, Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY];
     for (const place of bad) {
       expect(() => NewTile.of(place, two)).toThrow(
         new RangeError(`The place of a new tile must be a number from 0 up to 1, not ${place}.`),

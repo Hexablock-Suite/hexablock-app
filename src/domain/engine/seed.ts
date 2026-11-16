@@ -1,7 +1,5 @@
-import { Range } from './range';
-
-// The seeds of a game: the unsigned 32-bit integers.
-const SEEDS = Range.ofNumbers(0, 0xffffffff);
+// The largest seed of a game: the largest unsigned 32-bit integer.
+const MAX_SEED = 0xffffffff;
 
 // The seed of a game (APP-NFR-07, classes.md decision 48, issue #210): the same seed gives
 // the same pieces. It is a value object: it never changes, and two seeds are equal
@@ -17,7 +15,7 @@ export class Seed {
   }
 
   static of(value: number): Seed {
-    if (!Number.isInteger(value) || !SEEDS.contains(value)) {
+    if (!Number.isInteger(value) || value < 0 || value > MAX_SEED) {
       throw new RangeError(`A seed must be an integer from 0 to 4294967295, not ${value}.`);
     }
     return new Seed(value >>> 0);

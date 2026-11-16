@@ -24,9 +24,6 @@ export const primitiveBaseline: readonly PrimitiveEntry[] = [
   { primitive: 'number', where: 'SortSnapshot.clearedTiles', issue: 232 },
   // #238: the clock reading.
   { primitive: 'number', where: 'Clock.now', issue: 238 },
-  // #239: `Range` orders its values without a number.
-  { primitive: 'number', where: 'Compare', issue: 239 },
-  { primitive: 'number', where: 'Range.ofNumbers', issue: 239 },
   // #243: the engine primitives that keep a README reason.
   { primitive: 'number', where: 'RandomSource.next', issue: 243 },
   { primitive: 'number', where: 'Mulberry32Random.next', issue: 243 },

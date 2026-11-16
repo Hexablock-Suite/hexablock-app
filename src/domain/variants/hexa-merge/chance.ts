@@ -1,11 +1,7 @@
-import { Range } from '../../engine/range';
-
-// The chances that a probability can take: from 0 to 1, both included.
-const CHANCES = Range.ofNumbers(0, 1);
-
 // The chance that a new Merge tile is a 4 (statement §1.4, issue #210).
 // It is a value object: it never changes, and two chances are equal when their values are equal.
-// A chance is a number from 0 to 1. Any other number throws a RangeError.
+// A chance is a number from 0 to 1, both included. Any other number throws a RangeError.
+// `of()` checks the number itself (issue #239). NaN is no chance.
 // Only Hexa Merge has a chance, so the class lives in this folder and not in the engine.
 // The number stays private: `hits()` compares a draw with it.
 export class Chance {
@@ -14,7 +10,7 @@ export class Chance {
   }
 
   static of(value: number): Chance {
-    if (!CHANCES.contains(value)) {
+    if (Number.isNaN(value) || value < 0 || value > 1) {
       throw new RangeError(`The chance of a 4 must be a number from 0 to 1, not ${value}.`);
     }
     return new Chance(value === 0 ? 0 : value);
