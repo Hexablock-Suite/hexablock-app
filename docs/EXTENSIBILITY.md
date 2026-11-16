@@ -49,7 +49,7 @@ A new variant adds classes and data. It changes no engine file, no other variant
 | -------------------------------------- | ------------------------------------------------------------------------------------ |
 | The game list, `registered-games.ts`   | One entry that maps the new `GameId` to its factory, state mapper and cell renderer. |
 | The game selector route in `app/`      | One more game in the list that the player picks from (APP-FR-01).                    |
-| The text files for Spanish and English | The name of the new game in both languages (APP-FR-11).                              |
+| The text files for Spanish and English | The name of the new game in both languages, in `src/adapters/texts/` (APP-FR-11).    |
 
 If Hexa Fill keeps levels on the backend, the backend adds a section for it in the level schema (DS-6). The backend repository documents that change.
 
