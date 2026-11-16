@@ -2,6 +2,7 @@
 import { Score } from '../../../../src/domain/engine/score';
 import { ClearedStacks } from '../../../../src/domain/variants/hexa-sort/cleared-stacks';
 import type { SortState } from '../../../../src/domain/variants/hexa-sort/sort-state';
+import { TileCount } from '../../../../src/domain/variants/hexa-sort/tile-count';
 import { GameStateId } from '../../../../src/domain/engine/game-state-id';
 import { MatchId } from '../../../../src/domain/engine/match-id';
 import { square, type SquareCoord } from '../../../support/engine/square-topology';
@@ -155,7 +156,7 @@ describe('SortState', () => {
     expect(state.snapshot().board.occupantAt(square(0, 0))?.isEmpty()).toBe(true);
     expect(state.snapshot().board.occupiedCells()).toHaveLength(2);
     expect(state.snapshot().goalsDone).toEqual(ClearedStacks.of(1));
-    expect(state.snapshot().clearedTiles).toEqual([11]);
+    expect(state.snapshot().clearedTiles).toEqual([TileCount.of(11)]);
   });
 
   it('should_throw_a_range_error_and_keep_the_state_when_the_cell_has_no_stack_to_clear', () => {

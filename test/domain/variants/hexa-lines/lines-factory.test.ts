@@ -5,7 +5,9 @@ import { GameId } from '../../../../src/domain/engine/game-id';
 import type { Piece } from '../../../../src/domain/engine/piece';
 import { CellNode, ShapeGroup } from '../../../../src/domain/engine/shape-node';
 import type { Color } from '../../../../src/domain/engine/color';
+import { LineCount } from '../../../../src/domain/variants/hexa-lines/line-count';
 import { PlacePiece } from '../../../../src/domain/variants/hexa-lines/place-piece';
+import { TrayPosition } from '../../../../src/domain/variants/hexa-lines/tray-position';
 import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
 import { firstValidMove, startVariant, liveStateOf } from '../../../support/engine/variant-game';
 import {
@@ -97,9 +99,9 @@ describe('LinesFactory', () => {
       linesFactory().createScoring(),
     );
 
-    engine.play(new PlacePiece(0, square(0, 0)));
+    engine.play(new PlacePiece(TrayPosition.of(0), square(0, 0)));
 
-    expect(engine.snapshot().linesCleared).toBe(2);
+    expect(engine.snapshot().linesCleared).toEqual(LineCount.of(2));
     // 1 cell + 10 × 2 lines × (2 + 1 - 1). The base scoring alone gives 21.
     expect(engine.snapshot().score).toEqual(Score.of(41));
   });

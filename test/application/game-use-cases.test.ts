@@ -20,6 +20,7 @@ import { Score } from '../../src/domain/engine/score';
 import type { IRedoable } from '../../src/domain/engine/undo-capabilities';
 import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
 import { PlacePiece } from '../../src/domain/variants/hexa-lines/place-piece';
+import { TrayPosition } from '../../src/domain/variants/hexa-lines/tray-position';
 import type { ColorStack } from '../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../src/domain/variants/hexa-sort/goal-count';
 import type { PlaceStack } from '../../src/domain/variants/hexa-sort/place-stack';
@@ -434,7 +435,9 @@ describe('StartGame and ApplyMove', () => {
       new RecordingPublisher(),
     );
 
-    const error = errorOf(await applyMove.execute({ move: new PlacePiece(0, square(0, 0)) }));
+    const error = errorOf(
+      await applyMove.execute({ move: new PlacePiece(TrayPosition.of(0), square(0, 0)) }),
+    );
 
     expect([error.code, error.message, error.retryable]).toEqual([
       'move-failed',
@@ -463,7 +466,9 @@ describe('StartGame and ApplyMove', () => {
     valueOf(await startGame.execute({}));
     const before = games.running().snapshot();
 
-    const error = errorOf(await applyMove.execute({ move: new PlacePiece(0, square(9, 9)) }));
+    const error = errorOf(
+      await applyMove.execute({ move: new PlacePiece(TrayPosition.of(0), square(9, 9)) }),
+    );
 
     expect([error.code, error.retryable]).toEqual(['move-rejected', false]);
     const after = games.running().snapshot();
@@ -478,7 +483,9 @@ describe('StartGame and ApplyMove', () => {
   it('should_return_a_no_running_game_failure_when_apply_move_runs_before_start_game', async () => {
     const { applyMove } = gameUseCases(linesFactory());
 
-    const error = errorOf(await applyMove.execute({ move: new PlacePiece(0, square(0, 0)) }));
+    const error = errorOf(
+      await applyMove.execute({ move: new PlacePiece(TrayPosition.of(0), square(0, 0)) }),
+    );
 
     expect([error.code, error.retryable]).toEqual(['no-running-game', false]);
   });

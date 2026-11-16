@@ -7,6 +7,7 @@ import { MatchId } from '../../../../src/domain/engine/match-id';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import { MergeState } from '../../../../src/domain/variants/hexa-merge/merge-state';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
+import { Draw } from '../../../../src/domain/variants/hexa-merge/draw';
 import { NewTile } from '../../../../src/domain/variants/hexa-merge/new-tile';
 import { SlideSense, Slide } from '../../../../src/domain/variants/hexa-merge/slide';
 import {
@@ -28,7 +29,7 @@ const key = (q: number, r: number) => hexTopology.key(hex(q, r));
 
 function draws(...made: [number, number][]) {
   return new FixedListPieceSource<NewTile<MergeTile>>(
-    made.map(([place, value]) => NewTile.of(place, MergeTile.of(value))),
+    made.map(([place, value]) => NewTile.of(Draw.of(place), MergeTile.of(value))),
   );
 }
 
