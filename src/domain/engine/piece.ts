@@ -5,8 +5,9 @@ import type { GridTopology } from './grid-topology';
 import type { ShapeNode } from './shape-node';
 import type { Turns } from './turns';
 
-// One piece type for the four variants: a shape plus the content it puts on the board
-// (classes.md decision 6). A piece never changes: each operation returns a new piece.
+// One piece type for Lines, Fit and Sort: a shape plus the content it puts on the board
+// (classes.md decision 6). Merge uses no `Piece`: its source gives a `NewTile`.
+// A piece never changes: each operation returns a new piece.
 // The shape and the content are private (classes.md decision 49).
 // A reader asks the piece for the coordinates that it covers and for its occupant,
 // the cell that it puts on each of them (issue #234).
