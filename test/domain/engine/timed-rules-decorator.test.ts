@@ -329,4 +329,19 @@ describe('GameEngine.timed', () => {
 
     expect(engine.timed()).toBeUndefined();
   });
+
+  // A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails
+  // when the line compiles, because then the directive is unused.
+  it('should_reject_at_compile_time_when_a_subclass_reads_the_inner_rules', () => {
+    class PeekingRules extends TimedRulesDecorator<FakeMove, FakeState> {
+      peek(): unknown {
+        // @ts-expect-error `inner` is private (issue #231).
+        return this.inner;
+      }
+    }
+    const rules = new FakeRules();
+    const peeking = new PeekingRules(rules, new LevelTimer(TIMER_ID, new ManualClock()));
+
+    expect(peeking.evaluate(emptyState(2)).equals(rules.evaluate(emptyState(2)))).toBe(true);
+  });
 });

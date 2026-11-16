@@ -8,7 +8,9 @@ import type { LinesSnapshot, LinesState } from './lines-state';
 // The multiplier codes the accepted rule of issue #59 (D22, 2026-11-06): `lines + streak - 1`. One line with streak 1 gives factor 1.
 // The streak counts the current placement (issue 58), so a second clearing placement in a row
 // has streak 2. It extends the engine `ScoringDecorator` with `LinesScoring` as its inner
-// policy (view variant-1-lines), because it reads `inner.lineBonus()`.
+// policy (view variant-1-lines), because it reads `lineBonus()` of that policy.
+// The `inner` field of the base class is private (issue #231). So the decorator keeps its own
+// private reference to the same `LinesScoring` and passes it to `super()`.
 // It reads the photo after the turn, as the base policy does.
 // A placement that clears no line has no bonus, so the decorator adds nothing to the inner score.
 // `Score.times()` multiplies the bonus, so no number of a score leaves its value object.
@@ -16,10 +18,14 @@ export class ComboMultiplierDecorator<TCoord> extends ScoringDecorator<
   LinesState<TCoord>,
   LinesScoring<TCoord>
 > {
+  constructor(private readonly scoring: LinesScoring<TCoord>) {
+    super(scoring);
+  }
+
   score(before: LinesSnapshot<TCoord>, after: LinesSnapshot<TCoord>): Score {
     const base = super.score(before, after);
     if (after.linesCleared === 0) return base;
-    return base.add(this.inner.lineBonus(after).times(multiplier(after) - 1));
+    return base.add(this.scoring.lineBonus(after).times(multiplier(after) - 1));
   }
 }
 

@@ -57,4 +57,17 @@ describe('ScoringDecorator', () => {
     expect(scoring.score(before, after)).toEqual(Score.of(9));
     expect(inner.calls).toEqual([[before, after]]);
   });
+
+  // A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails
+  // when the line compiles, because then the directive is unused.
+  it('should_reject_at_compile_time_when_a_bonus_reads_the_inner_policy_of_its_base_class', () => {
+    class PeekingScoring extends ScoringDecorator<CounterState> {
+      peek(): unknown {
+        // @ts-expect-error `inner` is private (issue #231). A bonus keeps its own reference.
+        return this.inner;
+      }
+    }
+
+    expect(new PeekingScoring(new RecordingScoring()).score(before, after)).toEqual(Score.of(7));
+  });
 });
