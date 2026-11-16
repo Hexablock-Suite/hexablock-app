@@ -3,7 +3,7 @@ import { Outcome } from '../../src/domain/engine/outcome';
 import { phaseNameOf } from '../support/engine/phase-name';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import type { RunningGameStore } from '../../src/application/running-game-store';
+import type { GameRepository } from '../../src/application/game-repository';
 import { UndoMove } from '../../src/application/undo-move';
 import type { BoardState } from '../../src/domain/engine/board-state';
 import { PlayingPhase } from '../../src/domain/engine/game-phase';
@@ -18,7 +18,7 @@ import type { NewTile } from '../../src/domain/variants/hexa-merge/new-tile';
 import {
   errorOf,
   gameUseCases,
-  type MemoryRunningGameStore,
+  type MemoryGameRepository,
   valueOf,
 } from '../support/application/game-use-cases';
 import { firstMoveOf, firstValidMove } from '../support/engine/variant-game';
@@ -54,7 +54,7 @@ function factsOf<
   TCoord,
   TMove,
   TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
->(games: MemoryRunningGameStore<TCell, TCoord, TMove, TState>) {
+>(games: MemoryGameRepository<TCell, TCoord, TMove, TState>) {
   const engine = games.running();
   const state = engine.snapshot();
   return {
@@ -141,7 +141,7 @@ describe('UndoMove', () => {
     expect(source).not.toMatch(/hexa-|domain\/variants|Lines|Fit|Sort|Merge/);
   });
 
-  it('should_return_a_no_running_game_failure_when_the_store_has_no_game', async () => {
+  it('should_return_a_no_running_game_failure_when_the_repository_has_no_game', async () => {
     const { undoMove } = gameUseCases(mergeFactory());
 
     const error = errorOf(await undoMove.execute({}));
@@ -219,17 +219,17 @@ describe('UndoMove', () => {
     expect(factsOf(games)).toEqual(before);
   });
 
-  it('should_return_an_undo_failed_failure_when_the_store_throws', async () => {
-    const store = {
+  it('should_return_an_undo_failed_failure_when_the_repository_throws', async () => {
+    const repository = {
       current: () => {
-        throw new Error('The store cannot read.');
+        throw new Error('The repository cannot read.');
       },
       replace: () => undefined,
-    } as unknown as RunningGameStore<unknown, unknown, unknown, never>;
+    } as unknown as GameRepository<unknown, unknown, unknown, never>;
 
-    const error = errorOf(await new UndoMove(store).execute({}));
+    const error = errorOf(await new UndoMove(repository).execute({}));
 
-    expect([error.code, error.message]).toEqual(['undo-failed', 'The store cannot read.']);
+    expect([error.code, error.message]).toEqual(['undo-failed', 'The repository cannot read.']);
   });
 });
 

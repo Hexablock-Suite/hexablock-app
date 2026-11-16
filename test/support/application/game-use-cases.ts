@@ -1,11 +1,11 @@
 import { ApplyMove } from '../../../src/application/apply-move';
+import type { GameEventPublisher } from '../../../src/application/game-event-publisher';
+import type { GameRepository } from '../../../src/application/game-repository';
 import type { Result, UseCaseError } from '../../../src/application/result';
-import type { RunningGameStore } from '../../../src/application/running-game-store';
 import { StartGame } from '../../../src/application/start-game';
 import { UndoMove } from '../../../src/application/undo-move';
 import type { BoardState } from '../../../src/domain/engine/board-state';
 import type { Cloneable } from '../../../src/domain/engine/cloneable';
-import type { GameEventPublisher } from '../../../src/application/game-event-publisher';
 import type { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameFactory } from '../../../src/domain/engine/game-factory';
 import type { MatchIdGenerator } from '../../../src/domain/engine/match-id-generator';
@@ -17,14 +17,15 @@ import { RecordingPublisher } from './recording-publisher';
 
 // Helpers for the game use case tests. They exist only in test/.
 
-// A test double of the `RunningGameStore` port. It keeps zero or one engine in memory.
-// `InMemoryRunningGameStore` of layer 3 comes with the composition root.
-export class MemoryRunningGameStore<
+// A test double of the `GameRepository` port, the repository of the game aggregate.
+// It keeps zero or one engine in memory.
+// `InMemoryGameRepository` of layer 3 comes with the composition root.
+export class MemoryGameRepository<
   TCell,
   TCoord,
   TMove,
   TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
-> implements RunningGameStore<TCell, TCoord, TMove, TState> {
+> implements GameRepository<TCell, TCoord, TMove, TState> {
   private game: GameEngine<TCell, TCoord, TMove, TState> | undefined;
 
   current(): GameEngine<TCell, TCoord, TMove, TState> | undefined {
@@ -42,7 +43,7 @@ export class MemoryRunningGameStore<
   }
 }
 
-// The game use cases of one variant over one shared store.
+// The game use cases of one variant over one shared repository.
 // `ApplyMove` delivers the events of each turn to `events`, and it writes a publisher
 // failure to `logger` (issues 132 and 233).
 // `ids` gives the id of each game that `StartGame` opens. The first state of each game
@@ -59,7 +60,7 @@ export function gameUseCases<
   logger: RecordingLogger = new RecordingLogger(),
   ids: MatchIdGenerator = new CountingMatchIds(),
 ) {
-  const games = new MemoryRunningGameStore<TCell, TCoord, TMove, TState>();
+  const games = new MemoryGameRepository<TCell, TCoord, TMove, TState>();
   return {
     games,
     logger,

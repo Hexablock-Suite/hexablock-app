@@ -4,7 +4,7 @@ import { GameEngine } from '../../src/domain/engine/game-engine';
 import { GameId } from '../../src/domain/engine/game-id';
 import { PlayingPhase } from '../../src/domain/engine/game-phase';
 import { Score } from '../../src/domain/engine/score';
-import { errorOf, MemoryRunningGameStore } from '../support/application/game-use-cases';
+import { errorOf, MemoryGameRepository } from '../support/application/game-use-cases';
 import { RecordingLogger } from '../support/application/recording-logger';
 import { RecordingPublisher } from '../support/application/recording-publisher';
 import { fakeCell, type FakeCell } from '../support/engine/fake-cell';
@@ -24,7 +24,7 @@ const FULL = Score.of(Number.MAX_SAFE_INTEGER);
 // One cell and the largest score: the only move would end the game with a total
 // that is not a valid score.
 function overflowingGame() {
-  const games = new MemoryRunningGameStore<FakeCell, SquareCoord, FakeMove, FakeState>();
+  const games = new MemoryGameRepository<FakeCell, SquareCoord, FakeMove, FakeState>();
   const publisher = new RecordingPublisher();
   const engine = new GameEngine(
     MATCH_ID,
