@@ -9,7 +9,9 @@ import type { ProgressRecord } from './progress-model';
 // A progress model records each result in it (`IProgressModel`).
 // The progress asks each record whether it `improves()` the stored record.
 // So it keeps the best record by the order of DS-4 and DS-12, and a tie keeps the stored record.
-// Every field is private.
+// Every field is private. A repository of the edge receives the fields through `deliverTo()`
+// (issue #164). It builds a saved progress again with `start()`, `recordScore()`
+// and `recordLevel()`, so the progress keeps its rules when it comes back from storage.
 export class GameProgress {
   private highScore: ProgressRecord | undefined = undefined;
   // One record per level, in the order of the first result of each level.
@@ -54,4 +56,24 @@ export class GameProgress {
       this.highScore?.equals(record) === true || this.levels.some((stored) => stored.equals(record))
     );
   }
+
+  // Gives the game id, the high score and the record of each level to `receiver`.
+  // It returns nothing. A progress with no high score gives `undefined` for it.
+  // The levels come in the order of the first result of each level, in a new list,
+  // so the receiver cannot change the progress. Only a repository of the edge calls it
+  // (rule R-no-delivery-call).
+  deliverTo(receiver: GameProgressReceiver): void {
+    receiver.receive(this.gameId, this.highScore, [...this.levels]);
+  }
+}
+
+// The receiver of the data of a `GameProgress`. A repository of the edge implements it,
+// for example to save the progress (issue #164). No code of `src/domain/`
+// or `src/application/` calls `deliverTo()` (rule R-no-delivery-call).
+export interface GameProgressReceiver {
+  receive(
+    gameId: GameId,
+    highScore: ProgressRecord | undefined,
+    levels: readonly ProgressRecord[],
+  ): void;
 }

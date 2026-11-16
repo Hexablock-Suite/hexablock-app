@@ -76,8 +76,8 @@
           ProgressRepository port, which ApiProgressRepository in layer 4 implements, records the
           result in it with IProgressModel in layer 1, and saves it through the same port.
           ApiDtoMapper makes a ProgressDto, and ApiClient sends it over HTTP to
-          ProgressController.sync() of hexablock-api. The response travels back as a Result to the
-          screen.
+          ProgressController.sync() of hexablock-api. The response travels back to the screen as a
+          Result with no value.
         </desc>
         <defs>
           <marker
@@ -986,7 +986,7 @@
           stroke-dasharray="4,3"
           marker-end="url(#seqsave-reply)"
         />
-        <rect x="245.35" y="492" width="121.3" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="271.175" y="492" width="69.65" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="306"
           y="502"
@@ -995,7 +995,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          Result&lt;ProgressRecord&gt;
+          Result&lt;void&gt;
         </text>
         <!-- Reply: presenter returns to screen -->
         <line
@@ -1027,7 +1027,7 @@
           stroke-width="1"
           marker-end="url(#seqsave-call)"
         />
-        <rect x="106" y="566" width="157.35" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="106" y="566" width="91.05" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="110"
           y="576"
@@ -1036,7 +1036,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="start"
         >
-          shows the stars and the score
+          shows the result
         </text>
         <!-- Footnote -->
         <text
@@ -1097,7 +1097,8 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           When load() finds no progress, SaveProgress starts one with GameProgress.start() (S3-04,
-          #164). record() returns nothing: the progress keeps the best result by DS-4.
+          #164). record() returns nothing: the progress keeps the best result by DS-4, and
+          SaveProgress returns no value.
         </text>
         <!-- Legend -->
         <line x1="24" y1="746" x2="1216" y2="746" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />

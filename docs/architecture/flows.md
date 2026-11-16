@@ -25,7 +25,7 @@ View 3.2 of [classes.md](classes.md) shows `ApplyMove` with layers 2 and 1 only,
 
 ## Use case 2: save progress
 
-`SaveProgress` (APP-FR-09, APP-FR-13) saves the result of a finished game. `VictoryScreen` gives the `GameResult` to `ResultPresenter`, which calls the `UseCase` port. `SaveProgress` loads the `GameProgress` of the game through the `ProgressRepository` port, records the result in it with its `IProgressModel` strategy, and saves it through the same port (S3-04, classes.md decision 54). `ApiProgressRepository` in layer 4 implements that port: `ApiDtoMapper` makes a `ProgressDto`, and `ApiClient` sends it to `ProgressController.sync()` of `hexablock-api` (API-FR-02). The response comes back as a `Result` to the screen.
+`SaveProgress` (APP-FR-09, APP-FR-13) saves the result of a finished game. `VictoryScreen` gives the `GameResult` to `ResultPresenter`, which calls the `UseCase` port. `SaveProgress` loads the `GameProgress` of its game through the `ProgressRepository` port, or starts one when the game has none, records the result in it with its `IProgressModel` strategy, and saves it through the same port (S3-04, classes.md decisions 54 and 55). `ApiProgressRepository` in layer 4 implements that port: `ApiDtoMapper` makes a `ProgressDto`, and `ApiClient` sends it to `ProgressController.sync()` of `hexablock-api` (API-FR-02). The response comes back to the screen as a `Result` with no value. `LocalProgressRepository` in layer 3 implements the same port over `KeyValueStore` (#164), and view 4.2 shows it.
 
 This flow takes `SaveProgress` and not `SyncLeaderboard`, for two reasons:
 
@@ -126,6 +126,7 @@ Each other use case follows the path of one flow above. Its own classes are in t
 
 - `ApplyMoveRequest` holds the move only. `ResultPresenter.onFinish()` and `ApiClient.syncProgress()` are planned members. Today `ApiClient` has `getHealth()` only.
 - The composition root binds `ProgressRepository` to `ApiProgressRepository` for a signed-in player. This is an assumption for team review: the docs do not say yet when `LocalProgressRepository` runs instead.
+- Flow 2: `SaveProgress`, the `ProgressRepository` port, `GameProgress` and `LocalProgressRepository` are code since #164, but the composition root does not build `SaveProgress` yet. `VictoryScreen`, `ResultPresenter`, `ApiProgressRepository`, `ApiDtoMapper.toProgressDto()` and `ApiClient.syncProgress()` are planned.
 - The route path of `ProgressController.sync()` waits on the OpenAPI export of the endpoint.
 - Flow 3: `GamePresenter.startGame`, `GamePresenter.onStart(request: StartGameRequest)` and `StartGameRequest.levelId` are planned members. The sequence diagram draws the code: each variant factory calls `BoardBuilder`. No view says yet how the level definition reaches the level builder (#172), so the diagram draws no level builder.
 - Flow 4: `GamePresenter.undoMove` and `GamePresenter.onUndo()` are planned members. `MoveHistory.undo()` returns `void`, and `GameEngine` takes the state back through its private `restore(memento)`: the engine gives each `MoveCommand` this method as a function (decision 34, #159). `MoveCommand.after` and `redo()` come with `RedoableHistory` (#178).

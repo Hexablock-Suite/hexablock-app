@@ -9,6 +9,7 @@ import { Moves } from '../../../src/domain/engine/moves';
 import { GameResult, ProgressRecord } from '../../../src/domain/engine/progress-model';
 import { Score } from '../../../src/domain/engine/score';
 import { Stars } from '../../../src/domain/engine/stars';
+import { contentOf } from '../../support/engine/progress-content';
 
 // The local progress of one game is one object with the high score and the best result
 // of each level (S3-04, issue #156). A progress model records each result in it.
@@ -75,6 +76,45 @@ describe('GameProgress', () => {
     expect(progress.keeps(levelRecord('l2', 1, 40))).toBe(false);
     // A level result is not the high score, and a high score is not a level result.
     expect(progress.keeps(highScore(0))).toBe(false);
+  });
+
+  // The fields are private. A repository of the edge receives them through `deliverTo()`
+  // (issue #164), and the delivery returns nothing.
+  it('should_deliver_the_game_id_the_high_score_and_each_level_result_when_a_receiver_takes_the_progress', () => {
+    const progress = GameProgress.start(gameId);
+    progress.recordLevel(levelRecord('l2', 1, 40));
+    progress.recordScore(highScore(35));
+    progress.recordLevel(levelRecord('l1', 3, 10, 2000));
+    progress.recordLevel(levelRecord('l2', 2, 50));
+
+    const content = contentOf(progress);
+
+    expect(content.gameId.equals(gameId)).toBe(true);
+    expect(content.highScore?.equals(highScore(35))).toBe(true);
+    // One result per level, in the order of the first result of each level.
+    expect(content.levels).toHaveLength(2);
+    expect(content.levels[0].equals(levelRecord('l2', 2, 50))).toBe(true);
+    expect(content.levels[1].equals(levelRecord('l1', 3, 10, 2000))).toBe(true);
+    expect(progress.deliverTo({ receive: () => undefined })).toBeUndefined();
+  });
+
+  it('should_deliver_no_high_score_and_no_level_result_when_the_progress_is_new', () => {
+    const content = contentOf(GameProgress.start(gameId));
+
+    expect(content.gameId.equals(gameId)).toBe(true);
+    expect(content.highScore).toBeUndefined();
+    expect(content.levels).toEqual([]);
+  });
+
+  // The delivery gives a copy of the list, so a receiver cannot change the progress.
+  it('should_keep_its_level_results_when_a_receiver_empties_the_delivered_list', () => {
+    const progress = GameProgress.start(gameId);
+    progress.recordLevel(levelRecord('l1', 3, 10));
+
+    (contentOf(progress).levels as ProgressRecord[]).length = 0;
+
+    expect(contentOf(progress).levels).toHaveLength(1);
+    expect(progress.keeps(levelRecord('l1', 3, 10))).toBe(true);
   });
 
   // A progress is an entity (classes.md decision 52): its identity is the id of its game.

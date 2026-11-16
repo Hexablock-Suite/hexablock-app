@@ -38,9 +38,8 @@ const GAME_NAME = /^game\.([a-z0-9-]+)\.name$/;
 // and the texts of one language, so a test builds it without a screen.
 // The selector lists the games in the order of the registry. So a fifth variant adds one entry
 // to the registry and its texts to the catalog, and this presenter does not change.
-// `GameId` keeps its text private and has no `deliverTo()`. So the presenter finds the texts
-// of a game with `GameId.equals()`: it compares the id of each game that the catalog names
-// with the registered id.
+// `GameId` keeps its text private. The presenter finds the texts of a game with `GameId.equals()`:
+// it compares the id of each game that the catalog names with the registered id.
 export class HomePresenter {
   constructor(
     private readonly games: readonly GameId[],

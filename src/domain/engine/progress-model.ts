@@ -84,6 +84,7 @@ export class GameResult {
 // So the record has no check of its own: a `Score`, a `LevelId`, `Stars`, `Moves`
 // and an `ElapsedTime` are valid when they exist.
 // Every field is private (issue #240). A progress keeps the best record with `improves()`.
+// A repository of the edge receives the fields through `deliverTo()` (issue #164).
 export class ProgressRecord {
   private constructor(
     private readonly gameId: GameId,
@@ -148,6 +149,27 @@ export class ProgressRecord {
       false
     );
   }
+
+  // Gives the value objects of this record to `receiver`. It returns nothing.
+  // A record of a game with no levels gives no level id, no stars, no moves and no time.
+  // Only a repository of the edge calls it (rule R-no-delivery-call).
+  deliverTo(receiver: ProgressRecordReceiver): void {
+    receiver.receive(this.gameId, this.score, this.levelId, this.stars, this.moves, this.elapsedMs);
+  }
+}
+
+// The receiver of the value objects of a `ProgressRecord`. A repository of the edge
+// implements it, for example to save the record (issue #164). No code of `src/domain/`
+// or `src/application/` calls `deliverTo()` (rule R-no-delivery-call).
+export interface ProgressRecordReceiver {
+  receive(
+    gameId: GameId,
+    score: Score,
+    levelId: LevelId | undefined,
+    stars: Stars | undefined,
+    moves: Moves | undefined,
+    elapsedMs: ElapsedTime | undefined,
+  ): void;
 }
 
 // Compares two optional value objects with `same`, the `equals()` of their class.

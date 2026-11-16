@@ -88,7 +88,8 @@
           Moves, a LevelId and an ElapsedTime, and ProgressRecord holds a LevelId, Stars, a Moves
           and an ElapsedTime. Their fields are private: GameResult creates the ProgressRecord of a
           progress model with recordWith(), and ProgressRecord tells with improves() whether it is
-          better than the stored record, by the order of DS-4.
+          better than the stored record, by the order of DS-4. ProgressRecord gives its value
+          objects to a repository of the edge with deliverTo().
         </desc>
         <defs>
           <marker
@@ -783,15 +784,15 @@
         <line
           x1="608"
           y1="752"
-          x2="512"
+          x2="540"
           y2="752"
           stroke-width="1"
           marker-end="url(#sources-open)"
           stroke="#5b6873"
         />
-        <rect x="538" y="732" width="44" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="552" y="732" width="44" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="560"
+          x="574"
           y="741"
           fill="#7d8a94"
           font-size="8"
@@ -805,16 +806,16 @@
         <rect
           x="232"
           y="688"
-          width="280"
+          width="308"
           height="208"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="232" y1="736" x2="512" y2="736" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="232" y1="736" x2="540" y2="736" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="372"
+          x="386"
           y="706"
           fill="#5b6873"
           font-size="8"
@@ -825,7 +826,7 @@
           «value object»
         </text>
         <text
-          x="372"
+          x="386"
           y="724"
           fill="#17212a"
           font-size="12"
@@ -853,15 +854,15 @@
         <text x="248" y="832" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - elapsedMs: ElapsedTime [0..1]
         </text>
-        <line x1="232" y1="840" x2="512" y2="840" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="232" y1="840" x2="540" y2="840" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="248" y="856" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + improves(other: ProgressRecord): boolean
         </text>
         <text x="248" y="872" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + isForSameLevelAs(other: ProgressRecord):
+          + isForSameLevelAs(other: ProgressRecord): boolean
         </text>
-        <text x="259" y="888" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          boolean
+        <text x="248" y="888" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + deliverTo(receiver: ProgressRecordReceiver): void
         </text>
 
         <!-- Class: GameResult (value object, private fields) -->
