@@ -8,7 +8,8 @@ import type { Turns } from './turns';
 // One piece type for the four variants: a shape plus the content it puts on the board
 // (classes.md decision 6). A piece never changes: each operation returns a new piece.
 // The shape and the content are private (classes.md decision 49).
-// A reader asks the piece for the coordinates that it covers and for the cell that it puts.
+// A reader asks the piece for the coordinates that it covers and for its occupant,
+// the cell that it puts on each of them (issue #234).
 export class Piece<TCell, TCoord> implements Cloneable<Piece<TCell, TCoord>> {
   constructor(
     private readonly shape: ShapeNode<TCoord>,
@@ -24,14 +25,14 @@ export class Piece<TCell, TCoord> implements Cloneable<Piece<TCell, TCoord>> {
   }
 
   // The coordinates that the piece covers, in the order of its shape. Each call gives a new list.
-  cells(): TCoord[] {
+  coveredCoordinates(): TCoord[] {
     return this.shape.cells();
   }
 
-  // The cell that the piece puts on each coordinate that it covers:
+  // The occupant of the piece: the cell that it puts on each coordinate that it covers,
   // a color in Lines, a stack in Sort and the id of the piece in Fit.
   // A cell is a value, so the caller and the piece share it.
-  cell(): TCell {
+  occupant(): TCell {
     return this.content;
   }
 

@@ -71,6 +71,6 @@ describe('Seed', () => {
 
     expect(first(Seed.of(42))).toEqual(first(Seed.of(42)));
     expect(first(Seed.of(42))).not.toEqual(first(Seed.of(43)));
-    expect(new SeededPieceSource(Seed.of(42), draw).seed.equals(Seed.of(42))).toBe(true);
+    expect(new SeededPieceSource(Seed.of(42), draw).isSeededWith(Seed.of(42))).toBe(true);
   });
 });

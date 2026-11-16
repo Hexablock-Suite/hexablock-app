@@ -18,7 +18,7 @@ import { FitLevel } from '../../../../src/domain/variants/hexa-fit/fit-level';
 import { PlaceFitPiece } from '../../../../src/domain/variants/hexa-fit/fit-move';
 import { FitRules } from '../../../../src/domain/variants/hexa-fit/fit-rules';
 import { ManualClock } from '../../../support/engine/manual-clock';
-import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
+import { square, squareTopology } from '../../../support/engine/square-topology';
 import { startVariant } from '../../../support/engine/variant-game';
 import { A, fitFactory, threeDominoFitFactory } from '../../../support/variants/hexa-fit/fit-game';
 import { repoRoot } from '../../../support/run-tool';
@@ -37,19 +37,22 @@ describe('FitFactory', () => {
     const { engine } = startVariant(factory);
     const outcome = engine.play(new PlaceFitPiece(A, Turns.of(0), square(0, 0)));
 
-    expect(factory.gameId.equals(GameId.of('hexa-fit'))).toBe(true);
+    expect([factory.isFor(GameId.of('hexa-fit')), factory.isFor(GameId.of('hexa-sort'))]).toEqual([
+      true,
+      false,
+    ]);
     expect(
       factory
         .createBoard(BOARD_ID)
         .coordinates()
         .map((c) => squareTopology.key(c)),
     ).toEqual(['0,0', '1,0']);
-    expect(initial.remaining().map((p) => delivered(p.cell()))).toEqual(['a']);
+    expect(initial.remaining().map((p) => delivered(p.occupant()))).toEqual(['a']);
     expect(outcome).toBe(Outcome.victory);
     expect(engine.snapshot().score).toEqual(Score.of(0));
     expect(engine.takeEvents().map(dataOf)).toEqual([
       {
-        gameId: factory.gameId,
+        gameId: GameId.of('hexa-fit'),
         matchId: MATCH_ID,
         outcome: Outcome.victory,
         finalScore: Score.of(0),
@@ -60,8 +63,8 @@ describe('FitFactory', () => {
   it('should_give_a_new_source_of_the_level_pieces_when_the_fit_factory_is_asked_twice', () => {
     const factory = fitFactory();
 
-    const first = [...factory.createPieceSource()].map((p) => delivered(p.cell()));
-    const second = [...factory.createPieceSource()].map((p) => delivered(p.cell()));
+    const first = [...factory.createPieceSource()].map((p) => delivered(p.occupant()));
+    const second = [...factory.createPieceSource()].map((p) => delivered(p.occupant()));
 
     expect(first).toEqual(['a']);
     expect(second).toEqual(['a']);
@@ -82,12 +85,16 @@ describe('FitFactory', () => {
     );
   });
 
-  it('should_wrap_the_fit_rules_in_the_timer_when_the_fit_factory_creates_the_rules', () => {
-    const rules = fitFactory().createRules(MATCH_ID);
+  // The factory gives the timer as an optional part, as it gives the history.
+  // `GameFactory` wraps the rules in `TimedRulesDecorator` (issue #234, decision 19).
+  it('should_give_plain_fit_rules_and_a_new_timer_when_the_fit_factory_creates_them', () => {
+    const factory = fitFactory();
+    const timer = factory.createTimer(MATCH_ID);
 
-    expect(rules).toBeInstanceOf(TimedRulesDecorator);
-    expect(new FitRules<SquareCoord>().timed()).toBeUndefined();
-    expect(rules.timed()?.elapsedMs()).toEqual(ElapsedTime.ofMs(0));
+    expect(factory.createRules()).toBeInstanceOf(FitRules);
+    expect(timer).toBeInstanceOf(LevelTimer);
+    expect(timer.elapsedMs()).toEqual(ElapsedTime.ofMs(0));
+    expect(timer).not.toBe(factory.createTimer(MATCH_ID));
   });
 
   it('should_give_each_game_its_own_timer_when_the_fit_factory_starts_two_games', () => {
@@ -99,33 +106,30 @@ describe('FitFactory', () => {
     first.engine.play(new PlaceFitPiece(A, Turns.of(0), square(0, 0)));
     clock.advance(1_000);
 
-    expect(first.engine.timed()?.elapsedMs()).toEqual(ElapsedTime.ofMs(1_000));
-    expect(second.engine.timed()?.elapsedMs()).toEqual(ElapsedTime.ofMs(0));
+    expect(first.engine.elapsedTime()).toEqual(ElapsedTime.ofMs(1_000));
+    expect(second.engine.elapsedTime()).toEqual(ElapsedTime.ofMs(0));
   });
 
   // The timer is an entity with a local id (issue #236, classes.md decisions 19, 50 and 52).
-  // `createRules()` gives the timer as `ITimed`, and `ITimed` shows no id.
-  // So the test compares the timer with a timer that holds the expected id.
-  it('should_give_the_timer_the_id_of_the_match_when_the_fit_factory_creates_the_rules', () => {
+  // The test compares the timer with a timer that holds the expected id.
+  it('should_give_the_timer_the_id_of_the_match_when_the_fit_factory_creates_the_timer', () => {
     const clock = new ManualClock();
 
-    const timer = fitFactory(clock).createRules(MATCH_ID).timed();
+    const timer = fitFactory(clock).createTimer(MATCH_ID);
 
-    expect(timer).toBeInstanceOf(LevelTimer);
     expect([
-      (timer as LevelTimer).equals(new LevelTimer(TIMER_ID, clock)),
-      (timer as LevelTimer).equals(new LevelTimer(LevelTimerId.of(MATCH_ID), new ManualClock())),
-      (timer as LevelTimer).equals(new LevelTimer(LevelTimerId.of(MatchId.of('match-b')), clock)),
+      timer.equals(new LevelTimer(TIMER_ID, clock)),
+      timer.equals(new LevelTimer(LevelTimerId.of(MATCH_ID), new ManualClock())),
+      timer.equals(new LevelTimer(LevelTimerId.of(MatchId.of('match-b')), clock)),
     ]).toEqual([true, true, false]);
   });
 
-  it('should_give_two_timers_with_different_ids_and_separate_readings_when_the_rules_are_created_for_two_matches', () => {
+  it('should_give_two_timers_with_different_ids_and_separate_readings_when_the_timers_are_created_for_two_matches', () => {
     const clock = new ManualClock();
     const factory = threeDominoFitFactory(clock);
-    const firstRules = factory.createRules(MatchId.of('match-a'));
-    const secondRules = factory.createRules(MatchId.of('match-b'));
-    const first = firstRules.timed() as LevelTimer;
-    const second = secondRules.timed() as LevelTimer;
+    const first = factory.createTimer(MatchId.of('match-a'));
+    const second = factory.createTimer(MatchId.of('match-b'));
+    const firstRules = new TimedRulesDecorator(factory.createRules(), first);
 
     firstRules.playTurn(
       factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID),

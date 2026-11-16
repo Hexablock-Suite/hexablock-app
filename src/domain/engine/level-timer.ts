@@ -10,7 +10,9 @@ import type { ITimed } from './timed';
 // It changes in place, so it is not a value object. Its `LevelTimerId` is its identity.
 // The id never changes, and `equals()` compares two timers by it. The readings do not count.
 // The id is local: a timed variant factory builds it from the `MatchId` of the game (decision 52).
-// The root keeps no field for the timer: it reaches the timer through `IGameRules.timed()`.
+// The root keeps the timer as an optional part, as it keeps the history (classes.md decision 3).
+// `GameFactory` gives the same timer to the root and to the decorator, and the root reads
+// the time of play in `elapsedTime()` (issue #234).
 export class LevelTimer implements ITimed {
   private startedAt: number | undefined;
   private stoppedAt: number | undefined;

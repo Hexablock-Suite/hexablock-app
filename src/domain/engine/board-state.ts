@@ -11,6 +11,7 @@ import type { Score } from './score';
 // `GameEngine.snapshot()` and `moveResultOf()` read it. It has no tactical stereotype.
 // It carries domain values and no business method. It is frozen, and it holds a copy of the board,
 // so a change to the photo never changes the state, and a later move never changes the photo.
+// It hands out no board that a caller owns: `ReadonlyBoard` has no `clone()` (issue #234).
 // It holds the two ids of the state, so a state takes back only its own photo.
 // `view()` gives the plain data that the screen of the variant draws (decision 29).
 // Each variant photo extends it with the data of its variant and narrows `view()`.

@@ -91,7 +91,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
       this.offered = undefined;
       return;
     }
-    const { piece, rest } = this.source.take();
+    const [piece, rest] = this.source.take();
     this.offered = piece;
     this.source = rest;
   }
@@ -111,7 +111,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
     if (!this.isFree(at)) {
       throw new RangeError(`The cell ${this.board.key(at)} already holds a stack.`);
     }
-    this.board.occupy(at, this.offered.cell());
+    this.board.occupy(at, this.offered.occupant());
     this.placedAt = at;
     this.clearedTiles = [];
     this.offerNext();
@@ -122,7 +122,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
   // A cell `from` with no tile, the same cell twice, or a cell `to` outside the board
   // throws a RangeError.
   moveRun(from: TCoord, to: TCoord): void {
-    const giver = this.board.get(from);
+    const giver = this.board.occupantAt(from);
     if (giver === undefined || giver.isEmpty()) {
       throw new RangeError(`The cell ${this.board.key(from)} has no stack to move.`);
     }
@@ -130,7 +130,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
     if (this.board.key(from) === this.board.key(to)) {
       throw new RangeError(`A run cannot move to its own cell ${this.board.key(to)}.`);
     }
-    const receiver = this.board.get(to) ?? ColorStack.empty();
+    const receiver = this.board.occupantAt(to) ?? ColorStack.empty();
     this.board.occupy(from, giver.withoutTopRun());
     this.board.occupy(to, receiver.withOnTop(giver.topRun()));
   }
@@ -139,7 +139,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
   // and `clearedTiles` keeps the tile count of the stack for the scoring (#98).
   // A cell with no tile throws a RangeError.
   clearStack(at: TCoord): void {
-    const stack = this.board.get(at);
+    const stack = this.board.occupantAt(at);
     if (stack === undefined || stack.isEmpty()) {
       throw new RangeError(`The cell ${this.board.key(at)} has no stack to clear.`);
     }
@@ -205,7 +205,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
 
   // A cell inside the board with no stack, or with an empty stack, is free.
   private isFree(at: TCoord): boolean {
-    return this.board.contains(at) && (this.board.get(at)?.isEmpty() ?? true);
+    return this.board.contains(at) && (this.board.occupantAt(at)?.isEmpty() ?? true);
   }
 
   private checkInside(at: TCoord): void {

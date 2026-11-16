@@ -1,8 +1,10 @@
 /** @jest-environment node */
 import { BoardShape } from '../../../../src/domain/engine/board-shape';
 import { TopologyId } from '../../../../src/domain/engine/geometry-factory';
+import { HexGeometry } from '../../../../src/domain/engine/hex-geometry';
 import { Piece } from '../../../../src/domain/engine/piece';
 import { CellNode, ShapeGroup } from '../../../../src/domain/engine/shape-node';
+import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
 import { FitLevel } from '../../../../src/domain/variants/hexa-fit/fit-level';
 import type { PieceId } from '../../../../src/domain/variants/hexa-fit/piece-id';
 import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
@@ -25,7 +27,7 @@ function row(length: number): BoardShape<SquareCoord> {
 }
 
 function ids(level: FitLevel<SquareCoord>): string[] {
-  return level.trayPieces().map((piece) => delivered(piece.cell()));
+  return level.trayPieces().map((piece) => delivered(piece.occupant()));
 }
 
 describe('FitLevel', () => {
@@ -90,17 +92,19 @@ describe('FitLevel', () => {
     }
   });
 
-  it('should_tell_its_geometry_family_when_a_factory_asks_the_level', () => {
+  // Issue #234: a geometry keeps its family private, so the level asks the geometry.
+  it('should_tell_whether_it_runs_on_a_geometry_when_a_factory_asks_the_level', () => {
     const level = FitLevel.of(TopologyId.square, row(2), [domino(A)]);
+    const hexGeometry = new HexGeometry();
 
-    expect(level.isOf(TopologyId.square)).toBe(true);
-    expect(level.isOf(TopologyId.hex)).toBe(false);
-    // Issue #237: the error carries the two topologies as its `cause`.
-    const error = level.wrongFamily(TopologyId.hex);
+    expect(level.runsOn(new SquareGeometry())).toBe(true);
+    expect(level.runsOn(hexGeometry)).toBe(false);
+    // Issue #237: the error carries the topology of the level and the geometry as its `cause`.
+    const error = level.wrongFamily(hexGeometry);
     expect(error).toEqual(
       new RangeError('A Fit level cannot start on the geometry of another topology.'),
     );
-    expect(error.cause).toEqual({ topology: TopologyId.square, geometry: TopologyId.hex });
+    expect(error.cause).toEqual({ topology: TopologyId.square, geometry: hexGeometry });
   });
 
   it('should_give_its_figure_as_a_tree_of_cells_when_a_factory_asks_the_level', () => {

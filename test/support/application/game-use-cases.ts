@@ -11,6 +11,7 @@ import { GameFactory } from '../../../src/domain/engine/game-factory';
 import type { MatchIdGenerator } from '../../../src/domain/engine/match-id-generator';
 import type { IVariantFactory } from '../../../src/domain/engine/variant-factory';
 import { CountingMatchIds } from '../engine/match-id';
+import { gameIdOf } from '../engine/variant-game';
 import { RecordingLogger } from './recording-logger';
 import { RecordingPublisher } from './recording-publisher';
 
@@ -63,7 +64,7 @@ export function gameUseCases<
   return {
     games,
     logger,
-    startGame: new StartGame(new GameFactory(factory, ids), games),
+    startGame: new StartGame(new GameFactory(gameIdOf(factory), factory, ids), games),
     applyMove: new ApplyMove(games, logger, events),
     undoMove: new UndoMove(games),
   };

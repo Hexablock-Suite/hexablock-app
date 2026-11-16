@@ -61,6 +61,13 @@ export class HexCoord {
   key(): CoordKey {
     return coordKey(`${this.q},${this.r}`);
   }
+
+  // Gives the two values of the coordinate, `[q, r]`, to `receiver`. It returns nothing.
+  // A screen layout of layer 4 places the cell from them (issue #165).
+  // No code of the domain or of the use cases calls it (rule R-no-delivery-call).
+  deliverTo(receiver: ValueReceiver<readonly [number, number]>): void {
+    receiver.receive([this.q, this.r]);
+  }
 }
 
 // Creates a coordinate. It is the short name of `HexCoord.of()`, which checks the values.

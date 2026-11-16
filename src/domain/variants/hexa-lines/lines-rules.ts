@@ -70,7 +70,7 @@ function fullLines<TCoord>(board: ReadonlyBoard<Color, TCoord>): TCoord[][] {
       const id = lineId(board, line);
       if (seen.has(id)) continue;
       seen.add(id);
-      if (line.every((c) => board.get(c) !== undefined)) full.push(line);
+      if (line.every((c) => board.occupantAt(c) !== undefined)) full.push(line);
     }
   }
   return full;

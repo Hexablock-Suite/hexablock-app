@@ -105,16 +105,25 @@ export class LinesFactory<TCoord> implements IVariantFactory<
   PlacePiece<TCoord>,
   LinesState<TCoord>
 > {
-  readonly gameId = GameId.of('hexa-lines');
+  private readonly gameId = GameId.of('hexa-lines');
 
   constructor(
     private readonly geometry: GeometryFactory<TCoord>,
     private readonly settings: LinesSettings<TCoord>,
   ) {}
 
-  // Hexa Lines has no timer, so the rules need no `MatchId` (classes.md decision 50).
-  createRules(_matchId: MatchId): IGameRules<PlacePiece<TCoord>, LinesState<TCoord>> {
+  // True when `gameId` names Hexa Lines. The id stays private (issue #234).
+  isFor(gameId: GameId): boolean {
+    return this.gameId.equals(gameId);
+  }
+
+  createRules(): IGameRules<PlacePiece<TCoord>, LinesState<TCoord>> {
     return new LinesRules<TCoord>();
+  }
+
+  // Hexa Lines has no timer (classes.md decision 19).
+  createTimer(_matchId: MatchId): undefined {
+    return undefined;
   }
 
   createScoring(): IScoringPolicy<LinesState<TCoord>> {

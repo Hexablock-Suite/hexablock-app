@@ -22,12 +22,26 @@ function firstMoveIn(root: CompositionRoot, gameId: GameId): unknown {
   return root
     .registry()
     .gameOf(gameId)
-    .withFactory({ use: (factory) => firstMoveOf(factory) });
+    .withFactory({ use: (_gameId, factory) => firstMoveOf(factory) });
 }
 
 describe('CompositionRoot', () => {
   it('should_register_the_four_variants_when_the_root_is_built', () => {
     expect(testRoot().registry().gameIds().map(variantIdOf)).toEqual(FOUR_VARIANTS);
+  });
+
+  // Issue #234: the registry pairs each id with its factory in one place, and the root gives
+  // that id to `GameFactory`. A factory that does not build the game of its id fails here.
+  it('should_pair_each_registered_id_with_the_factory_of_that_game_when_the_root_is_built', () => {
+    const registry = testRoot().registry();
+
+    const pairs = registry.gameIds().map((id) =>
+      registry.gameOf(id).withFactory({
+        use: (gameId, factory) => gameId.equals(id) && factory.isFor(gameId),
+      }),
+    );
+
+    expect(pairs).toEqual([true, true, true, true]);
   });
 
   // The first move of a new game of the registered factory is valid in the game that

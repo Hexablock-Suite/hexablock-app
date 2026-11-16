@@ -77,7 +77,8 @@
           and the Outcome and no state, in private fields that a reader asks through wasAccepted(),
           endsTheGame(), phaseAfter() and leadsTo(), LinesRules and FitRules extending it (planned
           for Sprint 2), and TimedRulesDecorator, which implements IGameRules, wraps an inner
-          IGameRules and times the game with a LevelTimer.
+          IGameRules and times the game with a LevelTimer. The decorator hands out no timer: the
+          root keeps the same timer and answers elapsedTime() (decision 27).
         </desc>
         <defs>
           <marker
@@ -237,7 +238,7 @@
           x1="456"
           y1="336"
           x2="456"
-          y2="284"
+          y2="268"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -263,7 +264,7 @@
         <!-- TimedRulesDecorator holds the LevelTimer it receives as timer: use -->
         <line
           x1="844"
-          y1="496"
+          y1="480"
           x2="844"
           y2="552"
           stroke="#5b6873"
@@ -275,7 +276,7 @@
           x1="360"
           y1="552"
           x2="360"
-          y2="536"
+          y2="520"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#rules-triangle)"
@@ -285,7 +286,7 @@
           x1="552"
           y1="552"
           x2="552"
-          y2="536"
+          y2="520"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#rules-triangle)"
@@ -389,7 +390,7 @@
           x="296"
           y="100"
           width="320"
-          height="184"
+          height="168"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -439,15 +440,12 @@
         <text x="328" y="260" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Resolution
         </text>
-        <text x="312" y="276" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + timed(): ITimed | undefined
-        </text>
         <!-- Class: BaseGameRules (abstract, template method, focal) -->
         <rect
           x="284"
           y="336"
           width="352"
-          height="200"
+          height="184"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -552,15 +550,12 @@
         <text x="300" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           # noValidMove(state: TState): boolean
         </text>
-        <text x="300" y="528" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + timed(): ITimed | undefined
-        </text>
         <!-- Class: TimedRulesDecorator (decorator) -->
         <rect
           x="704"
           y="336"
           width="280"
-          height="160"
+          height="144"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -604,9 +599,6 @@
         </text>
         <text x="720" y="472" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + evaluate(state: TState): Outcome
-        </text>
-        <text x="720" y="488" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + timed(): ITimed
         </text>
         <!-- Reference box: GameEngine, detailed in part 1 · view 1 -->
         <rect
@@ -921,8 +913,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          In Sprint 2, SortRules and MergeRules extend BaseGameRules too. FitFactory wraps FitRules
-          in TimedRulesDecorator, because Fit stars use time (§1.2).
+          In Sprint 2, SortRules and MergeRules extend BaseGameRules too. GameFactory wraps FitRules
+          in TimedRulesDecorator with the timer of FitFactory, because Fit stars use time (§1.2).
         </text>
         <text
           x="24"

@@ -40,7 +40,7 @@ describe('FitState', () => {
   // The state has its own `GameStateId`, and it still knows its match (classes.md decision 26).
   it('should_be_the_same_state_when_two_states_have_one_state_id_whatever_they_hold', () => {
     const factory = fitFactory();
-    const rules = factory.createRules(MATCH_ID);
+    const rules = factory.createRules();
     const first = factory.createInitialState(
       MATCH_ID,
       GameStateId.of(MatchId.of('match-a')),
@@ -92,7 +92,7 @@ describe('FitState', () => {
     expect(place).toThrow(
       new RangeError('The level has no piece with this id.', { cause: unknown }),
     );
-    expect(state.snapshot().board.cells()).toEqual([]);
+    expect(state.snapshot().board.occupiedCells()).toEqual([]);
     expect(state.placed()).toEqual([]);
   });
 
@@ -103,7 +103,7 @@ describe('FitState', () => {
     const keys = () =>
       state
         .snapshot()
-        .board.cells()
+        .board.occupiedCells()
         .map(([c, id]) => `${squareTopology.key(c)}=${delivered(id)}`);
     const results: unknown[] = [];
 
@@ -131,11 +131,13 @@ describe('FitState', () => {
   it('should_throw_a_range_error_and_keep_the_state_when_a_placed_piece_leaves_the_figure', () => {
     const state = threeDominoFitFactory().createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
     state.place(B, Placement.of(Turns.of(0), square(0, 0), squareTopology));
-    const before = { cells: state.snapshot().board.cells(), placed: state.placed() };
+    const before = { cells: state.snapshot().board.occupiedCells(), placed: state.placed() };
 
     expect(() => state.place(A, Placement.of(Turns.of(0), square(5, 0), squareTopology))).toThrow(
       new RangeError('The coordinate 6,0 is outside the board.'),
     );
-    expect({ cells: state.snapshot().board.cells(), placed: state.placed() }).toEqual(before);
+    expect({ cells: state.snapshot().board.occupiedCells(), placed: state.placed() }).toEqual(
+      before,
+    );
   });
 });

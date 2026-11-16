@@ -47,7 +47,7 @@ export class FitRules<TCoord> extends BaseGameRules<FitMove<TCoord>, FitState<TC
     for (const piece of state.remaining()) {
       for (const rotation of board.fullTurn().shorter()) {
         for (const at of offsets) {
-          const move = new PlaceFitPiece(piece.cell(), rotation, at);
+          const move = new PlaceFitPiece(piece.occupant(), rotation, at);
           if (isValidOn(state, photo, move)) yield move;
         }
       }
@@ -81,14 +81,17 @@ function isValidOn<TCoord>(
   const { board } = photo;
   if (move instanceof PlaceFitPiece) {
     return (
-      state.placementOf(move.piece()) === undefined &&
-      fits(state, board, move.piece(), move.placement(board))
+      state.placementOf(move.pieceToPlace()) === undefined &&
+      fits(state, board, move.pieceToPlace(), move.placement(board))
     );
   }
-  if (move instanceof RemoveFitPiece) return state.placementOf(move.piece()) !== undefined;
+  if (move instanceof RemoveFitPiece) return state.placementOf(move.pieceToRemove()) !== undefined;
   if (move instanceof RotateFitPiece) {
-    const placement = state.placementOf(move.piece());
-    return placement !== undefined && fits(state, board, move.piece(), move.turn(placement, board));
+    const placement = state.placementOf(move.pieceToRotate());
+    return (
+      placement !== undefined &&
+      fits(state, board, move.pieceToRotate(), move.turn(placement, board))
+    );
   }
   return unknownMove(move);
 }
@@ -98,20 +101,20 @@ function isValidOn<TCoord>(
 function changeBy<TCoord>(state: FitState<TCoord>, move: FitMove<TCoord>): void {
   const { board } = state.snapshot();
   if (move instanceof PlaceFitPiece) {
-    state.place(move.piece(), move.placement(board));
+    state.place(move.pieceToPlace(), move.placement(board));
     return;
   }
   if (move instanceof RemoveFitPiece) {
-    state.remove(move.piece());
+    state.remove(move.pieceToRemove());
     return;
   }
   if (move instanceof RotateFitPiece) {
-    const placement = state.placementOf(move.piece());
+    const placement = state.placementOf(move.pieceToRotate());
     if (placement === undefined) {
-      throw new RangeError('The piece is not on the figure.', { cause: move.piece() });
+      throw new RangeError('The piece is not on the figure.', { cause: move.pieceToRotate() });
     }
-    state.remove(move.piece());
-    state.place(move.piece(), move.turn(placement, board));
+    state.remove(move.pieceToRotate());
+    state.place(move.pieceToRotate(), move.turn(placement, board));
     return;
   }
   unknownMove(move);
@@ -129,7 +132,7 @@ function fits<TCoord>(
   if (piece === undefined) return false;
   return placement.cells(piece, board).every((c) => {
     if (!board.contains(c)) return false;
-    const cell = board.get(c);
+    const cell = board.occupantAt(c);
     return cell === undefined || cell.equals(id);
   });
 }

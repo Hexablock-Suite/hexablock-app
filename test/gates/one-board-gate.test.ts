@@ -209,7 +209,7 @@ describe('one board gate (APP-NFR-01)', () => {
 
     expect(board.constructor).toBe(Board);
     expect(state.clone().snapshot().board.constructor).toBe(Board);
-    expect(board.get(square(0, 0))).toBeInstanceOf(Color);
+    expect(board.occupantAt(square(0, 0))).toBeInstanceOf(Color);
   });
 
   it('should_hold_an_engine_board_of_piece_ids_when_a_fit_state_places_a_piece', () => {
@@ -226,7 +226,7 @@ describe('one board gate (APP-NFR-01)', () => {
 
     expect(board.constructor).toBe(Board);
     expect(state.clone().snapshot().board.constructor).toBe(Board);
-    expect(board.get(square(0, 0))).toBeInstanceOf(PieceId);
+    expect(board.occupantAt(square(0, 0))).toBeInstanceOf(PieceId);
   });
 
   it('should_hold_an_engine_board_of_color_stacks_when_a_sort_state_starts', () => {
@@ -247,7 +247,7 @@ describe('one board gate (APP-NFR-01)', () => {
 
     expect(board.constructor).toBe(Board);
     expect(state.clone().snapshot().board.constructor).toBe(Board);
-    expect(board.get(square(0, 0))).toBeInstanceOf(ColorStack);
+    expect(board.occupantAt(square(0, 0))).toBeInstanceOf(ColorStack);
   });
 
   it('should_hold_an_engine_board_of_merge_tiles_when_a_merge_state_starts', () => {
@@ -256,6 +256,6 @@ describe('one board gate (APP-NFR-01)', () => {
 
     expect(board.constructor).toBe(Board);
     expect(state.clone().snapshot().board.constructor).toBe(Board);
-    expect(board.get(hex(0, 0))).toBeInstanceOf(MergeTile);
+    expect(board.occupantAt(hex(0, 0))).toBeInstanceOf(MergeTile);
   });
 });

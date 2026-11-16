@@ -12,16 +12,17 @@ export type ViewOf<TState> = SnapshotOf<TState> extends { view(): infer TView } 
 
 // The plain response model of the game use cases (classes.md decision 29).
 // It holds no `Board` and no engine, so layer 3 cannot change a running game.
-// `cells` are new pairs from `Board.cells()`. A cell is an immutable value object.
+// `cells` are new pairs from `Board.occupiedCells()`. A cell is an immutable value object.
 // `score` carries the `Score` value object of the photo. A use case never opens a domain object:
 // the presenter of layer 3 asks the score for its number (issue #203).
 // `outcome` carries the `Outcome` value object of the turn, by the same rule (issue #207).
-// `canUndo` and `canRedo` read the capabilities of the engine (decision 27).
-// `hasUndo` says whether the variant has undo at all. A false `canUndo` alone cannot
-// separate «no undo» from «undo used».
+// `canUndo` and `canRedo` ask the root (decision 27).
+// `hasUndo` says whether the variant has undo at all: it asks `offersUndo()` of the root.
+// A false `canUndo` alone cannot separate «no undo» from «undo used».
 // `payload` is the variant data of the `view()` of the photo, typed by the state.
 // `TView` defaults to `unknown`, so a signature that does not read the payload need not name it.
-// `elapsedMs` exists only for a timed game. It reads the timer when the response is built.
+// `elapsedMs` exists only for a timed game. It asks the root for the time of play
+// when the response is built.
 // It carries the `ElapsedTime` value object of the timer, by the same rule as `score` (issue #204).
 export interface MoveResult<TCell, TCoord, TView = unknown> {
   readonly cells: [TCoord, TCell][];
@@ -34,9 +35,9 @@ export interface MoveResult<TCell, TCoord, TView = unknown> {
   readonly elapsedMs?: ElapsedTime;
 }
 
-// Builds the response from the engine: the photo of the state and the undo capabilities.
-// It reads only the photo (classes.md decision 34) and the engine, never a field of the state,
-// so the use cases stay blind to the variant.
+// Builds the response from the engine: the photo of the state and the queries of the root.
+// It reads only the photo (classes.md decision 34) and the root, never a field of the state
+// and never a part of the aggregate, so the use cases stay blind to the variant (issue #234).
 // TypeScript cannot resolve `SnapshotOf<TState>` and `ViewOf<TState>` for an open `TState`.
 // Every photo is a `BoardSnapshot`, so the photo and the payload need a cast.
 export function moveResultOf<
@@ -49,16 +50,15 @@ export function moveResultOf<
   outcome: Outcome,
 ): MoveResult<TCell, TCoord, ViewOf<TState>> {
   const snapshot = engine.snapshot() as BoardSnapshot<TCell, TCoord> & SnapshotOf<TState>;
-  const undoable = engine.undoable();
-  const timed = engine.timed();
+  const elapsed = engine.elapsedTime();
   return {
-    cells: snapshot.board.cells(),
+    cells: snapshot.board.occupiedCells(),
     score: snapshot.score,
     outcome,
-    canUndo: undoable?.canUndo() ?? false,
-    canRedo: engine.redoable()?.canRedo() ?? false,
-    hasUndo: undoable !== undefined,
+    canUndo: engine.canUndo(),
+    canRedo: engine.canRedo(),
+    hasUndo: engine.offersUndo(),
     payload: snapshot.view() as ViewOf<TState>,
-    ...(timed === undefined ? {} : { elapsedMs: timed.elapsedMs() }),
+    ...(elapsed === undefined ? {} : { elapsedMs: elapsed }),
   };
 }

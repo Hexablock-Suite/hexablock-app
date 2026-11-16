@@ -4,6 +4,7 @@ import type { FakeCell } from '../engine/fake-cell';
 import { fakeGameFactory, type FakeMove, type FakeState } from '../engine/fake-game';
 import { CountingMatchIds } from '../engine/match-id';
 import type { SquareCoord } from '../engine/square-topology';
+import { gameIdOf } from '../engine/variant-game';
 
 // A repository of the fake game. It exists only in test/.
 export type FakeGameRepository = GameRepository<FakeCell, SquareCoord, FakeMove, FakeState>;
@@ -14,7 +15,8 @@ export type FakeGameRepository = GameRepository<FakeCell, SquareCoord, FakeMove,
 // A failed `toBe` prints the whole engine, so the suite compares the roots with `===`.
 export function describeGameRepositoryContract(name: string, make: () => FakeGameRepository): void {
   describe(`${name} as a GameRepository`, () => {
-    const games = new GameFactory(fakeGameFactory(), new CountingMatchIds());
+    const factory = fakeGameFactory();
+    const games = new GameFactory(gameIdOf(factory), factory, new CountingMatchIds());
 
     it('should_give_no_game_when_no_game_is_saved', () => {
       expect(make().current() === undefined).toBe(true);

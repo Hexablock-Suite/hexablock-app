@@ -548,6 +548,8 @@ describe('primitive scan of the domain', () => {
   // Issue #206: the three coordinates, `Radius` and `RegionSize` keep their numbers private.
   // Only the factory methods, the operations of the two counts and the hex distance
   // keep a primitive. A coordinate gives its `CoordKey` to its topology, not a text (issue #237).
+  // Issue #165: each coordinate delivers its two values to a receiver of the edge.
+  // The gate allows that delivery, so it is no break and needs no baseline entry.
   it('should_find_no_public_value_of_a_coordinate_when_the_code_is_scanned', () => {
     const uses = codeUses();
     const places = uses.map((use) => use.where);
@@ -568,6 +570,7 @@ describe('primitive scan of the domain', () => {
       /^(HexCoord|SquareCoord|TriangleCoord|Radius|RegionSize)\./.test(use.where),
     );
     expect(ofCoordinates.map(key).sort()).toEqual([
+      'number HexCoord.deliverTo',
       'number HexCoord.distanceTo',
       'number HexCoord.of',
       'number Radius.measures',
@@ -577,7 +580,9 @@ describe('primitive scan of the domain', () => {
       'number RegionSize.indexes',
       'number RegionSize.of',
       'number RegionSize.offsets',
+      'number SquareCoord.deliverTo',
       'number SquareCoord.of',
+      'number TriangleCoord.deliverTo',
       'number TriangleCoord.of',
     ]);
   });

@@ -100,18 +100,25 @@ export class MergeFactory<TCoord> implements IVariantFactory<
   MergeState<MergeTile, TCoord, GridAxis>,
   NewTile<MergeTile>
 > {
-  readonly gameId = GameId.of('hexa-merge');
+  private readonly gameId = GameId.of('hexa-merge');
 
   constructor(
     private readonly geometry: GeometryFactory<TCoord>,
     private readonly settings: MergeSettings,
   ) {}
 
-  // Hexa Merge has no timer, so the rules need no `MatchId` (classes.md decision 50).
-  createRules(
-    _matchId: MatchId,
-  ): IGameRules<Slide<GridAxis>, MergeState<MergeTile, TCoord, GridAxis>> {
+  // True when `gameId` names Hexa Merge. The id stays private (issue #234).
+  isFor(gameId: GameId): boolean {
+    return this.gameId.equals(gameId);
+  }
+
+  createRules(): IGameRules<Slide<GridAxis>, MergeState<MergeTile, TCoord, GridAxis>> {
     return new MergeRules<MergeTile, TCoord, GridAxis>(this.settings.targetTile());
+  }
+
+  // Hexa Merge has no timer (classes.md decision 19).
+  createTimer(_matchId: MatchId): undefined {
+    return undefined;
   }
 
   createScoring(): IScoringPolicy<MergeState<MergeTile, TCoord, GridAxis>> {

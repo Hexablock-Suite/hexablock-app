@@ -75,10 +75,11 @@
           InMemoryGameRepository implements the GameRepository port and keeps the running
           GameEngine. In layer 2, StartGame implements UseCase, takes a StartGameRequest, keeps the
           GameRepository port and the GameFactory, and builds a MoveResult. In layer 1, GameFactory
-          keeps the IVariantFactory and creates the started GameEngine. LinesFactory implements
+          keeps the GameId and the IVariantFactory, wraps the rules of a timed game in
+          TimedRulesDecorator and creates the started GameEngine. LinesFactory implements
           IVariantFactory and builds the board with BoardBuilder; both hold the GeometryFactory, and
-          BoardBuilder creates Board. StartGame reads the cells of Board. Every dependency between
-          layers points down.
+          BoardBuilder creates Board. StartGame reads the occupied cells of Board. Every dependency
+          between layers points down.
         </desc>
         <defs>
           <marker
@@ -302,7 +303,7 @@
         />
         <!-- GameFactory keeps the IVariantFactory it receives as variant: use -->
         <path
-          d="M776 960 V956 Q776 948 768 948 H308 Q300 948 300 940 V928"
+          d="M776 960 V958 Q776 952 770 952 H306 Q300 952 300 946 V944"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -310,7 +311,7 @@
         />
         <!-- LinesFactory implements IVariantFactory: realization -->
         <path
-          d="M160 960 V928"
+          d="M160 960 V944"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -374,7 +375,7 @@
         >
           BUILDS
         </text>
-        <rect x="482" y="743" width="44.96" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="482" y="743" width="80" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="486"
           y="752"
@@ -384,7 +385,7 @@
           text-anchor="start"
           letter-spacing="0.06em"
         >
-          CELLS()
+          OCCUPIEDCELLS()
         </text>
         <rect x="834" y="915" width="44.94" height="12" rx="2" fill="#f9f4dc" />
         <text
@@ -483,10 +484,10 @@
           factory
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="304" y="931" width="50.2" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="304" y="955" width="50.2" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="306"
-          y="940"
+          y="964"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -869,7 +870,7 @@
           x="40"
           y="776"
           width="340"
-          height="152"
+          height="168"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -899,22 +900,25 @@
         </text>
         <line x1="40" y1="824" x2="380" y2="824" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="56" y="840" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + createRules(matchId: MatchId): IGameRules&lt;TMove, TState&gt;
+          + createTimer(matchId: MatchId): LevelTimer [0..1]
         </text>
         <text x="56" y="856" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + createScoring(): IScoringPolicy&lt;TState&gt;
+          + createRules(): IGameRules&lt;TMove, TState&gt;
         </text>
         <text x="56" y="872" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + createHistory(): MoveHistory&lt;TMove, TState&gt; [0..1]
+          + createScoring(): IScoringPolicy&lt;TState&gt;
         </text>
         <text x="56" y="888" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + createHistory(): MoveHistory&lt;TMove, TState&gt; [0..1]
+        </text>
+        <text x="56" y="904" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createInitialState(matchId: MatchId, stateId:
         </text>
-        <text x="64" y="904" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="920" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           GameStateId, boardId: BoardId): TState
         </text>
-        <text x="56" y="920" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          createBoard() and the others: view 5
+        <text x="56" y="936" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          isFor(), createBoard() and the others: view 5
         </text>
         <!-- Class: Board -->
         <rect
@@ -951,7 +955,7 @@
         </text>
         <line x1="400" y1="824" x2="620" y2="824" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="416" y="840" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + cells(): [TCoord, TCell][]
+          + occupiedCells(): [TCoord, TCell][]
         </text>
         <!-- Class: GameEngine (aggregate root) -->
         <rect
@@ -988,8 +992,16 @@
         </text>
         <line x1="660" y1="824" x2="940" y2="824" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <line x1="660" y1="848" x2="940" y2="848" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="676" y="840" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          matchId, rules, scoring, phase, history: view 1
+        <text
+          x="676"
+          y="840"
+          fill="#5b6873"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          textLength="256"
+          lengthAdjust="spacingAndGlyphs"
+        >
+          matchId, rules, scoring, phase, history, timer: view 1
         </text>
         <text x="676" y="864" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + start(initial: TState): void
@@ -1225,7 +1237,7 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          variant, the id generators, events: view 5
+          gameId, variant, ids: view 5
         </text>
         <text
           x="768"
@@ -1557,8 +1569,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          variant factory for the rules, the scoring, the history and the first state. LinesFactory
-          builds the board with BoardBuilder, and both
+          variant factory for the timer, the rules, the scoring, the history and the first state.
+          LinesFactory builds the board with BoardBuilder, and both
         </text>
         <text
           x="24"

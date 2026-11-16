@@ -6,6 +6,10 @@ import { FixedListPieceSource } from '../../engine/piece-source';
 import { CellNode, ShapeGroup } from '../../engine/shape-node';
 import type { PieceId } from './piece-id';
 
+// The part of a geometry that a level asks: whether the geometry is of a family.
+// A geometry of any coordinate type answers it (classes.md decision 17).
+type Family = { isOfFamily(id: TopologyId): boolean };
+
 // One Hexa Fit level: the id of its geometry family, the figure and its pieces.
 // It is a value object (classes.md decision 46, issue #208): it never changes,
 // its fields are private, and two levels are equal when their parts are equal.
@@ -17,6 +21,7 @@ import type { PieceId } from './piece-id';
 // The level cannot check its figure, because only a topology finds a repeated coordinate.
 // `Board` makes that check when the game starts.
 // `FitFactory` checks the geometry, because only the factory holds one.
+// The geometry keeps its family private, so the level asks it with `isOfFamily()` (issue #234).
 // `FitLevelBuilder` builds the level through `of()` in Sprint 3 (#166).
 export class FitLevel<TCoord> {
   private constructor(
@@ -37,26 +42,27 @@ export class FitLevel<TCoord> {
   ): FitLevel<TCoord> {
     const copy = [...new FixedListPieceSource(pieces)];
     copy.forEach((piece, index) => {
-      const id = piece.cell();
-      if (copy.slice(0, index).some((earlier) => earlier.cell().equals(id))) {
+      const id = piece.occupant();
+      if (copy.slice(0, index).some((earlier) => earlier.occupant().equals(id))) {
         throw new RangeError('The level has two pieces with one id.', { cause: id });
       }
     });
     return new FitLevel(topology, figure, Object.freeze(copy));
   }
 
-  // True when the level runs on the geometry family `family`.
-  // The family asks, so a text that a cast puts in the level gives false.
-  isOf(family: TopologyId): boolean {
-    return family.equals(this.topology);
+  // True when the level runs on `geometry`: the geometry is of the family that the level names.
+  // The geometry asks, so a text that a cast puts in the level gives false.
+  runsOn(geometry: Family): boolean {
+    return geometry.isOfFamily(this.topology);
   }
 
-  // The error of a level that starts on another geometry family.
-  // The error carries the topology of the level and the family of the geometry as its `cause`,
-  // and the edge delivers their texts (issue #237).
-  wrongFamily(family: TopologyId): RangeError {
+  // The error of a level that starts on a geometry of another family.
+  // The error carries the topology of the level and the geometry as its `cause` (issue #237).
+  // The geometry keeps its family private (issue #234), so the edge delivers only
+  // the text of the topology.
+  wrongFamily(geometry: Family): RangeError {
     return new RangeError('A Fit level cannot start on the geometry of another topology.', {
-      cause: { topology: this.topology, geometry: family },
+      cause: { topology: this.topology, geometry },
     });
   }
 
