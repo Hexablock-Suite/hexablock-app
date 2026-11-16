@@ -6,12 +6,12 @@ import { PlayingPhase } from '../../src/domain/engine/game-phase';
 import { Score } from '../../src/domain/engine/score';
 import { errorOf, MemoryGameRepository } from '../support/application/game-use-cases';
 import { RecordingLogger } from '../support/application/recording-logger';
+import { RecordingPublisher } from '../support/application/recording-publisher';
 import { fakeCell, type FakeCell } from '../support/engine/fake-cell';
 import {
   emptyState,
   FakeRules,
   OnePointScoring,
-  RecordingPublisher,
   type FakeMove,
   type FakeState,
 } from '../support/engine/fake-game';
@@ -31,14 +31,13 @@ function overflowingGame() {
     GameId.of('fake-game'),
     new FakeRules(),
     new OnePointScoring(),
-    publisher,
   );
   const state = emptyState(1);
   state.addPoints(FULL);
   engine.start(state);
   games.replace(engine);
   const logger = new RecordingLogger();
-  return { engine, publisher, logger, applyMove: new ApplyMove(games, logger) };
+  return { engine, publisher, logger, applyMove: new ApplyMove(games, logger, publisher) };
 }
 
 const MOVE: FakeMove = { at: square(0, 0), cell: fakeCell(1) };
@@ -71,7 +70,7 @@ describe('a total score that passes the largest safe integer', () => {
   });
 
   it('should_throw_a_range_error_and_keep_the_game_when_the_engine_plays_that_turn', () => {
-    const { engine, publisher } = overflowingGame();
+    const { engine } = overflowingGame();
 
     expect(() => engine.play(MOVE)).toThrow(
       new RangeError('The sum of two scores cannot pass the largest safe integer.'),
@@ -80,6 +79,6 @@ describe('a total score that passes the largest safe integer', () => {
     expect(engine.snapshot().score).toEqual(FULL);
     expect(engine.snapshot().board.cells()).toEqual([]);
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
-    expect(publisher.events).toEqual([]);
+    expect(engine.takeEvents()).toEqual([]);
   });
 });

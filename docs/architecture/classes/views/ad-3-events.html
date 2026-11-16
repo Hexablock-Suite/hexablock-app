@@ -64,18 +64,18 @@
       <h1>Game events and sound: Observer and Facade</h1>
 
       <svg
-        viewBox="0 0 1040 736"
+        viewBox="0 0 1040 864"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="adevents-title adevents-desc"
       >
         <title id="adevents-title">HexaBlock game events and sound · UML class diagram</title>
         <desc id="adevents-desc">
-          Class diagram across layers 4, 3 and 1 showing GameEventBus in layer 3 implementing the
-          GameEventPublisher interface of layer 1 and holding many GameEventListener objects,
+          Class diagram across layers 4, 3, 2 and 1 showing GameEventBus in layer 3 implementing the
+          GameEventPublisher port of layer 2 and holding many GameEventListener objects,
           GamePresenter and AudioManager, the audio facade of layer 4, implementing
           GameEventListener, AudioManager playing through an external SoundLibrary, and
-          GameEventPublisher publishing GameEvent.
+          GameEventPublisher publishing GameEvent of layer 1.
         </desc>
         <defs>
           <marker
@@ -177,10 +177,32 @@
           LAYER 3 · INTERFACE ADAPTERS · src/adapters/
         </text>
 
-        <!-- Layer zone: layer 1, entities -->
+        <!-- Layer zone: layer 2, use cases -->
         <rect
           x="24"
           y="480"
+          width="992"
+          height="120"
+          rx="8"
+          fill="#efe7f8"
+          stroke="rgba(126,34,206,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="500"
+          fill="#7e22ce"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 2 · USE CASES · src/application/
+        </text>
+        <!-- Layer zone: layer 1, entities -->
+        <rect
+          x="24"
+          y="608"
           width="992"
           height="104"
           rx="8"
@@ -190,7 +212,7 @@
         />
         <text
           x="40"
-          y="500"
+          y="628"
           fill="#b45309"
           font-size="8"
           font-weight="500"
@@ -290,23 +312,21 @@
           stroke-width="1"
           marker-start="url(#adevents-diamond-hollow)"
         />
-        <!-- GameEventBus implements GameEventPublisher: realization, down from layer 3 to layer 1 -->
+        <!-- GameEventBus implements GameEventPublisher: realization, down from layer 3 to layer 2 -->
         <line
           x1="816"
           y1="436"
           x2="816"
-          y2="520"
+          y2="512"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
           marker-end="url(#adevents-triangle)"
         />
-        <!-- GameEventPublisher publishes GameEvent: use -->
-        <line
-          x1="716"
-          y1="540"
-          x2="620"
-          y2="540"
+        <!-- GameEventPublisher publishes GameEvent: use, down from layer 2 to layer 1 -->
+        <path
+          d="M760 584 V668 H620"
+          fill="none"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adevents-open)"
@@ -325,10 +345,10 @@
         >
           PLAYS WITH
         </text>
-        <rect x="640" y="520" width="56" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="640" y="648" width="56" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="668"
-          y="529"
+          y="657"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -548,33 +568,32 @@
           GamePresenter
         </text>
 
-        <!-- Reference box: GameEventPublisher, detailed in Part 1 view 5 -->
+        <!-- Class: GameEventPublisher (interface, output port of layer 2, issue 233) -->
         <rect
           x="716"
-          y="520"
+          y="512"
           width="200"
-          height="40"
+          height="72"
           rx="6"
           fill="#ffffff"
-          stroke="#7d8a94"
+          stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="4,3"
         />
+        <line x1="716" y1="560" x2="916" y2="560" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="816"
-          y="534"
-          fill="#7d8a94"
-          font-size="7"
-          font-weight="500"
+          y="530"
+          fill="#5b6873"
+          font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
-          letter-spacing="0.14em"
+          letter-spacing="0.08em"
         >
-          PART 1 · VIEW 5
+          «interface» «port»
         </text>
         <text
           x="816"
-          y="550"
+          y="548"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -583,11 +602,14 @@
         >
           GameEventPublisher
         </text>
+        <text x="728" y="576" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + publish(event: GameEvent): void
+        </text>
 
         <!-- Reference box: GameEvent (abstract), detailed in Part 1 view 5 -->
         <rect
           x="440"
-          y="520"
+          y="648"
           width="180"
           height="40"
           rx="6"
@@ -598,7 +620,7 @@
         />
         <text
           x="530"
-          y="534"
+          y="662"
           fill="#7d8a94"
           font-size="7"
           font-weight="500"
@@ -610,7 +632,7 @@
         </text>
         <text
           x="530"
-          y="550"
+          y="678"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -624,17 +646,18 @@
         <!-- Footnote -->
         <text
           x="24"
-          y="608"
+          y="736"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          The engine publishes at the end of each turn. AudioManager is the audio facade: it hides
-          the sound library and honours mute (APP-FR-10).
+          The engine records its events, and ApplyMove delivers them to the port after each turn
+          (#233). AudioManager is the audio facade: it hides the sound library and honours mute
+          (APP-FR-10).
         </text>
         <text
           x="24"
-          y="624"
+          y="752"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -644,10 +667,10 @@
         </text>
 
         <!-- Legend -->
-        <line x1="24" y1="648" x2="1016" y2="648" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <line x1="24" y1="776" x2="1016" y2="776" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="666"
+          y="794"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -658,9 +681,9 @@
 
         <line
           x1="24"
-          y1="684"
+          y1="812"
           x2="52"
-          y2="684"
+          y2="812"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -668,7 +691,7 @@
         />
         <text
           x="60"
-          y="688"
+          y="816"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -677,16 +700,16 @@
         </text>
         <line
           x1="144"
-          y1="684"
+          y1="812"
           x2="172"
-          y2="684"
+          y2="812"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#adevents-diamond-hollow)"
         />
         <text
           x="180"
-          y="688"
+          y="816"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -695,16 +718,16 @@
         </text>
         <line
           x1="384"
-          y1="684"
+          y1="812"
           x2="412"
-          y2="684"
+          y2="812"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adevents-open)"
         />
         <text
           x="420"
-          y="688"
+          y="816"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -714,7 +737,7 @@
 
         <rect
           x="24"
-          y="704"
+          y="832"
           width="28"
           height="12"
           rx="2"
@@ -724,7 +747,7 @@
         />
         <rect
           x="56"
-          y="704"
+          y="832"
           width="28"
           height="12"
           rx="2"
@@ -734,7 +757,17 @@
         />
         <rect
           x="88"
-          y="704"
+          y="832"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#efe7f8"
+          stroke="rgba(126,34,206,0.40)"
+          stroke-width="1"
+        />
+        <rect
+          x="120"
+          y="832"
           width="28"
           height="12"
           rx="2"
@@ -743,17 +776,17 @@
           stroke-width="1"
         />
         <text
-          x="124"
-          y="713"
+          x="156"
+          y="841"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Zones · layers 4, 3 and 1
+          Zones · layers 4 to 1
         </text>
         <rect
           x="264"
-          y="704"
+          y="832"
           width="28"
           height="12"
           rx="2"
@@ -764,7 +797,7 @@
         />
         <text
           x="300"
-          y="713"
+          y="841"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -773,7 +806,7 @@
         </text>
         <rect
           x="488"
-          y="704"
+          y="832"
           width="28"
           height="12"
           rx="2"
@@ -784,7 +817,7 @@
         />
         <text
           x="524"
-          y="713"
+          y="841"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -793,7 +826,7 @@
         </text>
         <rect
           x="720"
-          y="704"
+          y="832"
           width="28"
           height="12"
           rx="2"
@@ -803,7 +836,7 @@
         />
         <text
           x="756"
-          y="713"
+          y="841"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

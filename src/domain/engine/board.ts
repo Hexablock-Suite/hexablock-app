@@ -92,8 +92,8 @@ export interface ReadonlyBoard<TCell, TCoord, TAxis extends GridAxis = GridAxis>
 // A caller must not change a cell object. To change a cell, a new cell occupies the coordinate.
 // The board is an entity inside the state (classes.md decision 7). Its `BoardId` is its identity.
 // The id never changes, and `equals()` compares two boards by it. The cells do not count.
-// A `BoardIdGenerator` gives the id of each new board, and `clone()` keeps it:
-// the copy is the same board at an earlier moment.
+// The id is local: `GameFactory` builds it from the `MatchId` of the game (decision 52).
+// `clone()` keeps it: the copy is the same board at an earlier moment.
 // The board changes in place, and only through two business intentions: `occupy()` and `vacate()`.
 // `restore()` takes back the cells of an earlier copy of the same board, for the undo.
 // A space exists from its first write. So `cells()` lists the cells in first-write order.

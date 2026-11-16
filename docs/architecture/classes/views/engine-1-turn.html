@@ -74,17 +74,18 @@
           Class diagram of layer 1 showing GameEngine, the aggregate root of a game, running each
           turn through the IGameRules strategy, whose playTurn() is the template method of
           BaseGameRules and returns a Resolution that holds an Outcome, scoring with the
-          IScoringPolicy strategy, holding a GamePhase state, notifying through the
-          GameEventPublisher interface, and bounding its TState parameter by BoardState and
-          Cloneable of TState in its template box. The optional MoveHistory gives the undoable() and
-          redoable() capabilities. BoardState is an entity inside the GameEngine aggregate: its own
-          GameStateId is its identity, it keeps the MatchId of its game, its fields are private, and
-          it changes in place only through its business methods. Its snapshot() creates a
-          BoardSnapshot, the immutable photo with the Memento role and no tactical stereotype:
-          GameEngine.snapshot() returns it, IScoringPolicy reads two of them, and MoveHistory keeps
-          them for the undo. Resolution is a value object: it holds no state, and equals() compares
-          accepted and outcome. Score is the value object of the score and of the points of a turn:
-          IScoringPolicy returns one, BoardState adds it, and BoardSnapshot carries the score.
+          IScoringPolicy strategy, holding a GamePhase state, recording the GameEvent objects of its
+          turns, which ApplyMove takes with takeEvents() and delivers, and bounding its TState
+          parameter by BoardState and Cloneable of TState in its template box. The optional
+          MoveHistory gives the undoable() and redoable() capabilities. BoardState is an entity
+          inside the GameEngine aggregate: its own GameStateId is its identity, it keeps the MatchId
+          of its game, its fields are private, and it changes in place only through its business
+          methods. Its snapshot() creates a BoardSnapshot, the immutable photo with the Memento role
+          and no tactical stereotype: GameEngine.snapshot() returns it, IScoringPolicy reads two of
+          them, and MoveHistory keeps them for the undo. Resolution is a value object: it holds no
+          state, and equals() compares accepted and outcome. Score is the value object of the score
+          and of the points of a turn: IScoringPolicy returns one, BoardState adds it, and
+          BoardSnapshot carries the score.
         </desc>
         <defs>
           <marker
@@ -343,7 +344,7 @@
           stroke-width="1"
           marker-start="url(#t-diamond-hollow)"
         />
-        <!-- GameEngine notifies through GameEventPublisher: use -->
+        <!-- GameEngine keeps the GameEvent objects it records as recorded: use with role and multiplicity -->
         <line
           x1="520"
           y1="216"
@@ -402,9 +403,9 @@
         >
           rules
         </text>
-        <rect x="460" y="184" width="52" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="468" y="184" width="44" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="486"
+          x="490"
           y="193"
           fill="#7d8a94"
           font-size="8"
@@ -412,7 +413,7 @@
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          NOTIFIES
+          recorded
         </text>
 
         <rect x="335" y="411" width="42" height="12" rx="2" fill="#f9f4dc" />
@@ -464,6 +465,18 @@
           outcome
         </text>
         <!-- Multiplicities -->
+        <rect x="526" y="168" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="532"
+          y="177"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          *
+        </text>
         <rect x="338" y="260" width="12" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="344"
@@ -513,7 +526,7 @@
           0..1
         </text>
 
-        <!-- Class: GameEventPublisher (interface of the engine) -->
+        <!-- Class: GameEvent (abstract domain event, detailed in view 5) -->
         <rect
           x="396"
           y="92"
@@ -534,7 +547,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface»
+          «abstract» «domain event»
         </text>
         <text
           x="520"
@@ -542,13 +555,14 @@
           fill="#17212a"
           font-size="12"
           font-weight="600"
+          font-style="italic"
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          GameEventPublisher
+          GameEvent
         </text>
         <text x="412" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + publish(e: GameEvent): void
+          - gameId: GameId
         </text>
 
         <!-- Class: GameEngine (focal, aggregate root) -->
@@ -601,7 +615,7 @@
           - scoring: IScoringPolicy&lt;TState&gt;
         </text>
         <text x="396" y="344" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - events: GameEventPublisher
+          - recorded: GameEvent[]
         </text>
         <text
           x="396"
@@ -621,31 +635,39 @@
           + play(move: TMove): Outcome
         </text>
         <text x="396" y="416" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + pause(): void
+          + takeEvents(): readonly GameEvent[]
         </text>
         <text x="396" y="432" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + resume(): void
+          + pause(): void
         </text>
         <text x="396" y="448" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + snapshot(): SnapshotOf&lt;TState&gt;
+          + resume(): void
         </text>
         <text x="396" y="464" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + currentPhase(): GamePhase
+          + snapshot(): SnapshotOf&lt;TState&gt;
         </text>
         <text x="396" y="480" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + undoable(): IUndoable | undefined
+          + currentPhase(): GamePhase
         </text>
         <text x="396" y="496" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + redoable(): IRedoable | undefined
+          + undoable(): IUndoable | undefined
         </text>
         <text x="396" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + timed(): ITimed | undefined
+          + redoable(): IRedoable | undefined
         </text>
         <text x="396" y="528" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + equals(other: GameEngine&lt;TCell, TCoord,
+          + timed(): ITimed | undefined
         </text>
-        <text x="412" y="544" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          TMove, TState&gt;): boolean
+        <text
+          x="396"
+          y="544"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          textLength="278"
+          lengthAdjust="spacingAndGlyphs"
+        >
+          + equals(other: GameEngine&lt;TCell, TCoord, TMove, TState&gt;): boolean
         </text>
 
         <!-- Class: IGameRules (interface) -->

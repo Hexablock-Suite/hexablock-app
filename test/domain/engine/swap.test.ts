@@ -8,9 +8,10 @@ import { GameEngine } from '../../../src/domain/engine/game-engine';
 import {
   GameOver,
   type GameEvent,
-  type GameEventPublisher,
+  type GameOverReceiver,
 } from '../../../src/domain/engine/game-events';
 import { GameId } from '../../../src/domain/engine/game-id';
+import type { MatchId } from '../../../src/domain/engine/match-id';
 import { GameOverPhase } from '../../../src/domain/engine/game-phase';
 import { Outcome } from '../../../src/domain/engine/outcome';
 import {
@@ -40,7 +41,8 @@ import { delivered } from '../../support/engine/value-receiver';
 // No real scoring: the accepted rule of issue #59 (D22) has its own suite per variant.
 // Each dummy runs through `GameEngine`: the source lives in the state that the engine
 // copies and rolls back, the engine calls the scoring, and a subscriber of the
-// `GameOver` event gives a `GameResult` to the progress model.
+// `GameOver` event gives a `GameResult` to the progress model. The engine records the event,
+// and the subscriber takes it after each move, as `ApplyMove` does (issue #233).
 
 // Dummy piece sources: both endless, each with its own sequence of cell values.
 // Each one is a value: `take()` returns the piece and the next source, and changes nothing.
@@ -98,8 +100,8 @@ class MovesProgress implements IProgressModel {
 }
 
 // A subscriber of the engine events. On `GameOver` it builds a `GameResult`
-// and gives it to the progress model.
-class ProgressSubscriber implements GameEventPublisher {
+// and gives it to the progress model. The event delivers its data to the subscriber.
+class ProgressSubscriber implements GameOverReceiver {
   readonly records: ProgressRecord[] = [];
 
   constructor(
@@ -107,13 +109,13 @@ class ProgressSubscriber implements GameEventPublisher {
     private readonly moves: () => number,
   ) {}
 
-  publish(event: GameEvent): void {
-    if (!(event instanceof GameOver)) return;
-    const result = GameResult.of({
-      gameId: event.gameId,
-      score: event.finalScore,
-      moves: Moves.of(this.moves()),
-    });
+  // Takes the events that the engine recorded. A test double may ask the class of an event.
+  listen(events: readonly GameEvent[]): void {
+    for (const event of events) if (event instanceof GameOver) event.deliverTo(this);
+  }
+
+  receive(gameId: GameId, _matchId: MatchId, _outcome: Outcome, finalScore: Score): void {
+    const result = GameResult.of({ gameId, score: finalScore, moves: Moves.of(this.moves()) });
     this.records.push(this.progress.record(result));
   }
 }
@@ -151,11 +153,11 @@ function playGame(
 ) {
   let moves = 0;
   const subscriber = new ProgressSubscriber(progress, () => moves);
-  const engine = new GameEngine(MATCH_ID, GameId.of('fake-game'), rules, scoring, subscriber);
+  const engine = new GameEngine(MATCH_ID, GameId.of('fake-game'), rules, scoring);
   engine.start(sourceState(source));
   let outcome: Outcome = Outcome.playing;
   for (const at of sourceState(source).board.coordinates()) {
-    // The count includes this move, because `play()` publishes `GameOver` before it returns.
+    // The count includes this move, because the subscriber takes the events after the move.
     moves += 1;
     // A turn that throws is played once more.
     try {
@@ -163,6 +165,7 @@ function playGame(
     } catch {
       outcome = engine.play(at);
     }
+    subscriber.listen(engine.takeEvents());
   }
   return { outcome, state: engine.snapshot(), records: subscriber.records };
 }
@@ -235,10 +238,10 @@ describe('swapping the piece source, the scoring policy and the progress model',
       GameId.of('fake-game'),
       new SourceRules(),
       new OnePerMove(),
-      subscriber,
     );
     engine.start(sourceState(sources.counting()));
     for (const at of sourceState(sources.counting()).board.coordinates()) engine.play(at);
+    subscriber.listen(engine.takeEvents());
     const full = engine.snapshot();
 
     expect(() => engine.play(square(0, 0))).toThrow(RangeError);
@@ -246,6 +249,7 @@ describe('swapping the piece source, the scoring policy and the progress model',
     expect(engine.currentPhase()).toBe(GameOverPhase.instance);
     expect(engine.snapshot().board.cells()).toEqual(full.board.cells());
     expect(engine.snapshot().score).toEqual(full.score);
+    subscriber.listen(engine.takeEvents());
     expect(subscriber.records).toHaveLength(1);
   });
 });

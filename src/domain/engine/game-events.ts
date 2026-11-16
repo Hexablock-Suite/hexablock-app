@@ -1,35 +1,61 @@
 import type { GameId } from './game-id';
 import type { MatchId } from './match-id';
-import type { Outcome } from './outcome';
+import { Outcome } from './outcome';
 import type { Score } from './score';
 
-// Observer (statement §3.3). An event that the engine publishes. It is a domain event.
+// Observer (statement §3.3). A domain event of a game.
+// `GameEngine` records each event when it saves the turn, and tells nobody.
+// `ApplyMove` takes the events after the turn and delivers them to the publisher port
+// (classes.md decisions 25 and 29).
+// `GameOver` is the only event today. The documents name planned events, such as
+// `LineCleared`, `StackMerged`, `TileMerged` and `TargetReached`, so the base stays (#233).
+// Every event belongs to one game. The base keeps the `GameId` private, and no operation
+// returns it. A private member also makes the type nominal: only a subclass is a `GameEvent`.
 export abstract class GameEvent {
-  constructor(readonly gameId: GameId) {}
-}
+  protected constructor(private readonly gameId: GameId) {}
 
-// `GameEngine` builds this event after it saves the turn.
-// The final score is a `Score`, which is valid when it exists. So the event has no check
-// of its own (classes.md decision 41).
-// The event carries two ids: `gameId` says which game ended, and `matchId` says which match
-// of that game (classes.md decision 30). So a listener tells two matches of one game apart.
-export class GameOver extends GameEvent {
-  constructor(
-    gameId: GameId,
-    readonly matchId: MatchId,
-    readonly outcome: Outcome,
-    readonly finalScore: Score,
-  ) {
-    super(gameId);
+  // Gives the id of the game to `deliver`, the delivery of a concrete event.
+  // It returns nothing, so the id leaves the event only through that delivery.
+  protected withGameId(deliver: (gameId: GameId) => void): void {
+    deliver(this.gameId);
   }
 }
 
-// The event sink of the engine. `GameEventBus` in layer 3 implements it.
-// It is an engine interface, not a port: ports live in layer 2 (classes.md decision 25).
-export interface GameEventPublisher {
-  publish(event: GameEvent): void;
+// The event of a game that ends. `GameEngine` builds it inside the last turn.
+// The final score is a `Score`, which is valid when it exists. So the event has no check
+// of its own (classes.md decision 41).
+// The event carries two ids: the `GameId` says which game ended, and the `MatchId` says
+// which match of that game (classes.md decision 30). So a listener tells two matches of
+// one game apart.
+// Every field is private (rule R-domain-private-fields). A listener asks `isVictory()`,
+// or it receives the data through `deliverTo()`.
+export class GameOver extends GameEvent {
+  constructor(
+    gameId: GameId,
+    private readonly matchId: MatchId,
+    private readonly outcome: Outcome,
+    private readonly finalScore: Score,
+  ) {
+    super(gameId);
+  }
+
+  // Tells if the game ends with a victory. Any other end of a game is a game over.
+  isVictory(): boolean {
+    return Outcome.victory.equals(this.outcome);
+  }
+
+  // Gives the data of the event to `receiver`. It returns nothing.
+  // Only a listener of the edge calls it (rule R-no-delivery-call).
+  deliverTo(receiver: GameOverReceiver): void {
+    this.withGameId((gameId) =>
+      receiver.receive(gameId, this.matchId, this.outcome, this.finalScore),
+    );
+  }
 }
 
-// What `GameEngine.tryPlay()` calls when the publisher throws after the engine saves the turn.
-// It takes the thrown value. The turn and its outcome stay valid (issue 132).
-export type PublishFailureHandler = (error: unknown) => void;
+// The receiver of the data of a `GameOver` event. A listener of the edge implements it,
+// for example to save the final score. No code of `src/domain/` or `src/application/`
+// calls `deliverTo()` (rule R-no-delivery-call).
+export interface GameOverReceiver {
+  receive(gameId: GameId, matchId: MatchId, outcome: Outcome, finalScore: Score): void;
+}

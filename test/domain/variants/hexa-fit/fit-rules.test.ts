@@ -25,7 +25,6 @@ import { FitRules } from '../../../../src/domain/variants/hexa-fit/fit-rules';
 import { Placement } from '../../../../src/domain/variants/hexa-fit/placement';
 import { FitState, type FitSnapshot } from '../../../../src/domain/variants/hexa-fit/fit-state';
 import { PieceId } from '../../../../src/domain/variants/hexa-fit/piece-id';
-import { RecordingPublisher } from '../../../support/engine/fake-game';
 import { fitStateOf } from '../../../support/variants/hexa-fit/fit-game';
 import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
 import {
@@ -33,6 +32,7 @@ import {
   triangleTopology,
   type TriangleCoord,
 } from '../../../support/engine/triangle-topology';
+import { gameOverOf } from '../../../support/engine/game-over';
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 import { delivered } from '../../../support/engine/value-receiver';
@@ -90,7 +90,6 @@ function photoOf<TCoord>(state: FitState<TCoord> | FitSnapshot<TCoord>): FitSnap
 
 function engineOn(
   initial: FitState<SquareCoord>,
-  publisher = new RecordingPublisher(),
   scoring: IScoringPolicy<FitState<SquareCoord>> = noPoints,
 ) {
   const engine = new GameEngine<PieceId, SquareCoord, FitMove<SquareCoord>, FitState<SquareCoord>>(
@@ -98,7 +97,6 @@ function engineOn(
     GameId.of('hexa-fit'),
     new FitRules<SquareCoord>(),
     scoring,
-    publisher,
   );
   engine.start(initial);
   return engine;
@@ -257,9 +255,8 @@ describe('FitRules', () => {
     expect(cellsOf(engine.snapshot())).toEqual(['0,1=a', '1,1=a']);
   });
 
-  it('should_win_and_publish_game_over_when_the_pieces_cover_the_figure_exactly', () => {
-    const publisher = new RecordingPublisher();
-    const engine = engineOn(dominoLevel(), publisher);
+  it('should_win_and_record_game_over_when_the_pieces_cover_the_figure_exactly', () => {
+    const engine = engineOn(dominoLevel());
     engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)));
 
     const outcome = engine.play(new PlaceFitPiece(B, NO_TURN, square(0, 1)));
@@ -267,9 +264,10 @@ describe('FitRules', () => {
     expect(outcome).toBe(Outcome.victory);
     expect(engine.currentPhase()).toBe(VictoryPhase.instance);
     expect(trayOf(engine.snapshot())).toEqual([]);
-    expect(publisher.events).toHaveLength(1);
-    expect(publisher.events[0]).toBeInstanceOf(GameOver);
-    expect((publisher.events[0] as GameOver).outcome).toBe(Outcome.victory);
+    const events = engine.takeEvents();
+    expect(events).toHaveLength(1);
+    expect(events[0]).toBeInstanceOf(GameOver);
+    expect(gameOverOf(events[0]).isVictory()).toBe(true);
   });
 
   it('should_keep_playing_and_never_lose_when_no_tray_piece_fits', () => {
@@ -626,14 +624,10 @@ describe('FitRules in place', () => {
         throw new Error('The scoring fails.');
       },
     };
-    const engine = engineOn(dominoLevel(), new RecordingPublisher(), failing);
+    const engine = engineOn(dominoLevel(), failing);
     const playing = engineOn(dominoLevel());
     playing.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)));
-    const placed = engineOn(
-      fitStateOf(playing.snapshot(), dominoPieces()),
-      new RecordingPublisher(),
-      failing,
-    );
+    const placed = engineOn(fitStateOf(playing.snapshot(), dominoPieces()), failing);
     const facts = (state: FitSnapshot<SquareCoord>) => ({
       cells: cellsOf(state),
       tray: trayOf(state),

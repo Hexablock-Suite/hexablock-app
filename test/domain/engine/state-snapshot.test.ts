@@ -5,6 +5,7 @@ import { Score } from '../../../src/domain/engine/score';
 import type { Board } from '../../../src/domain/engine/board';
 import { BoardId } from '../../../src/domain/engine/board-id';
 import { GameStateId } from '../../../src/domain/engine/game-state-id';
+import { MatchId } from '../../../src/domain/engine/match-id';
 import { hex, HexAxis, type HexCoord } from '../../../src/domain/engine/hex-topology';
 import { Resolution } from '../../../src/domain/engine/resolution';
 import { Turns } from '../../../src/domain/engine/turns';
@@ -17,8 +18,7 @@ import { MergeTile } from '../../../src/domain/variants/hexa-merge/merge-tile';
 import { SlideSense, Slide } from '../../../src/domain/variants/hexa-merge/slide';
 import { ClearedStacks } from '../../../src/domain/variants/hexa-sort/cleared-stacks';
 import { SortScoring } from '../../../src/domain/variants/hexa-sort/sort-scoring';
-import { BOARD_ID, CountingBoardIds, CountingStateIds } from '../../support/engine/entity-ids';
-import { RecordingPublisher } from '../../support/engine/fake-game';
+import { BOARD_ID } from '../../support/engine/entity-ids';
 import { CountingMatchIds, MATCH_ID } from '../../support/engine/match-id';
 import { square } from '../../support/engine/square-topology';
 import { A, fitFactory } from '../../support/variants/hexa-fit/fit-game';
@@ -39,7 +39,7 @@ import { GameFactory } from '../../../src/domain/engine/game-factory';
 // answer of `GameEngine.snapshot()`. It carries domain values and no behavior of the state.
 
 const json = (value: unknown): string => JSON.stringify(value);
-const OTHER_STATE = GameStateId.of('another-state');
+const OTHER_STATE = GameStateId.of(MatchId.of('another-match'));
 
 describe('the photo of a state', () => {
   it('should_hold_the_lines_data_in_a_frozen_photo_when_a_lines_state_takes_its_snapshot', () => {
@@ -265,7 +265,7 @@ describe('the restore of a state from its photo', () => {
   it('should_throw_and_keep_the_state_when_the_photo_belongs_to_another_state', () => {
     const state = sortFactory().createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
     const stranger = sortFactory()
-      .createInitialState(MATCH_ID, GameStateId.of('stranger'), BOARD_ID)
+      .createInitialState(MATCH_ID, GameStateId.of(MatchId.of('stranger')), BOARD_ID)
       .snapshot();
     state.placeOfferedStack(square(0, 0));
     const before = json(state.snapshot().board.cells());
@@ -279,7 +279,7 @@ describe('the restore of a state from its photo', () => {
   it('should_throw_and_keep_the_board_when_the_photo_holds_another_board', () => {
     const state = sortFactory().createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
     const other = sortFactory()
-      .createInitialState(MATCH_ID, OTHER_STATE, BoardId.of('another-board'))
+      .createInitialState(MATCH_ID, OTHER_STATE, BoardId.of(MatchId.of('another-match')))
       .snapshot();
     state.placeOfferedStack(square(0, 0));
     const before = json(state.snapshot().board.cells());
@@ -291,13 +291,7 @@ describe('the restore of a state from its photo', () => {
 
 describe('the photo outside the state', () => {
   it('should_answer_a_frozen_photo_with_no_state_method_when_a_caller_asks_the_engine', () => {
-    const factory = new GameFactory(
-      sortFactory(),
-      new CountingMatchIds(),
-      new CountingStateIds(),
-      new CountingBoardIds(),
-      new RecordingPublisher(),
-    );
+    const factory = new GameFactory(sortFactory(), new CountingMatchIds());
     const photo = factory.createGame().snapshot();
     const members = photo as unknown as Record<string, unknown>;
 

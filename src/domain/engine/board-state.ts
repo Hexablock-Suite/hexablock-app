@@ -28,7 +28,8 @@ export type SnapshotOf<TState> = TState extends { snapshot(): infer TSnapshot } 
 
 // The state of one game: its board and its score. Each variant extends it.
 // The state is an entity inside the `GameEngine` aggregate (classes.md decisions 7 and 26).
-// Its identity is its own `GameStateId`. A `GameStateIdGenerator` gives it, and it never changes.
+// Its identity is its own `GameStateId`. The id is local: `GameFactory` builds it from the
+// `MatchId` of the game (decision 52), and it never changes.
 // A clone keeps it, because the clone is the same state at an earlier moment.
 // `equals()` compares two states by that identity only.
 // The state also keeps the `MatchId` of its game. `belongsTo()` tells whether the state

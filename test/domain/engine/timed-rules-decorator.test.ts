@@ -6,6 +6,7 @@ import { GameId } from '../../../src/domain/engine/game-id';
 import { GameOverPhase, PlayingPhase } from '../../../src/domain/engine/game-phase';
 import { LevelTimer } from '../../../src/domain/engine/level-timer';
 import { LevelTimerId } from '../../../src/domain/engine/level-timer-id';
+import { MatchId } from '../../../src/domain/engine/match-id';
 import { Outcome } from '../../../src/domain/engine/outcome';
 import type { IScoringPolicy } from '../../../src/domain/engine/scoring-policy';
 import { TimedRulesDecorator } from '../../../src/domain/engine/timed-rules-decorator';
@@ -14,7 +15,6 @@ import {
   emptyState,
   FakeRules,
   OnePointScoring,
-  RecordingPublisher,
   type FakeMove,
   type FakeState,
   type FakeSnapshot,
@@ -46,13 +46,7 @@ function timedGame(
   const clock = new ManualClock();
   const timer = new LevelTimer(TIMER_ID, clock);
   const decorated = new TimedRulesDecorator(rules, timer);
-  const engine = new GameEngine(
-    MATCH_ID,
-    GameId.of('fake-game'),
-    decorated,
-    scoring,
-    new RecordingPublisher(),
-  );
+  const engine = new GameEngine(MATCH_ID, GameId.of('fake-game'), decorated, scoring);
   engine.start(emptyState(size));
   return { clock, timer, decorated, engine, rules };
 }
@@ -236,7 +230,6 @@ describe('TimedRulesDecorator', () => {
       GameId.of('fake-game'),
       plainRules,
       new OnePointScoring(),
-      new RecordingPublisher(),
     );
     plain.start(emptyState(1));
     const timed = timedGame(1);
@@ -271,8 +264,8 @@ describe('TimedRulesDecorator', () => {
 describe('LevelTimer.equals', () => {
   it('should_be_equal_in_both_directions_when_two_timers_hold_one_id_and_only_one_is_started', () => {
     const clock = new ManualClock();
-    const started = new LevelTimer(LevelTimerId.of('timer-a'), clock);
-    const idle = new LevelTimer(LevelTimerId.of('timer-a'), new ManualClock());
+    const started = new LevelTimer(LevelTimerId.of(MatchId.of('match-a')), clock);
+    const idle = new LevelTimer(LevelTimerId.of(MatchId.of('match-a')), new ManualClock());
     started.start();
     clock.advance(SECOND);
 
@@ -287,8 +280,8 @@ describe('LevelTimer.equals', () => {
 
   it('should_be_different_in_both_directions_when_two_timers_hold_different_ids_and_read_one_clock', () => {
     const clock = new ManualClock();
-    const first = new LevelTimer(LevelTimerId.of('timer-a'), clock);
-    const second = new LevelTimer(LevelTimerId.of('timer-b'), clock);
+    const first = new LevelTimer(LevelTimerId.of(MatchId.of('match-a')), clock);
+    const second = new LevelTimer(LevelTimerId.of(MatchId.of('match-b')), clock);
     first.start();
     second.start();
     clock.advance(SECOND);
@@ -299,9 +292,9 @@ describe('LevelTimer.equals', () => {
 
   it('should_keep_its_identity_when_the_timer_starts_and_stops', () => {
     const clock = new ManualClock();
-    const timer = new LevelTimer(LevelTimerId.of('timer-a'), clock);
-    const same = new LevelTimer(LevelTimerId.of('timer-a'), clock);
-    const other = new LevelTimer(LevelTimerId.of('timer-b'), clock);
+    const timer = new LevelTimer(LevelTimerId.of(MatchId.of('match-a')), clock);
+    const same = new LevelTimer(LevelTimerId.of(MatchId.of('match-a')), clock);
+    const other = new LevelTimer(LevelTimerId.of(MatchId.of('match-b')), clock);
 
     timer.start();
     clock.advance(SECOND);
@@ -324,7 +317,6 @@ describe('GameEngine.timed', () => {
       GameId.of('fake-game'),
       new FakeRules(),
       new OnePointScoring(),
-      new RecordingPublisher(),
     );
 
     expect(engine.timed()).toBeUndefined();

@@ -1,19 +1,16 @@
 /** @jest-environment node */
 import { Outcome } from '../../src/domain/engine/outcome';
 import { ApplyMove } from '../../src/application/apply-move';
+import type { GameEventPublisher } from '../../src/application/game-event-publisher';
 import type { GameRepository } from '../../src/application/game-repository';
 import { StartGame } from '../../src/application/start-game';
 import type { BoardState } from '../../src/domain/engine/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
 import { GameEngine } from '../../src/domain/engine/game-engine';
-import {
-  GameOver,
-  type GameEvent,
-  type GameEventPublisher,
-} from '../../src/domain/engine/game-events';
+import type { GameEvent } from '../../src/domain/engine/game-events';
 import { GameFactory } from '../../src/domain/engine/game-factory';
 import { GameId } from '../../src/domain/engine/game-id';
-import { PlayingPhase, VictoryPhase } from '../../src/domain/engine/game-phase';
+import { PlayingPhase, VictoryPhase, type GamePhase } from '../../src/domain/engine/game-phase';
 import { MoveHistory } from '../../src/domain/engine/move-history';
 import type { Piece } from '../../src/domain/engine/piece';
 import { FixedListPieceSource, type IPieceSource } from '../../src/domain/engine/piece-source';
@@ -27,6 +24,7 @@ import type { ColorStack } from '../../src/domain/variants/hexa-sort/color-stack
 import { GoalCount } from '../../src/domain/variants/hexa-sort/goal-count';
 import type { PlaceStack } from '../../src/domain/variants/hexa-sort/place-stack';
 import { SortState } from '../../src/domain/variants/hexa-sort/sort-state';
+import { dataOf, type GameOverData } from '../support/engine/game-over';
 import { phaseNameOf } from '../support/engine/phase-name';
 import { square, type SquareCoord } from '../support/engine/square-topology';
 import { firstMoveOf } from '../support/engine/variant-game';
@@ -38,6 +36,7 @@ import {
   valueOf,
 } from '../support/application/game-use-cases';
 import { RecordingLogger } from '../support/application/recording-logger';
+import { RecordingPublisher } from '../support/application/recording-publisher';
 import type { UseCaseLogEntry } from '../../src/application/logger';
 import { fakeCell, type FakeCell } from '../support/engine/fake-cell';
 import {
@@ -45,7 +44,6 @@ import {
   fakeGameFactory,
   FakeRules,
   OnePointScoring,
-  RecordingPublisher,
   type FakeMove,
   type FakeState,
   type FakeSnapshot,
@@ -55,12 +53,7 @@ import { linesFactory } from '../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../support/variants/hexa-merge/merge-game';
 import { sortFactory, stack, stackPiece } from '../support/variants/hexa-sort/sort-game';
 import { CountingMatchIds, MATCH_ID } from '../support/engine/match-id';
-import {
-  BOARD_ID,
-  CountingBoardIds,
-  CountingStateIds,
-  STATE_ID,
-} from '../support/engine/entity-ids';
+import { BOARD_ID, STATE_ID } from '../support/engine/entity-ids';
 
 // `StartGame` and `ApplyMove` run the four variants through one code path (issue 100,
 // APP-FR-03, classes.md decisions 9, 28 and 29). The helper reads only `IVariantFactory`.
@@ -85,6 +78,22 @@ async function startAndPlayOnce<
 class ThrowingPublisher implements GameEventPublisher {
   publish(_event: GameEvent): void {
     throw new Error('The event bus is down.');
+  }
+}
+
+// A publisher that notes the phase of the running game when it receives an event.
+// So a test sees whether `ApplyMove` delivers the event after the engine saves the turn.
+class PhaseReadingPublisher implements GameEventPublisher {
+  readonly received: [GameOverData, string][] = [];
+  private games: { running(): { currentPhase(): GamePhase } } | undefined;
+
+  watch(games: { running(): { currentPhase(): GamePhase } }): void {
+    this.games = games;
+  }
+
+  publish(event: GameEvent): void {
+    const phase = this.games?.running().currentPhase();
+    this.received.push([dataOf(event), phase === undefined ? 'none' : phaseNameOf(phase)]);
   }
 }
 
@@ -132,7 +141,7 @@ function brokenStart<
 ): IVariantFactory<TCell, TCoord, TMove, TState, TPiece> {
   return {
     gameId: factory.gameId,
-    createRules: () => factory.createRules(),
+    createRules: (matchId) => factory.createRules(matchId),
     createScoring: () => factory.createScoring(),
     createPieceSource: () => factory.createPieceSource(),
     createBoard: (boardId) => factory.createBoard(boardId),
@@ -215,7 +224,7 @@ function sortFactoryWithFailingSource(): IVariantFactory<
   };
   return {
     gameId: factory.gameId,
-    createRules: () => factory.createRules(),
+    createRules: (matchId) => factory.createRules(matchId),
     createScoring: () => factory.createScoring(),
     createPieceSource: () => source,
     createBoard: (boardId) => factory.createBoard(boardId),
@@ -316,13 +325,7 @@ describe('StartGame and ApplyMove', () => {
     const oldGame = games.running();
     const before = runningGameOf(games);
     const broken = new StartGame(
-      new GameFactory(
-        brokenStart(linesFactory()),
-        new CountingMatchIds(),
-        new CountingStateIds(),
-        new CountingBoardIds(),
-        new RecordingPublisher(),
-      ),
+      new GameFactory(brokenStart(linesFactory()), new CountingMatchIds()),
       games,
     );
 
@@ -346,21 +349,36 @@ describe('StartGame and ApplyMove', () => {
     expect([first.equals(first), second.equals(second)]).toEqual([true, true]);
   });
 
-  it('should_publish_game_over_with_the_id_of_the_generator_when_the_started_game_ends', async () => {
-    const publisher = new RecordingPublisher();
+  // The root only records its event. `ApplyMove` takes it after the turn and delivers it
+  // to the publisher port (issue #233, classes.md decisions 25 and 29).
+  it('should_deliver_one_game_over_with_the_id_of_the_generator_after_the_turn_when_apply_move_plays_the_last_move', async () => {
+    const publisher = new PhaseReadingPublisher();
     const factory = fitFactory();
-    const { startGame, applyMove } = gameUseCases(factory, publisher, new RecordingLogger(), {
-      next: () => MATCH_ID,
-    });
+    const { games, startGame, applyMove } = gameUseCases(
+      factory,
+      publisher,
+      new RecordingLogger(),
+      { next: () => MATCH_ID },
+    );
+    publisher.watch(games);
     valueOf(await startGame.execute({}));
     const move = firstMoveOf(factory);
 
     const played = valueOf(await applyMove.execute({ move }));
 
     expect(played.outcome).toBe(Outcome.victory);
-    expect(publisher.events).toEqual([
-      new GameOver(factory.gameId, MATCH_ID, Outcome.victory, Score.of(0)),
+    expect(publisher.received).toEqual([
+      [
+        {
+          gameId: factory.gameId,
+          matchId: MATCH_ID,
+          outcome: Outcome.victory,
+          finalScore: Score.of(0),
+        },
+        'victory',
+      ],
     ]);
+    expect(games.running().takeEvents()).toEqual([]);
   });
 
   it('should_return_a_start_failed_failure_and_keep_the_old_game_when_the_id_generator_throws', async () => {
@@ -369,17 +387,11 @@ describe('StartGame and ApplyMove', () => {
     const oldGame = working.games.running();
     const before = runningGameOf(working.games);
     const broken = new StartGame(
-      new GameFactory(
-        linesFactory(),
-        {
-          next: () => {
-            throw new Error('The generator has no id.');
-          },
+      new GameFactory(linesFactory(), {
+        next: () => {
+          throw new Error('The generator has no id.');
         },
-        new CountingStateIds(),
-        new CountingBoardIds(),
-        new RecordingPublisher(),
-      ),
+      }),
       working.games,
     );
 
@@ -411,7 +423,11 @@ describe('StartGame and ApplyMove', () => {
   });
 
   it('should_return_a_move_failed_failure_when_the_repository_throws_on_current', async () => {
-    const applyMove = new ApplyMove(new ThrowingRepository('current'), new RecordingLogger());
+    const applyMove = new ApplyMove(
+      new ThrowingRepository('current'),
+      new RecordingLogger(),
+      new RecordingPublisher(),
+    );
 
     const error = errorOf(await applyMove.execute({ move: new PlacePiece(0, square(0, 0)) }));
 
@@ -424,13 +440,7 @@ describe('StartGame and ApplyMove', () => {
 
   it('should_return_a_start_failed_failure_when_the_repository_throws_on_replace', async () => {
     const startGame = new StartGame(
-      new GameFactory(
-        linesFactory(),
-        new CountingMatchIds(),
-        new CountingStateIds(),
-        new CountingBoardIds(),
-        new RecordingPublisher(),
-      ),
+      new GameFactory(linesFactory(), new CountingMatchIds()),
       new ThrowingRepository('replace'),
     );
 
@@ -555,14 +565,13 @@ describe('StartGame and ApplyMove', () => {
       GameId.of('fake-game'),
       new ResolveThrowingRules(),
       new OnePointScoring(),
-      publisher,
     );
     engine.start(emptyState());
     games.replace(engine);
     const logger = new RecordingLogger();
 
     const error = errorOf(
-      await new ApplyMove(games, logger).execute({
+      await new ApplyMove(games, logger, publisher).execute({
         move: { at: square(0, 0), cell: fakeCell(1) },
       }),
     );

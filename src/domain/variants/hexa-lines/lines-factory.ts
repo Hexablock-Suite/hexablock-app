@@ -112,7 +112,8 @@ export class LinesFactory<TCoord> implements IVariantFactory<
     private readonly settings: LinesSettings<TCoord>,
   ) {}
 
-  createRules(): IGameRules<PlacePiece<TCoord>, LinesState<TCoord>> {
+  // Hexa Lines has no timer, so the rules need no `MatchId` (classes.md decision 50).
+  createRules(_matchId: MatchId): IGameRules<PlacePiece<TCoord>, LinesState<TCoord>> {
     return new LinesRules<TCoord>();
   }
 

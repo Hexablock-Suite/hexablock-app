@@ -19,7 +19,6 @@ import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile
 import type { IMergeable } from '../../../../src/domain/variants/hexa-merge/mergeable';
 import type { NewTile } from '../../../../src/domain/variants/hexa-merge/new-tile';
 import { Slide, SlideSense } from '../../../../src/domain/variants/hexa-merge/slide';
-import { RecordingPublisher } from '../../../support/engine/fake-game';
 import {
   hexTopology,
   mergeGame,
@@ -174,7 +173,7 @@ describe('MergeRules', () => {
   });
 
   it('should_keep_playing_and_mark_the_target_when_a_merge_makes_the_target_tile', () => {
-    const { engine, publisher } = mergeGame(
+    const { engine } = mergeGame(
       mergeState(
         [
           [hex(-2, 0), 4],
@@ -196,7 +195,7 @@ describe('MergeRules', () => {
     expect(values(engine.snapshot())).toEqual({ '-2,0': 8 });
     expect(engine.snapshot().targetReached).toBe(true);
     expect(engine.currentPhase().canPlay()).toBe(true);
-    expect(publisher.events).toEqual([]);
+    expect(engine.takeEvents()).toEqual([]);
   });
 
   it('should_reject_the_slide_and_keep_the_board_when_no_tile_moves_that_way', () => {
@@ -266,7 +265,7 @@ describe('Merge edge cases', () => {
     // 2^53 is a power of two, but it is not a safe integer (merge-tile.ts).
     const big = MergeTile.of(2 ** 52);
     const tooBig = 'A merge tile needs a power of two of 2 or more, not 9007199254740992.';
-    const { engine, publisher } = mergeGame(
+    const { engine } = mergeGame(
       mergeState(
         [
           [hex(1, 0), 2 ** 52],
@@ -283,7 +282,7 @@ describe('Merge edge cases', () => {
     expect(() => engine.play(Slide.of(HexAxis.q, SlideSense.forward))).toThrow(tooBig);
     expect(values(engine.snapshot())).toEqual({ '1,0': 2 ** 52, '2,0': 2 ** 52 });
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
-    expect(publisher.events).toEqual([]);
+    expect(engine.takeEvents()).toEqual([]);
   });
 
   it('should_merge_any_mergeable_cell_and_keep_the_game_when_its_merge_throws', () => {
@@ -314,13 +313,9 @@ describe('Merge edge cases', () => {
         HexCoord,
         Slide<HexAxis>,
         MergeState<Chip, HexCoord, HexAxis>
-      >(
-        MATCH_ID,
-        GameId.of('hexa-merge'),
-        new MergeRules<Chip, HexCoord, HexAxis>(chip('aaaa')),
-        { score: () => Score.of(0) },
-        new RecordingPublisher(),
-      );
+      >(MATCH_ID, GameId.of('hexa-merge'), new MergeRules<Chip, HexCoord, HexAxis>(chip('aaaa')), {
+        score: () => Score.of(0),
+      });
       engine.start(
         new MergeState(STATE_ID, MATCH_ID, board, new FixedListPieceSource<NewTile<Chip>>([])),
       );
@@ -359,7 +354,7 @@ describe('Merge edge cases', () => {
     // The game ends when no slide changes the board (merge-rules.ts).
     // On an empty board no tile moves, so no slide changes it.
     const empty = mergeState([], 2);
-    const { engine, rules, publisher } = mergeGame(empty);
+    const { engine, rules } = mergeGame(empty);
 
     const outcome = engine.play(Slide.of(HexAxis.q, SlideSense.forward));
 
@@ -367,7 +362,7 @@ describe('Merge edge cases', () => {
     expect([...rules.validMoves(empty)]).toEqual([]);
     expect(outcome).toBe(Outcome.playing);
     expect(values(engine.snapshot())).toEqual({});
-    expect(publisher.events).toEqual([]);
+    expect(engine.takeEvents()).toEqual([]);
   });
 });
 

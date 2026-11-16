@@ -73,15 +73,15 @@
           Sequence diagram of one new game. The player opens a game on GameScreen in layer 4.
           GamePresenter in layer 3 calls execute() on StartGame in layer 2 through the UseCase port.
           StartGame calls createGame() on GameFactory in layer 1. GameFactory asks the
-          MatchIdGenerator, the GameStateIdGenerator and the BoardIdGenerator for one new id each,
-          and the IVariantFactory for the rules, the scoring and the history. It creates GameEngine
-          with the MatchId, and asks the IVariantFactory for the first state with the three ids. The
-          variant factory builds the board with BoardBuilder, with a region for Lines, Sort and
-          Merge or with the figure of the level for Fit, and BoardBuilder asks its GeometryFactory
-          for the topology. GameFactory starts GameEngine and returns it. StartGame keeps it in
-          InMemoryGameRepository through the GameRepository port, reads the photo of the state and
-          the cells of its board, and returns a Result with a MoveResult. GamePresenter maps the
-          cells as in flow 1 and GameScreen renders the board.
+          MatchIdGenerator for one new MatchId, builds the GameStateId and the BoardId from it, and
+          asks the IVariantFactory for the rules with the MatchId, the scoring and the history. It
+          creates GameEngine with the MatchId, and asks the IVariantFactory for the first state with
+          the three ids. The variant factory builds the board with BoardBuilder, with a region for
+          Lines, Sort and Merge or with the figure of the level for Fit, and BoardBuilder asks its
+          GeometryFactory for the topology. GameFactory starts GameEngine and returns it. StartGame
+          keeps it in InMemoryGameRepository through the GameRepository port, reads the photo of the
+          state and the cells of its board, and returns a Result with a MoveResult. GamePresenter
+          maps the cells as in flow 1 and GameScreen renders the board.
         </desc>
         <defs>
           <marker
@@ -403,7 +403,7 @@
         >
           factory of the aggregate
         </text>
-        <!-- Lifeline: ids, stateIds, boardIds : MatchIdGenerator -->
+        <!-- Lifeline: ids : MatchIdGenerator -->
         <rect
           x="734"
           y="24"
@@ -434,7 +434,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          ids, stateIds, boardIds :
+          ids :
         </text>
         <text
           x="832"
@@ -446,16 +446,6 @@
           text-anchor="middle"
         >
           MatchIdGenerator
-        </text>
-        <text
-          x="832"
-          y="80"
-          fill="#5b6873"
-          font-size="7.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          + GameStateIdGenerator, BoardIdGenerator
         </text>
         <!-- Lifeline: variant : IVariantFactory -->
         <rect
@@ -878,24 +868,6 @@
           stroke-width="1"
         />
         <rect
-          x="828"
-          y="294"
-          width="8"
-          height="36"
-          fill="#ffffff"
-          stroke="#17212a"
-          stroke-width="1"
-        />
-        <rect
-          x="828"
-          y="354"
-          width="8"
-          height="36"
-          fill="#ffffff"
-          stroke="#17212a"
-          stroke-width="1"
-        />
-        <rect
           x="984"
           y="414"
           width="8"
@@ -1227,91 +1199,43 @@
         >
           MatchId
         </text>
-        <!-- Message: gf to ids -->
-        <line
-          x1="668"
-          y1="296"
-          x2="828"
-          y2="296"
+        <!-- Self message: gf builds a local id from the MatchId -->
+        <path
+          d="M668 296 H692 V310 H668"
+          fill="none"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqstart-call)"
         />
-        <rect x="701.65" y="282" width="92.7" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="694" y="296" width="123.3" height="13" rx="2" fill="#f3f5f6" />
         <text
-          x="748"
-          y="292"
+          x="698"
+          y="306"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
+          text-anchor="start"
         >
-          next() · stateIds
+          GameStateId.of(matchId)
         </text>
-        <!-- Reply: ids to gf -->
-        <line
-          x1="828"
-          y1="326"
-          x2="668"
-          y2="326"
-          stroke="#5b6873"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#seqstart-reply)"
-        />
-        <rect x="716.95" y="312" width="62.1" height="13" rx="2" fill="#f3f5f6" />
-        <text
-          x="748"
-          y="322"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          GameStateId
-        </text>
-        <!-- Message: gf to ids -->
-        <line
-          x1="668"
-          y1="356"
-          x2="828"
-          y2="356"
+        <!-- Self message: gf builds a local id from the MatchId -->
+        <path
+          d="M668 356 H692 V370 H668"
+          fill="none"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqstart-call)"
         />
-        <rect x="701.65" y="342" width="92.7" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="694" y="356" width="102.9" height="13" rx="2" fill="#f3f5f6" />
         <text
-          x="748"
-          y="352"
+          x="698"
+          y="366"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
+          text-anchor="start"
         >
-          next() · boardIds
-        </text>
-        <!-- Reply: ids to gf -->
-        <line
-          x1="828"
-          y1="386"
-          x2="668"
-          y2="386"
-          stroke="#5b6873"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#seqstart-reply)"
-        />
-        <rect x="727.15" y="372" width="41.7" height="13" rx="2" fill="#f3f5f6" />
-        <text
-          x="748"
-          y="382"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          BoardId
+          BoardId.of(matchId)
         </text>
         <!-- Message: gf to vf -->
         <line
@@ -1323,7 +1247,7 @@
           stroke-width="1"
           marker-end="url(#seqstart-call)"
         />
-        <rect x="789.85" y="402" width="72.3" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="772" y="402" width="108" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="826"
           y="412"
@@ -1332,7 +1256,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          createRules()
+          createRules(matchId)
         </text>
         <!-- Reply: vf to gf -->
         <line
@@ -2035,7 +1959,7 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           StartGame names only GameFactory and the GameRepository port. GameFactory puts the game
-          together (decision 40): it asks each id generator for one new id,
+          together (decision 40): it asks the MatchIdGenerator for one new id,
         </text>
         <text
           x="24"
@@ -2044,8 +1968,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          and the variant factory for the rules, the scoring, the history and the first state. One
-          lifeline stands for the three generators: ids is the MatchIdGenerator,
+          builds the local ids of the state and of its board from it (decision 52), and asks the
+          variant factory for the rules, the scoring, the history and the first state.
         </text>
         <text
           x="24"
@@ -2054,8 +1978,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          stateIds the GameStateIdGenerator and boardIds the BoardIdGenerator. The composition root
-          injects the variant factory of the chosen game, so StartGame and
+          The rules get the MatchId too, so a timed variant builds the id of its timer from it. The
+          composition root injects the variant factory of the chosen game, so StartGame and
         </text>
         <text
           x="24"

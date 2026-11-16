@@ -1,4 +1,5 @@
 import { ApplyMove } from '../../../src/application/apply-move';
+import type { GameEventPublisher } from '../../../src/application/game-event-publisher';
 import type { GameRepository } from '../../../src/application/game-repository';
 import type { Result, UseCaseError } from '../../../src/application/result';
 import { StartGame } from '../../../src/application/start-game';
@@ -6,14 +7,12 @@ import { UndoMove } from '../../../src/application/undo-move';
 import type { BoardState } from '../../../src/domain/engine/board-state';
 import type { Cloneable } from '../../../src/domain/engine/cloneable';
 import type { GameEngine } from '../../../src/domain/engine/game-engine';
-import type { GameEventPublisher } from '../../../src/domain/engine/game-events';
 import { GameFactory } from '../../../src/domain/engine/game-factory';
 import type { MatchIdGenerator } from '../../../src/domain/engine/match-id-generator';
 import type { IVariantFactory } from '../../../src/domain/engine/variant-factory';
-import { RecordingPublisher } from '../engine/fake-game';
-import { CountingBoardIds, CountingStateIds } from '../engine/entity-ids';
 import { CountingMatchIds } from '../engine/match-id';
 import { RecordingLogger } from './recording-logger';
+import { RecordingPublisher } from './recording-publisher';
 
 // Helpers for the game use case tests. They exist only in test/.
 
@@ -44,9 +43,10 @@ export class MemoryGameRepository<
 }
 
 // The game use cases of one variant over one shared repository.
-// `ApplyMove` writes a publisher failure to `logger` (issue 132).
+// `ApplyMove` delivers the events of each turn to `events`, and it writes a publisher
+// failure to `logger` (issues 132 and 233).
 // `ids` gives the id of each game that `StartGame` opens. The first state of each game
-// takes its own id and the id of its board from two counting generators.
+// and its board take ids that `GameFactory` builds from that id (issue #236).
 export function gameUseCases<
   TCell,
   TCoord,
@@ -63,11 +63,8 @@ export function gameUseCases<
   return {
     games,
     logger,
-    startGame: new StartGame(
-      new GameFactory(factory, ids, new CountingStateIds(), new CountingBoardIds(), events),
-      games,
-    ),
-    applyMove: new ApplyMove(games, logger),
+    startGame: new StartGame(new GameFactory(factory, ids), games),
+    applyMove: new ApplyMove(games, logger, events),
     undoMove: new UndoMove(games),
   };
 }

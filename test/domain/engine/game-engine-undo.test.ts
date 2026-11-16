@@ -3,7 +3,6 @@ import { Outcome } from '../../../src/domain/engine/outcome';
 import { Score } from '../../../src/domain/engine/score';
 import type { Board, ReadonlyBoard } from '../../../src/domain/engine/board';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
-import { GameOver } from '../../../src/domain/engine/game-events';
 import { GameId } from '../../../src/domain/engine/game-id';
 import { MoveHistory } from '../../../src/domain/engine/move-history';
 import { FixedListPieceSource } from '../../../src/domain/engine/piece-source';
@@ -15,13 +14,13 @@ import {
   FakeRules,
   FakeState,
   OnePointScoring,
-  RecordingPublisher,
   SourceRules,
   sourceState,
   type FakeMove,
   type FakeSnapshot,
   type SourceSnapshot,
 } from '../../support/engine/fake-game';
+import { dataOf } from '../../support/engine/game-over';
 import { phaseNameOf } from '../../support/engine/phase-name';
 import {
   square,
@@ -45,20 +44,18 @@ function filled(board: ReadonlyBoard<FakeCell, SquareCoord>): [string, number][]
 }
 
 function historyGame(rules = new FakeRules(), size = 2) {
-  const publisher = new RecordingPublisher();
   const history = new MoveHistory<FakeMove, FakeSnapshot>();
   const engine = new GameEngine(
     MATCH_ID,
     GameId.of('fake-game'),
     rules,
     new OnePointScoring(),
-    publisher,
     history,
   );
   engine.start(emptyState(size));
   const undoable = engine.undoable();
   if (undoable === undefined) throw new RangeError('The engine has no undo capability.');
-  return { engine, undoable, publisher };
+  return { engine, undoable };
 }
 
 // The plain facts of a game for a comparison of two runs.
@@ -126,7 +123,6 @@ describe('GameEngine undo capability', () => {
       GameId.of('fake-game'),
       new FakeRules(),
       new OnePointScoring(),
-      new RecordingPublisher(),
     );
     engine.start(emptyState());
 
@@ -156,7 +152,6 @@ describe('GameEngine undo capability', () => {
   });
 
   it('should_put_the_piece_source_back_when_the_undone_move_drew_a_piece', () => {
-    const publisher = new RecordingPublisher();
     const pieces = [fakeCell(1), fakeCell(2), fakeCell(3)];
     const history = new MoveHistory<SquareCoord, SourceSnapshot>();
     const engine = new GameEngine(
@@ -164,7 +159,6 @@ describe('GameEngine undo capability', () => {
       GameId.of('fake-game'),
       new SourceRules(),
       { score: () => Score.of(0) },
-      publisher,
       history,
     );
     engine.start(sourceState(new FixedListPieceSource(pieces)));
@@ -226,7 +220,7 @@ describe('GameEngine undo capability', () => {
   });
 
   it('should_forget_the_moves_and_keep_the_end_of_the_game_when_the_last_move_ends_it', () => {
-    const { engine, undoable, publisher } = historyGame(new FakeRules(), 1);
+    const { engine, undoable } = historyGame(new FakeRules(), 1);
     engine.play(moveAt(0));
     const finished = factsOf(engine);
 
@@ -234,8 +228,13 @@ describe('GameEngine undo capability', () => {
     expect(undoable.canUndo()).toBe(false);
     expect(() => undoable.undo()).toThrow(new RangeError('The history has no move to undo.'));
     expect(factsOf(engine)).toEqual(finished);
-    expect(publisher.events).toEqual([
-      new GameOver(GameId.of('fake-game'), MATCH_ID, Outcome.gameOver, Score.of(1)),
+    expect(engine.takeEvents().map(dataOf)).toEqual([
+      {
+        gameId: GameId.of('fake-game'),
+        matchId: MATCH_ID,
+        outcome: Outcome.gameOver,
+        finalScore: Score.of(1),
+      },
     ]);
   });
 
@@ -267,7 +266,6 @@ describe('GameEngine undo capability', () => {
       GameId.of('fake-game'),
       new FakeRules(),
       scoring,
-      new RecordingPublisher(),
       new MoveHistory<FakeMove, FakeSnapshot>(),
     );
     engine.start(emptyState());
@@ -307,14 +305,12 @@ describe('GameEngine undo capability', () => {
 
   it('should_play_the_same_turns_when_the_engine_has_a_history', () => {
     const run = (withHistory: boolean) => {
-      const publisher = new RecordingPublisher();
       const history = withHistory ? new MoveHistory<FakeMove, FakeSnapshot>() : undefined;
       const engine = new GameEngine(
         MATCH_ID,
         GameId.of('fake-game'),
         new FakeRules(),
         new OnePointScoring(),
-        publisher,
         history,
       );
       engine.start(emptyState());
@@ -322,7 +318,7 @@ describe('GameEngine undo capability', () => {
       return {
         answers: reports.map((move) => engine.tryPlay(move)),
         facts: factsOf(engine),
-        events: publisher.events,
+        events: engine.takeEvents().map(dataOf),
       };
     };
 

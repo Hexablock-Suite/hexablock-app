@@ -1,7 +1,6 @@
 /** @jest-environment node */
 import { Outcome } from '../../../../src/domain/engine/outcome';
 import { Score } from '../../../../src/domain/engine/score';
-import { GameOver } from '../../../../src/domain/engine/game-events';
 import { GameId } from '../../../../src/domain/engine/game-id';
 import { PlayingPhase } from '../../../../src/domain/engine/game-phase';
 import { hex, HexAxis } from '../../../../src/domain/engine/hex-topology';
@@ -25,6 +24,7 @@ import {
   type HexMergeState,
   mergeStateOf,
 } from '../../../support/variants/hexa-merge/merge-game';
+import { dataOf } from '../../../support/engine/game-over';
 import { MATCH_ID } from '../../../support/engine/match-id';
 
 // The new tiles of Hexa Merge (statement §1.4, APP-NFR-07, issue #95).
@@ -185,7 +185,7 @@ describe('Merge new tiles', () => {
   it('should_end_the_game_when_an_accepted_slide_and_its_new_tile_leave_no_slide_that_changes_the_board', () => {
     // A full hexagon of seven cells. The slide merges the two 4s of the row r = 1,
     // so one cell is empty. The new tile is a 4 on it, and no two neighbors are equal then.
-    const { engine, rules, publisher } = mergeGame(
+    const { engine, rules } = mergeGame(
       mergeState(
         [
           [hex(0, 0), 2],
@@ -215,8 +215,13 @@ describe('Merge new tiles', () => {
     });
     expect([...rules.validMoves(mergeStateOf(engine.snapshot()))]).toEqual([]);
     expect(engine.currentPhase().canPlay()).toBe(false);
-    expect(publisher.events).toEqual([
-      new GameOver(GameId.of('hexa-merge'), MATCH_ID, Outcome.gameOver, Score.of(0)),
+    expect(engine.takeEvents().map(dataOf)).toEqual([
+      {
+        gameId: GameId.of('hexa-merge'),
+        matchId: MATCH_ID,
+        outcome: Outcome.gameOver,
+        finalScore: Score.of(0),
+      },
     ]);
   });
 
@@ -298,7 +303,7 @@ describe('Merge new tiles edge cases', () => {
     const slide = Slide.of(HexAxis.q, SlideSense.forward);
     const reference = mergeGame(mergeState([[hex(0, 0), 2]], 3, source(false)));
     reference.engine.play(slide);
-    const { engine, publisher } = mergeGame(mergeState([[hex(0, 0), 2]], 3, source(true)));
+    const { engine } = mergeGame(mergeState([[hex(0, 0), 2]], 3, source(true)));
 
     expect(() => engine.play(slide)).toThrow('The source failed.');
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
@@ -307,6 +312,6 @@ describe('Merge new tiles edge cases', () => {
     expect(engine.play(slide)).toBe(Outcome.playing);
     expect(Object.keys(values(engine.snapshot()))).toHaveLength(2);
     expect(values(engine.snapshot())).toEqual(values(reference.engine.snapshot()));
-    expect(publisher.events).toEqual([]);
+    expect(engine.takeEvents()).toEqual([]);
   });
 });
