@@ -31,6 +31,7 @@ import { SpaceCellRenderer } from './board/space-cell-renderer';
 import { SquareLayout } from './board/square-layout';
 import { TriangleLayout } from './board/triangle-layout';
 import { registered, type RegisteredGame, type ScreenParts } from './game-registry';
+import { BoardOnlyControls } from './ui/move-controls';
 
 // The count of seeds: the unsigned 32-bit integers (classes.md decision 48).
 const SEEDS = 2 ** 32;
@@ -151,13 +152,15 @@ function fitOn<TCoord>(figure: BoardFigure<TCoord>, clock: Clock): RegisteredGam
 }
 
 // The default screen parts on the board figure `figure`: the mapper and the renderer that tell
-// a free space from an occupied one, and the layout of the figure (D4, issue #165).
+// a free space from an occupied one, the controls that show the board alone,
+// and the layout of the figure (D4, issue #165).
 function defaultScreen<TCoord>(
   figure: BoardFigure<TCoord>,
 ): ScreenParts<unknown, TCoord, unknown, SpaceView, undefined> {
   return {
     mapper: new SpaceStateMapper(),
     renderer: new SpaceCellRenderer(),
+    controls: new BoardOnlyControls(),
     layoutOf: (size) => figure.layoutOf(size),
   };
 }
