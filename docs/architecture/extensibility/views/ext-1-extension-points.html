@@ -718,7 +718,7 @@
           + playTurn(state: TState, move: TMove):
         </text>
         <text x="96" y="414" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          Resolution&lt;TState&gt; {template}
+          Resolution {template}
         </text>
         <text x="80" y="430" fill="#7d8a94" font-size="9" font-family="'IBM Plex Mono', monospace">
           steps: isValid, apply, resolve, evaluate
@@ -781,7 +781,7 @@
           + playTurn(state: TState, move: TMove):
         </text>
         <text x="424" y="414" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          Resolution&lt;TState&gt;
+          Resolution
         </text>
         <text x="408" y="430" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           + evaluate(state: TState): Outcome
@@ -841,10 +841,10 @@
         </text>
         <line x1="720" y1="380" x2="976" y2="380" stroke="#17212a" stroke-width="1" />
         <text x="736" y="398" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + score(before: TState,
+          + score(before: SnapshotOf&lt;TState&gt;,
         </text>
         <text x="752" y="414" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          resolution: Resolution&lt;TState&gt;): Score
+          after: SnapshotOf&lt;TState&gt;): Score
         </text>
         <text x="736" y="430" fill="#7d8a94" font-size="9" font-family="'IBM Plex Mono', monospace">
           ScoringDecorator adds bonuses
