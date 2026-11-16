@@ -7,6 +7,7 @@ import type { CoordKey } from '../../engine/coord-key';
 import { GameId } from '../../engine/game-id';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { GeometryFactory } from '../../engine/geometry-factory';
+import { HighScoreProgress } from '../../engine/high-score-progress';
 import type { MatchId } from '../../engine/match-id';
 import { Piece } from '../../engine/piece';
 import { FixedListPieceSource, SeededPieceSource } from '../../engine/piece-source';
@@ -152,6 +153,11 @@ export class LinesFactory<TCoord> implements IVariantFactory<
   // Hexa Lines has no undo (APP-FR-08, classes.md decision 3).
   createHistory(): undefined {
     return undefined;
+  }
+
+  // Hexa Lines keeps a high score (APP-FR-04).
+  createProgressModel(): HighScoreProgress {
+    return new HighScoreProgress();
   }
 }
 

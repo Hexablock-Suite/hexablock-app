@@ -169,6 +169,7 @@ function brokenStart<
       throw new RangeError('The level is broken.');
     },
     createHistory: () => factory.createHistory(),
+    createProgressModel: () => factory.createProgressModel(),
   };
 }
 
@@ -258,6 +259,7 @@ function sortFactoryWithFailingSource(): IVariantFactory<
         goalsNeeded: GoalCount.of(1),
       }),
     createHistory: () => factory.createHistory(),
+    createProgressModel: () => factory.createProgressModel(),
   };
 }
 
