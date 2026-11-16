@@ -71,7 +71,7 @@
       >
         <title id="mapad-title">HexaBlock adapters map · UML class diagram</title>
         <desc id="mapad-desc">
-          Overview map of the 58 classes of layers 4 and 3 in 12 groups. The composition root group
+          Overview map of the 60 classes of layers 4 and 3 in 13 groups. The composition root group
           holds CompositionRoot, GameRegistry and BoardFigure, the drivers group holds
           SequentialMatchIds, and the events group holds NullGameEventPublisher. Each line joins two
           classes: GameScreen renders BoardView and keeps its GamePresenter, CompositionRoot creates
@@ -283,6 +283,41 @@
           letter-spacing="0.14em"
         >
           VIEWS 4.2, 4.4
+        </text>
+        <!-- Group: move controls (#177) -->
+        <rect
+          x="448"
+          y="270"
+          width="320"
+          height="78"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="460"
+          y="286"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          MOVE CONTROLS · STRATEGY
+        </text>
+        <text
+          x="756"
+          y="286"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+          letter-spacing="0.14em"
+        >
+          VIEW 4.1
         </text>
         <!-- Group: routes -->
         <rect
@@ -978,6 +1013,52 @@
           <text x="532" y="167" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               SoundLibrary
+            </tspan>
+          </text>
+        </g>
+        <!-- Chips: move controls -->
+        <g data-class="MoveControls">
+          <rect
+            x="464"
+            y="298"
+            width="136"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="532"
+            y="310"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="532" y="323" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              MoveControls
+            </tspan>
+          </text>
+        </g>
+        <g data-class="MergeControls">
+          <rect
+            x="616"
+            y="298"
+            width="136"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="684" y="319" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              MergeControls
             </tspan>
           </text>
         </g>
