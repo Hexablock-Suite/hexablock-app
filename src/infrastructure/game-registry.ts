@@ -15,7 +15,7 @@ export interface FactoryUse<TResult> {
 }
 
 // One game of the registry: its id and its variant factory, with the type arguments hidden.
-// The state mapper of the game (#170) and its cell renderer (#165, S3-07) join it later.
+// The state mapper of the game and its cell renderer join it later (#170, S3-07).
 export interface RegisteredGame {
   readonly gameId: GameId;
   withFactory<TResult>(use: FactoryUse<TResult>): TResult;
