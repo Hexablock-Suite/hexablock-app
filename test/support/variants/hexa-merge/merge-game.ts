@@ -1,4 +1,4 @@
-import type { GridAxis } from '../../../../src/domain/engine/grid-topology';
+import type { GridAxis, GridTopology } from '../../../../src/domain/engine/grid-topology';
 import { Score } from '../../../../src/domain/engine/score';
 import { Board, type ReadonlyBoard } from '../../../../src/domain/engine/board';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
@@ -29,6 +29,7 @@ import type { Slide } from '../../../../src/domain/variants/hexa-merge/slide';
 import { MATCH_ID } from '../../engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../engine/entity-ids';
 import { delivered } from '../../engine/value-receiver';
+import { boardOnTopologyLike } from '../../engine/variant-game';
 
 // The Merge game for the rules tests, on the real hexagonal geometry.
 // The rules tests score no points. The scoring tests pass their own policy.
@@ -49,6 +50,16 @@ export function noNewTiles(): IPieceSource<NewTile<MergeTile>> {
   return new FixedListPieceSource<NewTile<MergeTile>>([]);
 }
 
+// A new empty hexagon of `size` rings with the id `BOARD_ID`.
+// A photo hands out no board (issue #234), so a test that builds a state builds its board here.
+export function mergeBoard(size = 2): Board<MergeTile, HexCoord, HexAxis> {
+  return new Board<MergeTile, HexCoord, HexAxis>(
+    BOARD_ID,
+    hexTopology.region(RegionSize.of(size)),
+    hexTopology,
+  );
+}
+
 // A hexagon of `size` rings with a tile of each given value at its coordinate.
 export function mergeState(
   tiles: readonly [HexCoord, number][],
@@ -57,11 +68,7 @@ export function mergeState(
   matchId: MatchId = MATCH_ID,
   stateId: GameStateId = STATE_ID,
 ): HexMergeState {
-  const board = new Board<MergeTile, HexCoord, HexAxis>(
-    BOARD_ID,
-    hexTopology.region(RegionSize.of(size)),
-    hexTopology,
-  );
+  const board = mergeBoard(size);
   for (const [at, value] of tiles) board.occupy(at, MergeTile.of(value));
   return new MergeState(stateId, matchId, board, source);
 }
@@ -78,7 +85,7 @@ export function values<TAxis extends GridAxis>(state: {
   readonly board: ReadonlyBoard<MergeTile, HexCoord, TAxis>;
 }): Record<string, number> {
   const out: Record<string, number> = {};
-  for (const [at, tile] of state.board.cells()) out[hexTopology.key(at)] = valueOf(tile);
+  for (const [at, tile] of state.board.occupiedCells()) out[hexTopology.key(at)] = valueOf(tile);
   return out;
 }
 
@@ -107,12 +114,16 @@ export function mergeFactory(seed = 1): MergeFactory<HexCoord> {
 }
 
 // A live state built again from a photo, so a test can ask the rules about the state that a game
-// shows. The engine never gives its state away. So the helper builds a new state with the ids,
-// the board and the source of the photo, and the state takes the photo back with `restore()`.
-export function mergeStateOf<TCoord, TAxis extends GridAxis>(
-  photo: MergeSnapshot<MergeTile, TCoord, TAxis>,
-): MergeState<MergeTile, TCoord, TAxis> {
-  const state = new MergeState(photo.stateId, photo.matchId, photo.board.clone(), photo.tiles);
+// shows. The engine never gives its state away. So the helper builds a new state with the ids
+// and the source of the photo and a new hexagonal board of the same shape, and the state takes
+// the photo back with `restore()`. The photo hands out no board (issue #234).
+// The board takes the axis type of the photo, so the topology is cast to it.
+export function mergeStateOf<TAxis extends GridAxis>(
+  photo: MergeSnapshot<MergeTile, HexCoord, TAxis>,
+): MergeState<MergeTile, HexCoord, TAxis> {
+  const topology = hexTopology as unknown as GridTopology<HexCoord, TAxis>;
+  const board = boardOnTopologyLike(photo.board, topology, photo.matchId);
+  const state = new MergeState(photo.stateId, photo.matchId, board, photo.tiles);
   state.restore(photo);
   return state;
 }

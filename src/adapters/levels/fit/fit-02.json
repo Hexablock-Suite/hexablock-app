@@ -1,0 +1,52 @@
+{
+  "gameId": "hexa-fit",
+  "levelId": "fit-02",
+  "order": 2,
+  "version": 1,
+  "topology": "hex",
+  "section": {
+    "figure": [
+      [0, -1],
+      [1, -1],
+      [-1, 0],
+      [0, 0],
+      [1, 0],
+      [-1, 1],
+      [0, 1]
+    ],
+    "pieces": [
+      {
+        "id": "a",
+        "cells": [
+          [0, 0],
+          [1, 0],
+          [2, 0]
+        ]
+      },
+      {
+        "id": "b",
+        "cells": [
+          [0, 0],
+          [1, 0]
+        ]
+      },
+      {
+        "id": "c",
+        "cells": [
+          [0, 0],
+          [1, 0]
+        ]
+      }
+    ],
+    "witness": [
+      { "piece": "a", "rotation": 0, "at": [-1, 0] },
+      { "piece": "b", "rotation": 0, "at": [0, -1] },
+      { "piece": "c", "rotation": 3, "at": [0, 1] }
+    ],
+    "stars": [
+      { "maxMoves": 10, "maxElapsedMs": 120000 },
+      { "maxMoves": 6, "maxElapsedMs": 60000 },
+      { "maxMoves": 3, "maxElapsedMs": 30000 }
+    ]
+  }
+}

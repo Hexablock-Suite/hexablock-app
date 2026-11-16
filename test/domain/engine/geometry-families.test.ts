@@ -9,7 +9,6 @@ import {
   TriangleTopology,
   type TriangleCoord,
 } from '../../../src/domain/engine/triangle-topology';
-import { delivered } from '../../support/engine/value-receiver';
 
 // The real square and triangle families (issue 160, classes.md decision 17, D11).
 // The suite reads each family only through the `GeometryFactory` contract.
@@ -150,16 +149,20 @@ describe.each(families)('%s', (_name, tests) => {
   tests();
 });
 
-describe('GeometryFactory id', () => {
-  it('should_give_the_id_that_a_level_file_names_when_a_geometry_is_asked_for_its_id', () => {
-    expect([new HexGeometry().id, new SquareGeometry().id, new TriangleGeometry().id]).toEqual([
-      TopologyId.hex,
-      TopologyId.square,
-      TopologyId.triangle,
+// Issue #234: a geometry keeps its family private and answers `isOfFamily()`.
+describe('GeometryFactory family', () => {
+  it('should_answer_true_only_for_its_own_family_when_a_geometry_is_asked_about_a_family', () => {
+    const families = [TopologyId.hex, TopologyId.square, TopologyId.triangle];
+
+    const answers = [new HexGeometry(), new SquareGeometry(), new TriangleGeometry()].map(
+      (geometry) => families.map((id) => geometry.isOfFamily(id)),
+    );
+
+    expect(answers).toEqual([
+      [true, false, false],
+      [false, true, false],
+      [false, false, true],
     ]);
-    expect(
-      [new HexGeometry().id, new SquareGeometry().id, new TriangleGeometry().id].map(delivered),
-    ).toEqual(['hex', 'square', 'triangle']);
   });
 });
 

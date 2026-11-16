@@ -30,16 +30,25 @@ export class SortFactory<TCoord> implements IVariantFactory<
   PlaceStack<TCoord>,
   SortState<TCoord>
 > {
-  readonly gameId = GameId.of('hexa-sort');
+  private readonly gameId = GameId.of('hexa-sort');
 
   constructor(
     private readonly geometry: GeometryFactory<TCoord>,
     private readonly level: SortLevel,
   ) {}
 
-  // Hexa Sort has no timer, so the rules need no `MatchId` (classes.md decision 50).
-  createRules(_matchId: MatchId): IGameRules<PlaceStack<TCoord>, SortState<TCoord>> {
+  // True when `gameId` names Hexa Sort. The id stays private (issue #234).
+  isFor(gameId: GameId): boolean {
+    return this.gameId.equals(gameId);
+  }
+
+  createRules(): IGameRules<PlaceStack<TCoord>, SortState<TCoord>> {
     return new SortRules<TCoord>();
+  }
+
+  // Hexa Sort has no timer (classes.md decision 19).
+  createTimer(_matchId: MatchId): undefined {
+    return undefined;
   }
 
   createScoring(): IScoringPolicy<SortState<TCoord>> {

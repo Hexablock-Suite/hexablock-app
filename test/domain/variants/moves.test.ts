@@ -110,6 +110,15 @@ describe('equals of the moves', () => {
   });
 });
 
+// Issue #234: a Fit move names its piece through a query with a business name.
+describe('the piece of a Fit move', () => {
+  it('should_name_the_piece_that_it_places_removes_or_rotates_when_the_rules_ask_the_move', () => {
+    expect(new PlaceFitPiece(A, Turns.of(1), square(0, 0)).pieceToPlace()).toBe(A);
+    expect(new RemoveFitPiece(B).pieceToRemove()).toBe(B);
+    expect(new RotateFitPiece(A, Turns.of(2)).pieceToRotate()).toBe(A);
+  });
+});
+
 describe('the tray index of a Lines placement', () => {
   it('should_throw_a_range_error_when_the_tray_index_is_negative_decimal_or_not_a_number', () => {
     for (const index of [-1, 0.5, Number.NaN]) {

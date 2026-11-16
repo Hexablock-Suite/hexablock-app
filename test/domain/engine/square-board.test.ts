@@ -31,8 +31,8 @@ describe('Board with the square topology double', () => {
 
     board.occupy(square(1, 2), fakeCell(7));
 
-    expect(board.get(square(1, 2))).toEqual(fakeCell(7));
-    expect(board.get(square(2, 1))).toBeUndefined();
+    expect(board.occupantAt(square(1, 2))).toEqual(fakeCell(7));
+    expect(board.occupantAt(square(2, 1))).toBeUndefined();
   });
 
   it('should_walk_the_row_when_line_follows_the_col_axis', () => {
@@ -75,7 +75,7 @@ describe('Board with the square topology double', () => {
     const copy = board.clone();
     board.occupy(square(0, 0), fakeCell(2));
 
-    expect(copy.get(square(0, 0))).toEqual(fakeCell(1));
+    expect(copy.occupantAt(square(0, 0))).toEqual(fakeCell(1));
   });
 
   it('should_rotate_a_quarter_turn_when_rotate_takes_one_step', () => {

@@ -11,6 +11,7 @@ import { NewTile } from '../../../../src/domain/variants/hexa-merge/new-tile';
 import { SlideSense, Slide } from '../../../../src/domain/variants/hexa-merge/slide';
 import {
   hexTopology,
+  mergeBoard,
   mergeState,
   noNewTiles,
   values,
@@ -36,7 +37,7 @@ function facts(state: HexMergeState) {
   return {
     board: state
       .snapshot()
-      .board.cells()
+      .board.occupiedCells()
       .map(([at, tile]) => [hexTopology.key(at), valueOf(tile)]),
     left: state.snapshot().tiles.hasNext(),
     targetReached: state.snapshot().targetReached,
@@ -114,7 +115,7 @@ describe('MergeState', () => {
     expect(values(before.snapshot())).toEqual({ [key(-1, 0)]: 2, [key(0, 0)]: 2, [key(0, 1)]: 4 });
   });
 
-  // `Board.cells()` lists the cells in first-write order, and `MoveResult.cells` shows it.
+  // `Board.occupiedCells()` lists the cells in first-write order, and `MoveResult.cells` shows it.
   // A slide vacates every tile and then writes the packed tiles line by line.
   it('should_list_the_cells_in_the_order_of_the_packed_lines_when_tiles_slide_in_place', () => {
     const state = mergeState([
@@ -128,7 +129,7 @@ describe('MergeState', () => {
     expect(
       state
         .snapshot()
-        .board.cells()
+        .board.occupiedCells()
         .map(([at, tile]) => [hexTopology.key(at), valueOf(tile)]),
     ).toEqual([
       [key(-1, 0), 4],
@@ -190,7 +191,7 @@ describe('MergeState', () => {
 
   // The state has no check of its own: a `Score` is valid when it exists (issue #203).
   it('should_keep_the_score_when_a_state_is_built_with_a_score', () => {
-    const board = mergeState([]).snapshot().board.clone();
+    const board = mergeBoard();
 
     const state = new MergeState(STATE_ID, MATCH_ID, board, noNewTiles(), false, [], Score.of(7));
 

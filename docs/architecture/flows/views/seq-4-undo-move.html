@@ -63,7 +63,7 @@
       <p class="eyebrow">Use case flow · UndoMove · sequence diagram</p>
       <h1>UndoMove step by step: one undo from the screen to the history and back</h1>
       <svg
-        viewBox="0 0 1240 1216"
+        viewBox="0 0 1240 1396"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="sequndo-title sequndo-desc"
@@ -73,11 +73,13 @@
           Sequence diagram of one undo. The player taps undo on GameScreen in layer 4. GamePresenter
           in layer 3 calls execute() on UndoMove in layer 2 through the UseCase port. UndoMove takes
           the running GameEngine from InMemoryGameRepository through the GameRepository port and
-          asks it for its IUndoable capability. When the capability is undefined, UndoMove returns a
-          failed Result. Otherwise MoveHistory, which implements IUndoable, undoes the last
-          MoveCommand, which gives its photo of the state back to GameEngine through restore().
-          UndoMove reads the photo, its cells and the undo and redo flags, and returns a Result with
-          a MoveResult. GamePresenter maps it as in flow 1 and GameScreen renders the board.
+          asks it with offersUndo() whether the game offers undo and with canUndo() whether a move
+          can be undone. When one answer is false, UndoMove returns a failed Result. Otherwise
+          UndoMove calls undo() on GameEngine, the root, which hands the undo to MoveHistory.
+          MoveHistory undoes the last MoveCommand, which gives its photo of the state back to
+          GameEngine through restore(). UndoMove reads the photo, its occupied cells and the queries
+          of the root, and returns a Result with a MoveResult. GamePresenter maps it as in flow 1
+          and GameScreen renders the board.
         </desc>
         <defs>
           <marker
@@ -89,7 +91,7 @@
             orient="auto"
             markerUnits="userSpaceOnUse"
           >
-            <polygon points="0 0, 9 4, 0 8" fill="#17212a" />
+            <polygon points="0,0 9,4 0,8" fill="#17212a" />
           </marker>
           <marker
             id="sequndo-reply"
@@ -536,7 +538,7 @@
           x1="66"
           y1="88"
           x2="66"
-          y2="1030"
+          y2="1210"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -545,7 +547,7 @@
           x1="190"
           y1="88"
           x2="190"
-          y2="1030"
+          y2="1210"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -554,7 +556,7 @@
           x1="323"
           y1="88"
           x2="323"
-          y2="1030"
+          y2="1210"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -563,7 +565,7 @@
           x1="456"
           y1="88"
           x2="456"
-          y2="1030"
+          y2="1210"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -572,7 +574,7 @@
           x1="610"
           y1="88"
           x2="610"
-          y2="1030"
+          y2="1210"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -581,7 +583,7 @@
           x1="764"
           y1="88"
           x2="764"
-          y2="1030"
+          y2="1210"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -590,7 +592,7 @@
           x1="897"
           y1="88"
           x2="897"
-          y2="1030"
+          y2="1210"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -599,7 +601,7 @@
           x1="1030"
           y1="88"
           x2="1030"
-          y2="1030"
+          y2="1210"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -608,7 +610,7 @@
           x1="1164"
           y1="88"
           x2="1164"
-          y2="1030"
+          y2="1210"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -616,23 +618,23 @@
         <!-- Combined fragment: alt -->
         <rect
           x="283"
-          y="318"
+          y="378"
           width="945"
-          height="566"
+          height="686"
           rx="1"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
         />
         <path
-          d="M 283 332 H 315 L 321 326 V 318"
+          d="M 283 392 H 315 L 321 386 V 378"
           fill="#ffffff"
           stroke="#5b6873"
           stroke-width="1"
         />
         <text
           x="288"
-          y="328"
+          y="388"
           fill="#17212a"
           font-size="8.5"
           font-weight="600"
@@ -640,29 +642,29 @@
         >
           alt
         </text>
-        <rect x="325" y="320" width="60.1" height="12" fill="#f3f5f6" />
+        <rect x="325" y="380" width="39.7" height="12" fill="#f3f5f6" />
         <text
           x="327"
-          y="329"
+          y="389"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          [undefined]
+          [false]
         </text>
         <line
           x1="283"
-          y1="376"
+          y1="436"
           x2="1228"
-          y2="376"
+          y2="436"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
         />
-        <rect x="325" y="379" width="34.6" height="12" fill="#f3f5f6" />
+        <rect x="325" y="439" width="34.6" height="12" fill="#f3f5f6" />
         <text
           x="327"
-          y="388"
+          y="448"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -670,15 +672,6 @@
           [else]
         </text>
         <!-- Activation bars -->
-        <rect
-          x="760"
-          y="456"
-          width="8"
-          height="28"
-          fill="#ffffff"
-          stroke="#17212a"
-          stroke-width="1"
-        />
         <rect
           x="606"
           y="204"
@@ -698,8 +691,8 @@
           stroke-width="1"
         />
         <rect
-          x="1026"
-          y="432"
+          x="760"
+          y="324"
           width="8"
           height="36"
           fill="#ffffff"
@@ -707,8 +700,17 @@
           stroke-width="1"
         />
         <rect
+          x="760"
+          y="462"
+          width="8"
+          height="156"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
           x="893"
-          y="402"
+          y="492"
           width="8"
           height="96"
           fill="#ffffff"
@@ -716,7 +718,7 @@
           stroke-width="1"
         />
         <rect
-          x="760"
+          x="1026"
           y="522"
           width="8"
           height="36"
@@ -725,16 +727,16 @@
           stroke-width="1"
         />
         <rect
-          x="1160"
-          y="582"
+          x="764"
+          y="546"
           width="8"
-          height="36"
+          height="28"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
         <rect
-          x="893"
+          x="760"
           y="642"
           width="8"
           height="36"
@@ -743,8 +745,44 @@
           stroke-width="1"
         />
         <rect
-          x="760"
+          x="1160"
           y="702"
+          width="8"
+          height="36"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="760"
+          y="762"
+          width="8"
+          height="36"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="760"
+          y="822"
+          width="8"
+          height="36"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="760"
+          y="882"
+          width="8"
+          height="36"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="760"
+          y="942"
           width="8"
           height="36"
           fill="#ffffff"
@@ -755,7 +793,7 @@
           x="452"
           y="174"
           width="8"
-          height="700"
+          height="880"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
@@ -764,7 +802,7 @@
           x="319"
           y="144"
           width="8"
-          height="806"
+          height="986"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
@@ -773,7 +811,7 @@
           x="186"
           y="114"
           width="8"
-          height="886"
+          height="1066"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
@@ -781,7 +819,7 @@
         <!-- Interaction use: ref map the Result into GameViewModel -->
         <rect
           x="283"
-          y="890"
+          y="1070"
           width="243"
           height="36"
           rx="1"
@@ -790,14 +828,14 @@
           stroke-width="1"
         />
         <path
-          d="M 283 904 H 309 L 315 898 V 890"
+          d="M 283 1084 H 309 L 315 1078 V 1070"
           fill="#ffffff"
           stroke="#5b6873"
           stroke-width="1"
         />
         <text
           x="288"
-          y="900"
+          y="1080"
           fill="#17212a"
           font-size="8.5"
           font-weight="600"
@@ -807,7 +845,7 @@
         </text>
         <text
           x="423.5"
-          y="906"
+          y="1086"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -817,7 +855,7 @@
         </text>
         <text
           x="423.5"
-          y="919"
+          y="1099"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -942,7 +980,7 @@
           stroke-width="1"
           marker-end="url(#sequndo-call)"
         />
-        <rect x="580.25" y="252" width="59.5" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="575.15" y="252" width="69.7" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="610"
           y="262"
@@ -951,7 +989,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          undoable()
+          offersUndo()
         </text>
         <!-- Reply: game to undo -->
         <line
@@ -964,246 +1002,10 @@
           stroke-dasharray="4,3"
           marker-end="url(#sequndo-reply)"
         />
-        <rect x="552.2" y="282" width="115.6" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="587.9" y="282" width="44.2" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="610"
           y="292"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          IUndoable | undefined
-        </text>
-        <!-- Reply: undo to presenter -->
-        <line
-          x1="452"
-          y1="352"
-          x2="327"
-          y2="352"
-          stroke="#5b6873"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#sequndo-reply)"
-        />
-        <rect x="331" y="338" width="115.6" height="13" rx="2" fill="#f3f5f6" />
-        <text
-          x="335"
-          y="348"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
-        >
-          Result.failure(error)
-        </text>
-        <!-- Message: undo to history -->
-        <line
-          x1="460"
-          y1="404"
-          x2="893"
-          y2="404"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-end="url(#sequndo-call)"
-        />
-        <rect x="656.95" y="390" width="39.1" height="13" rx="2" fill="#f3f5f6" />
-        <text
-          x="676.5"
-          y="400"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          undo()
-        </text>
-        <!-- Message: history to command -->
-        <line
-          x1="901"
-          y1="434"
-          x2="1026"
-          y2="434"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-end="url(#sequndo-call)"
-        />
-        <rect x="943.95" y="420" width="39.1" height="13" rx="2" fill="#f3f5f6" />
-        <text
-          x="963.5"
-          y="430"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          undo()
-        </text>
-        <!-- Message: command to engine, the receiver of the undo -->
-        <line
-          x1="1026"
-          y1="464"
-          x2="768"
-          y2="464"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-end="url(#sequndo-call)"
-        />
-        <rect x="790" y="450" width="80" height="13" rx="2" fill="#f3f5f6" />
-        <text
-          x="830"
-          y="460"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          restore(before)
-        </text>
-        <!-- Reply: history to undo -->
-        <line
-          x1="893"
-          y1="494"
-          x2="460"
-          y2="494"
-          stroke="#5b6873"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#sequndo-reply)"
-        />
-        <rect x="662.05" y="480" width="28.9" height="13" rx="2" fill="#f3f5f6" />
-        <text
-          x="676.5"
-          y="490"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          void
-        </text>
-        <!-- Message: undo to game -->
-        <line
-          x1="460"
-          y1="524"
-          x2="760"
-          y2="524"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-end="url(#sequndo-call)"
-        />
-        <rect x="580.25" y="510" width="59.5" height="13" rx="2" fill="#f3f5f6" />
-        <text
-          x="610"
-          y="520"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          snapshot()
-        </text>
-        <!-- Reply: game to undo -->
-        <line
-          x1="760"
-          y1="554"
-          x2="460"
-          y2="554"
-          stroke="#5b6873"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#sequndo-reply)"
-        />
-        <rect x="590.45" y="540" width="39.1" height="13" rx="2" fill="#f3f5f6" />
-        <text
-          x="610"
-          y="550"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          SnapshotOf&lt;TState&gt;
-        </text>
-        <!-- Message: undo to board -->
-        <line
-          x1="460"
-          y1="584"
-          x2="1160"
-          y2="584"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-end="url(#sequndo-call)"
-        />
-        <rect x="752.2" y="570" width="115.6" height="13" rx="2" fill="#f3f5f6" />
-        <text
-          x="810"
-          y="580"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          cells() · photo.board
-        </text>
-        <!-- Reply: board to undo -->
-        <line
-          x1="1160"
-          y1="614"
-          x2="460"
-          y2="614"
-          stroke="#5b6873"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#sequndo-reply)"
-        />
-        <rect x="762.4" y="600" width="95.2" height="13" rx="2" fill="#f3f5f6" />
-        <text
-          x="810"
-          y="610"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          [TCoord, TCell][]
-        </text>
-        <!-- Message: undo to history -->
-        <line
-          x1="460"
-          y1="644"
-          x2="893"
-          y2="644"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-end="url(#sequndo-call)"
-        />
-        <rect x="649.3" y="630" width="54.4" height="13" rx="2" fill="#f3f5f6" />
-        <text
-          x="676.5"
-          y="640"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          canUndo()
-        </text>
-        <!-- Reply: history to undo -->
-        <line
-          x1="893"
-          y1="674"
-          x2="460"
-          y2="674"
-          stroke="#5b6873"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#sequndo-reply)"
-        />
-        <rect x="654.4" y="660" width="44.2" height="13" rx="2" fill="#f3f5f6" />
-        <text
-          x="676.5"
-          y="670"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1214,27 +1016,263 @@
         <!-- Message: undo to game -->
         <line
           x1="460"
-          y1="704"
+          y1="326"
           x2="760"
+          y2="326"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#sequndo-call)"
+        />
+        <rect x="582.8" y="312" width="54.4" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="610"
+          y="322"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          canUndo()
+        </text>
+        <!-- Reply: game to undo -->
+        <line
+          x1="760"
+          y1="356"
+          x2="460"
+          y2="356"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#sequndo-reply)"
+        />
+        <rect x="587.9" y="342" width="44.2" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="610"
+          y="352"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          boolean
+        </text>
+        <!-- Reply: undo to presenter -->
+        <line
+          x1="452"
+          y1="412"
+          x2="327"
+          y2="412"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#sequndo-reply)"
+        />
+        <rect x="331" y="398" width="115.6" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="335"
+          y="408"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          Result.failure(error)
+        </text>
+        <!-- Message: undo to game, the root -->
+        <line
+          x1="460"
+          y1="464"
+          x2="760"
+          y2="464"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#sequndo-call)"
+        />
+        <rect x="590.45" y="450" width="39.1" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="610"
+          y="460"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          undo()
+        </text>
+        <!-- Message: game to history -->
+        <line
+          x1="768"
+          y1="494"
+          x2="893"
+          y2="494"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#sequndo-call)"
+        />
+        <rect x="810.95" y="480" width="39.1" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="830.5"
+          y="490"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          undo()
+        </text>
+        <!-- Message: history to command -->
+        <line
+          x1="901"
+          y1="524"
+          x2="1026"
+          y2="524"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#sequndo-call)"
+        />
+        <rect x="943.95" y="510" width="39.1" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="963.5"
+          y="520"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          undo()
+        </text>
+        <!-- Message: command to engine, the receiver of the undo -->
+        <line
+          x1="1026"
+          y1="554"
+          x2="772"
+          y2="554"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#sequndo-call)"
+        />
+        <rect x="790" y="540" width="80" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="830"
+          y="550"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          restore(before)
+        </text>
+        <!-- Reply: history to game -->
+        <line
+          x1="893"
+          y1="584"
+          x2="768"
+          y2="584"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#sequndo-reply)"
+        />
+        <rect x="816.05" y="570" width="28.9" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="830.5"
+          y="580"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          void
+        </text>
+        <!-- Reply: game to undo -->
+        <line
+          x1="760"
+          y1="614"
+          x2="460"
+          y2="614"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#sequndo-reply)"
+        />
+        <rect x="595.55" y="600" width="28.9" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="610"
+          y="610"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          void
+        </text>
+        <!-- Message: undo to game -->
+        <line
+          x1="460"
+          y1="644"
+          x2="760"
+          y2="644"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#sequndo-call)"
+        />
+        <rect x="580.25" y="630" width="59.5" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="610"
+          y="640"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          snapshot()
+        </text>
+        <!-- Reply: game to undo -->
+        <line
+          x1="760"
+          y1="674"
+          x2="460"
+          y2="674"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#sequndo-reply)"
+        />
+        <rect x="590.45" y="660" width="39.1" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="610"
+          y="670"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          SnapshotOf&lt;TState&gt;
+        </text>
+        <!-- Message: undo to board -->
+        <line
+          x1="460"
+          y1="704"
+          x2="1160"
           y2="704"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#sequndo-call)"
         />
-        <rect x="580.25" y="690" width="59.5" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="731.8" y="690" width="156.4" height="13" rx="2" fill="#f3f5f6" />
         <text
-          x="610"
+          x="810"
           y="700"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          redoable()
+          occupiedCells() · photo.board
         </text>
-        <!-- Reply: game to undo -->
+        <!-- Reply: board to undo -->
         <line
-          x1="760"
+          x1="1160"
           y1="734"
           x2="460"
           y2="734"
@@ -1243,26 +1281,17 @@
           stroke-dasharray="4,3"
           marker-end="url(#sequndo-reply)"
         />
-        <rect x="552.2" y="720" width="115.6" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="762.4" y="720" width="95.2" height="13" rx="2" fill="#f3f5f6" />
         <text
-          x="610"
+          x="810"
           y="730"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          IRedoable | undefined
+          [TCoord, TCell][]
         </text>
-        <rect
-          x="760"
-          y="762"
-          width="8"
-          height="36"
-          fill="#ffffff"
-          stroke="#17212a"
-          stroke-width="1"
-        />
         <!-- Message: undo to game -->
         <line
           x1="460"
@@ -1273,7 +1302,7 @@
           stroke-width="1"
           marker-end="url(#sequndo-call)"
         />
-        <rect x="580.25" y="750" width="59.5" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="582.8" y="750" width="54.4" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="610"
           y="760"
@@ -1282,7 +1311,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          timed()
+          canUndo()
         </text>
         <!-- Reply: game to undo -->
         <line
@@ -1295,7 +1324,7 @@
           stroke-dasharray="4,3"
           marker-end="url(#sequndo-reply)"
         />
-        <rect x="552.2" y="780" width="115.6" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="587.9" y="780" width="44.2" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="610"
           y="790"
@@ -1304,20 +1333,149 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          ITimed | undefined
+          boolean
+        </text>
+        <!-- Message: undo to game -->
+        <line
+          x1="460"
+          y1="824"
+          x2="760"
+          y2="824"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#sequndo-call)"
+        />
+        <rect x="582.8" y="810" width="54.4" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="610"
+          y="820"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          canRedo()
+        </text>
+        <!-- Reply: game to undo -->
+        <line
+          x1="760"
+          y1="854"
+          x2="460"
+          y2="854"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#sequndo-reply)"
+        />
+        <rect x="587.9" y="840" width="44.2" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="610"
+          y="850"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          boolean
+        </text>
+        <!-- Message: undo to game -->
+        <line
+          x1="460"
+          y1="884"
+          x2="760"
+          y2="884"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#sequndo-call)"
+        />
+        <rect x="575.15" y="870" width="69.7" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="610"
+          y="880"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          offersUndo()
+        </text>
+        <!-- Reply: game to undo -->
+        <line
+          x1="760"
+          y1="914"
+          x2="460"
+          y2="914"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#sequndo-reply)"
+        />
+        <rect x="587.9" y="900" width="44.2" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="610"
+          y="910"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          boolean
+        </text>
+        <!-- Message: undo to game -->
+        <line
+          x1="460"
+          y1="944"
+          x2="760"
+          y2="944"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#sequndo-call)"
+        />
+        <rect x="572.6" y="930" width="74.8" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="610"
+          y="940"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          elapsedTime()
+        </text>
+        <!-- Reply: game to undo -->
+        <line
+          x1="760"
+          y1="974"
+          x2="460"
+          y2="974"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#sequndo-reply)"
+        />
+        <rect x="547.1" y="960" width="125.8" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="610"
+          y="970"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          ElapsedTime | undefined
         </text>
         <!-- Self message: undo -->
         <path
-          d="M 460 824 H 488 V 838 H 468"
+          d="M 460 1004 H 488 V 1018 H 468"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#sequndo-call)"
         />
-        <rect x="490" y="824" width="336.76" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="490" y="1004" width="336.76" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="494"
-          y="834"
+          y="1014"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1328,18 +1486,18 @@
         <!-- Reply: undo to presenter -->
         <line
           x1="452"
-          y1="864"
+          y1="1044"
           x2="327"
-          y2="864"
+          y2="1044"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#sequndo-reply)"
         />
-        <rect x="331" y="850" width="176.8" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="331" y="1030" width="176.8" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="335"
-          y="860"
+          y="1040"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1350,18 +1508,18 @@
         <!-- Reply: presenter to screen -->
         <line
           x1="319"
-          y1="946"
+          y1="1126"
           x2="194"
-          y2="946"
+          y2="1126"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#sequndo-reply)"
         />
-        <rect x="198" y="932" width="120.7" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="198" y="1112" width="120.7" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="202"
-          y="942"
+          y="1122"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1371,16 +1529,16 @@
         </text>
         <!-- Self message: screen -->
         <path
-          d="M 194 976 H 222 V 990 H 202"
+          d="M 194 1156 H 222 V 1170 H 202"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#sequndo-call)"
         />
-        <rect x="224" y="976" width="95.2" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="224" y="1156" width="95.2" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="228"
-          y="986"
+          y="1166"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1391,7 +1549,7 @@
         <!-- Footnote -->
         <text
           x="24"
-          y="1058"
+          y="1238"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1401,46 +1559,47 @@
         </text>
         <text
           x="24"
-          y="1074"
+          y="1254"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          UndoMove class view. UndoMove asks GameEngine for the IUndoable capability and never names
-          the history class (decision 27).
+          UndoMove class view. UndoMove calls only GameEngine, the root, and never names the history
+          (decisions 27 and 52).
         </text>
         <text
           x="24"
-          y="1090"
+          y="1270"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          MoveHistory is the Command invoker and the caretaker: MoveCommand.undo() gives the photo
-          of the state, the memento (decision 34), back to the engine through GameEngine.restore().
+          GameEngine.undo() hands the undo to MoveHistory, the Command invoker and the caretaker:
+          MoveCommand.undo() gives the photo of the state, the memento (decision 34), back through
+          GameEngine.restore().
         </text>
         <text
           x="24"
-          y="1106"
+          y="1286"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Hexa Lines and Hexa Sort get no history: undoable() is undefined, and UndoMove returns
+          Hexa Lines and Hexa Sort get no history: offersUndo() is false, and UndoMove returns
           Result.failure(error). No HTTP call runs.
         </text>
         <!-- Legend -->
         <line
           x1="24"
-          y1="1138"
+          y1="1318"
           x2="1216"
-          y2="1138"
+          y2="1318"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1156"
+          y="1336"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1450,16 +1609,16 @@
         </text>
         <line
           x1="24"
-          y1="1174"
+          y1="1354"
           x2="52"
-          y2="1174"
+          y2="1354"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#sequndo-call)"
         />
         <text
           x="60"
-          y="1177"
+          y="1357"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1468,9 +1627,9 @@
         </text>
         <line
           x1="245.0"
-          y1="1174"
+          y1="1354"
           x2="273.0"
-          y2="1174"
+          y2="1354"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
@@ -1478,7 +1637,7 @@
         />
         <text
           x="281"
-          y="1177"
+          y="1357"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1487,16 +1646,16 @@
         </text>
         <line
           x1="447.1"
-          y1="1167"
+          y1="1347"
           x2="447.1"
-          y2="1181"
+          y2="1361"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
         />
         <rect
           x="443.1"
-          y="1170"
+          y="1350"
           width="8"
           height="8"
           fill="#ffffff"
@@ -1505,7 +1664,7 @@
         />
         <text
           x="469.1"
-          y="1177"
+          y="1357"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1514,7 +1673,7 @@
         </text>
         <rect
           x="644.7"
-          y="1168"
+          y="1348"
           width="28"
           height="12"
           rx="1"
@@ -1524,7 +1683,7 @@
         />
         <text
           x="680.7"
-          y="1177"
+          y="1357"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1533,7 +1692,7 @@
         </text>
         <rect
           x="24"
-          y="1190"
+          y="1370"
           width="28"
           height="12"
           rx="2"
@@ -1543,7 +1702,7 @@
         />
         <text
           x="60"
-          y="1199"
+          y="1379"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1552,7 +1711,7 @@
         </text>
         <rect
           x="179.2"
-          y="1190"
+          y="1370"
           width="28"
           height="12"
           rx="2"
@@ -1562,7 +1721,7 @@
         />
         <text
           x="215.2"
-          y="1199"
+          y="1379"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1571,7 +1730,7 @@
         </text>
         <rect
           x="334.4"
-          y="1190"
+          y="1370"
           width="28"
           height="12"
           rx="2"
@@ -1581,7 +1740,7 @@
         />
         <text
           x="370.4"
-          y="1199"
+          y="1379"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1590,7 +1749,7 @@
         </text>
         <rect
           x="489.59999999999997"
-          y="1190"
+          y="1370"
           width="28"
           height="12"
           rx="2"
@@ -1600,7 +1759,7 @@
         />
         <text
           x="525.6"
-          y="1199"
+          y="1379"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

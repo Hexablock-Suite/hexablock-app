@@ -16,9 +16,9 @@ function facts(state: SortState<SquareCoord>) {
   return {
     board: state
       .snapshot()
-      .board.cells()
+      .board.occupiedCells()
       .map(([at, cell]) => [at, names(cell)]),
-    offered: offered === undefined ? undefined : names(offered.cell()),
+    offered: offered === undefined ? undefined : names(offered.occupant()),
     left: state.snapshot().source.hasNext(),
     goalsDone: state.snapshot().goalsDone,
     clearedTiles: [...state.snapshot().clearedTiles],
@@ -33,10 +33,10 @@ describe('SortState', () => {
 
     state.placeOfferedStack(square(1, 0));
 
-    expect(names(state.snapshot().board.get(square(1, 0)))).toEqual(['red']);
+    expect(names(state.snapshot().board.occupantAt(square(1, 0)))).toEqual(['red']);
     expect(state.snapshot().placedAt).toEqual(square(1, 0));
     expect(state.snapshot().clearedTiles).toEqual([]);
-    expect(names(state.snapshot().offered?.cell())).toEqual(['blue', 'blue']);
+    expect(names(state.snapshot().offered?.occupant())).toEqual(['blue', 'blue']);
     expect(state.snapshot().source.hasNext()).toBe(false);
   });
 
@@ -56,7 +56,7 @@ describe('SortState', () => {
 
     state.placeOfferedStack(square(0, 0));
 
-    expect(names(state.snapshot().board.get(square(0, 0)))).toEqual(['red']);
+    expect(names(state.snapshot().board.occupantAt(square(0, 0)))).toEqual(['red']);
   });
 
   it('should_tell_whether_the_offered_stack_can_go_on_a_cell_when_a_cell_is_asked', () => {
@@ -108,8 +108,13 @@ describe('SortState', () => {
 
     state.moveRun(square(0, 0), square(1, 0));
 
-    expect(names(state.snapshot().board.get(square(0, 0)))).toEqual(['blue']);
-    expect(names(state.snapshot().board.get(square(1, 0)))).toEqual(['green', 'red', 'red', 'red']);
+    expect(names(state.snapshot().board.occupantAt(square(0, 0)))).toEqual(['blue']);
+    expect(names(state.snapshot().board.occupantAt(square(1, 0)))).toEqual([
+      'green',
+      'red',
+      'red',
+      'red',
+    ]);
     expect(state.snapshot().goalsDone).toEqual(ClearedStacks.of(0));
     expect(state.snapshot().clearedTiles).toEqual([]);
   });
@@ -147,8 +152,8 @@ describe('SortState', () => {
 
     state.clearStack(square(0, 0));
 
-    expect(state.snapshot().board.get(square(0, 0))?.isEmpty()).toBe(true);
-    expect(state.snapshot().board.cells()).toHaveLength(2);
+    expect(state.snapshot().board.occupantAt(square(0, 0))?.isEmpty()).toBe(true);
+    expect(state.snapshot().board.occupiedCells()).toHaveLength(2);
     expect(state.snapshot().goalsDone).toEqual(ClearedStacks.of(1));
     expect(state.snapshot().clearedTiles).toEqual([11]);
   });

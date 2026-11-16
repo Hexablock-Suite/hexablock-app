@@ -53,7 +53,7 @@ class CountingSource implements IPieceSource<FakeCell> {
     return true;
   }
   take(): PieceDraw<FakeCell> {
-    return { piece: fakeCell(this.value + 1), rest: new CountingSource(this.value + 1) };
+    return [fakeCell(this.value + 1), new CountingSource(this.value + 1)];
   }
   [Symbol.iterator](): Iterator<FakeCell> {
     return piecesFrom(this);
@@ -65,7 +65,7 @@ class ConstantSource implements IPieceSource<FakeCell> {
     return true;
   }
   take(): PieceDraw<FakeCell> {
-    return { piece: fakeCell(9), rest: this };
+    return [fakeCell(9), this];
   }
   [Symbol.iterator](): Iterator<FakeCell> {
     return piecesFrom(this);
@@ -82,7 +82,9 @@ class OnePerMove implements IScoringPolicy<SourceState> {
 // The value of the cell that the move filled: the cell that `before` does not have.
 class CellValue implements IScoringPolicy<SourceState> {
   score(before: SourceSnapshot, after: SourceSnapshot): Score {
-    const placed = after.board.cells().find(([at]) => before.board.get(at) === undefined);
+    const placed = after.board
+      .occupiedCells()
+      .find(([at]) => before.board.occupantAt(at) === undefined);
     return Score.of(placed?.[1].value ?? 0);
   }
 }
@@ -186,8 +188,12 @@ describe('swapping the piece source, the scoring policy and the progress model',
     const counting = playGame(sources.counting(), new OnePerMove(), new ScoreProgress());
     const constant = playGame(sources.constant(), new OnePerMove(), new ScoreProgress());
 
-    expect(counting.state.board.cells().map(([, cell]) => cell.value)).toEqual([1, 2, 3, 4]);
-    expect(constant.state.board.cells().map(([, cell]) => cell.value)).toEqual([9, 9, 9, 9]);
+    expect(counting.state.board.occupiedCells().map(([, cell]) => cell.value)).toEqual([
+      1, 2, 3, 4,
+    ]);
+    expect(constant.state.board.occupiedCells().map(([, cell]) => cell.value)).toEqual([
+      9, 9, 9, 9,
+    ]);
   });
 
   it('should_give_the_score_of_each_policy_when_the_scoring_is_swapped', () => {
@@ -224,7 +230,7 @@ describe('swapping the piece source, the scoring policy and the progress model',
         new FailingOnceRules(),
       );
 
-      expect(retried.state.board.cells()).toEqual(plain.state.board.cells());
+      expect(retried.state.board.occupiedCells()).toEqual(plain.state.board.occupiedCells());
       expect(retried.state.score).toEqual(plain.state.score);
       expect(retried.recorded).toBe(1);
       expect(
@@ -270,7 +276,7 @@ describe('swapping the piece source, the scoring policy and the progress model',
     expect(() => engine.play(square(0, 0))).toThrow(RangeError);
     expect(() => engine.play(square(0, 0))).toThrow('game-over phase');
     expect(engine.currentPhase()).toBe(GameOverPhase.instance);
-    expect(engine.snapshot().board.cells()).toEqual(full.board.cells());
+    expect(engine.snapshot().board.occupiedCells()).toEqual(full.board.occupiedCells());
     expect(engine.snapshot().score).toEqual(full.score);
     subscriber.listen(engine.takeEvents());
     expect(subscriber.recorded).toBe(1);

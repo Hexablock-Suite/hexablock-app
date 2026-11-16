@@ -27,7 +27,7 @@ import { SortState } from '../../src/domain/variants/hexa-sort/sort-state';
 import { dataOf, type GameOverData } from '../support/engine/game-over';
 import { phaseNameOf } from '../support/engine/phase-name';
 import { square, type SquareCoord } from '../support/engine/square-topology';
-import { firstMoveOf } from '../support/engine/variant-game';
+import { firstMoveOf, gameIdOf } from '../support/engine/variant-game';
 import { variantIdOf } from '../support/variants/variant-id';
 import {
   errorOf,
@@ -58,6 +58,9 @@ import { BOARD_ID, STATE_ID } from '../support/engine/entity-ids';
 // `StartGame` and `ApplyMove` run the four variants through one code path (issue 100,
 // APP-FR-03, classes.md decisions 9, 28 and 29). The helper reads only `IVariantFactory`.
 
+// The id of Hexa Lines, as the composition root gives it to `GameFactory` (issue #234).
+const LINES = GameId.of('hexa-lines');
+
 async function startAndPlayOnce<
   TCell,
   TCoord,
@@ -68,11 +71,11 @@ async function startAndPlayOnce<
   const { games, startGame, applyMove } = gameUseCases(factory);
   const started = valueOf(await startGame.execute({}));
   const startState = games.running().snapshot();
-  const startCells = startState.board.cells();
+  const startCells = startState.board.occupiedCells();
   const move = firstMoveOf(factory);
   const played = valueOf(await applyMove.execute({ move }));
   const after = games.running().snapshot();
-  return { gameId: variantIdOf(factory.gameId), started, startState, startCells, played, after };
+  return { gameId: variantIdOf(gameIdOf(factory)), started, startState, startCells, played, after };
 }
 
 class ThrowingPublisher implements GameEventPublisher {
@@ -140,8 +143,9 @@ function brokenStart<
   factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>,
 ): IVariantFactory<TCell, TCoord, TMove, TState, TPiece> {
   return {
-    gameId: factory.gameId,
-    createRules: (matchId) => factory.createRules(matchId),
+    isFor: (gameId) => factory.isFor(gameId),
+    createRules: () => factory.createRules(),
+    createTimer: (matchId) => factory.createTimer(matchId),
     createScoring: () => factory.createScoring(),
     createPieceSource: () => factory.createPieceSource(),
     createBoard: (boardId) => factory.createBoard(boardId),
@@ -180,7 +184,7 @@ function runningGameOf<
 >(games: MemoryGameRepository<TCell, TCoord, TMove, TState>) {
   const engine = games.running();
   return [
-    engine.snapshot().board.cells(),
+    engine.snapshot().board.occupiedCells(),
     engine.snapshot().score,
     phaseNameOf(engine.currentPhase()),
   ];
@@ -223,8 +227,9 @@ function sortFactoryWithFailingSource(): IVariantFactory<
     [Symbol.iterator]: () => pieces[Symbol.iterator](),
   };
   return {
-    gameId: factory.gameId,
-    createRules: (matchId) => factory.createRules(matchId),
+    isFor: (gameId) => factory.isFor(gameId),
+    createRules: () => factory.createRules(),
+    createTimer: (matchId) => factory.createTimer(matchId),
     createScoring: () => factory.createScoring(),
     createPieceSource: () => source,
     createBoard: (boardId) => factory.createBoard(boardId),
@@ -271,7 +276,7 @@ describe('StartGame and ApplyMove', () => {
         ...time,
       });
       expect(run.played).toEqual({
-        cells: run.after.board.cells(),
+        cells: run.after.board.occupiedCells(),
         score: run.after.score,
         outcome: run.played.outcome,
         canUndo: run.gameId === 'hexa-merge',
@@ -325,7 +330,7 @@ describe('StartGame and ApplyMove', () => {
     const oldGame = games.running();
     const before = runningGameOf(games);
     const broken = new StartGame(
-      new GameFactory(brokenStart(linesFactory()), new CountingMatchIds()),
+      new GameFactory(LINES, brokenStart(linesFactory()), new CountingMatchIds()),
       games,
     );
 
@@ -370,7 +375,7 @@ describe('StartGame and ApplyMove', () => {
     expect(publisher.received).toEqual([
       [
         {
-          gameId: factory.gameId,
+          gameId: GameId.of('hexa-fit'),
           matchId: MATCH_ID,
           outcome: Outcome.victory,
           finalScore: Score.of(0),
@@ -387,7 +392,7 @@ describe('StartGame and ApplyMove', () => {
     const oldGame = working.games.running();
     const before = runningGameOf(working.games);
     const broken = new StartGame(
-      new GameFactory(linesFactory(), {
+      new GameFactory(LINES, linesFactory(), {
         next: () => {
           throw new Error('The generator has no id.');
         },
@@ -440,7 +445,7 @@ describe('StartGame and ApplyMove', () => {
 
   it('should_return_a_start_failed_failure_when_the_repository_throws_on_replace', async () => {
     const startGame = new StartGame(
-      new GameFactory(linesFactory(), new CountingMatchIds()),
+      new GameFactory(LINES, linesFactory(), new CountingMatchIds()),
       new ThrowingRepository('replace'),
     );
 
@@ -462,8 +467,8 @@ describe('StartGame and ApplyMove', () => {
 
     expect([error.code, error.retryable]).toEqual(['move-rejected', false]);
     const after = games.running().snapshot();
-    expect([after.board.cells(), after.score, after.tray]).toEqual([
-      before.board.cells(),
+    expect([after.board.occupiedCells(), after.score, after.tray]).toEqual([
+      before.board.occupiedCells(),
       before.score,
       before.tray,
     ]);
@@ -504,7 +509,7 @@ describe('StartGame and ApplyMove', () => {
 
     const saved = games.running().snapshot();
     expect(played).toEqual({
-      cells: saved.board.cells(),
+      cells: saved.board.occupiedCells(),
       score: saved.score,
       outcome: Outcome.victory,
       canUndo: false,
@@ -513,7 +518,7 @@ describe('StartGame and ApplyMove', () => {
       payload: saved.view(),
       elapsedMs: ElapsedTime.ofMs(0),
     });
-    expect(saved.board.cells()).not.toEqual([]);
+    expect(saved.board.occupiedCells()).not.toEqual([]);
     expect(games.running().currentPhase()).toBe(VictoryPhase.instance);
     expect(logger.entries).toHaveLength(1);
     const [entry] = logger.entries;
@@ -541,7 +546,7 @@ describe('StartGame and ApplyMove', () => {
     const played = valueOf(await applyMove.execute({ move }));
 
     expect(played.outcome).toBe(Outcome.victory);
-    expect(played.cells).toEqual(games.running().snapshot().board.cells());
+    expect(played.cells).toEqual(games.running().snapshot().board.occupiedCells());
     expect(games.running().currentPhase()).toBe(VictoryPhase.instance);
   });
 
@@ -581,7 +586,7 @@ describe('StartGame and ApplyMove', () => {
       'The rules broke.',
       false,
     ]);
-    expect(engine.snapshot().board.cells()).toEqual([]);
+    expect(engine.snapshot().board.occupiedCells()).toEqual([]);
     expect([engine.snapshot().score, phaseNameOf(engine.currentPhase())]).toEqual([
       Score.of(0),
       'playing',
@@ -592,13 +597,13 @@ describe('StartGame and ApplyMove', () => {
   it('should_leave_the_engine_unchanged_when_a_caller_changes_the_cells_of_a_move_result', async () => {
     const { games, startGame } = gameUseCases(mergeFactory());
     const started = valueOf(await startGame.execute({}));
-    const before = games.running().snapshot().board.cells();
+    const before = games.running().snapshot().board.occupiedCells();
 
     started.cells[0][0] = started.cells[1][0];
     started.cells.pop();
     started.cells.push(...before);
 
-    expect(games.running().snapshot().board.cells()).toEqual(before);
+    expect(games.running().snapshot().board.occupiedCells()).toEqual(before);
     expect(Object.keys(started).sort()).toEqual([
       'canRedo',
       'canUndo',

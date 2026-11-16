@@ -63,7 +63,7 @@
       <p class="eyebrow">Use case flow · ApplyMove · sequence diagram</p>
       <h1>ApplyMove step by step: one move from the screen to the engine and back</h1>
       <svg
-        viewBox="0 0 1376 1396"
+        viewBox="0 0 1376 1456"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="seqmove-title seqmove-desc"
@@ -75,8 +75,9 @@
           ApplyMove takes the running GameEngine from InMemoryGameRepository in layer 3 through the
           GameRepository port, plays the move on GameEngine in layer 1, which runs playTurn() on
           IGameRules, takes the events that GameEngine recorded and publishes each one to the
-          GameEventPublisher port, reads the photo of the state and its cells, and returns a Result
-          with a MoveResult. GamePresenter maps each cell with StateMapper, builds GameViewModel and
+          GameEventPublisher port, reads the photo of the state and its occupied cells, asks the
+          root canUndo(), canRedo(), offersUndo() and elapsedTime(), and returns a Result with a
+          MoveResult. GamePresenter maps each cell with StateMapper, builds GameViewModel and
           GameScreen renders it.
         </desc>
         <defs>
@@ -590,7 +591,7 @@
           x1="66"
           y1="88"
           x2="66"
-          y2="1160"
+          y2="1220"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -599,7 +600,7 @@
           x1="202"
           y1="88"
           x2="202"
-          y2="1160"
+          y2="1220"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -608,7 +609,7 @@
           x1="338"
           y1="88"
           x2="338"
-          y2="1160"
+          y2="1220"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -617,7 +618,7 @@
           x1="474"
           y1="88"
           x2="474"
-          y2="1160"
+          y2="1220"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -626,7 +627,7 @@
           x1="610"
           y1="88"
           x2="610"
-          y2="1160"
+          y2="1220"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -635,7 +636,7 @@
           x1="746"
           y1="88"
           x2="746"
-          y2="1160"
+          y2="1220"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -644,7 +645,7 @@
           x1="882"
           y1="88"
           x2="882"
-          y2="1160"
+          y2="1220"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -653,7 +654,7 @@
           x1="1018"
           y1="88"
           x2="1018"
-          y2="1160"
+          y2="1220"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -662,7 +663,7 @@
           x1="1154"
           y1="88"
           x2="1154"
-          y2="1160"
+          y2="1220"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -671,7 +672,7 @@
           x1="1290"
           y1="88"
           x2="1290"
-          y2="1160"
+          y2="1220"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -679,7 +680,7 @@
         <!-- Combined fragment: loop -->
         <rect
           x="298"
-          y="882"
+          y="942"
           width="246"
           height="88"
           rx="1"
@@ -688,14 +689,14 @@
           stroke-width="1"
         />
         <path
-          d="M 298 896 H 330 L 336 890 V 882"
+          d="M 298 956 H 330 L 336 950 V 942"
           fill="#ffffff"
           stroke="#5b6873"
           stroke-width="1"
         />
         <text
           x="303"
-          y="892"
+          y="952"
           fill="#17212a"
           font-size="8.5"
           font-weight="600"
@@ -705,7 +706,7 @@
         </text>
         <text
           x="342"
-          y="893"
+          y="953"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -717,7 +718,7 @@
           x="198"
           y="114"
           width="8"
-          height="1036"
+          height="1096"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
@@ -726,14 +727,14 @@
           x="334"
           y="144"
           width="8"
-          height="888"
+          height="948"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
         <rect
           x="334"
-          y="1058"
+          y="1118"
           width="8"
           height="34"
           fill="#ffffff"
@@ -744,7 +745,7 @@
           x="606"
           y="174"
           width="8"
-          height="690"
+          height="750"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
@@ -814,7 +815,7 @@
         />
         <rect
           x="470"
-          y="920"
+          y="980"
           width="8"
           height="34"
           fill="#ffffff"
@@ -1185,7 +1186,7 @@
           stroke-width="1"
           marker-end="url(#seqmove-call)"
         />
-        <rect x="821.35" y="568" width="121.3" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="798.88" y="568" width="166.24" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="882"
           y="578"
@@ -1194,7 +1195,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          cells() · photo.board
+          occupiedCells() · photo.board
         </text>
         <!-- Reply: board returns to apply -->
         <line
@@ -1228,7 +1229,7 @@
           stroke-width="1"
           marker-end="url(#seqmove-call)"
         />
-        <rect x="716.25" y="628" width="59.5" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="719.06" y="628" width="53.88" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="746"
           y="638"
@@ -1237,7 +1238,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          undoable()
+          canUndo()
         </text>
         <!-- Reply: game returns to apply -->
         <line
@@ -1250,7 +1251,7 @@
           stroke-dasharray="4,3"
           marker-end="url(#seqmove-reply)"
         />
-        <rect x="687.925" y="658" width="116.15" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="723.975" y="658" width="44.05" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="746"
           y="668"
@@ -1259,7 +1260,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          IUndoable | undefined
+          boolean
         </text>
         <!-- Message: apply calls game -->
         <line
@@ -1271,7 +1272,7 @@
           stroke-width="1"
           marker-end="url(#seqmove-call)"
         />
-        <rect x="716.25" y="688" width="59.5" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="719.06" y="688" width="53.88" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="746"
           y="698"
@@ -1280,7 +1281,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          redoable()
+          canRedo()
         </text>
         <!-- Reply: game returns to apply -->
         <line
@@ -1293,7 +1294,7 @@
           stroke-dasharray="4,3"
           marker-end="url(#seqmove-reply)"
         />
-        <rect x="687.925" y="718" width="116.15" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="723.975" y="718" width="44.05" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="746"
           y="728"
@@ -1302,7 +1303,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          IRedoable | undefined
+          boolean
         </text>
         <rect
           x="878"
@@ -1323,7 +1324,7 @@
           stroke-width="1"
           marker-end="url(#seqmove-call)"
         />
-        <rect x="716.25" y="748" width="59.5" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="710.63" y="748" width="70.74" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="746"
           y="758"
@@ -1332,7 +1333,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          timed()
+          offersUndo()
         </text>
         <!-- Reply: game returns to apply -->
         <line
@@ -1345,7 +1346,7 @@
           stroke-dasharray="4,3"
           marker-end="url(#seqmove-reply)"
         />
-        <rect x="687.925" y="778" width="116.15" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="723.975" y="778" width="44.05" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="746"
           y="788"
@@ -1354,20 +1355,72 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          ITimed | undefined
+          boolean
+        </text>
+        <rect
+          x="878"
+          y="820"
+          width="8"
+          height="34"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <!-- Message: apply calls game -->
+        <line
+          x1="614"
+          y1="822"
+          x2="878"
+          y2="822"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqmove-call)"
+        />
+        <rect x="707.825" y="808" width="76.35" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="746"
+          y="818"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          elapsedTime()
+        </text>
+        <!-- Reply: game returns to apply -->
+        <line
+          x1="878"
+          y1="852"
+          x2="614"
+          y2="852"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqmove-reply)"
+        />
+        <rect x="682.775" y="838" width="126.45" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="746"
+          y="848"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          ElapsedTime | undefined
         </text>
         <!-- Self message: apply -->
         <path
-          d="M 614 822 H 642 V 836 H 622"
+          d="M 614 882 H 642 V 896 H 622"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqmove-call)"
         />
-        <rect x="644" y="822" width="339.01" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="644" y="882" width="339.01" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="648"
-          y="832"
+          y="892"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1378,18 +1431,18 @@
         <!-- Reply: apply returns to presenter -->
         <line
           x1="606"
-          y1="862"
+          y1="922"
           x2="342"
-          y2="862"
+          y2="922"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#seqmove-reply)"
         />
-        <rect x="385.025" y="848" width="177.95" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="385.025" y="908" width="177.95" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="474"
-          y="858"
+          y="918"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1400,17 +1453,17 @@
         <!-- Message: presenter calls mapper -->
         <line
           x1="342"
-          y1="922"
+          y1="982"
           x2="470"
-          y2="922"
+          y2="982"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqmove-call)"
         />
-        <rect x="353.075" y="908" width="105.85" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="353.075" y="968" width="105.85" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="406"
-          y="918"
+          y="978"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1421,18 +1474,18 @@
         <!-- Reply: mapper returns to presenter -->
         <line
           x1="470"
-          y1="952"
+          y1="1012"
           x2="342"
-          y2="952"
+          y2="1012"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#seqmove-reply)"
         />
-        <rect x="381.4" y="938" width="49.2" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="381.4" y="998" width="49.2" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="406"
-          y="948"
+          y="1008"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1442,65 +1495,22 @@
         </text>
         <!-- Self message: presenter -->
         <path
-          d="M 342 990 H 370 V 1004 H 350"
+          d="M 342 1050 H 370 V 1064 H 350"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqmove-call)"
         />
-        <rect x="372" y="990" width="296.4" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="372" y="1050" width="296.4" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="376"
-          y="1000"
+          y="1060"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="start"
         >
           new GameViewModel(cells, score, canUndo, canRedo, phase, payload)
-        </text>
-        <!-- Reply: presenter returns to screen -->
-        <line
-          x1="334"
-          y1="1030"
-          x2="206"
-          y2="1030"
-          stroke="#5b6873"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#seqmove-reply)"
-        />
-        <rect x="210" y="1016" width="121.3" height="13" rx="2" fill="#f3f5f6" />
-        <text
-          x="214"
-          y="1026"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
-        >
-          Promise&lt;void&gt; resolves
-        </text>
-        <!-- Message: screen calls presenter -->
-        <line
-          x1="206"
-          y1="1060"
-          x2="334"
-          y2="1060"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-end="url(#seqmove-call)"
-        />
-        <rect x="237.675" y="1046" width="64.65" height="13" rx="2" fill="#f3f5f6" />
-        <text
-          x="270"
-          y="1056"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          viewModel()
         </text>
         <!-- Reply: presenter returns to screen -->
         <line
@@ -1513,10 +1523,53 @@
           stroke-dasharray="4,3"
           marker-end="url(#seqmove-reply)"
         />
-        <rect x="232.525" y="1076" width="74.95" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="210" y="1076" width="121.3" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="214"
+          y="1086"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          Promise&lt;void&gt; resolves
+        </text>
+        <!-- Message: screen calls presenter -->
+        <line
+          x1="206"
+          y1="1120"
+          x2="334"
+          y2="1120"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqmove-call)"
+        />
+        <rect x="237.675" y="1106" width="64.65" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="270"
-          y="1086"
+          y="1116"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          viewModel()
+        </text>
+        <!-- Reply: presenter returns to screen -->
+        <line
+          x1="334"
+          y1="1150"
+          x2="206"
+          y2="1150"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqmove-reply)"
+        />
+        <rect x="232.525" y="1136" width="74.95" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="270"
+          y="1146"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1526,16 +1579,16 @@
         </text>
         <!-- Self message: screen -->
         <path
-          d="M 206 1120 H 234 V 1134 H 214"
+          d="M 206 1180 H 234 V 1194 H 214"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqmove-call)"
         />
-        <rect x="236" y="1120" width="95.55" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="236" y="1180" width="95.55" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="240"
-          y="1130"
+          y="1190"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1546,7 +1599,7 @@
         <!-- Footnote -->
         <text
           x="24"
-          y="1188"
+          y="1248"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1556,7 +1609,7 @@
         </text>
         <text
           x="24"
-          y="1204"
+          y="1264"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1566,7 +1619,7 @@
         </text>
         <text
           x="24"
-          y="1220"
+          y="1280"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1576,7 +1629,7 @@
         </text>
         <text
           x="24"
-          y="1236"
+          y="1296"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1586,7 +1639,7 @@
         </text>
         <text
           x="24"
-          y="1252"
+          y="1312"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1596,7 +1649,7 @@
         </text>
         <text
           x="24"
-          y="1268"
+          y="1328"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1606,7 +1659,7 @@
         </text>
         <text
           x="24"
-          y="1284"
+          y="1344"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1618,15 +1671,15 @@
         <!-- Legend -->
         <line
           x1="24"
-          y1="1316"
+          y1="1376"
           x2="1352"
-          y2="1316"
+          y2="1376"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1334"
+          y="1394"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1636,16 +1689,16 @@
         </text>
         <line
           x1="24"
-          y1="1352"
+          y1="1412"
           x2="52"
-          y2="1352"
+          y2="1412"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqmove-call)"
         />
         <text
           x="60"
-          y="1355"
+          y="1415"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1654,9 +1707,9 @@
         </text>
         <line
           x1="224"
-          y1="1352"
+          y1="1412"
           x2="252"
-          y2="1352"
+          y2="1412"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
@@ -1664,7 +1717,7 @@
         />
         <text
           x="260"
-          y="1355"
+          y="1415"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1673,16 +1726,16 @@
         </text>
         <line
           x1="418"
-          y1="1345"
+          y1="1405"
           x2="418"
-          y2="1359"
+          y2="1419"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
         />
         <rect
           x="414"
-          y="1348"
+          y="1408"
           width="8"
           height="8"
           fill="#ffffff"
@@ -1691,7 +1744,7 @@
         />
         <text
           x="440"
-          y="1355"
+          y="1415"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1700,7 +1753,7 @@
         </text>
         <rect
           x="604"
-          y="1346"
+          y="1406"
           width="28"
           height="12"
           rx="1"
@@ -1710,7 +1763,7 @@
         />
         <text
           x="640"
-          y="1355"
+          y="1415"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1719,7 +1772,7 @@
         </text>
         <rect
           x="24"
-          y="1368"
+          y="1428"
           width="28"
           height="12"
           rx="2"
@@ -1729,7 +1782,7 @@
         />
         <text
           x="60"
-          y="1377"
+          y="1437"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1738,7 +1791,7 @@
         </text>
         <rect
           x="224"
-          y="1368"
+          y="1428"
           width="28"
           height="12"
           rx="2"
@@ -1748,7 +1801,7 @@
         />
         <text
           x="260"
-          y="1377"
+          y="1437"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1757,7 +1810,7 @@
         </text>
         <rect
           x="404"
-          y="1368"
+          y="1428"
           width="28"
           height="12"
           rx="2"
@@ -1767,7 +1820,7 @@
         />
         <text
           x="440"
-          y="1377"
+          y="1437"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1776,7 +1829,7 @@
         </text>
         <rect
           x="604"
-          y="1368"
+          y="1428"
           width="28"
           height="12"
           rx="2"
@@ -1786,7 +1839,7 @@
         />
         <text
           x="640"
-          y="1377"
+          y="1437"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

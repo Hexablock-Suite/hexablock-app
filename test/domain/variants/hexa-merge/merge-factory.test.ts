@@ -47,7 +47,7 @@ describe('MergeFactory', () => {
     const outcome = engine.play(slide);
     const after = engine.snapshot();
 
-    expect(factory.gameId.equals(GameId.of('hexa-merge'))).toBe(true);
+    expect(factory.isFor(GameId.of('hexa-merge'))).toBe(true);
     expect(factory.createBoard(BOARD_ID).coordinates()).toHaveLength(7);
     expect(Object.values(values(initial.snapshot()))).toHaveLength(2);
     expect(Object.values(values(initial.snapshot())).every((v) => v === 2 || v === 4)).toBe(true);
@@ -70,8 +70,8 @@ describe('MergeFactory', () => {
     };
 
     expect(play(9)).toEqual(play(9));
-    expect(mergeFactory(9).createPieceSource().take().piece).toEqual(
-      mergeFactory(9).createPieceSource().take().piece,
+    expect(mergeFactory(9).createPieceSource().take()[0]).toEqual(
+      mergeFactory(9).createPieceSource().take()[0],
     );
   });
 

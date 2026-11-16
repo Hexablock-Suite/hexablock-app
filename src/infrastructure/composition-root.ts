@@ -44,6 +44,8 @@ export interface RootDrivers {
 // the clock, the random source, the logger, the one id generator of `MatchId`
 // and the event publisher. No class has a static `instance()`, so a test passes its own drivers.
 // The game registry maps each `GameId` to its game and the variant factory of that game.
+// The registry pairs each id with its factory in one place, and the root gives that id
+// to `GameFactory` with that factory (issue #234).
 // Until #172, `StartGame` takes its factory in its constructor. So the root builds one
 // `StartGame` for each registered game, with one `ApplyMove` and one `UndoMove`
 // over one `InMemoryGameRepository`, and wraps each use case in the logging aspect.
@@ -77,17 +79,18 @@ export class CompositionRoot {
     const known = this.wired.get(game);
     if (known !== undefined) return known;
     const built = game.withFactory({
-      use: (variant) => wire(variant, this.ids, this.logger, this.events),
+      use: (id, variant) => wire(id, variant, this.ids, this.logger, this.events),
     });
     this.wired.set(game, built);
     return built;
   }
 }
 
-// The game use cases of one variant over one new repository, each inside the logging aspect.
+// The game use cases of the game `gameId` over one new repository, each inside the logging aspect.
 // Every game shares the id generator, the logger and the publisher,
 // so each one exists once in the app.
 function wire<TState extends BoardState<unknown, unknown> & Cloneable<TState>>(
+  gameId: GameId,
   variant: IVariantFactory<unknown, unknown, unknown, TState, unknown>,
   ids: MatchIdGenerator,
   logger: Logger,
@@ -96,7 +99,7 @@ function wire<TState extends BoardState<unknown, unknown> & Cloneable<TState>>(
   const games = new InMemoryGameRepository<unknown, unknown, unknown, TState>();
   return {
     startGame: new LoggingAspect(
-      new StartGame(new GameFactory(variant, ids), games),
+      new StartGame(new GameFactory(gameId, variant, ids), games),
       logger,
       'StartGame',
     ),

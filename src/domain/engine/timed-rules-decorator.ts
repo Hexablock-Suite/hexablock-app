@@ -2,7 +2,6 @@ import type { LevelTimer } from './level-timer';
 import type { Outcome } from './outcome';
 import type { Resolution } from './resolution';
 import type { IGameRules } from './rules';
-import type { ITimed } from './timed';
 
 // Decorator (statement §3.3, classes.md decision 19, D14): it times a game around any rules.
 // `GameEngine` calls only `playTurn()`, and `BaseGameRules.playTurn()` calls its own `evaluate()`.
@@ -10,6 +9,8 @@ import type { ITimed } from './timed';
 // The other steps only pass to the inner rules: a caller can ask them outside a turn,
 // and a question does not move the clock.
 // A rejected move starts nothing and stops nothing.
+// The decorator hands out no timer. `GameFactory` gives the same timer to the root,
+// and the root reads the time of play from it (classes.md decision 27, issue #234).
 export class TimedRulesDecorator<TMove, TState> implements IGameRules<TMove, TState> {
   constructor(
     private readonly inner: IGameRules<TMove, TState>,
@@ -42,9 +43,5 @@ export class TimedRulesDecorator<TMove, TState> implements IGameRules<TMove, TSt
     this.timer.start();
     if (resolution.endsTheGame()) this.timer.stop();
     return resolution;
-  }
-
-  timed(): ITimed {
-    return this.timer;
   }
 }

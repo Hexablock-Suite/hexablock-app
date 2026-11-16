@@ -31,7 +31,7 @@ export class Placement<TCoord> {
   // The figure cells that the piece covers: the board turns it and then moves it.
   // The board does not cut the piece, so a cell can lie outside the figure.
   cells(piece: Piece<PieceId, TCoord>, board: ReadonlyBoard<PieceId, TCoord>): TCoord[] {
-    return board.moved(board.turned(piece, this.rotation), this.at).cells();
+    return board.moved(board.turned(piece, this.rotation), this.at).coveredCoordinates();
   }
 
   // Two placements are equal when they have the same rotation and the same offset.

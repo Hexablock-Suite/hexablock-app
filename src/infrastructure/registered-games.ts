@@ -1,9 +1,12 @@
 import { BoardShape } from '../domain/engine/board-shape';
 import type { Clock } from '../domain/engine/clock';
 import { Color } from '../domain/engine/color';
+import { ElapsedTime } from '../domain/engine/elapsed-time';
+import { GameId } from '../domain/engine/game-id';
 import { TopologyId } from '../domain/engine/geometry-factory';
 import { HexGeometry } from '../domain/engine/hex-geometry';
 import { hex, type HexCoord } from '../domain/engine/hex-topology';
+import { Moves } from '../domain/engine/moves';
 import { Piece } from '../domain/engine/piece';
 import type { RandomSource } from '../domain/engine/random-source';
 import { RegionSize } from '../domain/engine/region-size';
@@ -11,6 +14,7 @@ import { Seed } from '../domain/engine/seed';
 import { CellNode, ShapeGroup } from '../domain/engine/shape-node';
 import { FitFactory } from '../domain/variants/hexa-fit/fit-factory';
 import { FitLevel } from '../domain/variants/hexa-fit/fit-level';
+import { FitStarThreshold } from '../domain/variants/hexa-fit/fit-stars';
 import { PieceId } from '../domain/variants/hexa-fit/piece-id';
 import { LinesFactory, LinesSettings } from '../domain/variants/hexa-lines/lines-factory';
 import { MergeFactory, MergeSettings } from '../domain/variants/hexa-merge/merge-factory';
@@ -38,6 +42,8 @@ const SORT_GOALS = GoalCount.of(3);
 
 // The games of the registry, in the order of the game selector, on the hexagonal figure.
 // The composition root calls the only module that names a variant factory: this one.
+// Each entry names the `GameId` of its game next to its factory, and `registered()`
+// checks the pair with `isFor()` (issue #234).
 // Lines, Sort and Merge draw their seed from `random`, so each run of the app gets new pieces.
 // Fit takes the clock for its level timer (classes.md decision 19).
 // The Fit level and the Sort level are first content only: #172 lets the player choose
@@ -47,6 +53,7 @@ export function registeredGames(clock: Clock, random: RandomSource): RegisteredG
   const geometry = new HexGeometry();
   return [
     registered(
+      GameId.of('hexa-lines'),
       new LinesFactory(
         geometry,
         LinesSettings.of(
@@ -57,14 +64,16 @@ export function registeredGames(clock: Clock, random: RandomSource): RegisteredG
         ),
       ),
     ),
-    registered(new FitFactory(geometry, firstFitLevel(), clock)),
+    registered(GameId.of('hexa-fit'), new FitFactory(geometry, firstFitLevel(), clock)),
     registered(
+      GameId.of('hexa-sort'),
       new SortFactory(
         geometry,
         SortLevel.seeded(SMALL_BOARD, SORT_GOALS, seedFrom(random), nonEmpty(SORT_COLORS)),
       ),
     ),
     registered(
+      GameId.of('hexa-merge'),
       new MergeFactory(geometry, MergeSettings.of(SMALL_BOARD, seedFrom(random), MERGE_TARGET)),
     ),
   ];
@@ -77,11 +86,23 @@ function seedFrom(random: RandomSource): Seed {
 
 // A Fit level of three cells in a row and two pieces, a domino and a single cell.
 // It can be won: the domino covers the first two cells, and the single cell covers the third.
+// The fewest moves are 2, so the third star can be won.
+// #172 starts the bundled levels by their id, in place of this level.
 function firstFitLevel(): FitLevel<HexCoord> {
-  return FitLevel.of(TopologyId.hex, BoardShape.of([hex(0, 0), hex(1, 0), hex(2, 0)]), [
-    fitPiece('a', [hex(0, 0), hex(1, 0)]),
-    fitPiece('b', [hex(0, 0)]),
-  ]);
+  return FitLevel.of(
+    TopologyId.hex,
+    BoardShape.of([hex(0, 0), hex(1, 0), hex(2, 0)]),
+    [fitPiece('a', [hex(0, 0), hex(1, 0)]), fitPiece('b', [hex(0, 0)])],
+    [fitStar(8, 120_000), fitStar(4, 60_000), fitStar(2, 30_000)],
+  );
+}
+
+// The thresholds of one Fit star: a move count and a time in milliseconds.
+function fitStar(maxMoves: number, maxElapsedMs: number): FitStarThreshold {
+  return FitStarThreshold.of({
+    maxMoves: Moves.of(maxMoves),
+    maxElapsedMs: ElapsedTime.ofMs(maxElapsedMs),
+  });
 }
 
 // A Fit piece with the id `id` over the cells `cells`, relative to the origin of the piece.

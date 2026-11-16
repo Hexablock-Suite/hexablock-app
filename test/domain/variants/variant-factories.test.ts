@@ -8,7 +8,9 @@ import type { BoardState } from '../../../src/domain/engine/board-state';
 import type { Cloneable } from '../../../src/domain/engine/cloneable';
 import { Color } from '../../../src/domain/engine/color';
 import { TopologyId, type GeometryFactory } from '../../../src/domain/engine/geometry-factory';
+import { GameId } from '../../../src/domain/engine/game-id';
 import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
+import { LevelTimer } from '../../../src/domain/engine/level-timer';
 import { MoveHistory } from '../../../src/domain/engine/move-history';
 import { Piece } from '../../../src/domain/engine/piece';
 import { RegionSize } from '../../../src/domain/engine/region-size';
@@ -30,13 +32,19 @@ import { SortFactory } from '../../../src/domain/variants/hexa-sort/sort-factory
 import { SortLevel } from '../../../src/domain/variants/hexa-sort/sort-level';
 import { ManualClock } from '../../support/engine/manual-clock';
 import { phaseNameOf } from '../../support/engine/phase-name';
-import { firstValidMove, startVariant, liveStateOf } from '../../support/engine/variant-game';
+import {
+  firstValidMove,
+  gameIdOf,
+  startVariant,
+  liveStateOf,
+} from '../../support/engine/variant-game';
 import { variantIdOf } from '../../support/variants/variant-id';
 import { A, fitFactory, threeDominoFitFactory } from '../../support/variants/hexa-fit/fit-game';
 import { linesFactory } from '../../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../../support/variants/hexa-merge/merge-game';
 import { sortFactory } from '../../support/variants/hexa-sort/sort-game';
 import { BOARD_ID } from '../../support/engine/entity-ids';
+import { MATCH_ID } from '../../support/engine/match-id';
 import { delivered } from '../../support/engine/value-receiver';
 
 // The engine runs the four variants through one code path (issue 99, APP-FR-03).
@@ -52,7 +60,7 @@ function playOnce<
   const { engine, rules } = startVariant(factory);
   const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, engine.snapshot())));
   return {
-    gameId: variantIdOf(factory.gameId),
+    gameId: variantIdOf(gameIdOf(factory)),
     outcome,
     phase: phaseNameOf(engine.currentPhase()),
   };
@@ -68,7 +76,10 @@ function twoBoards<
 >(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>) {
   const first = factory.createBoard(BOARD_ID);
   const second = factory.createBoard(BOARD_ID);
-  return { distinct: first !== second, filled: first.cells().length + second.cells().length };
+  return {
+    distinct: first !== second,
+    filled: first.occupiedCells().length + second.occupiedCells().length,
+  };
 }
 
 // The history of each variant (APP-FR-08, classes.md decision 3). Its class stays out of the
@@ -85,7 +96,7 @@ function historyOf<
 }
 
 // The count of moves that a game takes back after it plays `moves` moves.
-// The limit of a history is private, so the test reads it through the undo capability.
+// The limit of a history is private, so the test reads it through the undo of the root.
 function undosAfter<
   TCell,
   TCoord,
@@ -97,10 +108,9 @@ function undosAfter<
   for (let played = 0; played < moves; played += 1) {
     engine.play(firstValidMove(rules, liveStateOf(factory, engine.snapshot())));
   }
-  const history = engine.undoable();
   let undone = 0;
-  while (history?.canUndo()) {
-    history.undo();
+  while (engine.canUndo()) {
+    engine.undo();
     undone += 1;
   }
   return undone;
@@ -114,14 +124,19 @@ function startMerge<TCoord>(geometry: GeometryFactory<TCoord>) {
   const factory = new MergeFactory(geometry, mergeSettings);
   const { engine, rules } = startVariant(factory);
   const { board } = engine.snapshot();
-  const tiles = board.cells().length;
+  const tiles = board.occupiedCells().length;
   const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, engine.snapshot())));
   return { cells: board.coordinates().length, axes: board.axes(), tiles, outcome };
 }
 
 // Gives the tests of one figure. The result keeps the coordinate type inside it.
 // The tests read the figure only through the `GeometryFactory` contract.
-function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: number): () => void {
+// `family` is the family of the geometry. The geometry keeps it private (issue #234).
+function figureTests<TCoord>(
+  geometry: GeometryFactory<TCoord>,
+  family: TopologyId,
+  cellCount: number,
+): () => void {
   const size = RegionSize.of(2);
   const origin = geometry.createCoord([0, 0]);
   const next = geometry.createCoord([1, 0]);
@@ -132,7 +147,7 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
   // A level of two cells and one domino that covers them.
   function fitLevel(named: TopologyId): FitLevel<TCoord> {
     const domino = new ShapeGroup([new CellNode(origin), new CellNode(next)]);
-    return FitLevel.of(named, BoardShape.of([origin, next]), [new Piece(domino, A)]);
+    return FitLevel.of(named, BoardShape.of([origin, next]), [new Piece(domino, A)], []);
   }
 
   return () => {
@@ -148,7 +163,7 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
 
       expect(region).toHaveLength(cellCount);
       expect(keys(start.board.coordinates())).toEqual(region);
-      expect(start.board.cells()).toEqual([]);
+      expect(start.board.occupiedCells()).toEqual([]);
       expect(start.tray).toHaveLength(3);
       expect(outcome).toBe(Outcome.playing);
       expect(engine.snapshot().cellsPlaced).toBe(1);
@@ -167,29 +182,30 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
       const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, start)));
 
       expect(keys(start.board.coordinates())).toEqual(region);
-      expect(start.board.cells()).toEqual([]);
-      expect(start.offered?.cell().equals(ColorStack.of([Color.of('red')]))).toBe(true);
+      expect(start.board.occupiedCells()).toEqual([]);
+      expect(start.offered?.occupant().equals(ColorStack.of([Color.of('red')]))).toBe(true);
       expect(outcome).toBe(Outcome.playing);
-      expect(engine.snapshot().board.cells()).toHaveLength(1);
+      expect(engine.snapshot().board.occupiedCells()).toHaveLength(1);
     });
 
     it('should_start_and_win_the_fit_level_when_its_topology_names_the_geometry', () => {
       const { engine } = startVariant(
-        new FitFactory(geometry, fitLevel(geometry.id), new ManualClock()),
+        new FitFactory(geometry, fitLevel(family), new ManualClock()),
       );
       const start = engine.snapshot();
 
       const outcome = engine.play(new PlaceFitPiece(A, Turns.of(0), origin));
 
       expect(keys(start.board.coordinates())).toEqual(keys([origin, next]));
-      expect(start.view().remaining.map((piece) => delivered(piece.cell()))).toEqual(['a']);
+      expect(start.view().remaining.map((piece) => delivered(piece.occupant()))).toEqual(['a']);
       expect(outcome).toBe(Outcome.victory);
     });
 
-    // Issue #237: the error carries the two topologies as its `cause`.
-    it('should_throw_a_range_error_that_carries_both_topologies_when_the_fit_level_names_another_topology', () => {
+    // Issue #237: the error carries the topology of the level and the geometry as its `cause`.
+    // The geometry keeps its family private (issue #234).
+    it('should_throw_a_range_error_that_carries_the_topology_and_the_geometry_when_the_fit_level_names_another_topology', () => {
       const others = [TopologyId.hex, TopologyId.square, TopologyId.triangle].filter(
-        (id) => !id.equals(geometry.id),
+        (id) => !id.equals(family),
       );
 
       // Only a cast puts a free string here, as a broken level file would.
@@ -198,7 +214,7 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
 
         expect(create).toThrow(
           new RangeError('A Fit level cannot start on the geometry of another topology.', {
-            cause: { topology: named, geometry: geometry.id },
+            cause: { topology: named, geometry },
           }),
         );
       }
@@ -207,12 +223,39 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
 }
 
 const figures = [
-  ['hex', figureTests(new HexGeometry(), 7)],
-  ['square', figureTests(new SquareGeometry(), 4)],
-  ['triangle', figureTests(new TriangleGeometry(), 8)],
+  ['hex', figureTests(new HexGeometry(), TopologyId.hex, 7)],
+  ['square', figureTests(new SquareGeometry(), TopologyId.square, 4)],
+  ['triangle', figureTests(new TriangleGeometry(), TopologyId.triangle, 8)],
 ] as const;
 
 describe('IVariantFactory', () => {
+  // Each factory keeps its id private and answers `isFor()` (issue #234).
+  it('should_answer_true_only_for_its_own_game_when_each_factory_is_asked_whether_it_is_for_a_game', () => {
+    const ids = ['hexa-lines', 'hexa-fit', 'hexa-sort', 'hexa-merge'].map((id) => GameId.of(id));
+
+    const answers = [linesFactory(), fitFactory(), sortFactory(), mergeFactory()].map((factory) =>
+      ids.map((id) => factory.isFor(id)),
+    );
+
+    expect(answers).toEqual([
+      [true, false, false, false],
+      [false, true, false, false],
+      [false, false, true, false],
+      [false, false, false, true],
+    ]);
+  });
+
+  // Only Hexa Fit is timed (classes.md decision 19). A factory gives the timer as a part,
+  // as it gives the history (issue #234).
+  it('should_give_a_timer_only_for_the_fit_level_when_each_factory_creates_a_timer', () => {
+    const untimed = [linesFactory(), sortFactory(), mergeFactory()].map((factory) =>
+      factory.createTimer(MATCH_ID),
+    );
+
+    expect(untimed).toEqual([undefined, undefined, undefined]);
+    expect(fitFactory().createTimer(MATCH_ID)).toBeInstanceOf(LevelTimer);
+  });
+
   it('should_play_each_variant_through_the_same_path_when_the_engine_gets_the_four_factories', () => {
     const results = [
       playOnce(linesFactory()),

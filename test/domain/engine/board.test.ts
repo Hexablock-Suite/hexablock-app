@@ -51,7 +51,7 @@ function newBoard(): Board<string, number> {
 
 describe('Board', () => {
   it('should_return_undefined_when_cell_is_empty', () => {
-    expect(newBoard().get(2)).toBeUndefined();
+    expect(newBoard().occupantAt(2)).toBeUndefined();
   });
 
   it('should_return_the_cell_when_it_occupies_the_coordinate', () => {
@@ -59,7 +59,7 @@ describe('Board', () => {
 
     board.occupy(2, 'red');
 
-    expect(board.get(2)).toBe('red');
+    expect(board.occupantAt(2)).toBe('red');
   });
 
   it('should_replace_the_cell_when_two_cells_occupy_one_coordinate', () => {
@@ -68,7 +68,7 @@ describe('Board', () => {
     board.occupy(2, 'red');
     board.occupy(2, 'blue');
 
-    expect(board.get(2)).toBe('blue');
+    expect(board.occupantAt(2)).toBe('blue');
   });
 
   it('should_throw_when_occupy_is_outside_the_shape', () => {
@@ -80,7 +80,7 @@ describe('Board', () => {
     board.occupy(1, 'red');
     board.occupy(3, 'blue');
 
-    expect(board.cells()).toEqual([
+    expect(board.occupiedCells()).toEqual([
       [1, 'red'],
       [3, 'blue'],
     ]);
@@ -105,9 +105,9 @@ describe('Board', () => {
       [3, 'green'],
       [1, 'blue'],
     ];
-    expect(board.cells()).toEqual(written);
-    expect(board.clone().cells()).toEqual(written);
-    expect(initial.cells()).toEqual([
+    expect(board.occupiedCells()).toEqual(written);
+    expect(board.clone().occupiedCells()).toEqual(written);
+    expect(initial.occupiedCells()).toEqual([
       [4, 'red'],
       [0, 'blue'],
     ]);
@@ -124,9 +124,9 @@ describe('Board', () => {
 
     board.occupy(1, empty);
 
-    expect(board.get(1)).toBe(empty);
-    expect(board.get(2)).toBeUndefined();
-    expect(board.cells()).toEqual([[1, empty]]);
+    expect(board.occupantAt(1)).toBe(empty);
+    expect(board.occupantAt(2)).toBeUndefined();
+    expect(board.occupiedCells()).toEqual([[1, empty]]);
   });
 
   it('should_list_an_undefined_cell_when_it_occupies_a_coordinate', () => {
@@ -138,9 +138,9 @@ describe('Board', () => {
 
     board.occupy(1, undefined);
 
-    expect(board.get(1)).toBeUndefined();
-    expect(board.cells()).toEqual([[1, undefined]]);
-    expect(board.clone().cells()).toEqual([[1, undefined]]);
+    expect(board.occupantAt(1)).toBeUndefined();
+    expect(board.occupiedCells()).toEqual([[1, undefined]]);
+    expect(board.clone().occupiedCells()).toEqual([[1, undefined]]);
   });
 
   it('should_keep_the_clone_unchanged_when_the_original_changes', () => {
@@ -151,8 +151,8 @@ describe('Board', () => {
     board.occupy(1, 'blue');
     board.occupy(2, 'green');
 
-    expect(copy.get(1)).toBe('red');
-    expect(copy.get(2)).toBeUndefined();
+    expect(copy.occupantAt(1)).toBe('red');
+    expect(copy.occupantAt(2)).toBeUndefined();
     expect(copy.coordinates()).toEqual(board.coordinates());
     expect(copy.axes()).toEqual(board.axes());
   });
@@ -187,8 +187,8 @@ describe('Board', () => {
 
     const copy = board.clone();
 
-    expect(copy.get(1)).toBe(cell);
-    expect(copy.cells()[0]?.[1]).toBe(cell);
+    expect(copy.occupantAt(1)).toBe(cell);
+    expect(copy.occupiedCells()[0]?.[1]).toBe(cell);
   });
 
   it('should_yield_nothing_when_a_line_starts_outside_the_board', () => {
@@ -258,7 +258,7 @@ describe('Board identity', () => {
     board.occupy(1, 'red');
     other.occupy(1, 'red');
 
-    expect(board.cells()).toEqual(other.cells());
+    expect(board.occupiedCells()).toEqual(other.occupiedCells());
     expect([board.equals(other), other.equals(board)]).toEqual([false, false]);
     expect([board.clone().equals(other), other.clone().equals(board)]).toEqual([false, false]);
   });
@@ -271,8 +271,8 @@ describe('Board occupy and vacate', () => {
     board.occupy(2, 'red');
     board.occupy(2, 'blue');
 
-    expect(board.get(2)).toBe('blue');
-    expect(board.cells()).toEqual([[2, 'blue']]);
+    expect(board.occupantAt(2)).toBe('blue');
+    expect(board.occupiedCells()).toEqual([[2, 'blue']]);
   });
 
   it('should_throw_a_range_error_and_keep_the_board_when_occupy_is_outside_the_shape', () => {
@@ -282,7 +282,7 @@ describe('Board occupy and vacate', () => {
     expect(() => board.occupy(9, 'blue')).toThrow(
       new RangeError('The coordinate 9 is outside the board.'),
     );
-    expect(board.cells()).toEqual([[1, 'red']]);
+    expect(board.occupiedCells()).toEqual([[1, 'red']]);
   });
 
   it('should_free_the_coordinate_when_it_is_vacated', () => {
@@ -292,8 +292,8 @@ describe('Board occupy and vacate', () => {
 
     board.vacate(1);
 
-    expect(board.get(1)).toBeUndefined();
-    expect(board.cells()).toEqual([[3, 'blue']]);
+    expect(board.occupantAt(1)).toBeUndefined();
+    expect(board.occupiedCells()).toEqual([[3, 'blue']]);
   });
 
   it('should_throw_a_range_error_and_keep_the_board_when_vacate_is_outside_the_shape', () => {
@@ -301,7 +301,7 @@ describe('Board occupy and vacate', () => {
     board.occupy(1, 'red');
 
     expect(() => board.vacate(9)).toThrow(new RangeError('The coordinate 9 is outside the board.'));
-    expect(board.cells()).toEqual([[1, 'red']]);
+    expect(board.occupiedCells()).toEqual([[1, 'red']]);
   });
 
   it('should_throw_a_range_error_and_keep_the_board_when_vacate_finds_a_free_coordinate', () => {
@@ -312,7 +312,7 @@ describe('Board occupy and vacate', () => {
 
     expect(() => board.vacate(2)).toThrow(new RangeError('The coordinate 2 is already free.'));
     expect(() => board.vacate(3)).toThrow(new RangeError('The coordinate 3 is already free.'));
-    expect(board.cells()).toEqual([[1, 'red']]);
+    expect(board.occupiedCells()).toEqual([[1, 'red']]);
   });
 
   // A vacated coordinate counts as a new write when a cell occupies it again.
@@ -326,12 +326,12 @@ describe('Board occupy and vacate', () => {
     board.vacate(1);
     board.occupy(1, 'white');
 
-    expect(board.cells()).toEqual([
+    expect(board.occupiedCells()).toEqual([
       [3, 'blue'],
       [4, 'green'],
       [1, 'white'],
     ]);
-    expect(board.clone().cells()).toEqual(board.cells());
+    expect(board.clone().occupiedCells()).toEqual(board.occupiedCells());
   });
 
   it('should_keep_the_clone_unchanged_when_the_original_vacates', () => {
@@ -341,9 +341,9 @@ describe('Board occupy and vacate', () => {
 
     board.vacate(1);
 
-    expect(copy.get(1)).toBe('red');
-    expect(copy.cells()).toEqual([[1, 'red']]);
-    expect(board.get(1)).toBeUndefined();
+    expect(copy.occupantAt(1)).toBe('red');
+    expect(copy.occupiedCells()).toEqual([[1, 'red']]);
+    expect(board.occupantAt(1)).toBeUndefined();
   });
 
   it('should_keep_the_original_unchanged_when_the_clone_vacates', () => {
@@ -353,8 +353,8 @@ describe('Board occupy and vacate', () => {
 
     copy.vacate(1);
 
-    expect(board.get(1)).toBe('red');
-    expect(copy.get(1)).toBeUndefined();
+    expect(board.occupantAt(1)).toBe('red');
+    expect(copy.occupantAt(1)).toBeUndefined();
   });
 });
 
@@ -444,11 +444,11 @@ describe('Board initial content', () => {
     const copy = board.clone();
 
     tuple[1] = 'blue';
-    const [first] = board.cells();
+    const [first] = board.occupiedCells();
     if (first !== undefined) first[1] = 'green';
 
-    expect(board.get(1)).toBe('red');
-    expect(copy.get(1)).toBe('red');
+    expect(board.occupantAt(1)).toBe('red');
+    expect(copy.occupantAt(1)).toBe('red');
   });
 
   it('should_keep_the_initial_cells_when_the_content_matches_the_shape', () => {
@@ -459,7 +459,7 @@ describe('Board initial content', () => {
       contentOf([coordKey('0'), [0, 'red']], [coordKey('4'), [4, 'blue']]),
     );
 
-    expect(board.cells()).toEqual([
+    expect(board.occupiedCells()).toEqual([
       [0, 'red'],
       [4, 'blue'],
     ]);
@@ -498,13 +498,13 @@ describe('BoardSpace', () => {
   it('should_go_from_free_to_occupied_when_a_cell_occupies_the_space', () => {
     const space = freeSpace(1);
 
-    expect(space.occupation()).toBeUndefined();
+    expect(space.occupiedCell()).toBeUndefined();
 
     space.occupy('red');
-    expect(space.occupation()).toEqual([{ x: 1 }, 'red']);
+    expect(space.occupiedCell()).toEqual([{ x: 1 }, 'red']);
 
     space.occupy('blue');
-    expect(space.occupation()).toEqual([{ x: 1 }, 'blue']);
+    expect(space.occupiedCell()).toEqual([{ x: 1 }, 'blue']);
   });
 
   it('should_go_back_to_free_when_an_occupied_space_is_vacated', () => {
@@ -513,7 +513,7 @@ describe('BoardSpace', () => {
 
     space.vacate();
 
-    expect(space.occupation()).toBeUndefined();
+    expect(space.occupiedCell()).toBeUndefined();
     expect(space.equals(freeSpace(1))).toBe(true);
   });
 
@@ -521,7 +521,7 @@ describe('BoardSpace', () => {
     const space = freeSpace(1);
 
     expect(() => space.vacate()).toThrow(new RangeError('The space 1 is already free.'));
-    expect(space.occupation()).toBeUndefined();
+    expect(space.occupiedCell()).toBeUndefined();
   });
 
   // `Board` hands out no space. The spy runs the real method.
@@ -542,11 +542,11 @@ describe('BoardSpace', () => {
     expect(cloned.equals(original)).toBe(true);
 
     original.occupy('blue');
-    expect(board.get(1)).toBe('blue');
-    expect(copy.get(1)).toBe('red');
+    expect(board.occupantAt(1)).toBe('blue');
+    expect(copy.occupantAt(1)).toBe('red');
 
     cloned.occupy('green');
-    expect(copy.get(1)).toBe('green');
-    expect(board.get(1)).toBe('blue');
+    expect(copy.occupantAt(1)).toBe('green');
+    expect(board.occupantAt(1)).toBe('blue');
   });
 });

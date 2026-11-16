@@ -34,8 +34,8 @@ class ListRandom implements RandomSource {
 // The piece that the settings draw from two numbers, as text.
 function drawn(settings: LinesSettings<SquareCoord>, shape: number, color: number): string {
   const piece = settings.drawPiece(new ListRandom([shape, color]));
-  const keys = piece.cells().map((c) => squareTopology.key(c));
-  return `${piece.cell().equals(red) ? 'red' : 'blue'} ${keys.join(' ')}`;
+  const keys = piece.coveredCoordinates().map((c) => squareTopology.key(c));
+  return `${piece.occupant().equals(red) ? 'red' : 'blue'} ${keys.join(' ')}`;
 }
 
 describe('LinesSettings', () => {

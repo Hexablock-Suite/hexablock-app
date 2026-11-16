@@ -62,7 +62,7 @@ describe('a total score that passes the largest safe integer', () => {
     await applyMove.execute({ move: MOVE });
 
     const after = engine.snapshot();
-    expect(after.board.cells()).toEqual([]);
+    expect(after.board.occupiedCells()).toEqual([]);
     expect(after.score).toEqual(FULL);
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(publisher.events).toEqual([]);
@@ -77,7 +77,7 @@ describe('a total score that passes the largest safe integer', () => {
     );
 
     expect(engine.snapshot().score).toEqual(FULL);
-    expect(engine.snapshot().board.cells()).toEqual([]);
+    expect(engine.snapshot().board.occupiedCells()).toEqual([]);
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(engine.takeEvents()).toEqual([]);
   });

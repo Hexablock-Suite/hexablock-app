@@ -26,7 +26,7 @@ function first<T>(source: IPieceSource<T>, count: number): T[] {
 describe('FixedListPieceSource', () => {
   it('should_end_after_the_last_piece_when_read_with_for_of', () => {
     const source = new FixedListPieceSource(['a', 'b', 'c']);
-    const end = source.take().rest.take().rest.take().rest;
+    const end = source.take()[1].take()[1].take()[1];
 
     expect([...source]).toEqual(['a', 'b', 'c']);
     expect(source.hasNext()).toBe(true);
@@ -35,7 +35,7 @@ describe('FixedListPieceSource', () => {
   });
 
   it('should_throw_a_range_error_when_take_runs_after_the_last_piece', () => {
-    const end = new FixedListPieceSource(['a']).take().rest;
+    const end = new FixedListPieceSource(['a']).take()[1];
 
     expect(() => end.take()).toThrow(new RangeError('The piece source has no piece left.'));
     expect(() => new FixedListPieceSource<string>([]).take()).toThrow(RangeError);
@@ -44,7 +44,7 @@ describe('FixedListPieceSource', () => {
   it('should_keep_its_pieces_when_the_caller_changes_the_list', () => {
     const list = ['a', 'b'];
     const source = new FixedListPieceSource(list);
-    const rest = source.take().rest;
+    const rest = source.take()[1];
 
     list.push('c');
     list[1] = 'z';
@@ -74,7 +74,7 @@ describe('FixedListPieceSource', () => {
   it('should_return_the_piece_and_the_next_source_and_stay_at_its_position_when_take_runs', () => {
     const source = new FixedListPieceSource(['a', 'b', 'c']);
 
-    const { piece, rest } = source.take();
+    const [piece, rest] = source.take();
 
     expect(piece).toBe('a');
     expect(rest === source).toBe(false);
@@ -85,8 +85,8 @@ describe('FixedListPieceSource', () => {
   it('should_give_the_same_piece_twice_when_take_runs_twice_on_one_source', () => {
     const source = new FixedListPieceSource(['a', 'b']);
 
-    expect([source.take().piece, source.take().piece]).toEqual(['a', 'a']);
-    expect([...source.take().rest]).toEqual([...source.take().rest]);
+    expect([source.take()[0], source.take()[0]]).toEqual(['a', 'a']);
+    expect([...source.take()[1]]).toEqual([...source.take()[1]]);
   });
 
   it('should_throw_a_range_error_when_the_list_holds_undefined', () => {
@@ -137,9 +137,9 @@ describe('SeededPieceSource', () => {
   }
 
   it('should_accept_the_seed_when_it_is_zero_or_the_largest_32_bit_integer', () => {
-    expect(new SeededPieceSource(Seed.of(0), drawColor).seed.equals(Seed.of(0))).toBe(true);
+    expect(new SeededPieceSource(Seed.of(0), drawColor).isSeededWith(Seed.of(0))).toBe(true);
     expect(
-      new SeededPieceSource(Seed.of(4294967295), drawColor).seed.equals(Seed.of(4294967295)),
+      new SeededPieceSource(Seed.of(4294967295), drawColor).isSeededWith(Seed.of(4294967295)),
     ).toBe(true);
   });
 
@@ -157,11 +157,11 @@ describe('SeededPieceSource', () => {
     const source = new SeededPieceSource(Seed.of(42), drawColor);
     const expected = first(new SeededPieceSource(Seed.of(42), drawColor), 10);
 
-    const { piece, rest } = source.take();
+    const [piece, rest] = source.take();
 
     expect(piece).toBe(expected[0]);
     expect(rest === source).toBe(false);
-    expect(rest.seed.equals(Seed.of(42))).toBe(true);
+    expect(rest.isSeededWith(Seed.of(42))).toBe(true);
     expect(first(source, 10)).toEqual(expected);
   });
 
@@ -171,22 +171,37 @@ describe('SeededPieceSource', () => {
     const [one, two] = first(new SeededPieceSource(Seed.of(42), drawColor), 2);
 
     expect(one).not.toBe(two);
-    expect([source.take().piece, source.take().piece]).toEqual([one, one]);
-    expect([source.take().rest.take().piece, source.take().rest.take().piece]).toEqual([two, two]);
+    expect([source.take()[0], source.take()[0]]).toEqual([one, one]);
+    expect([source.take()[1].take()[0], source.take()[1].take()[0]]).toEqual([two, two]);
   });
 
   it('should_continue_the_sequence_of_the_seed_when_the_next_source_is_read', () => {
     const expected = first(new SeededPieceSource(Seed.of(42), drawColor), 12);
 
-    const second = new SeededPieceSource(Seed.of(42), drawColor).take().rest;
-    const third = second.take().rest;
+    const second = new SeededPieceSource(Seed.of(42), drawColor).take()[1];
+    const third = second.take()[1];
 
     expect(first(second, 11)).toEqual(expected.slice(1));
     expect(first(third, 10)).toEqual(expected.slice(2));
   });
 
-  it('should_expose_its_seed_when_the_seed_is_read', () => {
-    expect(new SeededPieceSource(Seed.of(42), drawColor).seed.equals(Seed.of(42))).toBe(true);
+  // Issue #234: the source keeps its seed private and answers a question about it.
+  it('should_tell_whether_it_takes_its_randomness_from_a_seed_when_the_seed_is_asked', () => {
+    const source = new SeededPieceSource(Seed.of(42), drawColor);
+
+    expect([source.isSeededWith(Seed.of(42)), source.isSeededWith(Seed.of(43))]).toEqual([
+      true,
+      false,
+    ]);
+  });
+
+  // Issue #234: `take()` keeps its pair, a result record with no field.
+  it('should_give_the_piece_and_the_next_source_as_a_pair_when_take_runs', () => {
+    const draw = new FixedListPieceSource(['a', 'b']).take();
+
+    expect(draw).toHaveLength(2);
+    expect(draw[0]).toBe('a');
+    expect([...draw[1]]).toEqual(['b']);
   });
 });
 

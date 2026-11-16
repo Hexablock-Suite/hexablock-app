@@ -64,7 +64,7 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
     source: IPieceSource<Piece<PieceId, TCoord>>,
   ): FitState<TCoord> {
     let pieces = PieceRegister.empty<Piece<PieceId, TCoord>>();
-    for (const piece of source) pieces = pieces.with(piece.cell(), piece);
+    for (const piece of source) pieces = pieces.with(piece.occupant(), piece);
     return new FitState(stateId, matchId, figure.clone(), pieces, PieceRegister.empty());
   }
 
@@ -103,12 +103,12 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
       }
     }
     for (const c of cells) this.board.occupy(c, id);
-    this.placements = this.placements.with(piece.cell(), placement);
+    this.placements = this.placements.with(piece.occupant(), placement);
   }
 
   // Takes the piece off the figure: the board vacates each cell of the piece.
   remove(id: PieceId): void {
-    for (const [c, cell] of this.board.cells()) {
+    for (const [c, cell] of this.board.occupiedCells()) {
       if (cell.equals(id)) this.board.vacate(c);
     }
     this.placements = this.placements.without(id);
@@ -165,7 +165,7 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
     checkOwnSnapshot(this.stateId, this.board, snapshot);
     let placements = PieceRegister.empty<Placement<TCoord>>();
     for (const [id, placement] of snapshot.placements) {
-      placements = placements.with(this.pieceOf(id).cell(), placement);
+      placements = placements.with(this.pieceOf(id).occupant(), placement);
     }
     this.board.restore(snapshot.board);
     this.placements = placements;

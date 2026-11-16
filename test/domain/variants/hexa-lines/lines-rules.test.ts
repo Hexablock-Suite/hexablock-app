@@ -38,7 +38,8 @@ import {
 } from '../../../support/variants/hexa-lines/lines-game';
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
-import { firstValidMove } from '../../../support/engine/variant-game';
+import { boardLike, firstValidMove } from '../../../support/engine/variant-game';
+import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
 import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
 
 // The rules suite of Hexa Lines (issue 91, APP-NFR-02, APP-NFR-12).
@@ -89,7 +90,7 @@ describe('Hexa Lines rules', () => {
 
     const state = engine.snapshot();
     expect(state.tray).toEqual([a, b, c]);
-    expect(state.source.take().piece).toBe(d);
+    expect(state.source.take()[0]).toBe(d);
   });
 
   it('should_reject_the_move_and_keep_the_state_when_the_piece_does_not_fit_or_names_no_tray_piece', () => {
@@ -160,7 +161,7 @@ describe('Hexa Lines rules', () => {
 
       const state = engine.snapshot();
       expect(line.length).toBeGreaterThanOrEqual(3);
-      for (const c of line) expect(state.board.get(c)).toBeUndefined();
+      for (const c of line) expect(state.board.occupantAt(c)).toBeUndefined();
       expect(state.linesCleared).toBeGreaterThanOrEqual(1);
     }
   });
@@ -400,7 +401,7 @@ describe('Hexa Lines rules edge cases', () => {
           new LinesState(
             STATE_ID,
             MATCH_ID,
-            base.snapshot().board.clone(),
+            boardLike(base.snapshot().board, new SquareGeometry(), MATCH_ID),
             base.snapshot().tray,
             failingSource,
           ),
@@ -498,9 +499,9 @@ describe('LinesRules atomic turn', () => {
     const start = linesFactory(5).createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
     const { engine } = linesGame(start, failing);
     const facts = (state: LinesSnapshot<SquareCoord>) => ({
-      cells: state.board.cells(),
+      cells: state.board.occupiedCells(),
       tray: [...state.tray],
-      nextPiece: state.source.take().piece,
+      nextPiece: state.source.take()[0],
       counts: [state.streak, state.linesCleared, state.cellsPlaced],
       score: state.score,
     });

@@ -510,7 +510,7 @@
           - identity: BoardId
         </text>
         <text x="88" y="212" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + get(at: TCoord): TCell | undefined
+          + occupantAt(at: TCoord): TCell | undefined
         </text>
         <text x="88" y="228" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + occupy(c: TCoord, cell: TCell): void
@@ -519,7 +519,7 @@
           + vacate(c: TCoord): void
         </text>
         <text x="88" y="260" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + cells(): [TCoord, TCell][]
+          + occupiedCells(): [TCoord, TCell][]
         </text>
         <text x="88" y="276" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + coordinates(): TCoord[]
@@ -751,7 +751,7 @@
           + vacate(): void
         </text>
         <text x="88" y="816" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + occupation(): [TCoord, TCell] | undefined
+          + occupiedCell(): [TCoord, TCell] | undefined
         </text>
         <text x="88" y="828" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + clone(): BoardSpace&lt;TCell, TCoord&gt;
@@ -811,10 +811,10 @@
           GridTopology&lt;TCoord&gt;): Piece&lt;TCell, TCoord&gt;
         </text>
         <text x="592" y="772" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + cells(): TCoord[]
+          + coveredCoordinates(): TCoord[]
         </text>
         <text x="592" y="788" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + cell(): TCell
+          + occupant(): TCell
         </text>
         <text x="592" y="804" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + clone(): Piece&lt;TCell, TCoord&gt;
