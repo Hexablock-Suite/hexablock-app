@@ -64,7 +64,7 @@
       <h1>Piece sources, scoring and progress: Strategy and Decorator</h1>
 
       <svg
-        viewBox="0 0 1040 1456"
+        viewBox="0 0 1040 1433"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="sources-title sources-desc"
@@ -116,22 +116,6 @@
             markerUnits="userSpaceOnUse"
           >
             <polygon points="0 5, 9 0, 18 5, 9 10" fill="#17212a" />
-          </marker>
-          <marker
-            id="sources-diamond-hollow"
-            markerWidth="18"
-            markerHeight="10"
-            refX="0"
-            refY="5"
-            orient="auto"
-            markerUnits="userSpaceOnUse"
-          >
-            <polygon
-              points="0 5, 9 0, 18 5, 9 10"
-              fill="#ffffff"
-              stroke="#17212a"
-              stroke-width="1"
-            />
           </marker>
           <marker
             id="sources-open"
@@ -275,15 +259,15 @@
           stroke-dasharray="5,4"
           marker-end="url(#sources-triangle)"
         />
-        <!-- ScoringDecorator holds the IScoringPolicy it receives as inner: aggregation, kept because Decorator holds it -->
+        <!-- ScoringDecorator keeps the IScoringPolicy it wraps as inner: use with role and multiplicity (decision 23) -->
         <line
           x1="824"
           y1="228"
           x2="824"
           y2="164"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#sources-diamond-hollow)"
+          marker-end="url(#sources-open)"
         />
         <!-- IProgressModel records a GameResult: use -->
         <line
@@ -343,7 +327,7 @@
           IRandomSeeded
         </text>
 
-        <!-- Class: IPieceSource (interface, strategy) -->
+        <!-- Class: IPieceSource (interface of the Strategy and the Iterator: only «interface», decision 23) -->
         <rect
           x="176"
           y="92"
@@ -364,7 +348,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Strategy» «Iterator»
+          «interface»
         </text>
         <text
           x="308"
@@ -481,7 +465,7 @@
           + take(): PieceDraw&lt;TPiece&gt;
         </text>
 
-        <!-- Class: IScoringPolicy (interface, strategy) -->
+        <!-- Class: IScoringPolicy (interface of the Strategy and the Decorator: only «interface», decision 23) -->
         <rect
           x="588"
           y="92"
@@ -502,7 +486,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Strategy»
+          «interface»
         </text>
         <text
           x="784"
@@ -519,7 +503,7 @@
           + score(before: SnapshotOf&lt;TState&gt;, after: SnapshotOf&lt;TState&gt;): Score
         </text>
 
-        <!-- Class: ScoringDecorator (abstract, decorator, focal) -->
+        <!-- Class: ScoringDecorator (abstract, focal; a piece of the Decorator pattern: the frame names it, decision 23) -->
         <rect
           x="664"
           y="228"
@@ -542,7 +526,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «abstract» «Decorator»
+          «abstract»
         </text>
         <text
           x="784"
@@ -560,7 +544,7 @@
           - inner: IScoringPolicy&lt;TState&gt;
         </text>
 
-        <!-- Class: IProgressModel (interface, strategy) -->
+        <!-- Class: IProgressModel (interface of the Strategy: only «interface», decision 23) -->
         <rect
           x="232"
           y="576"
@@ -581,7 +565,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Strategy»
+          «interface»
         </text>
         <text
           x="372"
@@ -601,7 +585,7 @@
           GameProgress): void
         </text>
 
-        <!-- SeededPieceSource keeps the Mulberry32Random it creates as random: use -->
+        <!-- SeededPieceSource keeps the Mulberry32Random it creates as random: use with role and multiplicity (decision 23) -->
         <line
           x1="256"
           y1="356"
@@ -636,7 +620,7 @@
           1
         </text>
 
-        <!-- SeededPieceSource holds its Seed: use -->
+        <!-- SeededPieceSource keeps its Seed as seed: use with role and multiplicity (decision 23) -->
         <polyline
           points="320,356 320,374 452,374 452,400"
           fill="none"
@@ -1006,17 +990,29 @@
         <text x="855" y="788" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           void
         </text>
-        <!-- GameResult and ProgressRecord hold the score as a Score: use -->
+        <!-- GameResult keeps its Score as score: use with role and multiplicity (decision 23). The line runs at the top of the 20-unit gap, so its label sits above Score. ProgressRecord also keeps a Score, with no line. -->
         <line
           x1="808"
-          y1="596"
+          y1="582"
           x2="828"
-          y2="596"
+          y2="582"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#sources-open)"
         />
-        <!-- ProgressRecord holds its stars as Stars: use -->
+        <rect x="830" y="559" width="38" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="832"
+          y="568"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          score
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <!-- ProgressRecord keeps zero or one Stars as stars: use with role and multiplicity (decision 23) -->
         <line
           x1="456"
           y1="912"
@@ -1026,7 +1022,19 @@
           stroke-width="1"
           marker-end="url(#sources-open)"
         />
-        <!-- GameResult holds its move count as Moves: use -->
+        <rect x="458" y="1030" width="52" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="460"
+          y="1039"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          stars
+          <tspan font-weight="600">0..1</tspan>
+        </text>
+        <!-- GameResult keeps its Moves as moves: use with role and multiplicity (decision 23) -->
         <line
           x1="660"
           y1="784"
@@ -1036,6 +1044,18 @@
           stroke-width="1"
           marker-end="url(#sources-open)"
         />
+        <rect x="662" y="1030" width="38" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="664"
+          y="1039"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          moves
+          <tspan font-weight="600">1</tspan>
+        </text>
         <!-- IProgressModel records each result in the GameProgress of its game: use -->
         <line
           x1="232"
@@ -1046,7 +1066,7 @@
           stroke-width="1"
           marker-end="url(#sources-open)"
         />
-        <!-- LevelProgress keeps the ILevelStars of its level as stars: use -->
+        <!-- LevelProgress keeps the ILevelStars of its level as stars: use with role and multiplicity (decision 23) -->
         <line
           x1="224"
           y1="944"
@@ -1103,7 +1123,7 @@
         >
           GameProgress
         </text>
-        <!-- Class: HighScoreProgress (concrete strategy, issue 156) -->
+        <!-- Class: HighScoreProgress (a piece of the Strategy pattern: the frame names it, decision 23; issue 156) -->
         <rect
           x="48"
           y="680"
@@ -1117,18 +1137,7 @@
         <line x1="48" y1="728" x2="224" y2="728" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="136"
-          y="698"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «Concrete Strategy»
-        </text>
-        <text
-          x="136"
-          y="716"
+          y="709"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1152,7 +1161,7 @@
         <text x="75" y="662" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           IProgressModel
         </text>
-        <!-- Class: LevelProgress (concrete strategy, issue 156) -->
+        <!-- Class: LevelProgress (a piece of the Strategy pattern: the frame names it, decision 23; issue 156) -->
         <rect
           x="48"
           y="824"
@@ -1166,18 +1175,7 @@
         <line x1="48" y1="872" x2="224" y2="872" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="136"
-          y="842"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «Concrete Strategy»
-        </text>
-        <text
-          x="136"
-          y="860"
+          y="853"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1880,30 +1878,12 @@
           y1="1388"
           x2="172"
           y2="1388"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#sources-diamond-hollow)"
-        />
-        <text
-          x="180"
-          y="1392"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Aggregation · in-layer pattern
-        </text>
-        <line
-          x1="384"
-          y1="1388"
-          x2="412"
-          y2="1388"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#sources-open)"
         />
         <text
-          x="420"
+          x="180"
           y="1392"
           fill="#5b6873"
           font-size="8.5"
@@ -2019,25 +1999,6 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Lollipop · engine interface
-        </text>
-        <text
-          x="24"
-          y="1440"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          «Sprint N»
-        </text>
-        <text
-          x="92"
-          y="1440"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Planned design, not in the code yet · N is the docs/ROADMAP.md sprint of the requirement
-          it serves · a planned class carries it once, for its members and arrows
         </text>
       </svg>
     </div>

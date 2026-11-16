@@ -112,22 +112,6 @@
             <polygon points="0 5, 9 0, 18 5, 9 10" fill="#17212a" />
           </marker>
           <marker
-            id="factory-diamond-hollow"
-            markerWidth="18"
-            markerHeight="10"
-            refX="0"
-            refY="5"
-            orient="auto"
-            markerUnits="userSpaceOnUse"
-          >
-            <polygon
-              points="0 5, 9 0, 18 5, 9 10"
-              fill="#ffffff"
-              stroke="#17212a"
-              stroke-width="1"
-            />
-          </marker>
-          <marker
             id="factory-open"
             markerWidth="10"
             markerHeight="8"
@@ -384,7 +368,7 @@
           GIVES
         </text>
 
-        <!-- Class: IVariantFactory (interface, abstract factory, focal) -->
+        <!-- Class: IVariantFactory (interface of the Abstract Factory and DDD factory, focal: the frame names the pattern, decision 23) -->
         <rect
           x="56"
           y="92"
@@ -407,7 +391,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Abstract Factory» «factory»
+          «interface» «factory»
         </text>
         <text
           x="256"
@@ -430,7 +414,7 @@
           + createTimer(matchId: MatchId): LevelTimer [0..1]
         </text>
         <text x="72" y="204" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + createPieceSource(): IPieceSource&lt;Piece&lt;TCell, TCoord&gt;&gt; [0..1]
+          + createPieceSource(): IPieceSource&lt;TPiece&gt; [0..1]
         </text>
         <text x="72" y="220" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createScoring(): IScoringPolicy&lt;TState&gt;
@@ -448,7 +432,7 @@
           boardId: BoardId): TState
         </text>
         <text x="72" y="300" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + createHistory(): MoveHistory&lt;TMove, TState&gt; [0..1]
+          + createHistory(): MoveHistory&lt;TMove, SnapshotOf&lt;TState&gt;&gt; [0..1]
         </text>
 
         <!-- Class: GameEvent (abstract, domain event) -->
@@ -611,16 +595,28 @@
         <text x="535" y="338" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           ValueReceiver&lt;number&gt;): void
         </text>
-        <!-- GameOver carries the final Score: use -->
+        <!-- GameOver keeps the final Score as finalScore: use with role and multiplicity (decision 23). The line runs near the top of GameOver, so its label fits above GameOver, under GameEvent. -->
         <line
           x1="792"
-          y1="228"
+          y1="216"
           x2="740"
-          y2="228"
+          y2="216"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#factory-open)"
         />
+        <rect x="742" y="195" width="62" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="744"
+          y="204"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          finalScore
+          <tspan font-weight="600">1</tspan>
+        </text>
         <!-- LevelDefinition gives the topology and the section to the ILevelBuilder in buildWith(): use with a verb -->
         <line
           x1="220"
@@ -726,7 +722,7 @@
         <text x="68" y="656" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: LevelDefinition): boolean
         </text>
-        <!-- Class: ILevelBuilder (interface, builder) -->
+        <!-- Class: ILevelBuilder (interface of the Builder: only «interface», decision 23) -->
         <rect
           x="52"
           y="704"
@@ -747,7 +743,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Builder»
+          «interface»
         </text>
         <text
           x="232"
@@ -1287,9 +1283,9 @@
           TCell, TCoord, TMove, TState
         </text>
         <rect
-          x="312"
+          x="272"
           y="82"
-          width="156"
+          width="196"
           height="18"
           rx="2"
           fill="#ffffff"
@@ -1298,14 +1294,14 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="390"
+          x="370"
           y="94"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TCell, TCoord, TMove, TState
+          TCell, TCoord, TMove, TState, TPiece
         </text>
         <rect
           x="376"
