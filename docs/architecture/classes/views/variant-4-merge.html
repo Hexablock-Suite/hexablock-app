@@ -333,7 +333,7 @@
           «bind» T → MergeTile
         </text>
 
-        <!-- Class: MergeFactory (concrete factory) -->
+        <!-- Class: MergeFactory (factory; a piece of the Abstract Factory pattern: the frame names it, decision 23) -->
         <rect
           x="64"
           y="120"
@@ -353,7 +353,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «Concrete Factory» «factory»
+          «factory»
         </text>
         <text
           x="176"
@@ -371,7 +371,7 @@
           - geometry: GeometryFactory&lt;TCoord&gt;
         </text>
 
-        <!-- Class: MergeRules (focal, concrete strategy) -->
+        <!-- Class: MergeRules (focal; a piece of the Strategy pattern: the frame names it, decision 23) -->
         <rect
           x="344"
           y="272"
@@ -387,18 +387,7 @@
         <line x1="344" y1="320" x2="620" y2="320" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text
           x="482"
-          y="290"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «Concrete Strategy»
-        </text>
-        <text
-          x="482"
-          y="308"
+          y="301"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -414,7 +403,7 @@
           slide to the edge, merge on collision
         </text>
 
-        <!-- Class: MergeScoring (concrete strategy) -->
+        <!-- Class: MergeScoring (a piece of the Strategy pattern: the frame names it, decision 23) -->
         <rect
           x="648"
           y="272"
@@ -428,18 +417,7 @@
         <line x1="648" y1="320" x2="848" y2="320" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="748"
-          y="290"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «Concrete Strategy»
-        </text>
-        <text
-          x="748"
-          y="308"
+          y="301"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -937,7 +915,7 @@
         >
           TCoord
         </text>
-        <!-- MergeSettings holds the chance of a 4: use -->
+        <!-- MergeSettings keeps its Chance of a 4 as fourChance: use with role and multiplicity (decision 23) -->
         <line
           x1="392"
           y1="904"
