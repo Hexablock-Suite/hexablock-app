@@ -100,6 +100,7 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 - `docs/REQUIREMENTS.md` records two offline sync rules that the team closed on 2026-11-06. DS-11: when the app holds a bundled copy and a backend copy of one level, the copy with the higher `version` wins. DS-12: when one account sends two results for one level, the backend keeps the best one. APP-FR-13, APP-FR-15 and A6 point to them, and the check of APP-FR-15 now also loads the higher `version`.
 - `src/infrastructure/api/schema.d.ts` holds the paths `/levels`, `/leaderboard/{gameId}` and `/leaderboard/{gameId}/levels/{levelId}` of the backend ([#185](https://github.com/Hexablock-Suite/hexablock-app/issues/185), rule R-api-contract). hexablock-api merged the level and leaderboard endpoints, so `pnpm api:check` failed on every pull request until `pnpm api:generate` wrote the file again. No app code calls the new paths yet.
 - The API-NFR-10 row of the Sprint 4 exit checks in `docs/ROADMAP.md` uses the words of its _Check_ in the backend requirements ([hexablock-api#22](https://github.com/Hexablock-Suite/hexablock-api/issues/22)).
+- Three documents match the board again. `docs/ROADMAP.md` no longer says that no task has an owner: the owner of a task is the assignee of its issue. `docs/README.md` calls the roadmap approved on 2026-11-04, not a proposal. Q8 and Q9 in `docs/REQUIREMENTS.md` name their working choice, S3-07 option A and S3-06 option B of [#151](https://github.com/Hexablock-Suite/hexablock-app/issues/151), and stay open for the professor.
 
 ### Fixed
 
