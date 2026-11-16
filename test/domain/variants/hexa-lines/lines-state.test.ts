@@ -32,12 +32,12 @@ const domino = piece(square(0, 0), square(1, 0));
 function facts(state: LinesState<SquareCoord>) {
   return {
     filled: filledKeys(state.snapshot()),
-    tray: [...state.snapshot().tray],
-    left: state.snapshot().source.hasNext(),
-    streak: state.snapshot().streak,
-    linesCleared: state.snapshot().linesCleared,
-    cellsPlaced: state.snapshot().cellsPlaced,
-    score: state.snapshot().score,
+    tray: [...state.snapshot().trayPieces()],
+    left: state.snapshot().pieceSource().hasNext(),
+    streak: state.snapshot().currentStreak(),
+    linesCleared: state.snapshot().lastCombo(),
+    cellsPlaced: state.snapshot().lastPlacedCells(),
+    score: state.snapshot().scoreSoFar(),
   };
 }
 
@@ -56,10 +56,10 @@ describe('LinesState', () => {
     state.placePiece(new PlacePiece(TrayPosition.of(0), square(1, 2)));
 
     expect(filledKeys(state.snapshot())).toEqual(['1,2', '2,2']);
-    expect(state.snapshot().board.occupantAt(square(1, 2))).toBe(red);
-    expect(state.snapshot().cellsPlaced).toEqual(CellCount.of(2));
-    expect(state.snapshot().tray).toEqual([one]);
-    expect(state.snapshot().source.hasNext()).toBe(true);
+    expect(state.snapshot().boardCopy().occupantAt(square(1, 2))).toBe(red);
+    expect(state.snapshot().lastPlacedCells()).toEqual(CellCount.of(2));
+    expect(state.snapshot().trayPieces()).toEqual([one]);
+    expect(state.snapshot().pieceSource().hasNext()).toBe(true);
   });
 
   it('should_fill_the_tray_from_the_source_when_the_last_tray_piece_is_placed', () => {
@@ -68,9 +68,9 @@ describe('LinesState', () => {
 
     state.placePiece(new PlacePiece(TrayPosition.of(0), square(0, 0)));
 
-    expect(state.snapshot().tray).toEqual([a, b, c]);
-    expect(state.snapshot().source.hasNext()).toBe(true);
-    expect(state.snapshot().cellsPlaced).toEqual(CellCount.of(1));
+    expect(state.snapshot().trayPieces()).toEqual([a, b, c]);
+    expect(state.snapshot().pieceSource().hasNext()).toBe(true);
+    expect(state.snapshot().lastPlacedCells()).toEqual(CellCount.of(1));
   });
 
   it('should_fill_the_tray_with_fewer_pieces_when_the_source_ends_first', () => {
@@ -78,8 +78,8 @@ describe('LinesState', () => {
 
     state.placePiece(new PlacePiece(TrayPosition.of(0), square(0, 0)));
 
-    expect(state.snapshot().tray).toEqual([domino]);
-    expect(state.snapshot().source.hasNext()).toBe(false);
+    expect(state.snapshot().trayPieces()).toEqual([domino]);
+    expect(state.snapshot().pieceSource().hasNext()).toBe(false);
   });
 
   it('should_draw_a_full_tray_when_a_game_starts', () => {
@@ -90,8 +90,8 @@ describe('LinesState', () => {
       new FixedListPieceSource([one, domino, one, domino]),
     );
 
-    expect(state.snapshot().tray).toEqual([one, domino, one]);
-    expect(state.snapshot().source.hasNext()).toBe(true);
+    expect(state.snapshot().trayPieces()).toEqual([one, domino, one]);
+    expect(state.snapshot().pieceSource().hasNext()).toBe(true);
     expect(facts(state)).toMatchObject({
       streak: Streak.of(0),
       linesCleared: LineCount.of(0),
@@ -148,14 +148,14 @@ describe('LinesState', () => {
     state.clearLines([row, column]);
 
     expect(filledKeys(state.snapshot())).toEqual(['2,2']);
-    expect(state.snapshot().linesCleared).toEqual(LineCount.of(2));
-    expect(state.snapshot().streak).toEqual(Streak.of(1));
+    expect(state.snapshot().lastCombo()).toEqual(LineCount.of(2));
+    expect(state.snapshot().currentStreak()).toEqual(Streak.of(1));
 
     state.clearLines([]);
 
     expect(filledKeys(state.snapshot())).toEqual(['2,2']);
-    expect(state.snapshot().linesCleared).toEqual(LineCount.of(0));
-    expect(state.snapshot().streak).toEqual(Streak.of(0));
+    expect(state.snapshot().lastCombo()).toEqual(LineCount.of(0));
+    expect(state.snapshot().currentStreak()).toEqual(Streak.of(0));
   });
 
   it('should_add_one_to_the_streak_when_two_placements_in_a_row_clear_a_line', () => {
@@ -167,8 +167,8 @@ describe('LinesState', () => {
     state.clearLines([[square(0, 0), square(1, 0)]]);
     state.clearLines([[square(0, 1), square(1, 1)]]);
 
-    expect(state.snapshot().streak).toEqual(Streak.of(2));
-    expect(state.snapshot().linesCleared).toEqual(LineCount.of(1));
+    expect(state.snapshot().currentStreak()).toEqual(Streak.of(2));
+    expect(state.snapshot().lastCombo()).toEqual(LineCount.of(1));
     expect(filledKeys(state.snapshot())).toEqual([]);
   });
 
@@ -195,7 +195,7 @@ describe('LinesState', () => {
     state.addPoints(Score.of(0));
     state.addPoints(Score.of(3));
 
-    expect(state.snapshot().score).toEqual(Score.of(15));
+    expect(state.snapshot().scoreSoFar()).toEqual(Score.of(15));
   });
 
   it('should_throw_a_range_error_and_keep_the_score_when_the_total_passes_the_largest_safe_integer', () => {
@@ -205,7 +205,7 @@ describe('LinesState', () => {
     expect(() => state.addPoints(Score.of(Number.MAX_SAFE_INTEGER))).toThrow(
       new RangeError('The sum of two scores cannot pass the largest safe integer.'),
     );
-    expect(state.snapshot().score).toEqual(Score.of(5));
+    expect(state.snapshot().scoreSoFar()).toEqual(Score.of(5));
   });
 
   it('should_throw_a_range_error_when_a_state_is_built_in_an_invalid_form', () => {

@@ -32,8 +32,8 @@ describe('SortScoring', () => {
 
     expect(game.play(place(1))).toBe(Outcome.playing);
 
-    expect(game.snapshot().goalsDone).toEqual(ClearedStacks.of(1));
-    expect(game.snapshot().score).toEqual(Score.of(110));
+    expect(game.snapshot().goalsReached()).toEqual(ClearedStacks.of(1));
+    expect(game.snapshot().scoreSoFar()).toEqual(Score.of(110));
   });
 
   it('should_score_no_points_and_keep_the_score_when_the_turn_clears_no_stack', () => {
@@ -48,7 +48,7 @@ describe('SortScoring', () => {
 
     expect(game.play(place(2))).toBe(Outcome.playing);
 
-    expect(game.snapshot().goalsDone).toEqual(ClearedStacks.of(1));
-    expect(game.snapshot().score).toEqual(Score.of(110));
+    expect(game.snapshot().goalsReached()).toEqual(ClearedStacks.of(1));
+    expect(game.snapshot().scoreSoFar()).toEqual(Score.of(110));
   });
 });

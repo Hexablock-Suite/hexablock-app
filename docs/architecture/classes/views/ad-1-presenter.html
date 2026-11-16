@@ -64,7 +64,7 @@
       <h1>Presenting a game: presenter, view model, state mapper and board</h1>
 
       <svg
-        viewBox="0 0 1040 1017"
+        viewBox="0 0 1040 1033"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="adpresenter-title adpresenter-desc"
@@ -1178,12 +1178,22 @@
           MoveResult is plain data with no Board (decision 29). onMove() reads a failed Result and
           puts its message in GameViewModel.error, so no exception reaches the screen (decision 28).
         </text>
-
-        <!-- Legend -->
-        <line x1="24" y1="904" x2="1016" y2="904" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="922"
+          y="896"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          The view in the payload keeps its fields private, so toPayload() receives its data with
+          deliverTo() (decisions 7 and 29, #245).
+        </text>
+
+        <!-- Legend -->
+        <line x1="24" y1="920" x2="1016" y2="920" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <text
+          x="24"
+          y="938"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1194,9 +1204,9 @@
 
         <line
           x1="24"
-          y1="940"
+          y1="956"
           x2="52"
-          y2="940"
+          y2="956"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -1204,7 +1214,7 @@
         />
         <text
           x="60"
-          y="944"
+          y="960"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1213,16 +1223,16 @@
         </text>
         <line
           x1="144"
-          y1="940"
+          y1="956"
           x2="172"
-          y2="940"
+          y2="956"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#adpresenter-diamond-hollow)"
         />
         <text
           x="180"
-          y="944"
+          y="960"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1231,16 +1241,16 @@
         </text>
         <line
           x1="384"
-          y1="940"
+          y1="956"
           x2="412"
-          y2="940"
+          y2="956"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adpresenter-open)"
         />
         <text
           x="420"
-          y="944"
+          y="960"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1250,7 +1260,7 @@
 
         <rect
           x="24"
-          y="960"
+          y="976"
           width="28"
           height="12"
           rx="2"
@@ -1260,7 +1270,7 @@
         />
         <text
           x="60"
-          y="969"
+          y="985"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1269,7 +1279,7 @@
         </text>
         <rect
           x="184"
-          y="960"
+          y="976"
           width="28"
           height="12"
           rx="2"
@@ -1279,7 +1289,7 @@
         />
         <text
           x="220"
-          y="969"
+          y="985"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1288,7 +1298,7 @@
         </text>
         <rect
           x="344"
-          y="960"
+          y="976"
           width="28"
           height="12"
           rx="2"
@@ -1298,7 +1308,7 @@
         />
         <text
           x="380"
-          y="969"
+          y="985"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1307,7 +1317,7 @@
         </text>
         <rect
           x="504"
-          y="960"
+          y="976"
           width="28"
           height="12"
           rx="2"
@@ -1318,7 +1328,7 @@
         />
         <text
           x="540"
-          y="969"
+          y="985"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1327,7 +1337,7 @@
         </text>
         <rect
           x="744"
-          y="960"
+          y="976"
           width="28"
           height="12"
           rx="2"
@@ -1338,7 +1348,7 @@
         />
         <text
           x="780"
-          y="969"
+          y="985"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1348,7 +1358,7 @@
 
         <rect
           x="24"
-          y="984"
+          y="1000"
           width="28"
           height="12"
           rx="2"
@@ -1359,7 +1369,7 @@
         />
         <text
           x="60"
-          y="994"
+          y="1010"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1368,7 +1378,7 @@
         </text>
         <rect
           x="280"
-          y="984"
+          y="1000"
           width="28"
           height="12"
           rx="2"
@@ -1378,7 +1388,7 @@
         />
         <text
           x="316"
-          y="994"
+          y="1010"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

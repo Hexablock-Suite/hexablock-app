@@ -44,7 +44,7 @@ describe('SortRules placement', () => {
     expect(game.play(place(0))).toBe(Outcome.playing);
 
     expect(chipsAt(game, 0)).toEqual(['red']);
-    expect(names(game.snapshot().offered?.occupant())).toEqual(['blue']);
+    expect(names(game.snapshot().offeredStack()?.occupant())).toEqual(['blue']);
   });
 
   it('should_reject_the_move_and_keep_the_state_when_the_cell_holds_a_stack', () => {
@@ -55,7 +55,7 @@ describe('SortRules placement', () => {
     expect(game.play(place(0))).toBe(Outcome.playing);
 
     expect(chipsAt(game, 0)).toEqual(['green']);
-    expect(names(game.snapshot().offered?.occupant())).toEqual(['red']);
+    expect(names(game.snapshot().offeredStack()?.occupant())).toEqual(['red']);
   });
 
   it('should_reject_the_move_when_the_cell_is_outside_the_board', () => {
@@ -63,8 +63,8 @@ describe('SortRules placement', () => {
 
     expect(game.play(place(5))).toBe(Outcome.playing);
 
-    expect(game.snapshot().board.occupiedCells()).toEqual([]);
-    expect(names(game.snapshot().offered?.occupant())).toEqual(['red']);
+    expect(game.snapshot().boardCopy().occupiedCells()).toEqual([]);
+    expect(names(game.snapshot().offeredStack()?.occupant())).toEqual(['red']);
   });
 });
 
@@ -152,8 +152,8 @@ describe('SortRules goal', () => {
     const state = game.snapshot();
     expect(chipsAt(game, 0)).toEqual([]);
     expect(chipsAt(game, 1)).toEqual([]);
-    expect(state.goalsDone).toEqual(ClearedStacks.of(1));
-    expect(state.clearedTiles).toEqual([TileCount.of(11)]);
+    expect(state.goalsReached()).toEqual(ClearedStacks.of(1));
+    expect(state.clearedStackHeights()).toEqual([TileCount.of(11)]);
   });
 
   it('should_keep_the_stack_when_its_top_run_is_nine', () => {
@@ -167,8 +167,8 @@ describe('SortRules goal', () => {
     game.play(place(1));
 
     expect(chipsAt(game, 0)).toEqual(tiles('red', 9));
-    expect(game.snapshot().goalsDone).toEqual(ClearedStacks.of(0));
-    expect(game.snapshot().clearedTiles).toEqual([]);
+    expect(game.snapshot().goalsReached()).toEqual(ClearedStacks.of(0));
+    expect(game.snapshot().clearedStackHeights()).toEqual([]);
   });
 
   it('should_forget_the_cleared_stacks_of_the_last_turn_when_a_new_turn_starts', () => {
@@ -182,8 +182,8 @@ describe('SortRules goal', () => {
     game.play(place(1));
     game.play(place(2));
 
-    expect(game.snapshot().goalsDone).toEqual(ClearedStacks.of(1));
-    expect(game.snapshot().clearedTiles).toEqual([]);
+    expect(game.snapshot().goalsReached()).toEqual(ClearedStacks.of(1));
+    expect(game.snapshot().clearedStackHeights()).toEqual([]);
   });
 });
 
@@ -213,7 +213,7 @@ describe('SortRules end of the game', () => {
     const game = sortGame(sortState({ board: row(3), offered: [stack('red')] }));
 
     expect(game.play(place(0))).toBe(Outcome.gameOver);
-    expect(game.snapshot().offered).toBeUndefined();
+    expect(game.snapshot().offeredStack()).toBeUndefined();
   });
 });
 
@@ -291,7 +291,7 @@ describe('SortRules edge cases', () => {
 
     // The green tile joins the nine greens on (1, 0), and the ten greens clear that stack.
     game.play(place(2));
-    expect(game.snapshot().goalsDone).toEqual(ClearedStacks.of(1));
+    expect(game.snapshot().goalsReached()).toEqual(ClearedStacks.of(1));
     expect(chipsAt(game, 1)).toEqual([]);
 
     // The placed red on (1, 0) ties with the red on (0, 0). The cell (1, 0) comes first
@@ -319,9 +319,9 @@ describe('SortRules edge cases', () => {
     const state = game.snapshot();
     expect(outcome).toBe(Outcome.playing);
     expect(chipsAt(game, 1)).toEqual([]);
-    expect(state.goalsDone).toEqual(ClearedStacks.of(1));
-    expect(state.clearedTiles).toEqual([TileCount.of(13)]);
-    expect(names(state.offered?.occupant())).toEqual(['green']);
+    expect(state.goalsReached()).toEqual(ClearedStacks.of(1));
+    expect(state.clearedStackHeights()).toEqual([TileCount.of(13)]);
+    expect(names(state.offeredStack()?.occupant())).toEqual(['green']);
   });
 
   it('should_take_the_top_runs_of_every_matching_neighbor_when_the_placed_stack_has_the_longest_run', () => {
@@ -337,7 +337,8 @@ describe('SortRules edge cases', () => {
     game.play(place(1, 1));
 
     expect(chipsAt(game, 1, 1)).toEqual(tiles('red', 6));
-    for (const at of ring) expect(names(game.snapshot().board.occupantAt(at))).toEqual(['blue']);
+    for (const at of ring)
+      expect(names(game.snapshot().boardCopy().occupantAt(at))).toEqual(['blue']);
   });
 
   it('should_give_only_the_placed_run_when_a_neighbor_has_the_longest_run', () => {
@@ -359,7 +360,7 @@ describe('SortRules edge cases', () => {
     expect(chipsAt(game, 1, 0)).toEqual(tiles('red', 5));
     expect(chipsAt(game, 1, 1)).toEqual([]);
     for (const at of others)
-      expect(names(game.snapshot().board.occupantAt(at))).toEqual(['blue', 'red']);
+      expect(names(game.snapshot().boardCopy().occupantAt(at))).toEqual(['blue', 'red']);
   });
 
   it('should_throw_and_keep_the_game_when_the_source_throws_on_the_next_stack', () => {
@@ -376,10 +377,10 @@ describe('SortRules edge cases', () => {
 
     const state = game.snapshot();
     expect(game.currentPhase()).toBe(PlayingPhase.instance);
-    expect(state.board.occupiedCells()).toEqual([]);
-    expect(names(state.offered?.occupant())).toEqual(['red']);
-    expect(state.placedAt).toBeUndefined();
-    expect(state.goalsDone).toEqual(ClearedStacks.of(0));
+    expect(state.boardCopy().occupiedCells()).toEqual([]);
+    expect(names(state.offeredStack()?.occupant())).toEqual(['red']);
+    expect(state.lastPlacedAt()).toBeUndefined();
+    expect(state.goalsReached()).toEqual(ClearedStacks.of(0));
   });
 });
 
@@ -397,12 +398,12 @@ describe('SortRules atomic turn', () => {
       failing,
     );
     const facts = (state: SortSnapshot<SquareCoord>) => ({
-      cells: state.board.occupiedCells(),
-      offered: state.offered,
-      goalsDone: state.goalsDone,
-      clearedTiles: [...state.clearedTiles],
-      placedAt: state.placedAt,
-      score: state.score,
+      cells: state.boardCopy().occupiedCells(),
+      offered: state.offeredStack(),
+      goalsDone: state.goalsReached(),
+      clearedTiles: [...state.clearedStackHeights()],
+      placedAt: state.lastPlacedAt(),
+      score: state.scoreSoFar(),
     });
     const before = facts(engine.snapshot());
 

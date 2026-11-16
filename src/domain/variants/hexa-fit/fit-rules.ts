@@ -17,7 +17,7 @@ const NO_TURN = Turns.of(0);
 // Each accepted move adds one to `FitState.moves`: place, rotate and remove (issue #60).
 // `playTurn()` applies only a valid move, so a rejected move counts nothing.
 // The rules stay generic over `TCoord`, so they run on any topology (classes.md decision 16).
-// The rules read the board through the photo of the state, and they ask the state
+// The rules ask the photo of the state for its board, and they ask the state
 // `piece()`, `placementOf()`, `placed()` and `remaining()`.
 // The rules read no field of the board or of a piece (classes.md decision 49).
 // They ask the board for its coordinates and its full turn, and they pass the board on.
@@ -34,7 +34,7 @@ export class FitRules<TCoord> extends BaseGameRules<FitMove<TCoord>, FitState<TC
   // The generator takes one photo, and every check of a move reads it.
   *validMoves(state: FitState<TCoord>): Iterable<FitMove<TCoord>> {
     const photo = state.snapshot();
-    const { board } = photo;
+    const board = photo.boardCopy();
     const offsets = board.coordinates();
     for (const id of state.placed()) {
       yield new RemoveFitPiece(id);
@@ -68,7 +68,7 @@ export class FitRules<TCoord> extends BaseGameRules<FitMove<TCoord>, FitState<TC
 
   // A piece goes only on free figure cells, so a full figure is an exact cover.
   evaluate(state: FitState<TCoord>): Outcome {
-    return state.snapshot().board.isFull() ? Outcome.victory : Outcome.playing;
+    return state.snapshot().boardCopy().isFull() ? Outcome.victory : Outcome.playing;
   }
 }
 
@@ -78,7 +78,7 @@ function isValidOn<TCoord>(
   photo: FitSnapshot<TCoord>,
   move: FitMove<TCoord>,
 ): boolean {
-  const { board } = photo;
+  const board = photo.boardCopy();
   if (move instanceof PlaceFitPiece) {
     return (
       state.placementOf(move.pieceToPlace()) === undefined &&
@@ -99,7 +99,7 @@ function isValidOn<TCoord>(
 // Changes the state by the move, before the rules count it.
 // A rotation removes the piece and places it again, turned.
 function changeBy<TCoord>(state: FitState<TCoord>, move: FitMove<TCoord>): void {
-  const { board } = state.snapshot();
+  const board = state.snapshot().boardCopy();
   if (move instanceof PlaceFitPiece) {
     state.place(move.pieceToPlace(), move.placement(board));
     return;

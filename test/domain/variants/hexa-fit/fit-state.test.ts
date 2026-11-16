@@ -24,7 +24,7 @@ describe('FitState', () => {
     state.addPoints(Score.of(0));
     state.addPoints(Score.of(2));
 
-    expect(state.snapshot().score).toEqual(Score.of(5));
+    expect(state.snapshot().scoreSoFar()).toEqual(Score.of(5));
   });
 
   it('should_throw_and_keep_the_score_when_the_total_passes_the_largest_safe_integer', () => {
@@ -34,7 +34,7 @@ describe('FitState', () => {
     expect(() => state.addPoints(Score.of(1))).toThrow(
       new RangeError('The sum of two scores cannot pass the largest safe integer.'),
     );
-    expect(state.snapshot().score).toEqual(Score.of(Number.MAX_SAFE_INTEGER));
+    expect(state.snapshot().scoreSoFar()).toEqual(Score.of(Number.MAX_SAFE_INTEGER));
   });
 
   // The state has its own `GameStateId`, and it still knows its match (classes.md decision 26).
@@ -92,36 +92,37 @@ describe('FitState', () => {
     expect(place).toThrow(
       new RangeError('The level has no piece with this id.', { cause: unknown }),
     );
-    expect(state.snapshot().board.occupiedCells()).toEqual([]);
+    expect(state.snapshot().boardCopy().occupiedCells()).toEqual([]);
     expect(state.placed()).toEqual([]);
   });
 
   // The state keeps its object: `place()`, `remove()` and `countMove()` change it in place.
   it('should_change_the_state_in_place_when_a_piece_is_placed_counted_and_removed', () => {
     const state = threeDominoFitFactory().createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
-    const board = state.snapshot().board;
+    const board = state.snapshot().boardCopy();
     const keys = () =>
       state
         .snapshot()
-        .board.occupiedCells()
+        .boardCopy()
+        .occupiedCells()
         .map(([c, id]) => `${squareTopology.key(c)}=${delivered(id)}`);
     const results: unknown[] = [];
 
     results.push(state.place(A, Placement.of(Turns.of(0), square(2, 0), squareTopology)));
     results.push(state.place(B, Placement.of(Turns.of(0), square(0, 0), squareTopology)));
     results.push(state.countMove());
-    const placed = { cells: keys(), placed: state.placed(), moves: state.snapshot().moves };
+    const placed = { cells: keys(), placed: state.placed(), moves: state.snapshot().moveCount() };
     results.push(state.remove(A));
 
     expect(results).toEqual([undefined, undefined, undefined, undefined]);
     // The board keeps its id: the same board changes in place.
-    expect(state.snapshot().board.equals(board)).toBe(true);
+    expect(state.snapshot().boardCopy().equals(board)).toBe(true);
     expect(placed).toEqual({
       cells: ['2,0=a', '3,0=a', '0,0=b', '1,0=b'],
       placed: [A, B],
       moves: Moves.of(1),
     });
-    expect([keys(), state.placed(), state.snapshot().moves]).toEqual([
+    expect([keys(), state.placed(), state.snapshot().moveCount()]).toEqual([
       ['0,0=b', '1,0=b'],
       [B],
       Moves.of(1),
@@ -131,12 +132,12 @@ describe('FitState', () => {
   it('should_throw_a_range_error_and_keep_the_state_when_a_placed_piece_leaves_the_figure', () => {
     const state = threeDominoFitFactory().createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
     state.place(B, Placement.of(Turns.of(0), square(0, 0), squareTopology));
-    const before = { cells: state.snapshot().board.occupiedCells(), placed: state.placed() };
+    const before = { cells: state.snapshot().boardCopy().occupiedCells(), placed: state.placed() };
 
     expect(() => state.place(A, Placement.of(Turns.of(0), square(5, 0), squareTopology))).toThrow(
       new RangeError('The coordinate 6,0 is outside the board.'),
     );
-    expect({ cells: state.snapshot().board.occupiedCells(), placed: state.placed() }).toEqual(
+    expect({ cells: state.snapshot().boardCopy().occupiedCells(), placed: state.placed() }).toEqual(
       before,
     );
   });

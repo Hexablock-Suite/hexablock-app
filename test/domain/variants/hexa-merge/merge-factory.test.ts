@@ -53,10 +53,10 @@ describe('MergeFactory', () => {
     expect(outcome).toBe(Outcome.playing);
     expect(values(after)).not.toEqual(values(initial.snapshot()));
     // The score is the sum of the merged values: the factory picks the Merge scoring.
-    expect(after.score).toEqual(
-      Score.of(after.merged.reduce((sum, tile) => sum + valueOf(tile), 0)),
+    expect(after.scoreSoFar()).toEqual(
+      Score.of(after.mergedTiles().reduce((sum, tile) => sum + valueOf(tile), 0)),
     );
-    expect(after.tiles.hasNext()).toBe(true);
+    expect(after.tileSource().hasNext()).toBe(true);
     expect(engine.takeEvents()).toEqual([]);
   });
 

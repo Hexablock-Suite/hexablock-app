@@ -81,7 +81,7 @@ describe('FitScoring', () => {
 
     expect(outcome).toBe(Outcome.victory);
     expect(FIT_POINTS_PER_TURN.equals(Score.of(0))).toBe(true);
-    expect(engine.snapshot().score).toEqual(Score.of(0));
+    expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(0));
   });
 });
 

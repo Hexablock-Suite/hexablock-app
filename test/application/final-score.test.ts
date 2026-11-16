@@ -62,8 +62,8 @@ describe('a total score that passes the largest safe integer', () => {
     await applyMove.execute({ move: MOVE });
 
     const after = engine.snapshot();
-    expect(after.board.occupiedCells()).toEqual([]);
-    expect(after.score).toEqual(FULL);
+    expect(after.boardCopy().occupiedCells()).toEqual([]);
+    expect(after.scoreSoFar()).toEqual(FULL);
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(publisher.events).toEqual([]);
     expect(logger.entries).toEqual([]);
@@ -76,8 +76,8 @@ describe('a total score that passes the largest safe integer', () => {
       new RangeError('The sum of two scores cannot pass the largest safe integer.'),
     );
 
-    expect(engine.snapshot().score).toEqual(FULL);
-    expect(engine.snapshot().board.occupiedCells()).toEqual([]);
+    expect(engine.snapshot().scoreSoFar()).toEqual(FULL);
+    expect(engine.snapshot().boardCopy().occupiedCells()).toEqual([]);
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(engine.takeEvents()).toEqual([]);
   });

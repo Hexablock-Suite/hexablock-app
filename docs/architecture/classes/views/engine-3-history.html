@@ -64,7 +64,7 @@
       <h1>Undo and redo: Command and segregated capabilities</h1>
 
       <svg
-        viewBox="0 0 1040 928"
+        viewBox="0 0 1040 944"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="history-title history-desc"
@@ -857,10 +857,20 @@
             elapsedSince() never gives a negative time and drops a fraction of a millisecond
             (decisions 19 and 25).
           </text>
+          <text
+            x="24"
+            y="656"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            The history never reads a photo: BoardState.restore() asks its queries, and every field
+            of BoardSnapshot is private (decision 7, #245).
+          </text>
         </g>
 
-        <!-- The legend sits 16 lower than the footnote, which has one more line (#238). -->
-        <g transform="translate(0 196)">
+        <!-- The legend sits 32 lower than the footnote, which has two more lines (#238, #245). -->
+        <g transform="translate(0 212)">
           <!-- Legend -->
           <line
             x1="24"
