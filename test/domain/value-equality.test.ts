@@ -266,7 +266,12 @@ describe('private fields of the value objects', () => {
   it('should_reject_at_compile_time_when_a_caller_reads_a_field_of_the_second_batch', () => {
     const leaf = new CellNode(square(0, 0));
     const group = new ShapeGroup([leaf]);
-    const command = new MoveCommand('the move', 'the state before', () => undefined);
+    const command = new MoveCommand(
+      'the move',
+      'the state before',
+      'the state after',
+      () => undefined,
+    );
     const readers = [
       // @ts-expect-error `MergeTile.value` is private.
       () => MergeTile.of(2).value,

@@ -9,9 +9,9 @@ import { LevelProgress } from '../../engine/level-progress';
 import { LevelTimer } from '../../engine/level-timer';
 import { LevelTimerId } from '../../engine/level-timer-id';
 import type { MatchId } from '../../engine/match-id';
-import { MoveHistory } from '../../engine/move-history';
 import type { Piece } from '../../engine/piece';
 import { FixedListPieceSource } from '../../engine/piece-source';
+import { RedoableHistory } from '../../engine/redoable-history';
 import type { IGameRules } from '../../engine/rules';
 import type { IScoringPolicy } from '../../engine/scoring-policy';
 import type { IVariantFactory } from '../../engine/variant-factory';
@@ -83,10 +83,9 @@ export class FitFactory<TCoord> implements IVariantFactory<
     return FitState.start(stateId, matchId, this.createBoard(boardId), this.createPieceSource());
   }
 
-  // Hexa Fit undoes with no limit (APP-FR-08, classes.md decision 3).
-  // `RedoableHistory` adds the redo of Hexa Fit in Sprint 3.
-  createHistory(): MoveHistory<FitMove<TCoord>, FitSnapshot<TCoord>> {
-    return new MoveHistory();
+  // Hexa Fit undoes and redoes with no limit (APP-FR-08, classes.md decisions 3 and 4, #178).
+  createHistory(): RedoableHistory<FitMove<TCoord>, FitSnapshot<TCoord>> {
+    return new RedoableHistory();
   }
 
   // Hexa Fit keeps the best result of each level. The level counts the stars of a play

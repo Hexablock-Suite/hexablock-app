@@ -17,7 +17,7 @@ import type { IRedoable } from './undo-capabilities';
 // The aggregate root of one game (classes.md decision 26).
 // It is an entity: its `MatchId` is its identity, and the id never changes.
 // `GameFactory` gives each new game the id of a generator. `gameId` only names the variant.
-// A game changes only through `play()` and `undo()`, and both act only
+// A game changes only through `play()`, `undo()` and `redo()`, and each acts only
 // while `currentPhase().canPlay()` is true. `snapshot()` returns the photo of the state,
 // which is immutable, so no caller changes the game through it (classes.md decision 34).
 // The engine depends only on the interfaces of the rules and the scoring (Strategy, D1).
@@ -83,8 +83,10 @@ export class GameEngine<
     this.history.undo();
   }
 
-  // Plays the last undone move again. A history that cannot redo throws a RangeError,
-  // and the game stays as it was. Only the `RedoableHistory` of #178 redoes.
+  // Plays the last undone move again: the state takes back the photo after that move.
+  // A history that cannot redo throws a RangeError, and so does a history with no undone move
+  // and a phase that accepts no undo. Each refusal leaves the game as it was.
+  // Only `RedoableHistory` redoes (#178).
   redo(): void {
     this.redoCapability().redo();
   }
@@ -151,7 +153,7 @@ export class GameEngine<
     }
     this.state = turn.next;
     this.current = turn.phase;
-    this.remember(move, turn.before);
+    this.remember(move, turn.before, turn.after);
     if (turn.ended !== undefined) this.recorded.push(turn.ended);
     // The engine builds the resolution, so the caller gets a real `Resolution` from any rules.
     return Resolution.resolved().evaluated(turn.outcome);
@@ -185,8 +187,9 @@ export class GameEngine<
   // and the photo of the copy after the rules. The copy then takes the points.
   // The points are a `Score`. A policy that gives no valid score throws, and so does a total
   // above the largest safe integer. Both leave the turn unsaved (classes.md decision 41).
-  // `before` is the Memento: the photo of the state before the move (classes.md decision 34).
-  // It is taken inside the turn, so a photo that throws leaves the turn unsaved.
+  // `before` and `after` are the Mementos: the photos of the state before and after the move,
+  // points included (classes.md decision 34, issue #178). They are taken inside the turn,
+  // so a photo that throws leaves the turn unsaved.
   // `ended` is the `GameOver` event of a turn that ends the game, or `undefined`.
   private resolveTurn(
     state: TState,
@@ -197,6 +200,7 @@ export class GameEngine<
         phase: GamePhase;
         outcome: Outcome;
         before: SnapshotOf<TState>;
+        after: SnapshotOf<TState>;
         ended: GameOver | undefined;
       }
     | undefined {
@@ -205,12 +209,14 @@ export class GameEngine<
     if (!resolution.wasAccepted()) return undefined;
     const before = photoOf(state);
     next.addPoints(this.scoring.score(before, photoOf(next)));
+    const after = photoOf(next);
     const phase = resolution.phaseAfter(this.current);
     return {
       next,
       phase,
       outcome: resolution.leadsTo(),
       before,
+      after,
       ended: this.gameOverOf(next, resolution),
     };
   }
@@ -227,13 +233,13 @@ export class GameEngine<
     );
   }
 
-  // Keeps the undo of a saved turn. A finished game forgets its moves: the game over event
-  // is already recorded, and an undo cannot take it back. The check reads the new phase.
-  // A variant with no history keeps no command.
-  private remember(move: TMove, before: SnapshotOf<TState>): void {
+  // Keeps the undo and the redo of a saved turn. A finished game forgets its moves: the game
+  // over event is already recorded, and an undo cannot take it back. The check reads the new
+  // phase. A variant with no history keeps no command.
+  private remember(move: TMove, before: SnapshotOf<TState>, after: SnapshotOf<TState>): void {
     if (this.current.canPlay()) {
       this.history?.record(
-        new MoveCommand<TMove, SnapshotOf<TState>>(move, before, (memento) =>
+        new MoveCommand<TMove, SnapshotOf<TState>>(move, before, after, (memento) =>
           this.restore(memento),
         ),
       );
@@ -242,7 +248,8 @@ export class GameEngine<
     }
   }
 
-  // The receiver of an undo (issue 159, classes.md decision 34). `MoveCommand.undo()` calls it.
+  // The receiver of an undo and of a redo (issue 159, classes.md decision 34).
+  // `MoveCommand.undo()` and `MoveCommand.redo()` call it. A paused game refuses both.
   // It is private and reaches a command only as a function, so no caller can write the state.
   // The state takes its photo back in place. The photo is immutable, so it needs no copy.
   private restore(memento: SnapshotOf<TState>): void {
