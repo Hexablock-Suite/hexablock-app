@@ -75,11 +75,11 @@
           IGameRules strategy and holds playTurn() as a template method over abstract steps, both
           returning a Resolution, the value object that holds whether the rules accepted the move
           and the Outcome and no state, in private fields that a reader asks through wasAccepted(),
-          endsTheGame(), phaseAfter() and leadsTo(), LinesRules and FitRules extending it (planned
-          for Sprint 2), and TimedRulesDecorator, which implements IGameRules, wraps an inner
-          IGameRules and times the game with a LevelTimer. The decorator times playTurn() and passes
-          the other five operations, validMoves() included, to its inner rules (decision 33). It
-          hands out no timer: the root keeps the same timer and answers elapsedTime() (decision 27).
+          endsTheGame(), phaseAfter() and leadsTo(), LinesRules and FitRules extending it, and
+          TimedRulesDecorator, which implements IGameRules, wraps an inner IGameRules and times the
+          game with a LevelTimer. The decorator times playTurn() and passes the other five
+          operations, validMoves() included, to its inner rules (decision 33). It hands out no
+          timer: the root keeps the same timer and answers elapsedTime() (decision 27).
         </desc>
         <defs>
           <marker
@@ -634,7 +634,6 @@
           stroke-dasharray="4,3"
         />
         <text
-          data-requirement="APP-NFR-02"
           x="360"
           y="566"
           fill="#7d8a94"
@@ -644,7 +643,7 @@
           text-anchor="middle"
           letter-spacing="0.14em"
         >
-          PART 2 · LINES · «Sprint 2»
+          PART 2 · LINES
         </text>
         <text
           x="360"
@@ -670,7 +669,6 @@
           stroke-dasharray="4,3"
         />
         <text
-          data-requirement="APP-NFR-02"
           x="552"
           y="566"
           fill="#7d8a94"
@@ -680,7 +678,7 @@
           text-anchor="middle"
           letter-spacing="0.14em"
         >
-          PART 2 · FIT · «Sprint 2»
+          PART 2 · FIT
         </text>
         <text
           x="552"
@@ -1086,25 +1084,6 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
-        </text>
-        <text
-          x="184"
-          y="861"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          «Sprint N»
-        </text>
-        <text
-          x="252"
-          y="861"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Planned design, not in the code yet · N is the docs/ROADMAP.md sprint of the requirement
-          it serves · a planned class carries it once, for its members and arrows
         </text>
       </svg>
     </div>

@@ -194,7 +194,7 @@
           LAYER 1 · ENTITIES · src/domain/engine/
         </text>
         <!-- Relationships (drawn before boxes) -->
-        <!-- VictoryScreen keeps the ResultPresenter it receives as a prop: use, down from layer 4 to layer 3 -->
+        <!-- VictoryScreen keeps the ResultPresenter it receives as the presenter prop: use with role and multiplicity, down from layer 4 to layer 3 -->
         <path
           d="M340 152 V392"
           fill="none"
@@ -202,7 +202,7 @@
           stroke-width="1"
           marker-end="url(#flowsave-open)"
         />
-        <!-- ApiProgressRepository keeps the ApiDtoMapper it receives in an attribute: use, inside layer 4 -->
+        <!-- ApiProgressRepository keeps the ApiDtoMapper it receives as mapper: use with role and multiplicity, inside layer 4 -->
         <path
           d="M540 212 V152"
           fill="none"
@@ -210,7 +210,7 @@
           stroke-width="1"
           marker-end="url(#flowsave-open)"
         />
-        <!-- ApiProgressRepository keeps the ApiClient it receives in an attribute: use, inside layer 4 -->
+        <!-- ApiProgressRepository keeps the ApiClient it receives as client: use with role and multiplicity, inside layer 4 -->
         <path
           d="M800 212 V180"
           fill="none"
@@ -227,7 +227,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#flowsave-triangle)"
         />
-        <!-- ResultPresenter keeps the UseCase input port it receives in an attribute: use, down from layer 3 to layer 2 -->
+        <!-- ResultPresenter keeps the UseCase input port it receives as saveProgress: use with role and multiplicity, down from layer 3 to layer 2 -->
         <path
           d="M340 488 V552"
           fill="none"
@@ -244,7 +244,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#flowsave-triangle)"
         />
-        <!-- SaveProgress keeps the ProgressRepository it receives in an attribute: use -->
+        <!-- SaveProgress keeps the ProgressRepository it receives as repository: use with role and multiplicity -->
         <path
           d="M400 704 H592 Q600 704 600 696 V640"
           fill="none"
@@ -252,7 +252,7 @@
           stroke-width="1"
           marker-end="url(#flowsave-open)"
         />
-        <!-- SaveProgress keeps the IProgressModel it receives in an attribute: use, down from layer 2 to layer 1 -->
+        <!-- SaveProgress keeps the IProgressModel it receives as model: use with role and multiplicity, down from layer 2 to layer 1 -->
         <path
           d="M340 840 V912"
           fill="none"
@@ -536,7 +536,7 @@
         <text x="762" y="172" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Promise&lt;ProgressDto&gt;
         </text>
-        <!-- Class: ApiProgressRepository (adapter) -->
+        <!-- Class: ApiProgressRepository (a piece of the Adapter pattern: the footnote names it, decision 23) -->
         <rect
           x="480"
           y="212"
@@ -556,7 +556,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «Adapter» «repository»
+          «repository»
         </text>
         <text
           x="670"
@@ -750,7 +750,7 @@
         <text x="576" y="632" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + save(progress: GameProgress): Promise&lt;void&gt;
         </text>
-        <!-- Class: IProgressModel (interface, strategy) -->
+        <!-- Class: IProgressModel (interface of a Strategy: only «interface», and the footnote names the pattern, decision 23) -->
         <rect
           x="60"
           y="912"
@@ -770,7 +770,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Strategy»
+          «interface»
         </text>
         <text
           x="220"
@@ -982,7 +982,7 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           One saved result, top to bottom: VictoryScreen gives the GameResult to ResultPresenter,
-          which calls the UseCase port. SaveProgress loads the
+          which calls the UseCase port. SaveProgress loads the GameProgress
         </text>
         <text
           x="24"
@@ -991,8 +991,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          GameProgress of the game, records the result in it with IProgressModel and saves it
-          through ProgressRepository (S3-04). Here ApiProgressRepository implements the port,
+          of the game, records the result in it with IProgressModel, a Strategy, and saves it
+          through ProgressRepository (S3-04). Here ApiProgressRepository, an Adapter,
         </text>
         <text
           x="24"
@@ -1001,8 +1001,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          so the progress leaves the app: ApiDtoMapper makes a ProgressDto and ApiClient sends it to
-          ProgressController.sync() of hexablock-api.
+          implements the port, so the progress leaves the app: ApiDtoMapper makes a ProgressDto and
+          ApiClient sends it to ProgressController.sync() of hexablock-api.
         </text>
         <text
           x="24"

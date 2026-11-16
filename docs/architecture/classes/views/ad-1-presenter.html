@@ -87,22 +87,6 @@
         </desc>
         <defs>
           <marker
-            id="adpresenter-diamond-hollow"
-            markerWidth="18"
-            markerHeight="10"
-            refX="0"
-            refY="5"
-            orient="auto"
-            markerUnits="userSpaceOnUse"
-          >
-            <polygon
-              points="0 5, 9 0, 18 5, 9 10"
-              fill="#ffffff"
-              stroke="#17212a"
-              stroke-width="1"
-            />
-          </marker>
-          <marker
             id="adpresenter-triangle"
             markerWidth="16"
             markerHeight="12"
@@ -287,7 +271,7 @@
           stroke-width="1"
           marker-end="url(#adpresenter-open)"
         />
-        <!-- GameScreen keeps the GamePresenter it receives as a prop: use, down from layer 4 to layer 3 -->
+        <!-- GameScreen keeps the GamePresenter it receives as presenter: use with role and multiplicity, down from layer 4 to layer 3 -->
         <path
           d="M352 184 H360 Q368 184 368 192 V528 Q368 536 376 536 H536 Q544 536 544 544 V620"
           fill="none"
@@ -356,15 +340,15 @@
           stroke-dasharray="5,4"
           marker-end="url(#adpresenter-triangle)"
         />
-        <!-- GamePresenter keeps the StateMapper it receives: aggregation, kept because Strategy holds it -->
+        <!-- GamePresenter keeps the StateMapper it receives as mapper: use with role and multiplicity (decision 23) -->
         <line
           x1="336"
           y1="676"
           x2="280"
           y2="676"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#adpresenter-diamond-hollow)"
+          marker-end="url(#adpresenter-open)"
         />
         <!-- GamePresenter builds GameViewModel: use -->
         <line
@@ -387,7 +371,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#adpresenter-triangle)"
         />
-        <!-- GamePresenter keeps the UseCase input port it receives in an attribute: use, down from layer 3 to layer 2 -->
+        <!-- GamePresenter keeps the UseCase input port it receives as applyMove: use with role and multiplicity, down from layer 3 to layer 2 -->
         <line
           x1="528"
           y1="788"
@@ -1205,7 +1189,7 @@
           + payload?: TPayloadView
         </text>
 
-        <!-- Class: StateMapper (interface, strategy) -->
+        <!-- Class: StateMapper (interface of the Strategy: only «interface», decision 23) -->
         <rect
           x="44"
           y="620"
@@ -1226,7 +1210,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Strategy»
+          «interface»
         </text>
         <text
           x="162"
@@ -1272,7 +1256,7 @@
           SpaceStateMapper
         </text>
 
-        <!-- Class: MoveControls (interface of the move controls Strategy, D3, #175) -->
+        <!-- Class: MoveControls (interface of the move controls Strategy, D3, #175: only «interface», and the footnote names the pattern, decision 23) -->
         <rect
           x="48"
           y="248"
@@ -1293,7 +1277,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Strategy»
+          «interface»
         </text>
         <text
           x="184"
@@ -1708,7 +1692,7 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           SpaceStateMapper, SpaceCellRenderer and BoardOnlyControls are the default parts of the
-          registry (#170, #175).
+          registry (#170, #175). MoveControls is the interface of a Strategy (D3).
         </text>
         <text
           x="24"
@@ -1815,30 +1799,12 @@
           y1="1312"
           x2="172"
           y2="1312"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#adpresenter-diamond-hollow)"
-        />
-        <text
-          x="180"
-          y="1316"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Aggregation · in-layer pattern
-        </text>
-        <line
-          x1="384"
-          y1="1312"
-          x2="412"
-          y2="1312"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adpresenter-open)"
         />
         <text
-          x="420"
+          x="180"
           y="1316"
           fill="#5b6873"
           font-size="8.5"

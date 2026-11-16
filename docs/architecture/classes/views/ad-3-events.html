@@ -90,22 +90,6 @@
             <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
           </marker>
           <marker
-            id="adevents-diamond-hollow"
-            markerWidth="18"
-            markerHeight="10"
-            refX="0"
-            refY="5"
-            orient="auto"
-            markerUnits="userSpaceOnUse"
-          >
-            <polygon
-              points="0 5, 9 0, 18 5, 9 10"
-              fill="#ffffff"
-              stroke="#17212a"
-              stroke-width="1"
-            />
-          </marker>
-          <marker
             id="adevents-open"
             markerWidth="10"
             markerHeight="8"
@@ -302,15 +286,15 @@
           stroke-dasharray="5,4"
           marker-end="url(#adevents-triangle)"
         />
-        <!-- GameEventBus keeps the GameEventListener objects it receives: aggregation, kept because Observer holds it -->
+        <!-- GameEventBus keeps the GameEventListener objects it receives as listeners: use with role and multiplicity (decision 23) -->
         <line
           x1="656"
           y1="384"
           x2="560"
           y2="384"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#adevents-diamond-hollow)"
+          marker-end="url(#adevents-open)"
         />
         <!-- GameEventBus implements GameEventPublisher: realization, down from layer 3 to layer 2 -->
         <line
@@ -372,7 +356,7 @@
           <tspan font-weight="600">0..*</tspan>
         </text>
 
-        <!-- Class: AudioManager (facade) -->
+        <!-- Class: AudioManager (single scope; a piece of the Facade pattern: the frame names it, decision 23) -->
         <rect
           x="320"
           y="92"
@@ -394,7 +378,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «Facade» «single scope»
+          «single scope»
         </text>
         <text
           x="440"
@@ -703,30 +687,12 @@
           y1="812"
           x2="172"
           y2="812"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#adevents-diamond-hollow)"
-        />
-        <text
-          x="180"
-          y="816"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Aggregation · in-layer pattern
-        </text>
-        <line
-          x1="384"
-          y1="812"
-          x2="412"
-          y2="812"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adevents-open)"
         />
         <text
-          x="420"
+          x="180"
           y="816"
           fill="#5b6873"
           font-size="8.5"

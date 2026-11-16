@@ -79,9 +79,9 @@
           started game, and builds a MoveResult. In layer 1, GameFactory keeps the GameId and the
           IVariantFactory, wraps the rules of a timed game in TimedRulesDecorator and creates the
           started GameEngine. LinesFactory implements IVariantFactory and builds the board with
-          BoardBuilder; both hold the GeometryFactory, and BoardBuilder creates Board. StartGame
-          reads the occupied cells and the free spaces of Board. Every dependency between layers
-          points down.
+          BoardBuilder; both keep the GeometryFactory as geometry, and BoardBuilder creates Board.
+          StartGame reads the occupied cells and the free spaces of Board. Every dependency between
+          layers points down.
         </desc>
         <defs>
           <marker
@@ -94,22 +94,6 @@
             markerUnits="userSpaceOnUse"
           >
             <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-          </marker>
-          <marker
-            id="flowstart-diamond-hollow"
-            markerWidth="18"
-            markerHeight="10"
-            refX="0"
-            refY="5"
-            orient="auto"
-            markerUnits="userSpaceOnUse"
-          >
-            <polygon
-              points="0 5, 9 0, 18 5, 9 10"
-              fill="#ffffff"
-              stroke="#17212a"
-              stroke-width="1"
-            />
           </marker>
           <marker
             id="flowstart-open"
@@ -213,7 +197,7 @@
           LAYER 1 · ENTITIES · src/domain/
         </text>
         <!-- Relationships (drawn before boxes) -->
-        <!-- GameScreen keeps the GamePresenter it receives as a prop: use, down from layer 4 to layer 3 -->
+        <!-- GameScreen keeps the GamePresenter it receives as the presenter prop: use with role and multiplicity, down from layer 4 to layer 3 -->
         <path
           d="M240 156 V224"
           fill="none"
@@ -221,7 +205,7 @@
           stroke-width="1"
           marker-end="url(#flowstart-open)"
         />
-        <!-- GamePresenter keeps the UseCase input port it receives in an attribute: use, down from layer 3 to layer 2 -->
+        <!-- GamePresenter keeps the UseCase input port it receives as startGame: use with role and multiplicity, down from layer 3 to layer 2 -->
         <path
           d="M360 352 V540"
           fill="none"
@@ -238,7 +222,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#flowstart-triangle)"
         />
-        <!-- InMemoryGameRepository keeps the running GameEngine: use, down from layer 3 to layer 1 -->
+        <!-- InMemoryGameRepository keeps zero or one running GameEngine as game: use with role and multiplicity, down from layer 3 to layer 1 -->
         <path
           d="M980 260 H994 Q1002 260 1002 268 V958 Q1002 966 994 966 H940"
           fill="none"
@@ -263,7 +247,7 @@
           stroke-width="1"
           marker-end="url(#flowstart-open)"
         />
-        <!-- StartGame keeps the GameRepository it receives in an attribute: use -->
+        <!-- StartGame keeps the GameRepository it receives as games: use with role and multiplicity -->
         <path
           d="M648 700 H692 Q700 700 700 692 V628"
           fill="none"
@@ -303,7 +287,7 @@
           stroke-width="1"
           marker-end="url(#flowstart-open)"
         />
-        <!-- GameFactory keeps the IVariantFactory it receives as variant: use -->
+        <!-- GameFactory keeps the IVariantFactory it receives as variant: use with role and multiplicity -->
         <path
           d="M776 1096 V1094 Q776 1088 770 1088 H306 Q300 1088 300 1082 V1080"
           fill="none"
@@ -336,21 +320,21 @@
           stroke-width="1"
           marker-end="url(#flowstart-open)"
         />
-        <!-- BoardBuilder holds the GeometryFactory it receives as geometry: aggregation, kept because Builder holds its Abstract Factory -->
+        <!-- BoardBuilder keeps the GeometryFactory it receives as geometry: use with role and multiplicity (decision 23) -->
         <path
           d="M560 1224 V1266"
           fill="none"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#flowstart-diamond-hollow)"
+          marker-end="url(#flowstart-open)"
         />
-        <!-- LinesFactory holds the GeometryFactory it receives as geometry: aggregation, kept because the variant factory holds its Abstract Factory -->
+        <!-- LinesFactory keeps the GeometryFactory it receives as geometry: use with role and multiplicity (decision 23) -->
         <path
           d="M160 1184 V1304 Q160 1312 168 1312 H440"
           fill="none"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#flowstart-diamond-hollow)"
+          marker-end="url(#flowstart-open)"
         />
         <!-- LevelGameFactories implements GameFactories: realization, down from layer 3 to layer 2 -->
         <path
@@ -361,7 +345,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#flowstart-triangle)"
         />
-        <!-- StartGame keeps the GameFactories port it receives in an attribute: use -->
+        <!-- StartGame keeps the GameFactories port it receives as factories: use with role and multiplicity -->
         <path
           d="M648 760 H720"
           fill="none"
@@ -527,9 +511,9 @@
           variant
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="564" y="1251" width="55" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="566" y="1251" width="55" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="566"
+          x="568"
           y="1260"
           fill="#17212a"
           font-size="8"
@@ -539,10 +523,10 @@
           geometry
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="383" y="1299" width="55" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="383" y="1296" width="55" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="436"
-          y="1308"
+          y="1305"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -984,7 +968,7 @@
         <text x="760" y="772" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           TMove, TState&gt;&gt;
         </text>
-        <!-- Class: IVariantFactory (interface, abstract factory) -->
+        <!-- Class: IVariantFactory (interface of an Abstract Factory: only «interface» and the DDD «factory», and the footnote names the pattern, decision 23) -->
         <rect
           x="40"
           y="912"
@@ -1004,7 +988,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Abstract Factory» «factory»
+          «interface» «factory»
         </text>
         <text
           x="210"
@@ -1027,8 +1011,16 @@
         <text x="56" y="1008" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createScoring(): IScoringPolicy&lt;TState&gt;
         </text>
-        <text x="56" y="1024" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + createHistory(): MoveHistory&lt;TMove, TState&gt; [0..1]
+        <text
+          x="56"
+          y="1024"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          textLength="314"
+          lengthAdjust="spacingAndGlyphs"
+        >
+          + createHistory(): MoveHistory&lt;TMove, SnapshotOf&lt;TState&gt;&gt; [0..1]
         </text>
         <text x="56" y="1040" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createInitialState(matchId: MatchId, stateId:
@@ -1039,7 +1031,7 @@
         <text x="56" y="1072" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           isFor(), createBoard() and the others: view 5
         </text>
-        <!-- Class: Board -->
+        <!-- Class: Board (no role label of a pattern, decision 23) -->
         <rect
           x="400"
           y="912"
@@ -1052,18 +1044,7 @@
         />
         <text
           x="510"
-          y="930"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «Iterator» «Prototype»
-        </text>
-        <text
-          x="510"
-          y="948"
+          y="942"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1143,7 +1124,7 @@
         >
           + snapshot(): SnapshotOf&lt;TState&gt;
         </text>
-        <!-- Class: LinesFactory (concrete factory, one of four) -->
+        <!-- Class: LinesFactory (a concrete factory, one of four: the footnote names the pattern, decision 23) -->
         <rect
           x="40"
           y="1096"
@@ -1163,7 +1144,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «Concrete Factory» «factory»
+          «factory»
         </text>
         <text
           x="160"
@@ -1183,7 +1164,7 @@
         <text x="56" y="1176" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           one factory per variant: Part 2
         </text>
-        <!-- Class: BoardBuilder (builder, DDD factory) -->
+        <!-- Class: BoardBuilder (a Builder and the DDD factory of the board: the footnote names the pattern, decision 23) -->
         <rect
           x="380"
           y="1096"
@@ -1203,7 +1184,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «Builder» «factory»
+          «factory»
         </text>
         <text
           x="560"
@@ -1234,7 +1215,7 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          + withRegion(size: number): BoardBuilder&lt;TCoord&gt;
+          + withRegion(size: RegionSize): BoardBuilder&lt;TCoord&gt;
         </text>
         <text
           x="396"
@@ -1252,9 +1233,9 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          + build&lt;TCell&gt;(): Board&lt;TCell, TCoord&gt;
+          + build&lt;TCell&gt;(id: BoardId): Board&lt;TCell, TCoord&gt;
         </text>
-        <!-- Class: GeometryFactory (interface, abstract factory) -->
+        <!-- Class: GeometryFactory (interface of an Abstract Factory: only «interface» and the DDD «factory», and the footnote names the pattern, decision 23) -->
         <rect
           x="440"
           y="1266"
@@ -1274,7 +1255,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Abstract Factory» «factory»
+          «interface» «factory»
         </text>
         <text
           x="570"
@@ -1746,7 +1727,7 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           One new game, top to bottom: GameScreen asks GamePresenter to start a level, and
-          GamePresenter calls the UseCase port. StartGame asks its
+          GamePresenter calls the UseCase port. StartGame asks its GameFactories port for
         </text>
         <text
           x="24"
@@ -1755,8 +1736,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          GameFactories port for the GameFactory of the level. LevelGameFactories finds the level in
-          LevelRepository, and the level builder of its variant
+          the GameFactory of the level. LevelGameFactories finds the level in LevelRepository, and
+          the level builder of its variant builds the level for a new variant factory
         </text>
         <text
           x="24"
@@ -1765,8 +1746,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          builds the level for a new variant factory (sequence diagram). GameFactory asks that
-          factory for the timer, the rules, the scoring, the history and
+          (sequence diagram). GameFactory asks that factory for the timer, the rules, the scoring,
+          the history and the first state. LinesFactory, a concrete factory of the
         </text>
         <text
           x="24"
@@ -1775,8 +1756,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          the first state. LinesFactory builds the board with BoardBuilder, and both keep the same
-          GeometryFactory, so the figure comes from that factory only.
+          Abstract Factory IVariantFactory, builds the board with BoardBuilder, a Builder, and both
+          keep the same GeometryFactory, another Abstract Factory, so the figure
         </text>
         <text
           x="24"
@@ -1785,8 +1766,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          StartGame keeps the new GameEngine in GameRepository and returns a MoveResult. StartGame
-          never names a variant: the adapter of layer 3 knows them.
+          comes from that factory only. StartGame keeps the new GameEngine in GameRepository and
+          returns a MoveResult. StartGame never names a variant: the adapter of layer 3 knows them.
         </text>
         <!-- Legend -->
         <line
@@ -1831,30 +1812,12 @@
           y1="1540"
           x2="183.7"
           y2="1540"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#flowstart-diamond-hollow)"
-        />
-        <text
-          x="191.7"
-          y="1543"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Aggregation · in-layer pattern
-        </text>
-        <line
-          x1="376.7"
-          y1="1540"
-          x2="404.7"
-          y2="1540"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#flowstart-open)"
         />
         <text
-          x="412.7"
+          x="191.7"
           y="1543"
           fill="#5b6873"
           font-size="8.5"

@@ -252,15 +252,15 @@
           marker-end="url(#lines-open)"
           stroke="#5b6873"
         />
-        <!-- ComboMultiplierDecorator wraps the LinesScoring that its base keeps in the private field inner: aggregation, kept because Decorator holds it -->
+        <!-- ComboMultiplierDecorator keeps the LinesScoring it wraps as inner, a private field of its base ScoringDecorator: use with role and multiplicity (decision 23) -->
         <line
           x1="664"
           y1="280"
           x2="532"
           y2="280"
           stroke-width="1"
-          marker-start="url(#lines-diamond-hollow)"
-          stroke="#17212a"
+          marker-end="url(#lines-open)"
+          stroke="#5b6873"
         />
         <!-- ComboMultiplierDecorator extends ScoringDecorator: generalization with binding -->
         <line
@@ -588,7 +588,7 @@
           LinesSnapshot&lt;TCoord&gt;): void
         </text>
 
-        <!-- Class: LinesRules (Concrete Strategy) -->
+        <!-- Class: LinesRules (a piece of the Strategy pattern: the frame names it, decision 23) -->
         <rect
           x="276"
           y="120"
@@ -602,18 +602,7 @@
         <line x1="276" y1="168" x2="564" y2="168" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="420"
-          y="138"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «Concrete Strategy»
-        </text>
-        <text
-          x="420"
-          y="156"
+          y="149"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -623,7 +612,7 @@
           LinesRules
         </text>
 
-        <!-- Class: LinesScoring (Concrete Strategy) -->
+        <!-- Class: LinesScoring (a piece of the Strategy pattern: the frame names it, decision 23) -->
         <rect
           x="292"
           y="256"
@@ -636,18 +625,7 @@
         />
         <text
           x="412"
-          y="274"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «Concrete Strategy»
-        </text>
-        <text
-          x="412"
-          y="292"
+          y="285"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -657,7 +635,7 @@
           LinesScoring
         </text>
 
-        <!-- Class: LinesFactory (Concrete Factory) -->
+        <!-- Class: LinesFactory (factory; a piece of the Abstract Factory pattern: the frame names it, decision 23) -->
         <rect
           x="664"
           y="120"
@@ -677,7 +655,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «Concrete Factory» «factory»
+          «factory»
         </text>
         <text
           x="776"
@@ -695,7 +673,7 @@
           - geometry: GeometryFactory&lt;TCoord&gt;
         </text>
 
-        <!-- Class: ComboMultiplierDecorator (focal, Concrete Decorator) -->
+        <!-- Class: ComboMultiplierDecorator (focal; a piece of the Decorator pattern: the frame names it, decision 23) -->
         <rect
           x="664"
           y="256"
@@ -708,18 +686,7 @@
         />
         <text
           x="784"
-          y="274"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «Concrete Decorator»
-        </text>
-        <text
-          x="784"
-          y="292"
+          y="285"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -871,8 +838,7 @@
         >
           TCoord
         </text>
-        <!-- Footnote: classes the budget leaves out -->
-        <!-- LinesFactory holds its LinesSettings: use -->
+        <!-- LinesFactory keeps the LinesSettings it receives as settings: use with role and multiplicity (decision 23). The label sits next to the multiplicity, at the arrowhead. -->
         <polyline
           points="888,180 936,180 936,440"
           fill="none"
@@ -880,10 +846,10 @@
           stroke-width="1"
           marker-end="url(#lines-open)"
         />
-        <rect x="942" y="321" width="48" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="942" y="410" width="48" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="966"
-          y="330"
+          y="419"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1022,7 +988,7 @@
         </text>
 
         <!-- The counts of the last placement and the tray position (issue 232) -->
-        <!-- LinesState keeps the Streak of its placements: use -->
+        <!-- LinesState keeps its Streak as streak: use with role and multiplicity (decision 23) -->
         <polyline
           points="222,534 222,760"
           fill="none"
@@ -1030,7 +996,7 @@
           stroke-width="1"
           marker-end="url(#lines-open)"
         />
-        <!-- LinesState keeps the LineCount of the last placement: use -->
+        <!-- LinesState keeps the LineCount of the last placement as linesCleared: use with role and multiplicity (decision 23) -->
         <polyline
           points="236,534 236,640 374,640 374,760"
           fill="none"
@@ -1038,7 +1004,7 @@
           stroke-width="1"
           marker-end="url(#lines-open)"
         />
-        <!-- LinesState keeps the CellCount of the last placement: use -->
+        <!-- LinesState keeps the CellCount of the last placement as cellsPlaced: use with role and multiplicity (decision 23) -->
         <polyline
           points="250,534 250,624 592,624 592,760"
           fill="none"
@@ -1046,7 +1012,7 @@
           stroke-width="1"
           marker-end="url(#lines-open)"
         />
-        <!-- PlacePiece names its tray piece with a TrayPosition: use -->
+        <!-- PlacePiece keeps the TrayPosition of its tray piece as position: use with role and multiplicity (decision 23) -->
         <polyline
           points="620,584 636,584 636,736 848,736 848,760"
           fill="none"
@@ -1062,6 +1028,103 @@
           stroke-width="1"
           marker-end="url(#lines-open)"
         />
+        <!-- Arrow labels of the counts and the tray position: role on the left of the arrowhead, multiplicity on the right (decision 23) -->
+        <rect x="180" y="740" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="198"
+          y="749"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          streak
+        </text>
+        <rect x="302" y="740" width="68" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="336"
+          y="749"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          linesCleared
+        </text>
+        <rect x="524" y="740" width="64" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="556"
+          y="749"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          cellsPlaced
+        </text>
+        <rect x="800" y="740" width="44" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="822"
+          y="749"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          position
+        </text>
+        <rect x="226" y="740" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="232"
+          y="749"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          1
+        </text>
+        <rect x="378" y="740" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="384"
+          y="749"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          1
+        </text>
+        <rect x="596" y="740" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="602"
+          y="749"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          1
+        </text>
+        <rect x="852" y="740" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="858"
+          y="749"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          1
+        </text>
 
         <!-- Class: Streak (value object, issue 232) -->
         <rect
@@ -1313,6 +1376,7 @@
           + misfitAt(at: CoordKey): RangeError
         </text>
 
+        <!-- Footnote: classes the budget leaves out -->
         <text
           x="24"
           y="992"
@@ -1409,30 +1473,12 @@
           y1="1116"
           x2="172"
           y2="1116"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#lines-diamond-hollow)"
-        />
-        <text
-          x="180"
-          y="1120"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Aggregation · in-layer pattern
-        </text>
-        <line
-          x1="384"
-          y1="1116"
-          x2="412"
-          y2="1116"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#lines-open)"
         />
         <text
-          x="420"
+          x="180"
           y="1120"
           fill="#5b6873"
           font-size="8.5"

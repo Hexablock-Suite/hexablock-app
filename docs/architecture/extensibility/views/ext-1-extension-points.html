@@ -63,7 +63,7 @@
       <p class="eyebrow">Extensibility diagram · View 1 · Statement §4.3</p>
       <h1>The engine in the center and the interfaces a fifth variant implements</h1>
       <svg
-        viewBox="0 0 1040 1708"
+        viewBox="0 0 1040 1740"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="ext-1-extension-points-title ext-1-extension-points-desc"
@@ -82,8 +82,11 @@
           each declares its own open GameId. The lines start on classes: LinesFactory implements
           IVariantFactory, LinesRules extends BaseGameRules and MergeScoring implements
           IScoringPolicy, one line per kind for every variant. No line touches a frame or a package.
-          «Sprint N» marks the planned classes and members that the code does not have yet, with the
-          docs/ROADMAP.md sprint of the requirement that each one serves.
+          GameEngine keeps its IGameRules as rules and its IScoringPolicy as scoring: two uses with
+          the attribute name and its multiplicity. No box carries a role label of a pattern: a
+          footnote names the pattern of each extension point. «Sprint N» marks the planned classes
+          and members that the code does not have yet, with the docs/ROADMAP.md sprint of the
+          requirement that each one serves.
         </desc>
         <defs>
           <marker
@@ -96,22 +99,6 @@
             markerUnits="userSpaceOnUse"
           >
             <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-          </marker>
-          <marker
-            id="ext1-diamond-hollow"
-            markerWidth="18"
-            markerHeight="10"
-            refX="0"
-            refY="5"
-            orient="auto"
-            markerUnits="userSpaceOnUse"
-          >
-            <polygon
-              points="0 5, 9 0, 18 5, 9 10"
-              fill="#ffffff"
-              stroke="#17212a"
-              stroke-width="1"
-            />
           </marker>
           <marker
             id="ext1-open"
@@ -203,6 +190,7 @@
         >
           LAYER 1 · ENTITIES · src/domain/
         </text>
+        <!-- Group: the extension points, what a fifth variant implements -->
         <rect
           x="48"
           y="440"
@@ -225,6 +213,7 @@
         >
           EXTENSION POINTS · WHAT A FIFTH VARIANT IMPLEMENTS · §4.3 · APP-NFR-06
         </text>
+        <!-- Group: the optional capabilities -->
         <rect
           x="64"
           y="1008"
@@ -248,6 +237,7 @@
           OPTIONAL CAPABILITIES · ISP · §3.2 · THE VARIANT FACTORY PICKS THEM
         </text>
         <!-- Outer layers: the per-variant classes implement the outer extension points -->
+        <!-- FitCellRenderer and the other cell renderers implement CellRenderer: realization -->
         <path
           d="M336 100 L400 100"
           fill="none"
@@ -256,6 +246,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#ext1-triangle)"
         />
+        <!-- FillCellRenderer implements CellRenderer: realization of a declared extension -->
         <path
           d="M704 100 L640 100"
           fill="none"
@@ -264,6 +255,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#ext1-triangle)"
         />
+        <!-- FitControls and the other move controls implement MoveControls: realization -->
         <path
           d="M336 188 L400 188"
           fill="none"
@@ -272,6 +264,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#ext1-triangle)"
         />
+        <!-- FillControls implements MoveControls: realization of a declared extension -->
         <path
           d="M704 188 L640 188"
           fill="none"
@@ -280,6 +273,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#ext1-triangle)"
         />
+        <!-- FitStateMapper and the other state mappers implement StateMapper: realization -->
         <path
           d="M336 336 L400 336"
           fill="none"
@@ -288,6 +282,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#ext1-triangle)"
         />
+        <!-- FillStateMapper implements StateMapper: realization of a declared extension -->
         <path
           d="M704 336 L640 336"
           fill="none"
@@ -305,21 +300,23 @@
           stroke-dasharray="5,4"
           marker-end="url(#ext1-triangle)"
         />
-        <!-- GameEngine holds the IGameRules and the IScoringPolicy it receives as rules and scoring: aggregation, kept because Strategy holds it -->
+        <!-- GameEngine keeps the IGameRules it receives as rules: use with role and multiplicity (decision 23) -->
         <path
           d="M456 632 L456 584"
           fill="none"
           stroke-width="1"
-          stroke="#17212a"
-          marker-start="url(#ext1-diamond-hollow)"
+          stroke="#5b6873"
+          marker-end="url(#ext1-open)"
         />
+        <!-- GameEngine keeps the IScoringPolicy it receives as scoring: use with role and multiplicity (decision 23) -->
         <path
           d="M648 656 L676 656 Q684 656 684 648 L684 616 Q684 608 692 608 L776 608 Q784 608 784 600 L784 584"
           fill="none"
           stroke-width="1"
-          stroke="#17212a"
-          marker-start="url(#ext1-diamond-hollow)"
+          stroke="#5b6873"
+          marker-end="url(#ext1-open)"
         />
+        <!-- Arrow labels: the attribute name and its multiplicity at the target end -->
         <rect x="462.0" y="587" width="12" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="468"
@@ -427,7 +424,7 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.12em"
         >
-          «Concrete Strategy» · ONE PER VARIANT
+          ONE PER VARIANT
         </text>
         <text x="60" y="90" fill="#17212a" font-size="9.5" font-family="'IBM Plex Mono', monospace">
           FitCellRenderer
@@ -461,6 +458,7 @@
           SortCellRenderer
           <tspan data-requirement="APP-FR-01" fill="#5b6873" font-size="8">«Sprint 3»</tspan>
         </text>
+        <!-- Class: CellRenderer (interface; the footnote names its pattern, decision 23) -->
         <rect
           x="400"
           y="72"
@@ -480,7 +478,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Strategy» · D3
+          «interface» · D3
         </text>
         <text
           x="520.0"
@@ -514,6 +512,7 @@
         >
           TCellView
         </text>
+        <!-- Declared extension, no class yet: FillCellRenderer -->
         <rect x="704" y="72" width="240" height="56" rx="6" fill="#cfdcf3" />
         <rect
           x="704"
@@ -568,7 +567,7 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.12em"
         >
-          «Concrete Strategy» · ONE PER VARIANT
+          ONE PER VARIANT
         </text>
         <text
           x="60"
@@ -597,6 +596,7 @@
         >
           BoardOnlyControls: the default
         </text>
+        <!-- Class: MoveControls (interface; the footnote names its pattern, decision 23) -->
         <rect
           x="400"
           y="160"
@@ -616,7 +616,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Strategy» · D3
+          «interface» · D3
         </text>
         <text
           x="520.0"
@@ -660,6 +660,7 @@
         >
           TPayloadView, TMove
         </text>
+        <!-- Declared extension, no class yet: FillControls -->
         <rect x="704" y="160" width="240" height="56" rx="6" fill="#cfdcf3" />
         <rect
           x="704"
@@ -714,7 +715,7 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.12em"
         >
-          «Concrete Strategy» · ONE PER VARIANT
+          ONE PER VARIANT
         </text>
         <text
           x="60"
@@ -754,6 +755,7 @@
           SortStateMapper
           <tspan data-requirement="APP-FR-01" fill="#5b6873" font-size="8">«Sprint 3»</tspan>
         </text>
+        <!-- Class: StateMapper (interface; the footnote names its pattern, decision 23) -->
         <rect
           x="400"
           y="308"
@@ -773,7 +775,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Strategy» · §3.4
+          «interface» · §3.4
         </text>
         <text
           x="520.0"
@@ -807,6 +809,7 @@
         >
           TCell
         </text>
+        <!-- Declared extension, no class yet: FillStateMapper -->
         <rect x="704" y="308" width="240" height="56" rx="6" fill="#e2ebf8" />
         <rect
           x="704"
@@ -842,6 +845,7 @@
           FillStateMapper
         </text>
         <!-- Row 1: the rules contract, its template and the scoring policy -->
+        <!-- Class: BaseGameRules (abstract; playTurn() is the template method that the footnote names, decision 23) -->
         <rect
           x="64"
           y="480"
@@ -861,7 +865,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «abstract» «Template Method» · D13
+          «abstract» · D13
         </text>
         <text
           x="192.0"
@@ -880,7 +884,7 @@
           + playTurn(state: TState, move: TMove):
         </text>
         <text x="96" y="562" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          Resolution {template}
+          Resolution
         </text>
         <text x="80" y="578" fill="#7d8a94" font-size="9" font-family="'IBM Plex Mono', monospace">
           steps: isValid, apply, resolve, evaluate
@@ -906,6 +910,7 @@
         >
           TMove, TState
         </text>
+        <!-- Class: IGameRules (interface; the footnote names its pattern, decision 23) -->
         <rect
           x="392"
           y="480"
@@ -925,7 +930,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Strategy» · D1
+          «interface» · D1
         </text>
         <text
           x="520.0"
@@ -969,6 +974,7 @@
         >
           TMove, TState
         </text>
+        <!-- Class: IScoringPolicy (interface; the footnote names its pattern, decision 23) -->
         <rect
           x="720"
           y="480"
@@ -988,7 +994,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Strategy» · §8
+          «interface» · §8
         </text>
         <text
           x="848.0"
@@ -1033,6 +1039,7 @@
           TState
         </text>
         <!-- Row 2: the variant factory, the engine (focal) and the piece source -->
+        <!-- Class: IVariantFactory (interface; the footnote names its pattern, decision 23) -->
         <rect
           x="64"
           y="632"
@@ -1044,7 +1051,6 @@
           stroke-width="1"
         />
         <text
-          data-requirement="APP-FR-16"
           x="216.0"
           y="650"
           fill="#5b6873"
@@ -1053,7 +1059,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Abstract Factory» · §3.3 · «Sprint 3»
+          «interface» · §3.3
         </text>
         <text
           x="216.0"
@@ -1071,7 +1077,7 @@
           + createRules(): IGameRules
         </text>
         <text x="80" y="712" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + createPieceSource(): IPieceSource
+          + createPieceSource(): IPieceSource [0..1]
         </text>
         <text x="80" y="728" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createScoring(): IScoringPolicy
@@ -1115,6 +1121,7 @@
         >
           TCell, TCoord, TMove, TState
         </text>
+        <!-- Class: GameEngine (focal, the generic engine) -->
         <rect x="392" y="632" width="256" height="136" rx="6" fill="#f9f4dc" />
         <rect
           x="392"
@@ -1187,6 +1194,7 @@
         >
           TCell, TCoord, TMove, TState
         </text>
+        <!-- Class: IPieceSource (interface; the footnote names its pattern, decision 23) -->
         <rect
           x="720"
           y="632"
@@ -1206,7 +1214,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Strategy» · §3.1
+          «interface» · §3.1
         </text>
         <text
           x="848.0"
@@ -1254,6 +1262,7 @@
           TPiece
         </text>
         <!-- Row 3: the level builder, the type arguments and the progress model -->
+        <!-- Class: ILevelBuilder (interface; the footnote names its pattern, decision 23) -->
         <rect
           x="64"
           y="848"
@@ -1273,7 +1282,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Builder» · §3.3
+          «interface» · §3.3
         </text>
         <text
           x="216.0"
@@ -1320,6 +1329,7 @@
         >
           TLevel
         </text>
+        <!-- The type arguments that a variant binds: no class -->
         <rect
           x="392"
           y="848"
@@ -1371,6 +1381,7 @@
         <text x="408" y="946" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           TState: a BoardState‹TCell, TCoord›
         </text>
+        <!-- Class: IProgressModel (interface; the footnote names its pattern, decision 23) -->
         <rect
           x="680"
           y="848"
@@ -1390,7 +1401,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Strategy» · §3.1
+          «interface» · §3.1
         </text>
         <text
           x="828.0"
@@ -1414,6 +1425,7 @@
           HighScoreProgress; LevelProgress takes ILevelStars
         </text>
         <!-- Row 4: the optional capability interfaces -->
+        <!-- Class: IUndoable (interface) -->
         <rect
           x="84"
           y="1032"
@@ -1425,7 +1437,6 @@
           stroke-width="1"
         />
         <text
-          data-requirement="APP-FR-08"
           x="184.0"
           y="1050"
           fill="#5b6873"
@@ -1434,7 +1445,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Sprint 3»
+          «interface»
         </text>
         <text
           x="184.0"
@@ -1457,6 +1468,7 @@
         >
           engine class: MoveHistory
         </text>
+        <!-- Class: IRedoable (interface) -->
         <rect
           x="308"
           y="1032"
@@ -1499,6 +1511,7 @@
         >
           engine class: RedoableHistory
         </text>
+        <!-- Class: ITimed (interface) -->
         <rect
           x="532"
           y="1032"
@@ -1510,7 +1523,6 @@
           stroke-width="1"
         />
         <text
-          data-requirement="APP-FR-09"
           x="632.0"
           y="1050"
           fill="#5b6873"
@@ -1519,7 +1531,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Sprint 3»
+          «interface»
         </text>
         <text
           x="632.0"
@@ -1542,6 +1554,7 @@
         >
           engine class: LevelTimer
         </text>
+        <!-- Class: IRandomSeeded (interface) -->
         <rect
           x="756"
           y="1032"
@@ -1615,15 +1628,8 @@
         >
           Hexa Lines
         </text>
-        <text
-          data-requirement="APP-NFR-02"
-          x="80"
-          y="1246"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          hexa-lines/ · §1.1 «Sprint 2»
+        <text x="80" y="1246" fill="#5b6873" font-size="8" font-family="'IBM Plex Mono', monospace">
+          hexa-lines/ · §1.1
         </text>
         <line x1="68" y1="1256" x2="236" y2="1256" stroke="rgba(23,33,42,0.25)" stroke-width="1" />
         <text
@@ -1729,14 +1735,13 @@
           Hexa Fit
         </text>
         <text
-          data-requirement="APP-NFR-02"
           x="264"
           y="1246"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
         >
-          hexa-fit/ · §1.2 «Sprint 2»
+          hexa-fit/ · §1.2
         </text>
         <line x1="252" y1="1256" x2="420" y2="1256" stroke="rgba(23,33,42,0.25)" stroke-width="1" />
         <text
@@ -1842,14 +1847,13 @@
           Hexa Sort
         </text>
         <text
-          data-requirement="APP-NFR-02"
           x="448"
           y="1246"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
         >
-          hexa-sort/ · §1.3 «Sprint 2»
+          hexa-sort/ · §1.3
         </text>
         <line x1="436" y1="1256" x2="604" y2="1256" stroke="rgba(23,33,42,0.25)" stroke-width="1" />
         <text
@@ -1964,14 +1968,13 @@
           Hexa Merge
         </text>
         <text
-          data-requirement="APP-NFR-02"
           x="632"
           y="1246"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
         >
-          hexa-merge/ · §1.4 «Sprint 2»
+          hexa-merge/ · §1.4
         </text>
         <line x1="620" y1="1256" x2="788" y2="1256" stroke="rgba(23,33,42,0.25)" stroke-width="1" />
         <text
@@ -2173,7 +2176,7 @@
         </text>
         <text
           x="24"
-          y="1524"
+          y="1556"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2183,7 +2186,7 @@
         </text>
         <text
           x="24"
-          y="1540"
+          y="1572"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2193,7 +2196,7 @@
         </text>
         <text
           x="24"
-          y="1556"
+          y="1588"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2213,7 +2216,7 @@
         </text>
         <text
           x="24"
-          y="1492"
+          y="1524"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2223,13 +2226,34 @@
         </text>
         <text
           x="24"
-          y="1508"
+          y="1540"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Hexa Fill is the example of statement §3.1. Its dashed boxes are declared extensions with
           no class yet.
+        </text>
+        <!-- Footnote: the pattern of each extension point. No box carries a role label (decision 23). -->
+        <text
+          x="24"
+          y="1492"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Strategy: IGameRules, IScoringPolicy, IPieceSource and IProgressModel in layer 1,
+          StateMapper in layer 3, and CellRenderer and MoveControls in layer 4 (§3.3).
+        </text>
+        <text
+          x="24"
+          y="1508"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Template Method: BaseGameRules.playTurn() over its steps. Abstract Factory:
+          IVariantFactory. Builder: ILevelBuilder (§3.3).
         </text>
         <!-- Classes inside a package that a line starts from: the outline marks the class -->
         <g data-class="LinesFactory">
@@ -2271,15 +2295,15 @@
         <!-- Legend -->
         <line
           x1="24"
-          y1="1580"
+          y1="1612"
           x2="1016"
-          y2="1580"
+          y2="1612"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1598"
+          y="1630"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -2289,9 +2313,9 @@
         </text>
         <line
           x1="24"
-          y1="1620"
+          y1="1652"
           x2="52"
-          y2="1620"
+          y2="1652"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -2299,7 +2323,7 @@
         />
         <text
           x="60"
-          y="1624"
+          y="1656"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2308,34 +2332,34 @@
         </text>
         <line
           x1="144"
-          y1="1620"
+          y1="1652"
           x2="172"
-          y2="1620"
-          stroke="#17212a"
+          y2="1652"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#ext1-diamond-hollow)"
+          marker-end="url(#ext1-open)"
         />
         <text
           x="180"
-          y="1624"
+          y="1656"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Aggregation · in-layer pattern
+          Use · attribute, parameter, return, local or new
         </text>
         <line
-          x1="384"
-          y1="1620"
-          x2="412"
-          y2="1620"
+          x1="424"
+          y1="1652"
+          x2="452"
+          y2="1652"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#ext1-triangle)"
         />
         <text
-          x="420"
-          y="1624"
+          x="460"
+          y="1656"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2344,7 +2368,7 @@
         </text>
         <rect
           x="520"
-          y="1658"
+          y="1690"
           width="12"
           height="5"
           rx="1"
@@ -2354,7 +2378,7 @@
         />
         <rect
           x="520"
-          y="1662"
+          y="1694"
           width="28"
           height="12"
           rx="2"
@@ -2364,7 +2388,7 @@
         />
         <text
           x="556"
-          y="1671"
+          y="1703"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2373,7 +2397,7 @@
         </text>
         <rect
           x="776"
-          y="1662"
+          y="1694"
           width="28"
           height="12"
           rx="2"
@@ -2383,7 +2407,7 @@
         />
         <text
           x="812"
-          y="1671"
+          y="1703"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2392,7 +2416,7 @@
         </text>
         <rect
           x="24"
-          y="1638"
+          y="1670"
           width="28"
           height="12"
           rx="2"
@@ -2402,7 +2426,7 @@
         />
         <text
           x="60"
-          y="1647"
+          y="1679"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2411,7 +2435,7 @@
         </text>
         <rect
           x="264"
-          y="1638"
+          y="1670"
           width="28"
           height="12"
           rx="2"
@@ -2421,7 +2445,7 @@
         />
         <text
           x="300"
-          y="1647"
+          y="1679"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2430,7 +2454,7 @@
         </text>
         <rect
           x="520"
-          y="1638"
+          y="1670"
           width="28"
           height="12"
           rx="2"
@@ -2440,7 +2464,7 @@
         />
         <text
           x="556"
-          y="1647"
+          y="1679"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2449,7 +2473,7 @@
         </text>
         <rect
           x="776"
-          y="1638"
+          y="1670"
           width="28"
           height="12"
           rx="2"
@@ -2460,7 +2484,7 @@
         />
         <text
           x="812"
-          y="1647"
+          y="1679"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2469,7 +2493,7 @@
         </text>
         <rect
           x="24"
-          y="1662"
+          y="1694"
           width="28"
           height="12"
           rx="2"
@@ -2480,7 +2504,7 @@
         />
         <text
           x="60"
-          y="1671"
+          y="1703"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2489,7 +2513,7 @@
         </text>
         <rect
           x="264"
-          y="1662"
+          y="1694"
           width="28"
           height="12"
           rx="2"
@@ -2500,7 +2524,7 @@
         />
         <text
           x="300"
-          y="1671"
+          y="1703"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2509,7 +2533,7 @@
         </text>
         <text
           x="24"
-          y="1692"
+          y="1724"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -2518,7 +2542,7 @@
         </text>
         <text
           x="92"
-          y="1692"
+          y="1724"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

@@ -40,20 +40,15 @@ The client follows Clean Architecture with four layers (statement §3.4). Every 
 | 3. Interface adapters     | `src/adapters/`                                        | MVP presenters and view models, state mappers, `GameEventBus`, the local repositories, `InMemoryGameRepository`       | Layers 1 and 2 and its own folder                                                                    |
 | 4. Frameworks and drivers | `src/infrastructure/`, `app/`                          | The composition root, its registry, the HTTP client and repositories, storage, session, audio, drivers; `app/` routes | Every inner layer and any package                                                                    |
 
-```mermaid
-flowchart TB
-  L4["Layer 4: Frameworks and drivers<br/>src/infrastructure/, app/"]
-  L3["Layer 3: Interface adapters<br/>src/adapters/"]
-  L2["Layer 2: Use cases<br/>src/application/"]
-  L1["Layer 1: Entities<br/>src/domain/engine/, src/domain/variants/"]
-  L4 --> L3 --> L2 --> L1
-  style L4 fill:#cfdcf3,stroke:#1e3a8a,color:#111827
-  style L3 fill:#e2ebf8,stroke:#1d4ed8,color:#111827
-  style L2 fill:#efe7f8,stroke:#7e22ce,color:#111827
-  style L1 fill:#fef3c7,stroke:#b45309,color:#111827
-```
+![Clean layer diagram: four concentric rings, layer 4 outside and layer 1 in the center; the input port UseCase and the output ports GameRepository, GameFactories, LevelRepository, GameEventPublisher, ProgressRepository and Logger sit on the edge of layer 2; the presenters of layer 3 call UseCase, the adapters of layer 3 and the drivers of layer 4 implement the output ports and the interfaces of the inner layers, the use cases use the engine, and every arrow points inward](docs/architecture/layers/views/layers-1-clean.png)
 
-This sketch shows only the layers and the direction of the dependencies. The full layer diagram, with every component, port and adapter, is the Mermaid source in [docs/architecture/layers.md](docs/architecture/layers.md). The repository has no rendered image of it yet.
+**Layer diagram.** The image draws the four layers as concentric rings, as statement §4.2 asks: layer 4 outside and layer 1 in the center. The ports sit on the edge of layer 2. The presenters of layer 3 call the input port `UseCase`, and the adapters of layer 3 and the drivers of layer 4 implement the output ports. Every arrow points inward or stays inside one layer. [docs/architecture/layers.md](docs/architecture/layers.md) explains the diagram and says where each piece lives, and its editable source is [`docs/architecture/layers/views/layers-1-clean.html`](docs/architecture/layers/views/layers-1-clean.html).
+
+**Class diagram.** [docs/architecture/classes.md](docs/architecture/classes.md) holds the class diagram: a map of each part with every class by layer and by pattern, and small views with the members. View 1, the turn, shows the three things that the class diagram must show. Its corner boxes give the generic types in UML template notation, such as `GameEngine‹TCell, TCoord, TMove, TState›` with the bound of `TState`. Its zone gives the layer of each class, and the title of each frame names a pattern. The class view of the `ApplyMove` flow crosses the four layers: each class sits in the band of its layer, and each relation between two layers is a use or a realization that points inward. Every view follows decision 23 of classes.md: a filled diamond goes only from the aggregate root to an internal entity, any other attribute is a use with its name and its multiplicity, and no box carries a role label of a pattern. The editable sources are the HTML files in [`docs/architecture/classes/views/`](docs/architecture/classes/views/), and [`docs/architecture/classes.drawio`](docs/architecture/classes.drawio) holds the whole model in one draw.io file. The extensibility diagram is in [Adding a fifth variant](#adding-a-fifth-variant).
+
+![View 1 of the class diagram, the turn: the generic GameEngine‹TCell, TCoord, TMove, TState› with the bound of TState in its corner box, in the zone of layer 1; a dark dashed frame marks the game aggregate, and the root joins its internal entities BoardState and LevelTimer with a filled diamond; the frames of the Strategy, State, Command and Observer patterns hold IGameRules and IScoringPolicy, GamePhase, MoveHistory and GameEvent, and the root reaches each one with a use that names the attribute and its multiplicity](docs/architecture/classes/views/engine-1-turn.png)
+
+![Class view of the ApplyMove flow: GameScreen in layer 4; GamePresenter, StateMapper, GameViewModel and InMemoryGameRepository in layer 3; UseCase, ApplyMove, ApplyMoveRequest, MoveResult and the GameRepository, Logger and GameEventPublisher ports in layer 2; GameEngine, IGameRules and Board in layer 1; every relation between two layers points inward](docs/architecture/classes/views/flow-1-apply-move.png)
 
 **The gate.** `pnpm arch` runs [dependency-cruiser](https://github.com/sverweij/dependency-cruiser) over `src/` and `app/` with the rules in `.dependency-cruiser.cjs`, and CI runs it inside `pnpm verify`. The rules are `domain-imports-only-domain`, `domain-no-framework`, `engine-no-variants`, `variants-isolated`, `application-imports-only-domain`, `application-no-variants` and `adapters-imports-only-inner-layers`. `test/gates/architecture-gate.test.ts` tests each rule. Layer 4 has no rule yet. A lint rule keeps `Math.random`, `Date.now` and `new Date()` out of the domain and the application layers, so time and randomness come by injection (rule R-domain-determinism).
 

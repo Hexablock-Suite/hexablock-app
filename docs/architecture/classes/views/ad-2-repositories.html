@@ -102,22 +102,6 @@
             <polygon points="0 5, 9 0, 18 5, 9 10" fill="#17212a" />
           </marker>
           <marker
-            id="adrepos-diamond-hollow"
-            markerWidth="18"
-            markerHeight="10"
-            refX="0"
-            refY="5"
-            orient="auto"
-            markerUnits="userSpaceOnUse"
-          >
-            <polygon
-              points="0 5, 9 0, 18 5, 9 10"
-              fill="#ffffff"
-              stroke="#17212a"
-              stroke-width="1"
-            />
-          </marker>
-          <marker
             id="adrepos-open"
             markerWidth="10"
             markerHeight="8"
@@ -274,15 +258,15 @@
           stroke-dasharray="5,4"
           marker-end="url(#adrepos-triangle)"
         />
-        <!-- LocalProgressRepository keeps the KeyValueStore it receives: aggregation, kept because object Adapter holds it -->
+        <!-- LocalProgressRepository keeps the KeyValueStore it receives as store: use with role and multiplicity (decision 23) -->
         <line
           x1="440"
           y1="328"
           x2="376"
           y2="328"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#adrepos-diamond-hollow)"
+          marker-end="url(#adrepos-open)"
         />
         <!-- ApiProgressRepository keeps the ApiDtoMapper it receives in an attribute: use -->
         <line
@@ -340,7 +324,7 @@
           <tspan font-weight="600">1</tspan>
         </text>
 
-        <!-- Class: DeviceKeyValueStore (adapter, driver) -->
+        <!-- Class: DeviceKeyValueStore (a driver; a piece of the Adapter pattern: the frame names it, decision 23) -->
         <rect
           x="56"
           y="92"
@@ -354,18 +338,7 @@
         <line x1="56" y1="140" x2="352" y2="140" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="204"
-          y="110"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «Adapter»
-        </text>
-        <text
-          x="204"
-          y="128"
+          y="121"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -423,7 +396,7 @@
         <text x="392" y="188" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + toLevelDefinition(dto: LevelDto): LevelDefinition
         </text>
-        <!-- Class: ApiProgressRepository (adapter, focal) -->
+        <!-- Class: ApiProgressRepository (focal; a piece of the Adapter pattern: the frame names it, decision 23) -->
         <rect
           x="744"
           y="92"
@@ -446,7 +419,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «Adapter» «repository»
+          «repository»
         </text>
         <text
           x="868"
@@ -505,7 +478,7 @@
         <text x="72" y="364" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + set(key: string, value: string): Promise&lt;void&gt;
         </text>
-        <!-- Class: LocalProgressRepository (adapter) -->
+        <!-- Class: LocalProgressRepository (a piece of the Adapter pattern: the frame names it, decision 23) -->
         <rect
           x="440"
           y="292"
@@ -526,7 +499,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «Adapter» «repository»
+          «repository»
         </text>
         <text
           x="610"
@@ -662,30 +635,12 @@
           y1="668"
           x2="172"
           y2="668"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#adrepos-diamond-hollow)"
-        />
-        <text
-          x="180"
-          y="672"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Aggregation · in-layer pattern
-        </text>
-        <line
-          x1="384"
-          y1="668"
-          x2="412"
-          y2="668"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adrepos-open)"
         />
         <text
-          x="420"
+          x="180"
           y="672"
           fill="#5b6873"
           font-size="8.5"
