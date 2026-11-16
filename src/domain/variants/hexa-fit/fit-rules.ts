@@ -1,12 +1,9 @@
-import type { ReadonlyBoard } from '../../engine/board';
 import { Outcome } from '../../engine/outcome';
 import { Resolution } from '../../engine/resolution';
 import { BaseGameRules } from '../../engine/rules';
 import { Turns } from '../../engine/turns';
 import { PlaceFitPiece, RemoveFitPiece, RotateFitPiece, type FitMove } from './fit-move';
-import type { FitSnapshot, FitState } from './fit-state';
-import type { PieceId } from './piece-id';
-import type { Placement } from './placement';
+import type { FitState } from './fit-state';
 
 const NO_TURN = Turns.of(0);
 
@@ -17,15 +14,15 @@ const NO_TURN = Turns.of(0);
 // Each accepted move adds one to `FitState.moves`: place, rotate and remove (issue #60).
 // `playTurn()` applies only a valid move, so a rejected move counts nothing.
 // The rules stay generic over `TCoord`, so they run on any topology (classes.md decision 16).
+// Each move holds its own check and its own change (classes.md decision 43, issue #244).
+// The rules ask the move `isValidOn()` with the state and its photo, and they ask it
+// `applyTo()` with the state. They never tell the moves apart by their class.
 // The rules read the board through the photo of the state, and they ask the state
-// `piece()`, `placementOf()`, `placed()` and `remaining()`.
-// The rules read no field of the board or of a piece (classes.md decision 49).
-// They ask the board for its coordinates and its full turn, and they pass the board on.
-// The rules read no field of a move (classes.md decision 43). The class of the move tells
-// its kind, and the rules ask the move for its piece and for the placement that it gives.
+// `placed()` and `remaining()`. They read no field of the board, of a piece or of a move
+// (classes.md decisions 43 and 49). They ask the board for its coordinates and its full turn.
 export class FitRules<TCoord> extends BaseGameRules<FitMove<TCoord>, FitState<TCoord>> {
   isValid(state: FitState<TCoord>, move: FitMove<TCoord>): boolean {
-    return isValidOn(state, state.snapshot(), move);
+    return knownMove(move).isValidOn(state, state.snapshot());
   }
 
   // Remove and rotate moves of the placed pieces first, then the place moves of the tray.
@@ -41,14 +38,14 @@ export class FitRules<TCoord> extends BaseGameRules<FitMove<TCoord>, FitState<TC
       for (const steps of board.fullTurn().shorter()) {
         const move = new RotateFitPiece(id, steps);
         // A rotation of no step changes nothing, so it is not a move.
-        if (!steps.equals(NO_TURN) && isValidOn(state, photo, move)) yield move;
+        if (!steps.equals(NO_TURN) && move.isValidOn(state, photo)) yield move;
       }
     }
     for (const piece of state.remaining()) {
       for (const rotation of board.fullTurn().shorter()) {
         for (const at of offsets) {
           const move = new PlaceFitPiece(piece.occupant(), rotation, at);
-          if (isValidOn(state, photo, move)) yield move;
+          if (move.isValidOn(state, photo)) yield move;
         }
       }
     }
@@ -56,7 +53,7 @@ export class FitRules<TCoord> extends BaseGameRules<FitMove<TCoord>, FitState<TC
 
   // The move changes the state in place, and the rules return the same state object.
   apply(state: FitState<TCoord>, move: FitMove<TCoord>): FitState<TCoord> {
-    changeBy(state, move);
+    knownMove(move).applyTo(state);
     state.countMove();
     return state;
   }
@@ -72,73 +69,11 @@ export class FitRules<TCoord> extends BaseGameRules<FitMove<TCoord>, FitState<TC
   }
 }
 
-// Whether the move is valid on the state that `photo` shows now.
-function isValidOn<TCoord>(
-  state: FitState<TCoord>,
-  photo: FitSnapshot<TCoord>,
-  move: FitMove<TCoord>,
-): boolean {
-  const { board } = photo;
-  if (move instanceof PlaceFitPiece) {
-    return (
-      state.placementOf(move.pieceToPlace()) === undefined &&
-      fits(state, board, move.pieceToPlace(), move.placement(board))
-    );
-  }
-  if (move instanceof RemoveFitPiece) return state.placementOf(move.pieceToRemove()) !== undefined;
-  if (move instanceof RotateFitPiece) {
-    const placement = state.placementOf(move.pieceToRotate());
-    return (
-      placement !== undefined &&
-      fits(state, board, move.pieceToRotate(), move.turn(placement, board))
-    );
-  }
-  return unknownMove(move);
-}
-
-// Changes the state by the move, before the rules count it.
-// A rotation removes the piece and places it again, turned.
-function changeBy<TCoord>(state: FitState<TCoord>, move: FitMove<TCoord>): void {
-  const { board } = state.snapshot();
-  if (move instanceof PlaceFitPiece) {
-    state.place(move.pieceToPlace(), move.placement(board));
-    return;
-  }
-  if (move instanceof RemoveFitPiece) {
-    state.remove(move.pieceToRemove());
-    return;
-  }
-  if (move instanceof RotateFitPiece) {
-    const placement = state.placementOf(move.pieceToRotate());
-    if (placement === undefined) {
-      throw new RangeError('The piece is not on the figure.', { cause: move.pieceToRotate() });
-    }
-    state.remove(move.pieceToRotate());
-    state.place(move.pieceToRotate(), move.turn(placement, board));
-    return;
-  }
-  unknownMove(move);
-}
-
-// True when every cell of the placed piece lies inside the figure and is free or
-// already holds this piece. The second case lets a placed piece turn over its own cells.
-function fits<TCoord>(
-  state: FitState<TCoord>,
-  board: ReadonlyBoard<PieceId, TCoord>,
-  id: PieceId,
-  placement: Placement<TCoord>,
-): boolean {
-  const piece = state.piece(id);
-  if (piece === undefined) return false;
-  return placement.cells(piece, board).every((c) => {
-    if (!board.contains(c)) return false;
-    const cell = board.occupantAt(c);
-    return cell === undefined || cell.equals(id);
-  });
-}
-
-// A value outside the `FitMove` union reaches this function only through a cast.
-// It is an object of no move class, so the message names the `kind` text that it carries.
-function unknownMove(move: never): never {
+// A value outside the `FitMove` union reaches the rules only through a cast.
+// It has no move operations, so the rules refuse it with a RangeError before they call one.
+// The message names the `kind` text that it carries.
+// A null or undefined value passes the optional read, and its `kind` read throws a TypeError.
+function knownMove<TCoord>(move: FitMove<TCoord>): FitMove<TCoord> {
+  if (typeof move?.isValidOn === 'function' && typeof move.applyTo === 'function') return move;
   throw new RangeError(`Unknown Fit move: ${String((move as { kind?: unknown }).kind)}.`);
 }

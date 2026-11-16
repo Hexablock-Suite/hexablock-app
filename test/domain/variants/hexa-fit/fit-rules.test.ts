@@ -458,6 +458,29 @@ describe('FitRules edge cases', () => {
     expect(trayOf(engine.snapshot())).toEqual(['a', 'b']);
   });
 
+  // Issue #244: the rules ask each move for its own check and its own change.
+  // An object that holds the parts of a move has no move operation, so it is no move,
+  // even when it carries the `kind` of a move.
+  it('should_throw_a_range_error_and_keep_the_state_when_an_object_with_the_parts_of_a_move_arrives_through_a_cast', () => {
+    const rules = new FitRules<SquareCoord>();
+    const state = dominoLevel();
+    const cast = (value: object) => value as unknown as FitMove<SquareCoord>;
+    const place = cast({ kind: 'place', pieceId: A, rotation: NO_TURN, at: square(0, 0) });
+    const bare = cast({ pieceId: A });
+
+    expect(() => rules.isValid(state, place)).toThrow(RangeError);
+    expect(() => rules.isValid(state, place)).toThrow(new RangeError('Unknown Fit move: place.'));
+    expect(() => rules.apply(state, place)).toThrow(RangeError);
+    expect(() => rules.apply(state, place)).toThrow(new RangeError('Unknown Fit move: place.'));
+    expect(() => rules.isValid(state, bare)).toThrow(
+      new RangeError('Unknown Fit move: undefined.'),
+    );
+    expect(() => rules.apply(state, bare)).toThrow(new RangeError('Unknown Fit move: undefined.'));
+    expect(cellsOf(state)).toEqual([]);
+    expect(trayOf(state)).toEqual(['a', 'b']);
+    expect(state.snapshot().moves).toEqual(Moves.of(0));
+  });
+
   it('should_give_the_same_moves_in_the_same_order_when_the_valid_moves_are_read_again', () => {
     // Remove and rotate moves of the placed pieces come first, then the place moves (fit-rules.ts).
     // Each call gives a new lazy sequence, so a partial read does not change the next call.
@@ -511,7 +534,7 @@ describe('FitRules edge cases', () => {
   });
 
   it('should_reject_the_rotation_and_keep_the_board_when_the_topology_turns_a_cell_outside_the_figure', () => {
-    // Every cell of a placed piece lies inside the figure (fit-rules.ts, `fits()`).
+    // Every cell of a placed piece lies inside the figure (fit-move.ts, `fits()`).
     const outward: GridTopology<SquareCoord> = {
       ...squareTopology,
       rotate: (c, turns) =>
