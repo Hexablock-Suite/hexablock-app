@@ -16,7 +16,7 @@ export interface ApplyMoveRequest<TMove> {
 // Plays one move on the running game (APP-FR-03, view 3.2).
 // The engine plays the turn, so the turn cycle stays in the domain (D1).
 // No exception leaves `execute()`. The failures:
-// - `no-running-game`: the store has no engine.
+// - `no-running-game`: the repository has no engine.
 // - `move-rejected`: the rules reject the move. The engine keeps its state.
 // - `move-failed`: the engine throws before it saves the turn, for example after the game ends.
 // The engine records its events and tells nobody (decision 52). After the turn, `ApplyMove`

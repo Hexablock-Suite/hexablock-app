@@ -64,14 +64,14 @@
       <h1>The use cases at a glance</h1>
 
       <svg
-        viewBox="0 0 1040 1184"
+        viewBox="0 0 1040 1234"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="mapuc-title mapuc-desc"
       >
         <title id="mapuc-title">HexaBlock use cases map · UML class diagram</title>
         <desc id="mapuc-desc">
-          Overview map of the 36 layer 2 classes in 7 groups. Each line joins two classes:
+          Overview map of the 37 layer 2 classes in 7 groups. Each line joins two classes:
           UseCaseAspect implements UseCase and keeps the inner one, StartGame, SaveProgress and
           Register each implement UseCase for their group, and RedoMove, SyncLeaderboard and
           UpdateSettings keep an output port. No line touches a group frame. Each group names the
@@ -136,7 +136,7 @@
           x="24"
           y="24"
           width="992"
-          height="1032"
+          height="1082"
           rx="8"
           fill="#efe7f8"
           stroke="rgba(126,34,206,0.40)"
@@ -335,7 +335,7 @@
           x="148"
           y="690"
           width="744"
-          height="128"
+          height="178"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -368,7 +368,7 @@
         <!-- Group: request and response models -->
         <rect
           x="56"
-          y="842"
+          y="892"
           width="928"
           height="178"
           rx="8"
@@ -379,7 +379,7 @@
         />
         <text
           x="68"
-          y="858"
+          y="908"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -390,7 +390,7 @@
         </text>
         <text
           x="972"
-          y="858"
+          y="908"
           fill="#1d4ed8"
           font-size="8"
           font-weight="500"
@@ -1050,148 +1050,36 @@
             </tspan>
           </text>
         </g>
+        <g data-class="GameEventPublisher">
+          <rect
+            x="164"
+            y="818"
+            width="244"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="286"
+            y="830"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="286" y="843" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              GameEventPublisher
+            </tspan>
+          </text>
+        </g>
         <!-- Chips: request and response models -->
         <g data-class="StartGameRequest">
-          <rect
-            x="88"
-            y="870"
-            width="160"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text
-            x="168"
-            y="882"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            value object
-          </text>
-          <text x="168" y="895" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              StartGameRequest
-            </tspan>
-          </text>
-        </g>
-        <g data-class="ApplyMoveRequest">
-          <rect
-            x="264"
-            y="870"
-            width="160"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text
-            x="344"
-            y="882"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            value object
-          </text>
-          <text x="344" y="895" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              ApplyMoveRequest
-            </tspan>
-          </text>
-        </g>
-        <g data-class="MoveResult">
-          <rect
-            x="440"
-            y="870"
-            width="160"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text
-            x="520"
-            y="882"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            value object
-          </text>
-          <text x="520" y="895" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              MoveResult
-            </tspan>
-          </text>
-        </g>
-        <g data-class="LevelSummary">
-          <rect
-            x="616"
-            y="870"
-            width="160"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text
-            x="696"
-            y="882"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            value object
-          </text>
-          <text x="696" y="895" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              LevelSummary
-            </tspan>
-          </text>
-        </g>
-        <g data-class="LevelDefinition">
-          <rect
-            x="792"
-            y="870"
-            width="160"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text
-            x="872"
-            y="882"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            value object
-          </text>
-          <text x="872" y="895" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              LevelDefinition
-            </tspan>
-          </text>
-        </g>
-        <g data-class="LeaderboardEntry">
           <rect
             x="88"
             y="920"
@@ -1215,11 +1103,11 @@
           </text>
           <text x="168" y="945" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              LeaderboardEntry
+              StartGameRequest
             </tspan>
           </text>
         </g>
-        <g data-class="Credentials">
+        <g data-class="ApplyMoveRequest">
           <rect
             x="264"
             y="920"
@@ -1243,11 +1131,11 @@
           </text>
           <text x="344" y="945" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              Credentials
+              ApplyMoveRequest
             </tspan>
           </text>
         </g>
-        <g data-class="Session">
+        <g data-class="MoveResult">
           <rect
             x="440"
             y="920"
@@ -1271,11 +1159,11 @@
           </text>
           <text x="520" y="945" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              Session
+              MoveResult
             </tspan>
           </text>
         </g>
-        <g data-class="Settings">
+        <g data-class="LevelSummary">
           <rect
             x="616"
             y="920"
@@ -1299,12 +1187,39 @@
           </text>
           <text x="696" y="945" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              Settings
+              LevelSummary
             </tspan>
           </text>
         </g>
-
-        <g data-class="Result">
+        <g data-class="LevelDefinition">
+          <rect
+            x="792"
+            y="920"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="872"
+            y="932"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="872" y="945" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              LevelDefinition
+            </tspan>
+          </text>
+        </g>
+        <g data-class="LeaderboardEntry">
           <rect
             x="88"
             y="970"
@@ -1328,11 +1243,11 @@
           </text>
           <text x="168" y="995" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              Result
+              LeaderboardEntry
             </tspan>
           </text>
         </g>
-        <g data-class="UseCaseError">
+        <g data-class="Credentials">
           <rect
             x="264"
             y="970"
@@ -1356,11 +1271,11 @@
           </text>
           <text x="344" y="995" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              UseCaseError
+              Credentials
             </tspan>
           </text>
         </g>
-        <g data-class="UseCaseLogEntry">
+        <g data-class="Session">
           <rect
             x="440"
             y="970"
@@ -1384,6 +1299,119 @@
           </text>
           <text x="520" y="995" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              Session
+            </tspan>
+          </text>
+        </g>
+        <g data-class="Settings">
+          <rect
+            x="616"
+            y="970"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="696"
+            y="982"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="696" y="995" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              Settings
+            </tspan>
+          </text>
+        </g>
+
+        <g data-class="Result">
+          <rect
+            x="88"
+            y="1020"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="168"
+            y="1032"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="168" y="1045" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              Result
+            </tspan>
+          </text>
+        </g>
+        <g data-class="UseCaseError">
+          <rect
+            x="264"
+            y="1020"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="344"
+            y="1032"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="344" y="1045" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              UseCaseError
+            </tspan>
+          </text>
+        </g>
+        <g data-class="UseCaseLogEntry">
+          <rect
+            x="440"
+            y="1020"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="520"
+            y="1032"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="520" y="1045" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               UseCaseLogEntry
             </tspan>
           </text>
@@ -1391,7 +1419,7 @@
         <!-- Footnote -->
         <text
           x="24"
-          y="1084"
+          y="1134"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1403,15 +1431,15 @@
         <!-- Legend -->
         <line
           x1="24"
-          y1="1108"
+          y1="1158"
           x2="1016"
-          y2="1108"
+          y2="1158"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1126"
+          y="1176"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1422,16 +1450,16 @@
 
         <line
           x1="24"
-          y1="1144"
+          y1="1194"
           x2="52"
-          y2="1144"
+          y2="1194"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#mapuc-open)"
         />
         <text
           x="60"
-          y="1148"
+          y="1198"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1440,9 +1468,9 @@
         </text>
         <line
           x1="384"
-          y1="1144"
+          y1="1194"
           x2="412"
-          y2="1144"
+          y2="1194"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -1450,7 +1478,7 @@
         />
         <text
           x="420"
-          y="1148"
+          y="1198"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1460,7 +1488,7 @@
 
         <rect
           x="24"
-          y="1164"
+          y="1214"
           width="28"
           height="12"
           rx="2"
@@ -1470,7 +1498,7 @@
         />
         <text
           x="60"
-          y="1173"
+          y="1223"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1479,7 +1507,7 @@
         </text>
         <rect
           x="184"
-          y="1164"
+          y="1214"
           width="28"
           height="12"
           rx="2"
@@ -1490,7 +1518,7 @@
         />
         <text
           x="220"
-          y="1173"
+          y="1223"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1499,7 +1527,7 @@
         </text>
         <rect
           x="432"
-          y="1164"
+          y="1214"
           width="28"
           height="12"
           rx="2"
@@ -1509,7 +1537,7 @@
         />
         <text
           x="468"
-          y="1173"
+          y="1223"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1518,7 +1546,7 @@
         </text>
         <text
           x="632"
-          y="1173"
+          y="1223"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1536,7 +1564,7 @@
         </text>
         <rect
           x="824"
-          y="1164"
+          y="1214"
           width="28"
           height="12"
           rx="2"
@@ -1546,7 +1574,7 @@
         />
         <text
           x="860"
-          y="1173"
+          y="1223"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
