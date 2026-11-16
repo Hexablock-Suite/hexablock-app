@@ -7,10 +7,11 @@ import { Stars } from '../../engine/stars';
 // It is a value object (classes.md decision 42): it never changes, and two plays are equal
 // when their moves and their times are equal. `Moves` and `ElapsedTime` check their own values,
 // so a play holds no count and no time that a game cannot give (gaps G110.1 and G110.2).
+// Both fields are private (issue #240). A threshold gives its limits to `isWithin()`.
 export class FitPlay {
   private constructor(
-    readonly moves: Moves,
-    readonly elapsedMs: ElapsedTime,
+    private readonly moves: Moves,
+    private readonly elapsedMs: ElapsedTime,
   ) {
     Object.freeze(this);
   }
@@ -22,6 +23,12 @@ export class FitPlay {
   // Two plays are equal when their moves and their times are equal.
   equals(other: FitPlay): boolean {
     return this.moves.equals(other.moves) && this.elapsedMs.equals(other.elapsedMs);
+  }
+
+  // Tells if the play stays within both limits: its moves and its time.
+  // A play that equals a limit stays within it.
+  isWithin(maxMoves: Moves, maxElapsedMs: ElapsedTime): boolean {
+    return !maxMoves.isFewerThan(this.moves) && !maxElapsedMs.isShorterThan(this.elapsedMs);
   }
 }
 
@@ -48,10 +55,9 @@ export class FitStarThreshold {
 
   // Tells if a play meets the threshold. The accepted rule of issue #59 (D22, 2026-11-06):
   // a star needs both limits, the moves and the time. A play that equals a limit meets it.
+  // The threshold gives its limits to the play, and the play answers.
   isMetBy(play: FitPlay): boolean {
-    return (
-      !this.maxMoves.isFewerThan(play.moves) && !this.maxElapsedMs.isShorterThan(play.elapsedMs)
-    );
+    return play.isWithin(this.maxMoves, this.maxElapsedMs);
   }
 }
 

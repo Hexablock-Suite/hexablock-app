@@ -66,10 +66,19 @@ describe('The time of a Fit level', () => {
     expect(last.elapsedMs).toBeInstanceOf(ElapsedTime);
     expect(last.outcome).toBe(Outcome.victory);
     expect(engine.timed()?.elapsedMs()).toEqual(ElapsedTime.ofMs(5_000));
-    expect(result.moves).toEqual(Moves.of(3));
-    expect(result.elapsedMs).toEqual(ElapsedTime.ofMs(5_000));
+    // The fields of a result are private (issue #240), so the test compares the result.
     expect(
-      fitStars(FitPlay.of({ moves: result.moves, elapsedMs: ElapsedTime.ofMs(5_000) }), [
+      result.equals(
+        GameResult.of({
+          gameId: factory.gameId,
+          score: last.score,
+          moves: Moves.of(3),
+          elapsedMs: ElapsedTime.ofMs(5_000),
+        }),
+      ),
+    ).toBe(true);
+    expect(
+      fitStars(FitPlay.of({ moves: Moves.of(3), elapsedMs: ElapsedTime.ofMs(5_000) }), [
         star(3, 5_000),
         star(3, 4_999),
       ]),

@@ -135,6 +135,20 @@ describe('FitPlay', () => {
   });
 });
 
+// The fields of a play are private (issue #240). The threshold gives its limits to the play,
+// and the play tells whether it stays within them.
+describe('FitPlay.isWithin', () => {
+  it('should_stay_within_the_limits_when_the_moves_and_the_time_meet_both_limits', () => {
+    expect(play(10, 60_000).isWithin(Moves.of(10), ElapsedTime.ofMs(60_000))).toBe(true);
+    expect(play(0, 0).isWithin(Moves.of(10), ElapsedTime.ofMs(60_000))).toBe(true);
+  });
+
+  it('should_pass_the_limits_when_the_moves_or_the_time_pass_one_limit', () => {
+    expect(play(11, 60_000).isWithin(Moves.of(10), ElapsedTime.ofMs(60_000))).toBe(false);
+    expect(play(10, 60_001).isWithin(Moves.of(10), ElapsedTime.ofMs(60_000))).toBe(false);
+  });
+});
+
 describe('fitStars', () => {
   it('should_give_the_star_when_the_moves_and_the_time_meet_both_thresholds', () => {
     expect(fitStars(play(10, 60_000), ONE_STAR)).toEqual(Stars.of(1));
