@@ -141,7 +141,7 @@ describe('TimedRulesDecorator', () => {
     engine.play(moveAt(0));
     clock.advance(SECOND);
 
-    expect(turn.accepted).toBe(false);
+    expect(turn.wasAccepted()).toBe(false);
     expect(afterRejected).toEqual(ElapsedTime.ofMs(0));
     // The first accepted turn starts the timer.
     expect(timer.elapsedMs()).toEqual(ElapsedTime.ofMs(SECOND));
@@ -155,7 +155,7 @@ describe('TimedRulesDecorator', () => {
     const turn = engine.tryPlay(outsideTheBoard);
     clock.advance(SECOND);
 
-    expect(turn.accepted).toBe(false);
+    expect(turn.wasAccepted()).toBe(false);
     expect(timer.elapsedMs()).toEqual(ElapsedTime.ofMs(2 * SECOND));
   });
 
@@ -253,7 +253,7 @@ describe('TimedRulesDecorator', () => {
     expect(decorated.apply(emptyState(), move).board.cells()).toEqual(
       rules.apply(emptyState(), move).board.cells(),
     );
-    expect(decorated.resolve(state).accepted).toBe(true);
+    expect(decorated.resolve(state).wasAccepted()).toBe(true);
     expect(decorated.evaluate(state)).toBe(Outcome.playing);
   });
 });

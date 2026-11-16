@@ -82,8 +82,6 @@ export const fieldBaseline: readonly FieldEntry[] = [
   { rule: 'get', where: 'ReadonlyBoard.get', issue: 234 },
   { rule: 'get', where: 'Board.get', issue: 234 },
   // #240: the fields of the result values.
-  { rule: 'field', where: 'Resolution.accepted', issue: 240 },
-  { rule: 'field', where: 'Resolution.outcome', issue: 240 },
   { rule: 'field', where: 'GameResult.gameId', issue: 240 },
   { rule: 'field', where: 'GameResult.score', issue: 240 },
   { rule: 'field', where: 'GameResult.moves', issue: 240 },
