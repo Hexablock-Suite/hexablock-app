@@ -20,6 +20,7 @@ import type { FitState } from '../../../src/domain/variants/hexa-fit/fit-state';
 import { PieceId } from '../../../src/domain/variants/hexa-fit/piece-id';
 import { Placement } from '../../../src/domain/variants/hexa-fit/placement';
 import { PlacePiece } from '../../../src/domain/variants/hexa-lines/place-piece';
+import { TrayPosition } from '../../../src/domain/variants/hexa-lines/tray-position';
 import { MergeTile } from '../../../src/domain/variants/hexa-merge/merge-tile';
 import { SlideSense, Slide } from '../../../src/domain/variants/hexa-merge/slide';
 import type { ColorStack } from '../../../src/domain/variants/hexa-sort/color-stack';
@@ -383,7 +384,10 @@ describe('aliasing of earlier snapshots (T18 probe)', () => {
       aliasingOf(sortFactory(), [place(0, 0), place(1, 0), place(0, 1)], sortStateOf),
       aliasingOf(
         linesFactory(),
-        [new PlacePiece(0, square(0, 0)), new PlacePiece(0, square(1, 1))],
+        [
+          new PlacePiece(TrayPosition.of(0), square(0, 0)),
+          new PlacePiece(TrayPosition.of(0), square(1, 1)),
+        ],
         linesStateOf,
       ),
       aliasingOf(
@@ -488,8 +492,8 @@ describe('atomicity of the state methods (T18 probe)', () => {
     const shown = () => shownBy(state);
 
     const result = allKept([
-      throwOf(shown, () => state.placePiece(new PlacePiece(9, square(0, 0)))),
-      throwOf(shown, () => state.placePiece(new PlacePiece(0, square(9, 9)))),
+      throwOf(shown, () => state.placePiece(new PlacePiece(TrayPosition.of(9), square(0, 0)))),
+      throwOf(shown, () => state.placePiece(new PlacePiece(TrayPosition.of(0), square(9, 9)))),
       throwOf(shown, () => state.clearLines([[square(0, 0)]])),
     ]);
 

@@ -71,11 +71,11 @@
       >
         <title id="mapuc-title">HexaBlock use cases map · UML class diagram</title>
         <desc id="mapuc-desc">
-          Overview map of the 37 layer 2 classes in 7 groups. Each line joins two classes:
-          UseCaseAspect implements UseCase and keeps the inner one, StartGame, SaveProgress and
-          Register each implement UseCase for their group, and RedoMove, SyncLeaderboard and
-          UpdateSettings keep an output port. No line touches a group frame. Each group names the
-          view that shows its members.
+          Overview map of the 36 layer 2 classes in 7 groups, with LevelDefinition of layer 1 as a
+          dashed chip. Each line joins two classes: UseCaseAspect implements UseCase and keeps the
+          inner one, StartGame, SaveProgress and Register each implement UseCase for their group,
+          and RedoMove, SyncLeaderboard and UpdateSettings keep an output port. No line touches a
+          group frame. Each group names the view that shows its members.
         </desc>
         <defs>
           <marker
@@ -1191,6 +1191,7 @@
             </tspan>
           </text>
         </g>
+        <!-- LevelDefinition lives in layer 1 since #166: a dashed chip, detailed in Part 1, view 5 -->
         <g data-class="LevelDefinition">
           <rect
             x="792"
@@ -1199,8 +1200,9 @@
             height="34"
             rx="4"
             fill="#ffffff"
-            stroke="#17212a"
+            stroke="#5b6873"
             stroke-width="1"
+            stroke-dasharray="4,3"
           />
           <text
             x="872"
@@ -1211,7 +1213,7 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            value object
+            engine · part 1 · view 5
           </text>
           <text x="872" y="945" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
@@ -1425,7 +1427,7 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Layer 3 implements every output port (Part 4). Use cases also use layer 1: the engine, the
-          variant factory and the progress model.
+          variant factory, the progress model and LevelDefinition, the dashed chip (decision 24).
         </text>
 
         <!-- Legend -->

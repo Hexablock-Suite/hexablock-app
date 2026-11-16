@@ -64,7 +64,7 @@
       <h1>Geometry and board: Abstract Factory and Builder</h1>
 
       <svg
-        viewBox="0 0 1040 1588"
+        viewBox="0 0 1040 1604"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="geometry-title geometry-desc"
@@ -74,7 +74,8 @@
         </title>
         <desc id="geometry-desc">
           Class diagram of layer 1 showing the GeometryFactory abstract factory, which creates the
-          coordinate, the topology and the piece shapes of one geometry, with HexGeometry creating
+          coordinate, the topology and the piece shapes of one geometry and turns each coordinate of
+          a level file into a coordinate value for FitLevelBuilder, with HexGeometry creating
           HexCoord and HexTopology and SquareGeometry creating SquareCoord, the three coordinate
           value objects HexCoord, SquareCoord and TriangleCoord with private values and their own
           operations, the value object TopologyId that names a family, which each concrete factory
@@ -1570,13 +1571,22 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          FitLevelBuilder and SortLevelBuilder ask BoardBuilder for the board. LinesFactory and
-          MergeFactory use it with no level (decision 15). A coordinate keeps its values private
-          (decision 44).
+          FitLevelBuilder reads each coordinate of a level file with createCoord() (decision 15). A
+          coordinate keeps its values private (decision 44).
         </text>
         <text
           x="24"
           y="1412"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          SortLevelBuilder asks BoardBuilder for the board. FitFactory builds the figure board with
+          it, and LinesFactory and MergeFactory use it with no level.
+        </text>
+        <text
+          x="24"
+          y="1428"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1586,7 +1596,7 @@
         </text>
         <text
           x="24"
-          y="1428"
+          y="1444"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1596,7 +1606,7 @@
         </text>
         <text
           x="24"
-          y="1444"
+          y="1460"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1606,7 +1616,7 @@
         </text>
         <text
           x="24"
-          y="1460"
+          y="1476"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1617,15 +1627,15 @@
         <!-- Legend -->
         <line
           x1="24"
-          y1="1480"
+          y1="1496"
           x2="1016"
-          y2="1480"
+          y2="1496"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1498"
+          y="1514"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1635,9 +1645,9 @@
         </text>
         <line
           x1="24"
-          y1="1516"
+          y1="1532"
           x2="52"
-          y2="1516"
+          y2="1532"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -1645,7 +1655,7 @@
         />
         <text
           x="60"
-          y="1520"
+          y="1536"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1654,16 +1664,16 @@
         </text>
         <line
           x1="144"
-          y1="1516"
+          y1="1532"
           x2="172"
-          y2="1516"
+          y2="1532"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#geo-diamond-hollow)"
         />
         <text
           x="180"
-          y="1520"
+          y="1536"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1672,16 +1682,16 @@
         </text>
         <line
           x1="384"
-          y1="1516"
+          y1="1532"
           x2="412"
-          y2="1516"
+          y2="1532"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#geo-open)"
         />
         <text
           x="420"
-          y="1520"
+          y="1536"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1690,7 +1700,7 @@
         </text>
         <rect
           x="24"
-          y="1536"
+          y="1552"
           width="28"
           height="12"
           rx="2"
@@ -1700,7 +1710,7 @@
         />
         <text
           x="60"
-          y="1545"
+          y="1561"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1709,7 +1719,7 @@
         </text>
         <rect
           x="184"
-          y="1536"
+          y="1552"
           width="28"
           height="12"
           rx="2"
@@ -1720,7 +1730,7 @@
         />
         <text
           x="220"
-          y="1545"
+          y="1561"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1729,7 +1739,7 @@
         </text>
         <rect
           x="440"
-          y="1536"
+          y="1552"
           width="28"
           height="12"
           rx="2"
@@ -1740,7 +1750,7 @@
         />
         <text
           x="476"
-          y="1545"
+          y="1561"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1749,7 +1759,7 @@
         </text>
         <rect
           x="648"
-          y="1536"
+          y="1552"
           width="28"
           height="12"
           rx="2"
@@ -1760,7 +1770,7 @@
         />
         <text
           x="684"
-          y="1545"
+          y="1561"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1769,7 +1779,7 @@
         </text>
         <rect
           x="24"
-          y="1560"
+          y="1576"
           width="28"
           height="12"
           rx="2"
@@ -1779,18 +1789,18 @@
         />
         <text
           x="60"
-          y="1569"
+          y="1585"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
         </text>
-        <line x1="184" y1="1566" x2="200" y2="1566" stroke="#17212a" stroke-width="1" />
-        <circle cx="205" cy="1566" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="184" y1="1582" x2="200" y2="1582" stroke="#17212a" stroke-width="1" />
+        <circle cx="205" cy="1582" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="220"
-          y="1569"
+          y="1585"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

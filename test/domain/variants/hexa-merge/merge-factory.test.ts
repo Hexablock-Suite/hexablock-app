@@ -9,7 +9,6 @@ import { Chance } from '../../../../src/domain/variants/hexa-merge/chance';
 import {
   MergeFactory,
   MergeSettings,
-  START_TILES,
 } from '../../../../src/domain/variants/hexa-merge/merge-factory';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
 import { firstValidMove, startVariant } from '../../../support/engine/variant-game';
@@ -116,7 +115,6 @@ describe('MergeFactory', () => {
 
     const initial = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
 
-    expect(START_TILES).toBe(2);
     expect(factory.createBoard(BOARD_ID).coordinates()).toHaveLength(1);
     expect(Object.keys(values(initial.snapshot()))).toEqual(['0,0']);
     expect([2, 4]).toContain(values(initial.snapshot())['0,0']);

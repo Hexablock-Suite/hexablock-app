@@ -9,7 +9,8 @@ import type { SortState } from './sort-state';
 // A top run of this many tiles of one color clears its stack (statement §1.3).
 // The accepted rule of issue #56: a top run of 10 or more removes the whole stack,
 // tiles of other colors below included, and counts one goal.
-export const GOAL_RUN = 10;
+// Only this file reads the length (issue #232).
+const GOAL_RUN = 10;
 
 // The rules of Hexa Sort (statement §1.3). The player places the offered stack on an
 // empty cell. Then the top tiles of neighbor stacks with the same top color move,

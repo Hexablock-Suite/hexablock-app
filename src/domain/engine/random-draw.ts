@@ -1,12 +1,13 @@
-import type { Ordered } from './ordered';
 import type { ValueReceiver } from './value-receiver';
 
 // One draw of a random source: a number from 0 up to 1, without 1 (APP-NFR-07, issue #243).
 // It is a value object: it never changes, and two draws are equal when their numbers are equal.
 // `of()` is the only place that checks the number. A negative zero is stored as 0.
 // The number stays private. A caller picks an item with `pick()` and compares with `equals()`
-// and `isBefore()`. Only an adapter of the edge receives the number (rule R-no-delivery-call).
-export class RandomDraw implements Ordered<RandomDraw> {
+// and `isBelow()`. Only an adapter of the edge receives the number (rule R-no-delivery-call).
+// It is the one type of a draw: Hexa Merge takes it too, for the cell and the value of a new
+// tile (issue #243, which replaced the Merge `Draw` of issue #232).
+export class RandomDraw {
   private constructor(private readonly value: number) {
     Object.freeze(this);
   }
@@ -23,8 +24,9 @@ export class RandomDraw implements Ordered<RandomDraw> {
     return this.value === other.value;
   }
 
-  // Tells if this draw is lower than the other draw.
-  isBefore(other: RandomDraw): boolean {
+  // Tells if this draw falls below the other draw. An equal draw does not fall below.
+  // The chance of a 4 of Hexa Merge hits when the draw falls below it.
+  isBelow(other: RandomDraw): boolean {
     return this.value < other.value;
   }
 

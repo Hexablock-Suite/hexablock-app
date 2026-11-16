@@ -35,22 +35,54 @@ describe('RandomDraw', () => {
     );
   });
 
-  it('should_be_equal_when_two_draws_hold_the_same_number', () => {
-    expect(RandomDraw.of(0.5)).not.toBe(RandomDraw.of(0.5));
-    expect(RandomDraw.of(0.5).equals(RandomDraw.of(0.5))).toBe(true);
-    expect(RandomDraw.of(0.5).equals(RandomDraw.of(0.25))).toBe(false);
+  // The comparison runs both ways, as the Merge `Draw` test of issue #232 pinned it.
+  it('should_be_equal_in_both_directions_when_two_draws_hold_the_same_number', () => {
+    const first = RandomDraw.of(0.5);
+    const second = RandomDraw.of(0.5);
+
+    expect(first).not.toBe(second);
+    expect([first.equals(second), second.equals(first)]).toEqual([true, true]);
+    expect([first.equals(RandomDraw.of(0.25)), RandomDraw.of(0.25).equals(first)]).toEqual([
+      false,
+      false,
+    ]);
     expect(RandomDraw.of(-0).equals(RandomDraw.of(0))).toBe(true);
   });
 
-  it('should_come_before_another_draw_when_its_number_is_lower', () => {
-    expect(RandomDraw.of(0.25).isBefore(RandomDraw.of(0.5))).toBe(true);
-    expect(RandomDraw.of(0.5).isBefore(RandomDraw.of(0.25))).toBe(false);
-    expect(RandomDraw.of(0.5).isBefore(RandomDraw.of(0.5))).toBe(false);
+  it('should_fall_below_another_draw_when_its_number_is_lower', () => {
+    const tenth = RandomDraw.of(0.1);
+
+    expect([0, 0.0999, 0.1, 0.9].map((value) => RandomDraw.of(value).isBelow(tenth))).toEqual([
+      true,
+      true,
+      false,
+      false,
+    ]);
+    expect(RandomDraw.of(0.25).isBelow(RandomDraw.of(0.5))).toBe(true);
+    expect(RandomDraw.of(0.5).isBelow(RandomDraw.of(0.25))).toBe(false);
   });
 
   it('should_give_its_number_to_the_receiver_when_the_draw_is_delivered', () => {
     expect(delivered(RandomDraw.of(0.25))).toBe(0.25);
     expect(Object.is(delivered(RandomDraw.of(-0)), 0)).toBe(true);
+  });
+
+  // A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails
+  // when the line compiles, because then the directive is unused.
+  it('should_reject_at_compile_time_when_a_caller_reads_the_number', () => {
+    const readers = [
+      // @ts-expect-error `RandomDraw.value` is private.
+      () => RandomDraw.of(0.5).value,
+    ];
+
+    expect(readers).toHaveLength(1);
+  });
+
+  it('should_keep_its_number_when_a_caller_tries_to_write_it', () => {
+    const draw = RandomDraw.of(0.5);
+
+    expect(Reflect.set(draw, 'value', 0)).toBe(false);
+    expect(draw.equals(RandomDraw.of(0.5))).toBe(true);
   });
 });
 

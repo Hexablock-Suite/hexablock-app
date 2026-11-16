@@ -6,6 +6,7 @@ import { NewTile } from '../../../../src/domain/variants/hexa-merge/new-tile';
 // One draw of the Merge tile source is a value object (issue 210, classes.md decision 48).
 // It holds the tile and the place of its cell, and both fields are private.
 // The place is a `RandomDraw`, which checks its number in `RandomDraw.of()` (issue #243).
+// It replaced the Merge `Draw` of issue #232.
 
 const two = MergeTile.of(2);
 const four = MergeTile.of(4);
