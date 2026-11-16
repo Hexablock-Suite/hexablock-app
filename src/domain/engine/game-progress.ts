@@ -1,5 +1,7 @@
 import type { GameId } from './game-id';
+import type { LevelId } from './level-id';
 import type { ProgressRecord } from './progress-model';
+import type { Stars } from './stars';
 
 // The local progress of one game (S3-04, issue #156): its high score and the best result
 // of each of its levels. It mirrors the progress of the backend (DS-5), so a sync maps one to one.
@@ -55,6 +57,17 @@ export class GameProgress {
     return (
       this.highScore?.equals(record) === true || this.levels.some((stored) => stored.equals(record))
     );
+  }
+
+  // The stars of the best result of the level `levelId`, or `undefined` when the progress
+  // keeps no result of that level. A level won with zero stars gives zero stars.
+  // The list of levels asks it for each level (#168).
+  starsOf(levelId: LevelId): Stars | undefined {
+    for (const stored of this.levels) {
+      const stars = stored.starsOf(levelId);
+      if (stars !== undefined) return stars;
+    }
+    return undefined;
   }
 
   // Gives the game id, the high score and the record of each level to `receiver`.

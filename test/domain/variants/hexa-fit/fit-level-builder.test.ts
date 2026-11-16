@@ -25,7 +25,7 @@ type FitFile = ReturnType<typeof fitLevelFile>;
 const hexGeometry = new HexGeometry();
 
 // The level that the hex Fit builder builds from `file`.
-function built(file: { topology: string; section: unknown }): FitLevel<HexCoord> {
+function built(file: Parameters<typeof LevelDefinition.of>[0]): FitLevel<HexCoord> {
   return LevelDefinition.of(file).buildWith(new FitLevelBuilder(hexGeometry));
 }
 
@@ -71,6 +71,8 @@ describe('FitLevelBuilder', () => {
   // so the same builder class builds a square level (APP-FR-16).
   it('should_turn_each_coordinate_through_its_geometry_when_the_level_is_square', () => {
     const file = {
+      levelId: 'fit-square-01',
+      order: 1,
       topology: 'square',
       section: {
         figure: [

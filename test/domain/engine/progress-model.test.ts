@@ -122,6 +122,21 @@ describe('ProgressRecord', () => {
       record.equals(ProgressRecord.of({ gameId, score: Score.of(0), levelId: LevelId.of('l1') })),
     ).toBe(false);
   });
+
+  // Issue #168: a progress asks each record for the stars of a level.
+  it('should_give_its_stars_only_for_its_own_level_when_a_record_is_asked_for_the_stars_of_a_level', () => {
+    const levelRecord = ProgressRecord.of({
+      gameId,
+      score: Score.of(0),
+      levelId: LevelId.of('l1'),
+      stars: Stars.of(2),
+    });
+    const highScore = ProgressRecord.of({ gameId, score: Score.of(36) });
+
+    expect(levelRecord.starsOf(LevelId.of('l1'))?.equals(Stars.of(2))).toBe(true);
+    expect(levelRecord.starsOf(LevelId.of('l2'))).toBeUndefined();
+    expect(highScore.starsOf(LevelId.of('l1'))).toBeUndefined();
+  });
 });
 
 // The order of DS-4 and DS-12 (issues #240 and #156): a level ranks by its stars, then by

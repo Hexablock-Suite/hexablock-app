@@ -132,6 +132,13 @@ export class ProgressRecord {
     return sameOptional(this.levelId, other.levelId, (left, right) => left.equals(right));
   }
 
+  // The stars of this record when it is the result of the level `levelId`.
+  // The record of another level and the record of a game with no levels give `undefined`.
+  // A progress asks each of its records for the stars of a level (#168).
+  starsOf(levelId: LevelId): Stars | undefined {
+    return this.levelId?.equals(levelId) === true ? this.stars : undefined;
+  }
+
   // Tells if this record is better than `other`, the stored record of the same game or level.
   // A game with no levels ranks by its score: a higher score is better.
   // A level ranks by the order of DS-4 and DS-12: more stars win; on equal stars, fewer moves
