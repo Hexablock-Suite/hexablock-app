@@ -51,11 +51,11 @@ Layers 2 to 4 have their own extension points. The view shows only the ones that
 
 - **Database and backend.** A new storage or backend is one more adapter of the layer 2 ports. The use cases do not change (§3.3, §3.4, decision 22).
 - **Level origin (A6).** `BundledLevelRepository` and `ApiLevelRepository` both implement `LevelRepository`, so bundled levels work offline (APP-FR-15).
-- **Observer.** A new subscriber implements `GameEventListener` and subscribes to `GameEventBus`, which implements the engine interface `GameEventPublisher`.
+- **Observer.** A new subscriber implements `GameEventListener` and subscribes to `GameEventBus`, which implements `GameEventPublisher`, the port of layer 2. The engine records its events, and `ApplyMove` delivers them to the port after each turn (#233).
 - **Aspects.** A new aspect extends `UseCaseAspect` and wraps any use case (§3.5, APP-NFR-11).
 - **Desktop and a game with no board (D5).** Both are planned seams with no class yet. The layer of the game registry is still open.
 
-![Outside the engine: HTTP adapters in layer 4 and local adapters in layer 3 implement the output ports of layer 2, with the two level origins of A6; GameEventBus implements GameEventPublisher and AudioManager listens to it; the aspects extend UseCaseAspect; the declared DesktopLayout, NewStorageAdapter, NewListener, GameRegistry, GameModule and CachingAspect are placeholders](extensibility/views/ext-4-outer-layers.png)
+![Outside the engine: HTTP adapters in layer 4 and local adapters in layer 3 implement the output ports of layer 2, with the two level origins of A6; GameEventBus implements GameEventPublisher, the port of layer 2, and AudioManager listens to it; the aspects extend UseCaseAspect; the declared DesktopLayout, NewStorageAdapter, NewListener, GameRegistry, GameModule and CachingAspect are placeholders](extensibility/views/ext-4-outer-layers.png)
 
 ## Extension points by variant
 

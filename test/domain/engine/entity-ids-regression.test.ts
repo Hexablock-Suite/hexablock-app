@@ -30,7 +30,6 @@ import {
   CountingStateIds,
   STATE_ID,
 } from '../../support/engine/entity-ids';
-import { RecordingPublisher } from '../../support/engine/fake-game';
 import { liveStateOf } from '../../support/engine/variant-game';
 import { CountingMatchIds, MATCH_ID } from '../../support/engine/match-id';
 import { square, type SquareCoord } from '../../support/engine/square-topology';
@@ -65,13 +64,7 @@ function gamesOf<TCell, TCoord, TMove, TState extends AnyState<TCell, TCoord, TS
   boardIds: BoardIdGenerator = new CountingBoardIds(),
   stateIds: GameStateIdGenerator = new CountingStateIds(),
 ): GameFactory<TCell, TCoord, TMove, TState> {
-  return new GameFactory(
-    variant,
-    new CountingMatchIds(),
-    stateIds,
-    boardIds,
-    new RecordingPublisher(),
-  );
+  return new GameFactory(variant, new CountingMatchIds(), stateIds, boardIds);
 }
 
 // The id facts of two games of one factory, in the order of `OWN_IDS`.
@@ -242,7 +235,6 @@ function throwingTurnOf<TCell, TCoord, TMove, TState extends AnyState<TCell, TCo
     variant.gameId,
     new ThrowingAfterTurnRules(variant.createRules()),
     variant.createScoring(),
-    new RecordingPublisher(),
     variant.createHistory(),
   );
   game.start(variant.createInitialState(MATCH_ID, STATE_ID, BOARD_ID));

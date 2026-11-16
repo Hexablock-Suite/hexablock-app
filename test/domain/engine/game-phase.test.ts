@@ -3,7 +3,7 @@ import { Outcome } from '../../../src/domain/engine/outcome';
 import { GameId } from '../../../src/domain/engine/game-id';
 import { MatchId } from '../../../src/domain/engine/match-id';
 import { Score } from '../../../src/domain/engine/score';
-import { GameOver } from '../../../src/domain/engine/game-events';
+import { GameEvent, GameOver } from '../../../src/domain/engine/game-events';
 import {
   GameOverPhase,
   PausedPhase,
@@ -12,6 +12,7 @@ import {
   VictoryPhase,
   type GamePhase,
 } from '../../../src/domain/engine/game-phase';
+import { dataOf } from '../../support/engine/game-over';
 import { MATCH_ID } from '../../support/engine/match-id';
 
 // The value that `act` throws, or `undefined` when it throws nothing.
@@ -181,8 +182,10 @@ describe('GameId', () => {
   });
 });
 
+// The event keeps its fields private (issue #233). A listener asks `isVictory()`,
+// or it receives the data through `deliverTo()`.
 describe('GameOver event', () => {
-  it('should_carry_the_game_the_match_the_outcome_and_the_final_score_when_it_is_created', () => {
+  it('should_deliver_the_game_the_match_the_outcome_and_the_final_score_when_a_receiver_takes_the_event', () => {
     const event = new GameOver(
       GameId.of('hexa-lines'),
       MatchId.of('match-a'),
@@ -190,12 +193,34 @@ describe('GameOver event', () => {
       Score.of(42),
     );
 
-    expect(event.gameId.equals(GameId.of('hexa-lines'))).toBe(true);
-    expect(event.matchId.equals(MatchId.of('match-a'))).toBe(true);
-    expect(event.matchId.equals(MatchId.of('match-b'))).toBe(false);
-    expect(event.outcome).toBe(Outcome.gameOver);
-    expect(event.finalScore).toBeInstanceOf(Score);
-    expect(event.finalScore.equals(Score.of(42))).toBe(true);
+    const data = dataOf(event);
+
+    expect(data.gameId.equals(GameId.of('hexa-lines'))).toBe(true);
+    expect([
+      data.matchId.equals(MatchId.of('match-a')),
+      data.matchId.equals(MatchId.of('match-b')),
+    ]).toEqual([true, false]);
+    expect(data.outcome).toBe(Outcome.gameOver);
+    expect(data.finalScore).toBeInstanceOf(Score);
+    expect(data.finalScore.equals(Score.of(42))).toBe(true);
+  });
+
+  // The documents name planned events, so `GameOver` keeps the abstract base `GameEvent`
+  // (issue #233). The publisher port and `GameEngine.takeEvents()` speak of `GameEvent`.
+  it('should_be_a_game_event_when_a_game_over_is_created', () => {
+    const event = new GameOver(GameId.of('hexa-lines'), MATCH_ID, Outcome.gameOver, Score.of(0));
+
+    expect(event).toBeInstanceOf(GameEvent);
+  });
+
+  it('should_tell_a_victory_from_a_game_over_when_a_listener_asks_the_event', () => {
+    const ended = (outcome: Outcome) =>
+      new GameOver(GameId.of('hexa-fit'), MATCH_ID, outcome, Score.of(0));
+
+    expect([ended(Outcome.victory).isVictory(), ended(Outcome.gameOver).isVictory()]).toEqual([
+      true,
+      false,
+    ]);
   });
 
   // The event has no check of its own: a `Score` is valid when it exists (issue #203).
@@ -208,7 +233,9 @@ describe('GameOver event', () => {
       );
     }
     expect(
-      new GameOver(gameId, MATCH_ID, Outcome.gameOver, Score.of(0)).finalScore.equals(Score.of(0)),
+      dataOf(new GameOver(gameId, MATCH_ID, Outcome.gameOver, Score.of(0))).finalScore.equals(
+        Score.of(0),
+      ),
     ).toBe(true);
   });
 });

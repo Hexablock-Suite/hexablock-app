@@ -1,5 +1,7 @@
 import type { BoardState } from '../domain/engine/board-state';
 import type { Cloneable } from '../domain/engine/cloneable';
+import type { GameEvent } from '../domain/engine/game-events';
+import type { GameEventPublisher } from './game-event-publisher';
 import { logEntryOf, type Logger } from './logger';
 import { moveResultOf, type MoveResult, type ViewOf } from './move-result';
 import { caughtError, Result, UseCaseError } from './result';
@@ -14,14 +16,15 @@ export interface ApplyMoveRequest<TMove> {
 // Plays one move on the running game (APP-FR-03, view 3.2).
 // The engine plays the turn, so the turn cycle stays in the domain (D1).
 // No exception leaves `execute()`. The failures:
-// - `no-running-game`: the store has no engine.
+// - `no-running-game`: the repository has no engine.
 // - `move-rejected`: the rules reject the move. The engine keeps its state.
 // - `move-failed`: the engine throws before it saves the turn, for example after the game ends.
-// The engine saves the turn before it publishes. So a publisher failure gives a success
-// built from the saved state (decision 29), and `logger` gets a `publish-failed` entry
-// (issue 132). `tryPlay()` returns the `Resolution` of the turn, a domain value. The publisher
-// failure is no domain concept (decision 48): the engine gives it to the handler
-// that `ApplyMove` passes. `ApplyMove` logs nothing else: the logging aspect logs each call.
+// The engine records its events and tells nobody (decision 52). After the turn, `ApplyMove`
+// takes the events of the engine and gives each one to `events`, the publisher port (#233).
+// The turn is saved before the delivery. So a publisher failure gives a success built from
+// the saved state (decision 29), and `logger` gets a `publish-failed` entry (issue 132).
+// The publisher failure is no domain concept (decision 48), so it stays in this use case.
+// `ApplyMove` logs nothing else: the logging aspect logs each call.
 export class ApplyMove<
   TCell,
   TCoord,
@@ -31,6 +34,7 @@ export class ApplyMove<
   constructor(
     private readonly games: GameRepository<TCell, TCoord, TMove, TState>,
     private readonly logger: Logger,
+    private readonly events: GameEventPublisher,
   ) {}
 
   async execute(
@@ -41,13 +45,26 @@ export class ApplyMove<
       if (engine === undefined) {
         return Result.failure(new UseCaseError('no-running-game', 'No game is running.'));
       }
-      const turn = engine.tryPlay(request.move, (error) => this.logPublishFailure(error));
+      const turn = engine.tryPlay(request.move);
+      this.deliver(engine.takeEvents());
       if (!turn.accepted) {
         return Result.failure(new UseCaseError('move-rejected', 'The rules rejected the move.'));
       }
       return Result.success(moveResultOf(engine, turn.outcome));
     } catch (thrown) {
       return Result.failure(caughtError('move-failed', thrown));
+    }
+  }
+
+  // Gives each event of the turn to the publisher. The turn is already saved, so a publisher
+  // that throws must not change the answer: this method logs the error and goes on.
+  private deliver(events: readonly GameEvent[]): void {
+    for (const event of events) {
+      try {
+        this.events.publish(event);
+      } catch (error) {
+        this.logPublishFailure(error);
+      }
     }
   }
 

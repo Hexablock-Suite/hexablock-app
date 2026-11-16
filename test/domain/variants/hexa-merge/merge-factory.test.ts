@@ -42,7 +42,7 @@ describe('MergeFactory', () => {
     const factory = mergeFactory(7);
 
     const initial = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
-    const { engine, rules, publisher } = startVariant(factory);
+    const { engine, rules } = startVariant(factory);
     const slide = firstValidMove(rules, mergeStateOf(engine.snapshot()));
     const outcome = engine.play(slide);
     const after = engine.snapshot();
@@ -58,7 +58,7 @@ describe('MergeFactory', () => {
       Score.of(after.merged.reduce((sum, tile) => sum + valueOf(tile), 0)),
     );
     expect(after.tiles.hasNext()).toBe(true);
-    expect(publisher.events).toEqual([]);
+    expect(engine.takeEvents()).toEqual([]);
   });
 
   it('should_give_the_same_game_when_two_merge_factories_share_a_seed', () => {

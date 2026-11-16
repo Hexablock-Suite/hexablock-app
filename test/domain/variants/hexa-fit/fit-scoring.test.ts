@@ -25,7 +25,6 @@ import {
 } from '../../../../src/domain/variants/hexa-fit/fit-stars';
 import { FitState } from '../../../../src/domain/variants/hexa-fit/fit-state';
 import { PieceId } from '../../../../src/domain/variants/hexa-fit/piece-id';
-import { RecordingPublisher } from '../../../support/engine/fake-game';
 import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
@@ -74,13 +73,7 @@ describe('FitScoring', () => {
       SquareCoord,
       FitMove<SquareCoord>,
       FitState<SquareCoord>
-    >(
-      MATCH_ID,
-      GameId.of('hexa-fit'),
-      new FitRules<SquareCoord>(),
-      new FitScoring<SquareCoord>(),
-      new RecordingPublisher(),
-    );
+    >(MATCH_ID, GameId.of('hexa-fit'), new FitRules<SquareCoord>(), new FitScoring<SquareCoord>());
     engine.start(dominoLevel());
 
     engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)));

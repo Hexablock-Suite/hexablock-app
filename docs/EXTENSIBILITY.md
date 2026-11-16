@@ -28,7 +28,7 @@ A new variant adds classes and data. It changes no engine file, no other variant
 7. If Hexa Fill publishes its own events, write classes that extend `GameEvent`, for example `RegionFilled`.
 8. In layer 3, write `FillStateMapper`, which implements `StateMapper<FillCell>` and turns each cell into a `CellView`.
 9. In layer 4, write `FillCellRenderer`, which implements `CellRenderer<TCellView>`. Its folder is open (Q8).
-10. Register the game: the composition root maps `hexa-fill` to `FillFactory`, `FillStateMapper` and `FillCellRenderer`, and the game selector shows the new entry. The composition root gives the `FillFactory` to a `GameFactory`, with the three id generators and the event publisher that every variant shares, and `StartGame` takes that `GameFactory`.
+10. Register the game: the composition root maps `hexa-fill` to `FillFactory`, `FillStateMapper` and `FillCellRenderer`, and the game selector shows the new entry. The composition root gives the `FillFactory` to a `GameFactory`, with the three id generators that every variant shares, and `StartGame` takes that `GameFactory`. The event publisher goes to `ApplyMove`, which delivers the events that the engine records (#233), so a new variant changes no wiring of events.
 11. Test the rules of Hexa Fill in their own test suite. The engine tests and the tests of the other variants do not change.
 
 ## Files that a fifth variant adds

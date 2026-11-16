@@ -1,7 +1,6 @@
 import { Board, type ReadonlyBoard } from '../../../src/domain/engine/board';
 import type { BoardId } from '../../../src/domain/engine/board-id';
 import type { BoardSnapshot, BoardState } from '../../../src/domain/engine/board-state';
-import type { GameEvent, GameEventPublisher } from '../../../src/domain/engine/game-events';
 import { GameId } from '../../../src/domain/engine/game-id';
 import type { GameStateId } from '../../../src/domain/engine/game-state-id';
 import type { MatchId } from '../../../src/domain/engine/match-id';
@@ -228,17 +227,6 @@ export class OnePointScoring implements IScoringPolicy<FakeState> {
   score(_before: FakeSnapshot, _after: FakeSnapshot): Score {
     this.log.push('score');
     return Score.of(1);
-  }
-}
-
-export class RecordingPublisher implements GameEventPublisher {
-  readonly events: GameEvent[] = [];
-
-  constructor(readonly log: string[] = []) {}
-
-  publish(event: GameEvent): void {
-    this.log.push('publish');
-    this.events.push(event);
   }
 }
 
