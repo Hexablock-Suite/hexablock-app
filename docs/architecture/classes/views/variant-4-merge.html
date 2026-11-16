@@ -1101,14 +1101,14 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          + hits(draw: number): boolean
+          + hits(draw: RandomDraw): boolean
         </text>
         <!-- Class: NewTile (value object, decision 48) -->
         <rect
           x="706"
           y="880"
           width="284"
-          height="144"
+          height="160"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1138,7 +1138,7 @@
           NewTile
         </text>
         <text x="722" y="944" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - place: number
+          - place: RandomDraw
         </text>
         <text x="722" y="960" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - tile: TCell
@@ -1152,11 +1152,21 @@
           font-family="'IBM Plex Mono', monospace"
           text-decoration="underline"
         >
-          + of(place: number, tile: TCell): NewTile&lt;TCell&gt;
+          + of(place: RandomDraw, tile: TCell):
+        </text>
+        <text
+          x="733"
+          y="1000"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          NewTile&lt;TCell&gt;
         </text>
         <text
           x="722"
-          y="1000"
+          y="1016"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1165,7 +1175,7 @@
         </text>
         <text
           x="722"
-          y="1016"
+          y="1032"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
