@@ -1,0 +1,13 @@
+{
+  "gameId": "hexa-sort",
+  "levelId": "sort-01",
+  "order": 1,
+  "version": 1,
+  "topology": "hex",
+  "section": {
+    "radius": 2,
+    "goals": 3,
+    "source": { "seed": 20261115, "colors": ["red", "green", "blue"] },
+    "stars": [{ "maxMoves": 40 }, { "maxMoves": 30 }, { "maxMoves": 20 }]
+  }
+}

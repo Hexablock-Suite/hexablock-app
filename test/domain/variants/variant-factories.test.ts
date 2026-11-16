@@ -40,6 +40,7 @@ import { ColorStack } from '../../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../../src/domain/variants/hexa-sort/sort-factory';
 import { SortLevel } from '../../../src/domain/variants/hexa-sort/sort-level';
+import { SortStarThreshold } from '../../../src/domain/variants/hexa-sort/sort-stars';
 import { ManualClock } from '../../support/engine/manual-clock';
 import { square } from '../../support/engine/square-topology';
 import { phaseNameOf } from '../../support/engine/phase-name';
@@ -289,7 +290,8 @@ describe('IVariantFactory', () => {
   });
 
   // The model of a level counts the stars with the thresholds of the level (decision 36).
-  // A Sort level holds no thresholds until #167, so its result has 0 stars.
+  // `SortLevelBuilder` gives a Sort level the thresholds of its file (#167). The level here
+  // gets them from `withStars()`: 4 moves meet the first threshold and miss the second.
   it('should_count_the_stars_with_the_thresholds_of_the_level_when_the_fit_or_sort_model_records_a_result', () => {
     const fitId = GameId.of('hexa-fit');
     const sortId = GameId.of('hexa-sort');
@@ -322,17 +324,21 @@ describe('IVariantFactory', () => {
       }),
       fitProgress,
     );
-    sortFactory()
-      .createProgressModel()
-      .record(
-        GameResult.of({
-          gameId: sortId,
-          score: Score.of(50),
-          moves: Moves.of(4),
-          levelId: LevelId.of('sort-01'),
-        }),
-        sortProgress,
-      );
+    const sort = new SortFactory(
+      new SquareGeometry(),
+      SortLevel.fixed(RegionSize.of(2), GoalCount.of(5), [
+        ColorStack.of([Color.of('red')]),
+      ]).withStars([SortStarThreshold.of(Moves.of(5)), SortStarThreshold.of(Moves.of(3))]),
+    );
+    sort.createProgressModel().record(
+      GameResult.of({
+        gameId: sortId,
+        score: Score.of(50),
+        moves: Moves.of(4),
+        levelId: LevelId.of('sort-01'),
+      }),
+      sortProgress,
+    );
 
     expect(
       fitProgress.keeps(
@@ -352,7 +358,7 @@ describe('IVariantFactory', () => {
           gameId: sortId,
           score: Score.of(50),
           levelId: LevelId.of('sort-01'),
-          stars: Stars.of(0),
+          stars: Stars.of(1),
           moves: Moves.of(4),
         }),
       ),

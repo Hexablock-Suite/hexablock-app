@@ -36,10 +36,10 @@ export interface SortSourceBuilders<TSource> {
 // so a level with a wrong seed cannot exist.
 // Each factory method copies its list and freezes the copy, and the object is frozen.
 // So a change to the array of the caller does not change the level.
-// `SortLevelBuilder` builds the level through a factory method in Sprint 3 (#167).
+// `SortLevelBuilder` builds the level from a level file through a factory method (#167).
 // The level also holds the thresholds of its stars, and `LevelProgress` asks it for the stars
 // of a play through `ILevelStars` (issue #156). A level holds no threshold until
-// `withStars()` gives them, so it gives 0 stars until #167 reads them from the level files.
+// `withStars()` gives them. `SortLevelBuilder` gives it the thresholds of the file.
 export class SortLevel implements ILevelStars {
   private constructor(
     private readonly size: RegionSize,
