@@ -64,7 +64,7 @@
       <h1>Wiring: the drivers and the composition root</h1>
 
       <svg
-        viewBox="0 0 1040 1069"
+        viewBox="0 0 1040 1269"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="adwiring-title adwiring-desc"
@@ -77,8 +77,10 @@
           MatchIdGenerator interfaces, and the planned AudioManager and SessionManager. It reads
           each BoardFigure, the hexagon, the square and the triangle, keeps one GameRegistry for
           each figure, which maps each GameId to its registered game, and creates
-          NullGameEventPublisher and InMemoryGameRepository in layer 3, so single-scope injection
-          replaces a classic Singleton.
+          NullGameEventPublisher, InMemoryGameRepository, LocalProgressRepository and
+          BundledLevelRepository in layer 3, so single-scope injection replaces a classic Singleton.
+          With a store in its drivers it builds ListAchievements once, and listAchievements() gives
+          it.
         </desc>
         <defs>
           <marker
@@ -101,7 +103,7 @@
           x="24"
           y="24"
           width="992"
-          height="640"
+          height="704"
           rx="8"
           fill="#cfdcf3"
           stroke="rgba(30,58,138,0.50)"
@@ -122,9 +124,9 @@
         <!-- Layer zone: layer 3, interface adapters -->
         <rect
           x="24"
-          y="672"
+          y="736"
           width="992"
-          height="172"
+          height="292"
           rx="8"
           fill="#e2ebf8"
           stroke="rgba(29,78,216,0.40)"
@@ -132,7 +134,7 @@
         />
         <text
           x="40"
-          y="692"
+          y="756"
           fill="#1d4ed8"
           font-size="8"
           font-weight="500"
@@ -170,7 +172,7 @@
           x="256"
           y="240"
           width="728"
-          height="252"
+          height="316"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -247,9 +249,9 @@
         <!-- CompositionRoot creates NullGameEventPublisher: use «create», down from layer 4 to layer 3 -->
         <line
           x1="460"
-          y1="476"
+          y1="540"
           x2="460"
-          y2="720"
+          y2="784"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adwiring-open)"
@@ -257,16 +259,36 @@
         <!-- CompositionRoot creates one InMemoryGameRepository per game and figure: use «create», down from layer 4 to layer 3 -->
         <line
           x1="640"
-          y1="476"
+          y1="540"
           x2="640"
-          y2="720"
+          y2="784"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#adwiring-open)"
+        />
+        <!-- CompositionRoot creates LocalProgressRepository over the store of its drivers: use «create», down from layer 4 to layer 3 -->
+        <line
+          x1="336"
+          y1="540"
+          x2="336"
+          y2="912"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#adwiring-open)"
+        />
+        <!-- CompositionRoot creates BundledLevelRepository: use «create», down from layer 4 to layer 3 -->
+        <line
+          x1="580"
+          y1="540"
+          x2="580"
+          y2="912"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adwiring-open)"
         />
         <!-- CompositionRoot reads each BoardFigure of boardFigures() and builds its GameRegistry: use with a verb, inside layer 4 -->
         <path
-          d="M272 452 H192 Q184 452 184 460 V516"
+          d="M272 452 H192 Q184 452 184 460 V580"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -334,10 +356,10 @@
         >
           «create»
         </text>
-        <rect x="464" y="692" width="47" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="464" y="756" width="47" height="12" rx="2" fill="#e2ebf8" />
         <text
           x="466"
-          y="701"
+          y="765"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -346,14 +368,39 @@
         >
           «create»
         </text>
-        <rect x="644" y="692" width="47" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="644" y="756" width="47" height="12" rx="2" fill="#e2ebf8" />
         <text
           x="646"
-          y="701"
+          y="765"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          «create»
+        </text>
+
+        <rect x="340" y="884" width="47" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="342"
+          y="893"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          «create»
+        </text>
+        <rect x="527" y="884" width="47" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="572"
+          y="893"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
           letter-spacing="0.06em"
         >
           «create»
@@ -527,7 +574,7 @@
           x="272"
           y="272"
           width="408"
-          height="204"
+          height="268"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -536,7 +583,7 @@
         <rect x="272" y="272" width="408" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
         <rect x="272" y="312" width="408" height="8" fill="rgba(15,111,116,0.10)" />
         <line x1="272" y1="320" x2="680" y2="320" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
-        <line x1="272" y1="412" x2="680" y2="412" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <line x1="272" y1="444" x2="680" y2="444" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text
           x="476"
           y="290"
@@ -574,20 +621,32 @@
         <text x="288" y="400" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - wired: Map‹RegisteredGame, GameUseCases›
         </text>
-        <text x="288" y="428" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + figures(): TopologyId[]
+        <text x="288" y="416" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - achievements: UseCase‹ListAchievementsRequest,
         </text>
-        <text x="288" y="444" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + registry(figure: TopologyId = hex): GameRegistry
+        <text x="304" y="432" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          AchievementSummary[]› [0..1]
         </text>
         <text x="288" y="460" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + figures(): TopologyId[]
+        </text>
+        <text x="288" y="476" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + registry(figure: TopologyId = hex): GameRegistry
+        </text>
+        <text x="288" y="492" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + gameUseCases(gameId: GameId, figure: TopologyId = hex): GameUseCases
+        </text>
+        <text x="288" y="508" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + listAchievements(): UseCase‹ListAchievementsRequest,
+        </text>
+        <text x="304" y="524" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          AchievementSummary[]›
         </text>
 
         <!-- Class: BoardFigure (the board figure that the player chooses, #171) -->
         <rect
           x="48"
-          y="516"
+          y="580"
           width="272"
           height="132"
           rx="6"
@@ -595,11 +654,11 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="48" y1="560" x2="320" y2="560" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="48" y1="620" x2="320" y2="620" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="48" y1="624" x2="320" y2="624" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="48" y1="684" x2="320" y2="684" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="184"
-          y="534"
+          y="598"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -610,7 +669,7 @@
         </text>
         <text
           x="184"
-          y="552"
+          y="616"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -619,23 +678,23 @@
         >
           BoardFigure
         </text>
-        <text x="64" y="576" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="640" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + id: TopologyId
         </text>
-        <text x="64" y="592" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="656" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + geometry: GeometryFactory‹TCoord›
         </text>
-        <text x="64" y="608" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="672" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + fitLevel?: FitLevel‹TCoord›
         </text>
-        <text x="64" y="636" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="700" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + layoutOf(size: number): BoardLayout‹TCoord›
         </text>
 
         <!-- UML template box of BoardFigure: type parameter on the top-right corner -->
         <rect
           x="276"
-          y="506"
+          y="570"
           width="44"
           height="18"
           rx="2"
@@ -646,7 +705,7 @@
         />
         <text
           x="298"
-          y="518"
+          y="582"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -692,7 +751,7 @@
         <!-- Class: NullGameEventPublisher (adapter, stands in for GameEventBus of view 4.3) -->
         <rect
           x="360"
-          y="720"
+          y="784"
           width="200"
           height="40"
           rx="6"
@@ -702,7 +761,7 @@
         />
         <text
           x="460"
-          y="745"
+          y="809"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -715,7 +774,7 @@
         <!-- Class: InMemoryGameRepository (adapter, repository of the game aggregate) -->
         <rect
           x="600"
-          y="720"
+          y="784"
           width="336"
           height="76"
           rx="6"
@@ -723,10 +782,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="600" y1="768" x2="936" y2="768" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="600" y1="832" x2="936" y2="832" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="768"
-          y="738"
+          y="802"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -737,7 +796,7 @@
         </text>
         <text
           x="768"
-          y="756"
+          y="820"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -746,14 +805,14 @@
         >
           InMemoryGameRepository
         </text>
-        <text x="616" y="784" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="616" y="848" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - game: GameEngine&lt;TCell, TCoord, TMove, TState&gt; [0..1]
         </text>
 
         <!-- UML template box: type parameters on the top-right corner -->
         <rect
           x="780"
-          y="710"
+          y="774"
           width="156"
           height="18"
           rx="2"
@@ -764,13 +823,89 @@
         />
         <text
           x="858"
-          y="722"
+          y="786"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
           TCell, TCoord, TMove, TState
+        </text>
+
+        <!-- Class: LocalProgressRepository (adapter of ProgressRepository over KeyValueStore, #164 and #188) -->
+        <rect
+          x="256"
+          y="912"
+          width="272"
+          height="72"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="256" y1="960" x2="528" y2="960" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="392"
+          y="930"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «Adapter» «repository»
+        </text>
+        <text
+          x="392"
+          y="948"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          LocalProgressRepository
+        </text>
+        <text x="272" y="976" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - store: KeyValueStore
+        </text>
+
+        <!-- Class: BundledLevelRepository (adapter of LevelRepository over the bundled level files, #168 and #188) -->
+        <rect
+          x="560"
+          y="912"
+          width="272"
+          height="72"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="560" y1="960" x2="832" y2="960" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="696"
+          y="930"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «Adapter» «repository»
+        </text>
+        <text
+          x="696"
+          y="948"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          BundledLevelRepository
+        </text>
+        <text x="576" y="976" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - files: LevelFile[*]
         </text>
 
         <!-- Lollipops: interface or port each class implements, with its binding -->
@@ -799,31 +934,54 @@
         <text x="795" y="102" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           SessionStore
         </text>
-        <line x1="376" y1="760" x2="376" y2="776" stroke="#17212a" stroke-width="1" />
-        <circle cx="376" cy="781" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="387" y="784" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="376" y1="824" x2="376" y2="840" stroke="#17212a" stroke-width="1" />
+        <circle cx="376" cy="845" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="387" y="848" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           GameEventPublisher
         </text>
-        <line x1="616" y1="796" x2="616" y2="812" stroke="#17212a" stroke-width="1" />
-        <circle cx="616" cy="817" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="627" y="820" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="616" y1="860" x2="616" y2="876" stroke="#17212a" stroke-width="1" />
+        <circle cx="616" cy="881" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="627" y="884" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           GameRepository‹TCell, TCoord, TMove, TState›
+        </text>
+
+        <line x1="272" y1="984" x2="272" y2="1000" stroke="#17212a" stroke-width="1" />
+        <circle cx="272" cy="1005" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text
+          x="283"
+          y="1008"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          ProgressRepository
+        </text>
+        <line x1="576" y1="984" x2="576" y2="1000" stroke="#17212a" stroke-width="1" />
+        <circle cx="576" cy="1005" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text
+          x="587"
+          y="1008"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          LevelRepository
         </text>
 
         <!-- Footnote -->
         <text
           x="24"
-          y="868"
+          y="1052"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
           The composition root creates each driver and adapter once and injects it. No class has a
-          static instance(), so a test passes its own clock and logger (decision 18).
+          static instance(), so a test passes its own clock, logger and store (decision 18).
         </text>
         <text
           x="24"
-          y="884"
+          y="1068"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -833,7 +991,7 @@
         </text>
         <text
           x="24"
-          y="900"
+          y="1084"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -843,7 +1001,7 @@
         </text>
         <text
           x="24"
-          y="916"
+          y="1100"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -853,7 +1011,7 @@
         </text>
         <text
           x="24"
-          y="932"
+          y="1116"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -862,12 +1020,29 @@
           registry takes its GeometryFactory, and Fit runs only on a figure with a Fit level
           (S3-08).
         </text>
-
-        <!-- Legend -->
-        <line x1="24" y1="956" x2="1016" y2="956" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="974"
+          y="1132"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          With the store that CompositionRootProvider passes, DeviceKeyValueStore, the root builds
+          ListAchievements (view 3.6) once over these two repositories, inside LoggingAspect (#188).
+        </text>
+
+        <!-- Legend -->
+        <line
+          x1="24"
+          y1="1156"
+          x2="1016"
+          y2="1156"
+          stroke="rgba(23,33,42,0.10)"
+          stroke-width="0.8"
+        />
+        <text
+          x="24"
+          y="1174"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -878,16 +1053,16 @@
 
         <line
           x1="24"
-          y1="992"
+          y1="1192"
           x2="52"
-          y2="992"
+          y2="1192"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adwiring-open)"
         />
         <text
           x="60"
-          y="996"
+          y="1196"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -897,7 +1072,7 @@
 
         <rect
           x="24"
-          y="1012"
+          y="1212"
           width="28"
           height="12"
           rx="2"
@@ -907,7 +1082,7 @@
         />
         <rect
           x="56"
-          y="1012"
+          y="1212"
           width="28"
           height="12"
           rx="2"
@@ -917,7 +1092,7 @@
         />
         <text
           x="92"
-          y="1021"
+          y="1221"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -926,7 +1101,7 @@
         </text>
         <rect
           x="216"
-          y="1012"
+          y="1212"
           width="28"
           height="12"
           rx="2"
@@ -937,7 +1112,7 @@
         />
         <text
           x="252"
-          y="1021"
+          y="1221"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -946,7 +1121,7 @@
         </text>
         <rect
           x="440"
-          y="1012"
+          y="1212"
           width="28"
           height="12"
           rx="2"
@@ -957,7 +1132,7 @@
         />
         <text
           x="476"
-          y="1021"
+          y="1221"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -966,7 +1141,7 @@
         </text>
         <rect
           x="616"
-          y="1012"
+          y="1212"
           width="28"
           height="12"
           rx="2"
@@ -976,7 +1151,7 @@
         />
         <text
           x="652"
-          y="1021"
+          y="1221"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -984,11 +1159,11 @@
           Teal · focal class
         </text>
 
-        <line x1="24" y1="1042" x2="40" y2="1042" stroke="#17212a" stroke-width="1" />
-        <circle cx="45" cy="1042" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="24" y1="1242" x2="40" y2="1242" stroke="#17212a" stroke-width="1" />
+        <circle cx="45" cy="1242" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="60"
-          y="1046"
+          y="1246"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
