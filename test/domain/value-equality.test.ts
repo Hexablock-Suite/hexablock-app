@@ -10,7 +10,7 @@ import { Moves } from '../../src/domain/engine/moves';
 import { Piece } from '../../src/domain/engine/piece';
 import { GameResult, ProgressRecord } from '../../src/domain/engine/progress-model';
 import { Radius } from '../../src/domain/engine/radius';
-import { Range, type Compare } from '../../src/domain/engine/range';
+import { Range } from '../../src/domain/engine/range';
 import { RegionSize } from '../../src/domain/engine/region-size';
 import { CellNode, ShapeGroup } from '../../src/domain/engine/shape-node';
 import { Score } from '../../src/domain/engine/score';
@@ -22,6 +22,7 @@ import { Chance } from '../../src/domain/variants/hexa-merge/chance';
 import { MergeTile } from '../../src/domain/variants/hexa-merge/merge-tile';
 import { ColorStack } from '../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../src/domain/variants/hexa-sort/goal-count';
+import { Rank } from '../support/engine/rank';
 import { square, squareTopology, type SquareCoord } from '../support/engine/square-topology';
 
 type Same<T> = (left: T, right: T) => boolean;
@@ -160,34 +161,15 @@ describe('equals of the progress values', () => {
 });
 
 describe('equals of Range', () => {
-  type Bound = { readonly n: number };
-  const byN: Compare<Bound> = (left, right) => left.n - right.n;
+  // Issue #239: the bounds are value objects that know their order.
+  it('should_be_equal_when_the_bounds_of_two_ranges_share_their_places_in_the_order', () => {
+    const same: Same<Range<Rank>> = (left, right) => left.equals(right);
+    const range = (min: number, max: number) => Range.of(Rank.of(min), Rank.of(max));
 
-  it('should_be_equal_when_two_ranges_have_bounds_of_the_same_order', () => {
-    const numbers: Same<Range<number>> = (left, right) => left.equals(right);
-    const bounds: Same<Range<Bound>> = (left, right) => left.equals(right);
-    const low = Range.of({ n: 1 }, { n: 5 }, byN);
-
-    expect(bothWays(numbers, Range.ofNumbers(1, 5), Range.ofNumbers(1, 5))).toEqual(EQUAL);
-    expect(bothWays(numbers, Range.ofNumbers(0, 5), Range.ofNumbers(-0, 5))).toEqual(EQUAL);
-    expect(bothWays(numbers, Range.ofNumbers(1, 5), Range.ofNumbers(2, 5))).toEqual(DIFFERENT);
-    expect(bothWays(numbers, Range.ofNumbers(1, 5), Range.ofNumbers(1, 6))).toEqual(DIFFERENT);
-    expect(bothWays(bounds, low, Range.of({ n: 1 }, { n: 5 }, byN))).toEqual(EQUAL);
-    expect(bothWays(bounds, low, Range.of({ n: 1 }, { n: 6 }, byN))).toEqual(DIFFERENT);
-  });
-
-  it('should_give_one_answer_in_both_directions_when_two_ranges_use_different_orders', () => {
-    const exact: Compare<string> = (left, right) => {
-      if (left === right) return 0;
-      return left < right ? -1 : 1;
-    };
-    const anyCase: Compare<string> = (left, right) =>
-      exact(left.toLowerCase(), right.toLowerCase());
-    const same: Same<Range<string>> = (left, right) => left.equals(right);
-    const lower = Range.of<string>('a', 'z', exact);
-    const upper = Range.of<string>('A', 'Z', anyCase);
-
-    expect(bothWays(same, lower, upper)).toEqual(DIFFERENT);
+    expect(bothWays(same, range(1, 5), range(1, 5))).toEqual(EQUAL);
+    expect(bothWays(same, range(1, 5), range(2, 5))).toEqual(DIFFERENT);
+    expect(bothWays(same, range(1, 5), range(1, 6))).toEqual(DIFFERENT);
+    expect(bothWays(same, range(1, 5), range(0, 6))).toEqual(DIFFERENT);
   });
 });
 
@@ -257,7 +239,7 @@ describe('equals of ColorStack', () => {
 // when the line compiles, because then the directive is unused.
 describe('private fields of the value objects', () => {
   it('should_reject_at_compile_time_when_a_caller_reads_a_field_that_no_production_code_reads', () => {
-    const range = Range.ofNumbers(1, 2);
+    const range = Range.of(Rank.of(1), Rank.of(2));
     const placement = Placement.of(Turns.of(1), square(0, 0), squareTopology);
     const readers = [
       // @ts-expect-error `Color.name` is private.
