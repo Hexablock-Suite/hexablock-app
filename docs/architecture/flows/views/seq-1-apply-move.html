@@ -75,10 +75,10 @@
           ApplyMove takes the running GameEngine from InMemoryGameRepository in layer 3 through the
           GameRepository port, plays the move on GameEngine in layer 1, which runs playTurn() on
           IGameRules, takes the events that GameEngine recorded and publishes each one to the
-          GameEventPublisher port, reads the photo of the state and its occupied cells, asks the
-          root canUndo(), canRedo(), offersUndo() and elapsedTime(), and returns a Result with a
-          MoveResult. GamePresenter maps each cell with StateMapper, builds GameViewModel and
-          GameScreen renders it.
+          GameEventPublisher port, reads the photo of the state, its occupied cells and its free
+          spaces, asks the root canUndo(), canRedo(), offersUndo() and elapsedTime(), and returns a
+          Result with a MoveResult. GamePresenter maps each space with StateMapper, builds
+          GameViewModel and GameScreen renders it.
         </desc>
         <defs>
           <marker
@@ -290,7 +290,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          LinesStateMapper, …
+          SpaceStateMapper, …
         </text>
         <!-- Lifeline: applyMove : ApplyMove -->
         <rect
@@ -711,7 +711,7 @@
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          [each cell of MoveResult.cells]
+          [each space of cells and freeSpaces]
         </text>
         <!-- Activation bars -->
         <rect
@@ -1186,7 +1186,7 @@
           stroke-width="1"
           marker-end="url(#seqmove-call)"
         />
-        <rect x="798.88" y="568" width="166.24" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="763.18" y="568" width="237.64" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="882"
           y="578"
@@ -1195,7 +1195,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          occupiedCells() · photo.board
+          occupiedCells(), freeSpaces() · photo.board
         </text>
         <!-- Reply: board returns to apply -->
         <line
@@ -1208,7 +1208,7 @@
           stroke-dasharray="4,3"
           marker-end="url(#seqmove-reply)"
         />
-        <rect x="834.225" y="598" width="95.55" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="808.725" y="598" width="146.55" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="882"
           y="608"
@@ -1217,7 +1217,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          [TCoord, TCell][]
+          [TCoord, TCell][], TCoord[]
         </text>
         <!-- Message: apply calls game -->
         <line
@@ -1417,7 +1417,7 @@
           stroke-width="1"
           marker-end="url(#seqmove-call)"
         />
-        <rect x="644" y="882" width="339.01" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="644" y="882" width="386.32" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="648"
           y="892"
@@ -1426,7 +1426,8 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="start"
         >
-          new MoveResult(cells, score, outcome, canUndo, canRedo, hasUndo, payload, elapsedMs?)
+          new MoveResult(cells, freeSpaces, score, outcome, canUndo, canRedo, hasUndo, payload,
+          elapsedMs?)
         </text>
         <!-- Reply: apply returns to presenter -->
         <line
@@ -1460,7 +1461,7 @@
           stroke-width="1"
           marker-end="url(#seqmove-call)"
         />
-        <rect x="353.075" y="968" width="105.85" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="350.29" y="968" width="111.42" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="406"
           y="978"
@@ -1469,7 +1470,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          toView(cell: TCell)
+          toView(), freeView()
         </text>
         <!-- Reply: mapper returns to presenter -->
         <line
@@ -1482,7 +1483,7 @@
           stroke-dasharray="4,3"
           marker-end="url(#seqmove-reply)"
         />
-        <rect x="381.4" y="998" width="49.2" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="378.33" y="998" width="55.35" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="406"
           y="1008"
@@ -1491,7 +1492,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          CellView
+          TCellView
         </text>
         <!-- Self message: presenter -->
         <path
@@ -1501,7 +1502,7 @@
           stroke-width="1"
           marker-end="url(#seqmove-call)"
         />
-        <rect x="372" y="1050" width="296.4" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="372" y="1050" width="255.36" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="376"
           y="1060"
@@ -1510,7 +1511,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="start"
         >
-          new GameViewModel(cells, score, canUndo, canRedo, phase, payload)
+          new GameViewModel(texts, cells, score, outcome, payload)
         </text>
         <!-- Reply: presenter returns to screen -->
         <line
@@ -1634,8 +1635,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          move, ApplyMove returns Result.failure(error), and onMove() puts its message in
-          GameViewModel.error (decision 28). No HTTP call runs.
+          move, ApplyMove returns Result.failure(error), and onMove() puts the text of the failure
+          in GameViewModel.error (decision 28). No HTTP call runs.
         </text>
         <text
           x="24"
