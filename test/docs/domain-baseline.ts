@@ -13,48 +13,9 @@ export type PrimitiveEntry = { primitive: 'number' | 'string'; where: string; is
 export type FieldEntry = { rule: 'field' | 'get'; where: string; issue: number };
 
 export const primitiveBaseline: readonly PrimitiveEntry[] = [
-  // #232: the primitives of the variants and `Score.times()`.
-  { primitive: 'number', where: 'Score.times', issue: 232 },
-  { primitive: 'number', where: 'LinesSnapshot.streak', issue: 232 },
-  { primitive: 'number', where: 'LinesSnapshot.linesCleared', issue: 232 },
-  { primitive: 'number', where: 'LinesSnapshot.cellsPlaced', issue: 232 },
-  { primitive: 'number', where: 'PlacePiece.constructor', issue: 232 },
-  { primitive: 'number', where: 'Chance.hits', issue: 232 },
-  { primitive: 'number', where: 'ColorStack.tileCount', issue: 232 },
-  { primitive: 'number', where: 'SortSnapshot.clearedTiles', issue: 232 },
-  // #238: the clock reading.
-  { primitive: 'number', where: 'Clock.now', issue: 238 },
-  // #239: `Range` orders its values without a number.
-  { primitive: 'number', where: 'Compare', issue: 239 },
-  { primitive: 'number', where: 'Range.ofNumbers', issue: 239 },
-  // #243: the engine primitives that keep a README reason.
-  { primitive: 'number', where: 'RandomSource.next', issue: 243 },
-  { primitive: 'number', where: 'Mulberry32Random.next', issue: 243 },
-  { primitive: 'number', where: 'Seed.generatorState', issue: 243 },
-  { primitive: 'number', where: 'ShapeNode.area', issue: 243 },
-  { primitive: 'number', where: 'CellNode.area', issue: 243 },
-  { primitive: 'number', where: 'ShapeGroup.area', issue: 243 },
-  { primitive: 'number', where: 'HexCoord.distanceTo', issue: 243 },
-  { primitive: 'number', where: 'Radius.offsets', issue: 243 },
-  { primitive: 'number', where: 'Radius.measures', issue: 243 },
-  { primitive: 'number', where: 'RegionSize.indexes', issue: 243 },
-  { primitive: 'number', where: 'RegionSize.offsets', issue: 243 },
-  { primitive: 'number', where: 'RegionSize.holds', issue: 243 },
-  { primitive: 'number', where: 'MoveHistory.constructor', issue: 243 },
   // #246: the team decides whether a branded key counts as a primitive.
   { primitive: 'string', where: 'CoordKey', issue: 246 },
   { primitive: 'string', where: 'coordKey', issue: 246 },
-  // #232: the exported number constants of the variants, and the three counts
-  // that the `LinesState` constructor takes. #232 covers the primitives of the variants.
-  { primitive: 'number', where: 'FIT_POINTS_PER_TURN', issue: 232 },
-  { primitive: 'number', where: 'POINTS_PER_CELL', issue: 232 },
-  { primitive: 'number', where: 'POINTS_PER_LINE', issue: 232 },
-  { primitive: 'number', where: 'TRAY_SIZE', issue: 232 },
-  { primitive: 'number', where: 'START_TILES', issue: 232 },
-  { primitive: 'number', where: 'MERGE_UNDO_LIMIT', issue: 232 },
-  { primitive: 'number', where: 'GOAL_RUN', issue: 232 },
-  { primitive: 'number', where: 'SORT_POINTS_PER_TILE', issue: 232 },
-  { primitive: 'number', where: 'LinesState.constructor', issue: 232 },
 ];
 
 export const fieldBaseline: readonly FieldEntry[] = [

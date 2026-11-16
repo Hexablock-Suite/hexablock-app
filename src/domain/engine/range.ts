@@ -1,51 +1,38 @@
-// Orders two values as `Array.prototype.sort` does: a negative number, zero or a positive number.
-// NaN means that the two values have no order.
-export type Compare<T> = (left: T, right: T) => number;
+import type { Ordered } from './ordered';
 
-// A closed interval [min, max] over any ordered type (issue #129). It is a value object:
-// it never changes. `contains()` tells if a value lies inside the bounds.
-// It mirrors the `Range<T>` of hexablock-api: the same API and the same message.
-// The limits of the domain that have two sides use it, such as a seed or the goal of a level.
-export class Range<T> {
+// A closed interval [min, max] over a value object that knows its order (issues #129 and #239).
+// It is a value object: it never changes. `contains()` tells if a value lies inside the bounds.
+// The bound `Ordered<T>` gives the order: `T` answers `isBefore()`, so no order is a number.
+// A business limit between two value objects uses it. A value object that wraps one number
+// checks that number in its own factory method, as `Seed` and `GoalCount` do.
+// It keeps the message of the `Range<T>` of hexablock-api.
+export class Range<T extends Ordered<T>> {
   private constructor(
     private readonly min: T,
     private readonly max: T,
-    private readonly compare: Compare<T>,
   ) {}
 
-  // Throws a RangeError when min comes after max or when the bounds have no order.
-  static of<T>(min: T, max: T, compare: Compare<T>): Range<T> {
-    if (!(compare(min, max) <= 0)) {
+  // Throws a RangeError when min comes after max.
+  static of<T extends Ordered<T>>(min: T, max: T): Range<T> {
+    if (max.isBefore(min)) {
       throw new RangeError('A Range needs min <= max.');
     }
-    return new Range(min, max, compare);
+    return new Range(min, max);
   }
 
-  static ofNumbers(min: number, max: number): Range<number> {
-    return Range.of(min, max, compareNumbers);
-  }
-
-  // A value without an order, such as NaN, is never inside the range.
+  // A value lies inside when it comes neither before min nor after max.
   contains(value: T): boolean {
-    return this.compare(this.min, value) <= 0 && this.compare(value, this.max) <= 0;
+    return !value.isBefore(this.min) && !this.max.isBefore(value);
   }
 
-  // Two ranges are equal when each one reads the bounds of both as the same bounds.
-  // The order of the range compares the bounds, so `T` needs no `equals`.
-  // Each range asks its own order, so the answer is the same in both directions.
+  // Two ranges are equal when their bounds share their places in the order of `T`.
+  // So `T` needs no `equals`, and the answer is the same in both directions.
   equals(other: Range<T>): boolean {
-    return this.hasBoundsOf(other) && other.hasBoundsOf(this);
+    return this.samePlace(this.min, other.min) && this.samePlace(this.max, other.max);
   }
 
-  private hasBoundsOf(other: Range<T>): boolean {
-    return this.compare(this.min, other.min) === 0 && this.compare(this.max, other.max) === 0;
+  // Two values share a place when neither one comes before the other.
+  private samePlace(left: T, right: T): boolean {
+    return !left.isBefore(right) && !right.isBefore(left);
   }
-}
-
-// Subtraction gives NaN for two equal infinities, so this function compares.
-// It reads -0 and 0 as equal.
-function compareNumbers(left: number, right: number): number {
-  if (left < right) return -1;
-  if (left > right) return 1;
-  return left === right ? 0 : Number.NaN;
 }

@@ -97,6 +97,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/levels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["LevelsController_list"];
+        put: operations["LevelsController_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/leaderboard/{gameId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["LeaderboardController_top"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/leaderboard/{gameId}/levels/{levelId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["LeaderboardController_topOfLevel"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -213,6 +261,228 @@ export interface components {
              */
             updatedAt: string;
             results: components["schemas"]["LevelResultDto"][];
+        };
+        FitPieceDto: {
+            /**
+             * @description A non-blank text, unique in the level.
+             * @example a
+             */
+            id: string;
+            /**
+             * @example [
+             *       [
+             *         0,
+             *         0
+             *       ],
+             *       [
+             *         1,
+             *         0
+             *       ]
+             *     ]
+             */
+            cells: number[][];
+        };
+        FitPlacementDto: {
+            /**
+             * @description The id of a piece of the level.
+             * @example b
+             */
+            piece: string;
+            /**
+             * @description Rotation steps of the topology. A negative count turns the other way.
+             * @example 1
+             */
+            rotation: number;
+            /**
+             * @example [
+             *       2,
+             *       0
+             *     ]
+             */
+            at: number[];
+        };
+        FitStarDto: {
+            /** @example 12 */
+            maxMoves: number;
+            /** @example 120000 */
+            maxElapsedMs: number;
+        };
+        FitSectionDto: {
+            /**
+             * @description The cells that the player covers.
+             * @example [
+             *       [
+             *         0,
+             *         0
+             *       ],
+             *       [
+             *         1,
+             *         0
+             *       ]
+             *     ]
+             */
+            figure: number[][];
+            pieces: components["schemas"]["FitPieceDto"][];
+            /** @description The solution of the designer. It covers the figure exactly (A5). */
+            witness: components["schemas"]["FitPlacementDto"][];
+            /** @description The star thresholds, from the first star up. */
+            stars: components["schemas"]["FitStarDto"][];
+        };
+        SeededSourceDto: {
+            /** @example 20261115 */
+            seed: number;
+            /**
+             * @example [
+             *       "red",
+             *       "green",
+             *       "blue"
+             *     ]
+             */
+            colors: string[];
+        };
+        FixedSourceDto: {
+            /**
+             * @example [
+             *       [
+             *         "red",
+             *         "red",
+             *         "blue"
+             *       ],
+             *       [
+             *         "green"
+             *       ]
+             *     ]
+             */
+            stacks: string[][];
+        };
+        SortStarDto: {
+            /** @example 40 */
+            maxMoves: number;
+        };
+        SortSectionDto: {
+            /** @example 2 */
+            radius: number;
+            /**
+             * @description The count of stacks to clear.
+             * @example 3
+             */
+            goals: number;
+            source: components["schemas"]["SeededSourceDto"] | components["schemas"]["FixedSourceDto"];
+            /** @description The star thresholds, from the first star up. */
+            stars: components["schemas"]["SortStarDto"][];
+        };
+        LevelDto: {
+            /**
+             * @description The game variant: hexa-fit or hexa-sort. Another game has no level files.
+             * @example hexa-fit
+             */
+            gameId: string;
+            /**
+             * @description A non-blank text, unique in its game.
+             * @example fit-01
+             */
+            levelId: string;
+            /**
+             * @description The place of the level in the list of its game.
+             * @example 1
+             */
+            order: number;
+            /**
+             * @description The copy of the level. The update rejects a version lower than the stored one, and accepts an equal or a higher one (S3-10).
+             * @example 1
+             */
+            version: number;
+            /**
+             * @description How to read the coordinates, such as hex.
+             * @example hex
+             */
+            topology: string;
+            /** @description The section of the game: the Fit section or the Sort section. */
+            section: components["schemas"]["FitSectionDto"] | components["schemas"]["SortSectionDto"];
+        };
+        LevelsDto: {
+            /** @description The levels, by gameId and then by levelId in an answer. */
+            levels: components["schemas"]["LevelDto"][];
+        };
+        ScoreEntryDto: {
+            /**
+             * @description 1 plus the number of rows that are strictly better. A full tie shares a rank, and the next rank skips: 1, 1, 3.
+             * @example 1
+             */
+            rank: number;
+            /**
+             * @description The player. A full tie lists its players by userId ascending.
+             * @example 0b6f6a4e-1c2d-4e5f-8a9b-0c1d2e3f4a5b
+             */
+            userId: string;
+            /** @example 2048 */
+            highScore: number;
+        };
+        StandingEntryDto: {
+            /**
+             * @description 1 plus the number of rows that are strictly better. A full tie shares a rank, and the next rank skips: 1, 1, 3.
+             * @example 1
+             */
+            rank: number;
+            /**
+             * @description The player. A full tie lists its players by userId ascending.
+             * @example 0b6f6a4e-1c2d-4e5f-8a9b-0c1d2e3f4a5b
+             */
+            userId: string;
+            /**
+             * @description The total of the stars.
+             * @example 9
+             */
+            stars: number;
+            /**
+             * @description The number of levels with a stored result.
+             * @example 3
+             */
+            levelsCompleted: number;
+            /**
+             * @description The total of the moves.
+             * @example 40
+             */
+            moves: number;
+            /**
+             * @description The total of the elapsed time.
+             * @example 90000
+             */
+            elapsedMs: number;
+        };
+        GlobalLeaderboardDto: {
+            /** @example hexa-lines */
+            gameId: string;
+            /** @description The high scores, the higher score first. Empty for a game that keeps no score, such as Fit and Sort. */
+            highScores: components["schemas"]["ScoreEntryDto"][];
+            /** @description The totals of the level results: more stars first, then more levels completed, then fewer moves, then less time. Empty for a game with no level results, such as Lines and Merge. */
+            standings: components["schemas"]["StandingEntryDto"][];
+        };
+        LevelEntryDto: {
+            /**
+             * @description 1 plus the number of rows that are strictly better. A full tie shares a rank, and the next rank skips: 1, 1, 3.
+             * @example 1
+             */
+            rank: number;
+            /**
+             * @description The player. A full tie lists its players by userId ascending.
+             * @example 0b6f6a4e-1c2d-4e5f-8a9b-0c1d2e3f4a5b
+             */
+            userId: string;
+            /** @example 3 */
+            stars: number;
+            /** @example 12 */
+            moves: number;
+            /** @example 45000 */
+            elapsedMs: number;
+        };
+        LevelLeaderboardDto: {
+            /** @example hexa-fit */
+            gameId: string;
+            /** @example fit-01 */
+            levelId: string;
+            /** @description More stars first, then fewer moves, then less time (DS-4). */
+            entries: components["schemas"]["LevelEntryDto"][];
         };
     };
     responses: never;
@@ -436,6 +706,147 @@ export interface operations {
             };
             /** @description The user has no progress for the gameId. */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+        };
+    };
+    LevelsController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Every stored level, by gameId and levelId. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LevelsDto"];
+                };
+            };
+        };
+    };
+    LevelsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LevelsDto"];
+            };
+        };
+        responses: {
+            /** @description Every level of the batch is saved. The body is empty. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The body has the wrong shape, or a level breaks a rule: a value of the common part, its section, A5, a lower version than the stored one, or a gameId with no level files. Each detail names one level by its gameId and levelId. A level problem saves no level of the batch, except a lower version, which saves the other levels. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+            /** @description The bearer token is missing, malformed, expired or signed with another key. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+        };
+    };
+    LeaderboardController_top: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                gameId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The score board and the standing board of the gameId. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GlobalLeaderboardDto"];
+                };
+            };
+            /** @description The gameId breaks its rule. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+            /** @description The bearer token is missing, malformed, expired or signed with another key. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+        };
+    };
+    LeaderboardController_topOfLevel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                gameId: string;
+                levelId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The board of one level. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LevelLeaderboardDto"];
+                };
+            };
+            /** @description The gameId or the levelId breaks its rule. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+            /** @description The bearer token is missing, malformed, expired or signed with another key. */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };

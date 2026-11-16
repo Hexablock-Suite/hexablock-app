@@ -11,6 +11,7 @@ import { ClearedStacks } from '../../../../src/domain/variants/hexa-sort/cleared
 import type { ColorStack } from '../../../../src/domain/variants/hexa-sort/color-stack';
 import { SortRules } from '../../../../src/domain/variants/hexa-sort/sort-rules';
 import type { SortSnapshot, SortState } from '../../../../src/domain/variants/hexa-sort/sort-state';
+import { TileCount } from '../../../../src/domain/variants/hexa-sort/tile-count';
 import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
 import {
   chipsAt,
@@ -152,7 +153,7 @@ describe('SortRules goal', () => {
     expect(chipsAt(game, 0)).toEqual([]);
     expect(chipsAt(game, 1)).toEqual([]);
     expect(state.goalsDone).toEqual(ClearedStacks.of(1));
-    expect(state.clearedTiles).toEqual([11]);
+    expect(state.clearedTiles).toEqual([TileCount.of(11)]);
   });
 
   it('should_keep_the_stack_when_its_top_run_is_nine', () => {
@@ -243,8 +244,7 @@ describe('SortRules colors', () => {
 describe('SortRules piece source (A4)', () => {
   it('should_offer_the_same_stacks_when_two_games_use_the_same_seed', () => {
     const colors = ['red', 'blue', 'green'];
-    const draw = (random: RandomSource) =>
-      stackPiece(stack(colors[Math.floor(random.next() * colors.length)] ?? 'red'));
+    const draw = (random: RandomSource) => stackPiece(stack(random.next().pick(colors)));
     const play = () => {
       const game = sortGame(
         sortState({ board: row(4), source: new SeededPieceSource(Seed.of(7), draw) }),
@@ -320,7 +320,7 @@ describe('SortRules edge cases', () => {
     expect(outcome).toBe(Outcome.playing);
     expect(chipsAt(game, 1)).toEqual([]);
     expect(state.goalsDone).toEqual(ClearedStacks.of(1));
-    expect(state.clearedTiles).toEqual([13]);
+    expect(state.clearedTiles).toEqual([TileCount.of(13)]);
     expect(names(state.offered?.occupant())).toEqual(['green']);
   });
 

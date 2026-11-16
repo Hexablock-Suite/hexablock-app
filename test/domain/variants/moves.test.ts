@@ -7,6 +7,7 @@ import {
 } from '../../../src/domain/variants/hexa-fit/fit-move';
 import { PieceId } from '../../../src/domain/variants/hexa-fit/piece-id';
 import { PlacePiece } from '../../../src/domain/variants/hexa-lines/place-piece';
+import { TrayPosition } from '../../../src/domain/variants/hexa-lines/tray-position';
 import { SlideSense, Slide } from '../../../src/domain/variants/hexa-merge/slide';
 import { PlaceStack } from '../../../src/domain/variants/hexa-sort/place-stack';
 import { square, SquareAxis, squareTopology } from '../../support/engine/square-topology';
@@ -28,11 +29,11 @@ describe('equals of the moves', () => {
       left.equals(right, squareTopology),
       right.equals(left, squareTopology),
     ];
-    const move = new PlacePiece(1, square(2, 0));
+    const move = new PlacePiece(TrayPosition.of(1), square(2, 0));
 
-    expect(same(move, new PlacePiece(1, square(2, 0)))).toEqual(EQUAL);
-    expect(same(move, new PlacePiece(0, square(2, 0)))).toEqual(DIFFERENT);
-    expect(same(move, new PlacePiece(1, square(0, 2)))).toEqual(DIFFERENT);
+    expect(same(move, new PlacePiece(TrayPosition.of(1), square(2, 0)))).toEqual(EQUAL);
+    expect(same(move, new PlacePiece(TrayPosition.of(0), square(2, 0)))).toEqual(DIFFERENT);
+    expect(same(move, new PlacePiece(TrayPosition.of(1), square(0, 2)))).toEqual(DIFFERENT);
   });
 
   it('should_be_equal_only_when_two_slides_hold_the_same_axis_and_sense', () => {
@@ -122,7 +123,7 @@ describe('the piece of a Fit move', () => {
 describe('the tray index of a Lines placement', () => {
   it('should_throw_a_range_error_when_the_tray_index_is_negative_decimal_or_not_a_number', () => {
     for (const index of [-1, 0.5, Number.NaN]) {
-      expect(() => new PlacePiece(index, square(0, 0))).toThrow(
+      expect(() => new PlacePiece(TrayPosition.of(index), square(0, 0))).toThrow(
         new RangeError(`A tray index needs a whole number of 0 or more, not ${index}.`),
       );
     }
@@ -134,7 +135,7 @@ describe('the tray index of a Lines placement', () => {
       Number.NEGATIVE_INFINITY,
       Number.MAX_SAFE_INTEGER + 1,
     ]) {
-      expect(() => new PlacePiece(index, square(0, 0))).toThrow(
+      expect(() => new PlacePiece(TrayPosition.of(index), square(0, 0))).toThrow(
         new RangeError(`A tray index needs a whole number of 0 or more, not ${index}.`),
       );
     }
@@ -143,9 +144,9 @@ describe('the tray index of a Lines placement', () => {
   it('should_build_the_move_when_the_tray_index_is_a_whole_number_of_0_or_more', () => {
     const tray = ['first', 'second', 'third'];
 
-    expect(new PlacePiece(0, square(0, 0)).pieceIn(tray)).toBe('first');
-    expect(new PlacePiece(2, square(0, 0)).pieceIn(tray)).toBe('third');
-    expect(new PlacePiece(3, square(0, 0)).pieceIn(tray)).toBeUndefined();
+    expect(new PlacePiece(TrayPosition.of(0), square(0, 0)).pieceIn(tray)).toBe('first');
+    expect(new PlacePiece(TrayPosition.of(2), square(0, 0)).pieceIn(tray)).toBe('third');
+    expect(new PlacePiece(TrayPosition.of(3), square(0, 0)).pieceIn(tray)).toBeUndefined();
   });
 });
 
@@ -154,7 +155,7 @@ describe('the tray index of a Lines placement', () => {
 // when the line compiles, because then the directive is unused.
 describe('private fields of the moves', () => {
   it('should_reject_at_compile_time_when_a_caller_reads_a_field_of_a_move', () => {
-    const placePiece = new PlacePiece(0, square(0, 0));
+    const placePiece = new PlacePiece(TrayPosition.of(0), square(0, 0));
     const slide = Slide.of(SquareAxis.row, SlideSense.forward);
     const placeFit = new PlaceFitPiece(A, Turns.of(0), square(0, 0));
     const removeFit = new RemoveFitPiece(A);
