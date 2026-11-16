@@ -28,6 +28,7 @@ export class FitLevel<TCoord> {
   }
 
   // Two pieces with the same id throw a RangeError, because a move names its piece by id.
+  // The error carries the id as its `cause`, and the edge delivers its text (issue #237).
   // `FixedListPieceSource` holds the check of `undefined`, so the level reads its copy.
   static of<TCoord>(
     topology: TopologyId,
@@ -38,7 +39,7 @@ export class FitLevel<TCoord> {
     copy.forEach((piece, index) => {
       const id = piece.cell();
       if (copy.slice(0, index).some((earlier) => earlier.cell().equals(id))) {
-        throw new RangeError(`The level has two pieces with the id ${id}.`);
+        throw new RangeError('The level has two pieces with one id.', { cause: id });
       }
     });
     return new FitLevel(topology, figure, Object.freeze(copy));
@@ -51,10 +52,12 @@ export class FitLevel<TCoord> {
   }
 
   // The error of a level that starts on another geometry family.
+  // The error carries the topology of the level and the family of the geometry as its `cause`,
+  // and the edge delivers their texts (issue #237).
   wrongFamily(family: TopologyId): RangeError {
-    return new RangeError(
-      `A Fit level of topology ${this.topology} cannot start on the ${family} geometry.`,
-    );
+    return new RangeError('A Fit level cannot start on the geometry of another topology.', {
+      cause: { topology: this.topology, geometry: family },
+    });
   }
 
   // The figure as a tree of cells, as `BoardBuilder` takes it. Each call gives a new tree.

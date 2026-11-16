@@ -18,12 +18,13 @@ export interface GamePhase {
 
 // The phase asks each outcome of the closed set with `equals()`. It reads no text
 // (classes.md decision 45). It calls no method of `outcome`, so a cast value reaches the error.
+// The error carries that value as its `cause`, and the edge delivers its text (issue #237).
 function phaseOf(outcome: Outcome): GamePhase {
   if (Outcome.playing.equals(outcome)) return PlayingPhase.instance;
   if (Outcome.victory.equals(outcome)) return VictoryPhase.instance;
   if (Outcome.gameOver.equals(outcome)) return GameOverPhase.instance;
   // A value outside the closed set of `Outcome` reaches this line only through a cast.
-  throw new RangeError(`Unknown outcome: ${String(outcome)}.`);
+  throw new RangeError('Unknown outcome.', { cause: outcome });
 }
 
 export class PlayingPhase implements GamePhase {

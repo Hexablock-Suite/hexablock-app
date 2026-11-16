@@ -2,6 +2,7 @@
 import { Moves } from '../../../../src/domain/engine/moves';
 import { Score } from '../../../../src/domain/engine/score';
 import { Turns } from '../../../../src/domain/engine/turns';
+import { PieceId } from '../../../../src/domain/variants/hexa-fit/piece-id';
 import { Placement } from '../../../../src/domain/variants/hexa-fit/placement';
 import { square, squareTopology } from '../../../support/engine/square-topology';
 import { A, B } from '../../../support/variants/hexa-fit/fit-game';
@@ -11,6 +12,7 @@ import { GameStateId } from '../../../../src/domain/engine/game-state-id';
 import { MatchId } from '../../../../src/domain/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 import { MATCH_ID } from '../../../support/engine/match-id';
+import { delivered } from '../../../support/engine/value-receiver';
 
 // R7: the Fit state is an entity. The engine adds the points of a turn through `addPoints()`.
 
@@ -76,6 +78,20 @@ describe('FitState', () => {
     ]).toEqual([true, true, false]);
   });
 
+  // Issue #237: the error carries the id as its `cause`, and the edge delivers its text.
+  it('should_throw_a_range_error_that_carries_the_id_and_keep_the_board_when_a_piece_of_no_level_piece_is_placed', () => {
+    const state = threeDominoFitFactory().createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
+    const unknown = PieceId.of('z');
+    const place = () =>
+      state.place(unknown, Placement.of(Turns.of(0), square(0, 0), squareTopology));
+
+    expect(place).toThrow(
+      new RangeError('The level has no piece with this id.', { cause: unknown }),
+    );
+    expect(state.snapshot().board.cells()).toEqual([]);
+    expect(state.placed()).toEqual([]);
+  });
+
   // The state keeps its object: `place()`, `remove()` and `countMove()` change it in place.
   it('should_change_the_state_in_place_when_a_piece_is_placed_counted_and_removed', () => {
     const state = threeDominoFitFactory().createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
@@ -84,7 +100,7 @@ describe('FitState', () => {
       state
         .snapshot()
         .board.cells()
-        .map(([c, id]) => `${squareTopology.key(c)}=${id}`);
+        .map(([c, id]) => `${squareTopology.key(c)}=${delivered(id)}`);
     const results: unknown[] = [];
 
     results.push(state.place(A, Placement.of(Turns.of(0), square(2, 0), squareTopology)));

@@ -1,10 +1,13 @@
+import type { ValueReceiver } from './value-receiver';
+
 // The result of a turn for the game as a whole (classes.md decision 45, issue #207).
 // It is a value object with a closed set of three instances: `playing`, `victory` and `gameOver`.
 // Each value has one shared instance, which is frozen. So `equals()` compares two outcomes
 // by identity, and no code compares a text to know an outcome.
 // A JSON body keeps the text. `of()` turns a text into its outcome and refuses an unknown text.
-// `toString()` gives the text back. The name of the operation that gives the text to an adapter
-// is an open question (README table «Primitive types»).
+// The text is private (issue #237). `deliverTo()` gives it to a receiver, and no operation
+// returns it. Only an adapter of the edge calls `deliverTo()`: the domain and the use cases
+// call `equals()` and `endsTheGame()`.
 export class Outcome {
   static readonly playing = new Outcome('playing');
   static readonly victory = new Outcome('victory');
@@ -40,8 +43,8 @@ export class Outcome {
     return !this.equals(Outcome.playing);
   }
 
-  // The text of the outcome, as a JSON body holds it.
-  toString(): string {
-    return this.name;
+  // Gives the text of the outcome, as a JSON body holds it, to `receiver`. It returns nothing.
+  deliverTo(receiver: ValueReceiver<string>): void {
+    receiver.receive(this.name);
   }
 }

@@ -4,6 +4,7 @@ import type { GridAxis, GridDirection, GridTopology } from './grid-topology';
 import type { Radius } from './radius';
 import type { RegionSize } from './region-size';
 import { Turns } from './turns';
+import type { ValueReceiver } from './value-receiver';
 
 // A coordinate holds a column and a row.
 // It is a value object (classes.md decisions 16 and 44, issue #206): it never changes,
@@ -48,9 +49,10 @@ export class SquareCoord {
     return SquareCoord.of(-this.row, this.col);
   }
 
-  // The text of the coordinate: `col,row`. `SquareTopology` brands it as its key.
-  toString(): string {
-    return `${this.col},${this.row}`;
+  // The key of the coordinate: `col,row`, branded as a `CoordKey` (issue #237).
+  // `SquareTopology.key()` gives it to the engine, so the topology reads no text.
+  key(): CoordKey {
+    return coordKey(`${this.col},${this.row}`);
   }
 }
 
@@ -96,9 +98,9 @@ export class SquareAxis implements GridAxis {
     return from.plus(this.step.opposite());
   }
 
-  // The name of the axis.
-  toString(): string {
-    return this.name;
+  // Gives the name of the axis to `receiver`. It returns nothing.
+  deliverTo(receiver: ValueReceiver<string>): void {
+    receiver.receive(this.name);
   }
 }
 
@@ -142,9 +144,9 @@ export class SquareDirection implements GridDirection {
     return c.plus(this.step);
   }
 
-  // The name of the direction.
-  toString(): string {
-    return this.name;
+  // Gives the name of the direction to `receiver`. It returns nothing.
+  deliverTo(receiver: ValueReceiver<string>): void {
+    receiver.receive(this.name);
   }
 }
 
@@ -154,8 +156,9 @@ export class SquareTopology implements GridTopology<SquareCoord, SquareAxis, Squ
     return Turns.of(4);
   }
 
+  // The coordinate builds its own key.
   key(c: SquareCoord): CoordKey {
-    return coordKey(c.toString());
+    return c.key();
   }
 
   neighbors(c: SquareCoord): SquareCoord[] {
@@ -164,8 +167,9 @@ export class SquareTopology implements GridTopology<SquareCoord, SquareAxis, Squ
 
   neighbor(c: SquareCoord, direction: SquareDirection): SquareCoord {
     // The check still runs when a caller casts another value to a direction.
+    // The error carries that value as its `cause`, and the edge delivers its text (issue #237).
     if (!(direction instanceof SquareDirection)) {
-      throw new RangeError(`The square grid has no direction ${String(direction)}.`);
+      throw new RangeError('The square grid has no such direction.', { cause: direction });
     }
     return direction.neighborOf(c);
   }
@@ -194,8 +198,9 @@ export class SquareTopology implements GridTopology<SquareCoord, SquareAxis, Squ
     contains: (c: SquareCoord) => boolean,
   ): Iterable<SquareCoord> {
     // The check still runs when a caller casts another value to an axis.
+    // The error carries that value as its `cause`, and the edge delivers its text (issue #237).
     if (!(axis instanceof SquareAxis)) {
-      throw new RangeError(`The square grid has no axis ${String(axis)}.`);
+      throw new RangeError('The square grid has no such axis.', { cause: axis });
     }
     let start = through;
     while (contains(axis.backward(start))) start = axis.backward(start);

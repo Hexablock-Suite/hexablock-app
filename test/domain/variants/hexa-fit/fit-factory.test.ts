@@ -24,6 +24,7 @@ import { A, fitFactory, threeDominoFitFactory } from '../../../support/variants/
 import { repoRoot } from '../../../support/run-tool';
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { BOARD_ID, CountingTimerIds, STATE_ID } from '../../../support/engine/entity-ids';
+import { delivered } from '../../../support/engine/value-receiver';
 
 // The Fit factory creates the whole family of Hexa Fit (issue 99, classes.md decision 31).
 
@@ -42,7 +43,7 @@ describe('FitFactory', () => {
         .coordinates()
         .map((c) => squareTopology.key(c)),
     ).toEqual(['0,0', '1,0']);
-    expect(initial.remaining().map((p) => String(p.cell()))).toEqual(['a']);
+    expect(initial.remaining().map((p) => delivered(p.cell()))).toEqual(['a']);
     expect(outcome).toBe(Outcome.victory);
     expect(engine.snapshot().score).toEqual(Score.of(0));
     expect(publisher.events).toEqual([
@@ -53,8 +54,8 @@ describe('FitFactory', () => {
   it('should_give_a_new_source_of_the_level_pieces_when_the_fit_factory_is_asked_twice', () => {
     const factory = fitFactory();
 
-    const first = [...factory.createPieceSource()].map((p) => String(p.cell()));
-    const second = [...factory.createPieceSource()].map((p) => String(p.cell()));
+    const first = [...factory.createPieceSource()].map((p) => delivered(p.cell()));
+    const second = [...factory.createPieceSource()].map((p) => delivered(p.cell()));
 
     expect(first).toEqual(['a']);
     expect(second).toEqual(['a']);

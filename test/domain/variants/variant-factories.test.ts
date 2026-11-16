@@ -37,6 +37,7 @@ import { linesFactory } from '../../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../../support/variants/hexa-merge/merge-game';
 import { sortFactory } from '../../support/variants/hexa-sort/sort-game';
 import { BOARD_ID, CountingTimerIds } from '../../support/engine/entity-ids';
+import { delivered } from '../../support/engine/value-receiver';
 
 // The engine runs the four variants through one code path (issue 99, APP-FR-03).
 // `playOnce()` reads only `IVariantFactory`: it has no branch on the game id.
@@ -181,11 +182,12 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
       const outcome = engine.play(new PlaceFitPiece(A, Turns.of(0), origin));
 
       expect(keys(start.board.coordinates())).toEqual(keys([origin, next]));
-      expect(start.view().remaining.map((piece) => String(piece.cell()))).toEqual(['a']);
+      expect(start.view().remaining.map((piece) => delivered(piece.cell()))).toEqual(['a']);
       expect(outcome).toBe(Outcome.victory);
     });
 
-    it('should_throw_a_range_error_when_the_fit_level_names_another_topology', () => {
+    // Issue #237: the error carries the two topologies as its `cause`.
+    it('should_throw_a_range_error_that_carries_both_topologies_when_the_fit_level_names_another_topology', () => {
       const others = [TopologyId.hex, TopologyId.square, TopologyId.triangle].filter(
         (id) => !id.equals(geometry.id),
       );
@@ -195,9 +197,10 @@ function figureTests<TCoord>(geometry: GeometryFactory<TCoord>, cellCount: numbe
         const create = () =>
           new FitFactory(geometry, fitLevel(named), new ManualClock(), new CountingTimerIds());
 
-        expect(create).toThrow(RangeError);
         expect(create).toThrow(
-          `A Fit level of topology ${String(named)} cannot start on the ${String(geometry.id)} geometry.`,
+          new RangeError('A Fit level cannot start on the geometry of another topology.', {
+            cause: { topology: named, geometry: geometry.id },
+          }),
         );
       }
     });

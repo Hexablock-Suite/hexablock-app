@@ -22,20 +22,6 @@ export const primitiveBaseline: readonly PrimitiveEntry[] = [
   { primitive: 'number', where: 'Chance.hits', issue: 232 },
   { primitive: 'number', where: 'ColorStack.tileCount', issue: 232 },
   { primitive: 'number', where: 'SortSnapshot.clearedTiles', issue: 232 },
-  // #237: `toString()` leaves 13 classes.
-  { primitive: 'string', where: 'TopologyId.toString', issue: 237 },
-  { primitive: 'string', where: 'Outcome.toString', issue: 237 },
-  { primitive: 'string', where: 'HexCoord.toString', issue: 237 },
-  { primitive: 'string', where: 'HexAxis.toString', issue: 237 },
-  { primitive: 'string', where: 'HexDirection.toString', issue: 237 },
-  { primitive: 'string', where: 'SquareCoord.toString', issue: 237 },
-  { primitive: 'string', where: 'SquareAxis.toString', issue: 237 },
-  { primitive: 'string', where: 'SquareDirection.toString', issue: 237 },
-  { primitive: 'string', where: 'TriangleCoord.toString', issue: 237 },
-  { primitive: 'string', where: 'TriangleAxis.toString', issue: 237 },
-  { primitive: 'string', where: 'TriangleDirection.toString', issue: 237 },
-  { primitive: 'string', where: 'PieceId.toString', issue: 237 },
-  { primitive: 'string', where: 'SlideSense.toString', issue: 237 },
   // #238: the clock reading.
   { primitive: 'number', where: 'Clock.now', issue: 238 },
   // #239: `Range` orders its values without a number.

@@ -4,6 +4,7 @@ import type { GridAxis, GridDirection, GridTopology } from './grid-topology';
 import type { Radius } from './radius';
 import type { RegionSize } from './region-size';
 import { Turns } from './turns';
+import type { ValueReceiver } from './value-receiver';
 
 // A coordinate is axial: `q` and `r`, and the third cube value is `s = -q - r`.
 // It is a value object (classes.md decisions 16 and 44, issue #206): it never changes,
@@ -55,9 +56,10 @@ export class HexCoord {
     return HexCoord.of(-this.r, this.q + this.r);
   }
 
-  // The text of the coordinate: `q,r`. `HexTopology` brands it as its key.
-  toString(): string {
-    return `${this.q},${this.r}`;
+  // The key of the coordinate: `q,r`, branded as a `CoordKey` (issue #237).
+  // `HexTopology.key()` gives it to the engine, so the topology reads no text.
+  key(): CoordKey {
+    return coordKey(`${this.q},${this.r}`);
   }
 }
 
@@ -105,9 +107,9 @@ export class HexAxis implements GridAxis {
     return from.plus(this.step.opposite());
   }
 
-  // The name of the axis.
-  toString(): string {
-    return this.name;
+  // Gives the name of the axis to `receiver`. It returns nothing.
+  deliverTo(receiver: ValueReceiver<string>): void {
+    receiver.receive(this.name);
   }
 }
 
@@ -154,9 +156,9 @@ export class HexDirection implements GridDirection {
     return c.plus(this.step);
   }
 
-  // The name of the direction.
-  toString(): string {
-    return this.name;
+  // Gives the name of the direction to `receiver`. It returns nothing.
+  deliverTo(receiver: ValueReceiver<string>): void {
+    receiver.receive(this.name);
   }
 }
 
@@ -176,8 +178,9 @@ export class HexTopology implements GridTopology<HexCoord, HexAxis, HexDirection
     return Turns.of(6);
   }
 
+  // The coordinate builds its own key.
   key(c: HexCoord): CoordKey {
-    return coordKey(c.toString());
+    return c.key();
   }
 
   neighbors(c: HexCoord): HexCoord[] {
@@ -186,8 +189,9 @@ export class HexTopology implements GridTopology<HexCoord, HexAxis, HexDirection
 
   neighbor(c: HexCoord, direction: HexDirection): HexCoord {
     // The check still runs when a caller casts another value to a direction.
+    // The error carries that value as its `cause`, and the edge delivers its text (issue #237).
     if (!(direction instanceof HexDirection)) {
-      throw new RangeError(`The hex grid has no direction ${String(direction)}.`);
+      throw new RangeError('The hex grid has no such direction.', { cause: direction });
     }
     return direction.neighborOf(c);
   }
@@ -212,8 +216,10 @@ export class HexTopology implements GridTopology<HexCoord, HexAxis, HexDirection
 
   *line(axis: HexAxis, through: HexCoord, contains: (c: HexCoord) => boolean): Iterable<HexCoord> {
     // The check still runs when a caller casts another value to an axis.
-    if (!(axis instanceof HexAxis))
-      throw new RangeError(`The hex grid has no axis ${String(axis)}.`);
+    // The error carries that value as its `cause`, and the edge delivers its text (issue #237).
+    if (!(axis instanceof HexAxis)) {
+      throw new RangeError('The hex grid has no such axis.', { cause: axis });
+    }
     let start = through;
     while (contains(axis.backward(start))) start = axis.backward(start);
     for (let c = start; contains(c); c = axis.forward(c)) yield c;

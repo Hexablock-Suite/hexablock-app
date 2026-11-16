@@ -1,9 +1,13 @@
 /** @jest-environment node */
-import { hex, HexCoord } from '../../../src/domain/engine/hex-topology';
+import { hex, HexCoord, HexTopology } from '../../../src/domain/engine/hex-topology';
 import { Radius } from '../../../src/domain/engine/radius';
 import { RegionSize } from '../../../src/domain/engine/region-size';
-import { square, SquareCoord } from '../../../src/domain/engine/square-topology';
-import { triangle, TriangleCoord } from '../../../src/domain/engine/triangle-topology';
+import { square, SquareCoord, SquareTopology } from '../../../src/domain/engine/square-topology';
+import {
+  triangle,
+  TriangleCoord,
+  TriangleTopology,
+} from '../../../src/domain/engine/triangle-topology';
 
 // Issue 206 (classes.md decision 44): a coordinate is a value object.
 // It keeps its numbers private, compares by value and does the calculations on its own values.
@@ -79,9 +83,16 @@ describe('HexCoord', () => {
     }
   });
 
-  it('should_give_its_two_values_as_text_when_the_coordinate_is_printed', () => {
-    expect(hex(1, -2).toString()).toBe('1,-2');
-    expect(`${hex(-0, 3)}`).toBe('0,3');
+  // Issue #237: the coordinate gives its key to its topology, and the topology reads no text.
+  it('should_give_its_two_values_as_its_key_when_the_topology_asks_for_the_key', () => {
+    expect(hex(1, -2).key()).toBe('1,-2');
+    expect(hex(-0, 3).key()).toBe('0,3');
+    expect(new HexTopology().key(hex(1, -2))).toBe('1,-2');
+  });
+
+  // Issue #237: no operation returns the values as text, `toString()` included.
+  it('should_give_no_text_when_a_template_literal_or_string_converts_the_coordinate', () => {
+    expect(`${String(hex(1, -2))}`).toBe('[object Object]');
   });
 
   it('should_refuse_the_write_when_a_caller_writes_a_private_value', () => {
@@ -136,9 +147,16 @@ describe('SquareCoord', () => {
     }
   });
 
-  it('should_give_its_two_values_as_text_when_the_coordinate_is_printed', () => {
-    expect(square(1, -2).toString()).toBe('1,-2');
-    expect(`${square(-0, 3)}`).toBe('0,3');
+  // Issue #237: the coordinate gives its key to its topology, and the topology reads no text.
+  it('should_give_its_two_values_as_its_key_when_the_topology_asks_for_the_key', () => {
+    expect(square(1, -2).key()).toBe('1,-2');
+    expect(square(-0, 3).key()).toBe('0,3');
+    expect(new SquareTopology().key(square(1, -2))).toBe('1,-2');
+  });
+
+  // Issue #237: no operation returns the values as text, `toString()` included.
+  it('should_give_no_text_when_a_template_literal_or_string_converts_the_coordinate', () => {
+    expect(`${String(square(1, -2))}`).toBe('[object Object]');
   });
 
   it('should_refuse_the_write_when_a_caller_writes_a_private_value', () => {
@@ -218,9 +236,16 @@ describe('TriangleCoord', () => {
     }
   });
 
-  it('should_give_its_two_values_as_text_when_the_coordinate_is_printed', () => {
-    expect(triangle(1, -2).toString()).toBe('1,-2');
-    expect(`${triangle(-0, 3)}`).toBe('0,3');
+  // Issue #237: the coordinate gives its key to its topology, and the topology reads no text.
+  it('should_give_its_two_values_as_its_key_when_the_topology_asks_for_the_key', () => {
+    expect(triangle(1, -2).key()).toBe('1,-2');
+    expect(triangle(-0, 3).key()).toBe('0,3');
+    expect(new TriangleTopology().key(triangle(1, -2))).toBe('1,-2');
+  });
+
+  // Issue #237: no operation returns the values as text, `toString()` included.
+  it('should_give_no_text_when_a_template_literal_or_string_converts_the_coordinate', () => {
+    expect(`${String(triangle(1, -2))}`).toBe('[object Object]');
   });
 
   it('should_refuse_the_write_when_a_caller_writes_a_private_value', () => {

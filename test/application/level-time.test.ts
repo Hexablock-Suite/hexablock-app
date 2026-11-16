@@ -12,6 +12,7 @@ import { PlaceFitPiece } from '../../src/domain/variants/hexa-fit/fit-move';
 import { FitPlay, FitStarThreshold, fitStars } from '../../src/domain/variants/hexa-fit/fit-stars';
 import { gameUseCases, valueOf } from '../support/application/game-use-cases';
 import { ManualClock } from '../support/engine/manual-clock';
+import { delivered } from '../support/engine/value-receiver';
 import { square } from '../support/engine/square-topology';
 import { firstMoveOf } from '../support/engine/variant-game';
 import { A, B, C, threeDominoFitFactory } from '../support/variants/hexa-fit/fit-game';
@@ -89,7 +90,7 @@ describe('The time of a Fit level', () => {
 
     // The undo takes the move back and leaves the time.
     expect(undone.elapsedMs).toEqual(ElapsedTime.ofMs(2_000));
-    expect(undone.payload.placed.map((id) => String(id))).toEqual(['a']);
+    expect(undone.payload.placed.map((id) => delivered(id))).toEqual(['a']);
     expect(replay.elapsedMs).toEqual(ElapsedTime.ofMs(3_000));
     expect(games.running().snapshot().moves).toEqual(Moves.of(2));
   });
