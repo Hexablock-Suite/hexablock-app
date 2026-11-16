@@ -9,6 +9,7 @@ import {
 import { Radius } from '../../../src/domain/engine/radius';
 import { RegionSize } from '../../../src/domain/engine/region-size';
 import { Turns } from '../../../src/domain/engine/turns';
+import { delivered } from '../../support/engine/value-receiver';
 
 // The real hexagonal topology (issue 153, classes.md decision 17).
 // The Merge tests run on it, so this suite pins its whole contract.
@@ -81,8 +82,8 @@ describe('HexTopology', () => {
       HexDirection.southWest,
       HexDirection.northEast,
     ]);
-    expect(topology.axes().map(String)).toEqual(['q', 'r', 's']);
-    expect(topology.directions().map(String)).toEqual([
+    expect(topology.axes().map(delivered)).toEqual(['q', 'r', 's']);
+    expect(topology.directions().map(delivered)).toEqual([
       'east',
       'west',
       'south-east',
@@ -178,16 +179,14 @@ describe('HexTopology', () => {
   it('should_throw_a_range_error_when_a_cast_names_an_axis_that_the_grid_lacks', () => {
     const read = () => [...topology.line('nort' as unknown as HexAxis, hex(0, 0), inside(2))];
 
-    expect(read).toThrow(RangeError);
-    expect(read).toThrow('The hex grid has no axis nort.');
+    expect(read).toThrow(new RangeError('The hex grid has no such axis.', { cause: 'nort' }));
   });
 
   it('should_throw_a_range_error_when_a_cast_names_an_object_prototype_member', () => {
     for (const name of ['constructor', 'toString', '__proto__']) {
       const read = () => [...topology.line(name as unknown as HexAxis, hex(0, 0), inside(2))];
 
-      expect(read).toThrow(RangeError);
-      expect(read).toThrow(`The hex grid has no axis ${name}.`);
+      expect(read).toThrow(new RangeError('The hex grid has no such axis.', { cause: name }));
     }
   });
 

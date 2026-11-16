@@ -4,6 +4,7 @@ import type { GridAxis, GridDirection, GridTopology } from './grid-topology';
 import type { Radius } from './radius';
 import type { RegionSize } from './region-size';
 import { Turns } from './turns';
+import type { ValueReceiver } from './value-receiver';
 
 // Rotation uses triangle coordinates (x, y, z): x + y + z is 1 for an up triangle
 // and 2 for a down triangle. The lattice cell (i, j) holds the up triangle
@@ -81,9 +82,10 @@ export class TriangleCoord {
     return TriangleCoord.fromCube([1 - y, 1 - z, 1 - x]);
   }
 
-  // The text of the coordinate: `col,row`. `TriangleTopology` brands it as its key.
-  toString(): string {
-    return `${this.col},${this.row}`;
+  // The key of the coordinate: `col,row`, branded as a `CoordKey` (issue #237).
+  // `TriangleTopology.key()` gives it to the engine, so the topology reads no text.
+  key(): CoordKey {
+    return coordKey(`${this.col},${this.row}`);
   }
 
   private toCube(): Cube {
@@ -186,9 +188,9 @@ export class TriangleAxis implements GridAxis {
     return follow(from, this.behind);
   }
 
-  // The name of the axis.
-  toString(): string {
-    return this.name;
+  // Gives the name of the axis to `receiver`. It returns nothing.
+  deliverTo(receiver: ValueReceiver<string>): void {
+    receiver.receive(this.name);
   }
 }
 
@@ -233,9 +235,9 @@ export class TriangleDirection implements GridDirection {
     return follow(c, this.step);
   }
 
-  // The name of the direction.
-  toString(): string {
-    return this.name;
+  // Gives the name of the direction to `receiver`. It returns nothing.
+  deliverTo(receiver: ValueReceiver<string>): void {
+    receiver.receive(this.name);
   }
 }
 
@@ -249,8 +251,9 @@ export class TriangleTopology implements GridTopology<
     return Turns.of(6);
   }
 
+  // The coordinate builds its own key.
   key(c: TriangleCoord): CoordKey {
-    return coordKey(c.toString());
+    return c.key();
   }
 
   neighbors(c: TriangleCoord): TriangleCoord[] {
@@ -259,8 +262,9 @@ export class TriangleTopology implements GridTopology<
 
   neighbor(c: TriangleCoord, direction: TriangleDirection): TriangleCoord {
     // The check still runs when a caller casts another value to a direction.
+    // The error carries that value as its `cause`, and the edge delivers its text (issue #237).
     if (!(direction instanceof TriangleDirection)) {
-      throw new RangeError(`The triangle grid has no direction ${String(direction)}.`);
+      throw new RangeError('The triangle grid has no such direction.', { cause: direction });
     }
     return direction.neighborOf(c);
   }
@@ -292,8 +296,9 @@ export class TriangleTopology implements GridTopology<
     contains: (c: TriangleCoord) => boolean,
   ): Iterable<TriangleCoord> {
     // The check still runs when a caller casts another value to an axis.
+    // The error carries that value as its `cause`, and the edge delivers its text (issue #237).
     if (!(axis instanceof TriangleAxis)) {
-      throw new RangeError(`The triangle grid has no axis ${String(axis)}.`);
+      throw new RangeError('The triangle grid has no such axis.', { cause: axis });
     }
     let start = through;
     while (contains(axis.backward(start))) start = axis.backward(start);

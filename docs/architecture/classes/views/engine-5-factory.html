@@ -64,7 +64,7 @@
       <h1>Wiring a variant: Abstract Factory, Builder, Observer and injected interfaces</h1>
 
       <svg
-        viewBox="0 0 1040 1328"
+        viewBox="0 0 1040 1360"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="factory-title factory-desc"
@@ -75,13 +75,14 @@
           rules, piece source, scoring, board, progress model, initial state and optional history of
           a variant, the ILevelBuilder builder, the abstract GameEvent with GameOver, the domain
           event that the root records when a game ends, the Clock and RandomSource interfaces that
-          layer 4 implements, and the four id generator interfaces that give the MatchId of each new
-          match, the GameStateId of its first state, the BoardId of its board and the LevelTimerId
-          of the timer of a timed game, all value objects. FitFactory takes the
-          LevelTimerIdGenerator. GameFactory keeps an IVariantFactory and the three generators and
-          creates the started GameEngine. GameOver keeps the MatchId, the Outcome and the final
-          Score, a value object, GameEvent keeps the GameId, and the fields are private: a listener
-          asks isVictory() or receives the data through deliverTo().
+          layer 4 implements, and the MatchIdGenerator interface that gives the MatchId of each new
+          match. The internal ids are local value objects that keep the MatchId of their match:
+          GameFactory builds the GameStateId of the first state and the BoardId of its board from
+          it, and FitFactory builds the LevelTimerId of the timer of a timed game in createRules().
+          GameFactory keeps an IVariantFactory and the MatchIdGenerator and creates the started
+          GameEngine. GameOver keeps the MatchId, the Outcome and the final Score, a value object,
+          GameEvent keeps the GameId, and the fields are private: a listener asks isVictory() or
+          receives the data through deliverTo().
         </desc>
         <defs>
           <marker
@@ -142,7 +143,7 @@
           x="24"
           y="24"
           width="992"
-          height="1124"
+          height="1156"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -258,7 +259,7 @@
           x="40"
           y="540"
           width="432"
-          height="196"
+          height="148"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -281,7 +282,7 @@
           x="496"
           y="540"
           width="496"
-          height="588"
+          height="620"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -297,7 +298,7 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.14em"
         >
-          IDENTITY · DECISIONS 7, 19, 25, 26, 30
+          IDENTITY · DECISIONS 7, 19, 25, 26, 30, 52
         </text>
         <!-- Relationships (drawn before boxes) -->
         <!-- GameFactory keeps the IVariantFactory it receives as variant: use with role and multiplicity -->
@@ -420,7 +421,7 @@
           + gameId: GameId
         </text>
         <text x="72" y="180" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + createRules(): IGameRules&lt;TMove, TState&gt;
+          + createRules(matchId: MatchId): IGameRules&lt;TMove, TState&gt;
         </text>
         <text x="72" y="196" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createPieceSource(): IPieceSource&lt;Piece&lt;TCell, TCoord&gt;&gt; [0..1]
@@ -812,81 +813,17 @@
         <text x="792" y="672" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: MatchId): boolean
         </text>
-        <!-- GameFactory keeps the GameStateIdGenerator it receives as stateIds: use with role and multiplicity -->
+        <!-- GameFactory builds the GameStateId of the first state from the MatchId: use with a verb -->
         <path
-          d="M 440 728 V 740 H 512"
+          d="M 440 680 V 740 H 512"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#factory-open)"
         />
-        <rect x="454" y="724" width="52" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="456.5" y="720" width="39" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="456"
-          y="733"
-          fill="#17212a"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
-        >
-          stateIds
-          <tspan font-weight="600">1</tspan>
-        </text>
-        <!-- GameFactory keeps the BoardIdGenerator it receives as boardIds: use with role and multiplicity -->
-        <path
-          d="M 424 728 V 876 H 512"
-          fill="none"
-          stroke="#5b6873"
-          stroke-width="1"
-          marker-end="url(#factory-open)"
-        />
-        <rect x="454" y="860" width="52" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="456"
-          y="869"
-          fill="#17212a"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
-        >
-          boardIds
-          <tspan font-weight="600">1</tspan>
-        </text>
-        <!-- LevelTimerIdGenerator gives a LevelTimerId: use with a verb -->
-        <line
-          x1="712"
-          y1="1012"
-          x2="776"
-          y2="1012"
-          stroke="#5b6873"
-          stroke-width="1"
-          marker-end="url(#factory-open)"
-        />
-        <rect x="726.5" y="992" width="35" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="744"
-          y="1001"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          GIVES
-        </text>
-        <!-- GameStateIdGenerator gives a GameStateId, and BoardIdGenerator gives a BoardId: use with a verb -->
-        <line
-          x1="712"
-          y1="740"
-          x2="776"
-          y2="740"
-          stroke="#5b6873"
-          stroke-width="1"
-          marker-end="url(#factory-open)"
-        />
-        <rect x="726.5" y="720" width="35" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="744"
+          x="476"
           y="729"
           fill="#7d8a94"
           font-size="8"
@@ -894,35 +831,56 @@
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          GIVES
+          BUILDS
         </text>
-        <line
-          x1="712"
-          y1="876"
-          x2="776"
-          y2="876"
+        <!-- GameFactory builds the BoardId of its board from the MatchId: use with a verb -->
+        <path
+          d="M 424 680 V 900 H 512"
+          fill="none"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#factory-open)"
         />
-        <rect x="726.5" y="856" width="35" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="456.5" y="880" width="39" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="744"
-          y="865"
+          x="476"
+          y="889"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          GIVES
+          BUILDS
         </text>
-        <!-- Class: GameStateIdGenerator (interface of the engine) -->
+        <!-- Each local id keeps the MatchId of its match: use with role and multiplicity, one shared end -->
+        <path d="M 712 740 H 876" fill="none" stroke="#5b6873" stroke-width="1" />
+        <path d="M 712 900 H 876" fill="none" stroke="#5b6873" stroke-width="1" />
+        <path
+          d="M 712 1028 H 876 V 680"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#factory-open)"
+        />
+        <rect x="880" y="686" width="43" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="882"
+          y="695"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          matchId
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <!-- Class: GameStateId (value object, local id) -->
         <rect
           x="512"
           y="704"
           width="200"
-          height="72"
+          height="144"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -938,47 +896,10 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface»
-        </text>
-        <text
-          x="612"
-          y="740"
-          fill="#17212a"
-          font-size="12"
-          font-weight="600"
-          font-family="'IBM Plex Sans', sans-serif"
-          text-anchor="middle"
-        >
-          GameStateIdGenerator
-        </text>
-        <text x="528" y="768" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + next(): GameStateId
-        </text>
-        <!-- Class: GameStateId (value object) -->
-        <rect
-          x="776"
-          y="704"
-          width="200"
-          height="128"
-          rx="6"
-          fill="#ffffff"
-          stroke="#17212a"
-          stroke-width="1"
-        />
-        <line x1="776" y1="752" x2="976" y2="752" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text
-          x="876"
-          y="722"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
           «value object»
         </text>
         <text
-          x="876"
+          x="612"
           y="740"
           fill="#17212a"
           font-size="12"
@@ -988,60 +909,26 @@
         >
           GameStateId
         </text>
-        <text x="792" y="768" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - value: string
+        <text x="528" y="768" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - matchId: MatchId
         </text>
-        <line x1="776" y1="776" x2="976" y2="776" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="792" y="792" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + of(value: string): GameStateId
+        <line x1="512" y1="776" x2="712" y2="776" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="528" y="792" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + of(matchId: MatchId):
         </text>
-        <text x="792" y="808" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="536" y="808" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          GameStateId
+        </text>
+        <text x="528" y="824" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: GameStateId):
         </text>
-        <text x="800" y="824" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="536" y="840" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           boolean
         </text>
-        <!-- Class: BoardIdGenerator (interface of the engine) -->
+        <!-- Class: BoardId (value object, local id) -->
         <rect
           x="512"
-          y="840"
-          width="200"
-          height="72"
-          rx="6"
-          fill="#ffffff"
-          stroke="#17212a"
-          stroke-width="1"
-        />
-        <line x1="512" y1="888" x2="712" y2="888" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text
-          x="612"
-          y="858"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «interface»
-        </text>
-        <text
-          x="612"
-          y="876"
-          fill="#17212a"
-          font-size="12"
-          font-weight="600"
-          font-family="'IBM Plex Sans', sans-serif"
-          text-anchor="middle"
-        >
-          BoardIdGenerator
-        </text>
-        <text x="528" y="904" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + next(): BoardId
-        </text>
-        <!-- Class: BoardId (value object) -->
-        <rect
-          x="776"
-          y="840"
+          y="864"
           width="200"
           height="112"
           rx="6"
@@ -1049,10 +936,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="776" y1="888" x2="976" y2="888" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="512" y1="912" x2="712" y2="912" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="876"
-          y="858"
+          x="612"
+          y="882"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1062,8 +949,8 @@
           «value object»
         </text>
         <text
-          x="876"
-          y="876"
+          x="612"
+          y="900"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1072,74 +959,31 @@
         >
           BoardId
         </text>
-        <text x="792" y="904" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - value: string
+        <text x="528" y="928" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - matchId: MatchId
         </text>
-        <line x1="776" y1="912" x2="976" y2="912" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="792" y="928" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + of(value: string): BoardId
+        <line x1="512" y1="936" x2="712" y2="936" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="528" y="952" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + of(matchId: MatchId): BoardId
         </text>
-        <text x="792" y="944" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="528" y="968" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: BoardId): boolean
         </text>
-        <!-- Class: LevelTimerIdGenerator (interface of the engine) -->
+        <!-- Class: LevelTimerId (value object, local id) -->
         <rect
           x="512"
-          y="976"
+          y="992"
           width="200"
-          height="72"
+          height="144"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="512" y1="1024" x2="712" y2="1024" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="512" y1="1040" x2="712" y2="1040" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="612"
-          y="994"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «interface»
-        </text>
-        <text
-          x="612"
-          y="1012"
-          fill="#17212a"
-          font-size="12"
-          font-weight="600"
-          font-family="'IBM Plex Sans', sans-serif"
-          text-anchor="middle"
-        >
-          LevelTimerIdGenerator
-        </text>
-        <text
-          x="528"
-          y="1040"
-          fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          + next(): LevelTimerId
-        </text>
-        <!-- Class: LevelTimerId (value object) -->
-        <rect
-          x="776"
-          y="976"
-          width="200"
-          height="128"
-          rx="6"
-          fill="#ffffff"
-          stroke="#17212a"
-          stroke-width="1"
-        />
-        <line x1="776" y1="1024" x2="976" y2="1024" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text
-          x="876"
-          y="994"
+          y="1010"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1149,8 +993,8 @@
           «value object»
         </text>
         <text
-          x="876"
-          y="1012"
+          x="612"
+          y="1028"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1160,27 +1004,36 @@
           LevelTimerId
         </text>
         <text
-          x="792"
-          y="1040"
+          x="528"
+          y="1056"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          - value: string
+          - matchId: MatchId
         </text>
-        <line x1="776" y1="1048" x2="976" y2="1048" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="512" y1="1064" x2="712" y2="1064" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="792"
-          y="1064"
-          fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          + of(value: string): LevelTimerId
-        </text>
-        <text
-          x="792"
+          x="528"
           y="1080"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + of(matchId: MatchId):
+        </text>
+        <text
+          x="536"
+          y="1096"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          LevelTimerId
+        </text>
+        <text
+          x="528"
+          y="1112"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1188,8 +1041,8 @@
           + equals(other: LevelTimerId):
         </text>
         <text
-          x="800"
-          y="1096"
+          x="536"
+          y="1128"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1201,7 +1054,7 @@
           x="56"
           y="568"
           width="400"
-          height="144"
+          height="112"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1236,14 +1089,8 @@
         <text x="72" y="648" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - ids: MatchIdGenerator
         </text>
-        <text x="72" y="664" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - stateIds: GameStateIdGenerator
-        </text>
-        <text x="72" y="680" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - boardIds: BoardIdGenerator
-        </text>
-        <line x1="56" y1="688" x2="456" y2="688" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="72" y="704" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="56" y1="656" x2="456" y2="656" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="72" y="672" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createGame(): GameEngine&lt;TCell, TCoord, TMove, TState&gt;
         </text>
         <!-- UML template boxes: type parameters on the top-right corner -->
@@ -1311,8 +1158,8 @@
           TLevel
         </text>
 
-        <!-- The footnote and the legend sit below the zone, which grew by 640. It grew by 32 more for the delivery operation of Score (#228). -->
-        <g transform="translate(0 672)">
+        <!-- The footnote and the legend sit below the zone, which grew by 640. It grew by 32 more for the delivery operation of Score (#228), and by 32 more for the local ids (#236). -->
+        <g transform="translate(0 704)">
           <!-- Footnote: classes the budget leaves out -->
           <text
             x="24"
@@ -1342,8 +1189,8 @@
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            Layer 4 implements Clock, RandomSource and the four id generators. They are engine
-            interfaces: ports live in layer 2, and GameEventPublisher is one since #233.
+            Layer 4 implements Clock, RandomSource and MatchIdGenerator. They are engine interfaces:
+            ports live in layer 2, and GameEventPublisher is one since #233.
           </text>
 
           <text
@@ -1353,8 +1200,9 @@
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            GameFactory keeps no LevelTimerIdGenerator: FitFactory takes it next to the Clock and
-            gives each new LevelTimer its LevelTimerId (view 3, the Hexa Fit view).
+            Only the root has global identity (decision 52). FitFactory builds the LevelTimerId of
+            each new LevelTimer from the MatchId that createRules() takes (view 3, the Hexa Fit
+            view).
           </text>
 
           <!-- Legend -->

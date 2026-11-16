@@ -1,12 +1,14 @@
 import type { GridTopology } from './grid-topology';
 import type { ShapeNode } from './shape-node';
+import type { ValueReceiver } from './value-receiver';
 
 // The id of one geometry family. A level names its family with this id in `topology` (DS-6).
 // It is a value object with a closed set of three instances (classes.md decision 45, issue #207).
 // Each value has one shared instance, which is frozen. So `equals()` compares two ids
 // by identity, and no code compares a text to know a family.
 // A level file keeps the text. `of()` turns a text into its id and refuses an unknown text.
-// `toString()` gives the text back, for the error that names a family.
+// The text is private (issue #237). `deliverTo()` gives it to a receiver, and no operation
+// returns it. An error that names a family carries the id as its `cause`.
 export class TopologyId {
   static readonly hex = new TopologyId('hex');
   static readonly square = new TopologyId('square');
@@ -37,9 +39,9 @@ export class TopologyId {
     return this === other;
   }
 
-  // The text of the id, as a level file holds it.
-  toString(): string {
-    return this.name;
+  // Gives the text of the id, as a level file holds it, to `receiver`. It returns nothing.
+  deliverTo(receiver: ValueReceiver<string>): void {
+    receiver.receive(this.name);
   }
 }
 

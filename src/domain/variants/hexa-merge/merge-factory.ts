@@ -107,7 +107,10 @@ export class MergeFactory<TCoord> implements IVariantFactory<
     private readonly settings: MergeSettings,
   ) {}
 
-  createRules(): IGameRules<Slide<GridAxis>, MergeState<MergeTile, TCoord, GridAxis>> {
+  // Hexa Merge has no timer, so the rules need no `MatchId` (classes.md decision 50).
+  createRules(
+    _matchId: MatchId,
+  ): IGameRules<Slide<GridAxis>, MergeState<MergeTile, TCoord, GridAxis>> {
     return new MergeRules<MergeTile, TCoord, GridAxis>(this.settings.targetTile());
   }
 

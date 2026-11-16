@@ -19,10 +19,12 @@ import type { IScoringPolicy } from './scoring-policy';
 // `createPieceSource()` returns `undefined` for a variant with no piece source.
 // `TPiece` is the item of the source. It is a `Piece` by default.
 // Hexa Merge draws a new tile and its cell (`NewTile`), so it binds `TPiece` to that type.
+// `createRules()` takes the `MatchId` of the game, so a timed variant gives its timer
+// the local id of that match (classes.md decisions 50 and 52). The other variants ignore it.
 // `createBoard()` gives a new empty board with the id `boardId` (classes.md decision 7).
 // `createInitialState()` puts a new board and the piece source in the first state.
 // The first state takes its own id `stateId` and the `MatchId` of its game (decision 26),
-// and its board takes the id `boardId`. `GameFactory` asks the generators for the three ids.
+// and its board takes the id `boardId`. `GameFactory` builds the two local ids from the `MatchId`.
 // So two calls give two games that share no board. A piece source is a value
 // (classes.md decision 51), so two games can share one source, and no draw changes it.
 // `createHistory()` returns a new history for each game, or `undefined` for a variant
@@ -36,7 +38,7 @@ export interface IVariantFactory<
   TPiece = Piece<TCell, TCoord>,
 > {
   readonly gameId: GameId;
-  createRules(): IGameRules<TMove, TState>;
+  createRules(matchId: MatchId): IGameRules<TMove, TState>;
   createScoring(): IScoringPolicy<TState>;
   createPieceSource(): IPieceSource<TPiece> | undefined;
   createBoard(boardId: BoardId): Board<TCell, TCoord>;

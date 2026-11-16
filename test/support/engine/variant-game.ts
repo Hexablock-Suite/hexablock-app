@@ -18,7 +18,7 @@ export function startVariant<
   TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
   TPiece,
 >(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>) {
-  const rules = factory.createRules();
+  const rules = factory.createRules(MATCH_ID);
   const engine = new GameEngine<TCell, TCoord, TMove, TState>(
     MATCH_ID,
     factory.gameId,
@@ -50,7 +50,7 @@ export function firstMoveOf<
   TPiece,
 >(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>): TMove {
   return firstValidMove(
-    factory.createRules(),
+    factory.createRules(MATCH_ID),
     factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID),
   );
 }

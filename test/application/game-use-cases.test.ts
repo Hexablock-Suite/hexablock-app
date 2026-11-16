@@ -53,12 +53,7 @@ import { linesFactory } from '../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../support/variants/hexa-merge/merge-game';
 import { sortFactory, stack, stackPiece } from '../support/variants/hexa-sort/sort-game';
 import { CountingMatchIds, MATCH_ID } from '../support/engine/match-id';
-import {
-  BOARD_ID,
-  CountingBoardIds,
-  CountingStateIds,
-  STATE_ID,
-} from '../support/engine/entity-ids';
+import { BOARD_ID, STATE_ID } from '../support/engine/entity-ids';
 
 // `StartGame` and `ApplyMove` run the four variants through one code path (issue 100,
 // APP-FR-03, classes.md decisions 9, 28 and 29). The helper reads only `IVariantFactory`.
@@ -146,7 +141,7 @@ function brokenStart<
 ): IVariantFactory<TCell, TCoord, TMove, TState, TPiece> {
   return {
     gameId: factory.gameId,
-    createRules: () => factory.createRules(),
+    createRules: (matchId) => factory.createRules(matchId),
     createScoring: () => factory.createScoring(),
     createPieceSource: () => factory.createPieceSource(),
     createBoard: (boardId) => factory.createBoard(boardId),
@@ -229,7 +224,7 @@ function sortFactoryWithFailingSource(): IVariantFactory<
   };
   return {
     gameId: factory.gameId,
-    createRules: () => factory.createRules(),
+    createRules: (matchId) => factory.createRules(matchId),
     createScoring: () => factory.createScoring(),
     createPieceSource: () => source,
     createBoard: (boardId) => factory.createBoard(boardId),
@@ -330,12 +325,7 @@ describe('StartGame and ApplyMove', () => {
     const oldGame = games.running();
     const before = runningGameOf(games);
     const broken = new StartGame(
-      new GameFactory(
-        brokenStart(linesFactory()),
-        new CountingMatchIds(),
-        new CountingStateIds(),
-        new CountingBoardIds(),
-      ),
+      new GameFactory(brokenStart(linesFactory()), new CountingMatchIds()),
       games,
     );
 
@@ -397,16 +387,11 @@ describe('StartGame and ApplyMove', () => {
     const oldGame = working.games.running();
     const before = runningGameOf(working.games);
     const broken = new StartGame(
-      new GameFactory(
-        linesFactory(),
-        {
-          next: () => {
-            throw new Error('The generator has no id.');
-          },
+      new GameFactory(linesFactory(), {
+        next: () => {
+          throw new Error('The generator has no id.');
         },
-        new CountingStateIds(),
-        new CountingBoardIds(),
-      ),
+      }),
       working.games,
     );
 
@@ -455,12 +440,7 @@ describe('StartGame and ApplyMove', () => {
 
   it('should_return_a_start_failed_failure_when_the_repository_throws_on_replace', async () => {
     const startGame = new StartGame(
-      new GameFactory(
-        linesFactory(),
-        new CountingMatchIds(),
-        new CountingStateIds(),
-        new CountingBoardIds(),
-      ),
+      new GameFactory(linesFactory(), new CountingMatchIds()),
       new ThrowingRepository('replace'),
     );
 

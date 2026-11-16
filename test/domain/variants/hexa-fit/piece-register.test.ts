@@ -6,6 +6,7 @@ import { PieceRegister } from '../../../../src/domain/variants/hexa-fit/piece-re
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { square } from '../../../support/engine/square-topology';
+import { delivered } from '../../../support/engine/value-receiver';
 import { A, B, C, threeDominoFitFactory } from '../../../support/variants/hexa-fit/fit-game';
 
 // Issue #211 (classes.md decision 49): `FitState` keeps its pieces and its placements
@@ -109,7 +110,7 @@ describe('PieceRegister', () => {
 describe('a Fit game with an equal piece id that is another object', () => {
   it('should_find_place_and_remove_the_piece_when_the_move_names_it_with_another_id_object', () => {
     const factory = threeDominoFitFactory();
-    const rules = factory.createRules();
+    const rules = factory.createRules(MATCH_ID);
     const state = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
     const other = PieceId.of('b');
     const place = new PlaceFitPiece(other, Turns.of(0), square(2, 0));
@@ -122,8 +123,8 @@ describe('a Fit game with an equal piece id that is another object', () => {
 
     expect(state.placementOf(PieceId.of('b'))).toBeDefined();
     expect(state.placed()).toEqual([B]);
-    expect(state.remaining().map((piece) => String(piece.cell()))).toEqual(['a', 'c']);
-    expect(state.snapshot().placements.map(([id]) => String(id))).toEqual(['b']);
+    expect(state.remaining().map((piece) => delivered(piece.cell()))).toEqual(['a', 'c']);
+    expect(state.snapshot().placements.map(([id]) => delivered(id))).toEqual(['b']);
 
     rules.apply(state, new RemoveFitPiece(PieceId.of('b')));
 

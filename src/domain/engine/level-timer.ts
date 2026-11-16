@@ -9,7 +9,7 @@ import type { ITimed } from './timed';
 // The timer is an entity inside the `GameEngine` aggregate (classes.md decisions 19 and 26).
 // It changes in place, so it is not a value object. Its `LevelTimerId` is its identity.
 // The id never changes, and `equals()` compares two timers by it. The readings do not count.
-// A `LevelTimerIdGenerator` gives the id of each new timer.
+// The id is local: a timed variant factory builds it from the `MatchId` of the game (decision 52).
 // The root keeps no field for the timer: it reaches the timer through `IGameRules.timed()`.
 export class LevelTimer implements ITimed {
   private startedAt: number | undefined;
