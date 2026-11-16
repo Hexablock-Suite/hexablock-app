@@ -83,6 +83,32 @@ describe('CompositionRoot', () => {
     ]);
   });
 
+  // Issue #178: the root wires `RedoMove` over the repository of each game, inside the aspect.
+  // The redo of a Fit move that was undone gives back the answer of that move.
+  it('should_redo_the_undone_fit_move_and_log_each_call_when_the_root_wires_redo_move', async () => {
+    const logger = new RecordingLogger();
+    const root = testRoot(logger);
+    const { startGame, applyMove, undoMove, redoMove } = root.gameUseCases(GameId.of('hexa-fit'));
+    valueOf(await startGame.execute({}));
+    const played = valueOf(
+      await applyMove.execute({ move: firstMoveIn(root, GameId.of('hexa-fit')) }),
+    );
+    valueOf(await undoMove.execute({}));
+
+    const redone = valueOf(await redoMove.execute({}));
+    const second = errorOf(await redoMove.execute({}));
+
+    expect(redone).toEqual(played);
+    expect(second.code).toBe('nothing-to-redo');
+    expect(logger.entries.map((entry) => [entry.useCase, entry.outcome])).toEqual([
+      ['StartGame', 'success'],
+      ['ApplyMove', 'success'],
+      ['UndoMove', 'success'],
+      ['RedoMove', 'success'],
+      ['RedoMove', 'failure'],
+    ]);
+  });
+
   it('should_give_the_same_use_cases_when_the_root_is_asked_twice_for_one_game', () => {
     const root = testRoot();
 

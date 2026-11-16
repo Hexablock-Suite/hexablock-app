@@ -1,6 +1,7 @@
 import { ApplyMove } from '../../../src/application/apply-move';
 import type { GameEventPublisher } from '../../../src/application/game-event-publisher';
 import type { GameRepository } from '../../../src/application/game-repository';
+import { RedoMove } from '../../../src/application/redo-move';
 import type { Result, UseCaseError } from '../../../src/application/result';
 import { StartGame } from '../../../src/application/start-game';
 import { UndoMove } from '../../../src/application/undo-move';
@@ -67,6 +68,7 @@ export function gameUseCases<
     startGame: new StartGame(new GameFactory(gameIdOf(factory), factory, ids), games),
     applyMove: new ApplyMove(games, logger, events),
     undoMove: new UndoMove(games),
+    redoMove: new RedoMove(games),
   };
 }
 
