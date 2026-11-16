@@ -244,8 +244,7 @@ describe('SortRules colors', () => {
 describe('SortRules piece source (A4)', () => {
   it('should_offer_the_same_stacks_when_two_games_use_the_same_seed', () => {
     const colors = ['red', 'blue', 'green'];
-    const draw = (random: RandomSource) =>
-      stackPiece(stack(colors[Math.floor(random.next() * colors.length)] ?? 'red'));
+    const draw = (random: RandomSource) => stackPiece(stack(random.next().pick(colors)));
     const play = () => {
       const game = sortGame(
         sortState({ board: row(4), source: new SeededPieceSource(Seed.of(7), draw) }),

@@ -13,7 +13,6 @@ import {
   DEFAULT_FOUR_CHANCE,
   mergeTileSource,
 } from '../../../../src/domain/variants/hexa-merge/merge-tile-source';
-import { Draw } from '../../../../src/domain/variants/hexa-merge/draw';
 import { NewTile } from '../../../../src/domain/variants/hexa-merge/new-tile';
 import { SlideSense, Slide } from '../../../../src/domain/variants/hexa-merge/slide';
 import { lintFixture } from '../../../support/run-tool';
@@ -298,7 +297,7 @@ describe('Merge new tiles edge cases', () => {
           failed = true;
           throw new Error('The source failed.');
         }
-        return NewTile.of(Draw.of(place), MergeTile.of(2));
+        return NewTile.of(place, MergeTile.of(2));
       });
     }
     const slide = Slide.of(HexAxis.q, SlideSense.forward);

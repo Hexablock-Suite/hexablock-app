@@ -1,5 +1,6 @@
 /** @jest-environment node */
 import type { Color } from '../../../../src/domain/engine/color';
+import { RandomDraw } from '../../../../src/domain/engine/random-draw';
 import type { RandomSource } from '../../../../src/domain/engine/random-source';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import { Seed } from '../../../../src/domain/engine/seed';
@@ -22,8 +23,8 @@ const domino = () => new ShapeGroup([new CellNode(square(0, 0)), new CellNode(sq
 class ListRandom implements RandomSource {
   constructor(private readonly numbers: number[]) {}
 
-  next(): number {
-    return this.numbers.shift() ?? 0;
+  next(): RandomDraw {
+    return RandomDraw.of(this.numbers.shift() ?? 0);
   }
 
   clone(): ListRandom {

@@ -79,9 +79,18 @@ export function registeredGames(clock: Clock, random: RandomSource): RegisteredG
   ];
 }
 
-// One seed from the next number of `random`: a whole number of 0 to 4294967295.
+// One seed from the next draw of `random`: a whole number of 0 to 4294967295.
+// The draw keeps its number private, so it delivers the number to this module of the edge
+// (rule R-no-delivery-call, issue #243).
 function seedFrom(random: RandomSource): Seed {
-  return Seed.of(Math.floor(random.next() * SEEDS));
+  let seed: Seed | undefined;
+  random.next().deliverTo({
+    receive: (draw) => {
+      seed = Seed.of(Math.floor(draw * SEEDS));
+    },
+  });
+  if (seed === undefined) throw new Error('The draw delivered no number.');
+  return seed;
 }
 
 // A Fit level of three cells in a row and two pieces, a domino and a single cell.

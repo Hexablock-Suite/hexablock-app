@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Area } from '../../../src/domain/engine/area';
 import type { GeometryFactory } from '../../../src/domain/engine/geometry-factory';
 import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
 import { HexAxis, hex, type HexCoord } from '../../../src/domain/engine/hex-topology';
@@ -62,11 +63,18 @@ describe('HexGeometry', () => {
     const shapes = geometry.createPieceShapes();
     const topology = geometry.createTopology();
 
-    expect(shapes.map((shape) => shape.area()).toSorted()).toEqual([1, 2, 3, 3, 4, 4, 5]);
+    // The count of shapes of each area, from one cell to five cells.
+    const countOfArea = (cells: number) =>
+      shapes.filter((shape) => shape.area().equals(Area.of(cells))).length;
+
+    expect(shapes).toHaveLength(7);
+    expect([1, 2, 3, 4, 5].map(countOfArea)).toEqual([1, 1, 2, 2, 1]);
     for (const shape of shapes) {
       const cells = shape.cells();
 
-      expect(new Set(cells.map((c) => topology.key(c))).size).toBe(shape.area());
+      expect(shape.area().equals(Area.of(new Set(cells.map((c) => topology.key(c))).size))).toBe(
+        true,
+      );
       expect(cells).toContainEqual(hex(0, 0));
       expect(isConnected(cells)).toBe(true);
     }
