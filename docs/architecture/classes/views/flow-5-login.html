@@ -91,22 +91,6 @@
             <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
           </marker>
           <marker
-            id="flowlogin-diamond-hollow"
-            markerWidth="18"
-            markerHeight="10"
-            refX="0"
-            refY="5"
-            orient="auto"
-            markerUnits="userSpaceOnUse"
-          >
-            <polygon
-              points="0 5, 9 0, 18 5, 9 10"
-              fill="#ffffff"
-              stroke="#17212a"
-              stroke-width="1"
-            />
-          </marker>
-          <marker
             id="flowlogin-open"
             markerWidth="10"
             markerHeight="8"
@@ -186,7 +170,7 @@
           LAYER 2 · USE CASES · src/application/
         </text>
         <!-- Relationships (drawn before boxes) -->
-        <!-- ApiAccountGateway keeps the ApiDtoMapper it receives in an attribute: use, inside layer 4 -->
+        <!-- ApiAccountGateway keeps the ApiDtoMapper it receives as mapper: use with role and multiplicity, inside layer 4 -->
         <path
           d="M680 236 H648 Q640 236 640 228 V176"
           fill="none"
@@ -194,7 +178,7 @@
           stroke-width="1"
           marker-end="url(#flowlogin-open)"
         />
-        <!-- ApiAccountGateway keeps the ApiClient it receives in an attribute: use, inside layer 4 -->
+        <!-- ApiAccountGateway keeps the ApiClient it receives as client: use with role and multiplicity, inside layer 4 -->
         <path
           d="M830 208 V172"
           fill="none"
@@ -202,7 +186,7 @@
           stroke-width="1"
           marker-end="url(#flowlogin-open)"
         />
-        <!-- AccountScreen keeps the AccountPresenter it receives as a prop: use, down from layer 4 to layer 3 -->
+        <!-- AccountScreen keeps the AccountPresenter it receives as the presenter prop: use with role and multiplicity, down from layer 4 to layer 3 -->
         <path
           d="M480 296 V388"
           fill="none"
@@ -228,7 +212,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#flowlogin-triangle)"
         />
-        <!-- AccountPresenter keeps the UseCase input port it receives in an attribute: use, down from layer 3 to layer 2 -->
+        <!-- AccountPresenter keeps the UseCase input port it receives as login: use with role and multiplicity, down from layer 3 to layer 2 -->
         <path
           d="M400 484 V552"
           fill="none"
@@ -245,7 +229,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#flowlogin-triangle)"
         />
-        <!-- Login keeps the SessionStore it receives in an attribute: use -->
+        <!-- Login keeps the SessionStore it receives as session: use with role and multiplicity -->
         <path
           d="M380 736 H320"
           fill="none"
@@ -253,7 +237,7 @@
           stroke-width="1"
           marker-end="url(#flowlogin-open)"
         />
-        <!-- Login keeps the AccountGateway it receives in an attribute: use -->
+        <!-- Login keeps the AccountGateway it receives as accounts: use with role and multiplicity -->
         <path
           d="M620 736 H680"
           fill="none"
@@ -544,7 +528,7 @@
         <text x="376" y="288" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           sends the credentials
         </text>
-        <!-- Class: ApiAccountGateway (adapter) -->
+        <!-- Class: ApiAccountGateway (a piece of the Adapter pattern: the footnote names it, decision 23) -->
         <rect
           x="680"
           y="208"
@@ -557,18 +541,7 @@
         />
         <text
           x="840"
-          y="226"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «Adapter»
-        </text>
-        <text
-          x="840"
-          y="244"
+          y="238"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -914,7 +887,7 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Login asks the AccountGateway port for a Session and writes it through the SessionStore
-          port. ApiAccountGateway implements
+          port. ApiAccountGateway, an Adapter, implements
         </text>
         <text
           x="24"
