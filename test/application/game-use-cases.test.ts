@@ -267,6 +267,7 @@ describe('StartGame and ApplyMove', () => {
       const time = run.gameId === 'hexa-fit' ? { elapsedMs: ElapsedTime.ofMs(0) } : {};
       expect(run.started).toEqual({
         cells: run.startCells,
+        freeSpaces: run.startState.board.freeSpaces(),
         score: Score.of(0),
         outcome: Outcome.playing,
         canUndo: false,
@@ -277,6 +278,7 @@ describe('StartGame and ApplyMove', () => {
       });
       expect(run.played).toEqual({
         cells: run.after.board.occupiedCells(),
+        freeSpaces: run.after.board.freeSpaces(),
         score: run.after.score,
         outcome: run.played.outcome,
         canUndo: run.gameId === 'hexa-merge',
@@ -510,6 +512,7 @@ describe('StartGame and ApplyMove', () => {
     const saved = games.running().snapshot();
     expect(played).toEqual({
       cells: saved.board.occupiedCells(),
+      freeSpaces: saved.board.freeSpaces(),
       score: saved.score,
       outcome: Outcome.victory,
       canUndo: false,
@@ -608,11 +611,60 @@ describe('StartGame and ApplyMove', () => {
       'canRedo',
       'canUndo',
       'cells',
+      'freeSpaces',
       'hasUndo',
       'outcome',
       'payload',
       'score',
     ]);
+  });
+});
+
+// Issue #170: a game screen draws every space of the board. So the response carries the free
+// spaces of the saved board next to its occupied cells, and the two lists name each space once.
+async function freeSpacesRun<
+  TCell,
+  TCoord,
+  TMove,
+  TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
+  TPiece,
+>(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>) {
+  const run = await startAndPlayOnce(factory);
+  const named = [...run.played.freeSpaces, ...run.played.cells.map(([at]) => at)];
+  return {
+    ...run,
+    named: named.length,
+    distinct: new Set(named.map((at) => run.after.board.key(at))).size,
+    spaces: run.after.board.coordinates().length,
+  };
+}
+
+describe('the free spaces of MoveResult', () => {
+  it('should_carry_the_free_spaces_of_the_saved_board_when_each_variant_starts_and_plays', async () => {
+    const runs = [
+      await freeSpacesRun(linesFactory()),
+      await freeSpacesRun(fitFactory()),
+      await freeSpacesRun(sortFactory()),
+      await freeSpacesRun(mergeFactory()),
+    ];
+
+    for (const run of runs) {
+      expect(run.started.freeSpaces).toEqual(run.startState.board.freeSpaces());
+      expect(run.played.freeSpaces).toEqual(run.after.board.freeSpaces());
+      expect([run.named, run.distinct]).toEqual([run.spaces, run.spaces]);
+    }
+    // The Merge board of the test has 7 spaces and starts with two tiles, so 5 spaces are free.
+    expect(runs[3].started.freeSpaces).toHaveLength(5);
+  });
+
+  it('should_leave_the_engine_unchanged_when_a_caller_changes_the_free_spaces_of_a_move_result', async () => {
+    const { games, startGame } = gameUseCases(mergeFactory());
+    const started = valueOf(await startGame.execute({}));
+    const before = games.running().snapshot().board.freeSpaces();
+
+    started.freeSpaces.splice(0, 3);
+
+    expect(games.running().snapshot().board.freeSpaces()).toEqual(before);
   });
 });
 

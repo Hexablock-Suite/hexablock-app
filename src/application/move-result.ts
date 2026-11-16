@@ -13,6 +13,9 @@ export type ViewOf<TState> = SnapshotOf<TState> extends { view(): infer TView } 
 // The plain response model of the game use cases (classes.md decision 29).
 // It holds no `Board` and no engine, so layer 3 cannot change a running game.
 // `cells` are new pairs from `Board.occupiedCells()`. A cell is an immutable value object.
+// `freeSpaces` is a new list from `Board.freeSpaces()`: the coordinate of each space that no cell
+// occupies. So `cells` and `freeSpaces` name each space of the board once, and a game screen
+// draws the whole board (issue #170).
 // `score` carries the `Score` value object of the photo. A use case never opens a domain object:
 // the presenter of layer 3 asks the score for its number (issue #203).
 // `outcome` carries the `Outcome` value object of the turn, by the same rule (issue #207).
@@ -26,6 +29,7 @@ export type ViewOf<TState> = SnapshotOf<TState> extends { view(): infer TView } 
 // It carries the `ElapsedTime` value object of the timer, by the same rule as `score` (issue #204).
 export interface MoveResult<TCell, TCoord, TView = unknown> {
   readonly cells: [TCoord, TCell][];
+  readonly freeSpaces: TCoord[];
   readonly score: Score;
   readonly outcome: Outcome;
   readonly canUndo: boolean;
@@ -53,6 +57,7 @@ export function moveResultOf<
   const elapsed = engine.elapsedTime();
   return {
     cells: snapshot.board.occupiedCells(),
+    freeSpaces: snapshot.board.freeSpaces(),
     score: snapshot.score,
     outcome,
     canUndo: engine.canUndo(),
