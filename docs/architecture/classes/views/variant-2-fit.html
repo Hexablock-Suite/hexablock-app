@@ -684,7 +684,7 @@
           x="696"
           y="734"
           width="232"
-          height="328"
+          height="356"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -770,28 +770,28 @@
           FitLevel&lt;TCoord&gt;
         </text>
         <text x="712" y="942" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + isOf(family: TopologyId): boolean
+          + runsOn(geometry: { isOfFamily(id:
         </text>
-        <text x="712" y="956" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + wrongFamily(family: TopologyId):
+        <text x="720" y="956" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          TopologyId): boolean }): boolean
         </text>
-        <text x="720" y="970" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="712" y="970" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + wrongFamily(geometry: { isOfFamily(
+        </text>
+        <text x="720" y="984" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          id: TopologyId): boolean }):
+        </text>
+        <text x="720" y="998" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           RangeError
         </text>
-        <text x="712" y="984" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + figureTree(): ShapeGroup&lt;TCoord&gt;
-        </text>
-        <text x="712" y="998" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + trayPieces(): Piece&lt;PieceId,
-        </text>
         <text
-          x="720"
+          x="712"
           y="1012"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          TCoord&gt;[]
+          + figureTree(): ShapeGroup&lt;TCoord&gt;
         </text>
         <text
           x="712"
@@ -800,7 +800,7 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          + equals(other: FitLevel&lt;TCoord&gt;,
+          + trayPieces(): Piece&lt;PieceId,
         </text>
         <text
           x="720"
@@ -809,11 +809,29 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
+          TCoord&gt;[]
+        </text>
+        <text
+          x="712"
+          y="1054"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + equals(other: FitLevel&lt;TCoord&gt;,
+        </text>
+        <text
+          x="720"
+          y="1068"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
           topology: { key(c: TCoord):
         </text>
         <text
           x="720"
-          y="1054"
+          y="1082"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1198,7 +1216,7 @@
           at: TCoord)
         </text>
         <text x="56" y="1494" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + piece(): PieceId
+          + pieceToPlace(): PieceId
         </text>
         <text x="56" y="1510" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + placement(topology: { fullTurn(): Turns }):
@@ -1273,7 +1291,7 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          + piece(): PieceId
+          + pieceToRemove(): PieceId
         </text>
         <text
           x="416"
@@ -1368,7 +1386,7 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          + piece(): PieceId
+          + pieceToRotate(): PieceId
         </text>
         <text
           x="678"
@@ -1683,8 +1701,8 @@
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            Undo: RedoableHistory, no limit. FitFactory wraps FitRules in TimedRulesDecorator (Part
-            1, view 7) and builds the id of each new LevelTimer from the MatchId (view 5).
+            Undo: RedoableHistory, no limit. GameFactory wraps FitRules in TimedRulesDecorator (Part
+            1, view 7) with the timer of FitFactory, which builds its id from the MatchId (view 5).
           </text>
           <text
             x="24"

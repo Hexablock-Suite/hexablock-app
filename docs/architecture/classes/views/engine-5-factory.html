@@ -78,11 +78,12 @@
           layer 4 implements, and the MatchIdGenerator interface that gives the MatchId of each new
           match. The internal ids are local value objects that keep the MatchId of their match:
           GameFactory builds the GameStateId of the first state and the BoardId of its board from
-          it, and FitFactory builds the LevelTimerId of the timer of a timed game in createRules().
-          GameFactory keeps an IVariantFactory and the MatchIdGenerator and creates the started
-          GameEngine. GameOver keeps the MatchId, the Outcome and the final Score, a value object,
-          GameEvent keeps the GameId, and the fields are private: a listener asks isVictory() or
-          receives the data through deliverTo().
+          it, and FitFactory builds the LevelTimerId of the timer of a timed game in createTimer().
+          GameFactory keeps the GameId of the game, an IVariantFactory that answers isFor() for it
+          and the MatchIdGenerator, wraps the rules of a timed game in TimedRulesDecorator, gives
+          the same timer to the root and creates the started GameEngine. GameOver keeps the MatchId,
+          the Outcome and the final Score, a value object, GameEvent keeps the GameId, and the
+          fields are private: a listener asks isVictory() or receives the data through deliverTo().
         </desc>
         <defs>
           <marker
@@ -259,7 +260,7 @@
           x="40"
           y="540"
           width="432"
-          height="148"
+          height="164"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -306,7 +307,7 @@
           x1="420"
           y1="568"
           x2="420"
-          y2="300"
+          y2="308"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#factory-open)"
@@ -343,10 +344,10 @@
         />
 
         <!-- Arrow labels -->
-        <rect x="364" y="306" width="50.2" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="364" y="314" width="50.2" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="366"
-          y="315"
+          y="323"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -385,7 +386,7 @@
           x="56"
           y="92"
           width="400"
-          height="208"
+          height="216"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -394,7 +395,6 @@
         <rect x="56" y="92" width="400" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
         <rect x="56" y="132" width="400" height="8" fill="rgba(15,111,116,0.10)" />
         <line x1="56" y1="140" x2="456" y2="140" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
-        <line x1="56" y1="164" x2="456" y2="164" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text
           x="256"
           y="110"
@@ -418,30 +418,33 @@
           IVariantFactory
         </text>
         <text x="72" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + gameId: GameId
+          + isFor(gameId: GameId): boolean
         </text>
-        <text x="72" y="180" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + createRules(matchId: MatchId): IGameRules&lt;TMove, TState&gt;
+        <text x="72" y="172" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + createRules(): IGameRules&lt;TMove, TState&gt;
         </text>
-        <text x="72" y="196" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="72" y="188" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + createTimer(matchId: MatchId): LevelTimer [0..1]
+        </text>
+        <text x="72" y="204" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createPieceSource(): IPieceSource&lt;Piece&lt;TCell, TCoord&gt;&gt; [0..1]
         </text>
-        <text x="72" y="212" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="72" y="220" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createScoring(): IScoringPolicy&lt;TState&gt;
         </text>
-        <text x="72" y="228" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="72" y="236" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createBoard(boardId: BoardId): Board&lt;TCell, TCoord&gt;
         </text>
-        <text x="72" y="244" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="72" y="252" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createProgressModel(): IProgressModel
         </text>
-        <text x="72" y="260" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="72" y="268" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createInitialState(matchId: MatchId, stateId: GameStateId,
         </text>
-        <text x="88" y="276" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="284" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           boardId: BoardId): TState
         </text>
-        <text x="72" y="292" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="72" y="300" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createHistory(): MoveHistory&lt;TMove, TState&gt; [0..1]
         </text>
 
@@ -815,7 +818,7 @@
         </text>
         <!-- GameFactory builds the GameStateId of the first state from the MatchId: use with a verb -->
         <path
-          d="M 440 680 V 740 H 512"
+          d="M 440 696 V 740 H 512"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -835,7 +838,7 @@
         </text>
         <!-- GameFactory builds the BoardId of its board from the MatchId: use with a verb -->
         <path
-          d="M 424 680 V 900 H 512"
+          d="M 424 696 V 900 H 512"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -1054,7 +1057,7 @@
           x="56"
           y="568"
           width="400"
-          height="112"
+          height="128"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1084,13 +1087,16 @@
           GameFactory
         </text>
         <text x="72" y="632" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - variant: IVariantFactory&lt;TCell, TCoord, TMove, TState&gt;
+          - gameId: GameId
         </text>
         <text x="72" y="648" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - variant: IVariantFactory&lt;TCell, TCoord, TMove, TState&gt;
+        </text>
+        <text x="72" y="664" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - ids: MatchIdGenerator
         </text>
-        <line x1="56" y1="656" x2="456" y2="656" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="72" y="672" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="56" y1="672" x2="456" y2="672" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="72" y="688" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createGame(): GameEngine&lt;TCell, TCoord, TMove, TState&gt;
         </text>
         <!-- UML template boxes: type parameters on the top-right corner -->
@@ -1201,7 +1207,7 @@
             font-family="'IBM Plex Sans', sans-serif"
           >
             Only the root has global identity (decision 52). FitFactory builds the LevelTimerId of
-            each new LevelTimer from the MatchId that createRules() takes (view 3, the Hexa Fit
+            each new LevelTimer from the MatchId that createTimer() takes (view 3, the Hexa Fit
             view).
           </text>
 

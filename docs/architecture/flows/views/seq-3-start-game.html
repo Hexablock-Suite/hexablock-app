@@ -63,7 +63,7 @@
       <p class="eyebrow">Use case flow · StartGame · sequence diagram</p>
       <h1>StartGame step by step: one new game from the screen to the engine and back</h1>
       <svg
-        viewBox="0 0 1616 1784"
+        viewBox="0 0 1616 1844"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="seqstart-title seqstart-desc"
@@ -74,14 +74,15 @@
           GamePresenter in layer 3 calls execute() on StartGame in layer 2 through the UseCase port.
           StartGame calls createGame() on GameFactory in layer 1. GameFactory asks the
           MatchIdGenerator for one new MatchId, builds the GameStateId and the BoardId from it, and
-          asks the IVariantFactory for the rules with the MatchId, the scoring and the history. It
-          creates GameEngine with the MatchId, and asks the IVariantFactory for the first state with
-          the three ids. The variant factory builds the board with BoardBuilder, with a region for
+          asks the IVariantFactory for the timer with the MatchId, the rules, the scoring and the
+          history. It wraps the rules of a timed game in TimedRulesDecorator, creates GameEngine
+          with the MatchId and the timer, and asks the IVariantFactory for the first state with the
+          three ids. The variant factory builds the board with BoardBuilder, with a region for
           Lines, Sort and Merge or with the figure of the level for Fit, and BoardBuilder asks its
           GeometryFactory for the topology. GameFactory starts GameEngine and returns it. StartGame
           keeps it in InMemoryGameRepository through the GameRepository port, reads the photo of the
-          state and the cells of its board, and returns a Result with a MoveResult. GamePresenter
-          maps the cells as in flow 1 and GameScreen renders the board.
+          state and the occupied cells of its board, and returns a Result with a MoveResult.
+          GamePresenter maps the cells as in flow 1 and GameScreen renders the board.
         </desc>
         <defs>
           <marker
@@ -104,7 +105,7 @@
             orient="auto"
             markerUnits="userSpaceOnUse"
           >
-            <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
+            <path d="M 0 0 L 9 4 L 0 8" fill="none" stroke="#5b6873" stroke-width="1" />
           </marker>
         </defs>
         <rect width="100%" height="100%" fill="#f3f5f6" />
@@ -702,7 +703,7 @@
           x1="60"
           y1="88"
           x2="60"
-          y2="1566"
+          y2="1626"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -711,7 +712,7 @@
           x1="160"
           y1="88"
           x2="160"
-          y2="1566"
+          y2="1626"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -720,7 +721,7 @@
           x1="268"
           y1="88"
           x2="268"
-          y2="1566"
+          y2="1626"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -729,7 +730,7 @@
           x1="376"
           y1="88"
           x2="376"
-          y2="1566"
+          y2="1626"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -738,7 +739,7 @@
           x1="514"
           y1="88"
           x2="514"
-          y2="1566"
+          y2="1626"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -747,7 +748,7 @@
           x1="664"
           y1="88"
           x2="664"
-          y2="1566"
+          y2="1626"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -756,7 +757,7 @@
           x1="832"
           y1="88"
           x2="832"
-          y2="1566"
+          y2="1626"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -765,7 +766,7 @@
           x1="988"
           y1="88"
           x2="988"
-          y2="1566"
+          y2="1626"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -774,7 +775,7 @@
           x1="1204"
           y1="88"
           x2="1204"
-          y2="1566"
+          y2="1626"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -783,7 +784,7 @@
           x1="1322"
           y1="88"
           x2="1322"
-          y2="1566"
+          y2="1626"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -792,7 +793,7 @@
           x1="1432"
           y1="88"
           x2="1432"
-          y2="1566"
+          y2="1626"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -801,7 +802,7 @@
           x1="1544"
           y1="88"
           x2="1544"
-          y2="1566"
+          y2="1626"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -809,7 +810,7 @@
         <!-- Combined fragment: alt, the two construction paths of BoardBuilder -->
         <rect
           x="948"
-          y="688"
+          y="748"
           width="440"
           height="228"
           rx="1"
@@ -817,10 +818,15 @@
           stroke="#5b6873"
           stroke-width="1"
         />
-        <path d="M948 702 H980 L986 696 V688" fill="#ffffff" stroke="#5b6873" stroke-width="1" />
+        <path
+          d="M 948 762 H 980 L 986 756 V 748"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="1"
+        />
         <text
           x="953"
-          y="698"
+          y="758"
           fill="#17212a"
           font-size="8.5"
           font-weight="600"
@@ -828,10 +834,10 @@
         >
           alt
         </text>
-        <rect x="990" y="690" width="146.8" height="12" fill="#f3f5f6" />
+        <rect x="990" y="750" width="146.8" height="12" fill="#f3f5f6" />
         <text
           x="992"
-          y="699"
+          y="759"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -840,17 +846,17 @@
         </text>
         <line
           x1="948"
-          y1="836"
+          y1="896"
           x2="1388"
-          y2="836"
+          y2="896"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
         />
-        <rect x="990" y="839" width="70.3" height="12" fill="#f3f5f6" />
+        <rect x="990" y="899" width="70.3" height="12" fill="#f3f5f6" />
         <text
           x="992"
-          y="848"
+          y="908"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -895,8 +901,17 @@
           stroke-width="1"
         />
         <rect
-          x="1428"
+          x="984"
           y="594"
+          width="8"
+          height="36"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="1428"
+          y="654"
           width="8"
           height="18"
           fill="#ffffff"
@@ -905,7 +920,7 @@
         />
         <rect
           x="1318"
-          y="750"
+          y="810"
           width="8"
           height="36"
           fill="#ffffff"
@@ -914,7 +929,7 @@
         />
         <rect
           x="1200"
-          y="720"
+          y="780"
           width="8"
           height="96"
           fill="#ffffff"
@@ -923,7 +938,7 @@
         />
         <rect
           x="1200"
-          y="864"
+          y="924"
           width="8"
           height="36"
           fill="#ffffff"
@@ -932,7 +947,7 @@
         />
         <rect
           x="1318"
-          y="974"
+          y="1034"
           width="8"
           height="36"
           fill="#ffffff"
@@ -941,7 +956,7 @@
         />
         <rect
           x="1200"
-          y="944"
+          y="1004"
           width="8"
           height="96"
           fill="#ffffff"
@@ -950,7 +965,7 @@
         />
         <rect
           x="984"
-          y="624"
+          y="684"
           width="8"
           height="446"
           fill="#ffffff"
@@ -959,7 +974,7 @@
         />
         <rect
           x="1428"
-          y="1094"
+          y="1154"
           width="8"
           height="36"
           fill="#ffffff"
@@ -970,22 +985,13 @@
           x="660"
           y="204"
           width="8"
-          height="956"
+          height="1016"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
         <rect
           x="510"
-          y="1184"
-          width="8"
-          height="36"
-          fill="#ffffff"
-          stroke="#17212a"
-          stroke-width="1"
-        />
-        <rect
-          x="1428"
           y="1244"
           width="8"
           height="36"
@@ -994,8 +1000,17 @@
           stroke-width="1"
         />
         <rect
-          x="1540"
+          x="1428"
           y="1304"
+          width="8"
+          height="36"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="1540"
+          y="1364"
           width="8"
           height="36"
           fill="#ffffff"
@@ -1006,7 +1021,7 @@
           x="372"
           y="174"
           width="8"
-          height="1236"
+          height="1296"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
@@ -1015,7 +1030,7 @@
           x="264"
           y="144"
           width="8"
-          height="1342"
+          height="1402"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
@@ -1024,7 +1039,7 @@
           x="156"
           y="114"
           width="8"
-          height="1422"
+          height="1482"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
@@ -1032,7 +1047,7 @@
         <!-- Interaction use: ref map each cell, build GameViewModel -->
         <rect
           x="228"
-          y="1426"
+          y="1486"
           width="244"
           height="36"
           rx="1"
@@ -1040,10 +1055,15 @@
           stroke="#5b6873"
           stroke-width="1"
         />
-        <path d="M228 1440 H254 L260 1434 V1426" fill="#ffffff" stroke="#5b6873" stroke-width="1" />
+        <path
+          d="M 228 1500 H 254 L 260 1494 V 1486"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="1"
+        />
         <text
           x="233"
-          y="1436"
+          y="1496"
           fill="#17212a"
           font-size="8.5"
           font-weight="600"
@@ -1053,7 +1073,7 @@
         </text>
         <text
           x="362"
-          y="1442"
+          y="1502"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1063,7 +1083,7 @@
         </text>
         <text
           x="362"
-          y="1455"
+          y="1515"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1201,7 +1221,7 @@
         </text>
         <!-- Self message: gf builds a local id from the MatchId -->
         <path
-          d="M668 296 H692 V310 H668"
+          d="M 668 296 H 692 V 310 H 668"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -1220,7 +1240,7 @@
         </text>
         <!-- Self message: gf builds a local id from the MatchId -->
         <path
-          d="M668 356 H692 V370 H668"
+          d="M 668 356 H 692 V 370 H 668"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -1256,7 +1276,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          createRules(matchId)
+          createTimer(matchId)
         </text>
         <!-- Reply: vf to gf -->
         <line
@@ -1269,7 +1289,7 @@
           stroke-dasharray="4,3"
           marker-end="url(#seqstart-reply)"
         />
-        <rect x="797.5" y="432" width="57" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="766.9" y="432" width="118.2" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="826"
           y="442"
@@ -1278,7 +1298,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          IGameRules
+          LevelTimer | undefined
         </text>
         <!-- Message: gf to vf -->
         <line
@@ -1290,7 +1310,7 @@
           stroke-width="1"
           marker-end="url(#seqstart-call)"
         />
-        <rect x="784.75" y="462" width="82.5" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="789.85" y="462" width="72.3" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="826"
           y="472"
@@ -1299,7 +1319,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          createScoring()
+          createRules()
         </text>
         <!-- Reply: vf to gf -->
         <line
@@ -1312,7 +1332,7 @@
           stroke-dasharray="4,3"
           marker-end="url(#seqstart-reply)"
         />
-        <rect x="787.3" y="492" width="77.4" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="797.5" y="492" width="57" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="826"
           y="502"
@@ -1321,7 +1341,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          IScoringPolicy
+          IGameRules
         </text>
         <!-- Message: gf to vf -->
         <line
@@ -1342,7 +1362,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          createHistory()
+          createScoring()
         </text>
         <!-- Reply: vf to gf -->
         <line
@@ -1355,10 +1375,53 @@
           stroke-dasharray="4,3"
           marker-end="url(#seqstart-reply)"
         />
-        <rect x="764.35" y="552" width="123.3" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="787.3" y="552" width="77.4" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="826"
           y="562"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          IScoringPolicy
+        </text>
+        <!-- Message: gf to vf -->
+        <line
+          x1="668"
+          y1="596"
+          x2="984"
+          y2="596"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqstart-call)"
+        />
+        <rect x="784.75" y="582" width="82.5" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="826"
+          y="592"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          createHistory()
+        </text>
+        <!-- Reply: vf to gf -->
+        <line
+          x1="984"
+          y1="626"
+          x2="668"
+          y2="626"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqstart-reply)"
+        />
+        <rect x="764.35" y="612" width="123.3" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="826"
+          y="622"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1369,38 +1432,38 @@
         <!-- Message: gf to game -->
         <line
           x1="668"
-          y1="596"
+          y1="656"
           x2="1428"
-          y2="596"
+          y2="656"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqstart-call)"
         />
-        <rect x="869.05" y="582" width="357.9" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="871.6" y="642" width="352.8" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="1048"
-          y="592"
+          y="652"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          «create» GameEngine(matchId, gameId, rules, scoring, events, history)
+          «create» GameEngine(matchId, gameId, rules, scoring, history, timer)
         </text>
         <!-- Message: gf to vf -->
         <line
           x1="668"
-          y1="626"
+          y1="686"
           x2="984"
-          y2="626"
+          y2="686"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqstart-call)"
         />
-        <rect x="708.25" y="612" width="235.5" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="708.25" y="672" width="235.5" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="826"
-          y="622"
+          y="682"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1410,16 +1473,16 @@
         </text>
         <!-- Self message: vf -->
         <path
-          d="M992 656 H1020 V670 H1000"
+          d="M 992 716 H 1020 V 730 H 1000"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqstart-call)"
         />
-        <rect x="1022" y="656" width="153.9" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="1022" y="716" width="153.9" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="1026"
-          y="666"
+          y="726"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1430,17 +1493,17 @@
         <!-- Message: vf to bb -->
         <line
           x1="992"
-          y1="722"
+          y1="782"
           x2="1200"
-          y2="722"
+          y2="782"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqstart-call)"
         />
-        <rect x="1021.6" y="708" width="148.8" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="1021.6" y="768" width="148.8" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="1096"
-          y="718"
+          y="778"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1451,17 +1514,17 @@
         <!-- Message: bb to geo -->
         <line
           x1="1208"
-          y1="752"
+          y1="812"
           x2="1318"
-          y2="752"
+          y2="812"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqstart-call)"
         />
-        <rect x="1219.2" y="738" width="87.6" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="1219.2" y="798" width="87.6" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="1263"
-          y="748"
+          y="808"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1472,18 +1535,18 @@
         <!-- Reply: geo to bb -->
         <line
           x1="1318"
-          y1="782"
+          y1="842"
           x2="1208"
-          y2="782"
+          y2="842"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#seqstart-reply)"
         />
-        <rect x="1212" y="768" width="108" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="1212" y="828" width="108" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="1216"
-          y="778"
+          y="838"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1494,18 +1557,18 @@
         <!-- Reply: bb to vf -->
         <line
           x1="1200"
-          y1="812"
+          y1="872"
           x2="992"
-          y2="812"
+          y2="872"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#seqstart-reply)"
         />
-        <rect x="1062.4" y="798" width="67.2" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="1062.4" y="858" width="67.2" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="1096"
-          y="808"
+          y="868"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1516,17 +1579,17 @@
         <!-- Message: vf to bb -->
         <line
           x1="992"
-          y1="866"
+          y1="926"
           x2="1200"
-          y2="866"
+          y2="926"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqstart-call)"
         />
-        <rect x="998.65" y="852" width="194.7" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="998.65" y="912" width="194.7" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="1096"
-          y="862"
+          y="922"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1537,18 +1600,18 @@
         <!-- Reply: bb to vf -->
         <line
           x1="1200"
-          y1="896"
+          y1="956"
           x2="992"
-          y2="896"
+          y2="956"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#seqstart-reply)"
         />
-        <rect x="1062.4" y="882" width="67.2" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="1062.4" y="942" width="67.2" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="1096"
-          y="892"
+          y="952"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1559,17 +1622,17 @@
         <!-- Message: vf to bb -->
         <line
           x1="992"
-          y1="946"
+          y1="1006"
           x2="1200"
-          y2="946"
+          y2="1006"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqstart-call)"
         />
-        <rect x="1047.1" y="932" width="97.8" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="1047.1" y="992" width="97.8" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="1096"
-          y="942"
+          y="1002"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1580,17 +1643,17 @@
         <!-- Message: bb to geo -->
         <line
           x1="1208"
-          y1="976"
+          y1="1036"
           x2="1318"
-          y2="976"
+          y2="1036"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqstart-call)"
         />
-        <rect x="1219.2" y="962" width="87.6" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="1219.2" y="1022" width="87.6" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="1263"
-          y="972"
+          y="1032"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1601,18 +1664,18 @@
         <!-- Reply: geo to bb -->
         <line
           x1="1318"
-          y1="1006"
+          y1="1066"
           x2="1208"
-          y2="1006"
+          y2="1066"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#seqstart-reply)"
         />
-        <rect x="1212" y="992" width="108" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="1212" y="1052" width="108" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="1216"
-          y="1002"
+          y="1062"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1623,18 +1686,18 @@
         <!-- Reply: bb to vf -->
         <line
           x1="1200"
-          y1="1036"
+          y1="1096"
           x2="992"
-          y2="1036"
+          y2="1096"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#seqstart-reply)"
         />
-        <rect x="1021.6" y="1022" width="148.8" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="1021.6" y="1082" width="148.8" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="1096"
-          y="1032"
+          y="1092"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1645,18 +1708,18 @@
         <!-- Reply: vf to gf -->
         <line
           x1="984"
-          y1="1066"
+          y1="1126"
           x2="668"
-          y2="1066"
+          y2="1126"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#seqstart-reply)"
         />
-        <rect x="761.8" y="1052" width="128.4" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="761.8" y="1112" width="128.4" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="826"
-          y="1062"
+          y="1122"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1667,17 +1730,17 @@
         <!-- Message: gf to game -->
         <line
           x1="668"
-          y1="1096"
+          y1="1156"
           x2="1428"
-          y2="1096"
+          y2="1156"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqstart-call)"
         />
-        <rect x="988.9" y="1082" width="118.2" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="988.9" y="1142" width="118.2" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="1048"
-          y="1092"
+          y="1152"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1688,18 +1751,18 @@
         <!-- Reply: game to gf -->
         <line
           x1="1428"
-          y1="1126"
+          y1="1186"
           x2="668"
-          y2="1126"
+          y2="1186"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#seqstart-reply)"
         />
-        <rect x="1034.8" y="1112" width="26.4" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="1034.8" y="1172" width="26.4" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="1048"
-          y="1122"
+          y="1182"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1710,18 +1773,18 @@
         <!-- Reply: gf to start -->
         <line
           x1="660"
-          y1="1156"
+          y1="1216"
           x2="380"
-          y2="1156"
+          y2="1216"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#seqstart-reply)"
         />
-        <rect x="466" y="1142" width="108" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="466" y="1202" width="108" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="520"
-          y="1152"
+          y="1212"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1732,17 +1795,17 @@
         <!-- Message: start to games -->
         <line
           x1="380"
-          y1="1186"
+          y1="1246"
           x2="510"
-          y2="1186"
+          y2="1246"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqstart-call)"
         />
-        <rect x="384" y="1172" width="133.5" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="384" y="1232" width="133.5" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="388"
-          y="1182"
+          y="1242"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1753,18 +1816,18 @@
         <!-- Reply: games to start -->
         <line
           x1="510"
-          y1="1216"
+          y1="1276"
           x2="380"
-          y2="1216"
+          y2="1276"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#seqstart-reply)"
         />
-        <rect x="431.8" y="1202" width="26.4" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="431.8" y="1262" width="26.4" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="445"
-          y="1212"
+          y="1272"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1775,17 +1838,17 @@
         <!-- Message: start to game -->
         <line
           x1="380"
-          y1="1246"
+          y1="1306"
           x2="1428"
-          y2="1246"
+          y2="1306"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqstart-call)"
         />
-        <rect x="875.5" y="1232" width="57" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="875.5" y="1292" width="57" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="904"
-          y="1242"
+          y="1302"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1796,18 +1859,18 @@
         <!-- Reply: game to start -->
         <line
           x1="1428"
-          y1="1276"
+          y1="1336"
           x2="380"
-          y2="1276"
+          y2="1336"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#seqstart-reply)"
         />
-        <rect x="824.5" y="1262" width="159" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="824.5" y="1322" width="159" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="904"
-          y="1272"
+          y="1332"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1818,39 +1881,39 @@
         <!-- Message: start to board -->
         <line
           x1="380"
-          y1="1306"
+          y1="1366"
           x2="1540"
-          y2="1306"
+          y2="1366"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqstart-call)"
         />
-        <rect x="895.8" y="1292" width="128.4" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="875.4" y="1352" width="169.2" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="960"
-          y="1302"
+          y="1362"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          cells() · snapshot.board
+          occupiedCells() · snapshot.board
         </text>
         <!-- Reply: board to start -->
         <line
           x1="1540"
-          y1="1336"
+          y1="1396"
           x2="380"
-          y2="1336"
+          y2="1396"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#seqstart-reply)"
         />
-        <rect x="913.65" y="1322" width="92.7" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="913.65" y="1382" width="92.7" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="960"
-          y="1332"
+          y="1392"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1860,16 +1923,16 @@
         </text>
         <!-- Self message: start -->
         <path
-          d="M380 1366 H408 V1380 H388"
+          d="M 380 1426 H 408 V 1440 H 388"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqstart-call)"
         />
-        <rect x="410" y="1366" width="439.5" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="410" y="1426" width="439.5" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="414"
-          y="1376"
+          y="1436"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1880,18 +1943,18 @@
         <!-- Reply: start to presenter -->
         <line
           x1="372"
-          y1="1406"
+          y1="1466"
           x2="272"
-          y2="1406"
+          y2="1466"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#seqstart-reply)"
         />
-        <rect x="276" y="1392" width="174.3" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="276" y="1452" width="174.3" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="280"
-          y="1402"
+          y="1462"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1902,18 +1965,18 @@
         <!-- Reply: presenter to screen -->
         <line
           x1="264"
-          y1="1482"
+          y1="1542"
           x2="164"
-          y2="1482"
+          y2="1542"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#seqstart-reply)"
         />
-        <rect x="168" y="1468" width="118.2" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="168" y="1528" width="118.2" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="172"
-          y="1478"
+          y="1538"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1923,16 +1986,16 @@
         </text>
         <!-- Self message: screen -->
         <path
-          d="M164 1512 H192 V1526 H172"
+          d="M 164 1572 H 192 V 1586 H 172"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqstart-call)"
         />
-        <rect x="194" y="1512" width="123.3" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="194" y="1572" width="123.3" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="198"
-          y="1522"
+          y="1582"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1943,7 +2006,7 @@
         <!-- Footnote -->
         <text
           x="24"
-          y="1594"
+          y="1654"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1953,7 +2016,7 @@
         </text>
         <text
           x="24"
-          y="1610"
+          y="1670"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1963,27 +2026,28 @@
         </text>
         <text
           x="24"
-          y="1626"
+          y="1686"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
           builds the local ids of the state and of its board from it (decision 52), and asks the
-          variant factory for the rules, the scoring, the history and the first state.
+          variant factory for the timer, the rules, the scoring, the history and the first state.
         </text>
         <text
           x="24"
-          y="1642"
+          y="1702"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          The rules get the MatchId too, so a timed variant builds the id of its timer from it. The
+          The timer gets the MatchId too, so a timed variant builds the id of its timer from it.
+          GameFactory wraps the rules of a timed game in TimedRulesDecorator (decision 19). The
           composition root injects the variant factory of the chosen game, so StartGame and
         </text>
         <text
           x="24"
-          y="1658"
+          y="1718"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1993,7 +2057,7 @@
         </text>
         <text
           x="24"
-          y="1674"
+          y="1734"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2004,15 +2068,15 @@
         <!-- Legend -->
         <line
           x1="24"
-          y1="1706"
+          y1="1766"
           x2="1592"
-          y2="1706"
+          y2="1766"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1724"
+          y="1784"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -2022,16 +2086,16 @@
         </text>
         <line
           x1="24"
-          y1="1742"
+          y1="1802"
           x2="52"
-          y2="1742"
+          y2="1802"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqstart-call)"
         />
         <text
           x="60"
-          y="1745"
+          y="1805"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2040,9 +2104,9 @@
         </text>
         <line
           x1="245"
-          y1="1742"
+          y1="1802"
           x2="273"
-          y2="1742"
+          y2="1802"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
@@ -2050,7 +2114,7 @@
         />
         <text
           x="281"
-          y="1745"
+          y="1805"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2059,16 +2123,16 @@
         </text>
         <line
           x1="447.1"
-          y1="1735"
+          y1="1795"
           x2="447.1"
-          y2="1749"
+          y2="1809"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
         />
         <rect
           x="443.1"
-          y="1738"
+          y="1798"
           width="8"
           height="8"
           fill="#ffffff"
@@ -2077,7 +2141,7 @@
         />
         <text
           x="469.1"
-          y="1745"
+          y="1805"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2086,7 +2150,7 @@
         </text>
         <rect
           x="644.7"
-          y="1736"
+          y="1796"
           width="28"
           height="12"
           rx="1"
@@ -2096,7 +2160,7 @@
         />
         <text
           x="680.7"
-          y="1745"
+          y="1805"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2105,7 +2169,7 @@
         </text>
         <rect
           x="24"
-          y="1758"
+          y="1818"
           width="28"
           height="12"
           rx="2"
@@ -2115,7 +2179,7 @@
         />
         <text
           x="60"
-          y="1767"
+          y="1827"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2124,7 +2188,7 @@
         </text>
         <rect
           x="179.2"
-          y="1758"
+          y="1818"
           width="28"
           height="12"
           rx="2"
@@ -2134,7 +2198,7 @@
         />
         <text
           x="215.2"
-          y="1767"
+          y="1827"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2143,7 +2207,7 @@
         </text>
         <rect
           x="334.4"
-          y="1758"
+          y="1818"
           width="28"
           height="12"
           rx="2"
@@ -2153,7 +2217,7 @@
         />
         <text
           x="370.4"
-          y="1767"
+          y="1827"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2162,7 +2226,7 @@
         </text>
         <rect
           x="489.6"
-          y="1758"
+          y="1818"
           width="28"
           height="12"
           rx="2"
@@ -2172,7 +2236,7 @@
         />
         <text
           x="525.6"
-          y="1767"
+          y="1827"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
