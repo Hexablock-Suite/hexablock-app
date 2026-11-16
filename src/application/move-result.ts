@@ -23,6 +23,8 @@ export type ViewOf<TState> = SnapshotOf<TState> extends { view(): infer TView } 
 // `hasUndo` says whether the variant has undo at all: it asks `offersUndo()` of the root.
 // A false `canUndo` alone cannot separate «no undo» from «undo used».
 // `payload` is the variant data of the `view()` of the photo, typed by the state.
+// The view keeps its fields private (issue #245). The use case reads nothing of it,
+// and an adapter of the edge receives its data with `deliverTo()`.
 // `TView` defaults to `unknown`, so a signature that does not read the payload need not name it.
 // `elapsedMs` exists only for a timed game. It asks the root for the time of play
 // when the response is built.
@@ -40,7 +42,7 @@ export interface MoveResult<TCell, TCoord, TView = unknown> {
 }
 
 // Builds the response from the engine: the photo of the state and the queries of the root.
-// It reads only the photo (classes.md decision 34) and the root, never a field of the state
+// It asks only the photo (classes.md decisions 7 and 34) and the root, never a field of the state
 // and never a part of the aggregate, so the use cases stay blind to the variant (issue #234).
 // TypeScript cannot resolve `SnapshotOf<TState>` and `ViewOf<TState>` for an open `TState`.
 // Every photo is a `BoardSnapshot`, so the photo and the payload need a cast.
@@ -56,9 +58,9 @@ export function moveResultOf<
   const snapshot = engine.snapshot() as BoardSnapshot<TCell, TCoord> & SnapshotOf<TState>;
   const elapsed = engine.elapsedTime();
   return {
-    cells: snapshot.board.occupiedCells(),
-    freeSpaces: snapshot.board.freeSpaces(),
-    score: snapshot.score,
+    cells: snapshot.boardCopy().occupiedCells(),
+    freeSpaces: snapshot.boardCopy().freeSpaces(),
+    score: snapshot.scoreSoFar(),
     outcome,
     canUndo: engine.canUndo(),
     canRedo: engine.canRedo(),

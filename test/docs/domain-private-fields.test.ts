@@ -179,11 +179,19 @@ describe('private fields of the domain', () => {
     ]);
   });
 
+  // The code has no break since issue #245. So the test adds a public field to a copy of the text
+  // of a file in the deepest folder of the domain, and the scan of the whole code finds only it.
   it('should_read_every_ts_file_of_the_domain_when_the_code_is_scanned', () => {
-    const baseline = fieldBaseline.filter((entry) => entry.where !== 'LinesSnapshot.streak');
+    const sources = domainSources();
+    const deep = path.join(domainDir, 'variants/hexa-lines/lines-state.ts');
+    const opened = {
+      ...sources,
+      [deep]: `${sources[deep]}\nexport class Opened {\n  readonly streak: Streak;\n}\n`,
+    };
 
-    expect(unexcused(codeBreaks(), baseline)).toEqual([
-      { rule: 'field', where: 'LinesSnapshot.streak' },
+    expect(Object.keys(sources)).toContain(deep);
+    expect(unexcused(fieldBreaksIn(opened), fieldBaseline)).toEqual([
+      { rule: 'field', where: 'Opened.streak' },
     ]);
   });
 

@@ -58,13 +58,13 @@ describe('LinesFactory', () => {
 
     expect(factory.isFor(GameId.of('hexa-lines'))).toBe(true);
     expect(factory.createBoard(BOARD_ID).coordinates()).toHaveLength(9);
-    expect(initial.snapshot().board.occupiedCells()).toEqual([]);
-    expect(initial.snapshot().tray).toHaveLength(3);
+    expect(initial.snapshot().boardCopy().occupiedCells()).toEqual([]);
+    expect(initial.snapshot().trayPieces()).toHaveLength(3);
     expect(outcome).toBe(Outcome.playing);
     expect(filledKeys(engine.snapshot())).toEqual(['0,0']);
-    expect(engine.snapshot().tray).toHaveLength(2);
+    expect(engine.snapshot().trayPieces()).toHaveLength(2);
     // One placed cell gives 1 point: the factory picks the Lines scoring.
-    expect(engine.snapshot().score).toEqual(Score.of(1));
+    expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(1));
     expect(engine.takeEvents()).toEqual([]);
   });
 
@@ -79,12 +79,14 @@ describe('LinesFactory', () => {
       linesFactory(42)
         .createInitialState(MATCH_ID, STATE_ID, BOARD_ID)
         .snapshot()
-        .tray.map(describe_),
+        .trayPieces()
+        .map(describe_),
     ).toEqual(
       linesFactory(42)
         .createInitialState(MATCH_ID, STATE_ID, BOARD_ID)
         .snapshot()
-        .tray.map(describe_),
+        .trayPieces()
+        .map(describe_),
     );
   });
 
@@ -101,9 +103,9 @@ describe('LinesFactory', () => {
 
     engine.play(new PlacePiece(TrayPosition.of(0), square(0, 0)));
 
-    expect(engine.snapshot().linesCleared).toEqual(LineCount.of(2));
+    expect(engine.snapshot().lastCombo()).toEqual(LineCount.of(2));
     // 1 cell + 10 × 2 lines × (2 + 1 - 1). The base scoring alone gives 21.
-    expect(engine.snapshot().score).toEqual(Score.of(41));
+    expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(41));
   });
 
   // Since issue 210 the seed checks itself, so the error comes when the settings are built,

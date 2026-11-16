@@ -145,7 +145,7 @@ describe('bundled Fit levels', () => {
 
       const playing = moves.slice(1).map(() => Outcome.playing);
       expect([name, outcomes]).toEqual([name, [...playing, Outcome.victory]]);
-      expect([name, engine.snapshot().moves]).toEqual([name, Moves.of(moves.length)]);
+      expect([name, engine.snapshot().moveCount()]).toEqual([name, Moves.of(moves.length)]);
     }
   });
 

@@ -9,7 +9,7 @@ import type { LinesSnapshot, LinesState } from './lines-state';
 // The streak counts the current placement (issue 58), so a second clearing placement in a row
 // has streak 2. It extends the engine `ScoringDecorator` with `LinesScoring` as its inner
 // policy (view variant-1-lines), and `super.score()` gives the base score.
-// It reads the photo after the turn, as the base policy does.
+// It asks the photo after the turn, as the base policy does.
 // The streak and the count of lines keep their numbers private (issue #232). So the streak
 // gives the combo bonus: the line bonus `multiplier - 1` more times, as a `Score`.
 // A placement that clears no line has no bonus, so the decorator adds nothing to the inner score.
@@ -18,6 +18,6 @@ export class ComboMultiplierDecorator<TCoord> extends ScoringDecorator<
   LinesScoring<TCoord>
 > {
   score(before: LinesSnapshot<TCoord>, after: LinesSnapshot<TCoord>): Score {
-    return super.score(before, after).add(after.streak.comboBonus(after.linesCleared));
+    return super.score(before, after).add(after.currentStreak().comboBonus(after.lastCombo()));
   }
 }

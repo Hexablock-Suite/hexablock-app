@@ -19,10 +19,11 @@ import { Streak } from '../../src/domain/variants/hexa-lines/streak';
 import { MergeScoring } from '../../src/domain/variants/hexa-merge/merge-scoring';
 import { MergeState } from '../../src/domain/variants/hexa-merge/merge-state';
 import { MergeTile } from '../../src/domain/variants/hexa-merge/merge-tile';
+import { ClearedStacks } from '../../src/domain/variants/hexa-sort/cleared-stacks';
 import type { ColorStack } from '../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../src/domain/variants/hexa-sort/goal-count';
 import { SortScoring } from '../../src/domain/variants/hexa-sort/sort-scoring';
-import { SortState } from '../../src/domain/variants/hexa-sort/sort-state';
+import { SortSnapshot, SortView } from '../../src/domain/variants/hexa-sort/sort-state';
 import { TileCount } from '../../src/domain/variants/hexa-sort/tile-count';
 import { squareTopology, type SquareCoord } from '../support/engine/square-topology';
 import { repoRoot } from '../support/run-tool';
@@ -95,15 +96,15 @@ function turnScore<TPhoto>(
 }
 
 // The points of one Lines placement from the real base policy and its decorator.
-// A photo is plain data, so the test gives the facts of the placement in a copy of a photo.
+// The photo keeps its fields private (issue #245), so the test builds a state with the facts
+// of the placement and takes its photo.
 function linesPoints(cells: number, lines: number, streak: number): number {
-  const photo = linesState(squareTopology, 1, { tray: [] }).snapshot();
-  const after = {
-    ...photo,
+  const after = linesState(squareTopology, 1, {
+    tray: [],
     cellsPlaced: CellCount.of(cells),
     linesCleared: LineCount.of(lines),
     streak: Streak.of(streak),
-  };
+  }).snapshot();
   return turnScore(new ComboMultiplierDecorator(new LinesScoring<SquareCoord>()), after);
 }
 
@@ -114,7 +115,7 @@ function mergePoints(values: number[]): number {
     STATE_ID,
     MATCH_ID,
     mergeBoard(),
-    start.snapshot().tiles,
+    start.snapshot().tileSource(),
     false,
     values.map(MergeTile.of),
   );
@@ -122,22 +123,30 @@ function mergePoints(values: number[]): number {
 }
 
 // The points of one Sort turn that clears stacks of the given tile counts.
+// The photo keeps its fields private (issue #245), so the test builds a photo with the heights
+// of the cleared stacks through its constructor.
 function sortPoints(stacks: number[]): number {
-  const state = SortState.start({
-    stateId: STATE_ID,
-    matchId: MATCH_ID,
-    board: new Board<ColorStack, SquareCoord>(
-      BOARD_ID,
-      squareTopology.region(RegionSize.of(1)),
-      squareTopology,
-    ),
-    source: new FixedListPieceSource([]),
-    goalsNeeded: GoalCount.of(1),
-  });
-  return turnScore(new SortScoring<SquareCoord>(), {
-    ...state.snapshot(),
-    clearedTiles: stacks.map(TileCount.of),
-  });
+  const board = new Board<ColorStack, SquareCoord>(
+    BOARD_ID,
+    squareTopology.region(RegionSize.of(1)),
+    squareTopology,
+  );
+  const goalsDone = ClearedStacks.of(stacks.length);
+  const goal = GoalCount.of(1);
+  const after = new SortSnapshot<SquareCoord>(
+    STATE_ID,
+    MATCH_ID,
+    board,
+    Score.of(0),
+    undefined,
+    goalsDone,
+    goal,
+    stacks.map(TileCount.of),
+    undefined,
+    new FixedListPieceSource([]),
+    new SortView(undefined, goalsDone, goal),
+  );
+  return turnScore(new SortScoring<SquareCoord>(), after);
 }
 
 // Writes 60000 as «60 000», the way the README writes a number of milliseconds.

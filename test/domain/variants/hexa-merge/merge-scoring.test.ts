@@ -47,30 +47,30 @@ describe('Hexa Merge scoring', () => {
   it('should_score_the_value_of_the_merged_tile_when_two_equal_tiles_merge', () => {
     const state = slideRow([2, 2]);
 
-    expect(state.merged.map(valueOf)).toEqual([4]);
-    expect(state.score).toEqual(Score.of(4));
+    expect(state.mergedTiles().map(valueOf)).toEqual([4]);
+    expect(state.scoreSoFar()).toEqual(Score.of(4));
   });
 
   it('should_score_the_sum_of_the_merged_values_when_one_slide_makes_two_merges', () => {
     const state = slideRow([2, 2, 4, 4]);
 
-    expect(state.merged.map(valueOf).sort()).toEqual([4, 8]);
-    expect(state.score).toEqual(Score.of(12));
+    expect(state.mergedTiles().map(valueOf).sort()).toEqual([4, 8]);
+    expect(state.scoreSoFar()).toEqual(Score.of(12));
   });
 
   it('should_score_each_merge_when_one_slide_makes_two_merges_of_the_same_value', () => {
     // A tile merges at most once per move, so 2 2 2 2 gives two tiles of 4, not one 8.
     const state = slideRow([2, 2, 2, 2]);
 
-    expect(state.merged.map(valueOf)).toEqual([4, 4]);
-    expect(state.score).toEqual(Score.of(8));
+    expect(state.mergedTiles().map(valueOf)).toEqual([4, 4]);
+    expect(state.scoreSoFar()).toEqual(Score.of(8));
   });
 
   it('should_score_zero_when_the_slide_moves_tiles_but_merges_none', () => {
     const state = slideRow([2, 4]);
 
-    expect(state.merged).toEqual([]);
-    expect(state.score).toEqual(Score.of(0));
+    expect(state.mergedTiles()).toEqual([]);
+    expect(state.scoreSoFar()).toEqual(Score.of(0));
   });
 
   it('should_add_nothing_for_the_new_tile_when_a_tile_appears_after_the_slide', () => {
@@ -79,8 +79,8 @@ describe('Hexa Merge scoring', () => {
     const moved = slideRow([2], Chance.of(1));
 
     expect(total(merged)).toBe(8);
-    expect(merged.score).toEqual(Score.of(4));
+    expect(merged.scoreSoFar()).toEqual(Score.of(4));
     expect(total(moved)).toBe(6);
-    expect(moved.score).toEqual(Score.of(0));
+    expect(moved.scoreSoFar()).toEqual(Score.of(0));
   });
 });

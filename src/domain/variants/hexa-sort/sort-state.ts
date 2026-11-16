@@ -1,5 +1,5 @@
-import type { Board } from '../../engine/board';
-import { checkOwnSnapshot, type BoardSnapshot, type BoardState } from '../../engine/board-state';
+import type { Board, ReadonlyBoard } from '../../engine/board';
+import { BoardSnapshot, checkOwnSnapshot, type BoardState } from '../../engine/board-state';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { MatchId } from '../../engine/match-id';
 import { Score } from '../../engine/score';
@@ -10,11 +10,33 @@ import { ColorStack } from './color-stack';
 import type { GoalCount } from './goal-count';
 import type { TileCount } from './tile-count';
 
+// The receiver of the data of a `SortView`. An adapter of the edge implements it,
+// for example the state mapper of the Sort screen. No code of `src/domain/` or
+// `src/application/` calls `deliverTo()` (rule R-no-delivery-call).
+export interface SortViewReceiver<TCoord> {
+  receive(
+    offered: Piece<ColorStack, TCoord> | undefined,
+    goalsDone: ClearedStacks,
+    goalsNeeded: GoalCount,
+  ): void;
+}
+
 // The data that the Sort screen draws: the offered stack and the goal counts.
-export interface SortView<TCoord> {
-  readonly offered: Piece<ColorStack, TCoord> | undefined;
-  readonly goalsDone: ClearedStacks;
-  readonly goalsNeeded: GoalCount;
+// Every field is private (issue #245). A piece and a count never change, so the view shares them,
+// and `deliverTo()` gives them to an adapter of the edge.
+export class SortView<TCoord> {
+  constructor(
+    private readonly offered: Piece<ColorStack, TCoord> | undefined,
+    private readonly goalsDone: ClearedStacks,
+    private readonly goalsNeeded: GoalCount,
+  ) {
+    Object.freeze(this);
+  }
+
+  // Gives the offered stack and the two goal counts to `receiver`. It returns nothing.
+  deliverTo(receiver: SortViewReceiver<TCoord>): void {
+    receiver.receive(this.offered, this.goalsDone, this.goalsNeeded);
+  }
 }
 
 // The photo of a Sort state (classes.md decision 34): the board, the score, the offered stack,
@@ -22,14 +44,64 @@ export interface SortView<TCoord> {
 // The source is a value (classes.md decision 51), so the photo shares it with the state,
 // and a reader that draws from it changes nothing.
 // `view()` gives the offered stack and the goal counts for the screen.
-export interface SortSnapshot<TCoord> extends BoardSnapshot<ColorStack, TCoord> {
-  readonly offered: Piece<ColorStack, TCoord> | undefined;
-  readonly goalsDone: ClearedStacks;
-  readonly goalsNeeded: GoalCount;
-  readonly clearedTiles: readonly TileCount[];
-  readonly placedAt: TCoord | undefined;
-  readonly source: IPieceSource<Piece<ColorStack, TCoord>>;
-  view(): SortView<TCoord>;
+// Every field is private (issue #245). The rules ask `offeredStack()`, `lastPlacedAt()`,
+// `goalsReached()` and `goal()`, the scoring asks `clearedStackHeights()`, and
+// `SortState.restore()` asks the facts of the state. The photo keeps a frozen list
+// of the cleared heights, and it is frozen itself.
+export class SortSnapshot<TCoord> extends BoardSnapshot<ColorStack, TCoord> {
+  private readonly clearedTiles: readonly TileCount[];
+
+  constructor(
+    stateId: GameStateId,
+    matchId: MatchId,
+    board: ReadonlyBoard<ColorStack, TCoord>,
+    score: Score,
+    private readonly offered: Piece<ColorStack, TCoord> | undefined,
+    private readonly goalsDone: ClearedStacks,
+    private readonly goalsNeeded: GoalCount,
+    clearedTiles: readonly TileCount[],
+    private readonly placedAt: TCoord | undefined,
+    private readonly source: IPieceSource<Piece<ColorStack, TCoord>>,
+    private readonly shown: SortView<TCoord>,
+  ) {
+    super(stateId, matchId, board, score);
+    this.clearedTiles = Object.freeze([...clearedTiles]);
+    Object.freeze(this);
+  }
+
+  // The stack that the player places next, or `undefined` when the source has ended.
+  offeredStack(): Piece<ColorStack, TCoord> | undefined {
+    return this.offered;
+  }
+
+  // The count of the stacks that the game has cleared.
+  goalsReached(): ClearedStacks {
+    return this.goalsDone;
+  }
+
+  // The goal of the level: the count of stacks to clear.
+  goal(): GoalCount {
+    return this.goalsNeeded;
+  }
+
+  // The height of each stack that the last turn cleared, in the order of the clears.
+  clearedStackHeights(): readonly TileCount[] {
+    return this.clearedTiles;
+  }
+
+  // The cell of the last placed stack, or `undefined` before the first move.
+  lastPlacedAt(): TCoord | undefined {
+    return this.placedAt;
+  }
+
+  // The piece source at its position. Only `SortState.restore()` needs it.
+  pieceSource(): IPieceSource<Piece<ColorStack, TCoord>> {
+    return this.source;
+  }
+
+  view(): SortView<TCoord> {
+    return this.shown;
+  }
 }
 
 // The state of one Hexa Sort game (classes.md, Hexa Sort view).
@@ -39,7 +111,7 @@ export interface SortSnapshot<TCoord> extends BoardSnapshot<ColorStack, TCoord> 
 // It changes only through `placeOfferedStack()`, `moveRun()`, `clearStack()`,
 // `offerNext()`, `addPoints()` and `restore()`. The rules decide when to call them.
 // A refused input throws a RangeError and leaves the whole state as it was.
-// The scoring, the rules and the use cases read the photo of `snapshot()`, never a field.
+// The scoring, the rules and the use cases ask the photo of `snapshot()`, never a field.
 // The piece source lives in the state (classes.md decision 31). The level chooses it:
 // seeded random or a fixed list (A4). A Sort piece is one cell with a stack (decision 6).
 // `offered` is the stack that the player places next. It is `undefined` when the source ends.
@@ -159,24 +231,19 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
   // and the source is a value, so the photo shares them.
   // It holds a frozen list and a copy of the board.
   snapshot(): SortSnapshot<TCoord> {
-    const view = Object.freeze({
-      offered: this.offered,
-      goalsDone: this.goalsDone,
-      goalsNeeded: this.goalsNeeded,
-    });
-    return Object.freeze({
-      stateId: this.stateId,
-      matchId: this.matchId,
-      board: this.board.clone(),
-      score: this.score,
-      offered: this.offered,
-      goalsDone: this.goalsDone,
-      goalsNeeded: this.goalsNeeded,
-      clearedTiles: Object.freeze([...this.clearedTiles]),
-      placedAt: this.placedAt,
-      source: this.source,
-      view: () => view,
-    });
+    return new SortSnapshot(
+      this.stateId,
+      this.matchId,
+      this.board.clone(),
+      this.score,
+      this.offered,
+      this.goalsDone,
+      this.goalsNeeded,
+      this.clearedTiles,
+      this.placedAt,
+      this.source,
+      new SortView(this.offered, this.goalsDone, this.goalsNeeded),
+    );
   }
 
   // Takes back a photo of this state, in place. The goal of the level never changes,
@@ -184,13 +251,13 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
   // changes nothing.
   restore(snapshot: SortSnapshot<TCoord>): void {
     checkOwnSnapshot(this.stateId, this.board, snapshot);
-    this.board.restore(snapshot.board);
-    this.source = snapshot.source;
-    this.offered = snapshot.offered;
-    this.goalsDone = snapshot.goalsDone;
-    this.clearedTiles = [...snapshot.clearedTiles];
-    this.placedAt = snapshot.placedAt;
-    this.score = snapshot.score;
+    this.board.restore(snapshot.boardCopy());
+    this.source = snapshot.pieceSource();
+    this.offered = snapshot.offeredStack();
+    this.goalsDone = snapshot.goalsReached();
+    this.clearedTiles = [...snapshot.clearedStackHeights()];
+    this.placedAt = snapshot.lastPlacedAt();
+    this.score = snapshot.scoreSoFar();
   }
 
   // True when this state is the state of the match `match`.
