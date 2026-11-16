@@ -71,13 +71,15 @@
       >
         <title id="mapad-title">HexaBlock adapters map · UML class diagram</title>
         <desc id="mapad-desc">
-          Overview map of the 61 classes of layers 4 and 3 in 12 groups. The composition root group
+          Overview map of the 64 classes of layers 4 and 3 in 13 groups. The composition root group
           holds CompositionRoot, GameRegistry and BoardFigure, the drivers group holds
-          SequentialMatchIds, and the events group holds NullGameEventPublisher. Each line joins two
-          classes: GameScreen renders BoardView and keeps its GamePresenter, CompositionRoot creates
-          InMemoryGameRepository, DeviceKeyValueStore implements KeyValueStore, GamePresenter keeps
-          its StateMapper and LocalProgressRepository keeps its KeyValueStore. No line touches a
-          group frame. Each group names the view that shows its members.
+          SequentialMatchIds, the move controls group holds MoveControls, FitControls and
+          BoardOnlyControls, and the events group holds NullGameEventPublisher. Each line joins two
+          classes: GameScreen renders BoardView and keeps its GamePresenter and its MoveControls,
+          CompositionRoot creates InMemoryGameRepository, DeviceKeyValueStore implements
+          KeyValueStore, GamePresenter keeps its StateMapper and LocalProgressRepository keeps its
+          KeyValueStore. No line touches a group frame. Each group names the view that shows its
+          members.
         </desc>
         <defs>
           <marker
@@ -283,6 +285,41 @@
           letter-spacing="0.14em"
         >
           VIEWS 4.2, 4.4
+        </text>
+        <!-- Group: move controls -->
+        <rect
+          x="448"
+          y="258"
+          width="352"
+          height="128"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="460"
+          y="274"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          MOVE CONTROLS · STRATEGY · D3
+        </text>
+        <text
+          x="788"
+          y="274"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+          letter-spacing="0.14em"
+        >
+          VIEW 4.1
         </text>
         <!-- Group: routes -->
         <rect
@@ -618,6 +655,14 @@
           stroke-width="1"
           marker-end="url(#mapad-open)"
         />
+        <!-- GameScreen keeps the MoveControls of its game as controls: use with role and multiplicity, inside layer 4 (view 4.1) -->
+        <path
+          d="M332 476 L332 404 L424 404 L424 303 L464 303"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#mapad-open)"
+        />
         <!-- CompositionRoot creates InMemoryGameRepository: use with a verb, down into layer 3 (view 4.4) -->
         <path
           d="M696 643 L724 643 L724 1068"
@@ -664,6 +709,18 @@
           letter-spacing="0.06em"
         >
           RENDERS
+        </text>
+        <rect x="336" y="424" width="52" height="12" rx="2" fill="#cfdcf3" />
+        <text
+          x="362"
+          y="433"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          controls 1
         </text>
         <rect x="494" y="810" width="60" height="12" rx="2" fill="#e2ebf8" />
         <text
@@ -932,6 +989,69 @@
           <text x="148" y="313" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               TriangleLayout
+            </tspan>
+          </text>
+        </g>
+        <!-- Chips: move controls -->
+        <g data-class="MoveControls">
+          <rect
+            x="464"
+            y="286"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="540"
+            y="298"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="540" y="311" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              MoveControls
+            </tspan>
+          </text>
+        </g>
+        <g data-class="FitControls">
+          <rect
+            x="632"
+            y="286"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="708" y="307" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              FitControls
+            </tspan>
+          </text>
+        </g>
+        <g data-class="BoardOnlyControls">
+          <rect
+            x="464"
+            y="336"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="540" y="357" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              BoardOnlyControls
             </tspan>
           </text>
         </g>
@@ -2035,7 +2155,8 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           GameRegistry maps each GameId to its variant factory and its screen parts (#170), by
-          default SpaceStateMapper and SpaceCellRenderer.
+          default SpaceStateMapper, SpaceCellRenderer and BoardOnlyControls. Hexa Fit has
+          FitStateMapper, FitCellRenderer and FitControls (#175).
         </text>
         <text
           x="24"

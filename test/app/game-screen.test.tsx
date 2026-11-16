@@ -3,12 +3,7 @@ import path from 'node:path';
 import { fireEvent, renderRouter, screen, testRouter } from 'expo-router/testing-library';
 
 import { repoRoot } from '../support/run-tool';
-
-// The root layout gives the composition root the storage of the device (#188).
-// The mock keeps the values in memory, so the test needs no device.
-jest.mock('@react-native-async-storage/async-storage', () =>
-  require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
-);
+import { occupiedSpaces, pressSpace } from '../support/ui/board-spaces';
 
 // The routes of `app/`, with the root layout and its composition root.
 const appDir = path.join(repoRoot, 'app');
@@ -60,6 +55,23 @@ describe('game route', () => {
 
     expect(drawn).toEqual(FOUR_BOARDS);
     expect(info).toHaveBeenCalledWith('StartGame: success');
+  });
+
+  // Issue #175: the player solves the Fit level of the hexagon on the game screen. The level
+  // has the spaces (0,0), (1,0) and (2,0) in a row, the domino `a` and the single cell `b`.
+  it('should_reach_the_victory_outcome_when_the_player_solves_the_fit_level_from_the_map', async () => {
+    await renderRouter(appDir, { initialUrl: '/map' });
+    await fireEvent.press(screen.getByRole('button', { name: /^Hexa Fit/ }));
+    await screen.findByText('En juego');
+
+    await fireEvent.press(screen.getByRole('radio', { name: 'Pieza a' }));
+    await pressSpace(0);
+    await fireEvent.press(screen.getByRole('radio', { name: 'Pieza b' }));
+    await pressSpace(2);
+
+    expect(await screen.findByText('¡Victoria!')).toBeOnTheScreen();
+    expect(occupiedSpaces()).toEqual([0, 1, 2]);
+    expect(screen.queryAllByRole('radio')).toEqual([]);
   });
 
   it('should_return_to_the_map_when_the_player_presses_the_map_button', async () => {

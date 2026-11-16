@@ -3,17 +3,19 @@ import { SpaceStateMapper } from '../../src/adapters/space-state-mapper';
 import { GameId } from '../../src/domain/engine/game-id';
 import { HexLayout } from '../../src/infrastructure/board/hex-layout';
 import { GameRegistry, registered, type ScreenParts } from '../../src/infrastructure/game-registry';
+import { BoardOnlyControls } from '../../src/infrastructure/ui/move-controls';
 import { fitFactory } from '../support/variants/hexa-fit/fit-game';
 import { linesFactory } from '../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../support/variants/hexa-merge/merge-game';
 import { variantIdOf } from '../support/variants/variant-id';
 
 // The screen parts of a game in these tests: the default mapper, a renderer that draws
-// nothing and the hexagon layout. A node test renders no component.
+// nothing, the default controls and the hexagon layout. A node test renders no component.
 function screenParts(): ScreenParts<unknown, unknown, unknown, unknown, undefined> {
   return {
     mapper: new SpaceStateMapper(),
     renderer: { render: () => null },
+    controls: new BoardOnlyControls(),
     layoutOf: (size) => new HexLayout(size),
   };
 }

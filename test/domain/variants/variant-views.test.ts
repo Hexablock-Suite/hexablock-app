@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Moves } from '../../../src/domain/engine/moves';
 import { FixedListPieceSource } from '../../../src/domain/engine/piece-source';
 import { MergeState } from '../../../src/domain/variants/hexa-merge/merge-state';
 import { ClearedStacks } from '../../../src/domain/variants/hexa-sort/cleared-stacks';
@@ -59,7 +60,7 @@ describe('the view of each variant state', () => {
     expect(returned).toEqual([undefined, undefined, undefined, undefined]);
     expect(calls).toEqual([
       [tray],
-      [[fit.piece(A)], []],
+      [[fit.piece(A)], [], Moves.of(0)],
       [offered, ClearedStacks.of(0), GoalCount.of(2)],
       [false],
     ]);
@@ -121,7 +122,9 @@ describe('the view of each variant state', () => {
     });
   });
 
-  it('should_build_the_view_from_the_remaining_and_placed_pieces_when_a_fit_state_builds_its_view', () => {
+  // Issue #175: the view also delivers the count of the accepted moves, so the Fit screen
+  // shows it. The state counts each place, rotate and remove (issue #60).
+  it('should_build_the_view_from_the_remaining_and_placed_pieces_and_the_move_count_when_a_fit_state_builds_its_view', () => {
     const factory = fitFactory();
     const rules = factory.createRules();
     const start = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
@@ -130,8 +133,8 @@ describe('the view of each variant state', () => {
     const before = start.snapshot().view();
     const after = rules.apply(start, firstValidMove(rules, start)).snapshot().view();
 
-    expect(fitViewData(before)).toEqual({ remaining: [domino], placed: [] });
-    expect(fitViewData(after)).toEqual({ remaining: [], placed: [A] });
+    expect(fitViewData(before)).toEqual({ remaining: [domino], placed: [], moves: Moves.of(0) });
+    expect(fitViewData(after)).toEqual({ remaining: [], placed: [A], moves: Moves.of(1) });
     expectFrozen(
       before,
       fitViewData(before).remaining,

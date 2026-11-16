@@ -12,12 +12,7 @@ import { valueOf } from '../../support/application/game-use-cases';
 import { RecordingLogger } from '../../support/application/recording-logger';
 import { ManualClock } from '../../support/engine/manual-clock';
 import { firstMoveOf } from '../../support/engine/variant-game';
-
-// The root layout gives the composition root the storage of the device (#188).
-// The mock keeps the values in memory, so the test needs no device.
-jest.mock('@react-native-async-storage/async-storage', () =>
-  require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
-);
+import { pressSpace } from '../../support/ui/board-spaces';
 
 // Issue #170: `GameStage`, the view of the game screen, shows the board of a game, its score
 // and its outcome, and starts the game when it opens. These tests build the real composition
@@ -84,8 +79,8 @@ describe('GameStage', () => {
     expect(screen.getByLabelText('Tablero')).toBeOnTheScreen();
     // The first Fit level has three cells, and no piece covers them yet.
     expect([free().length, occupied().length]).toEqual([3, 0]);
-    expect(screen.getByText('Puntos')).toBeOnTheScreen();
-    expect(screen.getByText('0')).toBeOnTheScreen();
+    // The Fit controls show the move count 0 too, so the test reads the score sign.
+    expect(screen.getByText('Puntos').parent).toHaveTextContent(/^Puntos\s*0$/);
     expect(logger.entries.map((entry) => [entry.useCase, entry.outcome])).toEqual([
       ['StartGame', 'success'],
     ]);
@@ -132,6 +127,19 @@ describe('GameStage', () => {
 
     expect(screen.getByRole('alert')).toHaveTextContent('Esa jugada no se puede hacer');
     expect([free().length, occupied().length]).toEqual(board);
+  });
+
+  // Issue #175: the board takes a press on a space for the move controls of a variant.
+  // A game with no move controls of its own plays no move when the player presses a space.
+  it('should_play_no_move_when_the_player_presses_a_space_of_a_game_with_no_move_controls', async () => {
+    const logger = new RecordingLogger();
+    await show(gameSessionOf(testRoot(logger), GameId.of('hexa-lines'), textCatalog.es));
+    const board = [free().length, occupied().length];
+
+    await pressSpace(0);
+
+    expect([free().length, occupied().length]).toEqual(board);
+    expect(logger.entries.map((entry) => entry.useCase)).toEqual(['StartGame']);
   });
 
   it('should_call_back_when_the_player_presses_the_map_button', async () => {
