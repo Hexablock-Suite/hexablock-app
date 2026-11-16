@@ -11,17 +11,17 @@ The layers themselves are in [layers.md](layers.md). The full class diagram is i
 
 ## Use case 1: apply a move
 
-`ApplyMove` (APP-FR-03) plays one move. The player taps a cell on `GameScreen`. `GamePresenter` calls the `UseCase` port, and `ApplyMove` takes the running `GameEngine` through the `GameRepository` port. The engine plays the turn with its `IGameRules` strategy: the rules change a copy of the state only through the business methods of the state, and the engine adds the points of the turn, a `Score`, with `BoardState.addPoints()` (decisions 7 and 41 of [classes.md](classes.md)). `ApplyMove` reads the photo of the state, `GameEngine.snapshot()`, and copies the cells of its board and the `payload` of its `view()` into a plain `MoveResult`, and the presenter maps each cell and the payload with its `StateMapper` into `GameViewModel`. No HTTP call runs.
+`ApplyMove` (APP-FR-03) plays one move. The player taps a cell on `GameScreen`. `GamePresenter` calls the `UseCase` port, and `ApplyMove` takes the running `GameEngine` through the `GameRepository` port. The engine plays the turn with its `IGameRules` strategy: the rules change a copy of the state only through the business methods of the state, and the engine adds the points of the turn, a `Score`, with `BoardState.addPoints()` (decisions 7 and 41 of [classes.md](classes.md)). A turn that ends the game records one `GameOver` event in the engine, which tells nobody. After the turn, `ApplyMove` takes the events with `GameEngine.takeEvents()` and publishes each one to the `GameEventPublisher` port; a publisher failure only goes to the `Logger` port, and the answer stays the same (decisions 26 and 29, #233). `ApplyMove` reads the photo of the state, `GameEngine.snapshot()`, and copies the cells of its board and the `payload` of its `view()` into a plain `MoveResult`, and the presenter maps each cell and the payload with its `StateMapper` into `GameViewModel`. No HTTP call runs.
 
 View 3.2 of [classes.md](classes.md) shows `ApplyMove` with layers 2 and 1 only, and view 4.1 shows the presenter without the use case. So this view joins both slices and does not repeat either view.
 
 ### Class view
 
-![ApplyMove class view: GameScreen in layer 4; GamePresenter, StateMapper, GameViewModel and InMemoryGameRepository in layer 3; UseCase, ApplyMove, ApplyMoveRequest, MoveResult and the GameRepository port in layer 2; GameEngine, IGameRules and Board in layer 1](classes/views/flow-1-apply-move.png)
+![ApplyMove class view: GameScreen in layer 4; GamePresenter, StateMapper, GameViewModel and InMemoryGameRepository in layer 3; UseCase, ApplyMove, ApplyMoveRequest, MoveResult and the GameRepository port in layer 2, where ApplyMove also keeps the Logger and GameEventPublisher ports; GameEngine, which records the events of its turns, IGameRules and Board in layer 1](classes/views/flow-1-apply-move.png)
 
 ### Sequence diagram
 
-![ApplyMove sequence: GameScreen calls onMove() on GamePresenter, which calls execute() on ApplyMove; ApplyMove takes the GameEngine from InMemoryGameRepository, calls tryPlay(), snapshot(), cells(), undoable(), redoable() and timed(), and returns a Result with a MoveResult; GamePresenter maps each cell with StateMapper and builds GameViewModel](flows/views/seq-1-apply-move.png)
+![ApplyMove sequence: GameScreen calls onMove() on GamePresenter, which calls execute() on ApplyMove; ApplyMove takes the GameEngine from InMemoryGameRepository, calls tryPlay() and takeEvents(), publishes each event to the GameEventPublisher port, calls snapshot(), cells(), undoable(), redoable() and timed(), and returns a Result with a MoveResult; GamePresenter maps each cell with StateMapper and builds GameViewModel](flows/views/seq-1-apply-move.png)
 
 ## Use case 2: save progress
 

@@ -2,7 +2,7 @@
 
 Status: draft for review with the professor, 2026-10-30. Updated on 2026-10-31 to match the class diagram: one generic input port, the ports of decisions 10 to 12, engine interfaces that are not ports, and the presentation pattern. Updated on 2026-11-02: the `Logger` port takes a log entry, and its adapter writes the text (decision 37 of the class diagram). Updated on 2026-11-07: the status text and the planned marks of the diagram follow the code in `src/` (issue #147).
 
-This page answers one question: in which layer does each piece of the client live? It follows the statement (§3.4, §4.2) and the layer rules in `.dependency-cruiser.cjs`. Part of the client exists today. `src/domain/` holds the engine and the four variants. `src/application/` holds the first use cases, `StartGame` and `ApplyMove`, with the input port `UseCase`, the ports `GameRepository` and `Logger`, and the aspects `UseCaseAspect` and `LoggingAspect`. `src/infrastructure/` holds the API client in `src/infrastructure/api/`. `app/` holds the root layout and a home screen that shows the title. The other screens, the adapters of `src/adapters/`, the drivers and the composition root are planned. The diagram marks each planned piece. Component names follow the statement (§3.1, §3.4) and the [class diagram](classes.md). They are not final. The engine names carry no geometry: `Board<TCell, TCoord>` is the `HexBoard<TCell>` of §3.1 (decision 16 of the class diagram). IDs such as A1, D3 and Q7 refer to [`docs/REQUIREMENTS.md`](../REQUIREMENTS.md). The classes of layer 1 are in the [class diagram](classes.md).
+This page answers one question: in which layer does each piece of the client live? It follows the statement (§3.4, §4.2) and the layer rules in `.dependency-cruiser.cjs`. Part of the client exists today. `src/domain/` holds the engine and the four variants. `src/application/` holds the first use cases, `StartGame` and `ApplyMove`, with the input port `UseCase`, the ports `GameRepository`, `Logger` and `GameEventPublisher`, and the aspects `UseCaseAspect` and `LoggingAspect`. `src/infrastructure/` holds the API client in `src/infrastructure/api/`. `app/` holds the root layout and a home screen that shows the title. The other screens, the adapters of `src/adapters/`, the drivers and the composition root are planned. The diagram marks each planned piece. Component names follow the statement (§3.1, §3.4) and the [class diagram](classes.md). They are not final. The engine names carry no geometry: `Board<TCell, TCoord>` is the `HexBoard<TCell>` of §3.1 (decision 16 of the class diagram). IDs such as A1, D3 and Q7 refer to [`docs/REQUIREMENTS.md`](../REQUIREMENTS.md). The classes of layer 1 are in the [class diagram](classes.md).
 
 ## Diagram
 
@@ -10,7 +10,7 @@ Statement §4.2 asks for four concentric layers. Mermaid draws them as a stack: 
 
 - Solid arrow: uses (imports). Dotted arrow: realization, the class implements an interface. Mermaid draws no hollow triangle, so the dotted line and its label `implements` stand for the UML realization.
 - Rounded node: a port, an interface that layer 2 owns and an outer layer implements. Ports live in the application layer, because a use case may depend only on ports of its own layer (§3.4). So only layer 2 has rounded nodes.
-- Plain box: a class or an interface that is not a port. The engine owns `Clock`, `RandomSource` and `GameEventPublisher`, and layer 3 owns `KeyValueStore`. An outer layer implements them too, but they are interfaces of their own layer, not ports (decision 25 of the class diagram).
+- Plain box: a class or an interface that is not a port. The engine owns `Clock` and `RandomSource`, and layer 3 owns `KeyValueStore`. An outer layer implements them too, but they are interfaces of their own layer, not ports (decision 25 of the class diagram).
 - Dashed border and the suffix "(planned)": the component does not exist yet. A solid border means the file exists today. A solid node whose label has a "planned:" part exists in part: only the names after "planned:" do not exist yet.
 - A label that names a question (Q8 or Q9) marks a placement the team has not settled. The box sits where this draft puts it, and the professor's answer can move it.
 - Colors: layer 1 yellow, layer 2 purple, layers 3 and 4 blue. The course colors three layers: the domain yellow, the application purple and the infrastructure blue. With four layers, layers 3 and 4 together are the blue infrastructure, so the team draws layer 3 light blue and layer 4 dark blue. The class views use the same colors.
@@ -60,6 +60,7 @@ flowchart TB
     SESSPORT(["SessionStore port (planned)"])
     SETPORT(["SettingsStore port (planned)"])
     LOGPORT(["Logger port: takes a UseCaseLogEntry"])
+    EVPORT(["GameEventPublisher port: ApplyMove delivers<br/>the events that the engine records"])
   end
 
   subgraph L1["Layer 1: Entities"]
@@ -77,7 +78,6 @@ flowchart TB
       DPORTS["Clock and RandomSource interfaces"]
       CMDSTATE["GamePhase classes, MoveCommand"]
       FACTORY["IVariantFactory: creates the rules, piece source,<br/>scoring, board, initial state and history;<br/>planned: progress model (Q8)"]
-      EVPORT["GameEventPublisher interface"]
     end
   end
 
@@ -112,6 +112,7 @@ flowchart TB
   UC --> GRPORT
   UC --> ACCPORT
   UC --> SETPORT
+  UC --> EVPORT
   UC --> CORE
 
   LINES & FIT & SORT & MERGE -.->|implement| CONTRACTS
@@ -123,7 +124,6 @@ flowchart TB
   CORE --> DPORTS
   CORE --> CAPS
   CORE --> CMDSTATE
-  CORE --> EVPORT
   UC --> FACTORY
 
   PRESENTERS -->|calls| INPORTS
@@ -151,7 +151,7 @@ flowchart TB
 
   %% Invisible links keep the layers stacked from outer to inner, with the legend last.
   KV & MAPPERS & GAMEREPO ~~~ ASPECTS
-  PPORT & LBPORT & LVPORT & GRPORT & ACCPORT & SESSPORT & SETPORT & LOGPORT & INPORTS ~~~ CORE & LINES & FIT & SORT & MERGE
+  PPORT & LBPORT & LVPORT & GRPORT & ACCPORT & SESSPORT & SETPORT & LOGPORT & EVPORT & INPORTS ~~~ CORE & LINES & FIT & SORT & MERGE
   L1 ~~~ LEGEND
 
   classDef planned stroke-dasharray: 5 5
@@ -195,7 +195,7 @@ The "May depend on" column repeats `.dependency-cruiser.cjs`. `pnpm arch` checks
 - **Abstract Factory per variant:** layer 1. The interface `IVariantFactory` lives in `src/domain/engine/`, and each variant folder holds one implementation. It creates the whole family of statement §3.3: the rules, the piece source (`createPieceSource()`), the scoring policy and the board (`createBoard()`, with `BoardBuilder`), plus the progress model, the initial state and the optional history (decision 31). `StartGame` receives a factory and never names a variant. The cell renderer that D3 assigns to this factory cannot live here. Q8 asks where the renderer goes, and its answer can move the factory too.
 - **Capability interfaces:** layer 1, `src/domain/engine/`. `IMergeable<TCell>` is the bound on the Hexa Merge cell (§3.1). `IUndoable`, `ITimed` and `IRandomSeeded` stay separate (§3.2, ISP). The engine classes `MoveHistory`, `RedoableHistory`, `LevelTimer` and `SeededPieceSource` implement them. `SeededPieceSource` is a value object, as every piece source is: a draw returns the next source and changes nothing (decision 51). The variant factory gives a game only the ones it uses, so Hexa Lines gets no `IUndoable` (decision 3). `LevelTimer` is an entity inside the `GameEngine` aggregate: its `LevelTimerId` is local, and the variant factory builds it from the `MatchId` of the game (decisions 50 and 52). `GameEngine.undoable()`, `redoable()` and `timed()` return the capability or `undefined`, so no use case asks for a concrete class (decision 27). `IRedoable` is our addition: Hexa Fit redoes, and Hexa Merge only undoes (§5.1.8).
 - **Command and State:** layer 1, `src/domain/engine/`. `MoveCommand` wraps each move, so the history supports undo and redo: unlimited in Hexa Fit, one move in Hexa Merge (§3.3). `GamePhase` has one class per phase of a game: Playing, Resolving, Paused, GameOver and Victory (§3.3). The name avoids a clash with the `TState` type parameter. The menu belongs to the presentation layer, not to `GamePhase` (D2).
-- **Game events (Observer):** the `GameEventPublisher` interface lives in layer 1, `src/domain/engine/`, because the engine notifies at the end of each turn. It is an engine interface, not a port. It publishes events such as `LineCleared`, `StackMerged`, `TileMerged` and `GameOver` (§3.3). `GameEventBus` in layer 3 implements it. The presenters, the score display and `AudioManager`, the audio facade in layer 4, listen to it, so the engine never knows about sound or screens.
+- **Game events (Observer):** the `GameEventPublisher` port lives in layer 2, `src/application/` (#233). The engine records its events at the end of a turn and tells nobody, and `ApplyMove` delivers them to the port after the turn. Today the only event is `GameOver`. `LineCleared`, `StackMerged` and `TileMerged` are planned events, and each one will extend the abstract `GameEvent`, as `GameOver` does (§3.3). `GameEventBus` in layer 3 implements the port. The presenters, the score display and `AudioManager`, the audio facade in layer 4, listen to it, so the engine never knows about sound or screens.
 - **Use cases:** layer 2, `src/application/`. One generic set for the four variants:
   - `StartGame`, `ApplyMove`, `UndoMove`, `SaveProgress` and `SyncLeaderboard`. The game use cases keep the running engine through `GameRepository`, the repository port of the game aggregate, and `InMemoryGameRepository` in layer 3 implements it (decision 10).
   - `RedoMove`: redo in Hexa Fit (statement §5.1.8).

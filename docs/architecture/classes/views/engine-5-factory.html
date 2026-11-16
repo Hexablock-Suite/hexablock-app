@@ -73,15 +73,16 @@
         <desc id="factory-desc">
           Class diagram of layer 1 showing the IVariantFactory abstract factory that creates the
           rules, piece source, scoring, board, progress model, initial state and optional history of
-          a variant, the ILevelBuilder builder, the GameEventPublisher interface that publishes
-          GameEvent values such as GameOver, the Clock and RandomSource interfaces that layer 4
-          implements, and the MatchIdGenerator interface that gives the MatchId of each new match.
-          The internal ids are local value objects that keep the MatchId of their match: GameFactory
-          builds the GameStateId of the first state and the BoardId of its board from it, and
-          FitFactory builds the LevelTimerId of the timer of a timed game in createRules().
-          GameFactory keeps an IVariantFactory, the MatchIdGenerator and a GameEventPublisher and
-          creates the started GameEngine, and GameOver carries the GameId, the MatchId and the final
-          Score, a value object.
+          a variant, the ILevelBuilder builder, the abstract GameEvent with GameOver, the domain
+          event that the root records when a game ends, the Clock and RandomSource interfaces that
+          layer 4 implements, and the MatchIdGenerator interface that gives the MatchId of each new
+          match. The internal ids are local value objects that keep the MatchId of their match:
+          GameFactory builds the GameStateId of the first state and the BoardId of its board from
+          it, and FitFactory builds the LevelTimerId of the timer of a timed game in createRules().
+          GameFactory keeps an IVariantFactory and the MatchIdGenerator and creates the started
+          GameEngine. GameOver keeps the MatchId, the Outcome and the final Score, a value object,
+          GameEvent keeps the GameId, and the fields are private: a listener asks isVictory() or
+          receives the data through deliverTo().
         </desc>
         <defs>
           <marker
@@ -258,7 +259,7 @@
           x="40"
           y="540"
           width="432"
-          height="164"
+          height="148"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -330,22 +331,12 @@
           stroke-width="1"
           marker-end="url(#factory-open)"
         />
-        <!-- GameEventPublisher publishes GameEvent: use -->
-        <line
-          x1="728"
-          y1="128"
-          x2="792"
-          y2="128"
-          stroke-width="1"
-          marker-end="url(#factory-open)"
-          stroke="#5b6873"
-        />
         <!-- GameOver extends GameEvent: generalization -->
         <line
           x1="884"
-          y1="204"
+          y1="208"
           x2="884"
-          y2="164"
+          y2="188"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#factory-triangle)"
@@ -387,18 +378,6 @@
           letter-spacing="0.06em"
         >
           GIVES
-        </text>
-        <rect x="732" y="108" width="56" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="760"
-          y="117"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          PUBLISHES
         </text>
 
         <!-- Class: IVariantFactory (interface, abstract factory, focal) -->
@@ -466,50 +445,12 @@
           + createHistory(): MoveHistory&lt;TMove, TState&gt; [0..1]
         </text>
 
-        <!-- Class: GameEventPublisher (interface of the engine) -->
-        <rect
-          x="508"
-          y="92"
-          width="220"
-          height="72"
-          rx="6"
-          fill="#ffffff"
-          stroke="#17212a"
-          stroke-width="1"
-        />
-        <line x1="508" y1="140" x2="728" y2="140" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text
-          x="618"
-          y="110"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «interface»
-        </text>
-        <text
-          x="618"
-          y="128"
-          fill="#17212a"
-          font-size="12"
-          font-weight="600"
-          font-family="'IBM Plex Sans', sans-serif"
-          text-anchor="middle"
-        >
-          GameEventPublisher
-        </text>
-        <text x="520" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + publish(event: GameEvent): void
-        </text>
-
         <!-- Class: GameEvent (abstract, domain event) -->
         <rect
           x="792"
           y="92"
           width="184"
-          height="72"
+          height="96"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -540,24 +481,28 @@
           GameEvent
         </text>
         <text x="808" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + gameId: GameId
+          - gameId: GameId
+        </text>
+        <line x1="792" y1="164" x2="976" y2="164" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="808" y="180" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          # withGameId(deliver): void
         </text>
 
         <!-- Class: GameOver (domain event) -->
         <rect
           x="792"
-          y="204"
+          y="208"
           width="184"
-          height="96"
+          height="152"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="792" y1="244" x2="976" y2="244" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="792" y1="248" x2="976" y2="248" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="884"
-          y="219"
+          y="223"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -568,7 +513,7 @@
         </text>
         <text
           x="884"
-          y="235"
+          y="239"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -577,14 +522,24 @@
         >
           GameOver
         </text>
-        <text x="808" y="260" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + matchId: MatchId
+        <text x="808" y="264" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - matchId: MatchId
         </text>
-        <text x="808" y="276" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + outcome: Outcome
+        <text x="808" y="280" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - outcome: Outcome
         </text>
-        <text x="808" y="292" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + finalScore: Score
+        <text x="808" y="296" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - finalScore: Score
+        </text>
+        <line x1="792" y1="304" x2="976" y2="304" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="808" y="320" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + isVictory(): boolean
+        </text>
+        <text x="808" y="336" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + deliverTo(receiver:
+        </text>
+        <text x="819" y="352" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          GameOverReceiver): void
         </text>
 
         <!-- Class: Score (value object, decision 41) -->
@@ -860,7 +815,7 @@
         </text>
         <!-- GameFactory builds the GameStateId of the first state from the MatchId: use with a verb -->
         <path
-          d="M 440 696 V 740 H 512"
+          d="M 440 680 V 740 H 512"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -880,7 +835,7 @@
         </text>
         <!-- GameFactory builds the BoardId of its board from the MatchId: use with a verb -->
         <path
-          d="M 424 696 V 900 H 512"
+          d="M 424 680 V 900 H 512"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -1099,7 +1054,7 @@
           x="56"
           y="568"
           width="400"
-          height="128"
+          height="112"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1134,11 +1089,8 @@
         <text x="72" y="648" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - ids: MatchIdGenerator
         </text>
-        <text x="72" y="664" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - events: GameEventPublisher
-        </text>
-        <line x1="56" y1="672" x2="456" y2="672" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="72" y="688" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="56" y1="656" x2="456" y2="656" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="72" y="672" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createGame(): GameEngine&lt;TCell, TCoord, TMove, TState&gt;
         </text>
         <!-- UML template boxes: type parameters on the top-right corner -->
@@ -1237,8 +1189,8 @@
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            GameEventBus in layer 3 implements GameEventPublisher, and layer 4 implements Clock,
-            RandomSource and MatchIdGenerator. They are engine interfaces: ports live in layer 2.
+            Layer 4 implements Clock, RandomSource and MatchIdGenerator. They are engine interfaces:
+            ports live in layer 2, and GameEventPublisher is one since #233.
           </text>
 
           <text

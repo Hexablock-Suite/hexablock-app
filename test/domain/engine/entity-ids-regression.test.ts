@@ -23,7 +23,6 @@ import { MergeTile } from '../../../src/domain/variants/hexa-merge/merge-tile';
 import { SlideSense, Slide } from '../../../src/domain/variants/hexa-merge/slide';
 import type { ColorStack } from '../../../src/domain/variants/hexa-sort/color-stack';
 import { BOARD_ID, STATE_ID } from '../../support/engine/entity-ids';
-import { RecordingPublisher } from '../../support/engine/fake-game';
 import { liveStateOf } from '../../support/engine/variant-game';
 import { CountingMatchIds, MATCH_ID } from '../../support/engine/match-id';
 import { square, type SquareCoord } from '../../support/engine/square-topology';
@@ -58,7 +57,7 @@ function gamesOf<TCell, TCoord, TMove, TState extends AnyState<TCell, TCoord, TS
   variant: IVariantFactory<TCell, TCoord, TMove, TState, unknown>,
   matchIds: MatchIdGenerator = new CountingMatchIds(),
 ): GameFactory<TCell, TCoord, TMove, TState> {
-  return new GameFactory(variant, matchIds, new RecordingPublisher());
+  return new GameFactory(variant, matchIds);
 }
 
 // The timer of a timed game. `ITimed` shows no id, so the probe compares the `LevelTimer`.
@@ -236,7 +235,6 @@ function throwingTurnOf<TCell, TCoord, TMove, TState extends AnyState<TCell, TCo
     variant.gameId,
     new ThrowingAfterTurnRules(variant.createRules(MATCH_ID)),
     variant.createScoring(),
-    new RecordingPublisher(),
     variant.createHistory(),
   );
   game.start(variant.createInitialState(MATCH_ID, STATE_ID, BOARD_ID));

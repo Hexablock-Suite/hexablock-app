@@ -15,7 +15,6 @@ import {
   emptyState,
   FakeRules,
   OnePointScoring,
-  RecordingPublisher,
   type FakeMove,
   type FakeState,
   type FakeSnapshot,
@@ -47,13 +46,7 @@ function timedGame(
   const clock = new ManualClock();
   const timer = new LevelTimer(TIMER_ID, clock);
   const decorated = new TimedRulesDecorator(rules, timer);
-  const engine = new GameEngine(
-    MATCH_ID,
-    GameId.of('fake-game'),
-    decorated,
-    scoring,
-    new RecordingPublisher(),
-  );
+  const engine = new GameEngine(MATCH_ID, GameId.of('fake-game'), decorated, scoring);
   engine.start(emptyState(size));
   return { clock, timer, decorated, engine, rules };
 }
@@ -237,7 +230,6 @@ describe('TimedRulesDecorator', () => {
       GameId.of('fake-game'),
       plainRules,
       new OnePointScoring(),
-      new RecordingPublisher(),
     );
     plain.start(emptyState(1));
     const timed = timedGame(1);
@@ -325,7 +317,6 @@ describe('GameEngine.timed', () => {
       GameId.of('fake-game'),
       new FakeRules(),
       new OnePointScoring(),
-      new RecordingPublisher(),
     );
 
     expect(engine.timed()).toBeUndefined();

@@ -1,6 +1,6 @@
 import type { BoardSnapshot, BoardState, SnapshotOf } from './board-state';
 import type { Cloneable } from './cloneable';
-import { GameOver, type GameEventPublisher, type PublishFailureHandler } from './game-events';
+import { GameOver, type GameEvent } from './game-events';
 import type { GameId } from './game-id';
 import { PlayingPhase, ResolvingPhase, type GamePhase } from './game-phase';
 import type { MatchId } from './match-id';
@@ -24,6 +24,8 @@ import type { IRedoable, IUndoable } from './undo-capabilities';
 // `history` is optional, because the variant factory decides it (classes.md decision 3).
 // The engine is the Memento originator (decision 34). Each saved turn keeps the photo of the
 // state before the move, and `restore()` gives that photo back to the state.
+// The root only records its events, and it tells nobody (classes.md decision 52).
+// `ApplyMove` takes them with `takeEvents()` after the turn and delivers them (decision 29).
 export class GameEngine<
   TCell,
   TCoord,
@@ -32,13 +34,14 @@ export class GameEngine<
 > {
   private state: TState | undefined;
   private current: GamePhase = PlayingPhase.instance;
+  // The events of the saved turns that no caller has taken yet, in their order.
+  private readonly recorded: GameEvent[] = [];
 
   constructor(
     private readonly matchId: MatchId,
     private readonly gameId: GameId,
     private readonly rules: IGameRules<TMove, TState>,
     private readonly scoring: IScoringPolicy<TState>,
-    private readonly events: GameEventPublisher,
     private readonly history?: MoveHistory<TMove, SnapshotOf<TState>>,
   ) {}
 
@@ -82,9 +85,8 @@ export class GameEngine<
   }
 
   // One turn: receive the move, let the rules validate, apply, resolve and evaluate it
-  // (template method `playTurn()`), score it, and notify when the game ends.
+  // (template method `playTurn()`), score it, and record `GameOver` when the game ends.
   // A rejected move returns `playing`. Call `tryPlay()` to tell it from an accepted move.
-  // A publisher that throws does not undo the turn, and `play()` rethrows its error.
   play(move: TMove): Outcome {
     return this.tryPlay(move).outcome;
   }
@@ -92,19 +94,17 @@ export class GameEngine<
   // The same turn as `play()`. It returns the `Resolution` of the turn, which also says
   // whether the rules accepted the move. So the `ApplyMove` use case can return a failure
   // for a rejected move (issue 100). A rejected move always has the outcome `playing`.
-  // The engine saves the turn before it publishes `GameOver` (classes.md decision 29).
-  // A publisher failure is not a concept of the game, so the resolution does not carry it
-  // (classes.md decision 48). When the publisher throws after the saved turn, the engine
-  // gives the thrown value to `onPublishFailure` and still returns the resolution (issue 132).
-  // With no handler the engine rethrows the thrown value, as `play()` does.
-  // An error that the handler throws leaves `tryPlay()`, and the turn stays saved.
+  // A turn that ends the game records one `GameOver` event when the engine saves the turn
+  // (classes.md decision 29). The engine builds the event inside the turn, so an error there
+  // leaves the turn unsaved. The engine calls no publisher, so no publisher failure reaches
+  // the turn (issue #233).
   // The rollback covers the whole state and the phase. A piece source lives in the state
   // (classes.md decision 31), and a draw replaces it only in the copy of the turn
   // (classes.md decision 51). So a turn that throws after a draw leaves the source
   // at its old position, and a retry draws the same piece.
   // The rules change their copy in place (classes.md decision 7), and a `Resolution` holds
   // no state. So the engine keeps the copy that it gave to the rules as the next state.
-  tryPlay(move: TMove, onPublishFailure?: PublishFailureHandler): Resolution {
+  tryPlay(move: TMove): Resolution {
     const state = this.started();
     this.current.checkAcceptsMove();
     this.current = ResolvingPhase.instance;
@@ -125,19 +125,16 @@ export class GameEngine<
     this.state = turn.next;
     this.current = turn.phase;
     this.remember(move, turn.before);
-    // The turn is committed before the engine publishes. A publisher that throws
-    // does not undo the turn. The handler takes its error, apart from the outcome.
-    if (turn.outcome.endsTheGame()) {
-      try {
-        const { score } = turn.next.snapshot();
-        this.events.publish(new GameOver(this.gameId, this.matchId, turn.outcome, score));
-      } catch (error) {
-        if (onPublishFailure === undefined) throw error;
-        onPublishFailure(error);
-      }
-    }
+    if (turn.ended !== undefined) this.recorded.push(turn.ended);
     // The engine builds the resolution, so the caller gets a real `Resolution` from any rules.
     return Resolution.resolved().evaluated(turn.outcome);
+  }
+
+  // The events that the game recorded since the last call, in their order.
+  // The game forgets them, so a second call never gives an event again.
+  // `ApplyMove` calls it after each turn and delivers the events (classes.md decision 29).
+  takeEvents(): readonly GameEvent[] {
+    return this.recorded.splice(0);
   }
 
   pause(): void {
@@ -163,25 +160,43 @@ export class GameEngine<
   // above the largest safe integer. Both leave the turn unsaved (classes.md decision 41).
   // `before` is the Memento: the photo of the state before the move (classes.md decision 34).
   // It is taken inside the turn, so a photo that throws leaves the turn unsaved.
+  // `ended` is the `GameOver` event of a turn that ends the game, or `undefined`.
   private resolveTurn(
     state: TState,
     move: TMove,
-  ): { next: TState; phase: GamePhase; outcome: Outcome; before: SnapshotOf<TState> } | undefined {
+  ):
+    | {
+        next: TState;
+        phase: GamePhase;
+        outcome: Outcome;
+        before: SnapshotOf<TState>;
+        ended: GameOver | undefined;
+      }
+    | undefined {
     const next = copy(state);
     const resolution = this.rules.playTurn(next, move);
     if (!resolution.accepted) return undefined;
     const before = photoOf(state);
     next.addPoints(this.scoring.score(before, photoOf(next)));
+    const phase = this.current.after(resolution.outcome);
     return {
       next,
-      phase: this.current.after(resolution.outcome),
+      phase,
       outcome: resolution.outcome,
       before,
+      ended: this.gameOverOf(next, resolution.outcome),
     };
   }
 
+  // The event of a turn that ends the game, with the final score of `next`.
+  // It is `undefined` while the game goes on.
+  private gameOverOf(next: TState, outcome: Outcome): GameOver | undefined {
+    if (!outcome.endsTheGame()) return undefined;
+    return new GameOver(this.gameId, this.matchId, outcome, photoOf(next).score);
+  }
+
   // Keeps the undo of a saved turn. A finished game forgets its moves: the game over event
-  // is already public, and an undo cannot take it back. The check reads the new phase.
+  // is already recorded, and an undo cannot take it back. The check reads the new phase.
   // A variant with no history keeps no command.
   private remember(move: TMove, before: SnapshotOf<TState>): void {
     if (this.current.canPlay()) {

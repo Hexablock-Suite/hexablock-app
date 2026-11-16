@@ -16,7 +16,6 @@ import {
   FakeRules,
   FakeState,
   OnePointScoring,
-  RecordingPublisher,
   SourceRules,
   sourceState,
   type FakeMove,
@@ -24,23 +23,24 @@ import {
   type SourceState,
 } from '../../support/engine/fake-game';
 import { STATE_ID } from '../../support/engine/entity-ids';
+import { dataOf, gameOverOf } from '../../support/engine/game-over';
 import { phaseNameOf } from '../../support/engine/phase-name';
 import { square, type SquareAxis, type SquareCoord } from '../../support/engine/square-topology';
 import { MATCH_ID } from '../../support/engine/match-id';
 
 // The turn cycle (statement §3.1): start, receive, validate, apply, resolve, evaluate, notify.
+// The engine records the event of the notify step and tells nobody. `ApplyMove` takes
+// the event and delivers it (issue #233).
 // The cell type, the rules and the scoring exist only in test/ (APP-NFR-13).
 
 function newGame(log: string[] = []) {
-  const publisher = new RecordingPublisher(log);
   const engine = new GameEngine(
     MATCH_ID,
     GameId.of('fake-game'),
     new FakeRules(log),
     new OnePointScoring(log),
-    publisher,
   );
-  return { engine, publisher };
+  return { engine };
 }
 
 // Rules that fail once in `resolve()`, after `apply()` has put the cell on the board.
@@ -152,13 +152,11 @@ describe('GameEngine.play()', () => {
   });
 
   it('should_keep_the_old_board_when_resolve_rejects_the_move_after_apply', () => {
-    const publisher = new RecordingPublisher();
     const engine = new GameEngine(
       MATCH_ID,
       GameId.of('fake-game'),
       new RejectingResolveRules(),
       new OnePointScoring(),
-      publisher,
     );
     engine.start(emptyState());
 
@@ -168,11 +166,11 @@ describe('GameEngine.play()', () => {
     expect(engine.snapshot().board.get(square(0, 0))).toBeUndefined();
     expect(engine.snapshot().score).toEqual(Score.of(0));
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
-    expect(publisher.events).toEqual([]);
+    expect(engine.takeEvents()).toEqual([]);
   });
 
-  it('should_publish_game_over_with_the_final_score_when_the_board_fills', () => {
-    const { engine, publisher } = newGame();
+  it('should_record_game_over_with_the_final_score_when_the_board_fills', () => {
+    const { engine } = newGame();
     engine.start(emptyState());
 
     [place(0, 0), place(1, 0), place(0, 1)].forEach((move) => engine.play(move));
@@ -180,21 +178,36 @@ describe('GameEngine.play()', () => {
 
     expect(outcome).toBe(Outcome.gameOver);
     expect(engine.currentPhase()).toBe(GameOverPhase.instance);
-    expect(publisher.events).toHaveLength(1);
-    const event = publisher.events[0] as GameOver;
-    expect(event).toBeInstanceOf(GameOver);
-    expect(event.gameId.equals(GameId.of('fake-game'))).toBe(true);
-    expect(event.outcome).toBe(Outcome.gameOver);
-    expect(event.finalScore).toEqual(Score.of(4));
+    const events = engine.takeEvents();
+    expect(events).toHaveLength(1);
+    expect(events[0]).toBeInstanceOf(GameOver);
+    expect(dataOf(events[0])).toEqual({
+      gameId: GameId.of('fake-game'),
+      matchId: MATCH_ID,
+      outcome: Outcome.gameOver,
+      finalScore: Score.of(4),
+    });
   });
 
-  it('should_publish_nothing_when_the_game_goes_on', () => {
-    const { engine, publisher } = newGame();
+  it('should_record_nothing_when_the_game_goes_on', () => {
+    const { engine } = newGame();
     engine.start(emptyState());
 
     engine.play(place(0, 0));
 
-    expect(publisher.events).toEqual([]);
+    expect(engine.takeEvents()).toEqual([]);
+  });
+
+  // The root keeps each event until a caller takes it. A taken event leaves the list.
+  it('should_give_each_recorded_event_once_when_the_events_are_taken_twice', () => {
+    const { engine } = newGame();
+    engine.start(emptyState(1));
+    engine.play(place(0, 0));
+
+    const first = engine.takeEvents();
+    const second = engine.takeEvents();
+
+    expect([first.length, second.length]).toEqual([1, 0]);
   });
 
   it('should_throw_when_play_runs_before_start', () => {
@@ -261,7 +274,6 @@ describe('GameEngine.play()', () => {
       GameId.of('fake-game'),
       new FailingOnceRules(),
       new OnePointScoring(),
-      new RecordingPublisher(),
     );
     engine.start(emptyState());
 
@@ -280,7 +292,6 @@ describe('GameEngine.play()', () => {
       GameId.of('fake-game'),
       new FakeRules(),
       new FailingOnceScoring(),
-      new RecordingPublisher(),
     );
     engine.start(emptyState());
 
@@ -340,13 +351,7 @@ class BaseCloneState implements BoardState<FakeCell, SquareCoord> {
 // A game with one played move, whose rules throw in `step` on the next move.
 function armedGame(step: 'apply' | 'evaluate') {
   const rules = new ThrowingStepRules(step);
-  const engine = new GameEngine(
-    MATCH_ID,
-    GameId.of('fake-game'),
-    rules,
-    new OnePointScoring(),
-    new RecordingPublisher(),
-  );
+  const engine = new GameEngine(MATCH_ID, GameId.of('fake-game'), rules, new OnePointScoring());
   engine.start(emptyState());
   engine.play(place(0, 0));
   rules.armed = true;
@@ -390,13 +395,7 @@ describe('GameEngine edge cases', () => {
   // The resolving phase refuses a move, so a reentrant `play()` throws a RangeError.
   it('should_reject_a_reentrant_play_when_the_scoring_calls_play_during_a_turn', () => {
     const scoring = new ReentrantScoring();
-    const engine = new GameEngine(
-      MATCH_ID,
-      GameId.of('fake-game'),
-      new FakeRules(),
-      scoring,
-      new RecordingPublisher(),
-    );
+    const engine = new GameEngine(MATCH_ID, GameId.of('fake-game'), new FakeRules(), scoring);
     scoring.engine = engine;
     engine.start(emptyState());
 
@@ -411,7 +410,7 @@ describe('GameEngine edge cases', () => {
   });
 
   it('should_start_a_new_game_when_start_runs_after_game_over', () => {
-    const { engine, publisher } = newGame();
+    const { engine } = newGame();
     engine.start(emptyState(1));
     engine.play(place(0, 0));
 
@@ -421,7 +420,7 @@ describe('GameEngine edge cases', () => {
     expect(engine.snapshot().board.cells()).toEqual([]);
     expect(engine.snapshot().score).toEqual(Score.of(0));
     expect(engine.play(place(0, 0))).toBe(Outcome.gameOver);
-    expect(publisher.events).toHaveLength(2);
+    expect(engine.takeEvents()).toHaveLength(2);
   });
 });
 
@@ -468,10 +467,16 @@ class MutatingThrowingScoring extends OnePointScoring {
   }
 }
 
-// A publisher that always throws.
-class ThrowingPublisher extends RecordingPublisher {
-  override publish(): void {
-    throw new Error('publish failed');
+// A state whose photo throws once the state has points. On a board of one cell, only the
+// photo that the engine takes for the event at the end of the turn has points.
+class PointsPhotoThrowingState extends FakeState {
+  override clone(): PointsPhotoThrowingState {
+    return new PointsPhotoThrowingState(this.board.clone(), this.score);
+  }
+
+  override snapshot(): FakeSnapshot {
+    if (this.score.isHigherThan(Score.of(0))) throw new Error('photo failed');
+    return super.snapshot();
   }
 }
 
@@ -501,25 +506,17 @@ class RejectingDrawRules extends SourceRules {
 
 // A game whose state holds a fixed list of three pieces.
 function sourceGame(rules: SourceRules) {
-  const engine = new GameEngine(
-    MATCH_ID,
-    GameId.of('fake-game'),
-    rules,
-    { score: () => Score.of(1) },
-    new RecordingPublisher(),
-  );
+  const engine = new GameEngine(MATCH_ID, GameId.of('fake-game'), rules, {
+    score: () => Score.of(1),
+  });
   engine.start(sourceState(new FixedListPieceSource([fakeCell(1), fakeCell(2), fakeCell(3)])));
   return engine;
 }
 
-function gameWith(
-  rules: FakeRules,
-  scoring: OnePointScoring = new OnePointScoring(),
-  publisher: RecordingPublisher = new RecordingPublisher(),
-) {
-  const engine = new GameEngine(MATCH_ID, GameId.of('fake-game'), rules, scoring, publisher);
+function gameWith(rules: FakeRules, scoring: OnePointScoring = new OnePointScoring()) {
+  const engine = new GameEngine(MATCH_ID, GameId.of('fake-game'), rules, scoring);
   engine.start(emptyState());
-  return { engine, publisher };
+  return { engine };
 }
 
 const initial = { cells: [], score: Score.of(0), phase: 'playing' };
@@ -529,35 +526,35 @@ describe('GameEngine review findings', () => {
     // `Resolution.evaluated()` refuses a rejected resolution, so a structural copy stands in
     // for a custom `IGameRules` that returns a rejected resolution with a final outcome.
     const forged = () => ({ accepted: false, outcome: Outcome.victory }) as unknown as Resolution;
-    const { engine, publisher } = gameWith(new FixedResolutionRules(forged));
+    const { engine } = gameWith(new FixedResolutionRules(forged));
 
     const outcome = engine.play(place(0, 0));
 
     expect(outcome).toBe(Outcome.playing);
     expect(summary(engine)).toEqual(initial);
-    expect(publisher.events).toEqual([]);
+    expect(engine.takeEvents()).toEqual([]);
     expect(engine.play(place(0, 0))).toBe(Outcome.playing);
   });
 
   it('should_keep_the_state_when_the_scoring_mutates_before_and_throws', () => {
-    const { engine, publisher } = gameWith(new FakeRules(), new MutatingThrowingScoring());
+    const { engine } = gameWith(new FakeRules(), new MutatingThrowingScoring());
 
     expect(() => engine.play(place(0, 0))).toThrow('score failed');
 
     expect(summary(engine)).toEqual(initial);
-    expect(publisher.events).toEqual([]);
+    expect(engine.takeEvents()).toEqual([]);
   });
 
   it('should_throw_and_keep_the_state_when_the_scoring_gives_a_score_that_is_not_valid', () => {
     for (const points of [Number.NaN, Number.POSITIVE_INFINITY, -1, 0.5]) {
-      const { engine, publisher } = gameWith(new FakeRules(), new FixedScoring(points));
+      const { engine } = gameWith(new FakeRules(), new FixedScoring(points));
 
       expect(() => engine.play(place(0, 0))).toThrow(
         new RangeError(`A score needs a whole number of 0 or more, not ${points}.`),
       );
 
       expect(summary(engine)).toEqual(initial);
-      expect(publisher.events).toEqual([]);
+      expect(engine.takeEvents()).toEqual([]);
     }
   });
 
@@ -571,94 +568,60 @@ describe('GameEngine review findings', () => {
   });
 
   it('should_throw_a_range_error_and_keep_the_state_when_the_rules_return_an_unknown_outcome', () => {
-    const { engine, publisher } = gameWith(new FixedOutcomeRules('draw' as unknown as Outcome));
+    const { engine } = gameWith(new FixedOutcomeRules('draw' as unknown as Outcome));
 
     expect(() => engine.play(place(0, 0))).toThrow(new RangeError('Unknown outcome: draw.'));
 
     expect(summary(engine)).toEqual(initial);
-    expect(publisher.events).toEqual([]);
+    expect(engine.takeEvents()).toEqual([]);
   });
 
-  // The engine commits the turn before it publishes. A throwing publisher cannot undo it.
-  it('should_commit_the_turn_and_rethrow_when_the_publisher_throws', () => {
-    const { engine } = gameWith(
-      new FixedOutcomeRules(Outcome.gameOver),
-      new OnePointScoring(),
-      new ThrowingPublisher(),
-    );
+  // The root saves the turn and records its event in one step. The root tells nobody,
+  // so no publisher runs inside the turn and none can break it (issue #233).
+  it('should_return_the_resolution_and_record_game_over_when_try_play_ends_the_game', () => {
+    const { engine } = gameWith(new FixedOutcomeRules(Outcome.gameOver));
 
-    expect(() => engine.play(place(0, 0))).toThrow('publish failed');
-
-    expect(summary(engine)).toEqual({ ...afterOneMove, phase: 'game-over' });
-  });
-
-  // `tryPlay()` keeps the publisher failure apart from the outcome (issue 132, G117.2).
-  // Since issue 210 it returns the `Resolution` of the turn, a domain value, and the publisher
-  // failure goes to the handler of the caller (classes.md decision 48).
-  it('should_return_the_resolution_and_give_the_publisher_failure_to_the_handler_when_try_play_saves_the_turn', () => {
-    const { engine } = gameWith(
-      new FixedOutcomeRules(Outcome.gameOver),
-      new OnePointScoring(),
-      new ThrowingPublisher(),
-    );
-    const failures: unknown[] = [];
-
-    const turn = engine.tryPlay(place(0, 0), (error) => failures.push(error));
+    const turn = engine.tryPlay(place(0, 0));
 
     expect(turn).toBeInstanceOf(Resolution);
     expect(turn.equals(Resolution.resolved().evaluated(Outcome.gameOver))).toBe(true);
-    expect(failures).toEqual([new Error('publish failed')]);
     expect(summary(engine)).toEqual({ ...afterOneMove, phase: 'game-over' });
+    expect(engine.takeEvents().map(dataOf)).toEqual([
+      {
+        gameId: GameId.of('fake-game'),
+        matchId: MATCH_ID,
+        outcome: Outcome.gameOver,
+        finalScore: Score.of(1),
+      },
+    ]);
   });
 
-  it('should_commit_the_turn_and_rethrow_when_the_publisher_throws_and_try_play_has_no_handler', () => {
-    const { engine } = gameWith(
-      new FixedOutcomeRules(Outcome.gameOver),
+  // The engine builds the event inside the turn (issue #233). So a photo that throws there
+  // leaves the turn unsaved, and the game records no event.
+  it('should_keep_the_state_and_record_nothing_when_the_photo_of_the_event_throws', () => {
+    const engine = new GameEngine(
+      MATCH_ID,
+      GameId.of('fake-game'),
+      new FakeRules(),
       new OnePointScoring(),
-      new ThrowingPublisher(),
     );
+    engine.start(new PointsPhotoThrowingState(emptyState(1).board));
 
-    expect(() => engine.tryPlay(place(0, 0))).toThrow('publish failed');
+    expect(() => engine.play(place(0, 0))).toThrow('photo failed');
 
-    expect(summary(engine)).toEqual({ ...afterOneMove, phase: 'game-over' });
+    expect(engine.currentPhase()).toBe(PlayingPhase.instance);
+    expect(engine.snapshot().board.cells()).toEqual([]);
+    expect(engine.takeEvents()).toEqual([]);
   });
 
-  it('should_commit_the_turn_and_let_the_error_out_when_the_handler_of_try_play_throws', () => {
-    const { engine } = gameWith(
-      new FixedOutcomeRules(Outcome.gameOver),
-      new OnePointScoring(),
-      new ThrowingPublisher(),
-    );
-    const handler = () => {
-      throw new Error('handler failed');
-    };
+  it('should_return_a_rejected_resolution_and_record_nothing_when_the_rules_reject_the_move', () => {
+    const { engine } = gameWith(new RejectingResolveRules());
 
-    expect(() => engine.tryPlay(place(0, 0), handler)).toThrow('handler failed');
-
-    expect(summary(engine)).toEqual({ ...afterOneMove, phase: 'game-over' });
-  });
-
-  it('should_not_call_the_handler_when_the_publisher_works', () => {
-    const { engine, publisher } = gameWith(new FixedOutcomeRules(Outcome.gameOver));
-    const failures: unknown[] = [];
-
-    const turn = engine.tryPlay(place(0, 0), (error) => failures.push(error));
-
-    expect(turn).toBeInstanceOf(Resolution);
-    expect([turn.accepted, turn.outcome]).toEqual([true, Outcome.gameOver]);
-    expect(failures).toEqual([]);
-    expect(publisher.events).toHaveLength(1);
-  });
-
-  it('should_return_a_rejected_resolution_and_call_no_handler_when_the_rules_reject_the_move', () => {
-    const { engine, publisher } = gameWith(new RejectingResolveRules());
-    const failures: unknown[] = [];
-
-    const turn = engine.tryPlay(place(0, 0), (error) => failures.push(error));
+    const turn = engine.tryPlay(place(0, 0));
 
     expect(turn).toBeInstanceOf(Resolution);
     expect(turn.equals(Resolution.rejected())).toBe(true);
-    expect([failures, publisher.events]).toEqual([[], []]);
+    expect(engine.takeEvents()).toEqual([]);
   });
 
   // The rollback covers the board, the score, the phase and the piece source in the state.
@@ -688,19 +651,22 @@ describe('GameEngine review findings', () => {
     expect(engine.snapshot().board.get(square(0, 0))).toEqual(fakeCell(1));
   });
 
-  it('should_publish_game_over_with_the_victory_outcome_when_the_rules_return_victory', () => {
-    const { engine, publisher } = gameWith(new FixedOutcomeRules(Outcome.victory));
+  it('should_record_game_over_with_the_victory_outcome_when_the_rules_return_victory', () => {
+    const { engine } = gameWith(new FixedOutcomeRules(Outcome.victory));
 
     const outcome = engine.play(place(0, 0));
 
     expect(outcome).toBe(Outcome.victory);
     expect(engine.currentPhase()).toBe(VictoryPhase.instance);
-    expect(publisher.events).toHaveLength(1);
-    const event = publisher.events[0] as GameOver;
-    expect(event).toBeInstanceOf(GameOver);
-    expect(event.gameId.equals(GameId.of('fake-game'))).toBe(true);
-    expect(event.outcome).toBe(Outcome.victory);
-    expect(event.finalScore).toEqual(Score.of(1));
+    const events = engine.takeEvents();
+    expect(events).toHaveLength(1);
+    expect(gameOverOf(events[0]).isVictory()).toBe(true);
+    expect(dataOf(events[0])).toEqual({
+      gameId: GameId.of('fake-game'),
+      matchId: MATCH_ID,
+      outcome: Outcome.victory,
+      finalScore: Score.of(1),
+    });
   });
 
   it('should_throw_when_pause_is_called_before_start', () => {
@@ -744,16 +710,9 @@ describe('GameEngine.currentPhase()', () => {
 // The identity of the aggregate root (classes.md decisions 26 and 30). `GameId` names the variant,
 // so two matches of one variant have the same `GameId`, and only the `MatchId` tells them apart.
 function matchOf(id: MatchId, size = 2) {
-  const publisher = new RecordingPublisher();
-  const engine = new GameEngine(
-    id,
-    GameId.of('fake-game'),
-    new FakeRules(),
-    new OnePointScoring(),
-    publisher,
-  );
+  const engine = new GameEngine(id, GameId.of('fake-game'), new FakeRules(), new OnePointScoring());
   engine.start(emptyState(size, id));
-  return { engine, publisher };
+  return { engine };
 }
 
 describe('GameEngine identity', () => {
@@ -815,15 +774,16 @@ describe('GameEngine identity', () => {
     ).toBe(true);
   });
 
-  it('should_publish_game_over_with_the_variant_id_and_the_match_id_when_the_game_ends', () => {
-    const { engine, publisher } = matchOf(MatchId.of('match-a'), 1);
+  it('should_record_game_over_with_the_variant_id_and_the_match_id_when_the_game_ends', () => {
+    const { engine } = matchOf(MatchId.of('match-a'), 1);
 
     engine.play(place(0, 0));
 
-    const event = publisher.events[0] as GameOver;
-    expect(publisher.events).toHaveLength(1);
-    expect(event.gameId.equals(GameId.of('fake-game'))).toBe(true);
-    expect(event.matchId.equals(MatchId.of('match-a'))).toBe(true);
-    expect(event.matchId.equals(MatchId.of('match-b'))).toBe(false);
+    const events = engine.takeEvents();
+    expect(events).toHaveLength(1);
+    const { gameId, matchId } = dataOf(events[0]);
+    expect(gameId.equals(GameId.of('fake-game'))).toBe(true);
+    expect(matchId.equals(MatchId.of('match-a'))).toBe(true);
+    expect(matchId.equals(MatchId.of('match-b'))).toBe(false);
   });
 });

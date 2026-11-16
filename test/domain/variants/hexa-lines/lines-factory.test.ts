@@ -51,7 +51,7 @@ describe('LinesFactory', () => {
     const factory = linesFactory();
 
     const initial = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
-    const { engine, rules, publisher } = startVariant(factory);
+    const { engine, rules } = startVariant(factory);
     const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, engine.snapshot())));
 
     expect(factory.gameId.equals(GameId.of('hexa-lines'))).toBe(true);
@@ -63,7 +63,7 @@ describe('LinesFactory', () => {
     expect(engine.snapshot().tray).toHaveLength(2);
     // One placed cell gives 1 point: the factory picks the Lines scoring.
     expect(engine.snapshot().score).toEqual(Score.of(1));
-    expect(publisher.events).toEqual([]);
+    expect(engine.takeEvents()).toEqual([]);
   });
 
   it('should_draw_the_same_pieces_when_two_lines_factories_share_a_seed', () => {

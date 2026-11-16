@@ -6,7 +6,6 @@ import { Score } from '../../../../src/domain/engine/score';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { BoardShape } from '../../../../src/domain/engine/board-shape';
-import { GameOver } from '../../../../src/domain/engine/game-events';
 import { GameId } from '../../../../src/domain/engine/game-id';
 import { LevelTimer } from '../../../../src/domain/engine/level-timer';
 import { LevelTimerId } from '../../../../src/domain/engine/level-timer-id';
@@ -23,6 +22,7 @@ import { square, squareTopology, type SquareCoord } from '../../../support/engin
 import { startVariant } from '../../../support/engine/variant-game';
 import { A, fitFactory, threeDominoFitFactory } from '../../../support/variants/hexa-fit/fit-game';
 import { repoRoot } from '../../../support/run-tool';
+import { dataOf } from '../../../support/engine/game-over';
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { BOARD_ID, STATE_ID, TIMER_ID } from '../../../support/engine/entity-ids';
 
@@ -33,7 +33,7 @@ describe('FitFactory', () => {
     const factory = fitFactory();
 
     const initial = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
-    const { engine, publisher } = startVariant(factory);
+    const { engine } = startVariant(factory);
     const outcome = engine.play(new PlaceFitPiece(A, Turns.of(0), square(0, 0)));
 
     expect(factory.gameId.equals(GameId.of('hexa-fit'))).toBe(true);
@@ -46,8 +46,13 @@ describe('FitFactory', () => {
     expect(initial.remaining().map((p) => String(p.cell()))).toEqual(['a']);
     expect(outcome).toBe(Outcome.victory);
     expect(engine.snapshot().score).toEqual(Score.of(0));
-    expect(publisher.events).toEqual([
-      new GameOver(factory.gameId, MATCH_ID, Outcome.victory, Score.of(0)),
+    expect(engine.takeEvents().map(dataOf)).toEqual([
+      {
+        gameId: factory.gameId,
+        matchId: MATCH_ID,
+        outcome: Outcome.victory,
+        finalScore: Score.of(0),
+      },
     ]);
   });
 
