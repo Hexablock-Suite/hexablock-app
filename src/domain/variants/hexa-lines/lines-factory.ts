@@ -161,9 +161,9 @@ export class LinesFactory<TCoord> implements IVariantFactory<
   }
 }
 
-// The item that one number of `random` picks. The settings hold one item or more in each list.
+// The item that one draw of `random` picks. The settings hold one item or more in each list.
 function pick<T>(items: readonly T[], random: RandomSource): T {
-  return items[Math.floor(random.next() * items.length)] ?? (items[0] as T);
+  return random.next().pick(items);
 }
 
 // True when two shapes cover the same coordinates.

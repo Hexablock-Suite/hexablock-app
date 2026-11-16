@@ -33,6 +33,7 @@ const fakeRenderer: CellRenderer<string> = {
 function responseWith<TCoord>(cells: [TCoord, string][]): MoveResult<string, TCoord> {
   return {
     cells,
+    freeSpaces: [],
     score: Score.of(0),
     outcome: Outcome.playing,
     canUndo: false,
@@ -76,7 +77,9 @@ async function draw<TCoord>(
   result: MoveResult<string, TCoord>,
   layout: BoardLayout<TCoord>,
 ): Promise<void> {
-  await render(<BoardView cells={result.cells} layout={layout} renderer={fakeRenderer} />);
+  await render(
+    <BoardView cells={result.cells} layout={layout} renderer={fakeRenderer} label="Tablero" />,
+  );
 }
 
 describe('BoardView', () => {
@@ -134,6 +137,13 @@ describe('BoardView', () => {
     expectBox('c', { left: 0, top: 30, width: SIZE, height: SIZE });
     expectBox('d', { left: across, top: 40, width: SIZE, height: SIZE });
     expectFrame('a', across + SIZE, 60);
+  });
+
+  // Issue #170: the screen reader names the board with a text of the catalog.
+  it('should_give_the_frame_the_accessible_name_when_the_board_gets_a_label', async () => {
+    await draw(responseWith<HexCoord>([[hex(0, 0), 'a']]), new HexLayout(SIZE));
+
+    expect(screen.getByLabelText('Tablero')).toBe(boxOf('a')?.parent);
   });
 
   it('should_draw_no_cell_and_an_empty_frame_when_the_response_holds_no_cell', async () => {

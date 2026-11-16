@@ -1,7 +1,7 @@
 import type { GameId } from '../domain/engine/game-id';
 import type { LevelDefinition } from '../domain/engine/level-definition';
 
-// Output port of the levels of a game (classes.md decisions 24 and 56, issue #168, A6).
+// Output port of the levels of a game (classes.md decisions 24 and 58, issue #168, A6).
 // It gives the `LevelDefinition` of each level of one game: the data of one level file.
 // A level is data that the player never changes, so the port only reads.
 // `BundledLevelRepository` in layer 3 implements it over the level files of the app,

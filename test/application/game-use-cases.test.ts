@@ -10,9 +10,12 @@ import { GameEngine } from '../../src/domain/engine/game-engine';
 import type { GameEvent } from '../../src/domain/engine/game-events';
 import { GameFactory } from '../../src/domain/engine/game-factory';
 import { GameId } from '../../src/domain/engine/game-id';
+import { MatchId } from '../../src/domain/engine/match-id';
 import { PlayingPhase, VictoryPhase, type GamePhase } from '../../src/domain/engine/game-phase';
 import { MoveHistory } from '../../src/domain/engine/move-history';
-import type { Piece } from '../../src/domain/engine/piece';
+import { hex } from '../../src/domain/engine/hex-topology';
+import { Piece } from '../../src/domain/engine/piece';
+import { CellNode } from '../../src/domain/engine/shape-node';
 import { FixedListPieceSource, type IPieceSource } from '../../src/domain/engine/piece-source';
 import type { Resolution } from '../../src/domain/engine/resolution';
 import { ElapsedTime } from '../../src/domain/engine/elapsed-time';
@@ -20,6 +23,9 @@ import { Score } from '../../src/domain/engine/score';
 import type { IRedoable } from '../../src/domain/engine/undo-capabilities';
 import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
 import { PlacePiece } from '../../src/domain/variants/hexa-lines/place-piece';
+import { TrayPosition } from '../../src/domain/variants/hexa-lines/tray-position';
+import { MergeTile } from '../../src/domain/variants/hexa-merge/merge-tile';
+import { ClearedStacks } from '../../src/domain/variants/hexa-sort/cleared-stacks';
 import type { ColorStack } from '../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../src/domain/variants/hexa-sort/goal-count';
 import type { PlaceStack } from '../../src/domain/variants/hexa-sort/place-stack';
@@ -49,10 +55,17 @@ import {
   type FakeSnapshot,
 } from '../support/engine/fake-game';
 import { A, fitFactory, fitStateOf } from '../support/variants/hexa-fit/fit-game';
-import { linesFactory } from '../support/variants/hexa-lines/lines-game';
+import { linesFactory, red } from '../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../support/variants/hexa-merge/merge-game';
 import { sortFactory, stack, stackPiece } from '../support/variants/hexa-sort/sort-game';
 import { CountingMatchIds, MATCH_ID } from '../support/engine/match-id';
+import {
+  fitViewData,
+  linesViewData,
+  mergeViewData,
+  sortViewData,
+  viewData,
+} from '../support/variants/view-data';
 import { BOARD_ID, STATE_ID } from '../support/engine/entity-ids';
 
 // `StartGame` and `ApplyMove` run the four variants through one code path (issue 100,
@@ -60,6 +73,9 @@ import { BOARD_ID, STATE_ID } from '../support/engine/entity-ids';
 
 // The id of Hexa Lines, as the composition root gives it to `GameFactory` (issue #234).
 const LINES = GameId.of('hexa-lines');
+
+// The match of the first game that `gameUseCases()` starts: its generator counts from 1.
+const FIRST_MATCH = MatchId.of('match-1');
 
 async function startAndPlayOnce<
   TCell,
@@ -71,7 +87,7 @@ async function startAndPlayOnce<
   const { games, startGame, applyMove } = gameUseCases(factory);
   const started = valueOf(await startGame.execute({}));
   const startState = games.running().snapshot();
-  const startCells = startState.board.occupiedCells();
+  const startCells = startState.boardCopy().occupiedCells();
   const move = firstMoveOf(factory);
   const played = valueOf(await applyMove.execute({ move }));
   const after = games.running().snapshot();
@@ -185,8 +201,8 @@ function runningGameOf<
 >(games: MemoryGameRepository<TCell, TCoord, TMove, TState>) {
   const engine = games.running();
   return [
-    engine.snapshot().board.occupiedCells(),
-    engine.snapshot().score,
+    engine.snapshot().boardCopy().occupiedCells(),
+    engine.snapshot().scoreSoFar(),
     phaseNameOf(engine.currentPhase()),
   ];
 }
@@ -267,24 +283,27 @@ describe('StartGame and ApplyMove', () => {
       const hasUndo = run.gameId === 'hexa-fit' || run.gameId === 'hexa-merge';
       // Only Fit is timed, and this clock does not move.
       const time = run.gameId === 'hexa-fit' ? { elapsedMs: ElapsedTime.ofMs(0) } : {};
-      expect(run.started).toEqual({
+      // A view keeps its fields private, so the test compares the data that it delivers.
+      expect({ ...run.started, payload: viewData(run.started.payload) }).toEqual({
         cells: run.startCells,
+        freeSpaces: run.startState.boardCopy().freeSpaces(),
         score: Score.of(0),
         outcome: Outcome.playing,
         canUndo: false,
         canRedo: false,
         hasUndo,
-        payload: run.startState.view(),
+        payload: viewData(run.startState.view()),
         ...time,
       });
-      expect(run.played).toEqual({
-        cells: run.after.board.occupiedCells(),
-        score: run.after.score,
+      expect({ ...run.played, payload: viewData(run.played.payload) }).toEqual({
+        cells: run.after.boardCopy().occupiedCells(),
+        freeSpaces: run.after.boardCopy().freeSpaces(),
+        score: run.after.scoreSoFar(),
         outcome: run.played.outcome,
         canUndo: run.gameId === 'hexa-merge',
         canRedo: false,
         hasUndo,
-        payload: run.after.view(),
+        payload: viewData(run.after.view()),
         ...time,
       });
     }
@@ -436,7 +455,9 @@ describe('StartGame and ApplyMove', () => {
       new RecordingPublisher(),
     );
 
-    const error = errorOf(await applyMove.execute({ move: new PlacePiece(0, square(0, 0)) }));
+    const error = errorOf(
+      await applyMove.execute({ move: new PlacePiece(TrayPosition.of(0), square(0, 0)) }),
+    );
 
     expect([error.code, error.message, error.retryable]).toEqual([
       'move-failed',
@@ -465,14 +486,16 @@ describe('StartGame and ApplyMove', () => {
     valueOf(await startGame.execute({}));
     const before = games.running().snapshot();
 
-    const error = errorOf(await applyMove.execute({ move: new PlacePiece(0, square(9, 9)) }));
+    const error = errorOf(
+      await applyMove.execute({ move: new PlacePiece(TrayPosition.of(0), square(9, 9)) }),
+    );
 
     expect([error.code, error.retryable]).toEqual(['move-rejected', false]);
     const after = games.running().snapshot();
-    expect([after.board.occupiedCells(), after.score, after.tray]).toEqual([
-      before.board.occupiedCells(),
-      before.score,
-      before.tray,
+    expect([after.boardCopy().occupiedCells(), after.scoreSoFar(), after.trayPieces()]).toEqual([
+      before.boardCopy().occupiedCells(),
+      before.scoreSoFar(),
+      before.trayPieces(),
     ]);
     expect(games.running().currentPhase()).toBe(PlayingPhase.instance);
   });
@@ -480,7 +503,9 @@ describe('StartGame and ApplyMove', () => {
   it('should_return_a_no_running_game_failure_when_apply_move_runs_before_start_game', async () => {
     const { applyMove } = gameUseCases(linesFactory());
 
-    const error = errorOf(await applyMove.execute({ move: new PlacePiece(0, square(0, 0)) }));
+    const error = errorOf(
+      await applyMove.execute({ move: new PlacePiece(TrayPosition.of(0), square(0, 0)) }),
+    );
 
     expect([error.code, error.retryable]).toEqual(['no-running-game', false]);
   });
@@ -510,17 +535,18 @@ describe('StartGame and ApplyMove', () => {
     const played = valueOf(await applyMove.execute({ move }));
 
     const saved = games.running().snapshot();
-    expect(played).toEqual({
-      cells: saved.board.occupiedCells(),
-      score: saved.score,
+    expect({ ...played, payload: viewData(played.payload) }).toEqual({
+      cells: saved.boardCopy().occupiedCells(),
+      freeSpaces: saved.boardCopy().freeSpaces(),
+      score: saved.scoreSoFar(),
       outcome: Outcome.victory,
       canUndo: false,
       canRedo: false,
       hasUndo: true,
-      payload: saved.view(),
+      payload: viewData(saved.view()),
       elapsedMs: ElapsedTime.ofMs(0),
     });
-    expect(saved.board.occupiedCells()).not.toEqual([]);
+    expect(saved.boardCopy().occupiedCells()).not.toEqual([]);
     expect(games.running().currentPhase()).toBe(VictoryPhase.instance);
     expect(logger.entries).toHaveLength(1);
     const [entry] = logger.entries;
@@ -548,7 +574,7 @@ describe('StartGame and ApplyMove', () => {
     const played = valueOf(await applyMove.execute({ move }));
 
     expect(played.outcome).toBe(Outcome.victory);
-    expect(played.cells).toEqual(games.running().snapshot().board.occupiedCells());
+    expect(played.cells).toEqual(games.running().snapshot().boardCopy().occupiedCells());
     expect(games.running().currentPhase()).toBe(VictoryPhase.instance);
   });
 
@@ -588,8 +614,8 @@ describe('StartGame and ApplyMove', () => {
       'The rules broke.',
       false,
     ]);
-    expect(engine.snapshot().board.occupiedCells()).toEqual([]);
-    expect([engine.snapshot().score, phaseNameOf(engine.currentPhase())]).toEqual([
+    expect(engine.snapshot().boardCopy().occupiedCells()).toEqual([]);
+    expect([engine.snapshot().scoreSoFar(), phaseNameOf(engine.currentPhase())]).toEqual([
       Score.of(0),
       'playing',
     ]);
@@ -599,22 +625,71 @@ describe('StartGame and ApplyMove', () => {
   it('should_leave_the_engine_unchanged_when_a_caller_changes_the_cells_of_a_move_result', async () => {
     const { games, startGame } = gameUseCases(mergeFactory());
     const started = valueOf(await startGame.execute({}));
-    const before = games.running().snapshot().board.occupiedCells();
+    const before = games.running().snapshot().boardCopy().occupiedCells();
 
     started.cells[0][0] = started.cells[1][0];
     started.cells.pop();
     started.cells.push(...before);
 
-    expect(games.running().snapshot().board.occupiedCells()).toEqual(before);
+    expect(games.running().snapshot().boardCopy().occupiedCells()).toEqual(before);
     expect(Object.keys(started).sort()).toEqual([
       'canRedo',
       'canUndo',
       'cells',
+      'freeSpaces',
       'hasUndo',
       'outcome',
       'payload',
       'score',
     ]);
+  });
+});
+
+// Issue #170: a game screen draws every space of the board. So the response carries the free
+// spaces of the saved board next to its occupied cells, and the two lists name each space once.
+async function freeSpacesRun<
+  TCell,
+  TCoord,
+  TMove,
+  TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
+  TPiece,
+>(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>) {
+  const run = await startAndPlayOnce(factory);
+  const named = [...run.played.freeSpaces, ...run.played.cells.map(([at]) => at)];
+  return {
+    ...run,
+    named: named.length,
+    distinct: new Set(named.map((at) => run.after.boardCopy().key(at))).size,
+    spaces: run.after.boardCopy().coordinates().length,
+  };
+}
+
+describe('the free spaces of MoveResult', () => {
+  it('should_carry_the_free_spaces_of_the_saved_board_when_each_variant_starts_and_plays', async () => {
+    const runs = [
+      await freeSpacesRun(linesFactory()),
+      await freeSpacesRun(fitFactory()),
+      await freeSpacesRun(sortFactory()),
+      await freeSpacesRun(mergeFactory()),
+    ];
+
+    for (const run of runs) {
+      expect(run.started.freeSpaces).toEqual(run.startState.boardCopy().freeSpaces());
+      expect(run.played.freeSpaces).toEqual(run.after.boardCopy().freeSpaces());
+      expect([run.named, run.distinct]).toEqual([run.spaces, run.spaces]);
+    }
+    // The Merge board of the test has 7 spaces and starts with two tiles, so 5 spaces are free.
+    expect(runs[3].started.freeSpaces).toHaveLength(5);
+  });
+
+  it('should_leave_the_engine_unchanged_when_a_caller_changes_the_free_spaces_of_a_move_result', async () => {
+    const { games, startGame } = gameUseCases(mergeFactory());
+    const started = valueOf(await startGame.execute({}));
+    const before = games.running().snapshot().boardCopy().freeSpaces();
+
+    started.freeSpaces.splice(0, 3);
+
+    expect(games.running().snapshot().boardCopy().freeSpaces()).toEqual(before);
   });
 });
 
@@ -635,8 +710,9 @@ class RedoingHistory extends MoveHistory<FakeMove, FakeSnapshot> implements IRed
 
 // Tries to change each list and each field of a payload, in depth.
 // A frozen part refuses the write: a list method throws, and a field write does nothing
-// because jest-expo compiles in sloppy mode. A class instance is a value object that never
-// changes (classes.md decisions 6 and 29), so this function does not go inside it.
+// because jest-expo compiles in sloppy mode. A class instance is a value object or a view
+// that never changes (classes.md decisions 6 and 29, issue #245), so this function does not
+// go inside it.
 function tryToChange(payload: unknown): void {
   if (Array.isArray(payload)) {
     payload.forEach(tryToChange);
@@ -670,7 +746,7 @@ async function changedPayloadRun<
 >(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>) {
   const { games, startGame } = gameUseCases(factory);
   const started = valueOf(await startGame.execute({}));
-  const read = () => [runningGameOf(games), games.running().snapshot().view()];
+  const read = () => [runningGameOf(games), viewData(games.running().snapshot().view())];
   const before = read();
   tryToChange(started.payload);
   return { before, after: read() };
@@ -692,33 +768,131 @@ describe('the variant data of MoveResult', () => {
   });
 
   it('should_give_each_payload_field_the_value_of_the_state_when_each_variant_starts_and_plays', async () => {
-    // Each field is read by name, so `pnpm typecheck` also proves that the state types the payload.
+    // Each view goes to the helper of its variant, so `pnpm typecheck` also proves that
+    // the state types the payload. A view delivers its data to a receiver (issue #245).
     const lines = await startAndPlayOnce(linesFactory());
-    expect(lines.started.payload.tray).toEqual(lines.startState.tray);
-    expect(lines.played.payload.tray).toEqual(lines.after.tray);
+    expect(linesViewData(lines.started.payload).tray).toEqual(lines.startState.trayPieces());
+    expect(linesViewData(lines.played.payload).tray).toEqual(lines.after.trayPieces());
 
     const fit = await startAndPlayOnce(fitFactory());
-    // The photo has no business query, so a state built again from it answers them.
-    const fitStart = fitStateOf(fit.startState, fitFactory().createPieceSource());
-    const fitAfter = fitStateOf(fit.after, fitFactory().createPieceSource());
-    expect(fit.started.payload.remaining).toEqual(fitStart.remaining());
-    expect(fit.started.payload.placed).toEqual(fitStart.placed());
-    expect(fit.played.payload.remaining).toEqual(fitAfter.remaining());
-    expect(fit.played.payload.placed).toEqual(fitAfter.placed());
+    // The photo gives no tray, so a state built again from it answers the queries.
+    const fitStart = fitStateOf(fit.startState, fitFactory().createPieceSource(), FIRST_MATCH);
+    const fitAfter = fitStateOf(fit.after, fitFactory().createPieceSource(), FIRST_MATCH);
+    const fitStarted = fitViewData(fit.started.payload);
+    const fitPlayed = fitViewData(fit.played.payload);
+    expect(fitStarted.remaining).toEqual(fitStart.remaining());
+    expect(fitStarted.placed).toEqual(fitStart.placed());
+    expect(fitPlayed.remaining).toEqual(fitAfter.remaining());
+    expect(fitPlayed.placed).toEqual(fitAfter.placed());
     expect(fitAfter.placed()).toEqual([A]);
 
     const sort = await startAndPlayOnce(sortFactory());
-    expect(sort.started.payload.offered).toEqual(sort.startState.offered);
-    expect(sort.started.payload.goalsDone).toEqual(sort.startState.goalsDone);
-    expect(sort.started.payload.goalsNeeded).toEqual(sort.startState.goalsNeeded);
-    expect(sort.played.payload.offered).toEqual(sort.after.offered);
-    expect(sort.played.payload.goalsDone).toEqual(sort.after.goalsDone);
-    expect(sort.played.payload.goalsNeeded).toEqual(sort.after.goalsNeeded);
-    expect(sort.after.offered).not.toEqual(sort.startState.offered);
+    const sortStarted = sortViewData(sort.started.payload);
+    const sortPlayed = sortViewData(sort.played.payload);
+    expect(sortStarted.offered).toEqual(sort.startState.offeredStack());
+    expect(sortStarted.goalsDone).toEqual(sort.startState.goalsReached());
+    expect(sortStarted.goalsNeeded).toEqual(sort.startState.goal());
+    expect(sortPlayed.offered).toEqual(sort.after.offeredStack());
+    expect(sortPlayed.goalsDone).toEqual(sort.after.goalsReached());
+    expect(sortPlayed.goalsNeeded).toEqual(sort.after.goal());
+    expect(sort.after.offeredStack()).not.toEqual(sort.startState.offeredStack());
 
     const merge = await startAndPlayOnce(mergeFactory());
-    expect(merge.started.payload.targetReached).toBe(merge.startState.targetReached);
-    expect(merge.played.payload.targetReached).toBe(merge.after.targetReached);
+    expect(mergeViewData(merge.started.payload).targetReached).toBe(
+      merge.startState.hasReachedTarget(),
+    );
+    expect(mergeViewData(merge.played.payload).targetReached).toBe(merge.after.hasReachedTarget());
+  });
+
+  // Done when of issue #245: `MoveResult` keeps its fields and their values. The photo and
+  // the view close their fields, and only the inside of `moveResultOf()` changes.
+  // The expected answers are the answers of the code before #245, written out as values.
+  // `freeSpaces` joins them since #170: the free spaces of the board, in the order of its shape.
+  // A view keeps its fields private, so the test compares the data that the view delivers.
+  it('should_keep_every_field_and_value_of_the_move_result_when_apply_move_plays_the_first_move_of_each_variant', async () => {
+    const fields = [
+      'canRedo',
+      'canUndo',
+      'cells',
+      'freeSpaces',
+      'hasUndo',
+      'outcome',
+      'payload',
+      'score',
+    ];
+    const lines = (await startAndPlayOnce(linesFactory())).played;
+    const fit = (await startAndPlayOnce(fitFactory())).played;
+    const sort = (await startAndPlayOnce(sortFactory())).played;
+    const merge = (await startAndPlayOnce(mergeFactory())).played;
+    const single = new Piece(new CellNode(square(0, 0)), red);
+
+    expect([lines, fit, sort, merge].map((result) => Object.keys(result).sort())).toEqual([
+      fields,
+      [...fields, 'elapsedMs'].sort(),
+      fields,
+      fields,
+    ]);
+    expect({ ...lines, payload: linesViewData(lines.payload) }).toEqual({
+      cells: [[square(0, 0), red]],
+      freeSpaces: [
+        square(1, 0),
+        square(2, 0),
+        square(0, 1),
+        square(1, 1),
+        square(2, 1),
+        square(0, 2),
+        square(1, 2),
+        square(2, 2),
+      ],
+      score: Score.of(1),
+      outcome: Outcome.playing,
+      canUndo: false,
+      canRedo: false,
+      hasUndo: false,
+      payload: { tray: [single, single] },
+    });
+    expect({ ...fit, payload: fitViewData(fit.payload) }).toEqual({
+      cells: [
+        [square(0, 0), A],
+        [square(1, 0), A],
+      ],
+      freeSpaces: [],
+      score: Score.of(0),
+      outcome: Outcome.victory,
+      canUndo: false,
+      canRedo: false,
+      hasUndo: true,
+      payload: { remaining: [], placed: [A] },
+      elapsedMs: ElapsedTime.ofMs(0),
+    });
+    expect({ ...sort, payload: sortViewData(sort.payload) }).toEqual({
+      cells: [[square(0, 0), stack('red')]],
+      freeSpaces: [square(1, 0), square(0, 1), square(1, 1)],
+      score: Score.of(0),
+      outcome: Outcome.playing,
+      canUndo: false,
+      canRedo: false,
+      hasUndo: false,
+      payload: {
+        offered: stackPiece(stack('blue')),
+        goalsDone: ClearedStacks.of(0),
+        goalsNeeded: GoalCount.of(5),
+      },
+    });
+    expect({ ...merge, payload: mergeViewData(merge.payload) }).toEqual({
+      cells: [
+        [hex(1, 0), MergeTile.of(2)],
+        [hex(0, 1), MergeTile.of(4)],
+        [hex(1, -1), MergeTile.of(2)],
+      ],
+      freeSpaces: [hex(-1, 0), hex(-1, 1), hex(0, -1), hex(0, 0)],
+      score: Score.of(0),
+      outcome: Outcome.playing,
+      canUndo: true,
+      canRedo: false,
+      hasUndo: true,
+      payload: { targetReached: false },
+    });
   });
 
   it('should_keep_the_running_game_when_a_caller_changes_the_payload_of_a_move_result', async () => {

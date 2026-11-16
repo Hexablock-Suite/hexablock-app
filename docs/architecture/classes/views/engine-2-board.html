@@ -160,7 +160,7 @@
           x="56"
           y="64"
           width="408"
-          height="444"
+          height="460"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -262,7 +262,7 @@
         <!-- Board keeps the BoardShape it receives from BoardBuilder as shape: use, because no GoF pattern needs a diamond here -->
         <line
           x1="200"
-          y1="508"
+          y1="524"
           x2="200"
           y2="572"
           stroke-width="1"
@@ -468,7 +468,7 @@
           x="72"
           y="92"
           width="376"
-          height="416"
+          height="432"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -522,48 +522,51 @@
           + occupiedCells(): [TCoord, TCell][]
         </text>
         <text x="88" y="276" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + coordinates(): TCoord[]
+          + freeSpaces(): TCoord[]
         </text>
         <text x="88" y="292" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + isFull(): boolean
+          + coordinates(): TCoord[]
         </text>
         <text x="88" y="308" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + contains(c: TCoord): boolean
+          + isFull(): boolean
         </text>
         <text x="88" y="324" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + key(c: TCoord): CoordKey
+          + contains(c: TCoord): boolean
         </text>
         <text x="88" y="340" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + axes(): TAxis[]
+          + key(c: TCoord): CoordKey
         </text>
         <text x="88" y="356" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + fullTurn(): Turns
+          + axes(): TAxis[]
         </text>
         <text x="88" y="372" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + fullTurn(): Turns
+        </text>
+        <text x="88" y="388" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + turned(piece: Piece&lt;TCell, TCoord&gt;, turns: Turns):
         </text>
-        <text x="104" y="388" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="104" y="404" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Piece&lt;TCell, TCoord&gt;
         </text>
-        <text x="88" y="404" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="420" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + moved(piece: Piece&lt;TCell, TCoord&gt;, offset: TCoord):
         </text>
-        <text x="104" y="420" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="104" y="436" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Piece&lt;TCell, TCoord&gt;
         </text>
-        <text x="88" y="436" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="452" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + line(axis: TAxis, through: TCoord): Iterable&lt;TCoord&gt;
         </text>
-        <text x="88" y="452" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="468" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + ring(center: TCoord, radius: Radius): Iterable&lt;TCoord&gt;
         </text>
-        <text x="88" y="468" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="484" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + neighborhood(c: TCoord): Iterable&lt;TCoord&gt;
         </text>
-        <text x="88" y="484" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="500" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + clone(): Board&lt;TCell, TCoord, TAxis&gt;
         </text>
-        <text x="88" y="500" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="516" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: Board&lt;TCell, TCoord, TAxis&gt;): boolean
         </text>
 
@@ -858,7 +861,7 @@
           + cells(): TCoord[]
         </text>
         <text x="272" y="944" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + area(): number
+          + area(): Area
         </text>
         <text x="272" y="960" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + rotated(turns: Turns, topology:

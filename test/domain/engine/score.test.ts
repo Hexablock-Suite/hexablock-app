@@ -111,39 +111,17 @@ describe('Score', () => {
     expect(Score.of(0).isHigherThan(Score.of(-0))).toBe(false);
   });
 
-  it('should_return_the_product_as_a_new_score_when_a_score_is_multiplied_by_a_factor', () => {
-    const bonus = Score.of(20);
+  // Issue #232: a score has no product with a number. A count of the game gives its own points.
+  // A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails
+  // when the line compiles, because then the directive is unused.
+  it('should_reject_at_compile_time_when_a_caller_multiplies_a_score_by_a_number', () => {
+    const products = [
+      // @ts-expect-error `Score` has no `times()` (issue #232).
+      () => Score.of(20).times(3),
+    ];
 
-    const product = bonus.times(3);
-
-    expect(product).toBeInstanceOf(Score);
-    expect(product.equals(Score.of(60))).toBe(true);
-    expect(bonus.equals(Score.of(20))).toBe(true);
-    expect(bonus.times(1).equals(bonus)).toBe(true);
-    expect(bonus.times(0).equals(Score.of(0))).toBe(true);
-    expect(deliveries(Score.of(0).times(-0)).map((held) => Object.is(held, 0))).toEqual([true]);
-  });
-
-  it('should_throw_a_range_error_when_the_factor_is_not_a_safe_integer_of_zero_or_more', () => {
-    const bonus = Score.of(20);
-
-    for (const factor of [-1, 0.5, Number.NaN, Number.POSITIVE_INFINITY, 2 ** 53]) {
-      expect(() => bonus.times(factor)).toThrow(
-        new RangeError(`A score factor needs a whole number of 0 or more, not ${factor}.`),
-      );
-    }
-    expect(bonus.equals(Score.of(20))).toBe(true);
-  });
-
-  it('should_throw_a_range_error_when_the_product_passes_the_largest_safe_integer', () => {
-    const half = Score.of((Number.MAX_SAFE_INTEGER + 1) / 2);
-
-    expect(() => half.times(2)).toThrow(
-      new RangeError('The product of a score cannot pass the largest safe integer.'),
-    );
-    expect(
-      Score.of(Number.MAX_SAFE_INTEGER).times(1).equals(Score.of(Number.MAX_SAFE_INTEGER)),
-    ).toBe(true);
+    expect(products).toHaveLength(1);
+    expect('times' in Score.of(20)).toBe(false);
   });
 
   // The value leaves the object only through a receiver (issue #228).

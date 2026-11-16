@@ -7,11 +7,15 @@ import {
 import type { RandomSource } from '../../../src/domain/engine/random-source';
 import { Mulberry32Random } from '../../../src/domain/engine/mulberry32-random';
 import { Seed } from '../../../src/domain/engine/seed';
+import { delivered } from '../../support/engine/value-receiver';
 
-// A draw function that turns one random number into a piece name.
+// A draw function that turns one random draw into a piece name.
 const colors = ['red', 'green', 'blue', 'yellow'];
-const drawColor = (random: RandomSource): string =>
-  colors[Math.floor(random.next() * colors.length)] ?? 'red';
+const drawColor = (random: RandomSource): string => random.next().pick(colors);
+
+// The numbers of the next `count` draws of `random`.
+const numbersOf = (random: RandomSource, count: number): number[] =>
+  Array.from({ length: count }, () => delivered(random.next()));
 
 // The first `count` pieces of a source. The read is pure, so the source stays where it is.
 function first<T>(source: IPieceSource<T>, count: number): T[] {
@@ -208,7 +212,7 @@ describe('SeededPieceSource', () => {
 describe('Mulberry32Random', () => {
   it('should_give_numbers_from_zero_up_to_one_when_next_is_read', () => {
     const random = Mulberry32Random.from(Seed.of(3));
-    const numbers = Array.from({ length: 500 }, () => random.next());
+    const numbers = numbersOf(random, 500);
 
     expect(numbers.every((n) => n >= 0 && n < 1)).toBe(true);
   });
@@ -223,19 +227,17 @@ describe('cloning a random source', () => {
 
     const randomClone = random.clone();
 
-    expect(Array.from({ length: 10 }, () => randomClone.next())).toEqual(
-      Array.from({ length: 10 }, () => random.next()),
-    );
+    expect(numbersOf(randomClone, 10)).toEqual(numbersOf(random, 10));
   });
 
   it('should_keep_the_original_unchanged_when_a_clone_draws', () => {
     const random = Mulberry32Random.from(Seed.of(7));
     const fresh = Mulberry32Random.from(Seed.of(7));
-    const expected = Array.from({ length: 5 }, () => fresh.next());
+    const expected = numbersOf(fresh, 5);
 
     const randomClone = random.clone();
     for (let i = 0; i < 5; i += 1) randomClone.next();
 
-    expect(Array.from({ length: 5 }, () => random.next())).toEqual(expected);
+    expect(numbersOf(random, 5)).toEqual(expected);
   });
 });

@@ -30,7 +30,7 @@ function linesProgress(score: number): GameProgress {
   return progress;
 }
 
-// The contract of the `ProgressRepository` port (classes.md decisions 54 and 55, issue #164).
+// The contract of the `ProgressRepository` port (classes.md decisions 56 and 57, issue #164).
 // Every adapter of the port runs the same suite, so they behave the same.
 // `make()` gives a new, empty repository for each test.
 // The progress keeps its fields private, so the suite compares the delivered value objects

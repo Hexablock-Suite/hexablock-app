@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Area } from '../../../src/domain/engine/area';
 import { Board } from '../../../src/domain/engine/board';
 import { Piece } from '../../../src/domain/engine/piece';
 import { RegionSize } from '../../../src/domain/engine/region-size';
@@ -65,7 +66,7 @@ describe('Piece translation on the triangle topology double', () => {
   it('should_count_two_cells_when_the_area_of_the_rhombus_is_read', () => {
     const shape = new ShapeGroup([new CellNode(triangle(0, 0)), new CellNode(triangle(1, 0))]);
 
-    expect(shape.area()).toBe(2);
+    expect(shape.area().equals(Area.of(2))).toBe(true);
     expect(rhombus().coveredCoordinates()).toHaveLength(2);
   });
 
@@ -141,7 +142,7 @@ function nested(): ShapeGroup<TriangleCoord> {
 describe('Nested shape groups and negative moves on the triangle topology double', () => {
   it('should_list_the_cells_of_every_level_when_a_group_holds_a_group', () => {
     expect(nested().cells()).toEqual([triangle(0, 0), triangle(1, 0), triangle(2, 0)]);
-    expect(nested().area()).toBe(3);
+    expect(nested().area().equals(Area.of(3))).toBe(true);
   });
 
   it('should_move_every_level_through_the_topology_when_a_group_of_groups_is_translated', () => {
@@ -152,7 +153,7 @@ describe('Nested shape groups and negative moves on the triangle topology double
         .cells()
         .map((c) => triangleTopology.translate(c, oddOffset)),
     );
-    expect(moved.area()).toBe(3);
+    expect(moved.area().equals(Area.of(3))).toBe(true);
   });
 
   it('should_turn_every_level_through_the_topology_when_a_group_of_groups_is_rotated', () => {
@@ -163,7 +164,7 @@ describe('Nested shape groups and negative moves on the triangle topology double
         .cells()
         .map((c) => triangleTopology.rotate(c, Turns.of(1))),
     );
-    expect(turned.area()).toBe(3);
+    expect(turned.area().equals(Area.of(3))).toBe(true);
   });
 
   it('should_keep_every_cell_orientation_when_the_offset_is_negative', () => {

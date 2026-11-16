@@ -77,9 +77,9 @@
           can be undone. When one answer is false, UndoMove returns a failed Result. Otherwise
           UndoMove calls undo() on GameEngine, the root, which hands the undo to MoveHistory.
           MoveHistory undoes the last MoveCommand, which gives its photo of the state back to
-          GameEngine through restore(). UndoMove reads the photo, its occupied cells and the queries
-          of the root, and returns a Result with a MoveResult. GamePresenter maps it as in flow 1
-          and GameScreen renders the board.
+          GameEngine through restore(). UndoMove reads the photo, its occupied cells, its free
+          spaces and the queries of the root, and returns a Result with a MoveResult. GamePresenter
+          maps it as in flow 1 and GameScreen renders the board.
         </desc>
         <defs>
           <marker
@@ -1259,7 +1259,7 @@
           stroke-width="1"
           marker-end="url(#sequndo-call)"
         />
-        <rect x="731.8" y="690" width="156.4" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="679.92" y="690" width="260.16" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="810"
           y="700"
@@ -1268,7 +1268,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          occupiedCells() · photo.board
+          occupiedCells(), freeSpaces() · photo.boardCopy()
         </text>
         <!-- Reply: board to undo -->
         <line
@@ -1281,7 +1281,7 @@
           stroke-dasharray="4,3"
           marker-end="url(#sequndo-reply)"
         />
-        <rect x="762.4" y="720" width="95.2" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="736.9" y="720" width="146.2" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="810"
           y="730"
@@ -1290,7 +1290,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          [TCoord, TCell][]
+          [TCoord, TCell][], TCoord[]
         </text>
         <!-- Message: undo to game -->
         <line

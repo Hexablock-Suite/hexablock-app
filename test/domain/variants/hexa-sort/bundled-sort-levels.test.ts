@@ -57,10 +57,10 @@ function built(file: LevelFile): SortLevel {
 // No two of the three cells are neighbors, so no run moves and no stack clears.
 function offeredInGame(factory: SortFactory<HexCoord>): string[][] {
   const { engine } = startVariant(factory);
-  const offered = [names(engine.snapshot().offered?.occupant())];
+  const offered = [names(engine.snapshot().offeredStack()?.occupant())];
   for (const at of [hex(0, 0), hex(2, 0), hex(-2, 0)]) {
     engine.play(PlaceStack.on(at));
-    offered.push(names(engine.snapshot().offered?.occupant()));
+    offered.push(names(engine.snapshot().offeredStack()?.occupant()));
   }
   return offered;
 }
@@ -167,17 +167,17 @@ describe('bundled Sort levels', () => {
 
       const photo = engine.snapshot();
 
-      const offered = names(photo.offered?.occupant());
+      const offered = names(photo.offeredStack()?.occupant());
       const [tile] = offered;
       const firstStack =
         'stacks' in source
           ? offered.join() === source.stacks[0]?.join()
           : offered.length === 1 && tile !== undefined && source.colors.includes(tile);
-      expect([name, photo.board.coordinates().length]).toEqual([
+      expect([name, photo.boardCopy().coordinates().length]).toEqual([
         name,
         3 * radius * (radius + 1) + 1,
       ]);
-      expect([name, photo.goalsNeeded.equals(GoalCount.of(goals))]).toEqual([name, true]);
+      expect([name, photo.goal().equals(GoalCount.of(goals))]).toEqual([name, true]);
       expect([name, firstStack]).toEqual([name, true]);
     }
   });

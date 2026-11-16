@@ -64,7 +64,7 @@
       <h1>The turn: Template Method over Strategy</h1>
 
       <svg
-        viewBox="0 0 1040 1148"
+        viewBox="0 0 1040 1180"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="engine-turn-title engine-turn-desc"
@@ -83,11 +83,13 @@
           of its game, its fields are private, and it changes in place only through its business
           methods. Its snapshot() creates a BoardSnapshot, the immutable photo with the Memento role
           and no tactical stereotype: GameEngine.snapshot() returns it, IScoringPolicy reads two of
-          them, and MoveHistory keeps them for the undo. Resolution is a value object: it holds no
-          state, its two fields are private, a reader asks wasAccepted(), endsTheGame(),
-          phaseAfter() and leadsTo(), and equals() compares accepted and outcome. Score is the value
-          object of the score and of the points of a turn: IScoringPolicy returns one, BoardState
-          adds it, and BoardSnapshot carries the score.
+          them, and MoveHistory keeps them for the undo. BoardSnapshot is abstract and its fields
+          are private: a reader asks isPhotoOf(), belongsTo(), boardCopy() and scoreSoFar(), and
+          each variant photo implements view(). Resolution is a value object: it holds no state, its
+          two fields are private, a reader asks wasAccepted(), endsTheGame(), phaseAfter() and
+          leadsTo(), and equals() compares accepted and outcome. Score is the value object of the
+          score and of the points of a turn: IScoringPolicy returns one, BoardState adds it, and
+          BoardSnapshot gives the score with scoreSoFar().
         </desc>
         <defs>
           <marker
@@ -148,7 +150,7 @@
           x="24"
           y="24"
           width="992"
-          height="912"
+          height="944"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -862,7 +864,7 @@
           - done: MoveCommand[]
         </text>
         <text x="776" y="484" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - limit: number [0..1]
+          - limit: UndoLimit [0..1]
         </text>
         <text x="776" y="508" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + record(command:
@@ -1025,12 +1027,12 @@
           + equals(other: Resolution): boolean
         </text>
 
-        <!-- Class: BoardSnapshot (interface, the photo: Memento role, no tactical stereotype) -->
+        <!-- Class: BoardSnapshot (abstract class, the photo: Memento role, no tactical stereotype; private fields, queries with business names, #245) -->
         <rect
           x="52"
           y="748"
           width="316"
-          height="132"
+          height="196"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1047,7 +1049,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Memento»
+          «abstract» «Memento»
         </text>
         <text
           x="210"
@@ -1055,30 +1057,50 @@
           fill="#17212a"
           font-size="12"
           font-weight="600"
+          font-style="italic"
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
           BoardSnapshot
         </text>
         <text x="68" y="802" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + stateId: GameStateId
+          - stateId: GameStateId
         </text>
         <text x="68" y="818" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + matchId: MatchId
+          - matchId: MatchId
         </text>
         <text x="68" y="834" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + board: ReadonlyBoard&lt;TCell, TCoord&gt;
+          - board: ReadonlyBoard&lt;TCell, TCoord, TAxis&gt;
         </text>
         <text x="68" y="850" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + score: Score
+          - score: Score
         </text>
         <text x="68" y="872" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + isPhotoOf(state: GameStateId): boolean
+        </text>
+        <text x="68" y="888" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + belongsTo(match: MatchId): boolean
+        </text>
+        <text x="68" y="904" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + boardCopy(): ReadonlyBoard&lt;TCell, TCoord, TAxis&gt;
+        </text>
+        <text x="68" y="920" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + scoreSoFar(): Score
+        </text>
+        <text
+          x="68"
+          y="936"
+          fill="#17212a"
+          font-size="9"
+          font-style="italic"
+          font-family="'IBM Plex Mono', monospace"
+        >
           + view(): unknown
         </text>
         <rect
-          x="292"
+          x="262"
           y="740"
-          width="72"
+          width="108"
           height="18"
           rx="2"
           fill="#ffffff"
@@ -1087,14 +1109,14 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="328"
+          x="316"
           y="752"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TCell, TCoord
+          TCell, TCoord, TAxis
         </text>
         <rect x="374" y="842" width="20" height="12" rx="2" fill="#f9f4dc" />
         <text
@@ -1113,7 +1135,7 @@
           x="752"
           y="740"
           width="236"
-          height="192"
+          height="176"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1160,18 +1182,15 @@
           + add(points: Score): Score
         </text>
         <text x="768" y="860" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + times(factor: number): Score
-        </text>
-        <text x="768" y="876" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: Score): boolean
         </text>
-        <text x="768" y="892" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="768" y="876" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + isHigherThan(other: Score): boolean
         </text>
-        <text x="768" y="908" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="768" y="892" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + deliverTo(receiver:
         </text>
-        <text x="779" y="924" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="779" y="908" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           ValueReceiver&lt;number&gt;): void
         </text>
         <!-- BoardState adds the points of a turn as a Score, and BoardSnapshot, IScoringPolicy and GameOver carry one: use -->
@@ -1382,8 +1401,8 @@
           TCell, TCoord
         </text>
 
-        <!-- The footnote and the legend sit below the zone, which grew by 32 and then by 80 for the Outcome box (#207). It grew by 32 more for the delivery operation of Score (#228). -->
-        <g transform="translate(0 200)">
+        <!-- The footnote and the legend sit below the zone, which grew by 32 and then by 80 for the Outcome box (#207). It grew by 32 more for the delivery operation of Score (#228), and by 32 more for the queries of BoardSnapshot (#245). -->
+        <g transform="translate(0 232)">
           <!-- Footnote -->
           <text
             x="24"
@@ -1435,7 +1454,7 @@
             font-family="'IBM Plex Sans', sans-serif"
           >
             IGameRules.evaluate(), GameEngine.play() and GamePhase.after() also use Outcome. Every
-            attribute of BoardSnapshot is read-only, and the photo is frozen (decision 34).
+            field of BoardSnapshot is private, and the photo is frozen (decisions 7 and 34).
           </text>
           <!-- Legend -->
           <line

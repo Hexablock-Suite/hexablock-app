@@ -1,5 +1,5 @@
-import type { Board } from '../../engine/board';
-import { checkOwnSnapshot, type BoardSnapshot, type BoardState } from '../../engine/board-state';
+import type { Board, ReadonlyBoard } from '../../engine/board';
+import { BoardSnapshot, checkOwnSnapshot, type BoardState } from '../../engine/board-state';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { MatchId } from '../../engine/match-id';
 import { Moves } from '../../engine/moves';
@@ -10,20 +10,70 @@ import type { PieceId } from './piece-id';
 import { PieceRegister } from './piece-register';
 import type { Placement } from './placement';
 
+// The receiver of the data of a `FitView`. An adapter of the edge implements it,
+// for example the state mapper of the Fit screen. No code of `src/domain/` or
+// `src/application/` calls `deliverTo()` (rule R-no-delivery-call).
+export interface FitViewReceiver<TCoord> {
+  receive(remaining: readonly Piece<PieceId, TCoord>[], placed: readonly PieceId[]): void;
+}
+
 // The data that the Fit screen draws: the tray and the pieces on the figure.
-export interface FitView<TCoord> {
-  readonly remaining: readonly Piece<PieceId, TCoord>[];
-  readonly placed: readonly PieceId[];
+// Both fields are private (issue #245). The view keeps frozen copies of the two lists,
+// and `deliverTo()` gives them to an adapter of the edge.
+export class FitView<TCoord> {
+  private readonly remaining: readonly Piece<PieceId, TCoord>[];
+  private readonly placed: readonly PieceId[];
+
+  constructor(remaining: readonly Piece<PieceId, TCoord>[], placed: readonly PieceId[]) {
+    this.remaining = Object.freeze([...remaining]);
+    this.placed = Object.freeze([...placed]);
+    Object.freeze(this);
+  }
+
+  // Gives the tray and the placed pieces to `receiver`. It returns nothing.
+  deliverTo(receiver: FitViewReceiver<TCoord>): void {
+    receiver.receive(this.remaining, this.placed);
+  }
 }
 
 // The photo of a Fit state (classes.md decision 34): the board, the score, the move count
 // and the placement of each piece on the figure, in the order of the placements.
 // The pieces of the level never change, so the photo does not hold them.
 // `view()` gives the tray and the placed pieces for the screen.
-export interface FitSnapshot<TCoord> extends BoardSnapshot<PieceId, TCoord> {
-  readonly placements: readonly (readonly [PieceId, Placement<TCoord>])[];
-  readonly moves: Moves;
-  view(): FitView<TCoord>;
+// Every field is private (issue #245). `FitState.restore()` asks `piecePlacements()` and
+// `moveCount()`. The photo keeps a frozen list of frozen pairs, and it is frozen itself.
+export class FitSnapshot<TCoord> extends BoardSnapshot<PieceId, TCoord> {
+  private readonly placements: readonly (readonly [PieceId, Placement<TCoord>])[];
+
+  constructor(
+    stateId: GameStateId,
+    matchId: MatchId,
+    board: ReadonlyBoard<PieceId, TCoord>,
+    score: Score,
+    placements: readonly (readonly [PieceId, Placement<TCoord>])[],
+    private readonly moves: Moves,
+    private readonly shown: FitView<TCoord>,
+  ) {
+    super(stateId, matchId, board, score);
+    this.placements = Object.freeze(
+      placements.map(([id, placement]) => Object.freeze([id, placement] as const)),
+    );
+    Object.freeze(this);
+  }
+
+  // The placement of each piece on the figure, in the order of the placements.
+  piecePlacements(): readonly (readonly [PieceId, Placement<TCoord>])[] {
+    return this.placements;
+  }
+
+  // The count of the accepted moves of the game.
+  moveCount(): Moves {
+    return this.moves;
+  }
+
+  view(): FitView<TCoord> {
+    return this.shown;
+  }
 }
 
 // The state of one Hexa Fit game: the figure board, the pieces of the level,
@@ -43,7 +93,7 @@ export interface FitSnapshot<TCoord> extends BoardSnapshot<PieceId, TCoord> {
 // The state keeps its object, so every business method changes it in place and returns nothing:
 // `place()`, `remove()`, `countMove()`, `addPoints()` and `restore()`. The engine calls them.
 // A refused input throws a RangeError and leaves the whole state as it was.
-// The rules read the photo of `snapshot()` and ask `piece()` and `placementOf()`.
+// The rules ask the photo of `snapshot()`, `piece()` and `placementOf()`.
 export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
   private constructor(
     private readonly stateId: GameStateId,
@@ -140,22 +190,15 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
   // The photo of the state now. A piece, an id and a placement never change,
   // so the photo shares them. It holds frozen lists and a copy of the board.
   snapshot(): FitSnapshot<TCoord> {
-    const placements = Object.freeze(
-      this.placements.entries().map(([id, placement]) => Object.freeze([id, placement] as const)),
+    return new FitSnapshot(
+      this.stateId,
+      this.matchId,
+      this.board.clone(),
+      this.score,
+      this.placements.entries(),
+      this.moves,
+      new FitView(this.remaining(), this.placed()),
     );
-    const view = Object.freeze({
-      remaining: Object.freeze(this.remaining()),
-      placed: Object.freeze(this.placed()),
-    });
-    return Object.freeze({
-      stateId: this.stateId,
-      matchId: this.matchId,
-      board: this.board.clone(),
-      score: this.score,
-      placements,
-      moves: this.moves,
-      view: () => view,
-    });
   }
 
   // Takes back a photo of this state, in place. A photo of another state, of another board
@@ -164,13 +207,13 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
   restore(snapshot: FitSnapshot<TCoord>): void {
     checkOwnSnapshot(this.stateId, this.board, snapshot);
     let placements = PieceRegister.empty<Placement<TCoord>>();
-    for (const [id, placement] of snapshot.placements) {
+    for (const [id, placement] of snapshot.piecePlacements()) {
       placements = placements.with(this.pieceOf(id).occupant(), placement);
     }
-    this.board.restore(snapshot.board);
+    this.board.restore(snapshot.boardCopy());
     this.placements = placements;
-    this.moves = snapshot.moves;
-    this.score = snapshot.score;
+    this.moves = snapshot.moveCount();
+    this.score = snapshot.scoreSoFar();
   }
 
   // The level piece of the id. An id of no level piece throws a RangeError.

@@ -9,14 +9,15 @@ import type { SortState } from './sort-state';
 // A top run of this many tiles of one color clears its stack (statement §1.3).
 // The accepted rule of issue #56: a top run of 10 or more removes the whole stack,
 // tiles of other colors below included, and counts one goal.
-export const GOAL_RUN = 10;
+// Only this file reads the length (issue #232).
+const GOAL_RUN = 10;
 
 // The rules of Hexa Sort (statement §1.3). The player places the offered stack on an
 // empty cell. Then the top tiles of neighbor stacks with the same top color move,
 // in cascade, to the stack with most of that color.
 // The rules ask the topology for the neighbors, so they run on any geometry (D4).
 // The rules decide. The state changes itself: the rules call `placeOfferedStack()`,
-// `moveRun()` and `clearStack()`. The rules read the state through its photo and `canPlace()`.
+// `moveRun()` and `clearStack()`. The rules ask the photo of the state and `canPlace()`.
 // A photo never changes, so the rules take a new photo after each change of the state.
 // The rules read no field of a move: they ask the move for its cell (classes.md decision 43).
 export class SortRules<TCoord> extends BaseGameRules<PlaceStack<TCoord>, SortState<TCoord>> {
@@ -25,9 +26,9 @@ export class SortRules<TCoord> extends BaseGameRules<PlaceStack<TCoord>, SortSta
   }
 
   *validMoves(state: SortState<TCoord>): Iterable<PlaceStack<TCoord>> {
-    const { offered, board } = state.snapshot();
-    if (offered === undefined) return;
-    for (const at of board.coordinates()) {
+    const photo = state.snapshot();
+    if (photo.offeredStack() === undefined) return;
+    for (const at of photo.boardCopy().coordinates()) {
       if (state.canPlace(at)) yield PlaceStack.on(at);
     }
   }
@@ -41,7 +42,7 @@ export class SortRules<TCoord> extends BaseGameRules<PlaceStack<TCoord>, SortSta
   // so the cascade checks them again. Each transfer joins two runs into one,
   // so the number of runs on the board falls and the cascade ends.
   resolve(state: SortState<TCoord>): Resolution {
-    const { placedAt } = state.snapshot();
+    const placedAt = state.snapshot().lastPlacedAt();
     const pending: TCoord[] = placedAt === undefined ? [] : [placedAt];
     for (let at = pending.shift(); at !== undefined; at = pending.shift()) {
       clearIfGoal<TCoord>(state, at);
@@ -52,8 +53,8 @@ export class SortRules<TCoord> extends BaseGameRules<PlaceStack<TCoord>, SortSta
 
   // The goals reached win. A board with no empty cell, or no stack left to place, loses.
   evaluate(state: SortState<TCoord>): Outcome {
-    const { goalsNeeded, goalsDone } = state.snapshot();
-    if (goalsNeeded.isReachedBy(goalsDone)) return Outcome.victory;
+    const photo = state.snapshot();
+    if (photo.goal().isReachedBy(photo.goalsReached())) return Outcome.victory;
     return this.noValidMove(state) ? Outcome.gameOver : Outcome.playing;
   }
 }
@@ -62,7 +63,7 @@ export class SortRules<TCoord> extends BaseGameRules<PlaceStack<TCoord>, SortSta
 // It returns the cells that changed, or none when no neighbor shares the color.
 // It reads one photo before the moves. The moves change only the stacks of `givers` and `target`.
 function transfer<TCoord>(state: SortState<TCoord>, at: TCoord): TCoord[] {
-  const { board } = state.snapshot();
+  const board = state.snapshot().boardCopy();
   const color = board.occupantAt(at)?.top();
   if (color === undefined) return [];
   const matches = [...board.neighborhood(at)].filter(
@@ -101,7 +102,7 @@ function targetOf<TCoord>(
 // the whole stack and counts one goal. `SortState.clearStack()` keeps an empty stack
 // on the cell and the size for the scoring (#98).
 function clearIfGoal<TCoord>(state: SortState<TCoord>, at: TCoord): void {
-  const cell = state.snapshot().board.occupantAt(at);
+  const cell = state.snapshot().boardCopy().occupantAt(at);
   if (cell === undefined || cell.topRun().length < GOAL_RUN) return;
   state.clearStack(at);
 }

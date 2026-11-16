@@ -49,7 +49,7 @@ describe('FitFactory', () => {
     ).toEqual(['0,0', '1,0']);
     expect(initial.remaining().map((p) => delivered(p.occupant()))).toEqual(['a']);
     expect(outcome).toBe(Outcome.victory);
-    expect(engine.snapshot().score).toEqual(Score.of(0));
+    expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(0));
     expect(engine.takeEvents().map(dataOf)).toEqual([
       {
         gameId: GameId.of('hexa-fit'),

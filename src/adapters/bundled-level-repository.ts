@@ -25,7 +25,7 @@ export interface LevelFile {
 const BUNDLED: readonly LevelFile[] = [fit01, fit02, fit03, sort01, sort02, sort03];
 
 // Adapter of the `LevelRepository` port over the level files of the app
-// (classes.md decisions 24 and 56, issue #168, A6). The files live in `src/adapters/levels/`,
+// (classes.md decisions 24 and 58, issue #168, A6). The files live in `src/adapters/levels/`,
 // so rule `adapters-imports-only-inner-layers` lets this adapter import them.
 // The bundled levels work offline (APP-FR-15).
 // It gives the levels of a game: the files whose `gameId` names that game.

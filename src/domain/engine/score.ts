@@ -9,6 +9,8 @@ import type { ValueReceiver } from './value-receiver';
 // The value is private (issue #228). `deliverTo()` gives the number to a receiver,
 // and no operation returns it. Only an adapter of the edge calls `deliverTo()`:
 // the domain and the use cases call the operations.
+// A score has no product with a number (issue #232). A count of the game gives its own points,
+// as `MergeTile.points()` and the Lines counts do, so no factor crosses a public signature.
 export class Score {
   private constructor(private readonly value: number) {
     Object.freeze(this);
@@ -39,20 +41,6 @@ export class Score {
       throw new RangeError('The sum of two scores cannot pass the largest safe integer.');
     }
     return new Score(sum);
-  }
-
-  // The product of this score and a whole factor, as a combo multiplier needs it.
-  // The factor is a safe integer of 0 or more. Any other factor throws a RangeError.
-  // A product above the largest safe integer is not exact, so it throws a RangeError.
-  times(factor: number): Score {
-    if (!Number.isSafeInteger(factor) || factor < 0) {
-      throw new RangeError(`A score factor needs a whole number of 0 or more, not ${factor}.`);
-    }
-    const product = this.value * factor;
-    if (product > Number.MAX_SAFE_INTEGER) {
-      throw new RangeError('The product of a score cannot pass the largest safe integer.');
-    }
-    return new Score(product === 0 ? 0 : product);
   }
 
   // Tells if this score is higher than `other`. An equal score is not higher.

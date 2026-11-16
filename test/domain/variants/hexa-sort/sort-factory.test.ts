@@ -29,10 +29,10 @@ import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 // The two cells are not neighbors, so no run moves.
 function offeredInGame(factory: SortFactory<SquareCoord>): string[][] {
   const { engine } = startVariant(factory);
-  const offered = [names(engine.snapshot().offered?.occupant())];
+  const offered = [names(engine.snapshot().offeredStack()?.occupant())];
   for (const move of [place(0, 0), place(1, 1)]) {
     engine.play(move);
-    offered.push(names(engine.snapshot().offered?.occupant()));
+    offered.push(names(engine.snapshot().offeredStack()?.occupant()));
   }
   return offered;
 }
@@ -47,12 +47,12 @@ describe('SortFactory', () => {
 
     expect(factory.isFor(GameId.of('hexa-sort'))).toBe(true);
     expect(factory.createBoard(BOARD_ID).coordinates()).toHaveLength(4);
-    expect(names(initial.snapshot().offered?.occupant())).toEqual(['red', 'red']);
-    expect(initial.snapshot().goalsNeeded.equals(GoalCount.of(5))).toBe(true);
+    expect(names(initial.snapshot().offeredStack()?.occupant())).toEqual(['red', 'red']);
+    expect(initial.snapshot().goal().equals(GoalCount.of(5))).toBe(true);
     expect(outcome).toBe(Outcome.playing);
     expect(chipsAt(engine, 0, 0)).toEqual(['red', 'red']);
-    expect(names(engine.snapshot().offered?.occupant())).toEqual(['blue']);
-    expect(engine.snapshot().score).toEqual(Score.of(0));
+    expect(names(engine.snapshot().offeredStack()?.occupant())).toEqual(['blue']);
+    expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(0));
     expect(engine.takeEvents()).toEqual([]);
   });
 
@@ -114,16 +114,18 @@ describe('SortFactory', () => {
       const factory = new SortFactory(new SquareGeometry(), level);
       const { engine: first } = startVariant(factory);
       const { engine: second } = startVariant(factory);
-      const start = names(second.snapshot().offered?.occupant());
-      const sourceAtStart = second.snapshot().source;
+      const start = names(second.snapshot().offeredStack()?.occupant());
+      const sourceAtStart = second.snapshot().pieceSource();
 
       first.play(place(0, 0));
       first.play(place(1, 1));
 
-      expect(names(first.snapshot().offered?.occupant())).not.toEqual([]);
-      expect(names(second.snapshot().offered?.occupant())).toEqual(start);
-      expect(second.snapshot().source).toBe(sourceAtStart);
-      expect(names(startVariant(factory).engine.snapshot().offered?.occupant())).toEqual(start);
+      expect(names(first.snapshot().offeredStack()?.occupant())).not.toEqual([]);
+      expect(names(second.snapshot().offeredStack()?.occupant())).toEqual(start);
+      expect(second.snapshot().pieceSource()).toBe(sourceAtStart);
+      expect(names(startVariant(factory).engine.snapshot().offeredStack()?.occupant())).toEqual(
+        start,
+      );
     }
   });
 

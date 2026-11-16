@@ -1,11 +1,12 @@
 /** @jest-environment node */
 import { MoveCommand } from '../../../src/domain/engine/move-command';
 import { MoveHistory } from '../../../src/domain/engine/move-history';
+import { UndoLimit } from '../../../src/domain/engine/undo-limit';
 
 // `MoveHistory` is the Command invoker and the Memento caretaker (classes.md decisions 3 and 34).
 // A test state is a plain string, because the history never reads the state.
 
-function newHistory(limit?: number) {
+function newHistory(limit?: UndoLimit) {
   const restored: string[] = [];
   const history = new MoveHistory<string, string>(limit);
   const record = (...states: string[]) => {
@@ -37,7 +38,7 @@ describe('MoveHistory', () => {
   });
 
   it('should_keep_only_the_newest_commands_when_the_history_has_a_limit', () => {
-    const { history, record, restored } = newHistory(2);
+    const { history, record, restored } = newHistory(UndoLimit.of(2));
     record('a', 'b', 'c');
 
     history.undo();
@@ -57,12 +58,16 @@ describe('MoveHistory', () => {
     expect(restored).toEqual([...states].reverse());
   });
 
-  it('should_throw_a_range_error_when_the_limit_is_not_a_whole_number_of_1_or_more', () => {
-    for (const limit of [0, -1, 1.5, Number.NaN, Number.POSITIVE_INFINITY]) {
-      expect(() => new MoveHistory<string, string>(limit)).toThrow(
-        new RangeError(`A history limit needs a whole number of 1 or more, not ${limit}.`),
-      );
-    }
+  // Issue #243: the limit is an `UndoLimit`, which checks its number in `UndoLimit.of()`.
+  // Merge keeps one move (classes.md decision 3).
+  it('should_keep_only_the_newest_command_when_the_history_has_a_limit_of_one', () => {
+    const { history, record, restored } = newHistory(UndoLimit.of(1));
+    record('a', 'b', 'c');
+
+    history.undo();
+
+    expect(restored).toEqual(['c']);
+    expect(history.canUndo()).toBe(false);
   });
 
   it('should_throw_a_range_error_and_give_back_nothing_when_undo_runs_on_an_empty_history', () => {

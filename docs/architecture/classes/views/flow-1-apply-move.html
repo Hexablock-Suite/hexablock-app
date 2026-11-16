@@ -63,7 +63,7 @@
       <p class="eyebrow">Use case flow · ApplyMove · class view</p>
       <h1>ApplyMove across the four layers: the classes of one move</h1>
       <svg
-        viewBox="0 0 1040 1354"
+        viewBox="0 0 1040 1370"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="flowmove-title flowmove-desc"
@@ -77,7 +77,8 @@
           ApplyMoveRequest, builds a MoveResult and keeps the GameRepository, Logger and
           GameEventPublisher ports. In layer 1, ApplyMove plays the move on GameEngine, which keeps
           the IGameRules strategy. ApplyMove then takes the events that GameEngine records and reads
-          the cells of Board. Every dependency between layers points down.
+          the occupied cells and the free spaces of Board. Every dependency between layers points
+          down.
         </desc>
         <defs>
           <marker
@@ -169,7 +170,7 @@
           x="24"
           y="508"
           width="992"
-          height="344"
+          height="360"
           rx="8"
           fill="#efe7f8"
           stroke="rgba(126,34,206,0.40)"
@@ -189,7 +190,7 @@
         <!-- Layer zone: layer 1 · entities -->
         <rect
           x="24"
-          y="860"
+          y="876"
           width="992"
           height="268"
           rx="8"
@@ -199,7 +200,7 @@
         />
         <text
           x="40"
-          y="880"
+          y="896"
           fill="#b45309"
           font-size="8"
           font-weight="500"
@@ -260,7 +261,7 @@
         />
         <!-- InMemoryGameRepository keeps zero or one GameEngine: use, down from layer 3 to layer 1 -->
         <path
-          d="M992 444 H1009 V948 Q1009 956 1001 956 H980"
+          d="M992 444 H1009 V964 Q1009 972 1001 972 H980"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -301,7 +302,7 @@
         />
         <!-- GameRepository stores and returns the GameEngine: use, down from layer 2 to layer 1 -->
         <path
-          d="M740 636 V912"
+          d="M740 636 V928"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -309,7 +310,7 @@
         />
         <!-- ApplyMove calls GameEngine.tryPlay() and snapshot(): use, down from layer 2 to layer 1 -->
         <path
-          d="M600 836 V888 Q600 896 608 896 H692 Q700 896 700 904 V912"
+          d="M600 836 V904 Q600 912 608 912 H692 Q700 912 700 920 V928"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -317,7 +318,7 @@
         />
         <!-- ApplyMove reads the cells of Board: use, down from layer 2 to layer 1 -->
         <path
-          d="M316 836 V888 Q316 896 308 896 H178 Q170 896 170 904 V912"
+          d="M316 836 V904 Q316 912 308 912 H178 Q170 912 170 920 V928"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -325,7 +326,7 @@
         />
         <!-- GameEngine keeps the IGameRules it receives: aggregation, kept because Strategy holds it -->
         <path
-          d="M680 968 H590"
+          d="M680 984 H590"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -404,7 +405,7 @@
         >
           TRYPLAY()
         </text>
-        <rect x="318" y="838" width="82" height="12" rx="2" fill="#efe7f8" />
+        <rect x="318" y="838" width="155" height="12" rx="2" fill="#efe7f8" />
         <text
           x="322"
           y="847"
@@ -414,7 +415,7 @@
           text-anchor="start"
           letter-spacing="0.06em"
         >
-          OCCUPIEDCELLS()
+          OCCUPIEDCELLS(), FREESPACES()
         </text>
         <!-- Role names and multiplicities at the part end -->
         <rect x="502" y="209" width="59.9" height="12" rx="2" fill="#e2ebf8" />
@@ -465,10 +466,10 @@
           games
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="954.9" y="941" width="50.1" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="954.9" y="957" width="50.1" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="1003"
-          y="950"
+          y="966"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -477,10 +478,10 @@
           game
           <tspan font-weight="600">0..1</tspan>
         </text>
-        <rect x="592" y="953" width="40.3" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="592" y="969" width="40.3" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="594"
-          y="962"
+          y="978"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -531,7 +532,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          app/game.tsx
+          app/game/[gameId].tsx
         </text>
         <line x1="400" y1="116" x2="680" y2="116" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="416" y="132" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
@@ -567,7 +568,7 @@
           - applyMove: UseCase&lt;ApplyMoveRequest&lt;TMove&gt;, MoveResult&lt;TCell, TCoord&gt;&gt;
         </text>
         <text x="336" y="304" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - mapper: StateMapper&lt;TCell&gt;
+          - mapper: StateMapper&lt;TCell, TView, TCellView, TPayloadView&gt;
         </text>
         <line x1="320" y1="312" x2="756" y2="312" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="336" y="328" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
@@ -584,7 +585,7 @@
           x="48"
           y="224"
           width="220"
-          height="88"
+          height="104"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -614,10 +615,13 @@
         </text>
         <line x1="48" y1="272" x2="268" y2="272" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="64" y="288" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + toView(cell: TCell): CellView
+          + toView(cell: TCell): TCellView
         </text>
         <text x="64" y="304" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + toPayload(p: TView): PayloadView
+          + freeView(): TCellView
+        </text>
+        <text x="64" y="320" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + toPayload(p: TView): TPayloadView
         </text>
         <!-- Class: GameViewModel (value object) -->
         <rect
@@ -654,25 +658,25 @@
         </text>
         <line x1="816" y1="272" x2="1000" y2="272" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="832" y="288" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + cells: CellView[]
+          + board: string
         </text>
         <text x="832" y="304" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + score: number
+          + cells: [TCoord, TCellView][]
         </text>
         <text x="832" y="320" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + canUndo: boolean
+          + scoreLabel: string
         </text>
         <text x="832" y="336" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + canRedo: boolean
+          + score: number
         </text>
         <text x="832" y="352" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + phase: string
+          + outcome: string
         </text>
         <text x="832" y="368" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + error: string [0..1]
         </text>
         <text x="832" y="384" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + payload: PayloadView
+          + payload: TPayloadView [0..1]
         </text>
         <!-- Class: InMemoryGameRepository (adapter) -->
         <rect
@@ -882,7 +886,7 @@
           x="40"
           y="652"
           width="210"
-          height="184"
+          height="200"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -915,32 +919,35 @@
           + cells: [TCoord, TCell][]
         </text>
         <text x="56" y="732" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + score: Score
+          + freeSpaces: TCoord[]
         </text>
         <text x="56" y="748" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + outcome: Outcome
+          + score: Score
         </text>
         <text x="56" y="764" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + canUndo: boolean
+          + outcome: Outcome
         </text>
         <text x="56" y="780" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + canRedo: boolean
+          + canUndo: boolean
         </text>
         <text x="56" y="796" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + hasUndo: boolean
+          + canRedo: boolean
         </text>
         <text x="56" y="812" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + payload: TView
+          + hasUndo: boolean
         </text>
         <text x="56" y="828" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + payload: TView
+        </text>
+        <text x="56" y="844" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + elapsedMs?: ElapsedTime
         </text>
         <!-- Class: Board (engine) -->
         <rect
           x="40"
-          y="912"
+          y="928"
           width="260"
-          height="88"
+          height="104"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -948,7 +955,7 @@
         />
         <text
           x="170"
-          y="930"
+          y="946"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -959,7 +966,7 @@
         </text>
         <text
           x="170"
-          y="948"
+          y="964"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -968,17 +975,20 @@
         >
           Board
         </text>
-        <line x1="40" y1="960" x2="300" y2="960" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="56" y="976" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="40" y1="976" x2="300" y2="976" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="56" y="992" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + occupantAt(at: TCoord): TCell | undefined
         </text>
-        <text x="56" y="992" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="56" y="1008" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + occupiedCells(): [TCoord, TCell][]
+        </text>
+        <text x="56" y="1024" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + freeSpaces(): TCoord[]
         </text>
         <!-- Class: IGameRules (interface, strategy) -->
         <rect
           x="330"
-          y="912"
+          y="928"
           width="260"
           height="88"
           rx="6"
@@ -988,7 +998,7 @@
         />
         <text
           x="460"
-          y="930"
+          y="946"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -999,7 +1009,7 @@
         </text>
         <text
           x="460"
-          y="948"
+          y="964"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1008,17 +1018,23 @@
         >
           IGameRules
         </text>
-        <line x1="330" y1="960" x2="590" y2="960" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="346" y="976" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="330" y1="976" x2="590" y2="976" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="346" y="992" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + playTurn(state: TState, move: TMove):
         </text>
-        <text x="362" y="992" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text
+          x="362"
+          y="1008"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
           Resolution
         </text>
         <!-- Class: GameEngine (aggregate root) -->
         <rect
           x="680"
-          y="912"
+          y="928"
           width="300"
           height="208"
           rx="6"
@@ -1028,7 +1044,7 @@
         />
         <text
           x="830"
-          y="930"
+          y="946"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1039,7 +1055,7 @@
         </text>
         <text
           x="830"
-          y="948"
+          y="964"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1048,13 +1064,13 @@
         >
           GameEngine
         </text>
-        <line x1="680" y1="960" x2="980" y2="960" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="696" y="976" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="680" y1="976" x2="980" y2="976" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="696" y="992" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - rules: IGameRules&lt;TMove, TState&gt;
         </text>
         <text
           x="696"
-          y="992"
+          y="1008"
           fill="#5b6873"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1063,10 +1079,10 @@
         >
           matchId, scoring, phase, history, timer, recorded: view 1
         </text>
-        <line x1="680" y1="1000" x2="980" y2="1000" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="680" y1="1016" x2="980" y2="1016" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="696"
-          y="1016"
+          y="1032"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1075,7 +1091,7 @@
         </text>
         <text
           x="696"
-          y="1032"
+          y="1048"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1084,7 +1100,7 @@
         </text>
         <text
           x="696"
-          y="1048"
+          y="1064"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1093,7 +1109,7 @@
         </text>
         <text
           x="696"
-          y="1064"
+          y="1080"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1102,7 +1118,7 @@
         </text>
         <text
           x="696"
-          y="1080"
+          y="1096"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1111,7 +1127,7 @@
         </text>
         <text
           x="696"
-          y="1096"
+          y="1112"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1120,7 +1136,7 @@
         </text>
         <text
           x="696"
-          y="1112"
+          y="1128"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1129,10 +1145,10 @@
         </text>
         <!-- UML template boxes: type parameters on the top-right corner -->
         <rect
-          x="648"
-          y="214"
-          width="120"
-          height="18"
+          x="603"
+          y="202"
+          width="165"
+          height="30"
           rx="2"
           fill="#ffffff"
           stroke="#5b6873"
@@ -1140,19 +1156,29 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="708"
+          x="685.5"
+          y="214"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCell, TCoord, TMove,
+        </text>
+        <text
+          x="685.5"
           y="226"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TCell, TCoord, TMove
+          TView, TCellView, TPayloadView
         </text>
         <rect
-          x="156"
+          x="79.3"
           y="214"
-          width="124"
+          width="200.7"
           height="18"
           rx="2"
           fill="#ffffff"
@@ -1161,14 +1187,14 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="218"
+          x="179.65"
           y="226"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TCell, TView = unknown
+          TCell, TView, TCellView, TPayloadView
         </text>
         <rect
           x="842.4"
@@ -1298,7 +1324,7 @@
         </text>
         <rect
           x="228.4"
-          y="902"
+          y="918"
           width="83.6"
           height="18"
           rx="2"
@@ -1309,7 +1335,7 @@
         />
         <text
           x="270.2"
-          y="914"
+          y="930"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1319,7 +1345,7 @@
         </text>
         <rect
           x="518"
-          y="902"
+          y="918"
           width="84"
           height="18"
           rx="2"
@@ -1330,7 +1356,7 @@
         />
         <text
           x="560"
-          y="914"
+          y="930"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1340,7 +1366,7 @@
         </text>
         <rect
           x="768"
-          y="890"
+          y="906"
           width="224"
           height="42"
           rx="2"
@@ -1351,7 +1377,7 @@
         />
         <text
           x="880"
-          y="902"
+          y="918"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1361,7 +1387,7 @@
         </text>
         <text
           x="880"
-          y="914"
+          y="930"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1371,7 +1397,7 @@
         </text>
         <text
           x="880"
-          y="926"
+          y="942"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1382,7 +1408,7 @@
         <!-- Footnote -->
         <text
           x="24"
-          y="1156"
+          y="1172"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1392,28 +1418,28 @@
         </text>
         <text
           x="24"
-          y="1172"
-          fill="#5b6873"
-          font-size="11"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          GameEngine from GameRepository, calls tryPlay() and snapshot(), copies the occupied cells
-          of the photo's Board and its view(), and asks the root for the flags and the time
-          (decision 29).
-        </text>
-        <text
-          x="24"
           y="1188"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          GamePresenter maps each cell and the payload with its StateMapper and builds
-          GameViewModel. The sequence diagram of this flow uses the same names.
+          GameEngine from GameRepository, calls tryPlay() and snapshot(), copies the cells and free
+          spaces of the photo's Board and its view(), and asks the root for the flags and the time
+          (decision 29).
         </text>
         <text
           x="24"
           y="1204"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          GamePresenter maps each space and the payload with its StateMapper and builds
+          GameViewModel. The sequence diagram of this flow uses the same names.
+        </text>
+        <text
+          x="24"
+          y="1220"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1423,7 +1449,7 @@
         </text>
         <text
           x="24"
-          y="1220"
+          y="1236"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1434,15 +1460,15 @@
         <!-- Legend -->
         <line
           x1="24"
-          y1="1244"
+          y1="1260"
           x2="1016"
-          y2="1244"
+          y2="1260"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1262"
+          y="1278"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1452,9 +1478,9 @@
         </text>
         <line
           x1="24"
-          y1="1280"
+          y1="1296"
           x2="52"
-          y2="1280"
+          y2="1296"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -1462,7 +1488,7 @@
         />
         <text
           x="60"
-          y="1283"
+          y="1299"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1471,16 +1497,16 @@
         </text>
         <line
           x1="144"
-          y1="1280"
+          y1="1296"
           x2="172"
-          y2="1280"
+          y2="1296"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#flowmove-diamond-hollow)"
         />
         <text
           x="180"
-          y="1283"
+          y="1299"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1489,16 +1515,16 @@
         </text>
         <line
           x1="344"
-          y1="1280"
+          y1="1296"
           x2="372"
-          y2="1280"
+          y2="1296"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#flowmove-open)"
         />
         <text
           x="380"
-          y="1283"
+          y="1299"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1507,7 +1533,7 @@
         </text>
         <rect
           x="24"
-          y="1296"
+          y="1312"
           width="28"
           height="12"
           rx="2"
@@ -1517,7 +1543,7 @@
         />
         <text
           x="60"
-          y="1305"
+          y="1321"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1526,7 +1552,7 @@
         </text>
         <rect
           x="144"
-          y="1296"
+          y="1312"
           width="28"
           height="12"
           rx="2"
@@ -1536,7 +1562,7 @@
         />
         <text
           x="180"
-          y="1305"
+          y="1321"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1545,7 +1571,7 @@
         </text>
         <rect
           x="264"
-          y="1296"
+          y="1312"
           width="28"
           height="12"
           rx="2"
@@ -1555,7 +1581,7 @@
         />
         <text
           x="300"
-          y="1305"
+          y="1321"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1564,7 +1590,7 @@
         </text>
         <rect
           x="384"
-          y="1296"
+          y="1312"
           width="28"
           height="12"
           rx="2"
@@ -1574,7 +1600,7 @@
         />
         <text
           x="420"
-          y="1305"
+          y="1321"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1583,7 +1609,7 @@
         </text>
         <rect
           x="504"
-          y="1296"
+          y="1312"
           width="28"
           height="12"
           rx="2"
@@ -1594,7 +1620,7 @@
         />
         <text
           x="540"
-          y="1305"
+          y="1321"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1603,7 +1629,7 @@
         </text>
         <rect
           x="704"
-          y="1296"
+          y="1312"
           width="28"
           height="12"
           rx="2"
@@ -1613,7 +1639,7 @@
         />
         <text
           x="740"
-          y="1305"
+          y="1321"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
