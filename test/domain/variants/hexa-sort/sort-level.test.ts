@@ -172,7 +172,8 @@ describe('SortLevel', () => {
     }
   });
 
-  // Until #167 reads the thresholds from the Sort level files, a level holds none.
+  // A factory method gives a level with no threshold. `SortLevelBuilder` gives a level
+  // the thresholds of its file with `withStars()` (#167).
   it('should_give_no_star_when_the_level_holds_no_threshold', () => {
     expect(fixed(stack('red')).starsFor(Moves.of(0), undefined).equals(Stars.of(0))).toBe(true);
   });
