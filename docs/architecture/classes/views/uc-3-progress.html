@@ -64,7 +64,7 @@
       <h1>Progress, levels and leaderboard: use cases over output ports</h1>
 
       <svg
-        viewBox="0 0 1040 1188"
+        viewBox="0 0 1040 1236"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="ucprogress-title ucprogress-desc"
@@ -74,11 +74,13 @@
           Class diagram of layer 2 showing the use cases SaveProgress, ListLevels and
           SyncLeaderboard, each implementing the UseCase input port with its binding, and the output
           ports they use: SaveProgress uses ProgressRepository, ListLevels uses LevelRepository and
-          ProgressRepository and returns LevelSummary values, and SyncLeaderboard uses
-          LeaderboardGateway and ProgressRepository. SaveProgress keeps the GameId of its game and
-          returns no value. ProgressRepository loads and saves the GameProgress of one game in layer
-          1: one object with the high score and the best result of each level, which delivers its
-          data to a repository of the edge with deliverTo().
+          ProgressRepository, takes the game and the chosen figure and returns LevelSummary values,
+          each with a LevelStatus of a closed set (completed, open, locked), and SyncLeaderboard
+          uses LeaderboardGateway and ProgressRepository. SaveProgress keeps the GameId of its game
+          and returns no value. ProgressRepository loads and saves the GameProgress of one game in
+          layer 1: one object with the high score and the best result of each level, which gives the
+          stars of a level with starsOf() and delivers its data to a repository of the edge with
+          deliverTo().
         </desc>
         <defs>
           <marker
@@ -162,7 +164,7 @@
           x="24"
           y="716"
           width="992"
-          height="256"
+          height="272"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -184,7 +186,7 @@
         <rect
           x="48"
           y="64"
-          width="272"
+          width="288"
           height="612"
           rx="8"
           fill="none"
@@ -234,6 +236,16 @@
           y1="136"
           x2="472"
           y2="136"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucprogress-open)"
+        />
+        <!-- LevelSummary holds its status as a LevelStatus: use -->
+        <line
+          x1="696"
+          y1="140"
+          x2="744"
+          y2="140"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#ucprogress-open)"
@@ -423,7 +435,7 @@
         </text>
         <line x1="64" y1="220" x2="304" y2="220" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text x="80" y="236" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + execute(request: GameId):
+          + execute(request: ListLevelsRequest):
         </text>
         <text x="96" y="252" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Promise&lt;Result&lt;LevelSummary[]&gt;&gt;
@@ -554,16 +566,16 @@
         <rect
           x="472"
           y="64"
-          width="272"
+          width="224"
           height="104"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="472" y1="112" x2="744" y2="112" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="472" y1="112" x2="696" y2="112" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="608"
+          x="584"
           y="82"
           fill="#5b6873"
           font-size="8"
@@ -574,7 +586,7 @@
           «value object»
         </text>
         <text
-          x="608"
+          x="584"
           y="100"
           fill="#17212a"
           font-size="12"
@@ -585,13 +597,65 @@
           LevelSummary
         </text>
         <text x="488" y="128" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + levelId: string
+          + levelId: LevelId
         </text>
         <text x="488" y="144" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + status: "completed" | "open" | "locked"
+          + status: LevelStatus
         </text>
         <text x="488" y="160" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + stars: number [0..1]
+          + stars: Stars [0..1]
+        </text>
+
+        <!-- Class: LevelStatus (value object: a closed set of three instances, decision 45) -->
+        <rect
+          x="744"
+          y="64"
+          width="240"
+          height="112"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="744" y1="112" x2="984" y2="112" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="864"
+          y="82"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="864"
+          y="100"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          LevelStatus
+        </text>
+        <text x="760" y="128" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - name: string
+        </text>
+        <text
+          x="760"
+          y="144"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + completed, open, locked: LevelStatus
+        </text>
+        <line x1="744" y1="152" x2="984" y2="152" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="760" y="168" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: LevelStatus): boolean
         </text>
 
         <!-- Class: LevelRepository (interface, port) -->
@@ -719,7 +783,7 @@
           x="616"
           y="744"
           width="336"
-          height="208"
+          height="224"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -778,9 +842,12 @@
           + keeps(record: ProgressRecord): boolean
         </text>
         <text x="632" y="928" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + equals(other: GameProgress): boolean
+          + starsOf(levelId: LevelId): Stars [0..1]
         </text>
         <text x="632" y="944" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + equals(other: GameProgress): boolean
+        </text>
+        <text x="632" y="960" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + deliverTo(receiver: GameProgressReceiver): void
         </text>
 
@@ -788,7 +855,7 @@
         <line x1="80" y1="120" x2="80" y2="104" stroke="#17212a" stroke-width="1" />
         <circle cx="80" cy="99" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text x="91" y="102" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          UseCase‹GameId, LevelSummary[]›
+          UseCase‹ListLevelsRequest, LevelSummary[]›
         </text>
         <line x1="80" y1="308" x2="80" y2="292" stroke="#17212a" stroke-width="1" />
         <circle cx="80" cy="287" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
@@ -804,7 +871,7 @@
         <!-- Footnote: classes the budget leaves out -->
         <text
           x="24"
-          y="996"
+          y="1012"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -814,7 +881,7 @@
         </text>
         <text
           x="24"
-          y="1012"
+          y="1028"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -825,7 +892,7 @@
 
         <text
           x="24"
-          y="1028"
+          y="1044"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -835,7 +902,7 @@
         </text>
         <text
           x="24"
-          y="1044"
+          y="1060"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -845,7 +912,7 @@
         </text>
         <text
           x="24"
-          y="1060"
+          y="1076"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -853,18 +920,38 @@
           SaveProgress takes the GameId of its game from the composition root and returns no value.
           A repository of the edge reads GameProgress with deliverTo() (rule R-no-delivery-call).
         </text>
+        <text
+          x="24"
+          y="1092"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          ListLevelsRequest holds the GameId and the chosen figure as a TopologyId. ListLevels keeps
+          the levels of that figure and orders them with LevelDefinition (decision 24).
+        </text>
+        <text
+          x="24"
+          y="1108"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          It asks GameProgress.starsOf() for each level: the first level is open, and a won level
+          opens the next one, also with zero stars (S3-12, S3-08, decision 56).
+        </text>
         <!-- Legend -->
         <line
           x1="24"
-          y1="1100"
+          y1="1148"
           x2="1016"
-          y2="1100"
+          y2="1148"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1118"
+          y="1166"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -875,16 +962,16 @@
 
         <line
           x1="24"
-          y1="1136"
+          y1="1184"
           x2="52"
-          y2="1136"
+          y2="1184"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#ucprogress-open)"
         />
         <text
           x="60"
-          y="1140"
+          y="1188"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -894,7 +981,7 @@
 
         <rect
           x="24"
-          y="1156"
+          y="1204"
           width="28"
           height="12"
           rx="2"
@@ -904,7 +991,7 @@
         />
         <text
           x="60"
-          y="1165"
+          y="1213"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -913,7 +1000,7 @@
         </text>
         <rect
           x="184"
-          y="1156"
+          y="1204"
           width="28"
           height="12"
           rx="2"
@@ -924,7 +1011,7 @@
         />
         <text
           x="220"
-          y="1165"
+          y="1213"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -933,7 +1020,7 @@
         </text>
         <rect
           x="424"
-          y="1156"
+          y="1204"
           width="28"
           height="12"
           rx="2"
@@ -943,18 +1030,18 @@
         />
         <text
           x="460"
-          y="1165"
+          y="1213"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
         </text>
-        <line x1="600" y1="1162" x2="616" y2="1162" stroke="#17212a" stroke-width="1" />
-        <circle cx="621" cy="1162" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="600" y1="1210" x2="616" y2="1210" stroke="#17212a" stroke-width="1" />
+        <circle cx="621" cy="1210" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="636"
-          y="1165"
+          y="1213"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

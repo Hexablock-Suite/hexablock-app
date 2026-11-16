@@ -45,20 +45,20 @@ flowchart TB
     EVENTBUS["GameEventBus: delivers game events<br/>to presenters, score and audio (planned)"]
     NULLPUB["NullGameEventPublisher: does nothing<br/>until GameEventBus exists"]
     LOCALREPO["LocalProgressRepository;<br/>LocalSettingsStore (planned)"]
-    LEVELREPO["BundledLevelRepository (planned)"]
+    LEVELREPO["BundledLevelRepository: the level<br/>files that the app bundles"]
     GAMEREPO["InMemoryGameRepository"]
     TEXTS["texts/: the text catalog, one Spanish<br/>and one English entry for each key"]
     KV["KeyValueStore interface"]
   end
 
   subgraph L2["Layer 2: Use cases, src/application/"]
-    UC["Generic use cases: StartGame, ApplyMove, UndoMove,<br/>SaveProgress; planned: RedoMove, ListLevels,<br/>SyncLeaderboard, Register, Login,<br/>UpdateSettings"]
+    UC["Generic use cases: StartGame, ApplyMove, UndoMove,<br/>SaveProgress, ListLevels; planned: RedoMove,<br/>SyncLeaderboard, Register, Login,<br/>UpdateSettings"]
     ASPECTS["Aspect decorators over the use cases:<br/>logging; planned: timing, retry,<br/>authorization"]
     MODELS["Request and response models,<br/>Result#lt;T, E#gt; and UseCaseError"]
     INPORTS(["UseCase#lt;TRequest, TResponse#gt;: one generic<br/>input port, each use case binds it"])
     PPORT(["ProgressRepository port"])
     LBPORT(["LeaderboardGateway port (planned)"])
-    LVPORT(["LevelRepository port (planned)"])
+    LVPORT(["LevelRepository port"])
     GRPORT(["GameRepository port"])
     ACCPORT(["AccountGateway port (planned)"])
     SESSPORT(["SessionStore port (planned)"])
@@ -210,14 +210,14 @@ The "May depend on" column repeats `.dependency-cruiser.cjs`. `pnpm arch` checks
 - **Use cases:** layer 2, `src/application/`. One generic set for the four variants:
   - `StartGame`, `ApplyMove`, `UndoMove`, `SaveProgress` and `SyncLeaderboard`. The game use cases keep the running engine through `GameRepository`, the repository port of the game aggregate, and `InMemoryGameRepository` in layer 3 implements it (decision 10).
   - `RedoMove`: redo in Hexa Fit (statement §5.1.8).
-  - `ListLevels`: the level selector with its progress indicator and locked levels (§5.1.2).
+  - `ListLevels`: the level selector with its progress indicator and locked levels (§5.1.2). It lists the levels of a game on the chosen figure as `LevelSummary` values, each one completed, open or locked, with the stars of a completed level (#168, decision 56).
   - `Register` and `Login`: sign-up and sign-in against the backend (§5.2.1), through the `AccountGateway` port, which `ApiAccountGateway` in layer 4 implements (decision 11). They write the token through the `SessionStore` port.
   - `UpdateSettings`: the mute option and the language (§5.1.10, §5.1.11), through the `SettingsStore` port, which `LocalSettingsStore` in layer 3 implements over `KeyValueStore` (decision 12).
 - **Input port:** layer 2, `src/application/`, one generic interface, `UseCase<TRequest, TResponse>` (decision 9). Each use case binds it, for example `UseCase<ApplyMoveRequest<TMove>, MoveResult<TCell, TCoord>>`. The presenters depend on the interface, not on the class. Each aspect decorator implements the same interface to wrap any use case. Tests call the same interface.
 - **Results and response models:** layer 2. `execute()` returns `Promise<Result<TResponse>>`: a use case reports a failure as a `Result` with a `UseCaseError` and never throws to the screen (decision 28). The response is plain data: `MoveResult` copies the cells and never carries the `Board` or the engine (decision 29).
 - **Session:** the `SessionStore` port lives in layer 2. `SessionManager`, the secure token storage in layer 4, implements it. `Login` and `Register` write the token through it. The authorization aspect reads it before `SaveProgress` and `SyncLeaderboard` run (§3.5).
 - **AOP decorators:** layer 2, `src/application/`. Each decorator implements the same use case interface and wraps a use case (§3.5, A2). `RetryAspect` runs the use case again while the error of its `Result` is retryable. A decorator logs through the `Logger` port and reads the time through the `Clock` interface of the engine, because `application-imports-only-domain` forbids a logging package there. The lint rule of R-domain-determinism covers `src/application/` too, so a decorator never calls `Date.now`. The decorator passes a `UseCaseLogEntry` with the use case name, the outcome, the time and the error, never a prebuilt message. The concrete logger lives in layer 4 and writes the text (decision 37 of the class diagram).
-- **Repositories:** the ports (`ProgressRepository`, `LeaderboardGateway`, `LevelRepository`) live in layer 2. The local implementations live in layer 3, `src/adapters/`, and use `KeyValueStore`, a driver interface of layer 3. The HTTP implementations and their DTO mapper live in layer 4, `src/infrastructure/api/`, next to the HTTP client, and implement the layer 2 ports directly (Q7, option B). No port names a transport type. A new database or backend means a new adapter, and the use cases do not change.
+- **Repositories:** the ports (`ProgressRepository`, `LeaderboardGateway`, `LevelRepository`) live in layer 2. The local implementations live in layer 3, `src/adapters/`. The local progress and settings use `KeyValueStore`, a driver interface of layer 3, and `BundledLevelRepository` imports the level files that the app bundles (#168). The HTTP implementations and their DTO mapper live in layer 4, `src/infrastructure/api/`, next to the HTTP client, and implement the layer 2 ports directly (Q7, option B). No port names a transport type. A new database or backend means a new adapter, and the use cases do not change.
 - **API client:** layer 4, `src/infrastructure/api/client.ts`. It uses the types in `schema.d.ts`, which `pnpm api:generate` writes from the backend OpenAPI document. `pacts/hexablock-app-hexablock-api.json` is the contract the consumer test writes for this client. It is a test artifact, not a layer.
 - **Screens:** layer 4, `app/` (Expo Router routes; the home screen and the game selector map exist, and the game route is a placeholder until #170). Their presenters and view models live in layer 3. A screen shows each text through a key of the text catalog in layer 3, `src/adapters/texts/`: `es.ts` and `en.ts` hold one Spanish and one English entry for each key (APP-FR-11, rule R-text-catalog in `AGENTS.md`). The catalog lives in layer 3, so a presenter can read it too. Since #165 the React Native board components live in `src/infrastructure/board/` (S3-07 in #151, «Propuesta, pendiente del equipo»): `BoardView`, the `CellRenderer<TCellView>` interface, and `BoardLayout<TCoord>` with `HexLayout`, `SquareLayout` and `TriangleLayout`. The cell renderer of each variant is planned in the same folder. Q8 still waits on the professor, and his answer can move them.
 - **Presentation pattern: Model-View-Presenter (MVP).** MVP is a presentation pattern, so it works inside Clean Architecture and orders only layers 3 and 4. The view is a route in layer 4, for example `GameScreen` with `BoardView`: it shows a `GameViewModel` and forwards each input to its presenter. The presenter (`GamePresenter`) and the view model live in layer 3: the presenter calls a use case through `UseCase`, maps the plain response to the view model and gives it to the view. The view model is plain data that the presenter builds, not an object that the view binds to, so the pattern is MVP and not MVVM. The model is layers 1 and 2.
