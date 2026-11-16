@@ -1,15 +1,14 @@
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
-
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { BundledLevelRepository } from '../../../src/adapters/bundled-level-repository';
 import { FitStateMapper } from '../../../src/adapters/fit-state-mapper';
+import fit01 from '../../../src/adapters/levels/fit/fit-01.json';
 import { GamePresenter } from '../../../src/adapters/game-presenter';
 import { textCatalog } from '../../../src/adapters/texts/text-catalog';
 import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
+import { GameId } from '../../../src/domain/engine/game-id';
 import type { HexCoord } from '../../../src/domain/engine/hex-topology';
-import { LevelDefinition } from '../../../src/domain/engine/level-definition';
 import { FitFactory } from '../../../src/domain/variants/hexa-fit/fit-factory';
 import type { FitLevel } from '../../../src/domain/variants/hexa-fit/fit-level';
 import { FitLevelBuilder } from '../../../src/domain/variants/hexa-fit/fit-level-builder';
@@ -19,7 +18,6 @@ import { FitControls } from '../../../src/infrastructure/ui/fit-controls';
 import { GameStage } from '../../../src/infrastructure/ui/game-stage';
 import { gameUseCases } from '../../support/application/game-use-cases';
 import { ManualClock } from '../../support/engine/manual-clock';
-import { repoRoot } from '../../support/run-tool';
 import { occupiedSpaces, pressSpace } from '../../support/ui/board-spaces';
 
 // Issue #175: the player plays Hexa Fit on the game screen. `GameStage` shows the board with
@@ -39,18 +37,18 @@ const METRICS = {
 
 const geometry = new HexGeometry();
 
-// The bundled Fit level of the file `name`, built as the level repository will build it.
-function bundledLevel(name: string): FitLevel<HexCoord> {
-  const file = JSON.parse(
-    readFileSync(path.join(repoRoot, 'src/adapters/levels/fit', name), 'utf8'),
-  ) as { topology: string; section: unknown };
-  return LevelDefinition.of(file).buildWith(new FitLevelBuilder(geometry));
+// The bundled level `fit-01`, as the level repository of the app gives it (#168),
+// built with the Fit level builder.
+async function firstBundledLevel(): Promise<FitLevel<HexCoord>> {
+  const [definition] = await new BundledLevelRepository([fit01]).list(GameId.of('hexa-fit'));
+  if (definition === undefined) throw new RangeError('The repository gave no Fit level.');
+  return definition.buildWith(new FitLevelBuilder(geometry));
 }
 
 // Opens the game screen on the level `fit-01` with the screen parts of Fit.
 async function openFirstBundledLevel(clock = new ManualClock()): Promise<void> {
   const { startGame, applyMove } = gameUseCases(
-    new FitFactory(geometry, bundledLevel('fit-01.json'), clock),
+    new FitFactory(geometry, await firstBundledLevel(), clock),
   );
   const presenter = new GamePresenter(
     startGame,

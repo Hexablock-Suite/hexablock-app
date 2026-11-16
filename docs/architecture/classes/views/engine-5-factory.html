@@ -64,7 +64,7 @@
       <h1>Wiring a variant: Abstract Factory, Builder, Observer and injected interfaces</h1>
 
       <svg
-        viewBox="0 0 1040 1624"
+        viewBox="0 0 1040 1704"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="factory-title factory-desc"
@@ -73,9 +73,10 @@
         <desc id="factory-desc">
           Class diagram of layer 1 showing the IVariantFactory abstract factory that creates the
           rules, piece source, scoring, board, progress model, initial state and optional history of
-          a variant, LevelDefinition, the data of one level file, which directs the ILevelBuilder
-          builder, the abstract GameEvent with GameOver, the domain event that the root records when
-          a game ends, the Clock and RandomSource interfaces that layer 4 implements, and the
+          a variant, LevelDefinition, the data of one level file with its level id and its order,
+          which directs the ILevelBuilder builder and tells the list of levels its figure and its
+          order, the abstract GameEvent with GameOver, the domain event that the root records when a
+          game ends, the Clock and RandomSource interfaces that layer 4 implements, and the
           MatchIdGenerator interface that gives the MatchId of each new match. Each reading of the
           Clock is a ClockReading value object (view 3). The internal ids are local value objects
           that keep the MatchId of their match: GameFactory builds the GameStateId of the first
@@ -146,7 +147,7 @@
           x="24"
           y="24"
           width="992"
-          height="1404"
+          height="1484"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -215,7 +216,7 @@
           x="40"
           y="380"
           width="432"
-          height="364"
+          height="444"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -260,7 +261,7 @@
         <!-- Pattern group: the factory of the aggregate -->
         <rect
           x="40"
-          y="788"
+          y="868"
           width="432"
           height="164"
           rx="8"
@@ -271,7 +272,7 @@
         />
         <text
           x="52"
-          y="804"
+          y="884"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -283,7 +284,7 @@
         <!-- Pattern group: the identity of a match -->
         <rect
           x="496"
-          y="788"
+          y="868"
           width="496"
           height="620"
           rx="8"
@@ -294,7 +295,7 @@
         />
         <text
           x="508"
-          y="804"
+          y="884"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -307,7 +308,7 @@
         <!-- GameFactory keeps the IVariantFactory it receives as variant: use with role and multiplicity -->
         <line
           x1="440"
-          y1="816"
+          y1="896"
           x2="440"
           y2="308"
           stroke="#5b6873"
@@ -317,9 +318,9 @@
         <!-- GameFactory keeps the MatchIdGenerator it receives as ids: use with role and multiplicity -->
         <line
           x1="456"
-          y1="852"
+          y1="932"
           x2="512"
-          y2="852"
+          y2="932"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#factory-open)"
@@ -327,9 +328,9 @@
         <!-- MatchIdGenerator gives a MatchId in next(): use with a verb -->
         <line
           x1="712"
-          y1="852"
+          y1="932"
           x2="776"
-          y2="852"
+          y2="932"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#factory-open)"
@@ -358,10 +359,10 @@
           variant
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="466" y="836" width="31" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="466" y="916" width="31" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="468"
-          y="845"
+          y="925"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -370,10 +371,10 @@
           ids
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="726.5" y="832" width="35" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="726.5" y="912" width="35" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="744"
-          y="841"
+          y="921"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -623,16 +624,16 @@
         <!-- LevelDefinition gives the topology and the section to the ILevelBuilder in buildWith(): use with a verb -->
         <line
           x1="220"
-          y1="584"
+          y1="664"
           x2="220"
-          y2="624"
+          y2="704"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#factory-open)"
         />
         <text
           x="228"
-          y="607"
+          y="687"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -645,7 +646,7 @@
           x="52"
           y="408"
           width="360"
-          height="176"
+          height="256"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -675,45 +676,60 @@
           LevelDefinition
         </text>
         <text x="68" y="472" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - topology: TopologyId
+          - id: LevelId
         </text>
         <text x="68" y="488" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - order: number
+        </text>
+        <text x="68" y="504" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - topology: TopologyId
+        </text>
+        <text x="68" y="520" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - section: string
         </text>
-        <line x1="52" y1="496" x2="412" y2="496" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="52" y1="528" x2="412" y2="528" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="68"
-          y="512"
+          y="544"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
           text-decoration="underline"
         >
-          + of(level: { topology: string; section: unknown }):
+          + of(level: { levelId: string; order: number;
         </text>
         <text
           x="79"
-          y="528"
+          y="560"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
           text-decoration="underline"
         >
-          LevelDefinition
-        </text>
-        <text x="68" y="544" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + buildWith&lt;TLevel&gt;(builder: ILevelBuilder&lt;TLevel&gt;):
-        </text>
-        <text x="79" y="560" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          TLevel
+          topology: string; section: unknown }): LevelDefinition
         </text>
         <text x="68" y="576" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + buildWith&lt;TLevel&gt;(builder: ILevelBuilder&lt;TLevel&gt;):
+        </text>
+        <text x="79" y="592" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          TLevel
+        </text>
+        <text x="68" y="608" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + levelId(): LevelId
+        </text>
+        <text x="68" y="624" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + isPlayedOn(figure: TopologyId): boolean
+        </text>
+        <text x="68" y="640" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + comesBefore(other: LevelDefinition): boolean
+        </text>
+        <text x="68" y="656" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: LevelDefinition): boolean
         </text>
         <!-- Class: ILevelBuilder (interface, builder) -->
         <rect
           x="52"
-          y="624"
+          y="704"
           width="360"
           height="104"
           rx="6"
@@ -721,10 +737,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="52" y1="672" x2="412" y2="672" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="52" y1="752" x2="412" y2="752" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="232"
-          y="642"
+          y="722"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -735,7 +751,7 @@
         </text>
         <text
           x="232"
-          y="660"
+          y="740"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -744,13 +760,13 @@
         >
           ILevelBuilder
         </text>
-        <text x="68" y="688" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="768" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + withTopology(topology: TopologyId): ILevelBuilder&lt;TLevel&gt;
         </text>
-        <text x="68" y="704" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="784" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + withSection(section: unknown): ILevelBuilder&lt;TLevel&gt;
         </text>
-        <text x="68" y="720" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="800" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + build(): TLevel
         </text>
 
@@ -833,7 +849,7 @@
         <!-- Class: MatchIdGenerator (interface of the engine) -->
         <rect
           x="512"
-          y="816"
+          y="896"
           width="200"
           height="72"
           rx="6"
@@ -841,10 +857,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="512" y1="864" x2="712" y2="864" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="512" y1="944" x2="712" y2="944" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="612"
-          y="834"
+          y="914"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -855,7 +871,7 @@
         </text>
         <text
           x="612"
-          y="852"
+          y="932"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -864,13 +880,13 @@
         >
           MatchIdGenerator
         </text>
-        <text x="528" y="880" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="528" y="960" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + next(): MatchId
         </text>
         <!-- Class: MatchId (value object) -->
         <rect
           x="776"
-          y="816"
+          y="896"
           width="200"
           height="112"
           rx="6"
@@ -878,10 +894,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="776" y1="864" x2="976" y2="864" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="776" y1="944" x2="976" y2="944" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="876"
-          y="834"
+          y="914"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -892,7 +908,7 @@
         </text>
         <text
           x="876"
-          y="852"
+          y="932"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -901,28 +917,34 @@
         >
           MatchId
         </text>
-        <text x="792" y="880" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="792" y="960" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - value: string
         </text>
-        <line x1="776" y1="888" x2="976" y2="888" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="792" y="904" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="776" y1="968" x2="976" y2="968" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="792" y="984" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + of(value: string): MatchId
         </text>
-        <text x="792" y="920" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text
+          x="792"
+          y="1000"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
           + equals(other: MatchId): boolean
         </text>
         <!-- GameFactory builds the GameStateId of the first state from the MatchId: use with a verb -->
         <path
-          d="M 440 944 V 988 H 512"
+          d="M 440 1024 V 1068 H 512"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#factory-open)"
         />
-        <rect x="456.5" y="968" width="39" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="456.5" y="1048" width="39" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="476"
-          y="977"
+          y="1057"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -933,16 +955,16 @@
         </text>
         <!-- GameFactory builds the BoardId of its board from the MatchId: use with a verb -->
         <path
-          d="M 424 944 V 1148 H 512"
+          d="M 424 1024 V 1228 H 512"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#factory-open)"
         />
-        <rect x="456.5" y="1128" width="39" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="456.5" y="1208" width="39" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="476"
-          y="1137"
+          y="1217"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -952,19 +974,19 @@
           BUILDS
         </text>
         <!-- Each local id keeps the MatchId of its match: use with role and multiplicity, one shared end -->
-        <path d="M 712 988 H 876" fill="none" stroke="#5b6873" stroke-width="1" />
-        <path d="M 712 1148 H 876" fill="none" stroke="#5b6873" stroke-width="1" />
+        <path d="M 712 1068 H 876" fill="none" stroke="#5b6873" stroke-width="1" />
+        <path d="M 712 1228 H 876" fill="none" stroke="#5b6873" stroke-width="1" />
         <path
-          d="M 712 1276 H 876 V 928"
+          d="M 712 1356 H 876 V 1008"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#factory-open)"
         />
-        <rect x="880" y="934" width="43" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="880" y="1014" width="43" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="882"
-          y="943"
+          y="1023"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -976,7 +998,7 @@
         <!-- Class: GameStateId (value object, local id) -->
         <rect
           x="512"
-          y="952"
+          y="1032"
           width="200"
           height="144"
           rx="6"
@@ -984,10 +1006,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="512" y1="1000" x2="712" y2="1000" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="512" y1="1080" x2="712" y2="1080" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="612"
-          y="970"
+          y="1050"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -998,7 +1020,7 @@
         </text>
         <text
           x="612"
-          y="988"
+          y="1068"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1009,17 +1031,17 @@
         </text>
         <text
           x="528"
-          y="1016"
+          y="1096"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
           - matchId: MatchId
         </text>
-        <line x1="512" y1="1024" x2="712" y2="1024" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="512" y1="1104" x2="712" y2="1104" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="528"
-          y="1040"
+          y="1120"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1028,7 +1050,7 @@
         </text>
         <text
           x="536"
-          y="1056"
+          y="1136"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1037,7 +1059,7 @@
         </text>
         <text
           x="528"
-          y="1072"
+          y="1152"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1046,7 +1068,7 @@
         </text>
         <text
           x="536"
-          y="1088"
+          y="1168"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1056,7 +1078,7 @@
         <!-- Class: BoardId (value object, local id) -->
         <rect
           x="512"
-          y="1112"
+          y="1192"
           width="200"
           height="112"
           rx="6"
@@ -1064,10 +1086,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="512" y1="1160" x2="712" y2="1160" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="512" y1="1240" x2="712" y2="1240" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="612"
-          y="1130"
+          y="1210"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1078,7 +1100,7 @@
         </text>
         <text
           x="612"
-          y="1148"
+          y="1228"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1089,17 +1111,17 @@
         </text>
         <text
           x="528"
-          y="1176"
+          y="1256"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
           - matchId: MatchId
         </text>
-        <line x1="512" y1="1184" x2="712" y2="1184" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="512" y1="1264" x2="712" y2="1264" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="528"
-          y="1200"
+          y="1280"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1108,7 +1130,7 @@
         </text>
         <text
           x="528"
-          y="1216"
+          y="1296"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1118,7 +1140,7 @@
         <!-- Class: LevelTimerId (value object, local id) -->
         <rect
           x="512"
-          y="1240"
+          y="1320"
           width="200"
           height="144"
           rx="6"
@@ -1126,10 +1148,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="512" y1="1288" x2="712" y2="1288" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="512" y1="1368" x2="712" y2="1368" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="612"
-          y="1258"
+          y="1338"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1140,7 +1162,7 @@
         </text>
         <text
           x="612"
-          y="1276"
+          y="1356"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1151,17 +1173,17 @@
         </text>
         <text
           x="528"
-          y="1304"
+          y="1384"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
           - matchId: MatchId
         </text>
-        <line x1="512" y1="1312" x2="712" y2="1312" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="512" y1="1392" x2="712" y2="1392" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="528"
-          y="1328"
+          y="1408"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1170,7 +1192,7 @@
         </text>
         <text
           x="536"
-          y="1344"
+          y="1424"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1179,7 +1201,7 @@
         </text>
         <text
           x="528"
-          y="1360"
+          y="1440"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1188,7 +1210,7 @@
         </text>
         <text
           x="536"
-          y="1376"
+          y="1456"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1198,7 +1220,7 @@
         <!-- Class: GameFactory (factory of the aggregate) -->
         <rect
           x="56"
-          y="816"
+          y="896"
           width="400"
           height="128"
           rx="6"
@@ -1206,10 +1228,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="56" y1="864" x2="456" y2="864" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="56" y1="944" x2="456" y2="944" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="256"
-          y="834"
+          y="914"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1220,7 +1242,7 @@
         </text>
         <text
           x="256"
-          y="852"
+          y="932"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1229,23 +1251,23 @@
         >
           GameFactory
         </text>
-        <text x="72" y="880" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="72" y="960" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - gameId: GameId
         </text>
-        <text x="72" y="896" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="72" y="976" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - variant: IVariantFactory&lt;TCell, TCoord, TMove, TState&gt;
         </text>
-        <text x="72" y="912" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="72" y="992" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - ids: MatchIdGenerator
         </text>
-        <line x1="56" y1="920" x2="456" y2="920" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="72" y="936" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="56" y1="1000" x2="456" y2="1000" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="72" y="1016" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createGame(): GameEngine&lt;TCell, TCoord, TMove, TState&gt;
         </text>
         <!-- UML template boxes: type parameters on the top-right corner -->
         <rect
           x="303"
-          y="806"
+          y="886"
           width="165"
           height="18"
           rx="2"
@@ -1256,7 +1278,7 @@
         />
         <text
           x="385.5"
-          y="818"
+          y="898"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1287,7 +1309,7 @@
         </text>
         <rect
           x="376"
-          y="614"
+          y="694"
           width="48"
           height="18"
           rx="2"
@@ -1298,7 +1320,7 @@
         />
         <text
           x="400"
-          y="626"
+          y="706"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1307,8 +1329,8 @@
           TLevel
         </text>
 
-        <!-- The footnote and the legend sit below the zone, which grew by 640. It grew by 32 more for the delivery operation of Score (#228), by 32 more for the local ids (#236), and by 248 more for LevelDefinition (#166). -->
-        <g transform="translate(0 952)">
+        <!-- The footnote and the legend sit below the zone, which grew by 640. It grew by 32 more for the delivery operation of Score (#228), by 32 more for the local ids (#236), by 248 more for LevelDefinition (#166), and by 80 more for the list of levels (#168). -->
+        <g transform="translate(0 1032)">
           <!-- Footnote: classes the budget leaves out -->
           <text
             x="24"

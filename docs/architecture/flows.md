@@ -25,7 +25,7 @@ View 3.2 of [classes.md](classes.md) shows `ApplyMove` with layers 2 and 1 only,
 
 ## Use case 2: save progress
 
-`SaveProgress` (APP-FR-09, APP-FR-13) saves the result of a finished game. `VictoryScreen` gives the `GameResult` to `ResultPresenter`, which calls the `UseCase` port. `SaveProgress` asks its `IProgressModel` strategy for the `ProgressRecord` and saves it through the `ProgressRepository` port. `ApiProgressRepository` in layer 4 implements that port: `ApiDtoMapper` makes a `ProgressDto`, and `ApiClient` sends it to `ProgressController.sync()` of `hexablock-api` (API-FR-02). The response comes back as a `Result` to the screen.
+`SaveProgress` (APP-FR-09, APP-FR-13) saves the result of a finished game. `VictoryScreen` gives the `GameResult` to `ResultPresenter`, which calls the `UseCase` port. `SaveProgress` loads the `GameProgress` of its game through the `ProgressRepository` port, or starts one when the game has none, records the result in it with its `IProgressModel` strategy, and saves it through the same port (S3-04, classes.md decisions 56 and 57). `ApiProgressRepository` in layer 4 implements that port: `ApiDtoMapper` makes a `ProgressDto`, and `ApiClient` sends it to `ProgressController.sync()` of `hexablock-api` (API-FR-02). The response comes back to the screen as a `Result` with no value. `LocalProgressRepository` in layer 3 implements the same port over `KeyValueStore` (#164), and view 4.2 shows it.
 
 This flow takes `SaveProgress` and not `SyncLeaderboard`, for two reasons:
 
@@ -36,11 +36,11 @@ The same endpoint is use case 1 of the API flows, in `hexablock-api/docs/archite
 
 ### Class view
 
-![SaveProgress class view: VictoryScreen, ApiProgressRepository, ApiDtoMapper and ApiClient in layer 4; ResultPresenter in layer 3; UseCase, SaveProgress and the ProgressRepository port in layer 2; IProgressModel, GameResult and ProgressRecord in layer 1](classes/views/flow-2-save-progress.png)
+![SaveProgress class view: VictoryScreen, ApiProgressRepository, ApiDtoMapper and ApiClient in layer 4; ResultPresenter in layer 3; UseCase, SaveProgress and the ProgressRepository port in layer 2; IProgressModel, GameResult, ProgressRecord and GameProgress in layer 1](classes/views/flow-2-save-progress.png)
 
 ### Sequence diagram
 
-![SaveProgress sequence: VictoryScreen calls onFinish() on ResultPresenter, which calls execute() on SaveProgress; SaveProgress calls record() on IProgressModel and save() on ApiProgressRepository, which calls toProgressDto() on ApiDtoMapper and syncProgress() on ApiClient; ApiClient sends the HTTP call to ProgressController.sync() of hexablock-api, and the replies go back to the screen](flows/views/seq-2-save-progress.png)
+![SaveProgress sequence: VictoryScreen calls onFinish() on ResultPresenter, which calls execute() on SaveProgress; SaveProgress calls load() on ApiProgressRepository, record() on IProgressModel and save() on ApiProgressRepository, which calls toProgressDto() on ApiDtoMapper and syncProgress() on ApiClient; ApiClient sends the HTTP call to ProgressController.sync() of hexablock-api, and the replies go back to the screen](flows/views/seq-2-save-progress.png)
 
 ## Use case 3: start a game
 
@@ -95,7 +95,7 @@ Each other use case follows the path of one flow above. Its own classes are in t
 | Use case          | Path                                                                                                                                                                                                                                    |
 | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `RedoMove`        | Same path as flow 4, except that it asks `GameEngine.canRedo()` and calls `GameEngine.redo()`, and the root asks the `IRedoable` capability of its history. Only Hexa Fit has it: `RedoableHistory` takes back an undone `MoveCommand`. |
-| `ListLevels`      | Same path as flow 2, except that it reads and does not write: it calls `LevelRepository.list()` and `ProgressRepository.load()` and returns `LevelSummary` values. Bundled levels come from `BundledLevelRepository` in layer 3 (A6).   |
+| `ListLevels`      | Same path as flow 2, except that it reads: it calls `LevelRepository.list()` and `ProgressRepository.load()` and returns one `LevelSummary` per level of the chosen figure. `BundledLevelRepository` gives the bundled levels (A6).     |
 | `SyncLeaderboard` | Same path as flow 2, except that it goes through the `LeaderboardGateway` port and `ApiLeaderboardGateway`. No view gives `ApiLeaderboardGateway` a member yet.                                                                         |
 | `Register`        | Same path as flow 5, except that it calls `AccountGateway.register()`, and the HTTP call goes to `AuthController.signUp()`.                                                                                                             |
 | `UpdateSettings`  | Same path as flow 5 up to the port, except that it stays in the app: `LocalSettingsStore` in layer 3 implements the `SettingsStore` port over `KeyValueStore`. No HTTP call runs.                                                       |
@@ -126,9 +126,11 @@ Each other use case follows the path of one flow above. Its own classes are in t
 
 - `ApplyMoveRequest` holds the move only. `ResultPresenter.onFinish()` and `ApiClient.syncProgress()` are planned members. Today `ApiClient` has `getHealth()` only.
 - The composition root binds `ProgressRepository` to `ApiProgressRepository` for a signed-in player. This is an assumption for team review: the docs do not say yet when `LocalProgressRepository` runs instead.
+- Flow 2: `SaveProgress`, the `ProgressRepository` port, `GameProgress` and `LocalProgressRepository` are code since #164, but the composition root does not build `SaveProgress` yet. `VictoryScreen`, `ResultPresenter`, `ApiProgressRepository`, `ApiDtoMapper.toProgressDto()` and `ApiClient.syncProgress()` are planned.
 - The route path of `ProgressController.sync()` waits on the OpenAPI export of the endpoint.
+- `ListLevels`, the `LevelRepository` port and `BundledLevelRepository` are code since #168, but the composition root does not build `ListLevels` yet, because no screen calls it. Its request holds the game and the chosen figure. It lists only the levels of that figure, in the order of their files, and each level is completed, open or locked (decision 58 of [classes.md](classes.md); S3-12 and S3-08 in #151, «Propuesta, pendiente del equipo»). A figure with no level gives an empty list.
 - Flow 1: the move controls of `GameScreen` are planned (#174 to #177). `GamePresenter.onEvent(event: GameEvent)` is a planned member, for `GameEventBus` (view 4.3 of [classes.md](classes.md)).
-- Flow 3: `StartGameRequest.levelId` is a planned member. `GamePresenter.startGame` and `GamePresenter.onStart()` exist since #170. `onStart()` takes no request, because `StartGameRequest` has no member yet. The sequence diagram draws the code: each variant factory calls `BoardBuilder`. No view says yet how the level definition reaches the level builder (#166, #167), so the diagram draws no level builder.
+- Flow 3: `StartGameRequest.levelId` is a planned member. `GamePresenter.startGame` and `GamePresenter.onStart()` exist since #170. `onStart()` takes no request, because `StartGameRequest` has no member yet. The sequence diagram draws the code: each variant factory calls `BoardBuilder`. No view says yet how the level definition reaches the level builder (#172), so the diagram draws no level builder.
 - Flow 4: `GamePresenter.undoMove` and `GamePresenter.onUndo()` are planned members. `MoveHistory.undo()` returns `void`, and `GameEngine` takes the state back through its private `restore(memento)`: the engine gives each `MoveCommand` this method as a function (decision 34, #159). `MoveCommand.after` and `redo()` come with `RedoableHistory` (#178).
 - Flow 5: `AccountPresenter.login`, `AccountPresenter.onLogin(credentials: Credentials)`, the `client` and `mapper` attributes of `ApiAccountGateway`, `ApiDtoMapper.toCredentialsDto()`, `ApiDtoMapper.toSession()` and `ApiClient.signIn()` are planned members. No view gives `Credentials` a member. The endpoint name follows view 3.3 of the API class diagram: `AuthController.signIn(body: CredentialsDto): Promise<TokenDto>`. The answer to a rejected sign-in, a rejected `Promise` that `Login` turns into `Result.failure(error)`, is an assumption for team review.
 

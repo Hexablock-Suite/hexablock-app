@@ -3,6 +3,7 @@ import type { BoardId } from '../../../src/domain/engine/board-id';
 import { BoardSnapshot, type BoardState } from '../../../src/domain/engine/board-state';
 import { GameId } from '../../../src/domain/engine/game-id';
 import type { GameStateId } from '../../../src/domain/engine/game-state-id';
+import { HighScoreProgress } from '../../../src/domain/engine/high-score-progress';
 import type { MatchId } from '../../../src/domain/engine/match-id';
 import { Outcome } from '../../../src/domain/engine/outcome';
 import type { IPieceSource } from '../../../src/domain/engine/piece-source';
@@ -250,7 +251,8 @@ export class OnePointScoring implements IScoringPolicy<FakeState> {
 }
 
 // The variant factory of the fake game, on a board of size × size cells.
-// It has no undo and no timer. The use cases and the game factory cannot name this game.
+// It has no undo and no timer, and it keeps a high score.
+// The use cases and the game factory cannot name this game.
 export function fakeGameFactory(
   size = 2,
 ): IVariantFactory<FakeCell, SquareCoord, FakeMove, FakeState, FakeCell> {
@@ -263,5 +265,6 @@ export function fakeGameFactory(
     createBoard: (boardId) => emptyState(size, MATCH_ID, STATE_ID, boardId).board,
     createInitialState: (matchId, stateId, boardId) => emptyState(size, matchId, stateId, boardId),
     createHistory: () => undefined,
+    createProgressModel: () => new HighScoreProgress(),
   };
 }

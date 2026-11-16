@@ -7,6 +7,15 @@ import { BoardShape } from '../../../src/domain/engine/board-shape';
 import type { BoardState } from '../../../src/domain/engine/board-state';
 import type { Cloneable } from '../../../src/domain/engine/cloneable';
 import { Color } from '../../../src/domain/engine/color';
+import { ElapsedTime } from '../../../src/domain/engine/elapsed-time';
+import { GameProgress } from '../../../src/domain/engine/game-progress';
+import { HighScoreProgress } from '../../../src/domain/engine/high-score-progress';
+import { LevelId } from '../../../src/domain/engine/level-id';
+import { LevelProgress } from '../../../src/domain/engine/level-progress';
+import { Moves } from '../../../src/domain/engine/moves';
+import { GameResult, ProgressRecord } from '../../../src/domain/engine/progress-model';
+import { Score } from '../../../src/domain/engine/score';
+import { Stars } from '../../../src/domain/engine/stars';
 import { TopologyId, type GeometryFactory } from '../../../src/domain/engine/geometry-factory';
 import { GameId } from '../../../src/domain/engine/game-id';
 import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
@@ -23,6 +32,7 @@ import type { IVariantFactory } from '../../../src/domain/engine/variant-factory
 import { FitFactory } from '../../../src/domain/variants/hexa-fit/fit-factory';
 import { FitLevel } from '../../../src/domain/variants/hexa-fit/fit-level';
 import { PlaceFitPiece } from '../../../src/domain/variants/hexa-fit/fit-move';
+import { FitStarThreshold } from '../../../src/domain/variants/hexa-fit/fit-stars';
 import { CellCount } from '../../../src/domain/variants/hexa-lines/cell-count';
 import { LinesFactory, LinesSettings } from '../../../src/domain/variants/hexa-lines/lines-factory';
 import { MergeFactory, MergeSettings } from '../../../src/domain/variants/hexa-merge/merge-factory';
@@ -31,7 +41,9 @@ import { ColorStack } from '../../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../../src/domain/variants/hexa-sort/sort-factory';
 import { SortLevel } from '../../../src/domain/variants/hexa-sort/sort-level';
+import { SortStarThreshold } from '../../../src/domain/variants/hexa-sort/sort-stars';
 import { ManualClock } from '../../support/engine/manual-clock';
+import { square } from '../../support/engine/square-topology';
 import { phaseNameOf } from '../../support/engine/phase-name';
 import {
   firstValidMove,
@@ -263,6 +275,103 @@ describe('IVariantFactory', () => {
 
     expect(untimed).toEqual([undefined, undefined, undefined]);
     expect(fitFactory().createTimer(MATCH_ID)).toBeInstanceOf(LevelTimer);
+  });
+
+  // Each factory gives the progress model of its game (issue #156, classes.md decision 31).
+  // Lines and Merge keep a high score. Fit and Sort keep the best result of each level.
+  it('should_give_the_progress_model_of_its_game_when_each_factory_creates_a_progress_model', () => {
+    const models = [linesFactory(), fitFactory(), sortFactory(), mergeFactory()].map((factory) =>
+      factory.createProgressModel(),
+    );
+
+    expect(models.map((model) => model instanceof HighScoreProgress)).toEqual([
+      true,
+      false,
+      false,
+      true,
+    ]);
+    expect(models.map((model) => model instanceof LevelProgress)).toEqual([
+      false,
+      true,
+      true,
+      false,
+    ]);
+  });
+
+  // The model of a level counts the stars with the thresholds of the level (decision 36).
+  // `SortLevelBuilder` gives a Sort level the thresholds of its file (#167). The level here
+  // gets them from `withStars()`: 4 moves meet the first threshold and miss the second.
+  it('should_count_the_stars_with_the_thresholds_of_the_level_when_the_fit_or_sort_model_records_a_result', () => {
+    const fitId = GameId.of('hexa-fit');
+    const sortId = GameId.of('hexa-sort');
+    const domino = new Piece(
+      new ShapeGroup([new CellNode(square(0, 0)), new CellNode(square(1, 0))]),
+      A,
+    );
+    const star = (maxMoves: number, maxMs: number) =>
+      FitStarThreshold.of({ maxMoves: Moves.of(maxMoves), maxElapsedMs: ElapsedTime.ofMs(maxMs) });
+    const fit = new FitFactory(
+      new SquareGeometry(),
+      FitLevel.of(
+        TopologyId.square,
+        BoardShape.of([square(0, 0), square(1, 0)]),
+        [domino],
+        [star(1, 5000), star(1, 2000)],
+      ),
+      new ManualClock(),
+    );
+    const fitProgress = GameProgress.start(fitId);
+    const sortProgress = GameProgress.start(sortId);
+
+    fit.createProgressModel().record(
+      GameResult.of({
+        gameId: fitId,
+        score: Score.of(0),
+        moves: Moves.of(1),
+        levelId: LevelId.of('fit-01'),
+        elapsedMs: ElapsedTime.ofMs(3000),
+      }),
+      fitProgress,
+    );
+    const sort = new SortFactory(
+      new SquareGeometry(),
+      SortLevel.fixed(RegionSize.of(2), GoalCount.of(5), [
+        ColorStack.of([Color.of('red')]),
+      ]).withStars([SortStarThreshold.of(Moves.of(5)), SortStarThreshold.of(Moves.of(3))]),
+    );
+    sort.createProgressModel().record(
+      GameResult.of({
+        gameId: sortId,
+        score: Score.of(50),
+        moves: Moves.of(4),
+        levelId: LevelId.of('sort-01'),
+      }),
+      sortProgress,
+    );
+
+    expect(
+      fitProgress.keeps(
+        ProgressRecord.of({
+          gameId: fitId,
+          score: Score.of(0),
+          levelId: LevelId.of('fit-01'),
+          stars: Stars.of(1),
+          moves: Moves.of(1),
+          elapsedMs: ElapsedTime.ofMs(3000),
+        }),
+      ),
+    ).toBe(true);
+    expect(
+      sortProgress.keeps(
+        ProgressRecord.of({
+          gameId: sortId,
+          score: Score.of(50),
+          levelId: LevelId.of('sort-01'),
+          stars: Stars.of(1),
+          moves: Moves.of(4),
+        }),
+      ),
+    ).toBe(true);
   });
 
   it('should_play_each_variant_through_the_same_path_when_the_engine_gets_the_four_factories', () => {

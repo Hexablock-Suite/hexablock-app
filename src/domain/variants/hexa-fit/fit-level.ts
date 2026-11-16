@@ -2,6 +2,7 @@ import type { BoardShape } from '../../engine/board-shape';
 import type { CoordKey } from '../../engine/coord-key';
 import type { ElapsedTime } from '../../engine/elapsed-time';
 import type { TopologyId } from '../../engine/geometry-factory';
+import type { ILevelStars } from '../../engine/level-progress';
 import type { Moves } from '../../engine/moves';
 import type { Piece } from '../../engine/piece';
 import { FixedListPieceSource } from '../../engine/piece-source';
@@ -28,7 +29,8 @@ type Family = { isOfFamily(id: TopologyId): boolean };
 // `FitFactory` checks the geometry, because only the factory holds one.
 // The geometry keeps its family private, so the level asks it with `isOfFamily()` (issue #234).
 // `FitLevelBuilder` builds the level from a level file through `of()` (issue #166).
-export class FitLevel<TCoord> {
+// `LevelProgress` asks the level for the stars of a play through `ILevelStars` (issue #156).
+export class FitLevel<TCoord> implements ILevelStars {
   private constructor(
     private readonly topology: TopologyId,
     private readonly figure: BoardShape<TCoord>,

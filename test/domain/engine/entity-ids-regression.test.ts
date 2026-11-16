@@ -94,6 +94,7 @@ function recordingTimers<TCell, TCoord, TMove, TState extends AnyState<TCell, TC
     createInitialState: (matchId, stateId, boardId) =>
       variant.createInitialState(matchId, stateId, boardId),
     createHistory: () => variant.createHistory(),
+    createProgressModel: () => variant.createProgressModel(),
   };
   return { timers, recording };
 }
