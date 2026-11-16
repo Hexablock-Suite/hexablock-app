@@ -24,8 +24,8 @@ export interface GameSession {
 
 // The session of the game `gameId` in the composition root `root`, with the texts `texts`,
 // on the board figure `figure`, by default the hexagon (#171).
-// The presenter takes `StartGame` and `ApplyMove` of the root, each inside its logging aspect,
-// and the state mapper of the registry entry. An id that the registry of the figure
+// The presenter takes `StartGame`, `ApplyMove`, `UndoMove` and `RedoMove` (#178) of the root,
+// each inside its logging aspect, and the state mapper of the registry entry. An id that the registry of the figure
 // does not hold throws a RangeError.
 export function gameSessionOf(
   root: CompositionRoot,
@@ -34,9 +34,9 @@ export function gameSessionOf(
   figure: TopologyId = TopologyId.hex,
 ): GameSession {
   const { screen } = root.registry(figure).gameOf(gameId);
-  const { startGame, applyMove } = root.gameUseCases(gameId, figure);
+  const { startGame, applyMove, undoMove, redoMove } = root.gameUseCases(gameId, figure);
   return {
-    presenter: new GamePresenter(startGame, applyMove, screen.mapper, texts),
+    presenter: new GamePresenter(startGame, applyMove, undoMove, redoMove, screen.mapper, texts),
     renderer: screen.renderer,
     controls: screen.controls,
     layoutOf: (size) => screen.layoutOf(size),

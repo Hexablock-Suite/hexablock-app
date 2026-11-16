@@ -25,6 +25,9 @@ type FitProps<TCoord> = MoveControlsProps<
   FitMove<TCoord>
 >;
 
+// One action of the view model with its label and its state: the undo or the redo (#178).
+type GameAction = NonNullable<FitProps<unknown>['model']['undo']>;
+
 // The piece that the player chose in the tray and the rotation step that it shows.
 interface Choice {
   readonly piece: string;
@@ -58,7 +61,8 @@ const PREVIEW_RENDERER: CellRenderer<PreviewSpace> = {
 
 // The move controls of Hexa Fit (classes.md decision 14, issue #175). The game registry
 // of the composition root chooses them for Fit. Below the board, a wood sign shows what to do
-// next, the count of the accepted moves, the tray and the rotate button.
+// next, the count of the accepted moves, the tray and the rotate button. Below the tray,
+// the undo button and the redo button take a move back and play it again (#178).
 // The player picks a piece of the tray, turns it by the rotation step of the topology
 // and presses a free space: the origin of the piece goes there. A piece only turns, and it never
 // mirrors (C7). A press on a space of a placed piece takes that piece back to the tray.
@@ -76,7 +80,7 @@ export class FitControls<TCoord> implements MoveControls<
   }
 }
 
-function FitPlay<TCoord>({ model, texts, layoutOf, play, board }: FitProps<TCoord>) {
+function FitPlay<TCoord>({ model, texts, layoutOf, play, undo, redo, board }: FitProps<TCoord>) {
   const [chosen, setChosen] = useState<Choice | undefined>();
   const tray = model.payload?.tray ?? [];
   const current = tray.find((each) => each.piece === chosen?.piece);
@@ -141,8 +145,36 @@ function FitPlay<TCoord>({ model, texts, layoutOf, play, board }: FitProps<TCoor
             onPress={rotate}
           />
         </View>
+        <HistoryButtons undo={model.undo} redo={model.redo} onUndo={undo} onRedo={redo} />
       </WoodSign>
     </>
+  );
+}
+
+// The undo button and the redo button of the view model, side by side (APP-FR-08, #178).
+// Each one takes no press while no move can go back or forward. A view model with no undo
+// shows no button.
+function HistoryButtons({
+  undo,
+  redo,
+  onUndo,
+  onRedo,
+}: {
+  readonly undo: GameAction | undefined;
+  readonly redo: GameAction | undefined;
+  readonly onUndo: () => void;
+  readonly onRedo: () => void;
+}) {
+  if (undo === undefined && redo === undefined) return null;
+  return (
+    <View style={styles.history}>
+      {undo === undefined ? null : (
+        <LipButton label={undo.label} look="panel" disabled={!undo.enabled} onPress={onUndo} />
+      )}
+      {redo === undefined ? null : (
+        <LipButton label={redo.label} look="panel" disabled={!redo.enabled} onPress={onRedo} />
+      )}
+    </View>
   );
 }
 
@@ -259,6 +291,13 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     flexDirection: 'row',
     alignItems: 'center',
+    gap: space.md,
+    marginTop: space.sm,
+  },
+  history: {
+    alignSelf: 'stretch',
+    flexDirection: 'row',
+    justifyContent: 'center',
     gap: space.md,
     marginTop: space.sm,
   },
