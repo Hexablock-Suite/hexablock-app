@@ -27,7 +27,7 @@ A new variant adds classes and data. It changes no engine file, no other variant
 6. If Hexa Fill has levels, write `FillLevel` and `FillLevelBuilder`, which implements `ILevelBuilder<FillLevel>` and builds the level step by step (D9). Add the level files. An adapter reads each file, and the builder gets plain data (decision 24).
 7. If Hexa Fill publishes its own events, write classes that extend `GameEvent`, for example `RegionFilled`.
 8. In layer 3, write `FillStateMapper`, which implements `StateMapper<FillCell>` and turns each cell into a `CellView`.
-9. In layer 4, write `FillCellRenderer`, which implements `CellRenderer<TCellView>`. Its folder is open (Q8).
+9. In layer 4, write `FillCellRenderer`, which implements [`CellRenderer<TCellView>`](../src/infrastructure/board/cell-renderer.ts). Its folder is `src/infrastructure/board/` (S3-07 in #151, «Propuesta, pendiente del equipo»), and Q8 can still move it.
 10. Register the game: add `registered(new FillFactory(geometry, …))` to the list in [`src/infrastructure/registered-games.ts`](../src/infrastructure/registered-games.ts). [`GameRegistry`](../src/infrastructure/game-registry.ts) then maps `hexa-fill` to `FillFactory`, and the game selector shows the new entry. `FillStateMapper` (#170) and `FillCellRenderer` (#165) join the same entry when the registry holds them. [`CompositionRoot`](../src/infrastructure/composition-root.ts) gives the `FillFactory` to a `GameFactory`, with the one `MatchIdGenerator` that every variant shares, and `StartGame` takes that `GameFactory`. The event publisher goes to `ApplyMove`, which delivers the events that the engine records (#233), so a new variant changes no wiring of events.
 11. Test the rules of Hexa Fill in their own test suite. The engine tests and the tests of the other variants do not change.
 
@@ -39,7 +39,7 @@ A new variant adds classes and data. It changes no engine file, no other variant
 | 1     | `src/domain/variants/hexa-fill/`, only with levels | `FillLevel`, `FillLevelBuilder`                                                                              |
 | 1     | `src/domain/variants/hexa-fill/`, only with events | One class per new event, for example `RegionFilled`                                                          |
 | 3     | `src/adapters/`                                    | `FillStateMapper`                                                                                            |
-| 4     | the folder of the cell renderers (Q8)              | `FillCellRenderer`                                                                                           |
+| 4     | `src/infrastructure/board/` (S3-07, Q8)            | `FillCellRenderer`                                                                                           |
 | data  | the bundled level files, only with levels          | One file per hand-made level                                                                                 |
 | tests | the test folder of the variant rules               | The rules suite of Hexa Fill                                                                                 |
 
