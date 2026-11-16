@@ -143,8 +143,9 @@ describe('GameStage', () => {
   });
 
   // Issue #178 (APP-FR-08): Lines and Sort show no undo. The move controls of a game choose
-  // its buttons: only the Fit controls show the undo and the redo for now (#179 adds Merge).
-  it('should_show_the_undo_and_the_redo_buttons_only_on_the_fit_screen_when_each_game_opens', async () => {
+  // its buttons: the Fit controls show the undo and the redo, and since #179 the Merge controls
+  // show the undo only, because Merge never redoes.
+  it('should_show_the_undo_on_the_fit_and_merge_screens_and_the_redo_only_on_the_fit_screen_when_each_game_opens', async () => {
     const shown: [string, number, number][] = [];
     for (const id of FOUR_VARIANTS) {
       await show(gameSessionOf(testRoot(), GameId.of(id), textCatalog.es));
@@ -160,7 +161,7 @@ describe('GameStage', () => {
       ['hexa-lines', 0, 0],
       ['hexa-fit', 1, 1],
       ['hexa-sort', 0, 0],
-      ['hexa-merge', 0, 0],
+      ['hexa-merge', 1, 0],
     ]);
   });
 

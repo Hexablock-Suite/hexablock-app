@@ -22,7 +22,7 @@ import { ManualClock } from '../../support/engine/manual-clock';
 // and one slide button for each way that the topology gives, six on the hexagon.
 // When a merge makes the target tile, the screen offers to continue, as in 2048 (A3).
 // The prompt reads the target flag of the payload, because the rules never answer a victory
-// for Merge.
+// for Merge. Since #179 an undo button below the slide buttons takes back the last slide.
 
 // A safe area with no insets, as a phone without a notch gives it.
 const METRICS = {
@@ -82,15 +82,55 @@ async function slideUntil(session: GameSession, done: () => boolean): Promise<nu
   return done() ? MOST_PRESSES : MOST_PRESSES + 1;
 }
 
+// Presses the undo button and waits for the answer of the presenter.
+async function undo(session: GameSession): Promise<void> {
+  const before = session.presenter.viewModel();
+  await fireEvent.press(undoButton());
+  await waitFor(() => expect(session.presenter.viewModel()).not.toBe(before));
+}
+
+// The Merge session of the real composition root with a manual clock, so the game takes
+// the same seed in every run. With that seed, the first two tiles can slide to the east.
+function realMergeSession(logger: RecordingLogger): GameSession {
+  const root = new CompositionRoot({ clock: new ManualClock(), logger });
+  return gameSessionOf(root, GameId.of('hexa-merge'), textCatalog.es);
+}
+
+// The real root plays to 2048, which no test reaches. So this session plays a game with
+// the target 4, which makes its target with the first merge of two tiles of 2.
+// The screen parts are the parts that the registry of the real root gives Merge on the hexagon.
+function targetFourSession(): GameSession {
+  const root = new CompositionRoot({ clock: new ManualClock(), logger: new RecordingLogger() });
+  const parts = root.registry().gameOf(GameId.of('hexa-merge')).screen;
+  const factory = new MergeFactory(
+    new HexGeometry(),
+    MergeSettings.of(RegionSize.of(3), Seed.of(7), MergeTile.of(4)),
+  );
+  const { startGame, applyMove, undoMove, redoMove } = gameUseCases(factory);
+  return {
+    presenter: new GamePresenter(
+      startGame,
+      applyMove,
+      undoMove,
+      redoMove,
+      parts.mapper,
+      textCatalog.es,
+    ),
+    renderer: parts.renderer,
+    controls: parts.controls,
+    layoutOf: (size) => parts.layoutOf(size),
+    texts: textCatalog.es,
+  };
+}
+
 const prompt = () => screen.queryByRole('header', { name: '¡Lo lograste!' });
+const undoButton = () => screen.getByRole('button', { name: 'Deshacer' });
+const scoreOf = (session: GameSession) => session.presenter.viewModel().score;
 
 describe('Merge on the game screen', () => {
-  // The real composition root with a manual clock, so the game takes the same seed in every run.
-  // With that seed, the first two tiles can slide to the east.
   it('should_change_the_board_when_the_player_presses_one_slide_button', async () => {
     const logger = new RecordingLogger();
-    const root = new CompositionRoot({ clock: new ManualClock(), logger });
-    const session = gameSessionOf(root, GameId.of('hexa-merge'), textCatalog.es);
+    const session = realMergeSession(logger);
     await show(session);
     const before = boardPicture();
 
@@ -106,31 +146,8 @@ describe('Merge on the game screen', () => {
     ]);
   });
 
-  // The real root plays to 2048, which no test reaches. So the presenter plays a game with
-  // the target 4, which makes its target with the first merge of two tiles of 2.
-  // The screen parts are the parts that the registry of the real root gives Merge on the hexagon.
   it('should_offer_to_continue_and_keep_the_game_going_when_a_slide_makes_the_target_tile', async () => {
-    const root = new CompositionRoot({ clock: new ManualClock(), logger: new RecordingLogger() });
-    const parts = root.registry().gameOf(GameId.of('hexa-merge')).screen;
-    const factory = new MergeFactory(
-      new HexGeometry(),
-      MergeSettings.of(RegionSize.of(3), Seed.of(7), MergeTile.of(4)),
-    );
-    const { startGame, applyMove, undoMove, redoMove } = gameUseCases(factory);
-    const session: GameSession = {
-      presenter: new GamePresenter(
-        startGame,
-        applyMove,
-        undoMove,
-        redoMove,
-        parts.mapper,
-        textCatalog.es,
-      ),
-      renderer: parts.renderer,
-      controls: parts.controls,
-      layoutOf: (size) => parts.layoutOf(size),
-      texts: textCatalog.es,
-    };
+    const session = targetFourSession();
     await show(session);
     expect(prompt()).toBeNull();
 
@@ -152,6 +169,91 @@ describe('Merge on the game screen', () => {
     // The flag of the payload stays true, and the prompt does not come back.
     expect(prompt()).toBeNull();
     expect(screen.getByText('En juego')).toBeOnTheScreen();
+  });
+
+  // Issue #179 (APP-FR-08, S3-15 in #151, «Propuesta, pendiente del equipo»): the undo button
+  // gives back the board and the score before the slide. The photo before the slide holds
+  // the tile source at its position, so the same slide draws the same new tile again.
+  // Merge never redoes, so the screen shows no redo button.
+  it('should_give_back_the_board_and_draw_the_same_new_tile_again_when_the_player_undoes_a_slide_and_slides_the_same_way', async () => {
+    const logger = new RecordingLogger();
+    const session = realMergeSession(logger);
+    await show(session);
+    const start = boardPicture();
+    expect(undoButton()).toBeDisabled();
+
+    await slide(session, 'Deslizar al este');
+    const played = boardPicture();
+    const playedScore = scoreOf(session);
+    expect(undoButton()).toBeEnabled();
+    await undo(session);
+    const undone = boardPicture();
+    const undoneScore = scoreOf(session);
+    expect(undoButton()).toBeDisabled();
+    await slide(session, 'Deslizar al este');
+
+    expect(played).not.toEqual(start);
+    expect(undone).toEqual(start);
+    expect(undoneScore).toBe(0);
+    expect(boardPicture()).toEqual(played);
+    expect(scoreOf(session)).toBe(playedScore);
+    expect(screen.queryByRole('button', { name: 'Rehacer' })).toBeNull();
+    expect(logger.entries.map((entry) => [entry.useCase, entry.outcome])).toEqual([
+      ['StartGame', 'success'],
+      ['ApplyMove', 'success'],
+      ['UndoMove', 'success'],
+      ['ApplyMove', 'success'],
+    ]);
+  });
+
+  // Issue #179, the check of APP-FR-08 for Merge: the history keeps one move. So after two
+  // slides and one undo, the undo button takes no press, and a second undo changes nothing.
+  it('should_change_nothing_when_the_player_presses_undo_a_second_time_in_a_row', async () => {
+    const logger = new RecordingLogger();
+    const session = realMergeSession(logger);
+    await show(session);
+    await slide(session, 'Deslizar al este');
+    const afterFirst = boardPicture();
+    await slide(session, 'Deslizar al oeste');
+    await undo(session);
+    const undone = boardPicture();
+    const score = scoreOf(session);
+
+    await fireEvent.press(undoButton());
+
+    expect(undone).toEqual(afterFirst);
+    expect(undoButton()).toBeDisabled();
+    expect(boardPicture()).toEqual(undone);
+    expect(scoreOf(session)).toBe(score);
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(logger.entries.map((entry) => [entry.useCase, entry.outcome])).toEqual([
+      ['StartGame', 'success'],
+      ['ApplyMove', 'success'],
+      ['ApplyMove', 'success'],
+      ['UndoMove', 'success'],
+    ]);
+  });
+
+  // Issue #179: an undo can take the target tile back. The target flag of the payload turns
+  // false, and the screen forgets that the player continued. The game is then before its first
+  // target again, so the prompt opens again when the same slide makes the target again.
+  it('should_offer_to_continue_again_when_the_player_undoes_the_slide_that_made_the_target_and_makes_it_again', async () => {
+    const session = targetFourSession();
+    await show(session);
+    const presses = await slideUntil(session, () => prompt() !== null);
+    expect(presses).toBeLessThanOrEqual(MOST_PRESSES);
+    await fireEvent.press(screen.getByRole('button', { name: 'Seguir jugando' }));
+    expect(prompt()).toBeNull();
+
+    await undo(session);
+    const afterUndo = session.presenter.viewModel().payload;
+    const promptAfterUndo = prompt();
+    await slide(session, SIX_SLIDES[(presses - 1) % SIX_SLIDES.length]);
+
+    expect(afterUndo).toEqual({ targetReached: false });
+    expect(promptAfterUndo).toBeNull();
+    expect(session.presenter.viewModel().payload).toEqual({ targetReached: true });
+    expect(prompt()).not.toBeNull();
   });
 
   // Lines and Sort keep `BoardOnlyControls`, the default controls, and Fit has `FitControls`

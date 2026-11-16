@@ -83,7 +83,7 @@
           MergeStateMapper and MergeControls, the parts of Hexa Merge, implement the same two
           strategies. GamePresenter also undoes and redoes a move through the UseCase port, and
           GameViewModel holds the undo and the redo of a variant with undo, which FitControls show
-          as two buttons.
+          as two buttons. MergeControls show the undo only, because Merge never redoes.
         </desc>
         <defs>
           <marker
@@ -1728,6 +1728,7 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           MergeStateMapper, MergeCellRenderer and MergeControls are the parts of Hexa Merge (#177).
+          MergeControls show the undo only, because Merge never redoes (#179).
         </text>
         <text
           x="24"
