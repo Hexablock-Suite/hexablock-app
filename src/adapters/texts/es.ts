@@ -4,11 +4,17 @@
 // of its `GameId`: the game selector finds the names of each registered game there (#169).
 // The texts of the game screen live under `play.<part>`, so no key of the game screen
 // looks like the key of a game (#170).
+// The name of each board figure lives under `figure.<id>`, where `<id>` is the text
+// of its `TopologyId` (#171).
 export const es = {
   'home.title': 'HexaBlock Suite',
   'home.brand': 'HexaBlock',
   'home.suite': 'Suite',
   'home.play': 'Jugar',
+  'home.figure': 'Figura del tablero',
+  'figure.hex': 'Hexágono',
+  'figure.square': 'Cuadrado',
+  'figure.triangle': 'Triángulo',
   'map.title': 'Mapa de mundos',
   'map.back': 'Atrás',
   'play.back': 'Mapa',

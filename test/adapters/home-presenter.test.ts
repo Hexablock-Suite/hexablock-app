@@ -2,9 +2,11 @@
 import { HomePresenter } from '../../src/adapters/home-presenter';
 import { textCatalog } from '../../src/adapters/texts/text-catalog';
 import { GameId } from '../../src/domain/engine/game-id';
+import { TopologyId } from '../../src/domain/engine/geometry-factory';
 
 // Issue #169: `HomePresenter` gives the view models of the home screen and of the game
-// selector map. It takes the ids of the registered games and the texts of one language.
+// selector map. It takes the ids of the registered games, the board figures of the root
+// (#171) and the texts of one language.
 // The selector lists the games in the order of the registry, so a fifth variant adds one
 // registry entry and its names in the text catalog.
 
@@ -14,25 +16,64 @@ function gameIds(...ids: string[]): GameId[] {
 
 const FOUR_GAMES = gameIds('hexa-lines', 'hexa-fit', 'hexa-sort', 'hexa-merge');
 
+// The three board figures of the root, in the order of the figure selector (#171).
+const THREE_FIGURES = [TopologyId.hex, TopologyId.square, TopologyId.triangle];
+
 describe('HomePresenter', () => {
   it('should_give_the_home_texts_of_the_language_when_the_home_screen_is_presented', () => {
-    expect(new HomePresenter(FOUR_GAMES, textCatalog.es).home()).toEqual({
+    expect(new HomePresenter(FOUR_GAMES, THREE_FIGURES, textCatalog.es).home()).toEqual({
       title: 'HexaBlock Suite',
       brand: 'HexaBlock',
       suite: 'Suite',
       play: 'Jugar',
+      figure: 'Figura del tablero',
+      figures: [
+        { id: 'hex', name: 'Hexágono' },
+        { id: 'square', name: 'Cuadrado' },
+        { id: 'triangle', name: 'Triángulo' },
+      ],
     });
-    expect(new HomePresenter(FOUR_GAMES, textCatalog.en).home()).toEqual({
+    expect(new HomePresenter(FOUR_GAMES, THREE_FIGURES, textCatalog.en).home()).toEqual({
       title: 'HexaBlock Suite',
       brand: 'HexaBlock',
       suite: 'Suite',
       play: 'Play',
+      figure: 'Board figure',
+      figures: [
+        { id: 'hex', name: 'Hexagon' },
+        { id: 'square', name: 'Square' },
+        { id: 'triangle', name: 'Triangle' },
+      ],
     });
+  });
+
+  // Issue #171: the home screen offers the board figures of the root, in its order.
+  it('should_list_each_figure_in_the_order_of_the_root_when_the_home_screen_is_presented', () => {
+    const presenter = new HomePresenter(
+      FOUR_GAMES,
+      [TopologyId.triangle, TopologyId.hex],
+      textCatalog.es,
+    );
+
+    expect(presenter.home().figures).toEqual([
+      { id: 'triangle', name: 'Triángulo' },
+      { id: 'hex', name: 'Hexágono' },
+    ]);
+  });
+
+  it('should_throw_a_range_error_when_the_catalog_lacks_the_name_of_a_figure', () => {
+    const { 'figure.square': _square, ...texts } = textCatalog.es;
+    const presenter = new HomePresenter(FOUR_GAMES, THREE_FIGURES, texts as typeof textCatalog.es);
+
+    expect(() => presenter.home()).toThrow(
+      new RangeError('The text catalog has no text for the key "figure.square".'),
+    );
   });
 
   it('should_list_each_game_in_the_order_of_the_registry_when_the_selector_is_presented', () => {
     const presenter = new HomePresenter(
       gameIds('hexa-merge', 'hexa-lines', 'hexa-sort', 'hexa-fit'),
+      THREE_FIGURES,
       textCatalog.es,
     );
 
@@ -49,7 +90,7 @@ describe('HomePresenter', () => {
   });
 
   it('should_give_the_english_texts_when_the_selector_is_presented_in_english', () => {
-    expect(new HomePresenter(FOUR_GAMES, textCatalog.en).gameSelector()).toEqual({
+    expect(new HomePresenter(FOUR_GAMES, THREE_FIGURES, textCatalog.en).gameSelector()).toEqual({
       title: 'World map',
       back: 'Back',
       games: [
@@ -67,7 +108,11 @@ describe('HomePresenter', () => {
       'game.hexa-fill.name': 'Hexa Fill',
       'game.hexa-fill.place': 'Isla Pintura',
     };
-    const presenter = new HomePresenter([...FOUR_GAMES, GameId.of('hexa-fill')], texts);
+    const presenter = new HomePresenter(
+      [...FOUR_GAMES, GameId.of('hexa-fill')],
+      THREE_FIGURES,
+      texts,
+    );
 
     expect(presenter.gameSelector().games.map((game) => game.id)).toEqual([
       'hexa-lines',
@@ -84,7 +129,7 @@ describe('HomePresenter', () => {
   });
 
   it('should_throw_a_range_error_when_the_catalog_names_no_game_with_the_id', () => {
-    const presenter = new HomePresenter([GameId.of('hexa-fill')], textCatalog.es);
+    const presenter = new HomePresenter([GameId.of('hexa-fill')], THREE_FIGURES, textCatalog.es);
 
     expect(() => presenter.gameSelector()).toThrow(
       new RangeError('The text catalog names no game with this id.'),
@@ -93,7 +138,7 @@ describe('HomePresenter', () => {
 
   it('should_throw_a_range_error_when_the_catalog_lacks_the_place_of_a_game', () => {
     const texts = { ...textCatalog.es, 'game.hexa-fill.name': 'Hexa Fill' };
-    const presenter = new HomePresenter([GameId.of('hexa-fill')], texts);
+    const presenter = new HomePresenter([GameId.of('hexa-fill')], THREE_FIGURES, texts);
 
     expect(() => presenter.gameSelector()).toThrow(
       new RangeError('The text catalog has no text for the key "game.hexa-fill.place".'),
