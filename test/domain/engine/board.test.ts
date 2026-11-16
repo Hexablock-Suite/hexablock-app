@@ -1,6 +1,7 @@
 /** @jest-environment node */
 import { Board, BoardSpace } from '../../../src/domain/engine/board';
 import { BoardId } from '../../../src/domain/engine/board-id';
+import { MatchId } from '../../../src/domain/engine/match-id';
 import { BoardShape } from '../../../src/domain/engine/board-shape';
 import { coordKey, type CoordKey } from '../../../src/domain/engine/coord-key';
 import type { GridTopology } from '../../../src/domain/engine/grid-topology';
@@ -250,7 +251,7 @@ describe('Board identity', () => {
   it('should_be_another_board_when_two_boards_have_different_ids_and_the_same_cells', () => {
     const board = newBoard();
     const other = new Board<string, number>(
-      BoardId.of('board-b'),
+      BoardId.of(MatchId.of('match-b')),
       stripTopology.region(RegionSize.of(5)),
       stripTopology,
     );

@@ -202,7 +202,7 @@ describe('MergeState', () => {
 
   // The state has its own `GameStateId`, and it still knows its match (classes.md decision 26).
   it('should_be_the_same_state_when_two_states_have_one_state_id_whatever_they_hold', () => {
-    const stateId = GameStateId.of('state-a');
+    const stateId = GameStateId.of(MatchId.of('match-a'));
     const first = mergeState([[hex(1, 0), 2]], 2, noNewTiles(), MATCH_ID, stateId);
     const second = mergeState([], 2, noNewTiles(), MATCH_ID, stateId);
     const before = first.clone();
@@ -221,8 +221,8 @@ describe('MergeState', () => {
 
   it('should_be_another_state_when_two_states_of_one_match_have_different_state_ids', () => {
     const matchId = MatchId.of('m-a');
-    const first = mergeState([], 2, noNewTiles(), matchId, GameStateId.of('state-a'));
-    const second = mergeState([], 2, noNewTiles(), matchId, GameStateId.of('state-b'));
+    const first = mergeState([], 2, noNewTiles(), matchId, GameStateId.of(MatchId.of('match-a')));
+    const second = mergeState([], 2, noNewTiles(), matchId, GameStateId.of(MatchId.of('match-b')));
 
     expect([first.equals(second), second.equals(first)]).toEqual([false, false]);
     expect([

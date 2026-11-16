@@ -2,30 +2,25 @@
 import { BoardId } from '../../../src/domain/engine/board-id';
 import { GameStateId } from '../../../src/domain/engine/game-state-id';
 import { LevelTimerId } from '../../../src/domain/engine/level-timer-id';
-import {
-  BOARD_ID,
-  CountingBoardIds,
-  CountingStateIds,
-  CountingTimerIds,
-  STATE_ID,
-  TIMER_ID,
-} from '../../support/engine/entity-ids';
+import { MatchId } from '../../../src/domain/engine/match-id';
+import { BOARD_ID, STATE_ID, TIMER_ID } from '../../support/engine/entity-ids';
 
-// The ids of the three entities inside the aggregate (classes.md decisions 7, 19 and 26):
-// `BoardId` names one board, `GameStateId` names one state of a game,
-// and `LevelTimerId` names the timer of one timed game (issue #214).
-// The system assigns each id through a generator, as it assigns a `MatchId`.
+// The ids of the three entities inside the aggregate (classes.md decisions 7, 19, 26 and 52):
+// `BoardId` names the board of a match, `GameStateId` names the state of a match,
+// and `LevelTimerId` names the timer of a timed match.
+// Each id is local (issue #236): the factory builds it from the `MatchId` of the root.
+// So each id keeps the `MatchId` of its match, and two ids are equal when their matches are equal.
+// `MatchId` rejects an empty or blank text, so no id needs a check of its own.
+
+const MATCH = MatchId.of('match-a');
+
+// Matches that differ from `MATCH`: another text, another case, a trailing space.
+const OTHER_MATCHES = [MatchId.of('match-b'), MatchId.of('MATCH-A'), MatchId.of('match-a ')];
 
 describe('BoardId', () => {
-  it('should_throw_a_range_error_when_the_value_is_empty_or_blank', () => {
-    for (const value of ['', ' ', '\t\n']) {
-      expect(() => BoardId.of(value)).toThrow(new RangeError('A board id cannot be empty.'));
-    }
-  });
-
-  it('should_be_equal_in_both_directions_when_two_ids_hold_the_same_value', () => {
-    const first = BoardId.of('board-a');
-    const second = BoardId.of('board-a');
+  it('should_be_equal_in_both_directions_when_two_ids_keep_the_same_match', () => {
+    const first = BoardId.of(MATCH);
+    const second = BoardId.of(MatchId.of('match-a'));
 
     expect(first).not.toBe(second);
     expect([first.equals(second), second.equals(first), first.equals(first)]).toEqual([
@@ -35,18 +30,28 @@ describe('BoardId', () => {
     ]);
   });
 
-  it('should_be_different_in_both_directions_when_two_ids_hold_different_values', () => {
-    const first = BoardId.of('board-a');
+  it('should_be_different_in_both_directions_when_two_ids_keep_different_matches', () => {
+    const first = BoardId.of(MATCH);
 
-    for (const other of [BoardId.of('board-b'), BoardId.of('BOARD-A'), BoardId.of('board-a ')]) {
+    for (const match of OTHER_MATCHES) {
+      const other = BoardId.of(match);
       expect([first.equals(other), other.equals(first)]).toEqual([false, false]);
     }
   });
 
-  it('should_reject_at_compile_time_when_a_caller_reads_the_value', () => {
+  it('should_reject_at_compile_time_when_a_caller_builds_the_id_from_a_text', () => {
+    const builders = [
+      // @ts-expect-error `BoardId.of()` takes the `MatchId` of the match, not a text.
+      () => BoardId.of('board-a'),
+    ];
+
+    expect(builders).toHaveLength(1);
+  });
+
+  it('should_reject_at_compile_time_when_a_caller_reads_the_match', () => {
     const readers = [
-      // @ts-expect-error `BoardId.value` is private.
-      () => BOARD_ID.value,
+      // @ts-expect-error `BoardId.matchId` is private.
+      () => BOARD_ID.matchId,
     ];
 
     expect(readers).toHaveLength(1);
@@ -54,17 +59,9 @@ describe('BoardId', () => {
 });
 
 describe('GameStateId', () => {
-  it('should_throw_a_range_error_when_the_value_is_empty_or_blank', () => {
-    for (const value of ['', ' ', '\t\n']) {
-      expect(() => GameStateId.of(value)).toThrow(
-        new RangeError('A game state id cannot be empty.'),
-      );
-    }
-  });
-
-  it('should_be_equal_in_both_directions_when_two_ids_hold_the_same_value', () => {
-    const first = GameStateId.of('state-a');
-    const second = GameStateId.of('state-a');
+  it('should_be_equal_in_both_directions_when_two_ids_keep_the_same_match', () => {
+    const first = GameStateId.of(MATCH);
+    const second = GameStateId.of(MatchId.of('match-a'));
 
     expect(first).not.toBe(second);
     expect([first.equals(second), second.equals(first), first.equals(first)]).toEqual([
@@ -74,22 +71,28 @@ describe('GameStateId', () => {
     ]);
   });
 
-  it('should_be_different_in_both_directions_when_two_ids_hold_different_values', () => {
-    const first = GameStateId.of('state-a');
+  it('should_be_different_in_both_directions_when_two_ids_keep_different_matches', () => {
+    const first = GameStateId.of(MATCH);
 
-    for (const other of [
-      GameStateId.of('state-b'),
-      GameStateId.of('STATE-A'),
-      GameStateId.of('state-a '),
-    ]) {
+    for (const match of OTHER_MATCHES) {
+      const other = GameStateId.of(match);
       expect([first.equals(other), other.equals(first)]).toEqual([false, false]);
     }
   });
 
-  it('should_reject_at_compile_time_when_a_caller_reads_the_value', () => {
+  it('should_reject_at_compile_time_when_a_caller_builds_the_id_from_a_text', () => {
+    const builders = [
+      // @ts-expect-error `GameStateId.of()` takes the `MatchId` of the match, not a text.
+      () => GameStateId.of('state-a'),
+    ];
+
+    expect(builders).toHaveLength(1);
+  });
+
+  it('should_reject_at_compile_time_when_a_caller_reads_the_match', () => {
     const readers = [
-      // @ts-expect-error `GameStateId.value` is private.
-      () => STATE_ID.value,
+      // @ts-expect-error `GameStateId.matchId` is private.
+      () => STATE_ID.matchId,
     ];
 
     expect(readers).toHaveLength(1);
@@ -97,17 +100,9 @@ describe('GameStateId', () => {
 });
 
 describe('LevelTimerId', () => {
-  it('should_throw_a_range_error_when_the_value_is_empty_or_blank', () => {
-    for (const value of ['', ' ', '\t\n']) {
-      expect(() => LevelTimerId.of(value)).toThrow(
-        new RangeError('A level timer id cannot be empty.'),
-      );
-    }
-  });
-
-  it('should_be_equal_in_both_directions_when_two_ids_hold_the_same_value', () => {
-    const first = LevelTimerId.of('timer-a');
-    const second = LevelTimerId.of('timer-a');
+  it('should_be_equal_in_both_directions_when_two_ids_keep_the_same_match', () => {
+    const first = LevelTimerId.of(MATCH);
+    const second = LevelTimerId.of(MatchId.of('match-a'));
 
     expect(first).not.toBe(second);
     expect([first.equals(second), second.equals(first), first.equals(first)]).toEqual([
@@ -117,59 +112,30 @@ describe('LevelTimerId', () => {
     ]);
   });
 
-  it('should_be_different_in_both_directions_when_two_ids_hold_different_values', () => {
-    const first = LevelTimerId.of('timer-a');
+  it('should_be_different_in_both_directions_when_two_ids_keep_different_matches', () => {
+    const first = LevelTimerId.of(MATCH);
 
-    for (const other of [
-      LevelTimerId.of('timer-b'),
-      LevelTimerId.of('TIMER-A'),
-      LevelTimerId.of('timer-a '),
-    ]) {
+    for (const match of OTHER_MATCHES) {
+      const other = LevelTimerId.of(match);
       expect([first.equals(other), other.equals(first)]).toEqual([false, false]);
     }
   });
 
-  it('should_reject_at_compile_time_when_a_caller_reads_the_value', () => {
+  it('should_reject_at_compile_time_when_a_caller_builds_the_id_from_a_text', () => {
+    const builders = [
+      // @ts-expect-error `LevelTimerId.of()` takes the `MatchId` of the match, not a text.
+      () => LevelTimerId.of('timer-a'),
+    ];
+
+    expect(builders).toHaveLength(1);
+  });
+
+  it('should_reject_at_compile_time_when_a_caller_reads_the_match', () => {
     const readers = [
-      // @ts-expect-error `LevelTimerId.value` is private.
-      () => TIMER_ID.value,
+      // @ts-expect-error `LevelTimerId.matchId` is private.
+      () => TIMER_ID.matchId,
     ];
 
     expect(readers).toHaveLength(1);
-  });
-});
-
-// The generators are engine interfaces, as `MatchIdGenerator` is. Layer 4 implements them.
-// This suite pins the test doubles that the other suites inject.
-describe('CountingBoardIds, CountingStateIds and CountingTimerIds', () => {
-  it('should_give_a_new_id_when_a_generator_is_asked_again', () => {
-    const boards = new CountingBoardIds();
-    const states = new CountingStateIds();
-
-    const [firstBoard, secondBoard] = [boards.next(), boards.next()];
-    const [firstState, secondState] = [states.next(), states.next()];
-
-    expect([
-      firstBoard.equals(BoardId.of('board-1')),
-      secondBoard.equals(BoardId.of('board-2')),
-      firstBoard.equals(secondBoard),
-    ]).toEqual([true, true, false]);
-    expect([
-      firstState.equals(GameStateId.of('state-1')),
-      secondState.equals(GameStateId.of('state-2')),
-      firstState.equals(secondState),
-    ]).toEqual([true, true, false]);
-  });
-
-  it('should_give_a_new_timer_id_when_the_timer_generator_is_asked_again', () => {
-    const timers = new CountingTimerIds();
-
-    const [first, second] = [timers.next(), timers.next()];
-
-    expect([
-      first.equals(LevelTimerId.of('timer-1')),
-      second.equals(LevelTimerId.of('timer-2')),
-      first.equals(second),
-    ]).toEqual([true, true, false]);
   });
 });

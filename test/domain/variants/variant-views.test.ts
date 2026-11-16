@@ -73,7 +73,7 @@ describe('the view of each variant state', () => {
 
   it('should_build_the_view_from_the_remaining_and_placed_pieces_when_a_fit_state_builds_its_view', () => {
     const factory = fitFactory();
-    const rules = factory.createRules();
+    const rules = factory.createRules(MATCH_ID);
     const start = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
     const domino = start.piece(A);
 

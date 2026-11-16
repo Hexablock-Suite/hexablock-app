@@ -21,6 +21,7 @@ import {
   type MemoryGameRepository,
   valueOf,
 } from '../support/application/game-use-cases';
+import { MATCH_ID } from '../support/engine/match-id';
 import { firstMoveOf, firstValidMove } from '../support/engine/variant-game';
 import { square } from '../support/engine/square-topology';
 import { A, B, threeDominoFitFactory } from '../support/variants/hexa-fit/fit-game';
@@ -106,7 +107,7 @@ describe('UndoMove', () => {
     const factory = mergeFactory(7);
     const { games, applyMove, undoMove } = await started(factory);
     const before = games.running().snapshot();
-    const slide = firstValidMove(factory.createRules(), mergeStateOf(before));
+    const slide = firstValidMove(factory.createRules(MATCH_ID), mergeStateOf(before));
     const firstPlay = valueOf(await applyMove.execute({ move: slide }));
     const afterPlay = games.running().snapshot();
 
@@ -176,7 +177,10 @@ describe('UndoMove', () => {
     const factory = mergeFactory(7);
     const { games, applyMove, undoMove } = await started(factory);
     const play = async () => {
-      const move = firstValidMove(factory.createRules(), mergeStateOf(games.running().snapshot()));
+      const move = firstValidMove(
+        factory.createRules(MATCH_ID),
+        mergeStateOf(games.running().snapshot()),
+      );
       valueOf(await applyMove.execute({ move }));
     };
     await play();
