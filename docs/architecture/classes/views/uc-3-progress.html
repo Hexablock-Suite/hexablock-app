@@ -241,7 +241,7 @@
           stroke-width="1"
           marker-end="url(#ucprogress-open)"
         />
-        <!-- LevelSummary holds its status as a LevelStatus: use -->
+        <!-- LevelSummary holds its LevelStatus as status: use with role and multiplicity (decision 23) -->
         <line
           x1="696"
           y1="140"
@@ -251,7 +251,7 @@
           stroke-width="1"
           marker-end="url(#ucprogress-open)"
         />
-        <!-- ListLevels keeps the LevelRepository it receives in an attribute: use -->
+        <!-- ListLevels keeps the LevelRepository it receives as levels: use with role and multiplicity (decision 23) -->
         <path
           d="M304 172 H392 Q400 172 400 180 V280 Q400 288 408 288 H472"
           fill="none"
@@ -259,7 +259,7 @@
           stroke-width="1"
           marker-end="url(#ucprogress-open)"
         />
-        <!-- ListLevels keeps the ProgressRepository it receives in an attribute: use -->
+        <!-- ListLevels keeps the ProgressRepository it receives as progress: use with role and multiplicity (decision 23) -->
         <path
           d="M304 204 H360 Q368 204 368 212 V364 Q368 372 376 372 H472"
           fill="none"
@@ -267,7 +267,7 @@
           stroke-width="1"
           marker-end="url(#ucprogress-open)"
         />
-        <!-- SaveProgress keeps the ProgressRepository it receives in an attribute: use -->
+        <!-- SaveProgress keeps the ProgressRepository it receives as repository: use with role and multiplicity (decision 23) -->
         <line
           x1="304"
           y1="396"
@@ -277,7 +277,7 @@
           stroke-width="1"
           marker-end="url(#ucprogress-open)"
         />
-        <!-- SyncLeaderboard keeps the ProgressRepository it receives in an attribute: use -->
+        <!-- SyncLeaderboard keeps the ProgressRepository it receives as progress: use with role and multiplicity (decision 23) -->
         <path
           d="M304 528 H376 Q384 528 384 520 V428 Q384 420 392 420 H472"
           fill="none"
@@ -285,7 +285,7 @@
           stroke-width="1"
           marker-end="url(#ucprogress-open)"
         />
-        <!-- SyncLeaderboard keeps the LeaderboardGateway it receives in an attribute: use -->
+        <!-- SyncLeaderboard keeps the LeaderboardGateway it receives as gateway: use with role and multiplicity (decision 23) -->
         <line
           x1="304"
           y1="556"
@@ -320,6 +320,18 @@
         </text>
 
         <!-- Role names and multiplicities at the part end -->
+        <rect x="699" y="124" width="43" height="12" rx="2" fill="#efe7f8" />
+        <text
+          x="740"
+          y="133"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+        >
+          status
+          <tspan font-weight="600">1</tspan>
+        </text>
         <rect x="411" y="275" width="43" height="12" rx="2" fill="#efe7f8" />
         <text
           x="452"
