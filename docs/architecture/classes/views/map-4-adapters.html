@@ -64,22 +64,22 @@
       <h1>Adapters, presenters and drivers at a glance</h1>
 
       <svg
-        viewBox="0 0 1040 1619"
+        viewBox="0 0 1040 1635"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="mapad-title mapad-desc"
       >
         <title id="mapad-title">HexaBlock adapters map · UML class diagram</title>
         <desc id="mapad-desc">
-          Overview map of the 64 classes of layers 4 and 3 in 13 groups. The composition root group
+          Overview map of the 66 classes of layers 4 and 3 in 13 groups. The composition root group
           holds CompositionRoot, GameRegistry and BoardFigure, the drivers group holds
-          SequentialMatchIds, the move controls group holds MoveControls, FitControls and
-          BoardOnlyControls, and the events group holds NullGameEventPublisher. Each line joins two
-          classes: GameScreen renders BoardView and keeps its GamePresenter and its MoveControls,
-          CompositionRoot creates InMemoryGameRepository, DeviceKeyValueStore implements
-          KeyValueStore, GamePresenter keeps its StateMapper and LocalProgressRepository keeps its
-          KeyValueStore. No line touches a group frame. Each group names the view that shows its
-          members.
+          SequentialMatchIds, the move controls group holds MoveControls, FitControls, MergeControls
+          and BoardOnlyControls, and the events group holds NullGameEventPublisher. Each line joins
+          two classes: GameScreen renders BoardView and keeps its GamePresenter and its
+          MoveControls, CompositionRoot creates InMemoryGameRepository, DeviceKeyValueStore
+          implements KeyValueStore, GamePresenter keeps its StateMapper and LocalProgressRepository
+          keeps its KeyValueStore. No line touches a group frame. Each group names the view that
+          shows its members.
         </desc>
         <defs>
           <marker
@@ -553,7 +553,7 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.14em"
         >
-          LOCAL REPOSITORIES · ADAPTER
+          LOCAL REPOSITORIES AND GAME FACTORIES · ADAPTER
         </text>
         <text
           x="972"
@@ -565,7 +565,7 @@
           text-anchor="end"
           letter-spacing="0.14em"
         >
-          VIEWS 4.2, 4.4
+          VIEWS 4.2, 4.4 · FLOW 3
         </text>
         <!-- Group: view models -->
         <rect
@@ -1052,6 +1052,23 @@
           <text x="540" y="357" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               BoardOnlyControls
+            </tspan>
+          </text>
+        </g>
+        <g data-class="MergeControls">
+          <rect
+            x="632"
+            y="336"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="708" y="357" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              MergeControls
             </tspan>
           </text>
         </g>
@@ -1977,6 +1994,23 @@
             </tspan>
           </text>
         </g>
+        <g data-class="LevelGameFactories">
+          <rect
+            x="816"
+            y="1118"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="892" y="1139" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              LevelGameFactories
+            </tspan>
+          </text>
+        </g>
         <!-- Chips: view models -->
         <g data-class="GameViewModel">
           <rect
@@ -2155,12 +2189,21 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           GameRegistry maps each GameId to its variant factory and its screen parts (#170), by
-          default SpaceStateMapper, SpaceCellRenderer and BoardOnlyControls. Hexa Fit has
-          FitStateMapper, FitCellRenderer and FitControls (#175).
+          default SpaceStateMapper, SpaceCellRenderer and BoardOnlyControls.
         </text>
         <text
           x="24"
           y="1478"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Hexa Fit has FitStateMapper, FitCellRenderer and FitControls (#175), and Hexa Merge has
+          MergeStateMapper, MergeCellRenderer and MergeControls (#177).
+        </text>
+        <text
+          x="24"
+          y="1494"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2171,7 +2214,7 @@
 
         <text
           x="24"
-          y="1494"
+          y="1510"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2183,15 +2226,15 @@
         <!-- Legend -->
         <line
           x1="24"
-          y1="1518"
+          y1="1534"
           x2="1016"
-          y2="1518"
+          y2="1534"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1536"
+          y="1552"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -2202,16 +2245,16 @@
 
         <line
           x1="24"
-          y1="1553"
+          y1="1569"
           x2="52"
-          y2="1553"
+          y2="1569"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#mapad-open)"
         />
         <text
           x="60"
-          y="1557"
+          y="1573"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2220,9 +2263,9 @@
         </text>
         <line
           x1="384"
-          y1="1553"
+          y1="1569"
           x2="412"
-          y2="1553"
+          y2="1569"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -2230,7 +2273,7 @@
         />
         <text
           x="420"
-          y="1557"
+          y="1573"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2240,7 +2283,7 @@
 
         <rect
           x="24"
-          y="1574"
+          y="1590"
           width="28"
           height="12"
           rx="2"
@@ -2251,7 +2294,7 @@
         />
         <text
           x="60"
-          y="1583"
+          y="1599"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2260,7 +2303,7 @@
         </text>
         <rect
           x="272"
-          y="1574"
+          y="1590"
           width="28"
           height="12"
           rx="2"
@@ -2270,7 +2313,7 @@
         />
         <text
           x="308"
-          y="1583"
+          y="1599"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2279,7 +2322,7 @@
         </text>
         <text
           x="472"
-          y="1583"
+          y="1599"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2297,7 +2340,7 @@
         </text>
         <rect
           x="664"
-          y="1574"
+          y="1590"
           width="28"
           height="12"
           rx="2"
@@ -2307,7 +2350,7 @@
         />
         <text
           x="700"
-          y="1583"
+          y="1599"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2317,7 +2360,7 @@
 
         <rect
           x="24"
-          y="1599"
+          y="1615"
           width="28"
           height="12"
           rx="2"
@@ -2327,7 +2370,7 @@
         />
         <text
           x="60"
-          y="1608"
+          y="1624"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2336,7 +2379,7 @@
         </text>
         <rect
           x="272"
-          y="1599"
+          y="1615"
           width="28"
           height="12"
           rx="2"
@@ -2346,7 +2389,7 @@
         />
         <text
           x="308"
-          y="1608"
+          y="1624"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

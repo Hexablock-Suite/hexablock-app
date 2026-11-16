@@ -1,4 +1,5 @@
 import { Score } from '../../engine/score';
+import type { ValueReceiver } from '../../engine/value-receiver';
 import type { IMergeable } from './mergeable';
 
 // The cell of Hexa Merge: a value object that wraps an integer (assumption A1).
@@ -36,5 +37,12 @@ export class MergeTile implements IMergeable<MergeTile> {
   // They are a `Score` (classes.md decision 41).
   points(): Score {
     return Score.of(this.value);
+  }
+
+  // Gives the value of the tile to `receiver`. It returns nothing.
+  // The state mapper of the Merge screen draws the number from it (issue #177).
+  // No code of the domain or of the use cases calls it (rule R-no-delivery-call).
+  deliverTo(receiver: ValueReceiver<number>): void {
+    receiver.receive(this.value);
   }
 }

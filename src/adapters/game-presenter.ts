@@ -1,8 +1,11 @@
 import type { ApplyMoveRequest } from '../application/apply-move';
 import type { MoveResult } from '../application/move-result';
+import type { RedoMoveRequest } from '../application/redo-move';
 import type { Result, UseCaseError } from '../application/result';
 import type { StartGameRequest } from '../application/start-game';
+import type { UndoMoveRequest } from '../application/undo-move';
 import type { UseCase } from '../application/use-case';
+import type { LevelId } from '../domain/engine/level-id';
 import { Outcome } from '../domain/engine/outcome';
 import type { StateMapper } from './state-mapper';
 import type { TextKey, Texts } from './texts/text-catalog';
@@ -24,6 +27,12 @@ export interface GameViewModel<TCoord, TCellView, TPayloadView> {
   // The time of play of a timed game in minutes and seconds, such as `1:05`, with its label.
   // It exists only when the response carries a time (decision 29, issue #175).
   readonly time?: { readonly label: string; readonly value: string };
+  // The undo and the redo of a variant with undo, each with its label and whether a move can go
+  // back or forward now (APP-FR-08, issue #178). They exist only when the response says that
+  // the variant has undo (`MoveResult.hasUndo`). The move controls of the game choose
+  // which of them to show.
+  readonly undo?: { readonly label: string; readonly enabled: boolean };
+  readonly redo?: { readonly label: string; readonly enabled: boolean };
   // The text of the last failure of a use case. A later success clears it.
   readonly error?: string;
   // The variant data for the screen. It exists after the first answer of `StartGame`.
@@ -42,17 +51,27 @@ const OUTCOME_TEXTS: readonly (readonly [Outcome, TextKey])[] = [
   [Outcome.gameOver, 'play.outcome.game-over'],
 ];
 
+// The failures with their own text. Every other failure shows the general text `play.error`.
+// A quick second tap on undo or redo can find no move left (#178): its text says so.
+const ERROR_TEXTS: readonly (readonly [string, TextKey])[] = [
+  ['move-rejected', 'play.error.move-rejected'],
+  ['nothing-to-undo', 'play.error.nothing-to-undo'],
+  ['nothing-to-redo', 'play.error.nothing-to-redo'],
+];
+
 // The presenter of the game screen (MVP, issue #170). It lives in layer 3 and imports no React.
-// It calls `StartGame` and `ApplyMove` through the `UseCase` input port (decision 9), so it never
-// sees a concrete use case. It reads only the plain `MoveResult` (decision 29): it never calls
+// It calls `StartGame`, `ApplyMove`, `UndoMove` and `RedoMove` (#178) through the `UseCase`
+// input port (decision 9), so it never sees a concrete use case. It reads only the plain `MoveResult` (decision 29): it never calls
 // a method of `Board` or of a photo (#234). The `StateMapper` of the game turns each occupied
 // cell, each free space and the payload into the data of the screen (decision 14).
 // So the presenter names no variant, and one presenter class serves every game.
 // A timed game shows the time of play of the response: the root reads it, so the screen
-// reads no clock (#175).
+// reads no clock (#175). A variant with undo shows the undo and the redo of the response:
+// the root answers `canUndo` and `canRedo`, so the presenter reads no history (#178).
 // A failed `Result` never throws (decision 28): the presenter keeps the last board and shows
-// the text of the failure. A rejected move has its own text, and any other failure has one
-// general text. Every text comes from the catalog of one language (APP-FR-11).
+// the text of the failure. A rejected move and an undo or a redo that finds no move have their
+// own texts, and any other failure has one general text.
+// Every text comes from the catalog of one language (APP-FR-11).
 // A view attaches to see each new view model. It sees the current one at once.
 export class GamePresenter<TCell, TCoord, TMove, TView, TCellView, TPayloadView> {
   private model: GameViewModel<TCoord, TCellView, TPayloadView>;
@@ -61,6 +80,8 @@ export class GamePresenter<TCell, TCoord, TMove, TView, TCellView, TPayloadView>
   constructor(
     private readonly startGame: UseCase<StartGameRequest, MoveResult<TCell, TCoord, TView>>,
     private readonly applyMove: UseCase<ApplyMoveRequest<TMove>, MoveResult<TCell, TCoord, TView>>,
+    private readonly undoMove: UseCase<UndoMoveRequest, MoveResult<TCell, TCoord, TView>>,
+    private readonly redoMove: UseCase<RedoMoveRequest, MoveResult<TCell, TCoord, TView>>,
     private readonly mapper: StateMapper<TCell, TView, TCellView, TPayloadView>,
     private readonly texts: Texts,
   ) {
@@ -87,14 +108,26 @@ export class GamePresenter<TCell, TCoord, TMove, TView, TCellView, TPayloadView>
     return this.model;
   }
 
-  // Opens a new game through `StartGame`.
-  async onStart(): Promise<void> {
-    this.present(await this.startGame.execute({}));
+  // Opens a new game through `StartGame`. `levelId` names the level that the player chose,
+  // and a game with no levels starts with no level id (issue #172).
+  // The presenter passes the id on and never reads it.
+  async onStart(levelId?: LevelId): Promise<void> {
+    this.present(await this.startGame.execute(levelId === undefined ? {} : { levelId }));
   }
 
   // Plays one move through `ApplyMove`.
   async onMove(move: TMove): Promise<void> {
     this.present(await this.applyMove.execute({ move }));
+  }
+
+  // Takes back the last move through `UndoMove` (#178).
+  async onUndo(): Promise<void> {
+    this.present(await this.undoMove.execute({}));
+  }
+
+  // Plays the last undone move again through `RedoMove` (#178).
+  async onRedo(): Promise<void> {
+    this.present(await this.redoMove.execute({}));
   }
 
   private present(result: Result<MoveResult<TCell, TCoord, TView>>): void {
@@ -121,6 +154,18 @@ export class GamePresenter<TCell, TCoord, TMove, TView, TCellView, TPayloadView>
       ...(response.elapsedMs === undefined
         ? {}
         : { time: { label: this.texts['play.time'], value: clockText(response.elapsedMs) } }),
+      ...this.historyOf(response),
+    };
+  }
+
+  // The undo and the redo of a variant with undo, and nothing for a variant with no undo.
+  private historyOf(
+    response: MoveResult<TCell, TCoord, TView>,
+  ): Pick<GameViewModel<TCoord, TCellView, TPayloadView>, 'undo' | 'redo'> {
+    if (!response.hasUndo) return {};
+    return {
+      undo: { label: this.texts['play.undo'], enabled: response.canUndo },
+      redo: { label: this.texts['play.redo'], enabled: response.canRedo },
     };
   }
 
@@ -143,9 +188,8 @@ export class GamePresenter<TCell, TCoord, TMove, TView, TCellView, TPayloadView>
   }
 
   private errorText(error: UseCaseError): string {
-    return error.code === 'move-rejected'
-      ? this.texts['play.error.move-rejected']
-      : this.texts['play.error'];
+    const found = ERROR_TEXTS.find(([code]) => code === error.code);
+    return this.texts[found === undefined ? 'play.error' : found[1]];
   }
 }
 

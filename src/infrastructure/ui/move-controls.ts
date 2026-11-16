@@ -14,13 +14,19 @@ export interface MoveControlsProps<TCoord, TCellView, TPayloadView, TMove> {
   layoutOf(size: number): BoardLayout<TCoord>;
   // Plays one move through `GamePresenter.onMove()`.
   play(move: TMove): void;
+  // Takes back the last move through `GamePresenter.onUndo()` (APP-FR-08, issue #178).
+  // The view model says whether the game has undo and whether a move can go back.
+  undo(): void;
+  // Plays the last undone move again through `GamePresenter.onRedo()` (#178).
+  redo(): void;
   // Draws the board in its wood frame. The controls give it the handler of a press on a space.
   board(onPressSpace: (at: TCoord, cell: TCellView) => void): ReactNode;
 }
 
 // Strategy (D3, classes.md decision 14, issue #175): the move controls of one game.
-// `GameStage` names no variant: it gives its view model, the board and `play()` to the controls
-// of the game, and the controls lay out the board with their own parts. The controls build each
+// `GameStage` names no variant: it gives its view model, the board, `play()`, `undo()` and
+// `redo()` to the controls of the game, and the controls lay out the board with their own parts.
+// The controls choose which of the undo and the redo of the view model they show (#178). The controls build each
 // move and play it through the presenter. The game registry of the composition root chooses
 // the controls of each game, as it chooses its state mapper and its cell renderer.
 // `render()` returns an element of a component, so the controls keep their own state.
@@ -32,7 +38,7 @@ export interface MoveControls<TCoord, TCellView, TPayloadView, TMove> {
 function ignoreSpace(): void {}
 
 // The default move controls of the game registry (issue #175): the board alone.
-// A press on a space plays nothing. Each «Play … on the game screen» task (#174, #176, #177)
+// A press on a space plays nothing, and the controls show no undo and no redo. Each «Play … on the game screen» task (#174, #176, #177)
 // registers the controls of its variant in their place.
 export class BoardOnlyControls implements MoveControls<unknown, unknown, unknown, unknown> {
   render(props: MoveControlsProps<unknown, unknown, unknown, unknown>): ReactNode {

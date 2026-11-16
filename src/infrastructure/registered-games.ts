@@ -3,6 +3,12 @@ import {
   type FitCellView,
   type FitPayloadView,
 } from '../adapters/fit-state-mapper';
+import { fitLevelVariant, sortLevelVariant } from '../adapters/level-game-factories';
+import {
+  MergeStateMapper,
+  type MergeCellView,
+  type MergePayloadView,
+} from '../adapters/merge-state-mapper';
 import { SpaceStateMapper, type SpaceView } from '../adapters/space-state-mapper';
 import { BoardShape } from '../domain/engine/board-shape';
 import type { Clock } from '../domain/engine/clock';
@@ -10,6 +16,7 @@ import { Color } from '../domain/engine/color';
 import { ElapsedTime } from '../domain/engine/elapsed-time';
 import { GameId } from '../domain/engine/game-id';
 import { TopologyId, type GeometryFactory } from '../domain/engine/geometry-factory';
+import type { GridAxis } from '../domain/engine/grid-topology';
 import { HexGeometry } from '../domain/engine/hex-geometry';
 import { hex, type HexCoord } from '../domain/engine/hex-topology';
 import { Moves } from '../domain/engine/moves';
@@ -28,18 +35,23 @@ import { FitStarThreshold } from '../domain/variants/hexa-fit/fit-stars';
 import { PieceId } from '../domain/variants/hexa-fit/piece-id';
 import { LinesFactory, LinesSettings } from '../domain/variants/hexa-lines/lines-factory';
 import { MergeFactory, MergeSettings } from '../domain/variants/hexa-merge/merge-factory';
+import type { MergeView } from '../domain/variants/hexa-merge/merge-state';
 import { MergeTile } from '../domain/variants/hexa-merge/merge-tile';
+import type { Slide } from '../domain/variants/hexa-merge/slide';
 import { GoalCount } from '../domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../domain/variants/hexa-sort/sort-factory';
 import { SortLevel } from '../domain/variants/hexa-sort/sort-level';
 import type { BoardLayout } from './board/board-layout';
 import { FitCellRenderer } from './board/fit-cell-renderer';
 import { HexLayout } from './board/hex-layout';
+import { MergeCellRenderer } from './board/merge-cell-renderer';
+import { slideWays } from './board/slide-ways';
 import { SpaceCellRenderer } from './board/space-cell-renderer';
 import { SquareLayout } from './board/square-layout';
 import { TriangleLayout } from './board/triangle-layout';
 import { registered, type RegisteredGame, type ScreenParts } from './game-registry';
 import { FitControls } from './ui/fit-controls';
+import { MergeControls } from './ui/merge-controls';
 import { BoardOnlyControls } from './ui/move-controls';
 
 // The count of seeds: the unsigned 32-bit integers (classes.md decision 48).
@@ -74,8 +86,8 @@ export interface BoardFigure<TCoord> {
 // The board figures, in the order of the figure selector. The first one, the hexagon,
 // is the default figure. The composition root builds one registry for each figure.
 // The registry hides the coordinate type, as it hides the types of each variant.
-// The first content has one Fit level, on the hexagon. So Fit offers no level on the square
-// and on the triangle until the bundled levels of #168 come through a level repository.
+// The first content has one Fit level, on the hexagon. Every bundled Fit level is hex too,
+// so Fit offers no level on the square and on the triangle.
 export function boardFigures(): BoardFigure<unknown>[] {
   return [
     boardFigure(TopologyId.hex, new HexGeometry(), (size) => new HexLayout(size), firstFitLevel()),
@@ -94,13 +106,14 @@ export function boardFigures(): BoardFigure<unknown>[] {
 // Fit takes the clock for its level timer (classes.md decision 19).
 // Fit offers only the levels whose `topology` names the figure (S3-08 in #151,
 // «Propuesta, pendiente del equipo»). A figure with no Fit level has no Fit entry.
-// The Fit level and the Sort level are first content only: #172 lets the player choose
-// a level from the level repository of #168, and `StartGame` then takes a port in place
-// of the factory.
+// Fit and Sort also take their `LevelVariant` on the geometry of the figure, so `StartGame`
+// starts a bundled level by its id (#172). The Fit level and the Sort level of each entry
+// are first content: a start with no level id starts them until the level selector (#173).
 // Each game shows its board with the default screen parts on the layout of the figure (#170).
 // Each «Play … on the game screen» task (#174 to #177) gives its game the state mapper,
 // the cell renderer and the move controls of its variant in place of `defaultScreen()`.
-// Fit has its own parts since #175: `fitScreen()`.
+// Fit has its own parts since #175: `fitScreen()`. Merge has its own parts since #177:
+// `mergeScreen()`.
 export function registeredGames<TCoord>(
   figure: BoardFigure<TCoord>,
   clock: Clock,
@@ -129,11 +142,12 @@ export function registeredGames<TCoord>(
         SortLevel.seeded(SMALL_BOARD, SORT_GOALS, seedFrom(random), nonEmpty(SORT_COLORS)),
       ),
       defaultScreen(figure),
+      sortLevelVariant(geometry),
     ),
     registered(
       GameId.of('hexa-merge'),
       new MergeFactory(geometry, MergeSettings.of(SMALL_BOARD, seedFrom(random), MERGE_TARGET)),
-      defaultScreen(figure),
+      mergeScreen(figure),
     ),
   ];
 }
@@ -157,6 +171,7 @@ function fitOn<TCoord>(figure: BoardFigure<TCoord>, clock: Clock): RegisteredGam
       GameId.of('hexa-fit'),
       new FitFactory(figure.geometry, fitLevel, clock),
       fitScreen(figure),
+      fitLevelVariant(figure.geometry, clock),
     ),
   ];
 }
@@ -196,6 +211,23 @@ function fitScreen<TCoord>(
   };
 }
 
+// The screen parts of Hexa Merge on the board figure `figure` (#177): `MergeStateMapper`,
+// `MergeCellRenderer`, `MergeControls` with one slide for each axis and sense of the topology
+// of the figure, and the layout of the figure. The slides take the board region of the Merge
+// factory, so each way on the screen follows the lines of that board.
+function mergeScreen<TCoord>(
+  figure: BoardFigure<TCoord>,
+): ScreenParts<MergeTile, TCoord, MergeView, MergeCellView, MergePayloadView, Slide<GridAxis>> {
+  return {
+    mapper: new MergeStateMapper(),
+    renderer: new MergeCellRenderer(),
+    controls: new MergeControls(
+      slideWays(figure.geometry.createTopology(), SMALL_BOARD, figure.layoutOf(1)),
+    ),
+    layoutOf: (size) => figure.layoutOf(size),
+  };
+}
+
 // One seed from the next draw of `random`: a whole number of 0 to 4294967295.
 // The draw keeps its number private, so it delivers the number to this module of the edge
 // (rule R-no-delivery-call, issue #243).
@@ -213,7 +245,8 @@ function seedFrom(random: RandomSource): Seed {
 // A Fit level of three cells in a row and two pieces, a domino and a single cell.
 // It can be won: the domino covers the first two cells, and the single cell covers the third.
 // The fewest moves are 2, so the third star can be won.
-// #172 starts the bundled levels by their id, in place of this level.
+// A start with no level id starts this level. A start with a level id starts the bundled
+// level of that id (#172).
 function firstFitLevel(): FitLevel<HexCoord> {
   return FitLevel.of(
     TopologyId.hex,

@@ -1,12 +1,16 @@
 /** @jest-environment node */
 import { FitStateMapper } from '../../src/adapters/fit-state-mapper';
+import { MergeStateMapper } from '../../src/adapters/merge-state-mapper';
 import { SpaceStateMapper } from '../../src/adapters/space-state-mapper';
 import { GameId } from '../../src/domain/engine/game-id';
 import { TopologyId } from '../../src/domain/engine/geometry-factory';
+import { LevelId } from '../../src/domain/engine/level-id';
 import { FitCellRenderer } from '../../src/infrastructure/board/fit-cell-renderer';
+import { MergeCellRenderer } from '../../src/infrastructure/board/merge-cell-renderer';
 import { SpaceCellRenderer } from '../../src/infrastructure/board/space-cell-renderer';
 import { CompositionRoot } from '../../src/infrastructure/composition-root';
 import { FitControls } from '../../src/infrastructure/ui/fit-controls';
+import { MergeControls } from '../../src/infrastructure/ui/merge-controls';
 import { BoardOnlyControls } from '../../src/infrastructure/ui/move-controls';
 import { errorOf, valueOf } from '../support/application/game-use-cases';
 import { RecordingLogger } from '../support/application/recording-logger';
@@ -83,6 +87,32 @@ describe('CompositionRoot', () => {
     ]);
   });
 
+  // Issue #178: the root wires `RedoMove` over the repository of each game, inside the aspect.
+  // The redo of a Fit move that was undone gives back the answer of that move.
+  it('should_redo_the_undone_fit_move_and_log_each_call_when_the_root_wires_redo_move', async () => {
+    const logger = new RecordingLogger();
+    const root = testRoot(logger);
+    const { startGame, applyMove, undoMove, redoMove } = root.gameUseCases(GameId.of('hexa-fit'));
+    valueOf(await startGame.execute({}));
+    const played = valueOf(
+      await applyMove.execute({ move: firstMoveIn(root, GameId.of('hexa-fit')) }),
+    );
+    valueOf(await undoMove.execute({}));
+
+    const redone = valueOf(await redoMove.execute({}));
+    const second = errorOf(await redoMove.execute({}));
+
+    expect(redone).toEqual(played);
+    expect(second.code).toBe('nothing-to-redo');
+    expect(logger.entries.map((entry) => [entry.useCase, entry.outcome])).toEqual([
+      ['StartGame', 'success'],
+      ['ApplyMove', 'success'],
+      ['UndoMove', 'success'],
+      ['RedoMove', 'success'],
+      ['RedoMove', 'failure'],
+    ]);
+  });
+
   it('should_give_the_same_use_cases_when_the_root_is_asked_twice_for_one_game', () => {
     const root = testRoot();
 
@@ -102,8 +132,9 @@ describe('CompositionRoot', () => {
   });
 
   // Issue #175: the registry gives Hexa Fit its own state mapper, cell renderer and move
-  // controls. The other games keep the default parts until their own tasks (#174, #176, #177).
-  it('should_give_hexa_fit_its_mapper_its_renderer_and_its_controls_when_the_root_builds_the_registry', () => {
+  // controls. Issue #177 gives Hexa Merge its own parts too. Lines and Sort keep the default
+  // parts until their own tasks (#174, #176).
+  it('should_give_hexa_fit_and_hexa_merge_their_mappers_renderers_and_controls_when_the_root_builds_the_registry', () => {
     const registry = testRoot().registry();
 
     const parts = registry.gameIds().map((id) => {
@@ -116,7 +147,7 @@ describe('CompositionRoot', () => {
       ['hexa-lines', ...defaults],
       ['hexa-fit', FitStateMapper, FitCellRenderer, FitControls],
       ['hexa-sort', ...defaults],
-      ['hexa-merge', ...defaults],
+      ['hexa-merge', MergeStateMapper, MergeCellRenderer, MergeControls],
     ]);
   });
 
@@ -225,6 +256,42 @@ describe('CompositionRoot', () => {
       expect(() => testRoot().registry({} as TopologyId)).toThrow(
         new RangeError('The root offers no board figure with this id.'),
       );
+    });
+  });
+
+  // Issue #172 (S3-13 in #151, option D): the root builds one `StartGame` for each game,
+  // and its `GameFactories` port gives the factory of a bundled level by its id.
+  describe('levels', () => {
+    // `fit-02` has seven cells. The Fit level of a start with no level id has three.
+    it('should_start_the_bundled_level_when_the_start_game_of_the_root_gets_its_level_id', async () => {
+      const { startGame } = testRoot().gameUseCases(GameId.of('hexa-fit'));
+
+      const started = valueOf(await startGame.execute({ levelId: LevelId.of('fit-02') }));
+
+      expect(started.freeSpaces).toHaveLength(7);
+    });
+
+    // Hexa Lines has no levels. Every bundled Sort level is hex, so the square refuses it (S3-08).
+    it('should_answer_start_failed_when_the_game_on_the_figure_has_no_level_with_the_id', async () => {
+      const root = testRoot();
+
+      const errors = [
+        errorOf(
+          await root
+            .gameUseCases(GameId.of('hexa-lines'))
+            .startGame.execute({ levelId: LevelId.of('fit-01') }),
+        ),
+        errorOf(
+          await root
+            .gameUseCases(GameId.of('hexa-sort'), TopologyId.square)
+            .startGame.execute({ levelId: LevelId.of('sort-01') }),
+        ),
+      ];
+
+      expect(errors.map((error) => [error.code, error.message])).toEqual([
+        ['start-failed', 'The game has no level with this id.'],
+        ['start-failed', 'A Sort level builder cannot build the board of another topology.'],
+      ]);
     });
   });
 

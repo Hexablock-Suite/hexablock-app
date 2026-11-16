@@ -6,6 +6,7 @@ import { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameId } from '../../../src/domain/engine/game-id';
 import { MoveHistory } from '../../../src/domain/engine/move-history';
 import { FixedListPieceSource } from '../../../src/domain/engine/piece-source';
+import { RedoableHistory } from '../../../src/domain/engine/redoable-history';
 import { Resolution } from '../../../src/domain/engine/resolution';
 import type { IRedoable } from '../../../src/domain/engine/undo-capabilities';
 import { fakeCell, type FakeCell } from '../../support/engine/fake-cell';
@@ -55,6 +56,19 @@ function historyGame(rules = new FakeRules(), size = 2) {
     history,
   );
   engine.start(emptyState(size));
+  return { engine };
+}
+
+// A started game whose history can redo, as `FitFactory` gives it (#178).
+function redoGame() {
+  const engine = new GameEngine(
+    MATCH_ID,
+    GameId.of('fake-game'),
+    new FakeRules(),
+    new OnePointScoring(),
+    new RedoableHistory<FakeMove, FakeSnapshot>(),
+  );
+  engine.start(emptyState());
   return { engine };
 }
 
@@ -374,6 +388,55 @@ describe('GameEngine undo through the root', () => {
 
     expect(engine.canUndo()).toBe(false);
     expect(factsOf(engine)).toEqual({ cells: [], score: Score.of(0), phase: 'playing' });
+  });
+
+  // Issue #178: `RedoableHistory` keeps each undone command, and the root redoes it.
+  // The command gives back the photo after its move, so the redo gives back the same game.
+  it('should_give_back_the_board_and_the_score_after_the_move_when_a_move_is_undone_and_redone', () => {
+    const { engine } = redoGame();
+    engine.play(moveAt(0));
+    engine.play(moveAt(1));
+    const played = factsOf(engine);
+    engine.undo();
+    engine.undo();
+
+    expect(engine.canRedo()).toBe(true);
+    engine.redo();
+    engine.redo();
+
+    expect(factsOf(engine)).toEqual(played);
+    expect([engine.canUndo(), engine.canRedo()]).toEqual([true, false]);
+    engine.undo();
+    expect(factsOf(engine)).toEqual({ cells: [['0,0', 1]], score: Score.of(1), phase: 'playing' });
+  });
+
+  it('should_forget_the_undone_moves_when_a_new_move_is_played_after_an_undo', () => {
+    const { engine } = redoGame();
+    engine.play(moveAt(0));
+    engine.undo();
+
+    engine.play(moveAt(1));
+
+    expect(engine.canRedo()).toBe(false);
+    expect(() => engine.redo()).toThrow(new RangeError('The history has no move to redo.'));
+    expect(factsOf(engine)).toEqual({ cells: [['1,0', 2]], score: Score.of(1), phase: 'playing' });
+  });
+
+  it('should_refuse_the_redo_and_change_nothing_when_the_game_is_paused', () => {
+    const { engine } = redoGame();
+    engine.play(moveAt(0));
+    engine.undo();
+    engine.pause();
+
+    expect(() => engine.redo()).toThrow(
+      new RangeError('The game cannot accept an undo in the paused phase.'),
+    );
+
+    expect(engine.canRedo()).toBe(true);
+    expect(factsOf(engine)).toEqual({ cells: [], score: Score.of(0), phase: 'paused' });
+    engine.resume();
+    engine.redo();
+    expect(factsOf(engine)).toEqual({ cells: [['0,0', 1]], score: Score.of(1), phase: 'playing' });
   });
 
   it('should_play_the_same_turns_when_the_engine_has_a_history', () => {

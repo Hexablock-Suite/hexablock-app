@@ -179,7 +179,10 @@ describe('ListLevels', () => {
   // No exception leaves `execute()` (classes.md decision 28).
   it('should_fail_with_list_failed_when_a_port_throws', async () => {
     const error = new Error('The store is gone.');
-    const brokenLevels: LevelRepository = { list: () => Promise.reject(error) };
+    const brokenLevels: LevelRepository = {
+      list: () => Promise.reject(error),
+      levelOf: () => Promise.reject(error),
+    };
     const brokenProgress: ProgressRepository = {
       load: () => Promise.reject(error),
       save: () => Promise.resolve(),

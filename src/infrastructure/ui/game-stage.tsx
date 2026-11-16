@@ -46,6 +46,8 @@ export interface GameStageProps<TCellView> {
 // A failed use case shows its text below the board. It names no variant, so it serves every game.
 // The move controls of the game lay out the board with their own parts (#175): the stage gives
 // them the view model, the board and `play()`, which calls `GamePresenter.onMove()`.
+// It also gives them `undo()` and `redo()`, which call `GamePresenter.onUndo()` and `onRedo()`
+// (#178). So the undo path of the stage names no variant, and each game shows its own buttons.
 // Every visible text comes from the presenter or from the texts that the controls get,
 // and both read the text catalog (APP-FR-11).
 export function GameStage<TCellView>({
@@ -101,6 +103,8 @@ export function GameStage<TCellView>({
         texts,
         layoutOf,
         play: (move) => void presenter.onMove(move),
+        undo: () => void presenter.onUndo(),
+        redo: () => void presenter.onRedo(),
         board: (onPressSpace) => (
           <View style={styles.boardArea}>
             <View style={styles.frame}>

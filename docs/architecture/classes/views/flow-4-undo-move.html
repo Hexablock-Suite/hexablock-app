@@ -63,7 +63,7 @@
       <p class="eyebrow">Use case flow · UndoMove · class view</p>
       <h1>UndoMove across the four layers: the classes of one undo</h1>
       <svg
-        viewBox="0 0 1040 1374"
+        viewBox="0 0 1040 1390"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="flowundo-title flowundo-desc"
@@ -192,7 +192,7 @@
           x="24"
           y="744"
           width="992"
-          height="448"
+          height="464"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -885,7 +885,7 @@
           x="40"
           y="1024"
           width="220"
-          height="144"
+          height="160"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -914,16 +914,19 @@
           MoveCommand
         </text>
         <line x1="40" y1="1072" x2="260" y2="1072" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="40" y1="1128" x2="260" y2="1128" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="40" y1="1144" x2="260" y2="1144" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="56" y="1088" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - move: TMove
         </text>
         <text x="56" y="1104" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - before: TMemento {memento}
         </text>
+        <text x="56" y="1120" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - after: TMemento {memento}
+        </text>
         <text
           x="56"
-          y="1120"
+          y="1136"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -932,10 +935,10 @@
         >
           - restore: (memento: TMemento) =&gt; void
         </text>
-        <text x="56" y="1144" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="56" y="1160" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + undo(): void
         </text>
-        <text x="56" y="1160" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="56" y="1176" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + redo(): void
         </text>
         <!-- Class: MoveHistory (Invoker, Caretaker) -->
@@ -1264,7 +1267,7 @@
         <!-- Footnote -->
         <text
           x="24"
-          y="1222"
+          y="1238"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1274,7 +1277,7 @@
         </text>
         <text
           x="24"
-          y="1238"
+          y="1254"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1284,7 +1287,7 @@
         </text>
         <text
           x="24"
-          y="1254"
+          y="1270"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1295,26 +1298,26 @@
         </text>
         <text
           x="24"
-          y="1270"
+          y="1286"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Hexa Lines and Hexa Sort get no history, so offersUndo() is false and UndoMove returns a
-          failed Result. Fit gets RedoableHistory.
+          failed Result. Fit gets RedoableHistory: RedoMove redoes with MoveCommand.after (#178).
         </text>
         <!-- Legend -->
         <line
           x1="24"
-          y1="1294"
+          y1="1310"
           x2="1016"
-          y2="1294"
+          y2="1310"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1312"
+          y="1328"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1324,9 +1327,9 @@
         </text>
         <line
           x1="24"
-          y1="1330"
+          y1="1346"
           x2="52"
-          y2="1330"
+          y2="1346"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -1334,7 +1337,7 @@
         />
         <text
           x="60"
-          y="1333"
+          y="1349"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1343,16 +1346,16 @@
         </text>
         <line
           x1="155.7"
-          y1="1330"
+          y1="1346"
           x2="183.7"
-          y2="1330"
+          y2="1346"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#flowundo-diamond-hollow)"
         />
         <text
           x="191.7"
-          y="1333"
+          y="1349"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1361,16 +1364,16 @@
         </text>
         <line
           x1="376.7"
-          y1="1330"
+          y1="1346"
           x2="404.7"
-          y2="1330"
+          y2="1346"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#flowundo-open)"
         />
         <text
           x="412.7"
-          y="1333"
+          y="1349"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1379,7 +1382,7 @@
         </text>
         <rect
           x="24"
-          y="1346"
+          y="1362"
           width="28"
           height="12"
           rx="2"
@@ -1389,7 +1392,7 @@
         />
         <text
           x="60"
-          y="1355"
+          y="1371"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1398,7 +1401,7 @@
         </text>
         <rect
           x="169.8"
-          y="1346"
+          y="1362"
           width="28"
           height="12"
           rx="2"
@@ -1408,7 +1411,7 @@
         />
         <text
           x="205.8"
-          y="1355"
+          y="1371"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1417,7 +1420,7 @@
         </text>
         <rect
           x="315.6"
-          y="1346"
+          y="1362"
           width="28"
           height="12"
           rx="2"
@@ -1427,7 +1430,7 @@
         />
         <text
           x="351.6"
-          y="1355"
+          y="1371"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1436,7 +1439,7 @@
         </text>
         <rect
           x="461.40000000000003"
-          y="1346"
+          y="1362"
           width="28"
           height="12"
           rx="2"
@@ -1446,7 +1449,7 @@
         />
         <text
           x="497.4"
-          y="1355"
+          y="1371"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1455,7 +1458,7 @@
         </text>
         <rect
           x="607.2"
-          y="1346"
+          y="1362"
           width="28"
           height="12"
           rx="2"
@@ -1466,7 +1469,7 @@
         />
         <text
           x="643.2"
-          y="1355"
+          y="1371"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1475,7 +1478,7 @@
         </text>
         <rect
           x="818.8000000000001"
-          y="1346"
+          y="1362"
           width="28"
           height="12"
           rx="2"
@@ -1485,7 +1488,7 @@
         />
         <text
           x="854.8"
-          y="1355"
+          y="1371"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

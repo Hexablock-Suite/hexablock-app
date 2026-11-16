@@ -142,6 +142,28 @@ describe('GameStage', () => {
     expect(logger.entries.map((entry) => entry.useCase)).toEqual(['StartGame']);
   });
 
+  // Issue #178 (APP-FR-08): Lines and Sort show no undo. The move controls of a game choose
+  // its buttons: only the Fit controls show the undo and the redo for now (#179 adds Merge).
+  it('should_show_the_undo_and_the_redo_buttons_only_on_the_fit_screen_when_each_game_opens', async () => {
+    const shown: [string, number, number][] = [];
+    for (const id of FOUR_VARIANTS) {
+      await show(gameSessionOf(testRoot(), GameId.of(id), textCatalog.es));
+      shown.push([
+        id,
+        screen.queryAllByRole('button', { name: 'Deshacer' }).length,
+        screen.queryAllByRole('button', { name: 'Rehacer' }).length,
+      ]);
+      await screen.unmount();
+    }
+
+    expect(shown).toEqual([
+      ['hexa-lines', 0, 0],
+      ['hexa-fit', 1, 1],
+      ['hexa-sort', 0, 0],
+      ['hexa-merge', 0, 0],
+    ]);
+  });
+
   it('should_call_back_when_the_player_presses_the_map_button', async () => {
     const onBack = jest.fn();
     await show(gameSessionOf(testRoot(), GameId.of('hexa-merge'), textCatalog.es), onBack);

@@ -76,7 +76,8 @@
           ports they use: SaveProgress uses ProgressRepository, ListLevels uses LevelRepository and
           ProgressRepository, takes the game and the chosen figure and returns LevelSummary values,
           each with a LevelStatus of a closed set (completed, open, locked), and SyncLeaderboard
-          uses LeaderboardGateway and ProgressRepository. SaveProgress keeps the GameId of its game
+          uses LeaderboardGateway and ProgressRepository. LevelRepository also finds the one level
+          of a game that a start names by its id (#172). SaveProgress keeps the GameId of its game
           and returns no value. ProgressRepository loads and saves the GameProgress of one game in
           layer 1: one object with the high score and the best result of each level, which gives the
           stars of a level with starsOf() and delivers its data to a repository of the edge with
@@ -662,16 +663,16 @@
         <rect
           x="472"
           y="252"
-          width="336"
-          height="72"
+          width="432"
+          height="88"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="472" y1="300" x2="808" y2="300" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="472" y1="300" x2="904" y2="300" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="640"
+          x="688"
           y="270"
           fill="#5b6873"
           font-size="8"
@@ -682,7 +683,7 @@
           «interface» «port» «repository»
         </text>
         <text
-          x="640"
+          x="688"
           y="288"
           fill="#17212a"
           font-size="12"
@@ -694,6 +695,17 @@
         </text>
         <text x="488" y="316" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + list(gameId: GameId): Promise&lt;LevelDefinition[]&gt;
+        </text>
+        <text
+          x="488"
+          y="332"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          textLength="400"
+          lengthAdjust="spacingAndGlyphs"
+        >
+          + levelOf(gameId: GameId, levelId: LevelId): Promise&lt;LevelDefinition | undefined&gt;
         </text>
 
         <!-- Class: ProgressRepository (interface, port) -->
