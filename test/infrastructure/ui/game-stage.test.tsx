@@ -13,6 +13,12 @@ import { RecordingLogger } from '../../support/application/recording-logger';
 import { ManualClock } from '../../support/engine/manual-clock';
 import { firstMoveOf } from '../../support/engine/variant-game';
 
+// The root layout gives the composition root the storage of the device (#188).
+// The mock keeps the values in memory, so the test needs no device.
+jest.mock('@react-native-async-storage/async-storage', () =>
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
+);
+
 // Issue #170: `GameStage`, the view of the game screen, shows the board of a game, its score
 // and its outcome, and starts the game when it opens. These tests build the real composition
 // root with a manual clock, so each game takes the same seed in every run. The presenter sends each move through

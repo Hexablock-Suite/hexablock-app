@@ -4,6 +4,12 @@ import { fireEvent, renderRouter, screen, testRouter } from 'expo-router/testing
 
 import { repoRoot } from '../support/run-tool';
 
+// The root layout gives the composition root the storage of the device (#188).
+// The mock keeps the values in memory, so the test needs no device.
+jest.mock('@react-native-async-storage/async-storage', () =>
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
+);
+
 // The routes of `app/`, with the root layout and its composition root.
 const appDir = path.join(repoRoot, 'app');
 

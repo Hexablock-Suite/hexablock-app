@@ -5,6 +5,12 @@ import { Text } from 'react-native';
 import RootLayout from '../../app/_layout';
 import { useCompositionRoot } from '../../src/infrastructure/composition-root-provider';
 
+// The root layout gives the composition root the storage of the device (#188).
+// The mock keeps the values in memory, so the test needs no device.
+jest.mock('@react-native-async-storage/async-storage', () =>
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
+);
+
 // A route that reads the composition root and shows the count of registered games.
 function GameCount() {
   const root = useCompositionRoot();
