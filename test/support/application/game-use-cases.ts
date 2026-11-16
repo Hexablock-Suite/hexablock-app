@@ -10,7 +10,6 @@ import type { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameFactory } from '../../../src/domain/engine/game-factory';
 import type { MatchIdGenerator } from '../../../src/domain/engine/match-id-generator';
 import type { IVariantFactory } from '../../../src/domain/engine/variant-factory';
-import { CountingBoardIds, CountingStateIds } from '../engine/entity-ids';
 import { CountingMatchIds } from '../engine/match-id';
 import { RecordingLogger } from './recording-logger';
 import { RecordingPublisher } from './recording-publisher';
@@ -47,7 +46,7 @@ export class MemoryGameRepository<
 // `ApplyMove` delivers the events of each turn to `events`, and it writes a publisher
 // failure to `logger` (issues 132 and 233).
 // `ids` gives the id of each game that `StartGame` opens. The first state of each game
-// takes its own id and the id of its board from two counting generators.
+// and its board take ids that `GameFactory` builds from that id (issue #236).
 export function gameUseCases<
   TCell,
   TCoord,
@@ -64,10 +63,7 @@ export function gameUseCases<
   return {
     games,
     logger,
-    startGame: new StartGame(
-      new GameFactory(factory, ids, new CountingStateIds(), new CountingBoardIds()),
-      games,
-    ),
+    startGame: new StartGame(new GameFactory(factory, ids), games),
     applyMove: new ApplyMove(games, logger, events),
     undoMove: new UndoMove(games),
   };

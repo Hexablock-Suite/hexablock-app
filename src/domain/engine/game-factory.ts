@@ -1,14 +1,15 @@
-import type { BoardIdGenerator } from './board-id-generator';
+import { BoardId } from './board-id';
 import type { BoardState } from './board-state';
 import type { Cloneable } from './cloneable';
 import { GameEngine } from './game-engine';
-import type { GameStateIdGenerator } from './game-state-id-generator';
+import { GameStateId } from './game-state-id';
 import type { MatchIdGenerator } from './match-id-generator';
 import type { IVariantFactory } from './variant-factory';
 
 // The factory of the aggregate (classes.md decision 40). It assembles one whole game:
-// the ids of the match, of the first state and of its board, and the family of parts that
-// the variant factory creates. One generator gives each kind of id.
+// the id of the match, the local ids of the first state and of its board, and the family
+// of parts that the variant factory creates. Only the root has global identity,
+// so one generator gives the `MatchId`, and this class builds the local ids from it (decision 52).
 // The game takes no publisher: it records its events, and `ApplyMove` delivers them (#233).
 // `IVariantFactory` creates the parts of one variant. This class puts them together,
 // and that work is the same for every variant, so no variant factory repeats it.
@@ -23,26 +24,26 @@ export class GameFactory<
   constructor(
     private readonly variant: IVariantFactory<TCell, TCoord, TMove, TState, unknown>,
     private readonly ids: MatchIdGenerator,
-    private readonly stateIds: GameStateIdGenerator,
-    private readonly boardIds: BoardIdGenerator,
   ) {}
 
-  // A new game that has started. Each call asks each generator for one new id,
+  // A new game that has started. Each call asks the generator for one new `MatchId`,
   // and the variant factory for new rules, a new history and a new first state.
-  // The first state gets its own id, the id of its board and the `MatchId` of the game,
-  // so the state belongs to the game. So two games share no id, no board and no move.
+  // The first state gets the `MatchId` of the game, and its own id and the id of its board
+  // come from that `MatchId`, so the state belongs to the game. The rules get the `MatchId` too,
+  // so a timed variant gives its timer the id of the match (decision 50).
+  // So two games share no id, no board and no move.
   createGame(): GameEngine<TCell, TCoord, TMove, TState> {
     const matchId = this.ids.next();
-    const stateId = this.stateIds.next();
-    const boardId = this.boardIds.next();
     const game = new GameEngine<TCell, TCoord, TMove, TState>(
       matchId,
       this.variant.gameId,
-      this.variant.createRules(),
+      this.variant.createRules(matchId),
       this.variant.createScoring(),
       this.variant.createHistory(),
     );
-    game.start(this.variant.createInitialState(matchId, stateId, boardId));
+    game.start(
+      this.variant.createInitialState(matchId, GameStateId.of(matchId), BoardId.of(matchId)),
+    );
     return game;
   }
 }

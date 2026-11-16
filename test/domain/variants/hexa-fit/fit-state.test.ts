@@ -38,12 +38,16 @@ describe('FitState', () => {
   // The state has its own `GameStateId`, and it still knows its match (classes.md decision 26).
   it('should_be_the_same_state_when_two_states_have_one_state_id_whatever_they_hold', () => {
     const factory = fitFactory();
-    const rules = factory.createRules();
-    const first = factory.createInitialState(MATCH_ID, GameStateId.of('state-a'), BOARD_ID);
+    const rules = factory.createRules(MATCH_ID);
+    const first = factory.createInitialState(
+      MATCH_ID,
+      GameStateId.of(MatchId.of('match-a')),
+      BOARD_ID,
+    );
     const moved = rules.apply(first, firstValidMove(rules, first));
     const other = threeDominoFitFactory().createInitialState(
       MATCH_ID,
-      GameStateId.of('state-a'),
+      GameStateId.of(MatchId.of('match-a')),
       BOARD_ID,
     );
 
@@ -59,12 +63,12 @@ describe('FitState', () => {
     const factory = fitFactory();
     const first = factory.createInitialState(
       MatchId.of('m-a'),
-      GameStateId.of('state-a'),
+      GameStateId.of(MatchId.of('match-a')),
       BOARD_ID,
     );
     const second = factory.createInitialState(
       MatchId.of('m-a'),
-      GameStateId.of('state-b'),
+      GameStateId.of(MatchId.of('match-b')),
       BOARD_ID,
     );
 

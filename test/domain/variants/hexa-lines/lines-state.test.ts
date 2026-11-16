@@ -238,12 +238,12 @@ describe('LinesState', () => {
   it('should_be_the_same_state_when_two_states_have_one_state_id_whatever_they_hold', () => {
     const first = linesState(squareTopology, 3, {
       tray: [one],
-      stateId: GameStateId.of('state-a'),
+      stateId: GameStateId.of(MatchId.of('match-a')),
     });
     const second = linesState(squareTopology, 2, {
       filled: [square(0, 0)],
       tray: [],
-      stateId: GameStateId.of('state-a'),
+      stateId: GameStateId.of(MatchId.of('match-a')),
     });
     first.addPoints(Score.of(9));
 
@@ -258,12 +258,12 @@ describe('LinesState', () => {
     const first = linesState(squareTopology, 3, {
       tray: [one],
       matchId: MatchId.of('match-a'),
-      stateId: GameStateId.of('state-a'),
+      stateId: GameStateId.of(MatchId.of('match-a')),
     });
     const second = linesState(squareTopology, 3, {
       tray: [one],
       matchId: MatchId.of('match-a'),
-      stateId: GameStateId.of('state-b'),
+      stateId: GameStateId.of(MatchId.of('match-b')),
     });
 
     expect([first.equals(second), second.equals(first)]).toEqual([false, false]);

@@ -72,16 +72,16 @@
         <title id="fit-title">Hexa Fit variant · UML class diagram</title>
         <desc id="fit-desc">
           Class diagram of layer 1 for the Hexa Fit variant. FitLevelBuilder creates FitLevel.
-          FitFactory holds one FitLevel, a Clock and a LevelTimerIdGenerator and creates FitRules
-          and FitScoring. FitRules uses FitMove as TMove and FitState as TState. Lollipops show the
-          engine interface each variant class implements, with its binding. PieceId, the cell
-          content, and Placement, the rotation and the offset of a placed piece, are value objects.
-          PieceRegister is the value object that holds the pieces and the placements of FitState and
-          finds an entry with PieceId.equals(). FitState is an entity inside the GameEngine
-          aggregate: its own GameStateId is its identity, it keeps the MatchId of its game, and it
-          changes in place only through its business methods. FitPlay holds the Moves and the
-          ElapsedTime of one won level, and FitStarThreshold tells whether a play meets its two
-          limits. Both are value objects.
+          FitFactory holds one FitLevel and a Clock and creates FitRules and FitScoring. It builds
+          the LevelTimerId of each timer from the MatchId of the game. FitRules uses FitMove as
+          TMove and FitState as TState. Lollipops show the engine interface each variant class
+          implements, with its binding. PieceId, the cell content, and Placement, the rotation and
+          the offset of a placed piece, are value objects. PieceRegister is the value object that
+          holds the pieces and the placements of FitState and finds an entry with PieceId.equals().
+          FitState is an entity inside the GameEngine aggregate: its own GameStateId is its
+          identity, it keeps the MatchId of its game, and it changes in place only through its
+          business methods. FitPlay holds the Moves and the ElapsedTime of one won level, and
+          FitStarThreshold tells whether a play meets its two limits. Both are value objects.
         </desc>
         <defs>
           <marker
@@ -244,7 +244,7 @@
         />
         <!-- FitFactory creates FitScoring: use «create», one elbow -->
         <path
-          d="M680,240 L680,260 Q680,268 672,268 L528,268"
+          d="M680,224 L680,260 Q680,268 672,268 L528,268"
           fill="none"
           stroke-width="1"
           marker-end="url(#fit-open)"
@@ -253,7 +253,7 @@
         <!-- FitFactory holds the FitLevel it receives as level: use -->
         <line
           x1="800"
-          y1="240"
+          y1="224"
           x2="800"
           y2="734"
           stroke-width="1"
@@ -639,7 +639,7 @@
           x="648"
           y="120"
           width="224"
-          height="120"
+          height="104"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -676,9 +676,6 @@
         </text>
         <text x="664" y="216" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - clock: Clock
-        </text>
-        <text x="664" y="232" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - timerIds: LevelTimerIdGenerator
         </text>
 
         <!-- Class: FitLevel (value object) -->
@@ -1680,7 +1677,7 @@
             font-family="'IBM Plex Sans', sans-serif"
           >
             Undo: RedoableHistory, no limit. FitFactory wraps FitRules in TimedRulesDecorator (Part
-            1, view 7) and gives each new LevelTimer an id of its LevelTimerIdGenerator (view 5).
+            1, view 7) and builds the id of each new LevelTimer from the MatchId (view 5).
           </text>
           <text
             x="24"

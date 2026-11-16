@@ -183,7 +183,7 @@ describe('SortState', () => {
 
   // The state has its own `GameStateId`, and it still knows its match (classes.md decision 26).
   it('should_be_the_same_state_when_two_states_have_one_state_id_whatever_they_hold', () => {
-    const stateId = GameStateId.of('state-a');
+    const stateId = GameStateId.of(MatchId.of('match-a'));
     const first = sortState({ board: row(2), offered: [stack('red')], stateId });
     const second = sortState({ board: row(3), stateId });
     first.placeOfferedStack(square(0, 0));
@@ -197,8 +197,16 @@ describe('SortState', () => {
 
   it('should_be_another_state_when_two_states_of_one_match_have_different_state_ids', () => {
     const matchId = MatchId.of('m-a');
-    const first = sortState({ board: row(2), matchId, stateId: GameStateId.of('state-a') });
-    const second = sortState({ board: row(2), matchId, stateId: GameStateId.of('state-b') });
+    const first = sortState({
+      board: row(2),
+      matchId,
+      stateId: GameStateId.of(MatchId.of('match-a')),
+    });
+    const second = sortState({
+      board: row(2),
+      matchId,
+      stateId: GameStateId.of(MatchId.of('match-b')),
+    });
 
     expect([first.equals(second), second.equals(first)]).toEqual([false, false]);
     expect([

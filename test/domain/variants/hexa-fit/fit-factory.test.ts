@@ -9,6 +9,7 @@ import { BoardShape } from '../../../../src/domain/engine/board-shape';
 import { GameId } from '../../../../src/domain/engine/game-id';
 import { LevelTimer } from '../../../../src/domain/engine/level-timer';
 import { LevelTimerId } from '../../../../src/domain/engine/level-timer-id';
+import { MatchId } from '../../../../src/domain/engine/match-id';
 import { TimedRulesDecorator } from '../../../../src/domain/engine/timed-rules-decorator';
 import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
 import { Turns } from '../../../../src/domain/engine/turns';
@@ -23,7 +24,7 @@ import { A, fitFactory, threeDominoFitFactory } from '../../../support/variants/
 import { repoRoot } from '../../../support/run-tool';
 import { dataOf } from '../../../support/engine/game-over';
 import { MATCH_ID } from '../../../support/engine/match-id';
-import { BOARD_ID, CountingTimerIds, STATE_ID } from '../../../support/engine/entity-ids';
+import { BOARD_ID, STATE_ID, TIMER_ID } from '../../../support/engine/entity-ids';
 
 // The Fit factory creates the whole family of Hexa Fit (issue 99, classes.md decision 31).
 
@@ -71,7 +72,6 @@ describe('FitFactory', () => {
       new SquareGeometry(),
       FitLevel.of(TopologyId.square, BoardShape.of([square(0, 0), square(0, 0)]), []),
       new ManualClock(),
-      new CountingTimerIds(),
     );
     const message = 'Two coordinates of the shape have the same key.';
 
@@ -82,7 +82,7 @@ describe('FitFactory', () => {
   });
 
   it('should_wrap_the_fit_rules_in_the_timer_when_the_fit_factory_creates_the_rules', () => {
-    const rules = fitFactory().createRules();
+    const rules = fitFactory().createRules(MATCH_ID);
 
     expect(rules).toBeInstanceOf(TimedRulesDecorator);
     expect(new FitRules<SquareCoord>().timed()).toBeUndefined();
@@ -102,41 +102,27 @@ describe('FitFactory', () => {
     expect(second.engine.timed()?.elapsedMs()).toEqual(ElapsedTime.ofMs(0));
   });
 
-  // The timer is an entity with an id of its own (issue #214, classes.md decisions 19 and 26).
+  // The timer is an entity with a local id (issue #236, classes.md decisions 19, 50 and 52).
   // `createRules()` gives the timer as `ITimed`, and `ITimed` shows no id.
   // So the test compares the timer with a timer that holds the expected id.
-  it('should_ask_the_generator_once_and_give_its_id_to_the_timer_when_the_fit_factory_creates_the_rules', () => {
+  it('should_give_the_timer_the_id_of_the_match_when_the_fit_factory_creates_the_rules', () => {
     const clock = new ManualClock();
-    const timerIds = new CountingTimerIds();
-    const factory = fitFactory(clock, timerIds);
 
-    const timer = factory.createRules().timed();
+    const timer = fitFactory(clock).createRules(MATCH_ID).timed();
 
     expect(timer).toBeInstanceOf(LevelTimer);
-    expect((timer as LevelTimer).equals(new LevelTimer(LevelTimerId.of('timer-1'), clock))).toBe(
-      true,
-    );
-    // The generator gave one id, so its next id is the second one.
-    expect(timerIds.next().equals(LevelTimerId.of('timer-2'))).toBe(true);
+    expect([
+      (timer as LevelTimer).equals(new LevelTimer(TIMER_ID, clock)),
+      (timer as LevelTimer).equals(new LevelTimer(LevelTimerId.of(MATCH_ID), new ManualClock())),
+      (timer as LevelTimer).equals(new LevelTimer(LevelTimerId.of(MatchId.of('match-b')), clock)),
+    ]).toEqual([true, true, false]);
   });
 
-  it('should_ask_no_timer_id_when_the_fit_factory_creates_the_other_parts', () => {
-    const timerIds = new CountingTimerIds();
-    const factory = fitFactory(new ManualClock(), timerIds);
-
-    factory.createScoring();
-    factory.createPieceSource();
-    factory.createHistory();
-    factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
-
-    expect(timerIds.next().equals(LevelTimerId.of('timer-1'))).toBe(true);
-  });
-
-  it('should_give_two_timers_with_different_ids_and_separate_readings_when_the_rules_are_created_twice', () => {
+  it('should_give_two_timers_with_different_ids_and_separate_readings_when_the_rules_are_created_for_two_matches', () => {
     const clock = new ManualClock();
-    const factory = threeDominoFitFactory(clock, new CountingTimerIds());
-    const firstRules = factory.createRules();
-    const secondRules = factory.createRules();
+    const factory = threeDominoFitFactory(clock);
+    const firstRules = factory.createRules(MatchId.of('match-a'));
+    const secondRules = factory.createRules(MatchId.of('match-b'));
     const first = firstRules.timed() as LevelTimer;
     const second = secondRules.timed() as LevelTimer;
 
@@ -147,8 +133,8 @@ describe('FitFactory', () => {
     clock.advance(1_000);
 
     expect([first.equals(second), second.equals(first)]).toEqual([false, false]);
-    expect(first.equals(new LevelTimer(LevelTimerId.of('timer-1'), clock))).toBe(true);
-    expect(second.equals(new LevelTimer(LevelTimerId.of('timer-2'), clock))).toBe(true);
+    expect(first.equals(new LevelTimer(LevelTimerId.of(MatchId.of('match-a')), clock))).toBe(true);
+    expect(second.equals(new LevelTimer(LevelTimerId.of(MatchId.of('match-b')), clock))).toBe(true);
     expect(first.elapsedMs()).toEqual(ElapsedTime.ofMs(1_000));
     expect(second.elapsedMs()).toEqual(ElapsedTime.ofMs(0));
   });

@@ -37,7 +37,8 @@ export class SortFactory<TCoord> implements IVariantFactory<
     private readonly level: SortLevel,
   ) {}
 
-  createRules(): IGameRules<PlaceStack<TCoord>, SortState<TCoord>> {
+  // Hexa Sort has no timer, so the rules need no `MatchId` (classes.md decision 50).
+  createRules(_matchId: MatchId): IGameRules<PlaceStack<TCoord>, SortState<TCoord>> {
     return new SortRules<TCoord>();
   }
 

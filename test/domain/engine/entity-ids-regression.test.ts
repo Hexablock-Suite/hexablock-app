@@ -1,15 +1,13 @@
 /** @jest-environment node */
 import type { GridAxis } from '../../../src/domain/engine/grid-topology';
 import { Score } from '../../../src/domain/engine/score';
-import { BoardId } from '../../../src/domain/engine/board-id';
-import type { BoardIdGenerator } from '../../../src/domain/engine/board-id-generator';
 import type { BoardState, SnapshotOf } from '../../../src/domain/engine/board-state';
 import type { Cloneable } from '../../../src/domain/engine/cloneable';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameFactory } from '../../../src/domain/engine/game-factory';
 import { PlayingPhase } from '../../../src/domain/engine/game-phase';
-import { GameStateId } from '../../../src/domain/engine/game-state-id';
-import type { GameStateIdGenerator } from '../../../src/domain/engine/game-state-id-generator';
+import { LevelTimer } from '../../../src/domain/engine/level-timer';
+import type { MatchIdGenerator } from '../../../src/domain/engine/match-id-generator';
 import type { Outcome } from '../../../src/domain/engine/outcome';
 import type { Resolution } from '../../../src/domain/engine/resolution';
 import type { IGameRules } from '../../../src/domain/engine/rules';
@@ -24,12 +22,7 @@ import { PlacePiece } from '../../../src/domain/variants/hexa-lines/place-piece'
 import { MergeTile } from '../../../src/domain/variants/hexa-merge/merge-tile';
 import { SlideSense, Slide } from '../../../src/domain/variants/hexa-merge/slide';
 import type { ColorStack } from '../../../src/domain/variants/hexa-sort/color-stack';
-import {
-  BOARD_ID,
-  CountingBoardIds,
-  CountingStateIds,
-  STATE_ID,
-} from '../../support/engine/entity-ids';
+import { BOARD_ID, STATE_ID } from '../../support/engine/entity-ids';
 import { liveStateOf } from '../../support/engine/variant-game';
 import { CountingMatchIds, MATCH_ID } from '../../support/engine/match-id';
 import { square, type SquareCoord } from '../../support/engine/square-topology';
@@ -47,7 +40,8 @@ import { place, sortFactory, sortStateOf } from '../../support/variants/hexa-sor
 // The regression probe of T18 (classes.md decisions 7 and 26). The verifier of the own ids
 // wrote it. It pins four things at the public interface:
 // - each game of one `GameFactory` gets its own state id and board id, and a clone keeps them;
-// - a generator that repeats an id is not detected, so two games then hold equal states;
+// - the ids are local (issue #236, decision 52): the factory builds them from the `MatchId`,
+//   so a match id generator that repeats an id gives two games with equal states;
 // - an earlier snapshot, its cells, its score and its view never change after more moves;
 // - a state method that throws, and rules that throw inside a turn, change nothing.
 // Since R8 `GameEngine.snapshot()` gives a photo (decision 34). The photo holds the two ids
@@ -58,13 +52,19 @@ type AnyState<TCell, TCoord, TState> = BoardState<TCell, TCoord> & Cloneable<TSt
 
 const json = (value: unknown): string => JSON.stringify(value);
 
-// A game factory of the variant with counting generators, unless a test gives its own.
+// A game factory of the variant with a counting match id generator, unless a test gives its own.
 function gamesOf<TCell, TCoord, TMove, TState extends AnyState<TCell, TCoord, TState>>(
   variant: IVariantFactory<TCell, TCoord, TMove, TState, unknown>,
-  boardIds: BoardIdGenerator = new CountingBoardIds(),
-  stateIds: GameStateIdGenerator = new CountingStateIds(),
+  matchIds: MatchIdGenerator = new CountingMatchIds(),
 ): GameFactory<TCell, TCoord, TMove, TState> {
-  return new GameFactory(variant, new CountingMatchIds(), stateIds, boardIds);
+  return new GameFactory(variant, matchIds);
+}
+
+// The timer of a timed game. `ITimed` shows no id, so the probe compares the `LevelTimer`.
+function timerOf(game: { timed(): unknown }): LevelTimer {
+  const timer = game.timed();
+  if (!(timer instanceof LevelTimer)) throw new Error('The game has no level timer.');
+  return timer;
 }
 
 // The id facts of two games of one factory, in the order of `OWN_IDS`.
@@ -106,7 +106,7 @@ function aliasingOf<TCell, TCoord, TMove, TState extends AnyState<TCell, TCoord,
   stateOf: (photo: SnapshotOf<TState>) => TState,
 ) {
   const game = gamesOf(variant).createGame();
-  const rules = variant.createRules();
+  const rules = variant.createRules(MATCH_ID);
   const snapshots: SnapshotOf<TState>[] = [];
   const views: unknown[] = [];
   const taken: string[] = [];
@@ -233,14 +233,16 @@ function throwingTurnOf<TCell, TCoord, TMove, TState extends AnyState<TCell, TCo
   const game = new GameEngine<TCell, TCoord, TMove, TState>(
     MATCH_ID,
     variant.gameId,
-    new ThrowingAfterTurnRules(variant.createRules()),
+    new ThrowingAfterTurnRules(variant.createRules(MATCH_ID)),
     variant.createScoring(),
     variant.createHistory(),
   );
   game.start(variant.createInitialState(MATCH_ID, STATE_ID, BOARD_ID));
   const shown = () => json([game.snapshot().board.cells(), game.snapshot().score]);
   const before = shown();
-  const move = firstOf(variant.createRules().validMoves(liveStateOf(variant, game.snapshot())));
+  const move = firstOf(
+    variant.createRules(MATCH_ID).validMoves(liveStateOf(variant, game.snapshot())),
+  );
   if (move === undefined) throw new Error('The first state has no valid move.');
   let message: unknown;
   try {
@@ -264,16 +266,42 @@ describe('own ids of the board and the states (T18 probe)', () => {
     expect(idFactsOf(linesFactory())).toEqual(OWN_IDS);
   });
 
-  it('should_hold_equal_states_and_boards_when_a_generator_repeats_an_id', () => {
-    const sameBoardId: BoardIdGenerator = { next: () => BoardId.of('x') };
-    const sameStateId: GameStateIdGenerator = { next: () => GameStateId.of('x') };
-    const games = gamesOf(sortFactory(), sameBoardId, sameStateId);
+  // Done when of issue #236: two matches share no state, no board and no timer.
+  it('should_give_different_states_boards_and_timers_when_two_games_have_different_match_ids', () => {
+    const games = gamesOf(fitFactory());
     const first = games.createGame();
     const second = games.createGame();
 
-    expect(first.equals(second)).toBe(false);
-    expect(first.snapshot().stateId.equals(second.snapshot().stateId)).toBe(true);
-    expect(first.snapshot().board.equals(second.snapshot().board)).toBe(true);
+    expect([first.equals(second), second.equals(first)]).toEqual([false, false]);
+    expect([
+      first.snapshot().stateId.equals(second.snapshot().stateId),
+      second.snapshot().stateId.equals(first.snapshot().stateId),
+      first.snapshot().board.equals(second.snapshot().board),
+      second.snapshot().board.equals(first.snapshot().board),
+      timerOf(first).equals(timerOf(second)),
+      timerOf(second).equals(timerOf(first)),
+    ]).toEqual([false, false, false, false, false, false]);
+    expect([
+      first.snapshot().stateId.equals(first.snapshot().stateId),
+      first.snapshot().board.equals(first.snapshot().board),
+      timerOf(first).equals(timerOf(first)),
+    ]).toEqual([true, true, true]);
+  });
+
+  // The `MatchIdGenerator` is the only source of global identity (decision 52).
+  // `GameFactory` does not check it, so a generator that repeats an id gives two equal games,
+  // and their internal entities are equal too.
+  it('should_hold_equal_games_states_boards_and_timers_when_the_match_id_generator_repeats_an_id', () => {
+    const games = gamesOf(fitFactory(), { next: () => MATCH_ID });
+    const first = games.createGame();
+    const second = games.createGame();
+
+    expect([
+      first.equals(second),
+      first.snapshot().stateId.equals(second.snapshot().stateId),
+      first.snapshot().board.equals(second.snapshot().board),
+      timerOf(first).equals(timerOf(second)),
+    ]).toEqual([true, true, true, true]);
   });
 
   it('should_be_different_when_two_states_of_other_variants_have_the_same_id', () => {
@@ -285,8 +313,6 @@ describe('own ids of the board and the states (T18 probe)', () => {
   });
 
   it('should_stay_equal_when_a_move_changes_the_content_of_the_state', () => {
-    expect(() => BoardId.of('  ')).toThrow(RangeError);
-    expect(() => GameStateId.of('')).toThrow(RangeError);
     const game = gamesOf(sortFactory()).createGame();
     const before = game.snapshot();
     const state = sortFactory().createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
@@ -340,7 +366,9 @@ describe('aliasing of earlier snapshots (T18 probe)', () => {
     const before = shown();
 
     for (let i = 0; i < 6; i += 1) {
-      const slide = firstOf(variant.createRules().validMoves(mergeStateOf(game.snapshot())));
+      const slide = firstOf(
+        variant.createRules(MATCH_ID).validMoves(mergeStateOf(game.snapshot())),
+      );
       if (slide !== undefined) game.tryPlay(slide);
     }
     expect(shown()).toBe(before);
