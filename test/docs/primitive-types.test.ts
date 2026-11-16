@@ -1,28 +1,57 @@
 /** @jest-environment node */
-import { readdirSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import ts from 'typescript';
 
 import { repoRoot } from '../support/run-tool';
+import { primitiveBaseline, type PrimitiveEntry } from './domain-baseline';
+import { domainDir, domainSources, hasModifier, isPrivate, nameOf } from './domain-source';
 
-// APP-NFR-25: no primitive type stays in the domain model, except a `boolean`, a private field
-// and the factory method of a value object. The redesign reaches the rule one unit at a time.
-// Until a unit lands, each primitive that stays has a reason. Every `number` and `string` in a public signature of
-// `src/domain/engine/` needs a row in the README table «Primitive types».
-// A `boolean` needs no row. The scan reads exported classes, interfaces, type aliases,
-// functions and variables (`export const`, `export let`). It reads the written type of each
-// member. When a member has no written type, the scan reads the type that the TypeScript
+// APP-NFR-25 (issue #231): no primitive type stays in the domain model, except a `boolean`.
+// The gate reads every `.ts` file under `src/domain/`. It reads the exported classes, interfaces,
+// type aliases, functions and variables (`export const`, `export let`). It reads the written type
+// of each member. When a member has no written type, the scan reads the type that the TypeScript
 // checker infers.
-// A literal type, such as `'playing'`, is a primitive too (issue #207, classes.md decision 45).
-// A closed union of texts is a `string` with a name, so the scan lists each text literal
-// as a `string` and each number literal as a `number`. A class with a closed set of instances
-// replaces such a union.
+// A primitive is `number`, `string` or a literal type, such as `'playing'` or `3` (issue #207,
+// classes.md decision 45). A closed union of texts is a `string` with a name, so the scan lists
+// each text literal as a `string` and each number literal as a `number`.
+// A class with a closed set of instances replaces such a union.
+// The gate allows these places, and no other place:
+// - a `boolean`, `true`, `false` and `null`;
+// - a private member, with the `private` modifier or a `#` name;
+// - a parameter of a `private` or `protected` constructor;
+// - the parameters of a static factory method: a `static` method of an exported class whose
+//   constructor is `private`, and whose return type is that class;
+// - the parameters of an entry of the fixed factory list below;
+// - `deliverTo(receiver: ValueReceiver<T>): void`, which gives the value only to an adapter
+//   of the edge (rule R-no-delivery-call).
+// A `private` parameter property of a public constructor is a constructor parameter,
+// because the caller passes it.
+// A README row allows nothing. Only an entry of the baseline list (`domain-baseline.ts`)
+// excuses a primitive, and each entry names the issue that removes it.
+// The README table «Primitive types» explains some places. The gate fails when a row names
+// a place that the scan does not find.
 
-const engineDir = path.join(repoRoot, 'src/domain/engine');
+const engineDir = path.join(domainDir, 'engine');
 const readme = readFileSync(path.join(repoRoot, 'README.md'), 'utf8');
+
+// The coordinate builders that are not static methods of their class.
+// The list does not shrink: a new entry is a change of the gate that its pull request names.
+// Each entry returns a class with a private constructor and a static factory method.
+const factoryList = [
+  'hex',
+  'square',
+  'triangle',
+  'GeometryFactory.createCoord',
+  'HexGeometry.createCoord',
+  'SquareGeometry.createCoord',
+  'TriangleGeometry.createCoord',
+];
 
 type Primitive = 'number' | 'string';
 type Use = { primitive: Primitive; where: string };
+// One primitive at one place. `counted` is false when a rule of the gate allows it.
+type Finding = Use & { counted: boolean };
 
 const key = (use: Use) => `${use.primitive} ${use.where}`;
 
@@ -51,25 +80,23 @@ function primitivesIn(nodes: readonly (ts.Node | undefined)[]): Primitive[] {
   return [...found];
 }
 
-function hasModifier(node: ts.Node, kind: ts.SyntaxKind): boolean {
-  return ts.canHaveModifiers(node) && (ts.getModifiers(node) ?? []).some((m) => m.kind === kind);
-}
-
-const isPrivate = (node: ts.Node) =>
-  hasModifier(node, ts.SyntaxKind.PrivateKeyword) ||
-  (ts.isClassElement(node) && node.name !== undefined && ts.isPrivateIdentifier(node.name));
-
-function nameOf(node: ts.NamedDeclaration): string {
-  return node.name?.getText() ?? 'constructor';
+// The primitives at one place. A primitive of `all` is counted when it is also in `counted`.
+function findingsAt(
+  where: string,
+  all: readonly (ts.Node | undefined)[],
+  counted: readonly (ts.Node | undefined)[] = all,
+): Finding[] {
+  const kept = new Set(primitivesIn(counted));
+  return primitivesIn(all).map((primitive) => ({ primitive, where, counted: kept.has(primitive) }));
 }
 
 // The type parameters of a declaration, one place each: `Owner<TParam>`.
-function typeParameterUses(owner: string, node: ts.DeclarationWithTypeParameterChildren): Use[] {
+function typeParameterUses(
+  owner: string,
+  node: ts.DeclarationWithTypeParameterChildren,
+): Finding[] {
   return (node.typeParameters ?? []).flatMap((parameter) =>
-    primitivesIn([parameter.constraint]).map((primitive) => ({
-      primitive,
-      where: `${owner}<${parameter.name.text}>`,
-    })),
+    findingsAt(`${owner}<${parameter.name.text}>`, [parameter.constraint]),
   );
 }
 
@@ -104,16 +131,24 @@ function typeOf(node: Declaration, checker: ts.TypeChecker): ts.Node | undefined
   return checker.typeToTypeNode(checker.getReturnTypeOfSignature(call), undefined, flags);
 }
 
+type Callable =
+  | ts.MethodDeclaration
+  | ts.MethodSignature
+  | ts.GetAccessorDeclaration
+  | ts.SetAccessorDeclaration
+  | ts.FunctionDeclaration;
+
+const isCallable = (member: ts.Node): member is Callable =>
+  ts.isMethodDeclaration(member) ||
+  ts.isMethodSignature(member) ||
+  ts.isGetAccessorDeclaration(member) ||
+  ts.isSetAccessorDeclaration(member) ||
+  ts.isFunctionDeclaration(member);
+
 // The signature of a member: its type parameters, its parameter types and its type.
 // A method body and an initializer are not part of the signature.
 function signature(member: ts.Node, checker: ts.TypeChecker): (ts.Node | undefined)[] {
-  if (
-    ts.isMethodDeclaration(member) ||
-    ts.isMethodSignature(member) ||
-    ts.isGetAccessorDeclaration(member) ||
-    ts.isSetAccessorDeclaration(member) ||
-    ts.isFunctionDeclaration(member)
-  ) {
+  if (isCallable(member)) {
     return [
       ...(member.typeParameters ?? []),
       ...member.parameters.map((parameter) => typeOf(parameter, checker)),
@@ -126,28 +161,99 @@ function signature(member: ts.Node, checker: ts.TypeChecker): (ts.Node | undefin
   return [];
 }
 
+// The signature of a member without its parameter types.
+function withoutParameters(member: ts.Node, checker: ts.TypeChecker): (ts.Node | undefined)[] {
+  if (!isCallable(member)) return signature(member, checker);
+  return [...(member.typeParameters ?? []), typeOf(member, checker)];
+}
+
+// The classes that a type names, such as `Range` for `Range<number>`.
+function classesOf(type: ts.Type): ts.ClassDeclaration[] {
+  return type.getSymbol()?.declarations?.filter(ts.isClassDeclaration) ?? [];
+}
+
+function hasPrivateConstructor(owner: ts.ClassDeclaration): boolean {
+  return owner.members.some((member) => ts.isConstructorDeclaration(member) && isPrivate(member));
+}
+
+// A static factory method: a `static` method of a class whose constructor is `private`,
+// and whose return type is that class.
+function isStaticFactory(
+  member: ts.Node,
+  owner: ts.ClassDeclaration | ts.InterfaceDeclaration,
+  checker: ts.TypeChecker,
+): boolean {
+  if (!ts.isClassDeclaration(owner) || !ts.isMethodDeclaration(member)) return false;
+  if (!hasModifier(member, ts.SyntaxKind.StaticKeyword) || !hasPrivateConstructor(owner)) {
+    return false;
+  }
+  const call = checker.getSignatureFromDeclaration(member);
+  return call !== undefined && classesOf(checker.getReturnTypeOfSignature(call)).includes(owner);
+}
+
+// A public `deliverTo` whose only parameter is a `ValueReceiver<T>` and whose return type is `void`.
+function isDelivery(member: ts.Node, checker: ts.TypeChecker): boolean {
+  if (!ts.isMethodDeclaration(member) && !ts.isMethodSignature(member)) return false;
+  if (nameOf(member) !== 'deliverTo' || hasModifier(member, ts.SyntaxKind.ProtectedKeyword)) {
+    return false;
+  }
+  const [parameter, ...rest] = member.parameters;
+  if (parameter === undefined || rest.length > 0) return false;
+  const type = typeOf(parameter, checker);
+  const receiver =
+    type !== undefined &&
+    ts.isTypeReferenceNode(type) &&
+    ts.isIdentifier(type.typeName) &&
+    type.typeName.text === 'ValueReceiver';
+  return receiver && typeOf(member, checker)?.kind === ts.SyntaxKind.VoidKeyword;
+}
+
+// The part of the signature of a member that the gate counts.
+function countedSignature(
+  where: string,
+  member: ts.Node,
+  owner: ts.ClassDeclaration | ts.InterfaceDeclaration,
+  checker: ts.TypeChecker,
+): (ts.Node | undefined)[] {
+  if (isDelivery(member, checker)) return [];
+  if (factoryList.includes(where) || isStaticFactory(member, owner, checker)) {
+    return withoutParameters(member, checker);
+  }
+  return signature(member, checker);
+}
+
 function constructorUses(
   owner: string,
   ctor: ts.ConstructorDeclaration,
   checker: ts.TypeChecker,
-): Use[] {
-  const ctorIsPrivate = isPrivate(ctor);
+): Finding[] {
+  // A caller cannot call a private or protected constructor, so its parameters pass.
+  const closed = isPrivate(ctor) || hasModifier(ctor, ts.SyntaxKind.ProtectedKeyword);
   return ctor.parameters.flatMap((parameter) => {
-    const isProperty = ts.isParameterPropertyDeclaration(parameter, ctor);
-    // A parameter property is a member: it is public unless it is private.
-    if (isProperty && isPrivate(parameter)) return [];
-    if (!isProperty && ctorIsPrivate) return [];
-    const where = isProperty ? `${owner}.${nameOf(parameter)}` : `${owner}.constructor`;
-    return primitivesIn([typeOf(parameter, checker)]).map((primitive) => ({ primitive, where }));
+    const type = [typeOf(parameter, checker)];
+    // A parameter property that is not private is a member of the class.
+    if (ts.isParameterPropertyDeclaration(parameter, ctor) && !isPrivate(parameter)) {
+      return findingsAt(`${owner}.${nameOf(parameter)}`, type);
+    }
+    // Any other parameter, a private parameter property too, is a value that the caller passes.
+    return closed ? [] : findingsAt(`${owner}.constructor`, type);
   });
 }
 
-function memberUses(owner: string, members: readonly ts.Node[], checker: ts.TypeChecker): Use[] {
-  return members.flatMap((member) => {
-    if (ts.isConstructorDeclaration(member)) return constructorUses(owner, member, checker);
+function memberUses(
+  owner: ts.ClassDeclaration | ts.InterfaceDeclaration,
+  checker: ts.TypeChecker,
+): Finding[] {
+  const name = owner.name?.text ?? 'default';
+  return (owner.members as readonly ts.Node[]).flatMap((member) => {
+    if (ts.isConstructorDeclaration(member)) return constructorUses(name, member, checker);
     if (isPrivate(member)) return [];
-    const where = `${owner}.${nameOf(member as ts.NamedDeclaration)}`;
-    return primitivesIn(signature(member, checker)).map((primitive) => ({ primitive, where }));
+    const where = `${name}.${nameOf(member as ts.NamedDeclaration)}`;
+    return findingsAt(
+      where,
+      signature(member, checker),
+      countedSignature(where, member, owner, checker),
+    );
   });
 }
 
@@ -161,41 +267,34 @@ function boundNames(pattern: ts.BindingPattern): ts.Identifier[] {
 
 // Each declarator of an exported variable statement. A plain name reads its written type.
 // Each name in a destructuring pattern reads the type that the checker infers.
-function variableUses(statement: ts.VariableStatement, checker: ts.TypeChecker): Use[] {
+function variableUses(statement: ts.VariableStatement, checker: ts.TypeChecker): Finding[] {
   return statement.declarationList.declarations.flatMap((declaration) => {
     const typed = ts.isIdentifier(declaration.name)
       ? [{ name: declaration.name, type: typeOf(declaration, checker) }]
       : boundNames(declaration.name).map((name) => ({ name, type: inferredType(name, checker) }));
-    return typed.flatMap(({ name, type }) =>
-      primitivesIn([type]).map((primitive) => ({ primitive, where: name.text })),
-    );
+    return typed.flatMap(({ name, type }) => findingsAt(name.text, [type]));
   });
 }
 
-function declarationUses(statement: ts.Statement, checker: ts.TypeChecker): Use[] {
+function declarationUses(statement: ts.Statement, checker: ts.TypeChecker): Finding[] {
   if (!hasModifier(statement, ts.SyntaxKind.ExportKeyword)) return [];
   if (ts.isClassDeclaration(statement) || ts.isInterfaceDeclaration(statement)) {
     const owner = statement.name?.text ?? 'default';
-    return [
-      ...typeParameterUses(owner, statement),
-      ...memberUses(owner, statement.members, checker),
-    ];
+    return [...typeParameterUses(owner, statement), ...memberUses(statement, checker)];
   }
   if (ts.isTypeAliasDeclaration(statement)) {
     const owner = statement.name.text;
-    const uses = primitivesIn([statement.type]).map((primitive) => ({ primitive, where: owner }));
-    return [...typeParameterUses(owner, statement), ...uses];
+    return [...typeParameterUses(owner, statement), ...findingsAt(owner, [statement.type])];
   }
   if (ts.isFunctionDeclaration(statement)) {
     const owner = statement.name?.text ?? 'default';
     // The function's own type parameters are listed once, as `owner<TParam>`.
-    const uses = primitivesIn(
-      signature(statement, checker).slice(statement.typeParameters?.length ?? 0),
-    );
-    return [
-      ...typeParameterUses(owner, statement),
-      ...uses.map((primitive) => ({ primitive, where: owner })),
-    ];
+    const own = statement.typeParameters?.length ?? 0;
+    const all = signature(statement, checker).slice(own);
+    const counted = factoryList.includes(owner)
+      ? withoutParameters(statement, checker).slice(own)
+      : all;
+    return [...typeParameterUses(owner, statement), ...findingsAt(owner, all, counted)];
   }
   if (ts.isVariableStatement(statement)) return variableUses(statement, checker);
   return [];
@@ -219,23 +318,127 @@ function programOf(files: Record<string, string>): ts.Program {
   return ts.createProgram(Object.keys(files), options, host);
 }
 
-// The uses in a set of source files, each named by its path.
-function usesIn(files: Record<string, string>): Use[] {
-  const program = programOf(files);
-  const checker = program.getTypeChecker();
-  const uses = Object.keys(files).flatMap((file) => {
+// The source files of a program, in the order of the given files.
+function sourcesOf(program: ts.Program, files: Record<string, string>): ts.SourceFile[] {
+  return Object.keys(files).map((file) => {
     const source = program.getSourceFile(file);
     if (source === undefined) throw new Error(`The program has no file ${file}.`);
-    return source.statements.flatMap((statement) => declarationUses(statement, checker));
+    return source;
   });
+}
+
+// The findings in a set of source files, each named by its path.
+function scan(files: Record<string, string>): Finding[] {
+  const program = programOf(files);
+  const checker = program.getTypeChecker();
+  return sourcesOf(program, files).flatMap((source) =>
+    source.statements.flatMap((statement) => declarationUses(statement, checker)),
+  );
+}
+
+// Each place once, in the order of the scan.
+function unique(findings: Finding[]): Use[] {
+  const uses = findings.map(({ primitive, where }) => ({ primitive, where }));
   return [...new Map(uses.map((use) => [key(use), use])).values()];
 }
 
-function codeUses(): Use[] {
-  const files = readdirSync(engineDir)
-    .filter((file) => file.endsWith('.ts'))
-    .map((file) => path.join(engineDir, file));
-  return usesIn(Object.fromEntries(files.map((file) => [file, readFileSync(file, 'utf8')])));
+// Every primitive in a public signature, also one that a rule of the gate allows.
+const usesIn = (files: Record<string, string>): Use[] => unique(scan(files));
+
+// The primitives that no rule of the gate allows: the breaks of APP-NFR-25.
+const breaksIn = (files: Record<string, string>): Use[] =>
+  unique(scan(files).filter((finding) => finding.counted));
+
+// The scan of `src/domain/` is the same for every test, so it runs once.
+let domainFindings: Finding[] | undefined;
+function codeFindings(): Finding[] {
+  domainFindings ??= scan(domainSources());
+  return domainFindings;
+}
+
+const codeUses = (): Use[] => unique(codeFindings());
+const codeBreaks = (): Use[] => unique(codeFindings().filter((finding) => finding.counted));
+
+// The classes that a type parameter of an interface or a class stands for:
+// the type argument of each class of the files that implements or extends its owner.
+function boundClasses(
+  declaration: ts.SignatureDeclaration,
+  parameter: ts.Type,
+  sources: ts.SourceFile[],
+  checker: ts.TypeChecker,
+): ts.ClassDeclaration[] {
+  const owner = declaration.parent;
+  if (!ts.isInterfaceDeclaration(owner) && !ts.isClassDeclaration(owner)) return [];
+  const index = (owner.typeParameters ?? []).findIndex(
+    (typeParameter) => checker.getTypeAtLocation(typeParameter) === parameter,
+  );
+  return sources
+    .flatMap((source) => source.statements.filter(ts.isClassDeclaration))
+    .flatMap((type) => (type.heritageClauses ?? []).flatMap((clause) => clause.types))
+    .filter((base) => ts.isIdentifier(base.expression) && base.expression.text === owner.name?.text)
+    .flatMap((base) => {
+      const argument = base.typeArguments?.[index];
+      return argument === undefined ? [] : classesOf(checker.getTypeFromTypeNode(argument));
+    });
+}
+
+// The classes that a declaration returns.
+function returnedClasses(
+  declaration: ts.SignatureDeclaration,
+  sources: ts.SourceFile[],
+  checker: ts.TypeChecker,
+): ts.ClassDeclaration[] {
+  const call = checker.getSignatureFromDeclaration(declaration);
+  if (call === undefined) return [];
+  const type = checker.getReturnTypeOfSignature(call);
+  if (type.isTypeParameter()) return boundClasses(declaration, type, sources, checker);
+  return classesOf(type);
+}
+
+// The exported functions and the methods of the exported classes and interfaces, by place.
+function callablesOf(sources: ts.SourceFile[]): Map<string, ts.SignatureDeclaration> {
+  const found = new Map<string, ts.SignatureDeclaration>();
+  for (const statement of sources.flatMap((source) => source.statements)) {
+    if (!hasModifier(statement, ts.SyntaxKind.ExportKeyword)) continue;
+    if (ts.isFunctionDeclaration(statement) && statement.name !== undefined) {
+      found.set(statement.name.text, statement);
+    }
+    if (ts.isClassDeclaration(statement) || ts.isInterfaceDeclaration(statement)) {
+      for (const member of statement.members as readonly ts.Node[]) {
+        if (ts.isMethodDeclaration(member) || ts.isMethodSignature(member)) {
+          found.set(`${statement.name?.text}.${nameOf(member)}`, member);
+        }
+      }
+    }
+  }
+  return found;
+}
+
+// The entries of the factory list that do not return a class with a private constructor
+// and a static factory method. A type parameter, such as `TCoord` of `GeometryFactory`,
+// stands for the type argument of each class that implements its interface.
+function factoryListProblems(files: Record<string, string>): string[] {
+  const program = programOf(files);
+  const checker = program.getTypeChecker();
+  const sources = sourcesOf(program, files);
+  const callables = callablesOf(sources);
+  return factoryList.flatMap((where) => {
+    const declaration = callables.get(where);
+    if (declaration === undefined) return [`${where} is not found.`];
+    const classes = returnedClasses(declaration, sources, checker);
+    if (classes.length === 0) return [`${where} returns no class.`];
+    return classes
+      .filter(
+        (type) =>
+          !hasPrivateConstructor(type) ||
+          !type.members.some((member) => isStaticFactory(member, type, checker)),
+      )
+      .map(
+        (type) =>
+          `${where} returns ${type.name?.text}, ` +
+          'which lacks a private constructor or a static factory method.',
+      );
+  });
 }
 
 type Row = { primitive: string; places: string[]; reason: string };
@@ -260,13 +463,20 @@ function readmeUses(): Use[] {
   );
 }
 
-// The uses that have no row in the README table. The gate fails when this list is not empty.
-function unlisted(uses: Use[]): Use[] {
-  const listed = new Set(readmeUses().map(key));
-  return uses.filter((use) => !listed.has(key(use)));
+// The breaks that have no entry in the baseline list. The gate fails when this list is not empty.
+// A README row excuses nothing.
+function unexcused(breaks: Use[], baseline: readonly PrimitiveEntry[]): Use[] {
+  const excused = new Set(baseline.map(key));
+  return breaks.filter((use) => !excused.has(key(use)));
 }
 
-describe('README primitive types', () => {
+// A source file at a place under `src/domain/`. The file exists only in the program of the test.
+const fixture = (name: string, source: string) => ({ [path.join(engineDir, name)]: source });
+const variantFixture = (name: string, source: string) => ({
+  [path.join(domainDir, 'variants/hexa-lines', name)]: source,
+});
+
+describe('primitive scan of the domain', () => {
   it('should_find_a_primitive_in_the_engine_when_the_code_is_scanned', () => {
     const uses = codeUses();
 
@@ -423,7 +633,7 @@ describe('README primitive types', () => {
   });
 
   // Issue #210, classes.md decision 48: a seed is a `Seed`, not a number.
-  // Only the factory of `Seed` and the first state of a generator keep a row.
+  // Only the factory of `Seed` and the first state of a generator keep a primitive.
   it('should_find_no_seed_of_type_number_when_the_code_is_scanned', () => {
     const uses = codeUses();
     const places = uses.map((use) => use.where);
@@ -457,7 +667,7 @@ describe('README primitive types', () => {
       '}',
     ].join('\n');
 
-    expect(usesIn({ [path.join(engineDir, 'fixture-unions.ts')]: source })).toEqual([
+    expect(usesIn(fixture('fixture-unions.ts', source))).toEqual([
       { primitive: 'string', where: 'Outcome' },
       { primitive: 'number', where: 'Sides' },
       { primitive: 'string', where: 'Topology<TAxis>' },
@@ -492,25 +702,13 @@ describe('README primitive types', () => {
       '}',
     ].join('\n');
 
-    expect(usesIn({ [path.join(engineDir, 'counter.ts')]: source })).toEqual([
+    expect(usesIn(fixture('counter.ts', source))).toEqual([
       { primitive: 'number', where: 'Counter.count' },
       { primitive: 'string', where: 'Counter.title' },
       { primitive: 'string', where: 'Counter.phase' },
       { primitive: 'number', where: 'Counter.size' },
       { primitive: 'string', where: 'label' },
     ]);
-  });
-
-  it('should_list_every_primitive_of_the_engine_when_the_readme_table_is_read', () => {
-    expect(unlisted(codeUses())).toEqual([]);
-  });
-
-  it('should_fail_the_gate_when_an_exported_number_constant_has_no_readme_row', () => {
-    const source = 'export const fixtureLimit: number = 3;';
-
-    const uses = usesIn({ [path.join(engineDir, 'fixture-limit.ts')]: source });
-
-    expect(unlisted(uses)).toEqual([{ primitive: 'number', where: 'fixtureLimit' }]);
   });
 
   it('should_read_every_binding_when_an_exported_variable_statement_is_scanned', () => {
@@ -524,7 +722,7 @@ describe('README primitive types', () => {
       'const hidden = 1;',
     ].join('\n');
 
-    expect(usesIn({ [path.join(engineDir, 'fixture-values.ts')]: source })).toEqual([
+    expect(usesIn(fixture('fixture-values.ts', source))).toEqual([
       { primitive: 'string', where: 'written' },
       { primitive: 'number', where: 'counted' },
       { primitive: 'number', where: 'width' },
@@ -535,15 +733,7 @@ describe('README primitive types', () => {
     ]);
   });
 
-  it('should_fail_the_gate_when_an_exported_function_has_a_primitive_parameter_and_no_row', () => {
-    const source = 'export function fixtureScale(factor: number): void {}';
-
-    const uses = usesIn({ [path.join(engineDir, 'fixture-scale.ts')]: source });
-
-    expect(unlisted(uses)).toEqual([{ primitive: 'number', where: 'fixtureScale' }]);
-  });
-
-  it('should_list_no_primitive_that_the_engine_lacks_when_the_readme_table_is_read', () => {
+  it('should_list_no_primitive_that_the_domain_lacks_when_the_readme_table_is_read', () => {
     const inCode = new Set(codeUses().map(key));
 
     const extra = readmeUses().filter((use) => !inCode.has(key(use)));
@@ -557,5 +747,227 @@ describe('README primitive types', () => {
     expect(rows.length).toBeGreaterThan(0);
     expect(rows.filter((row) => !['number', 'string'].includes(row.primitive))).toEqual([]);
     expect(rows.filter((row) => row.places.length === 0 || row.reason === '')).toEqual([]);
+  });
+});
+
+describe('domain primitive gate', () => {
+  it('should_fail_the_gate_when_a_variant_signature_has_a_primitive_and_no_baseline_entry', () => {
+    const baseline = primitiveBaseline.filter((entry) => entry.where !== 'LinesSnapshot.streak');
+
+    expect(unexcused(codeBreaks(), baseline)).toContainEqual({
+      primitive: 'number',
+      where: 'LinesSnapshot.streak',
+    });
+    expect(
+      unexcused(breaksIn(variantFixture('fixture-tray.ts', 'export type TraySize = number;')), []),
+    ).toEqual([{ primitive: 'number', where: 'TraySize' }]);
+  });
+
+  it('should_fail_the_gate_when_only_a_readme_row_names_the_primitive', () => {
+    const source = 'export interface Clock {\n  now(): number;\n}';
+
+    expect(readmeUses()).toContainEqual({ primitive: 'number', where: 'Clock.now' });
+    expect(unexcused(breaksIn(fixture('fixture-clock.ts', source)), [])).toEqual([
+      { primitive: 'number', where: 'Clock.now' },
+    ]);
+  });
+
+  it('should_fail_the_gate_when_an_exported_number_constant_has_no_baseline_entry', () => {
+    const source = 'export const fixtureLimit: number = 3;';
+
+    const breaks = breaksIn(fixture('fixture-limit.ts', source));
+
+    expect(unexcused(breaks, primitiveBaseline)).toEqual([
+      { primitive: 'number', where: 'fixtureLimit' },
+    ]);
+  });
+
+  it('should_fail_the_gate_when_an_exported_function_has_a_primitive_parameter_and_no_baseline_entry', () => {
+    const source = 'export function fixtureScale(factor: number): void {}';
+
+    const breaks = breaksIn(fixture('fixture-scale.ts', source));
+
+    expect(unexcused(breaks, primitiveBaseline)).toEqual([
+      { primitive: 'number', where: 'fixtureScale' },
+    ]);
+  });
+
+  it('should_pass_the_parameters_of_a_static_factory_when_the_class_has_a_private_constructor', () => {
+    const source = [
+      'export class Money {',
+      '  private constructor(private readonly cents: number) {}',
+      '  static of(cents: number): Money {',
+      '    return new Money(cents);',
+      '  }',
+      '  static parse(text: string): number {',
+      '    return Number(text);',
+      '  }',
+      '}',
+      'export class Span<T> {',
+      '  private constructor(private readonly low: T) {}',
+      '  static ofNumber(low: number): Span<number> {',
+      '    return new Span(low);',
+      '  }',
+      '}',
+      'export class Open {',
+      '  constructor() {}',
+      '  static of(size: number): Open {',
+      '    return new Open();',
+      '  }',
+      '}',
+    ].join('\n');
+
+    expect(breaksIn(fixture('fixture-money.ts', source))).toEqual([
+      { primitive: 'string', where: 'Money.parse' },
+      { primitive: 'number', where: 'Money.parse' },
+      { primitive: 'number', where: 'Span.ofNumber' },
+      { primitive: 'number', where: 'Open.of' },
+    ]);
+  });
+
+  it('should_pass_the_parameters_of_a_factory_list_entry_when_it_builds_a_coordinate', () => {
+    const source = [
+      'export class HexCoord {',
+      '  private constructor(private readonly q: number) {}',
+      '  static of(q: number): HexCoord {',
+      '    return new HexCoord(q);',
+      '  }',
+      '}',
+      'export function hex(q: number): HexCoord {',
+      '  return HexCoord.of(q);',
+      '}',
+      'export function hexagon(q: number): HexCoord {',
+      '  return HexCoord.of(q);',
+      '}',
+    ].join('\n');
+
+    expect(breaksIn(fixture('fixture-hex.ts', source))).toEqual([
+      { primitive: 'number', where: 'hexagon' },
+    ]);
+  });
+
+  it('should_return_a_class_with_a_private_constructor_and_a_static_factory_when_a_factory_list_entry_is_read', () => {
+    expect(factoryListProblems(domainSources())).toEqual([]);
+  });
+
+  it('should_report_a_factory_list_entry_when_it_returns_no_class_with_a_static_factory', () => {
+    const source = [
+      'export class SquareCoord {',
+      '  constructor(private readonly col: number) {}',
+      '}',
+      'export function square(col: number): SquareCoord {',
+      '  return new SquareCoord(col);',
+      '}',
+      'export function triangle(col: number): number {',
+      '  return col;',
+      '}',
+    ].join('\n');
+
+    expect(factoryListProblems(fixture('fixture-square.ts', source))).toEqual([
+      'hex is not found.',
+      'square returns SquareCoord, which lacks a private constructor or a static factory method.',
+      'triangle returns no class.',
+      'GeometryFactory.createCoord is not found.',
+      'HexGeometry.createCoord is not found.',
+      'SquareGeometry.createCoord is not found.',
+      'TriangleGeometry.createCoord is not found.',
+    ]);
+  });
+
+  it('should_pass_deliver_to_when_it_takes_only_a_value_receiver_and_returns_void', () => {
+    const source = [
+      'export interface ValueReceiver<T> {',
+      '  receive(value: T): void;',
+      '}',
+      'export class Kept {',
+      '  private constructor(private readonly value: number) {}',
+      '  deliverTo(receiver: ValueReceiver<number>): void {',
+      '    receiver.receive(this.value);',
+      '  }',
+      '}',
+      'export class Returned {',
+      '  private constructor(private readonly value: number) {}',
+      '  deliverTo(receiver: ValueReceiver<number>): number {',
+      '    return this.value;',
+      '  }',
+      '}',
+      'export class Plain {',
+      '  private constructor(private readonly value: number) {}',
+      '  deliverTo(value: number): void {}',
+      '}',
+    ].join('\n');
+
+    expect(breaksIn(fixture('fixture-receiver.ts', source))).toEqual([
+      { primitive: 'number', where: 'Returned.deliverTo' },
+      { primitive: 'number', where: 'Plain.deliverTo' },
+    ]);
+  });
+
+  it('should_pass_a_boolean_result_when_a_query_returns_a_boolean', () => {
+    const source = [
+      'export class Grid {',
+      '  readonly accepted: boolean = true;',
+      '  contains(other: Grid): boolean {',
+      '    return other === this;',
+      '  }',
+      '  isEmpty(): true {',
+      '    return true;',
+      '  }',
+      '  size(): number {',
+      '    return 0;',
+      '  }',
+      '}',
+    ].join('\n');
+
+    expect(breaksIn(fixture('fixture-grid.ts', source))).toEqual([
+      { primitive: 'number', where: 'Grid.size' },
+    ]);
+  });
+
+  it('should_pass_a_private_field_when_it_holds_a_primitive', () => {
+    const source = [
+      'export class Tally {',
+      '  private count: number = 0;',
+      "  private readonly label: string = 'tally';",
+      '  #size = 0;',
+      '  readonly total: number = 0;',
+      '}',
+    ].join('\n');
+
+    expect(breaksIn(fixture('fixture-tally.ts', source))).toEqual([
+      { primitive: 'number', where: 'Tally.total' },
+    ]);
+  });
+
+  it('should_count_a_private_parameter_property_when_the_constructor_is_public', () => {
+    const source = [
+      'export class Move {',
+      '  constructor(private readonly index: number) {}',
+      '}',
+      'export class Closed {',
+      '  private constructor(private readonly index: number) {}',
+      '}',
+      'export abstract class Shielded {',
+      '  protected constructor(private readonly index: number, label: string) {}',
+      '}',
+    ].join('\n');
+
+    expect(breaksIn(fixture('fixture-move.ts', source))).toEqual([
+      { primitive: 'number', where: 'Move.constructor' },
+    ]);
+    expect(codeBreaks()).toContainEqual({ primitive: 'number', where: 'PlacePiece.constructor' });
+    expect(codeBreaks()).toContainEqual({ primitive: 'number', where: 'MoveHistory.constructor' });
+  });
+
+  it('should_list_every_break_of_the_domain_when_the_baseline_is_read', () => {
+    expect(unexcused(codeBreaks(), primitiveBaseline)).toEqual([]);
+  });
+
+  it('should_keep_no_entry_that_the_code_lacks_when_the_baseline_is_read', () => {
+    const inCode = new Set(codeBreaks().map(key));
+    const keys = primitiveBaseline.map(key);
+
+    expect(primitiveBaseline.filter((entry) => !inCode.has(key(entry)))).toEqual([]);
+    expect(keys.filter((entry, index) => keys.indexOf(entry) !== index)).toEqual([]);
   });
 });
