@@ -11,6 +11,7 @@ import {
   type GameOverReceiver,
 } from '../../../src/domain/engine/game-events';
 import { GameId } from '../../../src/domain/engine/game-id';
+import { GameProgress } from '../../../src/domain/engine/game-progress';
 import type { MatchId } from '../../../src/domain/engine/match-id';
 import { GameOverPhase } from '../../../src/domain/engine/game-phase';
 import { Outcome } from '../../../src/domain/engine/outcome';
@@ -42,6 +43,7 @@ import { MATCH_ID } from '../../support/engine/match-id';
 // copies and rolls back, the engine calls the scoring, and a subscriber of the
 // `GameOver` event gives a `GameResult` to the progress model. The engine records the event,
 // and the subscriber takes it after each move, as `ApplyMove` does (issue #233).
+// The model records the result in the progress of the game (issue #156).
 
 // Dummy piece sources: both endless, each with its own sequence of cell values.
 // Each one is a value: `take()` returns the piece and the next source, and changes nothing.
@@ -88,25 +90,27 @@ class CellValue implements IScoringPolicy<SourceState> {
 // Dummy progress models. The fields of a result are private (issue #240),
 // so a model asks the result for its record and gives the stars that it counts.
 class ScoreProgress implements IProgressModel {
-  record(result: GameResult): ProgressRecord {
-    return result.recordWith();
+  record(result: GameResult, progress: GameProgress): void {
+    progress.recordScore(result.recordWith());
   }
 }
 
 // A dummy level model that gives three stars to every result.
 class ThreeStarsProgress implements IProgressModel {
-  record(result: GameResult): ProgressRecord {
-    return result.recordWith(Stars.of(3));
+  record(result: GameResult, progress: GameProgress): void {
+    progress.recordLevel(result.recordWith(Stars.of(3)));
   }
 }
 
 // A subscriber of the engine events. On `GameOver` it builds a `GameResult`
-// and gives it to the progress model. The event delivers its data to the subscriber.
+// and records it in the progress of the game with the progress model.
+// It counts the recorded results. The event delivers its data to the subscriber.
 class ProgressSubscriber implements GameOverReceiver {
-  readonly records: ProgressRecord[] = [];
+  readonly progress = GameProgress.start(GameId.of('fake-game'));
+  recorded = 0;
 
   constructor(
-    private readonly progress: IProgressModel,
+    private readonly model: IProgressModel,
     private readonly moves: () => number,
   ) {}
 
@@ -117,7 +121,8 @@ class ProgressSubscriber implements GameOverReceiver {
 
   receive(gameId: GameId, _matchId: MatchId, _outcome: Outcome, finalScore: Score): void {
     const result = GameResult.of({ gameId, score: finalScore, moves: Moves.of(this.moves()) });
-    this.records.push(this.progress.record(result));
+    this.model.record(result, this.progress);
+    this.recorded += 1;
   }
 }
 
@@ -168,7 +173,12 @@ function playGame(
     }
     subscriber.listen(engine.takeEvents());
   }
-  return { outcome, state: engine.snapshot(), records: subscriber.records };
+  return {
+    outcome,
+    state: engine.snapshot(),
+    progress: subscriber.progress,
+    recorded: subscriber.recorded,
+  };
 }
 
 describe('swapping the piece source, the scoring policy and the progress model', () => {
@@ -193,14 +203,13 @@ describe('swapping the piece source, the scoring policy and the progress model',
     const byStars = playGame(sources.constant(), new CellValue(), new ThreeStarsProgress());
     const gameId = GameId.of('fake-game');
 
-    expect(byScore.records.length).toBe(1);
-    expect(byScore.records[0]?.equals(ProgressRecord.of({ gameId, score: Score.of(36) }))).toBe(
-      true,
-    );
-    expect(byStars.records.length).toBe(1);
+    expect(byScore.recorded).toBe(1);
+    expect(byScore.progress.keeps(ProgressRecord.of({ gameId, score: Score.of(36) }))).toBe(true);
+    expect(byStars.recorded).toBe(1);
+    // The record of a level keeps the moves of the play too (issue #156).
     expect(
-      byStars.records[0]?.equals(
-        ProgressRecord.of({ gameId, score: Score.of(36), stars: Stars.of(3) }),
+      byStars.progress.keeps(
+        ProgressRecord.of({ gameId, score: Score.of(36), stars: Stars.of(3), moves: Moves.of(4) }),
       ),
     ).toBe(true);
   });
@@ -217,9 +226,9 @@ describe('swapping the piece source, the scoring policy and the progress model',
 
       expect(retried.state.board.cells()).toEqual(plain.state.board.cells());
       expect(retried.state.score).toEqual(plain.state.score);
-      expect(retried.records.length).toBe(1);
+      expect(retried.recorded).toBe(1);
       expect(
-        retried.records[0]?.equals(
+        retried.progress.keeps(
           ProgressRecord.of({ gameId: GameId.of('fake-game'), score: Score.of(4) }),
         ),
       ).toBe(true);
@@ -241,7 +250,7 @@ describe('swapping the piece source, the scoring policy and the progress model',
       );
 
       expect(game.outcome).toBe(Outcome.gameOver);
-      expect(game.records).toHaveLength(1);
+      expect(game.recorded).toBe(1);
     });
   }
 
@@ -264,7 +273,7 @@ describe('swapping the piece source, the scoring policy and the progress model',
     expect(engine.snapshot().board.cells()).toEqual(full.board.cells());
     expect(engine.snapshot().score).toEqual(full.score);
     subscriber.listen(engine.takeEvents());
-    expect(subscriber.records).toHaveLength(1);
+    expect(subscriber.recorded).toBe(1);
   });
 });
 
