@@ -35,6 +35,7 @@ import {
 import { gameOverOf } from '../../../support/engine/game-over';
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
+import { delivered } from '../../../support/engine/value-receiver';
 
 // The Fit rules suite (APP-NFR-12: one rules suite per variant).
 // The square double keeps the coordinates easy to read. The triangle double has
@@ -106,14 +107,14 @@ function cellsOf<TCoord>(state: FitState<TCoord> | FitSnapshot<TCoord>): string[
   const { board } = photoOf(state);
   return board
     .cells()
-    .map(([c, id]) => `${board.key(c)}=${id}`)
+    .map(([c, id]) => `${board.key(c)}=${delivered(id)}`)
     .sort();
 }
 
 function trayOf<TCoord>(state: FitState<TCoord> | FitSnapshot<TCoord>): string[] {
   return photoOf(state)
     .view()
-    .remaining.map((p) => String(p.cell()));
+    .remaining.map((p) => delivered(p.cell()));
 }
 
 describe('FitRules', () => {
@@ -185,7 +186,7 @@ describe('FitRules', () => {
     const state = dominoLevel();
     const resolution = rules.playTurn(state, new RemoveFitPiece(A));
 
-    expect(resolution.accepted).toBe(false);
+    expect(resolution.wasAccepted()).toBe(false);
     expect(trayOf(state)).toEqual(['a', 'b']);
   });
 
@@ -203,12 +204,12 @@ describe('FitRules', () => {
 
     const turned = rules.playTurn(placed, new RotateFitPiece(A, Turns.of(1)));
 
-    expect(turned.accepted).toBe(true);
+    expect(turned.wasAccepted()).toBe(true);
     expect(cellsOf(placed)).toEqual(['1,0=a']);
     expect(triangleTopology.fullTurn().equals(Turns.of(6))).toBe(true);
     // Five more steps complete the six steps of a full turn.
     const back = rules.playTurn(placed, new RotateFitPiece(A, Turns.of(5)));
-    expect(back.accepted).toBe(true);
+    expect(back.wasAccepted()).toBe(true);
     expect(cellsOf(placed)).toEqual(['0,0=a']);
   });
 
@@ -351,7 +352,7 @@ describe('FitRules edge cases', () => {
     const state = dominoLevel();
     const placed = rules.playTurn(state, new PlaceFitPiece(A, Turns.of(-1), square(1, 1)));
 
-    expect(placed.accepted).toBe(true);
+    expect(placed.wasAccepted()).toBe(true);
     expect(isPlaced(state, A, 3, square(1, 1))).toBe(true);
     expect(isPlaced(state, A, 2, square(1, 1))).toBe(false);
     expect(cellsOf(state)).toEqual(['1,0=a', '1,1=a']);
@@ -359,7 +360,7 @@ describe('FitRules edge cases', () => {
     // 2^53 - 1 is 3 modulo 4. Three steps more than 3 is a half turn.
     const turned = rules.playTurn(state, new RotateFitPiece(A, Turns.of(Number.MAX_SAFE_INTEGER)));
 
-    expect(turned.accepted).toBe(true);
+    expect(turned.wasAccepted()).toBe(true);
     expect(isPlaced(state, A, 2, square(1, 1))).toBe(true);
     expect(isPlaced(state, A, 3, square(1, 1))).toBe(false);
     expect(cellsOf(state)).toEqual(['0,1=a', '1,1=a']);
@@ -379,7 +380,7 @@ describe('FitRules edge cases', () => {
     );
 
     expect(source.hasNext()).toBe(true);
-    expect([...source].map((p) => String(p.cell()))).toEqual(['a', 'b']);
+    expect([...source].map((p) => delivered(p.cell()))).toEqual(['a', 'b']);
     expect(trayOf(state)).toEqual(['a', 'b']);
     expect(trayOf(state.clone())).toEqual(['a', 'b']);
   });
@@ -427,6 +428,18 @@ describe('FitRules edge cases', () => {
     expect(free).toBe(Outcome.playing);
     expect(cellsOf(engine.snapshot())).toEqual(['0,0=x', '0,1=a', '1,1=a']);
     expect(trayOf(engine.snapshot())).toEqual(['b']);
+  });
+
+  // Issue #237: the error carries the piece as its `cause`, and the edge delivers its text.
+  it('should_throw_a_range_error_that_carries_the_piece_when_a_rotation_is_applied_to_a_piece_off_the_figure', () => {
+    const rules = new FitRules<SquareCoord>();
+    const state = dominoLevel();
+
+    expect(() => rules.apply(state, new RotateFitPiece(A, Turns.of(1)))).toThrow(
+      new RangeError('The piece is not on the figure.', { cause: A }),
+    );
+    expect(cellsOf(state)).toEqual([]);
+    expect(trayOf(state)).toEqual(['a', 'b']);
   });
 
   it('should_throw_a_range_error_and_keep_the_game_when_a_move_of_unknown_kind_arrives_through_a_cast', () => {
@@ -536,7 +549,7 @@ describe('FitRules move count', () => {
       new RotateFitPiece(A, Turns.of(1)),
       new RemoveFitPiece(A),
     ]) {
-      expect(engine.tryPlay(move).accepted).toBe(true);
+      expect(engine.tryPlay(move).wasAccepted()).toBe(true);
       counts.push(engine.snapshot().moves);
     }
 
@@ -554,7 +567,7 @@ describe('FitRules move count', () => {
       engine.tryPlay(new RemoveFitPiece(B)),
     ];
 
-    expect(reports.map((r) => r.accepted)).toEqual([false, false, false]);
+    expect(reports.map((r) => r.wasAccepted())).toEqual([false, false, false]);
     expect(engine.snapshot().moves).toEqual(Moves.of(1));
     expect(cellsOf(engine.snapshot())).toEqual(['0,1=a', '1,1=a']);
   });

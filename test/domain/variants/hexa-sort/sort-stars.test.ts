@@ -52,6 +52,19 @@ describe('SortPlay', () => {
   });
 });
 
+// The field of a play is private (issue #240). The threshold gives its limit to the play,
+// and the play tells whether it stays within it.
+describe('SortPlay.isWithin', () => {
+  it('should_stay_within_the_limit_when_the_moves_equal_or_stay_below_it', () => {
+    expect(play(10).isWithin(Moves.of(10))).toBe(true);
+    expect(play(0).isWithin(Moves.of(10))).toBe(true);
+  });
+
+  it('should_pass_the_limit_when_the_moves_pass_it_by_one_move', () => {
+    expect(play(11).isWithin(Moves.of(10))).toBe(false);
+  });
+});
+
 describe('sortStars', () => {
   it('should_give_every_star_when_the_play_meets_every_threshold', () => {
     expect(sortStars(play(9), THREE_STARS)).toEqual(Stars.of(3));

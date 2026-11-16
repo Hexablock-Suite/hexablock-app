@@ -88,7 +88,7 @@ export class GameEngine<
   // (template method `playTurn()`), score it, and record `GameOver` when the game ends.
   // A rejected move returns `playing`. Call `tryPlay()` to tell it from an accepted move.
   play(move: TMove): Outcome {
-    return this.tryPlay(move).outcome;
+    return this.tryPlay(move).leadsTo();
   }
 
   // The same turn as `play()`. It returns the `Resolution` of the turn, which also says
@@ -175,24 +175,24 @@ export class GameEngine<
     | undefined {
     const next = copy(state);
     const resolution = this.rules.playTurn(next, move);
-    if (!resolution.accepted) return undefined;
+    if (!resolution.wasAccepted()) return undefined;
     const before = photoOf(state);
     next.addPoints(this.scoring.score(before, photoOf(next)));
-    const phase = this.current.after(resolution.outcome);
+    const phase = resolution.phaseAfter(this.current);
     return {
       next,
       phase,
-      outcome: resolution.outcome,
+      outcome: resolution.leadsTo(),
       before,
-      ended: this.gameOverOf(next, resolution.outcome),
+      ended: this.gameOverOf(next, resolution),
     };
   }
 
   // The event of a turn that ends the game, with the final score of `next`.
   // It is `undefined` while the game goes on.
-  private gameOverOf(next: TState, outcome: Outcome): GameOver | undefined {
-    if (!outcome.endsTheGame()) return undefined;
-    return new GameOver(this.gameId, this.matchId, outcome, photoOf(next).score);
+  private gameOverOf(next: TState, resolution: Resolution): GameOver | undefined {
+    if (!resolution.endsTheGame()) return undefined;
+    return new GameOver(this.gameId, this.matchId, resolution.leadsTo(), photoOf(next).score);
   }
 
   // Keeps the undo of a saved turn. A finished game forgets its moves: the game over event

@@ -1,9 +1,12 @@
+import type { ValueReceiver } from '../../engine/value-receiver';
+
 // The cell content of Hexa Fit: the id of the piece that covers the cell (REQUIREMENTS.md §1).
 // It is a value object: it never changes. Two ids are equal when their values are equal.
 // The value stays a string, because a level file names each piece with a text id.
 // An empty id, or an id of only spaces, throws a RangeError.
-// The value is private (classes.md decision 49). `toString()` gives the text back,
-// for the error that names a piece. A collection finds an id with `equals()`.
+// The value is private (classes.md decision 49). `deliverTo()` gives the text to a receiver,
+// and no operation returns it (issue #237). An error that names a piece carries the id
+// as its `cause`. A collection finds an id with `equals()`.
 export class PieceId {
   private constructor(private readonly value: string) {}
 
@@ -16,7 +19,8 @@ export class PieceId {
     return this.value === other.value;
   }
 
-  toString(): string {
-    return this.value;
+  // Gives the text of the id to `receiver`. It returns nothing.
+  deliverTo(receiver: ValueReceiver<string>): void {
+    receiver.receive(this.value);
   }
 }

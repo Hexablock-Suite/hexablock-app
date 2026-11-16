@@ -28,7 +28,7 @@ export abstract class BaseGameRules<TMove, TState> implements IGameRules<TMove, 
     const next = this.apply(state, move);
     const resolution = this.resolve(next);
     // A move that `resolve()` rejects ends no game, so `evaluate()` does not run.
-    if (!resolution.accepted) return resolution;
+    if (!resolution.wasAccepted()) return resolution;
     return resolution.evaluated(this.evaluate(next));
   }
 

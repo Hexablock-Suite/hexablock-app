@@ -525,7 +525,14 @@ describe('GameEngine review findings', () => {
   it('should_return_playing_when_the_rules_return_a_rejected_resolution_with_a_final_outcome', () => {
     // `Resolution.evaluated()` refuses a rejected resolution, so a structural copy stands in
     // for a custom `IGameRules` that returns a rejected resolution with a final outcome.
-    const forged = () => ({ accepted: false, outcome: Outcome.victory }) as unknown as Resolution;
+    // The fields are private (issue #240), so the copy answers the queries of a resolution.
+    const forged = () =>
+      ({
+        wasAccepted: () => false,
+        endsTheGame: () => true,
+        phaseAfter: () => VictoryPhase.instance,
+        leadsTo: () => Outcome.victory,
+      }) as unknown as Resolution;
     const { engine } = gameWith(new FixedResolutionRules(forged));
 
     const outcome = engine.play(place(0, 0));
@@ -570,7 +577,9 @@ describe('GameEngine review findings', () => {
   it('should_throw_a_range_error_and_keep_the_state_when_the_rules_return_an_unknown_outcome', () => {
     const { engine } = gameWith(new FixedOutcomeRules('draw' as unknown as Outcome));
 
-    expect(() => engine.play(place(0, 0))).toThrow(new RangeError('Unknown outcome: draw.'));
+    expect(() => engine.play(place(0, 0))).toThrow(
+      new RangeError('Unknown outcome.', { cause: 'draw' }),
+    );
 
     expect(summary(engine)).toEqual(initial);
     expect(engine.takeEvents()).toEqual([]);

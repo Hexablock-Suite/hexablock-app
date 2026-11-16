@@ -1,5 +1,6 @@
 /** @jest-environment node */
 import { SLIDE_SENSES, SlideSense } from '../../../../src/domain/variants/hexa-merge/slide';
+import { delivered, RecordingReceiver } from '../../../support/engine/value-receiver';
 
 // Issue #207 (classes.md decision 45): the sense of a slide is a class with two instances.
 describe('SlideSense', () => {
@@ -8,7 +9,7 @@ describe('SlideSense', () => {
 
     expect(instances).toEqual([SlideSense.forward, SlideSense.backward]);
     expect(SLIDE_SENSES).toEqual([SlideSense.forward, SlideSense.backward]);
-    expect(SLIDE_SENSES.map(String)).toEqual(['forward', 'backward']);
+    expect(SLIDE_SENSES.map(delivered)).toEqual(['forward', 'backward']);
     expect(SlideSense.forward).not.toBe(SlideSense.backward);
   });
 
@@ -20,7 +21,22 @@ describe('SlideSense', () => {
 
   it('should_refuse_the_write_when_a_cast_writes_a_field_of_a_sense', () => {
     expect(Reflect.set(SlideSense.forward, 'name', 'backward')).toBe(false);
-    expect(String(SlideSense.forward)).toBe('forward');
+    expect(delivered(SlideSense.forward)).toBe('forward');
+  });
+
+  // Issue #237: the name leaves a sense only through a receiver (rule R-no-delivery-call).
+  it('should_deliver_its_name_once_and_return_nothing_when_a_receiver_takes_it', () => {
+    const receiver = new RecordingReceiver<string>();
+
+    const returned: void = SlideSense.backward.deliverTo(receiver);
+
+    expect(returned).toBeUndefined();
+    expect(receiver.received()).toEqual(['backward']);
+  });
+
+  // Issue #237: no operation returns the name, `toString()` included.
+  it('should_give_no_text_when_a_template_literal_or_string_converts_a_sense', () => {
+    expect(`${String(SlideSense.forward)}`).toBe('[object Object]');
   });
 
   it('should_be_equal_when_two_senses_have_one_name', () => {

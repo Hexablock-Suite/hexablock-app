@@ -80,8 +80,9 @@
           holds the pieces and the placements of FitState and finds an entry with PieceId.equals().
           FitState is an entity inside the GameEngine aggregate: its own GameStateId is its
           identity, it keeps the MatchId of its game, and it changes in place only through its
-          business methods. FitPlay holds the Moves and the ElapsedTime of one won level, and
-          FitStarThreshold tells whether a play meets its two limits. Both are value objects.
+          business methods. FitPlay holds the Moves and the ElapsedTime of one won level in private
+          fields, and FitStarThreshold tells whether a play meets its two limits: it gives them to
+          isWithin() of the play. Both are value objects.
         </desc>
         <defs>
           <marker
@@ -874,19 +875,19 @@
         <!-- FitStarThreshold compares a FitPlay in isMetBy(): use -->
         <line
           x1="524"
-          y1="504"
+          y1="520"
           x2="524"
-          y2="488"
+          y2="504"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#fit-open)"
         />
-        <!-- Class: FitPlay (value object, decision 42) -->
+        <!-- Class: FitPlay (value object, decision 42, private fields) -->
         <rect
           x="328"
           y="360"
           width="392"
-          height="128"
+          height="144"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -916,10 +917,10 @@
           FitPlay
         </text>
         <text x="344" y="424" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + moves: Moves
+          - moves: Moves
         </text>
         <text x="344" y="440" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + elapsedMs: ElapsedTime
+          - elapsedMs: ElapsedTime
         </text>
         <line x1="328" y1="448" x2="720" y2="448" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
@@ -935,10 +936,13 @@
         <text x="344" y="480" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: FitPlay): boolean
         </text>
+        <text x="344" y="496" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + isWithin(maxMoves: Moves, maxElapsedMs: ElapsedTime): boolean
+        </text>
         <!-- Class: FitStarThreshold (value object, decision 42) -->
         <rect
           x="328"
-          y="504"
+          y="520"
           width="392"
           height="160"
           rx="6"
@@ -946,10 +950,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="328" y1="552" x2="720" y2="552" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="328" y1="568" x2="720" y2="568" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="524"
-          y="522"
+          y="538"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -960,7 +964,7 @@
         </text>
         <text
           x="524"
-          y="540"
+          y="556"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -969,16 +973,16 @@
         >
           FitStarThreshold
         </text>
-        <text x="344" y="568" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="344" y="584" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - maxMoves: Moves
         </text>
-        <text x="344" y="584" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="344" y="600" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - maxElapsedMs: ElapsedTime
         </text>
-        <line x1="328" y1="592" x2="720" y2="592" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="328" y1="608" x2="720" y2="608" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="344"
-          y="608"
+          y="624"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -988,7 +992,7 @@
         </text>
         <text
           x="355"
-          y="624"
+          y="640"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -996,10 +1000,10 @@
         >
           FitStarThreshold
         </text>
-        <text x="344" y="640" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="344" y="656" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: FitStarThreshold): boolean
         </text>
-        <text x="344" y="656" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="344" y="672" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + isMetBy(play: FitPlay): boolean
         </text>
         <!-- Class: PieceId (value object) -->
@@ -1007,7 +1011,7 @@
           x="40"
           y="1162"
           width="256"
-          height="128"
+          height="144"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1047,7 +1051,10 @@
           + equals(other: PieceId): boolean
         </text>
         <text x="56" y="1282" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + toString(): string
+          + deliverTo(receiver:
+        </text>
+        <text x="67" y="1298" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          ValueReceiver&lt;string&gt;): void
         </text>
         <!-- Class: Placement (value object) -->
         <rect

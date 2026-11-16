@@ -67,6 +67,14 @@ describe('Stars', () => {
     expect([first.equals(second), second.equals(first)]).toEqual([false, false]);
   });
 
+  // More stars is the better level result (DS-4). A progress record compares its stars with it.
+  it('should_be_more_only_when_the_count_is_above_the_other_count', () => {
+    expect(Stars.of(3).isMoreThan(Stars.of(2))).toBe(true);
+    expect(Stars.of(2).isMoreThan(Stars.of(3))).toBe(false);
+    expect(Stars.of(2).isMoreThan(Stars.of(2))).toBe(false);
+    expect(Stars.of(1).isMoreThan(Stars.of(-0))).toBe(true);
+  });
+
   // The value leaves the object only through a receiver (issue #228).
   it('should_deliver_its_value_once_and_return_nothing_when_a_receiver_takes_it', () => {
     const receiver = new RecordingReceiver<number>();

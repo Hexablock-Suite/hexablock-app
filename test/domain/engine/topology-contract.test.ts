@@ -35,6 +35,8 @@ import {
   triangle as supportTriangle,
   triangleTopology,
 } from '../../support/engine/triangle-topology';
+import type { ValueReceiver } from '../../../src/domain/engine/value-receiver';
+import { delivered } from '../../support/engine/value-receiver';
 
 // Issue 160: the same `GridTopology` tests run on the three real topologies.
 // `region(size)` has a different figure on each topology (Trap of issue 160).
@@ -71,6 +73,11 @@ interface Row<TCoord> {
 const missingNames = ['nort', 'constructor', 'toString', '__proto__'];
 const asAxis = (name: string) => name as unknown as GridAxis;
 const asDirection = (name: string) => name as unknown as GridDirection;
+
+// The name that an axis or a direction delivers (issue #237). The table erases the classes,
+// and the bound has no delivery, so the cast names the operation that each real class has.
+type Named = { deliverTo(receiver: ValueReceiver<string>): void };
+const nameOf = (member: GridAxis | GridDirection) => delivered(member as unknown as Named);
 
 // Gives the tests of one row. The result keeps the coordinate type of the row inside it,
 // so one table holds three coordinate types with no cast.
@@ -112,8 +119,8 @@ function contract<TCoord>(row: Row<TCoord>): () => void {
       expect(topology.fullTurn().equals(Turns.of(row.rotationSteps))).toBe(true);
       expect(topology.axes()).toEqual(row.axes);
       expect(topology.directions()).toEqual(row.directions);
-      expect(topology.axes().map(String)).toEqual(row.axisNames);
-      expect(topology.directions().map(String)).toEqual(row.directionNames);
+      expect(topology.axes().map(nameOf)).toEqual(row.axisNames);
+      expect(topology.directions().map(nameOf)).toEqual(row.directionNames);
     });
 
     it('should_give_one_key_per_cell_when_the_keys_of_different_cells_are_compared', () => {
@@ -151,8 +158,9 @@ function contract<TCoord>(row: Row<TCoord>): () => void {
       for (const name of missingNames) {
         const follow = () => topology.neighbor(row.origin, asDirection(name));
 
-        expect(follow).toThrow(RangeError);
-        expect(follow).toThrow(`The ${row.grid} grid has no direction ${name}.`);
+        expect(follow).toThrow(
+          new RangeError(`The ${row.grid} grid has no such direction.`, { cause: name }),
+        );
       }
     });
 
@@ -160,8 +168,9 @@ function contract<TCoord>(row: Row<TCoord>): () => void {
       for (const name of missingNames) {
         const read = () => [...topology.line(asAxis(name), row.origin, insideRegion(2))];
 
-        expect(read).toThrow(RangeError);
-        expect(read).toThrow(`The ${row.grid} grid has no axis ${name}.`);
+        expect(read).toThrow(
+          new RangeError(`The ${row.grid} grid has no such axis.`, { cause: name }),
+        );
       }
     });
 

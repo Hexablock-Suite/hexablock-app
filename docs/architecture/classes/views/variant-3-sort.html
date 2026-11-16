@@ -80,10 +80,11 @@
           SortRules typed by SortState and SortState holding ColorStack cells, each variant class
           marked with the engine interface it implements and its binding. GoalCount is the value
           object of the goal of a level, and ClearedStacks is the value object of the count of
-          cleared stacks that the goal reads. SortPlay holds the Moves of one won level, and
-          SortStarThreshold tells whether a play meets its limit. SortState is an entity inside the
-          GameEngine aggregate: its own GameStateId is its identity, it keeps the MatchId of its
-          game, and it changes in place only through its business methods.
+          cleared stacks that the goal reads. SortPlay holds the Moves of one won level in a private
+          field, and SortStarThreshold tells whether a play meets its limit: it gives the limit to
+          isWithin() of the play. SortState is an entity inside the GameEngine aggregate: its own
+          GameStateId is its identity, it keeps the MatchId of its game, and it changes in place
+          only through its business methods.
         </desc>
         <defs>
           <marker
@@ -921,12 +922,12 @@
         <text x="75" y="968" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           ValueReceiver&lt;number&gt;): void
         </text>
-        <!-- Class: SortPlay (value object, decision 42) -->
+        <!-- Class: SortPlay (value object, decision 42, private field) -->
         <rect
           x="328"
           y="800"
           width="176"
-          height="128"
+          height="160"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -956,7 +957,7 @@
           SortPlay
         </text>
         <text x="344" y="864" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + moves: Moves
+          - moves: Moves
         </text>
         <line x1="328" y1="872" x2="504" y2="872" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
@@ -973,6 +974,12 @@
           + equals(other: SortPlay):
         </text>
         <text x="355" y="920" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          boolean
+        </text>
+        <text x="344" y="936" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + isWithin(maxMoves: Moves):
+        </text>
+        <text x="355" y="952" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           boolean
         </text>
         <!-- Class: SortStarThreshold (value object, decision 42) -->

@@ -108,7 +108,7 @@ function changeBy<TCoord>(state: FitState<TCoord>, move: FitMove<TCoord>): void 
   if (move instanceof RotateFitPiece) {
     const placement = state.placementOf(move.piece());
     if (placement === undefined) {
-      throw new RangeError(`The piece ${move.piece()} is not on the figure.`);
+      throw new RangeError('The piece is not on the figure.', { cause: move.piece() });
     }
     state.remove(move.piece());
     state.place(move.piece(), move.turn(placement, board));

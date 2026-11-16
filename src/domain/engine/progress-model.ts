@@ -10,13 +10,14 @@ import type { Stars } from './stars';
 // Every field is a value object that checks its own value (classes.md decisions 41 and 42).
 // So the result has no check of its own: a `Score`, `Moves`, a `LevelId` and an `ElapsedTime`
 // are valid when they exist.
+// Every field is private (issue #240). A progress model asks `recordWith()` for its record.
 export class GameResult {
   private constructor(
-    readonly gameId: GameId,
-    readonly score: Score,
-    readonly moves: Moves,
-    readonly levelId?: LevelId,
-    readonly elapsedMs?: ElapsedTime,
+    private readonly gameId: GameId,
+    private readonly score: Score,
+    private readonly moves: Moves,
+    private readonly levelId?: LevelId,
+    private readonly elapsedMs?: ElapsedTime,
   ) {}
 
   static of(values: {
@@ -46,6 +47,18 @@ export class GameResult {
       this.gameId.equals(other.gameId)
     );
   }
+
+  // The record that a progress model keeps for this result: the game id, the score and
+  // the level id of the result, with `stars`. A model of a game with levels counts the stars
+  // of the level. A model of a game with no levels gives no stars.
+  recordWith(stars?: Stars): ProgressRecord {
+    return ProgressRecord.of({
+      gameId: this.gameId,
+      score: this.score,
+      levelId: this.levelId,
+      stars,
+    });
+  }
 }
 
 // What a progress model keeps for one game or one level. It is a value object.
@@ -54,12 +67,13 @@ export class GameResult {
 // Every field is a value object that checks its own value (classes.md decisions 41 and 42).
 // So the record has no check of its own: a `Score`, a `LevelId` and `Stars`
 // are valid when they exist.
+// Every field is private (issue #240). A progress model asks `improves()` to keep the best record.
 export class ProgressRecord {
   private constructor(
-    readonly gameId: GameId,
-    readonly score: Score,
-    readonly levelId?: LevelId,
-    readonly stars?: Stars,
+    private readonly gameId: GameId,
+    private readonly score: Score,
+    private readonly levelId?: LevelId,
+    private readonly stars?: Stars,
   ) {}
 
   static of(values: {
@@ -80,6 +94,18 @@ export class ProgressRecord {
       sameOptional(this.stars, other.stars, (left, right) => left.equals(right)) &&
       this.gameId.equals(other.gameId)
     );
+  }
+
+  // Tells if this record is better than `other`, the stored record of the same game or level.
+  // The order of DS-4 and DS-12: a level ranks by its stars, and a game with no levels ranks
+  // by its score. More is better. A tie keeps `other`, so a player never loses a best result.
+  // The record holds no moves and no time (#156 fixes its fields),
+  // so two records of a level with equal stars tie.
+  improves(other: ProgressRecord): boolean {
+    if (this.stars === undefined || other.stars === undefined) {
+      return this.score.isHigherThan(other.score);
+    }
+    return this.stars.isMoreThan(other.stars);
   }
 }
 

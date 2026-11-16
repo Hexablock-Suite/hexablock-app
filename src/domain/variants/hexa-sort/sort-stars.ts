@@ -5,8 +5,9 @@ import { Stars } from '../../engine/stars';
 // It is a value object (classes.md decision 42): it never changes, and two plays are equal
 // when their moves are equal. `Moves` checks its own value, so a play holds no count
 // that a game cannot give (issue #137).
+// The field is private (issue #240). A threshold gives its limit to `isWithin()`, as for `FitPlay`.
 export class SortPlay {
-  private constructor(readonly moves: Moves) {
+  private constructor(private readonly moves: Moves) {
     Object.freeze(this);
   }
 
@@ -17,6 +18,11 @@ export class SortPlay {
   // Two plays are equal when their moves are equal.
   equals(other: SortPlay): boolean {
     return this.moves.equals(other.moves);
+  }
+
+  // Tells if the play stays within the limit: its moves are the limit or fewer.
+  isWithin(maxMoves: Moves): boolean {
+    return !maxMoves.isFewerThan(this.moves);
   }
 }
 
@@ -41,8 +47,9 @@ export class SortStarThreshold {
   }
 
   // Tells if a play meets the threshold: its moves are the limit or fewer.
+  // The threshold gives its limit to the play, and the play answers.
   isMetBy(play: SortPlay): boolean {
-    return !this.maxMoves.isFewerThan(play.moves);
+    return play.isWithin(this.maxMoves);
   }
 }
 

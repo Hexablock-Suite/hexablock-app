@@ -34,7 +34,6 @@ import {
 } from '../../support/engine/fake-game';
 import { square, type SquareCoord } from '../../support/engine/square-topology';
 import { MATCH_ID } from '../../support/engine/match-id';
-import { delivered } from '../../support/engine/value-receiver';
 
 // APP-NFR-04: the piece source, the scoring policy and the progress model swap,
 // and no engine file changes. Every implementation here is a dummy that exists only in test/.
@@ -86,16 +85,18 @@ class CellValue implements IScoringPolicy<SourceState> {
   }
 }
 
-// Dummy progress models.
+// Dummy progress models. The fields of a result are private (issue #240),
+// so a model asks the result for its record and gives the stars that it counts.
 class ScoreProgress implements IProgressModel {
   record(result: GameResult): ProgressRecord {
-    return ProgressRecord.of({ gameId: result.gameId, score: result.score });
+    return result.recordWith();
   }
 }
 
-class MovesProgress implements IProgressModel {
+// A dummy level model that gives three stars to every result.
+class ThreeStarsProgress implements IProgressModel {
   record(result: GameResult): ProgressRecord {
-    return ProgressRecord.of({ gameId: result.gameId, score: Score.of(delivered(result.moves)) });
+    return result.recordWith(Stars.of(3));
   }
 }
 
@@ -189,11 +190,19 @@ describe('swapping the piece source, the scoring policy and the progress model',
 
   it('should_give_the_record_of_each_model_when_the_progress_model_is_swapped', () => {
     const byScore = playGame(sources.constant(), new CellValue(), new ScoreProgress());
-    const byMoves = playGame(sources.constant(), new CellValue(), new MovesProgress());
+    const byStars = playGame(sources.constant(), new CellValue(), new ThreeStarsProgress());
+    const gameId = GameId.of('fake-game');
 
-    expect(byScore.records.map((record) => record.score)).toEqual([Score.of(36)]);
-    expect(byMoves.records.map((record) => record.score)).toEqual([Score.of(4)]);
-    expect(byMoves.records[0]?.gameId.equals(GameId.of('fake-game'))).toBe(true);
+    expect(byScore.records.length).toBe(1);
+    expect(byScore.records[0]?.equals(ProgressRecord.of({ gameId, score: Score.of(36) }))).toBe(
+      true,
+    );
+    expect(byStars.records.length).toBe(1);
+    expect(
+      byStars.records[0]?.equals(
+        ProgressRecord.of({ gameId, score: Score.of(36), stars: Stars.of(3) }),
+      ),
+    ).toBe(true);
   });
 
   it('should_place_the_same_pieces_when_a_turn_throws_with_each_source', () => {
@@ -208,14 +217,19 @@ describe('swapping the piece source, the scoring policy and the progress model',
 
       expect(retried.state.board.cells()).toEqual(plain.state.board.cells());
       expect(retried.state.score).toEqual(plain.state.score);
-      expect(retried.records.map((record) => record.score)).toEqual([Score.of(4)]);
+      expect(retried.records.length).toBe(1);
+      expect(
+        retried.records[0]?.equals(
+          ProgressRecord.of({ gameId: GameId.of('fake-game'), score: Score.of(4) }),
+        ),
+      ).toBe(true);
     }
   });
 
   const combinations = [
     ['counting', 'one_per_move', 'score'],
-    ['counting', 'cell_value', 'moves'],
-    ['constant', 'one_per_move', 'moves'],
+    ['counting', 'cell_value', 'stars'],
+    ['constant', 'one_per_move', 'stars'],
     ['constant', 'cell_value', 'score'],
   ] as const;
   for (const [source, scoring, progress] of combinations) {
@@ -223,7 +237,7 @@ describe('swapping the piece source, the scoring policy and the progress model',
       const game = playGame(
         sources[source](),
         scorings[scoring](),
-        progress === 'score' ? new ScoreProgress() : new MovesProgress(),
+        progress === 'score' ? new ScoreProgress() : new ThreeStarsProgress(),
       );
 
       expect(game.outcome).toBe(Outcome.gameOver);
@@ -276,7 +290,10 @@ describe('GameResult and ProgressRecord', () => {
       });
 
     expect(() => timed(-1)).toThrow('milliseconds');
-    expect(timed(0).elapsedMs).toEqual(ElapsedTime.ofMs(0));
+    expect(timed(0).equals(timed(0))).toBe(true);
+    expect(timed(0).equals(GameResult.of({ gameId, score: Score.of(0), moves: noMoves }))).toBe(
+      false,
+    );
   });
 
   it('should_throw_a_range_error_when_a_result_has_a_decimal_number_of_moves', () => {
@@ -328,7 +345,8 @@ describe('GameResult and ProgressRecord', () => {
 
     expect(() => starred(-1)).toThrow(RangeError);
     expect(() => starred(-1)).toThrow('star count');
-    expect(starred(0).stars).toEqual(Stars.of(0));
+    expect(starred(0).equals(starred(0))).toBe(true);
+    expect(starred(0).equals(ProgressRecord.of({ gameId, score: Score.of(0) }))).toBe(false);
   });
 
   it('should_keep_the_optional_fields_when_a_result_has_a_level_and_a_time', () => {
@@ -340,7 +358,18 @@ describe('GameResult and ProgressRecord', () => {
       elapsedMs: ElapsedTime.ofMs(3000),
     });
 
-    expect(result.levelId).toEqual(LevelId.of('fit-01'));
-    expect(result.elapsedMs).toEqual(ElapsedTime.ofMs(3000));
+    const without = (change: { levelId?: LevelId; elapsedMs?: ElapsedTime }) =>
+      GameResult.of({
+        gameId: GameId.of('hexa-fit'),
+        score: Score.of(0),
+        moves: Moves.of(12),
+        ...change,
+      });
+
+    expect(
+      result.equals(without({ levelId: LevelId.of('fit-01'), elapsedMs: ElapsedTime.ofMs(3000) })),
+    ).toBe(true);
+    expect(result.equals(without({ elapsedMs: ElapsedTime.ofMs(3000) }))).toBe(false);
+    expect(result.equals(without({ levelId: LevelId.of('fit-01') }))).toBe(false);
   });
 });
