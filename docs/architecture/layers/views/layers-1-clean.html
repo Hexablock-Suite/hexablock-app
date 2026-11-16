@@ -1,0 +1,2452 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clean layers · layer diagram</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --color-paper: #f3f5f6;
+        --color-ink: #17212a;
+        --color-muted: #5b6873;
+        --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+        --font-serif: 'Instrument Serif', serif;
+        --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+      }
+      body {
+        font-family: var(--font-sans);
+        background: var(--color-paper);
+        color: var(--color-ink);
+        padding: 3rem 2rem;
+      }
+      .frame {
+        max-width: 1240px;
+        margin: 0 auto;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-muted);
+        margin-bottom: 0.5rem;
+      }
+      h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        margin-bottom: 1.5rem;
+      }
+      svg {
+        width: 100%;
+        min-width: 900px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <p class="eyebrow">Layer diagram · Clean Architecture · statement §4.2</p>
+      <h1>The four Clean layers: ports, adapters and drivers</h1>
+
+      <svg
+        viewBox="0 0 1040 1300"
+        xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-labelledby="layers-title layers-desc"
+      >
+        <title id="layers-title">HexaBlock client · Clean layer diagram</title>
+        <desc id="layers-desc">
+          Layer diagram of the client as four concentric rings: layer 4, frameworks and drivers,
+          outside; layer 3, interface adapters; layer 2, use cases; and layer 1, entities, in the
+          center. The ports of layer 2 sit on its edge: the input port UseCase, which the presenters
+          call and every use case and aspect implements, and the output ports GameRepository,
+          GameFactories, LevelRepository, GameEventPublisher, ProgressRepository and Logger, which
+          the use cases use. In layer 3, InMemoryGameRepository, LevelGameFactories,
+          BundledLevelRepository, NullGameEventPublisher and LocalProgressRepository implement the
+          output ports, and LocalProgressRepository keeps its data through the KeyValueStore
+          interface. In layer 4, ConsoleLogger implements Logger, DeviceKeyValueStore implements
+          KeyValueStore, and SystemClock, SeededRandomSource and SequentialMatchIds implement the
+          engine interfaces Clock, RandomSource and MatchIdGenerator. The routes use the presenters,
+          and CompositionRoot creates the adapters. The use cases and the presenters use the generic
+          engine, and the four variants implement its contracts. Every arrow points inward, toward
+          layer 1, or stays inside one layer. A dashed border marks a planned part.
+        </desc>
+        <defs>
+          <marker
+            id="layers-triangle"
+            markerWidth="16"
+            markerHeight="12"
+            refX="15"
+            refY="6"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          </marker>
+          <marker
+            id="layers-open"
+            markerWidth="10"
+            markerHeight="8"
+            refX="9"
+            refY="4"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
+          </marker>
+        </defs>
+        <rect width="100%" height="100%" fill="#f3f5f6" />
+        <!-- Layer rings: layer 4 outside, layer 1 in the center (statement §4.2) -->
+        <!-- Layer ring: layer 4, frameworks and drivers -->
+        <rect
+          x="24"
+          y="24"
+          width="992"
+          height="1087"
+          rx="8"
+          fill="#cfdcf3"
+          stroke="rgba(30,58,138,0.50)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="44"
+          fill="#1e3a8a"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 4 · FRAMEWORKS AND DRIVERS · src/infrastructure/ · app/
+        </text>
+        <!-- Layer ring: layer 3, interface adapters -->
+        <rect
+          x="44"
+          y="216"
+          width="952"
+          height="875"
+          rx="8"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="60"
+          y="236"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 3 · INTERFACE ADAPTERS · src/adapters/
+        </text>
+        <!-- Layer ring: layer 2, use cases; its ports sit on its edge -->
+        <rect
+          x="64"
+          y="496"
+          width="912"
+          height="575"
+          rx="8"
+          fill="#efe7f8"
+          stroke="rgba(126,34,206,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="80"
+          y="548"
+          fill="#7e22ce"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 2 · USE CASES
+        </text>
+        <text
+          x="80"
+          y="560"
+          fill="#7e22ce"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          src/application/
+        </text>
+        <!-- Layer ring: layer 1, entities -->
+        <rect
+          x="84"
+          y="790"
+          width="872"
+          height="261"
+          rx="8"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="100"
+          y="810"
+          fill="#b45309"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 1 · ENTITIES · src/domain/
+        </text>
+        <!-- Dependencies. A use points from the importer to the imported part. A realization points from an implementation to its interface. Every line points inward or stays inside one layer. -->
+        <!-- The routes use the presenters: use, from layer 4 into layer 3 -->
+        <path
+          d="M120 199 L120 356"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#layers-open)"
+        />
+        <!-- CompositionRoot creates InMemoryGameRepository and the other adapters: use, from layer 4 into layer 3 -->
+        <path
+          d="M340 147 L340 412"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#layers-open)"
+        />
+        <!-- DeviceKeyValueStore implements KeyValueStore: realization, from layer 4 into layer 3 -->
+        <path
+          d="M790 166 L790 250"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#layers-triangle)"
+        />
+        <!-- ConsoleLogger implements the Logger port: realization, from layer 4 to the edge of layer 2 -->
+        <path
+          d="M868.0 200 L868.0 478"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#layers-triangle)"
+        />
+        <!-- SystemClock, SeededRandomSource and SequentialMatchIds implement Clock, RandomSource and MatchIdGenerator: realization, from layer 4 into layer 1 -->
+        <path
+          d="M930 130 L930 824"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#layers-triangle)"
+        />
+        <!-- The presenters call the input port UseCase: use, from layer 3 to the edge of layer 2 -->
+        <path
+          d="M225.0 443 L225.0 478"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#layers-open)"
+        />
+        <!-- InMemoryGameRepository implements the GameRepository port: realization, from layer 3 to the edge of layer 2 -->
+        <path
+          d="M318.5 438 L318.5 478"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#layers-triangle)"
+        />
+        <!-- LevelGameFactories implements the GameFactories port: realization, from layer 3 to the edge of layer 2 -->
+        <path
+          d="M421.0 396 L421.0 478"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#layers-triangle)"
+        />
+        <!-- BundledLevelRepository implements the LevelRepository port: realization, from layer 3 to the edge of layer 2 -->
+        <path
+          d="M526.5 438 L526.5 478"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#layers-triangle)"
+        />
+        <!-- NullGameEventPublisher implements the GameEventPublisher port: realization, from layer 3 to the edge of layer 2 -->
+        <path
+          d="M645.5 396 L645.5 478"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#layers-triangle)"
+        />
+        <!-- LocalProgressRepository implements the ProgressRepository port: realization, from layer 3 to the edge of layer 2 -->
+        <path
+          d="M772.5 438 L772.5 478"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#layers-triangle)"
+        />
+        <!-- LocalProgressRepository keeps its data through KeyValueStore: use, inside layer 3 -->
+        <path
+          d="M760 412 L760 289"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#layers-open)"
+        />
+        <!-- The presenters read engine values, such as Outcome and GameId: use, from layer 3 into layer 1 -->
+        <path
+          d="M72 443 L72 878 L100 878"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#layers-open)"
+        />
+        <!-- The aspects implement UseCase: realization, inside layer 2 -->
+        <path
+          d="M212 572 L212 514"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#layers-triangle)"
+        />
+        <!-- Every use case implements UseCase: realization, inside layer 2 -->
+        <path
+          d="M252 572 L252 514"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#layers-triangle)"
+        />
+        <!-- The use cases use the GameRepository port: use, inside layer 2 -->
+        <path
+          d="M318.5 572 L318.5 514"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#layers-open)"
+        />
+        <!-- The use cases use the GameFactories port: use, inside layer 2 -->
+        <path
+          d="M421.0 572 L421.0 514"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#layers-open)"
+        />
+        <!-- The use cases use the LevelRepository port: use, inside layer 2 -->
+        <path
+          d="M526.5 572 L526.5 514"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#layers-open)"
+        />
+        <!-- The use cases use the GameEventPublisher port: use, inside layer 2 -->
+        <path
+          d="M645.5 572 L645.5 514"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#layers-open)"
+        />
+        <!-- The use cases use the ProgressRepository port: use, inside layer 2 -->
+        <path
+          d="M772.5 572 L772.5 514"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#layers-open)"
+        />
+        <!-- The use cases use the Logger port: use, inside layer 2 -->
+        <path
+          d="M868.0 572 L868.0 514"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#layers-open)"
+        />
+        <!-- The use cases run the generic engine: use, from layer 2 into layer 1 -->
+        <path
+          d="M560 659 L560 824"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#layers-open)"
+        />
+        <!-- Hexa Lines implements the contracts of the engine: realization, inside layer 1 -->
+        <path
+          d="M200.0 979 L200.0 937"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#layers-triangle)"
+        />
+        <!-- Hexa Fit implements the contracts of the engine: realization, inside layer 1 -->
+        <path
+          d="M412.0 979 L412.0 937"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#layers-triangle)"
+        />
+        <!-- Hexa Sort implements the contracts of the engine: realization, inside layer 1 -->
+        <path
+          d="M624.0 979 L624.0 937"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#layers-triangle)"
+        />
+        <!-- Hexa Merge implements the contracts of the engine: realization, inside layer 1 -->
+        <path
+          d="M836.0 979 L836.0 937"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#layers-triangle)"
+        />
+        <!-- Line labels: a verb on a line that is no import of a contract -->
+        <rect x="104.8" y="317" width="30.4" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="120"
+          y="326"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          uses
+        </text>
+        <rect x="316.4" y="162" width="47.199999999999996" height="12" rx="2" fill="#cfdcf3" />
+        <text
+          x="340"
+          y="171"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          creates
+        </text>
+        <rect x="207.0" y="455" width="36.0" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="225.0"
+          y="464"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          calls
+        </text>
+        <rect x="744.8" y="353" width="30.4" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="760"
+          y="362"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          uses
+        </text>
+        <rect x="544.8" y="690" width="30.4" height="12" rx="2" fill="#efe7f8" />
+        <text
+          x="560"
+          y="699"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          uses
+        </text>
+        <!-- Layer 4: routes, composition root, screen parts, HTTP client and drivers -->
+        <!-- Component: routes, app/ -->
+        <rect
+          x="40"
+          y="60"
+          width="180"
+          height="139"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="50"
+          y="74"
+          fill="#5b6873"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          app/ · ROUTES
+        </text>
+        <text
+          x="50"
+          y="89"
+          fill="#17212a"
+          font-size="11.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Expo Router routes
+        </text>
+        <line x1="40" y1="96" x2="220" y2="96" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="50"
+          y="112"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          _layout.tsx · calls the root
+        </text>
+        <text
+          x="50"
+          y="125"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          index.tsx · home
+        </text>
+        <text
+          x="50"
+          y="138"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          map.tsx · game selector map
+        </text>
+        <text
+          x="50"
+          y="151"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          game/[gameId].tsx · game
+        </text>
+        <text
+          x="50"
+          y="164"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          achievements.tsx
+        </text>
+        <text
+          x="50"
+          y="177"
+          fill="#7d8a94"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          planned: level selector,
+        </text>
+        <text
+          x="50"
+          y="190"
+          fill="#7d8a94"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          victory and defeat
+        </text>
+        <!-- Component: composition root, src/infrastructure/composition-root.ts (Q9) -->
+        <rect
+          x="232"
+          y="60"
+          width="148"
+          height="87"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="242"
+          y="74"
+          fill="#5b6873"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          ROOT · Q9
+        </text>
+        <text
+          x="242"
+          y="89"
+          fill="#17212a"
+          font-size="11.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          CompositionRoot
+        </text>
+        <line x1="232" y1="96" x2="380" y2="96" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="242"
+          y="112"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          GameRegistry
+        </text>
+        <text
+          x="242"
+          y="125"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          registered-games.ts
+        </text>
+        <text
+          x="242"
+          y="138"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          CompositionRootProvider
+        </text>
+        <!-- Component: board and screen parts, src/infrastructure/board/ and ui/ (Q8) -->
+        <rect
+          x="392"
+          y="60"
+          width="196"
+          height="139"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="402"
+          y="74"
+          fill="#5b6873"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          board/ · ui/ · Q8
+        </text>
+        <text
+          x="402"
+          y="89"
+          fill="#17212a"
+          font-size="11.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Board and screen parts
+        </text>
+        <line x1="392" y1="96" x2="588" y2="96" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="402"
+          y="112"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          BoardView · BoardLayout
+        </text>
+        <text
+          x="402"
+          y="125"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          Hex, Square, TriangleLayout
+        </text>
+        <text
+          x="402"
+          y="138"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          Space, Fit, Merge cell renderers
+        </text>
+        <text
+          x="402"
+          y="151"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          GameStage · MoveControls
+        </text>
+        <text
+          x="402"
+          y="164"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          BoardOnly, Fit, Merge controls
+        </text>
+        <text
+          x="402"
+          y="177"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          screen hooks and wood signs
+        </text>
+        <text
+          x="402"
+          y="190"
+          fill="#7d8a94"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          planned: other cell renderers
+        </text>
+        <!-- Component: HTTP client, src/infrastructure/api/ (decision 22) -->
+        <rect
+          x="600"
+          y="60"
+          width="160"
+          height="139"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="610"
+          y="74"
+          fill="#5b6873"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          api/ · HTTP
+        </text>
+        <text
+          x="610"
+          y="89"
+          fill="#17212a"
+          font-size="11.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          HTTP client
+        </text>
+        <line x1="600" y1="96" x2="760" y2="96" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="610"
+          y="112"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          createApiClient · ApiClient
+        </text>
+        <text
+          x="610"
+          y="125"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          schema.d.ts: OpenAPI types
+        </text>
+        <text
+          x="610"
+          y="138"
+          fill="#7d8a94"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          planned: ApiDtoMapper and
+        </text>
+        <text
+          x="610"
+          y="151"
+          fill="#7d8a94"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          ApiProgressRepository,
+        </text>
+        <text
+          x="610"
+          y="164"
+          fill="#7d8a94"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          ApiLevelRepository,
+        </text>
+        <text
+          x="610"
+          y="177"
+          fill="#7d8a94"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          ApiLeaderboardGateway,
+        </text>
+        <text
+          x="610"
+          y="190"
+          fill="#7d8a94"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          ApiAccountGateway
+        </text>
+        <!-- Drivers: each one implements an interface of an inner layer -->
+        <text
+          x="772"
+          y="68"
+          fill="#5b6873"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          DRIVERS
+        </text>
+        <!-- Component: planned single-scope drivers (decision 18) -->
+        <rect
+          x="772"
+          y="76"
+          width="96"
+          height="53"
+          rx="4"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="820.0"
+          y="89"
+          fill="#7d8a94"
+          font-size="7.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «single scope»
+        </text>
+        <text
+          x="820.0"
+          y="108"
+          fill="#7d8a94"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          SessionManager
+        </text>
+        <text
+          x="820.0"
+          y="122"
+          fill="#7d8a94"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          AudioManager
+        </text>
+        <!-- Component: drivers of the engine interfaces -->
+        <rect
+          x="880"
+          y="76"
+          width="120"
+          height="54"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="940.0"
+          y="95"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          SystemClock
+        </text>
+        <text
+          x="940.0"
+          y="109"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          SeededRandomSource
+        </text>
+        <text
+          x="940.0"
+          y="123"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          SequentialMatchIds
+        </text>
+        <!-- Component: driver of KeyValueStore -->
+        <rect
+          x="772"
+          y="140"
+          width="124"
+          height="26"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="834.0"
+          y="159"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          DeviceKeyValueStore
+        </text>
+        <!-- Component: driver of the Logger port -->
+        <rect
+          x="824"
+          y="174"
+          width="88"
+          height="26"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="868.0"
+          y="193"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          ConsoleLogger
+        </text>
+        <!-- Layer 3: presenters, state mappers, text catalog, driver interface and the adapters of the output ports -->
+        <!-- Component: state mappers -->
+        <rect
+          x="140"
+          y="250"
+          width="160"
+          height="100"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="150"
+          y="264"
+          fill="#5b6873"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          STATE MAPPERS
+        </text>
+        <text
+          x="150"
+          y="279"
+          fill="#17212a"
+          font-size="11.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          State mappers
+        </text>
+        <line x1="140" y1="286" x2="300" y2="286" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="150"
+          y="302"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          StateMapper
+        </text>
+        <text
+          x="150"
+          y="315"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          SpaceStateMapper
+        </text>
+        <text
+          x="150"
+          y="328"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          FitStateMapper
+        </text>
+        <text
+          x="150"
+          y="341"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          MergeStateMapper
+        </text>
+        <!-- Component: text catalog, src/adapters/texts/ (APP-FR-11) -->
+        <rect
+          x="360"
+          y="250"
+          width="108"
+          height="74"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="370"
+          y="264"
+          fill="#5b6873"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          texts/
+        </text>
+        <text
+          x="370"
+          y="279"
+          fill="#17212a"
+          font-size="11.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Text catalog
+        </text>
+        <line x1="360" y1="286" x2="468" y2="286" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="370"
+          y="302"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          es.ts · en.ts
+        </text>
+        <text
+          x="370"
+          y="315"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          one key, two texts
+        </text>
+        <!-- Component: planned adapters -->
+        <rect
+          x="480"
+          y="250"
+          width="220"
+          height="74"
+          rx="6"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="490"
+          y="264"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          PLANNED
+        </text>
+        <text
+          x="490"
+          y="279"
+          fill="#17212a"
+          font-size="11.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Planned adapters
+        </text>
+        <line x1="480" y1="286" x2="700" y2="286" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="490"
+          y="302"
+          fill="#7d8a94"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          LocalSettingsStore: SettingsStore
+        </text>
+        <text
+          x="490"
+          y="315"
+          fill="#7d8a94"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          GameEventBus: GameEventPublisher
+        </text>
+        <!-- Interface: KeyValueStore, the driver interface of layer 3 -->
+        <rect
+          x="722"
+          y="250"
+          width="100"
+          height="39"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="772.0"
+          y="263"
+          fill="#5b6873"
+          font-size="7.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface»
+        </text>
+        <text
+          x="772.0"
+          y="282"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          KeyValueStore
+        </text>
+        <!-- Component: presenters and view models -->
+        <rect
+          x="60"
+          y="356"
+          width="176"
+          height="87"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="70"
+          y="370"
+          fill="#5b6873"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          PRESENTERS
+        </text>
+        <text
+          x="70"
+          y="385"
+          fill="#17212a"
+          font-size="11.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Presenters
+        </text>
+        <line x1="60" y1="392" x2="236" y2="392" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="70"
+          y="408"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          HomePresenter
+        </text>
+        <text
+          x="70"
+          y="421"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          GamePresenter · GameViewModel
+        </text>
+        <text
+          x="70"
+          y="434"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          AchievementsPresenter
+        </text>
+        <!-- The adapters of the output ports, each one above its port -->
+        <!-- Component: InMemoryGameRepository -->
+        <rect
+          x="250.0"
+          y="412"
+          width="137"
+          height="26"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="318.5"
+          y="431"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          InMemoryGameRepository
+        </text>
+        <!-- Component: LevelGameFactories -->
+        <rect
+          x="363.0"
+          y="370"
+          width="116"
+          height="26"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="421.0"
+          y="389"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          LevelGameFactories
+        </text>
+        <!-- Component: BundledLevelRepository -->
+        <rect
+          x="458.0"
+          y="412"
+          width="137"
+          height="26"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="526.5"
+          y="431"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          BundledLevelRepository
+        </text>
+        <!-- Component: NullGameEventPublisher -->
+        <rect
+          x="577.0"
+          y="370"
+          width="137"
+          height="26"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="645.5"
+          y="389"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          NullGameEventPublisher
+        </text>
+        <!-- Component: LocalProgressRepository -->
+        <rect
+          x="701.0"
+          y="412"
+          width="143"
+          height="26"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="772.5"
+          y="431"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          LocalProgressRepository
+        </text>
+        <!-- Ports on the edge of layer 2: layer 2 owns each one, and an outer layer implements each output port -->
+        <!-- Port: the planned output ports -->
+        <rect
+          x="80"
+          y="470"
+          width="98"
+          height="64"
+          rx="4"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="129.0"
+          y="482"
+          fill="#7d8a94"
+          font-size="7.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «port» planned
+        </text>
+        <text
+          x="129.0"
+          y="496"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          LeaderboardGateway
+        </text>
+        <text
+          x="129.0"
+          y="507"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          AccountGateway
+        </text>
+        <text
+          x="129.0"
+          y="518"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          SessionStore
+        </text>
+        <text
+          x="129.0"
+          y="529"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          SettingsStore
+        </text>
+        <!-- Port: UseCase -->
+        <rect
+          x="190"
+          y="478"
+          width="70"
+          height="36"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="225.0"
+          y="491"
+          fill="#5b6873"
+          font-size="7.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «input port»
+        </text>
+        <text
+          x="225.0"
+          y="506"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          UseCase
+        </text>
+        <!-- Port: GameRepository -->
+        <rect
+          x="272"
+          y="478"
+          width="93"
+          height="36"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="318.5"
+          y="491"
+          fill="#5b6873"
+          font-size="7.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «port»
+        </text>
+        <text
+          x="318.5"
+          y="506"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GameRepository
+        </text>
+        <!-- Port: GameFactories -->
+        <rect
+          x="377"
+          y="478"
+          width="88"
+          height="36"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="421.0"
+          y="491"
+          fill="#5b6873"
+          font-size="7.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «port»
+        </text>
+        <text
+          x="421.0"
+          y="506"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GameFactories
+        </text>
+        <!-- Port: LevelRepository -->
+        <rect
+          x="477"
+          y="478"
+          width="99"
+          height="36"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="526.5"
+          y="491"
+          fill="#5b6873"
+          font-size="7.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «port»
+        </text>
+        <text
+          x="526.5"
+          y="506"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          LevelRepository
+        </text>
+        <!-- Port: GameEventPublisher -->
+        <rect
+          x="588"
+          y="478"
+          width="115"
+          height="36"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="645.5"
+          y="491"
+          fill="#5b6873"
+          font-size="7.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «port»
+        </text>
+        <text
+          x="645.5"
+          y="506"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GameEventPublisher
+        </text>
+        <!-- Port: ProgressRepository -->
+        <rect
+          x="715"
+          y="478"
+          width="115"
+          height="36"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="772.5"
+          y="491"
+          fill="#5b6873"
+          font-size="7.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «port»
+        </text>
+        <text
+          x="772.5"
+          y="506"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          ProgressRepository
+        </text>
+        <!-- Port: Logger -->
+        <rect
+          x="842"
+          y="478"
+          width="52"
+          height="36"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="868.0"
+          y="491"
+          fill="#5b6873"
+          font-size="7.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «port»
+        </text>
+        <text
+          x="868.0"
+          y="506"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          Logger
+        </text>
+        <!-- Layer 2: the aspects, the use cases and their models -->
+        <!-- Component: aspect decorators (APP-NFR-11) -->
+        <rect
+          x="80"
+          y="572"
+          width="148"
+          height="100"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="90"
+          y="586"
+          fill="#5b6873"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          ASPECTS
+        </text>
+        <text
+          x="90"
+          y="601"
+          fill="#17212a"
+          font-size="11.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aspect decorators
+        </text>
+        <line x1="80" y1="608" x2="228" y2="608" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="90"
+          y="624"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          UseCaseAspect
+        </text>
+        <text
+          x="90"
+          y="637"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          LoggingAspect
+        </text>
+        <text
+          x="90"
+          y="650"
+          fill="#7d8a94"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          planned: timing, retry,
+        </text>
+        <text
+          x="90"
+          y="663"
+          fill="#7d8a94"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          authorization
+        </text>
+        <!-- Component: use cases -->
+        <rect
+          x="248"
+          y="572"
+          width="646"
+          height="87"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="258"
+          y="586"
+          fill="#5b6873"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          USE CASES
+        </text>
+        <text
+          x="258"
+          y="601"
+          fill="#17212a"
+          font-size="11.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Generic use cases, one set for the four variants
+        </text>
+        <line x1="248" y1="608" x2="894" y2="608" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="258"
+          y="624"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          StartGame · ApplyMove · UndoMove · RedoMove · SaveProgress · ListLevels · ListAchievements
+        </text>
+        <text
+          x="258"
+          y="637"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          each one implements UseCase and returns a Result
+        </text>
+        <text
+          x="258"
+          y="650"
+          fill="#7d8a94"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          planned: SyncLeaderboard · Register · Login · UpdateSettings
+        </text>
+        <!-- Component: request and response models -->
+        <rect
+          x="80"
+          y="684"
+          width="148"
+          height="87"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="90"
+          y="698"
+          fill="#5b6873"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          MODELS
+        </text>
+        <text
+          x="90"
+          y="713"
+          fill="#17212a"
+          font-size="11.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Plain data
+        </text>
+        <line x1="80" y1="720" x2="228" y2="720" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="90"
+          y="736"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          Result · UseCaseError
+        </text>
+        <text
+          x="90"
+          y="749"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          MoveResult · LevelSummary
+        </text>
+        <text
+          x="90"
+          y="762"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          request types
+        </text>
+        <!-- Layer 1: the generic engine and the four variants -->
+        <!-- Component: the generic engine, src/domain/engine/ -->
+        <rect
+          x="100"
+          y="824"
+          width="720"
+          height="113"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="110"
+          y="838"
+          fill="#5b6873"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          src/domain/engine/
+        </text>
+        <text
+          x="110"
+          y="853"
+          fill="#17212a"
+          font-size="11.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          The generic engine
+        </text>
+        <line x1="100" y1="860" x2="820" y2="860" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="110"
+          y="876"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          GameEngine‹TCell, TCoord, TMove, TState›, the aggregate root, with BoardState, Board and
+          LevelTimer
+        </text>
+        <text
+          x="110"
+          y="889"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          IGameRules through BaseGameRules · IScoringPolicy · IPieceSource · IProgressModel ·
+          IVariantFactory
+        </text>
+        <text
+          x="110"
+          y="902"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          GameFactory · BoardBuilder · GeometryFactory with the hex, square and triangle families
+        </text>
+        <text
+          x="110"
+          y="915"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          GamePhase · MoveHistory · RedoableHistory · MoveCommand · GameEvent · GameOver
+        </text>
+        <text
+          x="110"
+          y="928"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          value objects: Score, Moves, ElapsedTime, Stars, LevelId, MatchId, GameId, Seed and more
+        </text>
+        <!-- Interfaces of the engine that layer 4 implements (decision 25) -->
+        <rect
+          x="836"
+          y="824"
+          width="110"
+          height="67"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="891.0"
+          y="837"
+          fill="#5b6873"
+          font-size="7.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface»
+        </text>
+        <text
+          x="891.0"
+          y="856"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          Clock
+        </text>
+        <text
+          x="891.0"
+          y="870"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          RandomSource
+        </text>
+        <text
+          x="891.0"
+          y="884"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          MatchIdGenerator
+        </text>
+        <!-- The four variants, one package each, src/domain/variants/ -->
+        <!-- Package: Hexa Lines, src/domain/variants/hexa-lines/ -->
+        <rect
+          x="100"
+          y="965"
+          width="64"
+          height="16"
+          rx="2"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="100"
+          y="979"
+          width="200"
+          height="60"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="112"
+          y="999"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Hexa Lines
+        </text>
+        <text
+          x="288"
+          y="999"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+        >
+          hexa-lines/
+        </text>
+        <text
+          x="112"
+          y="1017"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          LinesFactory · LinesRules
+        </text>
+        <text
+          x="112"
+          y="1030"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          LinesState · LinesScoring
+        </text>
+        <!-- Package: Hexa Fit, src/domain/variants/hexa-fit/ -->
+        <rect
+          x="312"
+          y="965"
+          width="64"
+          height="16"
+          rx="2"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="312"
+          y="979"
+          width="200"
+          height="60"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="324"
+          y="999"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Hexa Fit
+        </text>
+        <text
+          x="500"
+          y="999"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+        >
+          hexa-fit/
+        </text>
+        <text
+          x="324"
+          y="1017"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          FitFactory · FitRules
+        </text>
+        <text
+          x="324"
+          y="1030"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          FitState · FitLevelBuilder
+        </text>
+        <!-- Package: Hexa Sort, src/domain/variants/hexa-sort/ -->
+        <rect
+          x="524"
+          y="965"
+          width="64"
+          height="16"
+          rx="2"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="524"
+          y="979"
+          width="200"
+          height="60"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="536"
+          y="999"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Hexa Sort
+        </text>
+        <text
+          x="712"
+          y="999"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+        >
+          hexa-sort/
+        </text>
+        <text
+          x="536"
+          y="1017"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          SortFactory · SortRules
+        </text>
+        <text
+          x="536"
+          y="1030"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          SortState · SortLevelBuilder
+        </text>
+        <!-- Package: Hexa Merge, src/domain/variants/hexa-merge/ -->
+        <rect
+          x="736"
+          y="965"
+          width="64"
+          height="16"
+          rx="2"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="736"
+          y="979"
+          width="200"
+          height="60"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="748"
+          y="999"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Hexa Merge
+        </text>
+        <text
+          x="924"
+          y="999"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+        >
+          hexa-merge/
+        </text>
+        <text
+          x="748"
+          y="1017"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          MergeFactory · MergeRules
+        </text>
+        <text
+          x="748"
+          y="1030"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          MergeState · MergeTile
+        </text>
+        <!-- Footnotes -->
+        <text
+          x="24"
+          y="1135"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Each ring is a Clean layer: layer 4 outside and layer 1 in the center (§4.2). Every arrow
+          points inward or stays inside its layer.
+        </text>
+        <text
+          x="24"
+          y="1151"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          The ports sit on the edge of layer 2. A presenter calls the input port UseCase, and an
+          outer layer implements each output port.
+        </text>
+        <text
+          x="24"
+          y="1167"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Layer 3 may import layer 1 too: the presenters, the state mappers and the adapters read
+          engine values.
+        </text>
+        <text
+          x="24"
+          y="1183"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          CompositionRoot creates the drivers, the adapters, the use cases and the variant factories
+          once. Layer 4 has no dependency rule yet.
+        </text>
+        <text
+          x="24"
+          y="1199"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Planned: the HTTP repositories implement the repository and gateway ports (decision 22),
+          and SessionManager implements SessionStore.
+        </text>
+        <!-- Legend -->
+        <line
+          x1="24"
+          y1="1223"
+          x2="1016"
+          y2="1223"
+          stroke="rgba(23,33,42,0.10)"
+          stroke-width="0.8"
+        />
+        <text
+          x="24"
+          y="1241"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LEGEND
+        </text>
+        <line
+          x1="24"
+          y1="1259"
+          x2="52"
+          y2="1259"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#layers-open)"
+        />
+        <text
+          x="60"
+          y="1263"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Use · the source imports the target
+        </text>
+        <line
+          x1="264"
+          y1="1259"
+          x2="292"
+          y2="1259"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#layers-triangle)"
+        />
+        <text
+          x="300"
+          y="1263"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Realization · implements an interface or a port
+        </text>
+        <rect
+          x="560"
+          y="1253"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="596"
+          y="1263"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Box · a class, a port or a group of classes
+        </text>
+        <rect
+          x="816"
+          y="1253"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="852"
+          y="1263"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dashed border · planned
+        </text>
+        <rect
+          x="24"
+          y="1277"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#cfdcf3"
+          stroke="rgba(30,58,138,0.50)"
+          stroke-width="1"
+        />
+        <text
+          x="60"
+          y="1287"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Layer 4 · frameworks and drivers
+        </text>
+        <rect
+          x="264"
+          y="1277"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="300"
+          y="1287"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Layer 3 · interface adapters
+        </text>
+        <rect
+          x="504"
+          y="1277"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#efe7f8"
+          stroke="rgba(126,34,206,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="540"
+          y="1287"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Layer 2 · use cases
+        </text>
+        <rect
+          x="744"
+          y="1277"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="780"
+          y="1287"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Layer 1 · entities
+        </text>
+      </svg>
+    </div>
+  </body>
+</html>

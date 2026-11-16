@@ -1,190 +1,25 @@
 # Clean Architecture layers
 
-Status: draft for review with the professor, 2026-10-30. Updated on 2026-10-31 to match the class diagram: one generic input port, the ports of decisions 10 to 12, engine interfaces that are not ports, and the presentation pattern. Updated on 2026-11-02: the `Logger` port takes a log entry, and its adapter writes the text (decision 37 of the class diagram). Updated on 2026-11-07: the status text and the planned marks of the diagram follow the code in `src/` (issue #147). Updated on 2026-11-15: the composition root, its game registry and the first adapters and drivers exist (issue #162). Updated on 2026-11-16: the text catalog exists (issue #154). Updated on 2026-11-16: the home screen, the game selector map and `HomePresenter` exist (issue #169). Updated on 2026-11-16: the `KeyValueStore` driver interface and its driver `DeviceKeyValueStore` exist (issue #155). Updated on 2026-11-16: the achievements screen, `ListAchievements` and `AchievementsPresenter` exist (issue #188).
+Status: draft for review with the professor, 2026-10-30. Updated on 2026-10-31 to match the class diagram: one generic input port, the ports of decisions 10 to 12, engine interfaces that are not ports, and the presentation pattern. Updated on 2026-11-02: the `Logger` port takes a log entry, and its adapter writes the text (decision 37 of the class diagram). Updated on 2026-11-07: the status text and the planned marks of the diagram follow the code in `src/` (issue #147). Updated on 2026-11-15: the composition root, its game registry and the first adapters and drivers exist (issue #162). Updated on 2026-11-16: the text catalog exists (issue #154). Updated on 2026-11-16: the home screen, the game selector map and `HomePresenter` exist (issue #169). Updated on 2026-11-16: the `KeyValueStore` driver interface and its driver `DeviceKeyValueStore` exist (issue #155). Updated on 2026-11-16: the achievements screen, `ListAchievements` and `AchievementsPresenter` exist (issue #188). Updated on 2026-11-16: the diagram is an image with an HTML source in place of the Mermaid block, and it draws the ports on the edge of layer 2 (issue #52).
 
 This page answers one question: in which layer does each piece of the client live? It follows the statement (§3.4, §4.2) and the layer rules in `.dependency-cruiser.cjs`. Part of the client exists today. `src/domain/` holds the engine and the four variants. `src/application/` holds the first use cases, `StartGame`, `ApplyMove`, `SaveProgress` and `ListAchievements`, with the input port `UseCase`, the ports `GameRepository`, `GameFactories`, `ProgressRepository`, `Logger` and `GameEventPublisher`, and the aspects `UseCaseAspect` and `LoggingAspect`. `src/adapters/` holds `InMemoryGameRepository`, the adapter of `GameRepository`, `LevelGameFactories`, the adapter of `GameFactories` (#172), `NullGameEventPublisher`, a publisher that does nothing until `GameEventBus` exists, the text catalog in `src/adapters/texts/`, with one Spanish and one English entry for each visible text, `HomePresenter`, the presenter of the home screen and of the game selector map, `GamePresenter` with `GameViewModel`, `StateMapper` and the default `SpaceStateMapper`, for the game screen (#170), `AchievementsPresenter`, the presenter of the achievements screen (#188), the `KeyValueStore` driver interface, and `LocalProgressRepository`, the adapter of `ProgressRepository` over `KeyValueStore` (#164). `src/infrastructure/` holds the API client in `src/infrastructure/api/`, the composition root in `src/infrastructure/composition-root.ts` with its game registry, the drivers `SystemClock`, `SeededRandomSource`, `ConsoleLogger`, `SequentialMatchIds` and `DeviceKeyValueStore` (the `KeyValueStore` over AsyncStorage), the board components in `src/infrastructure/board/`: `BoardView`, the `CellRenderer` interface, the default `SpaceCellRenderer` and the screen layout of each figure, and the shared parts of the screens in `src/infrastructure/ui/`, `GameStage` among them. `app/` holds the root layout, which only calls the root, the home screen, the game selector map, the game screen (#170) and the achievements screen (#188). The other screens and the other adapters and drivers are planned. The diagram marks each planned piece. Component names follow the statement (§3.1, §3.4) and the [class diagram](classes.md). They are not final. The engine names carry no geometry: `Board<TCell, TCoord>` is the `HexBoard<TCell>` of §3.1 (decision 16 of the class diagram). IDs such as A1, D3 and Q7 refer to [`docs/REQUIREMENTS.md`](../REQUIREMENTS.md). The classes of layer 1 are in the [class diagram](classes.md).
 
 ## Diagram
 
-Statement §4.2 asks for four concentric layers. Mermaid draws them as a stack: layer 4, the outer ring, is at the top, and layer 1, the center, is at the bottom. Every arrow goes from the component that imports to the component it imports. No arrow points up, toward an outer layer. Some arrows stay inside one layer, for example from the presenters to the mappers.
+![Clean layer diagram: four concentric rings, layer 4 outside and layer 1 in the center; the input port UseCase and the output ports GameRepository, GameFactories, LevelRepository, GameEventPublisher, ProgressRepository and Logger sit on the edge of layer 2, next to the planned ports LeaderboardGateway, AccountGateway, SessionStore and SettingsStore; in layer 3 the presenters call UseCase, InMemoryGameRepository, LevelGameFactories, BundledLevelRepository, NullGameEventPublisher and LocalProgressRepository implement the output ports, and LocalProgressRepository uses KeyValueStore; in layer 4 the routes use the presenters, CompositionRoot creates the adapters, ConsoleLogger implements Logger, DeviceKeyValueStore implements KeyValueStore, and SystemClock, SeededRandomSource and SequentialMatchIds implement Clock, RandomSource and MatchIdGenerator of the engine; the use cases and the presenters use the generic engine, and the four variants implement its contracts](layers/views/layers-1-clean.png)
 
-- Solid arrow: uses (imports). Dotted arrow: realization, the class implements an interface. Mermaid draws no hollow triangle, so the dotted line and its label `implements` stand for the UML realization.
-- Rounded node: a port, an interface that layer 2 owns and an outer layer implements. Ports live in the application layer, because a use case may depend only on ports of its own layer (§3.4). So only layer 2 has rounded nodes.
-- Plain box: a class or an interface that is not a port. The engine owns `Clock` and `RandomSource`, and layer 3 owns `KeyValueStore`. An outer layer implements them too, but they are interfaces of their own layer, not ports (decision 25 of the class diagram).
-- Dashed border and the suffix "(planned)": the component does not exist yet. A solid border means the file exists today. A solid node whose label has a "planned:" part exists in part: only the names after "planned:" do not exist yet.
+Statement §4.2 asks for four concentric layers. The diagram draws them as four rings: layer 4, frameworks and drivers, outside, and layer 1, entities, in the center. Every arrow goes from the part that imports to the part it imports. No arrow points out, toward an outer layer. Some arrows stay inside one layer, for example from the use cases to the ports.
+
+- Each ring is one layer. Colors: layer 1 yellow, layer 2 purple, layers 3 and 4 blue. The course colors three layers: the domain yellow, the application purple and the infrastructure blue. With four layers, layers 3 and 4 together are the blue infrastructure, so the team draws layer 3 light blue and layer 4 dark blue. The class views use the same colors.
+- The ports sit on the edge of layer 2. A port is an interface that layer 2 owns and an outer layer implements, because a use case may depend only on ports of its own layer (§3.4). `UseCase` is the generic input port: the presenters call it, and every use case and every aspect implements it (decision 9 of the class diagram).
+- A box is a class, a port or a group of classes. Its header names its folder or its kind. An adapter of layer 3 sits above the port that it implements.
+- The engine owns `Clock`, `RandomSource` and `MatchIdGenerator`, and layer 3 owns `KeyValueStore`. A driver of layer 4 implements each one, but they are interfaces of their own layer, not ports (decision 25 of the class diagram).
+- Solid line with an open arrowhead: a use, the importer uses the imported part. Dashed line with a hollow triangle: a realization, the class implements an interface or a port. A use carries a verb, such as `creates`, where the line is not the import of a contract. The diagram draws parts of each layer, not the attributes of one class, so no line carries an attribute name or a multiplicity, and no line ends in a diamond. The class views show the attributes ([classes.md](classes.md)).
+- Dashed border: the part does not exist yet. A grey line that starts with "planned:" names the planned classes of a box that exists today.
 - A label that names a question (Q8 or Q9) marks a placement the team has not settled. The box sits where this draft puts it, and the professor's answer can move it.
-- Colors: layer 1 yellow, layer 2 purple, layers 3 and 4 blue. The course colors three layers: the domain yellow, the application purple and the infrastructure blue. With four layers, layers 3 and 4 together are the blue infrastructure, so the team draws layer 3 light blue and layer 4 dark blue. The class views use the same colors.
-- The legend is a box inside the drawing, below layer 1, so the image carries it too. It repeats the colors, the node shapes and the two arrows.
+- The legend is inside the drawing, below the rings, so the image carries it too. It repeats the two lines, the boxes and the colors.
 
-```mermaid
-flowchart TB
-  subgraph L4["Layer 4: Frameworks and drivers"]
-    subgraph APP["app/"]
-      ROUTES["Expo Router routes<br/>_layout.tsx calls the root, index.tsx (home),<br/>map.tsx (game selector map), game/[gameId].tsx<br/>(game screen), achievements.tsx (achievements)"]
-      SCREENS["Level selector, victory and defeat<br/>routes: the MVP views (planned)"]
-    end
-    subgraph INFRA["src/infrastructure/"]
-      API["api/client.ts: createApiClient<br/>api/schema.d.ts: generated OpenAPI types"]
-      STORAGE["DeviceKeyValueStore: local storage driver<br/>over AsyncStorage"]
-      APIREPOS["api/: ApiProgressRepository, ApiLevelRepository,<br/>ApiLeaderboardGateway, ApiAccountGateway<br/>and ApiDtoMapper (planned)"]
-      SECURE["SessionManager: secure token storage,<br/>single scope (planned)"]
-      AUDIO["AudioManager: audio facade over the<br/>sound library, single scope (planned)"]
-      CLOCK["SystemClock"]
-      RNG["SeededRandomSource"]
-      MATCHIDS["SequentialMatchIds: the one id generator"]
-      LOGGER["ConsoleLogger: writes the log text"]
-      VIEWS["board/: BoardView, CellRenderer, BoardLayout,<br/>the three figure layouts, SpaceCellRenderer,<br/>FitCellRenderer, MergeCellRenderer, slideWays<br/>and fittedCellSize; planned: the other cell renderers (Q8)"]
-      ROOT["composition-root.ts: CompositionRoot<br/>and GameRegistry (file: Q9)"]
-      UI["ui/: the scene, the wood signs, the buttons,<br/>FigureSelector, useHomePresenter, GameStage, useGameSession,<br/>MoveControls, BoardOnlyControls, FitControls,<br/>MergeControls and useAchievements"]
-    end
-  end
-
-  subgraph L3["Layer 3: Interface adapters, src/adapters/"]
-    PRESENTERS["MVP presenters and view models, one per screen:<br/>HomePresenter, GamePresenter and AchievementsPresenter;<br/>planned: the others"]
-    MAPPERS["State mappers: one space to one cell view;<br/>the default SpaceStateMapper and FitStateMapper<br/>(one per variant planned)"]
-    EVENTBUS["GameEventBus: delivers game events<br/>to presenters, score and audio (planned)"]
-    NULLPUB["NullGameEventPublisher: does nothing<br/>until GameEventBus exists"]
-    LOCALREPO["LocalProgressRepository;<br/>LocalSettingsStore (planned)"]
-    LEVELREPO["BundledLevelRepository: the level<br/>files that the app bundles"]
-    GAMEREPO["InMemoryGameRepository"]
-    TEXTS["texts/: the text catalog, one Spanish<br/>and one English entry for each key"]
-    KV["KeyValueStore interface"]
-  end
-
-  subgraph L2["Layer 2: Use cases, src/application/"]
-    UC["Generic use cases: StartGame, ApplyMove, UndoMove,<br/>RedoMove, SaveProgress, ListLevels; planned:<br/>SyncLeaderboard, Register, Login,<br/>UpdateSettings"]
-    ASPECTS["Aspect decorators over the use cases:<br/>logging; planned: timing, retry,<br/>authorization"]
-    MODELS["Request and response models,<br/>Result#lt;T, E#gt; and UseCaseError"]
-    INPORTS(["UseCase#lt;TRequest, TResponse#gt;: one generic<br/>input port, each use case binds it"])
-    PPORT(["ProgressRepository port"])
-    LBPORT(["LeaderboardGateway port (planned)"])
-    LVPORT(["LevelRepository port"])
-    GRPORT(["GameRepository port"])
-    ACCPORT(["AccountGateway port (planned)"])
-    SESSPORT(["SessionStore port (planned)"])
-    SETPORT(["SettingsStore port (planned)"])
-    LOGPORT(["Logger port: takes a UseCaseLogEntry"])
-    EVPORT(["GameEventPublisher port: ApplyMove delivers<br/>the events that the engine records"])
-  end
-
-  subgraph L1["Layer 1: Entities"]
-    subgraph VARIANTS["src/domain/variants/"]
-      LINES["hexa-lines"]
-      FIT["hexa-fit"]
-      SORT["hexa-sort"]
-      MERGE["hexa-merge"]
-    end
-    subgraph ENGINE["src/domain/engine/"]
-      CORE["GameEngine#lt;TCell, TCoord, TMove, TState#gt;, the aggregate root,<br/>Board#lt;TCell, TCoord#gt;, Piece, GridTopology#lt;TCoord#gt;, GameId,<br/>BoardBuilder, GeometryFactory with HexGeometry, SquareGeometry<br/>and TriangleGeometry, with their coordinates and topologies"]
-      CONTRACTS["Contracts that a variant implements:<br/>IGameRules#lt;TMove, TState#gt; through BaseGameRules,<br/>IScoringPolicy#lt;TState#gt;, BoardState#lt;TCell, TCoord#gt;"]
-      STRATS["Strategies with engine classes:<br/>IPieceSource#lt;TPiece#gt;: SeededPieceSource, FixedListPieceSource;<br/>IProgressModel: HighScoreProgress, LevelProgress;<br/>GameProgress, the progress of one game"]
-      CAPS["Capability interfaces: IRandomSeeded with its engine class<br/>SeededPieceSource, IMergeable#lt;TCell#gt;, IUndoable and IRedoable with<br/>MoveHistory and RedoableHistory, ITimed with LevelTimer"]
-      DPORTS["Clock, RandomSource and<br/>MatchIdGenerator interfaces"]
-      CMDSTATE["GamePhase classes, MoveCommand"]
-      FACTORY["IVariantFactory: creates the rules, piece source,<br/>scoring, board, initial state and history;<br/>planned: progress model (Q8)"]
-    end
-  end
-
-  ROUTES --> ROOT
-  ROUTES --> PRESENTERS
-  ROUTES --> TEXTS
-  ROUTES --> UI
-  UI --> ROOT
-  UI --> PRESENTERS
-  SCREENS --> VIEWS
-  SCREENS --> PRESENTERS
-  SCREENS --> TEXTS
-  VIEWS --> PRESENTERS
-  ROOT -->|wires every layer| L3
-  STORAGE -.->|implements| KV
-  LOGGER -.->|implements| LOGPORT
-  CLOCK -.->|implements| DPORTS
-  RNG -.->|implements| DPORTS
-  MATCHIDS -.->|implements| DPORTS
-
-  PRESENTERS --> MAPPERS
-  MAPPERS --> CORE
-  APIREPOS --> API
-  APIREPOS -.->|implement| PPORT & LBPORT & LVPORT & ACCPORT
-  LOCALREPO --> KV
-  LOCALREPO -.->|implement| PPORT & SETPORT
-  LEVELREPO -.->|implements| LVPORT
-  GAMEREPO -.->|implements| GRPORT
-  GAMEREPO --> CORE
-
-  ASPECTS -->|wraps| UC
-  ASPECTS --> LOGPORT
-  ASPECTS --> DPORTS
-  UC --> MODELS
-  UC --> PPORT
-  UC --> LBPORT
-  UC --> LVPORT
-  UC --> GRPORT
-  UC --> ACCPORT
-  UC --> SETPORT
-  UC --> EVPORT
-  UC --> CORE
-
-  LINES & FIT & SORT & MERGE -.->|implement| CONTRACTS
-  LINES & FIT & SORT & MERGE -.->|implement| FACTORY
-  LINES & FIT & SORT & MERGE -->|factories pick| STRATS & CAPS
-  MERGE -.->|MergeTile implements IMergeable| CAPS
-  CORE --> CONTRACTS
-  CORE --> STRATS
-  CORE --> DPORTS
-  CORE --> CAPS
-  CORE --> CMDSTATE
-  UC --> FACTORY
-
-  PRESENTERS -->|calls| INPORTS
-  PRESENTERS --> MODELS
-  UC -.->|implements| INPORTS
-  ASPECTS -.->|implements| INPORTS
-  ASPECTS --> SESSPORT
-  UC -->|Login and Register write| SESSPORT
-  SECURE -.->|implements| SESSPORT
-  EVENTBUS -.->|implements| EVPORT
-  NULLPUB -.->|implements| EVPORT
-  PRESENTERS -->|listens| EVENTBUS
-  AUDIO -->|listens| EVENTBUS
-
-  subgraph LEGEND["Legend"]
-    direction LR
-    LGL4["Layer 4: frameworks and drivers"]
-    LGL3["Layer 3: interface adapters"]
-    LGL2["Layer 2: use cases"]
-    LGL1["Layer 1: entities"]
-    LGPORT(["Rounded node: a port of layer 2"])
-    LGPLAN["Dashed border: planned"]
-    LGFROM["Importer"] -->|uses| LGTO["Imported"]
-    LGIMPL["Implementation"] -.->|realization: implements| LGIFACE["Interface"]
-  end
-
-  %% Invisible links keep the layers stacked from outer to inner, with the legend last.
-  KV & MAPPERS & GAMEREPO & NULLPUB & TEXTS ~~~ ASPECTS
-  PPORT & LBPORT & LVPORT & GRPORT & ACCPORT & SESSPORT & SETPORT & LOGPORT & EVPORT & INPORTS ~~~ CORE & LINES & FIT & SORT & MERGE
-  L1 ~~~ LEGEND
-
-  classDef planned stroke-dasharray: 5 5
-  class SCREENS,APIREPOS,SECURE,AUDIO planned
-  class MAPPERS,EVENTBUS,LOCALREPO,LEVELREPO planned
-  class PPORT,LBPORT,LVPORT,ACCPORT,SESSPORT,SETPORT planned
-  class LGPLAN planned
-
-  style L4 fill:#cfdcf3,stroke:#1e3a8a,color:#111827
-  style APP fill:#cfdcf3,stroke:#1e3a8a,color:#111827
-  style INFRA fill:#cfdcf3,stroke:#1e3a8a,color:#111827
-  style L3 fill:#e2ebf8,stroke:#1d4ed8,color:#111827
-  style L2 fill:#efe7f8,stroke:#7e22ce,color:#111827
-  style L1 fill:#fef3c7,stroke:#b45309,color:#111827
-  style VARIANTS fill:#fde68a,stroke:#b45309,color:#111827
-  style ENGINE fill:#fde68a,stroke:#b45309,color:#111827
-  style LEGEND fill:#ffffff,stroke:#4b5563,color:#111827
-  style LGL4 fill:#cfdcf3,stroke:#1e3a8a,color:#111827
-  style LGL3 fill:#e2ebf8,stroke:#1d4ed8,color:#111827
-  style LGL2 fill:#efe7f8,stroke:#7e22ce,color:#111827
-  style LGL1 fill:#fef3c7,stroke:#b45309,color:#111827
-```
+The editable source is [`layers/views/layers-1-clean.html`](layers/views/layers-1-clean.html). It holds one inline SVG in the style of the class views. The `.png` image next to it is that SVG alone, in a page 1236 px wide, rendered at scale 2 by a headless browser, as the class views are ([Render the images](classes.md#render-the-images)). When a layer gains or loses a part, edit the HTML file, export the image again, and commit both together. The file is not a class view, so the generator of [`classes.drawio`](classes.drawio) does not read it.
 
 ## Layers and allowed dependencies
 
