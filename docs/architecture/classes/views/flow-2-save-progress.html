@@ -74,9 +74,10 @@
           uses ResultPresenter, and ApiProgressRepository keeps ApiDtoMapper and ApiClient and
           implements the ProgressRepository port of layer 2. In layer 3, ResultPresenter uses the
           UseCase input port. In layer 2, SaveProgress implements UseCase and keeps the
-          ProgressRepository port and the IProgressModel strategy. In layer 1, IProgressModel turns
-          a GameResult into a ProgressRecord: the fields of GameResult are private, and its
-          recordWith() creates the record. Every dependency between layers points down.
+          ProgressRepository port and the IProgressModel strategy. The port loads and saves the
+          GameProgress of one game. In layer 1, IProgressModel records a GameResult in that
+          GameProgress: the fields of GameResult are private, and its recordWith() creates the
+          record. Every dependency between layers points down.
         </desc>
         <defs>
           <marker
@@ -282,9 +283,9 @@
           stroke-width="1"
           marker-end="url(#flowsave-open)"
         />
-        <!-- IProgressModel returns a ProgressRecord: use -->
+        <!-- IProgressModel records the result in the GameProgress of its game: use -->
         <path
-          d="M220 968 V1044 Q220 1052 228 1052 H878 Q886 1052 886 1044 V936"
+          d="M220 984 V1012"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -326,18 +327,6 @@
           letter-spacing="0.06em"
         >
           TAKES
-        </text>
-        <rect x="596" y="1039" width="47.2" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="600"
-          y="1048"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
-          letter-spacing="0.06em"
-        >
-          RETURNS
         </text>
         <!-- Role names and multiplicities at the part end -->
         <rect x="278.1" y="377" width="59.9" height="12" rx="2" fill="#e2ebf8" />
@@ -487,7 +476,7 @@
         </text>
         <line x1="396" y1="112" x2="714" y2="112" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="412" y="128" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + toProgressDto(record: ProgressRecord): ProgressDto
+          + toProgressDto(progress: GameProgress): ProgressDto
         </text>
         <text x="412" y="144" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           other mappings: view 4.2
@@ -588,7 +577,7 @@
         </text>
         <line x1="480" y1="300" x2="860" y2="300" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="496" y="316" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + save(gameId: GameId, record: ProgressRecord): Promise&lt;void&gt;
+          + save(progress: GameProgress): Promise&lt;void&gt;
         </text>
         <!-- Class: ResultPresenter -->
         <rect
@@ -752,17 +741,17 @@
         </text>
         <line x1="560" y1="600" x2="960" y2="600" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="576" y="616" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + load(gameId: GameId): Promise&lt;ProgressRecord | undefined&gt;
+          + load(gameId: GameId): Promise&lt;GameProgress | undefined&gt;
         </text>
         <text x="576" y="632" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + save(gameId: GameId, record: ProgressRecord): Promise&lt;void&gt;
+          + save(progress: GameProgress): Promise&lt;void&gt;
         </text>
         <!-- Class: IProgressModel (interface, strategy) -->
         <rect
           x="60"
           y="896"
           width="320"
-          height="72"
+          height="88"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -792,7 +781,10 @@
         </text>
         <line x1="60" y1="944" x2="380" y2="944" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="76" y="960" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + record(result: GameResult): ProgressRecord
+          + record(result: GameResult,
+        </text>
+        <text x="87" y="976" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          progress: GameProgress): void
         </text>
         <!-- GameResult creates the ProgressRecord in recordWith(): use with a verb -->
         <path
@@ -914,6 +906,41 @@
         >
           ProgressRecord
         </text>
+        <!-- Reference box: GameProgress, detailed in part 3 · view 3.3 -->
+        <rect
+          x="130"
+          y="1012"
+          width="180"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="220"
+          y="1026"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          PART 3 · VIEW 3.3
+        </text>
+        <text
+          x="220"
+          y="1043"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GameProgress
+        </text>
         <!-- UML template boxes: type parameters on the top-right corner -->
         <rect
           x="357.2"
@@ -945,7 +972,7 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           One saved result, top to bottom: VictoryScreen gives the GameResult to ResultPresenter,
-          which calls the UseCase port. SaveProgress
+          which calls the UseCase port. SaveProgress loads the
         </text>
         <text
           x="24"
@@ -954,8 +981,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          asks IProgressModel for the ProgressRecord and saves it through ProgressRepository. Here
-          ApiProgressRepository implements the port,
+          GameProgress of the game, records the result in it with IProgressModel and saves it
+          through ProgressRepository (S3-04). Here ApiProgressRepository implements the port,
         </text>
         <text
           x="24"
@@ -964,7 +991,7 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          so the record leaves the app: ApiDtoMapper makes a ProgressDto and ApiClient sends it to
+          so the progress leaves the app: ApiDtoMapper makes a ProgressDto and ApiClient sends it to
           ProgressController.sync() of hexablock-api.
         </text>
         <text

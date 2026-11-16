@@ -25,7 +25,7 @@ View 3.2 of [classes.md](classes.md) shows `ApplyMove` with layers 2 and 1 only,
 
 ## Use case 2: save progress
 
-`SaveProgress` (APP-FR-09, APP-FR-13) saves the result of a finished game. `VictoryScreen` gives the `GameResult` to `ResultPresenter`, which calls the `UseCase` port. `SaveProgress` asks its `IProgressModel` strategy for the `ProgressRecord` and saves it through the `ProgressRepository` port. `ApiProgressRepository` in layer 4 implements that port: `ApiDtoMapper` makes a `ProgressDto`, and `ApiClient` sends it to `ProgressController.sync()` of `hexablock-api` (API-FR-02). The response comes back as a `Result` to the screen.
+`SaveProgress` (APP-FR-09, APP-FR-13) saves the result of a finished game. `VictoryScreen` gives the `GameResult` to `ResultPresenter`, which calls the `UseCase` port. `SaveProgress` loads the `GameProgress` of the game through the `ProgressRepository` port, records the result in it with its `IProgressModel` strategy, and saves it through the same port (S3-04, classes.md decision 54). `ApiProgressRepository` in layer 4 implements that port: `ApiDtoMapper` makes a `ProgressDto`, and `ApiClient` sends it to `ProgressController.sync()` of `hexablock-api` (API-FR-02). The response comes back as a `Result` to the screen.
 
 This flow takes `SaveProgress` and not `SyncLeaderboard`, for two reasons:
 
@@ -36,11 +36,11 @@ The same endpoint is use case 1 of the API flows, in `hexablock-api/docs/archite
 
 ### Class view
 
-![SaveProgress class view: VictoryScreen, ApiProgressRepository, ApiDtoMapper and ApiClient in layer 4; ResultPresenter in layer 3; UseCase, SaveProgress and the ProgressRepository port in layer 2; IProgressModel, GameResult and ProgressRecord in layer 1](classes/views/flow-2-save-progress.png)
+![SaveProgress class view: VictoryScreen, ApiProgressRepository, ApiDtoMapper and ApiClient in layer 4; ResultPresenter in layer 3; UseCase, SaveProgress and the ProgressRepository port in layer 2; IProgressModel, GameResult, ProgressRecord and GameProgress in layer 1](classes/views/flow-2-save-progress.png)
 
 ### Sequence diagram
 
-![SaveProgress sequence: VictoryScreen calls onFinish() on ResultPresenter, which calls execute() on SaveProgress; SaveProgress calls record() on IProgressModel and save() on ApiProgressRepository, which calls toProgressDto() on ApiDtoMapper and syncProgress() on ApiClient; ApiClient sends the HTTP call to ProgressController.sync() of hexablock-api, and the replies go back to the screen](flows/views/seq-2-save-progress.png)
+![SaveProgress sequence: VictoryScreen calls onFinish() on ResultPresenter, which calls execute() on SaveProgress; SaveProgress calls load() on ApiProgressRepository, record() on IProgressModel and save() on ApiProgressRepository, which calls toProgressDto() on ApiDtoMapper and syncProgress() on ApiClient; ApiClient sends the HTTP call to ProgressController.sync() of hexablock-api, and the replies go back to the screen](flows/views/seq-2-save-progress.png)
 
 ## Use case 3: start a game
 
