@@ -8,14 +8,18 @@ import type { BoardLayout } from '../board/board-layout';
 import type { CellRenderer } from '../board/cell-renderer';
 import type { CompositionRoot } from '../composition-root';
 import { useCompositionRoot } from '../composition-root-provider';
+import type { MoveControls } from './move-controls';
 
 // What the game screen needs to show one game (issue #170): the presenter over the use cases
 // of the game, and the cell renderer and the figure layout of its registry entry.
 // The registry hides the type of a cell view, so the session keeps it hidden too.
+// `controls` are the move controls of the entry in the texts of the session (#177).
+// A game without them has none.
 export interface GameSession {
   readonly presenter: GamePresenter<unknown, unknown, unknown, unknown, unknown, unknown>;
   readonly renderer: CellRenderer<unknown>;
   readonly layoutOf: (size: number) => BoardLayout<unknown>;
+  readonly controls?: MoveControls<unknown, unknown>;
 }
 
 // The session of the game `gameId` in the composition root `root`, with the texts `texts`,
@@ -35,6 +39,7 @@ export function gameSessionOf(
     presenter: new GamePresenter(startGame, applyMove, screen.mapper, texts),
     renderer: screen.renderer,
     layoutOf: (size) => screen.layoutOf(size),
+    controls: screen.controlsOf?.(texts),
   };
 }
 

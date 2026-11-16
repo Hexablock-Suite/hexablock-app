@@ -8,6 +8,7 @@ import { fittedCellSize } from '../board/board-fit';
 import type { BoardLayout } from '../board/board-layout';
 import { BoardView } from '../board/board-view';
 import type { CellRenderer } from '../board/cell-renderer';
+import type { MoveControls } from './move-controls';
 import { Scenery } from './scenery';
 import { lip, palette, radius, serif, shadow, space } from './theme';
 import { LipButton, WoodSign } from './wood';
@@ -27,6 +28,8 @@ export interface GameStageProps<TCellView> {
   // The cell renderer and the figure layout that the registry chooses for the game.
   readonly renderer: CellRenderer<TCellView>;
   readonly layoutOf: (size: number) => BoardLayout<unknown>;
+  // The move controls that the registry chooses for the game, if it has them (#177).
+  readonly controls?: MoveControls<unknown, unknown>;
   // Goes back to the game selector map.
   readonly onBack: () => void;
 }
@@ -38,13 +41,15 @@ export interface GameStageProps<TCellView> {
 // `BoardView` with every space of the board, the score and the outcome. The board takes the
 // widest cell size that fits the screen. A failed use case shows its text below the board.
 // It names no variant, so it serves every game. Every visible text comes from the presenter,
-// which reads the text catalog (APP-FR-11). The move controls of each variant join it
-// in #174 to #177, and each one calls `GamePresenter.onMove()`.
+// which reads the text catalog (APP-FR-11). The move controls of the game, if the registry
+// gives them, show below the board with the payload view of the last view model, and they call
+// `GamePresenter.onMove()` (#177). Their texts come from the catalog too.
 export function GameStage<TCellView>({
   title,
   presenter,
   renderer,
   layoutOf,
+  controls,
   onBack,
 }: GameStageProps<TCellView>) {
   const view = useGameViewModel(presenter);
@@ -92,6 +97,10 @@ export function GameStage<TCellView>({
           </View>
         </View>
       </View>
+      {controls?.render({
+        payload: view.payload,
+        onMove: (move) => void presenter.onMove(move),
+      })}
       {view.error === undefined ? null : (
         <View
           accessible

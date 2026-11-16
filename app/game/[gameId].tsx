@@ -13,8 +13,9 @@ import {
 // The game screen, the route of one game (issue #170, S3-07 in #151, a proposal that waits
 // for the team). The game selector map opens it with the id of a registered game and the text
 // of the board figure (#171). It keeps the session of that game on that figure: the presenter
-// over the use cases of the composition root, and the cell renderer and the figure layout of its
-// registry entry. `GameStage` shows the board, the score and the outcome.
+// over the use cases of the composition root, and the cell renderer, the figure layout and the
+// move controls of its registry entry. `GameStage` shows the board, the score, the outcome
+// and the move controls (#177).
 // A text that names no figure goes home. An id that names no game of the figure goes back
 // to the map of the figure.
 export default function GameScreen() {
@@ -39,6 +40,7 @@ function Game({ game, figure }: { readonly game: GameChoice; readonly figure: Ro
       presenter={session.presenter}
       renderer={session.renderer}
       layoutOf={session.layoutOf}
+      controls={session.controls}
       onBack={() => router.dismissTo({ pathname: '/map', params: { figure: figure.param } })}
     />
   );
