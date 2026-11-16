@@ -23,6 +23,7 @@ import type { IVariantFactory } from '../../../src/domain/engine/variant-factory
 import { FitFactory } from '../../../src/domain/variants/hexa-fit/fit-factory';
 import { FitLevel } from '../../../src/domain/variants/hexa-fit/fit-level';
 import { PlaceFitPiece } from '../../../src/domain/variants/hexa-fit/fit-move';
+import { CellCount } from '../../../src/domain/variants/hexa-lines/cell-count';
 import { LinesFactory, LinesSettings } from '../../../src/domain/variants/hexa-lines/lines-factory';
 import { MergeFactory, MergeSettings } from '../../../src/domain/variants/hexa-merge/merge-factory';
 import { MergeTile } from '../../../src/domain/variants/hexa-merge/merge-tile';
@@ -147,7 +148,7 @@ function figureTests<TCoord>(
   // A level of two cells and one domino that covers them.
   function fitLevel(named: TopologyId): FitLevel<TCoord> {
     const domino = new ShapeGroup([new CellNode(origin), new CellNode(next)]);
-    return FitLevel.of(named, BoardShape.of([origin, next]), [new Piece(domino, A)]);
+    return FitLevel.of(named, BoardShape.of([origin, next]), [new Piece(domino, A)], []);
   }
 
   return () => {
@@ -166,7 +167,7 @@ function figureTests<TCoord>(
       expect(start.board.occupiedCells()).toEqual([]);
       expect(start.tray).toHaveLength(3);
       expect(outcome).toBe(Outcome.playing);
-      expect(engine.snapshot().cellsPlaced).toBe(1);
+      expect(engine.snapshot().cellsPlaced).toEqual(CellCount.of(1));
       expect(engine.snapshot().tray).toHaveLength(2);
     });
 

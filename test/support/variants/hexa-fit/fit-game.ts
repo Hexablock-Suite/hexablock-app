@@ -28,7 +28,7 @@ export function fitFactory(clock: Clock = new ManualClock()): FitFactory<SquareC
   );
   return new FitFactory(
     new SquareGeometry(),
-    FitLevel.of(TopologyId.square, BoardShape.of([square(0, 0), square(1, 0)]), [domino]),
+    FitLevel.of(TopologyId.square, BoardShape.of([square(0, 0), square(1, 0)]), [domino], []),
     clock,
   );
 }
@@ -43,6 +43,7 @@ export function threeDominoFitFactory(clock: Clock = new ManualClock()): FitFact
       TopologyId.square,
       BoardShape.of(Array.from({ length: 6 }, (_, col) => square(col, 0))),
       [domino(A), domino(B), domino(C)],
+      [],
     ),
     clock,
   );

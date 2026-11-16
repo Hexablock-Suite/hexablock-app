@@ -24,10 +24,11 @@ import type { Slide } from './slide';
 
 // The count of tiles on the first board. Statement §1.4 does not give it.
 // The value follows 2048, as the chance of a 4 does (issue 57): two tiles.
-export const START_TILES = 2;
+// Only this file reads the two counts (issue #232).
+const START_TILES = 2;
 
 // The count of moves that the Merge history keeps (statement §5.1.8, APP-FR-08).
-export const MERGE_UNDO_LIMIT = 1;
+const MERGE_UNDO_LIMIT = 1;
 
 // The settings of one Hexa Merge game: the board region, the seed of the new tiles,
 // the target tile and the chance that a new tile is a 4.

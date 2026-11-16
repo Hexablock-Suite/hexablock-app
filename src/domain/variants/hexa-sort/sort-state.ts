@@ -8,6 +8,7 @@ import type { Piece } from '../../engine/piece';
 import { ClearedStacks } from './cleared-stacks';
 import { ColorStack } from './color-stack';
 import type { GoalCount } from './goal-count';
+import type { TileCount } from './tile-count';
 
 // The data that the Sort screen draws: the offered stack and the goal counts.
 export interface SortView<TCoord> {
@@ -25,7 +26,7 @@ export interface SortSnapshot<TCoord> extends BoardSnapshot<ColorStack, TCoord> 
   readonly offered: Piece<ColorStack, TCoord> | undefined;
   readonly goalsDone: ClearedStacks;
   readonly goalsNeeded: GoalCount;
-  readonly clearedTiles: readonly number[];
+  readonly clearedTiles: readonly TileCount[];
   readonly placedAt: TCoord | undefined;
   readonly source: IPieceSource<Piece<ColorStack, TCoord>>;
   view(): SortView<TCoord>;
@@ -44,7 +45,7 @@ export interface SortSnapshot<TCoord> extends BoardSnapshot<ColorStack, TCoord> 
 // `offered` is the stack that the player places next. It is `undefined` when the source ends.
 // `goalsDone` counts the cleared stacks, as a `ClearedStacks` (classes.md decision 42).
 // `goalsNeeded` is the goal of the level, a `GoalCount`.
-// `clearedTiles` holds the tile count of each stack that the last turn cleared,
+// `clearedTiles` holds the `TileCount` of each stack that the last turn cleared (issue #232),
 // so the Sort scoring (issue #98) can read it. `placedAt` is the cell of the last move.
 export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
   private constructor(
@@ -55,7 +56,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
     private readonly goalsNeeded: GoalCount,
     private offered: Piece<ColorStack, TCoord> | undefined,
     private goalsDone: ClearedStacks,
-    private clearedTiles: number[],
+    private clearedTiles: TileCount[],
     private placedAt: TCoord | undefined,
     private score: Score,
   ) {}

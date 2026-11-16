@@ -485,8 +485,8 @@ describe('primitive scan of the domain', () => {
   });
 
   // Issue #203: `Score` replaces the number of every score in the engine.
-  // Only the factory, the delivery to a receiver and the factor of `Score.times()` keep a number.
-  // The value is private (issue #228), so the scan finds no `Score.value`.
+  // Only the factory and the delivery to a receiver keep a number. `Score.times()` is gone
+  // (issue #232). The value is private (issue #228), so the scan finds no `Score.value`.
   it('should_find_no_score_of_type_number_when_the_code_is_scanned', () => {
     const numbers = codeUses()
       .filter((use) => use.primitive === 'number')
@@ -506,7 +506,6 @@ describe('primitive scan of the domain', () => {
     expect(numbers.filter((place) => place.startsWith('Score.'))).toEqual([
       'Score.of',
       'Score.deliverTo',
-      'Score.times',
     ]);
   });
 
@@ -655,6 +654,36 @@ describe('primitive scan of the domain', () => {
     expect(ofSeed.map(key).sort()).toEqual(['number Seed.generatorState', 'number Seed.of']);
   });
 
+  // Issue #232: value objects of the game replace the primitives that crossed the public
+  // signatures of the variants. `Score.times()` is gone: the Lines counts give their points.
+  // The constants of the variants stay private to their files.
+  it('should_find_no_primitive_of_a_variant_when_the_code_is_scanned', () => {
+    const places = codeUses().map((use) => use.where);
+
+    for (const place of [
+      'Score.times',
+      'LinesSnapshot.streak',
+      'LinesSnapshot.linesCleared',
+      'LinesSnapshot.cellsPlaced',
+      'LinesState.constructor',
+      'PlacePiece.constructor',
+      'SortSnapshot.clearedTiles',
+      'ColorStack.tileCount',
+      'NewTile.of',
+      'Chance.hits',
+      'FIT_POINTS_PER_TURN',
+      'POINTS_PER_CELL',
+      'POINTS_PER_LINE',
+      'TRAY_SIZE',
+      'START_TILES',
+      'MERGE_UNDO_LIMIT',
+      'GOAL_RUN',
+      'SORT_POINTS_PER_TILE',
+    ]) {
+      expect(places).not.toContain(place);
+    }
+  });
+
   it('should_list_a_literal_type_as_its_primitive_when_a_signature_names_a_closed_union', () => {
     const source = [
       "export type Outcome = 'playing' | 'victory';",
@@ -754,16 +783,16 @@ describe('primitive scan of the domain', () => {
 });
 
 describe('domain primitive gate', () => {
+  // The variants have no break since #232, so a fixture under a variant folder stands for one.
   it('should_fail_the_gate_when_a_variant_signature_has_a_primitive_and_no_baseline_entry', () => {
-    const baseline = primitiveBaseline.filter((entry) => entry.where !== 'LinesSnapshot.streak');
+    const source = 'export interface FixtureSnapshot {\n  readonly streak: number;\n}';
 
-    expect(unexcused(codeBreaks(), baseline)).toContainEqual({
-      primitive: 'number',
-      where: 'LinesSnapshot.streak',
-    });
     expect(
       unexcused(breaksIn(variantFixture('fixture-tray.ts', 'export type TraySize = number;')), []),
     ).toEqual([{ primitive: 'number', where: 'TraySize' }]);
+    expect(
+      unexcused(breaksIn(variantFixture('fixture-photo.ts', source)), primitiveBaseline),
+    ).toEqual([{ primitive: 'number', where: 'FixtureSnapshot.streak' }]);
   });
 
   it('should_fail_the_gate_when_only_a_readme_row_names_the_primitive', () => {
@@ -958,7 +987,6 @@ describe('domain primitive gate', () => {
     expect(breaksIn(fixture('fixture-move.ts', source))).toEqual([
       { primitive: 'number', where: 'Move.constructor' },
     ]);
-    expect(codeBreaks()).toContainEqual({ primitive: 'number', where: 'PlacePiece.constructor' });
     expect(codeBreaks()).toContainEqual({ primitive: 'number', where: 'MoveHistory.constructor' });
   });
 
