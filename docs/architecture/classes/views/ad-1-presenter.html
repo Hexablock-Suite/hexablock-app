@@ -81,7 +81,9 @@
           the MoveControls strategy of the game, which FitControls and the default BoardOnlyControls
           implement; the controls take a press on a space of BoardView and play a move.
           MergeStateMapper and MergeControls, the parts of Hexa Merge, implement the same two
-          strategies.
+          strategies. GamePresenter also undoes and redoes a move through the UseCase port, and
+          GameViewModel holds the undo and the redo of a variant with undo, which FitControls show
+          as two buttons.
         </desc>
         <defs>
           <marker
@@ -388,7 +390,7 @@
         <!-- GamePresenter keeps the UseCase input port it receives in an attribute: use, down from layer 3 to layer 2 -->
         <line
           x1="528"
-          y1="756"
+          y1="788"
           x2="528"
           y2="1076"
           stroke="#5b6873"
@@ -1092,7 +1094,7 @@
           x="336"
           y="620"
           width="424"
-          height="136"
+          height="168"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -1126,6 +1128,12 @@
           + onMove(move: TMove): Promise&lt;void&gt;
         </text>
         <text x="352" y="748" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + onUndo(): Promise&lt;void&gt;
+        </text>
+        <text x="352" y="764" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + onRedo(): Promise&lt;void&gt;
+        </text>
+        <text x="352" y="780" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + viewModel(): GameViewModel
         </text>
 
@@ -1134,7 +1142,7 @@
           x="808"
           y="620"
           width="184"
-          height="200"
+          height="232"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1185,9 +1193,15 @@
           + time?: { label, value }
         </text>
         <text x="824" y="796" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + error?: string
+          + undo?: { label, enabled }
         </text>
         <text x="824" y="812" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + redo?: { label, enabled }
+        </text>
+        <text x="824" y="828" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + error?: string
+        </text>
+        <text x="824" y="844" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + payload?: TPayloadView
         </text>
 
@@ -1722,8 +1736,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          GameStage gives the board and play() to the controls of the game, and play() calls
-          onMove(). LevelSelector, Result, Account and Leaderboard follow the same shape.
+          GameStage gives the board, play(), undo() and redo() to the controls of the game (#178).
+          LevelSelector, Result, Account and Leaderboard follow the same shape.
         </text>
         <text
           x="24"

@@ -8,8 +8,9 @@ import { repoRoot } from '../support/run-tool';
 // Issue #170: `GamePresenter`, `GameViewModel` and the `StateMapper` interface serve every game,
 // so they name no variant. The gate reads `src/adapters/game-presenter.ts`, which holds
 // the presenter and the view model, and `src/adapters/state-mapper.ts`. Each file imports
-// only the use case port, the response model, the result, the two requests, two values
-// of the engine, the state mapper and the text catalog. It holds no name of a variant
+// only the use case port, the response model, the result, the requests of the four game
+// use cases (the undo and the redo since #178), two values of the engine, the state mapper
+// and the text catalog. It holds no name of a variant
 // class (a name that starts with `Lines`, `Fit`, `Sort` or `Merge`) and no text of a variant
 // id, such as `'hexa-lines'`.
 
@@ -18,8 +19,10 @@ const files = ['src/adapters/game-presenter.ts', 'src/adapters/state-mapper.ts']
 const ALLOWED_IMPORTS = new Set([
   '../application/apply-move',
   '../application/move-result',
+  '../application/redo-move',
   '../application/result',
   '../application/start-game',
+  '../application/undo-move',
   '../application/use-case',
   '../domain/engine/outcome',
   '../domain/engine/score',

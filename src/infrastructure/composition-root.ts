@@ -5,6 +5,7 @@ import type { GameEventPublisher } from '../application/game-event-publisher';
 import type { Logger } from '../application/logger';
 import { LoggingAspect } from '../application/logging-aspect';
 import type { MoveResult, ViewOf } from '../application/move-result';
+import { RedoMove, type RedoMoveRequest } from '../application/redo-move';
 import { StartGame, type StartGameRequest } from '../application/start-game';
 import { UndoMove, type UndoMoveRequest } from '../application/undo-move';
 import type { UseCase } from '../application/use-case';
@@ -30,6 +31,7 @@ export interface GameUseCases<TCell = unknown, TCoord = unknown, TMove = unknown
   readonly startGame: UseCase<StartGameRequest, MoveResult<TCell, TCoord, TView>>;
   readonly applyMove: UseCase<ApplyMoveRequest<TMove>, MoveResult<TCell, TCoord, TView>>;
   readonly undoMove: UseCase<UndoMoveRequest, MoveResult<TCell, TCoord, TView>>;
+  readonly redoMove: UseCase<RedoMoveRequest, MoveResult<TCell, TCoord, TView>>;
 }
 
 // The drivers that a test may replace. The app takes the system clock and the console logger.
@@ -51,8 +53,8 @@ export interface RootDrivers {
 // Each variant factory of a registry takes the `GeometryFactory` of its figure, so the choice
 // of the figure changes only that argument (APP-FR-16). The hexagon is the default figure.
 // Until #172, `StartGame` takes its factory in its constructor. So the root builds one
-// `StartGame` for each registered game, with one `ApplyMove` and one `UndoMove`
-// over one `InMemoryGameRepository`, and wraps each use case in the logging aspect.
+// `StartGame` for each registered game, with one `ApplyMove`, one `UndoMove` and one `RedoMove`
+// (#178) over one `InMemoryGameRepository`, and wraps each use case in the logging aspect.
 // It builds the use cases of a game the first time a caller asks for them.
 // The publisher goes to `ApplyMove`, which delivers the events of each turn (#233).
 export class CompositionRoot {
@@ -124,5 +126,6 @@ function wire<TState extends BoardState<unknown, unknown> & Cloneable<TState>>(
     ),
     applyMove: new LoggingAspect(new ApplyMove(games, logger, events), logger, 'ApplyMove'),
     undoMove: new LoggingAspect(new UndoMove(games), logger, 'UndoMove'),
+    redoMove: new LoggingAspect(new RedoMove(games), logger, 'RedoMove'),
   };
 }

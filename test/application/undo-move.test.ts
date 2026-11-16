@@ -98,7 +98,8 @@ describe('UndoMove', () => {
       score: afterFirst.score,
       outcome: Outcome.playing,
       canUndo: true,
-      canRedo: false,
+      // Since #178 Fit redoes: the undone move can be played again.
+      canRedo: true,
       hasUndo: true,
       payload: afterFirst.payload,
       // Fit is timed, and this clock does not move.
@@ -116,7 +117,8 @@ describe('UndoMove', () => {
 
     const undone = valueOf(await useCases.undoMove.execute({}));
 
-    expect(undone).toEqual(start);
+    // Since #178 Fit redoes, so only the redo flag differs from the start.
+    expect(undone).toEqual({ ...start, canRedo: true });
     expect(Object.keys(undone).sort()).toEqual([
       'canRedo',
       'canUndo',
@@ -128,7 +130,7 @@ describe('UndoMove', () => {
       'payload',
       'score',
     ]);
-    expect([undone.canUndo, undone.canRedo, undone.hasUndo]).toEqual([false, false, true]);
+    expect([undone.canUndo, undone.canRedo, undone.hasUndo]).toEqual([false, true, true]);
   });
 
   it('should_give_back_the_same_source_position_when_a_variant_with_a_random_source_undoes_a_move', async () => {

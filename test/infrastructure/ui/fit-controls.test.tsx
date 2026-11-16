@@ -22,6 +22,7 @@ import { occupiedSpaces, pressSpace } from '../../support/ui/board-spaces';
 
 // Issue #175: the player plays Hexa Fit on the game screen. `GameStage` shows the board with
 // `FitCellRenderer`, and `FitControls` show the tray, the rotate button and the move count.
+// Since #178 they also show the undo button and the redo button.
 // The player picks a piece of the tray, turns it by the rotation step of the topology, places it
 // with a press on a free space and takes a placed piece back with a press on one of its spaces.
 // These tests play the bundled level `fit-01` over the real use cases with a manual clock.
@@ -47,12 +48,14 @@ async function firstBundledLevel(): Promise<FitLevel<HexCoord>> {
 
 // Opens the game screen on the level `fit-01` with the screen parts of Fit.
 async function openFirstBundledLevel(clock = new ManualClock()): Promise<void> {
-  const { startGame, applyMove } = gameUseCases(
+  const { startGame, applyMove, undoMove, redoMove } = gameUseCases(
     new FitFactory(geometry, await firstBundledLevel(), clock),
   );
   const presenter = new GamePresenter(
     startGame,
     applyMove,
+    undoMove,
+    redoMove,
     new FitStateMapper(geometry.createTopology()),
     textCatalog.es,
   );
@@ -76,6 +79,8 @@ const piece = (id: string) => screen.getByRole('radio', { name: `Pieza ${id}` })
 const trayPieces = () =>
   screen.queryAllByRole('radio').map((each) => each.props.accessibilityLabel);
 const movesText = () => screen.getByTestId('fit-moves');
+const undoButton = () => screen.getByRole('button', { name: 'Deshacer' });
+const redoButton = () => screen.getByRole('button', { name: 'Rehacer' });
 
 async function choose(id: string): Promise<void> {
   await fireEvent.press(piece(id));
@@ -154,6 +159,49 @@ describe('FitControls', () => {
     await pressSpace(0);
 
     expect(screen.getByTestId('play-time')).toHaveTextContent(/Tiempo\s*1:05/);
+  });
+
+  // Issue #178, the check of APP-FR-08 on the screen: undo and then redo give back the same
+  // board. The undo gives back the move count before the move (#60), and the redo the count
+  // after it. Each button is enabled only when a move can go back or forward.
+  it('should_take_the_piece_back_and_place_it_again_when_the_player_presses_undo_and_then_redo', async () => {
+    await openFirstBundledLevel();
+    expect(undoButton()).toBeDisabled();
+    expect(redoButton()).toBeDisabled();
+    await choose('a');
+    await pressSpace(0);
+    expect(undoButton()).toBeEnabled();
+
+    await fireEvent.press(undoButton());
+
+    expect(occupiedSpaces()).toEqual([]);
+    expect(trayPieces()).toEqual(['Pieza a', 'Pieza b', 'Pieza c']);
+    expect(movesText()).toHaveTextContent(/Movimientos\s*0/);
+    expect(undoButton()).toBeDisabled();
+    expect(redoButton()).toBeEnabled();
+
+    await fireEvent.press(redoButton());
+
+    expect(occupiedSpaces()).toEqual([0, 1, 3]);
+    expect(trayPieces()).toEqual(['Pieza b', 'Pieza c']);
+    expect(movesText()).toHaveTextContent(/Movimientos\s*1/);
+    expect(undoButton()).toBeEnabled();
+    expect(redoButton()).toBeDisabled();
+  });
+
+  // A new move after an undo starts another line of play, so nothing is left to redo.
+  it('should_disable_the_redo_button_when_the_player_places_a_piece_after_an_undo', async () => {
+    await openFirstBundledLevel();
+    await choose('a');
+    await pressSpace(0);
+    await fireEvent.press(undoButton());
+
+    await choose('c');
+    await pressSpace(4);
+
+    expect(occupiedSpaces()).toEqual([4]);
+    expect(redoButton()).toBeDisabled();
+    expect(undoButton()).toBeEnabled();
   });
 
   // The witness of `fit-01` solves it: `a` with no turn on (0,0), `b` turned once on (2,0)

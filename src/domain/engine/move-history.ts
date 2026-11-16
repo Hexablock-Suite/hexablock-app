@@ -25,11 +25,13 @@ export class MoveHistory<TMove, TMemento> implements IUndoable {
 
   // The command leaves the history only after the engine takes the state back.
   // So a refused undo keeps the command, and the player can try again.
+  // Then the history gives the undone command to `keepUndone()`.
   undo(): void {
     const last = this.done.at(-1);
     if (last === undefined) throw new RangeError('The history has no move to undo.');
     last.undo();
     this.done.pop();
+    this.keepUndone(last);
   }
 
   // A new game and a finished game have no move to undo.
@@ -41,5 +43,11 @@ export class MoveHistory<TMove, TMemento> implements IUndoable {
   // so the engine reads the capability with no check of the history class (classes.md decision 27).
   redoable(): IRedoable | undefined {
     return undefined;
+  }
+
+  // The hook of an undone command (issue #178). A plain history forgets the command.
+  // `RedoableHistory` keeps it, so a redo can play it again.
+  protected keepUndone(_command: MoveCommand<TMove, TMemento>): void {
+    return;
   }
 }

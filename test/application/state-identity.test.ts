@@ -207,10 +207,12 @@ describe('A Fit game through the use cases', () => {
         placed: [A, B],
         elapsedMs: ElapsedTime.ofMs(2_000),
       },
+      // Since #178 Fit redoes, so the undone move can be played again.
       {
         ...playing,
         cells: cellsOf(A),
         canUndo: true,
+        canRedo: true,
         remaining: [B, C],
         placed: [A],
         elapsedMs: ElapsedTime.ofMs(5_000),

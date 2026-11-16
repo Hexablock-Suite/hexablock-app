@@ -10,6 +10,8 @@ import { GameId } from '../../../../src/domain/engine/game-id';
 import { LevelTimer } from '../../../../src/domain/engine/level-timer';
 import { LevelTimerId } from '../../../../src/domain/engine/level-timer-id';
 import { MatchId } from '../../../../src/domain/engine/match-id';
+import { Moves } from '../../../../src/domain/engine/moves';
+import { RedoableHistory } from '../../../../src/domain/engine/redoable-history';
 import { TimedRulesDecorator } from '../../../../src/domain/engine/timed-rules-decorator';
 import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
 import { Turns } from '../../../../src/domain/engine/turns';
@@ -20,7 +22,13 @@ import { FitRules } from '../../../../src/domain/variants/hexa-fit/fit-rules';
 import { ManualClock } from '../../../support/engine/manual-clock';
 import { square, squareTopology } from '../../../support/engine/square-topology';
 import { startVariant } from '../../../support/engine/variant-game';
-import { A, fitFactory, threeDominoFitFactory } from '../../../support/variants/hexa-fit/fit-game';
+import {
+  A,
+  B,
+  fitFactory,
+  threeDominoFitFactory,
+} from '../../../support/variants/hexa-fit/fit-game';
+import { fitViewData } from '../../../support/variants/view-data';
 import { repoRoot } from '../../../support/run-tool';
 import { dataOf } from '../../../support/engine/game-over';
 import { MATCH_ID } from '../../../support/engine/match-id';
@@ -142,6 +150,36 @@ describe('FitFactory', () => {
     expect(second.equals(new LevelTimer(LevelTimerId.of(MatchId.of('match-b')), clock))).toBe(true);
     expect(first.elapsedMs()).toEqual(ElapsedTime.ofMs(1_000));
     expect(second.elapsedMs()).toEqual(ElapsedTime.ofMs(0));
+  });
+
+  // Issue #178, the check of APP-FR-08: in Fit, undo and then redo give back the same board.
+  // The move count follows #60: the undo gives back the count before the move, and the redo
+  // gives back the count after it.
+  it('should_give_back_the_same_board_and_move_count_when_a_fit_move_is_undone_and_then_redone', () => {
+    const factory = threeDominoFitFactory();
+    const { engine } = startVariant(factory);
+    const facts = () => {
+      const photo = engine.snapshot();
+      const { placed, moves } = fitViewData(photo.view());
+      return { cells: photo.boardCopy().occupiedCells(), placed, moves };
+    };
+    const start = facts();
+    engine.play(new PlaceFitPiece(A, Turns.of(0), square(0, 0)));
+    engine.play(new PlaceFitPiece(B, Turns.of(0), square(2, 0)));
+    const played = facts();
+
+    engine.undo();
+    const undone = facts();
+    engine.undo();
+    engine.redo();
+    engine.redo();
+
+    expect(factory.createHistory()).toBeInstanceOf(RedoableHistory);
+    expect(undone.moves).toEqual(Moves.of(1));
+    expect(facts()).toEqual(played);
+    expect(played.moves).toEqual(Moves.of(2));
+    expect(played.cells).not.toEqual(start.cells);
+    expect([engine.canUndo(), engine.canRedo()]).toEqual([true, false]);
   });
 
   it('should_hold_no_timer_code_when_the_fit_rules_source_is_read', () => {

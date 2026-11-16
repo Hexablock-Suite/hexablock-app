@@ -34,10 +34,12 @@ describe('MergeStateMapper', () => {
   // of the hexagon of radius 1 show their numbers, the other 5 spaces show none, and the
   // target tile does not exist yet.
   it('should_show_the_first_tiles_and_no_target_when_the_presenter_starts_a_merge_game', async () => {
-    const { startGame, applyMove } = gameUseCases(mergeFactory());
+    const { startGame, applyMove, undoMove, redoMove } = gameUseCases(mergeFactory());
     const presenter = new GamePresenter(
       startGame,
       applyMove,
+      undoMove,
+      redoMove,
       new MergeStateMapper(),
       textCatalog.es,
     );

@@ -116,9 +116,16 @@ describe('Merge on the game screen', () => {
       new HexGeometry(),
       MergeSettings.of(RegionSize.of(3), Seed.of(7), MergeTile.of(4)),
     );
-    const { startGame, applyMove } = gameUseCases(factory);
+    const { startGame, applyMove, undoMove, redoMove } = gameUseCases(factory);
     const session: GameSession = {
-      presenter: new GamePresenter(startGame, applyMove, parts.mapper, textCatalog.es),
+      presenter: new GamePresenter(
+        startGame,
+        applyMove,
+        undoMove,
+        redoMove,
+        parts.mapper,
+        textCatalog.es,
+      ),
       renderer: parts.renderer,
       controls: parts.controls,
       layoutOf: (size) => parts.layoutOf(size),
