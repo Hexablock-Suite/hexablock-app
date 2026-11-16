@@ -94,6 +94,7 @@ describe('UndoMove', () => {
     expect(afterSecond.cells).not.toEqual(afterFirst.cells);
     expect(undone).toEqual({
       cells: afterFirst.cells,
+      freeSpaces: afterFirst.freeSpaces,
       score: afterFirst.score,
       outcome: Outcome.playing,
       canUndo: true,
@@ -121,6 +122,7 @@ describe('UndoMove', () => {
       'canUndo',
       'cells',
       'elapsedMs',
+      'freeSpaces',
       'hasUndo',
       'outcome',
       'payload',

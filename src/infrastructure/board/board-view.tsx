@@ -1,20 +1,22 @@
 import { StyleSheet, View } from 'react-native';
 
-import type { MoveResult } from '../../application/move-result';
 import type { BoardLayout } from './board-layout';
 import type { CellRenderer } from './cell-renderer';
 
 export interface BoardViewProps<TCellView, TCoord> {
-  // The cells of the plain response of layer 2 (classes.md decision 29).
-  readonly cells: MoveResult<TCellView, TCoord>['cells'];
+  // One pair of a coordinate and a cell view for each space to draw: the `cells` of
+  // `GameViewModel` (#170). The state mapper of the game builds each cell view.
+  readonly cells: readonly (readonly [TCoord, TCellView])[];
   // The screen layout of the board figure.
   readonly layout: BoardLayout<TCoord>;
   // The cell renderer of the variant.
   readonly renderer: CellRenderer<TCellView>;
+  // The accessible name of the board, a text of the catalog (APP-FR-11).
+  readonly label: string;
 }
 
 // Draws the cells of a board of any figure (D3, D4, issue #165).
-// It reads the cells from `MoveResult` and never calls a method of `Board` or of a photo (#234).
+// It reads only the pairs that it takes and never calls a method of `Board` or of a photo (#234).
 // The layout of the figure gives the place of each cell, and the renderer of the variant
 // draws the cell in a square box at that place. `BoardView` never asks which figure
 // or which game it draws, so it holds no branch on them.
@@ -25,6 +27,7 @@ export function BoardView<TCellView, TCoord>({
   cells,
   layout,
   renderer,
+  label,
 }: BoardViewProps<TCellView, TCoord>) {
   const size = layout.cellSize();
   const placed = cells.map(([at, cell]) => ({ center: layout.centerOf(at), cell }));
@@ -36,7 +39,7 @@ export function BoardView<TCellView, TCoord>({
   const width = Math.max(0, Math.max(...xs) - left + size);
   const height = Math.max(0, Math.max(...ys) - top + size);
   return (
-    <View style={[styles.board, { width, height }]}>
+    <View accessibilityLabel={label} style={[styles.board, { width, height }]}>
       {placed.map(({ center, cell }) => (
         <View
           key={`${center.x},${center.y}`}

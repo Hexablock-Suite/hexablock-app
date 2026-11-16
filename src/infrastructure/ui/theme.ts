@@ -24,6 +24,8 @@ export const palette = {
   ribbonDeep: '#B03A24',
   white: '#FFFFFF',
   shade: 'rgba(0, 0, 0, 0.22)',
+  // The board of the game screen: a dark wood face with sockets for the free spaces.
+  socket: 'rgba(43, 37, 34, 0.42)',
 } as const;
 
 // The two colors of one world on the map: the stone and its light inner face.
