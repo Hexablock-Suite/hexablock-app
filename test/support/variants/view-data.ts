@@ -1,4 +1,5 @@
 import type { Color } from '../../../src/domain/engine/color';
+import type { Moves } from '../../../src/domain/engine/moves';
 import type { Piece } from '../../../src/domain/engine/piece';
 import { FitView } from '../../../src/domain/variants/hexa-fit/fit-state';
 import type { PieceId } from '../../../src/domain/variants/hexa-fit/piece-id';
@@ -33,13 +34,16 @@ export function linesViewData<TCoord>(view: LinesView<TCoord>): {
   return once((keep) => view.deliverTo({ receive: (tray) => keep({ tray }) }));
 }
 
-// The tray and the placed pieces that a Fit view delivers.
+// The tray, the placed pieces and the move count that a Fit view delivers.
 export function fitViewData<TCoord>(view: FitView<TCoord>): {
   readonly remaining: readonly Piece<PieceId, TCoord>[];
   readonly placed: readonly PieceId[];
+  readonly moves: Moves;
 } {
   return once((keep) =>
-    view.deliverTo({ receive: (remaining, placed) => keep({ remaining, placed }) }),
+    view.deliverTo({
+      receive: (remaining, placed, moves) => keep({ remaining, placed, moves }),
+    }),
   );
 }
 

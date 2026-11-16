@@ -32,23 +32,28 @@ const LOOKS = {
 
 // A button with a face over a lip, as in the prototype. A pressed button sinks onto its lip,
 // and its bounds do not change. The screen reader reads the label as the name of the button.
+// A disabled button takes no press, fades, and tells the screen reader that it is disabled (#175).
 export function LipButton({
   label,
   look,
   onPress,
+  disabled = false,
 }: {
   readonly label: string;
   readonly look: keyof typeof LOOKS;
   readonly onPress: () => void;
+  readonly disabled?: boolean;
 }) {
   const colors = LOOKS[look];
   const main = look === 'sun';
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityState={{ disabled }}
+      disabled={disabled}
       onPress={onPress}
       hitSlop={space.sm}
-      style={styles.button}
+      style={[styles.button, disabled && styles.disabled]}
     >
       {({ pressed }) => (
         <>
@@ -123,6 +128,9 @@ const styles = StyleSheet.create({
   },
   pressed: {
     transform: [{ translateY: lip.md }],
+  },
+  disabled: {
+    opacity: 0.45,
   },
   label: {
     fontFamily: serif,

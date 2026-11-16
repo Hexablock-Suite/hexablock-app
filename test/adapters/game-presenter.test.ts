@@ -8,6 +8,7 @@ import type { MoveResult } from '../../src/application/move-result';
 import { Result, UseCaseError } from '../../src/application/result';
 import type { StartGameRequest } from '../../src/application/start-game';
 import type { UseCase } from '../../src/application/use-case';
+import { ElapsedTime } from '../../src/domain/engine/elapsed-time';
 import { Outcome } from '../../src/domain/engine/outcome';
 import { Score } from '../../src/domain/engine/score';
 
@@ -227,6 +228,30 @@ describe('GamePresenter', () => {
 
     expect(shown).toHaveLength(1);
     expect(presenter.viewModel()).toEqual(STARTED);
+  });
+
+  // Issue #175: a timed game shows its time of play. The time comes from the response,
+  // which asks the root (`GameEngine.elapsedTime()`), so the screen reads no clock.
+  // An untimed game has no time in its response and no time in its view model.
+  it('should_show_the_time_of_play_in_minutes_and_seconds_when_the_response_carries_a_time', async () => {
+    const timed = (ms: number) => {
+      const answer = response([['b', 'red']], ['a', 'c'], 0);
+      return answer.ok
+        ? Result.success({ ...answer.value, elapsedMs: ElapsedTime.ofMs(ms) })
+        : answer;
+    };
+    const { presenter, shown } = presenterWith([timed(0)], [timed(65_400), timed(600_999)]);
+    await presenter.onStart();
+
+    await presenter.onMove('place blue on a');
+    await presenter.onMove('place red on c');
+
+    expect(shown.map((model) => model.time)).toEqual([
+      undefined,
+      { label: 'Tiempo', value: '0:00' },
+      { label: 'Tiempo', value: '1:05' },
+      { label: 'Tiempo', value: '10:00' },
+    ]);
   });
 
   it('should_give_the_english_texts_when_the_presenter_gets_the_english_catalog', async () => {
