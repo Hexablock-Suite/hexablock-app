@@ -19,6 +19,8 @@ export interface HomeViewModel {
   readonly suite: string;
   // The label of the button that opens the game selector map.
   readonly play: string;
+  // The label of the button that opens the achievements screen (#188).
+  readonly achievements: string;
   // The label of the figure selector.
   readonly figure: string;
   // The board figures of the composition root, in its order. The first one is the default.
@@ -70,6 +72,7 @@ export class HomePresenter {
       brand: this.texts['home.brand'],
       suite: this.texts['home.suite'],
       play: this.texts['home.play'],
+      achievements: this.texts['home.achievements'],
       figure: this.texts['home.figure'],
       figures: this.figures.map((figure) => this.figureChoiceOf(figure)),
     };

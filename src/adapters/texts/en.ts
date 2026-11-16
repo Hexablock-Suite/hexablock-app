@@ -15,6 +15,7 @@ export const en = {
   'home.brand': 'HexaBlock',
   'home.suite': 'Suite',
   'home.play': 'Play',
+  'home.achievements': 'Achievements',
   'home.figure': 'Board figure',
   'figure.hex': 'Hexagon',
   'figure.square': 'Square',

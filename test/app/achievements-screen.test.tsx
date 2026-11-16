@@ -1,7 +1,7 @@
 import path from 'node:path';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { renderRouter, screen, within } from 'expo-router/testing-library';
+import { fireEvent, renderRouter, screen, within } from 'expo-router/testing-library';
 
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
 import { GameId } from '../../src/domain/engine/game-id';
@@ -13,11 +13,6 @@ import { Score } from '../../src/domain/engine/score';
 import { Stars } from '../../src/domain/engine/stars';
 import { DeviceKeyValueStore } from '../../src/infrastructure/device-key-value-store';
 import { repoRoot } from '../support/run-tool';
-
-// The device storage of the app. The mock keeps the values in memory, as the device does.
-jest.mock('@react-native-async-storage/async-storage', () =>
-  require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
-);
 
 // The routes of `app/`, with the root layout and its composition root.
 const appDir = path.join(repoRoot, 'app');
@@ -103,6 +98,23 @@ describe('achievements route', () => {
     expect(namesIn('achievements-in-progress')).toEqual(
       SEVEN.filter((name) => !name.includes('Hexa Fit')),
     );
+  });
+
+  // Decision of 2026-11-16 on issue #188: the home screen opens the achievements screen,
+  // and its back button goes home again.
+  it('should_open_the_achievements_from_home_and_go_back_when_the_player_presses_both_buttons', async () => {
+    await renderRouter(appDir, { initialUrl: '/' });
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Logros' }));
+    await screen.findByText(SEVEN[0]);
+
+    expect(screen).toHavePathname('/achievements');
+    expect(screen.getByRole('header', { name: 'Logros' })).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Atrás' }));
+
+    expect(screen).toHavePathname('/');
+    expect(screen.getByRole('header', { name: 'HexaBlock Suite' })).toBeOnTheScreen();
   });
 
   // A failed read of the device shows the error text as an alert, and no achievement.
