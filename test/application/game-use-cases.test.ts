@@ -284,6 +284,7 @@ describe('StartGame and ApplyMove', () => {
       // A view keeps its fields private, so the test compares the data that it delivers.
       expect({ ...run.started, payload: viewData(run.started.payload) }).toEqual({
         cells: run.startCells,
+        freeSpaces: run.startState.boardCopy().freeSpaces(),
         score: Score.of(0),
         outcome: Outcome.playing,
         canUndo: false,
@@ -294,6 +295,7 @@ describe('StartGame and ApplyMove', () => {
       });
       expect({ ...run.played, payload: viewData(run.played.payload) }).toEqual({
         cells: run.after.boardCopy().occupiedCells(),
+        freeSpaces: run.after.boardCopy().freeSpaces(),
         score: run.after.scoreSoFar(),
         outcome: run.played.outcome,
         canUndo: run.gameId === 'hexa-merge',
@@ -533,6 +535,7 @@ describe('StartGame and ApplyMove', () => {
     const saved = games.running().snapshot();
     expect({ ...played, payload: viewData(played.payload) }).toEqual({
       cells: saved.boardCopy().occupiedCells(),
+      freeSpaces: saved.boardCopy().freeSpaces(),
       score: saved.scoreSoFar(),
       outcome: Outcome.victory,
       canUndo: false,
@@ -631,11 +634,60 @@ describe('StartGame and ApplyMove', () => {
       'canRedo',
       'canUndo',
       'cells',
+      'freeSpaces',
       'hasUndo',
       'outcome',
       'payload',
       'score',
     ]);
+  });
+});
+
+// Issue #170: a game screen draws every space of the board. So the response carries the free
+// spaces of the saved board next to its occupied cells, and the two lists name each space once.
+async function freeSpacesRun<
+  TCell,
+  TCoord,
+  TMove,
+  TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
+  TPiece,
+>(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>) {
+  const run = await startAndPlayOnce(factory);
+  const named = [...run.played.freeSpaces, ...run.played.cells.map(([at]) => at)];
+  return {
+    ...run,
+    named: named.length,
+    distinct: new Set(named.map((at) => run.after.boardCopy().key(at))).size,
+    spaces: run.after.boardCopy().coordinates().length,
+  };
+}
+
+describe('the free spaces of MoveResult', () => {
+  it('should_carry_the_free_spaces_of_the_saved_board_when_each_variant_starts_and_plays', async () => {
+    const runs = [
+      await freeSpacesRun(linesFactory()),
+      await freeSpacesRun(fitFactory()),
+      await freeSpacesRun(sortFactory()),
+      await freeSpacesRun(mergeFactory()),
+    ];
+
+    for (const run of runs) {
+      expect(run.started.freeSpaces).toEqual(run.startState.boardCopy().freeSpaces());
+      expect(run.played.freeSpaces).toEqual(run.after.boardCopy().freeSpaces());
+      expect([run.named, run.distinct]).toEqual([run.spaces, run.spaces]);
+    }
+    // The Merge board of the test has 7 spaces and starts with two tiles, so 5 spaces are free.
+    expect(runs[3].started.freeSpaces).toHaveLength(5);
+  });
+
+  it('should_leave_the_engine_unchanged_when_a_caller_changes_the_free_spaces_of_a_move_result', async () => {
+    const { games, startGame } = gameUseCases(mergeFactory());
+    const started = valueOf(await startGame.execute({}));
+    const before = games.running().snapshot().boardCopy().freeSpaces();
+
+    started.freeSpaces.splice(0, 3);
+
+    expect(games.running().snapshot().boardCopy().freeSpaces()).toEqual(before);
   });
 });
 
@@ -753,9 +805,19 @@ describe('the variant data of MoveResult', () => {
   // Done when of issue #245: `MoveResult` keeps its fields and their values. The photo and
   // the view close their fields, and only the inside of `moveResultOf()` changes.
   // The expected answers are the answers of the code before #245, written out as values.
+  // `freeSpaces` joins them since #170: the free spaces of the board, in the order of its shape.
   // A view keeps its fields private, so the test compares the data that the view delivers.
   it('should_keep_every_field_and_value_of_the_move_result_when_apply_move_plays_the_first_move_of_each_variant', async () => {
-    const fields = ['canRedo', 'canUndo', 'cells', 'hasUndo', 'outcome', 'payload', 'score'];
+    const fields = [
+      'canRedo',
+      'canUndo',
+      'cells',
+      'freeSpaces',
+      'hasUndo',
+      'outcome',
+      'payload',
+      'score',
+    ];
     const lines = (await startAndPlayOnce(linesFactory())).played;
     const fit = (await startAndPlayOnce(fitFactory())).played;
     const sort = (await startAndPlayOnce(sortFactory())).played;
@@ -770,6 +832,16 @@ describe('the variant data of MoveResult', () => {
     ]);
     expect({ ...lines, payload: linesViewData(lines.payload) }).toEqual({
       cells: [[square(0, 0), red]],
+      freeSpaces: [
+        square(1, 0),
+        square(2, 0),
+        square(0, 1),
+        square(1, 1),
+        square(2, 1),
+        square(0, 2),
+        square(1, 2),
+        square(2, 2),
+      ],
       score: Score.of(1),
       outcome: Outcome.playing,
       canUndo: false,
@@ -782,6 +854,7 @@ describe('the variant data of MoveResult', () => {
         [square(0, 0), A],
         [square(1, 0), A],
       ],
+      freeSpaces: [],
       score: Score.of(0),
       outcome: Outcome.victory,
       canUndo: false,
@@ -792,6 +865,7 @@ describe('the variant data of MoveResult', () => {
     });
     expect({ ...sort, payload: sortViewData(sort.payload) }).toEqual({
       cells: [[square(0, 0), stack('red')]],
+      freeSpaces: [square(1, 0), square(0, 1), square(1, 1)],
       score: Score.of(0),
       outcome: Outcome.playing,
       canUndo: false,
@@ -809,6 +883,7 @@ describe('the variant data of MoveResult', () => {
         [hex(0, 1), MergeTile.of(4)],
         [hex(1, -1), MergeTile.of(2)],
       ],
+      freeSpaces: [hex(-1, 0), hex(-1, 1), hex(0, -1), hex(0, 0)],
       score: Score.of(0),
       outcome: Outcome.playing,
       canUndo: true,

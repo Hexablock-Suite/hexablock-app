@@ -81,8 +81,8 @@
           Lines, Sort and Merge or with the figure of the level for Fit, and BoardBuilder asks its
           GeometryFactory for the topology. GameFactory starts GameEngine and returns it. StartGame
           keeps it in InMemoryGameRepository through the GameRepository port, reads the photo of the
-          state and the occupied cells of its board, and returns a Result with a MoveResult.
-          GamePresenter maps the cells as in flow 1 and GameScreen renders the board.
+          state, the occupied cells and the free spaces of its board, and returns a Result with a
+          MoveResult. GamePresenter maps the cells as in flow 1 and GameScreen renders the board.
         </desc>
         <defs>
           <marker
@@ -1044,7 +1044,7 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <!-- Interaction use: ref map each cell, build GameViewModel -->
+        <!-- Interaction use: ref map each space, build GameViewModel -->
         <rect
           x="228"
           y="1486"
@@ -1079,7 +1079,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          map each cell, build GameViewModel
+          map each space, build GameViewModel
         </text>
         <text
           x="362"
@@ -1888,7 +1888,7 @@
           stroke-width="1"
           marker-end="url(#seqstart-call)"
         />
-        <rect x="859.54" y="1352" width="200.93" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="823.835" y="1352" width="272.33" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="960"
           y="1362"
@@ -1897,7 +1897,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          occupiedCells() · snapshot.boardCopy()
+          occupiedCells(), freeSpaces() · snapshot.boardCopy()
         </text>
         <!-- Reply: board to start -->
         <line
@@ -1910,7 +1910,7 @@
           stroke-dasharray="4,3"
           marker-end="url(#seqstart-reply)"
         />
-        <rect x="913.65" y="1382" width="92.7" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="888.15" y="1382" width="143.7" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="960"
           y="1392"
@@ -1919,7 +1919,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          [TCoord, TCell][]
+          [TCoord, TCell][], TCoord[]
         </text>
         <!-- Self message: start -->
         <path

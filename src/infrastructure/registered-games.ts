@@ -1,3 +1,4 @@
+import { SpaceStateMapper, type SpaceView } from '../adapters/space-state-mapper';
 import { BoardShape } from '../domain/engine/board-shape';
 import type { Clock } from '../domain/engine/clock';
 import { Color } from '../domain/engine/color';
@@ -22,7 +23,9 @@ import { MergeTile } from '../domain/variants/hexa-merge/merge-tile';
 import { GoalCount } from '../domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../domain/variants/hexa-sort/sort-factory';
 import { SortLevel } from '../domain/variants/hexa-sort/sort-level';
-import { registered, type RegisteredGame } from './game-registry';
+import { HexLayout } from './board/hex-layout';
+import { SpaceCellRenderer } from './board/space-cell-renderer';
+import { registered, type RegisteredGame, type ScreenParts } from './game-registry';
 
 // The count of seeds: the unsigned 32-bit integers (classes.md decision 48).
 const SEEDS = 2 ** 32;
@@ -49,6 +52,9 @@ const SORT_GOALS = GoalCount.of(3);
 // The Fit level and the Sort level are first content only: #172 lets the player choose
 // a level from the level repository of #168, and `StartGame` then takes a port in place
 // of the factory. APP-FR-16 lets the player choose the figure later.
+// Each game shows its board with the default screen parts on the hexagon layout (#170).
+// Each «Play … on the game screen» task (#174 to #177) gives its game the state mapper
+// and the cell renderer of its variant in place of `hexScreen()`.
 export function registeredGames(clock: Clock, random: RandomSource): RegisteredGame[] {
   const geometry = new HexGeometry();
   return [
@@ -63,20 +69,37 @@ export function registeredGames(clock: Clock, random: RandomSource): RegisteredG
           nonEmpty(LINES_COLORS),
         ),
       ),
+      hexScreen(),
     ),
-    registered(GameId.of('hexa-fit'), new FitFactory(geometry, firstFitLevel(), clock)),
+    registered(
+      GameId.of('hexa-fit'),
+      new FitFactory(geometry, firstFitLevel(), clock),
+      hexScreen(),
+    ),
     registered(
       GameId.of('hexa-sort'),
       new SortFactory(
         geometry,
         SortLevel.seeded(SMALL_BOARD, SORT_GOALS, seedFrom(random), nonEmpty(SORT_COLORS)),
       ),
+      hexScreen(),
     ),
     registered(
       GameId.of('hexa-merge'),
       new MergeFactory(geometry, MergeSettings.of(SMALL_BOARD, seedFrom(random), MERGE_TARGET)),
+      hexScreen(),
     ),
   ];
+}
+
+// The default screen parts on the hexagon figure: the mapper and the renderer that tell
+// a free space from an occupied one, and the layout of the hexagon (D4, issue #165).
+function hexScreen(): ScreenParts<unknown, HexCoord, unknown, SpaceView, undefined> {
+  return {
+    mapper: new SpaceStateMapper(),
+    renderer: new SpaceCellRenderer(),
+    layoutOf: (size) => new HexLayout(size),
+  };
 }
 
 // One seed from the next draw of `random`: a whole number of 0 to 4294967295.

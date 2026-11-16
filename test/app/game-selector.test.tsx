@@ -11,7 +11,7 @@ const appDir = path.join(repoRoot, 'app');
 const FOUR_VARIANTS = ['Hexa Lines', 'Hexa Fit', 'Hexa Sort', 'Hexa Merge'];
 
 // Issue #169: the game selector map lists the games of the registry and opens each one.
-// The game route is a placeholder until #170 builds `GameScreen` on it.
+// Since #170 the game route shows `GameScreen`, whose header names the game.
 describe('GameSelectorScreen', () => {
   // The check of APP-FR-01 (#36): a UI test opens each of the four variants from the selector.
   it('should_open_each_of_the_four_variants_when_the_player_picks_it_on_the_map', async () => {
