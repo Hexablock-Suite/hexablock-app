@@ -1,3 +1,4 @@
+import type { LevelVariant } from '../adapters/level-game-factories';
 import type { StateMapper } from '../adapters/state-mapper';
 import type { ViewOf } from '../application/move-result';
 import type { BoardState } from '../domain/engine/board-state';
@@ -8,16 +9,19 @@ import type { BoardLayout } from './board/board-layout';
 import type { CellRenderer } from './board/cell-renderer';
 import type { MoveControls } from './ui/move-controls';
 
-// What a caller does with the id and the variant factory of one registered game.
+// What a caller does with the id, the variant factory and the level variant of one registered game.
 // The registry holds variants with different type arguments, so it hides them.
 // `use()` gets the type of the state back for one call, so the factory, its history
 // and its states keep one state type. The cell, the coordinate, the move and the piece
 // stay open: a caller only passes them on.
 // `use()` gets the id with its factory, so a caller never pairs them again (issue #234).
+// It also gets the `LevelVariant` of a game with levels, which builds the variant factory
+// of each level of the game with the same state type, or `undefined` (issue #172).
 export interface FactoryUse<TResult> {
   use<TState extends BoardState<unknown, unknown> & Cloneable<TState>>(
     gameId: GameId,
     factory: IVariantFactory<unknown, unknown, unknown, TState, unknown>,
+    levels: LevelVariant<unknown, unknown, unknown, TState> | undefined,
   ): TResult;
 }
 
@@ -35,8 +39,8 @@ export interface ScreenParts<TCell, TCoord, TView, TCellView, TPayloadView, TMov
   layoutOf(size: number): BoardLayout<TCoord>;
 }
 
-// One game of the registry: its id, its variant factory and its screen parts,
-// with the type arguments hidden. `registered()` checks that the parts fit the factory,
+// One game of the registry: its id, its variant factory, its optional level variant
+// and its screen parts, with the type arguments hidden. `registered()` checks that the parts fit the factory,
 // so a screen only passes the cell views of the mapper to the renderer of the same entry.
 export interface RegisteredGame {
   readonly gameId: GameId;
@@ -52,6 +56,8 @@ export interface RegisteredGame {
 // The mapper of `screen` reads the cell and the payload of the states of `factory`, and its
 // layout places the coordinates of that factory (#170). Its controls play the moves
 // of that factory (#175).
+// A game with levels also takes `levels`, the `LevelVariant` that builds the variant factory
+// of each level. Its type arguments are those of `factory`, so the two give one state type (#172).
 export function registered<
   TCell,
   TCoord,
@@ -64,6 +70,7 @@ export function registered<
   gameId: GameId,
   factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>,
   screen: ScreenParts<TCell, TCoord, ViewOf<TState>, TCellView, TPayloadView, TMove>,
+  levels?: LevelVariant<TCell, TCoord, TMove, TState>,
 ): RegisteredGame {
   if (!factory.isFor(gameId)) {
     throw new RangeError('The factory does not build the game of this id.');
@@ -71,7 +78,7 @@ export function registered<
   return Object.freeze({
     gameId,
     screen,
-    withFactory: <TResult>(use: FactoryUse<TResult>) => use.use(gameId, factory),
+    withFactory: <TResult>(use: FactoryUse<TResult>) => use.use(gameId, factory, levels),
   });
 }
 

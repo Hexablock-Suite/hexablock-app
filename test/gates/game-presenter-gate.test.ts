@@ -9,8 +9,9 @@ import { repoRoot } from '../support/run-tool';
 // so they name no variant. The gate reads `src/adapters/game-presenter.ts`, which holds
 // the presenter and the view model, and `src/adapters/state-mapper.ts`. Each file imports
 // only the use case port, the response model, the result, the requests of the four game
-// use cases (the undo and the redo since #178), two values of the engine, the state mapper
-// and the text catalog. It holds no name of a variant
+// use cases (the undo and the redo since #178), three values of the engine, the state mapper
+// and the text catalog. The third value is the `LevelId` that `onStart()` passes
+// to `StartGame` (issue #172). It holds no name of a variant
 // class (a name that starts with `Lines`, `Fit`, `Sort` or `Merge`) and no text of a variant
 // id, such as `'hexa-lines'`.
 
@@ -24,6 +25,7 @@ const ALLOWED_IMPORTS = new Set([
   '../application/start-game',
   '../application/undo-move',
   '../application/use-case',
+  '../domain/engine/level-id',
   '../domain/engine/outcome',
   '../domain/engine/score',
   './state-mapper',

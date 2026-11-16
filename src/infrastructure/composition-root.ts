@@ -1,7 +1,11 @@
+import { BundledLevelRepository } from '../adapters/bundled-level-repository';
 import { InMemoryGameRepository } from '../adapters/in-memory-game-repository';
+import { LevelGameFactories } from '../adapters/level-game-factories';
 import { NullGameEventPublisher } from '../adapters/null-game-event-publisher';
 import { ApplyMove, type ApplyMoveRequest } from '../application/apply-move';
 import type { GameEventPublisher } from '../application/game-event-publisher';
+import type { GameFactories } from '../application/game-factories';
+import type { LevelRepository } from '../application/level-repository';
 import type { Logger } from '../application/logger';
 import { LoggingAspect } from '../application/logging-aspect';
 import type { MoveResult, ViewOf } from '../application/move-result';
@@ -12,11 +16,9 @@ import type { UseCase } from '../application/use-case';
 import type { BoardState } from '../domain/engine/board-state';
 import type { Clock } from '../domain/engine/clock';
 import type { Cloneable } from '../domain/engine/cloneable';
-import { GameFactory } from '../domain/engine/game-factory';
 import type { GameId } from '../domain/engine/game-id';
 import { TopologyId } from '../domain/engine/geometry-factory';
 import type { MatchIdGenerator } from '../domain/engine/match-id-generator';
-import type { IVariantFactory } from '../domain/engine/variant-factory';
 import { ConsoleLogger } from './console-logger';
 import { GameRegistry, type RegisteredGame } from './game-registry';
 import { boardFigures, registeredGames } from './registered-games';
@@ -44,17 +46,20 @@ export interface RootDrivers {
 // that imports from every layer. `app/_layout.tsx` only calls it, through
 // `CompositionRootProvider`, so `app/` keeps routes only.
 // It builds each driver and adapter once and injects it (single scope, classes.md decision 18):
-// the clock, the random source, the logger, the one id generator of `MatchId`
-// and the event publisher. No class has a static `instance()`, so a test passes its own drivers.
+// the clock, the random source, the logger, the one id generator of `MatchId`,
+// the event publisher and the level repository of the bundled levels.
+// No class has a static `instance()`, so a test passes its own drivers.
 // The game registry maps each `GameId` to its game and the variant factory of that game.
 // The registry pairs each id with its factory in one place, and the root gives that id
 // to `GameFactory` with that factory (issue #234).
 // The root builds one registry for each board figure that the player can choose (#171).
 // Each variant factory of a registry takes the `GeometryFactory` of its figure, so the choice
 // of the figure changes only that argument (APP-FR-16). The hexagon is the default figure.
-// Until #172, `StartGame` takes its factory in its constructor. So the root builds one
-// `StartGame` for each registered game, with one `ApplyMove`, one `UndoMove` and one `RedoMove`
-// (#178) over one `InMemoryGameRepository`, and wraps each use case in the logging aspect.
+// The root builds one `StartGame` for each registered game, with one `ApplyMove`, one `UndoMove`
+// and one `RedoMove` (#178) over one `InMemoryGameRepository`, and wraps each use case in the
+// logging aspect. `StartGame` takes the `GameFactories` port, which `LevelGameFactories`
+// implements over the level repository and the level variant of the game. So one `StartGame`
+// starts every level of its game by the level id of the request (S3-13 in #151, option D, #172).
 // It builds the use cases of a game the first time a caller asks for them.
 // The publisher goes to `ApplyMove`, which delivers the events of each turn (#233).
 export class CompositionRoot {
@@ -62,6 +67,7 @@ export class CompositionRoot {
   private readonly logger: Logger;
   private readonly ids: MatchIdGenerator;
   private readonly events: GameEventPublisher;
+  private readonly levels: LevelRepository;
   private readonly wired = new Map<RegisteredGame, GameUseCases>();
 
   constructor(drivers: RootDrivers = { clock: new SystemClock(), logger: new ConsoleLogger() }) {
@@ -75,6 +81,7 @@ export class CompositionRoot {
     this.logger = drivers.logger;
     this.ids = new SequentialMatchIds(drivers.clock);
     this.events = new NullGameEventPublisher();
+    this.levels = new BundledLevelRepository();
   }
 
   // The board figures that the player can choose, in the order of the figure selector (#171).
@@ -100,30 +107,29 @@ export class CompositionRoot {
     const known = this.wired.get(game);
     if (known !== undefined) return known;
     const built = game.withFactory({
-      use: (id, variant) => wire(id, variant, this.ids, this.logger, this.events),
+      use: (id, variant, levels) =>
+        wire(
+          new LevelGameFactories(id, variant, this.ids, this.levels, levels),
+          this.logger,
+          this.events,
+        ),
     });
     this.wired.set(game, built);
     return built;
   }
 }
 
-// The game use cases of the game `gameId` over one new repository, each inside the logging aspect.
-// Every game shares the id generator, the logger and the publisher,
-// so each one exists once in the app.
+// The game use cases of the game of `factories` over one new repository, each inside
+// the logging aspect. Every game shares the id generator, the logger, the publisher
+// and the level repository, so each one exists once in the app.
 function wire<TState extends BoardState<unknown, unknown> & Cloneable<TState>>(
-  gameId: GameId,
-  variant: IVariantFactory<unknown, unknown, unknown, TState, unknown>,
-  ids: MatchIdGenerator,
+  factories: GameFactories<unknown, unknown, unknown, TState>,
   logger: Logger,
   events: GameEventPublisher,
 ): GameUseCases<unknown, unknown, unknown, ViewOf<TState>> {
   const games = new InMemoryGameRepository<unknown, unknown, unknown, TState>();
   return {
-    startGame: new LoggingAspect(
-      new StartGame(new GameFactory(gameId, variant, ids), games),
-      logger,
-      'StartGame',
-    ),
+    startGame: new LoggingAspect(new StartGame(factories, games), logger, 'StartGame'),
     applyMove: new LoggingAspect(new ApplyMove(games, logger, events), logger, 'ApplyMove'),
     undoMove: new LoggingAspect(new UndoMove(games), logger, 'UndoMove'),
     redoMove: new LoggingAspect(new RedoMove(games), logger, 'RedoMove'),
