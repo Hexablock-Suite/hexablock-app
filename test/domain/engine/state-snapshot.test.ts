@@ -12,8 +12,12 @@ import { Resolution } from '../../../src/domain/engine/resolution';
 import { Turns } from '../../../src/domain/engine/turns';
 import { FitScoring } from '../../../src/domain/variants/hexa-fit/fit-scoring';
 import { Placement } from '../../../src/domain/variants/hexa-fit/placement';
+import { CellCount } from '../../../src/domain/variants/hexa-lines/cell-count';
+import { LineCount } from '../../../src/domain/variants/hexa-lines/line-count';
 import { LinesScoring } from '../../../src/domain/variants/hexa-lines/lines-scoring';
 import { PlacePiece } from '../../../src/domain/variants/hexa-lines/place-piece';
+import { Streak } from '../../../src/domain/variants/hexa-lines/streak';
+import { TrayPosition } from '../../../src/domain/variants/hexa-lines/tray-position';
 import { MergeScoring } from '../../../src/domain/variants/hexa-merge/merge-scoring';
 import { MergeTile } from '../../../src/domain/variants/hexa-merge/merge-tile';
 import { SlideSense, Slide } from '../../../src/domain/variants/hexa-merge/slide';
@@ -45,7 +49,7 @@ const OTHER_STATE = GameStateId.of(MatchId.of('another-match'));
 describe('the photo of a state', () => {
   it('should_hold_the_lines_data_in_a_frozen_photo_when_a_lines_state_takes_its_snapshot', () => {
     const state = linesFactory().createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
-    state.placePiece(new PlacePiece(0, square(0, 0)));
+    state.placePiece(new PlacePiece(TrayPosition.of(0), square(0, 0)));
 
     const photo = state.snapshot();
 
@@ -58,7 +62,11 @@ describe('the photo of a state', () => {
     expect(json([photo.board.occupiedCells(), photo.score, photo.tray.length])).toBe(
       json([[[square(0, 0), red]], Score.of(0), 2]),
     );
-    expect([photo.streak, photo.linesCleared, photo.cellsPlaced]).toEqual([0, 0, 1]);
+    expect([photo.streak, photo.linesCleared, photo.cellsPlaced]).toEqual([
+      Streak.of(0),
+      LineCount.of(0),
+      CellCount.of(1),
+    ]);
     expect(json(photo.view())).toBe(json({ tray: photo.tray }));
   });
 
@@ -123,7 +131,7 @@ describe('the photo of a state', () => {
     const photo = state.snapshot();
     const before = json([photo.board.occupiedCells(), photo.tray, photo.score]);
 
-    state.placePiece(new PlacePiece(0, square(0, 0)));
+    state.placePiece(new PlacePiece(TrayPosition.of(0), square(0, 0)));
     state.addPoints(Score.of(7));
     expect(json([photo.board.occupiedCells(), photo.tray, photo.score])).toBe(before);
 
@@ -139,7 +147,8 @@ describe('the restore of a state from its photo', () => {
     const state = linesFactory().createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
     const photo = state.snapshot();
     // The third piece empties the tray, so the source draws three new pieces.
-    for (const col of [0, 1, 2]) state.placePiece(new PlacePiece(0, square(col, 0)));
+    for (const col of [0, 1, 2])
+      state.placePiece(new PlacePiece(TrayPosition.of(0), square(col, 0)));
     state.clearLines([[square(0, 0), square(1, 0), square(2, 0)]]);
     state.addPoints(Score.of(13));
 
@@ -194,7 +203,8 @@ describe('the restore of a state from its photo', () => {
     const state = linesFactory().createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
     const photo = state.snapshot();
     const refill = (): string => {
-      for (const col of [0, 1, 2]) state.placePiece(new PlacePiece(0, square(col, 0)));
+      for (const col of [0, 1, 2])
+        state.placePiece(new PlacePiece(TrayPosition.of(0), square(col, 0)));
       return json(state.snapshot().tray);
     };
     const first = refill();
@@ -317,7 +327,7 @@ describe('the photo outside the state', () => {
   it('should_score_from_the_photos_when_a_policy_gets_the_photos_before_and_after_a_turn', () => {
     const lines = linesFactory().createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
     const linesBefore = lines.snapshot();
-    lines.placePiece(new PlacePiece(0, square(0, 0)));
+    lines.placePiece(new PlacePiece(TrayPosition.of(0), square(0, 0)));
     lines.clearLines([]);
 
     const sort = sortState({

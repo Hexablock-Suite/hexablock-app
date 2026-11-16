@@ -2,10 +2,14 @@
 import { Score } from '../../../../src/domain/engine/score';
 import { ScoringDecorator } from '../../../../src/domain/engine/scoring-decorator';
 import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
+import { CellCount } from '../../../../src/domain/variants/hexa-lines/cell-count';
 import { ComboMultiplierDecorator } from '../../../../src/domain/variants/hexa-lines/combo-multiplier-decorator';
+import { LineCount } from '../../../../src/domain/variants/hexa-lines/line-count';
 import { LinesScoring } from '../../../../src/domain/variants/hexa-lines/lines-scoring';
 import type { LinesState } from '../../../../src/domain/variants/hexa-lines/lines-state';
 import { PlacePiece } from '../../../../src/domain/variants/hexa-lines/place-piece';
+import { Streak } from '../../../../src/domain/variants/hexa-lines/streak';
+import { TrayPosition } from '../../../../src/domain/variants/hexa-lines/tray-position';
 import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
 import {
   linesFactory,
@@ -36,11 +40,11 @@ function twoClearingPlacements(scoring: IScoringPolicy<LinesState<SquareCoord>>)
     }),
     scoring,
   );
-  engine.play(new PlacePiece(0, square(0, 0)));
+  engine.play(new PlacePiece(TrayPosition.of(0), square(0, 0)));
   const first = engine.snapshot().score;
-  engine.play(new PlacePiece(0, square(0, 1)));
+  engine.play(new PlacePiece(TrayPosition.of(0), square(0, 1)));
   const second = engine.snapshot().score;
-  engine.play(new PlacePiece(0, square(2, 2)));
+  engine.play(new PlacePiece(TrayPosition.of(0), square(2, 2)));
   return [first, second, engine.snapshot().score];
 }
 
@@ -53,7 +57,7 @@ function comboPlacement(scoring: IScoringPolicy<LinesState<SquareCoord>>) {
     }),
     scoring,
   );
-  engine.play(new PlacePiece(0, origin));
+  engine.play(new PlacePiece(TrayPosition.of(0), origin));
   return engine.snapshot();
 }
 
@@ -69,9 +73,9 @@ function comboInAStreak(scoring: IScoringPolicy<LinesState<SquareCoord>>) {
     }),
     scoring,
   );
-  engine.play(new PlacePiece(0, square(0, 1)));
+  engine.play(new PlacePiece(TrayPosition.of(0), square(0, 1)));
   const first = engine.snapshot().score;
-  engine.play(new PlacePiece(0, origin));
+  engine.play(new PlacePiece(TrayPosition.of(0), origin));
   return { first, state: engine.snapshot() };
 }
 
@@ -83,10 +87,10 @@ describe('Hexa Lines scoring', () => {
       decorated(),
     );
 
-    engine.play(new PlacePiece(0, square(1, 2)));
+    engine.play(new PlacePiece(TrayPosition.of(0), square(1, 2)));
 
     const state = engine.snapshot();
-    expect(state.linesCleared).toBe(0);
+    expect(state.linesCleared).toEqual(LineCount.of(0));
     expect(state.score).toEqual(Score.of(2));
   });
 
@@ -98,7 +102,12 @@ describe('Hexa Lines scoring', () => {
     const base = new LinesScoring<SquareCoord>();
 
     for (const streak of [0, 1, 3]) {
-      const after = { ...photo, cellsPlaced: 3, linesCleared: 0, streak };
+      const after = {
+        ...photo,
+        cellsPlaced: CellCount.of(3),
+        linesCleared: LineCount.of(0),
+        streak: Streak.of(streak),
+      };
 
       expect(new ComboMultiplierDecorator(base).score(after, after)).toEqual(Score.of(3));
       expect(base.score(after, after)).toEqual(Score.of(3));
@@ -109,8 +118,8 @@ describe('Hexa Lines scoring', () => {
     const photo = linesState(squareTopology, 1, { tray: [] }).snapshot();
     const base = new LinesScoring<SquareCoord>();
 
-    expect(base.lineBonus({ ...photo, linesCleared: 2 })).toEqual(Score.of(20));
-    expect(base.lineBonus({ ...photo, linesCleared: 0 })).toEqual(Score.of(0));
+    expect(base.lineBonus({ ...photo, linesCleared: LineCount.of(2) })).toEqual(Score.of(20));
+    expect(base.lineBonus({ ...photo, linesCleared: LineCount.of(0) })).toEqual(Score.of(0));
   });
 
   it('should_add_ten_points_for_the_line_when_the_first_clearing_placement_clears_one_line', () => {
@@ -119,10 +128,10 @@ describe('Hexa Lines scoring', () => {
       decorated(),
     );
 
-    engine.play(new PlacePiece(0, origin));
+    engine.play(new PlacePiece(TrayPosition.of(0), origin));
 
     const state = engine.snapshot();
-    expect([state.linesCleared, state.streak]).toEqual([1, 1]);
+    expect([state.linesCleared, state.streak]).toEqual([LineCount.of(1), Streak.of(1)]);
     // 1 cell + 10 × 1 line × (1 + 1 - 1).
     expect(state.score).toEqual(Score.of(11));
   });
@@ -130,7 +139,7 @@ describe('Hexa Lines scoring', () => {
   it('should_multiply_the_line_bonus_by_the_combo_when_one_placement_clears_two_lines', () => {
     const state = comboPlacement(decorated());
 
-    expect([state.linesCleared, state.streak]).toEqual([2, 1]);
+    expect([state.linesCleared, state.streak]).toEqual([LineCount.of(2), Streak.of(1)]);
     // 1 cell + 10 × 2 lines × (2 + 1 - 1).
     expect(state.score).toEqual(Score.of(41));
   });
@@ -144,7 +153,11 @@ describe('Hexa Lines scoring', () => {
     // Only a combo inside a streak tells `lines + streak - 1` (3) from `lines × streak` (4).
     const { first, state } = comboInAStreak(decorated());
 
-    expect([state.linesCleared, state.streak, state.cellsPlaced]).toEqual([2, 2, 2]);
+    expect([state.linesCleared, state.streak, state.cellsPlaced]).toEqual([
+      LineCount.of(2),
+      Streak.of(2),
+      CellCount.of(2),
+    ]);
     // 11, then 2 cells + 10 × 2 lines × (2 + 2 - 1) = 62.
     expect([first, state.score]).toEqual([Score.of(11), Score.of(73)]);
     // The base scoring gives 2 cells + 10 × 2 lines = 22 for the same placement.

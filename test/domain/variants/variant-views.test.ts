@@ -11,6 +11,7 @@ import { linesState, piece } from '../../support/variants/hexa-lines/lines-game'
 import { mergeBoard, mergeState, noNewTiles } from '../../support/variants/hexa-merge/merge-game';
 import { row, stack, stackPiece, tiles } from '../../support/variants/hexa-sort/sort-game';
 import { PlacePiece } from '../../../src/domain/variants/hexa-lines/place-piece';
+import { TrayPosition } from '../../../src/domain/variants/hexa-lines/tray-position';
 import { MATCH_ID } from '../../support/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../support/engine/entity-ids';
 
@@ -34,7 +35,7 @@ describe('the view of each variant state', () => {
     expectFrozen(view, view.tray);
 
     // A later placement takes a piece from the tray, and it must not reach this view.
-    state.placePiece(new PlacePiece(0, square(0, 0)));
+    state.placePiece(new PlacePiece(TrayPosition.of(0), square(0, 0)));
 
     expect(view.tray).toEqual([first, second]);
     expect(state.snapshot().view().tray).toEqual([second]);

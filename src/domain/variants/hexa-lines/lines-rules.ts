@@ -5,6 +5,7 @@ import { Resolution } from '../../engine/resolution';
 import { BaseGameRules } from '../../engine/rules';
 import type { LinesState } from './lines-state';
 import { PlacePiece } from './place-piece';
+import { TrayPosition } from './tray-position';
 
 // The rules of Hexa Lines (statement §1.1). The rules ask the topology for the axes,
 // so they never hard-code 3 axes or 6 directions (D4).
@@ -12,7 +13,7 @@ import { PlacePiece } from './place-piece';
 // The rules decide. The state changes itself: the rules call `placePiece()` and `clearLines()`.
 // The rules read the state through its photo and through `canPlace()`, never through a field.
 // The rules read no field of a move: they pass the move to the state (classes.md decision 43).
-// `PlacePiece` checks its own tray index, so the rules do not check it again.
+// The `TrayPosition` of a `PlacePiece` checks its own index, so the rules do not check it again.
 export class LinesRules<TCoord> extends BaseGameRules<PlacePiece<TCoord>, LinesState<TCoord>> {
   isValid(state: LinesState<TCoord>, move: PlacePiece<TCoord>): boolean {
     return state.canPlace(move);
@@ -23,9 +24,10 @@ export class LinesRules<TCoord> extends BaseGameRules<PlacePiece<TCoord>, LinesS
   *validMoves(state: LinesState<TCoord>): Iterable<PlacePiece<TCoord>> {
     const { tray, board } = state.snapshot();
     const offsets = board.coordinates();
-    for (const trayIndex of tray.keys()) {
+    for (const index of tray.keys()) {
+      const position = TrayPosition.of(index);
       for (const at of offsets) {
-        const move = new PlacePiece(trayIndex, at);
+        const move = new PlacePiece(position, at);
         if (state.canPlace(move)) yield move;
       }
     }
