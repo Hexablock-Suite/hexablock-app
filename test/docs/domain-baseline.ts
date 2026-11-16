@@ -22,8 +22,6 @@ export const primitiveBaseline: readonly PrimitiveEntry[] = [
   { primitive: 'number', where: 'Chance.hits', issue: 232 },
   { primitive: 'number', where: 'ColorStack.tileCount', issue: 232 },
   { primitive: 'number', where: 'SortSnapshot.clearedTiles', issue: 232 },
-  // #238: the clock reading.
-  { primitive: 'number', where: 'Clock.now', issue: 238 },
   // #243: the engine primitives that keep a README reason.
   { primitive: 'number', where: 'RandomSource.next', issue: 243 },
   { primitive: 'number', where: 'Mulberry32Random.next', issue: 243 },

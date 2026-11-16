@@ -1,4 +1,5 @@
 import type { Clock } from './clock';
+import type { ClockReading } from './clock-reading';
 import { ElapsedTime } from './elapsed-time';
 import type { LevelTimerId } from './level-timer-id';
 import type { ITimed } from './timed';
@@ -13,9 +14,10 @@ import type { ITimed } from './timed';
 // The root keeps the timer as an optional part, as it keeps the history (classes.md decision 3).
 // `GameFactory` gives the same timer to the root and to the decorator, and the root reads
 // the time of play in `elapsedTime()` (issue #234).
+// The timer keeps each reading of the clock as a `ClockReading` (issue #238).
 export class LevelTimer implements ITimed {
-  private startedAt: number | undefined;
-  private stoppedAt: number | undefined;
+  private startedAt: ClockReading | undefined;
+  private stoppedAt: ClockReading | undefined;
 
   constructor(
     private readonly identity: LevelTimerId,
@@ -40,11 +42,11 @@ export class LevelTimer implements ITimed {
   }
 
   // The time of play as an `ElapsedTime`: a whole number of milliseconds of 0 or more.
-  // A clock that goes back gives 0, because an `ElapsedTime` is never negative.
-  // A clock can give a fraction of a millisecond, and the timer drops that fraction.
+  // `ClockReading.elapsedSince()` gives the time between the start and the stop,
+  // or between the start and now while the game goes on.
+  // A clock that goes back gives 0, and the time drops a fraction of a millisecond.
   elapsedMs(): ElapsedTime {
     if (this.startedAt === undefined) return ElapsedTime.ofMs(0);
-    const passed = (this.stoppedAt ?? this.clock.now()) - this.startedAt;
-    return ElapsedTime.ofMs(Math.max(0, Math.floor(passed)));
+    return (this.stoppedAt ?? this.clock.now()).elapsedSince(this.startedAt);
   }
 }
