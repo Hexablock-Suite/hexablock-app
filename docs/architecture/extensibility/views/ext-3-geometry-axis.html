@@ -64,7 +64,7 @@
       <h1>The geometry axis: one family per cell shape, next to the variant axis</h1>
 
       <svg
-        viewBox="0 0 1040 900"
+        viewBox="0 0 1040 880"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="ext-3-geometry-axis-title ext-3-geometry-axis-desc"
@@ -74,11 +74,10 @@
           Extensibility diagram of layer 1 with the generic GameEngine in the center. The variant
           axis above holds the four variant factories of the statement and Hexa Fill, the declared
           fifth variant. Each factory implements IVariantFactory, which creates the IGameRules that
-          GameEngine keeps, and keeps a GeometryFactory. The geometry axis below holds the hexagonal
-          family, the square test family and the declared triangular and 3D families, and the two
-          real families implement GeometryFactory. No line touches an axis frame. «Sprint N» marks
-          the planned classes with the docs/ROADMAP.md sprint of the requirement that each one
-          serves.
+          GameEngine keeps, and keeps a GeometryFactory. The geometry axis below holds the
+          hexagonal, square and triangular families, which implement GeometryFactory, and the
+          declared 3D family. No line touches an axis frame. No box carries a role label of a
+          pattern: the title of each axis frame names its Abstract Factory.
         </desc>
         <defs>
           <marker
@@ -102,22 +101,6 @@
             markerUnits="userSpaceOnUse"
           >
             <polygon points="0 5, 9 0, 18 5, 9 10" fill="#17212a" />
-          </marker>
-          <marker
-            id="ext-diamond-hollow"
-            markerWidth="18"
-            markerHeight="10"
-            refX="0"
-            refY="5"
-            orient="auto"
-            markerUnits="userSpaceOnUse"
-          >
-            <polygon
-              points="0 5, 9 0, 18 5, 9 10"
-              fill="#ffffff"
-              stroke="#17212a"
-              stroke-width="1"
-            />
           </marker>
           <marker
             id="ext-open"
@@ -156,6 +139,7 @@
           LAYER 1 · ENTITIES · src/domain/
         </text>
         <!-- Extension axes: one dashed frame each -->
+        <!-- Group: the variant axis -->
         <rect
           x="48"
           y="64"
@@ -178,6 +162,7 @@
         >
           VARIANT AXIS · ABSTRACT FACTORY · §3.1 · §3.3 · APP-NFR-06
         </text>
+        <!-- Group: the geometry axis -->
         <rect
           x="48"
           y="544"
@@ -256,7 +241,7 @@
         />
         <!-- MergeFactory keeps a GeometryFactory as geometry: use with role and multiplicity; every variant factory does the same (the four variant views) -->
         <path
-          d="M772,144 L772,476 L520,476"
+          d="M772,144 L772,476 L660,476"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -274,6 +259,15 @@
         <!-- SquareGeometry implements GeometryFactory: realization (part 1, view 6) -->
         <path
           d="M408,576 L408,496"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#ext-triangle)"
+        />
+        <!-- TriangleGeometry implements GeometryFactory: realization (part 1, view 6) -->
+        <path
+          d="M632,576 L632,496"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -305,9 +299,9 @@
         >
           rules 1
         </text>
-        <rect x="526" y="460" width="56" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="666" y="460" width="56" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="554"
+          x="694"
           y="469"
           fill="#7d8a94"
           font-size="8"
@@ -342,7 +336,6 @@
             stroke-width="1"
           />
           <text
-            data-requirement="APP-FR-16"
             x="430"
             y="223.0"
             fill="#5b6873"
@@ -351,7 +344,7 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            interface · Abstract Factory · «Sprint 3»
+            interface
           </text>
           <text
             x="430"
@@ -385,7 +378,7 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            interface · Strategy
+            interface
           </text>
           <text
             x="160"
@@ -403,7 +396,7 @@
           <rect
             x="120"
             y="456"
-            width="400"
+            width="540"
             height="40"
             rx="4"
             fill="#ffffff"
@@ -411,8 +404,7 @@
             stroke-width="1"
           />
           <text
-            data-requirement="APP-FR-16"
-            x="320"
+            x="390"
             y="471.0"
             fill="#5b6873"
             font-size="7"
@@ -420,10 +412,10 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            interface · Abstract Factory · «Sprint 3»
+            interface
           </text>
           <text
-            x="320"
+            x="390"
             y="484.0"
             fill="#17212a"
             text-anchor="middle"
@@ -436,7 +428,7 @@
         </g>
 
         <!-- Variant axis: the four variants of the statement and a fifth one -->
-        <!-- Class: LinesFactory (concrete factory of one variant) -->
+        <!-- Class: LinesFactory (a piece of the Abstract Factory pattern: the frame names it, decision 23) -->
         <rect
           x="68"
           y="96"
@@ -448,20 +440,8 @@
           stroke-width="1"
         />
         <text
-          data-requirement="APP-FR-16"
           x="152"
-          y="114"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.02em"
-        >
-          «Concrete Factory» «Sprint 3»
-        </text>
-        <text
-          x="152"
-          y="132"
+          y="124"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -470,7 +450,7 @@
         >
           LinesFactory
         </text>
-        <!-- Class: FitFactory (concrete factory of one variant) -->
+        <!-- Class: FitFactory (a piece of the Abstract Factory pattern: the frame names it, decision 23) -->
         <rect
           x="252"
           y="96"
@@ -482,20 +462,8 @@
           stroke-width="1"
         />
         <text
-          data-requirement="APP-FR-16"
           x="336"
-          y="114"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.02em"
-        >
-          «Concrete Factory» «Sprint 3»
-        </text>
-        <text
-          x="336"
-          y="132"
+          y="124"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -504,7 +472,7 @@
         >
           FitFactory
         </text>
-        <!-- Class: SortFactory (concrete factory of one variant) -->
+        <!-- Class: SortFactory (a piece of the Abstract Factory pattern: the frame names it, decision 23) -->
         <rect
           x="436"
           y="96"
@@ -516,20 +484,8 @@
           stroke-width="1"
         />
         <text
-          data-requirement="APP-FR-16"
           x="520"
-          y="114"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.02em"
-        >
-          «Concrete Factory» «Sprint 3»
-        </text>
-        <text
-          x="520"
-          y="132"
+          y="124"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -538,7 +494,7 @@
         >
           SortFactory
         </text>
-        <!-- Class: MergeFactory (concrete factory of one variant) -->
+        <!-- Class: MergeFactory (a piece of the Abstract Factory pattern: the frame names it, decision 23) -->
         <rect
           x="620"
           y="96"
@@ -550,20 +506,8 @@
           stroke-width="1"
         />
         <text
-          data-requirement="APP-FR-16"
           x="704"
-          y="114"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.02em"
-        >
-          «Concrete Factory» «Sprint 3»
-        </text>
-        <text
-          x="704"
-          y="132"
+          y="124"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -690,7 +634,6 @@
           stroke-width="1"
         />
         <text
-          data-requirement="APP-FR-16"
           x="184"
           y="594"
           fill="#5b6873"
@@ -699,7 +642,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          REAL · HEXAGONS · «Sprint 3»
+          REAL · HEXAGONS
         </text>
         <text
           x="184"
@@ -712,7 +655,7 @@
         >
           HexGeometry
         </text>
-        <!-- Class: SquareGeometry (test family) -->
+        <!-- Class: SquareGeometry (the real square family) -->
         <rect
           x="308"
           y="576"
@@ -724,7 +667,6 @@
           stroke-width="1"
         />
         <text
-          data-requirement="APP-NFR-13"
           x="408"
           y="594"
           fill="#5b6873"
@@ -733,7 +675,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          ENGINE TESTS · D4 · «Sprint 1»
+          REAL · SQUARES
         </text>
         <text
           x="408"
@@ -746,20 +688,18 @@
         >
           SquareGeometry
         </text>
-        <!-- Declared extension, no class yet: triangular cells -->
+        <!-- Class: TriangleGeometry (the real triangular family) -->
         <rect
           x="532"
           y="576"
           width="200"
           height="48"
           rx="6"
-          fill="rgba(23,33,42,0.02)"
-          stroke="rgba(23,33,42,0.35)"
+          fill="#ffffff"
+          stroke="#17212a"
           stroke-width="1"
-          stroke-dasharray="4,3"
         />
         <text
-          data-requirement="APP-FR-16"
           x="632"
           y="594"
           fill="#5b6873"
@@ -768,12 +708,12 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          DECLARED · §8 · «Sprint 3»
+          REAL · TRIANGLES
         </text>
         <text
           x="632"
           y="612"
-          fill="#5b6873"
+          fill="#17212a"
           font-size="12"
           font-weight="600"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1003,25 +943,6 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Dashed box · declared extension, no class yet
-        </text>
-        <text
-          x="24"
-          y="878"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          «Sprint N»
-        </text>
-        <text
-          x="92"
-          y="878"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Planned design, not in the code yet · N is the docs/ROADMAP.md sprint of the requirement
-          it serves · a planned class carries it once, for its members and arrows
         </text>
       </svg>
     </div>

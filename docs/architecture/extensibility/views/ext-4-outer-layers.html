@@ -77,7 +77,9 @@
           GameEventBus and its listeners over the GameEventPublisher port of layer 2, the use case
           aspects over UseCaseAspect, GameRegistry of layer 4, which keeps the registered games of
           the composition root, and the planned desktop layout and game module of D5 as dashed
-          placeholders.
+          placeholders. GameEventBus keeps its listeners: a use with the attribute name and its
+          multiplicity. No box carries a role label of a pattern: the footnotes name the Adapter,
+          the Observer, the Facade and the Decorator.
         </desc>
         <defs>
           <marker
@@ -90,22 +92,6 @@
             markerUnits="userSpaceOnUse"
           >
             <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-          </marker>
-          <marker
-            id="ext4-diamond-hollow"
-            markerWidth="18"
-            markerHeight="10"
-            refX="0"
-            refY="5"
-            orient="auto"
-            markerUnits="userSpaceOnUse"
-          >
-            <polygon
-              points="0 5, 9 0, 18 5, 9 10"
-              fill="#ffffff"
-              stroke="#17212a"
-              stroke-width="1"
-            />
           </marker>
           <marker
             id="ext4-open"
@@ -198,6 +184,7 @@
           LAYER 2 · USE CASES · src/application/
         </text>
         <!-- Database and backend: the adapters implement the layer 2 ports -->
+        <!-- LocalProgressRepository and the other local adapters implement the output ports: realization -->
         <path
           d="M144,364 L144,372 Q144,380 152,380 L288,380 Q296,380 296,388 L296,444"
           fill="none"
@@ -206,6 +193,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#ext4-triangle)"
         />
+        <!-- NewStorageAdapter implements the output ports: realization of a declared extension -->
         <path
           d="M336,340 L336,444"
           fill="none"
@@ -214,6 +202,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#ext4-triangle)"
         />
+        <!-- ApiProgressRepository and the other HTTP adapters implement the output ports: realization -->
         <path
           d="M448,156 L448,444"
           fill="none"
@@ -231,13 +220,13 @@
           stroke-dasharray="5,4"
           marker-end="url(#ext4-triangle)"
         />
-        <!-- GameEventBus keeps the listeners it receives: aggregation, kept because Observer holds it -->
+        <!-- GameEventBus keeps the GameEventListener objects it receives as listeners: use with role and multiplicity (decision 23) -->
         <path
           d="M656,312 L752,312"
           fill="none"
           stroke-width="1"
-          stroke="#17212a"
-          marker-start="url(#ext4-diamond-hollow)"
+          stroke="#5b6873"
+          marker-end="url(#ext4-open)"
         />
         <!-- AudioManager implements GameEventListener: realization -->
         <path
@@ -258,6 +247,7 @@
           marker-end="url(#ext4-triangle)"
         />
         <!-- Aspects extend UseCaseAspect: inheritance -->
+        <!-- LoggingAspect and the other aspects extend UseCaseAspect: inheritance -->
         <path
           d="M784,476 L840,476"
           fill="none"
@@ -265,6 +255,7 @@
           stroke="#17212a"
           marker-end="url(#ext4-triangle)"
         />
+        <!-- CachingAspect extends UseCaseAspect: inheritance of a declared extension -->
         <path
           d="M916,556 L916,508"
           fill="none"
@@ -306,6 +297,7 @@
           <tspan font-weight="600">0..*</tspan>
         </text>
 
+        <!-- Declared extension, no class yet: DesktopLayout -->
         <rect x="48" y="60" width="208" height="56" rx="6" fill="#cfdcf3" />
         <rect
           x="48"
@@ -340,6 +332,7 @@
         >
           DesktopLayout
         </text>
+        <!-- List box: the HTTP adapters (the footnote names their pattern, decision 23) -->
         <rect
           x="288"
           y="60"
@@ -359,7 +352,7 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.12em"
         >
-          «Adapter» · HTTP · DECISION 22
+          HTTP · DECISION 22
         </text>
         <text
           x="300.0"
@@ -397,6 +390,7 @@
         >
           ApiAccountGateway
         </text>
+        <!-- Class: AudioManager (a listener; the footnote names its pattern, decision 23) -->
         <rect
           x="704"
           y="60"
@@ -416,7 +410,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «Facade» · LISTENER
+          LISTENER
         </text>
         <text
           x="784.0"
@@ -429,6 +423,7 @@
         >
           AudioManager
         </text>
+        <!-- Declared extension, no class yet: NewListener -->
         <rect x="880" y="60" width="112" height="56" rx="6" fill="#cfdcf3" />
         <rect
           x="880"
@@ -463,6 +458,7 @@
         >
           NewListener
         </text>
+        <!-- List box: the local adapters (the footnote names their pattern, decision 23) -->
         <rect
           x="48"
           y="284"
@@ -482,7 +478,7 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.12em"
         >
-          «Adapter» · LOCAL · §3.3
+          LOCAL · §3.3
         </text>
         <text
           x="60.0"
@@ -511,6 +507,7 @@
         >
           LocalSettingsStore
         </text>
+        <!-- Declared extension, no class yet: NewStorageAdapter -->
         <rect x="256" y="284" width="160" height="56" rx="6" fill="#e2ebf8" />
         <rect
           x="256"
@@ -545,6 +542,7 @@
         >
           NewStorageAdapter
         </text>
+        <!-- Class: GameEventBus (the footnote names its pattern, decision 23) -->
         <rect
           x="512"
           y="284"
@@ -564,7 +562,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «Observer» · §3.3
+          §3.3
         </text>
         <text
           x="584.0"
@@ -577,6 +575,7 @@
         >
           GameEventBus
         </text>
+        <!-- Class: GameEventListener (interface) -->
         <rect
           x="752"
           y="284"
@@ -609,6 +608,7 @@
         >
           GameEventListener
         </text>
+        <!-- List box: the output ports of layer 2 -->
         <rect
           x="48"
           y="444"
@@ -684,6 +684,7 @@
         >
           SettingsStore
         </text>
+        <!-- List box: the use case aspects (the footnote names their pattern, decision 23) -->
         <rect
           x="616"
           y="444"
@@ -703,7 +704,7 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.12em"
         >
-          «Decorator» · §3.5 · A2
+          §3.5 · A2
         </text>
         <text
           x="628.0"
@@ -741,6 +742,7 @@
         >
           AuthorizationAspect
         </text>
+        <!-- Class: UseCaseAspect (abstract; the footnote names its pattern, decision 23) -->
         <rect
           x="840"
           y="444"
@@ -760,7 +762,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «abstract» «Decorator»
+          «abstract»
         </text>
         <text
           x="916.0"
@@ -795,6 +797,7 @@
         >
           TRequest, TResponse
         </text>
+        <!-- Declared extension, no class yet: CachingAspect -->
         <rect x="840" y="556" width="152" height="56" rx="6" fill="#efe7f8" />
         <rect
           x="840"
@@ -829,6 +832,7 @@
         >
           CachingAspect
         </text>
+        <!-- Class: GameEventPublisher (interface, output port) -->
         <rect
           x="496"
           y="556"
@@ -862,6 +866,7 @@
           GameEventPublisher
         </text>
         <!-- The game registry of the composition root (#162) and the declared game module of D5 -->
+        <!-- Class: GameRegistry -->
         <rect
           x="504"
           y="60"
@@ -894,6 +899,7 @@
         >
           GameRegistry
         </text>
+        <!-- Class: RegisteredGame (interface) -->
         <rect
           x="504"
           y="180"
@@ -926,6 +932,7 @@
         >
           RegisteredGame
         </text>
+        <!-- Declared extension, no class yet: GameModule -->
         <rect x="48" y="180" width="208" height="56" rx="6" fill="#cfdcf3" />
         <rect
           x="48"
@@ -967,8 +974,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Database and backend: a new storage or backend is one more adapter of the layer 2 ports.
-          The use cases do not change (§3.3, §3.4).
+          Database and backend (Adapter): a new storage or backend is one more adapter of the layer
+          2 ports. The use cases do not change (§3.3, §3.4).
         </text>
         <text
           x="24"
@@ -988,7 +995,7 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Observer: a new subscriber implements GameEventListener and subscribes to GameEventBus.
-          GamePresenter listens too.
+          AudioManager, the Facade of sound, and GamePresenter listen too.
         </text>
         <text
           x="24"
@@ -997,8 +1004,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Aspects: a new aspect extends UseCaseAspect and wraps any use case (§3.5). APP-NFR-11 also
-          names caching.
+          Aspects (Decorator): a new aspect extends UseCaseAspect and wraps any use case (§3.5).
+          APP-NFR-11 also names caching.
         </text>
         <text
           x="24"
@@ -1066,30 +1073,12 @@
           y1="791"
           x2="292"
           y2="791"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#ext4-diamond-hollow)"
-        />
-        <text
-          x="300"
-          y="795"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Aggregation · in-layer pattern
-        </text>
-        <line
-          x1="504"
-          y1="791"
-          x2="532"
-          y2="791"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#ext4-open)"
         />
         <text
-          x="540"
+          x="300"
           y="795"
           fill="#5b6873"
           font-size="8.5"

@@ -76,7 +76,9 @@
           data passed to BoardBuilder.withRegion(size). A new scoring policy is a class that
           implements IScoringPolicy or extends ScoringDecorator. A new piece shape is data, a
           ShapeGroup of CellNode cells. Below them, GameEngine does not change. The policy reads two
-          photos of the state, before and after the move.
+          photos of the state, before and after the move. No box carries a role label of a pattern:
+          the title of each frame names the pattern of its extension point, Builder, Strategy or
+          Composite.
         </desc>
         <defs>
           <marker
@@ -89,22 +91,6 @@
             markerUnits="userSpaceOnUse"
           >
             <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-          </marker>
-          <marker
-            id="ext2-diamond-hollow"
-            markerWidth="18"
-            markerHeight="10"
-            refX="0"
-            refY="5"
-            orient="auto"
-            markerUnits="userSpaceOnUse"
-          >
-            <polygon
-              points="0 5, 9 0, 18 5, 9 10"
-              fill="#ffffff"
-              stroke="#17212a"
-              stroke-width="1"
-            />
           </marker>
           <marker
             id="ext2-open"
@@ -152,6 +138,7 @@
         >
           LAYER 1 · ENTITIES · src/domain/
         </text>
+        <!-- Group: board size, the Builder of the board -->
         <rect
           x="48"
           y="64"
@@ -172,8 +159,9 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.14em"
         >
-          BOARD SIZE · §3.1 · §8
+          BOARD SIZE · BUILDER · §3.1 · §8
         </text>
+        <!-- Group: scoring policy, the Strategy of the scoring -->
         <rect
           x="376"
           y="64"
@@ -194,8 +182,9 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.14em"
         >
-          SCORING POLICY · §3.1 · §8
+          SCORING POLICY · STRATEGY · §3.1 · §8
         </text>
+        <!-- Group: piece shape, the Composite of the shapes -->
         <rect
           x="704"
           y="64"
@@ -216,8 +205,9 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.14em"
         >
-          PIECE SHAPE · §3.1 · §8
+          PIECE SHAPE · COMPOSITE · §3.1 · §8
         </text>
+        <!-- Group: what does not change -->
         <rect
           x="48"
           y="396"
@@ -459,6 +449,7 @@
           Lines: its piece list
         </text>
         <!-- Row B: the extension point that takes it -->
+        <!-- Class: BoardBuilder (DDD factory of the board; the frame names its pattern, decision 23) -->
         <rect
           x="64"
           y="252"
@@ -478,7 +469,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «Builder» «factory» · D9
+          «factory» · D9
         </text>
         <text
           x="184.0"
@@ -525,6 +516,7 @@
         >
           TCoord
         </text>
+        <!-- Class: IScoringPolicy (interface; the frame names its pattern, decision 23) -->
         <rect
           x="392"
           y="252"
@@ -544,7 +536,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Strategy»
+          «interface»
         </text>
         <text
           x="512.0"
@@ -588,6 +580,7 @@
         >
           TState
         </text>
+        <!-- Class: ShapeNode (interface; the frame names its pattern, decision 23) -->
         <rect
           x="720"
           y="252"
@@ -607,7 +600,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «Composite»
+          «interface»
         </text>
         <text
           x="840.0"
