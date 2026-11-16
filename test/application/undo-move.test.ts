@@ -3,9 +3,21 @@ import { Outcome } from '../../src/domain/engine/outcome';
 import { phaseNameOf } from '../support/engine/phase-name';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
 import type { GameRepository } from '../../src/application/game-repository';
+import { Result } from '../../src/application/result';
+import { SaveProgress } from '../../src/application/save-progress';
 import { UndoMove } from '../../src/application/undo-move';
 import type { BoardState } from '../../src/domain/engine/board-state';
+import { GameId } from '../../src/domain/engine/game-id';
+import type { HexCoord } from '../../src/domain/engine/hex-topology';
+import { Moves } from '../../src/domain/engine/moves';
+import { GameResult, ProgressRecord } from '../../src/domain/engine/progress-model';
+import type { Score } from '../../src/domain/engine/score';
+import type { MergeFactory } from '../../src/domain/variants/hexa-merge/merge-factory';
+import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-store';
+import { RecordingPublisher } from '../support/application/recording-publisher';
+import { dataOf } from '../support/engine/game-over';
 import { PlayingPhase } from '../../src/domain/engine/game-phase';
 import type { IPieceSource } from '../../src/domain/engine/piece-source';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
@@ -155,6 +167,36 @@ describe('UndoMove', () => {
     expect(replay.score).toEqual(firstPlay.score);
   });
 
+  // Issue #179 (APP-FR-08): the undo gives back the photo before the slide, points included.
+  // So the final score of the game, which `SaveProgress` keeps as the high score of Merge,
+  // does not count the undone slide. The same seed plays the same game with no undo.
+  it('should_save_a_high_score_without_the_points_of_the_undone_slide_when_a_merge_game_ends_after_an_undo', async () => {
+    const factory = mergeFactory(7);
+    const withUndo = await playToTheEnd(factory, true);
+    const withoutUndo = await playToTheEnd(factory, false);
+    const store = new InMemoryKeyValueStore();
+    const save = new SaveProgress(
+      new LocalProgressRepository(store),
+      factory.createProgressModel(),
+      MERGE,
+    );
+
+    const saved = await save.execute(
+      GameResult.of({ gameId: MERGE, score: withUndo.finalScore, moves: withUndo.kept }),
+    );
+    const progress = await new LocalProgressRepository(store).load(MERGE);
+
+    // The undone slide scored, and the undo took its points back.
+    expect(withUndo.undone?.after.isHigherThan(withUndo.undone.before)).toBe(true);
+    expect(withUndo.undone?.undone).toEqual(withUndo.undone?.before);
+    expect(withUndo.finalScore).toEqual(withoutUndo.finalScore);
+    expect(withUndo.kept).toEqual(withoutUndo.kept);
+    expect(saved).toEqual(Result.success(undefined));
+    expect(
+      progress?.keeps(ProgressRecord.of({ gameId: MERGE, score: withoutUndo.finalScore })),
+    ).toBe(true);
+  });
+
   it('should_return_a_failure_and_change_nothing_when_the_variant_has_no_history', async () => {
     const runs = [await noHistoryRun(linesFactory()), await noHistoryRun(sortFactory())];
 
@@ -266,6 +308,42 @@ describe('UndoMove', () => {
     expect([error.code, error.message]).toEqual(['undo-failed', 'The repository cannot read.']);
   });
 });
+
+// The id of Hexa Merge, which `SaveProgress` takes from the composition root.
+const MERGE = GameId.of('hexa-merge');
+
+// The most turns of one Merge game on a hexagon of 2 rings. The game ends long before.
+const MOST_TURNS = 500;
+
+// One Merge game through the use cases, from its start to its `GameOver` event.
+// Each turn plays the first valid slide. With `undoOnce`, the game undoes the first slide
+// that scores, once, and goes on. It gives the score before that slide, the score after it
+// and the score after the undo, the final score of the event and the count of kept slides.
+async function playToTheEnd(factory: MergeFactory<HexCoord>, undoOnce: boolean) {
+  const events = new RecordingPublisher();
+  const { games, startGame, applyMove, undoMove } = gameUseCases(factory, events);
+  let score = valueOf(await startGame.execute({})).score;
+  let kept = 0;
+  let undone: { before: Score; after: Score; undone: Score } | undefined;
+  for (let turn = 0; events.events.length === 0; turn += 1) {
+    if (turn === MOST_TURNS) throw new RangeError('The Merge game did not end.');
+    const slide = firstValidMove(
+      factory.createRules(),
+      mergeStateOf(games.running().snapshot(), FIRST_MATCH),
+    );
+    const played = valueOf(await applyMove.execute({ move: slide }));
+    kept += 1;
+    if (undoOnce && undone === undefined && played.canUndo && played.score.isHigherThan(score)) {
+      const back = valueOf(await undoMove.execute({}));
+      undone = { before: score, after: played.score, undone: back.score };
+      kept -= 1;
+      score = back.score;
+    } else {
+      score = played.score;
+    }
+  }
+  return { undone, finalScore: dataOf(events.events[0]).finalScore, kept: Moves.of(kept) };
+}
 
 // One game of a variant with no history: its first move, a refused undo and the facts around it.
 async function noHistoryRun<
