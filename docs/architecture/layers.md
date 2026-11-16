@@ -1,8 +1,8 @@
 # Clean Architecture layers
 
-Status: draft for review with the professor, 2026-10-30. Updated on 2026-10-31 to match the class diagram: one generic input port, the ports of decisions 10 to 12, engine interfaces that are not ports, and the presentation pattern. Updated on 2026-11-02: the `Logger` port takes a log entry, and its adapter writes the text (decision 37 of the class diagram). Updated on 2026-11-07: the status text and the planned marks of the diagram follow the code in `src/` (issue #147).
+Status: draft for review with the professor, 2026-10-30. Updated on 2026-10-31 to match the class diagram: one generic input port, the ports of decisions 10 to 12, engine interfaces that are not ports, and the presentation pattern. Updated on 2026-11-02: the `Logger` port takes a log entry, and its adapter writes the text (decision 37 of the class diagram). Updated on 2026-11-07: the status text and the planned marks of the diagram follow the code in `src/` (issue #147). Updated on 2026-11-15: the composition root, its game registry and the first adapters and drivers exist (issue #162).
 
-This page answers one question: in which layer does each piece of the client live? It follows the statement (§3.4, §4.2) and the layer rules in `.dependency-cruiser.cjs`. Part of the client exists today. `src/domain/` holds the engine and the four variants. `src/application/` holds the first use cases, `StartGame` and `ApplyMove`, with the input port `UseCase`, the ports `GameRepository`, `Logger` and `GameEventPublisher`, and the aspects `UseCaseAspect` and `LoggingAspect`. `src/infrastructure/` holds the API client in `src/infrastructure/api/`. `app/` holds the root layout and a home screen that shows the title. The other screens, the adapters of `src/adapters/`, the drivers and the composition root are planned. The diagram marks each planned piece. Component names follow the statement (§3.1, §3.4) and the [class diagram](classes.md). They are not final. The engine names carry no geometry: `Board<TCell, TCoord>` is the `HexBoard<TCell>` of §3.1 (decision 16 of the class diagram). IDs such as A1, D3 and Q7 refer to [`docs/REQUIREMENTS.md`](../REQUIREMENTS.md). The classes of layer 1 are in the [class diagram](classes.md).
+This page answers one question: in which layer does each piece of the client live? It follows the statement (§3.4, §4.2) and the layer rules in `.dependency-cruiser.cjs`. Part of the client exists today. `src/domain/` holds the engine and the four variants. `src/application/` holds the first use cases, `StartGame` and `ApplyMove`, with the input port `UseCase`, the ports `GameRepository`, `Logger` and `GameEventPublisher`, and the aspects `UseCaseAspect` and `LoggingAspect`. `src/adapters/` holds `InMemoryGameRepository`, the adapter of `GameRepository`, and `NullGameEventPublisher`, a publisher that does nothing until `GameEventBus` exists. `src/infrastructure/` holds the API client in `src/infrastructure/api/`, the composition root in `src/infrastructure/composition-root.ts` with its game registry, and the drivers `SystemClock`, `SeededRandomSource`, `ConsoleLogger` and `SequentialMatchIds`. `app/` holds the root layout, which only calls the root, and a home screen that shows the title. The other screens and the other adapters and drivers are planned. The diagram marks each planned piece. Component names follow the statement (§3.1, §3.4) and the [class diagram](classes.md). They are not final. The engine names carry no geometry: `Board<TCell, TCoord>` is the `HexBoard<TCell>` of §3.1 (decision 16 of the class diagram). IDs such as A1, D3 and Q7 refer to [`docs/REQUIREMENTS.md`](../REQUIREMENTS.md). The classes of layer 1 are in the [class diagram](classes.md).
 
 ## Diagram
 
@@ -20,7 +20,7 @@ Statement §4.2 asks for four concentric layers. Mermaid draws them as a stack: 
 flowchart TB
   subgraph L4["Layer 4: Frameworks and drivers"]
     subgraph APP["app/"]
-      ROUTES["Expo Router routes<br/>_layout.tsx, index.tsx (home)"]
+      ROUTES["Expo Router routes<br/>_layout.tsx calls the root, index.tsx (home)"]
       SCREENS["Game selector, level selector, game,<br/>victory and defeat routes: the MVP views (planned)"]
     end
     subgraph INFRA["src/infrastructure/"]
@@ -29,11 +29,12 @@ flowchart TB
       APIREPOS["api/: ApiProgressRepository, ApiLevelRepository,<br/>ApiLeaderboardGateway, ApiAccountGateway<br/>and ApiDtoMapper (planned)"]
       SECURE["SessionManager: secure token storage,<br/>single scope (planned)"]
       AUDIO["AudioManager: audio facade over the<br/>sound library, single scope (planned)"]
-      CLOCK["SystemClock (planned)"]
-      RNG["SeededRandomSource (planned)"]
-      LOGGER["ConsoleLogger: writes the log text (planned)"]
+      CLOCK["SystemClock"]
+      RNG["SeededRandomSource"]
+      MATCHIDS["SequentialMatchIds: the one id generator"]
+      LOGGER["ConsoleLogger: writes the log text"]
       VIEWS["BoardView and cell renderers,<br/>React Native (planned, folder: Q8)"]
-      ROOT["Composition root (planned, file: Q9)"]
+      ROOT["composition-root.ts: CompositionRoot<br/>and GameRegistry (file: Q9)"]
     end
   end
 
@@ -41,9 +42,10 @@ flowchart TB
     PRESENTERS["MVP presenters and view models,<br/>one per screen (planned)"]
     MAPPERS["State mappers per variant: one cell<br/>to one CellView (planned)"]
     EVENTBUS["GameEventBus: delivers game events<br/>to presenters, score and audio (planned)"]
+    NULLPUB["NullGameEventPublisher: does nothing<br/>until GameEventBus exists"]
     LOCALREPO["LocalProgressRepository and<br/>LocalSettingsStore (planned)"]
     LEVELREPO["BundledLevelRepository (planned)"]
-    GAMEREPO["InMemoryGameRepository (planned)"]
+    GAMEREPO["InMemoryGameRepository"]
     KV["KeyValueStore interface (planned)"]
   end
 
@@ -75,7 +77,7 @@ flowchart TB
       CONTRACTS["Contracts that a variant implements:<br/>IGameRules#lt;TMove, TState#gt; through BaseGameRules,<br/>IScoringPolicy#lt;TState#gt;, BoardState#lt;TCell, TCoord#gt;"]
       STRATS["Strategies with engine classes:<br/>IPieceSource#lt;TPiece#gt;: SeededPieceSource, FixedListPieceSource;<br/>IProgressModel; planned: HighScoreProgress, LevelProgress"]
       CAPS["Capability interfaces: IRandomSeeded with its engine class<br/>SeededPieceSource, IMergeable#lt;TCell#gt;, IUndoable and IRedoable with<br/>MoveHistory, ITimed with LevelTimer; planned:<br/>RedoableHistory"]
-      DPORTS["Clock and RandomSource interfaces"]
+      DPORTS["Clock, RandomSource and<br/>MatchIdGenerator interfaces"]
       CMDSTATE["GamePhase classes, MoveCommand"]
       FACTORY["IVariantFactory: creates the rules, piece source,<br/>scoring, board, initial state and history;<br/>planned: progress model (Q8)"]
     end
@@ -91,6 +93,7 @@ flowchart TB
   LOGGER -.->|implements| LOGPORT
   CLOCK -.->|implements| DPORTS
   RNG -.->|implements| DPORTS
+  MATCHIDS -.->|implements| DPORTS
 
   PRESENTERS --> MAPPERS
   MAPPERS --> CORE
@@ -134,6 +137,7 @@ flowchart TB
   UC -->|Login and Register write| SESSPORT
   SECURE -.->|implements| SESSPORT
   EVENTBUS -.->|implements| EVPORT
+  NULLPUB -.->|implements| EVPORT
   PRESENTERS -->|listens| EVENTBUS
   AUDIO -->|listens| EVENTBUS
 
@@ -150,13 +154,13 @@ flowchart TB
   end
 
   %% Invisible links keep the layers stacked from outer to inner, with the legend last.
-  KV & MAPPERS & GAMEREPO ~~~ ASPECTS
+  KV & MAPPERS & GAMEREPO & NULLPUB ~~~ ASPECTS
   PPORT & LBPORT & LVPORT & GRPORT & ACCPORT & SESSPORT & SETPORT & LOGPORT & EVPORT & INPORTS ~~~ CORE & LINES & FIT & SORT & MERGE
   L1 ~~~ LEGEND
 
   classDef planned stroke-dasharray: 5 5
-  class SCREENS,APIREPOS,STORAGE,SECURE,AUDIO,CLOCK,RNG,LOGGER,VIEWS,ROOT planned
-  class PRESENTERS,MAPPERS,EVENTBUS,LOCALREPO,LEVELREPO,GAMEREPO,KV planned
+  class SCREENS,APIREPOS,STORAGE,SECURE,AUDIO,VIEWS planned
+  class PRESENTERS,MAPPERS,EVENTBUS,LOCALREPO,LEVELREPO,KV planned
   class PPORT,LBPORT,LVPORT,ACCPORT,SESSPORT,SETPORT planned
   class LGPLAN planned
 
@@ -184,8 +188,8 @@ The "May depend on" column repeats `.dependency-cruiser.cjs`. `pnpm arch` checks
 | 1. Entities               | `src/domain/engine/`             | The generic engine: `Board<TCell, TCoord, TAxis>`, `Piece`, `GridTopology<TCoord, TAxis, TDirection>` (D4), `BoardBuilder`, the geometry family with `HexCoord` and `HexTopology`, `GameEngine<TCell, TCoord, TMove, TState>` and the contracts it uses. The interfaces for time and randomness (R-domain-determinism). | Only `src/domain/` code. Never a variant, a package or a Node module. Rules: `domain-imports-only-domain`, `domain-no-framework`, `engine-no-variants`.                      |
 | 1. Entities               | `src/domain/variants/<variant>/` | One folder per game. Each one holds its cell type, its move, its state, its `IGameRules` implementation, its scoring policy and its factory.                                                                                                                                                                            | `src/domain/engine/` and its own folder. Never another variant, a package or a Node module. Rules: `domain-imports-only-domain`, `domain-no-framework`, `variants-isolated`. |
 | 2. Use cases              | `src/application/`               | The generic use cases, the ports they need (repositories, gateways, running game, session, settings, logger), the request and response models, `Result` and the aspect decorators.                                                                                                                                      | Only `src/domain/` and `src/application/` code. No package. Rule: `application-imports-only-domain`.                                                                         |
-| 3. Interface adapters     | `src/adapters/`                  | Presenters and view models (MVP), state mappers, the local repositories, the in-memory running game store and the `KeyValueStore` driver interface.                                                                                                                                                                     | `src/application/`, `src/domain/` and its own folder. Never a driver of `src/infrastructure/`, a package or a Node module. Rule: `adapters-imports-only-inner-layers`.       |
-| 4. Frameworks and drivers | `src/infrastructure/`            | The HTTP client, its generated types and the HTTP repositories (Q7 closed); storage, session, audio, system clock, seeded random source, logger.                                                                                                                                                                        | Every inner layer and any package, per `src/infrastructure/README.md`. No rule.                                                                                              |
+| 3. Interface adapters     | `src/adapters/`                  | Presenters and view models (MVP), state mappers, the local repositories, `InMemoryGameRepository`, the event publisher and the `KeyValueStore` driver interface.                                                                                                                                                        | `src/application/`, `src/domain/` and its own folder. Never a driver of `src/infrastructure/`, a package or a Node module. Rule: `adapters-imports-only-inner-layers`.       |
+| 4. Frameworks and drivers | `src/infrastructure/`            | The composition root and its game registry; the HTTP client, its generated types and the HTTP repositories (Q7 closed); storage, session, audio, system clock, seeded random source, match id generator, logger.                                                                                                        | Every inner layer and any package, per `src/infrastructure/README.md`. No rule.                                                                                              |
 | 4. Frameworks and drivers | `app/`                           | Expo Router routes only (`AGENTS.md`).                                                                                                                                                                                                                                                                                  | Every inner layer and any package. No rule.                                                                                                                                  |
 
 ## Where each piece lives
@@ -210,7 +214,7 @@ The "May depend on" column repeats `.dependency-cruiser.cjs`. `pnpm arch` checks
 - **API client:** layer 4, `src/infrastructure/api/client.ts`. It uses the types in `schema.d.ts`, which `pnpm api:generate` writes from the backend OpenAPI document. `pacts/hexablock-app-hexablock-api.json` is the contract the consumer test writes for this client. It is a test artifact, not a layer.
 - **Screens:** layer 4, `app/` (Expo Router routes; only the home screen exists). Their presenters and view models live in layer 3. The folder for the React Native board and cell components is open (Q8).
 - **Presentation pattern: Model-View-Presenter (MVP).** MVP is a presentation pattern, so it works inside Clean Architecture and orders only layers 3 and 4. The view is a route in layer 4, for example `GameScreen` with `BoardView`: it shows a `GameViewModel` and forwards each input to its presenter. The presenter (`GamePresenter`) and the view model live in layer 3: the presenter calls a use case through `UseCase`, maps the plain response to the view model and gives it to the view. The view model is plain data that the presenter builds, not an object that the view binds to, so the pattern is MVP and not MVVM. The model is layers 1 and 2.
-- **Dependency-injection composition root:** layer 4. It builds the adapters, injects them into the use cases and wraps the use cases in the aspect decorators. It creates `AudioManager` and `SessionManager` once, so they have a single scope (§3.3). Its file is open (Q9).
+- **Dependency-injection composition root:** layer 4, `src/infrastructure/composition-root.ts` (S3-06 in #151, «Propuesta, pendiente del equipo», issue #162). It is the only module that imports from every layer. It builds the drivers and the adapters once, injects them into the use cases and wraps the use cases in the aspect decorators. Today it builds `SystemClock`, `SeededRandomSource`, `ConsoleLogger`, `SequentialMatchIds`, the one id generator of `MatchId`, and `NullGameEventPublisher`, which goes to `ApplyMove`. Its `GameRegistry` maps each `GameId` to its variant factory, and `src/infrastructure/registered-games.ts` lists the four games. Until #172, `StartGame` takes its factory in its constructor, so the root builds one `StartGame`, `ApplyMove` and `UndoMove` per game over one `InMemoryGameRepository`. `app/_layout.tsx` only calls it, through `CompositionRootProvider`, and the routes read it with `useCompositionRoot()`. It will create `AudioManager` and `SessionManager` once, so they have a single scope (§3.3). Q9 still waits on the professor, and his answer can move the root.
 
 ## Open questions for the professor
 
