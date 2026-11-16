@@ -1,4 +1,4 @@
-import { router } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -7,7 +7,11 @@ import type { GameChoice } from '../src/adapters/home-presenter';
 import { HexStone } from '../src/infrastructure/ui/hex-stone';
 import { Scenery } from '../src/infrastructure/ui/scenery';
 import { palette, serif, space, worldTone } from '../src/infrastructure/ui/theme';
-import { useHomePresenter } from '../src/infrastructure/ui/use-home-presenter';
+import {
+  useHomePresenter,
+  useRouteFigure,
+  type RouteFigure,
+} from '../src/infrastructure/ui/use-home-presenter';
 import { LipButton, WoodSign } from '../src/infrastructure/ui/wood';
 
 // The game selector map, the MVP view of `HomePresenter` (#169). It is its own route after
@@ -15,8 +19,17 @@ import { LipButton, WoodSign } from '../src/infrastructure/ui/wood';
 // each game of the registry, in the order of the registry, on a path that climbs from the grass.
 // A tap on a world opens the game route with the id of the game. #173 sends Fit and Sort
 // to the level selector first, and #170 builds the game screen on the game route.
+// The map lists the games of the board figure that its route names, by default the hexagon,
+// and passes the figure on to the game route (#171). A text that names no figure goes home.
 export default function GameSelectorScreen() {
-  const view = useHomePresenter().gameSelector();
+  const figure = useRouteFigure();
+  if (figure === undefined) return <Redirect href="/" />;
+  return <GameSelector figure={figure} />;
+}
+
+// The map of the games of the board figure `figure`.
+function GameSelector({ figure }: { readonly figure: RouteFigure }) {
+  const view = useHomePresenter(figure.figure).gameSelector();
   const insets = useSafeAreaInsets();
   return (
     <View style={styles.screen}>
@@ -38,7 +51,7 @@ export default function GameSelectorScreen() {
         </WoodSign>
         <View style={styles.path}>
           {view.games.map((game, position) => (
-            <World key={game.id} game={game} position={position} />
+            <World key={game.id} game={game} figure={figure.param} position={position} />
           ))}
         </View>
       </ScrollView>
@@ -48,11 +61,22 @@ export default function GameSelectorScreen() {
 
 // One world of the map: the hex stone of the game and its sign with the name and the place.
 // The worlds take turns on the left and on the right side of the path.
-function World({ game, position }: { readonly game: GameChoice; readonly position: number }) {
+// A tap opens the game on the board figure whose text is `figure`.
+function World({
+  game,
+  figure,
+  position,
+}: {
+  readonly game: GameChoice;
+  readonly figure: string;
+  readonly position: number;
+}) {
   return (
     <Pressable
       accessibilityRole="button"
-      onPress={() => router.push({ pathname: '/game/[gameId]', params: { gameId: game.id } })}
+      onPress={() =>
+        router.push({ pathname: '/game/[gameId]', params: { gameId: game.id, figure } })
+      }
       style={[styles.world, position % 2 === 0 ? styles.left : styles.right]}
     >
       {({ pressed }) => (

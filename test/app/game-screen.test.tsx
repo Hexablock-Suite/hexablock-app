@@ -66,4 +66,17 @@ describe('game route', () => {
     expect(screen).toHavePathname('/map');
     expect(screen.getByRole('header', { name: 'Mapa de mundos' })).toBeOnTheScreen();
   });
+
+  // Issue #171: the map button of the game screen goes back to the map of the chosen figure.
+  it('should_return_to_the_map_of_the_figure_when_the_player_presses_the_map_button', async () => {
+    const app = await renderRouter(appDir, { initialUrl: '/map?figure=triangle' });
+    await fireEvent.press(screen.getByRole('button', { name: /^Hexa Sort/ }));
+    await screen.findByText('En juego');
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Mapa' }));
+
+    expect(screen).toHavePathname('/map');
+    expect(app.getSearchParams()).toEqual({ figure: 'triangle' });
+    expect(screen.queryByRole('button', { name: /^Hexa Fit/ })).toBeNull();
+  });
 });
