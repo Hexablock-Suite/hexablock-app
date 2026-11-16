@@ -306,9 +306,9 @@ describe('the photo outside the state', () => {
     const rejected = Resolution.rejected();
 
     expect('state' in resolved).toBe(false);
-    expect([resolved.accepted, resolved.outcome]).toEqual([true, Outcome.playing]);
-    expect([rejected.accepted, rejected.outcome]).toEqual([false, Outcome.playing]);
-    expect(resolved.evaluated(Outcome.victory).outcome).toBe(Outcome.victory);
+    expect([resolved.wasAccepted(), resolved.leadsTo()]).toEqual([true, Outcome.playing]);
+    expect([rejected.wasAccepted(), rejected.leadsTo()]).toEqual([false, Outcome.playing]);
+    expect(resolved.evaluated(Outcome.victory).leadsTo()).toBe(Outcome.victory);
   });
 
   it('should_score_from_the_photos_when_a_policy_gets_the_photos_before_and_after_a_turn', () => {

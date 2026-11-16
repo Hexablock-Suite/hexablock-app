@@ -83,7 +83,9 @@
           Mulberry32Random starts from one. Score is the value object of a score: IScoringPolicy
           returns one, and GameResult and ProgressRecord hold one. Moves, ElapsedTime, Stars and
           LevelId are the value objects of the counters: GameResult holds a Moves, a LevelId and an
-          ElapsedTime, and ProgressRecord holds a LevelId and Stars.
+          ElapsedTime, and ProgressRecord holds a LevelId and Stars. Their fields are private:
+          GameResult creates the ProgressRecord of a progress model with recordWith(), and
+          ProgressRecord tells with improves() whether it is better than the stored record.
         </desc>
         <defs>
           <marker
@@ -504,7 +506,7 @@
           IScoringPolicy
         </text>
         <text x="600" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + score(before: TState, resolution: Resolution&lt;TState&gt;): Score
+          + score(before: SnapshotOf&lt;TState&gt;, after: SnapshotOf&lt;TState&gt;): Score
         </text>
 
         <!-- Class: ScoringDecorator (abstract, decorator, focal) -->
@@ -768,20 +770,42 @@
           RandomSource
         </text>
 
+        <!-- GameResult creates the ProgressRecord of a progress model in recordWith(): use with a verb -->
+        <line
+          x1="608"
+          y1="736"
+          x2="512"
+          y2="736"
+          stroke-width="1"
+          marker-end="url(#sources-open)"
+          stroke="#5b6873"
+        />
+        <rect x="538" y="716" width="44" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="560"
+          y="725"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          CREATES
+        </text>
         <!-- IProgressModel returns a ProgressRecord: use -->
         <line
           x1="372"
           y1="648"
           x2="372"
-          y2="688"
+          y2="672"
           stroke-width="1"
           marker-end="url(#sources-open)"
           stroke="#5b6873"
         />
-        <rect x="378" y="662" width="48" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="378" y="654" width="48" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="402"
-          y="671"
+          y="663"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -791,21 +815,21 @@
           RETURNS
         </text>
 
-        <!-- Class: ProgressRecord (value object) -->
+        <!-- Class: ProgressRecord (value object, private fields) -->
         <rect
           x="232"
-          y="688"
+          y="672"
           width="280"
-          height="120"
+          height="144"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="232" y1="736" x2="512" y2="736" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="232" y1="720" x2="512" y2="720" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="372"
-          y="706"
+          y="690"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -816,7 +840,7 @@
         </text>
         <text
           x="372"
-          y="724"
+          y="708"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -825,25 +849,29 @@
         >
           ProgressRecord
         </text>
+        <text x="248" y="736" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - gameId: GameId
+        </text>
         <text x="248" y="752" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + gameId: GameId
+          - score: Score
         </text>
         <text x="248" y="768" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + score: Score
+          - levelId: LevelId [0..1]
         </text>
         <text x="248" y="784" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + levelId: LevelId [0..1]
+          - stars: Stars [0..1]
         </text>
-        <text x="248" y="800" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + stars: Stars [0..1]
+        <line x1="232" y1="792" x2="512" y2="792" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="248" y="808" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + improves(other: ProgressRecord): boolean
         </text>
 
-        <!-- Class: GameResult (value object) -->
+        <!-- Class: GameResult (value object, private fields) -->
         <rect
           x="608"
           y="576"
           width="200"
-          height="136"
+          height="176"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -873,19 +901,26 @@
           GameResult
         </text>
         <text x="624" y="640" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + gameId: GameId
+          - gameId: GameId
         </text>
         <text x="624" y="656" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + levelId: LevelId [0..1]
+          - levelId: LevelId [0..1]
         </text>
         <text x="624" y="672" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + score: Score
+          - score: Score
         </text>
         <text x="624" y="688" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + moves: Moves
+          - moves: Moves
         </text>
         <text x="624" y="704" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + elapsedMs: ElapsedTime [0..1]
+          - elapsedMs: ElapsedTime [0..1]
+        </text>
+        <line x1="608" y1="712" x2="808" y2="712" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="624" y="728" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + recordWith(stars: Stars
+        </text>
+        <text x="635" y="744" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          [0..1]): ProgressRecord
         </text>
 
         <!-- Class: Score (value object, decision 41) -->
@@ -979,7 +1014,7 @@
         <!-- ProgressRecord holds its stars as Stars: use -->
         <line
           x1="372"
-          y1="808"
+          y1="816"
           x2="372"
           y2="848"
           stroke="#5b6873"
@@ -989,7 +1024,7 @@
         <!-- GameResult holds its move count as Moves: use -->
         <line
           x1="660"
-          y1="712"
+          y1="752"
           x2="660"
           y2="848"
           stroke="#5b6873"
@@ -1058,7 +1093,7 @@
           x="272"
           y="848"
           width="196"
-          height="144"
+          height="176"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1105,9 +1140,27 @@
           + equals(other: Stars): boolean
         </text>
         <text x="288" y="968" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + deliverTo(receiver:
+          + isMoreThan(other: Stars):
         </text>
         <text x="299" y="984" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          boolean
+        </text>
+        <text
+          x="288"
+          y="1000"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + deliverTo(receiver:
+        </text>
+        <text
+          x="299"
+          y="1016"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
           ValueReceiver&lt;number&gt;): void
         </text>
         <!-- Class: Moves (value object, decision 42) -->

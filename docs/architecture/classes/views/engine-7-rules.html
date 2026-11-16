@@ -74,9 +74,10 @@
           Class diagram of layer 1 showing the abstract BaseGameRules, which implements the
           IGameRules strategy and holds playTurn() as a template method over abstract steps, both
           returning a Resolution, the value object that holds whether the rules accepted the move
-          and the Outcome and no state, LinesRules and FitRules extending it (planned for Sprint 2),
-          and TimedRulesDecorator, which implements IGameRules, wraps an inner IGameRules and times
-          the game with a LevelTimer.
+          and the Outcome and no state, in private fields that a reader asks through wasAccepted(),
+          endsTheGame(), phaseAfter() and leadsTo(), LinesRules and FitRules extending it (planned
+          for Sprint 2), and TimedRulesDecorator, which implements IGameRules, wraps an inner
+          IGameRules and times the game with a LevelTimer.
         </desc>
         <defs>
           <marker
@@ -749,12 +750,12 @@
         >
           LevelTimer
         </text>
-        <!-- Class: Resolution (value object: it holds no state; equals() compares accepted and outcome) -->
+        <!-- Class: Resolution (value object: it holds no state; private fields, queries with business names; equals() compares accepted and outcome) -->
         <rect
           x="32"
           y="232"
           width="196"
-          height="200"
+          height="280"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -785,10 +786,10 @@
           Resolution
         </text>
         <text x="44" y="296" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + accepted: boolean {readOnly}
+          - accepted: boolean {readOnly}
         </text>
         <text x="44" y="312" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + outcome: Outcome {readOnly}
+          - outcome: Outcome {readOnly}
         </text>
         <text
           x="44"
@@ -817,9 +818,24 @@
           Resolution
         </text>
         <text x="44" y="400" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + wasAccepted(): boolean
+        </text>
+        <text x="44" y="416" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + endsTheGame(): boolean
+        </text>
+        <text x="44" y="432" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + phaseAfter(phase: GamePhase):
+        </text>
+        <text x="60" y="448" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          GamePhase
+        </text>
+        <text x="44" y="464" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + leadsTo(): Outcome
+        </text>
+        <text x="44" y="480" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: Resolution):
         </text>
-        <text x="60" y="416" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="60" y="496" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           boolean
         </text>
 

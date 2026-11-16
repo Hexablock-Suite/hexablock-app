@@ -8,7 +8,7 @@ import type { ValueReceiver } from './value-receiver';
 // The object is frozen, so no caller writes the value.
 // The value is private (issue #228). `deliverTo()` gives the number to a receiver,
 // and no operation returns it. Only an adapter of the edge calls `deliverTo()`:
-// the domain and the use cases call `equals()`.
+// the domain and the use cases call `equals()` and `isMoreThan()`.
 export class Stars {
   private constructor(private readonly value: number) {
     Object.freeze(this);
@@ -29,5 +29,11 @@ export class Stars {
   // Gives the number of this star count to `receiver`. It returns nothing.
   deliverTo(receiver: ValueReceiver<number>): void {
     receiver.receive(this.value);
+  }
+
+  // Tells if this count is above `other`. An equal count is not more.
+  // More stars is the better level result (DS-4).
+  isMoreThan(other: Stars): boolean {
+    return this.value > other.value;
   }
 }

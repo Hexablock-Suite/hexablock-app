@@ -53,17 +53,17 @@ describe('BaseGameRules.playTurn()', () => {
     const resolution = rules.playTurn(1, 2);
 
     expect(rules.steps).toEqual(['isValid', 'apply', 'resolve']);
-    expect(resolution.accepted).toBe(false);
+    expect(resolution.wasAccepted()).toBe(false);
     expect(rules.seen).toEqual([3]);
-    expect(resolution.outcome).toBe(Outcome.playing);
+    expect(resolution.leadsTo()).toBe(Outcome.playing);
   });
 
   it('should_skip_evaluate_and_keep_playing_when_resolve_rejects_a_winning_move', () => {
     // Without the rejection, the state 201 would evaluate to 'victory'.
     const resolution = new RejectingRules().playTurn(1, 200);
 
-    expect(resolution.accepted).toBe(false);
-    expect(resolution.outcome).toBe(Outcome.playing);
+    expect(resolution.wasAccepted()).toBe(false);
+    expect(resolution.leadsTo()).toBe(Outcome.playing);
   });
 
   it('should_call_the_four_steps_in_order_when_the_move_is_valid', () => {
@@ -78,9 +78,9 @@ describe('BaseGameRules.playTurn()', () => {
     const rules = new RecordingRules();
     const resolution = rules.playTurn(5, 95);
 
-    expect(resolution.accepted).toBe(true);
+    expect(resolution.wasAccepted()).toBe(true);
     expect(rules.seen).toEqual([100, 100]);
-    expect(resolution.outcome).toBe(Outcome.victory);
+    expect(resolution.leadsTo()).toBe(Outcome.victory);
   });
 
   it('should_stop_after_isvalid_when_the_move_is_invalid', () => {
@@ -89,9 +89,9 @@ describe('BaseGameRules.playTurn()', () => {
     const resolution = rules.playTurn(1, -1);
 
     expect(rules.steps).toEqual(['isValid']);
-    expect(resolution.accepted).toBe(false);
+    expect(resolution.wasAccepted()).toBe(false);
     expect(rules.seen).toEqual([]);
-    expect(resolution.outcome).toBe(Outcome.playing);
+    expect(resolution.leadsTo()).toBe(Outcome.playing);
   });
 });
 
@@ -100,6 +100,6 @@ describe('IGameRules type parameters', () => {
     // @ts-expect-error IGameRules takes two type parameters: the move and the state.
     const rules: IGameRules<never, number, number> = new RecordingRules();
 
-    expect(rules.playTurn(1, 2).accepted).toBe(true);
+    expect(rules.playTurn(1, 2).wasAccepted()).toBe(true);
   });
 });

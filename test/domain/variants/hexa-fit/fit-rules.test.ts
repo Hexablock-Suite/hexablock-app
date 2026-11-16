@@ -186,7 +186,7 @@ describe('FitRules', () => {
     const state = dominoLevel();
     const resolution = rules.playTurn(state, new RemoveFitPiece(A));
 
-    expect(resolution.accepted).toBe(false);
+    expect(resolution.wasAccepted()).toBe(false);
     expect(trayOf(state)).toEqual(['a', 'b']);
   });
 
@@ -204,12 +204,12 @@ describe('FitRules', () => {
 
     const turned = rules.playTurn(placed, new RotateFitPiece(A, Turns.of(1)));
 
-    expect(turned.accepted).toBe(true);
+    expect(turned.wasAccepted()).toBe(true);
     expect(cellsOf(placed)).toEqual(['1,0=a']);
     expect(triangleTopology.fullTurn().equals(Turns.of(6))).toBe(true);
     // Five more steps complete the six steps of a full turn.
     const back = rules.playTurn(placed, new RotateFitPiece(A, Turns.of(5)));
-    expect(back.accepted).toBe(true);
+    expect(back.wasAccepted()).toBe(true);
     expect(cellsOf(placed)).toEqual(['0,0=a']);
   });
 
@@ -352,7 +352,7 @@ describe('FitRules edge cases', () => {
     const state = dominoLevel();
     const placed = rules.playTurn(state, new PlaceFitPiece(A, Turns.of(-1), square(1, 1)));
 
-    expect(placed.accepted).toBe(true);
+    expect(placed.wasAccepted()).toBe(true);
     expect(isPlaced(state, A, 3, square(1, 1))).toBe(true);
     expect(isPlaced(state, A, 2, square(1, 1))).toBe(false);
     expect(cellsOf(state)).toEqual(['1,0=a', '1,1=a']);
@@ -360,7 +360,7 @@ describe('FitRules edge cases', () => {
     // 2^53 - 1 is 3 modulo 4. Three steps more than 3 is a half turn.
     const turned = rules.playTurn(state, new RotateFitPiece(A, Turns.of(Number.MAX_SAFE_INTEGER)));
 
-    expect(turned.accepted).toBe(true);
+    expect(turned.wasAccepted()).toBe(true);
     expect(isPlaced(state, A, 2, square(1, 1))).toBe(true);
     expect(isPlaced(state, A, 3, square(1, 1))).toBe(false);
     expect(cellsOf(state)).toEqual(['0,1=a', '1,1=a']);
@@ -549,7 +549,7 @@ describe('FitRules move count', () => {
       new RotateFitPiece(A, Turns.of(1)),
       new RemoveFitPiece(A),
     ]) {
-      expect(engine.tryPlay(move).accepted).toBe(true);
+      expect(engine.tryPlay(move).wasAccepted()).toBe(true);
       counts.push(engine.snapshot().moves);
     }
 
@@ -567,7 +567,7 @@ describe('FitRules move count', () => {
       engine.tryPlay(new RemoveFitPiece(B)),
     ];
 
-    expect(reports.map((r) => r.accepted)).toEqual([false, false, false]);
+    expect(reports.map((r) => r.wasAccepted())).toEqual([false, false, false]);
     expect(engine.snapshot().moves).toEqual(Moves.of(1));
     expect(cellsOf(engine.snapshot())).toEqual(['0,1=a', '1,1=a']);
   });

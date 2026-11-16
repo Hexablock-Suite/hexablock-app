@@ -47,10 +47,10 @@ export class ApplyMove<
       }
       const turn = engine.tryPlay(request.move);
       this.deliver(engine.takeEvents());
-      if (!turn.accepted) {
+      if (!turn.wasAccepted()) {
         return Result.failure(new UseCaseError('move-rejected', 'The rules rejected the move.'));
       }
-      return Result.success(moveResultOf(engine, turn.outcome));
+      return Result.success(moveResultOf(engine, turn.leadsTo()));
     } catch (thrown) {
       return Result.failure(caughtError('move-failed', thrown));
     }
