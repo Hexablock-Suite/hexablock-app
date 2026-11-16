@@ -546,8 +546,8 @@ describe('primitive scan of the domain', () => {
   });
 
   // Issue #206: the three coordinates, `Radius` and `RegionSize` keep their numbers private.
-  // Only the factory methods, the operations of the two counts, the hex distance
-  // and the text of a coordinate keep a primitive.
+  // Only the factory methods, the operations of the two counts and the hex distance
+  // keep a primitive. A coordinate gives its `CoordKey` to its topology, not a text (issue #237).
   it('should_find_no_public_value_of_a_coordinate_when_the_code_is_scanned', () => {
     const uses = codeUses();
     const places = uses.map((use) => use.where);
@@ -579,14 +579,12 @@ describe('primitive scan of the domain', () => {
       'number RegionSize.offsets',
       'number SquareCoord.of',
       'number TriangleCoord.of',
-      'string HexCoord.toString',
-      'string SquareCoord.toString',
-      'string TriangleCoord.toString',
     ]);
   });
 
   // Issue #207: the closed unions of texts are classes with a closed set of instances.
-  // Only the two factories and the text of each class keep a `string`.
+  // Only the two factories and the delivery of the text of each class keep a `string`.
+  // The delivery is allowed, and `toString()` is gone (issue #237).
   it('should_find_no_closed_union_of_texts_when_the_code_is_scanned', () => {
     const uses = codeUses();
     const places = uses.map((use) => use.where);
@@ -619,16 +617,16 @@ describe('primitive scan of the domain', () => {
       /^(Outcome|TopologyId|(Hex|Square|Triangle)(Axis|Direction))\./.test(use.where),
     );
     expect(ofClosedSets.map(key).sort()).toEqual([
-      'string HexAxis.toString',
-      'string HexDirection.toString',
+      'string HexAxis.deliverTo',
+      'string HexDirection.deliverTo',
+      'string Outcome.deliverTo',
       'string Outcome.of',
-      'string Outcome.toString',
-      'string SquareAxis.toString',
-      'string SquareDirection.toString',
+      'string SquareAxis.deliverTo',
+      'string SquareDirection.deliverTo',
+      'string TopologyId.deliverTo',
       'string TopologyId.of',
-      'string TopologyId.toString',
-      'string TriangleAxis.toString',
-      'string TriangleDirection.toString',
+      'string TriangleAxis.deliverTo',
+      'string TriangleDirection.deliverTo',
     ]);
   });
 

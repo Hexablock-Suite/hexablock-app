@@ -9,6 +9,7 @@ import { CellNode, ShapeGroup } from '../../../src/domain/engine/shape-node';
 import { Turns } from '../../../src/domain/engine/turns';
 import { PieceId } from '../../../src/domain/variants/hexa-fit/piece-id';
 import { BOARD_ID } from '../../support/engine/entity-ids';
+import { delivered, RecordingReceiver } from '../../support/engine/value-receiver';
 import {
   square,
   squareTopology,
@@ -241,11 +242,21 @@ describe('Piece operations', () => {
   });
 });
 
+// Issue #237: the text of a piece id leaves it only through a receiver (rule R-no-delivery-call).
 describe('PieceId text', () => {
-  it('should_give_its_text_when_a_message_names_the_piece', () => {
-    expect(String(PieceId.of('a'))).toBe('a');
-    expect(`The piece ${PieceId.of('long-l')} is not on the figure.`).toBe(
-      'The piece long-l is not on the figure.',
+  it('should_deliver_its_text_once_and_return_nothing_when_a_receiver_takes_it', () => {
+    const receiver = new RecordingReceiver<string>();
+
+    const returned: void = PieceId.of('long-l').deliverTo(receiver);
+
+    expect(returned).toBeUndefined();
+    expect(receiver.received()).toEqual(['long-l']);
+    expect(delivered(PieceId.of(' a '))).toBe(' a ');
+  });
+
+  it('should_give_no_text_when_a_template_literal_or_string_converts_the_id', () => {
+    expect(`The piece ${String(PieceId.of('long-l'))} is here.`).toBe(
+      'The piece [object Object] is here.',
     );
   });
 });

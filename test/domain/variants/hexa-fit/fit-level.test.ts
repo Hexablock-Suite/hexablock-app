@@ -7,6 +7,7 @@ import { FitLevel } from '../../../../src/domain/variants/hexa-fit/fit-level';
 import type { PieceId } from '../../../../src/domain/variants/hexa-fit/piece-id';
 import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
 import { A, B } from '../../../support/variants/hexa-fit/fit-game';
+import { delivered } from '../../../support/engine/value-receiver';
 
 // A Fit level is a value object that guards its own invariant (issue 208, classes.md decision 46).
 
@@ -24,14 +25,15 @@ function row(length: number): BoardShape<SquareCoord> {
 }
 
 function ids(level: FitLevel<SquareCoord>): string[] {
-  return level.trayPieces().map((piece) => String(piece.cell()));
+  return level.trayPieces().map((piece) => delivered(piece.cell()));
 }
 
 describe('FitLevel', () => {
-  it('should_throw_a_range_error_when_the_level_gets_two_pieces_with_one_id', () => {
+  // Issue #237: the error carries the id as its `cause`, and the edge delivers its text.
+  it('should_throw_a_range_error_that_carries_the_id_when_the_level_gets_two_pieces_with_one_id', () => {
     const create = () => FitLevel.of(TopologyId.square, row(4), [domino(A), domino(B), domino(A)]);
 
-    expect(create).toThrow(new RangeError('The level has two pieces with the id a.'));
+    expect(create).toThrow(new RangeError('The level has two pieces with one id.', { cause: A }));
   });
 
   it('should_throw_a_range_error_when_the_level_pieces_hold_undefined', () => {
@@ -93,9 +95,12 @@ describe('FitLevel', () => {
 
     expect(level.isOf(TopologyId.square)).toBe(true);
     expect(level.isOf(TopologyId.hex)).toBe(false);
-    expect(level.wrongFamily(TopologyId.hex)).toEqual(
-      new RangeError('A Fit level of topology square cannot start on the hex geometry.'),
+    // Issue #237: the error carries the two topologies as its `cause`.
+    const error = level.wrongFamily(TopologyId.hex);
+    expect(error).toEqual(
+      new RangeError('A Fit level cannot start on the geometry of another topology.'),
     );
+    expect(error.cause).toEqual({ topology: TopologyId.square, geometry: TopologyId.hex });
   });
 
   it('should_give_its_figure_as_a_tree_of_cells_when_a_factory_asks_the_level', () => {

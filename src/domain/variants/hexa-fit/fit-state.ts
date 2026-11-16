@@ -174,9 +174,12 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
   }
 
   // The level piece of the id. An id of no level piece throws a RangeError.
+  // The error carries the id as its `cause`, and the edge delivers its text (issue #237).
   private pieceOf(id: PieceId): Piece<PieceId, TCoord> {
     const piece = this.pieces.find(id);
-    if (piece === undefined) throw new RangeError(`The level has no piece ${id}.`);
+    if (piece === undefined) {
+      throw new RangeError('The level has no piece with this id.', { cause: id });
+    }
     return piece;
   }
 

@@ -570,7 +570,9 @@ describe('GameEngine review findings', () => {
   it('should_throw_a_range_error_and_keep_the_state_when_the_rules_return_an_unknown_outcome', () => {
     const { engine } = gameWith(new FixedOutcomeRules('draw' as unknown as Outcome));
 
-    expect(() => engine.play(place(0, 0))).toThrow(new RangeError('Unknown outcome: draw.'));
+    expect(() => engine.play(place(0, 0))).toThrow(
+      new RangeError('Unknown outcome.', { cause: 'draw' }),
+    );
 
     expect(summary(engine)).toEqual(initial);
     expect(engine.takeEvents()).toEqual([]);

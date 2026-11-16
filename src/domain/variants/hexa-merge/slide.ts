@@ -1,4 +1,5 @@
 import type { GridAxis } from '../../engine/grid-topology';
+import type { ValueReceiver } from '../../engine/value-receiver';
 
 // The way a slide goes along the line that `Board.line()` gives: toward its last
 // coordinate (`forward`) or toward its first coordinate (`backward`).
@@ -6,6 +7,7 @@ import type { GridAxis } from '../../engine/grid-topology';
 // Each sense has one shared instance, which is frozen. So `equals()` compares two senses
 // by identity, and no code compares a text to know a sense.
 // A sense orders a line from its leading edge with `fromLeadingEdge()`.
+// The name is private (issue #237). `deliverTo()` gives it to a receiver.
 export class SlideSense {
   static readonly forward = new SlideSense('forward');
   static readonly backward = new SlideSense('backward');
@@ -31,9 +33,9 @@ export class SlideSense {
     return this.equals(SlideSense.forward) ? [...line].reverse() : [...line];
   }
 
-  // The name of the sense.
-  toString(): string {
-    return this.name;
+  // Gives the name of the sense to `receiver`. It returns nothing.
+  deliverTo(receiver: ValueReceiver<string>): void {
+    receiver.receive(this.name);
   }
 }
 

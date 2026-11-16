@@ -9,6 +9,7 @@ import {
   TriangleTopology,
   type TriangleCoord,
 } from '../../../src/domain/engine/triangle-topology';
+import { delivered } from '../../support/engine/value-receiver';
 
 // The real square and triangle families (issue 160, classes.md decision 17, D11).
 // The suite reads each family only through the `GeometryFactory` contract.
@@ -157,7 +158,7 @@ describe('GeometryFactory id', () => {
       TopologyId.triangle,
     ]);
     expect(
-      [new HexGeometry().id, new SquareGeometry().id, new TriangleGeometry().id].map(String),
+      [new HexGeometry().id, new SquareGeometry().id, new TriangleGeometry().id].map(delivered),
     ).toEqual(['hex', 'square', 'triangle']);
   });
 });

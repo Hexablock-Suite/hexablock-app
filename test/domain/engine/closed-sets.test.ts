@@ -14,13 +14,18 @@ import {
   TriangleDirection,
   TriangleTopology,
 } from '../../../src/domain/engine/triangle-topology';
+import type { ValueReceiver } from '../../../src/domain/engine/value-receiver';
+import { deliveries, RecordingReceiver } from '../../support/engine/value-receiver';
 
 // Issue #207 (classes.md decision 45): a closed union of texts is a class with a closed set
 // of instances. Each row holds one class of the engine, its instances and their texts.
 interface Member {
   equals(other: never): boolean;
-  toString(): string;
+  deliverTo(receiver: ValueReceiver<string>): void;
 }
+
+// The text that each member delivers to a receiver.
+const textsOf = (members: readonly Member[]) => members.map((member) => deliveries(member));
 
 type Row = readonly [name: string, type: object, members: readonly Member[], texts: string[]];
 
@@ -82,7 +87,26 @@ describe.each(table)('closed set %s', (_name, type, members, texts) => {
     expect(members.every((member) => member instanceof (type as () => void))).toBe(true);
     expect(instancesOf(type)).toEqual(members);
     expect(new Set(members).size).toBe(texts.length);
-    expect(members.map(String)).toEqual(texts);
+    expect(textsOf(members)).toEqual(texts.map((text) => [text]));
+  });
+
+  // Issue #237: the text leaves a member only through a receiver (rule R-no-delivery-call).
+  it('should_deliver_its_text_once_and_return_nothing_when_a_receiver_takes_it', () => {
+    for (const [index, member] of members.entries()) {
+      const receiver = new RecordingReceiver<string>();
+
+      const returned: void = member.deliverTo(receiver);
+
+      expect(returned).toBeUndefined();
+      expect(receiver.received()).toEqual([texts[index]]);
+    }
+  });
+
+  // Issue #237: no operation returns the text, `toString()` included.
+  it('should_give_no_text_when_a_template_literal_or_string_converts_a_member', () => {
+    expect(members.map((member) => `${String(member)}`)).toEqual(
+      members.map(() => '[object Object]'),
+    );
   });
 
   it('should_throw_a_range_error_when_a_cast_calls_the_constructor', () => {
@@ -97,7 +121,7 @@ describe.each(table)('closed set %s', (_name, type, members, texts) => {
       expect(Object.isFrozen(member)).toBe(true);
       expect(Reflect.set(member, 'name', 'forged')).toBe(false);
     }
-    expect(members.map(String)).toEqual(texts);
+    expect(textsOf(members)).toEqual(texts.map((text) => [text]));
   });
 
   it('should_be_equal_when_two_instances_have_one_name', () => {
@@ -183,18 +207,24 @@ describe('the axes and the directions of a topology', () => {
     expect(TriangleDirection.vertical.neighborOf(triangle(1, 0))).toEqual(triangle(1, -1));
   });
 
-  it('should_throw_a_range_error_when_a_line_follows_an_axis_of_another_topology', () => {
+  // Issue #237: the error carries the axis of the other topology as its `cause`,
+  // and the edge delivers its text.
+  it('should_throw_a_range_error_that_carries_the_axis_when_a_line_follows_an_axis_of_another_topology', () => {
     const read = () => [
       ...new HexTopology().line(SquareAxis.col as unknown as HexAxis, hex(0, 0), () => false),
     ];
 
-    expect(read).toThrow(new RangeError('The hex grid has no axis col.'));
+    expect(read).toThrow(
+      new RangeError('The hex grid has no such axis.', { cause: SquareAxis.col }),
+    );
   });
 
-  it('should_throw_a_range_error_when_a_neighbor_follows_a_direction_of_another_topology', () => {
+  it('should_throw_a_range_error_that_carries_the_direction_when_a_neighbor_follows_a_direction_of_another_topology', () => {
     const follow = () =>
       new SquareTopology().neighbor(square(0, 0), HexDirection.east as unknown as SquareDirection);
 
-    expect(follow).toThrow(new RangeError('The square grid has no direction east.'));
+    expect(follow).toThrow(
+      new RangeError('The square grid has no such direction.', { cause: HexDirection.east }),
+    );
   });
 });

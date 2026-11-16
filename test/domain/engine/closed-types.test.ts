@@ -47,7 +47,9 @@ describe('closed axis classes', () => {
       // @ts-expect-error `SquareAxis.col` is an axis of the square topology.
       ...triangleTopology.line(SquareAxis.col, triangle(0, 0), () => true),
     ];
-    expect(squareAxisOnTriangles).toThrow(new RangeError('The triangle grid has no axis col.'));
+    expect(squareAxisOnTriangles).toThrow(
+      new RangeError('The triangle grid has no such axis.', { cause: SquareAxis.col }),
+    );
   });
 
   it('should_reject_at_compile_time_when_a_board_line_has_a_misspelled_axis', () => {

@@ -64,7 +64,7 @@
       <h1>Geometry and board: Abstract Factory and Builder</h1>
 
       <svg
-        viewBox="0 0 1040 1524"
+        viewBox="0 0 1040 1556"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="geometry-title geometry-desc"
@@ -140,7 +140,7 @@
           x="24"
           y="24"
           width="992"
-          height="1284"
+          height="1316"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -583,7 +583,7 @@
           + turned(): HexCoord
         </text>
         <text x="88" y="760" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + toString(): string
+          + key(): CoordKey
         </text>
         <!-- Class: SquareCoord (value object): private values, own operations (decision 44) -->
         <rect
@@ -649,7 +649,7 @@
           + turned(): SquareCoord
         </text>
         <text x="360" y="744" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + toString(): string
+          + key(): CoordKey
         </text>
         <!-- Class: TriangleCoord (value object): no sum of one value at a time (decision 16) -->
         <rect
@@ -727,7 +727,7 @@
           + turned(): TriangleCoord
         </text>
         <text x="648" y="808" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + toString(): string
+          + key(): CoordKey
         </text>
         <!-- Class: HexTopology -->
         <rect
@@ -840,7 +840,7 @@
           x="640"
           y="356"
           width="280"
-          height="144"
+          height="160"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -897,14 +897,17 @@
           + equals(other: TopologyId): boolean
         </text>
         <text x="656" y="492" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + toString(): string
+          + deliverTo(receiver:
+        </text>
+        <text x="667" y="508" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          ValueReceiver&lt;string&gt;): void
         </text>
         <!-- Class: HexAxis (value object): a closed set of instances that steps along itself (decision 45) -->
         <rect
           x="72"
           y="836"
           width="248"
-          height="176"
+          height="192"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -960,14 +963,17 @@
           + backward(from: HexCoord): HexCoord
         </text>
         <text x="88" y="1004" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + toString(): string
+          + deliverTo(receiver:
+        </text>
+        <text x="99" y="1020" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          ValueReceiver&lt;string&gt;): void
         </text>
         <!-- Class: SquareAxis (value object): a closed set of instances that steps along itself (decision 45) -->
         <rect
           x="344"
           y="836"
           width="264"
-          height="176"
+          height="192"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1029,14 +1035,23 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          + toString(): string
+          + deliverTo(receiver:
+        </text>
+        <text
+          x="371"
+          y="1020"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          ValueReceiver&lt;string&gt;): void
         </text>
         <!-- Class: TriangleAxis (value object): a closed set of instances that steps along itself (decision 45) -->
         <rect
           x="632"
           y="836"
           width="320"
-          height="192"
+          height="208"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1107,14 +1122,23 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          + toString(): string
+          + deliverTo(receiver:
+        </text>
+        <text
+          x="659"
+          y="1036"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          ValueReceiver&lt;string&gt;): void
         </text>
         <!-- Lollipop: HexAxis implements the engine interface GridAxis -->
-        <line x1="96" y1="1012" x2="96" y2="1028" stroke="#17212a" stroke-width="1" />
-        <circle cx="96" cy="1033" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="96" y1="1028" x2="96" y2="1044" stroke="#17212a" stroke-width="1" />
+        <circle cx="96" cy="1049" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="107"
-          y="1036"
+          y="1052"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1122,11 +1146,11 @@
           GridAxis
         </text>
         <!-- Lollipop: SquareAxis implements the engine interface GridAxis -->
-        <line x1="368" y1="1012" x2="368" y2="1028" stroke="#17212a" stroke-width="1" />
-        <circle cx="368" cy="1033" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="368" y1="1028" x2="368" y2="1044" stroke="#17212a" stroke-width="1" />
+        <circle cx="368" cy="1049" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="379"
-          y="1036"
+          y="1052"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1134,11 +1158,11 @@
           GridAxis
         </text>
         <!-- Lollipop: TriangleAxis implements the engine interface GridAxis -->
-        <line x1="656" y1="1028" x2="656" y2="1044" stroke="#17212a" stroke-width="1" />
-        <circle cx="656" cy="1049" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="656" y1="1044" x2="656" y2="1060" stroke="#17212a" stroke-width="1" />
+        <circle cx="656" cy="1065" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="667"
-          y="1052"
+          y="1068"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1148,18 +1172,18 @@
         <!-- Class: HexDirection (value object): a closed set of instances that gives the neighbor of a cell (decision 45) -->
         <rect
           x="72"
-          y="1076"
+          y="1092"
           width="248"
-          height="176"
+          height="192"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="72" y1="1124" x2="320" y2="1124" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="72" y1="1140" x2="320" y2="1140" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="196"
-          y="1094"
+          y="1110"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1170,7 +1194,7 @@
         </text>
         <text
           x="196"
-          y="1112"
+          y="1128"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1179,15 +1203,15 @@
         >
           HexDirection
         </text>
-        <text x="88" y="1140" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="1156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - name: string
         </text>
-        <text x="88" y="1156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="1172" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - step: HexCoord
         </text>
         <text
           x="88"
-          y="1172"
+          y="1188"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1197,7 +1221,7 @@
         </text>
         <text
           x="99"
-          y="1188"
+          y="1204"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1205,31 +1229,34 @@
         >
           southWest, northEast: HexDirection
         </text>
-        <line x1="72" y1="1196" x2="320" y2="1196" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="88" y="1212" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="72" y1="1212" x2="320" y2="1212" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="88" y="1228" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: GridDirection): boolean
         </text>
-        <text x="88" y="1228" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="1244" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + neighborOf(c: HexCoord): HexCoord
         </text>
-        <text x="88" y="1244" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + toString(): string
+        <text x="88" y="1260" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + deliverTo(receiver:
+        </text>
+        <text x="99" y="1276" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          ValueReceiver&lt;string&gt;): void
         </text>
         <!-- Class: SquareDirection (value object): a closed set of instances that gives the neighbor of a cell (decision 45) -->
         <rect
           x="344"
-          y="1076"
+          y="1092"
           width="264"
-          height="160"
+          height="176"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="344" y1="1124" x2="608" y2="1124" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="344" y1="1140" x2="608" y2="1140" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="476"
-          y="1094"
+          y="1110"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1240,7 +1267,7 @@
         </text>
         <text
           x="476"
-          y="1112"
+          y="1128"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1251,7 +1278,7 @@
         </text>
         <text
           x="360"
-          y="1140"
+          y="1156"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1260,7 +1287,7 @@
         </text>
         <text
           x="360"
-          y="1156"
+          y="1172"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1269,7 +1296,7 @@
         </text>
         <text
           x="360"
-          y="1172"
+          y="1188"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1277,10 +1304,10 @@
         >
           + north, east, south, west: SquareDirection
         </text>
-        <line x1="344" y1="1180" x2="608" y2="1180" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="344" y1="1196" x2="608" y2="1196" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="360"
-          y="1196"
+          y="1212"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1289,7 +1316,7 @@
         </text>
         <text
           x="360"
-          y="1212"
+          y="1228"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1298,28 +1325,37 @@
         </text>
         <text
           x="360"
-          y="1228"
+          y="1244"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          + toString(): string
+          + deliverTo(receiver:
+        </text>
+        <text
+          x="371"
+          y="1260"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          ValueReceiver&lt;string&gt;): void
         </text>
         <!-- Class: TriangleDirection (value object): a closed set of instances that gives the neighbor of a cell (decision 45) -->
         <rect
           x="632"
-          y="1076"
+          y="1092"
           width="320"
-          height="160"
+          height="176"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="632" y1="1124" x2="952" y2="1124" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="632" y1="1140" x2="952" y2="1140" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="792"
-          y="1094"
+          y="1110"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1330,7 +1366,7 @@
         </text>
         <text
           x="792"
-          y="1112"
+          y="1128"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1341,7 +1377,7 @@
         </text>
         <text
           x="648"
-          y="1140"
+          y="1156"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1350,7 +1386,7 @@
         </text>
         <text
           x="648"
-          y="1156"
+          y="1172"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1359,7 +1395,7 @@
         </text>
         <text
           x="648"
-          y="1172"
+          y="1188"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1367,10 +1403,10 @@
         >
           + left, right, vertical: TriangleDirection
         </text>
-        <line x1="632" y1="1180" x2="952" y2="1180" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="632" y1="1196" x2="952" y2="1196" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="648"
-          y="1196"
+          y="1212"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1379,7 +1415,7 @@
         </text>
         <text
           x="648"
-          y="1212"
+          y="1228"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1388,19 +1424,28 @@
         </text>
         <text
           x="648"
-          y="1228"
+          y="1244"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          + toString(): string
+          + deliverTo(receiver:
+        </text>
+        <text
+          x="659"
+          y="1260"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          ValueReceiver&lt;string&gt;): void
         </text>
         <!-- Lollipop: HexDirection implements the engine interface GridDirection -->
-        <line x1="96" y1="1252" x2="96" y2="1268" stroke="#17212a" stroke-width="1" />
-        <circle cx="96" cy="1273" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="96" y1="1284" x2="96" y2="1300" stroke="#17212a" stroke-width="1" />
+        <circle cx="96" cy="1305" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="107"
-          y="1276"
+          y="1308"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1408,11 +1453,11 @@
           GridDirection
         </text>
         <!-- Lollipop: SquareDirection implements the engine interface GridDirection -->
-        <line x1="368" y1="1236" x2="368" y2="1252" stroke="#17212a" stroke-width="1" />
-        <circle cx="368" cy="1257" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="368" y1="1268" x2="368" y2="1284" stroke="#17212a" stroke-width="1" />
+        <circle cx="368" cy="1289" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="379"
-          y="1260"
+          y="1292"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1420,11 +1465,11 @@
           GridDirection
         </text>
         <!-- Lollipop: TriangleDirection implements the engine interface GridDirection -->
-        <line x1="656" y1="1236" x2="656" y2="1252" stroke="#17212a" stroke-width="1" />
-        <circle cx="656" cy="1257" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="656" y1="1268" x2="656" y2="1284" stroke="#17212a" stroke-width="1" />
+        <circle cx="656" cy="1289" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="667"
-          y="1260"
+          y="1292"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1483,7 +1528,7 @@
         <!-- Footnote: classes the budget leaves out -->
         <text
           x="24"
-          y="1332"
+          y="1364"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1494,7 +1539,7 @@
         </text>
         <text
           x="24"
-          y="1348"
+          y="1380"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1504,7 +1549,7 @@
         </text>
         <text
           x="24"
-          y="1364"
+          y="1396"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1514,7 +1559,7 @@
         </text>
         <text
           x="24"
-          y="1380"
+          y="1412"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1524,7 +1569,7 @@
         </text>
         <text
           x="24"
-          y="1396"
+          y="1428"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1535,15 +1580,15 @@
         <!-- Legend -->
         <line
           x1="24"
-          y1="1416"
+          y1="1448"
           x2="1016"
-          y2="1416"
+          y2="1448"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1434"
+          y="1466"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1553,9 +1598,9 @@
         </text>
         <line
           x1="24"
-          y1="1452"
+          y1="1484"
           x2="52"
-          y2="1452"
+          y2="1484"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -1563,7 +1608,7 @@
         />
         <text
           x="60"
-          y="1456"
+          y="1488"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1572,16 +1617,16 @@
         </text>
         <line
           x1="144"
-          y1="1452"
+          y1="1484"
           x2="172"
-          y2="1452"
+          y2="1484"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#geo-diamond-hollow)"
         />
         <text
           x="180"
-          y="1456"
+          y="1488"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1590,16 +1635,16 @@
         </text>
         <line
           x1="384"
-          y1="1452"
+          y1="1484"
           x2="412"
-          y2="1452"
+          y2="1484"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#geo-open)"
         />
         <text
           x="420"
-          y="1456"
+          y="1488"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1608,7 +1653,7 @@
         </text>
         <rect
           x="24"
-          y="1472"
+          y="1504"
           width="28"
           height="12"
           rx="2"
@@ -1618,7 +1663,7 @@
         />
         <text
           x="60"
-          y="1481"
+          y="1513"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1627,7 +1672,7 @@
         </text>
         <rect
           x="184"
-          y="1472"
+          y="1504"
           width="28"
           height="12"
           rx="2"
@@ -1638,7 +1683,7 @@
         />
         <text
           x="220"
-          y="1481"
+          y="1513"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1647,7 +1692,7 @@
         </text>
         <rect
           x="440"
-          y="1472"
+          y="1504"
           width="28"
           height="12"
           rx="2"
@@ -1658,7 +1703,7 @@
         />
         <text
           x="476"
-          y="1481"
+          y="1513"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1667,7 +1712,7 @@
         </text>
         <rect
           x="648"
-          y="1472"
+          y="1504"
           width="28"
           height="12"
           rx="2"
@@ -1678,7 +1723,7 @@
         />
         <text
           x="684"
-          y="1481"
+          y="1513"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1687,7 +1732,7 @@
         </text>
         <rect
           x="24"
-          y="1496"
+          y="1528"
           width="28"
           height="12"
           rx="2"
@@ -1697,18 +1742,18 @@
         />
         <text
           x="60"
-          y="1505"
+          y="1537"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
         </text>
-        <line x1="184" y1="1502" x2="200" y2="1502" stroke="#17212a" stroke-width="1" />
-        <circle cx="205" cy="1502" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="184" y1="1534" x2="200" y2="1534" stroke="#17212a" stroke-width="1" />
+        <circle cx="205" cy="1534" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="220"
-          y="1505"
+          y="1537"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
