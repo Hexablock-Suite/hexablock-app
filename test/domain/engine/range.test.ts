@@ -1,75 +1,63 @@
 /** @jest-environment node */
 import { Range } from '../../../src/domain/engine/range';
+import { Rank } from '../../support/engine/rank';
 
-// Issue #129: a generic closed interval for the two-sided limits of the domain.
-// It mirrors the `Range<T>` of hexablock-api, with the same API and message.
+// Issue #129: a generic closed interval for the limits between value objects.
+// Issue #239: `T` is a value object that knows its order, so no order is a number.
+
+const ranks = (...positions: number[]) => positions.map((position) => Rank.of(position));
 
 describe('Range', () => {
   it('should_contain_the_value_when_it_lies_between_the_bounds_inclusive', () => {
-    const range = Range.ofNumbers(3, 32);
+    const range = Range.of(Rank.of(3), Rank.of(32));
 
-    expect([3, 4, 31, 32].map((value) => range.contains(value))).toEqual([true, true, true, true]);
+    expect(ranks(3, 4, 31, 32).map((rank) => range.contains(rank))).toEqual([
+      true,
+      true,
+      true,
+      true,
+    ]);
   });
 
-  it('should_not_contain_the_value_when_it_lies_outside_the_bounds_or_is_not_a_number', () => {
-    const range = Range.ofNumbers(3, 32);
+  it('should_not_contain_the_value_when_it_lies_outside_the_bounds', () => {
+    const range = Range.of(Rank.of(3), Rank.of(32));
 
-    for (const value of [2, 33, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, Number.NaN]) {
-      expect(range.contains(value)).toBe(false);
-    }
-  });
-
-  it('should_contain_an_infinite_value_when_the_upper_bound_is_infinite', () => {
-    const range = Range.ofNumbers(0, Number.POSITIVE_INFINITY);
-
-    expect(range.contains(Number.POSITIVE_INFINITY)).toBe(true);
-    expect(range.contains(-1)).toBe(false);
-  });
-
-  it('should_keep_the_bounds_when_a_range_is_created', () => {
-    const range = Range.ofNumbers(8, 128);
-
-    expect(range.equals(Range.ofNumbers(8, 128))).toBe(true);
-    expect(range.equals(Range.ofNumbers(8, 127))).toBe(false);
-    expect(range.equals(Range.ofNumbers(9, 128))).toBe(false);
-    expect([7, 8, 128, 129].map((value) => range.contains(value))).toEqual([
+    expect(ranks(2, 33, -1000, 1000).map((rank) => range.contains(rank))).toEqual([
       false,
-      true,
-      true,
+      false,
+      false,
       false,
     ]);
   });
 
   it('should_contain_only_the_bound_when_min_equals_max', () => {
-    const range = Range.ofNumbers(5, 5);
+    const range = Range.of(Rank.of(5), Rank.of(5));
 
-    expect([4, 5, 6].map((value) => range.contains(value))).toEqual([false, true, false]);
+    expect(ranks(4, 5, 6).map((rank) => range.contains(rank))).toEqual([false, true, false]);
   });
 
-  it('should_contain_negative_zero_when_zero_is_a_bound', () => {
-    expect(Range.ofNumbers(0, 1).contains(-0)).toBe(true);
-    expect(Range.ofNumbers(-1, 0).contains(-0)).toBe(true);
+  // The order of `T` decides: a value that shares a place with a bound lies inside.
+  it('should_contain_the_value_when_it_shares_a_place_with_a_bound_but_is_another_object', () => {
+    const range = Range.of(Rank.of(8), Rank.of(128));
+
+    expect(ranks(8, 128).map((rank) => range.contains(rank))).toEqual([true, true]);
+    expect(range.equals(Range.of(Rank.of(8), Rank.of(128)))).toBe(true);
+    expect(range.equals(Range.of(Rank.of(8), Rank.of(127)))).toBe(false);
+    expect(range.equals(Range.of(Rank.of(9), Rank.of(128)))).toBe(false);
   });
 
-  it('should_throw_a_range_error_when_min_is_greater_than_max_or_a_bound_is_not_a_number', () => {
-    for (const [min, max] of [
-      [5, 4],
-      [Number.NaN, 4],
-      [1, Number.NaN],
-    ] as const) {
-      expect(() => Range.ofNumbers(min, max)).toThrow(new RangeError('A Range needs min <= max.'));
-    }
-  });
-
-  it('should_order_the_values_with_the_compare_function_when_the_bounds_are_not_numbers', () => {
-    const byLength = (left: string, right: string) => left.length - right.length;
-    const range = Range.of<string>('ab', 'abcd', byLength);
-
-    expect(range.contains('xyz')).toBe(true);
-    expect(range.contains('x')).toBe(false);
-    expect(range.contains('xyzzy')).toBe(false);
-    expect(() => Range.of('abcd', 'ab', byLength)).toThrow(
+  it('should_throw_a_range_error_when_min_comes_after_max', () => {
+    expect(() => Range.of(Rank.of(5), Rank.of(4))).toThrow(
       new RangeError('A Range needs min <= max.'),
     );
+  });
+
+  // A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails
+  // when the line compiles, because then the directive is unused.
+  it('should_reject_at_compile_time_when_a_caller_builds_a_range_of_numbers', () => {
+    // @ts-expect-error `Range` has no factory method for numbers.
+    expect(() => Range.ofNumbers(1, 5)).toThrow(TypeError);
+    // @ts-expect-error A number has no `isBefore()`, so it is no bound of a range.
+    expect(() => Range.of(1, 5)).toThrow(TypeError);
   });
 });

@@ -1,5 +1,6 @@
 import { BoardShape } from './board-shape';
 import { coordKey, type CoordKey } from './coord-key';
+import { Distance } from './distance';
 import type { GridAxis, GridDirection, GridTopology } from './grid-topology';
 import type { Radius } from './radius';
 import type { RegionSize } from './region-size';
@@ -42,6 +43,12 @@ export class SquareCoord {
   // The coordinate on the other side of the origin.
   opposite(): SquareCoord {
     return SquareCoord.of(-this.col, -this.row);
+  }
+
+  // The count of steps between this cell and `other` through the four neighbors:
+  // the sum of the two differences, as a `Distance` (issue #243).
+  distanceTo(other: SquareCoord): Distance {
+    return Distance.of(Math.abs(this.col - other.col) + Math.abs(this.row - other.row));
   }
 
   // This coordinate after a quarter turn around the origin: (col, row) becomes (-row, col).
@@ -157,6 +164,12 @@ export class SquareDirection implements GridDirection {
   }
 }
 
+// A walk along a column from south to north. A ring reads each column in this order.
+const northward = {
+  forward: (from: SquareCoord) => SquareDirection.north.neighborOf(from),
+  backward: (from: SquareCoord) => SquareDirection.south.neighborOf(from),
+};
+
 // Strategy (statement §3.3, D4): the real square topology. `SquareGeometry` creates it.
 export class SquareTopology implements GridTopology<SquareCoord, SquareAxis, SquareDirection> {
   fullTurn(): Turns {
@@ -215,14 +228,12 @@ export class SquareTopology implements GridTopology<SquareCoord, SquareAxis, Squ
   }
 
   // The cells at Manhattan distance `radius`, the distance of the four neighbors.
-  // Each column offset has one row offset of zero or more that completes the distance.
-  // The cell below the center comes first, and then the cell above it.
+  // The columns run from west to east, and each column runs from south to north.
+  // So in each column the cell below the center comes first, and then the cell above it.
   *ring(center: SquareCoord, radius: Radius): Iterable<SquareCoord> {
-    for (const dc of radius.offsets()) {
-      for (const dr of radius.offsets()) {
-        if (dr < 0 || !radius.measures(Math.abs(dc) + dr)) continue;
-        yield center.plus(square(dc, dr));
-        if (dr !== 0) yield center.plus(square(dc, -dr));
+    for (const column of radius.offsets(center, SquareAxis.col)) {
+      for (const c of radius.offsets(column, northward)) {
+        if (radius.measures(c.distanceTo(center))) yield c;
       }
     }
   }
@@ -230,8 +241,8 @@ export class SquareTopology implements GridTopology<SquareCoord, SquareAxis, Squ
   // A square of `size` × `size` cells. Its corner is the origin.
   region(size: RegionSize): BoardShape<SquareCoord> {
     const cells: SquareCoord[] = [];
-    for (const row of size.indexes()) {
-      for (const col of size.indexes()) cells.push(square(col, row));
+    for (const row of size.indexes(square(0, 0), SquareAxis.row)) {
+      for (const c of size.indexes(row, SquareAxis.col)) cells.push(c);
     }
     return BoardShape.of(cells);
   }

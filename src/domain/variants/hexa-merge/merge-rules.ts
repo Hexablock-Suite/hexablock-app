@@ -17,8 +17,8 @@ import { SLIDE_SENSES, Slide } from './slide';
 // after the new tile appears.
 // The target tile sets `targetReached` and does not end the game (A3).
 // The rules decide. The state changes itself in place: `MergeState.slide()` packs the tiles,
-// and `MergeState.addNewTile()` puts the new tile. The rules read the axes through the photo
-// of the state and ask `canSlide()`.
+// and `MergeState.addNewTile()` puts the new tile. The rules ask the photo of the state
+// for the axes of its board, and they ask `canSlide()`.
 export class MergeRules<
   TCell extends IMergeable<TCell>,
   TCoord,
@@ -35,7 +35,7 @@ export class MergeRules<
   }
 
   *validMoves(state: MergeState<TCell, TCoord, TAxis>): Iterable<Slide<TAxis>> {
-    for (const axis of state.snapshot().board.axes()) {
+    for (const axis of state.snapshot().boardCopy().axes()) {
       for (const toward of SLIDE_SENSES) {
         const slide = Slide.of(axis, toward);
         if (this.isValid(state, slide)) yield slide;

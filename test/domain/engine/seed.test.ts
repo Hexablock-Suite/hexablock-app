@@ -1,14 +1,17 @@
 /** @jest-environment node */
+import { GeneratorState } from '../../../src/domain/engine/generator-state';
 import { Mulberry32Random } from '../../../src/domain/engine/mulberry32-random';
 import { SeededPieceSource } from '../../../src/domain/engine/piece-source';
 import type { RandomSource } from '../../../src/domain/engine/random-source';
 import { Seed } from '../../../src/domain/engine/seed';
+import { delivered } from '../../support/engine/value-receiver';
 
 // The seed of a game is a value object (issue 210, classes.md decision 48).
 // It holds a whole number from 0 to 4294967295, and it is the one place that checks the range.
 
+// The numbers of the next `count` draws of `random` (issue #243).
 const numbers = (random: RandomSource, count: number) =>
-  Array.from({ length: count }, () => random.next());
+  Array.from({ length: count }, () => delivered(random.next()));
 
 describe('Seed', () => {
   it('should_throw_a_range_error_when_the_seed_is_not_a_whole_number_from_0_to_4294967295', () => {
@@ -58,8 +61,17 @@ describe('Seed', () => {
     );
   });
 
+  // Issue #243: the first state of a generator is a `GeneratorState`, not a number.
+  it('should_start_a_generator_from_the_state_of_the_seed_when_a_seed_gives_its_state', () => {
+    const random = Mulberry32Random.from(Seed.of(7));
+
+    expect(Seed.of(7).generatorState().equals(GeneratorState.of(7))).toBe(true);
+    expect(Seed.of(7).generatorState().equals(GeneratorState.of(8))).toBe(false);
+    expect(random.next().equals(GeneratorState.of(7).advanced().draw())).toBe(true);
+  });
+
   it('should_draw_the_same_pieces_when_two_sources_start_from_equal_seeds', () => {
-    const draw = (random: RandomSource) => Math.floor(random.next() * 1000);
+    const draw = (random: RandomSource) => Math.floor(delivered(random.next()) * 1000);
     const first = (seed: Seed) => {
       const pieces: number[] = [];
       for (const piece of new SeededPieceSource(seed, draw)) {

@@ -64,7 +64,7 @@
       <h1>Hexa Sort: stacks, cascades and levels</h1>
 
       <svg
-        viewBox="0 0 1040 1408"
+        viewBox="0 0 1040 1440"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="sort-title sort-desc"
@@ -85,7 +85,8 @@
           field, and SortStarThreshold tells whether a play meets its limit: it gives the limit to
           isWithin() of the play. SortState is an entity inside the GameEngine aggregate: its own
           GameStateId is its identity, it keeps the MatchId of its game, and it changes in place
-          only through its business methods.
+          only through its business methods. TileCount is the value object of the height of a stack:
+          ColorStack gives it, and SortState keeps the TileCount of each cleared stack.
         </desc>
         <defs>
           <marker
@@ -520,7 +521,7 @@
           - goalsDone: ClearedStacks
         </text>
         <text x="536" y="582" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - clearedTiles: number[]
+          - clearedTiles: TileCount[]
         </text>
         <text x="536" y="596" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - placedAt: TCoord | undefined
@@ -637,7 +638,7 @@
           x="816"
           y="400"
           width="160"
-          height="112"
+          height="128"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -675,6 +676,9 @@
         </text>
         <text x="832" y="504" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + topRun(): Color[]
+        </text>
+        <text x="832" y="520" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + tileCount(): TileCount
         </text>
 
         <!-- Class: SortLevel (value object, decision 47) -->
@@ -1169,6 +1173,73 @@
           boolean
         </text>
 
+        <!-- Class: TileCount (value object, issue 232) -->
+        <rect
+          x="744"
+          y="920"
+          width="256"
+          height="128"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="744" y1="968" x2="1000" y2="968" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="872"
+          y="938"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="872"
+          y="956"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          TileCount
+        </text>
+        <text x="760" y="984" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - value: number
+        </text>
+        <line x1="744" y1="992" x2="1000" y2="992" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="760"
+          y="1008"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + of(value: number): TileCount
+        </text>
+        <text
+          x="760"
+          y="1024"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + equals(other: TileCount): boolean
+        </text>
+        <text
+          x="760"
+          y="1040"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + points(): Score
+        </text>
+
         <!-- UML template boxes: type parameters on the top-right corner -->
         <rect
           x="964"
@@ -1275,7 +1346,7 @@
         >
           TCoord
         </text>
-        <!-- The footnote and the legend sit below the zone, which grew by 100 and then by 144. It grew by 32 more for the delivery operation of ClearedStacks (#228), and by 40 more for the star thresholds of SortLevel (#156). -->
+        <!-- The footnote and the legend sit below the zone, which grew by 100 and then by 144. It grew by 32 more for the delivery operation of ClearedStacks (#228). The footnote has one more line for TileCount (#232). The zone grew by 40 more for the star thresholds of SortLevel (#156). -->
         <g transform="translate(0 520)">
           <!-- Footnote: classes the budget leaves out -->
           <text
@@ -1319,8 +1390,7 @@
             font-family="'IBM Plex Sans', sans-serif"
           >
             Each with step returns the builder, and only build() returns the level (decision 15,
-            D9). The header of SortLevel is the planned design of #167, and #167 gives the star
-            thresholds with withStars(). A level with no threshold gives 0 stars.
+            D9). The header of SortLevel and the call of withStars() are the planned design of #167.
           </text>
           <text
             x="24"
@@ -1349,21 +1419,43 @@
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            starsFor() of ILevelStars counts with sortStars(play, thresholds) the leading thresholds
-            that the play meets (decision 36). Moves and Stars: Part 1, view 4.
+            starsFor() of ILevelStars counts with sortStars() the leading thresholds that the play
+            meets, so a level with no threshold gives 0 stars (decision 36). Moves, Stars: Part 1,
+            view 4.
+          </text>
+          <text
+            x="24"
+            y="792"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            TileCount is the height of a stack (issue 232): ColorStack.tileCount() gives it,
+            SortState keeps one for each stack that the last turn cleared, and SortScoring adds
+            their points.
+          </text>
+          <text
+            x="24"
+            y="808"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            SortSnapshot keeps its fields private (#245): offeredStack(), goalsReached(), goal(),
+            clearedStackHeights(), lastPlacedAt(); SortView uses deliverTo().
           </text>
           <!-- Legend -->
           <line
             x1="24"
-            y1="800"
+            y1="832"
             x2="1016"
-            y2="800"
+            y2="832"
             stroke="rgba(23,33,42,0.10)"
             stroke-width="0.8"
           />
           <text
             x="24"
-            y="818"
+            y="850"
             fill="#5b6873"
             font-size="8"
             font-family="'IBM Plex Mono', monospace"
@@ -1374,16 +1466,16 @@
 
           <line
             x1="24"
-            y1="836"
+            y1="868"
             x2="52"
-            y2="836"
+            y2="868"
             stroke="#5b6873"
             stroke-width="1"
             marker-end="url(#sort-open)"
           />
           <text
             x="60"
-            y="840"
+            y="872"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1392,7 +1484,7 @@
           </text>
           <rect
             x="24"
-            y="856"
+            y="888"
             width="28"
             height="12"
             rx="2"
@@ -1402,7 +1494,7 @@
           />
           <text
             x="60"
-            y="865"
+            y="897"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1411,7 +1503,7 @@
           </text>
           <rect
             x="184"
-            y="856"
+            y="888"
             width="28"
             height="12"
             rx="2"
@@ -1422,7 +1514,7 @@
           />
           <text
             x="220"
-            y="865"
+            y="897"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1431,7 +1523,7 @@
           </text>
           <rect
             x="424"
-            y="856"
+            y="888"
             width="28"
             height="12"
             rx="2"
@@ -1441,18 +1533,18 @@
           />
           <text
             x="460"
-            y="865"
+            y="897"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
           >
             Teal · focal class
           </text>
-          <line x1="584" y1="862" x2="600" y2="862" stroke="#17212a" stroke-width="1" />
-          <circle cx="605" cy="862" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          <line x1="584" y1="894" x2="600" y2="894" stroke="#17212a" stroke-width="1" />
+          <circle cx="605" cy="894" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
           <text
             x="620"
-            y="865"
+            y="897"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1461,7 +1553,7 @@
           </text>
           <rect
             x="800"
-            y="856"
+            y="888"
             width="28"
             height="12"
             rx="2"
@@ -1472,7 +1564,7 @@
           />
           <text
             x="836"
-            y="865"
+            y="897"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"

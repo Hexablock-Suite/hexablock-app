@@ -1,5 +1,6 @@
 import { BoardShape } from './board-shape';
 import { coordKey, type CoordKey } from './coord-key';
+import { Distance } from './distance';
 import type { GridAxis, GridDirection, GridTopology } from './grid-topology';
 import type { Radius } from './radius';
 import type { RegionSize } from './region-size';
@@ -44,11 +45,11 @@ export class HexCoord {
     return HexCoord.of(-this.q, -this.r);
   }
 
-  // The count of steps between this cell and `other`.
-  distanceTo(other: HexCoord): number {
+  // The count of steps between this cell and `other`, as a `Distance` (issue #243).
+  distanceTo(other: HexCoord): Distance {
     const dq = this.q - other.q;
     const dr = this.r - other.r;
-    return (Math.abs(dq) + Math.abs(dr) + Math.abs(dq + dr)) / 2;
+    return Distance.of((Math.abs(dq) + Math.abs(dr) + Math.abs(dq + dr)) / 2);
   }
 
   // This coordinate after a sixth of a turn around the origin: (q, r) becomes (-r, q + r).
@@ -232,10 +233,11 @@ export class HexTopology implements GridTopology<HexCoord, HexAxis, HexDirection
     for (let c = start; contains(c); c = axis.forward(c)) yield c;
   }
 
+  // The cells of the square of offsets around the center, along `q` and then along `r`,
+  // that lie exactly at the distance of the radius.
   *ring(center: HexCoord, radius: Radius): Iterable<HexCoord> {
-    for (const dq of radius.offsets()) {
-      for (const dr of radius.offsets()) {
-        const c = center.plus(hex(dq, dr));
+    for (const column of radius.offsets(center, HexAxis.q)) {
+      for (const c of radius.offsets(column, HexAxis.r)) {
         if (radius.measures(c.distanceTo(center))) yield c;
       }
     }
@@ -245,9 +247,8 @@ export class HexTopology implements GridTopology<HexCoord, HexAxis, HexDirection
   region(size: RegionSize): BoardShape<HexCoord> {
     const origin = hex(0, 0);
     const cells: HexCoord[] = [];
-    for (const q of size.offsets()) {
-      for (const r of size.offsets()) {
-        const c = hex(q, r);
+    for (const column of size.offsets(origin, HexAxis.q)) {
+      for (const c of size.offsets(column, HexAxis.r)) {
         if (size.holds(c.distanceTo(origin))) cells.push(c);
       }
     }

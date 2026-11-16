@@ -91,7 +91,7 @@ export class SortLevel implements ILevelStars {
     if ('stacks' in supply) return builders.fixed(supply.stacks);
     const { colors } = supply;
     return builders.seeded(supply.seed, (random) => {
-      const color = colors[Math.floor(random.next() * colors.length)] ?? (colors[0] as Color);
+      const color = random.next().pick(colors);
       return ColorStack.of([color]);
     });
   }

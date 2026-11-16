@@ -6,8 +6,12 @@ import { GameStateId } from '../../../../src/domain/engine/game-state-id';
 import { MatchId } from '../../../../src/domain/engine/match-id';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import type { Color } from '../../../../src/domain/engine/color';
+import { CellCount } from '../../../../src/domain/variants/hexa-lines/cell-count';
+import { LineCount } from '../../../../src/domain/variants/hexa-lines/line-count';
 import { LinesState } from '../../../../src/domain/variants/hexa-lines/lines-state';
 import { PlacePiece } from '../../../../src/domain/variants/hexa-lines/place-piece';
+import { Streak } from '../../../../src/domain/variants/hexa-lines/streak';
+import { TrayPosition } from '../../../../src/domain/variants/hexa-lines/tray-position';
 import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
 import {
   filledKeys,
@@ -28,12 +32,12 @@ const domino = piece(square(0, 0), square(1, 0));
 function facts(state: LinesState<SquareCoord>) {
   return {
     filled: filledKeys(state.snapshot()),
-    tray: [...state.snapshot().tray],
-    left: state.snapshot().source.hasNext(),
-    streak: state.snapshot().streak,
-    linesCleared: state.snapshot().linesCleared,
-    cellsPlaced: state.snapshot().cellsPlaced,
-    score: state.snapshot().score,
+    tray: [...state.snapshot().trayPieces()],
+    left: state.snapshot().pieceSource().hasNext(),
+    streak: state.snapshot().currentStreak(),
+    linesCleared: state.snapshot().lastCombo(),
+    cellsPlaced: state.snapshot().lastPlacedCells(),
+    score: state.snapshot().scoreSoFar(),
   };
 }
 
@@ -49,33 +53,33 @@ describe('LinesState', () => {
   it('should_put_the_piece_on_the_board_and_take_it_from_the_tray_when_a_tray_piece_is_placed', () => {
     const state = linesState(squareTopology, 3, { tray: [domino, one], source: [one] });
 
-    state.placePiece(new PlacePiece(0, square(1, 2)));
+    state.placePiece(new PlacePiece(TrayPosition.of(0), square(1, 2)));
 
     expect(filledKeys(state.snapshot())).toEqual(['1,2', '2,2']);
-    expect(state.snapshot().board.occupantAt(square(1, 2))).toBe(red);
-    expect(state.snapshot().cellsPlaced).toBe(2);
-    expect(state.snapshot().tray).toEqual([one]);
-    expect(state.snapshot().source.hasNext()).toBe(true);
+    expect(state.snapshot().boardCopy().occupantAt(square(1, 2))).toBe(red);
+    expect(state.snapshot().lastPlacedCells()).toEqual(CellCount.of(2));
+    expect(state.snapshot().trayPieces()).toEqual([one]);
+    expect(state.snapshot().pieceSource().hasNext()).toBe(true);
   });
 
   it('should_fill_the_tray_from_the_source_when_the_last_tray_piece_is_placed', () => {
     const [a, b, c, d] = [piece(square(0, 0)), piece(square(0, 0)), piece(square(0, 0)), one];
     const state = linesState(squareTopology, 3, { tray: [one], source: [a!, b!, c!, d] });
 
-    state.placePiece(new PlacePiece(0, square(0, 0)));
+    state.placePiece(new PlacePiece(TrayPosition.of(0), square(0, 0)));
 
-    expect(state.snapshot().tray).toEqual([a, b, c]);
-    expect(state.snapshot().source.hasNext()).toBe(true);
-    expect(state.snapshot().cellsPlaced).toBe(1);
+    expect(state.snapshot().trayPieces()).toEqual([a, b, c]);
+    expect(state.snapshot().pieceSource().hasNext()).toBe(true);
+    expect(state.snapshot().lastPlacedCells()).toEqual(CellCount.of(1));
   });
 
   it('should_fill_the_tray_with_fewer_pieces_when_the_source_ends_first', () => {
     const state = linesState(squareTopology, 3, { tray: [one], source: [domino] });
 
-    state.placePiece(new PlacePiece(0, square(0, 0)));
+    state.placePiece(new PlacePiece(TrayPosition.of(0), square(0, 0)));
 
-    expect(state.snapshot().tray).toEqual([domino]);
-    expect(state.snapshot().source.hasNext()).toBe(false);
+    expect(state.snapshot().trayPieces()).toEqual([domino]);
+    expect(state.snapshot().pieceSource().hasNext()).toBe(false);
   });
 
   it('should_draw_a_full_tray_when_a_game_starts', () => {
@@ -86,12 +90,12 @@ describe('LinesState', () => {
       new FixedListPieceSource([one, domino, one, domino]),
     );
 
-    expect(state.snapshot().tray).toEqual([one, domino, one]);
-    expect(state.snapshot().source.hasNext()).toBe(true);
+    expect(state.snapshot().trayPieces()).toEqual([one, domino, one]);
+    expect(state.snapshot().pieceSource().hasNext()).toBe(true);
     expect(facts(state)).toMatchObject({
-      streak: 0,
-      linesCleared: 0,
-      cellsPlaced: 0,
+      streak: Streak.of(0),
+      linesCleared: LineCount.of(0),
+      cellsPlaced: CellCount.of(0),
       score: Score.of(0),
     });
   });
@@ -99,11 +103,11 @@ describe('LinesState', () => {
   it('should_tell_whether_a_tray_piece_fits_when_a_placement_is_asked', () => {
     const state = linesState(squareTopology, 3, { filled: [square(1, 1)], tray: [domino, one] });
 
-    expect(state.canPlace(new PlacePiece(0, square(0, 0)))).toBe(true);
-    expect(state.canPlace(new PlacePiece(0, square(0, 1)))).toBe(false);
-    expect(state.canPlace(new PlacePiece(0, square(2, 0)))).toBe(false);
-    expect(state.canPlace(new PlacePiece(1, square(1, 1)))).toBe(false);
-    expect(state.canPlace(new PlacePiece(2, square(0, 0)))).toBe(false);
+    expect(state.canPlace(new PlacePiece(TrayPosition.of(0), square(0, 0)))).toBe(true);
+    expect(state.canPlace(new PlacePiece(TrayPosition.of(0), square(0, 1)))).toBe(false);
+    expect(state.canPlace(new PlacePiece(TrayPosition.of(0), square(2, 0)))).toBe(false);
+    expect(state.canPlace(new PlacePiece(TrayPosition.of(1), square(1, 1)))).toBe(false);
+    expect(state.canPlace(new PlacePiece(TrayPosition.of(2), square(0, 0)))).toBe(false);
   });
 
   it('should_throw_a_range_error_and_keep_the_state_when_the_tray_has_no_piece_at_the_index', () => {
@@ -112,7 +116,7 @@ describe('LinesState', () => {
 
     // A tray index that is negative or not whole builds no move (issue #205, moves.test.ts).
     for (const index of [1, 2, Number.MAX_SAFE_INTEGER]) {
-      expect(() => state.placePiece(new PlacePiece(index, square(0, 0)))).toThrow(
+      expect(() => state.placePiece(new PlacePiece(TrayPosition.of(index), square(0, 0)))).toThrow(
         new RangeError(`The tray has no piece at index ${index}.`),
       );
     }
@@ -123,10 +127,10 @@ describe('LinesState', () => {
     const state = linesState(squareTopology, 3, { filled: [square(1, 1)], tray: [domino] });
     const before = facts(state);
 
-    expect(() => state.placePiece(new PlacePiece(0, square(0, 1)))).toThrow(
+    expect(() => state.placePiece(new PlacePiece(TrayPosition.of(0), square(0, 1)))).toThrow(
       new RangeError('The piece at tray index 0 does not fit at 0,1.'),
     );
-    expect(() => state.placePiece(new PlacePiece(0, square(2, 2)))).toThrow(
+    expect(() => state.placePiece(new PlacePiece(TrayPosition.of(0), square(2, 2)))).toThrow(
       new RangeError('The piece at tray index 0 does not fit at 2,2.'),
     );
     expect(facts(state)).toEqual(before);
@@ -144,14 +148,14 @@ describe('LinesState', () => {
     state.clearLines([row, column]);
 
     expect(filledKeys(state.snapshot())).toEqual(['2,2']);
-    expect(state.snapshot().linesCleared).toBe(2);
-    expect(state.snapshot().streak).toBe(1);
+    expect(state.snapshot().lastCombo()).toEqual(LineCount.of(2));
+    expect(state.snapshot().currentStreak()).toEqual(Streak.of(1));
 
     state.clearLines([]);
 
     expect(filledKeys(state.snapshot())).toEqual(['2,2']);
-    expect(state.snapshot().linesCleared).toBe(0);
-    expect(state.snapshot().streak).toBe(0);
+    expect(state.snapshot().lastCombo()).toEqual(LineCount.of(0));
+    expect(state.snapshot().currentStreak()).toEqual(Streak.of(0));
   });
 
   it('should_add_one_to_the_streak_when_two_placements_in_a_row_clear_a_line', () => {
@@ -163,8 +167,8 @@ describe('LinesState', () => {
     state.clearLines([[square(0, 0), square(1, 0)]]);
     state.clearLines([[square(0, 1), square(1, 1)]]);
 
-    expect(state.snapshot().streak).toBe(2);
-    expect(state.snapshot().linesCleared).toBe(1);
+    expect(state.snapshot().currentStreak()).toEqual(Streak.of(2));
+    expect(state.snapshot().lastCombo()).toEqual(LineCount.of(1));
     expect(filledKeys(state.snapshot())).toEqual([]);
   });
 
@@ -191,7 +195,7 @@ describe('LinesState', () => {
     state.addPoints(Score.of(0));
     state.addPoints(Score.of(3));
 
-    expect(state.snapshot().score).toEqual(Score.of(15));
+    expect(state.snapshot().scoreSoFar()).toEqual(Score.of(15));
   });
 
   it('should_throw_a_range_error_and_keep_the_score_when_the_total_passes_the_largest_safe_integer', () => {
@@ -201,7 +205,7 @@ describe('LinesState', () => {
     expect(() => state.addPoints(Score.of(Number.MAX_SAFE_INTEGER))).toThrow(
       new RangeError('The sum of two scores cannot pass the largest safe integer.'),
     );
-    expect(state.snapshot().score).toEqual(Score.of(5));
+    expect(state.snapshot().scoreSoFar()).toEqual(Score.of(5));
   });
 
   it('should_throw_a_range_error_when_a_state_is_built_in_an_invalid_form', () => {
@@ -211,25 +215,22 @@ describe('LinesState', () => {
     expect(() => new LinesState(STATE_ID, MATCH_ID, board, [one, one, one, one], source)).toThrow(
       new RangeError('A Lines tray holds at most 3 pieces, not 4.'),
     );
-    expect(() => new LinesState(STATE_ID, MATCH_ID, board, [], source, -1)).toThrow(
-      new RangeError('The streak of a Lines state must be a whole number of 0 or more, not -1.'),
+    // The three counts are value objects that check their own values (issue #232).
+    const state = new LinesState(
+      STATE_ID,
+      MATCH_ID,
+      board,
+      [one, domino],
+      source,
+      Streak.of(2),
+      LineCount.of(1),
+      CellCount.of(3),
+      Score.of(7),
     );
-    expect(() => new LinesState(STATE_ID, MATCH_ID, board, [], source, 0, 1.5)).toThrow(
-      new RangeError(
-        'The linesCleared of a Lines state must be a whole number of 0 or more, not 1.5.',
-      ),
-    );
-    expect(() => new LinesState(STATE_ID, MATCH_ID, board, [], source, 0, 0, Number.NaN)).toThrow(
-      new RangeError(
-        'The cellsPlaced of a Lines state must be a whole number of 0 or more, not NaN.',
-      ),
-    );
-    expect(
-      new LinesState(STATE_ID, MATCH_ID, board, [one, domino], source, 2, 1, 3, Score.of(7)),
-    ).toMatchObject({
-      streak: 2,
-      linesCleared: 1,
-      cellsPlaced: 3,
+    expect(facts(state)).toMatchObject({
+      streak: Streak.of(2),
+      linesCleared: LineCount.of(1),
+      cellsPlaced: CellCount.of(3),
       score: Score.of(7),
     });
   });

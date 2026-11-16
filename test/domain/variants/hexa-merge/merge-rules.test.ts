@@ -166,9 +166,14 @@ describe('MergeRules', () => {
     engine.play(Slide.of(HexAxis.r, SlideSense.backward));
     const plain = engine.snapshot();
 
-    expect(merged.merged.map(valueOf).sort((a, b) => a - b)).toEqual([4, 8]);
+    expect(
+      merged
+        .mergedTiles()
+        .map(valueOf)
+        .sort((a, b) => a - b),
+    ).toEqual([4, 8]);
     expect(total(merged)).toBe(total(before));
-    expect(plain.merged).toEqual([]);
+    expect(plain.mergedTiles()).toEqual([]);
     expect(total(plain)).toBe(total(before));
   });
 
@@ -189,11 +194,11 @@ describe('MergeRules', () => {
     const next = engine.play(Slide.of(HexAxis.q, SlideSense.backward));
 
     expect(outcome).toBe(Outcome.playing);
-    expect(reached.targetReached).toBe(true);
+    expect(reached.hasReachedTarget()).toBe(true);
     expect(values(reached)).toEqual({ '2,0': 8 });
     expect(next).toBe(Outcome.playing);
     expect(values(engine.snapshot())).toEqual({ '-2,0': 8 });
-    expect(engine.snapshot().targetReached).toBe(true);
+    expect(engine.snapshot().hasReachedTarget()).toBe(true);
     expect(engine.currentPhase().canPlay()).toBe(true);
     expect(engine.takeEvents()).toEqual([]);
   });
@@ -323,7 +328,7 @@ describe('Merge edge cases', () => {
     }
     function labels(engine: ReturnType<typeof chipGame>): Record<string, string> {
       const out: Record<string, string> = {};
-      for (const [at, cell] of engine.snapshot().board.occupiedCells())
+      for (const [at, cell] of engine.snapshot().boardCopy().occupiedCells())
         out[hexTopology.key(at)] = cell.label;
       return out;
     }
@@ -374,15 +379,15 @@ describe('MergeRules in place', () => {
       [hex(0, 0), 2],
       [hex(1, 0), 2],
     ]);
-    const board = state.snapshot().board;
+    const board = state.snapshot().boardCopy();
 
     const result = rules.apply(state, Slide.of(HexAxis.q, SlideSense.backward));
 
     expect(result).toBe(state);
     // The board keeps its id: the same board changes in place.
-    expect(state.snapshot().board.equals(board)).toBe(true);
+    expect(state.snapshot().boardCopy().equals(board)).toBe(true);
     expect(values(state.snapshot())).toEqual({ [hexTopology.key(hex(-1, 0))]: 4 });
-    expect(state.snapshot().merged).toEqual([MergeTile.of(4)]);
+    expect(state.snapshot().mergedTiles()).toEqual([MergeTile.of(4)]);
   });
 
   // The engine plays a turn on a copy of its state. So a turn that throws after the slide
@@ -403,11 +408,11 @@ describe('MergeRules in place', () => {
     );
     const { engine, rules } = mergeGame(start, MergeTile.of(2048), failing);
     const facts = (state: MergeSnapshot<MergeTile, HexCoord, HexAxis>) => ({
-      cells: state.board.occupiedCells(),
-      merged: state.merged,
-      targetReached: state.targetReached,
-      nextTile: state.tiles.take()[0],
-      score: state.score,
+      cells: state.boardCopy().occupiedCells(),
+      merged: state.mergedTiles(),
+      targetReached: state.hasReachedTarget(),
+      nextTile: state.tileSource().take()[0],
+      score: state.scoreSoFar(),
     });
     const before = facts(engine.snapshot());
 
