@@ -10,6 +10,8 @@ module.exports = {
     {
       displayName: 'app',
       preset: 'jest-expo',
+      // Jest runs the setup files of the preset first, then this one.
+      setupFiles: ['<rootDir>/jest.setup.js'],
       testPathIgnorePatterns: ['/node_modules/', fixtures, contractTests],
     },
     {

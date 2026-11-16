@@ -1,0 +1,1210 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Achievements use case · UML class diagram</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --color-paper: #f3f5f6;
+        --color-ink: #17212a;
+        --color-muted: #5b6873;
+        --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+        --font-serif: 'Instrument Serif', serif;
+        --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+      }
+      body {
+        font-family: var(--font-sans);
+        background: var(--color-paper);
+        color: var(--color-ink);
+        padding: 3rem 2rem;
+      }
+      .frame {
+        max-width: 1240px;
+        margin: 0 auto;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-muted);
+        margin-bottom: 0.5rem;
+      }
+      h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        margin-bottom: 1.5rem;
+      }
+      svg {
+        width: 100%;
+        min-width: 900px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <p class="eyebrow">Class diagram · Part 3 · View 6 of 6</p>
+      <h1>Achievements: the screen, its presenter and ListAchievements</h1>
+
+      <svg
+        viewBox="0 0 1040 1372"
+        xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-labelledby="ucach-title ucach-desc"
+      >
+        <title id="ucach-title">HexaBlock achievements use case · UML class diagram</title>
+        <desc id="ucach-desc">
+          Class diagram across layers 4, 3, 2 and 1 showing the achievements of issue 188.
+          AchievementsScreen in layer 4 keeps the AchievementsPresenter of its hook.
+          AchievementsPresenter in layer 3 keeps the UseCase input port and its
+          AchievementsViewModel, which holds two AchievementSection values: in progress and
+          completed. ListAchievements in layer 2 implements UseCase, keeps LevelRepository,
+          ProgressRepository and a list of Achievement values, and returns one AchievementSummary
+          per achievement. An Achievement keeps an optional AchievementGoal, a Strategy that
+          LevelsWon and EveryLevelWon implement. ProgressRepository loads GameProgress of layer 1.
+        </desc>
+        <defs>
+          <marker
+            id="ucach-triangle"
+            markerWidth="16"
+            markerHeight="12"
+            refX="15"
+            refY="6"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          </marker>
+          <marker
+            id="ucach-open"
+            markerWidth="10"
+            markerHeight="8"
+            refX="9"
+            refY="4"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
+          </marker>
+        </defs>
+        <rect width="100%" height="100%" fill="#f3f5f6" />
+        <!-- Layer zone: layer 4, frameworks and drivers -->
+        <rect
+          x="24"
+          y="24"
+          width="992"
+          height="156"
+          rx="8"
+          fill="#cfdcf3"
+          stroke="rgba(30,58,138,0.50)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="44"
+          fill="#1e3a8a"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 4 · FRAMEWORKS AND DRIVERS · app/
+        </text>
+        <!-- Layer zone: layer 3, interface adapters -->
+        <rect
+          x="24"
+          y="188"
+          width="992"
+          height="256"
+          rx="8"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="208"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 3 · INTERFACE ADAPTERS · src/adapters/
+        </text>
+        <!-- Layer zone: layer 2, use cases -->
+        <rect
+          x="24"
+          y="460"
+          width="992"
+          height="552"
+          rx="8"
+          fill="#efe7f8"
+          stroke="rgba(126,34,206,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="480"
+          fill="#7e22ce"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 2 · USE CASES · src/application/
+        </text>
+        <!-- Layer zone: layer 1, entities -->
+        <rect
+          x="24"
+          y="1028"
+          width="992"
+          height="92"
+          rx="8"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="1048"
+          fill="#b45309"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 1 · ENTITIES · src/domain/engine/
+        </text>
+        <!-- Groups -->
+        <!-- Relationships (drawn before boxes) -->
+        <!-- AchievementsScreen keeps the AchievementsPresenter of its hook: use, down from layer 4 to layer 3 -->
+        <path
+          d="M352 164 V228"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucach-open)"
+        />
+        <!-- AchievementsPresenter keeps the UseCase input port it receives in an attribute: use, down from layer 3 to layer 2 -->
+        <path
+          d="M320 428 V508"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucach-open)"
+        />
+        <!-- AchievementsPresenter keeps its AchievementsViewModel as model: use with role and multiplicity -->
+        <path
+          d="M480 304 H528"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucach-open)"
+        />
+        <!-- AchievementsViewModel holds its sections as AchievementSection values: use with role and multiplicity -->
+        <path
+          d="M744 304 H808"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucach-open)"
+        />
+        <!-- ListAchievements returns AchievementSummary values: use -->
+        <path
+          d="M352 652 H432"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucach-open)"
+        />
+        <!-- ListAchievements keeps its Achievement list as achievements: use with role and multiplicity -->
+        <path
+          d="M352 744 H432"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucach-open)"
+        />
+        <!-- Achievement keeps its AchievementGoal as goal: use with role and multiplicity -->
+        <path
+          d="M640 756 H704"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucach-open)"
+        />
+        <!-- LevelsWon implements AchievementGoal: realization -->
+        <path
+          d="M744 848 V816"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#ucach-triangle)"
+        />
+        <!-- EveryLevelWon implements AchievementGoal: realization -->
+        <path
+          d="M904 848 V816"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#ucach-triangle)"
+        />
+        <!-- ListAchievements keeps the LevelRepository it receives in an attribute: use -->
+        <path
+          d="M120 776 V828"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucach-open)"
+        />
+        <!-- ListAchievements keeps the ProgressRepository it receives in an attribute: use -->
+        <path
+          d="M352 768 H400 Q408 768 408 776 V924"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucach-open)"
+        />
+        <!-- ProgressRepository loads the GameProgress of one game: use, down from layer 2 to layer 1 -->
+        <path
+          d="M360 996 V1064"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucach-open)"
+        />
+        <!-- Arrow labels -->
+        <rect x="356" y="211" width="58" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="358"
+          y="220"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          presenter
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <rect x="324" y="487" width="94" height="12" rx="2" fill="#efe7f8" />
+        <text
+          x="326"
+          y="496"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          listAchievements
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <rect x="484" y="287" width="38" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="486"
+          y="296"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          model
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <rect x="748" y="287" width="52" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="750"
+          y="296"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          sections
+          <tspan font-weight="600">*</tspan>
+        </text>
+        <rect x="370" y="635" width="44" height="12" rx="2" fill="#efe7f8" />
+        <text
+          x="392"
+          y="644"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          RETURNS
+        </text>
+        <rect x="356" y="727" width="74" height="12" rx="2" fill="#efe7f8" />
+        <text
+          x="358"
+          y="736"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          achievements
+          <tspan font-weight="600">*</tspan>
+        </text>
+        <rect x="644" y="739" width="54" height="12" rx="2" fill="#efe7f8" />
+        <text
+          x="646"
+          y="748"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          goal
+          <tspan font-weight="600">0..1</tspan>
+        </text>
+        <rect x="124" y="803" width="46" height="12" rx="2" fill="#efe7f8" />
+        <text
+          x="126"
+          y="812"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          levels
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <rect x="348" y="905" width="56" height="12" rx="2" fill="#efe7f8" />
+        <text
+          x="402"
+          y="914"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+        >
+          progress
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <!-- Class: AchievementsScreen (component, route, #188) -->
+        <rect
+          x="64"
+          y="56"
+          width="304"
+          height="108"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="64" y1="116" x2="368" y2="116" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="64" y1="140" x2="368" y2="140" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="216"
+          y="74"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «component» «route»
+        </text>
+        <text
+          x="216"
+          y="92"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          AchievementsScreen
+        </text>
+        <text
+          x="216"
+          y="106"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          app/achievements.tsx
+        </text>
+        <text x="80" y="132" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - presenter: AchievementsPresenter
+        </text>
+        <text x="80" y="156" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          shows each AchievementsViewModel
+        </text>
+        <!-- Class: AchievementsPresenter (presenter, MVP, #188) -->
+        <rect
+          x="64"
+          y="228"
+          width="416"
+          height="200"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="64" y1="268" x2="480" y2="268" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="64" y1="356" x2="480" y2="356" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="272"
+          y="253"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          AchievementsPresenter
+        </text>
+        <text x="80" y="284" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - listAchievements: UseCase‹ListAchievementsRequest,
+        </text>
+        <text x="96" y="300" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          AchievementSummary[]›
+        </text>
+        <text x="80" y="316" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - texts: Texts
+        </text>
+        <text x="80" y="332" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - model: AchievementsViewModel
+        </text>
+        <text x="80" y="348" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - view: AchievementsView [0..1]
+        </text>
+        <text x="80" y="372" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + attach(view: AchievementsView): void
+        </text>
+        <text x="80" y="388" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + detach(): void
+        </text>
+        <text x="80" y="404" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + viewModel(): AchievementsViewModel
+        </text>
+        <text x="80" y="420" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + onOpen(): Promise‹void›
+        </text>
+        <!-- Class: AchievementsViewModel (value object, the view model of the screen) -->
+        <rect
+          x="528"
+          y="228"
+          width="216"
+          height="136"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="528" y1="276" x2="744" y2="276" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="636"
+          y="246"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="636"
+          y="264"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          AchievementsViewModel
+        </text>
+        <text x="544" y="292" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + title: string
+        </text>
+        <text x="544" y="308" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + back: string
+        </text>
+        <text x="544" y="324" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + sections: AchievementSection[*]
+        </text>
+        <text x="544" y="340" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + loading: string [0..1]
+        </text>
+        <text x="544" y="356" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + error: string [0..1]
+        </text>
+        <!-- Class: AchievementSection (value object, one section of the screen) -->
+        <rect
+          x="808"
+          y="228"
+          width="192"
+          height="120"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="808" y1="276" x2="1000" y2="276" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="904"
+          y="246"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="904"
+          y="264"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          AchievementSection
+        </text>
+        <text x="824" y="292" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + title: string
+        </text>
+        <text x="824" y="308" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + completed: boolean
+        </text>
+        <text x="824" y="324" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + items: AchievementItem[*]
+        </text>
+        <text x="824" y="340" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + empty: string
+        </text>
+        <!-- Reference box: UseCase, detailed in view 3.1 -->
+        <rect
+          x="240"
+          y="508"
+          width="160"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="320"
+          y="522"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          VIEW 3.1
+        </text>
+        <text
+          x="320"
+          y="538"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          UseCase
+        </text>
+        <!-- Class: ListAchievements (focal, use case) -->
+        <rect
+          x="64"
+          y="620"
+          width="288"
+          height="156"
+          rx="6"
+          fill="rgba(15,111,116,0.05)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <rect x="64" y="620" width="288" height="60" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="64" y="672" width="288" height="8" fill="rgba(15,111,116,0.10)" />
+        <line x1="64" y1="680" x2="352" y2="680" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <line x1="64" y1="736" x2="352" y2="736" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <text
+          x="208"
+          y="638"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «use case»
+        </text>
+        <text
+          x="208"
+          y="656"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          ListAchievements
+        </text>
+        <text
+          x="208"
+          y="670"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          #188
+        </text>
+        <text x="80" y="696" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - levels: LevelRepository
+        </text>
+        <text x="80" y="712" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - progress: ProgressRepository
+        </text>
+        <text x="80" y="728" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - achievements: Achievement[*]
+        </text>
+        <text x="80" y="752" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + execute(request: ListAchievementsRequest):
+        </text>
+        <text x="96" y="768" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Promise‹Result‹AchievementSummary[]››
+        </text>
+        <!-- Class: AchievementSummary (value object, the response model of ListAchievements) -->
+        <rect
+          x="432"
+          y="608"
+          width="208"
+          height="88"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="432" y1="656" x2="640" y2="656" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="536"
+          y="626"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="536"
+          y="644"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          AchievementSummary
+        </text>
+        <text x="448" y="672" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + id: string
+        </text>
+        <text x="448" y="688" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + completed: boolean
+        </text>
+        <!-- Class: Achievement (value object, one achievement of the list) -->
+        <rect
+          x="432"
+          y="712"
+          width="208"
+          height="88"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="432" y1="760" x2="640" y2="760" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="536"
+          y="730"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="536"
+          y="748"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          Achievement
+        </text>
+        <text x="448" y="776" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + id: string
+        </text>
+        <text x="448" y="792" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + goal: AchievementGoal [0..1]
+        </text>
+        <!-- Class: AchievementGoal (interface, strategy) -->
+        <rect
+          x="704"
+          y="712"
+          width="280"
+          height="104"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="704" y1="760" x2="984" y2="760" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="844"
+          y="730"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «strategy»
+        </text>
+        <text
+          x="844"
+          y="748"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          AchievementGoal
+        </text>
+        <text x="720" y="776" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + isReachedWith(levels: LevelRepository,
+        </text>
+        <text x="736" y="792" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          progress: ProgressRepository):
+        </text>
+        <text x="736" y="808" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Promise‹boolean›
+        </text>
+        <!-- Class: LevelsWon (strategy, a count of won levels of one game) -->
+        <rect
+          x="584"
+          y="848"
+          width="200"
+          height="104"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="584" y1="888" x2="784" y2="888" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="584" y1="928" x2="784" y2="928" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="684"
+          y="873"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          LevelsWon
+        </text>
+        <text x="600" y="904" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - gameId: GameId
+        </text>
+        <text x="600" y="920" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - count: number
+        </text>
+        <text x="600" y="944" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          implements isReachedWith()
+        </text>
+        <!-- Class: EveryLevelWon (strategy, every level of one game) -->
+        <rect
+          x="808"
+          y="848"
+          width="184"
+          height="88"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="808" y1="888" x2="992" y2="888" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="808" y1="912" x2="992" y2="912" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="900"
+          y="873"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          EveryLevelWon
+        </text>
+        <text x="824" y="904" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - gameId: GameId
+        </text>
+        <text x="824" y="928" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          implements isReachedWith()
+        </text>
+        <!-- Class: LevelRepository (interface, port) -->
+        <rect
+          x="64"
+          y="828"
+          width="304"
+          height="72"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="64" y1="876" x2="368" y2="876" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="216"
+          y="846"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «port» «repository»
+        </text>
+        <text
+          x="216"
+          y="864"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          LevelRepository
+        </text>
+        <text x="80" y="892" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + list(gameId: GameId): Promise‹LevelDefinition[]›
+        </text>
+        <!-- Class: ProgressRepository (interface, port) -->
+        <rect
+          x="64"
+          y="924"
+          width="352"
+          height="72"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="64" y1="972" x2="416" y2="972" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="240"
+          y="942"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «port» «repository»
+        </text>
+        <text
+          x="240"
+          y="960"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          ProgressRepository
+        </text>
+        <text x="80" y="988" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + load(gameId: GameId): Promise‹GameProgress | undefined›
+        </text>
+        <!-- Reference box: GameProgress, detailed in part 3 · view 3.3 -->
+        <rect
+          x="296"
+          y="1064"
+          width="160"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="376"
+          y="1078"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          VIEW 3.3
+        </text>
+        <text
+          x="376"
+          y="1094"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GameProgress
+        </text>
+        <!-- Lollipops: input port each use case implements, with its binding -->
+        <line x1="80" y1="620" x2="80" y2="604" stroke="#17212a" stroke-width="1" />
+        <circle cx="80" cy="599" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="91" y="602" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          UseCase‹ListAchievementsRequest, AchievementSummary[]›
+        </text>
+        <!-- Footnote: what the view leaves out -->
+        <text
+          x="24"
+          y="1144"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          ListAchievements gives one AchievementSummary per achievement, in the order of the list
+          that the
+        </text>
+        <text
+          x="24"
+          y="1160"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          composition root builds with registeredAchievements(). An achievement with no goal stays
+          in progress.
+        </text>
+        <text
+          x="24"
+          y="1176"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          A goal asks LevelRepository for the levels of its game and GameProgress.starsOf() for each
+          level: a level
+        </text>
+        <text
+          x="24"
+          y="1192"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          is won when the progress keeps a result of it, zero stars included (S3-12, decision 60).
+        </text>
+        <text
+          x="24"
+          y="1208"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          The saved progress keeps each won level, so a completed achievement stays after a restart
+          (#188).
+        </text>
+        <text
+          x="24"
+          y="1224"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Four achievements have no goal: no game event gives the lines of one placement, the tile
+          of a merge
+        </text>
+        <text
+          x="24"
+          y="1240"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          or the goals of a Sort game yet. useAchievements() builds the presenter. AchievementItem
+          holds an id
+        </text>
+        <text
+          x="24"
+          y="1256"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          and a name. The goals read the two ports through the parameters of isReachedWith() (not
+          drawn).
+        </text>
+        <!-- Legend -->
+        <line
+          x1="24"
+          y1="1288"
+          x2="1016"
+          y2="1288"
+          stroke="rgba(23,33,42,0.10)"
+          stroke-width="0.8"
+        />
+        <text
+          x="24"
+          y="1306"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LEGEND
+        </text>
+        <line
+          x1="24"
+          y1="1324"
+          x2="52"
+          y2="1324"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucach-open)"
+        />
+        <text
+          x="60"
+          y="1328"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Use · attribute, parameter, return, local or new
+        </text>
+        <line
+          x1="304"
+          y1="1324"
+          x2="332"
+          y2="1324"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#ucach-triangle)"
+        />
+        <text
+          x="340"
+          y="1328"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Realization · class to the interface it implements
+        </text>
+        <rect
+          x="24"
+          y="1344"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#efe7f8"
+          stroke="rgba(126,34,206,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="60"
+          y="1353"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zone · Clean layer
+        </text>
+        <rect
+          x="424"
+          y="1344"
+          width="28"
+          height="12"
+          rx="2"
+          fill="rgba(15,111,116,0.10)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <text
+          x="460"
+          y="1353"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Teal · focal class
+        </text>
+        <line x1="600" y1="1350" x2="616" y2="1350" stroke="#17212a" stroke-width="1" />
+        <circle cx="621" cy="1350" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text
+          x="636"
+          y="1353"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Lollipop · input port + binding
+        </text>
+        <rect
+          x="784"
+          y="1344"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="820"
+          y="1353"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Reference box · class shown in another view
+        </text>
+      </svg>
+    </div>
+  </body>
+</html>

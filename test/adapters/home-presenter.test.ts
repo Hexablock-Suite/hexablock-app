@@ -26,6 +26,7 @@ describe('HomePresenter', () => {
       brand: 'HexaBlock',
       suite: 'Suite',
       play: 'Jugar',
+      achievements: 'Logros',
       figure: 'Figura del tablero',
       figures: [
         { id: 'hex', name: 'Hexágono' },
@@ -38,6 +39,7 @@ describe('HomePresenter', () => {
       brand: 'HexaBlock',
       suite: 'Suite',
       play: 'Play',
+      achievements: 'Achievements',
       figure: 'Board figure',
       figures: [
         { id: 'hex', name: 'Hexagon' },

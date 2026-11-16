@@ -1,9 +1,16 @@
 import { BundledLevelRepository } from '../adapters/bundled-level-repository';
 import { InMemoryGameRepository } from '../adapters/in-memory-game-repository';
+import type { KeyValueStore } from '../adapters/key-value-store';
+import { LocalProgressRepository } from '../adapters/local-progress-repository';
 import { LevelGameFactories } from '../adapters/level-game-factories';
 import { NullGameEventPublisher } from '../adapters/null-game-event-publisher';
 import { ApplyMove, type ApplyMoveRequest } from '../application/apply-move';
 import type { GameEventPublisher } from '../application/game-event-publisher';
+import {
+  ListAchievements,
+  type AchievementSummary,
+  type ListAchievementsRequest,
+} from '../application/list-achievements';
 import type { GameFactories } from '../application/game-factories';
 import type { LevelRepository } from '../application/level-repository';
 import type { Logger } from '../application/logger';
@@ -21,6 +28,7 @@ import { TopologyId } from '../domain/engine/geometry-factory';
 import type { MatchIdGenerator } from '../domain/engine/match-id-generator';
 import { ConsoleLogger } from './console-logger';
 import { GameRegistry, type RegisteredGame } from './game-registry';
+import { registeredAchievements } from './registered-achievements';
 import { boardFigures, registeredGames } from './registered-games';
 import { SeededRandomSource } from './seeded-random-source';
 import { SequentialMatchIds } from './sequential-match-ids';
@@ -36,10 +44,13 @@ export interface GameUseCases<TCell = unknown, TCoord = unknown, TMove = unknown
   readonly redoMove: UseCase<RedoMoveRequest, MoveResult<TCell, TCoord, TView>>;
 }
 
-// The drivers that a test may replace. The app takes the system clock and the console logger.
+// The drivers that a test may replace. The app takes the system clock, the console logger
+// and `DeviceKeyValueStore`, which `CompositionRootProvider` builds (#188).
+// A root with no store reads no saved progress, so it lists no achievements.
 export interface RootDrivers {
   readonly clock: Clock;
   readonly logger: Logger;
+  readonly store?: KeyValueStore;
 }
 
 // The composition root (layers.md, Q9, S3-06 in #151, issue #162). It is the only place
@@ -62,6 +73,9 @@ export interface RootDrivers {
 // starts every level of its game by the level id of the request (S3-13 in #151, option D, #172).
 // It builds the use cases of a game the first time a caller asks for them.
 // The publisher goes to `ApplyMove`, which delivers the events of each turn (#233).
+// With the local store of its drivers, the root builds `ListAchievements` once (#188), over
+// its one level repository, `LocalProgressRepository` and the achievements
+// of `registeredAchievements()`, inside the logging aspect.
 export class CompositionRoot {
   private readonly games: ReadonlyMap<TopologyId, GameRegistry>;
   private readonly logger: Logger;
@@ -69,6 +83,7 @@ export class CompositionRoot {
   private readonly events: GameEventPublisher;
   private readonly levels: LevelRepository;
   private readonly wired = new Map<RegisteredGame, GameUseCases>();
+  private readonly achievements: UseCase<ListAchievementsRequest, AchievementSummary[]> | undefined;
 
   constructor(drivers: RootDrivers = { clock: new SystemClock(), logger: new ConsoleLogger() }) {
     const random = SeededRandomSource.fromClock(drivers.clock);
@@ -82,6 +97,18 @@ export class CompositionRoot {
     this.ids = new SequentialMatchIds(drivers.clock);
     this.events = new NullGameEventPublisher();
     this.levels = new BundledLevelRepository();
+    this.achievements =
+      drivers.store === undefined
+        ? undefined
+        : new LoggingAspect(
+            new ListAchievements(
+              this.levels,
+              new LocalProgressRepository(drivers.store),
+              registeredAchievements(),
+            ),
+            this.logger,
+            'ListAchievements',
+          );
   }
 
   // The board figures that the player can choose, in the order of the figure selector (#171).
@@ -116,6 +143,15 @@ export class CompositionRoot {
     });
     this.wired.set(game, built);
     return built;
+  }
+
+  // `ListAchievements` over the saved progress of the device (#188). Each call gives
+  // the same use case. A root with no local store throws an Error.
+  listAchievements(): UseCase<ListAchievementsRequest, AchievementSummary[]> {
+    if (this.achievements === undefined) {
+      throw new Error('The root has no local store, so it lists no achievements.');
+    }
+    return this.achievements;
   }
 }
 

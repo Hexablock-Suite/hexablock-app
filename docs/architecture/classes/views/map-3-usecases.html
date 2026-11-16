@@ -64,14 +64,14 @@
       <h1>The use cases at a glance</h1>
 
       <svg
-        viewBox="0 0 1040 1234"
+        viewBox="0 0 1040 1374"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="mapuc-title mapuc-desc"
       >
         <title id="mapuc-title">HexaBlock use cases map · UML class diagram</title>
         <desc id="mapuc-desc">
-          Overview map of the 39 layer 2 classes in 7 groups, with LevelDefinition of layer 1 as a
+          Overview map of the 46 layer 2 classes in 8 groups, with LevelDefinition of layer 1 as a
           dashed chip. Each line joins two classes: UseCaseAspect implements UseCase and keeps the
           inner one, StartGame, SaveProgress and Register each implement UseCase for their group,
           and RedoMove, SyncLeaderboard and UpdateSettings keep an output port. No line touches a
@@ -136,7 +136,7 @@
           x="24"
           y="24"
           width="992"
-          height="1082"
+          height="1222"
           rx="8"
           fill="#efe7f8"
           stroke="rgba(126,34,206,0.40)"
@@ -399,6 +399,42 @@
           letter-spacing="0.14em"
         >
           VIEW 3.5
+        </text>
+
+        <!-- Group: achievements -->
+        <rect
+          x="56"
+          y="1094"
+          width="928"
+          height="128"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="68"
+          y="1110"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          ACHIEVEMENTS · STRATEGY · #188
+        </text>
+        <text
+          x="972"
+          y="1110"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+          letter-spacing="0.14em"
+        >
+          VIEW 3.6
         </text>
 
         <!-- Dependencies between classes of two groups (drawn before chips). Each line starts on the class that holds, calls or implements and ends on the class it needs. No line touches a frame. -->
@@ -1502,10 +1538,174 @@
             </tspan>
           </text>
         </g>
+        <!-- Chips: achievements -->
+        <g data-class="ListAchievements">
+          <rect
+            x="88"
+            y="1122"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="168" y="1143" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              ListAchievements
+            </tspan>
+          </text>
+        </g>
+        <g data-class="AchievementGoal">
+          <rect
+            x="264"
+            y="1122"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="344"
+            y="1134"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="344" y="1147" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              AchievementGoal
+            </tspan>
+          </text>
+        </g>
+        <g data-class="LevelsWon">
+          <rect
+            x="440"
+            y="1122"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="520" y="1143" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              LevelsWon
+            </tspan>
+          </text>
+        </g>
+        <g data-class="EveryLevelWon">
+          <rect
+            x="616"
+            y="1122"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="696" y="1143" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              EveryLevelWon
+            </tspan>
+          </text>
+        </g>
+        <g data-class="Achievement">
+          <rect
+            x="792"
+            y="1122"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="872"
+            y="1134"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="872" y="1147" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              Achievement
+            </tspan>
+          </text>
+        </g>
+        <g data-class="ListAchievementsRequest">
+          <rect
+            x="88"
+            y="1172"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="168"
+            y="1184"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="168" y="1197" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              ListAchievementsRequest
+            </tspan>
+          </text>
+        </g>
+        <g data-class="AchievementSummary">
+          <rect
+            x="264"
+            y="1172"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="344"
+            y="1184"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="344" y="1197" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              AchievementSummary
+            </tspan>
+          </text>
+        </g>
         <!-- Footnote -->
         <text
           x="24"
-          y="1134"
+          y="1274"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1517,15 +1717,15 @@
         <!-- Legend -->
         <line
           x1="24"
-          y1="1158"
+          y1="1298"
           x2="1016"
-          y2="1158"
+          y2="1298"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1176"
+          y="1316"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1536,16 +1736,16 @@
 
         <line
           x1="24"
-          y1="1194"
+          y1="1334"
           x2="52"
-          y2="1194"
+          y2="1334"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#mapuc-open)"
         />
         <text
           x="60"
-          y="1198"
+          y="1338"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1554,9 +1754,9 @@
         </text>
         <line
           x1="384"
-          y1="1194"
+          y1="1334"
           x2="412"
-          y2="1194"
+          y2="1334"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -1564,7 +1764,7 @@
         />
         <text
           x="420"
-          y="1198"
+          y="1338"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1574,7 +1774,7 @@
 
         <rect
           x="24"
-          y="1214"
+          y="1354"
           width="28"
           height="12"
           rx="2"
@@ -1584,7 +1784,7 @@
         />
         <text
           x="60"
-          y="1223"
+          y="1363"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1593,7 +1793,7 @@
         </text>
         <rect
           x="184"
-          y="1214"
+          y="1354"
           width="28"
           height="12"
           rx="2"
@@ -1604,7 +1804,7 @@
         />
         <text
           x="220"
-          y="1223"
+          y="1363"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1613,7 +1813,7 @@
         </text>
         <rect
           x="432"
-          y="1214"
+          y="1354"
           width="28"
           height="12"
           rx="2"
@@ -1623,7 +1823,7 @@
         />
         <text
           x="468"
-          y="1223"
+          y="1363"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1632,7 +1832,7 @@
         </text>
         <text
           x="632"
-          y="1223"
+          y="1363"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1650,7 +1850,7 @@
         </text>
         <rect
           x="824"
-          y="1214"
+          y="1354"
           width="28"
           height="12"
           rx="2"
@@ -1660,7 +1860,7 @@
         />
         <text
           x="860"
-          y="1223"
+          y="1363"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
