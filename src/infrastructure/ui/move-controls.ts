@@ -35,7 +35,7 @@ function ignoreSpace(): void {}
 // A press on a space plays nothing. Each «Play … on the game screen» task (#174, #176, #177)
 // registers the controls of its variant in their place.
 export class BoardOnlyControls implements MoveControls<unknown, unknown, unknown, unknown> {
-  render({ board }: MoveControlsProps<unknown, unknown, unknown, unknown>): ReactNode {
-    return board(ignoreSpace);
+  render(props: MoveControlsProps<unknown, unknown, unknown, unknown>): ReactNode {
+    return props.board(ignoreSpace);
   }
 }
