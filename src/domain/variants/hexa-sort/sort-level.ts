@@ -1,10 +1,15 @@
 import type { Color } from '../../engine/color';
+import type { ElapsedTime } from '../../engine/elapsed-time';
+import type { ILevelStars } from '../../engine/level-progress';
+import type { Moves } from '../../engine/moves';
 import { FixedListPieceSource } from '../../engine/piece-source';
 import type { RandomSource } from '../../engine/random-source';
 import type { RegionSize } from '../../engine/region-size';
 import type { Seed } from '../../engine/seed';
+import type { Stars } from '../../engine/stars';
 import { ColorStack } from './color-stack';
 import type { GoalCount } from './goal-count';
+import { SortPlay, sortStars, type SortStarThreshold } from './sort-stars';
 
 // The data of the piece source of a level. A level picks one of the two kinds (A4).
 // A seeded supply holds the seed and the colors that a draw picks from.
@@ -32,11 +37,15 @@ export interface SortSourceBuilders<TSource> {
 // Each factory method copies its list and freezes the copy, and the object is frozen.
 // So a change to the array of the caller does not change the level.
 // `SortLevelBuilder` builds the level through a factory method in Sprint 3 (#167).
-export class SortLevel {
+// The level also holds the thresholds of its stars, and `LevelProgress` asks it for the stars
+// of a play through `ILevelStars` (issue #156). A level holds no threshold until
+// `withStars()` gives them, so it gives 0 stars until #167 reads them from the level files.
+export class SortLevel implements ILevelStars {
   private constructor(
     private readonly size: RegionSize,
     private readonly goalsNeeded: GoalCount,
     private readonly supply: StackSupply,
+    private readonly stars: readonly SortStarThreshold[] = Object.freeze([]),
   ) {
     Object.freeze(this);
   }
@@ -87,7 +96,22 @@ export class SortLevel {
     });
   }
 
-  // Two levels are equal when they hold the same size, the same goal and equal source data.
+  // The same level with the star thresholds `stars`, from the first star up (D22).
+  // It copies the list and freezes the copy, so a change to the array of the caller
+  // does not change the level. This level does not change.
+  withStars(stars: readonly SortStarThreshold[]): SortLevel {
+    return new SortLevel(this.size, this.goalsNeeded, this.supply, Object.freeze([...stars]));
+  }
+
+  // The stars of a won play of this level: `sortStars()` counts the leading thresholds
+  // that the moves of the play meet (D22, classes.md decision 36).
+  // A Sort level has no timer, so the time of the play changes no star.
+  starsFor(moves: Moves, _elapsedMs: ElapsedTime | undefined): Stars {
+    return sortStars(SortPlay.of(moves), this.stars);
+  }
+
+  // Two levels are equal when they hold the same size, the same goal, equal source data
+  // and equal star thresholds in the same order.
   // Two seeded levels need the same seed and equal colors in the same order,
   // because a draw picks a color by its place in the list.
   // Two fixed levels need equal stacks in the same order, because the source keeps that order.
@@ -96,7 +120,9 @@ export class SortLevel {
     return (
       this.size.equals(other.size) &&
       this.goalsNeeded.equals(other.goalsNeeded) &&
-      sameSupply(this.supply, other.supply)
+      sameSupply(this.supply, other.supply) &&
+      this.stars.length === other.stars.length &&
+      this.stars.every((threshold, i) => other.stars[i]?.equals(threshold) === true)
     );
   }
 }

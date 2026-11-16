@@ -77,7 +77,7 @@ flowchart TB
     subgraph ENGINE["src/domain/engine/"]
       CORE["GameEngine#lt;TCell, TCoord, TMove, TState#gt;, the aggregate root,<br/>Board#lt;TCell, TCoord#gt;, Piece, GridTopology#lt;TCoord#gt;, GameId,<br/>BoardBuilder, GeometryFactory with HexGeometry, SquareGeometry<br/>and TriangleGeometry, with their coordinates and topologies"]
       CONTRACTS["Contracts that a variant implements:<br/>IGameRules#lt;TMove, TState#gt; through BaseGameRules,<br/>IScoringPolicy#lt;TState#gt;, BoardState#lt;TCell, TCoord#gt;"]
-      STRATS["Strategies with engine classes:<br/>IPieceSource#lt;TPiece#gt;: SeededPieceSource, FixedListPieceSource;<br/>IProgressModel; planned: HighScoreProgress, LevelProgress"]
+      STRATS["Strategies with engine classes:<br/>IPieceSource#lt;TPiece#gt;: SeededPieceSource, FixedListPieceSource;<br/>IProgressModel: HighScoreProgress, LevelProgress;<br/>GameProgress, the progress of one game"]
       CAPS["Capability interfaces: IRandomSeeded with its engine class<br/>SeededPieceSource, IMergeable#lt;TCell#gt;, IUndoable and IRedoable with<br/>MoveHistory, ITimed with LevelTimer; planned:<br/>RedoableHistory"]
       DPORTS["Clock, RandomSource and<br/>MatchIdGenerator interfaces"]
       CMDSTATE["GamePhase classes, MoveCommand"]
