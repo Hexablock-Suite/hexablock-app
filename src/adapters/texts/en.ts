@@ -6,6 +6,9 @@
 // looks like the key of a game (#170).
 // The name of each board figure lives under `figure.<id>`, where `<id>` is the text
 // of its `TopologyId` (#171).
+// The texts of the achievements screen live under `achievements.<part>`, and the name of each
+// achievement lives under `achievement.<id>`, where `<id>` is the id that the composition root
+// gives to the achievement (#188).
 export const en = {
   'home.title': 'HexaBlock Suite',
   'home.brand': 'HexaBlock',
@@ -34,4 +37,19 @@ export const en = {
   'game.hexa-sort.place': 'Stackville',
   'game.hexa-merge.name': 'Hexa Merge',
   'game.hexa-merge.place': 'Merge Fountain',
+  'achievements.title': 'Achievements',
+  'achievements.back': 'Back',
+  'achievements.loading': 'Loading the achievements',
+  'achievements.error': 'The achievements could not be read. Go back and open them again.',
+  'achievements.in-progress': 'In progress',
+  'achievements.completed': 'Completed',
+  'achievements.none-in-progress': 'Every achievement is complete.',
+  'achievements.none-completed': 'No achievement is complete yet.',
+  'achievement.lines-combo': 'Clear 3 lines at once',
+  'achievement.merge-256': 'Reach 256 in Hexa Merge',
+  'achievement.merge-2048': 'Reach 2048 in Hexa Merge',
+  'achievement.fit-3': 'Win 3 Hexa Fit levels',
+  'achievement.sort-3': 'Win 3 Hexa Sort levels',
+  'achievement.fit-all': 'Win every Hexa Fit level',
+  'achievement.sort-goals': 'Complete 10 goals in Hexa Sort',
 } as const;
