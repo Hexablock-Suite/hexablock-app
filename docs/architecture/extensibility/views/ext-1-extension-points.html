@@ -1243,20 +1243,13 @@
         </text>
         <line x1="680" y1="748" x2="976" y2="748" stroke="#17212a" stroke-width="1" />
         <text x="696" y="766" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + record(result: GameResult):
+          + record(result: GameResult,
         </text>
         <text x="712" y="782" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          ProgressRecord
+          progress: GameProgress): void
         </text>
-        <text
-          data-requirement="APP-FR-04 APP-FR-09"
-          x="696"
-          y="798"
-          fill="#7d8a94"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          HighScoreProgress, LevelProgress «Sprint 3»
+        <text x="696" y="798" fill="#7d8a94" font-size="9" font-family="'IBM Plex Mono', monospace">
+          HighScoreProgress; LevelProgress takes ILevelStars
         </text>
         <!-- Row 4: the optional capability interfaces -->
         <rect
