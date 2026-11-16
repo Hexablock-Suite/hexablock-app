@@ -12,7 +12,7 @@ export const DEFAULT_FOUR_CHANCE = Chance.of(0.1);
 
 // The source of the new Merge tiles (APP-NFR-07). It reuses the engine `SeededPieceSource`,
 // so the same seed gives the same tiles, and a draw changes no source.
-// Each draw reads two numbers: the first picks the empty cell, the second picks 2 or 4.
+// Each draw reads two random draws: the first picks the empty cell, the second picks 2 or 4.
 // The seed and the chance check themselves (classes.md decision 48), so this function makes no check.
 export function mergeTileSource(
   seed: Seed,

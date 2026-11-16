@@ -17,6 +17,7 @@ import { Score } from '../../src/domain/engine/score';
 import { Seed } from '../../src/domain/engine/seed';
 import { Stars } from '../../src/domain/engine/stars';
 import { Turns } from '../../src/domain/engine/turns';
+import { UndoLimit } from '../../src/domain/engine/undo-limit';
 import { Placement } from '../../src/domain/variants/hexa-fit/placement';
 import { Chance } from '../../src/domain/variants/hexa-merge/chance';
 import { MergeTile } from '../../src/domain/variants/hexa-merge/merge-tile';
@@ -278,7 +279,7 @@ describe('private fields of the value objects', () => {
       // @ts-expect-error `MoveCommand.move` is private.
       () => command.move,
       // @ts-expect-error `MoveHistory.limit` is private.
-      () => new MoveHistory<string, string>(1).limit,
+      () => new MoveHistory<string, string>(UndoLimit.of(1)).limit,
     ];
 
     expect(readers).toHaveLength(6);

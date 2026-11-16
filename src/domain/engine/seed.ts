@@ -1,3 +1,5 @@
+import { GeneratorState } from './generator-state';
+
 // The largest seed of a game: the largest unsigned 32-bit integer.
 const MAX_SEED = 0xffffffff;
 
@@ -8,7 +10,7 @@ const MAX_SEED = 0xffffffff;
 // because a generator would truncate it and two different seeds would give the same game.
 // `of()` is the only place that checks the range. A negative zero is stored as 0.
 // The number stays private. The settings, a level and a seeded source pass the seed on,
-// and only a random generator asks for its first state.
+// and only a random generator asks for its first state, a `GeneratorState` (issue #243).
 export class Seed {
   private constructor(private readonly value: number) {
     Object.freeze(this);
@@ -26,9 +28,9 @@ export class Seed {
     return this.value === other.value;
   }
 
-  // The first state of a generator that starts from this seed: an unsigned 32-bit integer.
-  // A random generator reads it once, when it starts.
-  generatorState(): number {
-    return this.value;
+  // The first state of a generator that starts from this seed. It holds the number of the seed.
+  // A random generator asks for it once, when it starts.
+  generatorState(): GeneratorState {
+    return GeneratorState.of(this.value);
   }
 }

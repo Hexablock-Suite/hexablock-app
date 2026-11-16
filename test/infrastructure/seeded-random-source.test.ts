@@ -1,9 +1,11 @@
 /** @jest-environment node */
 import type { Clock } from '../../src/domain/engine/clock';
 import { Mulberry32Random } from '../../src/domain/engine/mulberry32-random';
+import type { RandomSource } from '../../src/domain/engine/random-source';
 import { Seed } from '../../src/domain/engine/seed';
 import { SeededRandomSource } from '../../src/infrastructure/seeded-random-source';
 import { describeRandomSourceContract } from '../support/contracts/random-source-contract';
+import { delivered } from '../support/engine/value-receiver';
 
 // Issue #162: the random driver runs the contract suite of `RandomSource`,
 // the same suite as the engine generator.
@@ -17,9 +19,9 @@ function clockAt(ms: number): Clock {
   return { now: () => ms };
 }
 
-// The first three numbers of a source.
-function firstThree(source: { next(): number }): number[] {
-  return [source.next(), source.next(), source.next()];
+// The numbers of the first three draws of a source (issue #243).
+function firstThree(source: RandomSource): number[] {
+  return [source.next(), source.next(), source.next()].map((draw) => delivered(draw));
 }
 
 describe('SeededRandomSource', () => {
@@ -45,7 +47,7 @@ describe('SeededRandomSource', () => {
   it('should_start_from_a_valid_seed_when_the_clock_reads_a_large_negative_or_fractional_time', () => {
     const readings = [1_763_164_800_000, -3, 12.75];
 
-    const draws = readings.map((ms) => SeededRandomSource.fromClock(clockAt(ms)).next());
+    const draws = readings.map((ms) => delivered(SeededRandomSource.fromClock(clockAt(ms)).next()));
 
     expect(draws.filter((n) => !(n >= 0 && n < 1))).toEqual([]);
   });

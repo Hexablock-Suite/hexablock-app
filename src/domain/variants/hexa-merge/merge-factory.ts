@@ -12,6 +12,7 @@ import type { RegionSize } from '../../engine/region-size';
 import type { IGameRules } from '../../engine/rules';
 import type { IScoringPolicy } from '../../engine/scoring-policy';
 import type { Seed } from '../../engine/seed';
+import { UndoLimit } from '../../engine/undo-limit';
 import type { IVariantFactory } from '../../engine/variant-factory';
 import type { Chance } from './chance';
 import { MergeRules } from './merge-rules';
@@ -153,6 +154,6 @@ export class MergeFactory<TCoord> implements IVariantFactory<
 
   // Hexa Merge undoes one move (APP-FR-08, classes.md decision 3).
   createHistory(): MoveHistory<Slide<GridAxis>, MergeSnapshot<MergeTile, TCoord, GridAxis>> {
-    return new MoveHistory(MERGE_UNDO_LIMIT);
+    return new MoveHistory(UndoLimit.of(MERGE_UNDO_LIMIT));
   }
 }

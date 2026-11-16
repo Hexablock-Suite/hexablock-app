@@ -248,6 +248,12 @@ export class TriangleDirection implements GridDirection {
   }
 }
 
+// The two steps of the lattice that a region walks. Each step keeps the orientation.
+// The next lattice cell of a row lies two triangles to the right.
+const nextLatticeCell = { forward: (from: TriangleCoord) => from.translated(triangle(1, 0)) };
+// The next lattice row lies one row down and one triangle to the right.
+const nextLatticeRow = { forward: (from: TriangleCoord) => from.translated(triangle(0, 1)) };
+
 // Strategy (statement §3.3, D4): the real triangle topology. `TriangleGeometry` creates it.
 export class TriangleTopology implements GridTopology<
   TriangleCoord,
@@ -332,12 +338,11 @@ export class TriangleTopology implements GridTopology<
   }
 
   // A rhombus of `size` × `size` lattice cells, two triangles each.
+  // Each lattice cell holds an up triangle and the down triangle on its right.
   region(size: RegionSize): BoardShape<TriangleCoord> {
     const cells: TriangleCoord[] = [];
-    for (const j of size.indexes()) {
-      for (const i of size.indexes()) {
-        cells.push(triangle(2 * i + j, j), triangle(2 * i + j + 1, j));
-      }
+    for (const row of size.indexes(triangle(0, 0), nextLatticeRow)) {
+      for (const up of size.indexes(row, nextLatticeCell)) cells.push(up, up.right());
     }
     return BoardShape.of(cells);
   }

@@ -1,5 +1,6 @@
 import type { Clock } from '../domain/engine/clock';
 import { Mulberry32Random } from '../domain/engine/mulberry32-random';
+import type { RandomDraw } from '../domain/engine/random-draw';
 import type { RandomSource } from '../domain/engine/random-source';
 import { Seed } from '../domain/engine/seed';
 
@@ -7,7 +8,7 @@ import { Seed } from '../domain/engine/seed';
 const SEEDS = 2 ** 32;
 
 // The random driver (issue #162). It implements the engine interface `RandomSource`
-// (classes.md decision 25). The same seed gives the same numbers (APP-NFR-07).
+// (classes.md decision 25). The same seed gives the same draws (APP-NFR-07).
 // It draws with the engine generator `Mulberry32Random`, so the app and the tests
 // share one generator. The composition root draws the seed of each game from it.
 export class SeededRandomSource implements RandomSource {
@@ -25,8 +26,8 @@ export class SeededRandomSource implements RandomSource {
     return new SeededRandomSource(Seed.of((whole + SEEDS) % SEEDS));
   }
 
-  // A number in [0, 1).
-  next(): number {
+  // The next draw: a `RandomDraw`, a number in [0, 1) that stays private (issue #243).
+  next(): RandomDraw {
     return this.generator.next();
   }
 
