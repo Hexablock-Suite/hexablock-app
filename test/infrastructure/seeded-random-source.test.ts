@@ -1,5 +1,6 @@
 /** @jest-environment node */
 import type { Clock } from '../../src/domain/engine/clock';
+import { ClockReading } from '../../src/domain/engine/clock-reading';
 import { Mulberry32Random } from '../../src/domain/engine/mulberry32-random';
 import type { RandomSource } from '../../src/domain/engine/random-source';
 import { Seed } from '../../src/domain/engine/seed';
@@ -16,7 +17,7 @@ describeRandomSourceContract('SeededRandomSource', () => new SeededRandomSource(
 
 // A clock that always reads `ms`.
 function clockAt(ms: number): Clock {
-  return { now: () => ms };
+  return { now: () => ClockReading.of(ms) };
 }
 
 // The numbers of the first three draws of a source (issue #243).

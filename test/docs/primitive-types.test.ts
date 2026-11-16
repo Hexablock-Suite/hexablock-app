@@ -830,12 +830,14 @@ describe('domain primitive gate', () => {
     ).toEqual([{ primitive: 'number', where: 'FixtureSnapshot.streak' }]);
   });
 
+  // The README row of `ElapsedTime.ofMs` explains a factory method. The same place
+  // as an interface member returns a primitive, and the row does not excuse it.
   it('should_fail_the_gate_when_only_a_readme_row_names_the_primitive', () => {
-    const source = 'export interface Clock {\n  now(): number;\n}';
+    const source = 'export interface ElapsedTime {\n  ofMs(): number;\n}';
 
-    expect(readmeUses()).toContainEqual({ primitive: 'number', where: 'Clock.now' });
-    expect(unexcused(breaksIn(fixture('fixture-clock.ts', source)), [])).toEqual([
-      { primitive: 'number', where: 'Clock.now' },
+    expect(readmeUses()).toContainEqual({ primitive: 'number', where: 'ElapsedTime.ofMs' });
+    expect(unexcused(breaksIn(fixture('fixture-elapsed-time.ts', source)), [])).toEqual([
+      { primitive: 'number', where: 'ElapsedTime.ofMs' },
     ]);
   });
 

@@ -19,10 +19,18 @@ export class SeededRandomSource implements RandomSource {
   }
 
   // A source whose seed is the reading of `clock`, so each run of the app gets other numbers.
+  // The driver is an adapter of the edge, so it receives the number of the reading
+  // through `deliverTo()` (issue #238).
   // The reading becomes a whole number of 0 to 4294967295 first,
   // so a large, a negative or a fractional reading gives a valid seed.
   static fromClock(clock: Clock): SeededRandomSource {
-    const whole = Math.floor(clock.now()) % SEEDS;
+    let ms = 0;
+    clock.now().deliverTo({
+      receive: (value) => {
+        ms = value;
+      },
+    });
+    const whole = Math.floor(ms) % SEEDS;
     return new SeededRandomSource(Seed.of((whole + SEEDS) % SEEDS));
   }
 

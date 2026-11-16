@@ -13,8 +13,6 @@ export type PrimitiveEntry = { primitive: 'number' | 'string'; where: string; is
 export type FieldEntry = { rule: 'field' | 'get'; where: string; issue: number };
 
 export const primitiveBaseline: readonly PrimitiveEntry[] = [
-  // #238: the clock reading.
-  { primitive: 'number', where: 'Clock.now', issue: 238 },
   // #246: the team decides whether a branded key counts as a primitive.
   { primitive: 'string', where: 'CoordKey', issue: 246 },
   { primitive: 'string', where: 'coordKey', issue: 246 },
