@@ -14,32 +14,40 @@ import type { Placement } from './placement';
 // for example the state mapper of the Fit screen. No code of `src/domain/` or
 // `src/application/` calls `deliverTo()` (rule R-no-delivery-call).
 export interface FitViewReceiver<TCoord> {
-  receive(remaining: readonly Piece<PieceId, TCoord>[], placed: readonly PieceId[]): void;
+  receive(
+    remaining: readonly Piece<PieceId, TCoord>[],
+    placed: readonly PieceId[],
+    moves: Moves,
+  ): void;
 }
 
-// The data that the Fit screen draws: the tray and the pieces on the figure.
-// Both fields are private (issue #245). The view keeps frozen copies of the two lists,
-// and `deliverTo()` gives them to an adapter of the edge.
+// The data that the Fit screen draws: the tray, the pieces on the figure and the count
+// of the accepted moves (issue #175). Every field is private (issue #245). The view keeps
+// frozen copies of the two lists, and `deliverTo()` gives the data to an adapter of the edge.
 export class FitView<TCoord> {
   private readonly remaining: readonly Piece<PieceId, TCoord>[];
   private readonly placed: readonly PieceId[];
 
-  constructor(remaining: readonly Piece<PieceId, TCoord>[], placed: readonly PieceId[]) {
+  constructor(
+    remaining: readonly Piece<PieceId, TCoord>[],
+    placed: readonly PieceId[],
+    private readonly moves: Moves,
+  ) {
     this.remaining = Object.freeze([...remaining]);
     this.placed = Object.freeze([...placed]);
     Object.freeze(this);
   }
 
-  // Gives the tray and the placed pieces to `receiver`. It returns nothing.
+  // Gives the tray, the placed pieces and the move count to `receiver`. It returns nothing.
   deliverTo(receiver: FitViewReceiver<TCoord>): void {
-    receiver.receive(this.remaining, this.placed);
+    receiver.receive(this.remaining, this.placed, this.moves);
   }
 }
 
 // The photo of a Fit state (classes.md decision 34): the board, the score, the move count
 // and the placement of each piece on the figure, in the order of the placements.
 // The pieces of the level never change, so the photo does not hold them.
-// `view()` gives the tray and the placed pieces for the screen.
+// `view()` gives the tray, the placed pieces and the move count for the screen.
 // Every field is private (issue #245). `FitState.restore()` asks `piecePlacements()` and
 // `moveCount()`. The photo keeps a frozen list of frozen pairs, and it is frozen itself.
 export class FitSnapshot<TCoord> extends BoardSnapshot<PieceId, TCoord> {
@@ -197,7 +205,7 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
       this.score,
       this.placements.entries(),
       this.moves,
-      new FitView(this.remaining(), this.placed()),
+      new FitView(this.remaining(), this.placed(), this.moves),
     );
   }
 
