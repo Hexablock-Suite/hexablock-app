@@ -2,7 +2,7 @@
 
 Status: draft for review with the professor, 2026-10-30. Updated on 2026-10-31 to match the class diagram: one generic input port, the ports of decisions 10 to 12, engine interfaces that are not ports, and the presentation pattern. Updated on 2026-11-02: the `Logger` port takes a log entry, and its adapter writes the text (decision 37 of the class diagram). Updated on 2026-11-07: the status text and the planned marks of the diagram follow the code in `src/` (issue #147).
 
-This page answers one question: in which layer does each piece of the client live? It follows the statement (§3.4, §4.2) and the layer rules in `.dependency-cruiser.cjs`. Part of the client exists today. `src/domain/` holds the engine and the four variants. `src/application/` holds the first use cases, `StartGame` and `ApplyMove`, with the input port `UseCase`, the ports `RunningGameStore` and `Logger`, and the aspects `UseCaseAspect` and `LoggingAspect`. `src/infrastructure/` holds the API client in `src/infrastructure/api/`. `app/` holds the root layout and a home screen that shows the title. The other screens, the adapters of `src/adapters/`, the drivers and the composition root are planned. The diagram marks each planned piece. Component names follow the statement (§3.1, §3.4) and the [class diagram](classes.md). They are not final. The engine names carry no geometry: `Board<TCell, TCoord>` is the `HexBoard<TCell>` of §3.1 (decision 16 of the class diagram). IDs such as A1, D3 and Q7 refer to [`docs/REQUIREMENTS.md`](../REQUIREMENTS.md). The classes of layer 1 are in the [class diagram](classes.md).
+This page answers one question: in which layer does each piece of the client live? It follows the statement (§3.4, §4.2) and the layer rules in `.dependency-cruiser.cjs`. Part of the client exists today. `src/domain/` holds the engine and the four variants. `src/application/` holds the first use cases, `StartGame` and `ApplyMove`, with the input port `UseCase`, the ports `GameRepository` and `Logger`, and the aspects `UseCaseAspect` and `LoggingAspect`. `src/infrastructure/` holds the API client in `src/infrastructure/api/`. `app/` holds the root layout and a home screen that shows the title. The other screens, the adapters of `src/adapters/`, the drivers and the composition root are planned. The diagram marks each planned piece. Component names follow the statement (§3.1, §3.4) and the [class diagram](classes.md). They are not final. The engine names carry no geometry: `Board<TCell, TCoord>` is the `HexBoard<TCell>` of §3.1 (decision 16 of the class diagram). IDs such as A1, D3 and Q7 refer to [`docs/REQUIREMENTS.md`](../REQUIREMENTS.md). The classes of layer 1 are in the [class diagram](classes.md).
 
 ## Diagram
 
@@ -43,7 +43,7 @@ flowchart TB
     EVENTBUS["GameEventBus: delivers game events<br/>to presenters, score and audio (planned)"]
     LOCALREPO["LocalProgressRepository and<br/>LocalSettingsStore (planned)"]
     LEVELREPO["BundledLevelRepository (planned)"]
-    RUNSTORE["InMemoryRunningGameStore (planned)"]
+    GAMEREPO["InMemoryGameRepository (planned)"]
     KV["KeyValueStore interface (planned)"]
   end
 
@@ -55,7 +55,7 @@ flowchart TB
     PPORT(["ProgressRepository port (planned)"])
     LBPORT(["LeaderboardGateway port (planned)"])
     LVPORT(["LevelRepository port (planned)"])
-    RGPORT(["RunningGameStore port"])
+    GRPORT(["GameRepository port"])
     ACCPORT(["AccountGateway port (planned)"])
     SESSPORT(["SessionStore port (planned)"])
     SETPORT(["SettingsStore port (planned)"])
@@ -99,8 +99,8 @@ flowchart TB
   LOCALREPO --> KV
   LOCALREPO -.->|implement| PPORT & SETPORT
   LEVELREPO -.->|implements| LVPORT
-  RUNSTORE -.->|implements| RGPORT
-  RUNSTORE --> CORE
+  GAMEREPO -.->|implements| GRPORT
+  GAMEREPO --> CORE
 
   ASPECTS -->|wraps| UC
   ASPECTS --> LOGPORT
@@ -109,7 +109,7 @@ flowchart TB
   UC --> PPORT
   UC --> LBPORT
   UC --> LVPORT
-  UC --> RGPORT
+  UC --> GRPORT
   UC --> ACCPORT
   UC --> SETPORT
   UC --> CORE
@@ -150,13 +150,13 @@ flowchart TB
   end
 
   %% Invisible links keep the layers stacked from outer to inner, with the legend last.
-  KV & MAPPERS & RUNSTORE ~~~ ASPECTS
-  PPORT & LBPORT & LVPORT & RGPORT & ACCPORT & SESSPORT & SETPORT & LOGPORT & INPORTS ~~~ CORE & LINES & FIT & SORT & MERGE
+  KV & MAPPERS & GAMEREPO ~~~ ASPECTS
+  PPORT & LBPORT & LVPORT & GRPORT & ACCPORT & SESSPORT & SETPORT & LOGPORT & INPORTS ~~~ CORE & LINES & FIT & SORT & MERGE
   L1 ~~~ LEGEND
 
   classDef planned stroke-dasharray: 5 5
   class SCREENS,APIREPOS,STORAGE,SECURE,AUDIO,CLOCK,RNG,LOGGER,VIEWS,ROOT planned
-  class PRESENTERS,MAPPERS,EVENTBUS,LOCALREPO,LEVELREPO,RUNSTORE,KV planned
+  class PRESENTERS,MAPPERS,EVENTBUS,LOCALREPO,LEVELREPO,GAMEREPO,KV planned
   class PPORT,LBPORT,LVPORT,ACCPORT,SESSPORT,SETPORT planned
   class LGPLAN planned
 
@@ -197,7 +197,7 @@ The "May depend on" column repeats `.dependency-cruiser.cjs`. `pnpm arch` checks
 - **Command and State:** layer 1, `src/domain/engine/`. `MoveCommand` wraps each move, so the history supports undo and redo: unlimited in Hexa Fit, one move in Hexa Merge (§3.3). `GamePhase` has one class per phase of a game: Playing, Resolving, Paused, GameOver and Victory (§3.3). The name avoids a clash with the `TState` type parameter. The menu belongs to the presentation layer, not to `GamePhase` (D2).
 - **Game events (Observer):** the `GameEventPublisher` interface lives in layer 1, `src/domain/engine/`, because the engine notifies at the end of each turn. It is an engine interface, not a port. It publishes events such as `LineCleared`, `StackMerged`, `TileMerged` and `GameOver` (§3.3). `GameEventBus` in layer 3 implements it. The presenters, the score display and `AudioManager`, the audio facade in layer 4, listen to it, so the engine never knows about sound or screens.
 - **Use cases:** layer 2, `src/application/`. One generic set for the four variants:
-  - `StartGame`, `ApplyMove`, `UndoMove`, `SaveProgress` and `SyncLeaderboard`. The game use cases keep the running engine through the `RunningGameStore` port, and `InMemoryRunningGameStore` in layer 3 implements it (decision 10).
+  - `StartGame`, `ApplyMove`, `UndoMove`, `SaveProgress` and `SyncLeaderboard`. The game use cases keep the running engine through `GameRepository`, the repository port of the game aggregate, and `InMemoryGameRepository` in layer 3 implements it (decision 10).
   - `RedoMove`: redo in Hexa Fit (statement §5.1.8).
   - `ListLevels`: the level selector with its progress indicator and locked levels (§5.1.2).
   - `Register` and `Login`: sign-up and sign-in against the backend (§5.2.1), through the `AccountGateway` port, which `ApiAccountGateway` in layer 4 implements (decision 11). They write the token through the `SessionStore` port.

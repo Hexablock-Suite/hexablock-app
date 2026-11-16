@@ -73,7 +73,7 @@
         <desc id="ucgame-desc">
           Class diagram of layers 2 and 1 showing the StartGame, ApplyMove, UndoMove and RedoMove
           use cases, each implementing the UseCase input port and reaching the running game through
-          the RunningGameStore output port, which holds at most one GameEngine; StartGame asks a
+          the GameRepository output port, which holds at most one GameEngine; StartGame asks a
           GameFactory for the started game and ApplyMove plays the move on the GameEngine of layer 1
           and passes a publisher failure to the Logger port; each use case answers with a plain
           MoveResult, and UndoMove and RedoMove ask the engine for undoable() and redoable().
@@ -226,7 +226,7 @@
         </text>
 
         <!-- Relationships (drawn before boxes) -->
-        <!-- UndoMove keeps the RunningGameStore it receives in an attribute: use -->
+        <!-- UndoMove keeps the GameRepository it receives in an attribute: use -->
         <path
           d="M632 184 H256 Q248 184 248 192 V316"
           fill="none"
@@ -234,7 +234,7 @@
           stroke-width="1"
           marker-end="url(#ucgame-open)"
         />
-        <!-- RedoMove keeps the RunningGameStore it receives in an attribute: use -->
+        <!-- RedoMove keeps the GameRepository it receives in an attribute: use -->
         <line
           x1="632"
           y1="380"
@@ -244,7 +244,7 @@
           stroke-width="1"
           marker-end="url(#ucgame-open)"
         />
-        <!-- StartGame keeps the RunningGameStore it receives in an attribute: use -->
+        <!-- StartGame keeps the GameRepository it receives in an attribute: use -->
         <path
           d="M632 552 H384 Q376 552 376 544 V404"
           fill="none"
@@ -252,7 +252,7 @@
           stroke-width="1"
           marker-end="url(#ucgame-open)"
         />
-        <!-- ApplyMove keeps the RunningGameStore it receives in an attribute: use -->
+        <!-- ApplyMove keeps the GameRepository it receives in an attribute: use -->
         <path
           d="M632 720 H352 Q344 720 344 712 V404"
           fill="none"
@@ -260,7 +260,7 @@
           stroke-width="1"
           marker-end="url(#ucgame-open)"
         />
-        <!-- RunningGameStore stores and returns the GameEngine: use, the interface keeps no attribute -->
+        <!-- GameRepository stores and returns the GameEngine: use, the interface keeps no attribute -->
         <line
           x1="288"
           y1="404"
@@ -421,7 +421,7 @@
           APP-FR-08
         </text>
         <text x="648" y="196" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - games: RunningGameStore&lt;TCell, TCoord, TMove, TState&gt;
+          - games: GameRepository&lt;TCell, TCoord, TMove, TState&gt;
         </text>
         <text x="648" y="212" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           failed Result when undoable() is undefined
@@ -480,7 +480,7 @@
           APP-FR-08
         </text>
         <text x="648" y="380" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - games: RunningGameStore&lt;TCell, TCoord, TMove, TState&gt;
+          - games: GameRepository&lt;TCell, TCoord, TMove, TState&gt;
         </text>
         <text x="648" y="396" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           failed Result when redoable() is undefined
@@ -542,7 +542,7 @@
           - factory: GameFactory&lt;TCell, TCoord, TMove, TState&gt;
         </text>
         <text x="648" y="580" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - games: RunningGameStore&lt;TCell, TCoord, TMove, TState&gt;
+          - games: GameRepository&lt;TCell, TCoord, TMove, TState&gt;
         </text>
         <line x1="632" y1="588" x2="960" y2="588" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="648" y="604" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
@@ -600,7 +600,7 @@
           APP-FR-03
         </text>
         <text x="648" y="748" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - games: RunningGameStore&lt;TCell, TCoord, TMove, TState&gt;
+          - games: GameRepository&lt;TCell, TCoord, TMove, TState&gt;
         </text>
         <text x="648" y="764" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - logger: Logger
@@ -613,7 +613,7 @@
           Promise&lt;Result&lt;MoveResult&lt;TCell, TCoord&gt;&gt;&gt;
         </text>
 
-        <!-- Class: RunningGameStore (interface, output port) -->
+        <!-- Class: GameRepository (interface, output port, repository) -->
         <rect
           x="64"
           y="316"
@@ -634,7 +634,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «port»
+          «interface» «port» «repository»
         </text>
         <text
           x="258"
@@ -645,7 +645,7 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          RunningGameStore
+          GameRepository
         </text>
         <text x="80" y="380" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + current(): GameEngine&lt;TCell, TCoord, TMove, TState&gt; | undefined
@@ -876,7 +876,7 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          so the turn stays in the domain (D1). RunningGameStore is a proposal. Each class bounds
+          so the turn stays in the domain (D1). GameRepository is a proposal. Each class bounds
           TState as GameEngine does (Part 1, view 1).
         </text>
         <text

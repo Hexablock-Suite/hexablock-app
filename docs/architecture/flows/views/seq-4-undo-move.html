@@ -72,7 +72,7 @@
         <desc id="sequndo-desc">
           Sequence diagram of one undo. The player taps undo on GameScreen in layer 4. GamePresenter
           in layer 3 calls execute() on UndoMove in layer 2 through the UseCase port. UndoMove takes
-          the running GameEngine from InMemoryRunningGameStore through the RunningGameStore port and
+          the running GameEngine from InMemoryGameRepository through the GameRepository port and
           asks it for its IUndoable capability. When the capability is undefined, UndoMove returns a
           failed Result. Otherwise MoveHistory, which implements IUndoable, undoes the last
           MoveCommand, which gives its photo of the state back to GameEngine through restore().
@@ -291,7 +291,7 @@
         >
           implements UseCase
         </text>
-        <!-- Lifeline: games : InMemoryRunningGameStore -->
+        <!-- Lifeline: games : InMemoryGameRepository -->
         <rect
           x="532"
           y="24"
@@ -333,7 +333,7 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          InMemoryRunningGameStore
+          InMemoryGameRepository
         </text>
         <text
           x="610"
@@ -343,7 +343,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          implements RunningGameStore
+          implements GameRepository
         </text>
         <!-- Lifeline: game : GameEngine -->
         <rect

@@ -72,8 +72,8 @@
         <desc id="flowundo-desc">
           Cross-layer class diagram of the UndoMove use case only. In layer 4, GameScreen uses
           GamePresenter. In layer 3, GamePresenter uses the UseCase input port, and
-          InMemoryRunningGameStore implements the RunningGameStore port and keeps the running
-          GameEngine. In layer 2, UndoMove implements UseCase, keeps the RunningGameStore port and
+          InMemoryGameRepository implements the GameRepository port and keeps the running
+          GameEngine. In layer 2, UndoMove implements UseCase, keeps the GameRepository port and
           builds a MoveResult. In layer 1, GameEngine holds zero or one MoveHistory, the Command
           invoker, and returns it as the IUndoable capability; MoveHistory implements IUndoable and
           holds its MoveCommands. UndoMove calls undoable() on GameEngine, undo() on IUndoable and
@@ -225,7 +225,7 @@
           stroke-width="1"
           marker-end="url(#flowundo-open)"
         />
-        <!-- InMemoryRunningGameStore implements RunningGameStore: realization, down from layer 3 to layer 2 -->
+        <!-- InMemoryGameRepository implements GameRepository: realization, down from layer 3 to layer 2 -->
         <path
           d="M820 296 V420"
           fill="none"
@@ -234,7 +234,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#flowundo-triangle)"
         />
-        <!-- InMemoryRunningGameStore keeps the running GameEngine: use, down from layer 3 to layer 1 -->
+        <!-- InMemoryGameRepository keeps the running GameEngine: use, down from layer 3 to layer 1 -->
         <path
           d="M980 260 H994 Q1002 260 1002 268 V822 Q1002 830 994 830 H940"
           fill="none"
@@ -251,7 +251,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#flowundo-triangle)"
         />
-        <!-- UndoMove keeps the RunningGameStore it receives in an attribute: use -->
+        <!-- UndoMove keeps the GameRepository it receives in an attribute: use -->
         <path
           d="M660 600 H692 Q700 600 700 592 V508"
           fill="none"
@@ -545,7 +545,7 @@
         <text x="56" y="344" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + viewModel(): GameViewModel
         </text>
-        <!-- Class: InMemoryRunningGameStore (adapter) -->
+        <!-- Class: InMemoryGameRepository (adapter) -->
         <rect
           x="640"
           y="224"
@@ -565,7 +565,7 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          InMemoryRunningGameStore
+          InMemoryGameRepository
         </text>
         <line x1="640" y1="272" x2="980" y2="272" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="656" y="288" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
@@ -608,7 +608,7 @@
         <text x="252" y="484" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + execute(request: TRequest): Promise&lt;Result&lt;TResponse&gt;&gt;
         </text>
-        <!-- Class: RunningGameStore (interface, output port) -->
+        <!-- Class: GameRepository (interface, output port, repository) -->
         <rect
           x="592"
           y="420"
@@ -628,7 +628,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «port»
+          «interface» «port» «repository»
         </text>
         <text
           x="784"
@@ -639,7 +639,7 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          RunningGameStore
+          GameRepository
         </text>
         <line x1="592" y1="468" x2="976" y2="468" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="608" y="484" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
@@ -755,7 +755,7 @@
         <line x1="300" y1="616" x2="660" y2="616" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <line x1="300" y1="656" x2="660" y2="656" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text x="316" y="632" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - games: RunningGameStore&lt;TCell, TCoord, TMove, TState&gt;
+          - games: GameRepository&lt;TCell, TCoord, TMove, TState&gt;
         </text>
         <text x="316" y="648" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           failed Result when undoable() is undefined
@@ -1293,7 +1293,7 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          running GameEngine from RunningGameStore and asks it for its IUndoable capability.
+          running GameEngine from GameRepository and asks it for its IUndoable capability.
           MoveHistory implements IUndoable: it takes the
         </text>
         <text
