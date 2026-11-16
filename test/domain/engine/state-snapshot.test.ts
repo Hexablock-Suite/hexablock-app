@@ -133,7 +133,9 @@ describe('the photo of a state', () => {
         .piecePlacements()
         .map(([id, at]) => [id.equals(A), at.equals(placement, photo.boardCopy())]),
     ).toEqual([[true, true]]);
-    expect(json(fitViewData(photo.view()))).toBe(json({ remaining: [], placed: [A] }));
+    expect(json(fitViewData(photo.view()))).toBe(
+      json({ remaining: [], placed: [A], moves: Moves.of(1) }),
+    );
   });
 
   it('should_keep_the_photo_and_the_state_apart_when_either_one_changes', () => {
