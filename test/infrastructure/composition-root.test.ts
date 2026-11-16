@@ -1,12 +1,15 @@
 /** @jest-environment node */
 import { FitStateMapper } from '../../src/adapters/fit-state-mapper';
+import { MergeStateMapper } from '../../src/adapters/merge-state-mapper';
 import { SpaceStateMapper } from '../../src/adapters/space-state-mapper';
 import { GameId } from '../../src/domain/engine/game-id';
 import { TopologyId } from '../../src/domain/engine/geometry-factory';
 import { FitCellRenderer } from '../../src/infrastructure/board/fit-cell-renderer';
+import { MergeCellRenderer } from '../../src/infrastructure/board/merge-cell-renderer';
 import { SpaceCellRenderer } from '../../src/infrastructure/board/space-cell-renderer';
 import { CompositionRoot } from '../../src/infrastructure/composition-root';
 import { FitControls } from '../../src/infrastructure/ui/fit-controls';
+import { MergeControls } from '../../src/infrastructure/ui/merge-controls';
 import { BoardOnlyControls } from '../../src/infrastructure/ui/move-controls';
 import { errorOf, valueOf } from '../support/application/game-use-cases';
 import { RecordingLogger } from '../support/application/recording-logger';
@@ -102,8 +105,9 @@ describe('CompositionRoot', () => {
   });
 
   // Issue #175: the registry gives Hexa Fit its own state mapper, cell renderer and move
-  // controls. The other games keep the default parts until their own tasks (#174, #176, #177).
-  it('should_give_hexa_fit_its_mapper_its_renderer_and_its_controls_when_the_root_builds_the_registry', () => {
+  // controls. Issue #177 gives Hexa Merge its own parts too. Lines and Sort keep the default
+  // parts until their own tasks (#174, #176).
+  it('should_give_hexa_fit_and_hexa_merge_their_mappers_renderers_and_controls_when_the_root_builds_the_registry', () => {
     const registry = testRoot().registry();
 
     const parts = registry.gameIds().map((id) => {
@@ -116,7 +120,7 @@ describe('CompositionRoot', () => {
       ['hexa-lines', ...defaults],
       ['hexa-fit', FitStateMapper, FitCellRenderer, FitControls],
       ['hexa-sort', ...defaults],
-      ['hexa-merge', ...defaults],
+      ['hexa-merge', MergeStateMapper, MergeCellRenderer, MergeControls],
     ]);
   });
 
