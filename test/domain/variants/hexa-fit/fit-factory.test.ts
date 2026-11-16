@@ -74,7 +74,7 @@ describe('FitFactory', () => {
     // `BoardShape` keeps a repeated cell, and the board rejects it by its topology key.
     const factory = new FitFactory(
       new SquareGeometry(),
-      FitLevel.of(TopologyId.square, BoardShape.of([square(0, 0), square(0, 0)]), []),
+      FitLevel.of(TopologyId.square, BoardShape.of([square(0, 0), square(0, 0)]), [], []),
       new ManualClock(),
     );
     const message = 'Two coordinates of the shape have the same key.';
