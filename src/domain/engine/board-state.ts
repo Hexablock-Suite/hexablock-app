@@ -9,18 +9,50 @@ import type { Score } from './score';
 // It is the Memento of the state: `BoardState.snapshot()` gives it, and `restore()` takes it back.
 // It is also the only way to read a state from outside: the rules, the scoring policies,
 // `GameEngine.snapshot()` and `moveResultOf()` read it. It has no tactical stereotype.
-// It carries domain values and no business method. It is frozen, and it holds a copy of the board,
-// so a change to the photo never changes the state, and a later move never changes the photo.
+// It holds a copy of the board, so a later move never changes the photo.
 // It hands out no board that a caller owns: `ReadonlyBoard` has no `clone()` (issue #234).
 // It holds the two ids of the state, so a state takes back only its own photo.
-// `view()` gives the plain data that the screen of the variant draws (decision 29).
-// Each variant photo extends it with the data of its variant and narrows `view()`.
-export interface BoardSnapshot<TCell, TCoord> {
-  readonly stateId: GameStateId;
-  readonly matchId: MatchId;
-  readonly board: ReadonlyBoard<TCell, TCoord>;
-  readonly score: Score;
-  view(): unknown;
+// Every field is private (issue #245). A reader in the domain or in a use case asks a query
+// with a business name, and each query returns a value object, the read-only board or a boolean.
+// `view()` gives the data that the screen of the variant draws (decision 29). The view also keeps
+// its fields private, and an adapter of the edge receives its data with `deliverTo(receiver)`.
+// The class is abstract: each variant photo extends it with the data of its variant,
+// implements `view()` and freezes itself. `TAxis` keeps the axis type of the board,
+// so the Merge photo gives the board of its topology.
+export abstract class BoardSnapshot<TCell, TCoord, TAxis extends GridAxis = GridAxis> {
+  protected constructor(
+    private readonly stateId: GameStateId,
+    private readonly matchId: MatchId,
+    private readonly board: ReadonlyBoard<TCell, TCoord, TAxis>,
+    private readonly score: Score,
+  ) {}
+
+  // True when this is a photo of the state `state`. A state asks it before it takes a photo back.
+  isPhotoOf(state: GameStateId): boolean {
+    return this.stateId.equals(state);
+  }
+
+  // True when this is a photo of a state of the match `match`.
+  belongsTo(match: MatchId): boolean {
+    return this.matchId.equals(match);
+  }
+
+  // The copy of the board that the photo holds. The rules ask it questions, `moveResultOf()`
+  // copies its occupied cells, and a state takes it back with `Board.restore()`.
+  // It is the same read-only copy on each call, so no reader can change the photo through it.
+  boardCopy(): ReadonlyBoard<TCell, TCoord, TAxis> {
+    return this.board;
+  }
+
+  // The score of the game at the moment of the photo. Three readers need the value itself:
+  // the `GameOver` event carries the final score, `moveResultOf()` puts it in `MoveResult`,
+  // and a state takes it back with `restore()`.
+  scoreSoFar(): Score {
+    return this.score;
+  }
+
+  // The data that the screen of the variant draws. Each variant photo narrows the type.
+  abstract view(): unknown;
 }
 
 // The photo type that a state type gives with `snapshot()`. A variant state narrows
@@ -38,7 +70,7 @@ export type SnapshotOf<TState> = TState extends { snapshot(): infer TSnapshot } 
 // It changes only through its own methods, which have business names.
 // The rules call them, and the engine calls `addPoints()`. No other class writes a field.
 // Every field of a state is private, so no other class reads a field either:
-// a reader reads the photo of `snapshot()`, or asks a query with a business name.
+// a reader asks the photo of `snapshot()`, or the state, a query with a business name.
 // `addPoints()` adds the points of one turn. The points and the score are `Score` values
 // (classes.md decision 41). A total above the largest safe integer throws a RangeError,
 // and the score stays as it was.
@@ -57,15 +89,17 @@ export interface BoardState<TCell, TCoord> extends Cloneable<BoardState<TCell, T
   restore(snapshot: SnapshotOf<this>): void;
 }
 
-// A state takes back only its own photo: a photo with the id of the state and a copy of its board.
+// A state takes back only its own photo: a photo of the state with a copy of its board.
 // Any other photo throws a RangeError. Each state calls it before `restore()` writes anything.
 export function checkOwnSnapshot<TCell, TCoord, TAxis extends GridAxis>(
   stateId: GameStateId,
   board: ReadonlyBoard<TCell, TCoord, TAxis>,
-  snapshot: { readonly stateId: GameStateId; readonly board: ReadonlyBoard<TCell, TCoord, TAxis> },
+  snapshot: BoardSnapshot<TCell, TCoord, TAxis>,
 ): void {
-  if (!snapshot.stateId.equals(stateId)) {
+  if (!snapshot.isPhotoOf(stateId)) {
     throw new RangeError('The snapshot belongs to another state.');
   }
-  if (!board.equals(snapshot.board)) throw new RangeError('The snapshot holds another board.');
+  if (!board.equals(snapshot.boardCopy())) {
+    throw new RangeError('The snapshot holds another board.');
+  }
 }

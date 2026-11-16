@@ -12,7 +12,7 @@ import { Placement } from './placement';
 // Each move holds its own check and its own change (issue #244). `isValidOn()` tells whether
 // the move is valid on a state and its photo, and `applyTo()` changes the state.
 // `FitRules` calls these two operations, so no code tells the moves apart by their class.
-// A move reads the figure through the photo of the state. It changes the state only through
+// A move asks the photo of the state for its board. It changes the state only through
 // the business methods `place()` and `remove()` of `FitState`.
 // Each class names its piece with a query that says what the move does with it:
 // `pieceToPlace()`, `pieceToRemove()` and `pieceToRotate()` (issue #234).
@@ -40,7 +40,7 @@ export class PlaceFitPiece<TCoord> {
 
   // True when the piece is in the tray and its placement fits on free figure cells.
   isValidOn(state: FitState<TCoord>, photo: FitSnapshot<TCoord>): boolean {
-    const { board } = photo;
+    const board = photo.boardCopy();
     return (
       state.placementOf(this.pieceId) === undefined &&
       fits(state, board, this.pieceId, this.placement(board))
@@ -49,7 +49,7 @@ export class PlaceFitPiece<TCoord> {
 
   // Puts the piece on the cells of its placement.
   applyTo(state: FitState<TCoord>): void {
-    const { board } = state.snapshot();
+    const board = state.snapshot().boardCopy();
     state.place(this.pieceId, this.placement(board));
   }
 
@@ -111,7 +111,7 @@ export class RotateFitPiece {
   // True when the piece is on the figure and the turned piece fits on free figure cells
   // or on its own cells.
   isValidOn<TCoord>(state: FitState<TCoord>, photo: FitSnapshot<TCoord>): boolean {
-    const { board } = photo;
+    const board = photo.boardCopy();
     const placement = state.placementOf(this.pieceId);
     return placement !== undefined && fits(state, board, this.pieceId, this.turn(placement, board));
   }
@@ -119,7 +119,7 @@ export class RotateFitPiece {
   // Removes the piece and places it again, turned. A piece off the figure throws a RangeError
   // before any change. The error carries the piece as its `cause` (issue #237).
   applyTo<TCoord>(state: FitState<TCoord>): void {
-    const { board } = state.snapshot();
+    const board = state.snapshot().boardCopy();
     const placement = state.placementOf(this.pieceId);
     if (placement === undefined) {
       throw new RangeError('The piece is not on the figure.', { cause: this.pieceId });

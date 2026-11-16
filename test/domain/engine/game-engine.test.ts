@@ -1,6 +1,6 @@
 /** @jest-environment node */
 import { Score } from '../../../src/domain/engine/score';
-import type { Board, ReadonlyBoard } from '../../../src/domain/engine/board';
+import type { Board } from '../../../src/domain/engine/board';
 import type { BoardState } from '../../../src/domain/engine/board-state';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameOver } from '../../../src/domain/engine/game-events';
@@ -19,7 +19,7 @@ import {
   SourceRules,
   sourceState,
   type FakeMove,
-  type FakeSnapshot,
+  FakeSnapshot,
   type SourceState,
 } from '../../support/engine/fake-game';
 import { STATE_ID } from '../../support/engine/entity-ids';
@@ -134,8 +134,8 @@ describe('GameEngine.play()', () => {
     const outcome = engine.play(place(1, 0, 7));
 
     expect(outcome).toBe(Outcome.playing);
-    expect(engine.snapshot().board.occupantAt(square(1, 0))).toEqual(fakeCell(7));
-    expect(engine.snapshot().score).toEqual(Score.of(1));
+    expect(engine.snapshot().boardCopy().occupantAt(square(1, 0))).toEqual(fakeCell(7));
+    expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(1));
   });
 
   it('should_keep_the_board_and_the_score_when_the_move_is_invalid', () => {
@@ -146,8 +146,8 @@ describe('GameEngine.play()', () => {
     const outcome = engine.play(place(0, 0, 9));
 
     expect(outcome).toBe(Outcome.playing);
-    expect(engine.snapshot().board.occupantAt(square(0, 0))).toEqual(fakeCell(1));
-    expect(engine.snapshot().score).toEqual(Score.of(1));
+    expect(engine.snapshot().boardCopy().occupantAt(square(0, 0))).toEqual(fakeCell(1));
+    expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(1));
     expect(engine.currentPhase().canPlay()).toBe(true);
   });
 
@@ -163,8 +163,8 @@ describe('GameEngine.play()', () => {
     const outcome = engine.play(place(0, 0));
 
     expect(outcome).toBe(Outcome.playing);
-    expect(engine.snapshot().board.occupantAt(square(0, 0))).toBeUndefined();
-    expect(engine.snapshot().score).toEqual(Score.of(0));
+    expect(engine.snapshot().boardCopy().occupantAt(square(0, 0))).toBeUndefined();
+    expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(0));
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(engine.takeEvents()).toEqual([]);
   });
@@ -225,7 +225,7 @@ describe('GameEngine.play()', () => {
     expect(() => engine.play(place(0, 0))).toThrow(
       new RangeError('The game cannot accept a move in the paused phase.'),
     );
-    expect(engine.snapshot().board.occupiedCells()).toEqual([]);
+    expect(engine.snapshot().boardCopy().occupiedCells()).toEqual([]);
   });
 
   it('should_accept_moves_again_when_a_paused_game_resumes', () => {
@@ -251,11 +251,14 @@ describe('GameEngine.play()', () => {
 
     const copy = engine.snapshot();
     // The photo shows a read-only board and is frozen. A cast reaches its copy of the board.
-    (copy.board as Board<FakeCell, SquareCoord, SquareAxis>).occupy(square(0, 0), fakeCell(5));
+    (copy.boardCopy() as Board<FakeCell, SquareCoord, SquareAxis>).occupy(
+      square(0, 0),
+      fakeCell(5),
+    );
     expect(Reflect.set(copy, 'score', 99)).toBe(false);
 
-    expect(engine.snapshot().board.occupantAt(square(0, 0))).toBeUndefined();
-    expect(engine.snapshot().score).toEqual(Score.of(0));
+    expect(engine.snapshot().boardCopy().occupantAt(square(0, 0))).toBeUndefined();
+    expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(0));
   });
 
   it('should_keep_the_engine_unchanged_when_the_initial_state_is_changed_after_start', () => {
@@ -265,7 +268,7 @@ describe('GameEngine.play()', () => {
 
     initial.board.occupy(square(0, 0), fakeCell(5));
 
-    expect(engine.snapshot().board.occupantAt(square(0, 0))).toBeUndefined();
+    expect(engine.snapshot().boardCopy().occupantAt(square(0, 0))).toBeUndefined();
   });
 
   it('should_keep_the_board_and_accept_the_next_move_when_the_rules_throw', () => {
@@ -280,10 +283,10 @@ describe('GameEngine.play()', () => {
     expect(() => engine.play(place(0, 0))).toThrow('resolve failed');
 
     expect(engine.currentPhase().canPlay()).toBe(true);
-    expect(engine.snapshot().board.occupantAt(square(0, 0))).toBeUndefined();
-    expect(engine.snapshot().score).toEqual(Score.of(0));
+    expect(engine.snapshot().boardCopy().occupantAt(square(0, 0))).toBeUndefined();
+    expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(0));
     expect(engine.play(place(0, 0))).toBe(Outcome.playing);
-    expect(engine.snapshot().board.occupantAt(square(0, 0))).toEqual(fakeCell(1));
+    expect(engine.snapshot().boardCopy().occupantAt(square(0, 0))).toEqual(fakeCell(1));
   });
 
   it('should_keep_the_board_and_accept_the_next_move_when_the_scoring_throws', () => {
@@ -298,10 +301,10 @@ describe('GameEngine.play()', () => {
     expect(() => engine.play(place(0, 0))).toThrow('score failed');
 
     expect(engine.currentPhase().canPlay()).toBe(true);
-    expect(engine.snapshot().board.occupantAt(square(0, 0))).toBeUndefined();
-    expect(engine.snapshot().score).toEqual(Score.of(0));
+    expect(engine.snapshot().boardCopy().occupantAt(square(0, 0))).toBeUndefined();
+    expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(0));
     expect(engine.play(place(0, 0))).toBe(Outcome.playing);
-    expect(engine.snapshot().score).toEqual(Score.of(1));
+    expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(1));
   });
 });
 
@@ -332,19 +335,12 @@ class BaseCloneState implements BoardState<FakeCell, SquareCoord> {
   }
 
   snapshot(): FakeSnapshot {
-    const view = Object.freeze({ filled: this.board.occupiedCells().length });
-    return Object.freeze({
-      stateId: STATE_ID,
-      matchId: MATCH_ID,
-      board: this.board.clone(),
-      score: this.score,
-      view: () => view,
-    });
+    return new FakeSnapshot(STATE_ID, MATCH_ID, this.board.clone(), this.score);
   }
 
   restore(snapshot: FakeSnapshot): void {
-    this.board.restore(snapshot.board as ReadonlyBoard<FakeCell, SquareCoord, SquareAxis>);
-    this.score = snapshot.score;
+    this.board.restore(snapshot.boardCopy());
+    this.score = snapshot.scoreSoFar();
   }
 }
 
@@ -362,8 +358,8 @@ function armedGame(step: 'apply' | 'evaluate') {
 function summary(engine: GameEngine<FakeCell, SquareCoord, FakeMove, FakeState>) {
   const state = engine.snapshot();
   return {
-    cells: state.board.occupiedCells(),
-    score: state.score,
+    cells: state.boardCopy().occupiedCells(),
+    score: state.scoreSoFar(),
     phase: phaseNameOf(engine.currentPhase()),
   };
 }
@@ -417,8 +413,8 @@ describe('GameEngine edge cases', () => {
     engine.start(emptyState(1));
 
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
-    expect(engine.snapshot().board.occupiedCells()).toEqual([]);
-    expect(engine.snapshot().score).toEqual(Score.of(0));
+    expect(engine.snapshot().boardCopy().occupiedCells()).toEqual([]);
+    expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(0));
     expect(engine.play(place(0, 0))).toBe(Outcome.gameOver);
     expect(engine.takeEvents()).toHaveLength(2);
   });
@@ -462,7 +458,10 @@ class FixedScoring extends OnePointScoring {
 // The photo is frozen, so a cast reaches only its copy of the board.
 class MutatingThrowingScoring extends OnePointScoring {
   override score(before: FakeSnapshot): Score {
-    (before.board as Board<FakeCell, SquareCoord, SquareAxis>).occupy(square(1, 1), fakeCell(9));
+    (before.boardCopy() as Board<FakeCell, SquareCoord, SquareAxis>).occupy(
+      square(1, 1),
+      fakeCell(9),
+    );
     throw new Error('score failed');
   }
 }
@@ -571,7 +570,7 @@ describe('GameEngine review findings', () => {
     engine.play(place(0, 0));
     engine.play(place(0, 1));
 
-    expect(engine.snapshot().score).toEqual(Score.of(14));
+    expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(14));
   });
 
   it('should_throw_a_range_error_and_keep_the_state_when_the_rules_return_an_unknown_outcome', () => {
@@ -619,7 +618,7 @@ describe('GameEngine review findings', () => {
     expect(() => engine.play(place(0, 0))).toThrow('photo failed');
 
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
-    expect(engine.snapshot().board.occupiedCells()).toEqual([]);
+    expect(engine.snapshot().boardCopy().occupiedCells()).toEqual([]);
     expect(engine.takeEvents()).toEqual([]);
   });
 
@@ -638,12 +637,12 @@ describe('GameEngine review findings', () => {
     const engine = sourceGame(new DrawingRules());
 
     expect(() => engine.play(square(0, 0))).toThrow('apply failed');
-    expect(engine.snapshot().board.occupiedCells()).toEqual([]);
-    expect(engine.snapshot().score).toEqual(Score.of(0));
+    expect(engine.snapshot().boardCopy().occupiedCells()).toEqual([]);
+    expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(0));
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
 
     expect(engine.play(square(0, 0))).toBe(Outcome.playing);
-    expect(engine.snapshot().board.occupantAt(square(0, 0))).toEqual(fakeCell(1));
+    expect(engine.snapshot().boardCopy().occupantAt(square(0, 0))).toEqual(fakeCell(1));
     expect([...engine.snapshot().source]).toEqual([fakeCell(2), fakeCell(3)]);
   });
 
@@ -652,12 +651,12 @@ describe('GameEngine review findings', () => {
     const engine = sourceGame(rules);
 
     expect(engine.play(square(0, 0))).toBe(Outcome.playing);
-    expect(engine.snapshot().board.occupiedCells()).toEqual([]);
+    expect(engine.snapshot().boardCopy().occupiedCells()).toEqual([]);
     expect([...engine.snapshot().source]).toEqual([fakeCell(1), fakeCell(2), fakeCell(3)]);
 
     rules.rejecting = false;
     expect(engine.play(square(0, 0))).toBe(Outcome.playing);
-    expect(engine.snapshot().board.occupantAt(square(0, 0))).toEqual(fakeCell(1));
+    expect(engine.snapshot().boardCopy().occupantAt(square(0, 0))).toEqual(fakeCell(1));
   });
 
   it('should_record_game_over_with_the_victory_outcome_when_the_rules_return_victory', () => {
@@ -730,8 +729,8 @@ describe('GameEngine identity', () => {
     const second = matchOf(MatchId.of('match-a'), 3).engine;
     first.play(place(0, 0));
 
-    expect(first.snapshot().board.occupiedCells()).not.toEqual(
-      second.snapshot().board.occupiedCells(),
+    expect(first.snapshot().boardCopy().occupiedCells()).not.toEqual(
+      second.snapshot().boardCopy().occupiedCells(),
     );
     expect([first.equals(second), second.equals(first), first.equals(first)]).toEqual([
       true,
@@ -744,7 +743,9 @@ describe('GameEngine identity', () => {
     const first = matchOf(MatchId.of('match-a')).engine;
     const second = matchOf(MatchId.of('match-b')).engine;
 
-    expect(first.snapshot().board.occupiedCells()).toEqual(second.snapshot().board.occupiedCells());
+    expect(first.snapshot().boardCopy().occupiedCells()).toEqual(
+      second.snapshot().boardCopy().occupiedCells(),
+    );
     expect([first.equals(second), second.equals(first)]).toEqual([false, false]);
   });
 
@@ -768,9 +769,11 @@ describe('GameEngine identity', () => {
     expect(() => engine.start(emptyState(2, MatchId.of('match-b')))).toThrow(
       new RangeError('The first state belongs to another match.'),
     );
-    expect(engine.snapshot().board.occupiedCells()).toEqual(before.board.occupiedCells());
-    expect(engine.snapshot().score).toEqual(Score.of(1));
-    expect(engine.snapshot().matchId.equals(MatchId.of('match-a'))).toBe(true);
+    expect(engine.snapshot().boardCopy().occupiedCells()).toEqual(
+      before.boardCopy().occupiedCells(),
+    );
+    expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(1));
+    expect(engine.snapshot().belongsTo(MatchId.of('match-a'))).toBe(true);
   });
 
   it('should_keep_the_identity_of_the_match_in_every_state_when_the_game_plays', () => {
@@ -779,10 +782,9 @@ describe('GameEngine identity', () => {
     engine.play(place(0, 0));
     engine.play(place(1, 0));
 
-    expect(engine.snapshot().matchId.equals(MatchId.of('match-a'))).toBe(true);
-    expect(
-      engine.snapshot().stateId.equals(emptyState(2, MatchId.of('match-a')).snapshot().stateId),
-    ).toBe(true);
+    expect(engine.snapshot().belongsTo(MatchId.of('match-a'))).toBe(true);
+    // `emptyState()` gives the state of every match the id `STATE_ID`.
+    expect(engine.snapshot().isPhotoOf(STATE_ID)).toBe(true);
   });
 
   it('should_record_game_over_with_the_variant_id_and_the_match_id_when_the_game_ends', () => {

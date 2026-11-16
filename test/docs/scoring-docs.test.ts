@@ -12,21 +12,19 @@ import { RegionSize } from '../../src/domain/engine/region-size';
 import { FIT_POINTS_PER_TURN } from '../../src/domain/variants/hexa-fit/fit-scoring';
 import { FitPlay, FitStarThreshold, fitStars } from '../../src/domain/variants/hexa-fit/fit-stars';
 import { ComboMultiplierDecorator } from '../../src/domain/variants/hexa-lines/combo-multiplier-decorator';
-import {
-  LinesScoring,
-  POINTS_PER_CELL,
-  POINTS_PER_LINE,
-} from '../../src/domain/variants/hexa-lines/lines-scoring';
+import { CellCount } from '../../src/domain/variants/hexa-lines/cell-count';
+import { LineCount } from '../../src/domain/variants/hexa-lines/line-count';
+import { LinesScoring } from '../../src/domain/variants/hexa-lines/lines-scoring';
+import { Streak } from '../../src/domain/variants/hexa-lines/streak';
 import { MergeScoring } from '../../src/domain/variants/hexa-merge/merge-scoring';
 import { MergeState } from '../../src/domain/variants/hexa-merge/merge-state';
 import { MergeTile } from '../../src/domain/variants/hexa-merge/merge-tile';
+import { ClearedStacks } from '../../src/domain/variants/hexa-sort/cleared-stacks';
 import type { ColorStack } from '../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../src/domain/variants/hexa-sort/goal-count';
-import {
-  SORT_POINTS_PER_TILE,
-  SortScoring,
-} from '../../src/domain/variants/hexa-sort/sort-scoring';
-import { SortState } from '../../src/domain/variants/hexa-sort/sort-state';
+import { SortScoring } from '../../src/domain/variants/hexa-sort/sort-scoring';
+import { SortSnapshot, SortView } from '../../src/domain/variants/hexa-sort/sort-state';
+import { TileCount } from '../../src/domain/variants/hexa-sort/tile-count';
 import { squareTopology, type SquareCoord } from '../support/engine/square-topology';
 import { repoRoot } from '../support/run-tool';
 import { linesState } from '../support/variants/hexa-lines/lines-game';
@@ -49,12 +47,17 @@ const scoringFiles = [
   'src/domain/variants/hexa-fit/fit-stars.ts',
 ];
 
-const constants: Record<string, number> = {
-  POINTS_PER_CELL,
-  POINTS_PER_LINE,
-  SORT_POINTS_PER_TILE,
-  FIT_POINTS_PER_TURN,
-};
+// The value of each constant that the README names, as the scoring code gives it.
+// A count keeps its points per unit private to its file (issue #232), so the test reads
+// each of those values from one turn of the real policy.
+function constants(): Record<string, number> {
+  return {
+    POINTS_PER_CELL: linesPoints(1, 0, 0),
+    POINTS_PER_LINE: linesPoints(0, 1, 1),
+    SORT_POINTS_PER_TILE: sortPoints([1]),
+    FIT_POINTS_PER_TURN: delivered(FIT_POINTS_PER_TURN),
+  };
+}
 
 // Returns the text of the level-3 section «Scoring», up to the next heading of level 2 or 3.
 function scoringSection(): string {
@@ -93,10 +96,15 @@ function turnScore<TPhoto>(
 }
 
 // The points of one Lines placement from the real base policy and its decorator.
-// A photo is plain data, so the test gives the facts of the placement in a copy of a photo.
+// The photo keeps its fields private (issue #245), so the test builds a state with the facts
+// of the placement and takes its photo.
 function linesPoints(cells: number, lines: number, streak: number): number {
-  const photo = linesState(squareTopology, 1, { tray: [] }).snapshot();
-  const after = { ...photo, cellsPlaced: cells, linesCleared: lines, streak };
+  const after = linesState(squareTopology, 1, {
+    tray: [],
+    cellsPlaced: CellCount.of(cells),
+    linesCleared: LineCount.of(lines),
+    streak: Streak.of(streak),
+  }).snapshot();
   return turnScore(new ComboMultiplierDecorator(new LinesScoring<SquareCoord>()), after);
 }
 
@@ -107,7 +115,7 @@ function mergePoints(values: number[]): number {
     STATE_ID,
     MATCH_ID,
     mergeBoard(),
-    start.snapshot().tiles,
+    start.snapshot().tileSource(),
     false,
     values.map(MergeTile.of),
   );
@@ -115,19 +123,30 @@ function mergePoints(values: number[]): number {
 }
 
 // The points of one Sort turn that clears stacks of the given tile counts.
+// The photo keeps its fields private (issue #245), so the test builds a photo with the heights
+// of the cleared stacks through its constructor.
 function sortPoints(stacks: number[]): number {
-  const state = SortState.start({
-    stateId: STATE_ID,
-    matchId: MATCH_ID,
-    board: new Board<ColorStack, SquareCoord>(
-      BOARD_ID,
-      squareTopology.region(RegionSize.of(1)),
-      squareTopology,
-    ),
-    source: new FixedListPieceSource([]),
-    goalsNeeded: GoalCount.of(1),
-  });
-  return turnScore(new SortScoring<SquareCoord>(), { ...state.snapshot(), clearedTiles: stacks });
+  const board = new Board<ColorStack, SquareCoord>(
+    BOARD_ID,
+    squareTopology.region(RegionSize.of(1)),
+    squareTopology,
+  );
+  const goalsDone = ClearedStacks.of(stacks.length);
+  const goal = GoalCount.of(1);
+  const after = new SortSnapshot<SquareCoord>(
+    STATE_ID,
+    MATCH_ID,
+    board,
+    Score.of(0),
+    undefined,
+    goalsDone,
+    goal,
+    stacks.map(TileCount.of),
+    undefined,
+    new FixedListPieceSource([]),
+    new SortView(undefined, goalsDone, goal),
+  );
+  return turnScore(new SortScoring<SquareCoord>(), after);
 }
 
 // Writes 60000 as «60 000», the way the README writes a number of milliseconds.
@@ -138,6 +157,7 @@ function grouped(value: number): string {
 // The worked examples of the README, each with the result that the scoring code gives.
 // The README takes the examples from the scoring tests (issue 104).
 function workedExamples(): string[] {
+  const { POINTS_PER_CELL, POINTS_PER_LINE, SORT_POINTS_PER_TILE } = constants();
   const lines = [
     [1, 1, 1],
     [1, 2, 1],
@@ -184,7 +204,7 @@ describe('README scoring section', () => {
   it('should_name_each_constant_with_its_code_value_when_the_readme_documents_the_formulas', () => {
     const section = scoringSection();
 
-    expect(wrongConstants(section, constants)).toEqual([]);
+    expect(wrongConstants(section, constants())).toEqual([]);
   });
 
   it('should_compare_the_text_that_javascript_writes_when_a_constant_is_a_decimal_or_negative_zero', () => {

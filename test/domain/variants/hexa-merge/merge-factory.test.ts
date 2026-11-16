@@ -9,7 +9,6 @@ import { Chance } from '../../../../src/domain/variants/hexa-merge/chance';
 import {
   MergeFactory,
   MergeSettings,
-  START_TILES,
 } from '../../../../src/domain/variants/hexa-merge/merge-factory';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
 import { firstValidMove, startVariant } from '../../../support/engine/variant-game';
@@ -54,10 +53,10 @@ describe('MergeFactory', () => {
     expect(outcome).toBe(Outcome.playing);
     expect(values(after)).not.toEqual(values(initial.snapshot()));
     // The score is the sum of the merged values: the factory picks the Merge scoring.
-    expect(after.score).toEqual(
-      Score.of(after.merged.reduce((sum, tile) => sum + valueOf(tile), 0)),
+    expect(after.scoreSoFar()).toEqual(
+      Score.of(after.mergedTiles().reduce((sum, tile) => sum + valueOf(tile), 0)),
     );
-    expect(after.tiles.hasNext()).toBe(true);
+    expect(after.tileSource().hasNext()).toBe(true);
     expect(engine.takeEvents()).toEqual([]);
   });
 
@@ -116,7 +115,6 @@ describe('MergeFactory', () => {
 
     const initial = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
 
-    expect(START_TILES).toBe(2);
     expect(factory.createBoard(BOARD_ID).coordinates()).toHaveLength(1);
     expect(Object.keys(values(initial.snapshot()))).toEqual(['0,0']);
     expect([2, 4]).toContain(values(initial.snapshot())['0,0']);

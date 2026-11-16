@@ -36,6 +36,7 @@ import { gameOverOf } from '../../../support/engine/game-over';
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 import { delivered } from '../../../support/engine/value-receiver';
+import { fitViewData } from '../../../support/variants/view-data';
 
 // The Fit rules suite (APP-NFR-12: one rules suite per variant).
 // The square double keeps the coordinates easy to read. The triangle double has
@@ -104,7 +105,7 @@ function engineOn(
 
 // The filled cells as `col,row=id` text, sorted, so a test compares whole boards.
 function cellsOf<TCoord>(state: FitState<TCoord> | FitSnapshot<TCoord>): string[] {
-  const { board } = photoOf(state);
+  const board = photoOf(state).boardCopy();
   return board
     .occupiedCells()
     .map(([c, id]) => `${board.key(c)}=${delivered(id)}`)
@@ -112,9 +113,7 @@ function cellsOf<TCoord>(state: FitState<TCoord> | FitSnapshot<TCoord>): string[
 }
 
 function trayOf<TCoord>(state: FitState<TCoord> | FitSnapshot<TCoord>): string[] {
-  return photoOf(state)
-    .view()
-    .remaining.map((p) => delivered(p.occupant()));
+  return fitViewData(photoOf(state).view()).remaining.map((p) => delivered(p.occupant()));
 }
 
 describe('FitRules', () => {
@@ -225,7 +224,7 @@ describe('FitRules', () => {
     const removed = played(rules, both, new RemoveFitPiece(A));
     const again = played(rules, removed, new PlaceFitPiece(A, NO_TURN, square(0, 0)));
 
-    expect(again.snapshot().board.occupiedCells()).toEqual([
+    expect(again.snapshot().boardCopy().occupiedCells()).toEqual([
       [square(0, 1), B],
       [square(1, 1), B],
       [square(0, 0), A],
@@ -338,9 +337,11 @@ describe('FitRules edge cases', () => {
     at: SquareCoord,
   ): boolean {
     const expected = Placement.of(Turns.of(turns), at, squareTopology);
-    return photoOf(state).placements.some(
-      ([placed, placement]) => placed.equals(id) && placement.equals(expected, squareTopology),
-    );
+    return photoOf(state)
+      .piecePlacements()
+      .some(
+        ([placed, placement]) => placed.equals(id) && placement.equals(expected, squareTopology),
+      );
   }
 
   it('should_store_the_rotation_from_zero_to_three_when_a_move_counts_negative_or_huge_steps', () => {
@@ -478,7 +479,7 @@ describe('FitRules edge cases', () => {
     expect(() => rules.apply(state, bare)).toThrow(new RangeError('Unknown Fit move: undefined.'));
     expect(cellsOf(state)).toEqual([]);
     expect(trayOf(state)).toEqual(['a', 'b']);
-    expect(state.snapshot().moves).toEqual(Moves.of(0));
+    expect(state.snapshot().moveCount()).toEqual(Moves.of(0));
   });
 
   it('should_give_the_same_moves_in_the_same_order_when_the_valid_moves_are_read_again', () => {
@@ -565,7 +566,7 @@ describe('FitRules edge cases', () => {
 describe('FitRules move count', () => {
   it('should_add_one_to_the_move_count_when_a_place_a_rotate_or_a_remove_is_accepted', () => {
     const engine = engineOn(dominoLevel());
-    const counts = [engine.snapshot().moves];
+    const counts = [engine.snapshot().moveCount()];
 
     for (const move of [
       new PlaceFitPiece(A, NO_TURN, square(0, 0)),
@@ -573,7 +574,7 @@ describe('FitRules move count', () => {
       new RemoveFitPiece(A),
     ]) {
       expect(engine.tryPlay(move).wasAccepted()).toBe(true);
-      counts.push(engine.snapshot().moves);
+      counts.push(engine.snapshot().moveCount());
     }
 
     expect(counts).toEqual([0, 1, 2, 3].map((count) => Moves.of(count)));
@@ -591,7 +592,7 @@ describe('FitRules move count', () => {
     ];
 
     expect(reports.map((r) => r.wasAccepted())).toEqual([false, false, false]);
-    expect(engine.snapshot().moves).toEqual(Moves.of(1));
+    expect(engine.snapshot().moveCount()).toEqual(Moves.of(1));
     expect(cellsOf(engine.snapshot())).toEqual(['0,1=a', '1,1=a']);
   });
 
@@ -604,12 +605,12 @@ describe('FitRules move count', () => {
 
     // A move changes its state in place, so the test reads the clone before it replays the clone.
     const removed = played(rules, placed, new RemoveFitPiece(A));
-    const kept = [before.snapshot().moves, cellsOf(before)];
+    const kept = [before.snapshot().moveCount(), cellsOf(before)];
     const replayed = played(rules, before, new RemoveFitPiece(A));
 
-    expect(removed.snapshot().moves).toEqual(Moves.of(2));
+    expect(removed.snapshot().moveCount()).toEqual(Moves.of(2));
     expect(kept).toEqual([Moves.of(1), ['0,0=a', '1,0=a']]);
-    expect(replayed.snapshot().moves).toEqual(Moves.of(2));
+    expect(replayed.snapshot().moveCount()).toEqual(Moves.of(2));
   });
 });
 
@@ -618,7 +619,7 @@ describe('FitRules in place', () => {
   it('should_change_the_same_state_object_when_a_place_a_rotate_or_a_remove_is_applied', () => {
     const rules = new FitRules<SquareCoord>();
     const state = dominoLevel();
-    const board = state.snapshot().board;
+    const board = state.snapshot().boardCopy();
     const seen = [];
 
     for (const move of [
@@ -627,7 +628,11 @@ describe('FitRules in place', () => {
       new RemoveFitPiece(A),
     ]) {
       const result = rules.apply(state, move);
-      seen.push({ same: result === state, cells: cellsOf(state), moves: state.snapshot().moves });
+      seen.push({
+        same: result === state,
+        cells: cellsOf(state),
+        moves: state.snapshot().moveCount(),
+      });
     }
 
     expect(seen).toEqual([
@@ -636,7 +641,7 @@ describe('FitRules in place', () => {
       { same: true, cells: [], moves: Moves.of(3) },
     ]);
     // The board keeps its id: the same board changes in place.
-    expect(state.snapshot().board.equals(board)).toBe(true);
+    expect(state.snapshot().boardCopy().equals(board)).toBe(true);
   });
 
   // The engine plays a turn on a copy of its state. So a turn that throws after the move
@@ -654,8 +659,8 @@ describe('FitRules in place', () => {
     const facts = (state: FitSnapshot<SquareCoord>) => ({
       cells: cellsOf(state),
       tray: trayOf(state),
-      moves: state.moves,
-      score: state.score,
+      moves: state.moveCount(),
+      score: state.scoreSoFar(),
     });
     const before = [facts(engine.snapshot()), facts(placed.snapshot())];
 

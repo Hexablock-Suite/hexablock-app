@@ -62,8 +62,8 @@ function historyGame(rules = new FakeRules(), size = 2) {
 function factsOf(engine: GameEngine<FakeCell, SquareCoord, FakeMove, FakeState>) {
   const state = engine.snapshot();
   return {
-    cells: filled(state.board),
-    score: state.score,
+    cells: filled(state.boardCopy()),
+    score: state.scoreSoFar(),
     phase: phaseNameOf(engine.currentPhase()),
   };
 }
@@ -238,7 +238,7 @@ describe('GameEngine undo through the root', () => {
     engine.play(square(1, 0));
 
     // The draw of the undone move comes back, so the new move gets the same piece.
-    expect(filled(engine.snapshot().board)).toEqual([['1,0', 1]]);
+    expect(filled(engine.snapshot().boardCopy())).toEqual([['1,0', 1]]);
     expect(engine.snapshot().source.take()[0]).toEqual(fakeCell(2));
   });
 
@@ -248,7 +248,10 @@ describe('GameEngine undo through the root', () => {
 
     // The photo shows a read-only board. A cast reaches its copy of the board.
     const photo = engine.snapshot();
-    (photo.board as Board<FakeCell, SquareCoord, SquareAxis>).occupy(square(1, 1), fakeCell(9));
+    (photo.boardCopy() as Board<FakeCell, SquareCoord, SquareAxis>).occupy(
+      square(1, 1),
+      fakeCell(9),
+    );
     engine.undo();
 
     expect(factsOf(engine)).toEqual({ cells: [], score: Score.of(0), phase: 'playing' });

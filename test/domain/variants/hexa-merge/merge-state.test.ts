@@ -4,6 +4,7 @@ import { hex, HexAxis } from '../../../../src/domain/engine/hex-topology';
 import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
 import { GameStateId } from '../../../../src/domain/engine/game-state-id';
 import { MatchId } from '../../../../src/domain/engine/match-id';
+import { RandomDraw } from '../../../../src/domain/engine/random-draw';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import { MergeState } from '../../../../src/domain/variants/hexa-merge/merge-state';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
@@ -28,7 +29,7 @@ const key = (q: number, r: number) => hexTopology.key(hex(q, r));
 
 function draws(...made: [number, number][]) {
   return new FixedListPieceSource<NewTile<MergeTile>>(
-    made.map(([place, value]) => NewTile.of(place, MergeTile.of(value))),
+    made.map(([place, value]) => NewTile.of(RandomDraw.of(place), MergeTile.of(value))),
   );
 }
 
@@ -37,12 +38,13 @@ function facts(state: HexMergeState) {
   return {
     board: state
       .snapshot()
-      .board.occupiedCells()
+      .boardCopy()
+      .occupiedCells()
       .map(([at, tile]) => [hexTopology.key(at), valueOf(tile)]),
-    left: state.snapshot().tiles.hasNext(),
-    targetReached: state.snapshot().targetReached,
-    merged: state.snapshot().merged.map(valueOf),
-    score: state.snapshot().score,
+    left: state.snapshot().tileSource().hasNext(),
+    targetReached: state.snapshot().hasReachedTarget(),
+    merged: state.snapshot().mergedTiles().map(valueOf),
+    score: state.snapshot().scoreSoFar(),
   };
 }
 
@@ -64,7 +66,7 @@ describe('MergeState', () => {
       [hexTopology.key(first)]: 4,
       [hexTopology.key(last)]: 2,
     });
-    expect(state.snapshot().tiles.hasNext()).toBe(false);
+    expect(state.snapshot().tileSource().hasNext()).toBe(false);
   });
 
   it('should_keep_the_board_when_the_source_has_ended_and_a_new_tile_is_asked', () => {
@@ -88,7 +90,7 @@ describe('MergeState', () => {
     full.addNewTile();
 
     expect(facts(full)).toEqual(before);
-    expect(full.snapshot().tiles.hasNext()).toBe(true);
+    expect(full.snapshot().tileSource().hasNext()).toBe(true);
   });
 
   it('should_merge_the_tiles_in_place_and_keep_the_board_and_the_source_when_tiles_slide', () => {
@@ -97,7 +99,9 @@ describe('MergeState', () => {
       [hex(0, 0), 2],
       [hex(0, 1), 4],
     ]);
-    const { board, tiles } = state.snapshot();
+    const photo = state.snapshot();
+    const board = photo.boardCopy();
+    const tiles = photo.tileSource();
     const before = state.clone();
 
     const result: unknown = state.slide(
@@ -107,11 +111,11 @@ describe('MergeState', () => {
 
     expect(result).toBeUndefined();
     expect(values(state.snapshot())).toEqual({ [key(1, 0)]: 4, [key(0, 1)]: 4 });
-    expect(state.snapshot().merged).toEqual([MergeTile.of(4)]);
-    expect(state.snapshot().targetReached).toBe(false);
+    expect(state.snapshot().mergedTiles()).toEqual([MergeTile.of(4)]);
+    expect(state.snapshot().hasReachedTarget()).toBe(false);
     // The board keeps its id, and the source keeps its position: the slide draws nothing.
-    expect(state.snapshot().board.equals(board)).toBe(true);
-    expect(state.snapshot().tiles === tiles).toBe(true);
+    expect(state.snapshot().boardCopy().equals(board)).toBe(true);
+    expect(state.snapshot().tileSource() === tiles).toBe(true);
     expect(values(before.snapshot())).toEqual({ [key(-1, 0)]: 2, [key(0, 0)]: 2, [key(0, 1)]: 4 });
   });
 
@@ -129,7 +133,8 @@ describe('MergeState', () => {
     expect(
       state
         .snapshot()
-        .board.occupiedCells()
+        .boardCopy()
+        .occupiedCells()
         .map(([at, tile]) => [hexTopology.key(at), valueOf(tile)]),
     ).toEqual([
       [key(-1, 0), 4],
@@ -148,11 +153,14 @@ describe('MergeState', () => {
     const later = mergeState([[hex(0, 0), 2]]);
     later.slide(Slide.of(HexAxis.q, SlideSense.forward), MergeTile.of(16));
 
-    expect(state.snapshot().targetReached).toBe(true);
-    expect(state.snapshot().merged).toEqual([MergeTile.of(16)]);
-    expect(later.snapshot().targetReached).toBe(false);
+    expect(state.snapshot().hasReachedTarget()).toBe(true);
+    expect(state.snapshot().mergedTiles()).toEqual([MergeTile.of(16)]);
+    expect(later.snapshot().hasReachedTarget()).toBe(false);
     state.slide(Slide.of(HexAxis.q, SlideSense.forward), MergeTile.of(16));
-    expect([state.snapshot().targetReached, state.snapshot().merged]).toEqual([true, []]);
+    expect([state.snapshot().hasReachedTarget(), state.snapshot().mergedTiles()]).toEqual([
+      true,
+      [],
+    ]);
   });
 
   it('should_tell_whether_a_slide_changes_the_board_when_a_slide_is_asked', () => {
@@ -182,11 +190,11 @@ describe('MergeState', () => {
     state.addPoints(Score.of(4));
     state.addPoints(Score.of(8));
 
-    expect(state.snapshot().score).toEqual(Score.of(12));
+    expect(state.snapshot().scoreSoFar()).toEqual(Score.of(12));
     expect(() => state.addPoints(Score.of(Number.MAX_SAFE_INTEGER))).toThrow(
       new RangeError('The sum of two scores cannot pass the largest safe integer.'),
     );
-    expect(state.snapshot().score).toEqual(Score.of(12));
+    expect(state.snapshot().scoreSoFar()).toEqual(Score.of(12));
   });
 
   // The state has no check of its own: a `Score` is valid when it exists (issue #203).
@@ -195,8 +203,8 @@ describe('MergeState', () => {
 
     const state = new MergeState(STATE_ID, MATCH_ID, board, noNewTiles(), false, [], Score.of(7));
 
-    expect(state.snapshot().score).toEqual(Score.of(7));
-    expect(new MergeState(STATE_ID, MATCH_ID, board, noNewTiles()).snapshot().score).toEqual(
+    expect(state.snapshot().scoreSoFar()).toEqual(Score.of(7));
+    expect(new MergeState(STATE_ID, MATCH_ID, board, noNewTiles()).snapshot().scoreSoFar()).toEqual(
       Score.of(0),
     );
   });
@@ -216,7 +224,7 @@ describe('MergeState', () => {
     ]);
     expect([
       first.belongsTo(MATCH_ID),
-      first.snapshot().board.equals(before.snapshot().board),
+      first.snapshot().boardCopy().equals(before.snapshot().boardCopy()),
     ]).toEqual([true, true]);
   });
 

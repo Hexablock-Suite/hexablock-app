@@ -17,7 +17,7 @@ const NO_TURN = Turns.of(0);
 // Each move holds its own check and its own change (classes.md decision 43, issue #244).
 // The rules ask the move `isValidOn()` with the state and its photo, and they ask it
 // `applyTo()` with the state. They never tell the moves apart by their class.
-// The rules read the board through the photo of the state, and they ask the state
+// The rules ask the photo of the state for its board, and they ask the state
 // `placed()` and `remaining()`. They read no field of the board, of a piece or of a move
 // (classes.md decisions 43 and 49). They ask the board for its coordinates and its full turn.
 export class FitRules<TCoord> extends BaseGameRules<FitMove<TCoord>, FitState<TCoord>> {
@@ -31,7 +31,7 @@ export class FitRules<TCoord> extends BaseGameRules<FitMove<TCoord>, FitState<TC
   // The generator takes one photo, and every check of a move reads it.
   *validMoves(state: FitState<TCoord>): Iterable<FitMove<TCoord>> {
     const photo = state.snapshot();
-    const { board } = photo;
+    const board = photo.boardCopy();
     const offsets = board.coordinates();
     for (const id of state.placed()) {
       yield new RemoveFitPiece(id);
@@ -65,7 +65,7 @@ export class FitRules<TCoord> extends BaseGameRules<FitMove<TCoord>, FitState<TC
 
   // A piece goes only on free figure cells, so a full figure is an exact cover.
   evaluate(state: FitState<TCoord>): Outcome {
-    return state.snapshot().board.isFull() ? Outcome.victory : Outcome.playing;
+    return state.snapshot().boardCopy().isFull() ? Outcome.victory : Outcome.playing;
   }
 }
 

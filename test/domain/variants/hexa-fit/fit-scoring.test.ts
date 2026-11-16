@@ -80,8 +80,8 @@ describe('FitScoring', () => {
     const outcome = engine.play(new PlaceFitPiece(B, NO_TURN, square(0, 1)));
 
     expect(outcome).toBe(Outcome.victory);
-    expect(FIT_POINTS_PER_TURN).toBe(0);
-    expect(engine.snapshot().score).toEqual(Score.of(0));
+    expect(FIT_POINTS_PER_TURN.equals(Score.of(0))).toBe(true);
+    expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(0));
   });
 });
 

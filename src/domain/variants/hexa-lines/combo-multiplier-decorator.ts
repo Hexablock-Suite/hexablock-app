@@ -8,29 +8,16 @@ import type { LinesSnapshot, LinesState } from './lines-state';
 // The multiplier codes the accepted rule of issue #59 (D22, 2026-11-06): `lines + streak - 1`. One line with streak 1 gives factor 1.
 // The streak counts the current placement (issue 58), so a second clearing placement in a row
 // has streak 2. It extends the engine `ScoringDecorator` with `LinesScoring` as its inner
-// policy (view variant-1-lines), because it reads `lineBonus()` of that policy.
-// The `inner` field of the base class is private (issue #231). So the decorator keeps its own
-// private reference to the same `LinesScoring` and passes it to `super()`.
-// It reads the photo after the turn, as the base policy does.
+// policy (view variant-1-lines), and `super.score()` gives the base score.
+// It asks the photo after the turn, as the base policy does.
+// The streak and the count of lines keep their numbers private (issue #232). So the streak
+// gives the combo bonus: the line bonus `multiplier - 1` more times, as a `Score`.
 // A placement that clears no line has no bonus, so the decorator adds nothing to the inner score.
-// `Score.times()` multiplies the bonus, so no number of a score leaves its value object.
 export class ComboMultiplierDecorator<TCoord> extends ScoringDecorator<
   LinesState<TCoord>,
   LinesScoring<TCoord>
 > {
-  constructor(private readonly scoring: LinesScoring<TCoord>) {
-    super(scoring);
-  }
-
   score(before: LinesSnapshot<TCoord>, after: LinesSnapshot<TCoord>): Score {
-    const base = super.score(before, after);
-    if (after.linesCleared === 0) return base;
-    return base.add(this.scoring.lineBonus(after).times(multiplier(after) - 1));
+    return super.score(before, after).add(after.currentStreak().comboBonus(after.lastCombo()));
   }
-}
-
-// The multiplier of a placement that clears a line. The streak counts that placement,
-// so the multiplier is 1 or more.
-function multiplier<TCoord>(after: LinesSnapshot<TCoord>): number {
-  return after.linesCleared + after.streak - 1;
 }
