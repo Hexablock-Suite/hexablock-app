@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Area } from '../../../src/domain/engine/area';
 import { TopologyId, type GeometryFactory } from '../../../src/domain/engine/geometry-factory';
 import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
 import { SquareGeometry } from '../../../src/domain/engine/square-geometry';
@@ -96,11 +97,16 @@ function familyTests<TCoord>({
     it('should_give_connected_shapes_of_one_to_five_cells_when_the_piece_shapes_are_created', () => {
       const shapes = geometry.createPieceShapes();
 
-      expect(shapes.map((shape) => shape.area()).toSorted()).toEqual([1, 2, 3, 3, 4, 4, 5]);
+      // The count of shapes of each area, from one cell to five cells.
+      const countOfArea = (cells: number) =>
+        shapes.filter((shape) => shape.area().equals(Area.of(cells))).length;
+
+      expect(shapes).toHaveLength(7);
+      expect([1, 2, 3, 4, 5].map(countOfArea)).toEqual([1, 1, 2, 2, 1]);
       for (const shape of shapes) {
         const cells = shape.cells();
 
-        expect(new Set(cells.map(keyOf)).size).toBe(shape.area());
+        expect(shape.area().equals(Area.of(new Set(cells.map(keyOf)).size))).toBe(true);
         expect(cells).toContainEqual(geometry.createCoord([0, 0]));
         expect(isConnected(cells)).toBe(true);
       }

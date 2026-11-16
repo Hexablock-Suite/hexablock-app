@@ -1,12 +1,14 @@
+import { Area } from './area';
 import type { GridTopology } from './grid-topology';
 import type { Turns } from './turns';
 
 // Composite (statement §3.3): a shape is a tree of cells.
 // Every coordinate calculation goes to the topology (classes.md decision 16).
 // A shape reads no axis and no direction, so it takes a topology with any axis and any direction.
+// The area of a shape is an `Area`, its count of cells (issue #243).
 export interface ShapeNode<TCoord> {
   cells(): TCoord[];
-  area(): number;
+  area(): Area;
   rotated(turns: Turns, topology: GridTopology<TCoord>): ShapeNode<TCoord>;
   translated(offset: TCoord, topology: GridTopology<TCoord>): ShapeNode<TCoord>;
 }
@@ -19,8 +21,8 @@ export class CellNode<TCoord> implements ShapeNode<TCoord> {
     return [this.at];
   }
 
-  area(): number {
-    return 1;
+  area(): Area {
+    return Area.of(1);
   }
 
   rotated(turns: Turns, topology: GridTopology<TCoord>): CellNode<TCoord> {
@@ -47,8 +49,9 @@ export class ShapeGroup<TCoord> implements ShapeNode<TCoord> {
     return this.children.flatMap((child) => child.cells());
   }
 
-  area(): number {
-    return this.children.reduce((sum, child) => sum + child.area(), 0);
+  // The sum of the areas of the children. A group holds at least one child.
+  area(): Area {
+    return this.children.map((child) => child.area()).reduce((sum, area) => sum.plus(area));
   }
 
   rotated(turns: Turns, topology: GridTopology<TCoord>): ShapeGroup<TCoord> {

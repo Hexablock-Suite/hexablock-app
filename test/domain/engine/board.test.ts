@@ -4,6 +4,7 @@ import { BoardId } from '../../../src/domain/engine/board-id';
 import { MatchId } from '../../../src/domain/engine/match-id';
 import { BoardShape } from '../../../src/domain/engine/board-shape';
 import { coordKey, type CoordKey } from '../../../src/domain/engine/coord-key';
+import { Distance } from '../../../src/domain/engine/distance';
 import type { GridTopology } from '../../../src/domain/engine/grid-topology';
 import { Radius } from '../../../src/domain/engine/radius';
 import { RegionSize } from '../../../src/domain/engine/region-size';
@@ -22,6 +23,9 @@ const X = named('x');
 const LEFT = named('left');
 const RIGHT = named('right');
 
+// One step along the strip: forward adds 1, and backward takes 1 away.
+const strip = { forward: (c: number) => c + 1, backward: (c: number) => c - 1 };
+
 const stripTopology: GridTopology<number> = {
   fullTurn: () => Turns.of(2),
   key: (c) => coordKey(String(c)),
@@ -36,12 +40,12 @@ const stripTopology: GridTopology<number> = {
     while (contains(start - 1)) start -= 1;
     for (let c = start; contains(c); c += 1) yield c;
   },
-  // The offsets at the distance of the radius: one for radius 0, and two for any other radius.
+  // The cells at the distance of the radius: one for radius 0, and two for any other radius.
   ring: (center, radius) =>
-    [...radius.offsets()]
-      .filter((offset) => radius.measures(Math.abs(offset)))
-      .map((offset) => center + offset),
-  region: (size) => BoardShape.of([...size.indexes()]),
+    [...radius.offsets(center, strip)].filter((c) =>
+      radius.measures(Distance.of(Math.abs(c - center))),
+    ),
+  region: (size) => BoardShape.of([...size.indexes(0, strip)]),
 };
 
 // The board covers the cells 0 to 4.

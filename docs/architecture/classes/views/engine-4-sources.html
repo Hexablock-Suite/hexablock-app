@@ -82,8 +82,9 @@
           object T that implements Ordered, so it orders its bounds with isBefore() and with no
           number. Seed is the value object of a seed: it checks its own number once,
           SeededPieceSource holds one privately and tells whether it draws from a seed with
-          isSeededWith(), and Mulberry32Random starts from one. Score is the value object of a
-          score: IScoringPolicy returns one, and GameResult and ProgressRecord hold one. Moves,
+          isSeededWith(), and Mulberry32Random starts from one: it keeps a GeneratorState and gives
+          a RandomDraw on each next(), so no number leaves it. Score is the value object of a score:
+          IScoringPolicy returns one, and GameResult and ProgressRecord hold one. Moves,
           ElapsedTime, Stars and LevelId are the value objects of the counters: GameResult holds a
           Moves, a LevelId and an ElapsedTime, and ProgressRecord holds a LevelId and Stars. Their
           fields are private: GameResult creates the ProgressRecord of a progress model with
@@ -675,16 +676,16 @@
         <rect
           x="352"
           y="400"
-          width="200"
+          width="216"
           height="128"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="352" y1="448" x2="552" y2="448" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="352" y1="448" x2="568" y2="448" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="452"
+          x="460"
           y="418"
           fill="#5b6873"
           font-size="8"
@@ -695,7 +696,7 @@
           «value object»
         </text>
         <text
-          x="452"
+          x="460"
           y="436"
           fill="#17212a"
           font-size="12"
@@ -708,7 +709,7 @@
         <text x="368" y="464" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - value: number
         </text>
-        <line x1="352" y1="472" x2="552" y2="472" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="352" y1="472" x2="568" y2="472" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="368"
           y="488"
@@ -723,7 +724,7 @@
           + equals(other: Seed): boolean
         </text>
         <text x="368" y="520" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + generatorState(): number
+          + generatorState(): GeneratorState
         </text>
         <!-- Class: Mulberry32Random -->
         <rect
@@ -750,7 +751,7 @@
           Mulberry32Random
         </text>
         <text x="84" y="448" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - state: number
+          - state: GeneratorState
         </text>
         <text
           x="84"
@@ -763,7 +764,7 @@
           + from(seed: Seed): Mulberry32Random
         </text>
         <text x="84" y="488" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + next(): number
+          + next(): RandomDraw
         </text>
         <text x="84" y="504" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + clone(): Mulberry32Random

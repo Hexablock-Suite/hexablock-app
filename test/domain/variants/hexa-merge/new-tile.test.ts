@@ -1,15 +1,16 @@
 /** @jest-environment node */
-import { Draw } from '../../../../src/domain/variants/hexa-merge/draw';
+import { RandomDraw } from '../../../../src/domain/engine/random-draw';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
 import { NewTile } from '../../../../src/domain/variants/hexa-merge/new-tile';
 
 // One draw of the Merge tile source is a value object (issue 210, classes.md decision 48).
 // It holds the tile and the place of its cell, and both fields are private.
-// The place is a `Draw`, which refuses a number outside 0 up to 1 (issue #232).
+// The place is a `RandomDraw`, which checks its number in `RandomDraw.of()` (issue #243).
+// It replaced the Merge `Draw` of issue #232.
 
 const two = MergeTile.of(2);
 const four = MergeTile.of(4);
-const at = (place: number) => Draw.of(place);
+const at = (place: number) => RandomDraw.of(place);
 
 describe('NewTile', () => {
   it('should_give_the_empty_cell_that_the_place_picks_and_the_tile_when_the_tile_appears', () => {
