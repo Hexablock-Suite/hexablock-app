@@ -23,7 +23,6 @@ import {
   type LinesSnapshot,
 } from '../../../../src/domain/variants/hexa-lines/lines-state';
 import type { PlacePiece } from '../../../../src/domain/variants/hexa-lines/place-piece';
-import { RecordingPublisher } from '../../engine/fake-game';
 import { square, type SquareCoord } from '../../engine/square-topology';
 import { MATCH_ID } from '../../engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../engine/entity-ids';
@@ -73,16 +72,14 @@ export function linesGame<TCoord>(
   initial: LinesState<TCoord>,
   scoring: IScoringPolicy<LinesState<TCoord>> = new NoScoring<TCoord>(),
 ) {
-  const publisher = new RecordingPublisher();
   const engine = new GameEngine<Color, TCoord, PlacePiece<TCoord>, LinesState<TCoord>>(
     MATCH_ID,
     GameId.of('hexa-lines'),
     new LinesRules<TCoord>(),
     scoring,
-    publisher,
   );
   engine.start(initial);
-  return { engine, publisher };
+  return { engine };
 }
 
 // The keys of the filled cells, sorted, so a test compares boards by value.

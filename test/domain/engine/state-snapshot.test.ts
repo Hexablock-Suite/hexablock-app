@@ -18,7 +18,6 @@ import { SlideSense, Slide } from '../../../src/domain/variants/hexa-merge/slide
 import { ClearedStacks } from '../../../src/domain/variants/hexa-sort/cleared-stacks';
 import { SortScoring } from '../../../src/domain/variants/hexa-sort/sort-scoring';
 import { BOARD_ID, CountingBoardIds, CountingStateIds } from '../../support/engine/entity-ids';
-import { RecordingPublisher } from '../../support/engine/fake-game';
 import { CountingMatchIds, MATCH_ID } from '../../support/engine/match-id';
 import { square } from '../../support/engine/square-topology';
 import { A, fitFactory } from '../../support/variants/hexa-fit/fit-game';
@@ -296,7 +295,6 @@ describe('the photo outside the state', () => {
       new CountingMatchIds(),
       new CountingStateIds(),
       new CountingBoardIds(),
-      new RecordingPublisher(),
     );
     const photo = factory.createGame().snapshot();
     const members = photo as unknown as Record<string, unknown>;

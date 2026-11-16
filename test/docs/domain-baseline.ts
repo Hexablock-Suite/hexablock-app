@@ -72,11 +72,6 @@ export const primitiveBaseline: readonly PrimitiveEntry[] = [
 ];
 
 export const fieldBaseline: readonly FieldEntry[] = [
-  // #233: the fields of the events.
-  { rule: 'field', where: 'GameEvent.gameId', issue: 233 },
-  { rule: 'field', where: 'GameOver.matchId', issue: 233 },
-  { rule: 'field', where: 'GameOver.outcome', issue: 233 },
-  { rule: 'field', where: 'GameOver.finalScore', issue: 233 },
   // #234: the public read-only members and `Board.get(at)`.
   { rule: 'field', where: 'PieceDraw.piece', issue: 234 },
   { rule: 'field', where: 'PieceDraw.rest', issue: 234 },

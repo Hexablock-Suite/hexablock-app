@@ -26,7 +26,6 @@ import {
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
 import type { NewTile } from '../../../../src/domain/variants/hexa-merge/new-tile';
 import type { Slide } from '../../../../src/domain/variants/hexa-merge/slide';
-import { RecordingPublisher } from '../../engine/fake-game';
 import { MATCH_ID } from '../../engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../engine/entity-ids';
 import { delivered } from '../../engine/value-receiver';
@@ -89,16 +88,14 @@ export function mergeGame(
   scoring: IScoringPolicy<HexMergeState> = new NoPointScoring(),
 ) {
   const rules = new MergeRules<MergeTile, HexCoord, HexAxis>(target);
-  const publisher = new RecordingPublisher();
   const engine = new GameEngine<MergeTile, HexCoord, Slide<HexAxis>, HexMergeState>(
     MATCH_ID,
     GameId.of('hexa-merge'),
     rules,
     scoring,
-    publisher,
   );
   engine.start(initial);
-  return { engine, rules, publisher };
+  return { engine, rules };
 }
 
 // A Merge factory on a hexagon of 2 rings, with the target 2048.

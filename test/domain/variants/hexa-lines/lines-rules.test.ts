@@ -251,22 +251,22 @@ describe('Hexa Lines rules', () => {
 
   it('should_end_the_game_when_no_tray_piece_fits_after_the_placement', () => {
     const long = piece(origin, square(1, 0), square(2, 0), square(3, 0));
-    const { engine, publisher } = linesGame(linesState(squareTopology, 3, { tray: [one, long] }));
+    const { engine } = linesGame(linesState(squareTopology, 3, { tray: [one, long] }));
 
     const outcome = engine.play(new PlacePiece(0, square(1, 1)));
 
     expect(outcome).toBe(Outcome.gameOver);
     expect(engine.currentPhase()).toBe(GameOverPhase.instance);
-    expect(publisher.events).toEqual([expect.any(GameOver)]);
+    expect(engine.takeEvents()).toEqual([expect.any(GameOver)]);
   });
 
   it('should_keep_playing_when_a_tray_piece_still_fits_after_the_placement', () => {
-    const { engine, publisher } = linesGame(linesState(squareTopology, 3, { tray: [one, one] }));
+    const { engine } = linesGame(linesState(squareTopology, 3, { tray: [one, one] }));
 
     const outcome = engine.play(new PlacePiece(0, square(1, 1)));
 
     expect(outcome).toBe(Outcome.playing);
-    expect(publisher.events).toEqual([]);
+    expect(engine.takeEvents()).toEqual([]);
   });
 
   it('should_keep_an_earlier_snapshot_when_a_later_move_changes_the_game', () => {
@@ -302,7 +302,7 @@ describe('Hexa Lines rules edge cases', () => {
   // Plays the move on a new 3 × 3 game and reports what an observer sees.
   function playOnce(move: PlacePiece<SquareCoord>) {
     const initial = linesState(squareTopology, 3, { filled: [square(1, 1)], tray: [domino, one] });
-    const { engine, publisher } = linesGame(initial);
+    const { engine } = linesGame(initial);
 
     const outcome = engine.play(move);
 
@@ -313,11 +313,11 @@ describe('Hexa Lines rules edge cases', () => {
       phase: phaseNameOf(engine.currentPhase()),
       filled: filledKeys(state),
       tray: state.tray,
-      events: publisher.events,
+      events: engine.takeEvents(),
     };
   }
 
-  // A rejected move keeps the board, the tray and the phase, and publishes nothing.
+  // A rejected move keeps the board, the tray and the phase, and records no event.
   const rejected = {
     valid: false,
     outcome: Outcome.playing,
@@ -369,7 +369,7 @@ describe('Hexa Lines rules edge cases', () => {
   it('should_end_the_game_with_free_cells_when_a_finite_source_leaves_the_tray_empty', () => {
     // The tray takes the next pieces, or fewer when a finite source runs out (PR #107).
     // The game ends when no tray piece fits (REQUIREMENTS.md §1), and an empty tray has none.
-    const { engine, publisher } = linesGame(linesState(squareTopology, 3, { tray: [one] }));
+    const { engine } = linesGame(linesState(squareTopology, 3, { tray: [one] }));
 
     const outcome = engine.play(new PlacePiece(0, square(1, 1)));
 
@@ -378,7 +378,7 @@ describe('Hexa Lines rules edge cases', () => {
     expect(engine.currentPhase()).toBe(GameOverPhase.instance);
     expect(state.tray).toEqual([]);
     expect(filledKeys(state)).toEqual(keys([square(1, 1)]));
-    expect(publisher.events).toEqual([expect.any(GameOver)]);
+    expect(engine.takeEvents()).toEqual([expect.any(GameOver)]);
   });
 
   it('should_throw_and_keep_the_game_when_the_source_or_the_topology_throws_during_a_move', () => {
@@ -414,7 +414,7 @@ describe('Hexa Lines rules edge cases', () => {
     ];
 
     for (const { game, error } of games) {
-      const { engine, publisher } = game;
+      const { engine } = game;
       const tray = engine.snapshot().tray;
 
       expect(() => engine.play(new PlacePiece(0, square(2, 2)))).toThrow(error);
@@ -424,7 +424,7 @@ describe('Hexa Lines rules edge cases', () => {
       expect(filledKeys(state)).toEqual([]);
       expect(state.tray).toEqual(tray);
       expect(state.streak).toBe(0);
-      expect(publisher.events).toEqual([]);
+      expect(engine.takeEvents()).toEqual([]);
     }
   });
 

@@ -42,7 +42,7 @@ describe('SortFactory', () => {
     const factory = sortFactory([stack('red', 'red'), stack('blue')]);
 
     const initial = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
-    const { engine, publisher } = startVariant(factory);
+    const { engine } = startVariant(factory);
     const outcome = engine.play(place(0, 0));
 
     expect(factory.gameId.equals(GameId.of('hexa-sort'))).toBe(true);
@@ -53,7 +53,7 @@ describe('SortFactory', () => {
     expect(chipsAt(engine, 0, 0)).toEqual(['red', 'red']);
     expect(names(engine.snapshot().offered?.cell())).toEqual(['blue']);
     expect(engine.snapshot().score).toEqual(Score.of(0));
-    expect(publisher.events).toEqual([]);
+    expect(engine.takeEvents()).toEqual([]);
   });
 
   it('should_throw_a_range_error_and_build_no_game_when_the_level_goal_is_zero', () => {

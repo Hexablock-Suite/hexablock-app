@@ -23,7 +23,6 @@ import { SortLevel } from '../../../../src/domain/variants/hexa-sort/sort-level'
 import { SortRules } from '../../../../src/domain/variants/hexa-sort/sort-rules';
 import { PlaceStack } from '../../../../src/domain/variants/hexa-sort/place-stack';
 import { SortState, type SortSnapshot } from '../../../../src/domain/variants/hexa-sort/sort-state';
-import { RecordingPublisher } from '../../engine/fake-game';
 import { square, squareTopology, type SquareCoord } from '../../engine/square-topology';
 import { MATCH_ID } from '../../engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../engine/entity-ids';
@@ -119,7 +118,6 @@ export function sortGame(
     GameId.of('hexa-sort'),
     new SortRules<SquareCoord>(),
     scoring,
-    new RecordingPublisher(),
   );
   engine.start(state);
   return engine;

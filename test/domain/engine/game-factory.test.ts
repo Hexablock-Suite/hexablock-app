@@ -2,7 +2,6 @@
 import { Outcome } from '../../../src/domain/engine/outcome';
 import { Score } from '../../../src/domain/engine/score';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
-import { GameOver } from '../../../src/domain/engine/game-events';
 import { GameFactory } from '../../../src/domain/engine/game-factory';
 import { BoardId } from '../../../src/domain/engine/board-id';
 import { GameId } from '../../../src/domain/engine/game-id';
@@ -15,18 +14,18 @@ import {
   fakeGameFactory,
   FakeRules,
   OnePointScoring,
-  RecordingPublisher,
   emptyState,
   type FakeMove,
   type FakeSnapshot,
 } from '../../support/engine/fake-game';
 import { CountingBoardIds, CountingStateIds } from '../../support/engine/entity-ids';
 import { CountingMatchIds, MATCH_ID } from '../../support/engine/match-id';
+import { dataOf } from '../../support/engine/game-over';
 import { phaseNameOf } from '../../support/engine/phase-name';
 import { square } from '../../support/engine/square-topology';
 
 // `GameFactory` assembles the whole aggregate of one match (classes.md decision 40):
-// the id of the match, the family of the variant and the event publisher.
+// the id of the match and the family of the variant. The game takes no publisher (#233).
 // The variant factory of this suite exists only in test/ (APP-NFR-13).
 
 const moveAt = (col: number): FakeMove => ({ at: square(col, 0), cell: fakeCell(1) });
@@ -48,7 +47,6 @@ describe('GameFactory', () => {
       new CountingMatchIds(),
       new CountingStateIds(),
       new CountingBoardIds(),
-      new RecordingPublisher(),
     );
 
     const game = games.createGame();
@@ -66,7 +64,6 @@ describe('GameFactory', () => {
       new CountingMatchIds(),
       new CountingStateIds(),
       new CountingBoardIds(),
-      new RecordingPublisher(),
     );
 
     const first = games.createGame();
@@ -83,7 +80,6 @@ describe('GameFactory', () => {
       new CountingMatchIds(),
       new CountingStateIds(),
       new CountingBoardIds(),
-      new RecordingPublisher(),
     );
 
     const first = games.createGame().snapshot();
@@ -100,29 +96,31 @@ describe('GameFactory', () => {
   });
 
   it('should_give_the_engine_and_its_game_over_event_the_id_of_the_generator_when_the_generator_is_fixed', () => {
-    const publisher = new RecordingPublisher();
     const ids = new FixedMatchId();
     const game = new GameFactory(
       fakeGameFactory(1),
       ids,
       new CountingStateIds(),
       new CountingBoardIds(),
-      publisher,
     ).createGame();
     const sameMatch = new GameEngine(
       MATCH_ID,
       GameId.of('another-game'),
       new FakeRules(),
       new OnePointScoring(),
-      new RecordingPublisher(),
     );
 
     game.play(moveAt(0));
 
     expect(ids.calls).toBe(1);
     expect(game.equals(sameMatch)).toBe(true);
-    expect(publisher.events).toEqual([
-      new GameOver(GameId.of('fake-game'), MATCH_ID, Outcome.gameOver, Score.of(1)),
+    expect(game.takeEvents().map(dataOf)).toEqual([
+      {
+        gameId: GameId.of('fake-game'),
+        matchId: MATCH_ID,
+        outcome: Outcome.gameOver,
+        finalScore: Score.of(1),
+      },
     ]);
   });
 
@@ -133,7 +131,6 @@ describe('GameFactory', () => {
       ids,
       new CountingStateIds(),
       new CountingBoardIds(),
-      new RecordingPublisher(),
     );
 
     games.createGame();
@@ -152,7 +149,6 @@ describe('GameFactory', () => {
       new CountingMatchIds(),
       new CountingStateIds(),
       new CountingBoardIds(),
-      new RecordingPublisher(),
     );
     const first = games.createGame();
     const second = games.createGame();
@@ -174,7 +170,6 @@ describe('GameFactory', () => {
       },
       new CountingStateIds(),
       new CountingBoardIds(),
-      new RecordingPublisher(),
     );
 
     expect(() => games.createGame()).toThrow('The generator has no id.');
@@ -186,7 +181,6 @@ describe('GameFactory', () => {
       new FixedMatchId(),
       new CountingStateIds(),
       new CountingBoardIds(),
-      new RecordingPublisher(),
     );
 
     const first = games.createGame().snapshot();
@@ -227,7 +221,6 @@ describe('GameFactory', () => {
           return boards.next();
         },
       },
-      new RecordingPublisher(),
     );
 
     games.createGame();
