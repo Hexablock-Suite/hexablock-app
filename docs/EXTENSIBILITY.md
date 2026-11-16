@@ -2,7 +2,7 @@
 
 This page explains how to add a fifth variant. The example is Hexa Fill, the game that statement §3.1 names («por ejemplo, Hexa Fill: pintar celdas con restricciones»). Its rules are not designed yet, so every `Fill` name below is a placeholder.
 
-The steps follow the [class diagram](architecture/classes.md) and the [extensibility diagram](architecture/extensibility.md). The engine, the four variants and the first use cases exist in `src/`. The classes of layers 3 and 4 that the steps name are planned. Some engine classes are planned too, for example the progress models and `RedoableHistory`. When a planned class exists, this page names its real file.
+The steps follow the [class diagram](architecture/classes.md) and the [extensibility diagram](architecture/extensibility.md). The engine, the four variants and the first use cases exist in `src/`. The composition root and its game registry exist too (#162). The other classes of layers 3 and 4 that the steps name are planned. Some engine classes are planned too, for example the progress models and `RedoableHistory`. When a planned class exists, this page names its real file.
 
 ## The rule
 
@@ -28,7 +28,7 @@ A new variant adds classes and data. It changes no engine file, no other variant
 7. If Hexa Fill publishes its own events, write classes that extend `GameEvent`, for example `RegionFilled`.
 8. In layer 3, write `FillStateMapper`, which implements `StateMapper<FillCell>` and turns each cell into a `CellView`.
 9. In layer 4, write `FillCellRenderer`, which implements `CellRenderer<TCellView>`. Its folder is open (Q8).
-10. Register the game: the composition root maps `hexa-fill` to `FillFactory`, `FillStateMapper` and `FillCellRenderer`, and the game selector shows the new entry. The composition root gives the `FillFactory` to a `GameFactory`, with the `MatchIdGenerator` that every variant shares, and `StartGame` takes that `GameFactory`. The event publisher goes to `ApplyMove`, which delivers the events that the engine records (#233), so a new variant changes no wiring of events.
+10. Register the game: add `registered(new FillFactory(geometry, …))` to the list in [`src/infrastructure/registered-games.ts`](../src/infrastructure/registered-games.ts). [`GameRegistry`](../src/infrastructure/game-registry.ts) then maps `hexa-fill` to `FillFactory`, and the game selector shows the new entry. `FillStateMapper` (#170) and `FillCellRenderer` (#165) join the same entry when the registry holds them. [`CompositionRoot`](../src/infrastructure/composition-root.ts) gives the `FillFactory` to a `GameFactory`, with the one `MatchIdGenerator` that every variant shares, and `StartGame` takes that `GameFactory`. The event publisher goes to `ApplyMove`, which delivers the events that the engine records (#233), so a new variant changes no wiring of events.
 11. Test the rules of Hexa Fill in their own test suite. The engine tests and the tests of the other variants do not change.
 
 ## Files that a fifth variant adds
@@ -47,7 +47,7 @@ A new variant adds classes and data. It changes no engine file, no other variant
 
 | File                                   | Change                                                                               |
 | -------------------------------------- | ------------------------------------------------------------------------------------ |
-| The composition root (file open, Q9)   | One entry that maps the new `GameId` to its factory, state mapper and cell renderer. |
+| The game list, `registered-games.ts`   | One entry that maps the new `GameId` to its factory, state mapper and cell renderer. |
 | The game selector route in `app/`      | One more game in the list that the player picks from (APP-FR-01).                    |
 | The text files for Spanish and English | The name of the new game in both languages (APP-FR-11).                              |
 
@@ -61,7 +61,7 @@ If Hexa Fill keeps levels on the backend, the backend adds a section for it in t
 | 1     | The four other variant folders: `hexa-lines/`, `hexa-fit/`, `hexa-sort/` and `hexa-merge/`                                                                                                                                                                                                                                                                                                        |
 | 2     | Every file in `src/application/`: the use cases, their ports, the aspects, `Result`, `MoveResult` and the other request and response models                                                                                                                                                                                                                                                       |
 | 3     | `GamePresenter`, `GameViewModel`, `GameEventBus`, the local repositories and `InMemoryGameRepository`                                                                                                                                                                                                                                                                                             |
-| 4     | The HTTP client and repositories, the drivers, `BoardView`, `AudioManager`, and the game, level selector, victory and defeat routes                                                                                                                                                                                                                                                               |
+| 4     | `CompositionRoot`, `GameRegistry`, the HTTP client and repositories, the drivers, `BoardView`, `AudioManager`, and the game, level selector, victory and defeat routes                                                                                                                                                                                                                            |
 | gates | `.dependency-cruiser.cjs` and the architecture tests                                                                                                                                                                                                                                                                                                                                              |
 
 ## Check

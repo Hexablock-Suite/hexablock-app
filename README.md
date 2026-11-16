@@ -23,7 +23,7 @@ HexaBlock Suite is one mobile app with four puzzle games on hexagonal boards: He
 | Hexa Sort  | Place the offered stack on an empty cell | Same-color tiles move between stacks, in cascade | Levels with stars (moves)          | No                   |
 | Hexa Merge | Slide all tiles in one of 6 directions   | Two equal tiles that collide merge               | High score                         | One move             |
 
-The full product table and every requirement are in [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md). The sprint plan is in [docs/ROADMAP.md](docs/ROADMAP.md). The engine and the four variants exist in `src/domain/`, and the first use cases, `StartGame` and `ApplyMove`, exist in `src/application/`. The game screens and the adapters are planned: `app/` holds only a home screen, and `src/adapters/` holds only its README. The sections below describe the design that the code follows.
+The full product table and every requirement are in [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md). The sprint plan is in [docs/ROADMAP.md](docs/ROADMAP.md). The engine and the four variants exist in `src/domain/`, and the first use cases, `StartGame` and `ApplyMove`, exist in `src/application/`. The composition root in `src/infrastructure/composition-root.ts` wires them with the first adapters and drivers: `InMemoryGameRepository`, `NullGameEventPublisher`, `SystemClock`, `SeededRandomSource`, `ConsoleLogger` and `SequentialMatchIds`. Its game registry maps each game to its variant factory. The game screens are planned: `app/` holds the root layout, which only calls the root, and a home screen. The sections below describe the design that the code follows.
 
 ## Demo / Screenshots
 
@@ -38,7 +38,7 @@ The client follows Clean Architecture with four layers (statement §3.4). Every 
 | 1. Entities               | `src/domain/engine/`, `src/domain/variants/<variant>/` | The generic engine and the four variants: board, rules, pieces, scoring, the variant factories                        | Only `src/domain/`. The engine never imports a variant, and a variant never imports another variant. |
 | 2. Use cases              | `src/application/`                                     | The generic use cases, their ports, the request and response models, `Result` and the aspect decorators               | Only `src/domain/` and `src/application/`                                                            |
 | 3. Interface adapters     | `src/adapters/`                                        | MVP presenters and view models, state mappers, `GameEventBus`, the local repositories, `InMemoryGameRepository`       | Layers 1 and 2 and its own folder                                                                    |
-| 4. Frameworks and drivers | `src/infrastructure/`, `app/`                          | The HTTP client and repositories, storage, session, audio, clock, random source, logger; Expo Router routes in `app/` | Every inner layer and any package                                                                    |
+| 4. Frameworks and drivers | `src/infrastructure/`, `app/`                          | The composition root, its registry, the HTTP client and repositories, storage, session, audio, drivers; `app/` routes | Every inner layer and any package                                                                    |
 
 ```mermaid
 flowchart TB
@@ -63,7 +63,7 @@ This sketch shows only the layers and the direction of the dependencies. The ful
 
 One placement differs from statement §3.4 on purpose. The statement puts the repository implementations and the DTO mappers in layer 3, interface adapters. The HTTP repositories and their DTO mapper live in layer 4, `src/infrastructure/api/`, next to the HTTP client, and implement the layer 2 ports directly. In layer 3 they needed a `BackendApi` port whose methods named transport types, which ties the use cases to the shape of the HTTP data. The local repositories stay in layer 3. See Q7 in [docs/architecture/layers.md](docs/architecture/layers.md) and decision 22 in [docs/architecture/classes.md](docs/architecture/classes.md).
 
-Two placements are still open with the professor: where the cell renderers live (Q8) and where the composition root lives (Q9). Both are in [docs/architecture/layers.md](docs/architecture/layers.md).
+Two placements are still open with the professor: where the cell renderers live (Q8) and where the composition root lives (Q9). The code puts the root in `src/infrastructure/composition-root.ts` (S3-06 in #151, «Propuesta, pendiente del equipo»), and the answer to Q9 can move it. Both are in [docs/architecture/layers.md](docs/architecture/layers.md).
 
 ## Generic Engine
 
