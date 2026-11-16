@@ -32,6 +32,7 @@ import { MATCH_ID } from '../../../support/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 import { mergeTileSource } from '../../../../src/domain/variants/hexa-merge/merge-tile-source';
 import { firstValidMove } from '../../../support/engine/variant-game';
+import { deliveries } from '../../../support/engine/value-receiver';
 import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
 
 // The rules suite of Hexa Merge (statement §1.4, APP-NFR-12).
@@ -70,6 +71,15 @@ describe('MergeTile', () => {
     expect(() => MergeTile.of(2).mergeWith(MergeTile.of(4))).toThrow(
       new RangeError('A tile of 2 cannot merge with a tile of 4.'),
     );
+  });
+
+  // Issue #177: the state mapper of the Merge screen draws the number of each tile.
+  // The value stays private, so the tile delivers it to a receiver of the edge.
+  it('should_deliver_its_value_to_the_receiver_when_an_adapter_asks_for_the_number', () => {
+    const tile = MergeTile.of(2).mergeWith(MergeTile.of(2));
+
+    expect(deliveries(tile)).toEqual([4]);
+    expect(deliveries(MergeTile.of(2048))).toEqual([2048]);
   });
 });
 
