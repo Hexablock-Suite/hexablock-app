@@ -1,8 +1,11 @@
+import { Distance } from './distance';
+
 // The distance of a ring from its center: a whole number of zero or more.
 // Radius 0 gives the center. It is a value object: it never changes.
 // A number above `Number.MAX_SAFE_INTEGER` is an error. A negative zero is stored as 0.
 // The number stays private (classes.md decision 44, issue #206).
 // A topology builds a ring through the operations of the radius.
+// They take and give cells and a `Distance`, never a number (issue #243).
 export class Radius {
   private constructor(private readonly value: number) {}
 
@@ -18,16 +21,20 @@ export class Radius {
     return this.value === other.value;
   }
 
-  // Each whole offset from minus the radius to the radius, in rising order.
-  // A topology turns two offsets into a coordinate with its factory.
-  *offsets(): Iterable<number> {
-    for (let offset = -this.value; offset <= this.value; offset += 1)
-      yield offset === 0 ? 0 : offset;
+  // Each cell of `axis` from the radius before `origin` to the radius after it, in order.
+  // The axis steps one cell forward or backward, so the topology builds no coordinate itself.
+  *offsets<T>(origin: T, axis: { forward(from: T): T; backward(from: T): T }): Iterable<T> {
+    let reached = this.expand(origin, (from) => axis.backward(from));
+    yield reached;
+    for (let step = 0; step < 2 * this.value; step += 1) {
+      reached = axis.forward(reached);
+      yield reached;
+    }
   }
 
   // Tells if a distance is exactly this radius.
-  measures(distance: number): boolean {
-    return distance === this.value;
+  measures(distance: Distance): boolean {
+    return distance.equals(Distance.of(this.value));
   }
 
   // Runs `step` once for each unit of the radius, from `start`. Radius 0 gives `start`.

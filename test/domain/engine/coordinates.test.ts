@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { Distance } from '../../../src/domain/engine/distance';
 import { hex, HexCoord, HexTopology } from '../../../src/domain/engine/hex-topology';
 import { Radius } from '../../../src/domain/engine/radius';
 import { RegionSize } from '../../../src/domain/engine/region-size';
@@ -26,6 +27,13 @@ const pairs: readonly (readonly [number, number])[] = [
   [-2, -2],
   [5, 7],
 ];
+
+// A line of whole numbers: one step forward adds 1, and one step backward takes 1 away.
+// `Radius` and `RegionSize` walk any axis, so the tests read their walks on this line.
+const numberLine = {
+  forward: (from: number) => from + 1,
+  backward: (from: number) => from - 1,
+};
 
 describe('HexCoord', () => {
   it('should_be_equal_when_two_coordinates_hold_the_same_values', () => {
@@ -67,11 +75,11 @@ describe('HexCoord', () => {
         const dr = ar - br;
         const steps = (Math.abs(dq) + Math.abs(dr) + Math.abs(dq + dr)) / 2;
 
-        expect(hex(aq, ar).distanceTo(hex(bq, br))).toBe(steps);
+        expect(hex(aq, ar).distanceTo(hex(bq, br)).equals(Distance.of(steps))).toBe(true);
       }
     }
-    expect(hex(0, 0).distanceTo(hex(2, -1))).toBe(2);
-    expect(hex(1, 1).distanceTo(hex(1, 1))).toBe(0);
+    expect(hex(0, 0).distanceTo(hex(2, -1)).equals(Distance.of(2))).toBe(true);
+    expect(hex(1, 1).distanceTo(hex(1, 1)).equals(Distance.of(0))).toBe(true);
   });
 
   it('should_map_q_r_to_minus_r_and_q_plus_r_when_the_coordinate_turns_one_step', () => {
@@ -153,6 +161,19 @@ describe('SquareCoord', () => {
       }
       expect(square(ac, ar).opposite().equals(square(-ac, -ar))).toBe(true);
     }
+  });
+
+  // Issue #243: the distance of the four neighbors, the sum of the two differences.
+  it('should_give_the_count_of_steps_between_two_cells_when_the_distance_is_read', () => {
+    for (const [ac, ar] of pairs) {
+      for (const [bc, br] of pairs) {
+        const steps = Math.abs(ac - bc) + Math.abs(ar - br);
+
+        expect(square(ac, ar).distanceTo(square(bc, br)).equals(Distance.of(steps))).toBe(true);
+      }
+    }
+    expect(square(0, 0).distanceTo(square(2, -1)).equals(Distance.of(3))).toBe(true);
+    expect(square(1, 1).distanceTo(square(1, 1)).equals(Distance.of(0))).toBe(true);
   });
 
   it('should_map_col_row_to_minus_row_and_col_when_the_coordinate_turns_one_step', () => {
@@ -307,16 +328,18 @@ describe('TriangleCoord', () => {
 });
 
 describe('Radius', () => {
-  it('should_give_each_whole_offset_from_minus_the_radius_to_the_radius_when_the_offsets_are_read', () => {
-    expect([...Radius.of(0).offsets()]).toEqual([0]);
-    expect([...Radius.of(2).offsets()]).toEqual([-2, -1, 0, 1, 2]);
+  // Issue #243: the offsets are the cells of an axis, not numbers.
+  it('should_give_each_cell_from_minus_the_radius_to_the_radius_along_the_axis_when_the_offsets_are_read', () => {
+    expect([...Radius.of(0).offsets(0, numberLine)]).toEqual([0]);
+    expect([...Radius.of(2).offsets(0, numberLine)]).toEqual([-2, -1, 0, 1, 2]);
+    expect([...Radius.of(2).offsets(10, numberLine)]).toEqual([8, 9, 10, 11, 12]);
   });
 
   it('should_tell_if_a_distance_is_the_radius_when_a_distance_is_measured', () => {
-    expect(Radius.of(2).measures(2)).toBe(true);
-    expect(Radius.of(2).measures(1)).toBe(false);
-    expect(Radius.of(2).measures(3)).toBe(false);
-    expect(Radius.of(0).measures(-0)).toBe(true);
+    expect(Radius.of(2).measures(Distance.of(2))).toBe(true);
+    expect(Radius.of(2).measures(Distance.of(1))).toBe(false);
+    expect(Radius.of(2).measures(Distance.of(3))).toBe(false);
+    expect(Radius.of(0).measures(Distance.of(-0))).toBe(true);
   });
 
   it('should_run_the_step_once_per_unit_of_the_radius_when_a_start_is_expanded', () => {
@@ -335,20 +358,23 @@ describe('Radius', () => {
 });
 
 describe('RegionSize', () => {
-  it('should_give_each_index_from_zero_below_the_size_when_the_indexes_are_read', () => {
-    expect([...RegionSize.of(1).indexes()]).toEqual([0]);
-    expect([...RegionSize.of(3).indexes()]).toEqual([0, 1, 2]);
+  // Issue #243: the indexes and the offsets are the cells of an axis, not numbers.
+  it('should_give_one_cell_per_index_from_the_start_when_the_indexes_are_read', () => {
+    expect([...RegionSize.of(1).indexes(0, numberLine)]).toEqual([0]);
+    expect([...RegionSize.of(3).indexes(0, numberLine)]).toEqual([0, 1, 2]);
+    expect([...RegionSize.of(3).indexes(10, numberLine)]).toEqual([10, 11, 12]);
   });
 
-  it('should_give_each_offset_that_is_nearer_than_the_size_when_the_offsets_are_read', () => {
-    expect([...RegionSize.of(1).offsets()]).toEqual([0]);
-    expect([...RegionSize.of(3).offsets()]).toEqual([-2, -1, 0, 1, 2]);
+  it('should_give_each_cell_that_is_nearer_than_the_size_along_the_axis_when_the_offsets_are_read', () => {
+    expect([...RegionSize.of(1).offsets(0, numberLine)]).toEqual([0]);
+    expect([...RegionSize.of(3).offsets(0, numberLine)]).toEqual([-2, -1, 0, 1, 2]);
+    expect([...RegionSize.of(3).offsets(10, numberLine)]).toEqual([8, 9, 10, 11, 12]);
   });
 
   it('should_tell_if_a_distance_is_below_the_size_when_a_distance_is_checked', () => {
-    expect(RegionSize.of(3).holds(0)).toBe(true);
-    expect(RegionSize.of(3).holds(2)).toBe(true);
-    expect(RegionSize.of(3).holds(3)).toBe(false);
+    expect(RegionSize.of(3).holds(Distance.of(0))).toBe(true);
+    expect(RegionSize.of(3).holds(Distance.of(2))).toBe(true);
+    expect(RegionSize.of(3).holds(Distance.of(3))).toBe(false);
   });
 
   it('should_reject_at_compile_time_when_a_caller_reads_the_number_of_the_size', () => {

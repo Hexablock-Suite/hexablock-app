@@ -76,15 +76,16 @@
           a variant, LevelDefinition, the data of one level file, which directs the ILevelBuilder
           builder, the abstract GameEvent with GameOver, the domain event that the root records when
           a game ends, the Clock and RandomSource interfaces that layer 4 implements, and the
-          MatchIdGenerator interface that gives the MatchId of each new match. The internal ids are
-          local value objects that keep the MatchId of their match: GameFactory builds the
-          GameStateId of the first state and the BoardId of its board from it, and FitFactory builds
-          the LevelTimerId of the timer of a timed game in createTimer(). GameFactory keeps the
-          GameId of the game, an IVariantFactory that answers isFor() for it and the
-          MatchIdGenerator, wraps the rules of a timed game in TimedRulesDecorator, gives the same
-          timer to the root and creates the started GameEngine. GameOver keeps the MatchId, the
-          Outcome and the final Score, a value object, GameEvent keeps the GameId, and the fields
-          are private: a listener asks isVictory() or receives the data through deliverTo().
+          MatchIdGenerator interface that gives the MatchId of each new match. Each reading of the
+          Clock is a ClockReading value object (view 3). The internal ids are local value objects
+          that keep the MatchId of their match: GameFactory builds the GameStateId of the first
+          state and the BoardId of its board from it, and FitFactory builds the LevelTimerId of the
+          timer of a timed game in createTimer(). GameFactory keeps the GameId of the game, an
+          IVariantFactory that answers isFor() for it and the MatchIdGenerator, wraps the rules of a
+          timed game in TimedRulesDecorator, gives the same timer to the root and creates the
+          started GameEngine. GameOver keeps the MatchId, the Outcome and the final Score, a value
+          object, GameEvent keeps the GameId, and the fields are private: a listener asks
+          isVictory() or receives the data through deliverTo().
         </desc>
         <defs>
           <marker
@@ -551,7 +552,7 @@
           x="508"
           y="170"
           width="232"
-          height="192"
+          height="176"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -598,18 +599,15 @@
           + add(points: Score): Score
         </text>
         <text x="524" y="290" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + times(factor: number): Score
-        </text>
-        <text x="524" y="306" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: Score): boolean
         </text>
-        <text x="524" y="322" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="524" y="306" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + isHigherThan(other: Score): boolean
         </text>
-        <text x="524" y="338" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="524" y="322" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + deliverTo(receiver:
         </text>
-        <text x="535" y="354" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="535" y="338" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           ValueReceiver&lt;number&gt;): void
         </text>
         <!-- GameOver carries the final Score: use -->
@@ -791,7 +789,7 @@
           Clock
         </text>
         <text x="528" y="472" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + now(): number
+          + now(): ClockReading
         </text>
 
         <!-- Class: RandomSource (interface of the engine) -->
@@ -829,7 +827,7 @@
           RandomSource
         </text>
         <text x="792" y="472" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + next(): number
+          + next(): RandomDraw
         </text>
 
         <!-- Class: MatchIdGenerator (interface of the engine) -->

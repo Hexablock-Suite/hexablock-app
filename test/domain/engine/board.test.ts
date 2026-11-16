@@ -4,6 +4,7 @@ import { BoardId } from '../../../src/domain/engine/board-id';
 import { MatchId } from '../../../src/domain/engine/match-id';
 import { BoardShape } from '../../../src/domain/engine/board-shape';
 import { coordKey, type CoordKey } from '../../../src/domain/engine/coord-key';
+import { Distance } from '../../../src/domain/engine/distance';
 import type { GridTopology } from '../../../src/domain/engine/grid-topology';
 import { Radius } from '../../../src/domain/engine/radius';
 import { RegionSize } from '../../../src/domain/engine/region-size';
@@ -22,6 +23,9 @@ const X = named('x');
 const LEFT = named('left');
 const RIGHT = named('right');
 
+// One step along the strip: forward adds 1, and backward takes 1 away.
+const strip = { forward: (c: number) => c + 1, backward: (c: number) => c - 1 };
+
 const stripTopology: GridTopology<number> = {
   fullTurn: () => Turns.of(2),
   key: (c) => coordKey(String(c)),
@@ -36,12 +40,12 @@ const stripTopology: GridTopology<number> = {
     while (contains(start - 1)) start -= 1;
     for (let c = start; contains(c); c += 1) yield c;
   },
-  // The offsets at the distance of the radius: one for radius 0, and two for any other radius.
+  // The cells at the distance of the radius: one for radius 0, and two for any other radius.
   ring: (center, radius) =>
-    [...radius.offsets()]
-      .filter((offset) => radius.measures(Math.abs(offset)))
-      .map((offset) => center + offset),
-  region: (size) => BoardShape.of([...size.indexes()]),
+    [...radius.offsets(center, strip)].filter((c) =>
+      radius.measures(Distance.of(Math.abs(c - center))),
+    ),
+  region: (size) => BoardShape.of([...size.indexes(0, strip)]),
 };
 
 // The board covers the cells 0 to 4.
@@ -355,6 +359,60 @@ describe('Board occupy and vacate', () => {
 
     expect(board.occupantAt(1)).toBe('red');
     expect(copy.occupantAt(1)).toBeUndefined();
+  });
+});
+
+// Issue #170: a game screen draws every space of the board, so the player sees the board
+// and can choose a space. `freeSpaces()` names the free spaces, and `occupiedCells()`
+// names the occupied ones. Together they name each coordinate of the shape once.
+describe('Board free spaces', () => {
+  it('should_list_every_coordinate_in_the_order_of_the_shape_when_no_cell_occupies_the_board', () => {
+    expect(newBoard().freeSpaces()).toEqual([0, 1, 2, 3, 4]);
+  });
+
+  it('should_list_only_the_free_coordinates_in_the_order_of_the_shape_when_cells_occupy_some', () => {
+    const board = newBoard();
+    board.occupy(3, 'blue');
+    board.occupy(1, 'red');
+    board.occupy(4, 'green');
+    board.vacate(4);
+
+    expect(board.freeSpaces()).toEqual([0, 2, 4]);
+    expect([...board.freeSpaces(), ...board.occupiedCells().map(([c]) => c)].sort()).toEqual(
+      board.coordinates().sort(),
+    );
+  });
+
+  // A space that a cell occupies is not free, whatever the cell is.
+  it('should_list_no_occupied_coordinate_when_an_undefined_cell_or_an_empty_stack_occupies_it', () => {
+    const undefinedCells = new Board<string | undefined, number>(
+      BOARD_ID,
+      stripTopology.region(RegionSize.of(3)),
+      stripTopology,
+    );
+    const stacks = new Board<ColorStack, number>(
+      BOARD_ID,
+      stripTopology.region(RegionSize.of(3)),
+      stripTopology,
+    );
+
+    undefinedCells.occupy(1, undefined);
+    stacks.occupy(2, ColorStack.empty());
+
+    expect(undefinedCells.freeSpaces()).toEqual([0, 2]);
+    expect(stacks.freeSpaces()).toEqual([0, 1]);
+  });
+
+  it('should_keep_the_board_and_its_clone_unchanged_when_a_caller_changes_the_list', () => {
+    const board = newBoard();
+    board.occupy(2, 'red');
+    const copy = board.clone();
+
+    board.freeSpaces().splice(0, 2);
+    board.occupy(0, 'blue');
+
+    expect(board.freeSpaces()).toEqual([1, 3, 4]);
+    expect(copy.freeSpaces()).toEqual([0, 1, 3, 4]);
   });
 });
 

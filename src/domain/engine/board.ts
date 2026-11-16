@@ -64,13 +64,14 @@ export class BoardSpace<TCell, TCoord> implements Cloneable<BoardSpace<TCell, TC
 // It has no `clone()`: a copy would be a `Board` with the same `BoardId`, the internal entity,
 // with `occupy()`, `vacate()` and `restore()`. Only a state copies its own board (issue #234).
 // It shows no field (classes.md decision 49): a reader asks the board for the occupant of
-// a coordinate, the occupied cells, its coordinates, its axes, the key of a coordinate,
-// its full turn and a piece that it turns or moves.
+// a coordinate, the occupied cells, the free spaces, its coordinates, its axes, the key of
+// a coordinate, its full turn and a piece that it turns or moves.
 export interface ReadonlyBoard<TCell, TCoord, TAxis extends GridAxis = GridAxis> {
   equals(other: ReadonlyBoard<TCell, TCoord, TAxis>): boolean;
   contains(c: TCoord): boolean;
   occupantAt(at: TCoord): TCell | undefined;
   occupiedCells(): [TCoord, TCell][];
+  freeSpaces(): TCoord[];
   coordinates(): TCoord[];
   isFull(): boolean;
   key(c: TCoord): CoordKey;
@@ -108,8 +109,8 @@ export interface ReadonlyBoard<TCell, TCoord, TAxis extends GridAxis = GridAxis>
 // so `Board<TCell, TCoord>` is a board with any axis. The board reads no direction,
 // so it takes a topology with any direction.
 // The shape and the topology are private (classes.md decision 49). A reader asks the board:
-// `occupantAt()` and `occupiedCells()` answer for the cells, `coordinates()` and `isFull()`
-// answer for the shape, and `key()`, `axes()`, `fullTurn()`, `turned()` and `moved()` answer
+// `occupantAt()` and `occupiedCells()` answer for the cells, `freeSpaces()` answers for
+// the spaces that no cell occupies, `coordinates()` and `isFull()` answer for the shape, and `key()`, `axes()`, `fullTurn()`, `turned()` and `moved()` answer
 // with the topology. No reader holds the topology of a board.
 export class Board<TCell, TCoord, TAxis extends GridAxis = GridAxis>
   implements ReadonlyBoard<TCell, TCoord, TAxis>, Cloneable<Board<TCell, TCoord, TAxis>>
@@ -197,6 +198,16 @@ export class Board<TCell, TCoord, TAxis extends GridAxis = GridAxis>
       const occupied = space.occupiedCell();
       return occupied === undefined ? [] : [occupied];
     });
+  }
+
+  // The coordinate of each free space of the board, in the order of its shape (issue #170).
+  // A space that a cell occupies is not free, whatever the cell is: also an `undefined` cell.
+  // So `freeSpaces()` and `occupiedCells()` name each coordinate of the shape once.
+  // Each call gives a new list, so a caller cannot change the board through it.
+  freeSpaces(): TCoord[] {
+    return this.shape
+      .coordinates()
+      .filter((c) => this.content.get(this.topology.key(c))?.occupiedCell() === undefined);
   }
 
   // Every coordinate of the board, free or occupied, in the order of its shape.

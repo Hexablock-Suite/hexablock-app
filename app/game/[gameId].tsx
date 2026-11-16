@@ -1,46 +1,45 @@
-import { Redirect, useLocalSearchParams } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { Redirect, router, useLocalSearchParams } from 'expo-router';
 
-import { Scenery } from '../../src/infrastructure/ui/scenery';
-import { palette, serif, space } from '../../src/infrastructure/ui/theme';
-import { useHomePresenter } from '../../src/infrastructure/ui/use-home-presenter';
-import { WoodSign } from '../../src/infrastructure/ui/wood';
+import type { GameChoice } from '../../src/adapters/home-presenter';
+import { GameId } from '../../src/domain/engine/game-id';
+import { GameStage } from '../../src/infrastructure/ui/game-stage';
+import { useGameSession } from '../../src/infrastructure/ui/game-session';
+import {
+  useHomePresenter,
+  useRouteFigure,
+  type RouteFigure,
+} from '../../src/infrastructure/ui/use-home-presenter';
 
-// The game route, a placeholder until #170. The game selector map opens it with the id of
-// a registered game, and it shows the name of that game. #170 replaces this view with
-// `GameScreen`, which starts the game through the use cases of the composition root.
-// An id that names no registered game goes back to the map.
-export default function GamePlaceholderScreen() {
+// The game screen, the route of one game (issue #170, S3-07 in #151, a proposal that waits
+// for the team). The game selector map opens it with the id of a registered game and the text
+// of the board figure (#171). It keeps the session of that game on that figure: the presenter
+// over the use cases of the composition root, and the cell renderer and the figure layout of its
+// registry entry. `GameStage` shows the board, the score and the outcome.
+// A text that names no figure goes home. An id that names no game of the figure goes back
+// to the map of the figure.
+export default function GameScreen() {
   const { gameId } = useLocalSearchParams<{ gameId: string }>();
-  const game = useHomePresenter()
-    .gameSelector()
-    .games.find((choice) => choice.id === gameId);
-  if (game === undefined) return <Redirect href="/map" />;
-  return (
-    <View style={styles.screen}>
-      <StatusBar style="dark" />
-      <Scenery />
-      <WoodSign>
-        <Text accessibilityRole="header" style={styles.name}>
-          {game.name}
-        </Text>
-      </WoodSign>
-    </View>
-  );
+  const figure = useRouteFigure();
+  const games = useHomePresenter(figure?.figure).gameSelector().games;
+  if (figure === undefined) return <Redirect href="/" />;
+  const game = games.find((choice) => choice.id === gameId);
+  if (game === undefined) {
+    return <Redirect href={{ pathname: '/map', params: { figure: figure.param } }} />;
+  }
+  return <Game key={`${figure.param}/${game.id}`} game={game} figure={figure} />;
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: space.lg,
-    backgroundColor: palette.sky,
-  },
-  name: {
-    color: palette.ink,
-    fontFamily: serif,
-    fontSize: 30,
-  },
-});
+// One registered game on one board figure. The session lives as long as the screen of the game.
+// The map button goes back to the map of the figure.
+function Game({ game, figure }: { readonly game: GameChoice; readonly figure: RouteFigure }) {
+  const session = useGameSession(GameId.of(game.id), figure.figure);
+  return (
+    <GameStage
+      title={game.name}
+      presenter={session.presenter}
+      renderer={session.renderer}
+      layoutOf={session.layoutOf}
+      onBack={() => router.dismissTo({ pathname: '/map', params: { figure: figure.param } })}
+    />
+  );
+}

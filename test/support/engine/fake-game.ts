@@ -1,6 +1,6 @@
-import { Board, type ReadonlyBoard } from '../../../src/domain/engine/board';
+import { Board } from '../../../src/domain/engine/board';
 import type { BoardId } from '../../../src/domain/engine/board-id';
-import type { BoardSnapshot, BoardState } from '../../../src/domain/engine/board-state';
+import { BoardSnapshot, type BoardState } from '../../../src/domain/engine/board-state';
 import { GameId } from '../../../src/domain/engine/game-id';
 import type { GameStateId } from '../../../src/domain/engine/game-state-id';
 import { HighScoreProgress } from '../../../src/domain/engine/high-score-progress';
@@ -26,9 +26,24 @@ export interface FakeMove {
 }
 
 // The photo of a fake state: its board, its score, its ids and the count of filled cells.
-export interface FakeSnapshot extends BoardSnapshot<FakeCell, SquareCoord> {
-  readonly board: ReadonlyBoard<FakeCell, SquareCoord, SquareAxis>;
-  view(): { readonly filled: number };
+// It extends the engine photo, as a variant photo does, so it asks the same queries.
+export class FakeSnapshot extends BoardSnapshot<FakeCell, SquareCoord, SquareAxis> {
+  private readonly shown: { readonly filled: number };
+
+  constructor(
+    stateId: GameStateId,
+    matchId: MatchId,
+    board: Board<FakeCell, SquareCoord, SquareAxis>,
+    score: Score,
+  ) {
+    super(stateId, matchId, board, score);
+    this.shown = Object.freeze({ filled: board.occupiedCells().length });
+    Object.freeze(this);
+  }
+
+  view(): { readonly filled: number } {
+    return this.shown;
+  }
 }
 
 // Its identity is its own `GameStateId`, as in a variant state, and it keeps the `MatchId`
@@ -60,19 +75,12 @@ export class FakeState implements BoardState<FakeCell, SquareCoord> {
 
   // The view holds the count of filled cells, so a test sees the view of each state.
   snapshot(): FakeSnapshot {
-    const view = Object.freeze({ filled: this.board.occupiedCells().length });
-    return Object.freeze({
-      stateId: this.stateId,
-      matchId: this.matchId,
-      board: this.board.clone(),
-      score: this.score,
-      view: () => view,
-    });
+    return new FakeSnapshot(this.stateId, this.matchId, this.board.clone(), this.score);
   }
 
   restore(snapshot: FakeSnapshot): void {
-    this.board.restore(snapshot.board);
-    this.score = snapshot.score;
+    this.board.restore(snapshot.boardCopy());
+    this.score = snapshot.scoreSoFar();
   }
 }
 
@@ -92,10 +100,22 @@ export function emptyState(
 }
 
 // The photo of a state with a source: the source at its position.
-export interface SourceSnapshot extends BoardSnapshot<FakeCell, SquareCoord> {
-  readonly board: ReadonlyBoard<FakeCell, SquareCoord, SquareAxis>;
-  readonly source: IPieceSource<FakeCell>;
-  view(): undefined;
+// A test double keeps the source public, so a test reads its pieces directly.
+export class SourceSnapshot extends BoardSnapshot<FakeCell, SquareCoord, SquareAxis> {
+  constructor(
+    stateId: GameStateId,
+    matchId: MatchId,
+    board: Board<FakeCell, SquareCoord, SquareAxis>,
+    score: Score,
+    readonly source: IPieceSource<FakeCell>,
+  ) {
+    super(stateId, matchId, board, score);
+    Object.freeze(this);
+  }
+
+  view(): undefined {
+    return undefined;
+  }
 }
 
 // A state that holds a piece source, as a variant state does (classes.md decision 31).
@@ -134,20 +154,19 @@ export class SourceState implements BoardState<FakeCell, SquareCoord> {
   }
 
   snapshot(): SourceSnapshot {
-    return Object.freeze({
-      stateId: this.stateId,
-      matchId: this.matchId,
-      board: this.board.clone(),
-      score: this.score,
-      source: this.source,
-      view: () => undefined,
-    });
+    return new SourceSnapshot(
+      this.stateId,
+      this.matchId,
+      this.board.clone(),
+      this.score,
+      this.source,
+    );
   }
 
   restore(snapshot: SourceSnapshot): void {
-    this.board.restore(snapshot.board);
+    this.board.restore(snapshot.boardCopy());
     this.source = snapshot.source;
-    this.score = snapshot.score;
+    this.score = snapshot.scoreSoFar();
   }
 }
 

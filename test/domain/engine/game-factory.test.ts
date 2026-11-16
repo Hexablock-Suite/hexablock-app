@@ -53,11 +53,11 @@ describe('GameFactory', () => {
     const game = games.createGame();
 
     expect(phaseNameOf(game.currentPhase())).toBe('playing');
-    expect(game.snapshot().board.occupiedCells()).toEqual([]);
+    expect(game.snapshot().boardCopy().occupiedCells()).toEqual([]);
     expect(game.offersUndo()).toBe(false);
     expect(game.elapsedTime()).toBeUndefined();
     expect(game.play(moveAt(0))).toBe(Outcome.playing);
-    expect(game.snapshot().score).toEqual(Score.of(1));
+    expect(game.snapshot().scoreSoFar()).toEqual(Score.of(1));
   });
 
   it('should_give_two_games_with_different_ids_and_boards_when_one_variant_starts_twice', () => {
@@ -68,7 +68,7 @@ describe('GameFactory', () => {
     first.play(moveAt(0));
 
     expect([first.equals(second), second.equals(first)]).toEqual([false, false]);
-    expect(second.snapshot().board.occupiedCells()).toEqual([]);
+    expect(second.snapshot().boardCopy().occupiedCells()).toEqual([]);
   });
 
   it('should_give_each_game_a_first_state_of_its_own_match_when_a_game_is_created', () => {
@@ -78,12 +78,12 @@ describe('GameFactory', () => {
     const second = games.createGame().snapshot();
 
     expect([
-      first.matchId.equals(MatchId.of('match-1')),
-      second.matchId.equals(MatchId.of('match-2')),
+      first.belongsTo(MatchId.of('match-1')),
+      second.belongsTo(MatchId.of('match-2')),
     ]).toEqual([true, true]);
     expect([
-      first.stateId.equals(second.stateId),
-      first.matchId.equals(MatchId.of('match-2')),
+      first.isPhotoOf(GameStateId.of(MatchId.of('match-2'))),
+      first.belongsTo(MatchId.of('match-2')),
     ]).toEqual([false, false]);
   });
 
@@ -134,7 +134,7 @@ describe('GameFactory', () => {
 
     expect([first.canUndo(), second.canUndo()]).toEqual([true, false]);
     first.undo();
-    expect(first.snapshot().board.occupiedCells()).toEqual([]);
+    expect(first.snapshot().boardCopy().occupiedCells()).toEqual([]);
   });
 
   it('should_throw_the_error_of_the_generator_when_the_generator_gives_no_id', () => {
@@ -156,24 +156,26 @@ describe('GameFactory', () => {
       const match = MatchId.of(name);
       return emptyState(2, match, GameStateId.of(match), BoardId.of(match));
     };
+    // The id of the state of the match `name`. The photo keeps its ids private (issue #245),
+    // so the test asks the photo whether it shows the state of this id.
+    const stateIdOf = (name: string) => GameStateId.of(MatchId.of(name));
 
     const first = games.createGame().snapshot();
     const second = games.createGame().snapshot();
 
     expect([
-      first.stateId.equals(stateOf('match-1').snapshot().stateId),
-      first.board.equals(stateOf('match-1').board),
-      second.stateId.equals(stateOf('match-2').snapshot().stateId),
-      second.board.equals(stateOf('match-2').board),
+      first.isPhotoOf(stateIdOf('match-1')),
+      first.boardCopy().equals(stateOf('match-1').board),
+      second.isPhotoOf(stateIdOf('match-2')),
+      second.boardCopy().equals(stateOf('match-2').board),
     ]).toEqual([true, true, true, true]);
-    expect([first.stateId.equals(second.stateId), second.stateId.equals(first.stateId)]).toEqual([
-      false,
-      false,
-    ]);
-    expect([first.board.equals(second.board), second.board.equals(first.board)]).toEqual([
-      false,
-      false,
-    ]);
+    expect([first.isPhotoOf(stateIdOf('match-2')), second.isPhotoOf(stateIdOf('match-1'))]).toEqual(
+      [false, false],
+    );
+    expect([
+      first.boardCopy().equals(second.boardCopy()),
+      second.boardCopy().equals(first.boardCopy()),
+    ]).toEqual([false, false]);
   });
 
   // A timed variant builds the id of its timer from the `MatchId` (classes.md decision 50).

@@ -5,7 +5,9 @@ import { GameId } from '../../../../src/domain/engine/game-id';
 import type { Piece } from '../../../../src/domain/engine/piece';
 import { CellNode, ShapeGroup } from '../../../../src/domain/engine/shape-node';
 import type { Color } from '../../../../src/domain/engine/color';
+import { LineCount } from '../../../../src/domain/variants/hexa-lines/line-count';
 import { PlacePiece } from '../../../../src/domain/variants/hexa-lines/place-piece';
+import { TrayPosition } from '../../../../src/domain/variants/hexa-lines/tray-position';
 import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
 import { firstValidMove, startVariant, liveStateOf } from '../../../support/engine/variant-game';
 import {
@@ -56,13 +58,13 @@ describe('LinesFactory', () => {
 
     expect(factory.isFor(GameId.of('hexa-lines'))).toBe(true);
     expect(factory.createBoard(BOARD_ID).coordinates()).toHaveLength(9);
-    expect(initial.snapshot().board.occupiedCells()).toEqual([]);
-    expect(initial.snapshot().tray).toHaveLength(3);
+    expect(initial.snapshot().boardCopy().occupiedCells()).toEqual([]);
+    expect(initial.snapshot().trayPieces()).toHaveLength(3);
     expect(outcome).toBe(Outcome.playing);
     expect(filledKeys(engine.snapshot())).toEqual(['0,0']);
-    expect(engine.snapshot().tray).toHaveLength(2);
+    expect(engine.snapshot().trayPieces()).toHaveLength(2);
     // One placed cell gives 1 point: the factory picks the Lines scoring.
-    expect(engine.snapshot().score).toEqual(Score.of(1));
+    expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(1));
     expect(engine.takeEvents()).toEqual([]);
   });
 
@@ -77,12 +79,14 @@ describe('LinesFactory', () => {
       linesFactory(42)
         .createInitialState(MATCH_ID, STATE_ID, BOARD_ID)
         .snapshot()
-        .tray.map(describe_),
+        .trayPieces()
+        .map(describe_),
     ).toEqual(
       linesFactory(42)
         .createInitialState(MATCH_ID, STATE_ID, BOARD_ID)
         .snapshot()
-        .tray.map(describe_),
+        .trayPieces()
+        .map(describe_),
     );
   });
 
@@ -97,11 +101,11 @@ describe('LinesFactory', () => {
       linesFactory().createScoring(),
     );
 
-    engine.play(new PlacePiece(0, square(0, 0)));
+    engine.play(new PlacePiece(TrayPosition.of(0), square(0, 0)));
 
-    expect(engine.snapshot().linesCleared).toBe(2);
+    expect(engine.snapshot().lastCombo()).toEqual(LineCount.of(2));
     // 1 cell + 10 × 2 lines × (2 + 1 - 1). The base scoring alone gives 21.
-    expect(engine.snapshot().score).toEqual(Score.of(41));
+    expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(41));
   });
 
   // Since issue 210 the seed checks itself, so the error comes when the settings are built,

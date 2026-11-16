@@ -1,4 +1,5 @@
 import type { Color } from '../../engine/color';
+import { TileCount } from './tile-count';
 
 // The cell of Hexa Sort: a stack of colored tiles (statement §1.3).
 // `chips` lists the tiles from the bottom to the top. Each tile has the engine `Color`
@@ -21,9 +22,9 @@ export class ColorStack {
     return new ColorStack([]);
   }
 
-  // Tells how many tiles the stack holds.
-  tileCount(): number {
-    return this.chips.length;
+  // Tells how many tiles the stack holds, as a `TileCount` (issue #232).
+  tileCount(): TileCount {
+    return TileCount.of(this.chips.length);
   }
 
   isEmpty(): boolean {
