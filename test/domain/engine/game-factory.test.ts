@@ -8,6 +8,9 @@ import { GameId } from '../../../src/domain/engine/game-id';
 import { GameStateId } from '../../../src/domain/engine/game-state-id';
 import { MatchId } from '../../../src/domain/engine/match-id';
 import type { MatchIdGenerator } from '../../../src/domain/engine/match-id-generator';
+import { ElapsedTime } from '../../../src/domain/engine/elapsed-time';
+import { LevelTimer } from '../../../src/domain/engine/level-timer';
+import { LevelTimerId } from '../../../src/domain/engine/level-timer-id';
 import { MoveHistory } from '../../../src/domain/engine/move-history';
 import { fakeCell } from '../../support/engine/fake-cell';
 import {
@@ -20,6 +23,7 @@ import {
 } from '../../support/engine/fake-game';
 import { CountingMatchIds, MATCH_ID } from '../../support/engine/match-id';
 import { dataOf } from '../../support/engine/game-over';
+import { ManualClock } from '../../support/engine/manual-clock';
 import { phaseNameOf } from '../../support/engine/phase-name';
 import { square } from '../../support/engine/square-topology';
 
@@ -28,6 +32,9 @@ import { square } from '../../support/engine/square-topology';
 // The variant factory of this suite exists only in test/ (APP-NFR-13).
 
 const moveAt = (col: number): FakeMove => ({ at: square(col, 0), cell: fakeCell(1) });
+
+// The id of the fake game. The composition root gives the id of the chosen game (issue #234).
+const FAKE_GAME = GameId.of('fake-game');
 
 // A generator double that always gives the same id and counts its calls.
 class FixedMatchId implements MatchIdGenerator {
@@ -41,30 +48,31 @@ class FixedMatchId implements MatchIdGenerator {
 
 describe('GameFactory', () => {
   it('should_give_a_started_game_of_the_variant_when_a_game_is_created', () => {
-    const games = new GameFactory(fakeGameFactory(), new CountingMatchIds());
+    const games = new GameFactory(FAKE_GAME, fakeGameFactory(), new CountingMatchIds());
 
     const game = games.createGame();
 
     expect(phaseNameOf(game.currentPhase())).toBe('playing');
-    expect(game.snapshot().board.cells()).toEqual([]);
-    expect(game.undoable()).toBeUndefined();
+    expect(game.snapshot().board.occupiedCells()).toEqual([]);
+    expect(game.offersUndo()).toBe(false);
+    expect(game.elapsedTime()).toBeUndefined();
     expect(game.play(moveAt(0))).toBe(Outcome.playing);
     expect(game.snapshot().score).toEqual(Score.of(1));
   });
 
   it('should_give_two_games_with_different_ids_and_boards_when_one_variant_starts_twice', () => {
-    const games = new GameFactory(fakeGameFactory(), new CountingMatchIds());
+    const games = new GameFactory(FAKE_GAME, fakeGameFactory(), new CountingMatchIds());
 
     const first = games.createGame();
     const second = games.createGame();
     first.play(moveAt(0));
 
     expect([first.equals(second), second.equals(first)]).toEqual([false, false]);
-    expect(second.snapshot().board.cells()).toEqual([]);
+    expect(second.snapshot().board.occupiedCells()).toEqual([]);
   });
 
   it('should_give_each_game_a_first_state_of_its_own_match_when_a_game_is_created', () => {
-    const games = new GameFactory(fakeGameFactory(), new CountingMatchIds());
+    const games = new GameFactory(FAKE_GAME, fakeGameFactory(), new CountingMatchIds());
 
     const first = games.createGame().snapshot();
     const second = games.createGame().snapshot();
@@ -81,7 +89,7 @@ describe('GameFactory', () => {
 
   it('should_give_the_engine_and_its_game_over_event_the_id_of_the_generator_when_the_generator_is_fixed', () => {
     const ids = new FixedMatchId();
-    const game = new GameFactory(fakeGameFactory(1), ids).createGame();
+    const game = new GameFactory(FAKE_GAME, fakeGameFactory(1), ids).createGame();
     const sameMatch = new GameEngine(
       MATCH_ID,
       GameId.of('another-game'),
@@ -105,7 +113,7 @@ describe('GameFactory', () => {
 
   it('should_ask_the_generator_once_when_each_game_is_created', () => {
     const ids = new FixedMatchId();
-    const games = new GameFactory(fakeGameFactory(), ids);
+    const games = new GameFactory(FAKE_GAME, fakeGameFactory(), ids);
 
     games.createGame();
     games.createGame();
@@ -118,19 +126,19 @@ describe('GameFactory', () => {
       ...fakeGameFactory(),
       createHistory: () => new MoveHistory<FakeMove, FakeSnapshot>(),
     };
-    const games = new GameFactory(withUndo, new CountingMatchIds());
+    const games = new GameFactory(FAKE_GAME, withUndo, new CountingMatchIds());
     const first = games.createGame();
     const second = games.createGame();
 
     first.play(moveAt(0));
 
-    expect([first.undoable()?.canUndo(), second.undoable()?.canUndo()]).toEqual([true, false]);
-    first.undoable()?.undo();
-    expect(first.snapshot().board.cells()).toEqual([]);
+    expect([first.canUndo(), second.canUndo()]).toEqual([true, false]);
+    first.undo();
+    expect(first.snapshot().board.occupiedCells()).toEqual([]);
   });
 
   it('should_throw_the_error_of_the_generator_when_the_generator_gives_no_id', () => {
-    const games = new GameFactory(fakeGameFactory(), {
+    const games = new GameFactory(FAKE_GAME, fakeGameFactory(), {
       next: () => {
         throw new Error('The generator has no id.');
       },
@@ -142,7 +150,7 @@ describe('GameFactory', () => {
   // The state and its board are entities with local ids (classes.md decisions 7, 26 and 52).
   // The factory builds each id from the `MatchId` of the game (issue #236).
   it('should_give_the_first_state_and_its_board_the_ids_of_the_match_when_a_game_is_created', () => {
-    const games = new GameFactory(fakeGameFactory(), new CountingMatchIds());
+    const games = new GameFactory(FAKE_GAME, fakeGameFactory(), new CountingMatchIds());
     // A state of the match `name` whose state and board hold the ids of that match.
     const stateOf = (name: string) => {
       const match = MatchId.of(name);
@@ -169,16 +177,16 @@ describe('GameFactory', () => {
   });
 
   // A timed variant builds the id of its timer from the `MatchId` (classes.md decision 50).
-  it('should_give_the_variant_rules_the_match_id_of_the_game_when_a_game_is_created', () => {
+  it('should_give_the_variant_timer_the_match_id_of_the_game_when_a_game_is_created', () => {
     const seen: MatchId[] = [];
     const recording = {
       ...fakeGameFactory(),
-      createRules: (matchId: MatchId) => {
+      createTimer: (matchId: MatchId) => {
         seen.push(matchId);
-        return new FakeRules();
+        return undefined;
       },
     };
-    const games = new GameFactory(recording, new CountingMatchIds());
+    const games = new GameFactory(FAKE_GAME, recording, new CountingMatchIds());
 
     games.createGame();
     games.createGame();
@@ -188,5 +196,27 @@ describe('GameFactory', () => {
       seen[0]?.equals(MatchId.of('match-1')),
       seen[1]?.equals(MatchId.of('match-2')),
     ]).toEqual([true, true]);
+  });
+
+  // The variant factory gives the timer as an optional part, as it gives the history.
+  // `GameFactory` wraps the rules in `TimedRulesDecorator` with that timer and gives the
+  // same timer to the root (issue #234, classes.md decisions 19 and 27).
+  it('should_time_each_game_with_its_own_timer_when_the_variant_factory_gives_one', () => {
+    const clock = new ManualClock();
+    const timed = {
+      ...fakeGameFactory(),
+      createTimer: (matchId: MatchId) => new LevelTimer(LevelTimerId.of(matchId), clock),
+    };
+    const games = new GameFactory(FAKE_GAME, timed, new CountingMatchIds());
+    const first = games.createGame();
+    const second = games.createGame();
+    // The time before the first turn does not count.
+    clock.advance(5_000);
+
+    first.play(moveAt(0));
+    clock.advance(1_000);
+
+    expect(first.elapsedTime()).toEqual(ElapsedTime.ofMs(1_000));
+    expect(second.elapsedTime()).toEqual(ElapsedTime.ofMs(0));
   });
 });

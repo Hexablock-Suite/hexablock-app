@@ -34,7 +34,7 @@ export class PlacePiece<TCoord> {
   // The cells that the piece covers when the board moves it by the offset of this move.
   // The board does not cut the piece, so a cell can lie outside the board.
   cells<TCell>(piece: Piece<TCell, TCoord>, board: ReadonlyBoard<TCell, TCoord>): TCoord[] {
-    return board.moved(piece, this.at).cells();
+    return board.moved(piece, this.at).coveredCoordinates();
   }
 
   // The error of a tray that has no piece at the index of this move.

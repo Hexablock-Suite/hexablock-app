@@ -43,7 +43,7 @@ describe('SortRules placement', () => {
     expect(game.play(place(0))).toBe(Outcome.playing);
 
     expect(chipsAt(game, 0)).toEqual(['red']);
-    expect(names(game.snapshot().offered?.cell())).toEqual(['blue']);
+    expect(names(game.snapshot().offered?.occupant())).toEqual(['blue']);
   });
 
   it('should_reject_the_move_and_keep_the_state_when_the_cell_holds_a_stack', () => {
@@ -54,7 +54,7 @@ describe('SortRules placement', () => {
     expect(game.play(place(0))).toBe(Outcome.playing);
 
     expect(chipsAt(game, 0)).toEqual(['green']);
-    expect(names(game.snapshot().offered?.cell())).toEqual(['red']);
+    expect(names(game.snapshot().offered?.occupant())).toEqual(['red']);
   });
 
   it('should_reject_the_move_when_the_cell_is_outside_the_board', () => {
@@ -62,8 +62,8 @@ describe('SortRules placement', () => {
 
     expect(game.play(place(5))).toBe(Outcome.playing);
 
-    expect(game.snapshot().board.cells()).toEqual([]);
-    expect(names(game.snapshot().offered?.cell())).toEqual(['red']);
+    expect(game.snapshot().board.occupiedCells()).toEqual([]);
+    expect(names(game.snapshot().offered?.occupant())).toEqual(['red']);
   });
 });
 
@@ -98,7 +98,7 @@ describe('SortRules transfer', () => {
   });
 
   it('should_move_to_the_stack_whose_coordinate_key_comes_first_when_two_stacks_tie', () => {
-    // The board holds (2, 0) before (0, 0), so (2, 0) comes first in `board.cells()`.
+    // The board holds (2, 0) before (0, 0), so (2, 0) comes first in `board.occupiedCells()`.
     // The key `0,0` comes before the key `2,0`, so (0, 0) wins the tie (issue #56).
     const game = sortGame(
       sortState({
@@ -277,7 +277,7 @@ describe('SortRules edge cases', () => {
 
   it('should_break_the_tie_by_the_coordinate_key_when_a_stack_is_placed_on_a_cleared_cell', () => {
     // A tie goes to the stack whose coordinate key comes first (issue #56), never to the stack
-    // that comes first in `board.cells()`. A cleared cell keeps an empty stack (sort-state.ts),
+    // that comes first in `board.occupiedCells()`. A cleared cell keeps an empty stack (sort-state.ts),
     // so it keeps its old place in that order. The key order does not depend on that history (G108.3).
     const game = sortGame(
       sortState({
@@ -295,7 +295,7 @@ describe('SortRules edge cases', () => {
     expect(chipsAt(game, 1)).toEqual([]);
 
     // The placed red on (1, 0) ties with the red on (0, 0). The cell (1, 0) comes first
-    // in `board.cells()`, but the key `0,0` comes before the key `1,0`, so (0, 0) wins.
+    // in `board.occupiedCells()`, but the key `0,0` comes before the key `1,0`, so (0, 0) wins.
     game.play(place(1));
 
     expect(chipsAt(game, 0)).toEqual(['blue', 'red', 'red']);
@@ -321,7 +321,7 @@ describe('SortRules edge cases', () => {
     expect(chipsAt(game, 1)).toEqual([]);
     expect(state.goalsDone).toEqual(ClearedStacks.of(1));
     expect(state.clearedTiles).toEqual([13]);
-    expect(names(state.offered?.cell())).toEqual(['green']);
+    expect(names(state.offered?.occupant())).toEqual(['green']);
   });
 
   it('should_take_the_top_runs_of_every_matching_neighbor_when_the_placed_stack_has_the_longest_run', () => {
@@ -337,7 +337,7 @@ describe('SortRules edge cases', () => {
     game.play(place(1, 1));
 
     expect(chipsAt(game, 1, 1)).toEqual(tiles('red', 6));
-    for (const at of ring) expect(names(game.snapshot().board.get(at))).toEqual(['blue']);
+    for (const at of ring) expect(names(game.snapshot().board.occupantAt(at))).toEqual(['blue']);
   });
 
   it('should_give_only_the_placed_run_when_a_neighbor_has_the_longest_run', () => {
@@ -358,7 +358,8 @@ describe('SortRules edge cases', () => {
 
     expect(chipsAt(game, 1, 0)).toEqual(tiles('red', 5));
     expect(chipsAt(game, 1, 1)).toEqual([]);
-    for (const at of others) expect(names(game.snapshot().board.get(at))).toEqual(['blue', 'red']);
+    for (const at of others)
+      expect(names(game.snapshot().board.occupantAt(at))).toEqual(['blue', 'red']);
   });
 
   it('should_throw_and_keep_the_game_when_the_source_throws_on_the_next_stack', () => {
@@ -375,8 +376,8 @@ describe('SortRules edge cases', () => {
 
     const state = game.snapshot();
     expect(game.currentPhase()).toBe(PlayingPhase.instance);
-    expect(state.board.cells()).toEqual([]);
-    expect(names(state.offered?.cell())).toEqual(['red']);
+    expect(state.board.occupiedCells()).toEqual([]);
+    expect(names(state.offered?.occupant())).toEqual(['red']);
     expect(state.placedAt).toBeUndefined();
     expect(state.goalsDone).toEqual(ClearedStacks.of(0));
   });
@@ -396,7 +397,7 @@ describe('SortRules atomic turn', () => {
       failing,
     );
     const facts = (state: SortSnapshot<SquareCoord>) => ({
-      cells: state.board.cells(),
+      cells: state.board.occupiedCells(),
       offered: state.offered,
       goalsDone: state.goalsDone,
       clearedTiles: [...state.clearedTiles],

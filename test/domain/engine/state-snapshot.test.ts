@@ -4,6 +4,7 @@ import { Moves } from '../../../src/domain/engine/moves';
 import { Score } from '../../../src/domain/engine/score';
 import type { Board } from '../../../src/domain/engine/board';
 import { BoardId } from '../../../src/domain/engine/board-id';
+import { GameId } from '../../../src/domain/engine/game-id';
 import { GameStateId } from '../../../src/domain/engine/game-state-id';
 import { MatchId } from '../../../src/domain/engine/match-id';
 import { hex, HexAxis, type HexCoord } from '../../../src/domain/engine/hex-topology';
@@ -54,7 +55,7 @@ describe('the photo of a state', () => {
       true,
       true,
     ]);
-    expect(json([photo.board.cells(), photo.score, photo.tray.length])).toBe(
+    expect(json([photo.board.occupiedCells(), photo.score, photo.tray.length])).toBe(
       json([[[square(0, 0), red]], Score.of(0), 2]),
     );
     expect([photo.streak, photo.linesCleared, photo.cellsPlaced]).toEqual([0, 0, 1]);
@@ -120,16 +121,16 @@ describe('the photo of a state', () => {
   it('should_keep_the_photo_and_the_state_apart_when_either_one_changes', () => {
     const state = linesFactory().createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
     const photo = state.snapshot();
-    const before = json([photo.board.cells(), photo.tray, photo.score]);
+    const before = json([photo.board.occupiedCells(), photo.tray, photo.score]);
 
     state.placePiece(new PlacePiece(0, square(0, 0)));
     state.addPoints(Score.of(7));
-    expect(json([photo.board.cells(), photo.tray, photo.score])).toBe(before);
+    expect(json([photo.board.occupiedCells(), photo.tray, photo.score])).toBe(before);
 
     const later = state.snapshot();
-    const shown = json(later.board.cells());
+    const shown = json(later.board.occupiedCells());
     (later.board as Board<typeof red, ReturnType<typeof square>>).occupy(square(2, 2), red);
-    expect(json(state.snapshot().board.cells())).toBe(shown);
+    expect(json(state.snapshot().board.occupiedCells())).toBe(shown);
   });
 });
 
@@ -145,11 +146,11 @@ describe('the restore of a state from its photo', () => {
     state.restore(photo);
 
     const back = state.snapshot();
-    expect(json([back.board.cells(), back.score, back.tray, back.streak])).toBe(
-      json([photo.board.cells(), photo.score, photo.tray, photo.streak]),
+    expect(json([back.board.occupiedCells(), back.score, back.tray, back.streak])).toBe(
+      json([photo.board.occupiedCells(), photo.score, photo.tray, photo.streak]),
     );
     expect([back.linesCleared, back.cellsPlaced]).toEqual([photo.linesCleared, photo.cellsPlaced]);
-    expect(json(back.source.take().piece)).toBe(json(photo.source.take().piece));
+    expect(json(back.source.take()[0])).toBe(json(photo.source.take()[0]));
   });
 
   it('should_give_back_the_offered_stack_and_the_source_when_sort_restores', () => {
@@ -161,13 +162,13 @@ describe('the restore of a state from its photo', () => {
     state.restore(photo);
 
     const back = state.snapshot();
-    expect(json([back.board.cells(), back.score, back.offered, back.goalsDone])).toBe(
-      json([photo.board.cells(), photo.score, photo.offered, photo.goalsDone]),
+    expect(json([back.board.occupiedCells(), back.score, back.offered, back.goalsDone])).toBe(
+      json([photo.board.occupiedCells(), photo.score, photo.offered, photo.goalsDone]),
     );
     expect(json([back.clearedTiles, back.placedAt])).toBe(
       json([photo.clearedTiles, photo.placedAt]),
     );
-    expect(json(back.source.take().piece)).toBe(json(photo.source.take().piece));
+    expect(json(back.source.take()[0])).toBe(json(photo.source.take()[0]));
   });
 
   it('should_give_back_the_tiles_and_the_tile_source_when_merge_restores', () => {
@@ -180,10 +181,10 @@ describe('the restore of a state from its photo', () => {
     state.restore(photo);
 
     const back = state.snapshot();
-    expect(json([back.board.cells(), back.score, back.targetReached, back.merged])).toBe(
-      json([photo.board.cells(), photo.score, photo.targetReached, photo.merged]),
+    expect(json([back.board.occupiedCells(), back.score, back.targetReached, back.merged])).toBe(
+      json([photo.board.occupiedCells(), photo.score, photo.targetReached, photo.merged]),
     );
-    expect(json(back.tiles.take().piece)).toBe(json(photo.tiles.take().piece));
+    expect(json(back.tiles.take()[0])).toBe(json(photo.tiles.take()[0]));
   });
 
   // Issue 215: a piece source is a value. A draw replaces the source of the state,
@@ -223,14 +224,14 @@ describe('the restore of a state from its photo', () => {
     const state = mergeFactory(5).createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
     const photo = state.snapshot();
     state.addNewTile();
-    const first = json(state.snapshot().board.cells());
-    expect(first).not.toBe(json(photo.board.cells()));
+    const first = json(state.snapshot().board.occupiedCells());
+    expect(first).not.toBe(json(photo.board.occupiedCells()));
 
     state.restore(photo);
 
     expect(state.snapshot().tiles === photo.tiles).toBe(true);
     state.addNewTile();
-    expect(json(state.snapshot().board.cells())).toBe(first);
+    expect(json(state.snapshot().board.occupiedCells())).toBe(first);
   });
 
   it('should_keep_the_next_tile_of_the_state_when_a_reader_draws_from_the_source_of_a_photo', () => {
@@ -238,12 +239,14 @@ describe('the restore of a state from its photo', () => {
     const twin = mergeFactory(5).createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
     const photo = state.snapshot();
 
-    const drawn = [photo.tiles.take().piece, photo.tiles.take().rest.take().piece];
+    const drawn = [photo.tiles.take()[0], photo.tiles.take()[1].take()[0]];
 
-    expect(json(drawn[0])).toBe(json(state.snapshot().tiles.take().piece));
+    expect(json(drawn[0])).toBe(json(state.snapshot().tiles.take()[0]));
     state.addNewTile();
     twin.addNewTile();
-    expect(json(state.snapshot().board.cells())).toBe(json(twin.snapshot().board.cells()));
+    expect(json(state.snapshot().board.occupiedCells())).toBe(
+      json(twin.snapshot().board.occupiedCells()),
+    );
   });
 
   it('should_give_back_the_placements_and_the_moves_when_fit_restores', () => {
@@ -255,8 +258,8 @@ describe('the restore of a state from its photo', () => {
     state.restore(photo);
 
     const back = state.snapshot();
-    expect(json([back.board.cells(), back.score, back.moves, back.view()])).toBe(
-      json([photo.board.cells(), photo.score, photo.moves, photo.view()]),
+    expect(json([back.board.occupiedCells(), back.score, back.moves, back.view()])).toBe(
+      json([photo.board.occupiedCells(), photo.score, photo.moves, photo.view()]),
     );
     expect(back.placements).toEqual([]);
     expect(state.placementOf(A)).toBeUndefined();
@@ -268,12 +271,12 @@ describe('the restore of a state from its photo', () => {
       .createInitialState(MATCH_ID, GameStateId.of(MatchId.of('stranger')), BOARD_ID)
       .snapshot();
     state.placeOfferedStack(square(0, 0));
-    const before = json(state.snapshot().board.cells());
+    const before = json(state.snapshot().board.occupiedCells());
 
     expect(() => state.restore(stranger)).toThrow(
       new RangeError('The snapshot belongs to another state.'),
     );
-    expect(json(state.snapshot().board.cells())).toBe(before);
+    expect(json(state.snapshot().board.occupiedCells())).toBe(before);
   });
 
   it('should_throw_and_keep_the_board_when_the_photo_holds_another_board', () => {
@@ -282,16 +285,16 @@ describe('the restore of a state from its photo', () => {
       .createInitialState(MATCH_ID, OTHER_STATE, BoardId.of(MatchId.of('another-match')))
       .snapshot();
     state.placeOfferedStack(square(0, 0));
-    const before = json(state.snapshot().board.cells());
+    const before = json(state.snapshot().board.occupiedCells());
 
     expect(() => state.restore(other)).toThrow(new RangeError('The snapshot holds another board.'));
-    expect(json(state.snapshot().board.cells())).toBe(before);
+    expect(json(state.snapshot().board.occupiedCells())).toBe(before);
   });
 });
 
 describe('the photo outside the state', () => {
   it('should_answer_a_frozen_photo_with_no_state_method_when_a_caller_asks_the_engine', () => {
-    const factory = new GameFactory(sortFactory(), new CountingMatchIds());
+    const factory = new GameFactory(GameId.of('hexa-sort'), sortFactory(), new CountingMatchIds());
     const photo = factory.createGame().snapshot();
     const members = photo as unknown as Record<string, unknown>;
 

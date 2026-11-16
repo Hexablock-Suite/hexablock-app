@@ -21,7 +21,6 @@ import {
   type MemoryGameRepository,
   valueOf,
 } from '../support/application/game-use-cases';
-import { MATCH_ID } from '../support/engine/match-id';
 import { firstMoveOf, firstValidMove } from '../support/engine/variant-game';
 import { square } from '../support/engine/square-topology';
 import { A, B, threeDominoFitFactory } from '../support/variants/hexa-fit/fit-game';
@@ -59,7 +58,7 @@ function factsOf<
   const engine = games.running();
   const state = engine.snapshot();
   return {
-    cells: state.board.cells(),
+    cells: state.board.occupiedCells(),
     score: state.score,
     phase: phaseNameOf(engine.currentPhase()),
     view: state.view(),
@@ -99,15 +98,37 @@ describe('UndoMove', () => {
       // Fit is timed, and this clock does not move.
       elapsedMs: ElapsedTime.ofMs(0),
     });
-    expect(games.running().snapshot().board.cells()).toEqual(afterFirst.cells);
+    expect(games.running().snapshot().board.occupiedCells()).toEqual(afterFirst.cells);
     expect(games.running().currentPhase()).toBe(PlayingPhase.instance);
+  });
+
+  // Issue #234: `UndoMove` and `moveResultOf()` call only the root. The response keeps its shape.
+  it('should_give_the_fields_and_values_of_the_start_when_the_only_fit_move_is_undone', async () => {
+    const useCases = gameUseCases(threeDominoFitFactory());
+    const start = valueOf(await useCases.startGame.execute({}));
+    valueOf(await useCases.applyMove.execute({ move: placeA }));
+
+    const undone = valueOf(await useCases.undoMove.execute({}));
+
+    expect(undone).toEqual(start);
+    expect(Object.keys(undone).sort()).toEqual([
+      'canRedo',
+      'canUndo',
+      'cells',
+      'elapsedMs',
+      'hasUndo',
+      'outcome',
+      'payload',
+      'score',
+    ]);
+    expect([undone.canUndo, undone.canRedo, undone.hasUndo]).toEqual([false, false, true]);
   });
 
   it('should_give_back_the_same_source_position_when_a_variant_with_a_random_source_undoes_a_move', async () => {
     const factory = mergeFactory(7);
     const { games, applyMove, undoMove } = await started(factory);
     const before = games.running().snapshot();
-    const slide = firstValidMove(factory.createRules(MATCH_ID), mergeStateOf(before));
+    const slide = firstValidMove(factory.createRules(), mergeStateOf(before));
     const firstPlay = valueOf(await applyMove.execute({ move: slide }));
     const afterPlay = games.running().snapshot();
 
@@ -118,7 +139,7 @@ describe('UndoMove', () => {
     // The move drew a tile, so the source moved. The undo puts the source back (S3-15).
     expect(drawsOf(afterPlay.tiles)).not.toEqual(drawsOf(before.tiles));
     expect(drawsOf(after.tiles)).toEqual(drawsOf(before.tiles));
-    expect(undone.cells).toEqual(before.board.cells());
+    expect(undone.cells).toEqual(before.board.occupiedCells());
     expect([undone.score, undone.outcome]).toEqual([before.score, Outcome.playing]);
     // The same slide draws the same new tile again.
     expect(replay.cells).toEqual(firstPlay.cells);
@@ -177,10 +198,7 @@ describe('UndoMove', () => {
     const factory = mergeFactory(7);
     const { games, applyMove, undoMove } = await started(factory);
     const play = async () => {
-      const move = firstValidMove(
-        factory.createRules(MATCH_ID),
-        mergeStateOf(games.running().snapshot()),
-      );
+      const move = firstValidMove(factory.createRules(), mergeStateOf(games.running().snapshot()));
       valueOf(await applyMove.execute({ move }));
     };
     await play();

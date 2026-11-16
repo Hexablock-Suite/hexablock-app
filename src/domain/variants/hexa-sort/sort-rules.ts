@@ -63,10 +63,10 @@ export class SortRules<TCoord> extends BaseGameRules<PlaceStack<TCoord>, SortSta
 // It reads one photo before the moves. The moves change only the stacks of `givers` and `target`.
 function transfer<TCoord>(state: SortState<TCoord>, at: TCoord): TCoord[] {
   const { board } = state.snapshot();
-  const color = board.get(at)?.top();
+  const color = board.occupantAt(at)?.top();
   if (color === undefined) return [];
   const matches = [...board.neighborhood(at)].filter(
-    (n) => board.get(n)?.top()?.equals(color) === true,
+    (n) => board.occupantAt(n)?.top()?.equals(color) === true,
   );
   if (matches.length === 0) return [];
   const target = targetOf(board, at, matches);
@@ -89,7 +89,7 @@ function targetOf<TCoord>(
   first: TCoord,
   others: readonly TCoord[],
 ): TCoord {
-  const run = (c: TCoord) => board.get(c)?.topRun().length ?? 0;
+  const run = (c: TCoord) => board.occupantAt(c)?.topRun().length ?? 0;
   const key = (c: TCoord) => board.key(c);
   return others.reduce((best, c) => {
     const longer = run(c) - run(best);
@@ -101,7 +101,7 @@ function targetOf<TCoord>(
 // the whole stack and counts one goal. `SortState.clearStack()` keeps an empty stack
 // on the cell and the size for the scoring (#98).
 function clearIfGoal<TCoord>(state: SortState<TCoord>, at: TCoord): void {
-  const cell = state.snapshot().board.get(at);
+  const cell = state.snapshot().board.occupantAt(at);
   if (cell === undefined || cell.topRun().length < GOAL_RUN) return;
   state.clearStack(at);
 }

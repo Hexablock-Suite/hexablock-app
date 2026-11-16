@@ -21,7 +21,12 @@ const pieces: readonly (readonly TriangleCoord[])[] = [
 
 // Concrete Factory (classes.md decision 17, D11): the real triangle family.
 export class TriangleGeometry implements GeometryFactory<TriangleCoord> {
-  readonly id = TopologyId.triangle;
+  private readonly family = TopologyId.triangle;
+
+  // True when `id` names the triangle family.
+  isOfFamily(id: TopologyId): boolean {
+    return this.family.equals(id);
+  }
 
   // `values` holds `col` and then `row`.
   createCoord(values: number[]): TriangleCoord {

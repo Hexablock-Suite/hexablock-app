@@ -8,7 +8,9 @@ import { Placement } from './placement';
 // Each move is a value object (classes.md decision 43): it never changes, its fields are
 // private, and two moves are equal when they are of the same class and hold the same parts.
 // A move does not know the figure. The rules ask the move for its piece and for the placement
-// that it gives, and they check both on the board.
+// that it gives, and they check both on the board. Each class names its piece with a query
+// that says what the move does with it: `pieceToPlace()`, `pieceToRemove()` and
+// `pieceToRotate()` (issue #234).
 // A rotation counts steps of the topology, never degrees (A5, D4).
 
 // Puts a tray piece on the figure. The piece turns by `rotation` around its own origin,
@@ -21,7 +23,7 @@ export class PlaceFitPiece<TCoord> {
   ) {}
 
   // The piece that this move puts on the figure.
-  piece(): PieceId {
+  pieceToPlace(): PieceId {
     return this.pieceId;
   }
 
@@ -49,7 +51,7 @@ export class RemoveFitPiece {
   constructor(private readonly pieceId: PieceId) {}
 
   // The piece that this move takes off the figure.
-  piece(): PieceId {
+  pieceToRemove(): PieceId {
     return this.pieceId;
   }
 
@@ -67,7 +69,7 @@ export class RotateFitPiece {
   ) {}
 
   // The piece that this move turns.
-  piece(): PieceId {
+  pieceToRotate(): PieceId {
     return this.pieceId;
   }
 

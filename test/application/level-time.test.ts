@@ -3,6 +3,7 @@ import { Outcome } from '../../src/domain/engine/outcome';
 import type { BoardState } from '../../src/domain/engine/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
 import { ElapsedTime } from '../../src/domain/engine/elapsed-time';
+import { GameId } from '../../src/domain/engine/game-id';
 import { Moves } from '../../src/domain/engine/moves';
 import { GameResult } from '../../src/domain/engine/progress-model';
 import { Stars } from '../../src/domain/engine/stars';
@@ -21,7 +22,7 @@ import { mergeFactory } from '../support/variants/hexa-merge/merge-game';
 import { sortFactory } from '../support/variants/hexa-sort/sort-game';
 
 // The time of a Hexa Fit level reaches the use cases and `GameResult` (issue 157, DS-5, DS-6).
-// The path: `TimedRulesDecorator`, `GameEngine.timed()` and `MoveResult.elapsedMs`.
+// The path: `TimedRulesDecorator`, `GameEngine.elapsedTime()` and `MoveResult.elapsedMs`.
 
 const placeA = new PlaceFitPiece(A, Turns.of(0), square(0, 0));
 const placeB = new PlaceFitPiece(B, Turns.of(0), square(2, 0));
@@ -41,7 +42,7 @@ async function fitLevel() {
 
 describe('The time of a Fit level', () => {
   it('should_give_the_expected_elapsed_ms_and_game_result_when_a_fake_clock_times_a_fit_level', async () => {
-    const { clock, factory, started, games, applyMove } = await fitLevel();
+    const { clock, started, games, applyMove } = await fitLevel();
     // The time before the first turn does not count.
     clock.advance(9_000);
 
@@ -54,7 +55,7 @@ describe('The time of a Fit level', () => {
     const engine = games.running();
     const state = engine.snapshot();
     const result = GameResult.of({
-      gameId: factory.gameId,
+      gameId: GameId.of('hexa-fit'),
       score: last.score,
       moves: state.moves,
       elapsedMs: last.elapsedMs,
@@ -66,12 +67,12 @@ describe('The time of a Fit level', () => {
     expect(last.elapsedMs).toEqual(ElapsedTime.ofMs(5_000));
     expect(last.elapsedMs).toBeInstanceOf(ElapsedTime);
     expect(last.outcome).toBe(Outcome.victory);
-    expect(engine.timed()?.elapsedMs()).toEqual(ElapsedTime.ofMs(5_000));
+    expect(engine.elapsedTime()).toEqual(ElapsedTime.ofMs(5_000));
     // The fields of a result are private (issue #240), so the test compares the result.
     expect(
       result.equals(
         GameResult.of({
-          gameId: factory.gameId,
+          gameId: GameId.of('hexa-fit'),
           score: last.score,
           moves: Moves.of(3),
           elapsedMs: ElapsedTime.ofMs(5_000),

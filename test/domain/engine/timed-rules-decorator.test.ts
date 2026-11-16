@@ -46,7 +46,15 @@ function timedGame(
   const clock = new ManualClock();
   const timer = new LevelTimer(TIMER_ID, clock);
   const decorated = new TimedRulesDecorator(rules, timer);
-  const engine = new GameEngine(MATCH_ID, GameId.of('fake-game'), decorated, scoring);
+  // The root holds the same timer as the decorator, as `GameFactory` gives it (issue #234).
+  const engine = new GameEngine(
+    MATCH_ID,
+    GameId.of('fake-game'),
+    decorated,
+    scoring,
+    undefined,
+    timer,
+  );
   engine.start(emptyState(size));
   return { clock, timer, decorated, engine, rules };
 }
@@ -57,7 +65,7 @@ class ThrowsOnFirstEnd implements IScoringPolicy<FakeState> {
 
   // The fake game ends when the board is full, so the photo after the turn shows the end.
   score(_before: FakeSnapshot, after: FakeSnapshot): Score {
-    const ended = after.board.cells().length === after.board.coordinates().length;
+    const ended = after.board.occupiedCells().length === after.board.coordinates().length;
     if (ended && !this.thrown) {
       this.thrown = true;
       throw new Error('The scoring failed.');
@@ -74,7 +82,7 @@ function factsOf(
 ) {
   const state = engine.snapshot();
   return {
-    cells: state.board.cells().map(([at, cell]) => [squareTopology.key(at), cell.value]),
+    cells: state.board.occupiedCells().map(([at, cell]) => [squareTopology.key(at), cell.value]),
     score: state.score,
     phase: phaseNameOf(engine.currentPhase()),
     log: rules.log,
@@ -251,8 +259,8 @@ describe('TimedRulesDecorator', () => {
     expect(decorated.isValid(state, move)).toBe(rules.isValid(state, move));
     expect(decorated.isValid(state, outsideTheBoard)).toBe(false);
     expect([...decorated.validMoves(state)]).toEqual([...rules.validMoves(state)]);
-    expect(decorated.apply(emptyState(), move).board.cells()).toEqual(
-      rules.apply(emptyState(), move).board.cells(),
+    expect(decorated.apply(emptyState(), move).board.occupiedCells()).toEqual(
+      rules.apply(emptyState(), move).board.occupiedCells(),
     );
     expect(decorated.resolve(state).wasAccepted()).toBe(true);
     expect(decorated.evaluate(state)).toBe(Outcome.playing);
@@ -304,22 +312,28 @@ describe('LevelTimer.equals', () => {
   });
 });
 
-describe('GameEngine.timed', () => {
-  it('should_return_the_timer_when_the_rules_are_timed', () => {
-    const { engine, timer } = timedGame();
+// The root gives the time of play itself (issue #234, classes.md decisions 19 and 27).
+describe('GameEngine.elapsedTime', () => {
+  it('should_give_the_time_of_its_timer_when_the_game_is_timed', () => {
+    const { clock, engine } = timedGame();
+    clock.advance(SECOND);
+    engine.play(moveAt(0));
+    clock.advance(2 * SECOND);
 
-    expect(engine.timed()).toBe(timer);
+    expect(engine.elapsedTime()).toEqual(ElapsedTime.ofMs(2 * SECOND));
   });
 
-  it('should_return_undefined_when_the_rules_have_no_timer', () => {
+  it('should_give_no_time_when_the_game_has_no_timer', () => {
     const engine = new GameEngine(
       MATCH_ID,
       GameId.of('fake-game'),
       new FakeRules(),
       new OnePointScoring(),
     );
+    engine.start(emptyState());
+    engine.play(moveAt(0));
 
-    expect(engine.timed()).toBeUndefined();
+    expect(engine.elapsedTime()).toBeUndefined();
   });
 
   // A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails

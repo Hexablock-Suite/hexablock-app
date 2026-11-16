@@ -323,7 +323,7 @@ describe('Merge edge cases', () => {
     }
     function labels(engine: ReturnType<typeof chipGame>): Record<string, string> {
       const out: Record<string, string> = {};
-      for (const [at, cell] of engine.snapshot().board.cells())
+      for (const [at, cell] of engine.snapshot().board.occupiedCells())
         out[hexTopology.key(at)] = cell.label;
       return out;
     }
@@ -403,10 +403,10 @@ describe('MergeRules in place', () => {
     );
     const { engine, rules } = mergeGame(start, MergeTile.of(2048), failing);
     const facts = (state: MergeSnapshot<MergeTile, HexCoord, HexAxis>) => ({
-      cells: state.board.cells(),
+      cells: state.board.occupiedCells(),
       merged: state.merged,
       targetReached: state.targetReached,
-      nextTile: state.tiles.take().piece,
+      nextTile: state.tiles.take()[0],
       score: state.score,
     });
     const before = facts(engine.snapshot());

@@ -103,11 +103,11 @@ describe('Merge new tiles', () => {
       2,
       mergeTileSource(Seed.of(5)),
     );
-    const next = mergeTileSource(Seed.of(5)).take().piece;
+    const next = mergeTileSource(Seed.of(5)).take()[0];
     const resolved = full.clone();
     game.rules.resolve(resolved);
     expect(values(resolved.snapshot())).toEqual(values(full.snapshot()));
-    expect(resolved.snapshot().tiles.take().piece).toEqual(next);
+    expect(resolved.snapshot().tiles.take()[0]).toEqual(next);
   });
 
   it('should_draw_only_twos_or_only_fours_when_the_chance_of_a_four_is_zero_or_one', () => {
@@ -281,7 +281,7 @@ describe('Merge new tiles edge cases', () => {
         `A seed must be an integer from 0 to 4294967295, not ${seed}.`,
       );
     }
-    expect(mergeTileSource(Seed.of(0xffffffff)).seed.equals(Seed.of(0xffffffff))).toBe(true);
+    expect(mergeTileSource(Seed.of(0xffffffff)).isSeededWith(Seed.of(0xffffffff))).toBe(true);
   });
 
   it('should_throw_and_draw_the_same_new_tile_on_a_retry_when_the_source_throws_once', () => {

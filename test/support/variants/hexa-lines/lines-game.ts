@@ -26,6 +26,7 @@ import type { PlacePiece } from '../../../../src/domain/variants/hexa-lines/plac
 import { square, type SquareCoord } from '../../engine/square-topology';
 import { MATCH_ID } from '../../engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../engine/entity-ids';
+import { boardLike } from '../../engine/variant-game';
 
 // Builders for the Hexa Lines rules tests. They exist only in test/.
 
@@ -88,7 +89,7 @@ export function filledKeys<TCoord>(state: {
   readonly board: ReadonlyBoard<Color, TCoord>;
 }): string[] {
   return state.board
-    .cells()
+    .occupiedCells()
     .map(([c]) => state.board.key(c))
     .sort();
 }
@@ -108,10 +109,12 @@ export function linesFactory(
 }
 
 // A live state built again from a photo, so a test can ask the rules about the state that a game
-// shows. The engine never gives its state away. So the helper builds a new state with the ids,
-// the board and the source of the photo, and the state takes the photo back with `restore()`.
-export function linesStateOf<TCoord>(photo: LinesSnapshot<TCoord>): LinesState<TCoord> {
-  const state = new LinesState(photo.stateId, photo.matchId, photo.board.clone(), [], photo.source);
+// shows. The engine never gives its state away. So the helper builds a new state with the ids
+// and the source of the photo and a new square board of the same shape, and the state takes
+// the photo back with `restore()`. The photo hands out no board (issue #234).
+export function linesStateOf(photo: LinesSnapshot<SquareCoord>): LinesState<SquareCoord> {
+  const board = boardLike(photo.board, new SquareGeometry(), photo.matchId);
+  const state = new LinesState(photo.stateId, photo.matchId, board, [], photo.source);
   state.restore(photo);
   return state;
 }
