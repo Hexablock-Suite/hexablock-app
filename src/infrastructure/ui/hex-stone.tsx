@@ -5,7 +5,8 @@ import { lip, palette, type WorldTone } from './theme';
 // A flat-topped regular hexagon `size` wide, from one vertex to the opposite vertex.
 // Three rectangles cover it: each one is one side wide and the hexagon high,
 // and they turn by 0, 60 and 120 degrees about the center.
-function Hexagon({ size, color }: { readonly size: number; readonly color: string }) {
+// The figure selector draws the hexagon of its first figure with it too (#171).
+export function Hexagon({ size, color }: { readonly size: number; readonly color: string }) {
   const side = size / 2;
   const height = side * Math.sqrt(3);
   return (

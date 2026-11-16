@@ -1,24 +1,22 @@
 import type { MoveCommand } from './move-command';
 import type { IRedoable, IUndoable } from './undo-capabilities';
+import type { UndoLimit } from './undo-limit';
 
 // Command invoker and Memento caretaker (classes.md decisions 3 and 34).
 // The history keeps the commands of one game and never reads the photo inside them.
 // `TMemento` is the type of that photo: the engine binds it to `SnapshotOf<TState>`.
 // Without a `limit` the history keeps every command. With a limit it keeps the newest ones.
-// A limit is a whole number of 1 or more. A variant with no undo has no history at all.
+// A limit is an `UndoLimit`, which checks its count in `UndoLimit.of()` (issue #243).
+// A variant with no undo has no history at all.
 export class MoveHistory<TMove, TMemento> implements IUndoable {
-  private readonly done: MoveCommand<TMove, TMemento>[] = [];
+  private done: MoveCommand<TMove, TMemento>[] = [];
 
-  constructor(private readonly limit?: number) {
-    if (limit !== undefined && (!Number.isSafeInteger(limit) || limit < 1)) {
-      throw new RangeError(`A history limit needs a whole number of 1 or more, not ${limit}.`);
-    }
-  }
+  constructor(private readonly limit?: UndoLimit) {}
 
   // The newest command goes last. A full history drops its oldest command.
   record(command: MoveCommand<TMove, TMemento>): void {
     this.done.push(command);
-    if (this.limit !== undefined && this.done.length > this.limit) this.done.shift();
+    if (this.limit !== undefined) this.done = this.limit.newestOf(this.done);
   }
 
   canUndo(): boolean {

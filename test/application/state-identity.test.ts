@@ -10,6 +10,7 @@ import { Score } from '../../src/domain/engine/score';
 import { Turns } from '../../src/domain/engine/turns';
 import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
 import { PlaceFitPiece } from '../../src/domain/variants/hexa-fit/fit-move';
+import type { FitView } from '../../src/domain/variants/hexa-fit/fit-state';
 import type { MoveResult } from '../../src/application/move-result';
 import type { Result } from '../../src/application/result';
 import { gameUseCases, valueOf } from '../support/application/game-use-cases';
@@ -20,6 +21,7 @@ import { A, B, C, fitFactory, threeDominoFitFactory } from '../support/variants/
 import { linesFactory } from '../support/variants/hexa-lines/lines-game';
 import { mergeFactory, mergeStateOf } from '../support/variants/hexa-merge/merge-game';
 import { sortFactory } from '../support/variants/hexa-sort/sort-game';
+import { fitViewData } from '../support/variants/view-data';
 
 // R7: the state of a game and its board are entities (classes.md decisions 7 and 26).
 // The state has its own `GameStateId` and knows its match. The board has its own `BoardId`.
@@ -36,18 +38,20 @@ const OTHER = MatchId.of('match-2');
 
 // The identity of the running state: its match, its own id and the id of its board.
 // The engine gives only a photo, and the photo holds the two ids and a copy of the board.
+// The photo keeps its ids private (issue #245), so the test asks it whether it shows
+// the state of the match `MATCH` or of the match `OTHER`.
 function identityOf<TCell, TCoord>(
   photo: BoardSnapshot<TCell, TCoord>,
   reference: BoardState<TCell, TCoord>,
   other: BoardState<TCell, TCoord>,
 ) {
   return {
-    ofTheMatch: photo.matchId.equals(MATCH),
-    ofAnotherMatch: photo.matchId.equals(MatchId.of('match-2')),
-    sameState: photo.stateId.equals(reference.snapshot().stateId),
-    anotherState: photo.stateId.equals(other.snapshot().stateId),
-    sameBoard: photo.board.equals(reference.snapshot().board),
-    anotherBoard: photo.board.equals(other.snapshot().board),
+    ofTheMatch: photo.belongsTo(MATCH),
+    ofAnotherMatch: photo.belongsTo(OTHER),
+    sameState: photo.isPhotoOf(STATE),
+    anotherState: photo.isPhotoOf(GameStateId.of(OTHER)),
+    sameBoard: photo.boardCopy().equals(reference.snapshot().boardCopy()),
+    anotherBoard: photo.boardCopy().equals(other.snapshot().boardCopy()),
   };
 }
 
@@ -108,7 +112,10 @@ describe('The identity of the running state', () => {
     const seen = [];
 
     for (let turn = 0; turn < 5; turn += 1) {
-      const move = firstValidMove(factory.createRules(), mergeStateOf(games.running().snapshot()));
+      const move = firstValidMove(
+        factory.createRules(),
+        mergeStateOf(games.running().snapshot(), MATCH),
+      );
       valueOf(await applyMove.execute({ move }));
       seen.push(identityOf(games.running().snapshot(), reference, other));
     }
@@ -121,14 +128,14 @@ describe('The identity of the running state', () => {
     const { games, startGame } = gameUseCases(factory);
     valueOf(await startGame.execute({}));
     const engine = games.running();
-    const before = engine.snapshot().board.occupiedCells();
+    const before = engine.snapshot().boardCopy().occupiedCells();
     const foreign = factory.createInitialState(OTHER, STATE, BOARD);
 
     expect(() => engine.start(foreign)).toThrow(
       new RangeError('The first state belongs to another match.'),
     );
-    expect(engine.snapshot().board.occupiedCells()).toEqual(before);
-    expect(engine.snapshot().matchId.equals(MATCH)).toBe(true);
+    expect(engine.snapshot().boardCopy().occupiedCells()).toEqual(before);
+    expect(engine.snapshot().belongsTo(MATCH)).toBe(true);
   });
 });
 
@@ -136,12 +143,10 @@ describe('The identity of the running state', () => {
 // The expected answers are the answers of the code before #236, written out as values.
 describe('A Fit game through the use cases', () => {
   // The part of a move result that a screen reads, with the ids of the pieces of the payload.
+  // The Fit view keeps its fields private, so the test reads the data that it delivers (#245).
   function answerOf(result: Result<MoveResult<unknown, unknown, unknown>>) {
     const value = valueOf(result);
-    const payload = value.payload as {
-      readonly remaining: readonly { occupant(): unknown }[];
-      readonly placed: readonly unknown[];
-    };
+    const payload = fitViewData(value.payload as FitView<unknown>);
     return {
       cells: value.cells,
       score: value.score,

@@ -1,7 +1,7 @@
 import type { GameId } from '../domain/engine/game-id';
 import type { GameProgress } from '../domain/engine/game-progress';
 
-// Output port and repository of the progress aggregate (classes.md decisions 52, 54 and 55,
+// Output port and repository of the progress aggregate (classes.md decisions 52, 56 and 57,
 // issue #164). It saves and gives back the whole aggregate root, `GameProgress`:
 // the high score and the best result of each level of one game (S3-04).
 // The device keeps one progress per game, so the game id finds it.

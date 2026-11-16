@@ -10,6 +10,7 @@ import { PlayingPhase } from '../../src/domain/engine/game-phase';
 import type { IPieceSource } from '../../src/domain/engine/piece-source';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
 import { ElapsedTime } from '../../src/domain/engine/elapsed-time';
+import { MatchId } from '../../src/domain/engine/match-id';
 import { Turns } from '../../src/domain/engine/turns';
 import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
 import { PlaceFitPiece } from '../../src/domain/variants/hexa-fit/fit-move';
@@ -27,6 +28,7 @@ import { A, B, threeDominoFitFactory } from '../support/variants/hexa-fit/fit-ga
 import { linesFactory } from '../support/variants/hexa-lines/lines-game';
 import { mergeFactory, mergeStateOf } from '../support/variants/hexa-merge/merge-game';
 import { sortFactory } from '../support/variants/hexa-sort/sort-game';
+import { viewData } from '../support/variants/view-data';
 import { repoRoot } from '../support/run-tool';
 
 // `UndoMove` takes back the last move of a variant that has a history (issue 159, APP-FR-08,
@@ -34,6 +36,9 @@ import { repoRoot } from '../support/run-tool';
 
 const placeA = new PlaceFitPiece(A, Turns.of(0), square(0, 0));
 const placeB = new PlaceFitPiece(B, Turns.of(0), square(2, 0));
+
+// The match of the first game that `gameUseCases()` starts: its generator counts from 1.
+const FIRST_MATCH = MatchId.of('match-1');
 
 // Starts one game of a factory and returns its use cases.
 async function started<
@@ -58,10 +63,10 @@ function factsOf<
   const engine = games.running();
   const state = engine.snapshot();
   return {
-    cells: state.board.occupiedCells(),
-    score: state.score,
+    cells: state.boardCopy().occupiedCells(),
+    score: state.scoreSoFar(),
     phase: phaseNameOf(engine.currentPhase()),
-    view: state.view(),
+    view: viewData(state.view()),
   };
 }
 
@@ -89,6 +94,7 @@ describe('UndoMove', () => {
     expect(afterSecond.cells).not.toEqual(afterFirst.cells);
     expect(undone).toEqual({
       cells: afterFirst.cells,
+      freeSpaces: afterFirst.freeSpaces,
       score: afterFirst.score,
       outcome: Outcome.playing,
       canUndo: true,
@@ -98,7 +104,7 @@ describe('UndoMove', () => {
       // Fit is timed, and this clock does not move.
       elapsedMs: ElapsedTime.ofMs(0),
     });
-    expect(games.running().snapshot().board.occupiedCells()).toEqual(afterFirst.cells);
+    expect(games.running().snapshot().boardCopy().occupiedCells()).toEqual(afterFirst.cells);
     expect(games.running().currentPhase()).toBe(PlayingPhase.instance);
   });
 
@@ -116,6 +122,7 @@ describe('UndoMove', () => {
       'canUndo',
       'cells',
       'elapsedMs',
+      'freeSpaces',
       'hasUndo',
       'outcome',
       'payload',
@@ -128,7 +135,7 @@ describe('UndoMove', () => {
     const factory = mergeFactory(7);
     const { games, applyMove, undoMove } = await started(factory);
     const before = games.running().snapshot();
-    const slide = firstValidMove(factory.createRules(), mergeStateOf(before));
+    const slide = firstValidMove(factory.createRules(), mergeStateOf(before, FIRST_MATCH));
     const firstPlay = valueOf(await applyMove.execute({ move: slide }));
     const afterPlay = games.running().snapshot();
 
@@ -137,10 +144,10 @@ describe('UndoMove', () => {
     const replay = valueOf(await applyMove.execute({ move: slide }));
 
     // The move drew a tile, so the source moved. The undo puts the source back (S3-15).
-    expect(drawsOf(afterPlay.tiles)).not.toEqual(drawsOf(before.tiles));
-    expect(drawsOf(after.tiles)).toEqual(drawsOf(before.tiles));
-    expect(undone.cells).toEqual(before.board.occupiedCells());
-    expect([undone.score, undone.outcome]).toEqual([before.score, Outcome.playing]);
+    expect(drawsOf(afterPlay.tileSource())).not.toEqual(drawsOf(before.tileSource()));
+    expect(drawsOf(after.tileSource())).toEqual(drawsOf(before.tileSource()));
+    expect(undone.cells).toEqual(before.boardCopy().occupiedCells());
+    expect([undone.score, undone.outcome]).toEqual([before.scoreSoFar(), Outcome.playing]);
     // The same slide draws the same new tile again.
     expect(replay.cells).toEqual(firstPlay.cells);
     expect(replay.score).toEqual(firstPlay.score);
@@ -198,7 +205,10 @@ describe('UndoMove', () => {
     const factory = mergeFactory(7);
     const { games, applyMove, undoMove } = await started(factory);
     const play = async () => {
-      const move = firstValidMove(factory.createRules(), mergeStateOf(games.running().snapshot()));
+      const move = firstValidMove(
+        factory.createRules(),
+        mergeStateOf(games.running().snapshot(), FIRST_MATCH),
+      );
       valueOf(await applyMove.execute({ move }));
     };
     await play();

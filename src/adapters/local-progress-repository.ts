@@ -40,7 +40,7 @@ type Delivers<T> = { deliverTo(receiver: ValueReceiver<T>): void };
 // A parsed JSON object.
 type JsonObject = Readonly<Record<string, unknown>>;
 
-// Adapter of the `ProgressRepository` port over the local storage (classes.md decision 55,
+// Adapter of the `ProgressRepository` port over the local storage (classes.md decision 57,
 // issue #164). It keeps the progress of each game as one JSON text under the key
 // `progress:<game id>` of a `KeyValueStore`.
 // The saved JSON holds plain numbers and texts. The adapter reads each value of the domain

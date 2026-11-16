@@ -13,11 +13,12 @@ import type { Clock } from '../domain/engine/clock';
 import type { Cloneable } from '../domain/engine/cloneable';
 import { GameFactory } from '../domain/engine/game-factory';
 import type { GameId } from '../domain/engine/game-id';
+import { TopologyId } from '../domain/engine/geometry-factory';
 import type { MatchIdGenerator } from '../domain/engine/match-id-generator';
 import type { IVariantFactory } from '../domain/engine/variant-factory';
 import { ConsoleLogger } from './console-logger';
 import { GameRegistry, type RegisteredGame } from './game-registry';
-import { registeredGames } from './registered-games';
+import { boardFigures, registeredGames } from './registered-games';
 import { SeededRandomSource } from './seeded-random-source';
 import { SequentialMatchIds } from './sequential-match-ids';
 import { SystemClock } from './system-clock';
@@ -46,13 +47,16 @@ export interface RootDrivers {
 // The game registry maps each `GameId` to its game and the variant factory of that game.
 // The registry pairs each id with its factory in one place, and the root gives that id
 // to `GameFactory` with that factory (issue #234).
+// The root builds one registry for each board figure that the player can choose (#171).
+// Each variant factory of a registry takes the `GeometryFactory` of its figure, so the choice
+// of the figure changes only that argument (APP-FR-16). The hexagon is the default figure.
 // Until #172, `StartGame` takes its factory in its constructor. So the root builds one
 // `StartGame` for each registered game, with one `ApplyMove` and one `UndoMove`
 // over one `InMemoryGameRepository`, and wraps each use case in the logging aspect.
 // It builds the use cases of a game the first time a caller asks for them.
 // The publisher goes to `ApplyMove`, which delivers the events of each turn (#233).
 export class CompositionRoot {
-  private readonly games: GameRegistry;
+  private readonly games: ReadonlyMap<TopologyId, GameRegistry>;
   private readonly logger: Logger;
   private readonly ids: MatchIdGenerator;
   private readonly events: GameEventPublisher;
@@ -60,22 +64,37 @@ export class CompositionRoot {
 
   constructor(drivers: RootDrivers = { clock: new SystemClock(), logger: new ConsoleLogger() }) {
     const random = SeededRandomSource.fromClock(drivers.clock);
-    this.games = new GameRegistry(registeredGames(drivers.clock, random));
+    this.games = new Map(
+      boardFigures().map((figure) => [
+        figure.id,
+        new GameRegistry(registeredGames(figure, drivers.clock, random)),
+      ]),
+    );
     this.logger = drivers.logger;
     this.ids = new SequentialMatchIds(drivers.clock);
     this.events = new NullGameEventPublisher();
   }
 
-  // The game registry. The game selector reads the registered games from it (#169).
-  registry(): GameRegistry {
-    return this.games;
+  // The board figures that the player can choose, in the order of the figure selector (#171).
+  figures(): TopologyId[] {
+    return [...this.games.keys()];
   }
 
-  // The game use cases of the game `gameId`. Each call for one game gives the same use cases,
-  // so the screens of one game share its running game.
-  // An id that the registry does not hold throws a RangeError.
-  gameUseCases(gameId: GameId): GameUseCases {
-    const game = this.games.gameOf(gameId);
+  // The game registry of the board figure `figure`, by default the hexagon.
+  // The game selector reads the registered games from it (#169).
+  // A figure that the root does not offer throws a RangeError.
+  registry(figure: TopologyId = TopologyId.hex): GameRegistry {
+    const games = this.games.get(figure);
+    if (games === undefined) throw new RangeError('The root offers no board figure with this id.');
+    return games;
+  }
+
+  // The game use cases of the game `gameId` on the board figure `figure`, by default the hexagon.
+  // Each call for one game on one figure gives the same use cases, so the screens of that game
+  // share its running game. The game on another figure has its own use cases.
+  // An id that the registry of the figure does not hold throws a RangeError.
+  gameUseCases(gameId: GameId, figure: TopologyId = TopologyId.hex): GameUseCases {
+    const game = this.registry(figure).gameOf(gameId);
     const known = this.wired.get(game);
     if (known !== undefined) return known;
     const built = game.withFactory({

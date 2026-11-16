@@ -1,8 +1,10 @@
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { FigureSelector } from '../src/infrastructure/ui/figure-selector';
 import { HexStone } from '../src/infrastructure/ui/hex-stone';
 import { Scenery } from '../src/infrastructure/ui/scenery';
 import {
@@ -23,10 +25,14 @@ const STONE_HEIGHT = (STONE / 2) * Math.sqrt(3);
 
 // The home screen, the MVP view of `HomePresenter` (#169). It shows the suite name and opens
 // the game selector map on its own route (S3-11 in #151, a proposal that waits for the team).
-// The settings stay on this screen: the language (#163) and the board figure (#171) join it.
+// The settings stay on this screen: the language (#163) joins the board figure (#171).
+// The player chooses the figure in the figure selector, and the hexagon, the first figure,
+// is chosen when the screen opens. The play button passes the text of the chosen figure
+// to the map, so the map lists the games of that figure.
 // Every visible text comes from the text catalog through the presenter (APP-FR-11).
 export default function HomeScreen() {
   const view = useHomePresenter().home();
+  const [figure, setFigure] = useState(view.figures[0]?.id ?? '');
   const insets = useSafeAreaInsets();
   return (
     <View
@@ -66,7 +72,19 @@ export default function HomeScreen() {
           </View>
         ))}
       </View>
-      <LipButton label={view.play} look="sun" onPress={() => router.push('/map')} />
+      <View style={styles.controls}>
+        <FigureSelector
+          label={view.figure}
+          figures={view.figures}
+          chosen={figure}
+          onChoose={setFigure}
+        />
+        <LipButton
+          label={view.play}
+          look="sun"
+          onPress={() => router.push({ pathname: '/map', params: { figure } })}
+        />
+      </View>
     </View>
   );
 }
@@ -129,5 +147,10 @@ const styles = StyleSheet.create({
   },
   raised: {
     transform: [{ translateY: -STONE_HEIGHT / 2 - 2 }],
+  },
+  controls: {
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    gap: space.xl,
   },
 });
