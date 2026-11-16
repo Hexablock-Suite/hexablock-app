@@ -5,6 +5,7 @@ import type { Clock } from '../../engine/clock';
 import { GameId } from '../../engine/game-id';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { GeometryFactory } from '../../engine/geometry-factory';
+import { LevelProgress } from '../../engine/level-progress';
 import { LevelTimer } from '../../engine/level-timer';
 import { LevelTimerId } from '../../engine/level-timer-id';
 import type { MatchId } from '../../engine/match-id';
@@ -86,5 +87,11 @@ export class FitFactory<TCoord> implements IVariantFactory<
   // `RedoableHistory` adds the redo of Hexa Fit in Sprint 3.
   createHistory(): MoveHistory<FitMove<TCoord>, FitSnapshot<TCoord>> {
     return new MoveHistory();
+  }
+
+  // Hexa Fit keeps the best result of each level. The level counts the stars of a play
+  // by its moves and its time (D20, classes.md decision 36).
+  createProgressModel(): LevelProgress {
+    return new LevelProgress(this.level);
   }
 }

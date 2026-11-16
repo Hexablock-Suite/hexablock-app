@@ -1,5 +1,8 @@
 /** @jest-environment node */
 import { Color } from '../../../../src/domain/engine/color';
+import { ElapsedTime } from '../../../../src/domain/engine/elapsed-time';
+import type { ILevelStars } from '../../../../src/domain/engine/level-progress';
+import { Moves } from '../../../../src/domain/engine/moves';
 import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import { Seed } from '../../../../src/domain/engine/seed';
@@ -8,6 +11,8 @@ import type { ColorStack } from '../../../../src/domain/variants/hexa-sort/color
 import { GoalCount } from '../../../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../../../src/domain/variants/hexa-sort/sort-factory';
 import { SortLevel } from '../../../../src/domain/variants/hexa-sort/sort-level';
+import { SortStarThreshold } from '../../../../src/domain/variants/hexa-sort/sort-stars';
+import { Stars } from '../../../../src/domain/engine/stars';
 import { names, stack } from '../../../support/variants/hexa-sort/sort-game';
 
 // A Sort level is a value object that holds the data of its piece source:
@@ -146,6 +151,48 @@ describe('SortLevel', () => {
     expect(level.equals(fixed(stack('red')))).toBe(true);
     expect(firstStacks(seeded, 3)).toEqual([['red'], ['red'], ['red']]);
     expect(seeded.equals(SortLevel.seeded(SIZE, GOAL, Seed.of(7), [red]))).toBe(true);
+  });
+
+  // A Sort level holds the thresholds of its stars and counts the stars of a play by its moves
+  // (D22, classes.md decision 36, issue #156). `LevelProgress` asks it through `ILevelStars`.
+  it('should_count_the_leading_thresholds_that_the_moves_meet_when_the_level_has_thresholds', () => {
+    const thresholds = [SortStarThreshold.of(Moves.of(20)), SortStarThreshold.of(Moves.of(10))];
+    const levels: ILevelStars[] = [
+      fixed(stack('red')).withStars(thresholds),
+      SortLevel.seeded(SIZE, GOAL, Seed.of(7), [red]).withStars(thresholds),
+    ];
+    thresholds.push(SortStarThreshold.of(Moves.of(1)));
+
+    for (const level of levels) {
+      expect(level.starsFor(Moves.of(10), undefined).equals(Stars.of(2))).toBe(true);
+      expect(level.starsFor(Moves.of(15), undefined).equals(Stars.of(1))).toBe(true);
+      expect(level.starsFor(Moves.of(21), undefined).equals(Stars.of(0))).toBe(true);
+      // A Sort level has no timer, so a time changes no star.
+      expect(level.starsFor(Moves.of(10), ElapsedTime.ofMs(99_000)).equals(Stars.of(2))).toBe(true);
+    }
+  });
+
+  // A factory method gives a level with no threshold. `SortLevelBuilder` gives a level
+  // the thresholds of its file with `withStars()` (#167).
+  it('should_give_no_star_when_the_level_holds_no_threshold', () => {
+    expect(fixed(stack('red')).starsFor(Moves.of(0), undefined).equals(Stars.of(0))).toBe(true);
+  });
+
+  it('should_not_be_equal_when_two_levels_hold_other_star_thresholds', () => {
+    const ten = [SortStarThreshold.of(Moves.of(10))];
+    const level = fixed(stack('red')).withStars(ten);
+
+    expect(level.equals(fixed(stack('red')).withStars([SortStarThreshold.of(Moves.of(10))]))).toBe(
+      true,
+    );
+    expect(level.equals(fixed(stack('red')))).toBe(false);
+    expect(level.equals(fixed(stack('red')).withStars([SortStarThreshold.of(Moves.of(9))]))).toBe(
+      false,
+    );
+    // `withStars()` gives a new level, and the first level keeps no threshold.
+    const plain = fixed(stack('red'));
+    plain.withStars(ten);
+    expect(plain.equals(fixed(stack('red')))).toBe(true);
   });
 
   it('should_refuse_a_write_when_a_caller_changes_the_level', () => {

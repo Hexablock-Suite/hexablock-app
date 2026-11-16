@@ -4,7 +4,6 @@ import type { Result, UseCaseError } from '../application/result';
 import type { StartGameRequest } from '../application/start-game';
 import type { UseCase } from '../application/use-case';
 import { Outcome } from '../domain/engine/outcome';
-import type { Score } from '../domain/engine/score';
 import type { StateMapper } from './state-mapper';
 import type { TextKey, Texts } from './texts/text-catalog';
 
@@ -22,6 +21,9 @@ export interface GameViewModel<TCoord, TCellView, TPayloadView> {
   readonly score: number;
   // The text of the outcome, or the text of a board that has not started.
   readonly outcome: string;
+  // The time of play of a timed game in minutes and seconds, such as `1:05`, with its label.
+  // It exists only when the response carries a time (decision 29, issue #175).
+  readonly time?: { readonly label: string; readonly value: string };
   // The text of the last failure of a use case. A later success clears it.
   readonly error?: string;
   // The variant data for the screen. It exists after the first answer of `StartGame`.
@@ -46,6 +48,8 @@ const OUTCOME_TEXTS: readonly (readonly [Outcome, TextKey])[] = [
 // a method of `Board` or of a photo (#234). The `StateMapper` of the game turns each occupied
 // cell, each free space and the payload into the data of the screen (decision 14).
 // So the presenter names no variant, and one presenter class serves every game.
+// A timed game shows the time of play of the response: the root reads it, so the screen
+// reads no clock (#175).
 // A failed `Result` never throws (decision 28): the presenter keeps the last board and shows
 // the text of the failure. A rejected move has its own text, and any other failure has one
 // general text. Every text comes from the catalog of one language (APP-FR-11).
@@ -114,6 +118,9 @@ export class GamePresenter<TCell, TCoord, TMove, TView, TCellView, TPayloadView>
         ...response.freeSpaces.map((at) => [at, this.mapper.freeView()] as const),
       ],
       payload: this.mapper.toPayload(response.payload),
+      ...(response.elapsedMs === undefined
+        ? {}
+        : { time: { label: this.texts['play.time'], value: clockText(response.elapsedMs) } }),
     };
   }
 
@@ -142,14 +149,23 @@ export class GamePresenter<TCell, TCoord, TMove, TView, TCellView, TPayloadView>
   }
 }
 
-// The number of a score. The presenter is an adapter of the edge, so it receives the value
-// through `deliverTo()` (rule R-no-delivery-call).
-function numberOf(score: Score): number {
+// A value object of the engine that delivers one number, such as `Score` and `ElapsedTime`.
+type DeliversNumber = { deliverTo(receiver: { receive(value: number): void }): void };
+
+// The number of a score or of a time. The presenter is an adapter of the edge, so it receives
+// the value through `deliverTo()` (rule R-no-delivery-call).
+function numberOf(source: DeliversNumber): number {
   let value = 0;
-  score.deliverTo({
+  source.deliverTo({
     receive: (delivered) => {
       value = delivered;
     },
   });
   return value;
+}
+
+// A time in milliseconds as whole minutes and seconds, such as `1:05`.
+function clockText(elapsed: DeliversNumber): string {
+  const seconds = Math.floor(numberOf(elapsed) / 1000);
+  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
 }

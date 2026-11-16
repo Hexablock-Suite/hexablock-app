@@ -19,6 +19,7 @@ import { CellNode } from '../../src/domain/engine/shape-node';
 import { FixedListPieceSource, type IPieceSource } from '../../src/domain/engine/piece-source';
 import type { Resolution } from '../../src/domain/engine/resolution';
 import { ElapsedTime } from '../../src/domain/engine/elapsed-time';
+import { Moves } from '../../src/domain/engine/moves';
 import { Score } from '../../src/domain/engine/score';
 import type { IRedoable } from '../../src/domain/engine/undo-capabilities';
 import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
@@ -169,6 +170,7 @@ function brokenStart<
       throw new RangeError('The level is broken.');
     },
     createHistory: () => factory.createHistory(),
+    createProgressModel: () => factory.createProgressModel(),
   };
 }
 
@@ -258,6 +260,7 @@ function sortFactoryWithFailingSource(): IVariantFactory<
         goalsNeeded: GoalCount.of(1),
       }),
     createHistory: () => factory.createHistory(),
+    createProgressModel: () => factory.createProgressModel(),
   };
 }
 
@@ -860,7 +863,7 @@ describe('the variant data of MoveResult', () => {
       canUndo: false,
       canRedo: false,
       hasUndo: true,
-      payload: { remaining: [], placed: [A] },
+      payload: { remaining: [], placed: [A], moves: Moves.of(1) },
       elapsedMs: ElapsedTime.ofMs(0),
     });
     expect({ ...sort, payload: sortViewData(sort.payload) }).toEqual({

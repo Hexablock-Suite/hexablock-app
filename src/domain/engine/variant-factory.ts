@@ -9,6 +9,7 @@ import type { MatchId } from './match-id';
 import type { MoveHistory } from './move-history';
 import type { Piece } from './piece';
 import type { IPieceSource } from './piece-source';
+import type { IProgressModel } from './progress-model';
 import type { IGameRules } from './rules';
 import type { IScoringPolicy } from './scoring-policy';
 
@@ -35,7 +36,8 @@ import type { IScoringPolicy } from './scoring-policy';
 // (classes.md decision 51), so two games can share one source, and no draw changes it.
 // `createHistory()` returns a new history for each game, or `undefined` for a variant
 // with no undo (classes.md decision 3). The history keeps the photos of the state (decision 34).
-// The progress model of view 5 comes in Sprint 3.
+// `createProgressModel()` gives the progress model of the game (issue #156): `HighScoreProgress`
+// for a game with no levels, or `LevelProgress` with the star rule of its level.
 export interface IVariantFactory<
   TCell,
   TCoord,
@@ -51,4 +53,5 @@ export interface IVariantFactory<
   createBoard(boardId: BoardId): Board<TCell, TCoord>;
   createInitialState(matchId: MatchId, stateId: GameStateId, boardId: BoardId): TState;
   createHistory(): MoveHistory<TMove, SnapshotOf<TState>> | undefined;
+  createProgressModel(): IProgressModel;
 }

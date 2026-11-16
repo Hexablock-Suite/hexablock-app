@@ -4,6 +4,7 @@ import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { GamePresenter, GameViewModel } from '../../adapters/game-presenter';
+import type { Texts } from '../../adapters/texts/text-catalog';
 import { fittedCellSize } from '../board/board-fit';
 import type { BoardLayout } from '../board/board-layout';
 import { BoardView } from '../board/board-view';
@@ -25,11 +26,13 @@ export interface GameStageProps<TCellView> {
   // The name of the game, as the game selector shows it.
   readonly title: string;
   readonly presenter: GamePresenter<unknown, unknown, unknown, unknown, TCellView, unknown>;
-  // The cell renderer and the figure layout that the registry chooses for the game.
+  // The cell renderer, the move controls and the figure layout that the registry chooses
+  // for the game.
   readonly renderer: CellRenderer<TCellView>;
+  readonly controls: MoveControls<unknown, TCellView, unknown, unknown>;
   readonly layoutOf: (size: number) => BoardLayout<unknown>;
-  // The move controls that the registry chooses for the game, if it has them (#177).
-  readonly controls?: MoveControls<unknown, unknown>;
+  // The texts of the language of the screen, for the move controls (#175).
+  readonly texts: Texts;
   // Goes back to the game selector map.
   readonly onBack: () => void;
 }
@@ -38,18 +41,20 @@ export interface GameStageProps<TCellView> {
 // a proposal that waits for the team). `GameScreen`, the game route, renders it with the session
 // of its game. It keeps the presenter, the cell renderer and the figure layout that it receives.
 // It starts the game when it opens, and it shows each view model that the presenter gives:
-// `BoardView` with every space of the board, the score and the outcome. The board takes the
-// widest cell size that fits the screen. A failed use case shows its text below the board.
-// It names no variant, so it serves every game. Every visible text comes from the presenter,
-// which reads the text catalog (APP-FR-11). The move controls of the game, if the registry
-// gives them, show below the board with the payload view of the last view model, and they call
-// `GamePresenter.onMove()` (#177). Their texts come from the catalog too.
+// `BoardView` with every space of the board, the score, the time of a timed game (#175)
+// and the outcome. The board takes the widest cell size that fits the screen.
+// A failed use case shows its text below the board. It names no variant, so it serves every game.
+// The move controls of the game lay out the board with their own parts (#175): the stage gives
+// them the view model, the board and `play()`, which calls `GamePresenter.onMove()`.
+// Every visible text comes from the presenter or from the texts that the controls get,
+// and both read the text catalog (APP-FR-11).
 export function GameStage<TCellView>({
   title,
   presenter,
   renderer,
-  layoutOf,
   controls,
+  layoutOf,
+  texts,
   onBack,
 }: GameStageProps<TCellView>) {
   const view = useGameViewModel(presenter);
@@ -80,26 +85,37 @@ export function GameStage<TCellView>({
             <Text style={styles.scoreLabel}>{view.scoreLabel}</Text>
             <Text style={styles.scoreValue}>{view.score}</Text>
           </View>
+          {view.time === undefined ? null : (
+            <View accessible testID="play-time" style={styles.score}>
+              <Text style={styles.scoreLabel}>{view.time.label}</Text>
+              <Text style={styles.scoreValue}>{view.time.value}</Text>
+            </View>
+          )}
           <Text accessibilityLiveRegion="polite" style={styles.outcome}>
             {view.outcome}
           </Text>
         </View>
       </WoodSign>
-      <View style={styles.boardArea}>
-        <View style={styles.frame}>
-          <View style={styles.face}>
-            <BoardView
-              cells={view.cells}
-              layout={layoutOf(size)}
-              renderer={renderer}
-              label={view.board}
-            />
+      {controls.render({
+        model: view,
+        texts,
+        layoutOf,
+        play: (move) => void presenter.onMove(move),
+        board: (onPressSpace) => (
+          <View style={styles.boardArea}>
+            <View style={styles.frame}>
+              <View style={styles.face}>
+                <BoardView
+                  cells={view.cells}
+                  layout={layoutOf(size)}
+                  renderer={renderer}
+                  label={view.board}
+                  onPressSpace={onPressSpace}
+                />
+              </View>
+            </View>
           </View>
-        </View>
-      </View>
-      {controls?.render({
-        payload: view.payload,
-        onMove: (move) => void presenter.onMove(move),
+        ),
       })}
       {view.error === undefined ? null : (
         <View

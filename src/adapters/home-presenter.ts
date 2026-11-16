@@ -52,9 +52,8 @@ const GAME_NAME = /^game\.([a-z0-9-]+)\.name$/;
 // so a test builds it without a screen.
 // The selector lists the games in the order of the registry. So a fifth variant adds one entry
 // to the registry and its texts to the catalog, and this presenter does not change.
-// `GameId` keeps its text private and has no `deliverTo()`. So the presenter finds the texts
-// of a game with `GameId.equals()`: it compares the id of each game that the catalog names
-// with the registered id.
+// `GameId` keeps its text private. The presenter finds the texts of a game with `GameId.equals()`:
+// it compares the id of each game that the catalog names with the registered id.
 // `TopologyId` delivers its text to a receiver (issue #237). A presenter is an adapter of the
 // edge, so it takes that text as the id of a figure and finds its name under `figure.<id>`.
 export class HomePresenter {

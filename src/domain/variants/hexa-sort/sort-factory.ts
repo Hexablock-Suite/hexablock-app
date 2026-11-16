@@ -4,6 +4,7 @@ import { BoardBuilder } from '../../engine/board-builder';
 import { GameId } from '../../engine/game-id';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { GeometryFactory } from '../../engine/geometry-factory';
+import { LevelProgress } from '../../engine/level-progress';
 import type { MatchId } from '../../engine/match-id';
 import { Piece } from '../../engine/piece';
 import {
@@ -87,6 +88,12 @@ export class SortFactory<TCoord> implements IVariantFactory<
   // Hexa Sort has no undo (APP-FR-08, classes.md decision 3).
   createHistory(): undefined {
     return undefined;
+  }
+
+  // Hexa Sort keeps the best result of each level. The level counts the stars of a play
+  // by its moves (D22, classes.md decision 36).
+  createProgressModel(): LevelProgress {
+    return new LevelProgress(this.level);
   }
 
   // The cell of every Sort piece: the first cell of the level region.

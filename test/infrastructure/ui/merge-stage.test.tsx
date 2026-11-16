@@ -11,7 +11,6 @@ import { Seed } from '../../../src/domain/engine/seed';
 import { MergeFactory, MergeSettings } from '../../../src/domain/variants/hexa-merge/merge-factory';
 import { MergeTile } from '../../../src/domain/variants/hexa-merge/merge-tile';
 import { CompositionRoot } from '../../../src/infrastructure/composition-root';
-import { boardFigures, mergeScreen } from '../../../src/infrastructure/registered-games';
 import { gameSessionOf, type GameSession } from '../../../src/infrastructure/ui/game-session';
 import { GameStage } from '../../../src/infrastructure/ui/game-stage';
 import { gameUseCases } from '../../support/application/game-use-cases';
@@ -19,10 +18,11 @@ import { RecordingLogger } from '../../support/application/recording-logger';
 import { ManualClock } from '../../support/engine/manual-clock';
 
 // Issue #177: Hexa Merge is playable on the game screen. The registry gives Merge its state
-// mapper, its cell renderer and its move controls: one slide button for each way that
-// the topology gives, six on the hexagon. When a merge makes the target tile, the screen
-// offers to continue, as in 2048 (A3). The prompt reads the target flag of the payload,
-// because the rules never answer a victory for Merge.
+// mapper, its cell renderer and its move controls, the `MoveControls` of #175: the board
+// and one slide button for each way that the topology gives, six on the hexagon.
+// When a merge makes the target tile, the screen offers to continue, as in 2048 (A3).
+// The prompt reads the target flag of the payload, because the rules never answer a victory
+// for Merge.
 
 // A safe area with no insets, as a phone without a notch gives it.
 const METRICS = {
@@ -106,10 +106,12 @@ describe('Merge on the game screen', () => {
     ]);
   });
 
-  // A game with the target 4 makes its target with the first merge of two tiles of 2.
-  // The screen parts are the parts that the registry gives Merge on the hexagon.
+  // The real root plays to 2048, which no test reaches. So the presenter plays a game with
+  // the target 4, which makes its target with the first merge of two tiles of 2.
+  // The screen parts are the parts that the registry of the real root gives Merge on the hexagon.
   it('should_offer_to_continue_and_keep_the_game_going_when_a_slide_makes_the_target_tile', async () => {
-    const parts = mergeScreen(boardFigures()[0]);
+    const root = new CompositionRoot({ clock: new ManualClock(), logger: new RecordingLogger() });
+    const parts = root.registry().gameOf(GameId.of('hexa-merge')).screen;
     const factory = new MergeFactory(
       new HexGeometry(),
       MergeSettings.of(RegionSize.of(3), Seed.of(7), MergeTile.of(4)),
@@ -118,8 +120,9 @@ describe('Merge on the game screen', () => {
     const session: GameSession = {
       presenter: new GamePresenter(startGame, applyMove, parts.mapper, textCatalog.es),
       renderer: parts.renderer,
+      controls: parts.controls,
       layoutOf: (size) => parts.layoutOf(size),
-      controls: parts.controlsOf?.(textCatalog.es),
+      texts: textCatalog.es,
     };
     await show(session);
     expect(prompt()).toBeNull();
@@ -144,9 +147,9 @@ describe('Merge on the game screen', () => {
     expect(screen.getByText('En juego')).toBeOnTheScreen();
   });
 
-  // The other games keep the default screen parts until their own task, so they show
-  // no slide button (#170).
-  it('should_show_no_slide_button_when_the_game_has_no_move_controls', async () => {
+  // Lines and Sort keep `BoardOnlyControls`, the default controls, and Fit has `FitControls`
+  // (#175). So no other game shows a slide button.
+  it('should_show_no_slide_button_when_another_game_opens', async () => {
     const root = new CompositionRoot({ clock: new ManualClock(), logger: new RecordingLogger() });
     for (const id of ['hexa-lines', 'hexa-fit', 'hexa-sort']) {
       await show(gameSessionOf(root, GameId.of(id), textCatalog.es));

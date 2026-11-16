@@ -1,15 +1,22 @@
 import { useState, type ReactNode } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import type { MergePayloadView } from '../../adapters/merge-state-mapper';
+import type { MergeCellView, MergePayloadView } from '../../adapters/merge-state-mapper';
 import type { Texts } from '../../adapters/texts/text-catalog';
 import type { GridAxis } from '../../domain/engine/grid-topology';
 import type { Slide } from '../../domain/variants/hexa-merge/slide';
 import type { SlideWay } from '../board/slide-ways';
 import { Hexagon, HexStone } from './hex-stone';
-import type { MoveControlProps, MoveControls } from './move-controls';
+import type { MoveControls, MoveControlsProps } from './move-controls';
 import { lip, palette, radius, serif, space } from './theme';
 import { LipButton, WoodSign } from './wood';
+
+type MergeProps<TCoord> = MoveControlsProps<
+  TCoord,
+  MergeCellView,
+  MergePayloadView,
+  Slide<GridAxis>
+>;
 
 // A slide button: a round face wide enough for a finger, over its lip.
 const BUTTON = 48;
@@ -18,45 +25,44 @@ const GAP = space.sm;
 // The wood hexagon at the center of the ring.
 const HUB = 22;
 
-// The move controls of Hexa Merge (D3, classes.md decision 55, issue #177).
-// The game registry builds them with the slides of the board figure and the texts of one language.
-// One button for each slide sits on a ring around a wood hexagon, at the angle of its way
-// on the screen: six on the hexagon, four on the square. Each button names its way.
+// The handler of the Merge board: a slide moves every tile, so a press on a space plays nothing.
+function ignoreSpace(): void {}
+
+// The move controls of Hexa Merge (classes.md decision 14, issue #177). The game registry
+// of the composition root chooses them for Merge, with the slides of the board figure.
+// Below the board, one button for each slide sits on a ring around a wood hexagon, at the angle
+// of its way on the screen: six on the hexagon, four on the square. Each button names its way
+// and plays its `Slide` through `GamePresenter.onMove()`.
 // When the payload says that a merge made the target tile, a prompt over the screen offers
 // to continue, as in 2048 (A3). The rules never answer a victory for Merge, so the prompt
 // reads the flag of the payload, not the outcome. The flag stays true, so the prompt opens
 // once: after the player continues, it stays closed.
-export class MergeControls implements MoveControls<Slide<GridAxis>, MergePayloadView> {
-  constructor(
-    private readonly ways: readonly SlideWay[],
-    private readonly texts: Texts,
-  ) {}
+export class MergeControls<TCoord> implements MoveControls<
+  TCoord,
+  MergeCellView,
+  MergePayloadView,
+  Slide<GridAxis>
+> {
+  constructor(private readonly ways: readonly SlideWay[]) {}
 
-  render(props: MoveControlProps<Slide<GridAxis>, MergePayloadView>): ReactNode {
-    return (
-      <MergePad
-        ways={this.ways}
-        texts={this.texts}
-        reached={props.payload?.targetReached === true}
-        onSlide={(move) => props.onMove(move)}
-      />
-    );
+  render(props: MergeProps<TCoord>): ReactNode {
+    return <MergePlay ways={this.ways} {...props} />;
   }
 }
 
-interface MergePadProps {
-  readonly ways: readonly SlideWay[];
-  readonly texts: Texts;
-  readonly reached: boolean;
-  readonly onSlide: (move: Slide<GridAxis>) => void;
-}
-
-// The ring of slide buttons and the prompt of the target tile.
-function MergePad({ ways, texts, reached, onSlide }: MergePadProps) {
+// The board, the ring of slide buttons and the prompt of the target tile.
+function MergePlay<TCoord>({
+  ways,
+  model,
+  texts,
+  play,
+  board,
+}: MergeProps<TCoord> & { readonly ways: readonly SlideWay[] }) {
   const [continued, setContinued] = useState(false);
   const ring = ringOf(ways);
   return (
     <>
+      {board(ignoreSpace)}
       <View style={[styles.pad, { width: ring.width, height: ring.height }]}>
         <View
           accessibilityElementsHidden
@@ -72,12 +78,12 @@ function MergePad({ ways, texts, reached, onSlide }: MergePadProps) {
             angle={way.angle}
             left={left}
             top={top}
-            onPress={() => onSlide(way.move)}
+            onPress={() => play(way.move)}
           />
         ))}
       </View>
       <TargetPrompt
-        visible={reached && !continued}
+        visible={model.payload?.targetReached === true && !continued}
         texts={texts}
         onContinue={() => setContinued(true)}
       />

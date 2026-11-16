@@ -11,15 +11,15 @@ import { useCompositionRoot } from '../composition-root-provider';
 import type { MoveControls } from './move-controls';
 
 // What the game screen needs to show one game (issue #170): the presenter over the use cases
-// of the game, and the cell renderer and the figure layout of its registry entry.
-// The registry hides the type of a cell view, so the session keeps it hidden too.
-// `controls` are the move controls of the entry in the texts of the session (#177).
-// A game without them has none.
+// of the game, the cell renderer, the move controls and the figure layout of its registry entry,
+// and the texts of the screen (#175). The registry hides the type of a cell view,
+// so the session keeps it hidden too.
 export interface GameSession {
   readonly presenter: GamePresenter<unknown, unknown, unknown, unknown, unknown, unknown>;
   readonly renderer: CellRenderer<unknown>;
+  readonly controls: MoveControls<unknown, unknown, unknown, unknown>;
   readonly layoutOf: (size: number) => BoardLayout<unknown>;
-  readonly controls?: MoveControls<unknown, unknown>;
+  readonly texts: Texts;
 }
 
 // The session of the game `gameId` in the composition root `root`, with the texts `texts`,
@@ -38,8 +38,9 @@ export function gameSessionOf(
   return {
     presenter: new GamePresenter(startGame, applyMove, screen.mapper, texts),
     renderer: screen.renderer,
+    controls: screen.controls,
     layoutOf: (size) => screen.layoutOf(size),
-    controls: screen.controlsOf?.(texts),
+    texts,
   };
 }
 

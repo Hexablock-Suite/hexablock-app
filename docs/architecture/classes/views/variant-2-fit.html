@@ -74,20 +74,21 @@
           Class diagram of layer 1 for the Hexa Fit variant. FitLevelBuilder holds a
           GeometryFactory, builds FitLevel from the topology and the section of a level file that
           LevelDefinition gives it, checks A5 in build() and creates FitLevel. FitLevel keeps the
-          thresholds of its stars as stars and counts the stars of a play with starsFor().
-          FitFactory holds one FitLevel and a Clock and creates FitRules and FitScoring. It builds
-          the LevelTimerId of each timer from the MatchId of the game. FitRules uses FitMove as
-          TMove and FitState as TState. Each Fit move holds its own check, isValidOn(), and its own
-          change, applyTo(), so FitRules asks the move and never tells the moves apart by their
-          class (decision 43). Lollipops show the engine interface each variant class implements,
-          with its binding. PieceId, the cell content, and Placement, the rotation and the offset of
-          a placed piece, are value objects. PieceRegister is the value object that holds the pieces
-          and the placements of FitState and finds an entry with PieceId.equals(). FitState is an
-          entity inside the GameEngine aggregate: its own GameStateId is its identity, it keeps the
-          MatchId of its game, and it changes in place only through its business methods. FitPlay
-          holds the Moves and the ElapsedTime of one won level in private fields, and
-          FitStarThreshold tells whether a play meets its two limits: it gives them to isWithin() of
-          the play. Both are value objects.
+          thresholds of its stars as stars and counts the stars of a play with starsFor(), so it
+          implements ILevelStars, the star rule that LevelProgress asks. FitFactory holds one
+          FitLevel and a Clock and creates FitRules and FitScoring. It builds the LevelTimerId of
+          each timer from the MatchId of the game. FitRules uses FitMove as TMove and FitState as
+          TState. Each Fit move holds its own check, isValidOn(), and its own change, applyTo(), so
+          FitRules asks the move and never tells the moves apart by their class (decision 43).
+          Lollipops show the engine interface each variant class implements, with its binding.
+          PieceId, the cell content, and Placement, the rotation and the offset of a placed piece,
+          are value objects. PieceRegister is the value object that holds the pieces and the
+          placements of FitState and finds an entry with PieceId.equals(). FitState is an entity
+          inside the GameEngine aggregate: its own GameStateId is its identity, it keeps the MatchId
+          of its game, and it changes in place only through its business methods. FitPlay holds the
+          Moves and the ElapsedTime of one won level in private fields, and FitStarThreshold tells
+          whether a play meets its two limits: it gives them to isWithin() of the play. Both are
+          value objects.
         </desc>
         <defs>
           <marker
@@ -400,6 +401,17 @@
         <circle cx="240" cy="963" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text x="251" y="966" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           ILevelBuilder‹FitLevel›
+        </text>
+        <line x1="712" y1="1102" x2="712" y2="1110" stroke="#17212a" stroke-width="1" />
+        <circle cx="712" cy="1115" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text
+          x="723"
+          y="1118"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          ILevelStars
         </text>
 
         <!-- Class: FitMove (type, a closed union of three value objects) -->
@@ -1845,8 +1857,8 @@
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            starsFor() counts with fitStars(play, thresholds) the leading thresholds that the play
-            meets and returns Stars (decision 42). Moves, ElapsedTime and Stars: Part 1, view 4.
+            starsFor() of ILevelStars counts with fitStars(play, thresholds) the leading thresholds
+            that the play meets (decision 36). Moves, ElapsedTime and Stars: Part 1, view 4.
           </text>
           <text
             x="24"
@@ -1856,7 +1868,7 @@
             font-family="'IBM Plex Sans', sans-serif"
           >
             FitSnapshot keeps its fields private (#245): piecePlacements() and moveCount(); FitView
-            delivers the tray and the placed pieces with deliverTo().
+            delivers the tray, the placed pieces and the move count with deliverTo() (#175).
           </text>
           <!-- Legend -->
           <line
