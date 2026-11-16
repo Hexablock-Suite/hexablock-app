@@ -27,7 +27,7 @@ type SortFile = ReturnType<typeof sortLevelFile>;
 const hexGeometry = new HexGeometry();
 
 // The level that the hex Sort builder builds from `file`.
-function built(file: { topology: string; section: unknown }): SortLevel {
+function built(file: Parameters<typeof LevelDefinition.of>[0]): SortLevel {
   return LevelDefinition.of(file).buildWith(new SortLevelBuilder(hexGeometry));
 }
 

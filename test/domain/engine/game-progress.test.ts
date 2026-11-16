@@ -125,6 +125,28 @@ describe('GameProgress', () => {
     expect(progress.equals(GameProgress.start(GameId.of('fake-game')))).toBe(true);
     expect(progress.equals(GameProgress.start(GameId.of('other-game')))).toBe(false);
   });
+
+  // Issue #168: the list of levels asks the progress for the stars of each level.
+  // A level won with zero stars keeps a result, so it gives `Stars.of(0)`.
+  it('should_give_the_stars_of_the_best_result_of_a_level_when_the_progress_keeps_results_of_it', () => {
+    const progress = GameProgress.start(gameId);
+
+    progress.recordLevel(levelRecord('l1', 1, 9, 1000));
+    progress.recordLevel(levelRecord('l1', 2, 30, 9000));
+    progress.recordLevel(levelRecord('l2', 0, 50));
+
+    expect(progress.starsOf(LevelId.of('l1'))?.equals(Stars.of(2))).toBe(true);
+    expect(progress.starsOf(LevelId.of('l2'))?.equals(Stars.of(0))).toBe(true);
+  });
+
+  it('should_give_no_stars_when_the_progress_keeps_no_result_of_the_level', () => {
+    const progress = GameProgress.start(gameId);
+    progress.recordScore(highScore(36));
+    progress.recordLevel(levelRecord('l1', 3, 9));
+
+    expect(progress.starsOf(LevelId.of('l2'))).toBeUndefined();
+    expect(GameProgress.start(gameId).starsOf(LevelId.of('l1'))).toBeUndefined();
+  });
 });
 
 // Done when of issue #156: a test records two results in each model, and the best one stays.
