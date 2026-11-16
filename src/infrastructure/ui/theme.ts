@@ -26,6 +26,8 @@ export const palette = {
   shade: 'rgba(0, 0, 0, 0.22)',
   // The board of the game screen: a dark wood face with sockets for the free spaces.
   socket: 'rgba(43, 37, 34, 0.42)',
+  // The veil behind a prompt over the game screen (#177).
+  scrim: 'rgba(43, 37, 34, 0.6)',
 } as const;
 
 // The two colors of one world on the map: the stone and its light inner face.
@@ -67,3 +69,33 @@ export const shadow = {
 // The prototype draws its texts in Young Serif and Gelasio. The app bundles no font yet.
 // So the screens take the serif face of the system, the fallback of the prototype.
 export const serif = Platform.select({ ios: 'Georgia', android: 'serif', default: 'Georgia' });
+
+// The face of a Merge tile and the color of its number (#177).
+export interface TileTone {
+  readonly face: string;
+  readonly ink: string;
+}
+
+// The tones of the Merge tiles, one for each doubling from the tile of 2 up to the tile of 2048.
+// They take the colors of the scene and of the four worlds, so the board stays in the world
+// of the prototype. Each number has a contrast of 4.5:1 or more on its face.
+// The tile of 2048, the target of the app, is a dark stone with a sun-yellow number.
+const TILE_TONES: readonly TileTone[] = [
+  { face: palette.cloud, ink: palette.ink },
+  { face: worldTone(0).wash, ink: palette.ink },
+  { face: worldTone(0).tone, ink: palette.ink },
+  { face: worldTone(2).tone, ink: palette.ink },
+  { face: palette.ribbonDeep, ink: palette.white },
+  { face: palette.sunDeep, ink: palette.ink },
+  { face: palette.sun, ink: palette.ink },
+  { face: worldTone(1).tone, ink: palette.ink },
+  { face: worldTone(3).tone, ink: palette.ink },
+  { face: palette.hill, ink: palette.white },
+  { face: palette.ink, ink: palette.sun },
+];
+
+// The tone of the Merge tile `step` doublings above the tile of 2. A larger tile keeps
+// the tone of 2048, and a step below 0 takes the tone of 2.
+export function tileTone(step: number): TileTone {
+  return TILE_TONES[Math.max(0, Math.min(step, TILE_TONES.length - 1))];
+}

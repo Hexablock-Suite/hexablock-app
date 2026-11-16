@@ -5,8 +5,8 @@ import type { ReactNode } from 'react';
 // The renderer draws inside a square box with the side `BoardLayout.cellSize()`.
 // The circle of the cell touches the four sides of that box, so one renderer serves every figure.
 // `TCellView` is the data of one cell for the screen. By S3-07 in #151 («Propuesta, pendiente
-// del equipo»), the game registry of the composition root will choose the renderer of each game.
-// No renderer of a variant exists yet.
+// del equipo»), the game registry of the composition root chooses the renderer of each game.
+// `MergeCellRenderer` is the first renderer of a variant (#177).
 export interface CellRenderer<TCellView> {
   render(cell: TCellView): ReactNode;
 }
