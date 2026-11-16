@@ -1,6 +1,7 @@
 import type { LevelRepository } from '../application/level-repository';
 import { GameId } from '../domain/engine/game-id';
 import { LevelDefinition } from '../domain/engine/level-definition';
+import type { LevelId } from '../domain/engine/level-id';
 import fit01 from './levels/fit/fit-01.json';
 import fit02 from './levels/fit/fit-02.json';
 import fit03 from './levels/fit/fit-03.json';
@@ -31,6 +32,7 @@ const BUNDLED: readonly LevelFile[] = [fit01, fit02, fit03, sort01, sort02, sort
 // It gives the levels of a game: the files whose `gameId` names that game.
 // `LevelDefinition.of()` checks the common part of each file, and `GameId.of()` checks
 // the `gameId`. A file that one of them refuses makes `list()` throw.
+// It finds one level of a game by its level id among the same files (issue #172).
 // A test can give other files to the constructor, for example a square level.
 export class BundledLevelRepository implements LevelRepository {
   constructor(private readonly files: readonly LevelFile[] = BUNDLED) {}
@@ -39,5 +41,11 @@ export class BundledLevelRepository implements LevelRepository {
     return this.files
       .filter((file) => GameId.of(file.gameId).equals(gameId))
       .map((file) => LevelDefinition.of(file));
+  }
+
+  // The level of the game whose level id is `levelId`, or `undefined` when the game has none.
+  async levelOf(gameId: GameId, levelId: LevelId): Promise<LevelDefinition | undefined> {
+    const levels = await this.list(gameId);
+    return levels.find((level) => level.levelId().equals(levelId));
   }
 }

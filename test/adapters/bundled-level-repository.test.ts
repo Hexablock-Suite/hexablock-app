@@ -5,6 +5,7 @@ import path from 'node:path';
 import { BundledLevelRepository } from '../../src/adapters/bundled-level-repository';
 import { GameId } from '../../src/domain/engine/game-id';
 import { LevelDefinition } from '../../src/domain/engine/level-definition';
+import { describeLevelRepositoryContract } from '../support/contracts/level-repository-contract';
 import { delivered } from '../support/engine/value-receiver';
 import { repoRoot } from '../support/run-tool';
 import { fitLevelFile } from '../support/variants/hexa-fit/fit-level-file';
@@ -12,6 +13,11 @@ import { sortLevelFile } from '../support/variants/hexa-sort/sort-level-file';
 
 // `BundledLevelRepository` implements the `LevelRepository` port over the level files
 // that the app bundles in `src/adapters/levels/<game>/` (issue #168, A6, classes.md decision 24).
+// It runs the contract suite of the port over the files that the suite gives (issue #172).
+describeLevelRepositoryContract(
+  'BundledLevelRepository',
+  (levels) => new BundledLevelRepository(levels),
+);
 
 const levelsDir = path.join(repoRoot, 'src/adapters/levels');
 
