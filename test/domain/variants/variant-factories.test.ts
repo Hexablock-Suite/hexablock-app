@@ -147,7 +147,7 @@ function figureTests<TCoord>(
   // A level of two cells and one domino that covers them.
   function fitLevel(named: TopologyId): FitLevel<TCoord> {
     const domino = new ShapeGroup([new CellNode(origin), new CellNode(next)]);
-    return FitLevel.of(named, BoardShape.of([origin, next]), [new Piece(domino, A)]);
+    return FitLevel.of(named, BoardShape.of([origin, next]), [new Piece(domino, A)], []);
   }
 
   return () => {
