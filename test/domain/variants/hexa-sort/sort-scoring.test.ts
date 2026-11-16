@@ -11,10 +11,7 @@ import {
   stack,
   tiles,
 } from '../../../support/variants/hexa-sort/sort-game';
-import {
-  SORT_POINTS_PER_TILE,
-  SortScoring,
-} from '../../../../src/domain/variants/hexa-sort/sort-scoring';
+import { SortScoring } from '../../../../src/domain/variants/hexa-sort/sort-scoring';
 import type { SquareCoord } from '../../../support/engine/square-topology';
 
 // The Sort scoring of issue #98. It codes the accepted rule of issue #59 (D22):
@@ -35,7 +32,6 @@ describe('SortScoring', () => {
 
     expect(game.play(place(1))).toBe(Outcome.playing);
 
-    expect(SORT_POINTS_PER_TILE).toBe(10);
     expect(game.snapshot().goalsDone).toEqual(ClearedStacks.of(1));
     expect(game.snapshot().score).toEqual(Score.of(110));
   });

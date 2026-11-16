@@ -485,8 +485,8 @@ describe('primitive scan of the domain', () => {
   });
 
   // Issue #203: `Score` replaces the number of every score in the engine.
-  // Only the factory, the delivery to a receiver and the factor of `Score.times()` keep a number.
-  // The value is private (issue #228), so the scan finds no `Score.value`.
+  // Only the factory and the delivery to a receiver keep a number. `Score.times()` is gone
+  // (issue #232). The value is private (issue #228), so the scan finds no `Score.value`.
   it('should_find_no_score_of_type_number_when_the_code_is_scanned', () => {
     const numbers = codeUses()
       .filter((use) => use.primitive === 'number')
@@ -506,7 +506,6 @@ describe('primitive scan of the domain', () => {
     expect(numbers.filter((place) => place.startsWith('Score.'))).toEqual([
       'Score.of',
       'Score.deliverTo',
-      'Score.times',
     ]);
   });
 
@@ -546,8 +545,9 @@ describe('primitive scan of the domain', () => {
   });
 
   // Issue #206: the three coordinates, `Radius` and `RegionSize` keep their numbers private.
-  // Only the factory methods, the operations of the two counts and the hex distance
-  // keep a primitive. A coordinate gives its `CoordKey` to its topology, not a text (issue #237).
+  // Only the factory methods keep a primitive. Since issue #243 the operations of the two counts
+  // and the distance of two cells take and give value objects.
+  // A coordinate gives its `CoordKey` to its topology, not a text (issue #237).
   // Issue #165: each coordinate delivers its two values to a receiver of the edge.
   // The gate allows that delivery, so it is no break and needs no baseline entry.
   it('should_find_no_public_value_of_a_coordinate_when_the_code_is_scanned', () => {
@@ -571,15 +571,9 @@ describe('primitive scan of the domain', () => {
     );
     expect(ofCoordinates.map(key).sort()).toEqual([
       'number HexCoord.deliverTo',
-      'number HexCoord.distanceTo',
       'number HexCoord.of',
-      'number Radius.measures',
       'number Radius.of',
-      'number Radius.offsets',
-      'number RegionSize.holds',
-      'number RegionSize.indexes',
       'number RegionSize.of',
-      'number RegionSize.offsets',
       'number SquareCoord.deliverTo',
       'number SquareCoord.of',
       'number TriangleCoord.deliverTo',
@@ -636,7 +630,8 @@ describe('primitive scan of the domain', () => {
   });
 
   // Issue #210, classes.md decision 48: a seed is a `Seed`, not a number.
-  // Only the factory of `Seed` and the first state of a generator keep a primitive.
+  // Only the factory of `Seed` keeps a primitive. The first state of a generator is a
+  // `GeneratorState` since issue #243.
   it('should_find_no_seed_of_type_number_when_the_code_is_scanned', () => {
     const uses = codeUses();
     const places = uses.map((use) => use.where);
@@ -652,7 +647,76 @@ describe('primitive scan of the domain', () => {
       expect(places).not.toContain(place);
     }
     const ofSeed = uses.filter((use) => use.where.startsWith('Seed.'));
-    expect(ofSeed.map(key).sort()).toEqual(['number Seed.generatorState', 'number Seed.of']);
+    expect(ofSeed.map(key).sort()).toEqual(['number Seed.of']);
+  });
+
+  // Issue #243: value objects replace the last primitives of the engine signatures:
+  // a random draw, a generator state, the area of a shape, a distance of the board and an undo
+  // limit. Each one keeps its number private. Only its factory method keeps a primitive,
+  // and a random draw gives its number to a receiver of the edge.
+  it('should_find_no_engine_primitive_that_keeps_a_readme_reason_when_the_code_is_scanned', () => {
+    const uses = codeUses();
+    const places = uses.map((use) => use.where);
+
+    for (const place of [
+      'RandomSource.next',
+      'Mulberry32Random.next',
+      'Seed.generatorState',
+      'ShapeNode.area',
+      'CellNode.area',
+      'ShapeGroup.area',
+      'HexCoord.distanceTo',
+      'SquareCoord.distanceTo',
+      'Radius.offsets',
+      'Radius.measures',
+      'RegionSize.indexes',
+      'RegionSize.offsets',
+      'RegionSize.holds',
+      'MoveHistory.constructor',
+    ]) {
+      expect(places).not.toContain(place);
+    }
+    const ofValues = uses.filter((use) =>
+      /^(RandomDraw|GeneratorState|Area|Distance|UndoLimit)\./.test(use.where),
+    );
+    expect(ofValues.map(key).sort()).toEqual([
+      'number Area.of',
+      'number Distance.of',
+      'number GeneratorState.of',
+      'number RandomDraw.deliverTo',
+      'number RandomDraw.of',
+      'number UndoLimit.of',
+    ]);
+  });
+
+  // Issue #232: value objects of the game replace the primitives that crossed the public
+  // signatures of the variants. `Score.times()` is gone: the Lines counts give their points.
+  // The constants of the variants stay private to their files.
+  it('should_find_no_primitive_of_a_variant_when_the_code_is_scanned', () => {
+    const places = codeUses().map((use) => use.where);
+
+    for (const place of [
+      'Score.times',
+      'LinesSnapshot.streak',
+      'LinesSnapshot.linesCleared',
+      'LinesSnapshot.cellsPlaced',
+      'LinesState.constructor',
+      'PlacePiece.constructor',
+      'SortSnapshot.clearedTiles',
+      'ColorStack.tileCount',
+      'NewTile.of',
+      'Chance.hits',
+      'FIT_POINTS_PER_TURN',
+      'POINTS_PER_CELL',
+      'POINTS_PER_LINE',
+      'TRAY_SIZE',
+      'START_TILES',
+      'MERGE_UNDO_LIMIT',
+      'GOAL_RUN',
+      'SORT_POINTS_PER_TILE',
+    ]) {
+      expect(places).not.toContain(place);
+    }
   });
 
   it('should_list_a_literal_type_as_its_primitive_when_a_signature_names_a_closed_union', () => {
@@ -754,16 +818,16 @@ describe('primitive scan of the domain', () => {
 });
 
 describe('domain primitive gate', () => {
+  // The variants have no break since #232, so a fixture under a variant folder stands for one.
   it('should_fail_the_gate_when_a_variant_signature_has_a_primitive_and_no_baseline_entry', () => {
-    const baseline = primitiveBaseline.filter((entry) => entry.where !== 'LinesSnapshot.streak');
+    const source = 'export interface FixtureSnapshot {\n  readonly streak: number;\n}';
 
-    expect(unexcused(codeBreaks(), baseline)).toContainEqual({
-      primitive: 'number',
-      where: 'LinesSnapshot.streak',
-    });
     expect(
       unexcused(breaksIn(variantFixture('fixture-tray.ts', 'export type TraySize = number;')), []),
     ).toEqual([{ primitive: 'number', where: 'TraySize' }]);
+    expect(
+      unexcused(breaksIn(variantFixture('fixture-photo.ts', source)), primitiveBaseline),
+    ).toEqual([{ primitive: 'number', where: 'FixtureSnapshot.streak' }]);
   });
 
   // The README row of `ElapsedTime.ofMs` explains a factory method. The same place
@@ -960,8 +1024,6 @@ describe('domain primitive gate', () => {
     expect(breaksIn(fixture('fixture-move.ts', source))).toEqual([
       { primitive: 'number', where: 'Move.constructor' },
     ]);
-    expect(codeBreaks()).toContainEqual({ primitive: 'number', where: 'PlacePiece.constructor' });
-    expect(codeBreaks()).toContainEqual({ primitive: 'number', where: 'MoveHistory.constructor' });
   });
 
   it('should_list_every_break_of_the_domain_when_the_baseline_is_read', () => {

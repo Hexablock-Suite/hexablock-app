@@ -64,7 +64,7 @@
       <h1>Hexa Merge: the bounded generic of §3.1</h1>
 
       <svg
-        viewBox="0 0 1040 1320"
+        viewBox="0 0 1040 1472"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="merge-title merge-desc"
@@ -79,7 +79,9 @@
           GameEngine aggregate: its own GameStateId is its identity, it keeps the MatchId of its
           game, and it changes in place only through its business methods. MergeSettings, Chance and
           NewTile are value objects: the settings hold the board size, the Seed, the target tile and
-          the chance of a 4, and a NewTile is one draw of the tile source.
+          the chance of a 4, and a NewTile is one draw of the tile source. The engine RandomDraw is
+          one draw of the random source from 0 up to 1: the place of a NewTile, and the draw that a
+          Chance compares. It replaced the Merge Draw of issue 232 (issue 243).
         </desc>
         <defs>
           <marker
@@ -140,7 +142,7 @@
           x="24"
           y="24"
           width="992"
-          height="1112"
+          height="1248"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -1048,7 +1050,7 @@
           x="464"
           y="880"
           width="210"
-          height="128"
+          height="144"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1101,14 +1103,23 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          + hits(draw: number): boolean
+          + hits(draw: RandomDraw): boolean
+        </text>
+        <text
+          x="480"
+          y="1016"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + isAbove(other: Chance): boolean
         </text>
         <!-- Class: NewTile (value object, decision 48) -->
         <rect
           x="706"
           y="880"
           width="284"
-          height="144"
+          height="160"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1138,7 +1149,7 @@
           NewTile
         </text>
         <text x="722" y="944" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - place: number
+          - place: RandomDraw
         </text>
         <text x="722" y="960" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - tile: TCell
@@ -1152,11 +1163,21 @@
           font-family="'IBM Plex Mono', monospace"
           text-decoration="underline"
         >
-          + of(place: number, tile: TCell): NewTile&lt;TCell&gt;
+          + of(place: RandomDraw, tile: TCell):
+        </text>
+        <text
+          x="733"
+          y="1000"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          NewTile&lt;TCell&gt;
         </text>
         <text
           x="722"
-          y="1000"
+          y="1016"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1165,7 +1186,7 @@
         </text>
         <text
           x="722"
-          y="1016"
+          y="1032"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1193,10 +1214,163 @@
         >
           TCell extends IMergeable‹TCell›
         </text>
+        <!-- NewTile keeps its place as a RandomDraw: use with role and multiplicity -->
+        <polyline
+          points="848,1040 848,1072"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#merge-open)"
+        />
+        <rect x="798" y="1050" width="44" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="820"
+          y="1059"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          place
+        </text>
+        <rect x="854" y="1056" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="860"
+          y="1065"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          1
+        </text>
+        <!-- Chance compares a RandomDraw with its chance in hits(): use -->
+        <polyline
+          points="569,1024 569,1160 728,1160"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#merge-open)"
+        />
+
+        <!-- Class: RandomDraw (engine value object, issue 243) -->
+        <rect
+          x="728"
+          y="1072"
+          width="240"
+          height="184"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="728" y1="1128" x2="968" y2="1128" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="848"
+          y="1088"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="848"
+          y="1100"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          engine
+        </text>
+        <text
+          x="848"
+          y="1118"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          RandomDraw
+        </text>
+        <text
+          x="744"
+          y="1144"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          - value: number
+        </text>
+        <line x1="728" y1="1152" x2="968" y2="1152" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="744"
+          y="1168"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + of(value: number): RandomDraw
+        </text>
+        <text
+          x="744"
+          y="1184"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + equals(other: RandomDraw): boolean
+        </text>
+        <text
+          x="744"
+          y="1200"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + isBelow(other: RandomDraw): boolean
+        </text>
+        <text
+          x="744"
+          y="1216"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + pick(items: T[]): T
+        </text>
+        <text
+          x="744"
+          y="1232"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + deliverTo(receiver:
+        </text>
+        <text
+          x="755"
+          y="1248"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          ValueReceiver&lt;number&gt;): void
+        </text>
+
         <!-- Footnote: classes the budget leaves out -->
         <text
           x="24"
-          y="1160"
+          y="1296"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1206,7 +1380,7 @@
         </text>
         <text
           x="24"
-          y="1176"
+          y="1312"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1217,7 +1391,7 @@
 
         <text
           x="24"
-          y="1192"
+          y="1328"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1227,7 +1401,7 @@
         </text>
         <text
           x="24"
-          y="1208"
+          y="1344"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1236,18 +1410,28 @@
           of the tile source is a NewTile: appearsOn() gives the empty cell and the tile (decision
           48).
         </text>
+        <text
+          x="24"
+          y="1360"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          A RandomDraw of the engine is one draw from 0 up to 1 (issue 243): the place of a NewTile
+          picks the empty cell, and Chance.hits() tells whether the next draw gives a 4.
+        </text>
         <!-- Legend -->
         <line
           x1="24"
-          y1="1232"
+          y1="1384"
           x2="1016"
-          y2="1232"
+          y2="1384"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1250"
+          y="1402"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1258,9 +1442,9 @@
 
         <line
           x1="24"
-          y1="1268"
+          y1="1420"
           x2="52"
-          y2="1268"
+          y2="1420"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -1268,7 +1452,7 @@
         />
         <text
           x="60"
-          y="1272"
+          y="1424"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1277,16 +1461,16 @@
         </text>
         <line
           x1="144"
-          y1="1268"
+          y1="1420"
           x2="172"
-          y2="1268"
+          y2="1420"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#merge-open)"
         />
         <text
           x="180"
-          y="1272"
+          y="1424"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1295,7 +1479,7 @@
         </text>
         <rect
           x="24"
-          y="1288"
+          y="1440"
           width="28"
           height="12"
           rx="2"
@@ -1305,7 +1489,7 @@
         />
         <text
           x="60"
-          y="1297"
+          y="1449"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1314,7 +1498,7 @@
         </text>
         <rect
           x="184"
-          y="1288"
+          y="1440"
           width="28"
           height="12"
           rx="2"
@@ -1325,7 +1509,7 @@
         />
         <text
           x="220"
-          y="1297"
+          y="1449"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1334,7 +1518,7 @@
         </text>
         <rect
           x="424"
-          y="1288"
+          y="1440"
           width="28"
           height="12"
           rx="2"
@@ -1345,7 +1529,7 @@
         />
         <text
           x="460"
-          y="1297"
+          y="1449"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1354,7 +1538,7 @@
         </text>
         <rect
           x="600"
-          y="1288"
+          y="1440"
           width="28"
           height="12"
           rx="2"
@@ -1364,18 +1548,18 @@
         />
         <text
           x="636"
-          y="1297"
+          y="1449"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
         </text>
-        <line x1="760" y1="1294" x2="776" y2="1294" stroke="#17212a" stroke-width="1" />
-        <circle cx="781" cy="1294" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="760" y1="1446" x2="776" y2="1446" stroke="#17212a" stroke-width="1" />
+        <circle cx="781" cy="1446" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="796"
-          y="1297"
+          y="1449"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

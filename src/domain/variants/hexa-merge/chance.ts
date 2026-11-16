@@ -1,9 +1,11 @@
+import { RandomDraw } from '../../engine/random-draw';
+
 // The chance that a new Merge tile is a 4 (statement §1.4, issue #210).
 // It is a value object: it never changes, and two chances are equal when their values are equal.
 // A chance is a number from 0 to 1, both included. Any other number throws a RangeError.
 // `of()` checks the number itself (issue #239). NaN is no chance.
 // Only Hexa Merge has a chance, so the class lives in this folder and not in the engine.
-// The number stays private: `hits()` compares a draw with it.
+// The number stays private: `hits()` compares a `RandomDraw` with it (issues #232 and #243).
 export class Chance {
   private constructor(private readonly value: number) {
     Object.freeze(this);
@@ -21,9 +23,16 @@ export class Chance {
     return this.value === other.value;
   }
 
-  // Tells if a draw hits. A draw is a number from 0 up to 1, as a random source gives it.
+  // Tells if a draw hits. A draw is the `RandomDraw` of a random source (issue #243).
   // It hits when it is below the chance. So a chance of 0 never hits, and a chance of 1 always hits.
-  hits(draw: number): boolean {
-    return draw < this.value;
+  // A draw is always below 1, so the chance of 1 hits with no comparison.
+  // Any other chance is a draw itself, and the draw hits when it falls below it.
+  hits(draw: RandomDraw): boolean {
+    return this.value === 1 || draw.isBelow(RandomDraw.of(this.value));
+  }
+
+  // Tells if this chance is above `other`. An equal chance is not above.
+  isAbove(other: Chance): boolean {
+    return this.value > other.value;
   }
 }
