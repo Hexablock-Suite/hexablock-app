@@ -11,6 +11,7 @@ import type { BoardState } from '../../src/domain/engine/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
 import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
 import { PlacePiece } from '../../src/domain/variants/hexa-lines/place-piece';
+import { TrayPosition } from '../../src/domain/variants/hexa-lines/tray-position';
 import { square } from '../support/engine/square-topology';
 import { firstMoveOf } from '../support/engine/variant-game';
 import { errorOf, gameUseCases, valueOf } from '../support/application/game-use-cases';
@@ -128,7 +129,7 @@ describe('LoggingAspect', () => {
     const { applyMove } = gameUseCases(linesFactory());
     const aspect = new LoggingAspect(applyMove, logger, 'ApplyMove');
 
-    const result = await aspect.execute({ move: new PlacePiece(0, square(0, 0)) });
+    const result = await aspect.execute({ move: new PlacePiece(TrayPosition.of(0), square(0, 0)) });
 
     const error = errorOf(result);
     expect(error.code).toBe('no-running-game');

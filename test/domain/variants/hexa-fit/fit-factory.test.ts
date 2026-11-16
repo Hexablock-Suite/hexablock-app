@@ -49,7 +49,7 @@ describe('FitFactory', () => {
     ).toEqual(['0,0', '1,0']);
     expect(initial.remaining().map((p) => delivered(p.occupant()))).toEqual(['a']);
     expect(outcome).toBe(Outcome.victory);
-    expect(engine.snapshot().score).toEqual(Score.of(0));
+    expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(0));
     expect(engine.takeEvents().map(dataOf)).toEqual([
       {
         gameId: GameId.of('hexa-fit'),
@@ -74,7 +74,7 @@ describe('FitFactory', () => {
     // `BoardShape` keeps a repeated cell, and the board rejects it by its topology key.
     const factory = new FitFactory(
       new SquareGeometry(),
-      FitLevel.of(TopologyId.square, BoardShape.of([square(0, 0), square(0, 0)]), []),
+      FitLevel.of(TopologyId.square, BoardShape.of([square(0, 0), square(0, 0)]), [], []),
       new ManualClock(),
     );
     const message = 'Two coordinates of the shape have the same key.';

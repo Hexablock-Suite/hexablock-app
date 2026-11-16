@@ -1,4 +1,6 @@
 import { TopologyId } from '../../../../src/domain/engine/geometry-factory';
+import { GameStateId } from '../../../../src/domain/engine/game-state-id';
+import type { MatchId } from '../../../../src/domain/engine/match-id';
 import { BoardShape } from '../../../../src/domain/engine/board-shape';
 import type { Clock } from '../../../../src/domain/engine/clock';
 import { Piece } from '../../../../src/domain/engine/piece';
@@ -10,6 +12,7 @@ import { FitLevel } from '../../../../src/domain/variants/hexa-fit/fit-level';
 import { FitState, type FitSnapshot } from '../../../../src/domain/variants/hexa-fit/fit-state';
 import { PieceId } from '../../../../src/domain/variants/hexa-fit/piece-id';
 import { ManualClock } from '../../engine/manual-clock';
+import { MATCH_ID } from '../../engine/match-id';
 import { square, type SquareCoord } from '../../engine/square-topology';
 import { boardLike } from '../../engine/variant-game';
 
@@ -28,7 +31,7 @@ export function fitFactory(clock: Clock = new ManualClock()): FitFactory<SquareC
   );
   return new FitFactory(
     new SquareGeometry(),
-    FitLevel.of(TopologyId.square, BoardShape.of([square(0, 0), square(1, 0)]), [domino]),
+    FitLevel.of(TopologyId.square, BoardShape.of([square(0, 0), square(1, 0)]), [domino], []),
     clock,
   );
 }
@@ -43,23 +46,26 @@ export function threeDominoFitFactory(clock: Clock = new ManualClock()): FitFact
       TopologyId.square,
       BoardShape.of(Array.from({ length: 6 }, (_, col) => square(col, 0))),
       [domino(A), domino(B), domino(C)],
+      [],
     ),
     clock,
   );
 }
 
 // A live state built again from a photo, so a test can ask the rules about the state that a game
-// shows. The engine never gives its state away. So the helper builds a new state with the ids
-// of the photo and a new square board of the same shape, and the state takes the photo back
-// with `restore()`. The photo hands out no board (issue #234).
+// shows. The engine never gives its state away. So the helper builds a new state of the match
+// `matchId` and a new square board of the same shape, and the state takes the photo back
+// with `restore()`. The photo hands out no board (issue #234), and it keeps its ids private
+// (issue #245): the ids of the state and of the board come from `matchId`.
 // A Fit photo does not hold the pieces of the level, so `pieces` gives them,
 // for example `fitFactory().createPieceSource()`.
 export function fitStateOf(
   photo: FitSnapshot<SquareCoord>,
   pieces: IPieceSource<Piece<PieceId, SquareCoord>>,
+  matchId: MatchId = MATCH_ID,
 ): FitState<SquareCoord> {
-  const board = boardLike(photo.board, new SquareGeometry(), photo.matchId);
-  const state = FitState.start(photo.stateId, photo.matchId, board, pieces);
+  const board = boardLike(photo.boardCopy(), new SquareGeometry(), matchId);
+  const state = FitState.start(GameStateId.of(matchId), matchId, board, pieces);
   state.restore(photo);
   return state;
 }

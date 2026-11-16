@@ -219,7 +219,12 @@ export class GameEngine<
   // It is `undefined` while the game goes on.
   private gameOverOf(next: TState, resolution: Resolution): GameOver | undefined {
     if (!resolution.endsTheGame()) return undefined;
-    return new GameOver(this.gameId, this.matchId, resolution.leadsTo(), photoOf(next).score);
+    return new GameOver(
+      this.gameId,
+      this.matchId,
+      resolution.leadsTo(),
+      photoOf(next).scoreSoFar(),
+    );
   }
 
   // Keeps the undo of a saved turn. A finished game forgets its moves: the game over event

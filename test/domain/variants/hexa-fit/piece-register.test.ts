@@ -124,12 +124,17 @@ describe('a Fit game with an equal piece id that is another object', () => {
     expect(state.placementOf(PieceId.of('b'))).toBeDefined();
     expect(state.placed()).toEqual([B]);
     expect(state.remaining().map((piece) => delivered(piece.occupant()))).toEqual(['a', 'c']);
-    expect(state.snapshot().placements.map(([id]) => delivered(id))).toEqual(['b']);
+    expect(
+      state
+        .snapshot()
+        .piecePlacements()
+        .map(([id]) => delivered(id)),
+    ).toEqual(['b']);
 
     rules.apply(state, new RemoveFitPiece(PieceId.of('b')));
 
     expect(state.placed()).toEqual([]);
     expect(state.placementOf(B)).toBeUndefined();
-    expect(state.snapshot().board.occupiedCells()).toEqual([]);
+    expect(state.snapshot().boardCopy().occupiedCells()).toEqual([]);
   });
 });

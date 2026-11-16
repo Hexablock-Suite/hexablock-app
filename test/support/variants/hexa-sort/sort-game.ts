@@ -5,7 +5,7 @@ import { Color } from '../../../../src/domain/engine/color';
 import type { CoordKey } from '../../../../src/domain/engine/coord-key';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
 import { GameId } from '../../../../src/domain/engine/game-id';
-import type { GameStateId } from '../../../../src/domain/engine/game-state-id';
+import { GameStateId } from '../../../../src/domain/engine/game-state-id';
 import type { MatchId } from '../../../../src/domain/engine/match-id';
 import { Piece } from '../../../../src/domain/engine/piece';
 import {
@@ -131,7 +131,7 @@ export function place(col: number, row = 0): PlaceStack<SquareCoord> {
 // The color names of the cell `(col, row)`, from the bottom to the top.
 // An empty cell gives `[]`.
 export function chipsAt(game: SortGame, col: number, row = 0): string[] {
-  return names(game.snapshot().board.occupantAt(square(col, row)));
+  return names(game.snapshot().boardCopy().occupantAt(square(col, row)));
 }
 
 // A Sort factory on a 2 × 2 square board. The level offers `offered` from a fixed list.
@@ -147,16 +147,21 @@ export function sortFactory(
 }
 
 // A live state built again from a photo, so a test can ask the rules about the state that a game
-// shows. The engine never gives its state away. So the helper builds a new state with the ids
-// and the source of the photo and a new square board of the same shape, and the state takes
-// the photo back with `restore()`. The photo hands out no board (issue #234).
-export function sortStateOf(photo: SortSnapshot<SquareCoord>): SortState<SquareCoord> {
+// shows. The engine never gives its state away. So the helper builds a new state of the match
+// `matchId` with the source and the goal of the photo and a new square board of the same shape,
+// and the state takes the photo back with `restore()`. The photo hands out no board (issue #234),
+// and it keeps its ids private (issue #245): the ids of the state and of the board come from
+// `matchId`.
+export function sortStateOf(
+  photo: SortSnapshot<SquareCoord>,
+  matchId: MatchId = MATCH_ID,
+): SortState<SquareCoord> {
   const state = SortState.start({
-    stateId: photo.stateId,
-    matchId: photo.matchId,
-    board: boardLike(photo.board, new SquareGeometry(), photo.matchId),
-    source: photo.source,
-    goalsNeeded: photo.goalsNeeded,
+    stateId: GameStateId.of(matchId),
+    matchId,
+    board: boardLike(photo.boardCopy(), new SquareGeometry(), matchId),
+    source: photo.pieceSource(),
+    goalsNeeded: photo.goal(),
   });
   state.restore(photo);
   return state;

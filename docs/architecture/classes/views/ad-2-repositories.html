@@ -74,8 +74,8 @@
           Class diagram across layers 4, 3 and 2 showing ApiProgressRepository in layer 4, which
           holds the ApiClient and the ApiDtoMapper and implements the ProgressRepository port of
           layer 2 directly, and LocalProgressRepository in layer 3, which holds the KeyValueStore
-          driver interface of layer 3 that DeviceKeyValueStore implements and implements the same
-          port.
+          driver interface of layer 3 and implements the same port. DeviceKeyValueStore implements
+          KeyValueStore over AsyncStorage.
         </desc>
         <defs>
           <marker
@@ -265,7 +265,7 @@
         <!-- DeviceKeyValueStore implements KeyValueStore: realization, down from layer 4 to layer 3 -->
         <line
           x1="336"
-          y1="168"
+          y1="184"
           x2="336"
           y2="284"
           stroke="#17212a"
@@ -344,7 +344,7 @@
           x="56"
           y="92"
           width="296"
-          height="72"
+          height="88"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -373,8 +373,11 @@
         >
           DeviceKeyValueStore
         </text>
-        <text x="72" y="156" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          storage library to choose
+        <text x="72" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + get(key: string): Promise&lt;string | undefined&gt;
+        </text>
+        <text x="72" y="172" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + set(key: string, value: string): Promise&lt;void&gt;
         </text>
         <!-- Class: ApiDtoMapper (DTO mapper) -->
         <rect

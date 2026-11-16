@@ -1,8 +1,8 @@
 # Clean Architecture layers
 
-Status: draft for review with the professor, 2026-10-30. Updated on 2026-10-31 to match the class diagram: one generic input port, the ports of decisions 10 to 12, engine interfaces that are not ports, and the presentation pattern. Updated on 2026-11-02: the `Logger` port takes a log entry, and its adapter writes the text (decision 37 of the class diagram). Updated on 2026-11-07: the status text and the planned marks of the diagram follow the code in `src/` (issue #147). Updated on 2026-11-15: the composition root, its game registry and the first adapters and drivers exist (issue #162). Updated on 2026-11-16: the text catalog exists (issue #154). Updated on 2026-11-16: the home screen, the game selector map and `HomePresenter` exist (issue #169).
+Status: draft for review with the professor, 2026-10-30. Updated on 2026-10-31 to match the class diagram: one generic input port, the ports of decisions 10 to 12, engine interfaces that are not ports, and the presentation pattern. Updated on 2026-11-02: the `Logger` port takes a log entry, and its adapter writes the text (decision 37 of the class diagram). Updated on 2026-11-07: the status text and the planned marks of the diagram follow the code in `src/` (issue #147). Updated on 2026-11-15: the composition root, its game registry and the first adapters and drivers exist (issue #162). Updated on 2026-11-16: the text catalog exists (issue #154). Updated on 2026-11-16: the home screen, the game selector map and `HomePresenter` exist (issue #169). Updated on 2026-11-16: the `KeyValueStore` driver interface and its driver `DeviceKeyValueStore` exist (issue #155).
 
-This page answers one question: in which layer does each piece of the client live? It follows the statement (§3.4, §4.2) and the layer rules in `.dependency-cruiser.cjs`. Part of the client exists today. `src/domain/` holds the engine and the four variants. `src/application/` holds the first use cases, `StartGame` and `ApplyMove`, with the input port `UseCase`, the ports `GameRepository`, `Logger` and `GameEventPublisher`, and the aspects `UseCaseAspect` and `LoggingAspect`. `src/adapters/` holds `InMemoryGameRepository`, the adapter of `GameRepository`, `NullGameEventPublisher`, a publisher that does nothing until `GameEventBus` exists, the text catalog in `src/adapters/texts/`, with one Spanish and one English entry for each visible text, `HomePresenter`, the presenter of the home screen and of the game selector map, and `GamePresenter` with `GameViewModel`, `StateMapper` and the default `SpaceStateMapper`, for the game screen (#170). `src/infrastructure/` holds the API client in `src/infrastructure/api/`, the composition root in `src/infrastructure/composition-root.ts` with its game registry, the drivers `SystemClock`, `SeededRandomSource`, `ConsoleLogger` and `SequentialMatchIds`, the board components in `src/infrastructure/board/`: `BoardView`, the `CellRenderer` interface, the default `SpaceCellRenderer` and the screen layout of each figure, and the shared parts of the screens in `src/infrastructure/ui/`, `GameStage` among them. `app/` holds the root layout, which only calls the root, the home screen, the game selector map and the game screen (#170). The other screens and the other adapters and drivers are planned. The diagram marks each planned piece. Component names follow the statement (§3.1, §3.4) and the [class diagram](classes.md). They are not final. The engine names carry no geometry: `Board<TCell, TCoord>` is the `HexBoard<TCell>` of §3.1 (decision 16 of the class diagram). IDs such as A1, D3 and Q7 refer to [`docs/REQUIREMENTS.md`](../REQUIREMENTS.md). The classes of layer 1 are in the [class diagram](classes.md).
+This page answers one question: in which layer does each piece of the client live? It follows the statement (§3.4, §4.2) and the layer rules in `.dependency-cruiser.cjs`. Part of the client exists today. `src/domain/` holds the engine and the four variants. `src/application/` holds the first use cases, `StartGame` and `ApplyMove`, with the input port `UseCase`, the ports `GameRepository`, `Logger` and `GameEventPublisher`, and the aspects `UseCaseAspect` and `LoggingAspect`. `src/adapters/` holds `InMemoryGameRepository`, the adapter of `GameRepository`, `NullGameEventPublisher`, a publisher that does nothing until `GameEventBus` exists, the text catalog in `src/adapters/texts/`, with one Spanish and one English entry for each visible text, `HomePresenter`, the presenter of the home screen and of the game selector map, `GamePresenter` with `GameViewModel`, `StateMapper` and the default `SpaceStateMapper`, for the game screen (#170), and the `KeyValueStore` driver interface. `src/infrastructure/` holds the API client in `src/infrastructure/api/`, the composition root in `src/infrastructure/composition-root.ts` with its game registry, the drivers `SystemClock`, `SeededRandomSource`, `ConsoleLogger`, `SequentialMatchIds` and `DeviceKeyValueStore` (the `KeyValueStore` over AsyncStorage), the board components in `src/infrastructure/board/`: `BoardView`, the `CellRenderer` interface, the default `SpaceCellRenderer` and the screen layout of each figure, and the shared parts of the screens in `src/infrastructure/ui/`, `GameStage` among them. `app/` holds the root layout, which only calls the root, the home screen, the game selector map and the game screen (#170). The other screens and the other adapters and drivers are planned. The diagram marks each planned piece. Component names follow the statement (§3.1, §3.4) and the [class diagram](classes.md). They are not final. The engine names carry no geometry: `Board<TCell, TCoord>` is the `HexBoard<TCell>` of §3.1 (decision 16 of the class diagram). IDs such as A1, D3 and Q7 refer to [`docs/REQUIREMENTS.md`](../REQUIREMENTS.md). The classes of layer 1 are in the [class diagram](classes.md).
 
 ## Diagram
 
@@ -25,7 +25,7 @@ flowchart TB
     end
     subgraph INFRA["src/infrastructure/"]
       API["api/client.ts: createApiClient<br/>api/schema.d.ts: generated OpenAPI types"]
-      STORAGE["DeviceKeyValueStore: local storage driver (planned)"]
+      STORAGE["DeviceKeyValueStore: local storage driver<br/>over AsyncStorage"]
       APIREPOS["api/: ApiProgressRepository, ApiLevelRepository,<br/>ApiLeaderboardGateway, ApiAccountGateway<br/>and ApiDtoMapper (planned)"]
       SECURE["SessionManager: secure token storage,<br/>single scope (planned)"]
       AUDIO["AudioManager: audio facade over the<br/>sound library, single scope (planned)"]
@@ -48,7 +48,7 @@ flowchart TB
     LEVELREPO["BundledLevelRepository (planned)"]
     GAMEREPO["InMemoryGameRepository"]
     TEXTS["texts/: the text catalog, one Spanish<br/>and one English entry for each key"]
-    KV["KeyValueStore interface (planned)"]
+    KV["KeyValueStore interface"]
   end
 
   subgraph L2["Layer 2: Use cases, src/application/"]
@@ -166,8 +166,8 @@ flowchart TB
   L1 ~~~ LEGEND
 
   classDef planned stroke-dasharray: 5 5
-  class SCREENS,APIREPOS,STORAGE,SECURE,AUDIO planned
-  class MAPPERS,EVENTBUS,LOCALREPO,LEVELREPO,KV planned
+  class SCREENS,APIREPOS,SECURE,AUDIO planned
+  class MAPPERS,EVENTBUS,LOCALREPO,LEVELREPO planned
   class PPORT,LBPORT,LVPORT,ACCPORT,SESSPORT,SETPORT planned
   class LGPLAN planned
 

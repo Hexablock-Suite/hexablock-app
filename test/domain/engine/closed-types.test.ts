@@ -2,6 +2,7 @@
 import { Board } from '../../../src/domain/engine/board';
 import type { BoardState } from '../../../src/domain/engine/board-state';
 import { Color } from '../../../src/domain/engine/color';
+import { Distance } from '../../../src/domain/engine/distance';
 import { coordKey, type CoordKey } from '../../../src/domain/engine/coord-key';
 import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
 import { HexTopology } from '../../../src/domain/engine/hex-topology';
@@ -31,6 +32,12 @@ import { BOARD_ID } from '../../support/engine/entity-ids';
 // Issue #207: an axis and a direction are instances of a closed class, so a text does not compile.
 // A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails
 // when the line compiles, because then the directive is unused.
+
+// A line of whole numbers. `Radius` and `RegionSize` walk any axis (issue #243).
+const numberLine = {
+  forward: (from: number) => from + 1,
+  backward: (from: number) => from - 1,
+};
 
 describe('closed axis classes', () => {
   it('should_reject_at_compile_time_when_a_board_line_names_an_axis_the_topology_lacks', () => {
@@ -87,15 +94,15 @@ describe('test double axes and directions', () => {
     const state: BoardState<FakeCell, SquareCoord> = emptyState(2);
 
     expect([...board.line(SquareAxis.col, square(0, 1))]).toEqual([square(0, 1), square(1, 1)]);
-    expect(state.snapshot().board.coordinates()).toHaveLength(4);
+    expect(state.snapshot().boardCopy().coordinates()).toHaveLength(4);
   });
 });
 
 describe('Radius', () => {
   it('should_keep_the_value_when_the_radius_is_a_whole_number_of_zero_or_more', () => {
-    expect(Radius.of(0).measures(0)).toBe(true);
-    expect(Radius.of(3).measures(3)).toBe(true);
-    expect(Radius.of(3).measures(2)).toBe(false);
+    expect(Radius.of(0).measures(Distance.of(0))).toBe(true);
+    expect(Radius.of(3).measures(Distance.of(3))).toBe(true);
+    expect(Radius.of(3).measures(Distance.of(2))).toBe(false);
   });
 
   it('should_throw_a_range_error_when_the_radius_is_negative_or_not_a_whole_number', () => {
@@ -109,7 +116,8 @@ describe('Radius', () => {
 
   it('should_store_zero_when_a_radius_is_negative_zero', () => {
     // `toEqual` tells 0 from a negative zero.
-    expect([...Radius.of(-0).offsets()]).toEqual([0]);
+    expect([...Radius.of(-0).offsets(0, numberLine)]).toEqual([0]);
+    expect(Radius.of(-0).measures(Distance.of(0))).toBe(true);
   });
 
   it('should_throw_a_range_error_when_a_radius_is_not_a_safe_integer', () => {
@@ -119,7 +127,9 @@ describe('Radius', () => {
         `A radius needs a whole number of zero or more, not ${value}.`,
       );
     }
-    expect(Radius.of(Number.MAX_SAFE_INTEGER).measures(Number.MAX_SAFE_INTEGER)).toBe(true);
+    expect(Radius.of(Number.MAX_SAFE_INTEGER).measures(Distance.of(Number.MAX_SAFE_INTEGER))).toBe(
+      true,
+    );
   });
 
   it('should_give_the_center_when_a_board_ring_has_radius_zero', () => {
@@ -154,8 +164,8 @@ describe('Color', () => {
 
 describe('RegionSize', () => {
   it('should_keep_the_value_when_the_size_is_a_whole_number_of_one_or_more', () => {
-    expect([...RegionSize.of(1).indexes()]).toEqual([0]);
-    expect([...RegionSize.of(5).indexes()]).toEqual([0, 1, 2, 3, 4]);
+    expect([...RegionSize.of(1).indexes(0, numberLine)]).toEqual([0]);
+    expect([...RegionSize.of(5).indexes(0, numberLine)]).toEqual([0, 1, 2, 3, 4]);
   });
 
   it('should_throw_a_range_error_when_the_size_is_below_one_or_not_a_whole_number', () => {
@@ -175,8 +185,8 @@ describe('RegionSize', () => {
       );
     }
     const largest = RegionSize.of(Number.MAX_SAFE_INTEGER);
-    expect(largest.holds(Number.MAX_SAFE_INTEGER - 1)).toBe(true);
-    expect(largest.holds(Number.MAX_SAFE_INTEGER)).toBe(false);
+    expect(largest.holds(Distance.of(Number.MAX_SAFE_INTEGER - 1))).toBe(true);
+    expect(largest.holds(Distance.of(Number.MAX_SAFE_INTEGER))).toBe(false);
   });
 
   it('should_cover_one_cell_when_the_region_size_is_one', () => {

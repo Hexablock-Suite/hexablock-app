@@ -107,7 +107,7 @@ describe('Merge new tiles', () => {
     const resolved = full.clone();
     game.rules.resolve(resolved);
     expect(values(resolved.snapshot())).toEqual(values(full.snapshot()));
-    expect(resolved.snapshot().tiles.take()[0]).toEqual(next);
+    expect(resolved.snapshot().tileSource().take()[0]).toEqual(next);
   });
 
   it('should_draw_only_twos_or_only_fours_when_the_chance_of_a_four_is_zero_or_one', () => {
