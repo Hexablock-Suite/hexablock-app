@@ -12,7 +12,7 @@ import type { ITimed } from './timed';
 // A rejected move starts nothing and stops nothing.
 export class TimedRulesDecorator<TMove, TState> implements IGameRules<TMove, TState> {
   constructor(
-    protected readonly inner: IGameRules<TMove, TState>,
+    private readonly inner: IGameRules<TMove, TState>,
     private readonly timer: LevelTimer,
   ) {}
 
