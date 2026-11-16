@@ -64,7 +64,7 @@
       <h1>Undo and redo: Command and segregated capabilities</h1>
 
       <svg
-        viewBox="0 0 1040 944"
+        viewBox="0 0 1040 992"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="history-title history-desc"
@@ -78,8 +78,10 @@
           its LevelTimerId is its identity, and equals() compares two timers by that id. The timer
           keeps its start and its stop as two ClockReading values, and ClockReading.elapsedSince()
           gives the ElapsedTime between two readings: never negative, in whole milliseconds. Each
-          MoveCommand keeps a TMemento, the immutable photo of the state before the move, which
-          BoardState.snapshot() gives (view 1, decision 34).
+          MoveCommand keeps two TMemento values, the immutable photos of the state before and after
+          the move, which BoardState.snapshot() gives (view 1, decision 34): undo() gives back the
+          first and redo() the second. MoveHistory hands each undone command to its protected
+          keepUndone(), which RedoableHistory overrides to keep the command for redo().
         </desc>
         <defs>
           <marker
@@ -140,7 +142,7 @@
           x="24"
           y="24"
           width="992"
-          height="720"
+          height="752"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -163,7 +165,7 @@
           x="56"
           y="64"
           width="920"
-          height="214"
+          height="246"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -184,7 +186,7 @@
 
         <rect
           x="56"
-          y="296"
+          y="328"
           width="920"
           height="252"
           rx="8"
@@ -195,7 +197,7 @@
         />
         <text
           x="68"
-          y="312"
+          y="344"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -228,7 +230,7 @@
         />
         <!-- MoveHistory implements IUndoable: realization, with a hop over the undone line -->
         <path
-          d="M616 268 a 8,8 0 0,1 0,16 V324"
+          d="M616 284 V292 a 8,8 0 0,1 0,16 V356"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -240,7 +242,7 @@
           x1="860"
           y1="196"
           x2="860"
-          y2="324"
+          y2="356"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -249,9 +251,9 @@
         <!-- LevelTimer implements ITimed: realization -->
         <line
           x1="248"
-          y1="360"
+          y1="392"
           x2="296"
-          y2="360"
+          y2="392"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -260,7 +262,7 @@
 
         <!-- RedoableHistory holds the MoveCommands it can redo as undone: aggregation, kept because Command holds it -->
         <path
-          d="M800 196 V264 Q800 272 792 272 H200 Q192 272 192 264 V236"
+          d="M800 196 V292 Q800 300 792 300 H200 Q192 300 192 292 V252"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -269,9 +271,9 @@
         <!-- LevelTimer keeps the ClockReading of its start as startedAt: use with role and multiplicity -->
         <line
           x1="112"
-          y1="532"
+          y1="564"
           x2="112"
-          y2="584"
+          y2="616"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#history-open)"
@@ -279,9 +281,9 @@
         <!-- LevelTimer keeps the ClockReading of its stop as stoppedAt: use with role and multiplicity -->
         <line
           x1="208"
-          y1="532"
+          y1="564"
           x2="208"
-          y2="584"
+          y2="616"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#history-open)"
@@ -300,10 +302,10 @@
         >
           done
         </text>
-        <rect x="200" y="242" width="40" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="200" y="262" width="40" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="220"
-          y="251"
+          y="271"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -312,10 +314,10 @@
         >
           undone
         </text>
-        <rect x="114" y="560" width="74" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="114" y="592" width="74" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="116"
-          y="569"
+          y="601"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -324,10 +326,10 @@
           startedAt
           <tspan font-weight="600">0..1</tspan>
         </text>
-        <rect x="210" y="560" width="74" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="210" y="592" width="74" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="212"
-          y="569"
+          y="601"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -349,10 +351,10 @@
         >
           0..*
         </text>
-        <rect x="156" y="242" width="28" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="156" y="262" width="28" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="170"
-          y="251"
+          y="271"
           fill="#17212a"
           font-size="8"
           font-weight="600"
@@ -366,14 +368,14 @@
           x="72"
           y="92"
           width="240"
-          height="144"
+          height="160"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
         <line x1="72" y1="140" x2="312" y2="140" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="72" y1="196" x2="312" y2="196" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="72" y1="212" x2="312" y2="212" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="192"
           y="110"
@@ -403,12 +405,15 @@
           - before: TMemento {memento}
         </text>
         <text x="88" y="188" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - after: TMemento {memento}
+        </text>
+        <text x="88" y="204" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - restore: (memento: TMemento) =&gt; void
         </text>
-        <text x="88" y="212" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="228" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + undo(): void
         </text>
-        <text x="88" y="228" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="244" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + redo(): void
         </text>
 
@@ -417,7 +422,7 @@
           x="376"
           y="92"
           width="320"
-          height="176"
+          height="192"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -470,6 +475,17 @@
         <text x="392" y="260" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + redoable(): IRedoable | undefined
         </text>
+        <text
+          x="392"
+          y="276"
+          textLength="296"
+          lengthAdjust="spacingAndGlyphs"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          # keepUndone(command: MoveCommand&lt;TMove, TMemento&gt;): void
+        </text>
 
         <!-- Class: RedoableHistory -->
         <rect
@@ -508,7 +524,7 @@
         <!-- Class: LevelTimer (entity) -->
         <rect
           x="72"
-          y="324"
+          y="356"
           width="176"
           height="208"
           rx="6"
@@ -516,11 +532,11 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="72" y1="372" x2="248" y2="372" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="72" y1="444" x2="248" y2="444" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="72" y1="404" x2="248" y2="404" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="72" y1="476" x2="248" y2="476" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="160"
-          y="342"
+          y="374"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -531,7 +547,7 @@
         </text>
         <text
           x="160"
-          y="360"
+          y="392"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -540,38 +556,38 @@
         >
           LevelTimer
         </text>
-        <text x="88" y="388" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="420" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - identity: LevelTimerId
         </text>
-        <text x="88" y="404" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="436" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - clock: Clock
         </text>
-        <text x="88" y="420" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="452" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - startedAt: ClockReading
         </text>
-        <text x="88" y="436" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="468" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - stoppedAt: ClockReading
         </text>
-        <text x="88" y="460" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="492" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: LevelTimer):
         </text>
-        <text x="88" y="492" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="524" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + start(): void
         </text>
-        <text x="88" y="508" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="540" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + stop(): void
         </text>
-        <text x="88" y="524" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="556" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + elapsedMs(): ElapsedTime
         </text>
-        <text x="99" y="476" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="99" y="508" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           boolean
         </text>
 
         <!-- Class: ITimed (interface) -->
         <rect
           x="296"
-          y="324"
+          y="356"
           width="176"
           height="72"
           rx="6"
@@ -579,10 +595,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="296" y1="372" x2="472" y2="372" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="296" y1="404" x2="472" y2="404" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="384"
-          y="342"
+          y="374"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -593,7 +609,7 @@
         </text>
         <text
           x="384"
-          y="360"
+          y="392"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -602,14 +618,14 @@
         >
           ITimed
         </text>
-        <text x="312" y="388" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="312" y="420" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + elapsedMs(): ElapsedTime
         </text>
 
         <!-- Class: IUndoable (interface) -->
         <rect
           x="536"
-          y="324"
+          y="356"
           width="160"
           height="88"
           rx="6"
@@ -617,10 +633,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="536" y1="372" x2="696" y2="372" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="536" y1="404" x2="696" y2="404" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="616"
-          y="342"
+          y="374"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -631,7 +647,7 @@
         </text>
         <text
           x="616"
-          y="360"
+          y="392"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -640,17 +656,17 @@
         >
           IUndoable
         </text>
-        <text x="552" y="388" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="552" y="420" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + canUndo(): boolean
         </text>
-        <text x="552" y="404" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="552" y="436" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + undo(): void
         </text>
 
         <!-- Class: IRedoable (interface) -->
         <rect
           x="780"
-          y="324"
+          y="356"
           width="160"
           height="88"
           rx="6"
@@ -658,10 +674,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="780" y1="372" x2="940" y2="372" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="780" y1="404" x2="940" y2="404" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="860"
-          y="342"
+          y="374"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -672,7 +688,7 @@
         </text>
         <text
           x="860"
-          y="360"
+          y="392"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -681,17 +697,17 @@
         >
           IRedoable
         </text>
-        <text x="796" y="388" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="796" y="420" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + canRedo(): boolean
         </text>
-        <text x="796" y="404" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="796" y="436" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + redo(): void
         </text>
 
         <!-- Class: ClockReading (value object, decision 25) -->
         <rect
           x="72"
-          y="584"
+          y="616"
           width="320"
           height="144"
           rx="6"
@@ -699,10 +715,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="72" y1="632" x2="392" y2="632" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="72" y1="664" x2="392" y2="664" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="232"
-          y="602"
+          y="634"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -713,7 +729,7 @@
         </text>
         <text
           x="232"
-          y="620"
+          y="652"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -722,13 +738,13 @@
         >
           ClockReading
         </text>
-        <text x="88" y="648" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="680" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - value: number
         </text>
-        <line x1="72" y1="656" x2="392" y2="656" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="72" y1="688" x2="392" y2="688" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="88"
-          y="672"
+          y="704"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -736,13 +752,13 @@
         >
           + of(value: number): ClockReading
         </text>
-        <text x="88" y="688" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="720" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + elapsedSince(earlier: ClockReading): ElapsedTime
         </text>
-        <text x="88" y="704" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="736" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: ClockReading): boolean
         </text>
-        <text x="88" y="720" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="752" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + deliverTo(receiver: ValueReceiver&lt;number&gt;): void
         </text>
 
@@ -811,8 +827,9 @@
           TMove, TMemento
         </text>
 
-        <!-- The footnote sits below the zone, which grew by 180 for ClockReading (#238). -->
-        <g transform="translate(0 180)">
+        <!-- The footnote sits below the zone, which grew by 180 for ClockReading (#238) and by 32
+             for the after photo and keepUndone() (#178). -->
+        <g transform="translate(0 212)">
           <!-- Footnote: classes the budget leaves out -->
           <text
             x="24"
@@ -831,8 +848,9 @@
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            TMemento is BoardSnapshot, the photo of the state (view 1, decision 34). IRedoable is
-            our addition (§3.2, ISP). LevelTimer reads time from the Clock interface (APP-NFR-07).
+            TMemento is BoardSnapshot, a photo of the state before or after the move (view 1,
+            decision 34). IRedoable is our addition (§3.2, ISP). LevelTimer reads time from the
+            Clock interface (APP-NFR-07).
           </text>
 
           <text
@@ -867,10 +885,20 @@
             The history never reads a photo: BoardState.restore() asks its queries, and every field
             of BoardSnapshot is private (decision 7, #245).
           </text>
+          <text
+            x="24"
+            y="672"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            undo() gives each undone command to keepUndone(): RedoableHistory keeps it, and redo()
+            gives back its after photo. A new move and clear() forget it (decisions 3 and 34, #178).
+          </text>
         </g>
 
-        <!-- The legend sits 32 lower than the footnote, which has two more lines (#238, #245). -->
-        <g transform="translate(0 212)">
+        <!-- The legend sits 48 lower than the footnote, which has three more lines (#238, #245, #178). -->
+        <g transform="translate(0 260)">
           <!-- Legend -->
           <line
             x1="24"

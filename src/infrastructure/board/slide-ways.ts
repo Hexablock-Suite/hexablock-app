@@ -1,0 +1,74 @@
+import type { GridAxis, GridTopology } from '../../domain/engine/grid-topology';
+import type { RegionSize } from '../../domain/engine/region-size';
+import { SLIDE_SENSES, Slide } from '../../domain/variants/hexa-merge/slide';
+import type { BoardLayout } from './board-layout';
+
+// The eight compass names of a way on the screen, counterclockwise from the east.
+// The text catalog names each one under `play.merge.slide.<name>`.
+const COMPASS = [
+  'east',
+  'north-east',
+  'north',
+  'north-west',
+  'west',
+  'south-west',
+  'south',
+  'south-east',
+] as const;
+
+export type Compass = (typeof COMPASS)[number];
+
+// One slide of Hexa Merge with the way that its tiles go on the screen (issue #177).
+// `angle` is the angle of the way in radians, from the east. The screen `y` grows down,
+// so a positive angle turns clockwise, as a CSS rotation does. `compass` is the nearest
+// of the eight compass names.
+export interface SlideWay {
+  readonly move: Slide<GridAxis>;
+  readonly compass: Compass;
+  readonly angle: number;
+}
+
+// The slides of a Merge board of the region `size` on `topology`: one for each axis and sense,
+// with its way on the screen of `layout` (issue #177). A hexagon gives six, a square four.
+// The way of a slide goes from the last cell to the first cell of its longest line, in the order
+// of `Slide.fromLeadingEdge()`. So the screen side asks the slide and the topology,
+// and it names no axis. The ways come clockwise from the north, the order of the screen reader.
+export function slideWays<TCoord>(
+  topology: GridTopology<TCoord>,
+  size: RegionSize,
+  layout: BoardLayout<TCoord>,
+): SlideWay[] {
+  const cells = topology.region(size).coordinates();
+  const keys = new Set(cells.map((c) => topology.key(c)));
+  const board = {
+    line: (axis: GridAxis, through: TCoord) =>
+      topology.line(axis, through, (c) => keys.has(topology.key(c))),
+  };
+  return topology
+    .axes()
+    .flatMap((axis) => SLIDE_SENSES.map((toward) => Slide.of(axis, toward)))
+    .map((move) => {
+      const longest = cells
+        .map((c) => [...move.lineThrough(board, c)])
+        .reduce((best, line) => (line.length > best.length ? line : best));
+      const ordered = move.fromLeadingEdge(longest);
+      const lead = layout.centerOf(ordered[0]);
+      const tail = layout.centerOf(ordered[ordered.length - 1]);
+      const angle = Math.atan2(lead.y - tail.y, lead.x - tail.x);
+      return { move, compass: compassOf(angle), angle };
+    })
+    .sort((a, b) => clockwiseFromNorth(a.angle) - clockwiseFromNorth(b.angle));
+}
+
+// The nearest compass name of `angle`. The compass turns counterclockwise, and the screen
+// angle turns clockwise, so the step count takes the other sign.
+function compassOf(angle: number): Compass {
+  const steps = Math.round(-angle / (Math.PI / 4));
+  return COMPASS[((steps % COMPASS.length) + COMPASS.length) % COMPASS.length];
+}
+
+// The angle in whole degrees, clockwise from the north: 0 for the north, 90 for the east.
+function clockwiseFromNorth(angle: number): number {
+  const degrees = Math.round((angle * 180) / Math.PI) + 90;
+  return ((degrees % 360) + 360) % 360;
+}

@@ -12,7 +12,7 @@ function newHistory(limit?: UndoLimit) {
   const record = (...states: string[]) => {
     for (const before of states) {
       history.record(
-        new MoveCommand(`move from ${before}`, before, (memento) => {
+        new MoveCommand(`move from ${before}`, before, `${before}'`, (memento) => {
           restored.push(memento);
         }),
       );
@@ -83,7 +83,7 @@ describe('MoveHistory', () => {
     let refuse = true;
     const restored: string[] = [];
     history.record(
-      new MoveCommand('move', 'a', (memento) => {
+      new MoveCommand('move', 'a', "a'", (memento) => {
         if (refuse) throw new RangeError('The engine is paused.');
         restored.push(memento);
       }),
@@ -116,12 +116,47 @@ describe('MoveHistory', () => {
 
   it('should_give_back_the_kept_state_when_a_command_is_undone', () => {
     const restored: string[] = [];
-    const command = new MoveCommand('the move', 'the state before', (memento) => {
-      restored.push(memento);
-    });
+    const command = new MoveCommand(
+      'the move',
+      'the state before',
+      'the state after',
+      (memento) => {
+        restored.push(memento);
+      },
+    );
 
     command.undo();
 
     expect(restored).toEqual(['the state before']);
+  });
+
+  // Issue #178: a command keeps the photo after its move too, so a redo gives it back.
+  it('should_give_back_the_kept_state_after_the_move_when_a_command_is_redone', () => {
+    const restored: string[] = [];
+    const command = new MoveCommand(
+      'the move',
+      'the state before',
+      'the state after',
+      (memento) => {
+        restored.push(memento);
+      },
+    );
+
+    command.undo();
+    command.redo();
+
+    expect(restored).toEqual(['the state before', 'the state after']);
+  });
+
+  // Issue #178: a plain history forgets an undone command, so it keeps nothing to redo.
+  it('should_forget_the_undone_command_when_the_history_is_a_plain_move_history', () => {
+    const { history, record, restored } = newHistory();
+    record('a', 'b');
+
+    history.undo();
+
+    expect(history.redoable()).toBeUndefined();
+    expect(restored).toEqual(['b']);
+    expect(history.canUndo()).toBe(true);
   });
 });

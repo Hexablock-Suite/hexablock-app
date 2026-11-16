@@ -3,7 +3,8 @@
 // The texts of one game live under `game.<id>.<part>`, where `<id>` is the text
 // of its `GameId`: the game selector finds the names of each registered game there (#169).
 // The texts of the game screen live under `play.<part>`, so no key of the game screen
-// looks like the key of a game (#170).
+// looks like the key of a game (#170). The texts of the move controls of one variant
+// live under `play.<variant>.<part>`, such as `play.fit.rotate` (#175).
 // The name of each board figure lives under `figure.<id>`, where `<id>` is the text
 // of its `TopologyId` (#171).
 export const es = {
@@ -26,6 +27,29 @@ export const es = {
   'play.outcome.game-over': 'Fin del juego',
   'play.error.move-rejected': 'Esa jugada no se puede hacer',
   'play.error': 'No se pudo jugar. Vuelve al mapa y abre el juego otra vez.',
+  'play.time': 'Tiempo',
+  'play.undo': 'Deshacer',
+  'play.redo': 'Rehacer',
+  'play.error.nothing-to-undo': 'No hay jugada para deshacer',
+  'play.error.nothing-to-redo': 'No hay jugada para rehacer',
+  'play.fit.moves': 'Movimientos',
+  'play.fit.tray': 'Bandeja de piezas',
+  'play.fit.piece': 'Pieza',
+  'play.fit.rotate': 'Girar',
+  'play.fit.hint.pick': 'Elige una pieza. Toca una pieza puesta para quitarla.',
+  'play.fit.hint.place': 'Toca una casilla libre: el punto de la pieza va ahí.',
+  'play.fit.hint.done': 'Todas las piezas están en la figura.',
+  'play.merge.slide.east': 'Deslizar al este',
+  'play.merge.slide.north-east': 'Deslizar al noreste',
+  'play.merge.slide.north': 'Deslizar al norte',
+  'play.merge.slide.north-west': 'Deslizar al noroeste',
+  'play.merge.slide.west': 'Deslizar al oeste',
+  'play.merge.slide.south-west': 'Deslizar al suroeste',
+  'play.merge.slide.south': 'Deslizar al sur',
+  'play.merge.slide.south-east': 'Deslizar al sureste',
+  'play.merge.target.title': '¡Lo lograste!',
+  'play.merge.target.body': 'Formaste la ficha objetivo. Sigue jugando para sumar más puntos.',
+  'play.merge.target.continue': 'Seguir jugando',
   'game.hexa-lines.name': 'Hexa Lines',
   'game.hexa-lines.place': 'Estación Línea',
   'game.hexa-fit.name': 'Hexa Fit',

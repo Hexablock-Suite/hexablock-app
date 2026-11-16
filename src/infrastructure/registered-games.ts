@@ -1,4 +1,14 @@
+import {
+  FitStateMapper,
+  type FitCellView,
+  type FitPayloadView,
+} from '../adapters/fit-state-mapper';
 import { fitLevelVariant, sortLevelVariant } from '../adapters/level-game-factories';
+import {
+  MergeStateMapper,
+  type MergeCellView,
+  type MergePayloadView,
+} from '../adapters/merge-state-mapper';
 import { SpaceStateMapper, type SpaceView } from '../adapters/space-state-mapper';
 import { BoardShape } from '../domain/engine/board-shape';
 import type { Clock } from '../domain/engine/clock';
@@ -6,6 +16,7 @@ import { Color } from '../domain/engine/color';
 import { ElapsedTime } from '../domain/engine/elapsed-time';
 import { GameId } from '../domain/engine/game-id';
 import { TopologyId, type GeometryFactory } from '../domain/engine/geometry-factory';
+import type { GridAxis } from '../domain/engine/grid-topology';
 import { HexGeometry } from '../domain/engine/hex-geometry';
 import { hex, type HexCoord } from '../domain/engine/hex-topology';
 import { Moves } from '../domain/engine/moves';
@@ -18,20 +29,30 @@ import { SquareGeometry } from '../domain/engine/square-geometry';
 import { TriangleGeometry } from '../domain/engine/triangle-geometry';
 import { FitFactory } from '../domain/variants/hexa-fit/fit-factory';
 import { FitLevel } from '../domain/variants/hexa-fit/fit-level';
+import type { FitMove } from '../domain/variants/hexa-fit/fit-move';
+import type { FitView } from '../domain/variants/hexa-fit/fit-state';
 import { FitStarThreshold } from '../domain/variants/hexa-fit/fit-stars';
 import { PieceId } from '../domain/variants/hexa-fit/piece-id';
 import { LinesFactory, LinesSettings } from '../domain/variants/hexa-lines/lines-factory';
 import { MergeFactory, MergeSettings } from '../domain/variants/hexa-merge/merge-factory';
+import type { MergeView } from '../domain/variants/hexa-merge/merge-state';
 import { MergeTile } from '../domain/variants/hexa-merge/merge-tile';
+import type { Slide } from '../domain/variants/hexa-merge/slide';
 import { GoalCount } from '../domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../domain/variants/hexa-sort/sort-factory';
 import { SortLevel } from '../domain/variants/hexa-sort/sort-level';
 import type { BoardLayout } from './board/board-layout';
+import { FitCellRenderer } from './board/fit-cell-renderer';
 import { HexLayout } from './board/hex-layout';
+import { MergeCellRenderer } from './board/merge-cell-renderer';
+import { slideWays } from './board/slide-ways';
 import { SpaceCellRenderer } from './board/space-cell-renderer';
 import { SquareLayout } from './board/square-layout';
 import { TriangleLayout } from './board/triangle-layout';
 import { registered, type RegisteredGame, type ScreenParts } from './game-registry';
+import { FitControls } from './ui/fit-controls';
+import { MergeControls } from './ui/merge-controls';
+import { BoardOnlyControls } from './ui/move-controls';
 
 // The count of seeds: the unsigned 32-bit integers (classes.md decision 48).
 const SEEDS = 2 ** 32;
@@ -89,8 +110,10 @@ export function boardFigures(): BoardFigure<unknown>[] {
 // starts a bundled level by its id (#172). The Fit level and the Sort level of each entry
 // are first content: a start with no level id starts them until the level selector (#173).
 // Each game shows its board with the default screen parts on the layout of the figure (#170).
-// Each «Play … on the game screen» task (#174 to #177) gives its game the state mapper
-// and the cell renderer of its variant in place of `defaultScreen()`.
+// Each «Play … on the game screen» task (#174 to #177) gives its game the state mapper,
+// the cell renderer and the move controls of its variant in place of `defaultScreen()`.
+// Fit has its own parts since #175: `fitScreen()`. Merge has its own parts since #177:
+// `mergeScreen()`.
 export function registeredGames<TCoord>(
   figure: BoardFigure<TCoord>,
   clock: Clock,
@@ -124,7 +147,7 @@ export function registeredGames<TCoord>(
     registered(
       GameId.of('hexa-merge'),
       new MergeFactory(geometry, MergeSettings.of(SMALL_BOARD, seedFrom(random), MERGE_TARGET)),
-      defaultScreen(figure),
+      mergeScreen(figure),
     ),
   ];
 }
@@ -147,20 +170,60 @@ function fitOn<TCoord>(figure: BoardFigure<TCoord>, clock: Clock): RegisteredGam
     registered(
       GameId.of('hexa-fit'),
       new FitFactory(figure.geometry, fitLevel, clock),
-      defaultScreen(figure),
+      fitScreen(figure),
       fitLevelVariant(figure.geometry, clock),
     ),
   ];
 }
 
 // The default screen parts on the board figure `figure`: the mapper and the renderer that tell
-// a free space from an occupied one, and the layout of the figure (D4, issue #165).
+// a free space from an occupied one, the controls that show the board alone,
+// and the layout of the figure (D4, issue #165).
 function defaultScreen<TCoord>(
   figure: BoardFigure<TCoord>,
 ): ScreenParts<unknown, TCoord, unknown, SpaceView, undefined> {
   return {
     mapper: new SpaceStateMapper(),
     renderer: new SpaceCellRenderer(),
+    controls: new BoardOnlyControls(),
+    layoutOf: (size) => figure.layoutOf(size),
+  };
+}
+
+// The screen parts of Hexa Fit on the board figure `figure` (issue #175): its state mapper
+// over the topology of the figure, its cell renderer, its move controls and the layout
+// of the figure.
+function fitScreen<TCoord>(
+  figure: BoardFigure<TCoord>,
+): ScreenParts<
+  PieceId,
+  TCoord,
+  FitView<TCoord>,
+  FitCellView,
+  FitPayloadView<TCoord>,
+  FitMove<TCoord>
+> {
+  return {
+    mapper: new FitStateMapper(figure.geometry.createTopology()),
+    renderer: new FitCellRenderer(),
+    controls: new FitControls(),
+    layoutOf: (size) => figure.layoutOf(size),
+  };
+}
+
+// The screen parts of Hexa Merge on the board figure `figure` (#177): `MergeStateMapper`,
+// `MergeCellRenderer`, `MergeControls` with one slide for each axis and sense of the topology
+// of the figure, and the layout of the figure. The slides take the board region of the Merge
+// factory, so each way on the screen follows the lines of that board.
+function mergeScreen<TCoord>(
+  figure: BoardFigure<TCoord>,
+): ScreenParts<MergeTile, TCoord, MergeView, MergeCellView, MergePayloadView, Slide<GridAxis>> {
+  return {
+    mapper: new MergeStateMapper(),
+    renderer: new MergeCellRenderer(),
+    controls: new MergeControls(
+      slideWays(figure.geometry.createTopology(), SMALL_BOARD, figure.layoutOf(1)),
+    ),
     layoutOf: (size) => figure.layoutOf(size),
   };
 }

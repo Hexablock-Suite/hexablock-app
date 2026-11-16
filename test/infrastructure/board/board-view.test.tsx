@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 import { StyleSheet, View } from 'react-native';
 
 import type { MoveResult } from '../../../src/application/move-result';
@@ -144,6 +144,44 @@ describe('BoardView', () => {
     await draw(responseWith<HexCoord>([[hex(0, 0), 'a']]), new HexLayout(SIZE));
 
     expect(screen.getByLabelText('Tablero')).toBe(boxOf('a')?.parent);
+  });
+
+  // Issue #175: the move controls of a variant take a press on a space. The board hands
+  // the handler the coordinate and the cell view of that space, so it reads no cell itself.
+  it('should_hand_the_coordinate_and_the_cell_to_the_handler_when_the_player_presses_a_space', async () => {
+    const pressed: [HexCoord, string][] = [];
+    const result = responseWith<HexCoord>([
+      [hex(0, 0), 'a'],
+      [hex(1, 0), 'b'],
+    ]);
+    await render(
+      <BoardView
+        cells={result.cells}
+        layout={new HexLayout(SIZE)}
+        renderer={fakeRenderer}
+        label="Tablero"
+        onPressSpace={(at, cell) => pressed.push([at, cell])}
+      />,
+    );
+
+    await fireEvent.press(screen.getByTestId('cell-b'));
+    await fireEvent.press(screen.getByTestId('cell-a'));
+
+    expect(pressed.map(([at, cell]) => [at.equals(result.cells[1][0]), cell])).toEqual([
+      [true, 'b'],
+      [false, 'a'],
+    ]);
+    expect(pressed[1][0].equals(hex(0, 0))).toBe(true);
+  });
+
+  // A board with no handler, such as the board of a game with no move controls,
+  // plays nothing when the player presses a space.
+  it('should_do_nothing_when_the_player_presses_a_space_of_a_board_with_no_handler', async () => {
+    await draw(responseWith<HexCoord>([[hex(0, 0), 'a']]), new HexLayout(SIZE));
+
+    await fireEvent.press(screen.getByTestId('cell-a'));
+
+    expect(screen.getByTestId('cell-a')).toBeOnTheScreen();
   });
 
   it('should_draw_no_cell_and_an_empty_frame_when_the_response_holds_no_cell', async () => {

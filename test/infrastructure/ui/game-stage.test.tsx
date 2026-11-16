@@ -12,6 +12,7 @@ import { valueOf } from '../../support/application/game-use-cases';
 import { RecordingLogger } from '../../support/application/recording-logger';
 import { ManualClock } from '../../support/engine/manual-clock';
 import { firstMoveOf } from '../../support/engine/variant-game';
+import { pressSpace } from '../../support/ui/board-spaces';
 
 // Issue #170: `GameStage`, the view of the game screen, shows the board of a game, its score
 // and its outcome, and starts the game when it opens. These tests build the real composition
@@ -78,8 +79,8 @@ describe('GameStage', () => {
     expect(screen.getByLabelText('Tablero')).toBeOnTheScreen();
     // The first Fit level has three cells, and no piece covers them yet.
     expect([free().length, occupied().length]).toEqual([3, 0]);
-    expect(screen.getByText('Puntos')).toBeOnTheScreen();
-    expect(screen.getByText('0')).toBeOnTheScreen();
+    // The Fit controls show the move count 0 too, so the test reads the score sign.
+    expect(screen.getByText('Puntos').parent).toHaveTextContent(/^Puntos\s*0$/);
     expect(logger.entries.map((entry) => [entry.useCase, entry.outcome])).toEqual([
       ['StartGame', 'success'],
     ]);
@@ -126,6 +127,41 @@ describe('GameStage', () => {
 
     expect(screen.getByRole('alert')).toHaveTextContent('Esa jugada no se puede hacer');
     expect([free().length, occupied().length]).toEqual(board);
+  });
+
+  // Issue #175: the board takes a press on a space for the move controls of a variant.
+  // A game with no move controls of its own plays no move when the player presses a space.
+  it('should_play_no_move_when_the_player_presses_a_space_of_a_game_with_no_move_controls', async () => {
+    const logger = new RecordingLogger();
+    await show(gameSessionOf(testRoot(logger), GameId.of('hexa-lines'), textCatalog.es));
+    const board = [free().length, occupied().length];
+
+    await pressSpace(0);
+
+    expect([free().length, occupied().length]).toEqual(board);
+    expect(logger.entries.map((entry) => entry.useCase)).toEqual(['StartGame']);
+  });
+
+  // Issue #178 (APP-FR-08): Lines and Sort show no undo. The move controls of a game choose
+  // its buttons: only the Fit controls show the undo and the redo for now (#179 adds Merge).
+  it('should_show_the_undo_and_the_redo_buttons_only_on_the_fit_screen_when_each_game_opens', async () => {
+    const shown: [string, number, number][] = [];
+    for (const id of FOUR_VARIANTS) {
+      await show(gameSessionOf(testRoot(), GameId.of(id), textCatalog.es));
+      shown.push([
+        id,
+        screen.queryAllByRole('button', { name: 'Deshacer' }).length,
+        screen.queryAllByRole('button', { name: 'Rehacer' }).length,
+      ]);
+      await screen.unmount();
+    }
+
+    expect(shown).toEqual([
+      ['hexa-lines', 0, 0],
+      ['hexa-fit', 1, 1],
+      ['hexa-sort', 0, 0],
+      ['hexa-merge', 0, 0],
+    ]);
   });
 
   it('should_call_back_when_the_player_presses_the_map_button', async () => {
