@@ -64,7 +64,7 @@
       <h1>Undo and redo: Command and segregated capabilities</h1>
 
       <svg
-        viewBox="0 0 1040 732"
+        viewBox="0 0 1040 748"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="history-title history-desc"
@@ -740,11 +740,22 @@
           and equals() compares two timers by it (decisions 19 and 26, view 5).
         </text>
 
-        <!-- Legend -->
-        <line x1="24" y1="644" x2="1016" y2="644" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="662"
+          y="640"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          The history never reads a photo: BoardState.restore() asks its queries, and every field of
+          BoardSnapshot is private (decision 7, #245).
+        </text>
+
+        <!-- Legend -->
+        <line x1="24" y1="660" x2="1016" y2="660" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <text
+          x="24"
+          y="678"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -755,16 +766,16 @@
 
         <line
           x1="24"
-          y1="680"
+          y1="696"
           x2="52"
-          y2="680"
+          y2="696"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#history-triangle)"
         />
         <text
           x="60"
-          y="684"
+          y="700"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -773,9 +784,9 @@
         </text>
         <line
           x1="144"
-          y1="680"
+          y1="696"
           x2="172"
-          y2="680"
+          y2="696"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -783,7 +794,7 @@
         />
         <text
           x="180"
-          y="684"
+          y="700"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -792,16 +803,16 @@
         </text>
         <line
           x1="264"
-          y1="680"
+          y1="696"
           x2="292"
-          y2="680"
+          y2="696"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#history-diamond-hollow)"
         />
         <text
           x="300"
-          y="684"
+          y="700"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -810,7 +821,7 @@
         </text>
         <rect
           x="24"
-          y="700"
+          y="716"
           width="28"
           height="12"
           rx="2"
@@ -820,7 +831,7 @@
         />
         <text
           x="60"
-          y="709"
+          y="725"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -829,7 +840,7 @@
         </text>
         <rect
           x="184"
-          y="700"
+          y="716"
           width="28"
           height="12"
           rx="2"
@@ -840,7 +851,7 @@
         />
         <text
           x="220"
-          y="709"
+          y="725"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -849,7 +860,7 @@
         </text>
         <rect
           x="424"
-          y="700"
+          y="716"
           width="28"
           height="12"
           rx="2"
@@ -860,7 +871,7 @@
         />
         <text
           x="460"
-          y="709"
+          y="725"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -869,7 +880,7 @@
         </text>
         <rect
           x="624"
-          y="700"
+          y="716"
           width="28"
           height="12"
           rx="2"
@@ -879,7 +890,7 @@
         />
         <text
           x="660"
-          y="709"
+          y="725"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
