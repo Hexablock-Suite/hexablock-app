@@ -317,7 +317,7 @@
           stroke-width="1"
           marker-end="url(#adpresenter-open)"
         />
-        <!-- HexLayout, SquareLayout and TriangleLayout implement BoardLayout: realization with binding -->
+        <!-- HexLayout implements BoardLayout: realization with binding -->
         <line
           x1="496"
           y1="376"
@@ -328,6 +328,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#adpresenter-triangle)"
         />
+        <!-- SquareLayout implements BoardLayout: realization with binding -->
         <line
           x1="656"
           y1="376"
@@ -338,6 +339,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#adpresenter-triangle)"
         />
+        <!-- TriangleLayout implements BoardLayout: realization with binding -->
         <line
           x1="816"
           y1="376"
@@ -451,9 +453,9 @@
           TView → LinesView
         </text>
 
-        <rect x="502" y="342" width="76" height="24" rx="2" fill="#cfdcf3" />
+        <rect x="499" y="342" width="74" height="24" rx="2" fill="#cfdcf3" />
         <text
-          x="540"
+          x="536"
           y="351"
           fill="#7d8a94"
           font-size="8"
@@ -464,7 +466,7 @@
           «bind» TCoord
         </text>
         <text
-          x="540"
+          x="536"
           y="362"
           fill="#7d8a94"
           font-size="8"
@@ -773,7 +775,7 @@
         <text x="440" y="316" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + centerOf(at: TCoord): ScreenPoint
         </text>
-        <!-- Classes: the three figure layouts -->
+        <!-- Class: HexLayout (the layout of the hexagon figure) -->
         <rect
           x="424"
           y="376"
@@ -795,6 +797,7 @@
         >
           HexLayout
         </text>
+        <!-- Class: SquareLayout (the layout of the square figure) -->
         <rect
           x="584"
           y="376"
@@ -816,6 +819,7 @@
         >
           SquareLayout
         </text>
+        <!-- Class: TriangleLayout (the layout of the triangle figure) -->
         <rect
           x="744"
           y="376"
