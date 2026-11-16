@@ -64,7 +64,7 @@
       <h1>Repositories: Adapter over storage and HTTP</h1>
 
       <svg
-        viewBox="0 0 1040 688"
+        viewBox="0 0 1040 744"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="adrepos-title adrepos-desc"
@@ -74,7 +74,8 @@
           Class diagram across layers 4, 3 and 2 showing ApiProgressRepository in layer 4, which
           holds the ApiClient and the ApiDtoMapper and implements the ProgressRepository port of
           layer 2 directly, and LocalProgressRepository in layer 3, which holds the KeyValueStore
-          driver interface of layer 3 and implements the same port. DeviceKeyValueStore implements
+          driver interface of layer 3 and implements the same port with load() and save(): it keeps
+          the GameProgress of each game as plain JSON in the store. DeviceKeyValueStore implements
           KeyValueStore over AsyncStorage.
         </desc>
         <defs>
@@ -156,7 +157,7 @@
           x="24"
           y="232"
           width="992"
-          height="160"
+          height="200"
           rx="8"
           fill="#e2ebf8"
           stroke="rgba(29,78,216,0.40)"
@@ -175,7 +176,7 @@
         </text>
         <rect
           x="24"
-          y="400"
+          y="440"
           width="992"
           height="100"
           rx="8"
@@ -185,7 +186,7 @@
         />
         <text
           x="40"
-          y="420"
+          y="460"
           fill="#7e22ce"
           font-size="8"
           font-weight="500"
@@ -242,8 +243,8 @@
         <rect
           x="432"
           y="256"
-          width="280"
-          height="120"
+          width="360"
+          height="160"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -296,9 +297,9 @@
         <!-- LocalProgressRepository implements ProgressRepository: realization, down from layer 3 to layer 2 -->
         <line
           x1="600"
-          y1="364"
+          y1="404"
           x2="600"
-          y2="436"
+          y2="476"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -306,7 +307,7 @@
         />
         <!-- ApiProgressRepository implements ProgressRepository: realization, down from layer 4 to layer 2 -->
         <path
-          d="M864 180 V448 Q864 456 856 456 H760"
+          d="M864 180 V488 Q864 496 856 496 H760"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -508,16 +509,16 @@
         <rect
           x="440"
           y="292"
-          width="256"
-          height="72"
+          width="340"
+          height="112"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="440" y1="340" x2="696" y2="340" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="440" y1="340" x2="780" y2="340" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="568"
+          x="610"
           y="310"
           fill="#5b6873"
           font-size="8"
@@ -528,7 +529,7 @@
           «Adapter» «repository»
         </text>
         <text
-          x="568"
+          x="610"
           y="328"
           fill="#17212a"
           font-size="12"
@@ -541,10 +542,17 @@
         <text x="456" y="356" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - store: KeyValueStore
         </text>
+        <line x1="440" y1="364" x2="780" y2="364" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="456" y="380" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + load(gameId: GameId): Promise&lt;GameProgress | undefined&gt;
+        </text>
+        <text x="456" y="396" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + save(progress: GameProgress): Promise&lt;void&gt;
+        </text>
         <!-- Reference box: ProgressRepository, detailed in view 3.3 -->
         <rect
           x="560"
-          y="436"
+          y="476"
           width="200"
           height="40"
           rx="6"
@@ -555,7 +563,7 @@
         />
         <text
           x="660"
-          y="450"
+          y="490"
           fill="#7d8a94"
           font-size="7"
           font-weight="500"
@@ -567,7 +575,7 @@
         </text>
         <text
           x="660"
-          y="466"
+          y="506"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -579,7 +587,7 @@
         <!-- Footnote: classes the budget leaves out -->
         <text
           x="24"
-          y="524"
+          y="564"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -589,7 +597,7 @@
         </text>
         <text
           x="24"
-          y="540"
+          y="580"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -599,7 +607,7 @@
         </text>
         <text
           x="24"
-          y="556"
+          y="596"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -607,11 +615,21 @@
           A level result goes to the backend as stars, moves and elapsedMs, the field names of
           GameResult. No port names a transport type.
         </text>
-        <!-- Legend -->
-        <line x1="24" y1="576" x2="1016" y2="576" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="594"
+          y="612"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          LocalProgressRepository saves the GameProgress of each game as plain JSON under the key
+          progress:&lt;game id&gt; and reads each value with deliverTo() (decision 57, #164).
+        </text>
+        <!-- Legend -->
+        <line x1="24" y1="632" x2="1016" y2="632" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <text
+          x="24"
+          y="650"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -622,9 +640,9 @@
 
         <line
           x1="24"
-          y1="612"
+          y1="668"
           x2="52"
-          y2="612"
+          y2="668"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -632,7 +650,7 @@
         />
         <text
           x="60"
-          y="616"
+          y="672"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -641,16 +659,16 @@
         </text>
         <line
           x1="144"
-          y1="612"
+          y1="668"
           x2="172"
-          y2="612"
+          y2="668"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#adrepos-diamond-hollow)"
         />
         <text
           x="180"
-          y="616"
+          y="672"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -659,16 +677,16 @@
         </text>
         <line
           x1="384"
-          y1="612"
+          y1="668"
           x2="412"
-          y2="612"
+          y2="668"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adrepos-open)"
         />
         <text
           x="420"
-          y="616"
+          y="672"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -678,7 +696,7 @@
 
         <rect
           x="24"
-          y="632"
+          y="688"
           width="28"
           height="12"
           rx="2"
@@ -688,7 +706,7 @@
         />
         <text
           x="60"
-          y="641"
+          y="697"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -697,7 +715,7 @@
         </text>
         <rect
           x="184"
-          y="632"
+          y="688"
           width="28"
           height="12"
           rx="2"
@@ -707,7 +725,7 @@
         />
         <text
           x="220"
-          y="641"
+          y="697"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -716,7 +734,7 @@
         </text>
         <rect
           x="344"
-          y="632"
+          y="688"
           width="28"
           height="12"
           rx="2"
@@ -726,7 +744,7 @@
         />
         <text
           x="380"
-          y="641"
+          y="697"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -735,7 +753,7 @@
         </text>
         <rect
           x="504"
-          y="632"
+          y="688"
           width="28"
           height="12"
           rx="2"
@@ -746,7 +764,7 @@
         />
         <text
           x="540"
-          y="641"
+          y="697"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -755,7 +773,7 @@
         </text>
         <rect
           x="760"
-          y="632"
+          y="688"
           width="28"
           height="12"
           rx="2"
@@ -766,7 +784,7 @@
         />
         <text
           x="796"
-          y="641"
+          y="697"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -776,7 +794,7 @@
 
         <rect
           x="24"
-          y="656"
+          y="712"
           width="28"
           height="12"
           rx="2"
@@ -786,7 +804,7 @@
         />
         <text
           x="60"
-          y="665"
+          y="721"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

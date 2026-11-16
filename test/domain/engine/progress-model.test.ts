@@ -6,6 +6,7 @@ import { Moves } from '../../../src/domain/engine/moves';
 import { GameResult, ProgressRecord } from '../../../src/domain/engine/progress-model';
 import { Score } from '../../../src/domain/engine/score';
 import { Stars } from '../../../src/domain/engine/stars';
+import { recordContentOf } from '../../support/engine/progress-content';
 
 // A progress value holds value objects: a `Score`, `Moves`, a `LevelId`, an `ElapsedTime`
 // and `Stars`. It has no check of its own: each value object is valid when it exists
@@ -69,6 +70,44 @@ describe('ProgressRecord', () => {
     expect(record(10, 5000).equals(record(10, 5000))).toBe(true);
     expect(record(10, 5000).equals(record(11, 5000))).toBe(false);
     expect(record(10, 5000).equals(record(10, 5001))).toBe(false);
+  });
+
+  // The fields are private. A repository of the edge receives them through `deliverTo()`
+  // (issue #164), and the delivery returns nothing.
+  it('should_deliver_each_value_object_when_a_receiver_takes_the_record_of_a_level', () => {
+    const record = ProgressRecord.of({
+      gameId,
+      score: Score.of(12),
+      levelId: LevelId.of('l1'),
+      stars: Stars.of(2),
+      moves: Moves.of(9),
+      elapsedMs: ElapsedTime.ofMs(3000),
+    });
+
+    const content = recordContentOf(record);
+
+    expect([
+      content.gameId.equals(gameId),
+      content.score.equals(Score.of(12)),
+      content.levelId?.equals(LevelId.of('l1')),
+      content.stars?.equals(Stars.of(2)),
+      content.moves?.equals(Moves.of(9)),
+      content.elapsedMs?.equals(ElapsedTime.ofMs(3000)),
+    ]).toEqual([true, true, true, true, true, true]);
+    expect(record.deliverTo({ receive: () => undefined })).toBeUndefined();
+  });
+
+  it('should_deliver_no_level_values_when_a_receiver_takes_the_record_of_a_high_score', () => {
+    const content = recordContentOf(ProgressRecord.of({ gameId, score: Score.of(36) }));
+
+    expect(content.gameId.equals(gameId)).toBe(true);
+    expect(content.score.equals(Score.of(36))).toBe(true);
+    expect([content.levelId, content.stars, content.moves, content.elapsedMs]).toEqual([
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+    ]);
   });
 
   // A game with no levels has no level id and no stars, and that is valid.

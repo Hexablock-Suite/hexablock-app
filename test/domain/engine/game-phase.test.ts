@@ -14,6 +14,7 @@ import {
 } from '../../../src/domain/engine/game-phase';
 import { dataOf } from '../../support/engine/game-over';
 import { MATCH_ID } from '../../support/engine/match-id';
+import { RecordingReceiver } from '../../support/engine/value-receiver';
 
 // The value that `act` throws, or `undefined` when it throws nothing.
 function thrownBy(act: () => void): unknown {
@@ -179,6 +180,17 @@ describe('GameId', () => {
   it('should_be_equal_when_two_ids_hold_the_same_value', () => {
     expect(GameId.of('hexa-fit').equals(GameId.of('hexa-fit'))).toBe(true);
     expect(GameId.of('hexa-fit').equals(GameId.of('hexa-sort'))).toBe(false);
+  });
+
+  // The text leaves the id only through a receiver (issue #164).
+  // The local progress repository saves the progress of a game under a key with this text.
+  it('should_deliver_its_text_once_and_return_nothing_when_a_receiver_takes_it', () => {
+    const receiver = new RecordingReceiver<string>();
+
+    const returned: void = GameId.of('hexa-fit').deliverTo(receiver);
+
+    expect(returned).toBeUndefined();
+    expect(receiver.received()).toEqual(['hexa-fit']);
   });
 });
 
