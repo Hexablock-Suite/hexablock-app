@@ -1,5 +1,6 @@
 import { ApplyMove } from '../../../src/application/apply-move';
 import type { GameEventPublisher } from '../../../src/application/game-event-publisher';
+import type { GameFactories } from '../../../src/application/game-factories';
 import type { GameRepository } from '../../../src/application/game-repository';
 import type { Result, UseCaseError } from '../../../src/application/result';
 import { StartGame } from '../../../src/application/start-game';
@@ -8,6 +9,7 @@ import type { BoardState } from '../../../src/domain/engine/board-state';
 import type { Cloneable } from '../../../src/domain/engine/cloneable';
 import type { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameFactory } from '../../../src/domain/engine/game-factory';
+import type { LevelId } from '../../../src/domain/engine/level-id';
 import type { MatchIdGenerator } from '../../../src/domain/engine/match-id-generator';
 import type { IVariantFactory } from '../../../src/domain/engine/variant-factory';
 import { CountingMatchIds } from '../engine/match-id';
@@ -43,6 +45,25 @@ export class MemoryGameRepository<
   }
 }
 
+// A test double of the `GameFactories` port (issue #172). It gives the one factory `factory`
+// to a start with no level id, and it rejects a level id, as a game with no levels does.
+// `LevelGameFactories` of layer 3 comes with the composition root.
+export function factoriesOf<
+  TCell,
+  TCoord,
+  TMove,
+  TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
+>(factory: GameFactory<TCell, TCoord, TMove, TState>): GameFactories<TCell, TCoord, TMove, TState> {
+  return {
+    factoryFor: async (levelId?: LevelId) => {
+      if (levelId !== undefined) {
+        throw new RangeError('The game has no level with this id.', { cause: levelId });
+      }
+      return factory;
+    },
+  };
+}
+
 // The game use cases of one variant over one shared repository.
 // `ApplyMove` delivers the events of each turn to `events`, and it writes a publisher
 // failure to `logger` (issues 132 and 233).
@@ -64,7 +85,7 @@ export function gameUseCases<
   return {
     games,
     logger,
-    startGame: new StartGame(new GameFactory(gameIdOf(factory), factory, ids), games),
+    startGame: new StartGame(factoriesOf(new GameFactory(gameIdOf(factory), factory, ids)), games),
     applyMove: new ApplyMove(games, logger, events),
     undoMove: new UndoMove(games),
   };

@@ -3,6 +3,7 @@ import type { MoveResult } from '../application/move-result';
 import type { Result, UseCaseError } from '../application/result';
 import type { StartGameRequest } from '../application/start-game';
 import type { UseCase } from '../application/use-case';
+import type { LevelId } from '../domain/engine/level-id';
 import { Outcome } from '../domain/engine/outcome';
 import type { Score } from '../domain/engine/score';
 import type { StateMapper } from './state-mapper';
@@ -83,9 +84,11 @@ export class GamePresenter<TCell, TCoord, TMove, TView, TCellView, TPayloadView>
     return this.model;
   }
 
-  // Opens a new game through `StartGame`.
-  async onStart(): Promise<void> {
-    this.present(await this.startGame.execute({}));
+  // Opens a new game through `StartGame`. `levelId` names the level that the player chose,
+  // and a game with no levels starts with no level id (issue #172).
+  // The presenter passes the id on and never reads it.
+  async onStart(levelId?: LevelId): Promise<void> {
+    this.present(await this.startGame.execute(levelId === undefined ? {} : { levelId }));
   }
 
   // Plays one move through `ApplyMove`.

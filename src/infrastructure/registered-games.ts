@@ -1,3 +1,4 @@
+import { fitLevelVariant, sortLevelVariant } from '../adapters/level-game-factories';
 import { SpaceStateMapper, type SpaceView } from '../adapters/space-state-mapper';
 import { BoardShape } from '../domain/engine/board-shape';
 import type { Clock } from '../domain/engine/clock';
@@ -64,8 +65,8 @@ export interface BoardFigure<TCoord> {
 // The board figures, in the order of the figure selector. The first one, the hexagon,
 // is the default figure. The composition root builds one registry for each figure.
 // The registry hides the coordinate type, as it hides the types of each variant.
-// The first content has one Fit level, on the hexagon. So Fit offers no level on the square
-// and on the triangle until the bundled levels of #168 come through a level repository.
+// The first content has one Fit level, on the hexagon. Every bundled Fit level is hex too,
+// so Fit offers no level on the square and on the triangle.
 export function boardFigures(): BoardFigure<unknown>[] {
   return [
     boardFigure(TopologyId.hex, new HexGeometry(), (size) => new HexLayout(size), firstFitLevel()),
@@ -84,9 +85,9 @@ export function boardFigures(): BoardFigure<unknown>[] {
 // Fit takes the clock for its level timer (classes.md decision 19).
 // Fit offers only the levels whose `topology` names the figure (S3-08 in #151,
 // «Propuesta, pendiente del equipo»). A figure with no Fit level has no Fit entry.
-// The Fit level and the Sort level are first content only: #172 lets the player choose
-// a level from the level repository of #168, and `StartGame` then takes a port in place
-// of the factory.
+// Fit and Sort also take their `LevelVariant` on the geometry of the figure, so `StartGame`
+// starts a bundled level by its id (#172). The Fit level and the Sort level of each entry
+// are first content: a start with no level id starts them until the level selector (#173).
 // Each game shows its board with the default screen parts on the layout of the figure (#170).
 // Each «Play … on the game screen» task (#174 to #177) gives its game the state mapper
 // and the cell renderer of its variant in place of `defaultScreen()`.
@@ -118,6 +119,7 @@ export function registeredGames<TCoord>(
         SortLevel.seeded(SMALL_BOARD, SORT_GOALS, seedFrom(random), nonEmpty(SORT_COLORS)),
       ),
       defaultScreen(figure),
+      sortLevelVariant(geometry),
     ),
     registered(
       GameId.of('hexa-merge'),
@@ -146,6 +148,7 @@ function fitOn<TCoord>(figure: BoardFigure<TCoord>, clock: Clock): RegisteredGam
       GameId.of('hexa-fit'),
       new FitFactory(figure.geometry, fitLevel, clock),
       defaultScreen(figure),
+      fitLevelVariant(figure.geometry, clock),
     ),
   ];
 }
@@ -179,7 +182,8 @@ function seedFrom(random: RandomSource): Seed {
 // A Fit level of three cells in a row and two pieces, a domino and a single cell.
 // It can be won: the domino covers the first two cells, and the single cell covers the third.
 // The fewest moves are 2, so the third star can be won.
-// #172 starts the bundled levels by their id, in place of this level.
+// A start with no level id starts this level. A start with a level id starts the bundled
+// level of that id (#172).
 function firstFitLevel(): FitLevel<HexCoord> {
   return FitLevel.of(
     TopologyId.hex,

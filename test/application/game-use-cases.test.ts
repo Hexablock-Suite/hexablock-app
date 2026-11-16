@@ -37,6 +37,7 @@ import { firstMoveOf, gameIdOf } from '../support/engine/variant-game';
 import { variantIdOf } from '../support/variants/variant-id';
 import {
   errorOf,
+  factoriesOf,
   gameUseCases,
   MemoryGameRepository,
   valueOf,
@@ -351,7 +352,7 @@ describe('StartGame and ApplyMove', () => {
     const oldGame = games.running();
     const before = runningGameOf(games);
     const broken = new StartGame(
-      new GameFactory(LINES, brokenStart(linesFactory()), new CountingMatchIds()),
+      factoriesOf(new GameFactory(LINES, brokenStart(linesFactory()), new CountingMatchIds())),
       games,
     );
 
@@ -413,11 +414,13 @@ describe('StartGame and ApplyMove', () => {
     const oldGame = working.games.running();
     const before = runningGameOf(working.games);
     const broken = new StartGame(
-      new GameFactory(LINES, linesFactory(), {
-        next: () => {
-          throw new Error('The generator has no id.');
-        },
-      }),
+      factoriesOf(
+        new GameFactory(LINES, linesFactory(), {
+          next: () => {
+            throw new Error('The generator has no id.');
+          },
+        }),
+      ),
       working.games,
     );
 
@@ -468,7 +471,7 @@ describe('StartGame and ApplyMove', () => {
 
   it('should_return_a_start_failed_failure_when_the_repository_throws_on_replace', async () => {
     const startGame = new StartGame(
-      new GameFactory(LINES, linesFactory(), new CountingMatchIds()),
+      factoriesOf(new GameFactory(LINES, linesFactory(), new CountingMatchIds())),
       new ThrowingRepository('replace'),
     );
 

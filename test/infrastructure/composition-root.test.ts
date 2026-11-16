@@ -1,6 +1,7 @@
 /** @jest-environment node */
 import { GameId } from '../../src/domain/engine/game-id';
 import { TopologyId } from '../../src/domain/engine/geometry-factory';
+import { LevelId } from '../../src/domain/engine/level-id';
 import { CompositionRoot } from '../../src/infrastructure/composition-root';
 import { errorOf, valueOf } from '../support/application/game-use-cases';
 import { RecordingLogger } from '../support/application/recording-logger';
@@ -200,6 +201,42 @@ describe('CompositionRoot', () => {
       expect(() => testRoot().registry({} as TopologyId)).toThrow(
         new RangeError('The root offers no board figure with this id.'),
       );
+    });
+  });
+
+  // Issue #172 (S3-13 in #151, option D): the root builds one `StartGame` for each game,
+  // and its `GameFactories` port gives the factory of a bundled level by its id.
+  describe('levels', () => {
+    // `fit-02` has seven cells. The Fit level of a start with no level id has three.
+    it('should_start_the_bundled_level_when_the_start_game_of_the_root_gets_its_level_id', async () => {
+      const { startGame } = testRoot().gameUseCases(GameId.of('hexa-fit'));
+
+      const started = valueOf(await startGame.execute({ levelId: LevelId.of('fit-02') }));
+
+      expect(started.freeSpaces).toHaveLength(7);
+    });
+
+    // Hexa Lines has no levels. Every bundled Sort level is hex, so the square refuses it (S3-08).
+    it('should_answer_start_failed_when_the_game_on_the_figure_has_no_level_with_the_id', async () => {
+      const root = testRoot();
+
+      const errors = [
+        errorOf(
+          await root
+            .gameUseCases(GameId.of('hexa-lines'))
+            .startGame.execute({ levelId: LevelId.of('fit-01') }),
+        ),
+        errorOf(
+          await root
+            .gameUseCases(GameId.of('hexa-sort'), TopologyId.square)
+            .startGame.execute({ levelId: LevelId.of('sort-01') }),
+        ),
+      ];
+
+      expect(errors.map((error) => [error.code, error.message])).toEqual([
+        ['start-failed', 'The game has no level with this id.'],
+        ['start-failed', 'A Sort level builder cannot build the board of another topology.'],
+      ]);
     });
   });
 
