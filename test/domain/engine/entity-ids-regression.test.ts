@@ -7,8 +7,10 @@ import type { BoardState, SnapshotOf } from '../../../src/domain/engine/board-st
 import type { Cloneable } from '../../../src/domain/engine/cloneable';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameFactory } from '../../../src/domain/engine/game-factory';
+import { GameStateId } from '../../../src/domain/engine/game-state-id';
 import { PlayingPhase } from '../../../src/domain/engine/game-phase';
 import { LevelTimer } from '../../../src/domain/engine/level-timer';
+import { MatchId } from '../../../src/domain/engine/match-id';
 import type { MatchIdGenerator } from '../../../src/domain/engine/match-id-generator';
 import type { Outcome } from '../../../src/domain/engine/outcome';
 import type { Resolution } from '../../../src/domain/engine/resolution';
@@ -39,6 +41,7 @@ import {
 import { linesFactory, linesStateOf } from '../../support/variants/hexa-lines/lines-game';
 import { mergeFactory, mergeStateOf } from '../../support/variants/hexa-merge/merge-game';
 import { place, sortFactory, sortStateOf } from '../../support/variants/hexa-sort/sort-game';
+import { viewData } from '../../support/variants/view-data';
 
 // The regression probe of T18 (classes.md decisions 7 and 26). The verifier of the own ids
 // wrote it. It pins four things at the public interface:
@@ -48,12 +51,19 @@ import { place, sortFactory, sortStateOf } from '../../support/variants/hexa-sor
 // - an earlier snapshot, its cells, its score and its view never change after more moves;
 // - a state method that throws, and rules that throw inside a turn, change nothing.
 // Since R8 `GameEngine.snapshot()` gives a photo (decision 34). The photo holds the two ids
-// and a copy of the board, so the probe compares the ids of two photos where it compared
-// two states. The rules and the state methods need a live state, so the probe builds one.
+// and a copy of the board, so the probe asks each photo whose state it shows where it compared
+// two states. The photo keeps its ids private (issue #245), so the probe names the state id
+// that it expects. A view keeps its fields private too, so the probe compares the data that
+// each view delivers. The rules and the state methods need a live state, so the probe builds one.
 
 type AnyState<TCell, TCoord, TState> = BoardState<TCell, TCoord> & Cloneable<TState>;
 
 const json = (value: unknown): string => JSON.stringify(value);
+
+// The first two matches of a counting match id generator, and the ids of their states.
+const FIRST_MATCH = MatchId.of('match-1');
+const FIRST_STATE = GameStateId.of(FIRST_MATCH);
+const SECOND_STATE = GameStateId.of(MatchId.of('match-2'));
 
 // A game factory of the variant with a counting match id generator, unless a test gives its own.
 function gamesOf<TCell, TCoord, TMove, TState extends AnyState<TCell, TCoord, TState>>(
@@ -95,13 +105,14 @@ function timerAt(timers: readonly LevelTimer[], index: number): LevelTimer {
   return timer;
 }
 
-// A copy of the state of a photo. A photo hands out no board (issue #234), so the probe
-// builds the state of the photo again and asks that state for its copy.
+// A copy of the state of a photo of the match `matchId`. A photo hands out no board (issue #234),
+// so the probe builds the state of the photo again and asks that state for its copy.
 function stateCopyOf<TCell, TCoord, TMove, TState extends AnyState<TCell, TCoord, TState>>(
   variant: IVariantFactory<TCell, TCoord, TMove, TState, unknown>,
   photo: SnapshotOf<TState>,
+  matchId: MatchId,
 ): BoardState<TCell, TCoord> {
-  const state = variant.createInitialState(photo.matchId, photo.stateId, BoardId.of(photo.matchId));
+  const state = variant.createInitialState(matchId, GameStateId.of(matchId), BoardId.of(matchId));
   state.restore(photo);
   return state.clone();
 }
@@ -116,11 +127,14 @@ function idFactsOf<TCell, TCoord, TMove, TState extends AnyState<TCell, TCoord, 
   const firstState = first.snapshot();
   const secondState = second.snapshot();
   return {
-    statesEqual: firstState.stateId.equals(secondState.stateId),
-    boardsEqual: firstState.board.equals(secondState.board),
-    laterStateEqual: firstState.stateId.equals(first.snapshot().stateId),
-    laterBoardEqual: firstState.board.equals(first.snapshot().board),
-    boardCloneEqual: stateCopyOf(variant, firstState).snapshot().board.equals(firstState.board),
+    statesEqual: secondState.isPhotoOf(FIRST_STATE),
+    boardsEqual: firstState.boardCopy().equals(secondState.boardCopy()),
+    laterStateEqual: [firstState, first.snapshot()].every((photo) => photo.isPhotoOf(FIRST_STATE)),
+    laterBoardEqual: firstState.boardCopy().equals(first.snapshot().boardCopy()),
+    boardCloneEqual: stateCopyOf(variant, firstState, FIRST_MATCH)
+      .snapshot()
+      .boardCopy()
+      .equals(firstState.boardCopy()),
     gamesEqual: first.equals(second),
   };
 }
@@ -153,9 +167,15 @@ function aliasingOf<TCell, TCoord, TMove, TState extends AnyState<TCell, TCoord,
   const record = () => {
     const snapshot = game.snapshot();
     snapshots.push(snapshot);
-    taken.push(json([snapshot.board.occupiedCells(), snapshot.score, snapshot.view()]));
+    taken.push(
+      json([
+        snapshot.boardCopy().occupiedCells(),
+        snapshot.scoreSoFar(),
+        viewData(snapshot.view()),
+      ]),
+    );
     views.push(snapshot.view());
-    viewsTaken.push(json(snapshot.view()));
+    viewsTaken.push(json(viewData(snapshot.view())));
   };
   record();
   for (let i = 0; i < 4; i += 1) {
@@ -168,10 +188,12 @@ function aliasingOf<TCell, TCoord, TMove, TState extends AnyState<TCell, TCoord,
     }
     record();
   }
-  const now = snapshots.map((s) => json([s.board.occupiedCells(), s.score, s.view()]));
-  const viewsNow = views.map((view) => json(view));
-  const cellsBefore = json(game.snapshot().board.occupiedCells());
-  const scoreBefore = game.snapshot().score;
+  const now = snapshots.map((s) =>
+    json([s.boardCopy().occupiedCells(), s.scoreSoFar(), viewData(s.view())]),
+  );
+  const viewsNow = views.map((view) => json(viewData(view)));
+  const cellsBefore = json(game.snapshot().boardCopy().occupiedCells());
+  const scoreBefore = game.snapshot().scoreSoFar();
   // The photo is frozen, so a write to it fails and changes neither the photo nor the game.
   const changed = game.snapshot();
   const writeRefused = !Reflect.set(changed, 'score', scoreBefore.add(Score.of(5)));
@@ -181,11 +203,11 @@ function aliasingOf<TCell, TCoord, TMove, TState extends AnyState<TCell, TCoord,
     viewsTaken,
     viewsNow,
     cellsBefore,
-    cellsAfter: json(game.snapshot().board.occupiedCells()),
+    cellsAfter: json(game.snapshot().boardCopy().occupiedCells()),
     writeRefused,
     scoreBefore,
-    gameScore: game.snapshot().score,
-    changedScore: changed.score,
+    gameScore: game.snapshot().scoreSoFar(),
+    changedScore: changed.scoreSoFar(),
   };
 }
 
@@ -198,13 +220,13 @@ function firstOf<T>(items: Iterable<T>): T | undefined {
 // and the placed pieces with their placements.
 function shownBy<TCell, TCoord>(state: BoardState<TCell, TCoord>): string {
   const photo = state.snapshot();
-  return json([photo.board.occupiedCells(), photo.score, photo.view()]);
+  return json([photo.boardCopy().occupiedCells(), photo.scoreSoFar(), viewData(photo.view())]);
 }
 
 function shownByFit(state: FitState<SquareCoord>): string {
   return json([
     shownBy(state),
-    state.snapshot().moves,
+    state.snapshot().moveCount(),
     state.placed().map((id) => [id, state.placementOf(id) !== undefined]),
   ]);
 }
@@ -273,7 +295,8 @@ function throwingTurnOf<TCell, TCoord, TMove, TState extends AnyState<TCell, TCo
     variant.createHistory(),
   );
   game.start(variant.createInitialState(MATCH_ID, STATE_ID, BOARD_ID));
-  const shown = () => json([game.snapshot().board.occupiedCells(), game.snapshot().score]);
+  const shown = () =>
+    json([game.snapshot().boardCopy().occupiedCells(), game.snapshot().scoreSoFar()]);
   const before = shown();
   const move = firstOf(variant.createRules().validMoves(liveStateOf(variant, game.snapshot())));
   if (move === undefined) throw new Error('The first state has no valid move.');
@@ -309,16 +332,16 @@ describe('own ids of the board and the states (T18 probe)', () => {
 
     expect([first.equals(second), second.equals(first)]).toEqual([false, false]);
     expect([
-      first.snapshot().stateId.equals(second.snapshot().stateId),
-      second.snapshot().stateId.equals(first.snapshot().stateId),
-      first.snapshot().board.equals(second.snapshot().board),
-      second.snapshot().board.equals(first.snapshot().board),
+      first.snapshot().isPhotoOf(SECOND_STATE),
+      second.snapshot().isPhotoOf(FIRST_STATE),
+      first.snapshot().boardCopy().equals(second.snapshot().boardCopy()),
+      second.snapshot().boardCopy().equals(first.snapshot().boardCopy()),
       timerOf(first).equals(timerOf(second)),
       timerOf(second).equals(timerOf(first)),
     ]).toEqual([false, false, false, false, false, false]);
     expect([
-      first.snapshot().stateId.equals(first.snapshot().stateId),
-      first.snapshot().board.equals(first.snapshot().board),
+      first.snapshot().isPhotoOf(FIRST_STATE),
+      first.snapshot().boardCopy().equals(first.snapshot().boardCopy()),
       timerOf(first).equals(timerOf(first)),
     ]).toEqual([true, true, true]);
   });
@@ -334,8 +357,8 @@ describe('own ids of the board and the states (T18 probe)', () => {
 
     expect([
       first.equals(second),
-      first.snapshot().stateId.equals(second.snapshot().stateId),
-      first.snapshot().board.equals(second.snapshot().board),
+      first.snapshot().isPhotoOf(STATE_ID) && second.snapshot().isPhotoOf(STATE_ID),
+      first.snapshot().boardCopy().equals(second.snapshot().boardCopy()),
       timerAt(timers, 0).equals(timerAt(timers, 1)),
     ]).toEqual([true, true, true, true]);
   });
@@ -373,7 +396,7 @@ describe('own ids of the board and the states (T18 probe)', () => {
     game.play(place(0, 0));
     state.placeOfferedStack(square(0, 0));
 
-    expect(game.snapshot().stateId.equals(before.stateId)).toBe(true);
+    expect([before, game.snapshot()].every((photo) => photo.isPhotoOf(FIRST_STATE))).toBe(true);
     expect(state.equals(earlier)).toBe(true);
   });
 });
@@ -381,14 +404,16 @@ describe('own ids of the board and the states (T18 probe)', () => {
 describe('aliasing of earlier snapshots (T18 probe)', () => {
   it('should_keep_every_earlier_snapshot_and_view_when_the_game_plays_more_moves', () => {
     const results = [
-      aliasingOf(sortFactory(), [place(0, 0), place(1, 0), place(0, 1)], sortStateOf),
+      aliasingOf(sortFactory(), [place(0, 0), place(1, 0), place(0, 1)], (photo) =>
+        sortStateOf(photo, FIRST_MATCH),
+      ),
       aliasingOf(
         linesFactory(),
         [
           new PlacePiece(TrayPosition.of(0), square(0, 0)),
           new PlacePiece(TrayPosition.of(0), square(1, 1)),
         ],
-        linesStateOf,
+        (photo) => linesStateOf(photo, FIRST_MATCH),
       ),
       aliasingOf(
         threeDominoFitFactory(),
@@ -396,9 +421,9 @@ describe('aliasing of earlier snapshots (T18 probe)', () => {
           new PlaceFitPiece(A, Turns.of(0), square(0, 0)),
           new PlaceFitPiece(B, Turns.of(0), square(2, 0)),
         ],
-        (photo) => fitStateOf(photo, threeDominoFitFactory().createPieceSource()),
+        (photo) => fitStateOf(photo, threeDominoFitFactory().createPieceSource(), FIRST_MATCH),
       ),
-      aliasingOf(mergeFactory(3), [], mergeStateOf),
+      aliasingOf(mergeFactory(3), [], (photo) => mergeStateOf(photo, FIRST_MATCH)),
     ];
 
     for (const result of results) {
@@ -418,18 +443,25 @@ describe('aliasing of earlier snapshots (T18 probe)', () => {
     const game = gamesOf(variant).createGame();
     const first = game.snapshot();
     const shown = () =>
-      json([first.board.occupiedCells(), first.merged, first.score, first.targetReached]);
+      json([
+        first.boardCopy().occupiedCells(),
+        first.mergedTiles(),
+        first.scoreSoFar(),
+        first.hasReachedTarget(),
+      ]);
     const before = shown();
 
     for (let i = 0; i < 6; i += 1) {
-      const slide = firstOf(variant.createRules().validMoves(mergeStateOf(game.snapshot())));
+      const slide = firstOf(
+        variant.createRules().validMoves(mergeStateOf(game.snapshot(), FIRST_MATCH)),
+      );
       if (slide !== undefined) game.tryPlay(slide);
     }
     expect(shown()).toBe(before);
 
     // The photo freezes its list of merged tiles, so a push throws and changes nothing.
-    expect(() => (first.merged as MergeTile[]).push(MergeTile.of(2))).toThrow(TypeError);
-    expect(first.merged).toHaveLength(JSON.parse(before)[1].length);
+    expect(() => (first.mergedTiles() as MergeTile[]).push(MergeTile.of(2))).toThrow(TypeError);
+    expect(first.mergedTiles()).toHaveLength(JSON.parse(before)[1].length);
   });
 });
 
@@ -437,7 +469,7 @@ describe('atomicity of the state methods (T18 probe)', () => {
   it('should_keep_the_fit_state_when_a_fit_method_throws', () => {
     const state = threeDominoFitFactory().createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
     // The board gives the full turn that a placement needs.
-    const topology = state.snapshot().board;
+    const topology = state.snapshot().boardCopy();
     const shown = () => shownByFit(state);
 
     const result = allKept([

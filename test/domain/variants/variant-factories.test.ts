@@ -47,6 +47,7 @@ import { sortFactory } from '../../support/variants/hexa-sort/sort-game';
 import { BOARD_ID } from '../../support/engine/entity-ids';
 import { MATCH_ID } from '../../support/engine/match-id';
 import { delivered } from '../../support/engine/value-receiver';
+import { fitViewData } from '../../support/variants/view-data';
 
 // The engine runs the four variants through one code path (issue 99, APP-FR-03).
 // `playOnce()` reads only `IVariantFactory`: it has no branch on the game id.
@@ -124,7 +125,7 @@ const mergeSettings = MergeSettings.of(RegionSize.of(2), Seed.of(7), MergeTile.o
 function startMerge<TCoord>(geometry: GeometryFactory<TCoord>) {
   const factory = new MergeFactory(geometry, mergeSettings);
   const { engine, rules } = startVariant(factory);
-  const { board } = engine.snapshot();
+  const board = engine.snapshot().boardCopy();
   const tiles = board.occupiedCells().length;
   const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, engine.snapshot())));
   return { cells: board.coordinates().length, axes: board.axes(), tiles, outcome };
@@ -163,12 +164,12 @@ function figureTests<TCoord>(
       const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, start)));
 
       expect(region).toHaveLength(cellCount);
-      expect(keys(start.board.coordinates())).toEqual(region);
-      expect(start.board.occupiedCells()).toEqual([]);
-      expect(start.tray).toHaveLength(3);
+      expect(keys(start.boardCopy().coordinates())).toEqual(region);
+      expect(start.boardCopy().occupiedCells()).toEqual([]);
+      expect(start.trayPieces()).toHaveLength(3);
       expect(outcome).toBe(Outcome.playing);
-      expect(engine.snapshot().cellsPlaced).toEqual(CellCount.of(1));
-      expect(engine.snapshot().tray).toHaveLength(2);
+      expect(engine.snapshot().lastPlacedCells()).toEqual(CellCount.of(1));
+      expect(engine.snapshot().trayPieces()).toHaveLength(2);
     });
 
     it('should_start_sort_on_the_region_of_the_geometry_when_the_sort_factory_gets_it', () => {
@@ -182,11 +183,16 @@ function figureTests<TCoord>(
 
       const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, start)));
 
-      expect(keys(start.board.coordinates())).toEqual(region);
-      expect(start.board.occupiedCells()).toEqual([]);
-      expect(start.offered?.occupant().equals(ColorStack.of([Color.of('red')]))).toBe(true);
+      expect(keys(start.boardCopy().coordinates())).toEqual(region);
+      expect(start.boardCopy().occupiedCells()).toEqual([]);
+      expect(
+        start
+          .offeredStack()
+          ?.occupant()
+          .equals(ColorStack.of([Color.of('red')])),
+      ).toBe(true);
       expect(outcome).toBe(Outcome.playing);
-      expect(engine.snapshot().board.occupiedCells()).toHaveLength(1);
+      expect(engine.snapshot().boardCopy().occupiedCells()).toHaveLength(1);
     });
 
     it('should_start_and_win_the_fit_level_when_its_topology_names_the_geometry', () => {
@@ -197,8 +203,10 @@ function figureTests<TCoord>(
 
       const outcome = engine.play(new PlaceFitPiece(A, Turns.of(0), origin));
 
-      expect(keys(start.board.coordinates())).toEqual(keys([origin, next]));
-      expect(start.view().remaining.map((piece) => delivered(piece.occupant()))).toEqual(['a']);
+      expect(keys(start.boardCopy().coordinates())).toEqual(keys([origin, next]));
+      expect(
+        fitViewData(start.view()).remaining.map((piece) => delivered(piece.occupant())),
+      ).toEqual(['a']);
       expect(outcome).toBe(Outcome.victory);
     });
 

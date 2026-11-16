@@ -11,7 +11,7 @@ import { TrayPosition } from './tray-position';
 // so they never hard-code 3 axes or 6 directions (D4).
 // Hexa Lines has no gravity (REQUIREMENTS.md §8). A cleared cell stays empty, and no cell moves.
 // The rules decide. The state changes itself: the rules call `placePiece()` and `clearLines()`.
-// The rules read the state through its photo and through `canPlace()`, never through a field.
+// The rules ask the photo of the state and `canPlace()`, and they read no field.
 // The rules read no field of a move: they pass the move to the state (classes.md decision 43).
 // The `TrayPosition` of a `PlacePiece` checks its own index, so the rules do not check it again.
 export class LinesRules<TCoord> extends BaseGameRules<PlacePiece<TCoord>, LinesState<TCoord>> {
@@ -22,9 +22,9 @@ export class LinesRules<TCoord> extends BaseGameRules<PlacePiece<TCoord>, LinesS
   // A lazy generator: each tray piece at each offset that a board cell gives.
   // The «no tray piece fits» end reads only its first move (classes.md decision 33).
   *validMoves(state: LinesState<TCoord>): Iterable<PlacePiece<TCoord>> {
-    const { tray, board } = state.snapshot();
-    const offsets = board.coordinates();
-    for (const index of tray.keys()) {
+    const photo = state.snapshot();
+    const offsets = photo.boardCopy().coordinates();
+    for (const index of photo.trayPieces().keys()) {
       const position = TrayPosition.of(index);
       for (const at of offsets) {
         const move = new PlacePiece(position, at);
@@ -46,7 +46,7 @@ export class LinesRules<TCoord> extends BaseGameRules<PlacePiece<TCoord>, LinesS
   // The streak counts the placements in a row that clear at least one line.
   // The first placement that clears no line sets it back to 0.
   resolve(state: LinesState<TCoord>): Resolution {
-    state.clearLines(fullLines(state.snapshot().board));
+    state.clearLines(fullLines(state.snapshot().boardCopy()));
     return Resolution.resolved();
   }
 

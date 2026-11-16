@@ -1,5 +1,5 @@
 import type { Board, ReadonlyBoard } from '../../engine/board';
-import { checkOwnSnapshot, type BoardSnapshot, type BoardState } from '../../engine/board-state';
+import { BoardSnapshot, checkOwnSnapshot, type BoardState } from '../../engine/board-state';
 import type { CoordKey } from '../../engine/coord-key';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { GridAxis } from '../../engine/grid-topology';
@@ -10,9 +10,24 @@ import type { IMergeable } from './mergeable';
 import type { NewTile } from './new-tile';
 import type { Slide } from './slide';
 
+// The receiver of the data of a `MergeView`. An adapter of the edge implements it,
+// for example the state mapper of the Merge screen. No code of `src/domain/` or
+// `src/application/` calls `deliverTo()` (rule R-no-delivery-call).
+export interface MergeViewReceiver {
+  receive(targetReached: boolean): void;
+}
+
 // The data that the Merge screen draws: whether the target tile exists.
-export interface MergeView {
-  readonly targetReached: boolean;
+// The field is private (issue #245), and `deliverTo()` gives it to an adapter of the edge.
+export class MergeView {
+  constructor(private readonly targetReached: boolean) {
+    Object.freeze(this);
+  }
+
+  // Gives whether the target tile exists to `receiver`. It returns nothing.
+  deliverTo(receiver: MergeViewReceiver): void {
+    receiver.receive(this.targetReached);
+  }
 }
 
 // The photo of a Merge state (classes.md decision 34): the board of its topology, the score,
@@ -20,16 +35,49 @@ export interface MergeView {
 // at its position. The source is a value (classes.md decision 51), so the photo shares it
 // with the state, and a reader that draws from it changes nothing.
 // `view()` gives whether the target exists for the screen.
-export interface MergeSnapshot<
+// Every field is private (issue #245). The rules ask `boardCopy()`, the scoring asks
+// `mergedTiles()`, and `MergeState.restore()` asks every query. The photo keeps a frozen list
+// of the merged tiles, and it is frozen itself.
+export class MergeSnapshot<
   TCell extends IMergeable<TCell>,
   TCoord,
   TAxis extends GridAxis,
-> extends BoardSnapshot<TCell, TCoord> {
-  readonly board: ReadonlyBoard<TCell, TCoord, TAxis>;
-  readonly targetReached: boolean;
-  readonly merged: readonly TCell[];
-  readonly tiles: IPieceSource<NewTile<TCell>>;
-  view(): MergeView;
+> extends BoardSnapshot<TCell, TCoord, TAxis> {
+  private readonly merged: readonly TCell[];
+
+  constructor(
+    stateId: GameStateId,
+    matchId: MatchId,
+    board: ReadonlyBoard<TCell, TCoord, TAxis>,
+    score: Score,
+    private readonly targetReached: boolean,
+    merged: readonly TCell[],
+    private readonly tiles: IPieceSource<NewTile<TCell>>,
+    private readonly shown: MergeView,
+  ) {
+    super(stateId, matchId, board, score);
+    this.merged = Object.freeze([...merged]);
+    Object.freeze(this);
+  }
+
+  // True when a merge of the game has made the target tile. It stays true (A3).
+  hasReachedTarget(): boolean {
+    return this.targetReached;
+  }
+
+  // The tiles that the last move made, one per merge.
+  mergedTiles(): readonly TCell[] {
+    return this.merged;
+  }
+
+  // The source of the new tiles at its position. Only `MergeState.restore()` needs it.
+  tileSource(): IPieceSource<NewTile<TCell>> {
+    return this.tiles;
+  }
+
+  view(): MergeView {
+    return this.shown;
+  }
 }
 
 // The state of one Hexa Merge game. It narrows `board` to the board of its topology.
@@ -38,7 +86,7 @@ export interface MergeSnapshot<
 // It also keeps the `MatchId` of its game, and `belongsTo()` reads it.
 // It changes only through its own methods. The state keeps its object, so `addNewTile()`,
 // `slide()`, `addPoints()` and `restore()` change it in place. The rules decide when to call
-// each method. The scoring, the rules and the use cases read the photo of `snapshot()`.
+// each method. The scoring, the rules and the use cases ask the photo of `snapshot()`.
 // A refused input throws a RangeError and leaves the whole state as it was.
 // `tiles` is the source of the new tiles. It lives in the state (classes.md decision 31),
 // and it is a value (classes.md decision 51): a draw replaces it with the next source.
@@ -120,28 +168,27 @@ export class MergeState<
   // The photo of the state now. A tile and the tile source are values, so the photo shares them.
   // It holds a frozen list and a copy of the board.
   snapshot(): MergeSnapshot<TCell, TCoord, TAxis> {
-    const view = Object.freeze({ targetReached: this.targetReached });
-    return Object.freeze({
-      stateId: this.stateId,
-      matchId: this.matchId,
-      board: this.board.clone(),
-      score: this.score,
-      targetReached: this.targetReached,
-      merged: Object.freeze([...this.merged]),
-      tiles: this.tiles,
-      view: () => view,
-    });
+    return new MergeSnapshot(
+      this.stateId,
+      this.matchId,
+      this.board.clone(),
+      this.score,
+      this.targetReached,
+      this.merged,
+      this.tiles,
+      new MergeView(this.targetReached),
+    );
   }
 
   // Takes back a photo of this state, in place. A photo of another state or of another board
   // changes nothing.
   restore(snapshot: MergeSnapshot<TCell, TCoord, TAxis>): void {
     checkOwnSnapshot(this.stateId, this.board, snapshot);
-    this.board.restore(snapshot.board);
-    this.tiles = snapshot.tiles;
-    this.targetReached = snapshot.targetReached;
-    this.merged = [...snapshot.merged];
-    this.score = snapshot.score;
+    this.board.restore(snapshot.boardCopy());
+    this.tiles = snapshot.tileSource();
+    this.targetReached = snapshot.hasReachedTarget();
+    this.merged = [...snapshot.mergedTiles()];
+    this.score = snapshot.scoreSoFar();
   }
 
   clone(): MergeState<TCell, TCoord, TAxis> {

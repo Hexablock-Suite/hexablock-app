@@ -3,7 +3,7 @@ import { Score } from '../../../../src/domain/engine/score';
 import { Board, type ReadonlyBoard } from '../../../../src/domain/engine/board';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
 import { GameId } from '../../../../src/domain/engine/game-id';
-import type { GameStateId } from '../../../../src/domain/engine/game-state-id';
+import { GameStateId } from '../../../../src/domain/engine/game-state-id';
 import type { MatchId } from '../../../../src/domain/engine/match-id';
 import { HexGeometry } from '../../../../src/domain/engine/hex-geometry';
 import type { HexAxis, HexCoord } from '../../../../src/domain/engine/hex-topology';
@@ -81,11 +81,13 @@ export function valueOf(tile: MergeTile): number {
 
 // The value of each filled cell, by the topology key of its coordinate.
 // It takes a photo, because only the photo shows the board of a state.
-export function values<TAxis extends GridAxis>(state: {
-  readonly board: ReadonlyBoard<MergeTile, HexCoord, TAxis>;
+export function values<TAxis extends GridAxis>(photo: {
+  boardCopy(): ReadonlyBoard<MergeTile, HexCoord, TAxis>;
 }): Record<string, number> {
   const out: Record<string, number> = {};
-  for (const [at, tile] of state.board.occupiedCells()) out[hexTopology.key(at)] = valueOf(tile);
+  for (const [at, tile] of photo.boardCopy().occupiedCells()) {
+    out[hexTopology.key(at)] = valueOf(tile);
+  }
   return out;
 }
 
@@ -114,16 +116,18 @@ export function mergeFactory(seed = 1): MergeFactory<HexCoord> {
 }
 
 // A live state built again from a photo, so a test can ask the rules about the state that a game
-// shows. The engine never gives its state away. So the helper builds a new state with the ids
-// and the source of the photo and a new hexagonal board of the same shape, and the state takes
-// the photo back with `restore()`. The photo hands out no board (issue #234).
+// shows. The engine never gives its state away. So the helper builds a new state of the match
+// `matchId` with the source of the photo and a new hexagonal board of the same shape, and the state
+// takes the photo back with `restore()`. The photo hands out no board (issue #234), and it keeps
+// its ids private (issue #245): the ids of the state and of the board come from `matchId`.
 // The board takes the axis type of the photo, so the topology is cast to it.
 export function mergeStateOf<TAxis extends GridAxis>(
   photo: MergeSnapshot<MergeTile, HexCoord, TAxis>,
+  matchId: MatchId = MATCH_ID,
 ): MergeState<MergeTile, HexCoord, TAxis> {
   const topology = hexTopology as unknown as GridTopology<HexCoord, TAxis>;
-  const board = boardOnTopologyLike(photo.board, topology, photo.matchId);
-  const state = new MergeState(photo.stateId, photo.matchId, board, photo.tiles);
+  const board = boardOnTopologyLike(photo.boardCopy(), topology, matchId);
+  const state = new MergeState(GameStateId.of(matchId), matchId, board, photo.tileSource());
   state.restore(photo);
   return state;
 }

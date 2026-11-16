@@ -87,7 +87,7 @@ describe('test double axes and directions', () => {
     const state: BoardState<FakeCell, SquareCoord> = emptyState(2);
 
     expect([...board.line(SquareAxis.col, square(0, 1))]).toEqual([square(0, 1), square(1, 1)]);
-    expect(state.snapshot().board.coordinates()).toHaveLength(4);
+    expect(state.snapshot().boardCopy().coordinates()).toHaveLength(4);
   });
 });
 

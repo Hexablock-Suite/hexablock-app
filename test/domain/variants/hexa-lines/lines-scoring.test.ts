@@ -41,11 +41,11 @@ function twoClearingPlacements(scoring: IScoringPolicy<LinesState<SquareCoord>>)
     scoring,
   );
   engine.play(new PlacePiece(TrayPosition.of(0), square(0, 0)));
-  const first = engine.snapshot().score;
+  const first = engine.snapshot().scoreSoFar();
   engine.play(new PlacePiece(TrayPosition.of(0), square(0, 1)));
-  const second = engine.snapshot().score;
+  const second = engine.snapshot().scoreSoFar();
   engine.play(new PlacePiece(TrayPosition.of(0), square(2, 2)));
-  return [first, second, engine.snapshot().score];
+  return [first, second, engine.snapshot().scoreSoFar()];
 }
 
 // One placement at the origin that fills row 0 and column 0 together.
@@ -74,7 +74,7 @@ function comboInAStreak(scoring: IScoringPolicy<LinesState<SquareCoord>>) {
     scoring,
   );
   engine.play(new PlacePiece(TrayPosition.of(0), square(0, 1)));
-  const first = engine.snapshot().score;
+  const first = engine.snapshot().scoreSoFar();
   engine.play(new PlacePiece(TrayPosition.of(0), origin));
   return { first, state: engine.snapshot() };
 }
@@ -90,24 +90,24 @@ describe('Hexa Lines scoring', () => {
     engine.play(new PlacePiece(TrayPosition.of(0), square(1, 2)));
 
     const state = engine.snapshot();
-    expect(state.linesCleared).toEqual(LineCount.of(0));
-    expect(state.score).toEqual(Score.of(2));
+    expect(state.lastCombo()).toEqual(LineCount.of(0));
+    expect(state.scoreSoFar()).toEqual(Score.of(2));
   });
 
-  // A photo is plain data, so the test gives the facts of the placement in a copy of a photo.
+  // The photo keeps its fields private (issue #245), so the test builds a state with the facts
+  // of the placement and takes its photo.
   // With no cleared line the factor `lines + streak - 1` is 0 or less, and the decorator
   // adds nothing: it gives the score of the base policy (issue #203).
   it('should_give_the_base_score_when_the_decorator_scores_a_placement_that_clears_no_line', () => {
-    const photo = linesState(squareTopology, 1, { tray: [] }).snapshot();
     const base = new LinesScoring<SquareCoord>();
 
     for (const streak of [0, 1, 3]) {
-      const after = {
-        ...photo,
+      const after = linesState(squareTopology, 1, {
+        tray: [],
         cellsPlaced: CellCount.of(3),
         linesCleared: LineCount.of(0),
         streak: Streak.of(streak),
-      };
+      }).snapshot();
 
       expect(new ComboMultiplierDecorator(base).score(after, after)).toEqual(Score.of(3));
       expect(base.score(after, after)).toEqual(Score.of(3));
@@ -115,11 +115,12 @@ describe('Hexa Lines scoring', () => {
   });
 
   it('should_give_the_line_bonus_as_a_score_when_the_base_policy_reads_the_cleared_lines', () => {
-    const photo = linesState(squareTopology, 1, { tray: [] }).snapshot();
+    const photoOf = (lines: number) =>
+      linesState(squareTopology, 1, { tray: [], linesCleared: LineCount.of(lines) }).snapshot();
     const base = new LinesScoring<SquareCoord>();
 
-    expect(base.lineBonus({ ...photo, linesCleared: LineCount.of(2) })).toEqual(Score.of(20));
-    expect(base.lineBonus({ ...photo, linesCleared: LineCount.of(0) })).toEqual(Score.of(0));
+    expect(base.lineBonus(photoOf(2))).toEqual(Score.of(20));
+    expect(base.lineBonus(photoOf(0))).toEqual(Score.of(0));
   });
 
   it('should_add_ten_points_for_the_line_when_the_first_clearing_placement_clears_one_line', () => {
@@ -131,17 +132,17 @@ describe('Hexa Lines scoring', () => {
     engine.play(new PlacePiece(TrayPosition.of(0), origin));
 
     const state = engine.snapshot();
-    expect([state.linesCleared, state.streak]).toEqual([LineCount.of(1), Streak.of(1)]);
+    expect([state.lastCombo(), state.currentStreak()]).toEqual([LineCount.of(1), Streak.of(1)]);
     // 1 cell + 10 × 1 line × (1 + 1 - 1).
-    expect(state.score).toEqual(Score.of(11));
+    expect(state.scoreSoFar()).toEqual(Score.of(11));
   });
 
   it('should_multiply_the_line_bonus_by_the_combo_when_one_placement_clears_two_lines', () => {
     const state = comboPlacement(decorated());
 
-    expect([state.linesCleared, state.streak]).toEqual([LineCount.of(2), Streak.of(1)]);
+    expect([state.lastCombo(), state.currentStreak()]).toEqual([LineCount.of(2), Streak.of(1)]);
     // 1 cell + 10 × 2 lines × (2 + 1 - 1).
-    expect(state.score).toEqual(Score.of(41));
+    expect(state.scoreSoFar()).toEqual(Score.of(41));
   });
 
   it('should_multiply_the_line_bonus_by_lines_plus_streak_minus_one_when_clearing_placements_follow_in_a_row', () => {
@@ -153,21 +154,23 @@ describe('Hexa Lines scoring', () => {
     // Only a combo inside a streak tells `lines + streak - 1` (3) from `lines × streak` (4).
     const { first, state } = comboInAStreak(decorated());
 
-    expect([state.linesCleared, state.streak, state.cellsPlaced]).toEqual([
+    expect([state.lastCombo(), state.currentStreak(), state.lastPlacedCells()]).toEqual([
       LineCount.of(2),
       Streak.of(2),
       CellCount.of(2),
     ]);
     // 11, then 2 cells + 10 × 2 lines × (2 + 2 - 1) = 62.
-    expect([first, state.score]).toEqual([Score.of(11), Score.of(73)]);
+    expect([first, state.scoreSoFar()]).toEqual([Score.of(11), Score.of(73)]);
     // The base scoring gives 2 cells + 10 × 2 lines = 22 for the same placement.
-    expect(comboInAStreak(new LinesScoring<SquareCoord>()).state.score).toEqual(Score.of(33));
+    expect(comboInAStreak(new LinesScoring<SquareCoord>()).state.scoreSoFar()).toEqual(
+      Score.of(33),
+    );
   });
 
   it('should_give_no_multiplier_when_the_base_lines_scoring_plays_alone', () => {
     const base = new LinesScoring<SquareCoord>();
 
-    expect(comboPlacement(base).score).toEqual(Score.of(21));
+    expect(comboPlacement(base).scoreSoFar()).toEqual(Score.of(21));
     expect(twoClearingPlacements(base)).toEqual([11, 22, 23].map(Score.of));
   });
 
@@ -176,7 +179,9 @@ describe('Hexa Lines scoring', () => {
     const scoring: IScoringPolicy<LinesState<SquareCoord>> = new ComboMultiplierDecorator(base);
 
     expect(scoring).toBeInstanceOf(ComboMultiplierDecorator);
-    expect(comboPlacement(scoring).score.isHigherThan(comboPlacement(base).score)).toBe(true);
+    expect(
+      comboPlacement(scoring).scoreSoFar().isHigherThan(comboPlacement(base).scoreSoFar()),
+    ).toBe(true);
   });
 
   // The class views draw `ComboMultiplierDecorator extends ScoringDecorator` (issue 146).

@@ -20,6 +20,7 @@ import { A, B, C, threeDominoFitFactory } from '../support/variants/hexa-fit/fit
 import { linesFactory } from '../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../support/variants/hexa-merge/merge-game';
 import { sortFactory } from '../support/variants/hexa-sort/sort-game';
+import { fitViewData } from '../support/variants/view-data';
 
 // The time of a Hexa Fit level reaches the use cases and `GameResult` (issue 157, DS-5, DS-6).
 // The path: `TimedRulesDecorator`, `GameEngine.elapsedTime()` and `MoveResult.elapsedMs`.
@@ -57,7 +58,7 @@ describe('The time of a Fit level', () => {
     const result = GameResult.of({
       gameId: GameId.of('hexa-fit'),
       score: last.score,
-      moves: state.moves,
+      moves: state.moveCount(),
       elapsedMs: last.elapsedMs,
     });
 
@@ -100,9 +101,9 @@ describe('The time of a Fit level', () => {
 
     // The undo takes the move back and leaves the time.
     expect(undone.elapsedMs).toEqual(ElapsedTime.ofMs(2_000));
-    expect(undone.payload.placed.map((id) => delivered(id))).toEqual(['a']);
+    expect(fitViewData(undone.payload).placed.map((id) => delivered(id))).toEqual(['a']);
     expect(replay.elapsedMs).toEqual(ElapsedTime.ofMs(3_000));
-    expect(games.running().snapshot().moves).toEqual(Moves.of(2));
+    expect(games.running().snapshot().moveCount()).toEqual(Moves.of(2));
   });
 
   it('should_give_no_elapsed_ms_field_when_the_variant_has_no_timer', async () => {
