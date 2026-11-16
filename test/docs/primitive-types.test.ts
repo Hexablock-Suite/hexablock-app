@@ -654,6 +654,36 @@ describe('primitive scan of the domain', () => {
     expect(ofSeed.map(key).sort()).toEqual(['number Seed.generatorState', 'number Seed.of']);
   });
 
+  // Issue #232: value objects of the game replace the primitives that crossed the public
+  // signatures of the variants. `Score.times()` is gone: the Lines counts give their points.
+  // The constants of the variants stay private to their files.
+  it('should_find_no_primitive_of_a_variant_when_the_code_is_scanned', () => {
+    const places = codeUses().map((use) => use.where);
+
+    for (const place of [
+      'Score.times',
+      'LinesSnapshot.streak',
+      'LinesSnapshot.linesCleared',
+      'LinesSnapshot.cellsPlaced',
+      'LinesState.constructor',
+      'PlacePiece.constructor',
+      'SortSnapshot.clearedTiles',
+      'ColorStack.tileCount',
+      'NewTile.of',
+      'Chance.hits',
+      'FIT_POINTS_PER_TURN',
+      'POINTS_PER_CELL',
+      'POINTS_PER_LINE',
+      'TRAY_SIZE',
+      'START_TILES',
+      'MERGE_UNDO_LIMIT',
+      'GOAL_RUN',
+      'SORT_POINTS_PER_TILE',
+    ]) {
+      expect(places).not.toContain(place);
+    }
+  });
+
   it('should_list_a_literal_type_as_its_primitive_when_a_signature_names_a_closed_union', () => {
     const source = [
       "export type Outcome = 'playing' | 'victory';",

@@ -193,7 +193,7 @@ A slide scores the sum of the values that its merges make (statement §1.4).
 
 A turn scores each tile of every stack that it clears. Statement §1.3 defines no points. A won level also gets stars by moves.
 
-- Policy: [`SortScoring`](src/domain/variants/hexa-sort/sort-scoring.ts) gives `SORT_POINTS_PER_TILE` = 10 per tile of a cleared stack.
+- Policy: [`SortScoring`](src/domain/variants/hexa-sort/sort-scoring.ts) adds the points of each cleared stack. Its [`TileCount`](src/domain/variants/hexa-sort/tile-count.ts) gives `SORT_POINTS_PER_TILE` = 10 per tile.
 - Formula: `cleared tiles × 10`. A turn that clears no stack gives 0.
 - Example from [`sort-scoring.test.ts`](test/domain/variants/hexa-sort/sort-scoring.test.ts): a turn clears one stack of 11 tiles (one blue below ten reds), so it gives `11 × 10` = 110.
 - Stars: [`sortStars(play, thresholds)`](src/domain/variants/hexa-sort/sort-stars.ts) counts the stars of a won level by moves: a star needs `moves <= maxMoves`. The level file holds one `maxMoves` threshold per star, and the caller counts the moves. The stars are cumulative: star N needs star N-1, so the count stops at the first threshold that the play misses. The play is a `SortPlay`, each threshold is a `SortStarThreshold` whose `isMetBy(play)` tells whether the play meets it, and the result is a [`Stars`](src/domain/engine/stars.ts) value (decision 42). The moves are a [`Moves`](src/domain/engine/moves.ts) value: a move count that is not a whole number of 0 or more throws a `RangeError`.
@@ -203,7 +203,7 @@ A turn scores each tile of every stack that it clears. Statement §1.3 defines n
 
 Fit grades a won level with stars by moves and time, not with points (statement §1.2).
 
-- Policy: [`FitScoring`](src/domain/variants/hexa-fit/fit-scoring.ts) gives `FIT_POINTS_PER_TURN` = 0 on every turn.
+- Policy: [`FitScoring`](src/domain/variants/hexa-fit/fit-scoring.ts) gives `FIT_POINTS_PER_TURN` = 0 on every turn, a `Score` (#232).
 - Stars: [`fitStars(play, thresholds)`](src/domain/variants/hexa-fit/fit-stars.ts) counts the stars of a won level by moves and time: a star needs both `moves <= maxMoves` and `elapsedMs <= maxElapsedMs`. The level file holds the thresholds. The stars are cumulative: star N needs star N-1, so the count stops at the first threshold that the play misses. The play is a `FitPlay`, each threshold is a `FitStarThreshold` whose `isMetBy(play)` tells whether the play meets it, and the result is a `Stars` value (decision 42). The moves are a `Moves` value and the time is an [`ElapsedTime`](src/domain/engine/elapsed-time.ts) value: a move count or a time in milliseconds that is not a whole number of 0 or more throws a `RangeError`.
 - Moves ([#60](https://github.com/Hexablock-Suite/hexablock-app/issues/60)): every accepted place, rotate and remove counts one move, and a rejected move counts nothing. [`FitState.moves`](src/domain/variants/hexa-fit/fit-state.ts) holds the count as a `Moves` value, so undo restores the count before the move. Undo itself comes with `MoveHistory` in Sprint 3.
 - Example from [`fit-scoring.test.ts`](test/domain/variants/hexa-fit/fit-scoring.test.ts): with one star of 10 moves and 60 000 ms, a play of 10 moves and 60 000 ms gets the star. A play of 10 moves and 60 001 ms gets no star, because only the moves meet the threshold.

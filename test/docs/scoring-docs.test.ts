@@ -21,11 +21,9 @@ import { MergeState } from '../../src/domain/variants/hexa-merge/merge-state';
 import { MergeTile } from '../../src/domain/variants/hexa-merge/merge-tile';
 import type { ColorStack } from '../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../src/domain/variants/hexa-sort/goal-count';
-import {
-  SORT_POINTS_PER_TILE,
-  SortScoring,
-} from '../../src/domain/variants/hexa-sort/sort-scoring';
+import { SortScoring } from '../../src/domain/variants/hexa-sort/sort-scoring';
 import { SortState } from '../../src/domain/variants/hexa-sort/sort-state';
+import { TileCount } from '../../src/domain/variants/hexa-sort/tile-count';
 import { squareTopology, type SquareCoord } from '../support/engine/square-topology';
 import { repoRoot } from '../support/run-tool';
 import { linesState } from '../support/variants/hexa-lines/lines-game';
@@ -55,8 +53,8 @@ function constants(): Record<string, number> {
   return {
     POINTS_PER_CELL: linesPoints(1, 0, 0),
     POINTS_PER_LINE: linesPoints(0, 1, 1),
-    SORT_POINTS_PER_TILE,
-    FIT_POINTS_PER_TURN,
+    SORT_POINTS_PER_TILE: sortPoints([1]),
+    FIT_POINTS_PER_TURN: delivered(FIT_POINTS_PER_TURN),
   };
 }
 
@@ -136,7 +134,10 @@ function sortPoints(stacks: number[]): number {
     source: new FixedListPieceSource([]),
     goalsNeeded: GoalCount.of(1),
   });
-  return turnScore(new SortScoring<SquareCoord>(), { ...state.snapshot(), clearedTiles: stacks });
+  return turnScore(new SortScoring<SquareCoord>(), {
+    ...state.snapshot(),
+    clearedTiles: stacks.map(TileCount.of),
+  });
 }
 
 // Writes 60000 as «60 000», the way the README writes a number of milliseconds.
@@ -147,7 +148,7 @@ function grouped(value: number): string {
 // The worked examples of the README, each with the result that the scoring code gives.
 // The README takes the examples from the scoring tests (issue 104).
 function workedExamples(): string[] {
-  const { POINTS_PER_CELL, POINTS_PER_LINE } = constants();
+  const { POINTS_PER_CELL, POINTS_PER_LINE, SORT_POINTS_PER_TILE } = constants();
   const lines = [
     [1, 1, 1],
     [1, 2, 1],

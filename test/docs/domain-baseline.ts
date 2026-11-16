@@ -13,10 +13,6 @@ export type PrimitiveEntry = { primitive: 'number' | 'string'; where: string; is
 export type FieldEntry = { rule: 'field' | 'get'; where: string; issue: number };
 
 export const primitiveBaseline: readonly PrimitiveEntry[] = [
-  // #232: the primitives of the variants.
-  { primitive: 'number', where: 'Chance.hits', issue: 232 },
-  { primitive: 'number', where: 'ColorStack.tileCount', issue: 232 },
-  { primitive: 'number', where: 'SortSnapshot.clearedTiles', issue: 232 },
   // #238: the clock reading.
   { primitive: 'number', where: 'Clock.now', issue: 238 },
   // #239: `Range` orders its values without a number.
@@ -39,12 +35,6 @@ export const primitiveBaseline: readonly PrimitiveEntry[] = [
   // #246: the team decides whether a branded key counts as a primitive.
   { primitive: 'string', where: 'CoordKey', issue: 246 },
   { primitive: 'string', where: 'coordKey', issue: 246 },
-  // #232: the exported number constants of the variants. #232 covers the primitives of the variants.
-  { primitive: 'number', where: 'FIT_POINTS_PER_TURN', issue: 232 },
-  { primitive: 'number', where: 'START_TILES', issue: 232 },
-  { primitive: 'number', where: 'MERGE_UNDO_LIMIT', issue: 232 },
-  { primitive: 'number', where: 'GOAL_RUN', issue: 232 },
-  { primitive: 'number', where: 'SORT_POINTS_PER_TILE', issue: 232 },
 ];
 
 export const fieldBaseline: readonly FieldEntry[] = [

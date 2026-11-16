@@ -1,4 +1,5 @@
 import { Range } from '../../engine/range';
+import type { Draw } from './draw';
 
 // The chances that a probability can take: from 0 to 1, both included.
 const CHANCES = Range.ofNumbers(0, 1);
@@ -7,7 +8,7 @@ const CHANCES = Range.ofNumbers(0, 1);
 // It is a value object: it never changes, and two chances are equal when their values are equal.
 // A chance is a number from 0 to 1. Any other number throws a RangeError.
 // Only Hexa Merge has a chance, so the class lives in this folder and not in the engine.
-// The number stays private: `hits()` compares a draw with it.
+// The number stays private: `hits()` compares a `Draw` with it (issue #232).
 export class Chance {
   private constructor(private readonly value: number) {
     Object.freeze(this);
@@ -27,7 +28,12 @@ export class Chance {
 
   // Tells if a draw hits. A draw is a number from 0 up to 1, as a random source gives it.
   // It hits when it is below the chance. So a chance of 0 never hits, and a chance of 1 always hits.
-  hits(draw: number): boolean {
-    return draw < this.value;
+  hits(draw: Draw): boolean {
+    return draw.isBelow(this);
+  }
+
+  // Tells if this chance is above `other`. An equal chance is not above.
+  isAbove(other: Chance): boolean {
+    return this.value > other.value;
   }
 }
