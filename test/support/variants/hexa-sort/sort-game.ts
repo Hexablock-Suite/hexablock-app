@@ -26,6 +26,7 @@ import { SortState, type SortSnapshot } from '../../../../src/domain/variants/he
 import { square, squareTopology, type SquareCoord } from '../../engine/square-topology';
 import { MATCH_ID } from '../../engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../engine/entity-ids';
+import { boardLike } from '../../engine/variant-game';
 
 // Hexa Sort test helpers. The board uses the square topology double (D4), so the tests
 // prove that the Sort rules ask the topology for the neighbors and assume no hexagon.
@@ -71,7 +72,7 @@ export function stackPiece(content: ColorStack): Piece<ColorStack, SquareCoord> 
 }
 
 // A board of one row of `length` cells, (0, 0) to (length - 1, 0).
-// The board keeps `content` in the order of the list, so `board.cells()` keeps it too.
+// The board keeps `content` in the order of the list, so `board.occupiedCells()` keeps it too.
 export function row(
   length: number,
   content: readonly [SquareCoord, ColorStack][] = [],
@@ -130,7 +131,7 @@ export function place(col: number, row = 0): PlaceStack<SquareCoord> {
 // The color names of the cell `(col, row)`, from the bottom to the top.
 // An empty cell gives `[]`.
 export function chipsAt(game: SortGame, col: number, row = 0): string[] {
-  return names(game.snapshot().board.get(square(col, row)));
+  return names(game.snapshot().board.occupantAt(square(col, row)));
 }
 
 // A Sort factory on a 2 × 2 square board. The level offers `offered` from a fixed list.
@@ -146,13 +147,14 @@ export function sortFactory(
 }
 
 // A live state built again from a photo, so a test can ask the rules about the state that a game
-// shows. The engine never gives its state away. So the helper builds a new state with the ids,
-// the board and the source of the photo, and the state takes the photo back with `restore()`.
-export function sortStateOf<TCoord>(photo: SortSnapshot<TCoord>): SortState<TCoord> {
+// shows. The engine never gives its state away. So the helper builds a new state with the ids
+// and the source of the photo and a new square board of the same shape, and the state takes
+// the photo back with `restore()`. The photo hands out no board (issue #234).
+export function sortStateOf(photo: SortSnapshot<SquareCoord>): SortState<SquareCoord> {
   const state = SortState.start({
     stateId: photo.stateId,
     matchId: photo.matchId,
-    board: photo.board.clone(),
+    board: boardLike(photo.board, new SquareGeometry(), photo.matchId),
     source: photo.source,
     goalsNeeded: photo.goalsNeeded,
   });

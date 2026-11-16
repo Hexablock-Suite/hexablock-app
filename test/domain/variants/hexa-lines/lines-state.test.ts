@@ -52,7 +52,7 @@ describe('LinesState', () => {
     state.placePiece(new PlacePiece(0, square(1, 2)));
 
     expect(filledKeys(state.snapshot())).toEqual(['1,2', '2,2']);
-    expect(state.snapshot().board.get(square(1, 2))).toBe(red);
+    expect(state.snapshot().board.occupantAt(square(1, 2))).toBe(red);
     expect(state.snapshot().cellsPlaced).toBe(2);
     expect(state.snapshot().tray).toEqual([one]);
     expect(state.snapshot().source.hasNext()).toBe(true);

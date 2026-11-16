@@ -59,7 +59,7 @@ export class FakeState implements BoardState<FakeCell, SquareCoord> {
 
   // The view holds the count of filled cells, so a test sees the view of each state.
   snapshot(): FakeSnapshot {
-    const view = Object.freeze({ filled: this.board.cells().length });
+    const view = Object.freeze({ filled: this.board.occupiedCells().length });
     return Object.freeze({
       stateId: this.stateId,
       matchId: this.matchId,
@@ -123,7 +123,7 @@ export class SourceState implements BoardState<FakeCell, SquareCoord> {
 
   // Takes the next piece, and keeps the next source in place of the source.
   draw(): FakeCell {
-    const { piece, rest } = this.source.take();
+    const [piece, rest] = this.source.take();
     this.source = rest;
     return piece;
   }
@@ -162,7 +162,7 @@ export function sourceState(source: IPieceSource<FakeCell>, size = 2): SourceSta
 // A move is valid on an empty cell inside the board. The game ends when no valid move is left.
 export class SourceRules extends BaseGameRules<SquareCoord, SourceState> {
   isValid(state: SourceState, at: SquareCoord): boolean {
-    return state.board.contains(at) && state.board.get(at) === undefined;
+    return state.board.contains(at) && state.board.occupantAt(at) === undefined;
   }
 
   *validMoves(state: SourceState): Iterable<SquareCoord> {
@@ -192,12 +192,12 @@ export class FakeRules extends BaseGameRules<FakeMove, FakeState> {
 
   isValid(state: FakeState, move: FakeMove): boolean {
     this.log.push('isValid');
-    return state.board.contains(move.at) && state.board.get(move.at) === undefined;
+    return state.board.contains(move.at) && state.board.occupantAt(move.at) === undefined;
   }
 
   *validMoves(state: FakeState): Iterable<FakeMove> {
     for (const at of state.board.coordinates()) {
-      if (state.board.get(at) === undefined) yield { at, cell: { kind: 'fake', value: 0 } };
+      if (state.board.occupantAt(at) === undefined) yield { at, cell: { kind: 'fake', value: 0 } };
     }
   }
 
@@ -214,7 +214,7 @@ export class FakeRules extends BaseGameRules<FakeMove, FakeState> {
 
   evaluate(state: FakeState): Outcome {
     this.log.push('evaluate');
-    return state.board.cells().length === state.board.coordinates().length
+    return state.board.occupiedCells().length === state.board.coordinates().length
       ? Outcome.gameOver
       : Outcome.playing;
   }
@@ -230,14 +230,15 @@ export class OnePointScoring implements IScoringPolicy<FakeState> {
   }
 }
 
-// The variant factory of the fake game, on a board of size × size cells. It has no undo.
-// The use cases and the game factory cannot name this game.
+// The variant factory of the fake game, on a board of size × size cells.
+// It has no undo and no timer. The use cases and the game factory cannot name this game.
 export function fakeGameFactory(
   size = 2,
 ): IVariantFactory<FakeCell, SquareCoord, FakeMove, FakeState, FakeCell> {
   return {
-    gameId: GameId.of('fake-game'),
+    isFor: (gameId) => gameId.equals(GameId.of('fake-game')),
     createRules: () => new FakeRules(),
+    createTimer: () => undefined,
     createScoring: () => new OnePointScoring(),
     createPieceSource: () => undefined,
     createBoard: (boardId) => emptyState(size, MATCH_ID, STATE_ID, boardId).board,

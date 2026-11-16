@@ -4,17 +4,18 @@ import { Mulberry32Random } from './mulberry32-random';
 import type { Seed } from './seed';
 
 // One draw of a source: the piece, and the source that gives the pieces after it.
-export interface PieceDraw<TPiece> {
-  readonly piece: TPiece;
-  readonly rest: IPieceSource<TPiece>;
-}
+// It is a pair, a result record of `take()`, and not an object with fields (issue #234).
+// It holds no state of its own and has no behavior: a caller takes its two parts apart
+// at once with `const [piece, rest] = source.take()`.
+export type PieceDraw<TPiece> = readonly [piece: TPiece, rest: IPieceSource<TPiece>];
 
 // Strategy and Iterator (classes.md decision 32). The variant factory picks the source,
 // and a caller reads the pieces with `for...of`.
 // A source is a value object (classes.md decision 51): no operation changes it.
-// `take()` returns the next piece and the next source, and the source stays at its position.
+// `take()` returns the next piece and the next source as a pair, and the source stays
+// at its position.
 // So two calls of `take()` on one source give the same piece.
-// A state that draws keeps `rest` in place of its source (classes.md decision 31).
+// A state that draws keeps the next source in place of its source (classes.md decision 31).
 // A state, its photo and its copy share one source, and none of them copies it.
 // `for...of` reads the pieces from the position of the source and changes nothing,
 // so a second `for...of` gives the same pieces.
@@ -25,12 +26,12 @@ export interface IPieceSource<TPiece> extends Iterable<TPiece> {
 }
 
 // The pieces of a source from its position, until `hasNext()` is false.
-// It follows `rest` from draw to draw, so it changes no source.
+// It follows the next source from draw to draw, so it changes no source.
 // A caller that reads an endless source stops itself.
 export function* piecesFrom<TPiece>(source: IPieceSource<TPiece>): Iterator<TPiece> {
   let current = source;
   while (current.hasNext()) {
-    const { piece, rest } = current.take();
+    const [piece, rest] = current.take();
     yield piece;
     current = rest;
   }
@@ -38,6 +39,7 @@ export function* piecesFrom<TPiece>(source: IPieceSource<TPiece>): Iterator<TPie
 
 // An endless source: `hasNext()` is always true. The seed fixes the sequence.
 // The seed is a `Seed`, which checks its own range (classes.md decision 48).
+// The seed is private. `isSeededWith()` tells whether the source draws from a seed (issue #234).
 // So `[...source]` and `Array.from(source)` never return: a caller reads it with
 // `for...of` and `break`, or with `take()`.
 // `draw` turns the random source into one piece, so the variant decides what a piece is.
@@ -47,23 +49,28 @@ export class SeededPieceSource<TPiece> implements IPieceSource<TPiece>, IRandomS
   private random: RandomSource;
 
   constructor(
-    readonly seed: Seed,
+    private readonly seed: Seed,
     private readonly draw: (random: RandomSource) => TPiece,
   ) {
     this.random = Mulberry32Random.from(seed);
+  }
+
+  // True when the source takes its randomness from `seed`.
+  isSeededWith(seed: Seed): boolean {
+    return this.seed.equals(seed);
   }
 
   hasNext(): boolean {
     return true;
   }
 
-  take(): { readonly piece: TPiece; readonly rest: SeededPieceSource<TPiece> } {
+  take(): readonly [piece: TPiece, rest: SeededPieceSource<TPiece>] {
     const random = this.random.clone();
     const piece = this.draw(random);
     // The next source is new, so the write of its generator changes no source in use.
     const rest = new SeededPieceSource(this.seed, this.draw);
     rest.random = random;
-    return { piece, rest };
+    return [piece, rest];
   }
 
   [Symbol.iterator](): Iterator<TPiece> {
@@ -90,14 +97,14 @@ export class FixedListPieceSource<TPiece> implements IPieceSource<TPiece> {
     return this.index < this.pieces.length;
   }
 
-  take(): { readonly piece: TPiece; readonly rest: FixedListPieceSource<TPiece> } {
+  take(): readonly [piece: TPiece, rest: FixedListPieceSource<TPiece>] {
     if (!this.hasNext()) throw new RangeError('The piece source has no piece left.');
     const piece = this.pieces[this.index] as TPiece;
     // The next source is new, so the writes of its list and position change no source in use.
     const rest = new FixedListPieceSource<TPiece>([]);
     rest.pieces = this.pieces;
     rest.index = this.index + 1;
-    return { piece, rest };
+    return [piece, rest];
   }
 
   [Symbol.iterator](): Iterator<TPiece> {

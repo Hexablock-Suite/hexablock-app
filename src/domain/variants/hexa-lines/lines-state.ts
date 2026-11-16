@@ -89,7 +89,7 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
     if (piece === undefined) throw move.missingPiece();
     const cells = this.cellsOf(piece, move);
     if (!this.fits(cells)) throw move.misfit(this.board);
-    for (const c of cells) this.board.occupy(c, piece.cell());
+    for (const c of cells) this.board.occupy(c, piece.occupant());
     this.cellsPlaced = cells.length;
     this.tray = move.trayWithout(this.tray);
     if (this.tray.length === 0) this.drawTray();
@@ -102,7 +102,7 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
   clearLines(lines: readonly (readonly TCoord[])[]): void {
     const cleared = new Map<CoordKey, TCoord>();
     for (const c of lines.flat()) {
-      if (this.board.get(c) === undefined) {
+      if (this.board.occupantAt(c) === undefined) {
         throw new RangeError(`A cleared line holds the free cell ${this.board.key(c)}.`);
       }
       cleared.set(this.board.key(c), c);
@@ -184,7 +184,7 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
     const pieces: Piece<Color, TCoord>[] = [];
     let source = this.source;
     while (pieces.length < TRAY_SIZE && source.hasNext()) {
-      const { piece, rest } = source.take();
+      const [piece, rest] = source.take();
       pieces.push(piece);
       source = rest;
     }
@@ -199,7 +199,7 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
 
   // A piece fits when each of its cells lies inside the board on a free cell.
   private fits(cells: readonly TCoord[]): boolean {
-    return cells.every((c) => this.board.contains(c) && this.board.get(c) === undefined);
+    return cells.every((c) => this.board.contains(c) && this.board.occupantAt(c) === undefined);
   }
 }
 

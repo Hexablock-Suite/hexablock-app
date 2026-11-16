@@ -11,6 +11,7 @@ import { FitState, type FitSnapshot } from '../../../../src/domain/variants/hexa
 import { PieceId } from '../../../../src/domain/variants/hexa-fit/piece-id';
 import { ManualClock } from '../../engine/manual-clock';
 import { square, type SquareCoord } from '../../engine/square-topology';
+import { boardLike } from '../../engine/variant-game';
 
 // Hexa Fit test helpers. They exist only in test/.
 
@@ -48,15 +49,17 @@ export function threeDominoFitFactory(clock: Clock = new ManualClock()): FitFact
 }
 
 // A live state built again from a photo, so a test can ask the rules about the state that a game
-// shows. The engine never gives its state away. So the helper builds a new state with the ids,
-// the board and the source of the photo, and the state takes the photo back with `restore()`.
+// shows. The engine never gives its state away. So the helper builds a new state with the ids
+// of the photo and a new square board of the same shape, and the state takes the photo back
+// with `restore()`. The photo hands out no board (issue #234).
 // A Fit photo does not hold the pieces of the level, so `pieces` gives them,
 // for example `fitFactory().createPieceSource()`.
-export function fitStateOf<TCoord>(
-  photo: FitSnapshot<TCoord>,
-  pieces: IPieceSource<Piece<PieceId, TCoord>>,
-): FitState<TCoord> {
-  const state = FitState.start(photo.stateId, photo.matchId, photo.board.clone(), pieces);
+export function fitStateOf(
+  photo: FitSnapshot<SquareCoord>,
+  pieces: IPieceSource<Piece<PieceId, SquareCoord>>,
+): FitState<SquareCoord> {
+  const board = boardLike(photo.board, new SquareGeometry(), photo.matchId);
+  const state = FitState.start(photo.stateId, photo.matchId, board, pieces);
   state.restore(photo);
   return state;
 }

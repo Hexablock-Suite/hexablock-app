@@ -8,7 +8,7 @@ import { square, squareTopology } from '../../support/engine/square-topology';
 import { firstValidMove } from '../../support/engine/variant-game';
 import { A, fitFactory } from '../../support/variants/hexa-fit/fit-game';
 import { linesState, piece } from '../../support/variants/hexa-lines/lines-game';
-import { mergeState, noNewTiles } from '../../support/variants/hexa-merge/merge-game';
+import { mergeBoard, mergeState, noNewTiles } from '../../support/variants/hexa-merge/merge-game';
 import { row, stack, stackPiece, tiles } from '../../support/variants/hexa-sort/sort-game';
 import { PlacePiece } from '../../../src/domain/variants/hexa-lines/place-piece';
 import { MATCH_ID } from '../../support/engine/match-id';
@@ -73,7 +73,7 @@ describe('the view of each variant state', () => {
 
   it('should_build_the_view_from_the_remaining_and_placed_pieces_when_a_fit_state_builds_its_view', () => {
     const factory = fitFactory();
-    const rules = factory.createRules(MATCH_ID);
+    const rules = factory.createRules();
     const start = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
     const domino = start.piece(A);
 
@@ -87,13 +87,7 @@ describe('the view of each variant state', () => {
 
   it('should_build_the_view_from_the_target_flag_when_a_merge_state_builds_its_view', () => {
     const notReached = mergeState([]).snapshot().view();
-    const reached = new MergeState(
-      STATE_ID,
-      MATCH_ID,
-      mergeState([]).snapshot().board.clone(),
-      noNewTiles(),
-      true,
-    )
+    const reached = new MergeState(STATE_ID, MATCH_ID, mergeBoard(), noNewTiles(), true)
       .snapshot()
       .view();
 

@@ -67,6 +67,18 @@ describe('private fields of the board, the board shape, the piece and the piece 
   });
 });
 
+// Issue #234: the photo hands out no board that a caller owns. `ReadonlyBoard` has no `clone()`,
+// so a reader of a photo cannot get a `Board` with `occupy()`, `vacate()` and `restore()`.
+describe('ReadonlyBoard copy', () => {
+  it('should_reject_at_compile_time_when_a_reader_copies_the_board_of_a_photo', () => {
+    const photo: ReadonlyBoard<Color, SquareCoord, SquareAxis> = squareBoard();
+    // @ts-expect-error `ReadonlyBoard` has no `clone()` (issue #234).
+    const copy = () => photo.clone();
+
+    expect(copy).toBeInstanceOf(Function);
+  });
+});
+
 describe('BoardShape operations', () => {
   it('should_give_its_coordinates_in_their_order_when_a_reader_asks_for_them', () => {
     const shape = BoardShape.of([4, 2, 0]);
@@ -187,10 +199,10 @@ describe('Board operations', () => {
 
     const moved = board.moved(piece, square(2, 2));
 
-    expect(keysOf(moved.cells())).toEqual(['2,2', '3,2']);
-    expect(moved.cells().map((c) => board.contains(c))).toEqual([true, false]);
-    expect(keysOf(piece.cells())).toEqual(['0,0', '1,0']);
-    expect(board.cells()).toEqual([]);
+    expect(keysOf(moved.coveredCoordinates())).toEqual(['2,2', '3,2']);
+    expect(moved.coveredCoordinates().map((c) => board.contains(c))).toEqual([true, false]);
+    expect(keysOf(piece.coveredCoordinates())).toEqual(['0,0', '1,0']);
+    expect(board.occupiedCells()).toEqual([]);
   });
 
   it('should_give_the_turned_piece_when_the_board_turns_a_piece_by_its_topology', () => {
@@ -199,11 +211,14 @@ describe('Board operations', () => {
 
     const turned = board.turned(piece, Turns.of(1));
 
-    expect(keysOf(turned.cells())).toEqual(
-      keysOf(piece.rotated(Turns.of(1), squareTopology).cells()),
+    expect(keysOf(turned.coveredCoordinates())).toEqual(
+      keysOf(piece.rotated(Turns.of(1), squareTopology).coveredCoordinates()),
     );
-    expect(keysOf(board.turned(piece, board.fullTurn()).cells())).toEqual(['0,0', '1,0']);
-    expect(keysOf(piece.cells())).toEqual(['0,0', '1,0']);
+    expect(keysOf(board.turned(piece, board.fullTurn()).coveredCoordinates())).toEqual([
+      '0,0',
+      '1,0',
+    ]);
+    expect(keysOf(piece.coveredCoordinates())).toEqual(['0,0', '1,0']);
   });
 
   it('should_keep_its_id_when_a_reader_asks_the_new_operations', () => {
@@ -222,23 +237,23 @@ describe('Board operations', () => {
 
 describe('Piece operations', () => {
   it('should_give_the_coordinates_that_it_covers_when_the_shape_is_a_group', () => {
-    expect(keysOf(domino().cells())).toEqual(['0,0', '1,0']);
-    expect(new Piece(new CellNode(hex(1, -1)), RED).cells()).toEqual([hex(1, -1)]);
+    expect(keysOf(domino().coveredCoordinates())).toEqual(['0,0', '1,0']);
+    expect(new Piece(new CellNode(hex(1, -1)), RED).coveredCoordinates()).toEqual([hex(1, -1)]);
   });
 
   it('should_give_the_cell_that_it_puts_on_the_board_when_a_reader_asks_for_it', () => {
     const id = PieceId.of('a');
 
-    expect(domino().cell()).toBe(RED);
-    expect(new Piece(new CellNode(square(0, 0)), id).cell()).toBe(id);
+    expect(domino().occupant()).toBe(RED);
+    expect(new Piece(new CellNode(square(0, 0)), id).occupant()).toBe(id);
   });
 
   it('should_keep_its_cell_when_the_piece_is_turned_moved_or_copied', () => {
     const piece = domino();
 
-    expect(piece.rotated(Turns.of(1), squareTopology).cell()).toBe(RED);
-    expect(piece.translated(square(1, 1), squareTopology).cell()).toBe(RED);
-    expect(piece.clone().cell()).toBe(RED);
+    expect(piece.rotated(Turns.of(1), squareTopology).occupant()).toBe(RED);
+    expect(piece.translated(square(1, 1), squareTopology).occupant()).toBe(RED);
+    expect(piece.clone().occupant()).toBe(RED);
   });
 });
 

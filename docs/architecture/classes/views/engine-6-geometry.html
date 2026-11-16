@@ -77,10 +77,11 @@
           coordinate, the topology and the piece shapes of one geometry, with HexGeometry creating
           HexCoord and HexTopology and SquareGeometry creating SquareCoord, the three coordinate
           value objects HexCoord, SquareCoord and TriangleCoord with private values and their own
-          operations, the value object TopologyId that names a family, the axis and direction value
-          objects of the three topologies, each a closed set of instances that implements GridAxis
-          or GridDirection, and BoardBuilder, the builder that the class calls a DDD factory,
-          holding a GeometryFactory and creating the Board.
+          operations, the value object TopologyId that names a family, which each concrete factory
+          keeps private and which GeometryFactory answers with isOfFamily(), the axis and direction
+          value objects of the three topologies, each a closed set of instances that implements
+          GridAxis or GridDirection, and BoardBuilder, the builder that the class calls a DDD
+          factory, holding a GeometryFactory and creating the Board.
         </desc>
         <defs>
           <marker
@@ -208,7 +209,7 @@
           x1="172"
           y1="296"
           x2="172"
-          y2="204"
+          y2="220"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -219,7 +220,7 @@
           x1="404"
           y1="296"
           x2="404"
-          y2="204"
+          y2="220"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -271,7 +272,7 @@
           marker-end="url(#geo-open)"
           stroke="#5b6873"
         />
-        <!-- GeometryFactory names its family with a TopologyId as id: use with role and multiplicity -->
+        <!-- GeometryFactory asks whether it is of a family with isOfFamily(id: TopologyId): use with a verb. Each concrete factory keeps its TopologyId private (#234) -->
         <path
           d="M448 190 H544 Q552 190 552 198 V412 Q552 420 560 420 H640"
           fill="none"
@@ -280,7 +281,7 @@
           stroke="#5b6873"
         />
         <!-- Arrow labels -->
-        <rect x="584" y="404" width="20" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="562" y="404" width="64" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="594"
           y="413"
@@ -290,7 +291,7 @@
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          id
+          ISOFFAMILY()
         </text>
 
         <rect x="180" y="228" width="148" height="12" rx="2" fill="#f9f4dc" />
@@ -378,18 +379,6 @@
           «create»
         </text>
         <!-- Multiplicities -->
-        <rect x="622" y="426" width="12" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="628"
-          y="435"
-          fill="#17212a"
-          font-size="8"
-          font-weight="600"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          1
-        </text>
 
         <rect x="454" y="158" width="12" height="12" rx="2" fill="#f9f4dc" />
         <text
@@ -408,7 +397,7 @@
           x="72"
           y="100"
           width="376"
-          height="104"
+          height="120"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -438,12 +427,15 @@
           GeometryFactory
         </text>
         <text x="88" y="164" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + createCoord(values: number[]): TCoord
+          + isOfFamily(id: TopologyId): boolean
         </text>
         <text x="88" y="180" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + createTopology(): GridTopology&lt;TCoord&gt;
+          + createCoord(values: number[]): TCoord
         </text>
         <text x="88" y="196" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + createTopology(): GridTopology&lt;TCoord&gt;
+        </text>
+        <text x="88" y="212" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + createPieceShapes(): ShapeNode&lt;TCoord&gt;[]
         </text>
         <!-- Class: HexGeometry (concrete factory) -->

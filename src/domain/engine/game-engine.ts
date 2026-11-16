@@ -1,5 +1,6 @@
 import type { BoardSnapshot, BoardState, SnapshotOf } from './board-state';
 import type { Cloneable } from './cloneable';
+import type { ElapsedTime } from './elapsed-time';
 import { GameOver, type GameEvent } from './game-events';
 import type { GameId } from './game-id';
 import { PlayingPhase, ResolvingPhase, type GamePhase } from './game-phase';
@@ -11,17 +12,21 @@ import { Resolution } from './resolution';
 import type { IGameRules } from './rules';
 import type { IScoringPolicy } from './scoring-policy';
 import type { ITimed } from './timed';
-import type { IRedoable, IUndoable } from './undo-capabilities';
+import type { IRedoable } from './undo-capabilities';
 
 // The aggregate root of one game (classes.md decision 26).
 // It is an entity: its `MatchId` is its identity, and the id never changes.
 // `GameFactory` gives each new game the id of a generator. `gameId` only names the variant.
-// A game changes only through `play()` and through the undo capability, and both act only
+// A game changes only through `play()` and `undo()`, and both act only
 // while `currentPhase().canPlay()` is true. `snapshot()` returns the photo of the state,
 // which is immutable, so no caller changes the game through it (classes.md decision 34).
 // The engine depends only on the interfaces of the rules and the scoring (Strategy, D1).
 // `TState` is a `BoardState` whose `clone()` returns `TState`, so each copy keeps the state type.
-// `history` is optional, because the variant factory decides it (classes.md decision 3).
+// `history` and `timer` are optional parts, because the variant factory decides them
+// (classes.md decisions 3 and 19). The root is their only door (classes.md decisions 27 and 52):
+// a caller asks `undo()`, `redo()`, `canUndo()`, `canRedo()`, `offersUndo()` and `elapsedTime()`,
+// and the root hands out neither part (issue #234). `GameFactory` gives the same timer
+// to the root and to the `TimedRulesDecorator` that starts and stops it.
 // The engine is the Memento originator (decision 34). Each saved turn keeps the photo of the
 // state before the move, and `restore()` gives that photo back to the state.
 // The root only records its events, and it tells nobody (classes.md decision 52).
@@ -43,6 +48,7 @@ export class GameEngine<
     private readonly rules: IGameRules<TMove, TState>,
     private readonly scoring: IScoringPolicy<TState>,
     private readonly history?: MoveHistory<TMove, SnapshotOf<TState>>,
+    private readonly timer?: ITimed,
   ) {}
 
   // Two engines are the same game when they have the same `MatchId`.
@@ -69,19 +75,40 @@ export class GameEngine<
     this.history?.clear();
   }
 
-  // The undo capability that the variant factory gave, or `undefined` (classes.md decision 27).
-  undoable(): IUndoable | undefined {
-    return this.history;
+  // Takes back the last saved move (classes.md decisions 27 and 34).
+  // A game with no history throws a RangeError. A history with no move to undo throws one too,
+  // and so does a phase that accepts no undo. Each refusal leaves the game as it was.
+  undo(): void {
+    if (this.history === undefined) throw new RangeError('The game offers no undo.');
+    this.history.undo();
   }
 
-  // The redo capability of the history, or `undefined`.
-  redoable(): IRedoable | undefined {
-    return this.history?.redoable();
+  // Plays the last undone move again. A history that cannot redo throws a RangeError,
+  // and the game stays as it was. Only the `RedoableHistory` of #178 redoes.
+  redo(): void {
+    this.redoCapability().redo();
   }
 
-  // The timer of the rules, or `undefined` for a game with no timer (classes.md decision 27).
-  timed(): ITimed | undefined {
-    return this.rules.timed();
+  // True when the game has a saved move to take back.
+  canUndo(): boolean {
+    return this.history?.canUndo() ?? false;
+  }
+
+  // True when the game has an undone move to play again.
+  canRedo(): boolean {
+    return this.history?.redoable()?.canRedo() ?? false;
+  }
+
+  // True when the variant offers undo at all. A false `canUndo()` cannot tell «no undo»
+  // from «undo used», so `UndoMove` and `MoveResult.hasUndo` ask this query.
+  offersUndo(): boolean {
+    return this.history !== undefined;
+  }
+
+  // The time of play of a timed game, or `undefined` for a game with no timer
+  // (classes.md decisions 19 and 27). So `MoveResult.elapsedMs` exists only for a timed game.
+  elapsedTime(): ElapsedTime | undefined {
+    return this.timer?.elapsedMs();
   }
 
   // One turn: receive the move, let the rules validate, apply, resolve and evaluate it
@@ -221,6 +248,13 @@ export class GameEngine<
   private started(): TState {
     if (this.state === undefined) throw new RangeError('The game has not started.');
     return this.state;
+  }
+
+  // The redo capability of the history. A game whose history cannot redo throws a RangeError.
+  private redoCapability(): IRedoable {
+    const redoable = this.history?.redoable();
+    if (redoable === undefined) throw new RangeError('The game offers no redo.');
+    return redoable;
   }
 }
 

@@ -58,15 +58,6 @@ export const primitiveBaseline: readonly PrimitiveEntry[] = [
 ];
 
 export const fieldBaseline: readonly FieldEntry[] = [
-  // #234: the public read-only members and `Board.get(at)`.
-  { rule: 'field', where: 'PieceDraw.piece', issue: 234 },
-  { rule: 'field', where: 'PieceDraw.rest', issue: 234 },
-  { rule: 'field', where: 'SeededPieceSource.seed', issue: 234 },
-  { rule: 'field', where: 'IRandomSeeded.seed', issue: 234 },
-  { rule: 'field', where: 'IVariantFactory.gameId', issue: 234 },
-  { rule: 'field', where: 'GeometryFactory.id', issue: 234 },
-  { rule: 'get', where: 'ReadonlyBoard.get', issue: 234 },
-  { rule: 'get', where: 'Board.get', issue: 234 },
   // #245: the five photos and the four `*View` interfaces.
   { rule: 'field', where: 'BoardSnapshot.stateId', issue: 245 },
   { rule: 'field', where: 'BoardSnapshot.matchId', issue: 245 },
@@ -96,13 +87,4 @@ export const fieldBaseline: readonly FieldEntry[] = [
   { rule: 'field', where: 'MergeSnapshot.targetReached', issue: 245 },
   { rule: 'field', where: 'MergeSnapshot.merged', issue: 245 },
   { rule: 'field', where: 'MergeSnapshot.tiles', issue: 245 },
-  // #234: the classes that implement `IVariantFactory.gameId` and `GeometryFactory.id`.
-  // #234 turns those two members into queries, so the fields of the classes close with them.
-  { rule: 'field', where: 'LinesFactory.gameId', issue: 234 },
-  { rule: 'field', where: 'FitFactory.gameId', issue: 234 },
-  { rule: 'field', where: 'SortFactory.gameId', issue: 234 },
-  { rule: 'field', where: 'MergeFactory.gameId', issue: 234 },
-  { rule: 'field', where: 'HexGeometry.id', issue: 234 },
-  { rule: 'field', where: 'SquareGeometry.id', issue: 234 },
-  { rule: 'field', where: 'TriangleGeometry.id', issue: 234 },
 ];

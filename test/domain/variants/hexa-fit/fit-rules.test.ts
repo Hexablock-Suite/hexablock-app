@@ -106,7 +106,7 @@ function engineOn(
 function cellsOf<TCoord>(state: FitState<TCoord> | FitSnapshot<TCoord>): string[] {
   const { board } = photoOf(state);
   return board
-    .cells()
+    .occupiedCells()
     .map(([c, id]) => `${board.key(c)}=${delivered(id)}`)
     .sort();
 }
@@ -114,7 +114,7 @@ function cellsOf<TCoord>(state: FitState<TCoord> | FitSnapshot<TCoord>): string[
 function trayOf<TCoord>(state: FitState<TCoord> | FitSnapshot<TCoord>): string[] {
   return photoOf(state)
     .view()
-    .remaining.map((p) => delivered(p.cell()));
+    .remaining.map((p) => delivered(p.occupant()));
 }
 
 describe('FitRules', () => {
@@ -225,7 +225,7 @@ describe('FitRules', () => {
     const removed = played(rules, both, new RemoveFitPiece(A));
     const again = played(rules, removed, new PlaceFitPiece(A, NO_TURN, square(0, 0)));
 
-    expect(again.snapshot().board.cells()).toEqual([
+    expect(again.snapshot().board.occupiedCells()).toEqual([
       [square(0, 1), B],
       [square(1, 1), B],
       [square(0, 0), A],
@@ -380,7 +380,7 @@ describe('FitRules edge cases', () => {
     );
 
     expect(source.hasNext()).toBe(true);
-    expect([...source].map((p) => delivered(p.cell()))).toEqual(['a', 'b']);
+    expect([...source].map((p) => delivered(p.occupant()))).toEqual(['a', 'b']);
     expect(trayOf(state)).toEqual(['a', 'b']);
     expect(trayOf(state.clone())).toEqual(['a', 'b']);
   });

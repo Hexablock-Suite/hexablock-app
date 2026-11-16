@@ -27,8 +27,8 @@ const domino = new ShapeGroup([new CellNode(square(0, 0)), new CellNode(square(1
 // A piece as text: its color and the keys of its cells, so two pieces compare by value.
 // `Color` keeps its name private, so `equals()` names the color. These tests draw red or blue.
 function describe_(piece: Piece<Color, SquareCoord>): string {
-  const keys = piece.cells().map((c) => squareTopology.key(c));
-  const color = piece.cell().equals(red) ? 'red' : 'blue';
+  const keys = piece.coveredCoordinates().map((c) => squareTopology.key(c));
+  const color = piece.occupant().equals(red) ? 'red' : 'blue';
   return `${color} ${keys.join(' ')}`;
 }
 
@@ -54,9 +54,9 @@ describe('LinesFactory', () => {
     const { engine, rules } = startVariant(factory);
     const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, engine.snapshot())));
 
-    expect(factory.gameId.equals(GameId.of('hexa-lines'))).toBe(true);
+    expect(factory.isFor(GameId.of('hexa-lines'))).toBe(true);
     expect(factory.createBoard(BOARD_ID).coordinates()).toHaveLength(9);
-    expect(initial.snapshot().board.cells()).toEqual([]);
+    expect(initial.snapshot().board.occupiedCells()).toEqual([]);
     expect(initial.snapshot().tray).toHaveLength(3);
     expect(outcome).toBe(Outcome.playing);
     expect(filledKeys(engine.snapshot())).toEqual(['0,0']);

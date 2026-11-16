@@ -1,6 +1,7 @@
 import { BoardShape } from '../domain/engine/board-shape';
 import type { Clock } from '../domain/engine/clock';
 import { Color } from '../domain/engine/color';
+import { GameId } from '../domain/engine/game-id';
 import { TopologyId } from '../domain/engine/geometry-factory';
 import { HexGeometry } from '../domain/engine/hex-geometry';
 import { hex, type HexCoord } from '../domain/engine/hex-topology';
@@ -38,6 +39,8 @@ const SORT_GOALS = GoalCount.of(3);
 
 // The games of the registry, in the order of the game selector, on the hexagonal figure.
 // The composition root calls the only module that names a variant factory: this one.
+// Each entry names the `GameId` of its game next to its factory, and `registered()`
+// checks the pair with `isFor()` (issue #234).
 // Lines, Sort and Merge draw their seed from `random`, so each run of the app gets new pieces.
 // Fit takes the clock for its level timer (classes.md decision 19).
 // The Fit level and the Sort level are first content only: #172 lets the player choose
@@ -47,6 +50,7 @@ export function registeredGames(clock: Clock, random: RandomSource): RegisteredG
   const geometry = new HexGeometry();
   return [
     registered(
+      GameId.of('hexa-lines'),
       new LinesFactory(
         geometry,
         LinesSettings.of(
@@ -57,14 +61,16 @@ export function registeredGames(clock: Clock, random: RandomSource): RegisteredG
         ),
       ),
     ),
-    registered(new FitFactory(geometry, firstFitLevel(), clock)),
+    registered(GameId.of('hexa-fit'), new FitFactory(geometry, firstFitLevel(), clock)),
     registered(
+      GameId.of('hexa-sort'),
       new SortFactory(
         geometry,
         SortLevel.seeded(SMALL_BOARD, SORT_GOALS, seedFrom(random), nonEmpty(SORT_COLORS)),
       ),
     ),
     registered(
+      GameId.of('hexa-merge'),
       new MergeFactory(geometry, MergeSettings.of(SMALL_BOARD, seedFrom(random), MERGE_TARGET)),
     ),
   ];

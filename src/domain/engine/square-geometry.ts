@@ -19,7 +19,12 @@ const pieces: readonly (readonly SquareCoord[])[] = [
 
 // Concrete Factory (classes.md decision 17, D11): the real square family.
 export class SquareGeometry implements GeometryFactory<SquareCoord> {
-  readonly id = TopologyId.square;
+  private readonly family = TopologyId.square;
+
+  // True when `id` names the square family.
+  isOfFamily(id: TopologyId): boolean {
+    return this.family.equals(id);
+  }
 
   // `values` holds `col` and then `row`.
   createCoord(values: number[]): SquareCoord {

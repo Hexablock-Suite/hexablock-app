@@ -134,7 +134,7 @@ describe('GameEngine.play()', () => {
     const outcome = engine.play(place(1, 0, 7));
 
     expect(outcome).toBe(Outcome.playing);
-    expect(engine.snapshot().board.get(square(1, 0))).toEqual(fakeCell(7));
+    expect(engine.snapshot().board.occupantAt(square(1, 0))).toEqual(fakeCell(7));
     expect(engine.snapshot().score).toEqual(Score.of(1));
   });
 
@@ -146,7 +146,7 @@ describe('GameEngine.play()', () => {
     const outcome = engine.play(place(0, 0, 9));
 
     expect(outcome).toBe(Outcome.playing);
-    expect(engine.snapshot().board.get(square(0, 0))).toEqual(fakeCell(1));
+    expect(engine.snapshot().board.occupantAt(square(0, 0))).toEqual(fakeCell(1));
     expect(engine.snapshot().score).toEqual(Score.of(1));
     expect(engine.currentPhase().canPlay()).toBe(true);
   });
@@ -163,7 +163,7 @@ describe('GameEngine.play()', () => {
     const outcome = engine.play(place(0, 0));
 
     expect(outcome).toBe(Outcome.playing);
-    expect(engine.snapshot().board.get(square(0, 0))).toBeUndefined();
+    expect(engine.snapshot().board.occupantAt(square(0, 0))).toBeUndefined();
     expect(engine.snapshot().score).toEqual(Score.of(0));
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(engine.takeEvents()).toEqual([]);
@@ -225,7 +225,7 @@ describe('GameEngine.play()', () => {
     expect(() => engine.play(place(0, 0))).toThrow(
       new RangeError('The game cannot accept a move in the paused phase.'),
     );
-    expect(engine.snapshot().board.cells()).toEqual([]);
+    expect(engine.snapshot().board.occupiedCells()).toEqual([]);
   });
 
   it('should_accept_moves_again_when_a_paused_game_resumes', () => {
@@ -254,7 +254,7 @@ describe('GameEngine.play()', () => {
     (copy.board as Board<FakeCell, SquareCoord, SquareAxis>).occupy(square(0, 0), fakeCell(5));
     expect(Reflect.set(copy, 'score', 99)).toBe(false);
 
-    expect(engine.snapshot().board.get(square(0, 0))).toBeUndefined();
+    expect(engine.snapshot().board.occupantAt(square(0, 0))).toBeUndefined();
     expect(engine.snapshot().score).toEqual(Score.of(0));
   });
 
@@ -265,7 +265,7 @@ describe('GameEngine.play()', () => {
 
     initial.board.occupy(square(0, 0), fakeCell(5));
 
-    expect(engine.snapshot().board.get(square(0, 0))).toBeUndefined();
+    expect(engine.snapshot().board.occupantAt(square(0, 0))).toBeUndefined();
   });
 
   it('should_keep_the_board_and_accept_the_next_move_when_the_rules_throw', () => {
@@ -280,10 +280,10 @@ describe('GameEngine.play()', () => {
     expect(() => engine.play(place(0, 0))).toThrow('resolve failed');
 
     expect(engine.currentPhase().canPlay()).toBe(true);
-    expect(engine.snapshot().board.get(square(0, 0))).toBeUndefined();
+    expect(engine.snapshot().board.occupantAt(square(0, 0))).toBeUndefined();
     expect(engine.snapshot().score).toEqual(Score.of(0));
     expect(engine.play(place(0, 0))).toBe(Outcome.playing);
-    expect(engine.snapshot().board.get(square(0, 0))).toEqual(fakeCell(1));
+    expect(engine.snapshot().board.occupantAt(square(0, 0))).toEqual(fakeCell(1));
   });
 
   it('should_keep_the_board_and_accept_the_next_move_when_the_scoring_throws', () => {
@@ -298,7 +298,7 @@ describe('GameEngine.play()', () => {
     expect(() => engine.play(place(0, 0))).toThrow('score failed');
 
     expect(engine.currentPhase().canPlay()).toBe(true);
-    expect(engine.snapshot().board.get(square(0, 0))).toBeUndefined();
+    expect(engine.snapshot().board.occupantAt(square(0, 0))).toBeUndefined();
     expect(engine.snapshot().score).toEqual(Score.of(0));
     expect(engine.play(place(0, 0))).toBe(Outcome.playing);
     expect(engine.snapshot().score).toEqual(Score.of(1));
@@ -332,7 +332,7 @@ class BaseCloneState implements BoardState<FakeCell, SquareCoord> {
   }
 
   snapshot(): FakeSnapshot {
-    const view = Object.freeze({ filled: this.board.cells().length });
+    const view = Object.freeze({ filled: this.board.occupiedCells().length });
     return Object.freeze({
       stateId: STATE_ID,
       matchId: MATCH_ID,
@@ -362,7 +362,7 @@ function armedGame(step: 'apply' | 'evaluate') {
 function summary(engine: GameEngine<FakeCell, SquareCoord, FakeMove, FakeState>) {
   const state = engine.snapshot();
   return {
-    cells: state.board.cells(),
+    cells: state.board.occupiedCells(),
     score: state.score,
     phase: phaseNameOf(engine.currentPhase()),
   };
@@ -417,7 +417,7 @@ describe('GameEngine edge cases', () => {
     engine.start(emptyState(1));
 
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
-    expect(engine.snapshot().board.cells()).toEqual([]);
+    expect(engine.snapshot().board.occupiedCells()).toEqual([]);
     expect(engine.snapshot().score).toEqual(Score.of(0));
     expect(engine.play(place(0, 0))).toBe(Outcome.gameOver);
     expect(engine.takeEvents()).toHaveLength(2);
@@ -619,7 +619,7 @@ describe('GameEngine review findings', () => {
     expect(() => engine.play(place(0, 0))).toThrow('photo failed');
 
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
-    expect(engine.snapshot().board.cells()).toEqual([]);
+    expect(engine.snapshot().board.occupiedCells()).toEqual([]);
     expect(engine.takeEvents()).toEqual([]);
   });
 
@@ -638,12 +638,12 @@ describe('GameEngine review findings', () => {
     const engine = sourceGame(new DrawingRules());
 
     expect(() => engine.play(square(0, 0))).toThrow('apply failed');
-    expect(engine.snapshot().board.cells()).toEqual([]);
+    expect(engine.snapshot().board.occupiedCells()).toEqual([]);
     expect(engine.snapshot().score).toEqual(Score.of(0));
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
 
     expect(engine.play(square(0, 0))).toBe(Outcome.playing);
-    expect(engine.snapshot().board.get(square(0, 0))).toEqual(fakeCell(1));
+    expect(engine.snapshot().board.occupantAt(square(0, 0))).toEqual(fakeCell(1));
     expect([...engine.snapshot().source]).toEqual([fakeCell(2), fakeCell(3)]);
   });
 
@@ -652,12 +652,12 @@ describe('GameEngine review findings', () => {
     const engine = sourceGame(rules);
 
     expect(engine.play(square(0, 0))).toBe(Outcome.playing);
-    expect(engine.snapshot().board.cells()).toEqual([]);
+    expect(engine.snapshot().board.occupiedCells()).toEqual([]);
     expect([...engine.snapshot().source]).toEqual([fakeCell(1), fakeCell(2), fakeCell(3)]);
 
     rules.rejecting = false;
     expect(engine.play(square(0, 0))).toBe(Outcome.playing);
-    expect(engine.snapshot().board.get(square(0, 0))).toEqual(fakeCell(1));
+    expect(engine.snapshot().board.occupantAt(square(0, 0))).toEqual(fakeCell(1));
   });
 
   it('should_record_game_over_with_the_victory_outcome_when_the_rules_return_victory', () => {
@@ -730,7 +730,9 @@ describe('GameEngine identity', () => {
     const second = matchOf(MatchId.of('match-a'), 3).engine;
     first.play(place(0, 0));
 
-    expect(first.snapshot().board.cells()).not.toEqual(second.snapshot().board.cells());
+    expect(first.snapshot().board.occupiedCells()).not.toEqual(
+      second.snapshot().board.occupiedCells(),
+    );
     expect([first.equals(second), second.equals(first), first.equals(first)]).toEqual([
       true,
       true,
@@ -742,7 +744,7 @@ describe('GameEngine identity', () => {
     const first = matchOf(MatchId.of('match-a')).engine;
     const second = matchOf(MatchId.of('match-b')).engine;
 
-    expect(first.snapshot().board.cells()).toEqual(second.snapshot().board.cells());
+    expect(first.snapshot().board.occupiedCells()).toEqual(second.snapshot().board.occupiedCells());
     expect([first.equals(second), second.equals(first)]).toEqual([false, false]);
   });
 
@@ -766,7 +768,7 @@ describe('GameEngine identity', () => {
     expect(() => engine.start(emptyState(2, MatchId.of('match-b')))).toThrow(
       new RangeError('The first state belongs to another match.'),
     );
-    expect(engine.snapshot().board.cells()).toEqual(before.board.cells());
+    expect(engine.snapshot().board.occupiedCells()).toEqual(before.board.occupiedCells());
     expect(engine.snapshot().score).toEqual(Score.of(1));
     expect(engine.snapshot().matchId.equals(MatchId.of('match-a'))).toBe(true);
   });

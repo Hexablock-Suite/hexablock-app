@@ -110,7 +110,7 @@ describe('PieceRegister', () => {
 describe('a Fit game with an equal piece id that is another object', () => {
   it('should_find_place_and_remove_the_piece_when_the_move_names_it_with_another_id_object', () => {
     const factory = threeDominoFitFactory();
-    const rules = factory.createRules(MATCH_ID);
+    const rules = factory.createRules();
     const state = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
     const other = PieceId.of('b');
     const place = new PlaceFitPiece(other, Turns.of(0), square(2, 0));
@@ -123,13 +123,13 @@ describe('a Fit game with an equal piece id that is another object', () => {
 
     expect(state.placementOf(PieceId.of('b'))).toBeDefined();
     expect(state.placed()).toEqual([B]);
-    expect(state.remaining().map((piece) => delivered(piece.cell()))).toEqual(['a', 'c']);
+    expect(state.remaining().map((piece) => delivered(piece.occupant()))).toEqual(['a', 'c']);
     expect(state.snapshot().placements.map(([id]) => delivered(id))).toEqual(['b']);
 
     rules.apply(state, new RemoveFitPiece(PieceId.of('b')));
 
     expect(state.placed()).toEqual([]);
     expect(state.placementOf(B)).toBeUndefined();
-    expect(state.snapshot().board.cells()).toEqual([]);
+    expect(state.snapshot().board.occupiedCells()).toEqual([]);
   });
 });

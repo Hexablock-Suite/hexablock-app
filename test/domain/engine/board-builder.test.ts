@@ -29,7 +29,7 @@ describe('BoardBuilder', () => {
     expect(board.contains(hex(1, -1))).toBe(true);
     expect(board.contains(hex(2, 0))).toBe(false);
     expect([...board.neighborhood(hex(0, 0))]).toHaveLength(6);
-    expect(board.cells()).toEqual([]);
+    expect(board.occupiedCells()).toEqual([]);
   });
 
   it('should_build_an_empty_board_of_the_figure_when_the_builder_takes_a_figure', () => {
@@ -43,7 +43,7 @@ describe('BoardBuilder', () => {
     expect(board.coordinates()).toEqual(cells);
     expect(board.contains(hex(1, 1))).toBe(true);
     expect(board.contains(hex(0, 1))).toBe(false);
-    expect(board.cells()).toEqual([]);
+    expect(board.occupiedCells()).toEqual([]);
   });
 
   it('should_return_the_builder_when_a_step_runs', () => {
@@ -92,13 +92,13 @@ describe('BoardBuilder', () => {
     first.occupy(hex(0, 0), 'x');
 
     expect(second).not.toBe(first);
-    expect(second.get(hex(0, 0))).toBeUndefined();
-    expect(second.cells()).toEqual([]);
+    expect(second.occupantAt(hex(0, 0))).toBeUndefined();
+    expect(second.occupiedCells()).toEqual([]);
   });
 
   it('should_use_the_topology_of_its_geometry_when_the_geometry_is_not_hexagonal', () => {
     const geometry: GeometryFactory<SquareCoord> = {
-      id: TopologyId.square,
+      isOfFamily: (id) => id.equals(TopologyId.square),
       createCoord: ([col = 0, row = 0]) => square(col, row),
       createTopology: () => squareTopology,
       createPieceShapes: () => [],

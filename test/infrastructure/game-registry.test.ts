@@ -11,9 +11,9 @@ import { variantIdOf } from '../support/variants/variant-id';
 describe('GameRegistry', () => {
   it('should_give_the_ids_in_the_order_of_registration_when_games_are_registered', () => {
     const registry = new GameRegistry([
-      registered(mergeFactory()),
-      registered(linesFactory()),
-      registered(fitFactory()),
+      registered(GameId.of('hexa-merge'), mergeFactory()),
+      registered(GameId.of('hexa-lines'), linesFactory()),
+      registered(GameId.of('hexa-fit'), fitFactory()),
     ]);
 
     expect(registry.gameIds().map(variantIdOf)).toEqual(['hexa-merge', 'hexa-lines', 'hexa-fit']);
@@ -21,20 +21,31 @@ describe('GameRegistry', () => {
 
   it('should_give_the_factory_of_the_game_when_its_id_is_registered', () => {
     const merge = mergeFactory();
-    const registry = new GameRegistry([registered(linesFactory()), registered(merge)]);
+    const registry = new GameRegistry([
+      registered(GameId.of('hexa-lines'), linesFactory()),
+      registered(GameId.of('hexa-merge'), merge),
+    ]);
 
     const found = registry
       .gameOf(GameId.of('hexa-merge'))
-      .withFactory({ use: (factory) => Object.is(factory, merge) });
+      .withFactory({ use: (_gameId, factory) => Object.is(factory, merge) });
 
     expect(found).toBe(true);
   });
 
   it('should_throw_a_range_error_when_the_id_is_not_registered', () => {
-    const registry = new GameRegistry([registered(linesFactory())]);
+    const registry = new GameRegistry([registered(GameId.of('hexa-lines'), linesFactory())]);
 
     expect(() => registry.gameOf(GameId.of('hexa-fill'))).toThrow(
       new RangeError('The registry holds no game with this id.'),
+    );
+  });
+
+  // Issue #234: the factory keeps its id private, so the entry pairs the id with the factory
+  // in one place and asks the factory with `isFor()`.
+  it('should_throw_a_range_error_when_the_factory_does_not_build_the_game_of_the_id', () => {
+    expect(() => registered(GameId.of('hexa-fit'), linesFactory())).toThrow(
+      new RangeError('The factory does not build the game of this id.'),
     );
   });
 
@@ -42,9 +53,9 @@ describe('GameRegistry', () => {
     expect(
       () =>
         new GameRegistry([
-          registered(linesFactory()),
-          registered(mergeFactory()),
-          registered(linesFactory(2)),
+          registered(GameId.of('hexa-lines'), linesFactory()),
+          registered(GameId.of('hexa-merge'), mergeFactory()),
+          registered(GameId.of('hexa-lines'), linesFactory(2)),
         ]),
     ).toThrow(new RangeError('The registry holds two games with one id.'));
   });

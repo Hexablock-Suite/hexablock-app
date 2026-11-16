@@ -31,9 +31,9 @@ class AdjacentRules extends BaseGameRules<SquareCoord, FakeState> {
 
   isValid(state: FakeState, at: SquareCoord): boolean {
     const { board } = state;
-    if (!board.contains(at) || board.get(at) !== undefined) return false;
+    if (!board.contains(at) || board.occupantAt(at) !== undefined) return false;
     for (const n of board.neighborhood(at)) {
-      if (board.get(n) !== undefined) return true;
+      if (board.occupantAt(n) !== undefined) return true;
     }
     return false;
   }

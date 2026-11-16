@@ -30,7 +30,7 @@ import { SortState } from '../../src/domain/variants/hexa-sort/sort-state';
 import { squareTopology, type SquareCoord } from '../support/engine/square-topology';
 import { repoRoot } from '../support/run-tool';
 import { linesState } from '../support/variants/hexa-lines/lines-game';
-import { mergeState } from '../support/variants/hexa-merge/merge-game';
+import { mergeBoard, mergeState } from '../support/variants/hexa-merge/merge-game';
 import { MATCH_ID } from '../support/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../support/engine/entity-ids';
 import { delivered } from '../support/engine/value-receiver';
@@ -106,7 +106,7 @@ function mergePoints(values: number[]): number {
   const state = new MergeState(
     STATE_ID,
     MATCH_ID,
-    start.snapshot().board.clone(),
+    mergeBoard(),
     start.snapshot().tiles,
     false,
     values.map(MergeTile.of),

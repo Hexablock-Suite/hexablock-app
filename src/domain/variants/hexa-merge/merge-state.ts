@@ -71,9 +71,9 @@ export class MergeState<
   // A board with no empty cell, or a source that has ended, gets no new tile.
   // The rules call it after each slide, and `MergeFactory` calls it for the first tiles.
   addNewTile(): void {
-    const empty = this.board.coordinates().filter((c) => this.board.get(c) === undefined);
+    const empty = this.board.coordinates().filter((c) => this.board.occupantAt(c) === undefined);
     if (empty.length === 0 || !this.tiles.hasNext()) return;
-    const { piece, rest } = this.tiles.take();
+    const [piece, rest] = this.tiles.take();
     const [at, tile] = piece.appearsOn(empty);
     this.board.occupy(at, tile);
     this.tiles = rest;
@@ -86,7 +86,7 @@ export class MergeState<
 
   // Packs the tiles of the board toward the leading edge of each line, in place.
   // The board vacates every tile, then takes the packed tiles line by line.
-  // So `cells()` lists the tiles in the order of the packed lines.
+  // So `occupiedCells()` lists the tiles in the order of the packed lines.
   // `merged` takes the tiles that the merges of this slide make.
   // A merge that makes `target` sets `targetReached`. The tile source and the score do not change.
   // A slide that changes no cell, or a slide on an axis of another topology, throws a RangeError
@@ -94,7 +94,7 @@ export class MergeState<
   slide(slide: Slide<TAxis>, target: TCell): void {
     const plan = this.planOf(slide);
     if (plan === undefined) throw new RangeError('The slide changes no cell of the board.');
-    for (const [c] of this.board.cells()) this.board.vacate(c);
+    for (const [c] of this.board.occupiedCells()) this.board.vacate(c);
     for (const [c, cell] of plan.cells) this.board.occupy(c, cell);
     this.targetReached ||= plan.merged.some((tile) => tile.canMergeWith(target));
     this.merged = plan.merged;
@@ -178,7 +178,7 @@ export class MergeState<
       ordered.forEach((c, i) => {
         const cell = packed[i];
         if (cell !== undefined) cells.push([c, cell]);
-        if (!isSameCell(board.get(c), cell)) changed = true;
+        if (!isSameCell(board.occupantAt(c), cell)) changed = true;
       });
     }
     return changed ? { cells, merged } : undefined;
@@ -196,7 +196,7 @@ function isSameCell<TCell extends IMergeable<TCell>>(
 }
 
 function tileAt<TCell, TCoord>(board: Board<TCell, TCoord>, c: TCoord): TCell[] {
-  const cell = board.get(c);
+  const cell = board.occupantAt(c);
   return cell === undefined ? [] : [cell];
 }
 

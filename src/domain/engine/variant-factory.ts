@@ -4,6 +4,7 @@ import type { BoardState, SnapshotOf } from './board-state';
 import type { Cloneable } from './cloneable';
 import type { GameId } from './game-id';
 import type { GameStateId } from './game-state-id';
+import type { LevelTimer } from './level-timer';
 import type { MatchId } from './match-id';
 import type { MoveHistory } from './move-history';
 import type { Piece } from './piece';
@@ -15,12 +16,17 @@ import type { IScoringPolicy } from './scoring-policy';
 // creates the whole family of its game: the rules, the scoring, the piece source,
 // the board, the first state and the undo history. The engine and the use cases depend
 // only on this interface, so they never name a variant (rule `engine-no-variants`).
-// Each factory declares its own open `GameId` (classes.md decision 30).
+// Each factory declares its own open `GameId` (classes.md decision 30) and keeps it private.
+// `isFor()` tells whether the factory builds a game, so the composition root finds the factory
+// of the chosen game and gives that id to `GameFactory` (issue #234).
 // `createPieceSource()` returns `undefined` for a variant with no piece source.
 // `TPiece` is the item of the source. It is a `Piece` by default.
 // Hexa Merge draws a new tile and its cell (`NewTile`), so it binds `TPiece` to that type.
-// `createRules()` takes the `MatchId` of the game, so a timed variant gives its timer
-// the local id of that match (classes.md decisions 50 and 52). The other variants ignore it.
+// `createRules()` gives the plain rules of the variant.
+// `createTimer()` returns a new timer for each game, or `undefined` for a variant with no timer
+// (classes.md decision 19). It takes the `MatchId` of the game, so the timer gets the local id
+// of that match (classes.md decisions 50 and 52). `GameFactory` gives the timer to the root
+// and wraps the rules in `TimedRulesDecorator` with it, as it gives the history (issue #234).
 // `createBoard()` gives a new empty board with the id `boardId` (classes.md decision 7).
 // `createInitialState()` puts a new board and the piece source in the first state.
 // The first state takes its own id `stateId` and the `MatchId` of its game (decision 26),
@@ -37,8 +43,9 @@ export interface IVariantFactory<
   TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
   TPiece = Piece<TCell, TCoord>,
 > {
-  readonly gameId: GameId;
-  createRules(matchId: MatchId): IGameRules<TMove, TState>;
+  isFor(gameId: GameId): boolean;
+  createRules(): IGameRules<TMove, TState>;
+  createTimer(matchId: MatchId): LevelTimer | undefined;
   createScoring(): IScoringPolicy<TState>;
   createPieceSource(): IPieceSource<TPiece> | undefined;
   createBoard(boardId: BoardId): Board<TCell, TCoord>;

@@ -108,10 +108,7 @@ describe('The identity of the running state', () => {
     const seen = [];
 
     for (let turn = 0; turn < 5; turn += 1) {
-      const move = firstValidMove(
-        factory.createRules(MATCH),
-        mergeStateOf(games.running().snapshot()),
-      );
+      const move = firstValidMove(factory.createRules(), mergeStateOf(games.running().snapshot()));
       valueOf(await applyMove.execute({ move }));
       seen.push(identityOf(games.running().snapshot(), reference, other));
     }
@@ -124,13 +121,13 @@ describe('The identity of the running state', () => {
     const { games, startGame } = gameUseCases(factory);
     valueOf(await startGame.execute({}));
     const engine = games.running();
-    const before = engine.snapshot().board.cells();
+    const before = engine.snapshot().board.occupiedCells();
     const foreign = factory.createInitialState(OTHER, STATE, BOARD);
 
     expect(() => engine.start(foreign)).toThrow(
       new RangeError('The first state belongs to another match.'),
     );
-    expect(engine.snapshot().board.cells()).toEqual(before);
+    expect(engine.snapshot().board.occupiedCells()).toEqual(before);
     expect(engine.snapshot().matchId.equals(MATCH)).toBe(true);
   });
 });
@@ -142,7 +139,7 @@ describe('A Fit game through the use cases', () => {
   function answerOf(result: Result<MoveResult<unknown, unknown, unknown>>) {
     const value = valueOf(result);
     const payload = value.payload as {
-      readonly remaining: readonly { cell(): unknown }[];
+      readonly remaining: readonly { occupant(): unknown }[];
       readonly placed: readonly unknown[];
     };
     return {
@@ -151,7 +148,7 @@ describe('A Fit game through the use cases', () => {
       outcome: value.outcome,
       canUndo: value.canUndo,
       canRedo: value.canRedo,
-      remaining: payload.remaining.map((piece) => piece.cell()),
+      remaining: payload.remaining.map((piece) => piece.occupant()),
       placed: payload.placed,
       elapsedMs: value.elapsedMs,
     };

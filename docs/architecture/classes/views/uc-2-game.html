@@ -77,7 +77,7 @@
           GameFactory for the started game and ApplyMove plays the move on the GameEngine of layer
           1, delivers the events that the engine records to the GameEventPublisher port and passes a
           publisher failure to the Logger port; each use case answers with a plain MoveResult, and
-          UndoMove and RedoMove ask the engine for undoable() and redoable().
+          UndoMove and RedoMove ask the root offersUndo(), canUndo(), undo(), canRedo() and redo().
         </desc>
         <defs>
           <marker
@@ -425,7 +425,7 @@
           - games: GameRepository&lt;TCell, TCoord, TMove, TState&gt;
         </text>
         <text x="648" y="212" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          failed Result when undoable() is undefined
+          failed Result when offersUndo() or canUndo() is false
         </text>
         <line x1="632" y1="220" x2="960" y2="220" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="648" y="236" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
@@ -484,7 +484,7 @@
           - games: GameRepository&lt;TCell, TCoord, TMove, TState&gt;
         </text>
         <text x="648" y="396" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          failed Result when redoable() is undefined
+          failed Result when canRedo() is false
         </text>
         <line x1="632" y1="404" x2="960" y2="404" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="648" y="420" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
@@ -890,8 +890,9 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          UndoMove and RedoMove return a failed Result when undoable() or redoable() is undefined
-          (decision 27). MoveResult is plain data, so no Board leaves layer 2 (view 3.5).
+          UndoMove and RedoMove ask only the root and return a failed Result when no move can go
+          back or forward (decision 27). MoveResult is plain data, so no Board leaves layer 2 (view
+          3.5).
         </text>
         <text
           x="24"

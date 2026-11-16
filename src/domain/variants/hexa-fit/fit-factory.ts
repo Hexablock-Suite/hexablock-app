@@ -13,7 +13,6 @@ import type { Piece } from '../../engine/piece';
 import { FixedListPieceSource } from '../../engine/piece-source';
 import type { IGameRules } from '../../engine/rules';
 import type { IScoringPolicy } from '../../engine/scoring-policy';
-import { TimedRulesDecorator } from '../../engine/timed-rules-decorator';
 import type { IVariantFactory } from '../../engine/variant-factory';
 import type { FitLevel } from './fit-level';
 import type { FitMove } from './fit-move';
@@ -31,7 +30,7 @@ export class FitFactory<TCoord> implements IVariantFactory<
   FitMove<TCoord>,
   FitState<TCoord>
 > {
-  readonly gameId = GameId.of('hexa-fit');
+  private readonly gameId = GameId.of('hexa-fit');
 
   constructor(
     private readonly geometry: GeometryFactory<TCoord>,
@@ -41,16 +40,25 @@ export class FitFactory<TCoord> implements IVariantFactory<
     // A level file has no compile-time types, so the check runs when the game starts.
     // The level checks itself when it is created (classes.md decision 46).
     // Only this check needs the geometry, so the factory keeps it and asks the level.
-    if (!level.isOf(geometry.id)) throw level.wrongFamily(geometry.id);
+    if (!level.runsOn(geometry)) throw level.wrongFamily(geometry);
   }
 
-  // Fit stars use time (D14, classes.md decision 19). `FitRules` holds no timer code.
-  // Each call gives a new timer, so two games share only the `Clock`.
-  // The timer is an entity (classes.md decision 26). Its id is local (decision 52):
-  // the factory builds the `LevelTimerId` from the `MatchId` of the game.
-  createRules(matchId: MatchId): IGameRules<FitMove<TCoord>, FitState<TCoord>> {
-    const timer = new LevelTimer(LevelTimerId.of(matchId), this.clock);
-    return new TimedRulesDecorator(new FitRules<TCoord>(), timer);
+  // True when `gameId` names Hexa Fit. The id stays private (issue #234).
+  isFor(gameId: GameId): boolean {
+    return this.gameId.equals(gameId);
+  }
+
+  // `FitRules` holds no timer code. `GameFactory` wraps the rules in `TimedRulesDecorator`
+  // with the timer of `createTimer()` (classes.md decision 19).
+  createRules(): IGameRules<FitMove<TCoord>, FitState<TCoord>> {
+    return new FitRules<TCoord>();
+  }
+
+  // Fit stars use time (D14, classes.md decision 19). Each call gives a new timer,
+  // so two games share only the `Clock`. The timer is an entity (classes.md decision 26).
+  // Its id is local (decision 52): the factory builds the `LevelTimerId` from the `MatchId`.
+  createTimer(matchId: MatchId): LevelTimer {
+    return new LevelTimer(LevelTimerId.of(matchId), this.clock);
   }
 
   createScoring(): IScoringPolicy<FitState<TCoord>> {
