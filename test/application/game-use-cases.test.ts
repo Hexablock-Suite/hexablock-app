@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { Outcome } from '../../src/domain/engine/outcome';
 import { ApplyMove } from '../../src/application/apply-move';
-import type { RunningGameStore } from '../../src/application/running-game-store';
+import type { GameRepository } from '../../src/application/game-repository';
 import { StartGame } from '../../src/application/start-game';
 import type { BoardState } from '../../src/domain/engine/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
@@ -34,7 +34,7 @@ import { variantIdOf } from '../support/variants/variant-id';
 import {
   errorOf,
   gameUseCases,
-  MemoryRunningGameStore,
+  MemoryGameRepository,
   valueOf,
 } from '../support/application/game-use-cases';
 import { RecordingLogger } from '../support/application/recording-logger';
@@ -143,22 +143,22 @@ function brokenStart<
   };
 }
 
-// A store whose `current()` or `replace()` throws, as a broken storage adapter would.
-class ThrowingStore<
+// A repository whose `current()` or `replace()` throws, as a broken storage adapter would.
+class ThrowingRepository<
   TCell,
   TCoord,
   TMove,
   TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
-> implements RunningGameStore<TCell, TCoord, TMove, TState> {
+> implements GameRepository<TCell, TCoord, TMove, TState> {
   constructor(private readonly failing: 'current' | 'replace') {}
 
   current(): GameEngine<TCell, TCoord, TMove, TState> | undefined {
-    if (this.failing === 'current') throw new Error('The store cannot read.');
+    if (this.failing === 'current') throw new Error('The repository cannot read.');
     return undefined;
   }
 
   replace(_game: GameEngine<TCell, TCoord, TMove, TState>): void {
-    if (this.failing === 'replace') throw new Error('The store cannot write.');
+    if (this.failing === 'replace') throw new Error('The repository cannot write.');
   }
 }
 
@@ -168,7 +168,7 @@ function runningGameOf<
   TCoord,
   TMove,
   TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
->(games: MemoryRunningGameStore<TCell, TCoord, TMove, TState>) {
+>(games: MemoryGameRepository<TCell, TCoord, TMove, TState>) {
   const engine = games.running();
   return [
     engine.snapshot().board.cells(),
@@ -410,19 +410,19 @@ describe('StartGame and ApplyMove', () => {
     }
   });
 
-  it('should_return_a_move_failed_failure_when_the_store_throws_on_current', async () => {
-    const applyMove = new ApplyMove(new ThrowingStore('current'), new RecordingLogger());
+  it('should_return_a_move_failed_failure_when_the_repository_throws_on_current', async () => {
+    const applyMove = new ApplyMove(new ThrowingRepository('current'), new RecordingLogger());
 
     const error = errorOf(await applyMove.execute({ move: new PlacePiece(0, square(0, 0)) }));
 
     expect([error.code, error.message, error.retryable]).toEqual([
       'move-failed',
-      'The store cannot read.',
+      'The repository cannot read.',
       false,
     ]);
   });
 
-  it('should_return_a_start_failed_failure_when_the_store_throws_on_replace', async () => {
+  it('should_return_a_start_failed_failure_when_the_repository_throws_on_replace', async () => {
     const startGame = new StartGame(
       new GameFactory(
         linesFactory(),
@@ -431,14 +431,14 @@ describe('StartGame and ApplyMove', () => {
         new CountingBoardIds(),
         new RecordingPublisher(),
       ),
-      new ThrowingStore('replace'),
+      new ThrowingRepository('replace'),
     );
 
     const error = errorOf(await startGame.execute({}));
 
     expect([error.code, error.message, error.retryable]).toEqual([
       'start-failed',
-      'The store cannot write.',
+      'The repository cannot write.',
       false,
     ]);
   });
@@ -548,7 +548,7 @@ describe('StartGame and ApplyMove', () => {
   });
 
   it('should_return_a_move_failed_failure_and_log_nothing_when_the_rules_throw_before_the_turn_is_saved', async () => {
-    const games = new MemoryRunningGameStore<FakeCell, SquareCoord, FakeMove, FakeState>();
+    const games = new MemoryGameRepository<FakeCell, SquareCoord, FakeMove, FakeState>();
     const publisher = new RecordingPublisher();
     const engine = new GameEngine(
       MATCH_ID,

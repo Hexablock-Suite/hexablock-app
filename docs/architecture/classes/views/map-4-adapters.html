@@ -73,9 +73,9 @@
         <desc id="mapad-desc">
           Overview map of the 47 classes of layers 4 and 3 in 12 groups. Each line joins two
           classes: GameScreen renders BoardView and keeps its GamePresenter, CompositionRoot creates
-          InMemoryRunningGameStore, DeviceKeyValueStore implements KeyValueStore, GamePresenter
-          keeps its StateMapper and LocalProgressRepository keeps its KeyValueStore. No line touches
-          a group frame. Each group names the view that shows its members.
+          InMemoryGameRepository, DeviceKeyValueStore implements KeyValueStore, GamePresenter keeps
+          its StateMapper and LocalProgressRepository keeps its KeyValueStore. No line touches a
+          group frame. Each group names the view that shows its members.
         </desc>
         <defs>
           <marker
@@ -616,7 +616,7 @@
           stroke-width="1"
           marker-end="url(#mapad-open)"
         />
-        <!-- CompositionRoot creates InMemoryRunningGameStore: use with a verb, down into layer 3 (view 4.4) -->
+        <!-- CompositionRoot creates InMemoryGameRepository: use with a verb, down into layer 3 (view 4.4) -->
         <path
           d="M596,493 L724,493 L724,818"
           fill="none"
@@ -1579,7 +1579,7 @@
             </tspan>
           </text>
         </g>
-        <g data-class="InMemoryRunningGameStore">
+        <g data-class="InMemoryGameRepository">
           <rect
             x="480"
             y="818"
@@ -1592,7 +1592,7 @@
           />
           <text x="640" y="839" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              InMemoryRunningGameStore
+              InMemoryGameRepository
             </tspan>
           </text>
         </g>

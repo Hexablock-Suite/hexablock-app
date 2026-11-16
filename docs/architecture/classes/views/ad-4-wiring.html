@@ -74,7 +74,7 @@
           Class diagram across layers 4 and 3 showing CompositionRoot in layer 4 creating each
           driver once: AudioManager, SeededRandomSource, ConsoleLogger and SessionManager, which
           implement the GameEventListener, RandomSource, Logger and SessionStore interfaces, and
-          creating InMemoryRunningGameStore and GameEventBus in layer 3, so single-scope injection
+          creating InMemoryGameRepository and GameEventBus in layer 3, so single-scope injection
           replaces a classic Singleton.
         </desc>
         <defs>
@@ -271,7 +271,7 @@
           stroke-width="1"
           marker-end="url(#adwiring-open)"
         />
-        <!-- CompositionRoot creates InMemoryRunningGameStore: use «create», down from layer 4 to layer 3 -->
+        <!-- CompositionRoot creates InMemoryGameRepository: use «create», down from layer 4 to layer 3 -->
         <line
           x1="560"
           y1="380"
@@ -568,7 +568,7 @@
           GameEventBus
         </text>
 
-        <!-- Class: InMemoryRunningGameStore -->
+        <!-- Class: InMemoryGameRepository -->
         <rect
           x="512"
           y="472"
@@ -589,7 +589,7 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          InMemoryRunningGameStore
+          InMemoryGameRepository
         </text>
         <text x="528" y="528" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - game: GameEngine&lt;TCell, TCoord, TMove, TState&gt; [0..1]
@@ -642,7 +642,7 @@
         <line x1="528" y1="536" x2="528" y2="552" stroke="#17212a" stroke-width="1" />
         <circle cx="528" cy="557" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text x="539" y="560" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          RunningGameStore‹TCell, TCoord, TMove, TState›
+          GameRepository‹TCell, TCoord, TMove, TState›
         </text>
 
         <!-- Footnote -->
@@ -673,7 +673,7 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          InMemoryRunningGameStore keeps the running game, the aggregate root, for the use cases of
+          InMemoryGameRepository keeps the running game, the aggregate root, for the use cases of
           layer 2 only. A presenter never gets the engine: it gets a plain MoveResult (decision 29).
         </text>
 

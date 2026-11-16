@@ -72,9 +72,9 @@
         <desc id="flowmove-desc">
           Cross-layer class diagram of the ApplyMove use case only. In layer 4, GameScreen uses
           GamePresenter and reads GameViewModel. In layer 3, GamePresenter keeps the StateMapper
-          strategy, builds GameViewModel and uses the UseCase input port; InMemoryRunningGameStore
-          implements the RunningGameStore port. In layer 2, ApplyMove implements UseCase, takes an
-          ApplyMoveRequest, builds a MoveResult and keeps the RunningGameStore and Logger ports. In
+          strategy, builds GameViewModel and uses the UseCase input port; InMemoryGameRepository
+          implements the GameRepository port. In layer 2, ApplyMove implements UseCase, takes an
+          ApplyMoveRequest, builds a MoveResult and keeps the GameRepository and Logger ports. In
           layer 1, ApplyMove plays the move on GameEngine, which keeps the IGameRules strategy, and
           reads the cells of Board. Every dependency between layers points down.
         </desc>
@@ -248,7 +248,7 @@
           stroke-width="1"
           marker-end="url(#flowmove-open)"
         />
-        <!-- InMemoryRunningGameStore implements RunningGameStore: realization, down from layer 3 to layer 2 -->
+        <!-- InMemoryGameRepository implements GameRepository: realization, down from layer 3 to layer 2 -->
         <path
           d="M760 484 V548"
           fill="none"
@@ -257,7 +257,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#flowmove-triangle)"
         />
-        <!-- InMemoryRunningGameStore keeps zero or one GameEngine: use, down from layer 3 to layer 1 -->
+        <!-- InMemoryGameRepository keeps zero or one GameEngine: use, down from layer 3 to layer 1 -->
         <path
           d="M992 444 H1009 V932 Q1009 940 1001 940 H980"
           fill="none"
@@ -290,7 +290,7 @@
           stroke-width="1"
           marker-end="url(#flowmove-open)"
         />
-        <!-- ApplyMove keeps the RunningGameStore it receives in an attribute: use -->
+        <!-- ApplyMove keeps the GameRepository it receives in an attribute: use -->
         <path
           d="M628 712 H692 Q700 712 700 704 V636"
           fill="none"
@@ -298,7 +298,7 @@
           stroke-width="1"
           marker-end="url(#flowmove-open)"
         />
-        <!-- RunningGameStore stores and returns the GameEngine: use, down from layer 2 to layer 1 -->
+        <!-- GameRepository stores and returns the GameEngine: use, down from layer 2 to layer 1 -->
         <path
           d="M740 636 V896"
           fill="none"
@@ -673,7 +673,7 @@
         <text x="832" y="384" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + payload: PayloadView
         </text>
-        <!-- Class: InMemoryRunningGameStore (adapter) -->
+        <!-- Class: InMemoryGameRepository (adapter) -->
         <rect
           x="652"
           y="412"
@@ -693,7 +693,7 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          InMemoryRunningGameStore
+          InMemoryGameRepository
         </text>
         <line x1="652" y1="460" x2="992" y2="460" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="668" y="476" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
@@ -773,7 +773,7 @@
         <text x="56" y="612" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + move: TMove
         </text>
-        <!-- Class: RunningGameStore (interface, output port) -->
+        <!-- Class: GameRepository (interface, output port, repository) -->
         <rect
           x="602"
           y="548"
@@ -793,7 +793,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «port»
+          «interface» «port» «repository»
         </text>
         <text
           x="798"
@@ -804,7 +804,7 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          RunningGameStore
+          GameRepository
         </text>
         <line x1="602" y1="596" x2="994" y2="596" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="618" y="612" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
@@ -861,7 +861,7 @@
         </text>
         <line x1="300" y1="740" x2="628" y2="740" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text x="316" y="756" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - games: RunningGameStore&lt;TCell, TCoord, TMove, TState&gt;
+          - games: GameRepository&lt;TCell, TCoord, TMove, TState&gt;
         </text>
         <text x="316" y="772" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - logger: Logger
@@ -1358,7 +1358,7 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          GameEngine from RunningGameStore, calls tryPlay() and snapshot(), and copies the cells of
+          GameEngine from GameRepository, calls tryPlay() and snapshot(), and copies the cells of
           the photo's Board and the payload of its view() into a MoveResult (decisions 29, 34).
         </text>
         <text

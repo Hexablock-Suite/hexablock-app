@@ -72,13 +72,13 @@
         <desc id="flowstart-desc">
           Cross-layer class diagram of the StartGame use case only. In layer 4, GameScreen uses
           GamePresenter. In layer 3, GamePresenter uses the UseCase input port, and
-          InMemoryRunningGameStore implements the RunningGameStore port and keeps the running
+          InMemoryGameRepository implements the GameRepository port and keeps the running
           GameEngine. In layer 2, StartGame implements UseCase, takes a StartGameRequest, keeps the
-          RunningGameStore port and the GameFactory, and builds a MoveResult. In layer 1,
-          GameFactory keeps the IVariantFactory and creates the started GameEngine. LinesFactory
-          implements IVariantFactory and builds the board with BoardBuilder; both hold the
-          GeometryFactory, and BoardBuilder creates Board. StartGame reads the cells of Board. Every
-          dependency between layers points down.
+          GameRepository port and the GameFactory, and builds a MoveResult. In layer 1, GameFactory
+          keeps the IVariantFactory and creates the started GameEngine. LinesFactory implements
+          IVariantFactory and builds the board with BoardBuilder; both hold the GeometryFactory, and
+          BoardBuilder creates Board. StartGame reads the cells of Board. Every dependency between
+          layers points down.
         </desc>
         <defs>
           <marker
@@ -226,7 +226,7 @@
           stroke-width="1"
           marker-end="url(#flowstart-open)"
         />
-        <!-- InMemoryRunningGameStore implements RunningGameStore: realization, down from layer 3 to layer 2 -->
+        <!-- InMemoryGameRepository implements GameRepository: realization, down from layer 3 to layer 2 -->
         <path
           d="M820 296 V420"
           fill="none"
@@ -235,7 +235,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#flowstart-triangle)"
         />
-        <!-- InMemoryRunningGameStore keeps the running GameEngine: use, down from layer 3 to layer 1 -->
+        <!-- InMemoryGameRepository keeps the running GameEngine: use, down from layer 3 to layer 1 -->
         <path
           d="M980 260 H994 Q1002 260 1002 268 V822 Q1002 830 994 830 H940"
           fill="none"
@@ -260,7 +260,7 @@
           stroke-width="1"
           marker-end="url(#flowstart-open)"
         />
-        <!-- StartGame keeps the RunningGameStore it receives in an attribute: use -->
+        <!-- StartGame keeps the GameRepository it receives in an attribute: use -->
         <path
           d="M660 600 H692 Q700 600 700 592 V508"
           fill="none"
@@ -606,7 +606,7 @@
         <text x="56" y="344" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + viewModel(): GameViewModel
         </text>
-        <!-- Class: InMemoryRunningGameStore (adapter) -->
+        <!-- Class: InMemoryGameRepository (adapter) -->
         <rect
           x="640"
           y="224"
@@ -626,7 +626,7 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          InMemoryRunningGameStore
+          InMemoryGameRepository
         </text>
         <line x1="640" y1="272" x2="980" y2="272" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="656" y="288" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
@@ -706,7 +706,7 @@
         <text x="252" y="484" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + execute(request: TRequest): Promise&lt;Result&lt;TResponse&gt;&gt;
         </text>
-        <!-- Class: RunningGameStore (interface, output port) -->
+        <!-- Class: GameRepository (interface, output port, repository) -->
         <rect
           x="592"
           y="420"
@@ -726,7 +726,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «port»
+          «interface» «port» «repository»
         </text>
         <text
           x="784"
@@ -737,7 +737,7 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          RunningGameStore
+          GameRepository
         </text>
         <line x1="592" y1="468" x2="976" y2="468" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="608" y="484" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
@@ -856,7 +856,7 @@
           - factory: GameFactory&lt;TCell, TCoord, TMove, TState&gt;
         </text>
         <text x="316" y="648" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - games: RunningGameStore&lt;TCell, TCoord, TMove, TState&gt;
+          - games: GameRepository&lt;TCell, TCoord, TMove, TState&gt;
         </text>
         <text x="316" y="672" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + execute(request: StartGameRequest):
@@ -1577,8 +1577,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          RunningGameStore and returns a MoveResult. StartGame never names a variant: the
-          composition root injects the factory of the chosen game.
+          GameRepository and returns a MoveResult. StartGame never names a variant: the composition
+          root injects the factory of the chosen game.
         </text>
         <!-- Legend -->
         <line

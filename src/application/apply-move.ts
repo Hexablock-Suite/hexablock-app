@@ -3,7 +3,7 @@ import type { Cloneable } from '../domain/engine/cloneable';
 import { logEntryOf, type Logger } from './logger';
 import { moveResultOf, type MoveResult, type ViewOf } from './move-result';
 import { caughtError, Result, UseCaseError } from './result';
-import type { RunningGameStore } from './running-game-store';
+import type { GameRepository } from './game-repository';
 import type { UseCase } from './use-case';
 
 // The request of `ApplyMove`: the move only (docs/architecture/flows.md).
@@ -29,7 +29,7 @@ export class ApplyMove<
   TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
 > implements UseCase<ApplyMoveRequest<TMove>, MoveResult<TCell, TCoord, ViewOf<TState>>> {
   constructor(
-    private readonly games: RunningGameStore<TCell, TCoord, TMove, TState>,
+    private readonly games: GameRepository<TCell, TCoord, TMove, TState>,
     private readonly logger: Logger,
   ) {}
 
