@@ -64,14 +64,14 @@
       <h1>Adapters, presenters and drivers at a glance</h1>
 
       <svg
-        viewBox="0 0 1040 1271"
+        viewBox="0 0 1040 1321"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="mapad-title mapad-desc"
       >
         <title id="mapad-title">HexaBlock adapters map · UML class diagram</title>
         <desc id="mapad-desc">
-          Overview map of the 50 classes of layers 4 and 3 in 12 groups. The composition root group
+          Overview map of the 51 classes of layers 4 and 3 in 12 groups. The composition root group
           holds CompositionRoot and GameRegistry, the drivers group holds SequentialMatchIds, and
           the events group holds NullGameEventPublisher. Each line joins two classes: GameScreen
           renders BoardView and keeps its GamePresenter, CompositionRoot creates
@@ -138,7 +138,7 @@
           x="24"
           y="24"
           width="992"
-          height="534"
+          height="584"
           rx="8"
           fill="#cfdcf3"
           stroke="rgba(30,58,138,0.50)"
@@ -158,7 +158,7 @@
         <!-- Layer zone: layer 3, interface adapters (8px under layer 4) -->
         <rect
           x="24"
-          y="566"
+          y="616"
           width="992"
           height="536"
           rx="8"
@@ -168,7 +168,7 @@
         />
         <text
           x="40"
-          y="586"
+          y="636"
           fill="#1d4ed8"
           font-size="8"
           font-weight="500"
@@ -289,7 +289,7 @@
           x="56"
           y="298"
           width="312"
-          height="228"
+          height="278"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -393,7 +393,7 @@
         <!-- Group: presenters -->
         <rect
           x="56"
-          y="606"
+          y="656"
           width="628"
           height="128"
           rx="8"
@@ -404,7 +404,7 @@
         />
         <text
           x="68"
-          y="622"
+          y="672"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -415,7 +415,7 @@
         </text>
         <text
           x="672"
-          y="622"
+          y="672"
           fill="#1d4ed8"
           font-size="8"
           font-weight="500"
@@ -428,7 +428,7 @@
         <!-- Group: driver interface -->
         <rect
           x="744"
-          y="606"
+          y="656"
           width="240"
           height="78"
           rx="8"
@@ -439,7 +439,7 @@
         />
         <text
           x="756"
-          y="622"
+          y="672"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -450,7 +450,7 @@
         </text>
         <text
           x="972"
-          y="622"
+          y="672"
           fill="#1d4ed8"
           font-size="8"
           font-weight="500"
@@ -463,7 +463,7 @@
         <!-- Group: state mappers -->
         <rect
           x="56"
-          y="790"
+          y="840"
           width="320"
           height="178"
           rx="8"
@@ -474,7 +474,7 @@
         />
         <text
           x="68"
-          y="806"
+          y="856"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -485,7 +485,7 @@
         </text>
         <text
           x="364"
-          y="806"
+          y="856"
           fill="#1d4ed8"
           font-size="8"
           font-weight="500"
@@ -498,7 +498,7 @@
         <!-- Group: repositories -->
         <rect
           x="464"
-          y="790"
+          y="840"
           width="520"
           height="128"
           rx="8"
@@ -509,7 +509,7 @@
         />
         <text
           x="476"
-          y="806"
+          y="856"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -520,7 +520,7 @@
         </text>
         <text
           x="972"
-          y="806"
+          y="856"
           fill="#1d4ed8"
           font-size="8"
           font-weight="500"
@@ -533,7 +533,7 @@
         <!-- Group: view models -->
         <rect
           x="56"
-          y="992"
+          y="1042"
           width="288"
           height="78"
           rx="8"
@@ -544,7 +544,7 @@
         />
         <text
           x="68"
-          y="1008"
+          y="1058"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -555,7 +555,7 @@
         </text>
         <text
           x="332"
-          y="1008"
+          y="1058"
           fill="#1d4ed8"
           font-size="8"
           font-weight="500"
@@ -568,7 +568,7 @@
         <!-- Group: events -->
         <rect
           x="368"
-          y="992"
+          y="1042"
           width="480"
           height="78"
           rx="8"
@@ -579,7 +579,7 @@
         />
         <text
           x="380"
-          y="1008"
+          y="1058"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -590,7 +590,7 @@
         </text>
         <text
           x="836"
-          y="1008"
+          y="1058"
           fill="#1d4ed8"
           font-size="8"
           font-weight="500"
@@ -612,7 +612,7 @@
         />
         <!-- GameScreen keeps the GamePresenter it receives as presenter: use with role and multiplicity, down into layer 3 (view 4.1) -->
         <path
-          d="M352,343 L380,343 L380,590 L488,590 L488,634"
+          d="M352,343 L380,343 L380,640 L488,640 L488,684"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -620,7 +620,7 @@
         />
         <!-- CompositionRoot creates InMemoryGameRepository: use with a verb, down into layer 3 (view 4.4) -->
         <path
-          d="M696,493 L724,493 L724,818"
+          d="M696,493 L724,493 L724,868"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -628,7 +628,7 @@
         />
         <!-- DeviceKeyValueStore implements KeyValueStore: realization, down into layer 3 (view 4.2) -->
         <path
-          d="M968,209 L1000,209 L1000,651 L968,651"
+          d="M968,209 L1000,209 L1000,701 L968,701"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -637,7 +637,7 @@
         />
         <!-- GamePresenter keeps its StateMapper as mapper: use with role and multiplicity, inside layer 3 (view 4.1) -->
         <path
-          d="M676,651 L696,651 L696,762 L260,762 L260,818"
+          d="M676,701 L696,701 L696,812 L260,812 L260,868"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -645,7 +645,7 @@
         />
         <!-- LocalProgressRepository keeps its KeyValueStore as store: use with role and multiplicity, inside layer 3 (view 4.2) -->
         <path
-          d="M860,818 L860,668"
+          d="M860,868 L860,718"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -665,10 +665,10 @@
         >
           RENDERS
         </text>
-        <rect x="494" y="610" width="60" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="494" y="660" width="60" height="12" rx="2" fill="#e2ebf8" />
         <text
           x="524"
-          y="619"
+          y="669"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -677,10 +677,10 @@
         >
           presenter 1
         </text>
-        <rect x="730" y="744" width="44" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="730" y="794" width="44" height="12" rx="2" fill="#e2ebf8" />
         <text
           x="752"
-          y="753"
+          y="803"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -689,10 +689,10 @@
         >
           CREATES
         </text>
-        <rect x="266" y="772" width="44" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="266" y="822" width="44" height="12" rx="2" fill="#e2ebf8" />
         <text
           x="288"
-          y="781"
+          y="831"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -701,10 +701,10 @@
         >
           mapper 1
         </text>
-        <rect x="866" y="740" width="40" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="866" y="790" width="40" height="12" rx="2" fill="#e2ebf8" />
         <text
           x="886"
-          y="749"
+          y="799"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1045,6 +1045,34 @@
             </tspan>
           </text>
         </g>
+        <g data-class="GameSelectorScreen">
+          <rect
+            x="72"
+            y="526"
+            width="132"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="138"
+            y="538"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            component
+          </text>
+          <text x="138" y="551" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              GameSelectorScreen
+            </tspan>
+          </text>
+        </g>
         <g data-class="LevelSelectorScreen">
           <rect
             x="72"
@@ -1338,57 +1366,6 @@
         <g data-class="HomePresenter">
           <rect
             x="72"
-            y="634"
-            width="188"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text x="166" y="655" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              HomePresenter
-            </tspan>
-          </text>
-        </g>
-        <g data-class="LevelSelectorPresenter">
-          <rect
-            x="276"
-            y="634"
-            width="188"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text x="370" y="655" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              LevelSelectorPresenter
-            </tspan>
-          </text>
-        </g>
-        <g data-class="GamePresenter">
-          <rect
-            x="472"
-            y="634"
-            width="204"
-            height="34"
-            rx="4"
-            fill="rgba(15,111,116,0.10)"
-            stroke="#0f6f74"
-            stroke-width="1"
-          />
-          <text x="574" y="655" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              GamePresenter
-            </tspan>
-          </text>
-        </g>
-        <g data-class="ResultPresenter">
-          <rect
-            x="72"
             y="684"
             width="188"
             height="34"
@@ -1399,11 +1376,11 @@
           />
           <text x="166" y="705" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              ResultPresenter
+              HomePresenter
             </tspan>
           </text>
         </g>
-        <g data-class="AccountPresenter">
+        <g data-class="LevelSelectorPresenter">
           <rect
             x="276"
             y="684"
@@ -1416,14 +1393,31 @@
           />
           <text x="370" y="705" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              AccountPresenter
+              LevelSelectorPresenter
             </tspan>
           </text>
         </g>
-        <g data-class="LeaderboardPresenter">
+        <g data-class="GamePresenter">
           <rect
-            x="480"
+            x="472"
             y="684"
+            width="204"
+            height="34"
+            rx="4"
+            fill="rgba(15,111,116,0.10)"
+            stroke="#0f6f74"
+            stroke-width="1"
+          />
+          <text x="574" y="705" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              GamePresenter
+            </tspan>
+          </text>
+        </g>
+        <g data-class="ResultPresenter">
+          <rect
+            x="72"
+            y="734"
             width="188"
             height="34"
             rx="4"
@@ -1431,7 +1425,41 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="574" y="705" fill="#17212a" text-anchor="middle">
+          <text x="166" y="755" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              ResultPresenter
+            </tspan>
+          </text>
+        </g>
+        <g data-class="AccountPresenter">
+          <rect
+            x="276"
+            y="734"
+            width="188"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="370" y="755" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              AccountPresenter
+            </tspan>
+          </text>
+        </g>
+        <g data-class="LeaderboardPresenter">
+          <rect
+            x="480"
+            y="734"
+            width="188"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="574" y="755" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               LeaderboardPresenter
             </tspan>
@@ -1441,7 +1469,7 @@
         <g data-class="KeyValueStore">
           <rect
             x="816"
-            y="634"
+            y="684"
             width="152"
             height="34"
             rx="4"
@@ -1451,7 +1479,7 @@
           />
           <text
             x="892"
-            y="646"
+            y="696"
             fill="#5b6873"
             font-size="7"
             font-family="'IBM Plex Mono', monospace"
@@ -1460,7 +1488,7 @@
           >
             interface
           </text>
-          <text x="892" y="659" fill="#17212a" text-anchor="middle">
+          <text x="892" y="709" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               KeyValueStore
             </tspan>
@@ -1470,7 +1498,7 @@
         <g data-class="StateMapper">
           <rect
             x="224"
-            y="818"
+            y="868"
             width="136"
             height="34"
             rx="4"
@@ -1480,7 +1508,7 @@
           />
           <text
             x="292"
-            y="830"
+            y="880"
             fill="#5b6873"
             font-size="7"
             font-family="'IBM Plex Mono', monospace"
@@ -1489,30 +1517,13 @@
           >
             interface
           </text>
-          <text x="292" y="843" fill="#17212a" text-anchor="middle">
+          <text x="292" y="893" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               StateMapper
             </tspan>
           </text>
         </g>
         <g data-class="LinesStateMapper">
-          <rect
-            x="72"
-            y="818"
-            width="136"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text x="140" y="839" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              LinesStateMapper
-            </tspan>
-          </text>
-        </g>
-        <g data-class="FitStateMapper">
           <rect
             x="72"
             y="868"
@@ -1525,28 +1536,11 @@
           />
           <text x="140" y="889" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              FitStateMapper
+              LinesStateMapper
             </tspan>
           </text>
         </g>
-        <g data-class="SortStateMapper">
-          <rect
-            x="224"
-            y="868"
-            width="136"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text x="292" y="889" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              SortStateMapper
-            </tspan>
-          </text>
-        </g>
-        <g data-class="MergeStateMapper">
+        <g data-class="FitStateMapper">
           <rect
             x="72"
             y="918"
@@ -1559,6 +1553,40 @@
           />
           <text x="140" y="939" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              FitStateMapper
+            </tspan>
+          </text>
+        </g>
+        <g data-class="SortStateMapper">
+          <rect
+            x="224"
+            y="918"
+            width="136"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="292" y="939" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              SortStateMapper
+            </tspan>
+          </text>
+        </g>
+        <g data-class="MergeStateMapper">
+          <rect
+            x="72"
+            y="968"
+            width="136"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="140" y="989" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               MergeStateMapper
             </tspan>
           </text>
@@ -1567,7 +1595,7 @@
         <g data-class="LocalProgressRepository">
           <rect
             x="816"
-            y="818"
+            y="868"
             width="152"
             height="34"
             rx="4"
@@ -1575,7 +1603,7 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="892" y="839" fill="#17212a" text-anchor="middle">
+          <text x="892" y="889" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               LocalProgressRepository
             </tspan>
@@ -1584,7 +1612,7 @@
         <g data-class="BundledLevelRepository">
           <rect
             x="480"
-            y="868"
+            y="918"
             width="152"
             height="34"
             rx="4"
@@ -1592,7 +1620,7 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="556" y="889" fill="#17212a" text-anchor="middle">
+          <text x="556" y="939" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               BundledLevelRepository
             </tspan>
@@ -1601,7 +1629,7 @@
         <g data-class="LocalSettingsStore">
           <rect
             x="648"
-            y="868"
+            y="918"
             width="152"
             height="34"
             rx="4"
@@ -1609,7 +1637,7 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="724" y="889" fill="#17212a" text-anchor="middle">
+          <text x="724" y="939" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               LocalSettingsStore
             </tspan>
@@ -1618,7 +1646,7 @@
         <g data-class="InMemoryGameRepository">
           <rect
             x="480"
-            y="818"
+            y="868"
             width="320"
             height="34"
             rx="4"
@@ -1628,7 +1656,7 @@
           />
           <text
             x="640"
-            y="830"
+            y="880"
             fill="#5b6873"
             font-size="7"
             font-family="'IBM Plex Mono', monospace"
@@ -1637,7 +1665,7 @@
           >
             «Adapter» «repository»
           </text>
-          <text x="640" y="843" fill="#17212a" text-anchor="middle">
+          <text x="640" y="893" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               InMemoryGameRepository
             </tspan>
@@ -1647,7 +1675,7 @@
         <g data-class="GameViewModel">
           <rect
             x="72"
-            y="1020"
+            y="1070"
             width="120"
             height="34"
             rx="4"
@@ -1657,7 +1685,7 @@
           />
           <text
             x="132"
-            y="1032"
+            y="1082"
             fill="#5b6873"
             font-size="7"
             font-family="'IBM Plex Mono', monospace"
@@ -1666,7 +1694,7 @@
           >
             value object
           </text>
-          <text x="132" y="1045" fill="#17212a" text-anchor="middle">
+          <text x="132" y="1095" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               GameViewModel
             </tspan>
@@ -1675,7 +1703,7 @@
         <g data-class="CellView">
           <rect
             x="208"
-            y="1020"
+            y="1070"
             width="120"
             height="34"
             rx="4"
@@ -1685,7 +1713,7 @@
           />
           <text
             x="268"
-            y="1032"
+            y="1082"
             fill="#5b6873"
             font-size="7"
             font-family="'IBM Plex Mono', monospace"
@@ -1694,7 +1722,7 @@
           >
             value object
           </text>
-          <text x="268" y="1045" fill="#17212a" text-anchor="middle">
+          <text x="268" y="1095" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               CellView
             </tspan>
@@ -1704,7 +1732,7 @@
         <g data-class="GameEventBus">
           <rect
             x="384"
-            y="1020"
+            y="1070"
             width="128"
             height="34"
             rx="4"
@@ -1712,7 +1740,7 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="448" y="1041" fill="#17212a" text-anchor="middle">
+          <text x="448" y="1091" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               GameEventBus
             </tspan>
@@ -1721,7 +1749,7 @@
         <g data-class="GameEventListener">
           <rect
             x="528"
-            y="1020"
+            y="1070"
             width="128"
             height="34"
             rx="4"
@@ -1731,7 +1759,7 @@
           />
           <text
             x="592"
-            y="1032"
+            y="1082"
             fill="#5b6873"
             font-size="7"
             font-family="'IBM Plex Mono', monospace"
@@ -1740,7 +1768,7 @@
           >
             interface
           </text>
-          <text x="592" y="1045" fill="#17212a" text-anchor="middle">
+          <text x="592" y="1095" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               GameEventListener
             </tspan>
@@ -1749,7 +1777,7 @@
         <g data-class="NullGameEventPublisher">
           <rect
             x="672"
-            y="1020"
+            y="1070"
             width="160"
             height="34"
             rx="4"
@@ -1757,7 +1785,7 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="752" y="1041" fill="#17212a" text-anchor="middle">
+          <text x="752" y="1091" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               NullGameEventPublisher
             </tspan>
@@ -1767,7 +1795,7 @@
         <!-- Footnote -->
         <text
           x="24"
-          y="1130"
+          y="1180"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1777,7 +1805,7 @@
         </text>
         <text
           x="24"
-          y="1146"
+          y="1196"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1789,15 +1817,15 @@
         <!-- Legend -->
         <line
           x1="24"
-          y1="1170"
+          y1="1220"
           x2="1016"
-          y2="1170"
+          y2="1220"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1188"
+          y="1238"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1808,16 +1836,16 @@
 
         <line
           x1="24"
-          y1="1205"
+          y1="1255"
           x2="52"
-          y2="1205"
+          y2="1255"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#mapad-open)"
         />
         <text
           x="60"
-          y="1209"
+          y="1259"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1826,9 +1854,9 @@
         </text>
         <line
           x1="384"
-          y1="1205"
+          y1="1255"
           x2="412"
-          y2="1205"
+          y2="1255"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -1836,7 +1864,7 @@
         />
         <text
           x="420"
-          y="1209"
+          y="1259"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1846,7 +1874,7 @@
 
         <rect
           x="24"
-          y="1226"
+          y="1276"
           width="28"
           height="12"
           rx="2"
@@ -1857,7 +1885,7 @@
         />
         <text
           x="60"
-          y="1235"
+          y="1285"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1866,7 +1894,7 @@
         </text>
         <rect
           x="272"
-          y="1226"
+          y="1276"
           width="28"
           height="12"
           rx="2"
@@ -1876,7 +1904,7 @@
         />
         <text
           x="308"
-          y="1235"
+          y="1285"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1885,7 +1913,7 @@
         </text>
         <text
           x="472"
-          y="1235"
+          y="1285"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1903,7 +1931,7 @@
         </text>
         <rect
           x="664"
-          y="1226"
+          y="1276"
           width="28"
           height="12"
           rx="2"
@@ -1913,7 +1941,7 @@
         />
         <text
           x="700"
-          y="1235"
+          y="1285"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1923,7 +1951,7 @@
 
         <rect
           x="24"
-          y="1251"
+          y="1301"
           width="28"
           height="12"
           rx="2"
@@ -1933,7 +1961,7 @@
         />
         <text
           x="60"
-          y="1260"
+          y="1310"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1942,7 +1970,7 @@
         </text>
         <rect
           x="272"
-          y="1251"
+          y="1301"
           width="28"
           height="12"
           rx="2"
@@ -1952,7 +1980,7 @@
         />
         <text
           x="308"
-          y="1260"
+          y="1310"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

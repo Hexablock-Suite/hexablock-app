@@ -2,7 +2,7 @@
 
 This page explains how to add a fifth variant. The example is Hexa Fill, the game that statement §3.1 names («por ejemplo, Hexa Fill: pintar celdas con restricciones»). Its rules are not designed yet, so every `Fill` name below is a placeholder.
 
-The steps follow the [class diagram](architecture/classes.md) and the [extensibility diagram](architecture/extensibility.md). The engine, the four variants and the first use cases exist in `src/`. The composition root and its game registry exist too (#162). The other classes of layers 3 and 4 that the steps name are planned. Some engine classes are planned too, for example the progress models and `RedoableHistory`. When a planned class exists, this page names its real file.
+The steps follow the [class diagram](architecture/classes.md) and the [extensibility diagram](architecture/extensibility.md). The engine, the four variants and the first use cases exist in `src/`. The composition root and its game registry exist too (#162), and so do the home screen, the game selector map and `HomePresenter` (#169). The other classes of layers 3 and 4 that the steps name are planned. Some engine classes are planned too, for example the progress models and `RedoableHistory`. When a planned class exists, this page names its real file.
 
 ## The rule
 
@@ -28,7 +28,7 @@ A new variant adds classes and data. It changes no engine file, no other variant
 7. If Hexa Fill publishes its own events, write classes that extend `GameEvent`, for example `RegionFilled`.
 8. In layer 3, write `FillStateMapper`, which implements `StateMapper<FillCell>` and turns each cell into a `CellView`.
 9. In layer 4, write `FillCellRenderer`, which implements `CellRenderer<TCellView>`. Its folder is open (Q8).
-10. Register the game: add `registered(new FillFactory(geometry, …))` to the list in [`src/infrastructure/registered-games.ts`](../src/infrastructure/registered-games.ts). [`GameRegistry`](../src/infrastructure/game-registry.ts) then maps `hexa-fill` to `FillFactory`, and the game selector shows the new entry. `FillStateMapper` (#170) and `FillCellRenderer` (#165) join the same entry when the registry holds them. [`CompositionRoot`](../src/infrastructure/composition-root.ts) gives the `FillFactory` to a `GameFactory`, with the one `MatchIdGenerator` that every variant shares, and `StartGame` takes that `GameFactory`. The event publisher goes to `ApplyMove`, which delivers the events that the engine records (#233), so a new variant changes no wiring of events.
+10. Register the game: add `registered(new FillFactory(geometry, …))` to the list in [`src/infrastructure/registered-games.ts`](../src/infrastructure/registered-games.ts). [`GameRegistry`](../src/infrastructure/game-registry.ts) then maps `hexa-fill` to `FillFactory`, and the game selector map shows the new entry, because `HomePresenter` reads the ids of the registry (#169). `FillStateMapper` (#170) and `FillCellRenderer` (#165) join the same entry when the registry holds them. [`CompositionRoot`](../src/infrastructure/composition-root.ts) gives the `FillFactory` to a `GameFactory`, with the one `MatchIdGenerator` that every variant shares, and `StartGame` takes that `GameFactory`. The event publisher goes to `ApplyMove`, which delivers the events that the engine records (#233), so a new variant changes no wiring of events.
 11. Test the rules of Hexa Fill in their own test suite. The engine tests and the tests of the other variants do not change.
 
 ## Files that a fifth variant adds
@@ -45,11 +45,10 @@ A new variant adds classes and data. It changes no engine file, no other variant
 
 ## Files outside the new folders that change
 
-| File                                   | Change                                                                               |
-| -------------------------------------- | ------------------------------------------------------------------------------------ |
-| The game list, `registered-games.ts`   | One entry that maps the new `GameId` to its factory, state mapper and cell renderer. |
-| The game selector route in `app/`      | One more game in the list that the player picks from (APP-FR-01).                    |
-| The text files for Spanish and English | The name of the new game in both languages, in `src/adapters/texts/` (APP-FR-11).    |
+| File                                   | Change                                                                                                                                                                                                                                         |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The game list, `registered-games.ts`   | One entry that maps the new `GameId` to its factory, state mapper and cell renderer.                                                                                                                                                           |
+| The text files for Spanish and English | The name of the new game and its place on the map in both languages, under `game.hexa-fill.name` and `game.hexa-fill.place` in `src/adapters/texts/` (APP-FR-11). `HomePresenter` throws for a registered game that the catalog does not name. |
 
 If Hexa Fill keeps levels on the backend, the backend adds a section for it in the level schema (DS-6). The backend repository documents that change.
 
@@ -60,8 +59,8 @@ If Hexa Fill keeps levels on the backend, the backend adds a section for it in t
 | 1     | Every file in `src/domain/engine/`: `GameEngine`, `GameFactory`, `MatchIdGenerator`, the ids `MatchId`, `GameStateId`, `BoardId` and `LevelTimerId`, `BaseGameRules`, `IGameRules`, `IVariantFactory`, `BoardState`, `BoardSnapshot`, `GameId`, `Board`, `BoardBuilder`, `GridTopology`, the geometry family, the piece sources, the progress models, the histories, `LevelTimer` and `GameEvent` |
 | 1     | The four other variant folders: `hexa-lines/`, `hexa-fit/`, `hexa-sort/` and `hexa-merge/`                                                                                                                                                                                                                                                                                                        |
 | 2     | Every file in `src/application/`: the use cases, their ports, the aspects, `Result`, `MoveResult` and the other request and response models                                                                                                                                                                                                                                                       |
-| 3     | `GamePresenter`, `GameViewModel`, `GameEventBus`, the local repositories and `InMemoryGameRepository`                                                                                                                                                                                                                                                                                             |
-| 4     | `CompositionRoot`, `GameRegistry`, the HTTP client and repositories, the drivers, `BoardView`, `AudioManager`, and the game, level selector, victory and defeat routes                                                                                                                                                                                                                            |
+| 3     | `HomePresenter`, `GamePresenter`, `GameViewModel`, `GameEventBus`, the local repositories and `InMemoryGameRepository`                                                                                                                                                                                                                                                                            |
+| 4     | `CompositionRoot`, `GameRegistry`, the HTTP client and repositories, the drivers, `BoardView`, `AudioManager`, and the home, game selector map, game, level selector, victory and defeat routes                                                                                                                                                                                                   |
 | gates | `.dependency-cruiser.cjs` and the architecture tests                                                                                                                                                                                                                                                                                                                                              |
 
 ## Check
