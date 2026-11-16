@@ -64,7 +64,7 @@
       <h1>The turn: Template Method over Strategy</h1>
 
       <svg
-        viewBox="0 0 1040 1180"
+        viewBox="0 0 1040 1384"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="engine-turn-title engine-turn-desc"
@@ -76,20 +76,24 @@
           BaseGameRules and returns a Resolution that holds an Outcome, scoring with the
           IScoringPolicy strategy, holding a GamePhase state, recording the GameEvent objects of its
           turns, which ApplyMove takes with takeEvents() and delivers, and bounding its TState
-          parameter by BoardState and Cloneable of TState in its template box. The optional
-          MoveHistory and the optional timer stay inside: the root answers for them with undo(),
-          redo(), canUndo(), canRedo(), offersUndo() and elapsedTime(). BoardState is an entity
-          inside the GameEngine aggregate: its own GameStateId is its identity, it keeps the MatchId
-          of its game, its fields are private, and it changes in place only through its business
-          methods. Its snapshot() creates a BoardSnapshot, the immutable photo with the Memento role
-          and no tactical stereotype: GameEngine.snapshot() returns it, IScoringPolicy reads two of
-          them, and MoveHistory keeps them for the undo. BoardSnapshot is abstract and its fields
-          are private: a reader asks isPhotoOf(), belongsTo(), boardCopy() and scoreSoFar(), and
-          each variant photo implements view(). Resolution is a value object: it holds no state, its
-          two fields are private, a reader asks wasAccepted(), endsTheGame(), phaseAfter() and
-          leadsTo(), and equals() compares accepted and outcome. Score is the value object of the
-          score and of the points of a turn: IScoringPolicy returns one, BoardState adds it, and
-          BoardSnapshot gives the score with scoreSoFar().
+          parameter by BoardState and Cloneable of TState in its template box. A dark dashed frame
+          marks the boundary of the game aggregate: the root and its internal entities, the
+          BoardState, the Board of the state and the LevelTimer of a timed game. The root joins the
+          state and the timer with a filled diamond, the state keeps its board, and the reference
+          boxes of the board and the timer name views 2 and 3. The optional MoveHistory and the
+          optional timer stay inside: the root answers for them with undo(), redo(), canUndo(),
+          canRedo(), offersUndo() and elapsedTime(). BoardState is an entity inside the GameEngine
+          aggregate: its own GameStateId is its identity, it keeps the MatchId of its game, its
+          fields are private, and it changes in place only through its business methods. Its
+          snapshot() creates a BoardSnapshot, the immutable photo of the Memento pattern:
+          GameEngine.snapshot() returns it, IScoringPolicy reads two of them, and MoveHistory keeps
+          them for the undo. BoardSnapshot is abstract and its fields are private: a reader asks
+          isPhotoOf(), belongsTo(), boardCopy() and scoreSoFar(), and each variant photo implements
+          view(). Resolution is a value object: it holds no state, its two fields are private, a
+          reader asks wasAccepted(), endsTheGame(), phaseAfter() and leadsTo(), and equals()
+          compares accepted and outcome. Score is the value object of the score and of the points of
+          a turn: IScoringPolicy returns one, BoardState adds it, and BoardSnapshot gives the score
+          with scoreSoFar().
         </desc>
         <defs>
           <marker
@@ -115,22 +119,6 @@
             <polygon points="0 5, 9 0, 18 5, 9 10" fill="#17212a" />
           </marker>
           <marker
-            id="t-diamond-hollow"
-            markerWidth="18"
-            markerHeight="10"
-            refX="0"
-            refY="5"
-            orient="auto"
-            markerUnits="userSpaceOnUse"
-          >
-            <polygon
-              points="0 5, 9 0, 18 5, 9 10"
-              fill="#ffffff"
-              stroke="#17212a"
-              stroke-width="1"
-            />
-          </marker>
-          <marker
             id="t-open"
             markerWidth="10"
             markerHeight="8"
@@ -150,7 +138,7 @@
           x="24"
           y="24"
           width="992"
-          height="944"
+          height="1092"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -192,27 +180,28 @@
           OBSERVER · §3.3
         </text>
 
+        <!-- Group: the boundary of the game aggregate, the root and its internal entities (decisions 26 and 52, #21). A dark dashed frame, so it differs from the frame of a pattern. -->
         <rect
           x="364"
           y="188"
           width="332"
-          height="436"
+          height="892"
           rx="8"
           fill="none"
-          stroke="rgba(91,104,115,0.55)"
-          stroke-width="1"
-          stroke-dasharray="4,4"
+          stroke="#17212a"
+          stroke-width="1.2"
+          stroke-dasharray="6,3"
         />
         <text
           x="376"
           y="204"
-          fill="#5b6873"
+          fill="#17212a"
           font-size="8"
           font-weight="500"
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.14em"
         >
-          CONTEXT · D1
+          AGGREGATE · DECISION 52
         </text>
 
         <rect
@@ -284,69 +273,46 @@
           COMMAND · §3.3 · §5.1.8
         </text>
 
-        <rect
-          x="380"
-          y="648"
-          width="280"
-          height="228"
-          rx="8"
-          fill="none"
-          stroke="rgba(91,104,115,0.55)"
-          stroke-width="1"
-          stroke-dasharray="4,4"
-        />
-        <text
-          x="392"
-          y="664"
-          fill="#5b6873"
-          font-size="8"
-          font-weight="500"
-          font-family="'IBM Plex Mono', monospace"
-          letter-spacing="0.14em"
-        >
-          BOUNDED GENERIC · §3.1
-        </text>
-
-        <!-- Relationships (drawn before boxes) -->
-        <!-- GameEngine holds the IGameRules it receives as rules: aggregation, kept because Strategy holds it -->
+        <!-- Relationships (drawn before boxes). Decision 23: a filled diamond goes only from the root to an internal entity, and every other attribute is a use with its name and multiplicity. -->
+        <!-- GameEngine keeps the IGameRules it receives as rules: use with role and multiplicity -->
         <line
           x1="380"
           y1="256"
           x2="332"
           y2="256"
           stroke-width="1"
-          marker-start="url(#t-diamond-hollow)"
-          stroke="#17212a"
+          marker-end="url(#t-open)"
+          stroke="#5b6873"
         />
-        <!-- GameEngine holds the IScoringPolicy it receives as scoring: aggregation, kept because Strategy holds it -->
+        <!-- GameEngine keeps the IScoringPolicy it receives as scoring: use with role and multiplicity -->
         <line
           x1="380"
           y1="404"
           x2="332"
           y2="404"
           stroke-width="1"
-          marker-start="url(#t-diamond-hollow)"
-          stroke="#17212a"
+          marker-end="url(#t-open)"
+          stroke="#5b6873"
         />
-        <!-- GameEngine creates its GamePhase phase: composition, kept because State holds it -->
+        <!-- GameEngine keeps its GamePhase as current: use with role and multiplicity -->
         <line
           x1="680"
           y1="256"
           x2="760"
           y2="256"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#t-diamond-filled)"
+          marker-end="url(#t-open)"
         />
-        <!-- GameEngine holds zero or one MoveHistory it receives as history: aggregation, kept because Command holds it: MoveHistory is the Command invoker -->
+        <!-- GameEngine keeps zero or one MoveHistory it receives as history: use with role and multiplicity -->
         <line
           x1="680"
           y1="428"
           x2="760"
           y2="428"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#t-diamond-hollow)"
+          marker-end="url(#t-open)"
         />
         <!-- GameEngine keeps the GameEvent objects it records as recorded: use with role and multiplicity -->
         <line
@@ -358,18 +324,46 @@
           marker-end="url(#t-open)"
           stroke="#5b6873"
         />
+        <!-- GameEngine holds its BoardState as state: composition from the root to an internal entity, with a hop over the outcome line -->
+        <path
+          d="M460,648 V756 a 8,8 0 0,1 0,16 V792"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#t-diamond-filled)"
+        />
+        <!-- GameEngine holds the LevelTimer of a timed game as timer: composition from the root to an internal entity -->
+        <line
+          x1="616"
+          y1="648"
+          x2="616"
+          y2="696"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#t-diamond-filled)"
+        />
+        <!-- BoardState keeps its Board as board: use with role and multiplicity -->
+        <line
+          x1="520"
+          y1="984"
+          x2="520"
+          y2="1024"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#t-open)"
+        />
 
         <!-- Rules return a Resolution: use, through the return type of resolve() and playTurn() -->
         <path
-          d="M52,352 H32 V608 H52"
+          d="M52,352 H32 V644 H52"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#t-open)"
         />
-        <!-- IScoringPolicy reads two BoardSnapshot photos: use, through the parameters of score() -->
+        <!-- IScoringPolicy reads two BoardSnapshot photos: use, through the parameters of score(), with a hop over the outcome line -->
         <path
-          d="M332,460 H372 V764 H368"
+          d="M332,460 H350 V756 a 8,8 0 0,1 0,16 V804 H336"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -378,16 +372,25 @@
         <!-- BoardState creates its BoardSnapshot in snapshot(): use with a verb -->
         <line
           x1="396"
-          y1="862"
-          x2="368"
-          y2="862"
+          y1="956"
+          x2="336"
+          y2="956"
           stroke-width="1"
           marker-end="url(#t-open)"
           stroke="#5b6873"
         />
         <!-- Resolution keeps its Outcome as outcome: use with role and multiplicity -->
         <path
-          d="M368,632 H752"
+          d="M336,764 H752"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#t-open)"
+        />
+
+        <!-- BoardSnapshot keeps its Score as score: use with role and multiplicity, below the frame of the aggregate -->
+        <path
+          d="M194,984 V1100 H870 V976"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -407,10 +410,10 @@
         >
           rules
         </text>
-        <rect x="468" y="184" width="44" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="468" y="168" width="44" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="490"
-          y="193"
+          y="177"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -432,9 +435,9 @@
         >
           scoring
         </text>
-        <rect x="720" y="240" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="712" y="240" width="44" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="738"
+          x="734"
           y="249"
           fill="#7d8a94"
           font-size="8"
@@ -442,7 +445,7 @@
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          phase
+          current
         </text>
         <rect x="710" y="410" width="48" height="12" rx="2" fill="#f9f4dc" />
         <text
@@ -456,10 +459,10 @@
         >
           history
         </text>
-        <rect x="712" y="636" width="40" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="712" y="768" width="40" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="732"
-          y="645"
+          y="777"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -468,7 +471,103 @@
         >
           outcome
         </text>
+        <rect x="466" y="776" width="30" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="481"
+          y="785"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          state
+        </text>
+        <rect x="620" y="676" width="32" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="636"
+          y="685"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          timer
+        </text>
+        <rect x="524" y="1004" width="30" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="539"
+          y="1013"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          board
+        </text>
+        <rect x="874" y="984" width="30" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="889"
+          y="993"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          score
+        </text>
         <!-- Multiplicities -->
+        <rect x="428" y="776" width="28" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="442"
+          y="785"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          0..1
+        </text>
+        <rect x="584" y="676" width="28" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="598"
+          y="685"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          0..1
+        </text>
+        <rect x="854" y="984" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="860"
+          y="993"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          1
+        </text>
+        <rect x="506" y="1004" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="512"
+          y="1013"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          1
+        </text>
         <rect x="526" y="168" width="12" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="532"
@@ -574,7 +673,7 @@
           x="380"
           y="216"
           width="300"
-          height="400"
+          height="432"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -583,7 +682,7 @@
         <rect x="380" y="216" width="300" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
         <rect x="380" y="256" width="300" height="8" fill="rgba(15,111,116,0.10)" />
         <line x1="380" y1="264" x2="680" y2="264" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
-        <line x1="380" y1="384" x2="680" y2="384" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <line x1="380" y1="416" x2="680" y2="416" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text
           x="530"
           y="238"
@@ -613,17 +712,23 @@
           - gameId: GameId
         </text>
         <text x="396" y="312" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - rules: IGameRules&lt;TMove, TState&gt;
+          - state: TState [0..1]
         </text>
         <text x="396" y="328" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - scoring: IScoringPolicy&lt;TState&gt;
+          - current: GamePhase
         </text>
         <text x="396" y="344" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - rules: IGameRules&lt;TMove, TState&gt;
+        </text>
+        <text x="396" y="360" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - scoring: IScoringPolicy&lt;TState&gt;
+        </text>
+        <text x="396" y="376" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - recorded: GameEvent[]
         </text>
         <text
           x="396"
-          y="360"
+          y="392"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -632,51 +737,51 @@
         >
           - history: MoveHistory&lt;TMove, SnapshotOf&lt;TState&gt;&gt; [0..1]
         </text>
-        <text x="396" y="376" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="396" y="408" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - timer: ITimed [0..1]
         </text>
-        <text x="396" y="400" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="396" y="432" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + start(initial: TState): void
         </text>
-        <text x="396" y="416" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="396" y="448" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + play(move: TMove): Outcome
         </text>
-        <text x="396" y="432" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="396" y="464" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + takeEvents(): readonly GameEvent[]
         </text>
-        <text x="396" y="448" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="396" y="480" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + pause(): void
         </text>
-        <text x="396" y="464" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="396" y="496" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + resume(): void
         </text>
-        <text x="396" y="480" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="396" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + snapshot(): SnapshotOf&lt;TState&gt;
         </text>
-        <text x="396" y="496" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="396" y="528" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + currentPhase(): GamePhase
         </text>
-        <text x="396" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="396" y="544" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + undo(): void
         </text>
-        <text x="396" y="528" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="396" y="560" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + redo(): void
         </text>
-        <text x="396" y="544" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="396" y="576" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + canUndo(): boolean
         </text>
-        <text x="396" y="560" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="396" y="592" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + canRedo(): boolean
         </text>
-        <text x="396" y="576" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="396" y="608" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + offersUndo(): boolean
         </text>
-        <text x="396" y="592" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="396" y="624" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + elapsedTime(): ElapsedTime | undefined
         </text>
         <text
           x="396"
-          y="608"
+          y="640"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -873,10 +978,10 @@
           MoveCommand&lt;TMove, TMemento&gt;): void
         </text>
 
-        <!-- Class: BoardState (interface, entity) -->
+        <!-- Class: BoardState (interface, entity inside the aggregate) -->
         <rect
           x="396"
-          y="676"
+          y="792"
           width="248"
           height="192"
           rx="6"
@@ -884,11 +989,11 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="396" y1="724" x2="644" y2="724" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="396" y1="732" x2="644" y2="732" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="396" y1="840" x2="644" y2="840" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="396" y1="848" x2="644" y2="848" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="520"
-          y="694"
+          y="810"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -899,7 +1004,7 @@
         </text>
         <text
           x="520"
-          y="712"
+          y="828"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -908,36 +1013,107 @@
         >
           BoardState
         </text>
-        <text x="412" y="748" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="412" y="864" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + addPoints(points: Score): void
         </text>
-        <text x="412" y="764" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="412" y="880" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + belongsTo(match: MatchId): boolean
         </text>
-        <text x="412" y="780" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="412" y="896" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: BoardState&lt;TCell,
         </text>
-        <text x="420" y="796" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="420" y="912" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           TCoord&gt;): boolean
         </text>
-        <text x="412" y="812" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="412" y="928" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + clone(): BoardState&lt;TCell, TCoord&gt;
         </text>
-        <text x="412" y="828" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="412" y="944" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + snapshot(): BoardSnapshot&lt;TCell, TCoord&gt;
         </text>
-        <text x="412" y="844" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="412" y="960" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + restore(snapshot:
         </text>
-        <text x="420" y="860" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="420" y="976" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           SnapshotOf&lt;this&gt;): void
         </text>
 
-        <!-- Multiplicity: Resolution keeps one Outcome -->
-        <rect x="742" y="618" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <!-- Reference box: LevelTimer, detailed in part 1 · view 3 -->
+        <rect
+          x="552"
+          y="696"
+          width="128"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
         <text
-          x="748"
-          y="627"
+          x="616"
+          y="710"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          PART 1 · VIEW 3
+        </text>
+        <text
+          x="616"
+          y="726"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          LevelTimer
+        </text>
+        <!-- Reference box: Board, detailed in part 1 · view 2 -->
+        <rect
+          x="456"
+          y="1024"
+          width="128"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="520"
+          y="1038"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          PART 1 · VIEW 2
+        </text>
+        <text
+          x="520"
+          y="1054"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          Board
+        </text>
+
+        <!-- Multiplicity: Resolution keeps one Outcome -->
+        <rect x="740" y="750" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="746"
+          y="759"
           fill="#17212a"
           font-size="8"
           font-weight="600"
@@ -950,19 +1126,19 @@
         <!-- Class: Resolution (value object: private fields, queries with business names; equals() compares accepted and outcome) -->
         <rect
           x="52"
-          y="512"
-          width="316"
+          y="548"
+          width="284"
           height="224"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="52" y1="560" x2="368" y2="560" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="52" y1="600" x2="368" y2="600" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="52" y1="596" x2="336" y2="596" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="52" y1="636" x2="336" y2="636" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="210"
-          y="530"
+          x="194"
+          y="566"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -972,8 +1148,8 @@
           «value object»
         </text>
         <text
-          x="210"
-          y="548"
+          x="194"
+          y="584"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -982,15 +1158,15 @@
         >
           Resolution
         </text>
-        <text x="68" y="576" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="612" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - accepted: boolean {readOnly}
         </text>
-        <text x="68" y="592" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="628" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - outcome: Outcome {readOnly}
         </text>
         <text
           x="68"
-          y="616"
+          y="652"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1000,7 +1176,7 @@
         </text>
         <text
           x="68"
-          y="632"
+          y="668"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1008,52 +1184,52 @@
         >
           + resolved(): Resolution
         </text>
-        <text x="68" y="648" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="684" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + evaluated(outcome: Outcome): Resolution
         </text>
-        <text x="68" y="664" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="700" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + wasAccepted(): boolean
         </text>
-        <text x="68" y="680" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="716" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + endsTheGame(): boolean
         </text>
-        <text x="68" y="696" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="732" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + phaseAfter(phase: GamePhase): GamePhase
         </text>
-        <text x="68" y="712" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="748" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + leadsTo(): Outcome
         </text>
-        <text x="68" y="728" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="764" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: Resolution): boolean
         </text>
 
-        <!-- Class: BoardSnapshot (abstract class, the photo: Memento role, no tactical stereotype; private fields, queries with business names, #245) -->
+        <!-- Class: BoardSnapshot (abstract class, the photo of the Memento pattern: no role label and no tactical stereotype, decision 23; private fields, queries with business names, #245) -->
         <rect
           x="52"
-          y="748"
-          width="316"
+          y="788"
+          width="284"
           height="196"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="52" y1="788" x2="368" y2="788" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="52" y1="856" x2="368" y2="856" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="52" y1="828" x2="336" y2="828" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="52" y1="896" x2="336" y2="896" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="210"
-          y="764"
+          x="194"
+          y="804"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «abstract» «Memento»
+          «abstract»
         </text>
         <text
-          x="210"
-          y="780"
+          x="194"
+          y="820"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1063,33 +1239,41 @@
         >
           BoardSnapshot
         </text>
-        <text x="68" y="802" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="842" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - stateId: GameStateId
         </text>
-        <text x="68" y="818" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="858" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - matchId: MatchId
         </text>
-        <text x="68" y="834" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="874" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - board: ReadonlyBoard&lt;TCell, TCoord, TAxis&gt;
         </text>
-        <text x="68" y="850" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="890" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - score: Score
         </text>
-        <text x="68" y="872" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="912" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + isPhotoOf(state: GameStateId): boolean
         </text>
-        <text x="68" y="888" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="928" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + belongsTo(match: MatchId): boolean
         </text>
-        <text x="68" y="904" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text
+          x="68"
+          y="944"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          textLength="260"
+          lengthAdjust="spacingAndGlyphs"
+        >
           + boardCopy(): ReadonlyBoard&lt;TCell, TCoord, TAxis&gt;
         </text>
-        <text x="68" y="920" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="960" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + scoreSoFar(): Score
         </text>
         <text
           x="68"
-          y="936"
+          y="976"
           fill="#17212a"
           font-size="9"
           font-style="italic"
@@ -1098,8 +1282,8 @@
           + view(): unknown
         </text>
         <rect
-          x="262"
-          y="740"
+          x="230"
+          y="780"
           width="108"
           height="18"
           rx="2"
@@ -1109,8 +1293,8 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="316"
-          y="752"
+          x="284"
+          y="792"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1118,10 +1302,10 @@
         >
           TCell, TCoord, TAxis
         </text>
-        <rect x="374" y="842" width="20" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="340" y="936" width="20" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="384"
-          y="851"
+          x="350"
+          y="945"
           fill="#7d8a94"
           font-size="6"
           font-family="'IBM Plex Mono', monospace"
@@ -1133,7 +1317,7 @@
         <!-- Class: Score (value object, decision 41) -->
         <rect
           x="752"
-          y="740"
+          y="800"
           width="236"
           height="176"
           rx="6"
@@ -1141,10 +1325,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="752" y1="788" x2="988" y2="788" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="752" y1="848" x2="988" y2="848" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="870"
-          y="758"
+          y="818"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1155,7 +1339,7 @@
         </text>
         <text
           x="870"
-          y="776"
+          y="836"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1164,13 +1348,13 @@
         >
           Score
         </text>
-        <text x="768" y="804" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="768" y="864" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - value: number
         </text>
-        <line x1="752" y1="812" x2="988" y2="812" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="752" y1="872" x2="988" y2="872" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="768"
-          y="828"
+          y="888"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1178,27 +1362,27 @@
         >
           + of(value: number): Score
         </text>
-        <text x="768" y="844" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="768" y="904" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + add(points: Score): Score
         </text>
-        <text x="768" y="860" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="768" y="920" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: Score): boolean
         </text>
-        <text x="768" y="876" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="768" y="936" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + isHigherThan(other: Score): boolean
         </text>
-        <text x="768" y="892" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="768" y="952" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + deliverTo(receiver:
         </text>
-        <text x="779" y="908" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="779" y="968" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           ValueReceiver&lt;number&gt;): void
         </text>
         <!-- BoardState adds the points of a turn as a Score, and BoardSnapshot, IScoringPolicy and GameOver carry one: use -->
         <line
           x1="644"
-          y1="860"
+          y1="888"
           x2="752"
-          y2="860"
+          y2="888"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#t-open)"
@@ -1206,7 +1390,7 @@
         <!-- Class: Outcome (value object: a closed set of three instances, decision 45) -->
         <rect
           x="752"
-          y="556"
+          y="600"
           width="236"
           height="176"
           rx="6"
@@ -1214,10 +1398,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="752" y1="604" x2="988" y2="604" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="752" y1="648" x2="988" y2="648" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="870"
-          y="574"
+          y="618"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1228,7 +1412,7 @@
         </text>
         <text
           x="870"
-          y="592"
+          y="636"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1237,12 +1421,12 @@
         >
           Outcome
         </text>
-        <text x="768" y="620" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="768" y="664" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - name: string
         </text>
         <text
           x="768"
-          y="636"
+          y="680"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1250,10 +1434,10 @@
         >
           + playing, victory, gameOver: Outcome
         </text>
-        <line x1="752" y1="644" x2="988" y2="644" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="752" y1="688" x2="988" y2="688" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="768"
-          y="660"
+          y="704"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1261,16 +1445,16 @@
         >
           + of(name: string): Outcome
         </text>
-        <text x="768" y="676" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="768" y="720" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: Outcome): boolean
         </text>
-        <text x="768" y="692" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="768" y="736" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + endsTheGame(): boolean
         </text>
-        <text x="768" y="708" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="768" y="752" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + deliverTo(receiver:
         </text>
-        <text x="779" y="724" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="779" y="768" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           ValueReceiver&lt;string&gt;): void
         </text>
 
@@ -1381,7 +1565,7 @@
         </text>
         <rect
           x="572"
-          y="666"
+          y="782"
           width="84"
           height="18"
           rx="2"
@@ -1392,7 +1576,7 @@
         />
         <text
           x="614"
-          y="678"
+          y="794"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1401,8 +1585,8 @@
           TCell, TCoord
         </text>
 
-        <!-- The footnote and the legend sit below the zone, which grew by 32 and then by 80 for the Outcome box (#207). It grew by 32 more for the delivery operation of Score (#228), and by 32 more for the queries of BoardSnapshot (#245). -->
-        <g transform="translate(0 232)">
+        <!-- The footnote and the legend sit below the zone, which grew by 32 and then by 80 for the Outcome box (#207). It grew by 32 more for the delivery operation of Score (#228), by 32 more for the queries of BoardSnapshot (#245), and by 148 more for the frame of the aggregate, its two reference boxes and the score line below it (#21). -->
+        <g transform="translate(0 380)">
           <!-- Footnote -->
           <text
             x="24"
@@ -1422,7 +1606,7 @@
             font-family="'IBM Plex Sans', sans-serif"
           >
             GameEngine declares TCoord and bounds TState by BoardState&lt;TCell, TCoord&gt; &amp;
-            Cloneable&lt;TState&gt; in its corner box (decision 16).
+            Cloneable&lt;TState&gt; in its corner box: the bounded generic of §3.1 (decision 16).
           </text>
           <text
             x="24"
@@ -1456,18 +1640,38 @@
             IGameRules.evaluate(), GameEngine.play() and GamePhase.after() also use Outcome. Every
             field of BoardSnapshot is private, and the photo is frozen (decisions 7 and 34).
           </text>
+          <text
+            x="24"
+            y="832"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            The dark dashed frame is the boundary of the game aggregate: the root and its internal
+            entities, the state, its board and the timer, which have local ids (decisions 26, 52).
+          </text>
+          <text
+            x="24"
+            y="848"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            The phase, the history and the two Strategies are parts of the aggregate too: each one
+            stays in the frame of its pattern, and the root keeps it with a use (decision 23).
+          </text>
           <!-- Legend -->
           <line
             x1="24"
-            y1="840"
+            y1="872"
             x2="1016"
-            y2="840"
+            y2="872"
             stroke="rgba(23,33,42,0.10)"
             stroke-width="0.8"
           />
           <text
             x="24"
-            y="858"
+            y="890"
             fill="#5b6873"
             font-size="8"
             font-family="'IBM Plex Mono', monospace"
@@ -1478,52 +1682,34 @@
 
           <line
             x1="24"
-            y1="876"
+            y1="908"
             x2="52"
-            y2="876"
+            y2="908"
             stroke="#17212a"
             stroke-width="1"
             marker-start="url(#t-diamond-filled)"
           />
           <text
             x="60"
-            y="880"
+            y="912"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            Composition · in-layer pattern
+            Composition · aggregate root to internal entity
           </text>
           <line
-            x1="264"
-            y1="876"
-            x2="292"
-            y2="876"
-            stroke="#17212a"
-            stroke-width="1"
-            marker-start="url(#t-diamond-hollow)"
-          />
-          <text
-            x="300"
-            y="880"
-            fill="#5b6873"
-            font-size="8.5"
-            font-family="'IBM Plex Sans', sans-serif"
-          >
-            Aggregation · in-layer pattern
-          </text>
-          <line
-            x1="504"
-            y1="876"
-            x2="532"
-            y2="876"
+            x1="304"
+            y1="908"
+            x2="332"
+            y2="908"
             stroke="#5b6873"
             stroke-width="1"
             marker-end="url(#t-open)"
           />
           <text
-            x="540"
-            y="880"
+            x="340"
+            y="912"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1532,7 +1718,7 @@
           </text>
           <rect
             x="24"
-            y="896"
+            y="928"
             width="28"
             height="12"
             rx="2"
@@ -1542,7 +1728,7 @@
           />
           <text
             x="60"
-            y="905"
+            y="937"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1551,7 +1737,7 @@
           </text>
           <rect
             x="184"
-            y="896"
+            y="928"
             width="28"
             height="12"
             rx="2"
@@ -1562,7 +1748,7 @@
           />
           <text
             x="220"
-            y="905"
+            y="937"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1571,7 +1757,27 @@
           </text>
           <rect
             x="344"
-            y="896"
+            y="928"
+            width="28"
+            height="12"
+            rx="2"
+            fill="none"
+            stroke="#17212a"
+            stroke-width="1.2"
+            stroke-dasharray="6,3"
+          />
+          <text
+            x="380"
+            y="937"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Dark dashed frame · boundary of an aggregate
+          </text>
+          <rect
+            x="584"
+            y="928"
             width="28"
             height="12"
             rx="2"
@@ -1581,8 +1787,8 @@
             stroke-dasharray="4,3"
           />
           <text
-            x="380"
-            y="905"
+            x="620"
+            y="937"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1590,8 +1796,28 @@
             Corner box · type parameters
           </text>
           <rect
-            x="504"
-            y="896"
+            x="24"
+            y="952"
+            width="28"
+            height="12"
+            rx="2"
+            fill="#ffffff"
+            stroke="#7d8a94"
+            stroke-width="1"
+            stroke-dasharray="4,3"
+          />
+          <text
+            x="60"
+            y="961"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Reference box · detailed in another view
+          </text>
+          <rect
+            x="264"
+            y="952"
             width="28"
             height="12"
             rx="2"
@@ -1600,8 +1826,8 @@
             stroke-width="1"
           />
           <text
-            x="540"
-            y="905"
+            x="300"
+            y="961"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1610,7 +1836,7 @@
           </text>
           <text
             x="24"
-            y="928"
+            y="984"
             fill="#17212a"
             font-size="8.5"
             font-family="'IBM Plex Mono', monospace"
@@ -1619,7 +1845,7 @@
           </text>
           <text
             x="92"
-            y="928"
+            y="984"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"

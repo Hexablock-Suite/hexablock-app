@@ -96,22 +96,6 @@
             <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
           </marker>
           <marker
-            id="history-diamond-hollow"
-            markerWidth="18"
-            markerHeight="10"
-            refX="0"
-            refY="5"
-            orient="auto"
-            markerUnits="userSpaceOnUse"
-          >
-            <polygon
-              points="0 5, 9 0, 18 5, 9 10"
-              fill="#ffffff"
-              stroke="#17212a"
-              stroke-width="1"
-            />
-          </marker>
-          <marker
             id="history-diamond-filled"
             markerWidth="18"
             markerHeight="10"
@@ -160,12 +144,12 @@
           LAYER 1 · ENTITIES · src/domain/engine/
         </text>
 
-        <!-- Pattern groups -->
+        <!-- Pattern groups. The Command frame starts 8 higher, so its label clears the corner box of MoveCommand. -->
         <rect
           x="56"
-          y="64"
+          y="56"
           width="920"
-          height="246"
+          height="254"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -174,14 +158,14 @@
         />
         <text
           x="68"
-          y="80"
+          y="72"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.14em"
         >
-          COMMAND · MEMENTO · §3.3
+          COMMAND · MEMENTO · §3.3 · §5.1.8
         </text>
 
         <rect
@@ -208,15 +192,15 @@
         </text>
 
         <!-- Relationships (drawn before boxes) -->
-        <!-- MoveHistory holds the MoveCommands it receives as done: aggregation, kept because Command holds it -->
+        <!-- MoveHistory keeps each done MoveCommand as done: use with role and multiplicity (decision 23) -->
         <line
           x1="376"
           y1="164"
           x2="312"
           y2="164"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#history-diamond-hollow)"
+          marker-end="url(#history-open)"
         />
         <!-- RedoableHistory extends MoveHistory: generalization -->
         <line
@@ -260,13 +244,13 @@
           marker-end="url(#history-triangle)"
         />
 
-        <!-- RedoableHistory holds the MoveCommands it can redo as undone: aggregation, kept because Command holds it -->
+        <!-- RedoableHistory keeps each undone MoveCommand as undone: use with role and multiplicity (decision 23) -->
         <path
           d="M800 196 V292 Q800 300 792 300 H200 Q192 300 192 292 V252"
           fill="none"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-start="url(#history-diamond-hollow)"
+          marker-end="url(#history-open)"
         />
         <!-- LevelTimer keeps the ClockReading of its start as startedAt: use with role and multiplicity -->
         <line
@@ -363,7 +347,7 @@
         >
           0..*
         </text>
-        <!-- Class: MoveCommand (Command) -->
+        <!-- Class: MoveCommand (a piece of the Command pattern: the frame names it, decision 23) -->
         <rect
           x="72"
           y="92"
@@ -378,18 +362,7 @@
         <line x1="72" y1="212" x2="312" y2="212" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="192"
-          y="110"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «Command»
-        </text>
-        <text
-          x="192"
-          y="128"
+          y="121"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -402,10 +375,10 @@
           - move: TMove
         </text>
         <text x="88" y="172" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - before: TMemento {memento}
+          - before: TMemento
         </text>
         <text x="88" y="188" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - after: TMemento {memento}
+          - after: TMemento
         </text>
         <text x="88" y="204" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - restore: (memento: TMemento) =&gt; void
@@ -417,7 +390,7 @@
           + redo(): void
         </text>
 
-        <!-- Class: MoveHistory (focal, Invoker) -->
+        <!-- Class: MoveHistory (focal; a piece of the Command pattern: the frame names it, decision 23) -->
         <rect
           x="376"
           y="92"
@@ -434,18 +407,7 @@
         <line x1="376" y1="180" x2="696" y2="180" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text
           x="536"
-          y="110"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «Invoker» «Caretaker»
-        </text>
-        <text
-          x="536"
-          y="128"
+          y="121"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -961,30 +923,12 @@
             y1="680"
             x2="292"
             y2="680"
-            stroke="#17212a"
-            stroke-width="1"
-            marker-start="url(#history-diamond-hollow)"
-          />
-          <text
-            x="300"
-            y="684"
-            fill="#5b6873"
-            font-size="8.5"
-            font-family="'IBM Plex Sans', sans-serif"
-          >
-            Aggregation · in-layer pattern
-          </text>
-          <line
-            x1="464"
-            y1="680"
-            x2="492"
-            y2="680"
             stroke="#5b6873"
             stroke-width="1"
             marker-end="url(#history-open)"
           />
           <text
-            x="500"
+            x="300"
             y="684"
             fill="#5b6873"
             font-size="8.5"
