@@ -54,6 +54,13 @@ export class SquareCoord {
   key(): CoordKey {
     return coordKey(`${this.col},${this.row}`);
   }
+
+  // Gives the two values of the coordinate, `[col, row]`, to `receiver`. It returns nothing.
+  // A screen layout of layer 4 places the cell from them (issue #165).
+  // No code of the domain or of the use cases calls it (rule R-no-delivery-call).
+  deliverTo(receiver: ValueReceiver<readonly [number, number]>): void {
+    receiver.receive([this.col, this.row]);
+  }
 }
 
 // Creates a coordinate. It is the short name of `SquareCoord.of()`, which checks the values.

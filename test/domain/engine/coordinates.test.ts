@@ -8,6 +8,7 @@ import {
   TriangleCoord,
   TriangleTopology,
 } from '../../../src/domain/engine/triangle-topology';
+import { deliveries } from '../../support/engine/value-receiver';
 
 // Issue 206 (classes.md decision 44): a coordinate is a value object.
 // It keeps its numbers private, compares by value and does the calculations on its own values.
@@ -90,6 +91,19 @@ describe('HexCoord', () => {
     expect(new HexTopology().key(hex(1, -2))).toBe('1,-2');
   });
 
+  // Issue #165: a screen layout of layer 4 places a cell from its two values.
+  // The coordinate gives them to a receiver once and returns nothing.
+  it('should_give_its_two_values_to_the_receiver_when_it_delivers_them', () => {
+    for (const [q, r] of pairs) {
+      expect(deliveries(hex(q, r))).toEqual([[q, r]]);
+    }
+    const [[first, second]] = deliveries(hex(-0, 3));
+
+    expect(Object.is(first, 0)).toBe(true);
+    expect(second).toBe(3);
+    expect(hex(1, 2).deliverTo({ receive: () => undefined })).toBeUndefined();
+  });
+
   // Issue #237: no operation returns the values as text, `toString()` included.
   it('should_give_no_text_when_a_template_literal_or_string_converts_the_coordinate', () => {
     expect(`${String(hex(1, -2))}`).toBe('[object Object]');
@@ -152,6 +166,19 @@ describe('SquareCoord', () => {
     expect(square(1, -2).key()).toBe('1,-2');
     expect(square(-0, 3).key()).toBe('0,3');
     expect(new SquareTopology().key(square(1, -2))).toBe('1,-2');
+  });
+
+  // Issue #165: a screen layout of layer 4 places a cell from its two values.
+  // The coordinate gives them to a receiver once and returns nothing.
+  it('should_give_its_two_values_to_the_receiver_when_it_delivers_them', () => {
+    for (const [col, row] of pairs) {
+      expect(deliveries(square(col, row))).toEqual([[col, row]]);
+    }
+    const [[first, second]] = deliveries(square(-0, 3));
+
+    expect(Object.is(first, 0)).toBe(true);
+    expect(second).toBe(3);
+    expect(square(1, 2).deliverTo({ receive: () => undefined })).toBeUndefined();
   });
 
   // Issue #237: no operation returns the values as text, `toString()` included.
@@ -241,6 +268,19 @@ describe('TriangleCoord', () => {
     expect(triangle(1, -2).key()).toBe('1,-2');
     expect(triangle(-0, 3).key()).toBe('0,3');
     expect(new TriangleTopology().key(triangle(1, -2))).toBe('1,-2');
+  });
+
+  // Issue #165: a screen layout of layer 4 places a cell from its two values.
+  // The coordinate gives them to a receiver once and returns nothing.
+  it('should_give_its_two_values_to_the_receiver_when_it_delivers_them', () => {
+    for (const [col, row] of pairs) {
+      expect(deliveries(triangle(col, row))).toEqual([[col, row]]);
+    }
+    const [[first, second]] = deliveries(triangle(-0, 3));
+
+    expect(Object.is(first, 0)).toBe(true);
+    expect(second).toBe(3);
+    expect(triangle(1, 2).deliverTo({ receive: () => undefined })).toBeUndefined();
   });
 
   // Issue #237: no operation returns the values as text, `toString()` included.

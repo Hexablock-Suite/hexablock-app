@@ -63,7 +63,7 @@
       <p class="eyebrow">Extensibility diagram · View 4 · Statement §3.4 · §8</p>
       <h1>Extension points outside the engine, by Clean layer</h1>
       <svg
-        viewBox="0 0 1040 796"
+        viewBox="0 0 1040 860"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="ext-4-outer-layers-title ext-4-outer-layers-desc"
@@ -75,8 +75,9 @@
           Extension points of layers 2 to 4 that §8 or the class diagram declare: local and HTTP
           adapters of the layer 2 output ports for storage and backend, the two level origins of A6,
           GameEventBus and its listeners over the GameEventPublisher port of layer 2, the use case
-          aspects over UseCaseAspect, and the planned desktop layout and game registry of D5 as
-          dashed placeholders.
+          aspects over UseCaseAspect, GameRegistry of layer 4, which keeps the registered games of
+          the composition root, and the planned desktop layout and game module of D5 as dashed
+          placeholders.
         </desc>
         <defs>
           <marker
@@ -135,7 +136,7 @@
           x="24"
           y="24"
           width="992"
-          height="148"
+          height="212"
           rx="8"
           fill="#cfdcf3"
           stroke="rgba(30,58,138,0.50)"
@@ -155,7 +156,7 @@
         <!-- Layer zone: layer 3, interface adapters -->
         <rect
           x="24"
-          y="184"
+          y="248"
           width="992"
           height="148"
           rx="8"
@@ -165,7 +166,7 @@
         />
         <text
           x="40"
-          y="204"
+          y="268"
           fill="#1d4ed8"
           font-size="8"
           font-weight="500"
@@ -177,7 +178,7 @@
         <!-- Layer zone: layer 2, use cases -->
         <rect
           x="24"
-          y="344"
+          y="408"
           width="992"
           height="228"
           rx="8"
@@ -187,7 +188,7 @@
         />
         <text
           x="40"
-          y="364"
+          y="428"
           fill="#7e22ce"
           font-size="8"
           font-weight="500"
@@ -198,7 +199,7 @@
         </text>
         <!-- Database and backend: the adapters implement the layer 2 ports -->
         <path
-          d="M144,300 L144,308 Q144,316 152,316 L288,316 Q296,316 296,324 L296,380"
+          d="M144,364 L144,372 Q144,380 152,380 L288,380 Q296,380 296,388 L296,444"
           fill="none"
           stroke-width="1"
           stroke="#17212a"
@@ -206,7 +207,7 @@
           marker-end="url(#ext4-triangle)"
         />
         <path
-          d="M336,276 L336,380"
+          d="M336,340 L336,444"
           fill="none"
           stroke-width="1"
           stroke="#17212a"
@@ -214,7 +215,7 @@
           marker-end="url(#ext4-triangle)"
         />
         <path
-          d="M448,156 L448,380"
+          d="M448,156 L448,444"
           fill="none"
           stroke-width="1"
           stroke="#17212a"
@@ -223,7 +224,7 @@
         />
         <!-- Observer: GameEventBus implements the GameEventPublisher port of layer 2: realization -->
         <path
-          d="M584,276 L584,492"
+          d="M584,340 L584,556"
           fill="none"
           stroke-width="1"
           stroke="#17212a"
@@ -232,7 +233,7 @@
         />
         <!-- GameEventBus keeps the listeners it receives: aggregation, kept because Observer holds it -->
         <path
-          d="M656,248 L752,248"
+          d="M656,312 L752,312"
           fill="none"
           stroke-width="1"
           stroke="#17212a"
@@ -240,7 +241,7 @@
         />
         <!-- AudioManager implements GameEventListener: realization -->
         <path
-          d="M784,116 L784,220"
+          d="M784,116 L784,284"
           fill="none"
           stroke-width="1"
           stroke="#17212a"
@@ -249,7 +250,7 @@
         />
         <!-- A new subscriber implements GameEventListener: realization -->
         <path
-          d="M936,116 L936,240 Q936,248 928,248 L896,248"
+          d="M936,116 L936,304 Q936,312 928,312 L896,312"
           fill="none"
           stroke-width="1"
           stroke="#17212a"
@@ -258,50 +259,50 @@
         />
         <!-- Aspects extend UseCaseAspect: inheritance -->
         <path
-          d="M784,412 L840,412"
+          d="M784,476 L840,476"
           fill="none"
           stroke-width="1"
           stroke="#17212a"
           marker-end="url(#ext4-triangle)"
         />
         <path
-          d="M916,492 L916,444"
+          d="M916,556 L916,508"
           fill="none"
           stroke-width="1"
           stroke="#17212a"
           marker-end="url(#ext4-triangle)"
         />
-        <!-- GameRegistry keeps the game modules it receives in an attribute: use -->
+        <!-- GameRegistry keeps the registered games it receives in an attribute: use -->
         <path
-          d="M200,520 L288,520"
+          d="M592,116 L592,180"
           fill="none"
           stroke-width="1"
           stroke="#5b6873"
           marker-end="url(#ext4-open)"
         />
         <!-- Role names and multiplicities at the part end -->
-        <rect x="676" y="233" width="72" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="598" y="142" width="54" height="12" rx="2" fill="#cfdcf3" />
+        <text
+          x="600"
+          y="151"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          games
+          <tspan font-weight="600">0..*</tspan>
+        </text>
+        <rect x="676" y="297" width="72" height="12" rx="2" fill="#e2ebf8" />
         <text
           x="678"
-          y="242"
+          y="306"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="start"
         >
           listeners
-          <tspan font-weight="600">0..*</tspan>
-        </text>
-        <rect x="220" y="504" width="62" height="12" rx="2" fill="#efe7f8" />
-        <text
-          x="222"
-          y="513"
-          fill="#17212a"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
-        >
-          modules
           <tspan font-weight="600">0..*</tspan>
         </text>
 
@@ -464,7 +465,7 @@
         </text>
         <rect
           x="48"
-          y="220"
+          y="284"
           width="192"
           height="80"
           rx="6"
@@ -474,7 +475,7 @@
         />
         <text
           x="60"
-          y="236"
+          y="300"
           fill="#5b6873"
           font-size="7.5"
           font-weight="500"
@@ -485,7 +486,7 @@
         </text>
         <text
           x="60.0"
-          y="254"
+          y="318"
           fill="#17212a"
           font-size="9.5"
           font-family="'IBM Plex Mono', monospace"
@@ -494,7 +495,7 @@
         </text>
         <text
           x="60.0"
-          y="270"
+          y="334"
           fill="#17212a"
           font-size="9.5"
           font-family="'IBM Plex Mono', monospace"
@@ -503,17 +504,17 @@
         </text>
         <text
           x="60.0"
-          y="286"
+          y="350"
           fill="#17212a"
           font-size="9.5"
           font-family="'IBM Plex Mono', monospace"
         >
           LocalSettingsStore
         </text>
-        <rect x="256" y="220" width="160" height="56" rx="6" fill="#e2ebf8" />
+        <rect x="256" y="284" width="160" height="56" rx="6" fill="#e2ebf8" />
         <rect
           x="256"
-          y="220"
+          y="284"
           width="160"
           height="56"
           rx="6"
@@ -524,7 +525,7 @@
         />
         <text
           x="336.0"
-          y="244.0"
+          y="308.0"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -535,7 +536,7 @@
         </text>
         <text
           x="336.0"
-          y="262.0"
+          y="326.0"
           fill="#5b6873"
           font-size="12"
           font-weight="600"
@@ -546,7 +547,7 @@
         </text>
         <rect
           x="512"
-          y="220"
+          y="284"
           width="144"
           height="56"
           rx="6"
@@ -556,7 +557,7 @@
         />
         <text
           x="584.0"
-          y="244.0"
+          y="308.0"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -567,7 +568,7 @@
         </text>
         <text
           x="584.0"
-          y="262.0"
+          y="326.0"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -578,7 +579,7 @@
         </text>
         <rect
           x="752"
-          y="220"
+          y="284"
           width="144"
           height="56"
           rx="6"
@@ -588,7 +589,7 @@
         />
         <text
           x="824"
-          y="244.0"
+          y="308.0"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -599,7 +600,7 @@
         </text>
         <text
           x="824"
-          y="262.0"
+          y="326.0"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -610,7 +611,7 @@
         </text>
         <rect
           x="48"
-          y="380"
+          y="444"
           width="432"
           height="80"
           rx="6"
@@ -620,7 +621,7 @@
         />
         <text
           x="60"
-          y="396"
+          y="460"
           fill="#5b6873"
           font-size="7.5"
           font-weight="500"
@@ -631,7 +632,7 @@
         </text>
         <text
           x="60"
-          y="414"
+          y="478"
           fill="#17212a"
           font-size="9.5"
           font-family="'IBM Plex Mono', monospace"
@@ -640,7 +641,7 @@
         </text>
         <text
           x="60"
-          y="430"
+          y="494"
           fill="#17212a"
           font-size="9.5"
           font-family="'IBM Plex Mono', monospace"
@@ -649,7 +650,7 @@
         </text>
         <text
           x="60"
-          y="446"
+          y="510"
           fill="#17212a"
           font-size="9.5"
           font-family="'IBM Plex Mono', monospace"
@@ -658,7 +659,7 @@
         </text>
         <text
           x="276"
-          y="414"
+          y="478"
           fill="#17212a"
           font-size="9.5"
           font-family="'IBM Plex Mono', monospace"
@@ -667,7 +668,7 @@
         </text>
         <text
           x="276"
-          y="430"
+          y="494"
           fill="#17212a"
           font-size="9.5"
           font-family="'IBM Plex Mono', monospace"
@@ -676,84 +677,16 @@
         </text>
         <text
           x="276"
-          y="446"
+          y="510"
           fill="#17212a"
           font-size="9.5"
           font-family="'IBM Plex Mono', monospace"
         >
           SettingsStore
         </text>
-        <rect x="48" y="492" width="152" height="56" rx="6" fill="#efe7f8" />
-        <rect
-          x="48"
-          y="492"
-          width="152"
-          height="56"
-          rx="6"
-          fill="rgba(23,33,42,0.02)"
-          stroke="rgba(23,33,42,0.35)"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-        />
-        <text
-          x="124"
-          y="516.0"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          DECLARED · §8 · D5
-        </text>
-        <text
-          x="124"
-          y="534.0"
-          fill="#5b6873"
-          font-size="12"
-          font-weight="600"
-          font-family="'IBM Plex Sans', sans-serif"
-          text-anchor="middle"
-        >
-          GameRegistry
-        </text>
-        <rect x="288" y="492" width="192" height="56" rx="6" fill="#efe7f8" />
-        <rect
-          x="288"
-          y="492"
-          width="192"
-          height="56"
-          rx="6"
-          fill="rgba(23,33,42,0.02)"
-          stroke="rgba(23,33,42,0.35)"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-        />
-        <text
-          x="384.0"
-          y="516.0"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          DECLARED · §8 · D5
-        </text>
-        <text
-          x="384.0"
-          y="534.0"
-          fill="#5b6873"
-          font-size="12"
-          font-weight="600"
-          font-family="'IBM Plex Sans', sans-serif"
-          text-anchor="middle"
-        >
-          GameModule
-        </text>
         <rect
           x="616"
-          y="380"
+          y="444"
           width="168"
           height="96"
           rx="6"
@@ -763,7 +696,7 @@
         />
         <text
           x="628"
-          y="396"
+          y="460"
           fill="#5b6873"
           font-size="7.5"
           font-weight="500"
@@ -774,7 +707,7 @@
         </text>
         <text
           x="628.0"
-          y="414"
+          y="478"
           fill="#17212a"
           font-size="9.5"
           font-family="'IBM Plex Mono', monospace"
@@ -783,7 +716,7 @@
         </text>
         <text
           x="628.0"
-          y="430"
+          y="494"
           fill="#17212a"
           font-size="9.5"
           font-family="'IBM Plex Mono', monospace"
@@ -792,7 +725,7 @@
         </text>
         <text
           x="628.0"
-          y="446"
+          y="510"
           fill="#17212a"
           font-size="9.5"
           font-family="'IBM Plex Mono', monospace"
@@ -801,7 +734,7 @@
         </text>
         <text
           x="628.0"
-          y="462"
+          y="526"
           fill="#17212a"
           font-size="9.5"
           font-family="'IBM Plex Mono', monospace"
@@ -810,7 +743,7 @@
         </text>
         <rect
           x="840"
-          y="380"
+          y="444"
           width="152"
           height="64"
           rx="6"
@@ -820,7 +753,7 @@
         />
         <text
           x="916.0"
-          y="408.0"
+          y="472.0"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -831,7 +764,7 @@
         </text>
         <text
           x="916.0"
-          y="426.0"
+          y="490.0"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -843,7 +776,7 @@
         </text>
         <rect
           x="884"
-          y="370"
+          y="434"
           width="124"
           height="18"
           rx="2"
@@ -854,7 +787,7 @@
         />
         <text
           x="946.0"
-          y="382"
+          y="446"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -862,10 +795,10 @@
         >
           TRequest, TResponse
         </text>
-        <rect x="840" y="492" width="152" height="56" rx="6" fill="#efe7f8" />
+        <rect x="840" y="556" width="152" height="56" rx="6" fill="#efe7f8" />
         <rect
           x="840"
-          y="492"
+          y="556"
           width="152"
           height="56"
           rx="6"
@@ -876,7 +809,7 @@
         />
         <text
           x="916.0"
-          y="516.0"
+          y="580.0"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -887,7 +820,7 @@
         </text>
         <text
           x="916.0"
-          y="534.0"
+          y="598.0"
           fill="#5b6873"
           font-size="12"
           font-weight="600"
@@ -898,7 +831,7 @@
         </text>
         <rect
           x="496"
-          y="492"
+          y="556"
           width="176"
           height="56"
           rx="6"
@@ -908,7 +841,7 @@
         />
         <text
           x="584.0"
-          y="516.0"
+          y="580.0"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -919,7 +852,7 @@
         </text>
         <text
           x="584.0"
-          y="534.0"
+          y="598.0"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -928,9 +861,108 @@
         >
           GameEventPublisher
         </text>
+        <!-- The game registry of the composition root (#162) and the declared game module of D5 -->
+        <rect
+          x="504"
+          y="60"
+          width="176"
+          height="56"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="592.0"
+          y="84.0"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          STEP 10 · D15
+        </text>
+        <text
+          x="592.0"
+          y="102.0"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GameRegistry
+        </text>
+        <rect
+          x="504"
+          y="180"
+          width="176"
+          height="56"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="592.0"
+          y="204.0"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface»
+        </text>
+        <text
+          x="592.0"
+          y="222.0"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          RegisteredGame
+        </text>
+        <rect x="48" y="180" width="208" height="56" rx="6" fill="#cfdcf3" />
+        <rect
+          x="48"
+          y="180"
+          width="208"
+          height="56"
+          rx="6"
+          fill="rgba(23,33,42,0.02)"
+          stroke="rgba(23,33,42,0.35)"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="152.0"
+          y="204.0"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          DECLARED · §8 · D5
+        </text>
+        <text
+          x="152.0"
+          y="222.0"
+          fill="#5b6873"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GameModule
+        </text>
         <text
           x="24"
-          y="600"
+          y="664"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -940,7 +972,7 @@
         </text>
         <text
           x="24"
-          y="616"
+          y="680"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -950,7 +982,7 @@
         </text>
         <text
           x="24"
-          y="632"
+          y="696"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -960,7 +992,7 @@
         </text>
         <text
           x="24"
-          y="648"
+          y="712"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -970,19 +1002,20 @@
         </text>
         <text
           x="24"
-          y="664"
+          y="728"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          D5: desktop and a game with no board are planned seams. Dashed boxes have placeholder
-          names. The layer of GameRegistry is open.
+          D5: desktop and a game with no board are planned seams with placeholder names.
+          GameRegistry exists (#162): a fifth variant adds one entry, and a game with no board needs
+          a GameModule.
         </text>
         <!-- Legend -->
-        <line x1="24" y1="688" x2="1016" y2="688" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <line x1="24" y1="752" x2="1016" y2="752" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="706"
+          y="770"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -993,16 +1026,16 @@
 
         <line
           x1="24"
-          y1="727"
+          y1="791"
           x2="52"
-          y2="727"
+          y2="791"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#ext4-triangle)"
         />
         <text
           x="60"
-          y="731"
+          y="795"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1011,9 +1044,9 @@
         </text>
         <line
           x1="144"
-          y1="727"
+          y1="791"
           x2="172"
-          y2="727"
+          y2="791"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -1021,7 +1054,7 @@
         />
         <text
           x="180"
-          y="731"
+          y="795"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1030,16 +1063,16 @@
         </text>
         <line
           x1="264"
-          y1="727"
+          y1="791"
           x2="292"
-          y2="727"
+          y2="791"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#ext4-diamond-hollow)"
         />
         <text
           x="300"
-          y="731"
+          y="795"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1048,16 +1081,16 @@
         </text>
         <line
           x1="504"
-          y1="727"
+          y1="791"
           x2="532"
-          y2="727"
+          y2="791"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#ext4-open)"
         />
         <text
           x="540"
-          y="731"
+          y="795"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1067,7 +1100,7 @@
 
         <rect
           x="24"
-          y="746"
+          y="810"
           width="28"
           height="12"
           rx="2"
@@ -1077,7 +1110,7 @@
         />
         <text
           x="60"
-          y="755"
+          y="819"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1086,7 +1119,7 @@
         </text>
         <rect
           x="264"
-          y="746"
+          y="810"
           width="28"
           height="12"
           rx="2"
@@ -1096,7 +1129,7 @@
         />
         <text
           x="300"
-          y="755"
+          y="819"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1105,7 +1138,7 @@
         </text>
         <rect
           x="520"
-          y="746"
+          y="810"
           width="28"
           height="12"
           rx="2"
@@ -1115,7 +1148,7 @@
         />
         <text
           x="556"
-          y="755"
+          y="819"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1125,7 +1158,7 @@
 
         <rect
           x="24"
-          y="770"
+          y="834"
           width="28"
           height="12"
           rx="2"
@@ -1136,7 +1169,7 @@
         />
         <text
           x="60"
-          y="779"
+          y="843"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1145,7 +1178,7 @@
         </text>
         <rect
           x="260"
-          y="770"
+          y="834"
           width="28"
           height="12"
           rx="2"
@@ -1155,7 +1188,7 @@
         />
         <text
           x="296"
-          y="779"
+          y="843"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
