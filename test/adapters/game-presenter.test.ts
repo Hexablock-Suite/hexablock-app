@@ -11,6 +11,7 @@ import type { StartGameRequest } from '../../src/application/start-game';
 import type { UndoMoveRequest } from '../../src/application/undo-move';
 import type { UseCase } from '../../src/application/use-case';
 import { ElapsedTime } from '../../src/domain/engine/elapsed-time';
+import { LevelId } from '../../src/domain/engine/level-id';
 import { Outcome } from '../../src/domain/engine/outcome';
 import { Score } from '../../src/domain/engine/score';
 
@@ -133,6 +134,18 @@ describe('GamePresenter', () => {
     expect(startGame.requests).toEqual([{}]);
     expect(presenter.viewModel()).toEqual(STARTED);
     expect(shown.at(-1)).toEqual(STARTED);
+  });
+
+  // Issue #172: the presenter passes the chosen level to `StartGame`. It never reads the id.
+  it('should_ask_start_game_for_the_level_and_show_its_board_when_the_view_starts_a_level', async () => {
+    const { presenter, startGame } = presenterWith([response([['b', 'red']], ['a', 'c'], 0)]);
+    const levelId = LevelId.of('fit-02');
+
+    await presenter.onStart(levelId);
+
+    expect(startGame.requests).toHaveLength(1);
+    expect(startGame.requests[0]?.levelId === levelId).toBe(true);
+    expect(presenter.viewModel()).toEqual(STARTED);
   });
 
   it('should_send_the_move_through_apply_move_and_show_the_new_state_when_the_move_is_accepted', async () => {
