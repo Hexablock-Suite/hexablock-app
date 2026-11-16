@@ -147,7 +147,7 @@ The app signs in, syncs progress, shows the leaderboards and takes levels from t
 | APP-NFR-09 | The README section "Design Patterns" lists each pattern used with its justification and a link to its file, and Strategy and Abstract Factory are in it.                                                                                  |
 | APP-NFR-19 | The README embeds the three images; [`architecture/layers.md`](architecture/layers.md), [`architecture/classes.md`](architecture/classes.md) and [`architecture/extensibility.md`](architecture/extensibility.md) hold the three sources. |
 | API-NFR-09 | The README section "Design Patterns" lists each pattern used with its justification and a link to its file.                                                                                                                               |
-| API-NFR-10 | `architecture/layers.md`, `architecture/classes.md` and `architecture/extensibility.md` hold the layer, class and extensibility diagrams; `docs/EXTENSIBILITY.md` is still to write.                                                      |
+| API-NFR-10 | `architecture/layers.md` holds the layer diagram and `architecture/classes.md` holds the class diagram; `architecture/extensibility.md` holds the extensibility diagram; `docs/EXTENSIBILITY.md` is still to write.                       |
 
 App pull request 15 and backend pull request 9 added the three diagrams of each repository. Only `docs/EXTENSIBILITY.md` of the backend is still to write, and its _Check_ says so.
 
