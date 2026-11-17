@@ -6,6 +6,8 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-16
+
 ### Added
 
 - The achievements screen with `ListAchievements` and `AchievementsPresenter` ([#188](https://github.com/Hexablock-Suite/hexablock-app/issues/188), classes.md decision 60). `ListAchievements` in `src/application/` gives the seven achievements of the issue, each in progress or completed. «Win 3 levels of Hexa Fit», «win 3 levels of Hexa Sort» and «win every Hexa Fit level» read the saved progress of #164 through their `AchievementGoal` (`LevelsWon` or `EveryLevelWon`), so they stay completed after a restart and need no store of their own. The other four stay listed and in progress: no game event gives their data yet, and [#277](https://github.com/Hexablock-Suite/hexablock-app/issues/277) adds those events. `AchievementsPresenter` in `src/adapters/` puts each achievement in one of two sections, and the route `app/achievements.tsx` shows them with the texts of the es/en catalog. `CompositionRootProvider` gives the root `DeviceKeyValueStore`, and the root builds `ListAchievements` over `BundledLevelRepository` and `LocalProgressRepository`. A side button on the home screen opens it, and `HomeViewModel` gains its label `achievements`. No screen saves a result until #180. `jest.setup.js` gives every test of the `app` project of Jest the official mock of AsyncStorage. The new view 3.6, view 4.4 and the maps of Parts 3 and 4 show the change, and their PNG images are exported again.
