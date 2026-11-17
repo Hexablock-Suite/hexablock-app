@@ -44,6 +44,7 @@ import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 import { boardLike, firstValidMove } from '../../../support/engine/variant-game';
 import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
 import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
+import { delivered } from '../../../support/engine/value-receiver';
 
 // The rules suite of Hexa Lines (issue 91, APP-NFR-02, APP-NFR-12).
 // The combo and the streak follow the proposal on issue 58,
@@ -54,7 +55,7 @@ const origin = square(0, 0);
 const one = piece(origin);
 
 function keys(cells: readonly SquareCoord[]): string[] {
-  return cells.map((c) => squareTopology.key(c)).sort();
+  return cells.map((c) => delivered(squareTopology.key(c))).sort();
 }
 
 describe('Hexa Lines rules', () => {

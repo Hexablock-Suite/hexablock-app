@@ -47,6 +47,8 @@ export class PlacePiece<TCoord> {
   // Two moves are equal when they have the same tray position and the same offset.
   // The topology compares the offsets, because `TCoord` has no bound (classes.md decision 16).
   equals(other: PlacePiece<TCoord>, topology: { key(c: TCoord): CoordKey }): boolean {
-    return this.position.equals(other.position) && topology.key(this.at) === topology.key(other.at);
+    return (
+      this.position.equals(other.position) && topology.key(this.at).equals(topology.key(other.at))
+    );
   }
 }

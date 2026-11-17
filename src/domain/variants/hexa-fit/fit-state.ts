@@ -157,7 +157,9 @@ export class FitState<TCoord> implements BoardState<PieceId, TCoord> {
     const cells = placement.cells(piece, this.board);
     for (const c of cells) {
       if (!this.board.contains(c)) {
-        throw new RangeError(`The coordinate ${this.board.key(c)} is outside the board.`);
+        throw new RangeError('The coordinate is outside the board.', {
+          cause: this.board.key(c),
+        });
       }
     }
     for (const c of cells) this.board.occupy(c, id);

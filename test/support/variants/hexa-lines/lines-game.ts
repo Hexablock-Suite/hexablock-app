@@ -30,6 +30,7 @@ import { square, type SquareCoord } from '../../engine/square-topology';
 import { MATCH_ID } from '../../engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../engine/entity-ids';
 import { boardLike } from '../../engine/variant-game';
+import { delivered } from '../../engine/value-receiver';
 
 // Builders for the Hexa Lines rules tests. They exist only in test/.
 
@@ -101,7 +102,7 @@ export function filledKeys<TCoord>(photo: { boardCopy(): ReadonlyBoard<Color, TC
   const board = photo.boardCopy();
   return board
     .occupiedCells()
-    .map(([c]) => board.key(c))
+    .map(([c]) => delivered(board.key(c)))
     .sort();
 }
 

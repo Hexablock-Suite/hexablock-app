@@ -10,6 +10,7 @@ import {
   TriangleTopology,
   type TriangleCoord,
 } from '../../../src/domain/engine/triangle-topology';
+import { delivered } from '../../support/engine/value-receiver';
 
 // The real square and triangle families (issue 160, classes.md decision 17, D11).
 // The suite reads each family only through the `GeometryFactory` contract.
@@ -28,7 +29,7 @@ function familyTests<TCoord>({
   fields: [first, second],
 }: Family<TCoord>): () => void {
   const topology = geometry.createTopology();
-  const keyOf = (c: TCoord) => topology.key(c);
+  const keyOf = (c: TCoord) => delivered(topology.key(c));
 
   // True when each cell reaches every other cell through the neighbors of the topology.
   function isConnected(cells: readonly TCoord[]): boolean {

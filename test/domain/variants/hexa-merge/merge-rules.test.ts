@@ -34,6 +34,7 @@ import { mergeTileSource } from '../../../../src/domain/variants/hexa-merge/merg
 import { firstValidMove } from '../../../support/engine/variant-game';
 import { deliveries } from '../../../support/engine/value-receiver';
 import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
+import { delivered } from '../../../support/engine/value-receiver';
 
 // The rules suite of Hexa Merge (statement §1.4, APP-NFR-12).
 // The tests play through `GameEngine.play()` and the rules contract, on the real hex geometry.
@@ -101,7 +102,7 @@ describe('MergeRules', () => {
 
       expect(rules).toBeInstanceOf(BaseGameRules);
       expect(outcome).toBe(Outcome.playing);
-      expect(values(engine.snapshot())).toEqual({ [hexTopology.key(edge)]: 2 });
+      expect(values(engine.snapshot())).toEqual({ [delivered(hexTopology.key(edge))]: 2 });
     }
   });
 
@@ -339,7 +340,7 @@ describe('Merge edge cases', () => {
     function labels(engine: ReturnType<typeof chipGame>): Record<string, string> {
       const out: Record<string, string> = {};
       for (const [at, cell] of engine.snapshot().boardCopy().occupiedCells())
-        out[hexTopology.key(at)] = cell.label;
+        out[delivered(hexTopology.key(at))] = cell.label;
       return out;
     }
     const merging = chipGame([
@@ -396,7 +397,7 @@ describe('MergeRules in place', () => {
     expect(result).toBe(state);
     // The board keeps its id: the same board changes in place.
     expect(state.snapshot().boardCopy().equals(board)).toBe(true);
-    expect(values(state.snapshot())).toEqual({ [hexTopology.key(hex(-1, 0))]: 4 });
+    expect(values(state.snapshot())).toEqual({ [delivered(hexTopology.key(hex(-1, 0)))]: 4 });
     expect(state.snapshot().mergedTiles()).toEqual([MergeTile.of(4)]);
   });
 

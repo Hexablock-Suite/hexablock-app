@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { CoordKey } from '../../../../src/domain/engine/coord-key';
 import { Score } from '../../../../src/domain/engine/score';
 import { Board } from '../../../../src/domain/engine/board';
 import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
@@ -128,10 +129,14 @@ describe('LinesState', () => {
     const before = facts(state);
 
     expect(() => state.placePiece(new PlacePiece(TrayPosition.of(0), square(0, 1)))).toThrow(
-      new RangeError('The piece at tray index 0 does not fit at 0,1.'),
+      new RangeError('The piece at tray index 0 does not fit at its cell.', {
+        cause: CoordKey.of('0,1'),
+      }),
     );
     expect(() => state.placePiece(new PlacePiece(TrayPosition.of(0), square(2, 2)))).toThrow(
-      new RangeError('The piece at tray index 0 does not fit at 2,2.'),
+      new RangeError('The piece at tray index 0 does not fit at its cell.', {
+        cause: CoordKey.of('2,2'),
+      }),
     );
     expect(facts(state)).toEqual(before);
   });
@@ -158,6 +163,23 @@ describe('LinesState', () => {
     expect(state.snapshot().currentStreak()).toEqual(Streak.of(0));
   });
 
+  // Issue #246: each key of a coordinate is a new object, so the state finds the shared cell
+  // by an equal key and vacates it once.
+  it('should_vacate_a_shared_cell_once_when_two_cleared_lines_cross', () => {
+    const state = linesState(squareTopology, 2, {
+      filled: [square(0, 0), square(1, 0), square(0, 1), square(1, 1)],
+      tray: [one],
+    });
+
+    state.clearLines([
+      [square(0, 0), square(1, 0)],
+      [square(0, 0), square(0, 1)],
+    ]);
+
+    expect(state.snapshot().lastCombo()).toEqual(LineCount.of(2));
+    expect(filledKeys(state.snapshot())).toEqual(['1,1']);
+  });
+
   it('should_add_one_to_the_streak_when_two_placements_in_a_row_clear_a_line', () => {
     const state = linesState(squareTopology, 2, {
       filled: [square(0, 0), square(1, 0), square(0, 1), square(1, 1)],
@@ -180,10 +202,10 @@ describe('LinesState', () => {
     const before = facts(state);
 
     expect(() => state.clearLines([[square(0, 0), square(1, 0), square(2, 0)]])).toThrow(
-      new RangeError('A cleared line holds the free cell 2,0.'),
+      new RangeError('A cleared line holds a free cell.', { cause: CoordKey.of('2,0') }),
     );
     expect(() => state.clearLines([[square(0, 0), square(5, 0)]])).toThrow(
-      new RangeError('A cleared line holds the free cell 5,0.'),
+      new RangeError('A cleared line holds a free cell.', { cause: CoordKey.of('5,0') }),
     );
     expect(facts(state)).toEqual(before);
   });

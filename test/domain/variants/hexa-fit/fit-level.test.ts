@@ -134,7 +134,7 @@ describe('FitLevel', () => {
 
     const cells = level.figureTree().cells();
 
-    expect(cells.map((c) => squareTopology.key(c))).toEqual(['0,0', '1,0', '2,0']);
+    expect(cells.map((c) => delivered(squareTopology.key(c)))).toEqual(['0,0', '1,0', '2,0']);
   });
 
   // Issue #166: the level holds the thresholds of its stars, and the stars are cumulative.

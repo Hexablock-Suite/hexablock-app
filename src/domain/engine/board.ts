@@ -2,6 +2,7 @@ import type { BoardId } from './board-id';
 import type { BoardShape } from './board-shape';
 import type { Cloneable } from './cloneable';
 import type { CoordKey } from './coord-key';
+import { CoordKeyMap } from './coord-key-map';
 import type { GridAxis, GridTopology } from './grid-topology';
 import type { Piece } from './piece';
 import type { Radius } from './radius';
@@ -30,7 +31,7 @@ export class BoardSpace<TCell, TCoord> implements Cloneable<BoardSpace<TCell, TC
 
   // Two spaces with one identity are the same space. Their states and their objects do not count.
   equals(other: BoardSpace<TCell, TCoord>): boolean {
-    return this.identity === other.identity;
+    return this.identity.equals(other.identity);
   }
 
   // A free space becomes occupied. An occupied space takes the new cell.
@@ -39,9 +40,10 @@ export class BoardSpace<TCell, TCoord> implements Cloneable<BoardSpace<TCell, TC
   }
 
   // An occupied space becomes free. A free space throws a RangeError and stays free.
+  // The error carries the key of the space as its `cause`, and the edge delivers its text.
   vacate(): void {
     if (this.occupant === undefined) {
-      throw new RangeError(`The space ${this.identity} is already free.`);
+      throw new RangeError('The space is already free.', { cause: this.identity });
     }
     this.occupant = undefined;
   }
@@ -103,6 +105,8 @@ export interface ReadonlyBoard<TCell, TCoord, TAxis extends GridAxis = GridAxis>
 // A vacated space is free. When a cell occupies it again, that write counts as a first write.
 // So `occupiedCells()` gives the same order as a board built again from the cells that stay.
 // Each coordinate of the shape has its own topology key. Two equal keys are an error.
+// A key is a value object, so the board keys its spaces in a `CoordKeyMap`, which compares
+// two keys with `equals()` (issue #246). An error carries the key as its `cause`.
 // The initial content is checked like `occupy()`: each entry lies inside the shape,
 // and its key is the topology key of its coordinate. The board keeps no pair of a caller.
 // `TAxis` is the axis class of the topology (classes.md decision 45). It defaults to `GridAxis`,
@@ -115,8 +119,8 @@ export interface ReadonlyBoard<TCell, TCoord, TAxis extends GridAxis = GridAxis>
 export class Board<TCell, TCoord, TAxis extends GridAxis = GridAxis>
   implements ReadonlyBoard<TCell, TCoord, TAxis>, Cloneable<Board<TCell, TCoord, TAxis>>
 {
-  private readonly inside: ReadonlySet<CoordKey>;
-  private readonly content: Map<CoordKey, BoardSpace<TCell, TCoord>>;
+  private readonly inside: CoordKeyMap<TCoord>;
+  private readonly content: CoordKeyMap<BoardSpace<TCell, TCoord>>;
 
   constructor(
     private readonly identity: BoardId,
@@ -124,21 +128,24 @@ export class Board<TCell, TCoord, TAxis extends GridAxis = GridAxis>
     private readonly topology: GridTopology<TCoord, TAxis>,
     content: ReadonlyMap<CoordKey, [TCoord, TCell]> = new Map(),
   ) {
-    const keys = shape.keys(topology);
-    this.inside = new Set(keys);
-    if (this.inside.size !== keys.length) {
-      throw new RangeError('Two coordinates of the shape have the same key.');
+    this.inside = new CoordKeyMap();
+    for (const c of shape.coordinates()) {
+      const key = topology.key(c);
+      if (this.inside.has(key)) {
+        throw new RangeError('Two coordinates of the shape have the same key.');
+      }
+      this.inside.set(key, c);
     }
-    this.content = new Map();
+    this.content = new CoordKeyMap();
     for (const [key, [c, cell]] of content) {
       const expected = topology.key(c);
-      if (key !== expected) {
-        throw new RangeError(
-          `The key ${key} does not match the key ${expected} of its coordinate.`,
-        );
+      if (!key.equals(expected)) {
+        throw new RangeError('The key does not match the key of its coordinate.', {
+          cause: { key, expected },
+        });
       }
       if (!this.inside.has(expected)) {
-        throw new RangeError(`The coordinate ${expected} is outside the board.`);
+        throw new RangeError('The coordinate is outside the board.', { cause: expected });
       }
       this.occupySpace(expected, c, cell);
     }
@@ -155,7 +162,7 @@ export class Board<TCell, TCoord, TAxis extends GridAxis = GridAxis>
 
   // The cell that occupies `at`, or `undefined` when `at` is free or outside the board.
   occupantAt(at: TCoord): TCell | undefined {
-    return this.content.get(this.topology.key(at))?.occupiedCell()?.[1];
+    return this.content.find(this.topology.key(at))?.occupiedCell()?.[1];
   }
 
   // The cell occupies the coordinate, free or occupied. A coordinate outside the shape
@@ -168,9 +175,9 @@ export class Board<TCell, TCoord, TAxis extends GridAxis = GridAxis>
   // throws a RangeError and leaves the board unchanged.
   vacate(c: TCoord): void {
     const key = this.insideKey(c);
-    const space = this.content.get(key);
+    const space = this.content.find(key);
     if (space?.occupiedCell() === undefined) {
-      throw new RangeError(`The coordinate ${key} is already free.`);
+      throw new RangeError('The coordinate is already free.', { cause: key });
     }
     space.vacate();
   }
@@ -207,7 +214,7 @@ export class Board<TCell, TCoord, TAxis extends GridAxis = GridAxis>
   freeSpaces(): TCoord[] {
     return this.shape
       .coordinates()
-      .filter((c) => this.content.get(this.topology.key(c))?.occupiedCell() === undefined);
+      .filter((c) => this.content.find(this.topology.key(c))?.occupiedCell() === undefined);
   }
 
   // Every coordinate of the board, free or occupied, in the order of its shape.
@@ -218,7 +225,7 @@ export class Board<TCell, TCoord, TAxis extends GridAxis = GridAxis>
 
   // True when a cell occupies every coordinate of the board.
   isFull(): boolean {
-    return this.occupiedCells().length === this.inside.size;
+    return this.occupiedCells().length === this.inside.values().length;
   }
 
   // The key of a coordinate on this board, as the topology gives it.
@@ -268,21 +275,23 @@ export class Board<TCell, TCoord, TAxis extends GridAxis = GridAxis>
 
   clone(): Board<TCell, TCoord, TAxis> {
     const copy = new Board<TCell, TCoord, TAxis>(this.identity, this.shape, this.topology);
-    for (const [key, space] of this.content) copy.content.set(key, space.clone());
+    for (const [key, space] of this.content.entries()) copy.content.set(key, space.clone());
     return copy;
   }
 
   // The key of a coordinate inside the shape. Any other coordinate throws a RangeError.
   private insideKey(c: TCoord): CoordKey {
     const key = this.topology.key(c);
-    if (!this.inside.has(key)) throw new RangeError(`The coordinate ${key} is outside the board.`);
+    if (!this.inside.has(key)) {
+      throw new RangeError('The coordinate is outside the board.', { cause: key });
+    }
     return key;
   }
 
-  // `Map.set` keeps the place of a key that exists. So the first write fixes the order.
+  // `CoordKeyMap.set` keeps the place of a key that exists. So the first write fixes the order.
   // A free space leaves the map before it takes the cell, so it goes to the end of the order.
   private occupySpace(key: CoordKey, c: TCoord, cell: TCell): void {
-    const space = this.content.get(key) ?? BoardSpace.free<TCell, TCoord>(c, this.topology);
+    const space = this.content.find(key) ?? BoardSpace.free<TCell, TCoord>(c, this.topology);
     if (space.occupiedCell() === undefined) this.content.delete(key);
     space.occupy(cell);
     this.content.set(key, space);
