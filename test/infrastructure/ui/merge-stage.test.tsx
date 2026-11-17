@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react-native';
 import { StyleSheet } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { GamePresenter } from '../../../src/adapters/game-presenter';
@@ -45,9 +46,11 @@ const MOST_PRESSES = 30;
 
 async function show(session: GameSession): Promise<void> {
   await render(
-    <SafeAreaProvider initialMetrics={METRICS}>
-      <GameStage title="Hexa Merge" {...session} onBack={jest.fn()} />
-    </SafeAreaProvider>,
+    <GestureHandlerRootView>
+      <SafeAreaProvider initialMetrics={METRICS}>
+        <GameStage title="Hexa Merge" {...session} onBack={jest.fn()} />
+      </SafeAreaProvider>
+    </GestureHandlerRootView>,
   );
   await screen.findByText('En juego');
 }

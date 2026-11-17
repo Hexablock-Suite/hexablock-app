@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 
 import type { MergeCellView, MergePayloadView } from '../../adapters/merge-state-mapper';
 import type { Texts } from '../../adapters/texts/text-catalog';
@@ -8,6 +9,7 @@ import type { Slide } from '../../domain/variants/hexa-merge/slide';
 import type { SlideWay } from '../board/slide-ways';
 import { Hexagon, HexStone } from './hex-stone';
 import type { MoveControls, MoveControlsProps } from './move-controls';
+import { swipedWay, useSlideKeys } from './slide-input';
 import { lip, palette, radius, serif, space } from './theme';
 import { LipButton, WoodSign } from './wood';
 
@@ -33,6 +35,10 @@ function ignoreSpace(): void {}
 // Below the board, one button for each slide sits on a ring around a wood hexagon, at the angle
 // of its way on the screen: six on the hexagon, four on the square. Each button names its way
 // and plays its `Slide` through `GamePresenter.onMove()`.
+// Since #292 a swipe anywhere on the board plays a slide too, and on the web the arrow keys
+// and the keys Q, E, Z and C play one. Each plays the way nearest to its own angle.
+// The swipe area holds the board only, so a press that starts on a slide button or on the undo
+// button is a press, not a swipe. The ring stays, so a screen reader can still play.
 // Below the ring, the undo button takes back the last slide through `GamePresenter.onUndo()`
 // (APP-FR-08, issue #179). It takes no press while no slide can go back. Merge never redoes,
 // so the controls show no redo button: the root answers `canRedo()` false for every Merge game
@@ -68,6 +74,7 @@ function MergePlay<TCoord>({
   const [continued, setContinued] = useState(false);
   const reached = model.payload?.targetReached === true;
   const ring = ringOf(ways);
+  useSlideKeys(ways, (way) => play(way.move));
 
   // An undo can take the target tile back, and then the flag turns false.
   // The screen forgets the continue, so the prompt opens when a merge makes the target again.
@@ -77,7 +84,9 @@ function MergePlay<TCoord>({
 
   return (
     <>
-      {board(ignoreSpace)}
+      <SwipeArea ways={ways} onSwipe={(way) => play(way.move)}>
+        {board(ignoreSpace)}
+      </SwipeArea>
       <View style={[styles.pad, { width: ring.width, height: ring.height }]}>
         <View
           accessibilityElementsHidden
@@ -111,6 +120,36 @@ function MergePlay<TCoord>({
         onContinue={() => setContinued(true)}
       />
     </>
+  );
+}
+
+interface SwipeAreaProps {
+  readonly ways: readonly SlideWay[];
+  readonly onSwipe: (way: SlideWay) => void;
+  readonly children: ReactNode;
+}
+
+// The area of the board that takes a swipe (issue #292). When the finger lifts, the swipe gives
+// the way nearest to its angle to `onSwipe`. A swipe shorter than the threshold, or a gesture
+// that the system cancels, plays nothing. The callback runs on the JS thread, because it plays
+// a move through the presenter. The gesture needs `GestureHandlerRootView` around the app.
+function SwipeArea({ ways, onSwipe, children }: SwipeAreaProps) {
+  const swipe = usePanGesture({
+    testID: 'merge-swipe',
+    runOnJS: true,
+    disableReanimated: true,
+    onDeactivate: (event) => {
+      if (event.canceled) return;
+      const way = swipedWay(ways, event.translationX, event.translationY);
+      if (way !== undefined) onSwipe(way);
+    },
+  });
+  return (
+    <GestureDetector gesture={swipe}>
+      <View testID="merge-swipe-area" style={styles.swipeArea}>
+        {children}
+      </View>
+    </GestureDetector>
   );
 }
 
@@ -226,6 +265,9 @@ function TargetPrompt({ visible, texts, onContinue }: TargetPromptProps) {
 }
 
 const styles = StyleSheet.create({
+  swipeArea: {
+    alignSelf: 'stretch',
+  },
   pad: {
     alignSelf: 'center',
     marginBottom: space.md,

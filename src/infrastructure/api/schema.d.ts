@@ -632,7 +632,7 @@ export interface operations {
                     "application/json": components["schemas"]["CurrentUserDto"];
                 };
             };
-            /** @description The bearer token is missing, malformed, expired or signed with another key. */
+            /** @description The bearer token is missing, malformed, expired, signed with another key or names a user that is not stored. */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -674,7 +674,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorDto"];
                 };
             };
-            /** @description The bearer token is missing, malformed, expired or signed with another key. */
+            /** @description The bearer token is missing, malformed, expired, signed with another key or names a user that is not stored. */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -714,7 +714,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorDto"];
                 };
             };
-            /** @description The bearer token is missing, malformed, expired or signed with another key. */
+            /** @description The bearer token is missing, malformed, expired, signed with another key or names a user that is not stored. */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -783,7 +783,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorDto"];
                 };
             };
-            /** @description The bearer token is missing, malformed, expired or signed with another key. */
+            /** @description The bearer token is missing, malformed, expired, signed with another key or names a user that is not stored. */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -832,7 +832,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorDto"];
                 };
             };
-            /** @description The bearer token is missing, malformed, expired or signed with another key. */
+            /** @description The bearer token is missing, malformed, expired, signed with another key or names a user that is not stored. */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -873,7 +873,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorDto"];
                 };
             };
-            /** @description The bearer token is missing, malformed, expired or signed with another key. */
+            /** @description The bearer token is missing, malformed, expired, signed with another key or names a user that is not stored. */
             401: {
                 headers: {
                     [name: string]: unknown;
