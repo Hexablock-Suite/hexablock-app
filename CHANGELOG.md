@@ -6,6 +6,10 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 
 ## [Unreleased]
 
+### Changed
+
+- Regenerate `src/infrastructure/api/schema.d.ts` against hexablock-api `main`: `PUT /levels` now answers 403 when the account is not a level editor (Hexablock-Suite/hexablock-api#145). The pact still passes.
+
 ## [0.2.0] - 2026-11-16
 
 ### Added
