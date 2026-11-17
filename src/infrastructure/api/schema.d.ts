@@ -773,6 +773,15 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorDto"];
                 };
             };
+            /** @description The account of the token is not in the list of level editors of the configuration. An empty or unset list lets no account update. No level is saved. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
         };
     };
     LeaderboardController_top: {
