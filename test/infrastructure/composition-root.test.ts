@@ -187,6 +187,22 @@ describe('CompositionRoot', () => {
       ]);
     });
 
+    // Issue #298: each entry declares the world colors of its game, so a game has one color
+    // on every figure, and the four games have four colors.
+    it('should_give_each_game_one_color_on_every_figure_when_each_entry_declares_its_colors', () => {
+      const root = testRoot();
+      const hexagon = root.registry();
+
+      for (const figure of FIGURES) {
+        const registry = root.registry(figure);
+        for (const id of registry.gameIds()) {
+          expect(registry.gameOf(id).tone).toEqual(hexagon.gameOf(id).tone);
+        }
+      }
+      const tones = hexagon.gameIds().map((id) => hexagon.gameOf(id).tone.tone);
+      expect(new Set(tones).size).toBe(FOUR_VARIANTS.length);
+    });
+
     // A board region of size 5 holds 61 hexagons, 25 squares or 50 triangles,
     // and a region of size 3 holds 19 hexagons, 9 squares or 18 triangles.
     it('should_build_each_board_on_the_geometry_of_the_figure_when_the_figure_is_chosen', () => {

@@ -2,8 +2,10 @@ import { useLocalSearchParams } from 'expo-router';
 
 import { HomePresenter } from '../../adapters/home-presenter';
 import { DEFAULT_LANGUAGE, textCatalog } from '../../adapters/texts/text-catalog';
+import { GameId } from '../../domain/engine/game-id';
 import { TopologyId } from '../../domain/engine/geometry-factory';
 import { useCompositionRoot } from '../composition-root-provider';
+import type { WorldTone } from './theme';
 
 // The presenter of the home screen and of the game selector map (#169).
 // It takes the ids of the registered games from the game registry of the board figure `figure`,
@@ -17,6 +19,15 @@ export function useHomePresenter(figure: TopologyId = TopologyId.hex): HomePrese
     root.figures(),
     textCatalog[DEFAULT_LANGUAGE],
   );
+}
+
+// The world colors of each game on the map of the board figure `figure` (#298), from the entry
+// of the game in the registry of that figure. The map passes the `id` of a `GameChoice`.
+// The presenter takes its ids from the same registry, so each id has an entry.
+// An id that the registry does not hold throws a RangeError.
+export function useGameTones(figure: TopologyId): (gameId: string) => WorldTone {
+  const registry = useCompositionRoot().registry(figure);
+  return (gameId) => registry.gameOf(GameId.of(gameId)).tone;
 }
 
 // The board figure of a route (#171): its `TopologyId`, and its text for the next route.

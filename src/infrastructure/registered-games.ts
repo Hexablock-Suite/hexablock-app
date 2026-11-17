@@ -53,6 +53,7 @@ import { registered, type RegisteredGame, type ScreenParts } from './game-regist
 import { FitControls } from './ui/fit-controls';
 import { MergeControls } from './ui/merge-controls';
 import { BoardOnlyControls } from './ui/move-controls';
+import { worldTone } from './ui/theme';
 
 // The count of seeds: the unsigned 32-bit integers (classes.md decision 48).
 const SEEDS = 2 ** 32;
@@ -114,6 +115,9 @@ export function boardFigures(): BoardFigure<unknown>[] {
 // the cell renderer and the move controls of its variant in place of `defaultScreen()`.
 // Fit has its own parts since #175: `fitScreen()`. Merge has its own parts since #177:
 // `mergeScreen()`.
+// Each entry declares the world colors of its game on the map (#298): orange for Lines,
+// green for Fit, pink for Sort and blue for Merge, the colors of the team prototype.
+// So a game keeps its color on the square and on the triangle, where Fit has no entry.
 export function registeredGames<TCoord>(
   figure: BoardFigure<TCoord>,
   clock: Clock,
@@ -133,6 +137,7 @@ export function registeredGames<TCoord>(
         ),
       ),
       defaultScreen(figure),
+      worldTone(0),
     ),
     ...fitOn(figure, clock),
     registered(
@@ -142,12 +147,14 @@ export function registeredGames<TCoord>(
         SortLevel.seeded(SMALL_BOARD, SORT_GOALS, seedFrom(random), nonEmpty(SORT_COLORS)),
       ),
       defaultScreen(figure),
+      worldTone(2),
       sortLevelVariant(geometry),
     ),
     registered(
       GameId.of('hexa-merge'),
       new MergeFactory(geometry, MergeSettings.of(SMALL_BOARD, seedFrom(random), MERGE_TARGET)),
       mergeScreen(figure),
+      worldTone(3),
     ),
   ];
 }
@@ -171,6 +178,7 @@ function fitOn<TCoord>(figure: BoardFigure<TCoord>, clock: Clock): RegisteredGam
       GameId.of('hexa-fit'),
       new FitFactory(figure.geometry, fitLevel, clock),
       fitScreen(figure),
+      worldTone(1),
       fitLevelVariant(figure.geometry, clock),
     ),
   ];

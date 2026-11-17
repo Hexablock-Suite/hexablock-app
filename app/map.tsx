@@ -6,8 +6,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { GameChoice } from '../src/adapters/home-presenter';
 import { HexStone } from '../src/infrastructure/ui/hex-stone';
 import { Scenery } from '../src/infrastructure/ui/scenery';
-import { palette, serif, space, worldTone } from '../src/infrastructure/ui/theme';
+import { palette, serif, space, type WorldTone } from '../src/infrastructure/ui/theme';
 import {
+  useGameTones,
   useHomePresenter,
   useRouteFigure,
   type RouteFigure,
@@ -30,6 +31,7 @@ export default function GameSelectorScreen() {
 // The map of the games of the board figure `figure`.
 function GameSelector({ figure }: { readonly figure: RouteFigure }) {
   const view = useHomePresenter(figure.figure).gameSelector();
+  const toneOf = useGameTones(figure.figure);
   const insets = useSafeAreaInsets();
   return (
     <View style={styles.screen}>
@@ -51,7 +53,13 @@ function GameSelector({ figure }: { readonly figure: RouteFigure }) {
         </WoodSign>
         <View style={styles.path}>
           {view.games.map((game, position) => (
-            <World key={game.id} game={game} figure={figure.param} position={position} />
+            <World
+              key={game.id}
+              game={game}
+              tone={toneOf(game.id)}
+              figure={figure.param}
+              position={position}
+            />
           ))}
         </View>
       </ScrollView>
@@ -60,14 +68,19 @@ function GameSelector({ figure }: { readonly figure: RouteFigure }) {
 }
 
 // One world of the map: the hex stone of the game and its sign with the name and the place.
-// The worlds take turns on the left and on the right side of the path.
+// The stone takes `tone`, the colors that the registry entry of the game declares, so a game
+// keeps its color on every figure (#298).
+// The worlds take turns on the left and on the right side of the path by their place in the
+// list, not by the game. So the path keeps its zig-zag when a figure has no entry for a game.
 // A tap opens the game on the board figure whose text is `figure`.
 function World({
   game,
+  tone,
   figure,
   position,
 }: {
   readonly game: GameChoice;
+  readonly tone: WorldTone;
   readonly figure: string;
   readonly position: number;
 }) {
@@ -81,7 +94,7 @@ function World({
     >
       {({ pressed }) => (
         <>
-          <HexStone size={84} colors={worldTone(position)} pressed={pressed} />
+          <HexStone size={84} colors={tone} pressed={pressed} />
           <WoodSign style={styles.worldSign}>
             <Text style={styles.name}>{game.name}</Text>
             <Text style={styles.place}>{game.place}</Text>
