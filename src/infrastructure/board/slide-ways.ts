@@ -72,3 +72,21 @@ function clockwiseFromNorth(angle: number): number {
   const degrees = Math.round((angle * 180) / Math.PI) + 90;
   return ((degrees % 360) + 360) % 360;
 }
+
+// Two gaps closer than this count as equal, so a rounding error never breaks a tie.
+const TIE = 1e-9;
+
+// The way of `ways` whose angle is nearest to `angle`, in radians from the east (issue #292).
+// A swipe and a key give their angle, and each figure answers with its own ways, so the
+// function holds no branch on the figure. When two ways are equally near, the first of them
+// wins, in the order of `slideWays()`: clockwise from the north.
+export function nearestWay(ways: readonly SlideWay[], angle: number): SlideWay {
+  const gaps = ways.map((way) => angleBetween(way.angle, angle));
+  const nearest = Math.min(...gaps);
+  return ways[gaps.findIndex((gap) => gap - nearest < TIE)];
+}
+
+// The smallest turn from `a` to `b`, in radians from 0 to π.
+function angleBetween(a: number, b: number): number {
+  return Math.abs(Math.atan2(Math.sin(b - a), Math.cos(b - a)));
+}
