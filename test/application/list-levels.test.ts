@@ -65,6 +65,12 @@ const fitPlay = (moves: number, ms: number) =>
     elapsedMs: ElapsedTime.ofMs(ms),
   });
 
+// The ids of the bundled Fit levels after the first two, in the order of the repository.
+async function laterFitIds(): Promise<string[]> {
+  const levels = await new BundledLevelRepository().list(FIT);
+  return levels.slice(2).map((level) => delivered(level.levelId()));
+}
+
 // `ListLevels` over the bundled levels, and `SaveProgress` of the first Fit level,
 // over one local progress. The progress model counts the stars with the thresholds of `fit-01`.
 function fitUseCases(levels: LevelRepository = new BundledLevelRepository()) {
@@ -83,6 +89,7 @@ describe('ListLevels', () => {
   // Four moves in 30 s win the three stars of `fit-01`.
   it('should_open_level_2_and_lock_level_3_when_fit_level_1_is_won', async () => {
     const { list, save } = fitUseCases();
+    const later = await laterFitIds();
 
     const saved = await save.execute(fitPlay(4, 30_000));
     const result = await list.execute(onHex);
@@ -91,14 +98,16 @@ describe('ListLevels', () => {
     expect(rowsOf(result)).toEqual([
       { level: 'fit-01', status: 'completed', stars: 3 },
       { level: 'fit-02', status: 'open' },
-      { level: 'fit-03', status: 'locked' },
+      ...later.map((level) => ({ level, status: 'locked' })),
     ]);
+    expect(later[0]).toBe('fit-03');
   });
 
   // Done when of issue #168: thirteen moves pass every move limit of `fit-01`, so the play
   // wins zero stars (D22). The level is still won, so the next level opens.
   it('should_open_the_next_level_when_a_level_is_won_with_zero_stars', async () => {
     const { list, save } = fitUseCases();
+    const later = await laterFitIds();
 
     await save.execute(fitPlay(13, 1000));
     const result = await list.execute(onHex);
@@ -106,7 +115,7 @@ describe('ListLevels', () => {
     expect(rowsOf(result)).toEqual([
       { level: 'fit-01', status: 'completed', stars: 0 },
       { level: 'fit-02', status: 'open' },
-      { level: 'fit-03', status: 'locked' },
+      ...later.map((level) => ({ level, status: 'locked' })),
     ]);
   });
 
@@ -139,13 +148,14 @@ describe('ListLevels', () => {
 
   it('should_open_only_the_first_level_when_the_game_has_no_saved_progress', async () => {
     const { list } = fitUseCases();
+    const later = await laterFitIds();
 
     const result = await list.execute(onHex);
 
     expect(rowsOf(result)).toEqual([
       { level: 'fit-01', status: 'open' },
       { level: 'fit-02', status: 'locked' },
-      { level: 'fit-03', status: 'locked' },
+      ...later.map((level) => ({ level, status: 'locked' })),
     ]);
   });
 

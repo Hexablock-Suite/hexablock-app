@@ -83,6 +83,77 @@ const PLANS: Readonly<Record<string, readonly [number, number][]>> = {
     [1, 0],
     [1, 1],
   ],
+  // The red run under the blue run joins the red stack when the blue run moves away.
+  'sort-04.json': [
+    [0, 0],
+    [1, 0],
+    [-1, 0],
+    [2, 0],
+    [-2, 0],
+  ],
+  // The green tiles under the red run join the green stack on the left.
+  'sort-05.json': [
+    [0, 0],
+    [1, 0],
+    [-1, 0],
+    [2, 0],
+    [-2, 0],
+    [-1, 1],
+  ],
+  // The green run moves to the left, and the red run below it joins the center in cascade.
+  'sort-06.json': [
+    [0, 0],
+    [1, 0],
+    [-1, 0],
+    [-2, 0],
+    [2, 0],
+    [0, -1],
+  ],
+  // A cleared cell takes a new stack. The yellow tiles are a decoy.
+  'sort-07.json': [
+    [0, 0],
+    [1, 0],
+    [2, 0],
+    [1, 0],
+    [2, -1],
+    [0, 0],
+    [1, 0],
+  ],
+  // The blue clear frees two green runs, and they meet on the cell (-1, 0).
+  'sort-08.json': [
+    [0, 0],
+    [1, 0],
+    [-1, 0],
+    [1, 0],
+    [0, 0],
+    [-2, 0],
+    [-1, -1],
+    [-1, 0],
+  ],
+  // A tie of two blue runs goes to the cell whose key comes first.
+  'sort-09.json': [
+    [0, 0],
+    [1, 0],
+    [2, 0],
+    [-1, 0],
+    [2, -1],
+    [-1, -1],
+    [1, 0],
+    [-1, 0],
+  ],
+  // Red and blue clear in the north, and green and yellow clear in the south.
+  'sort-10.json': [
+    [0, -1],
+    [0, 1],
+    [1, -1],
+    [1, 1],
+    [-1, -1],
+    [-1, 1],
+    [2, -2],
+    [0, 2],
+    [-2, 0],
+    [-2, 2],
+  ],
 };
 
 // The fields of each object of the format, in the order of its table.
@@ -111,10 +182,10 @@ const isSource = (value: unknown) => {
 };
 
 describe('bundled Sort levels', () => {
-  it('should_hold_three_levels_or_more_in_the_order_of_their_ids_when_the_folder_is_read', () => {
+  it('should_hold_ten_levels_or_more_in_the_order_of_their_ids_when_the_folder_is_read', () => {
     const files = bundledFiles();
 
-    expect(files.length).toBeGreaterThanOrEqual(3);
+    expect(files.length).toBeGreaterThanOrEqual(10);
     expect(files.map(([name, file]) => [name, file.levelId, file.order])).toEqual(
       files.map((_, index) => {
         const id = `sort-${String(index + 1).padStart(2, '0')}`;

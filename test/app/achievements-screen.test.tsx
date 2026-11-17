@@ -3,6 +3,7 @@ import path from 'node:path';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fireEvent, renderRouter, screen, within } from 'expo-router/testing-library';
 
+import { BundledLevelRepository } from '../../src/adapters/bundled-level-repository';
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
 import { GameId } from '../../src/domain/engine/game-id';
 import { GameProgress } from '../../src/domain/engine/game-progress';
@@ -12,6 +13,7 @@ import { ProgressRecord } from '../../src/domain/engine/progress-model';
 import { Score } from '../../src/domain/engine/score';
 import { Stars } from '../../src/domain/engine/stars';
 import { DeviceKeyValueStore } from '../../src/infrastructure/device-key-value-store';
+import { delivered } from '../support/engine/value-receiver';
 import { repoRoot } from '../support/run-tool';
 
 // The routes of `app/`, with the root layout and its composition root.
@@ -31,9 +33,10 @@ const SEVEN = [
 ];
 
 // Saves a won result of each bundled Fit level on the device, as the victory screen of #180 does.
-async function saveThreeWonFitLevels(): Promise<void> {
+async function saveEveryWonFitLevel(): Promise<void> {
   const progress = GameProgress.start(FIT);
-  for (const levelId of ['fit-01', 'fit-02', 'fit-03']) {
+  const levels = await new BundledLevelRepository().list(FIT);
+  for (const levelId of levels.map((level) => delivered(level.levelId()))) {
     progress.recordLevel(
       ProgressRecord.of({
         gameId: FIT,
@@ -85,8 +88,8 @@ describe('achievements route', () => {
     expect(screen.queryByText('Cargando los logros')).toBeNull();
   });
 
-  it('should_show_the_fit_achievements_completed_when_the_device_keeps_three_won_fit_levels', async () => {
-    await saveThreeWonFitLevels();
+  it('should_show_the_fit_achievements_completed_when_the_device_keeps_every_won_fit_level', async () => {
+    await saveEveryWonFitLevel();
 
     await renderRouter(appDir, { initialUrl: '/achievements' });
     await screen.findByText(SEVEN[0]);

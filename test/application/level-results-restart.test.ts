@@ -51,7 +51,8 @@ interface Play {
 // or equal moves and more time. The last play of `worse` wins fewer stars.
 interface LevelGame {
   readonly gameId: GameId;
-  readonly levelIds: readonly [string, string, string];
+  // The first two bundled levels of the game.
+  readonly levelIds: readonly [string, string];
   // The progress model of the level of `definition`. The factory of the level gives it,
   // so the model counts the stars with the thresholds of the level file.
   readonly modelOf: (definition: LevelDefinition) => IProgressModel;
@@ -63,7 +64,7 @@ interface LevelGame {
 // and three stars for 4 moves in 30 s. Its witness places its three pieces in three moves.
 const FIT: LevelGame = {
   gameId: GameId.of('hexa-fit'),
-  levelIds: ['fit-01', 'fit-02', 'fit-03'],
+  levelIds: ['fit-01', 'fit-02'],
   modelOf: (definition) =>
     new FitFactory(
       geometry,
@@ -82,7 +83,7 @@ const FIT: LevelGame = {
 // A Sort level has no timer, so a play has no time.
 const SORT: LevelGame = {
   gameId: GameId.of('hexa-sort'),
-  levelIds: ['sort-01', 'sort-02', 'sort-03'],
+  levelIds: ['sort-01', 'sort-02'],
   modelOf: (definition) =>
     new SortFactory(
       geometry,
@@ -158,13 +159,15 @@ function runOf(game: LevelGame, store: KeyValueStore) {
 }
 
 // The rows after a won first level: it is completed with `stars`, the second level is open,
-// and the third level stays locked (S3-12).
-function rowsAfterWin(game: LevelGame, stars: number): Row[] {
-  const [first, second, third] = game.levelIds;
+// and every later level stays locked (S3-12). The later ids come from the bundled levels.
+async function rowsAfterWin(game: LevelGame, stars: number): Promise<Row[]> {
+  const [first, second] = game.levelIds;
+  const levels = await new BundledLevelRepository().list(game.gameId);
+  const later = levels.slice(2).map((level) => delivered(level.levelId()));
   return [
     { level: first, status: 'completed', stars },
     { level: second, status: 'open' },
-    { level: third, status: 'locked' },
+    ...later.map((level) => ({ level, status: 'locked' })),
   ];
 }
 
@@ -183,7 +186,7 @@ describe.each([
     const loaded = await restarted.progress.load(game.gameId);
 
     expect(saved).toEqual(Result.success(undefined));
-    expect(rows).toEqual(rowsAfterWin(game, game.best.stars));
+    expect(rows).toEqual(await rowsAfterWin(game, game.best.stars));
     expect(loaded?.keeps(recordOf(game, game.best))).toBe(true);
   });
 
@@ -201,7 +204,7 @@ describe.each([
     const loaded = await third.progress.load(game.gameId);
 
     expect(saved).toEqual(game.worse.map(() => Result.success(undefined)));
-    expect(rows).toEqual(rowsAfterWin(game, game.best.stars));
+    expect(rows).toEqual(await rowsAfterWin(game, game.best.stars));
     // The list shows only the stars. The saved records show the steps of the moves and the time.
     expect([game.best, ...game.worse].map((play) => loaded?.keeps(recordOf(game, play)))).toEqual([
       true,

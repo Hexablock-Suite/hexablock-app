@@ -6,6 +6,10 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 
 ## [Unreleased]
 
+### Added
+
+- The hand-made levels of APP-FR-05 ([#49](https://github.com/Hexablock-Suite/hexablock-app/issues/49), A5): `src/adapters/levels/fit/` now holds 15 Fit levels and `src/adapters/levels/sort/` holds 10 Sort levels, with rising difficulty. The new Fit levels `fit-04` to `fit-15` are `hex`, grow from 12 cells and 4 pieces to 36 cells and 8 pieces, and each one carries a witness that wins it. The new Sort levels `sort-04` to `sort-10` give a fixed list of stacks and grow from 2 goals in 5 moves to 4 goals in 10 moves. `BundledLevelRepository` imports every file. The count tests now need 15 Fit and 10 Sort level files, a test wins every Fit level with its witness through the real Fit rules, and a test wins every fixed Sort level by its plan with every star.
+
 ## [0.2.0] - 2026-11-16
 
 ### Added
