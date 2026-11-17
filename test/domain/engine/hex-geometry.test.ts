@@ -4,6 +4,7 @@ import type { GeometryFactory } from '../../../src/domain/engine/geometry-factor
 import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
 import { HexAxis, hex, type HexCoord } from '../../../src/domain/engine/hex-topology';
 import { Turns } from '../../../src/domain/engine/turns';
+import { delivered } from '../../support/engine/value-receiver';
 
 // `HexGeometry` is the real geometry family (issue 153, classes.md decision 17, D11).
 // The suite reads it only through the `GeometryFactory` contract.
@@ -13,14 +14,14 @@ const geometry: GeometryFactory<HexCoord> = new HexGeometry();
 // True when each cell reaches every other cell through the neighbors of the topology.
 function isConnected(cells: readonly HexCoord[]): boolean {
   const topology = geometry.createTopology();
-  const keys = new Set(cells.map((c) => topology.key(c)));
+  const keys = new Set(cells.map((c) => delivered(topology.key(c))));
   const [first] = cells;
   if (first === undefined) return false;
-  const seen = new Set([topology.key(first)]);
+  const seen = new Set([delivered(topology.key(first))]);
   const queue = [first];
   for (let next = queue.pop(); next !== undefined; next = queue.pop()) {
     for (const n of topology.neighbors(next)) {
-      const key = topology.key(n);
+      const key = delivered(topology.key(n));
       if (keys.has(key) && !seen.has(key)) {
         seen.add(key);
         queue.push(n);
@@ -72,9 +73,9 @@ describe('HexGeometry', () => {
     for (const shape of shapes) {
       const cells = shape.cells();
 
-      expect(shape.area().equals(Area.of(new Set(cells.map((c) => topology.key(c))).size))).toBe(
-        true,
-      );
+      expect(
+        shape.area().equals(Area.of(new Set(cells.map((c) => delivered(topology.key(c)))).size)),
+      ).toBe(true);
       expect(cells).toContainEqual(hex(0, 0));
       expect(isConnected(cells)).toBe(true);
     }
@@ -85,7 +86,7 @@ describe('HexGeometry', () => {
     const names = geometry.createPieceShapes().map((shape) =>
       shape
         .cells()
-        .map((c) => topology.key(c))
+        .map((c) => delivered(topology.key(c)))
         .toSorted()
         .join(' '),
     );

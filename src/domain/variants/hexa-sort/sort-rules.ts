@@ -73,8 +73,7 @@ function transfer<TCoord>(state: SortState<TCoord>, at: TCoord): TCoord[] {
   const target = targetOf(board, at, matches);
   // When `at` is the target, every matching neighbor gives its run to it.
   // Otherwise only `at` gives its run, because the other neighbors can lie away from the target.
-  const key = (c: TCoord) => board.key(c);
-  const givers = key(target) === key(at) ? matches : [at];
+  const givers = board.key(target).equals(board.key(at)) ? matches : [at];
   for (const giver of givers) state.moveRun(giver, target);
   clearIfGoal(state, target);
   return [...givers, target];
@@ -82,8 +81,8 @@ function transfer<TCoord>(state: SortState<TCoord>, at: TCoord): TCoord[] {
 
 // The stack with the longest top run wins. The accepted rule of issue #56: the amount
 // compared is the size of the top run, and a tie goes to the stack whose coordinate key
-// comes first. The keys compare by plain string order (code units, `<`), not by
-// `localeCompare`, so the order is the same on every device and locale.
+// comes first. `CoordKey.isBefore()` compares the keys by plain string order (code units, `<`),
+// not by `localeCompare`, so the order is the same on every device and locale (issue #246).
 // The key order does not depend on when a cell was filled or emptied (gap G108.3).
 function targetOf<TCoord>(
   board: ReadonlyBoard<ColorStack, TCoord>,
@@ -94,7 +93,7 @@ function targetOf<TCoord>(
   const key = (c: TCoord) => board.key(c);
   return others.reduce((best, c) => {
     const longer = run(c) - run(best);
-    return longer > 0 || (longer === 0 && key(c) < key(best)) ? c : best;
+    return longer > 0 || (longer === 0 && key(c).isBefore(key(best))) ? c : best;
   }, first);
 }
 

@@ -3,7 +3,7 @@ import { Board, BoardSpace } from '../../../src/domain/engine/board';
 import { BoardId } from '../../../src/domain/engine/board-id';
 import { MatchId } from '../../../src/domain/engine/match-id';
 import { BoardShape } from '../../../src/domain/engine/board-shape';
-import { coordKey, type CoordKey } from '../../../src/domain/engine/coord-key';
+import { CoordKey } from '../../../src/domain/engine/coord-key';
 import { Distance } from '../../../src/domain/engine/distance';
 import type { GridTopology } from '../../../src/domain/engine/grid-topology';
 import { Radius } from '../../../src/domain/engine/radius';
@@ -28,7 +28,7 @@ const strip = { forward: (c: number) => c + 1, backward: (c: number) => c - 1 };
 
 const stripTopology: GridTopology<number> = {
   fullTurn: () => Turns.of(2),
-  key: (c) => coordKey(String(c)),
+  key: (c) => CoordKey.of(String(c)),
   neighbors: (c) => [c - 1, c + 1],
   neighbor: (c, direction) => (direction.equals(LEFT) ? c - 1 : c + 1),
   directions: () => [LEFT, RIGHT],
@@ -75,6 +75,22 @@ describe('Board', () => {
     expect(board.occupantAt(2)).toBe('blue');
   });
 
+  // Issue #246: a key is a value object, and each call of `key()` gives a new object.
+  // So the board finds a space by an equal key, not by the same object.
+  it('should_find_the_space_when_the_key_of_the_coordinate_is_equal_but_not_the_same_object', () => {
+    const board = newBoard();
+
+    board.occupy(2, 'red');
+
+    expect(stripTopology.key(2)).not.toBe(stripTopology.key(2));
+    expect(board.contains(2)).toBe(true);
+    expect(board.occupantAt(2)).toBe('red');
+    expect(board.freeSpaces()).toEqual([0, 1, 3, 4]);
+    board.vacate(2);
+    expect(board.occupantAt(2)).toBeUndefined();
+    expect(board.isFull()).toBe(false);
+  });
+
   it('should_throw_when_occupy_is_outside_the_shape', () => {
     expect(() => newBoard().occupy(9, 'red')).toThrow('outside the board');
   });
@@ -100,8 +116,8 @@ describe('Board', () => {
       stripTopology.region(RegionSize.of(5)),
       stripTopology,
       new Map<CoordKey, [number, string]>([
-        [coordKey('4'), [4, 'red']],
-        [coordKey('0'), [0, 'blue']],
+        [CoordKey.of('4'), [4, 'red']],
+        [CoordKey.of('0'), [0, 'blue']],
       ]),
     );
 
@@ -284,7 +300,7 @@ describe('Board occupy and vacate', () => {
     board.occupy(1, 'red');
 
     expect(() => board.occupy(9, 'blue')).toThrow(
-      new RangeError('The coordinate 9 is outside the board.'),
+      new RangeError('The coordinate is outside the board.', { cause: CoordKey.of('9') }),
     );
     expect(board.occupiedCells()).toEqual([[1, 'red']]);
   });
@@ -304,7 +320,9 @@ describe('Board occupy and vacate', () => {
     const board = newBoard();
     board.occupy(1, 'red');
 
-    expect(() => board.vacate(9)).toThrow(new RangeError('The coordinate 9 is outside the board.'));
+    expect(() => board.vacate(9)).toThrow(
+      new RangeError('The coordinate is outside the board.', { cause: CoordKey.of('9') }),
+    );
     expect(board.occupiedCells()).toEqual([[1, 'red']]);
   });
 
@@ -314,8 +332,12 @@ describe('Board occupy and vacate', () => {
     board.occupy(3, 'blue');
     board.vacate(3);
 
-    expect(() => board.vacate(2)).toThrow(new RangeError('The coordinate 2 is already free.'));
-    expect(() => board.vacate(3)).toThrow(new RangeError('The coordinate 3 is already free.'));
+    expect(() => board.vacate(2)).toThrow(
+      new RangeError('The coordinate is already free.', { cause: CoordKey.of('2') }),
+    );
+    expect(() => board.vacate(3)).toThrow(
+      new RangeError('The coordinate is already free.', { cause: CoordKey.of('3') }),
+    );
     expect(board.occupiedCells()).toEqual([[1, 'red']]);
   });
 
@@ -447,7 +469,7 @@ describe('Board shape invariants', () => {
   it('should_throw_a_range_error_when_the_topology_gives_two_coordinates_the_same_key', () => {
     const collidingTopology: GridTopology<number> = {
       ...stripTopology,
-      key: (c) => coordKey(String(c % 2)),
+      key: (c) => CoordKey.of(String(c % 2)),
     };
 
     expect(
@@ -473,21 +495,23 @@ describe('Board initial content', () => {
 
   it('should_throw_a_range_error_when_the_initial_content_lies_outside_the_shape', () => {
     const shape = stripTopology.region(RegionSize.of(5));
-    const content = contentOf([coordKey('7'), [7, 'red']]);
+    const content = contentOf([CoordKey.of('7'), [7, 'red']]);
 
     expect(() => new Board(BOARD_ID, shape, stripTopology, content)).toThrow(RangeError);
     expect(() => new Board(BOARD_ID, shape, stripTopology, content)).toThrow(
-      'The coordinate 7 is outside the board.',
+      new RangeError('The coordinate is outside the board.', { cause: CoordKey.of('7') }),
     );
   });
 
   it('should_throw_a_range_error_when_an_initial_key_does_not_match_its_coordinate', () => {
     const shape = stripTopology.region(RegionSize.of(5));
-    const content = contentOf([coordKey('3'), [1, 'red']]);
+    const content = contentOf([CoordKey.of('3'), [1, 'red']]);
 
     expect(() => new Board(BOARD_ID, shape, stripTopology, content)).toThrow(RangeError);
     expect(() => new Board(BOARD_ID, shape, stripTopology, content)).toThrow(
-      'The key 3 does not match the key 1 of its coordinate.',
+      new RangeError('The key does not match the key of its coordinate.', {
+        cause: { key: CoordKey.of('3'), expected: CoordKey.of('1') },
+      }),
     );
   });
 
@@ -497,7 +521,7 @@ describe('Board initial content', () => {
       BOARD_ID,
       stripTopology.region(RegionSize.of(5)),
       stripTopology,
-      contentOf([coordKey('1'), tuple]),
+      contentOf([CoordKey.of('1'), tuple]),
     );
     const copy = board.clone();
 
@@ -514,7 +538,7 @@ describe('Board initial content', () => {
       BOARD_ID,
       stripTopology.region(RegionSize.of(5)),
       stripTopology,
-      contentOf([coordKey('0'), [0, 'red']], [coordKey('4'), [4, 'blue']]),
+      contentOf([CoordKey.of('0'), [0, 'red']], [CoordKey.of('4'), [4, 'blue']]),
     );
 
     expect(board.occupiedCells()).toEqual([
@@ -527,7 +551,7 @@ describe('Board initial content', () => {
 describe('BoardSpace', () => {
   // A coordinate is an object here, so one coordinate can have two objects.
   type Point = { readonly x: number };
-  const pointTopology = { key: (c: Point) => coordKey(String(c.x)) };
+  const pointTopology = { key: (c: Point) => CoordKey.of(String(c.x)) };
 
   function freeSpace(x: number): BoardSpace<string, Point> {
     return BoardSpace.free<string, Point>({ x }, pointTopology);
@@ -578,7 +602,9 @@ describe('BoardSpace', () => {
   it('should_throw_a_range_error_when_a_free_space_is_vacated', () => {
     const space = freeSpace(1);
 
-    expect(() => space.vacate()).toThrow(new RangeError('The space 1 is already free.'));
+    expect(() => space.vacate()).toThrow(
+      new RangeError('The space is already free.', { cause: CoordKey.of('1') }),
+    );
     expect(space.occupiedCell()).toBeUndefined();
   });
 

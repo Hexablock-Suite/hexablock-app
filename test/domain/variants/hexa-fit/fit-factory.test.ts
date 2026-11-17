@@ -53,7 +53,7 @@ describe('FitFactory', () => {
       factory
         .createBoard(BOARD_ID)
         .coordinates()
-        .map((c) => squareTopology.key(c)),
+        .map((c) => delivered(squareTopology.key(c))),
     ).toEqual(['0,0', '1,0']);
     expect(initial.remaining().map((p) => delivered(p.occupant()))).toEqual(['a']);
     expect(outcome).toBe(Outcome.victory);

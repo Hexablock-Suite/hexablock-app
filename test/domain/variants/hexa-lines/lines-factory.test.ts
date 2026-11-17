@@ -21,6 +21,7 @@ import {
 } from '../../../support/variants/hexa-lines/lines-game';
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
+import { delivered } from '../../../support/engine/value-receiver';
 
 // The Lines factory creates the whole family of Hexa Lines (issue 99, classes.md decision 31).
 
@@ -29,7 +30,7 @@ const domino = new ShapeGroup([new CellNode(square(0, 0)), new CellNode(square(1
 // A piece as text: its color and the keys of its cells, so two pieces compare by value.
 // `Color` keeps its name private, so `equals()` names the color. These tests draw red or blue.
 function describe_(piece: Piece<Color, SquareCoord>): string {
-  const keys = piece.coveredCoordinates().map((c) => squareTopology.key(c));
+  const keys = piece.coveredCoordinates().map((c) => delivered(squareTopology.key(c)));
   const color = piece.occupant().equals(red) ? 'red' : 'blue';
   return `${color} ${keys.join(' ')}`;
 }

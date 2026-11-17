@@ -19,7 +19,7 @@ import { domainDir, domainSources } from './domain-source';
 // - a `+` or a `+=` with a text on one side and an object on the other side;
 // - a call of `join()` on a list of objects.
 // A text, a number, a boolean, a bigint, a symbol, `null` and `undefined` are not objects.
-// A branded text, such as `CoordKey`, is a text. A type parameter is an object
+// A branded text, such as `string & { brand }`, is a text. A type parameter is an object
 // when its bound is an object.
 // The scan does not report `unknown` and `any`: the code that holds them names any value.
 // It reports `never`: such a value reaches the line only through a cast,

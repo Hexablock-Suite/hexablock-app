@@ -34,7 +34,8 @@ function domino(): Piece<Color, SquareCoord> {
   return new Piece(new ShapeGroup([new CellNode(square(0, 0)), new CellNode(square(1, 0))]), RED);
 }
 
-const keysOf = (cells: readonly SquareCoord[]) => cells.map((c) => squareTopology.key(c));
+const keysOf = (cells: readonly SquareCoord[]) =>
+  cells.map((c) => delivered(squareTopology.key(c)));
 
 // A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails
 // when the line compiles, because then the directive is unused.
@@ -105,7 +106,7 @@ describe('BoardShape operations', () => {
   it('should_give_one_key_for_each_coordinate_when_a_topology_names_them', () => {
     const shape = BoardShape.of([square(1, 0), square(0, 0), square(1, 0)]);
 
-    expect(shape.keys(squareTopology)).toEqual(['1,0', '0,0', '1,0']);
+    expect(shape.keys(squareTopology).map((key) => delivered(key))).toEqual(['1,0', '0,0', '1,0']);
   });
 });
 
@@ -149,8 +150,8 @@ describe('Board operations', () => {
   it('should_give_the_topology_key_when_a_coordinate_lies_inside_or_outside_the_board', () => {
     const board = squareBoard();
 
-    expect(board.key(square(2, 1))).toBe('2,1');
-    expect(board.key(square(9, -4))).toBe(squareTopology.key(square(9, -4)));
+    expect(delivered(board.key(square(2, 1)))).toBe('2,1');
+    expect(delivered(board.key(square(9, -4)))).toBe(delivered(squareTopology.key(square(9, -4))));
     expect(board.contains(square(9, -4))).toBe(false);
   });
 

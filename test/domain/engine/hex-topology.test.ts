@@ -22,14 +22,14 @@ function inside(size: number): (c: HexCoord) => boolean {
     topology
       .region(RegionSize.of(size))
       .coordinates()
-      .map((c) => topology.key(c)),
+      .map((c) => delivered(topology.key(c))),
   );
-  return (c) => keys.has(topology.key(c));
+  return (c) => keys.has(delivered(topology.key(c)));
 }
 
 // The two values of a coordinate, read from its key. A coordinate keeps them private.
 function valuesOf(c: HexCoord): [number, number] {
-  const [q = Number.NaN, r = Number.NaN] = topology.key(c).split(',').map(Number);
+  const [q = Number.NaN, r = Number.NaN] = delivered(topology.key(c)).split(',').map(Number);
   return [q, r];
 }
 
@@ -49,7 +49,7 @@ describe('hex', () => {
     // The values are private. `Reflect.get` stands for a caller that ignores it.
     expect(Object.is(Reflect.get(c, 'q'), 0)).toBe(true);
     expect(Object.is(Reflect.get(c, 'r'), 0)).toBe(true);
-    expect(topology.key(c)).toBe(topology.key(hex(0, 0)));
+    expect(delivered(topology.key(c))).toBe(delivered(topology.key(hex(0, 0))));
   });
 
   it('should_throw_a_range_error_when_a_value_is_not_a_safe_integer', () => {
@@ -94,9 +94,9 @@ describe('HexTopology', () => {
   });
 
   it('should_give_one_key_per_coordinate_when_two_keys_are_compared', () => {
-    expect(topology.key(hex(1, -2))).toBe('1,-2');
-    expect(topology.key(hex(1, -2))).toBe(topology.key(hex(1, -2)));
-    expect(topology.key(hex(-2, 1))).not.toBe(topology.key(hex(1, -2)));
+    expect(delivered(topology.key(hex(1, -2)))).toBe('1,-2');
+    expect(delivered(topology.key(hex(1, -2)))).toBe(delivered(topology.key(hex(1, -2))));
+    expect(delivered(topology.key(hex(-2, 1)))).not.toBe(delivered(topology.key(hex(1, -2))));
   });
 
   it('should_give_the_six_neighbors_when_the_neighbors_of_a_cell_are_read', () => {
@@ -201,7 +201,7 @@ describe('HexTopology', () => {
       const ring = [...topology.ring(center, Radius.of(radius))];
 
       expect(ring).toHaveLength(6 * radius);
-      expect(new Set(ring.map((c) => topology.key(c))).size).toBe(6 * radius);
+      expect(new Set(ring.map((c) => delivered(topology.key(c)))).size).toBe(6 * radius);
       expect(ring.every((c) => distance(c, center) === radius)).toBe(true);
     }
   });
@@ -217,7 +217,7 @@ describe('HexTopology', () => {
       const cells = topology.region(RegionSize.of(size)).coordinates();
 
       expect(cells).toHaveLength(count);
-      expect(new Set(cells.map((c) => topology.key(c))).size).toBe(count);
+      expect(new Set(cells.map((c) => delivered(topology.key(c)))).size).toBe(count);
       expect(cells.every((c) => distance(c, hex(0, 0)) < size)).toBe(true);
     }
   });

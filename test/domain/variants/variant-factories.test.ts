@@ -155,7 +155,7 @@ function figureTests<TCoord>(
   const origin = geometry.createCoord([0, 0]);
   const next = geometry.createCoord([1, 0]);
   const topology = geometry.createTopology();
-  const keys = (cells: readonly TCoord[]) => cells.map((c) => topology.key(c));
+  const keys = (cells: readonly TCoord[]) => cells.map((c) => delivered(topology.key(c)));
   const region = keys(topology.region(size).coordinates());
 
   // A level of two cells and one domino that covers them.

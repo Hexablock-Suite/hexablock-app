@@ -10,6 +10,7 @@ import {
   TriangleTopology,
 } from '../../../src/domain/engine/triangle-topology';
 import { deliveries } from '../../support/engine/value-receiver';
+import { delivered } from '../../support/engine/value-receiver';
 
 // Issue 206 (classes.md decision 44): a coordinate is a value object.
 // It keeps its numbers private, compares by value and does the calculations on its own values.
@@ -94,9 +95,9 @@ describe('HexCoord', () => {
 
   // Issue #237: the coordinate gives its key to its topology, and the topology reads no text.
   it('should_give_its_two_values_as_its_key_when_the_topology_asks_for_the_key', () => {
-    expect(hex(1, -2).key()).toBe('1,-2');
-    expect(hex(-0, 3).key()).toBe('0,3');
-    expect(new HexTopology().key(hex(1, -2))).toBe('1,-2');
+    expect(delivered(hex(1, -2).key())).toBe('1,-2');
+    expect(delivered(hex(-0, 3).key())).toBe('0,3');
+    expect(delivered(new HexTopology().key(hex(1, -2)))).toBe('1,-2');
   });
 
   // Issue #165: a screen layout of layer 4 places a cell from its two values.
@@ -184,9 +185,9 @@ describe('SquareCoord', () => {
 
   // Issue #237: the coordinate gives its key to its topology, and the topology reads no text.
   it('should_give_its_two_values_as_its_key_when_the_topology_asks_for_the_key', () => {
-    expect(square(1, -2).key()).toBe('1,-2');
-    expect(square(-0, 3).key()).toBe('0,3');
-    expect(new SquareTopology().key(square(1, -2))).toBe('1,-2');
+    expect(delivered(square(1, -2).key())).toBe('1,-2');
+    expect(delivered(square(-0, 3).key())).toBe('0,3');
+    expect(delivered(new SquareTopology().key(square(1, -2)))).toBe('1,-2');
   });
 
   // Issue #165: a screen layout of layer 4 places a cell from its two values.
@@ -286,9 +287,9 @@ describe('TriangleCoord', () => {
 
   // Issue #237: the coordinate gives its key to its topology, and the topology reads no text.
   it('should_give_its_two_values_as_its_key_when_the_topology_asks_for_the_key', () => {
-    expect(triangle(1, -2).key()).toBe('1,-2');
-    expect(triangle(-0, 3).key()).toBe('0,3');
-    expect(new TriangleTopology().key(triangle(1, -2))).toBe('1,-2');
+    expect(delivered(triangle(1, -2).key())).toBe('1,-2');
+    expect(delivered(triangle(-0, 3).key())).toBe('0,3');
+    expect(delivered(new TriangleTopology().key(triangle(1, -2)))).toBe('1,-2');
   });
 
   // Issue #165: a screen layout of layer 4 places a cell from its two values.

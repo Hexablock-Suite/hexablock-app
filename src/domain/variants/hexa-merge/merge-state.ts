@@ -1,6 +1,6 @@
 import type { Board, ReadonlyBoard } from '../../engine/board';
 import { BoardSnapshot, checkOwnSnapshot, type BoardState } from '../../engine/board-state';
-import type { CoordKey } from '../../engine/coord-key';
+import { CoordKeyMap } from '../../engine/coord-key-map';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { GridAxis } from '../../engine/grid-topology';
 import type { MatchId } from '../../engine/match-id';
@@ -252,12 +252,12 @@ function linesOf<TCell, TCoord, TAxis extends GridAxis>(
   board: Board<TCell, TCoord, TAxis>,
   slide: Slide<TAxis>,
 ): TCoord[][] {
-  const covered = new Set<CoordKey>();
+  const covered = new CoordKeyMap<TCoord>();
   const lines: TCoord[][] = [];
   for (const c of board.coordinates()) {
     if (covered.has(board.key(c))) continue;
     const line = [...slide.lineThrough(board, c)];
-    for (const on of line) covered.add(board.key(on));
+    for (const on of line) covered.set(board.key(on), on);
     lines.push(line);
   }
   return lines;
