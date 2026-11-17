@@ -1,0 +1,87 @@
+name: Bug report
+description: Report a defect of the app on the web, Android or iOS.
+title: '[Bug]: '
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Fill one form for each bug.
+        Do not paste tokens, passwords, local paths or IP addresses.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: Describe the defect in one or two sentences.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Give the smallest list of steps that shows the bug.
+      placeholder: |
+        1. Run `pnpm web`.
+        2. Open `/game/hexa-lines`.
+        3. Place a piece on the board.
+        4. See the error.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: Say what the app should do instead.
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      description: Select every platform that shows the bug.
+      multiple: true
+      options:
+        - Web
+        - Android
+        - iOS
+    validations:
+      required: true
+  - type: dropdown
+    id: screen
+    attributes:
+      label: Screen
+      description: Select the screen that shows the bug.
+      options:
+        - Home
+        - World map
+        - Achievements
+        - Hexa Lines
+        - Hexa Fit
+        - Hexa Sort
+        - Hexa Merge
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Commit or version
+      description: Give the commit or the release tag that you ran.
+      placeholder: 673bfa6 or v0.3.0
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or console output
+      description: Paste the error text. It renders as code.
+      render: text
+    validations:
+      required: false
+  - type: textarea
+    id: context
+    attributes:
+      label: Screenshots or extra context
+      description: Attach screenshots or add anything else that helps.
+    validations:
+      required: false
