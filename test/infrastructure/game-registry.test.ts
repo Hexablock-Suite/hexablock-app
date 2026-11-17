@@ -4,6 +4,7 @@ import { GameId } from '../../src/domain/engine/game-id';
 import { HexLayout } from '../../src/infrastructure/board/hex-layout';
 import { GameRegistry, registered, type ScreenParts } from '../../src/infrastructure/game-registry';
 import { BoardOnlyControls } from '../../src/infrastructure/ui/move-controls';
+import { worldTone } from '../../src/infrastructure/ui/theme';
 import { fitFactory } from '../support/variants/hexa-fit/fit-game';
 import { linesFactory } from '../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../support/variants/hexa-merge/merge-game';
@@ -26,9 +27,9 @@ function screenParts(): ScreenParts<unknown, unknown, unknown, unknown, undefine
 describe('GameRegistry', () => {
   it('should_give_the_ids_in_the_order_of_registration_when_games_are_registered', () => {
     const registry = new GameRegistry([
-      registered(GameId.of('hexa-merge'), mergeFactory(), screenParts()),
-      registered(GameId.of('hexa-lines'), linesFactory(), screenParts()),
-      registered(GameId.of('hexa-fit'), fitFactory(), screenParts()),
+      registered(GameId.of('hexa-merge'), mergeFactory(), screenParts(), worldTone(0)),
+      registered(GameId.of('hexa-lines'), linesFactory(), screenParts(), worldTone(0)),
+      registered(GameId.of('hexa-fit'), fitFactory(), screenParts(), worldTone(0)),
     ]);
 
     expect(registry.gameIds().map(variantIdOf)).toEqual(['hexa-merge', 'hexa-lines', 'hexa-fit']);
@@ -37,8 +38,8 @@ describe('GameRegistry', () => {
   it('should_give_the_factory_of_the_game_when_its_id_is_registered', () => {
     const merge = mergeFactory();
     const registry = new GameRegistry([
-      registered(GameId.of('hexa-lines'), linesFactory(), screenParts()),
-      registered(GameId.of('hexa-merge'), merge, screenParts()),
+      registered(GameId.of('hexa-lines'), linesFactory(), screenParts(), worldTone(0)),
+      registered(GameId.of('hexa-merge'), merge, screenParts(), worldTone(0)),
     ]);
 
     const found = registry
@@ -52,17 +53,28 @@ describe('GameRegistry', () => {
     const lines = screenParts();
     const merge = screenParts();
     const registry = new GameRegistry([
-      registered(GameId.of('hexa-lines'), linesFactory(), lines),
-      registered(GameId.of('hexa-merge'), mergeFactory(), merge),
+      registered(GameId.of('hexa-lines'), linesFactory(), lines, worldTone(0)),
+      registered(GameId.of('hexa-merge'), mergeFactory(), merge, worldTone(3)),
     ]);
 
     expect(registry.gameOf(GameId.of('hexa-merge')).screen === merge).toBe(true);
     expect(registry.gameOf(GameId.of('hexa-lines')).screen === lines).toBe(true);
   });
 
+  // Issue #298: each entry declares the world colors of its game for the map.
+  it('should_give_the_world_colors_of_the_game_when_its_id_is_registered', () => {
+    const registry = new GameRegistry([
+      registered(GameId.of('hexa-lines'), linesFactory(), screenParts(), worldTone(0)),
+      registered(GameId.of('hexa-merge'), mergeFactory(), screenParts(), worldTone(3)),
+    ]);
+
+    expect(registry.gameOf(GameId.of('hexa-merge')).tone).toEqual(worldTone(3));
+    expect(registry.gameOf(GameId.of('hexa-lines')).tone).toEqual(worldTone(0));
+  });
+
   it('should_throw_a_range_error_when_the_id_is_not_registered', () => {
     const registry = new GameRegistry([
-      registered(GameId.of('hexa-lines'), linesFactory(), screenParts()),
+      registered(GameId.of('hexa-lines'), linesFactory(), screenParts(), worldTone(0)),
     ]);
 
     expect(() => registry.gameOf(GameId.of('hexa-fill'))).toThrow(
@@ -73,18 +85,18 @@ describe('GameRegistry', () => {
   // Issue #234: the factory keeps its id private, so the entry pairs the id with the factory
   // in one place and asks the factory with `isFor()`.
   it('should_throw_a_range_error_when_the_factory_does_not_build_the_game_of_the_id', () => {
-    expect(() => registered(GameId.of('hexa-fit'), linesFactory(), screenParts())).toThrow(
-      new RangeError('The factory does not build the game of this id.'),
-    );
+    expect(() =>
+      registered(GameId.of('hexa-fit'), linesFactory(), screenParts(), worldTone(0)),
+    ).toThrow(new RangeError('The factory does not build the game of this id.'));
   });
 
   it('should_throw_a_range_error_when_two_games_have_one_game_id', () => {
     expect(
       () =>
         new GameRegistry([
-          registered(GameId.of('hexa-lines'), linesFactory(), screenParts()),
-          registered(GameId.of('hexa-merge'), mergeFactory(), screenParts()),
-          registered(GameId.of('hexa-lines'), linesFactory(2), screenParts()),
+          registered(GameId.of('hexa-lines'), linesFactory(), screenParts(), worldTone(0)),
+          registered(GameId.of('hexa-merge'), mergeFactory(), screenParts(), worldTone(0)),
+          registered(GameId.of('hexa-lines'), linesFactory(2), screenParts(), worldTone(0)),
         ]),
     ).toThrow(new RangeError('The registry holds two games with one id.'));
   });

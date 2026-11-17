@@ -45,7 +45,9 @@ const WORLD_TONES: readonly WorldTone[] = [
   { tone: '#4C9BE0', wash: '#CBE4F8' },
 ];
 
-// The colors of the world at `position` in the registry, from 0.
+// The world colors at `position`, from 0. The parts that name no game take them by position:
+// the stones of the home screen, the Fit pieces and the Merge tiles. Each entry of the game
+// registry declares the colors of its game (#298), and the map takes them from there.
 export function worldTone(position: number): WorldTone {
   return WORLD_TONES[position % WORLD_TONES.length];
 }
