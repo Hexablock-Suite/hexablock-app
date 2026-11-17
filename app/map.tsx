@@ -4,16 +4,21 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { GameChoice } from '../src/adapters/home-presenter';
-import { HexStone } from '../src/infrastructure/ui/hex-stone';
+import type { CellShape } from '../src/infrastructure/board/board-layout';
+import { FigureStone } from '../src/infrastructure/ui/figure-stone';
 import { Scenery } from '../src/infrastructure/ui/scenery';
 import { palette, serif, space, type WorldTone } from '../src/infrastructure/ui/theme';
 import {
+  useFigureShapes,
   useGameTones,
   useHomePresenter,
   useRouteFigure,
   type RouteFigure,
 } from '../src/infrastructure/ui/use-home-presenter';
 import { LipButton, WoodSign } from '../src/infrastructure/ui/wood';
+
+// The longer side of the stone of a world.
+const STONE = 84;
 
 // The game selector map, the MVP view of `HomePresenter` (#169). It is its own route after
 // the home screen (S3-11 in #151, a proposal that waits for the team). It shows one world for
@@ -32,6 +37,7 @@ export default function GameSelectorScreen() {
 function GameSelector({ figure }: { readonly figure: RouteFigure }) {
   const view = useHomePresenter(figure.figure).gameSelector();
   const toneOf = useGameTones(figure.figure);
+  const stone = useFigureShapes()(figure.param, STONE);
   const insets = useSafeAreaInsets();
   return (
     <View style={styles.screen}>
@@ -57,6 +63,7 @@ function GameSelector({ figure }: { readonly figure: RouteFigure }) {
               key={game.id}
               game={game}
               tone={toneOf(game.id)}
+              shape={stone}
               figure={figure.param}
               position={position}
             />
@@ -67,7 +74,8 @@ function GameSelector({ figure }: { readonly figure: RouteFigure }) {
   );
 }
 
-// One world of the map: the hex stone of the game and its sign with the name and the place.
+// One world of the map: the stone of the game and its sign with the name and the place.
+// The stone has `shape`, the shape of the board figure of the map (#297, APP-FR-16).
 // The stone takes `tone`, the colors that the registry entry of the game declares, so a game
 // keeps its color on every figure (#298).
 // The worlds take turns on the left and on the right side of the path by their place in the
@@ -76,11 +84,13 @@ function GameSelector({ figure }: { readonly figure: RouteFigure }) {
 function World({
   game,
   tone,
+  shape,
   figure,
   position,
 }: {
   readonly game: GameChoice;
   readonly tone: WorldTone;
+  readonly shape: CellShape;
   readonly figure: string;
   readonly position: number;
 }) {
@@ -94,7 +104,7 @@ function World({
     >
       {({ pressed }) => (
         <>
-          <HexStone size={84} colors={tone} pressed={pressed} />
+          <FigureStone shape={shape} colors={tone} pressed={pressed} />
           <WoodSign style={styles.worldSign}>
             <Text style={styles.name}>{game.name}</Text>
             <Text style={styles.place}>{game.place}</Text>

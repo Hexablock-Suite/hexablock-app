@@ -5,7 +5,7 @@ import { lip, palette, type WorldTone } from './theme';
 // A flat-topped regular hexagon `size` wide, from one vertex to the opposite vertex.
 // Three rectangles cover it: each one is one side wide and the hexagon high,
 // and they turn by 0, 60 and 120 degrees about the center.
-// The figure selector draws the hexagon of its first figure with it too (#171).
+// The hub of the Merge controls draws it too.
 export function Hexagon({ size, color }: { readonly size: number; readonly color: string }) {
   const side = size / 2;
   const height = side * Math.sqrt(3);
@@ -29,7 +29,9 @@ export function Hexagon({ size, color }: { readonly size: number; readonly color
   );
 }
 
-// The hex stone of one world: the stone in its tone, a light inner face and a shade below it.
+// A hex stone: the stone in its tone, a light inner face and a shade below it.
+// The achievements screen and the Merge controls draw it. The home screen and the map draw
+// `FigureStone` in its place, in the shape of the chosen figure (#297).
 // A pressed stone sinks onto its shade. The stone is decoration: the screen reader skips it.
 export function HexStone({
   size,

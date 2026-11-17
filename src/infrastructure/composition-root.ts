@@ -26,10 +26,11 @@ import type { Cloneable } from '../domain/engine/cloneable';
 import type { GameId } from '../domain/engine/game-id';
 import { TopologyId } from '../domain/engine/geometry-factory';
 import type { MatchIdGenerator } from '../domain/engine/match-id-generator';
+import type { CellShape } from './board/board-layout';
 import { ConsoleLogger } from './console-logger';
 import { GameRegistry, type RegisteredGame } from './game-registry';
 import { registeredAchievements } from './registered-achievements';
-import { boardFigures, registeredGames } from './registered-games';
+import { boardFigures, originShape, registeredGames, type BoardFigure } from './registered-games';
 import { SeededRandomSource } from './seeded-random-source';
 import { SequentialMatchIds } from './sequential-match-ids';
 import { SystemClock } from './system-clock';
@@ -78,6 +79,7 @@ export interface RootDrivers {
 // of `registeredAchievements()`, inside the logging aspect.
 export class CompositionRoot {
   private readonly games: ReadonlyMap<TopologyId, GameRegistry>;
+  private readonly boards: ReadonlyMap<TopologyId, BoardFigure<unknown>>;
   private readonly logger: Logger;
   private readonly ids: MatchIdGenerator;
   private readonly events: GameEventPublisher;
@@ -87,8 +89,10 @@ export class CompositionRoot {
 
   constructor(drivers: RootDrivers = { clock: new SystemClock(), logger: new ConsoleLogger() }) {
     const random = SeededRandomSource.fromClock(drivers.clock);
+    const figures = boardFigures();
+    this.boards = new Map(figures.map((figure) => [figure.id, figure]));
     this.games = new Map(
-      boardFigures().map((figure) => [
+      figures.map((figure) => [
         figure.id,
         new GameRegistry(registeredGames(figure, drivers.clock, random)),
       ]),
@@ -114,6 +118,16 @@ export class CompositionRoot {
   // The board figures that the player can choose, in the order of the figure selector (#171).
   figures(): TopologyId[] {
     return [...this.games.keys()];
+  }
+
+  // The shape of the origin cell of the board figure `figure`, with `size` points on the longer
+  // side of its box (#297). The stones of the home screen and of the map and the glyphs of the
+  // figure selector take it, so they show the figure as the board does.
+  // A figure that the root does not offer throws a RangeError.
+  figureShape(figure: TopologyId, size: number): CellShape {
+    const board = this.boards.get(figure);
+    if (board === undefined) throw new RangeError('The root offers no board figure with this id.');
+    return originShape(board, size);
   }
 
   // The game registry of the board figure `figure`, by default the hexagon.
