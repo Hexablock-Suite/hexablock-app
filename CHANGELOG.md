@@ -8,6 +8,7 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 
 ### Changed
 
+- Regenerate `src/infrastructure/api/schema.d.ts` against hexablock-api `main`: `GET /levels` may list the stored levels that break a rule in `unavailable` (Hexablock-Suite/hexablock-api#156). The pact still passes.
 - Regenerate `src/infrastructure/api/schema.d.ts` against hexablock-api `main`: `PUT /levels` now answers 403 when the account is not a level editor (Hexablock-Suite/hexablock-api#145). The pact still passes.
 
 ### Fixed
