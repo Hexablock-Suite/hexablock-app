@@ -51,12 +51,9 @@ interface PreviewSpace {
   readonly anchor: boolean;
 }
 
+// It draws each space in the outline of the figure, as the board does (#296).
 const PREVIEW_RENDERER: CellRenderer<PreviewSpace> = {
-  render: ({ piece, anchor }) => (
-    <View style={styles.previewSpace}>
-      <PieceStone piece={piece} anchor={anchor} />
-    </View>
-  ),
+  render: ({ piece, anchor }, shape) => <PieceStone piece={piece} anchor={anchor} shape={shape} />,
 };
 
 // The move controls of Hexa Fit (classes.md decision 14, issue #175). The game registry
@@ -329,9 +326,5 @@ const styles = StyleSheet.create({
   },
   pressed: {
     transform: [{ translateY: lip.sm }],
-  },
-  previewSpace: {
-    width: '92%',
-    aspectRatio: 1,
   },
 });

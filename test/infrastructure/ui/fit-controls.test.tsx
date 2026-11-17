@@ -19,6 +19,7 @@ import { GameStage } from '../../../src/infrastructure/ui/game-stage';
 import { gameUseCases } from '../../support/application/game-use-cases';
 import { ManualClock } from '../../support/engine/manual-clock';
 import { occupiedSpaces, pressSpace } from '../../support/ui/board-spaces';
+import { outlinesIn } from '../../support/ui/cell-outlines';
 
 // Issue #175: the player plays Hexa Fit on the game screen. `GameStage` shows the board with
 // `FitCellRenderer`, and `FitControls` show the tray, the rotate button and the move count.
@@ -221,5 +222,18 @@ describe('FitControls', () => {
     expect(occupiedSpaces()).toEqual([0, 1, 2, 3, 4, 5]);
     expect(trayPieces()).toEqual([]);
     expect(screen.getByText('Todas las piezas están en la figura.')).toBeOnTheScreen();
+  });
+
+  // Issue #296: the tray draws each piece through `BoardView`, so each space of a piece
+  // shows the outline of the figure, as the board does. `fit-01` is a level on the hexagon.
+  it('should_draw_each_space_of_each_tray_piece_as_a_hexagon_when_the_figure_is_the_hexagon', async () => {
+    await openFirstBundledLevel();
+
+    const drawn = ['a', 'b', 'c'].map((id) => outlinesIn(piece(id)));
+
+    expect(drawn.map((outlines) => outlines.length)).toEqual([6, 4, 2]);
+    expect(new Set(drawn.flat().map(({ corners, points }) => `${corners}:${points}`))).toEqual(
+      new Set(['6:pointy']),
+    );
   });
 });

@@ -7,7 +7,7 @@ import { Outcome } from '../../../src/domain/engine/outcome';
 import { Score } from '../../../src/domain/engine/score';
 import { square, type SquareCoord } from '../../../src/domain/engine/square-topology';
 import { triangle, type TriangleCoord } from '../../../src/domain/engine/triangle-topology';
-import type { BoardLayout } from '../../../src/infrastructure/board/board-layout';
+import { cellBoxOf, type BoardLayout } from '../../../src/infrastructure/board/board-layout';
 import { BoardView } from '../../../src/infrastructure/board/board-view';
 import type { CellRenderer } from '../../../src/infrastructure/board/cell-renderer';
 import { HexLayout } from '../../../src/infrastructure/board/hex-layout';
@@ -19,7 +19,9 @@ import { TriangleLayout } from '../../../src/infrastructure/board/triangle-layou
 // The fake cell is a name that exists only in this test. The renderer draws one element
 // with the test id `cell-<name>`, so the test finds each cell and the box around it.
 // The frame of the board wraps the boxes of the cells, so the leftmost box starts at 0
-// and the topmost box starts at 0.
+// and the topmost box starts at 0. Since #296 the frame wraps the whole outline of each cell:
+// a hexagon is 2/√3 sizes high, and a triangle is √3 sizes wide and 1.5 sizes high.
+// Each box stays the touch box around the inner circle, one size wide and high.
 
 const SIZE = 20;
 // √3 / 2: the height of an equilateral triangle with a side of 1.
@@ -95,11 +97,14 @@ describe('BoardView', () => {
 
     expect(screen.getAllByTestId(/^cell-/)).toHaveLength(4);
     const row = SIZE * HALF_ROOT_3;
-    expectBox('a', { left: 10, top: 0, width: SIZE, height: SIZE });
-    expectBox('b', { left: 30, top: 0, width: SIZE, height: SIZE });
-    expectBox('c', { left: 20, top: row, width: SIZE, height: SIZE });
-    expectBox('d', { left: 0, top: row, width: SIZE, height: SIZE });
-    expectFrame('a', 50, row + SIZE);
+    const high = (2 * SIZE) / Math.sqrt(3);
+    // The frame starts at the top corner of the hexagon, (2/√3 - 1) / 2 sizes above the box.
+    const lift = (high - SIZE) / 2;
+    expectBox('a', { left: 10, top: lift, width: SIZE, height: SIZE });
+    expectBox('b', { left: 30, top: lift, width: SIZE, height: SIZE });
+    expectBox('c', { left: 20, top: row + lift, width: SIZE, height: SIZE });
+    expectBox('d', { left: 0, top: row + lift, width: SIZE, height: SIZE });
+    expectFrame('a', 50, row + high);
   });
 
   it('should_draw_one_box_per_cell_at_its_square_place_when_the_figure_is_the_square', async () => {
@@ -132,11 +137,14 @@ describe('BoardView', () => {
 
     expect(screen.getAllByTestId(/^cell-/)).toHaveLength(4);
     const across = SIZE * HALF_ROOT_3;
-    expectBox('a', { left: 0, top: 10, width: SIZE, height: SIZE });
-    expectBox('b', { left: across, top: 0, width: SIZE, height: SIZE });
-    expectBox('c', { left: 0, top: 30, width: SIZE, height: SIZE });
-    expectBox('d', { left: across, top: 40, width: SIZE, height: SIZE });
-    expectFrame('a', across + SIZE, 60);
+    const wide = 2 * across;
+    // The frame starts at the left corner of the triangle, (√3 - 1) / 2 sizes left of the box.
+    const shift = (wide - SIZE) / 2;
+    expectBox('a', { left: shift, top: 10, width: SIZE, height: SIZE });
+    expectBox('b', { left: across + shift, top: 0, width: SIZE, height: SIZE });
+    expectBox('c', { left: shift, top: 30, width: SIZE, height: SIZE });
+    expectBox('d', { left: across + shift, top: 40, width: SIZE, height: SIZE });
+    expectFrame('a', 3 * across, 60);
   });
 
   // Issue #170: the screen reader names the board with a text of the catalog.
@@ -182,6 +190,43 @@ describe('BoardView', () => {
     await fireEvent.press(screen.getByTestId('cell-a'));
 
     expect(screen.getByTestId('cell-a')).toBeOnTheScreen();
+  });
+
+  // Issue #296: the outline of a cell can reach past its inner circle. The touch box of a space
+  // is the box of its inner circle, so a press at a center never reaches a neighbor.
+  // A center inside a box or on its edge counts as held by that box.
+  it('should_give_each_space_a_touch_box_that_holds_its_own_center_and_no_neighbor_center_when_neighbors_are_drawn', async () => {
+    const boards: [BoardLayout<never>, unknown[]][] = [
+      [new HexLayout(SIZE) as BoardLayout<never>, [hex(0, 0), hex(1, 0), hex(0, 1), hex(-1, 1)]],
+      [new SquareLayout(SIZE) as BoardLayout<never>, [square(0, 0), square(1, 0), square(0, 1)]],
+      [
+        new TriangleLayout(SIZE) as BoardLayout<never>,
+        [triangle(2, 1), triangle(1, 1), triangle(3, 1), triangle(2, 0), triangle(3, 2)],
+      ],
+    ];
+
+    for (const [layout, coords] of boards) {
+      const names = coords.map((_, index) => `n${index}`);
+      await draw(responseWith(coords.map((at, index) => [at as never, names[index]])), layout);
+      // The centers in the frame: the frame starts at the leftmost and topmost outline.
+      const origins = coords.map((at) => cellBoxOf(layout, at as never).origin);
+      const left = Math.min(...origins.map(({ x }) => x));
+      const top = Math.min(...origins.map(({ y }) => y));
+      const centers = coords.map((at) => layout.centerOf(at as never));
+      const held = names.map((name) => {
+        const box = styleOf(boxOf(name)) as Box;
+        return centers.flatMap(({ x, y }, index) =>
+          x - left >= box.left - 1e-9 &&
+          x - left <= box.left + box.width + 1e-9 &&
+          y - top >= box.top - 1e-9 &&
+          y - top <= box.top + box.height + 1e-9
+            ? [index]
+            : [],
+        );
+      });
+
+      expect(held).toEqual(names.map((_, index) => [index]));
+    }
   });
 
   it('should_draw_no_cell_and_an_empty_frame_when_the_response_holds_no_cell', async () => {
