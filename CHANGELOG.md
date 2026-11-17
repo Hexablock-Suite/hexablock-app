@@ -6,6 +6,10 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 
 ## [Unreleased]
 
+### Changed
+
+- Record D25 in `docs/REQUIREMENTS.md`: the Hexa Lines tray fills again with the next 3 pieces when its last piece is placed ([#301](https://github.com/Hexablock-Suite/hexablock-app/issues/301), decision A of 2026-11-17). It leaves «Still to define (team)». No code changes.
+
 ## [0.2.0] - 2026-11-16
 
 ### Added
