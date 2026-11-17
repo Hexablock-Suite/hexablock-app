@@ -329,6 +329,7 @@ Read [AGENTS.md](AGENTS.md) for the repository rules and [docs/REQUIREMENTS.md](
 - **Commits.** Messages follow [Conventional Commits](https://www.conventionalcommits.org/) in English. The `commit-msg` hook runs commitlint.
 - **Hooks.** `pnpm install` installs them. The `pre-commit` hook lints and formats the staged files. The `pre-push` hook runs `pnpm lint`, `pnpm typecheck` and `pnpm arch`. Never bypass a hook with `--no-verify`.
 - **Before a pull request.** Run `pnpm verify`. When a requirement, an assumption or a professor answer changes, update `docs/REQUIREMENTS.md` in the same pull request. Log AI use in [AI_USAGE.md](AI_USAGE.md).
+- **Bugs.** Report a bug with the `Bug report` issue form in `.github/ISSUE_TEMPLATE/bug-report.yml`.
 - **Pull requests.** Branch from `main` and open a pull request to `main` with the template in `.github/pull_request_template.md`. The `main` ruleset requires a pull request, the CI checks `verify` and `contract`, and a branch that is up to date with `main`. It allows merge commits only and blocks force pushes and deletion of `main`.
 
 ## License
