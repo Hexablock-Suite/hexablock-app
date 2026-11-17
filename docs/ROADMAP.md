@@ -4,7 +4,7 @@
 
 This file is the one place for the HexaBlock Suite sprint plan, for both repositories. `hexablock-api` links here and keeps no copy. Each sprint lists the requirement IDs it delivers and its exit check. The IDs come from [`REQUIREMENTS.md`](REQUIREMENTS.md) (APP-FR-n, APP-NFR-n) and from the backend [`REQUIREMENTS.md`](https://github.com/Hexablock-Suite/hexablock-api/blob/main/docs/REQUIREMENTS.md) (API-FR-n, API-NFR-n). The exit check of a requirement is its _Check_, copied here. When a _Check_ changes in a requirements file, update it here in the same pull request. A path in an API row is a path in `hexablock-api`.
 
-This file names no owner. The team assigns an owner to each task at the start of each sprint. No task has an owner yet.
+This file names no owner. The team assigns an owner to each task at the start of each sprint, as the assignee of the task issue.
 
 ## Why one-week sprints
 
