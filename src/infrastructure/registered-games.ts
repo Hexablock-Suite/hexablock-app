@@ -41,7 +41,7 @@ import type { Slide } from '../domain/variants/hexa-merge/slide';
 import { GoalCount } from '../domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../domain/variants/hexa-sort/sort-factory';
 import { SortLevel } from '../domain/variants/hexa-sort/sort-level';
-import type { BoardLayout } from './board/board-layout';
+import { cellBoxOf, type BoardLayout, type CellShape } from './board/board-layout';
 import { FitCellRenderer } from './board/fit-cell-renderer';
 import { HexLayout } from './board/hex-layout';
 import { MergeCellRenderer } from './board/merge-cell-renderer';
@@ -157,6 +157,16 @@ export function registeredGames<TCoord>(
       worldTone(3),
     ),
   ];
+}
+
+// The shape of the origin cell of the board figure `figure` (issue #297), from the outline that
+// the layout of the figure gives, as the board draws its cells (#296). The longer side
+// of the box of the shape is `size` points. The origin cell has the values 0 and 0,
+// and a triangle there points up. It reads only the layout, so it serves every figure.
+export function originShape<TCoord>(figure: BoardFigure<TCoord>, size: number): CellShape {
+  const origin = figure.geometry.createCoord([0, 0]);
+  const { width, height } = cellBoxOf(figure.layoutOf(1), origin).shape;
+  return cellBoxOf(figure.layoutOf(size / Math.max(width, height)), origin).shape;
 }
 
 // The board figure `id` with its geometry, its layout and its optional Fit level.
