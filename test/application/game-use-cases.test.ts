@@ -69,6 +69,7 @@ import {
   viewData,
 } from '../support/variants/view-data';
 import { BOARD_ID, STATE_ID } from '../support/engine/entity-ids';
+import { delivered } from '../support/engine/value-receiver';
 
 // `StartGame` and `ApplyMove` run the four variants through one code path (issue 100,
 // APP-FR-03, classes.md decisions 9, 28 and 29). The helper reads only `IVariantFactory`.
@@ -663,7 +664,7 @@ async function freeSpacesRun<
   return {
     ...run,
     named: named.length,
-    distinct: new Set(named.map((at) => run.after.boardCopy().key(at))).size,
+    distinct: new Set(named.map((at) => delivered(run.after.boardCopy().key(at)))).size,
     spaces: run.after.boardCopy().coordinates().length,
   };
 }

@@ -41,7 +41,10 @@ export class TrayPosition {
   }
 
   // The error of a tray piece at this position that does not fit at the cell of the key `at`.
+  // The error carries the key as its `cause`, and the edge delivers its text (issue #246).
   misfitAt(at: CoordKey): RangeError {
-    return new RangeError(`The piece at tray index ${this.index} does not fit at ${at}.`);
+    return new RangeError(`The piece at tray index ${this.index} does not fit at its cell.`, {
+      cause: at,
+    });
   }
 }

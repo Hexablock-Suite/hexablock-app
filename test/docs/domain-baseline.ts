@@ -12,10 +12,6 @@ export type PrimitiveEntry = { primitive: 'number' | 'string'; where: string; is
 // (rule R-domain-private-fields).
 export type FieldEntry = { rule: 'field' | 'get'; where: string; issue: number };
 
-export const primitiveBaseline: readonly PrimitiveEntry[] = [
-  // #246: the team decides whether a branded key counts as a primitive.
-  { primitive: 'string', where: 'CoordKey', issue: 246 },
-  { primitive: 'string', where: 'coordKey', issue: 246 },
-];
+export const primitiveBaseline: readonly PrimitiveEntry[] = [];
 
 export const fieldBaseline: readonly FieldEntry[] = [];

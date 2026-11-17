@@ -61,7 +61,7 @@ export class PlaceFitPiece<TCoord> {
       isOfClassOf(this, other) &&
       this.pieceId.equals(other.pieceId) &&
       this.rotation.equals(other.rotation) &&
-      topology.key(this.at) === topology.key(other.at)
+      topology.key(this.at).equals(topology.key(other.at))
     );
   }
 }

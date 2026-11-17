@@ -30,6 +30,7 @@ import {
   type SquareCoord,
 } from '../../support/engine/square-topology';
 import { MATCH_ID } from '../../support/engine/match-id';
+import { delivered } from '../../support/engine/value-receiver';
 
 // `GameEngine` takes the state back through its own undo (classes.md decisions 27 and 34).
 // The root is the only door: a caller asks `undo()`, `redo()`, `canUndo()`, `canRedo()` and
@@ -43,7 +44,7 @@ const moveAt = (col: number, row = 0): FakeMove => ({
 
 // The filled cells of a board in plain facts: its key and the fake cell value.
 function filled(board: ReadonlyBoard<FakeCell, SquareCoord>): [string, number][] {
-  return board.occupiedCells().map(([at, cell]) => [squareTopology.key(at), cell.value]);
+  return board.occupiedCells().map(([at, cell]) => [delivered(squareTopology.key(at)), cell.value]);
 }
 
 function historyGame(rules = new FakeRules(), size = 2) {

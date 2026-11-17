@@ -1,5 +1,6 @@
 import { BoardShape } from './board-shape';
-import { coordKey, type CoordKey } from './coord-key';
+import { CoordKey } from './coord-key';
+import { CoordKeyMap } from './coord-key-map';
 import type { GridAxis, GridDirection, GridTopology } from './grid-topology';
 import type { Radius } from './radius';
 import type { RegionSize } from './region-size';
@@ -82,10 +83,10 @@ export class TriangleCoord {
     return TriangleCoord.fromCube([1 - y, 1 - z, 1 - x]);
   }
 
-  // The key of the coordinate: `col,row`, branded as a `CoordKey` (issue #237).
+  // The key of the coordinate: `col,row`, as a `CoordKey` value object (issues #237 and #246).
   // `TriangleTopology.key()` gives it to the engine, so the topology reads no text.
   key(): CoordKey {
-    return coordKey(`${this.col},${this.row}`);
+    return CoordKey.of(`${this.col},${this.row}`);
   }
 
   // Gives the two values of the coordinate, `[col, row]`, to `receiver`. It returns nothing.
@@ -320,14 +321,16 @@ export class TriangleTopology implements GridTopology<
 
   // The cells at graph distance `radius`, found breadth first.
   *ring(center: TriangleCoord, radius: Radius): Iterable<TriangleCoord> {
-    const seen = new Set([this.key(center)]);
+    // A key is a value object, so the map finds a cell by an equal key (issue #246).
+    const seen = new CoordKeyMap<TriangleCoord>();
+    seen.set(this.key(center), center);
     // One step of the radius: the new cells that touch the frontier.
     const grow = (frontier: TriangleCoord[]): TriangleCoord[] => {
       const next: TriangleCoord[] = [];
       for (const c of frontier) {
         for (const n of this.neighbors(c)) {
           if (!seen.has(this.key(n))) {
-            seen.add(this.key(n));
+            seen.set(this.key(n), n);
             next.push(n);
           }
         }

@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { CoordKey } from '../../../../src/domain/engine/coord-key';
 import { Score } from '../../../../src/domain/engine/score';
 import { ClearedStacks } from '../../../../src/domain/variants/hexa-sort/cleared-stacks';
 import type { SortState } from '../../../../src/domain/variants/hexa-sort/sort-state';
@@ -88,10 +89,10 @@ describe('SortState', () => {
     const endedBefore = facts(ended);
 
     expect(() => state.placeOfferedStack(square(0, 0))).toThrow(
-      new RangeError('The cell 0,0 already holds a stack.'),
+      new RangeError('The cell already holds a stack.', { cause: CoordKey.of('0,0') }),
     );
     expect(() => state.placeOfferedStack(square(5, 0))).toThrow(
-      new RangeError('The coordinate 5,0 is outside the board.'),
+      new RangeError('The coordinate is outside the board.', { cause: CoordKey.of('5,0') }),
     );
     expect(() => ended.placeOfferedStack(square(0, 0))).toThrow(
       new RangeError('No stack is on offer.'),
@@ -131,16 +132,16 @@ describe('SortState', () => {
     const before = facts(state);
 
     expect(() => state.moveRun(square(1, 0), square(0, 0))).toThrow(
-      new RangeError('The cell 1,0 has no stack to move.'),
+      new RangeError('The cell has no stack to move.', { cause: CoordKey.of('1,0') }),
     );
     expect(() => state.moveRun(square(2, 0), square(0, 0))).toThrow(
-      new RangeError('The cell 2,0 has no stack to move.'),
+      new RangeError('The cell has no stack to move.', { cause: CoordKey.of('2,0') }),
     );
     expect(() => state.moveRun(square(0, 0), square(0, 0))).toThrow(
-      new RangeError('A run cannot move to its own cell 0,0.'),
+      new RangeError('A run cannot move to its own cell.', { cause: CoordKey.of('0,0') }),
     );
     expect(() => state.moveRun(square(0, 0), square(4, 0))).toThrow(
-      new RangeError('The coordinate 4,0 is outside the board.'),
+      new RangeError('The coordinate is outside the board.', { cause: CoordKey.of('4,0') }),
     );
     expect(facts(state)).toEqual(before);
   });
@@ -167,10 +168,10 @@ describe('SortState', () => {
     const before = facts(state);
 
     expect(() => state.clearStack(square(0, 0))).toThrow(
-      new RangeError('The cell 0,0 has no stack to clear.'),
+      new RangeError('The cell has no stack to clear.', { cause: CoordKey.of('0,0') }),
     );
     expect(() => state.clearStack(square(1, 0))).toThrow(
-      new RangeError('The cell 1,0 has no stack to clear.'),
+      new RangeError('The cell has no stack to clear.', { cause: CoordKey.of('1,0') }),
     );
     expect(facts(state)).toEqual(before);
   });

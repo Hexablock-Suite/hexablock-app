@@ -1,3 +1,4 @@
+import { CoordKeyMap } from '../../domain/engine/coord-key-map';
 import type { GridAxis, GridTopology } from '../../domain/engine/grid-topology';
 import type { RegionSize } from '../../domain/engine/region-size';
 import { SLIDE_SENSES, Slide } from '../../domain/variants/hexa-merge/slide';
@@ -39,10 +40,12 @@ export function slideWays<TCoord>(
   layout: BoardLayout<TCoord>,
 ): SlideWay[] {
   const cells = topology.region(size).coordinates();
-  const keys = new Set(cells.map((c) => topology.key(c)));
+  // A key is a value object, so the map finds a cell by an equal key (issue #246).
+  const region = new CoordKeyMap<TCoord>();
+  for (const c of cells) region.set(topology.key(c), c);
   const board = {
     line: (axis: GridAxis, through: TCoord) =>
-      topology.line(axis, through, (c) => keys.has(topology.key(c))),
+      topology.line(axis, through, (c) => region.has(topology.key(c))),
   };
   return topology
     .axes()

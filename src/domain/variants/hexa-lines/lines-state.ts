@@ -4,7 +4,7 @@ import type { Color } from '../../engine/color';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { MatchId } from '../../engine/match-id';
 import { Score } from '../../engine/score';
-import type { CoordKey } from '../../engine/coord-key';
+import { CoordKeyMap } from '../../engine/coord-key-map';
 import type { Piece } from '../../engine/piece';
 import type { IPieceSource } from '../../engine/piece-source';
 import { CellCount } from './cell-count';
@@ -168,10 +168,10 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
   // A line that holds a free cell, or a cell outside the board, throws a RangeError.
   // The new counts exist before the first vacated cell, so a refused count changes nothing.
   clearLines(lines: readonly (readonly TCoord[])[]): void {
-    const cleared = new Map<CoordKey, TCoord>();
+    const cleared = new CoordKeyMap<TCoord>();
     for (const c of lines.flat()) {
       if (this.board.occupantAt(c) === undefined) {
-        throw new RangeError(`A cleared line holds the free cell ${this.board.key(c)}.`);
+        throw new RangeError('A cleared line holds a free cell.', { cause: this.board.key(c) });
       }
       cleared.set(this.board.key(c), c);
     }

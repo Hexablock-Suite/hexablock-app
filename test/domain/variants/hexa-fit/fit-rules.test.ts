@@ -108,7 +108,7 @@ function cellsOf<TCoord>(state: FitState<TCoord> | FitSnapshot<TCoord>): string[
   const board = photoOf(state).boardCopy();
   return board
     .occupiedCells()
-    .map(([c, id]) => `${board.key(c)}=${delivered(id)}`)
+    .map(([c, id]) => `${delivered(board.key(c))}=${delivered(id)}`)
     .sort();
 }
 

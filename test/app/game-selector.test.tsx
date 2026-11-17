@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fireEvent, renderRouter, screen, testRouter } from 'expo-router/testing-library';
 import { StyleSheet } from 'react-native';
 
+import { outlinesIn } from '../support/ui/cell-outlines';
 import { repoRoot } from '../support/run-tool';
 
 // The routes of `app/`, with the root layout and its composition root.
@@ -22,14 +23,26 @@ function descendants(element: Drawn): Drawn[] {
   return [element, ...children.flatMap(descendants)];
 }
 
-// The background colors that the world of the game `name` draws on the open map, in the order
-// of the tree: the shade, the stone and its inner face.
+// The colors that the world of the game `name` draws on the open map, in the order
+// of the tree: the shade, the stone and its inner face. A view gives its background color,
+// and an outline gives its fill.
 function colorsOfWorld(name: string): unknown[] {
   const world = screen.getByRole('button', { name: new RegExp(`^${name}`) });
   return descendants(world)
-    .map((each) => (StyleSheet.flatten(each.props.style) ?? {}).backgroundColor)
+    .flatMap((each) => [
+      (StyleSheet.flatten(each.props.style) ?? {}).backgroundColor,
+      each.props.fill,
+    ])
     .filter((color) => color !== undefined);
 }
+
+// The text of each board figure in the route, and the corner count and the way
+// of the outline of its origin cell (#297).
+const FIGURE_SHAPES = [
+  { figure: 'hex', shape: { corners: 6, points: 'pointy' } },
+  { figure: 'square', shape: { corners: 4, points: 'flat' } },
+  { figure: 'triangle', shape: { corners: 3, points: 'up' } },
+];
 
 // Issue #169: the game selector map lists the games of the registry and opens each one.
 // Since #170 the game route shows `GameScreen`, whose header names the game.
@@ -109,6 +122,27 @@ describe('GameSelectorScreen', () => {
     );
 
     expect(sides).toEqual(['flex-start', 'flex-end', 'flex-start']);
+  });
+
+  // Issue #297: the marker of each game on the map has the shape of the figure of the map
+  // (APP-FR-16, decision A of 2026-11-17).
+  it('should_draw_each_marker_in_the_shape_of_the_figure_when_the_map_of_that_figure_opens', async () => {
+    const drawn: { figure: string; shapes: unknown[] }[] = [];
+    for (const { figure } of FIGURE_SHAPES) {
+      await renderRouter(appDir, { initialUrl: `/map?figure=${figure}` });
+      const worlds = screen.getAllByRole('button', { name: /^Hexa / });
+      const outlines = worlds.map((world) => outlinesIn(world));
+      expect(worlds.length).toBeGreaterThan(0);
+      for (const each of outlines) expect(each.length).toBeGreaterThan(0);
+      drawn.push({
+        figure,
+        shapes: [...new Set(outlines.flat().map((each) => JSON.stringify(each)))],
+      });
+    }
+
+    expect(drawn).toEqual(
+      FIGURE_SHAPES.map(({ figure, shape }) => ({ figure, shapes: [JSON.stringify(shape)] })),
+    );
   });
 
   it('should_go_to_the_home_screen_when_the_map_route_names_no_figure_of_the_root', async () => {

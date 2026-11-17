@@ -4,6 +4,7 @@ import { HomePresenter } from '../../adapters/home-presenter';
 import { DEFAULT_LANGUAGE, textCatalog } from '../../adapters/texts/text-catalog';
 import { GameId } from '../../domain/engine/game-id';
 import { TopologyId } from '../../domain/engine/geometry-factory';
+import type { CellShape } from '../board/board-layout';
 import { useCompositionRoot } from '../composition-root-provider';
 import type { WorldTone } from './theme';
 
@@ -28,6 +29,15 @@ export function useHomePresenter(figure: TopologyId = TopologyId.hex): HomePrese
 export function useGameTones(figure: TopologyId): (gameId: string) => WorldTone {
   const registry = useCompositionRoot().registry(figure);
   return (gameId) => registry.gameOf(GameId.of(gameId)).tone;
+}
+
+// The shape of a board figure for a stone or a glyph (#297), from the composition root.
+// A screen passes the text of the figure, as a `FigureChoice` and a route hold it,
+// and the size of the longer side of the shape. So no screen branches on the figure.
+// A text that names no figure of the root throws a RangeError.
+export function useFigureShapes(): (figure: string, size: number) => CellShape {
+  const root = useCompositionRoot();
+  return (figure, size) => root.figureShape(TopologyId.of(figure), size);
 }
 
 // The board figure of a route (#171): its `TopologyId`, and its text for the next route.

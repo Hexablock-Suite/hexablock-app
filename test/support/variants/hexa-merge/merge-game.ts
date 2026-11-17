@@ -86,7 +86,7 @@ export function values<TAxis extends GridAxis>(photo: {
 }): Record<string, number> {
   const out: Record<string, number> = {};
   for (const [at, tile] of photo.boardCopy().occupiedCells()) {
-    out[hexTopology.key(at)] = valueOf(tile);
+    out[delivered(hexTopology.key(at))] = valueOf(tile);
   }
   return out;
 }

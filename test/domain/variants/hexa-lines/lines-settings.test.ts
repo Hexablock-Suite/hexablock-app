@@ -8,6 +8,7 @@ import { CellNode, ShapeGroup, type ShapeNode } from '../../../../src/domain/eng
 import { LinesSettings } from '../../../../src/domain/variants/hexa-lines/lines-factory';
 import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
 import { blue, red } from '../../../support/variants/hexa-lines/lines-game';
+import { delivered } from '../../../support/engine/value-receiver';
 
 // The settings of a Hexa Lines game are a value object (issue 210, classes.md decision 48).
 
@@ -35,7 +36,7 @@ class ListRandom implements RandomSource {
 // The piece that the settings draw from two numbers, as text.
 function drawn(settings: LinesSettings<SquareCoord>, shape: number, color: number): string {
   const piece = settings.drawPiece(new ListRandom([shape, color]));
-  const keys = piece.coveredCoordinates().map((c) => squareTopology.key(c));
+  const keys = piece.coveredCoordinates().map((c) => delivered(squareTopology.key(c)));
   return `${piece.occupant().equals(red) ? 'red' : 'blue'} ${keys.join(' ')}`;
 }
 

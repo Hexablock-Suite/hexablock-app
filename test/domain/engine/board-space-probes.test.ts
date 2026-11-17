@@ -1,5 +1,6 @@
 /** @jest-environment node */
 import { Board, BoardSpace } from '../../../src/domain/engine/board';
+import { CoordKey } from '../../../src/domain/engine/coord-key';
 import { RegionSize } from '../../../src/domain/engine/region-size';
 import { square, squareTopology } from '../../support/engine/square-topology';
 import { BOARD_ID } from '../../support/engine/entity-ids';
@@ -69,7 +70,7 @@ describe('Board with BoardSpace entities (probes)', () => {
   });
 
   it('should_keep_a_space_apart_from_another_space_when_both_hold_the_same_state', () => {
-    const topology = { key: (c: { x: number }) => String(c.x) as never };
+    const topology = { key: (c: { x: number }) => CoordKey.of(String(c.x)) };
     const one = BoardSpace.free<string, { x: number }>({ x: 1 }, topology);
     const two = BoardSpace.free<string, { x: number }>({ x: 2 }, topology);
     one.occupy('red');

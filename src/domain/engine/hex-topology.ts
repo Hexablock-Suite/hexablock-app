@@ -1,5 +1,5 @@
 import { BoardShape } from './board-shape';
-import { coordKey, type CoordKey } from './coord-key';
+import { CoordKey } from './coord-key';
 import { Distance } from './distance';
 import type { GridAxis, GridDirection, GridTopology } from './grid-topology';
 import type { Radius } from './radius';
@@ -57,10 +57,10 @@ export class HexCoord {
     return HexCoord.of(-this.r, this.q + this.r);
   }
 
-  // The key of the coordinate: `q,r`, branded as a `CoordKey` (issue #237).
+  // The key of the coordinate: `q,r`, as a `CoordKey` value object (issues #237 and #246).
   // `HexTopology.key()` gives it to the engine, so the topology reads no text.
   key(): CoordKey {
-    return coordKey(`${this.q},${this.r}`);
+    return CoordKey.of(`${this.q},${this.r}`);
   }
 
   // Gives the two values of the coordinate, `[q, r]`, to `receiver`. It returns nothing.

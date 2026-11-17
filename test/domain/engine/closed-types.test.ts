@@ -3,7 +3,7 @@ import { Board } from '../../../src/domain/engine/board';
 import type { BoardState } from '../../../src/domain/engine/board-state';
 import { Color } from '../../../src/domain/engine/color';
 import { Distance } from '../../../src/domain/engine/distance';
-import { coordKey, type CoordKey } from '../../../src/domain/engine/coord-key';
+import { CoordKey } from '../../../src/domain/engine/coord-key';
 import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
 import { HexTopology } from '../../../src/domain/engine/hex-topology';
 import { Radius } from '../../../src/domain/engine/radius';
@@ -328,10 +328,13 @@ describe('CoordKey', () => {
     expect(free).toBe('0,0');
   });
 
-  it('should_give_the_same_key_when_two_equal_coordinates_are_keyed', () => {
+  // Issue #246: a key is a value object, so two equal coordinates give two equal keys,
+  // each a new object, and `equals()` compares them by value.
+  it('should_give_equal_keys_when_two_equal_coordinates_are_keyed', () => {
     const key: CoordKey = squareTopology.key(square(1, 2));
 
-    expect(key).toBe(squareTopology.key(square(1, 2)));
-    expect(key).toBe(coordKey('1,2'));
+    expect(key).not.toBe(squareTopology.key(square(1, 2)));
+    expect(key.equals(squareTopology.key(square(1, 2)))).toBe(true);
+    expect(key.equals(CoordKey.of('1,2'))).toBe(true);
   });
 });
