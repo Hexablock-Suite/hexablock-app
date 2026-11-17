@@ -73,7 +73,8 @@
         <desc id="adpresenter-desc">
           Class diagram across layers 4, 3 and 2 showing the GameScreen route using GamePresenter
           and rendering BoardView, BoardView keeping the CellRenderer of the variant and the
-          BoardLayout of the figure, which HexLayout, SquareLayout and TriangleLayout implement,
+          BoardLayout of the figure, which HexLayout, SquareLayout and TriangleLayout implement; the
+          layout gives the outline of each cell, and the renderer draws that outline (#296),
           BoardView reading GameViewModel, GamePresenter building GameViewModel, mapping each
           occupied cell, each free space and the payload of the plain MoveResult through the
           StateMapper strategy that the default SpaceStateMapper and FitStateMapper implement, and
@@ -923,7 +924,7 @@
           x="728"
           y="100"
           width="232"
-          height="68"
+          height="76"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -952,8 +953,11 @@
         >
           CellRenderer
         </text>
-        <text x="744" y="160" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + render(cell: TCellView): ReactNode
+        <text x="744" y="158" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + render(cell: TCellView,
+        </text>
+        <text x="768" y="170" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          shape: CellShape): ReactNode
         </text>
         <!-- Class: BoardLayout (interface of the layout Strategy, D4 and D11) -->
         <rect
@@ -989,11 +993,14 @@
         >
           BoardLayout
         </text>
-        <text x="440" y="316" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="440" y="313" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + cellSize(): number
         </text>
-        <text x="440" y="332" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="440" y="326" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + centerOf(at: TCoord): ScreenPoint
+        </text>
+        <text x="440" y="339" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + outlineOf(at: TCoord): ScreenPoint[]
         </text>
         <!-- Class: HexLayout (the layout of the hexagon figure) -->
         <rect

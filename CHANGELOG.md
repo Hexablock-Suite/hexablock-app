@@ -6,6 +6,10 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 
 ## [Unreleased]
 
+### Fixed
+
+- Each space of the board shows the shape of its figure ([#296](https://github.com/Hexablock-Suite/hexablock-app/issues/296), APP-FR-16, classes.md decisions 14 and 17): a hexagon, a square, or a triangle that points up or down as its coordinate does, free and occupied, on the board and in the Fit tray. `BoardLayout` gains `outlineOf(at)`, `cellBoxOf()` gives the box that holds its whole outline, so the frame never clips it, the touch box stays the square around the inner circle, so a press never reaches a neighbor, and `CellRenderer.render(cell, shape)` draws that outline with `react-native-svg` 15.16.0, added with `npx expo install`. `BoardView` and the renderers still hold no branch on the figure. View 4.1 and `classes.drawio` show the change, and the PNG image of view 4.1 is exported again.
+
 ## [0.2.0] - 2026-11-16
 
 ### Added
