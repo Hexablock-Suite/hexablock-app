@@ -182,7 +182,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
     if (this.offered === undefined) throw new RangeError('No stack is on offer.');
     this.checkInside(at);
     if (!this.isFree(at)) {
-      throw new RangeError(`The cell ${this.board.key(at)} already holds a stack.`);
+      throw new RangeError('The cell already holds a stack.', { cause: this.board.key(at) });
     }
     this.board.occupy(at, this.offered.occupant());
     this.placedAt = at;
@@ -197,11 +197,11 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
   moveRun(from: TCoord, to: TCoord): void {
     const giver = this.board.occupantAt(from);
     if (giver === undefined || giver.isEmpty()) {
-      throw new RangeError(`The cell ${this.board.key(from)} has no stack to move.`);
+      throw new RangeError('The cell has no stack to move.', { cause: this.board.key(from) });
     }
     this.checkInside(to);
-    if (this.board.key(from) === this.board.key(to)) {
-      throw new RangeError(`A run cannot move to its own cell ${this.board.key(to)}.`);
+    if (this.board.key(from).equals(this.board.key(to))) {
+      throw new RangeError('A run cannot move to its own cell.', { cause: this.board.key(to) });
     }
     const receiver = this.board.occupantAt(to) ?? ColorStack.empty();
     this.board.occupy(from, giver.withoutTopRun());
@@ -214,7 +214,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
   clearStack(at: TCoord): void {
     const stack = this.board.occupantAt(at);
     if (stack === undefined || stack.isEmpty()) {
-      throw new RangeError(`The cell ${this.board.key(at)} has no stack to clear.`);
+      throw new RangeError('The cell has no stack to clear.', { cause: this.board.key(at) });
     }
     this.board.occupy(at, ColorStack.empty());
     this.goalsDone = this.goalsDone.plusOne();
@@ -278,7 +278,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
 
   private checkInside(at: TCoord): void {
     if (!this.board.contains(at)) {
-      throw new RangeError(`The coordinate ${this.board.key(at)} is outside the board.`);
+      throw new RangeError('The coordinate is outside the board.', { cause: this.board.key(at) });
     }
   }
 

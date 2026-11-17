@@ -1,5 +1,5 @@
 import { BoardShape } from './board-shape';
-import { coordKey, type CoordKey } from './coord-key';
+import { CoordKey } from './coord-key';
 import { Distance } from './distance';
 import type { GridAxis, GridDirection, GridTopology } from './grid-topology';
 import type { Radius } from './radius';
@@ -56,10 +56,10 @@ export class SquareCoord {
     return SquareCoord.of(-this.row, this.col);
   }
 
-  // The key of the coordinate: `col,row`, branded as a `CoordKey` (issue #237).
+  // The key of the coordinate: `col,row`, as a `CoordKey` value object (issues #237 and #246).
   // `SquareTopology.key()` gives it to the engine, so the topology reads no text.
   key(): CoordKey {
-    return coordKey(`${this.col},${this.row}`);
+    return CoordKey.of(`${this.col},${this.row}`);
   }
 
   // Gives the two values of the coordinate, `[col, row]`, to `receiver`. It returns nothing.

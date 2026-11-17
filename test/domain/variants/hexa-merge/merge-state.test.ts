@@ -21,11 +21,12 @@ import {
 } from '../../../support/variants/hexa-merge/merge-game';
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { STATE_ID } from '../../../support/engine/entity-ids';
+import { delivered } from '../../../support/engine/value-receiver';
 
 // R7: the Merge state is an entity. It keeps its object: a new tile and a slide change it in place.
 // A refused input leaves the whole state as it was.
 
-const key = (q: number, r: number) => hexTopology.key(hex(q, r));
+const key = (q: number, r: number) => delivered(hexTopology.key(hex(q, r)));
 
 function draws(...made: [number, number][]) {
   return new FixedListPieceSource<NewTile<MergeTile>>(
@@ -40,7 +41,7 @@ function facts(state: HexMergeState) {
       .snapshot()
       .boardCopy()
       .occupiedCells()
-      .map(([at, tile]) => [hexTopology.key(at), valueOf(tile)]),
+      .map(([at, tile]) => [delivered(hexTopology.key(at)), valueOf(tile)]),
     left: state.snapshot().tileSource().hasNext(),
     targetReached: state.snapshot().hasReachedTarget(),
     merged: state.snapshot().mergedTiles().map(valueOf),
@@ -63,8 +64,8 @@ describe('MergeState', () => {
     const last = empty[empty.length - 1]!;
     expect(values(state.snapshot())).toEqual({
       [key(0, 0)]: 2,
-      [hexTopology.key(first)]: 4,
-      [hexTopology.key(last)]: 2,
+      [delivered(hexTopology.key(first))]: 4,
+      [delivered(hexTopology.key(last))]: 2,
     });
     expect(state.snapshot().tileSource().hasNext()).toBe(false);
   });
@@ -135,7 +136,7 @@ describe('MergeState', () => {
         .snapshot()
         .boardCopy()
         .occupiedCells()
-        .map(([at, tile]) => [hexTopology.key(at), valueOf(tile)]),
+        .map(([at, tile]) => [delivered(hexTopology.key(at)), valueOf(tile)]),
     ).toEqual([
       [key(-1, 0), 4],
       [key(-1, 1), 8],

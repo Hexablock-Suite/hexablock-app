@@ -5,7 +5,8 @@ import { StyleSheet } from 'react-native';
 // A cell renderer draws a free space with the test id `space-free` and an occupied space
 // with the test id `space-occupied`. It hides each space from the screen reader,
 // because the board carries the accessible name. `BoardView` places each space in a box,
-// the parent of the element of the renderer.
+// the parent of the element of the renderer. The drawing of a space takes no press,
+// so a helper presses the box.
 
 // A drawn host element, as the queries of the screen give it.
 type Drawn = ReturnType<typeof screen.getByTestId>;
@@ -37,5 +38,5 @@ export function occupiedSpaces(): number[] {
 export async function pressSpace(index: number): Promise<void> {
   const space = spaces()[index];
   if (space === undefined) throw new RangeError(`The board has no space ${index}.`);
-  await fireEvent.press(space);
+  await fireEvent.press(space.parent ?? space);
 }

@@ -1,5 +1,6 @@
 import { BoardShape } from '../../engine/board-shape';
-import type { CoordKey } from '../../engine/coord-key';
+import { CoordKey } from '../../engine/coord-key';
+import { CoordKeyMap } from '../../engine/coord-key-map';
 import { ElapsedTime } from '../../engine/elapsed-time';
 import type { GeometryFactory, TopologyId } from '../../engine/geometry-factory';
 import type { ILevelBuilder } from '../../engine/level-builder';
@@ -160,7 +161,7 @@ export class FitLevelBuilder<TCoord> implements ILevelBuilder<FitLevel<TCoord>> 
       const placed = piece.rotated(rotation, topology).translated(at, topology);
       return placed.coveredCoordinates().map((c) => topology.key(c));
     });
-    if (!eachPieceOnce || new Set(covered).size !== covered.length || !sameKeys(covered, cells)) {
+    if (!eachPieceOnce || repeatsAKey(covered) || !CoordKey.sameKeys(covered, cells)) {
       throw new RangeError(INEXACT_WITNESS);
     }
   }
@@ -186,9 +187,12 @@ function listOf(value: unknown): readonly unknown[] {
   return value;
 }
 
-// True when two lists hold the same keys, each key as many times, in any order.
-function sameKeys(left: readonly CoordKey[], right: readonly CoordKey[]): boolean {
-  const mine = [...left].sort();
-  const theirs = [...right].sort();
-  return mine.length === theirs.length && mine.every((key, i) => key === theirs[i]);
+// True when the list holds two equal keys. A key is a value object, so a `Set` cannot tell.
+function repeatsAKey(keys: readonly CoordKey[]): boolean {
+  const seen = new CoordKeyMap<CoordKey>();
+  return keys.some((key) => {
+    if (seen.has(key)) return true;
+    seen.set(key, key);
+    return false;
+  });
 }

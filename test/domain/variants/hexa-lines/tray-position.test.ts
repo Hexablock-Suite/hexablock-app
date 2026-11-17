@@ -1,6 +1,8 @@
 /** @jest-environment node */
+import { CoordKey } from '../../../../src/domain/engine/coord-key';
 import { TrayPosition } from '../../../../src/domain/variants/hexa-lines/tray-position';
 import { squareTopology, square } from '../../../support/engine/square-topology';
+import { delivered } from '../../../support/engine/value-receiver';
 
 // The place of one piece in the Lines tray, from 0 (issue #232).
 // A `PlacePiece` names its tray piece with it (classes.md decision 43).
@@ -48,9 +50,14 @@ describe('TrayPosition', () => {
     expect(TrayPosition.of(2).missingPiece()).toEqual(
       new RangeError('The tray has no piece at index 2.'),
     );
-    expect(TrayPosition.of(1).misfitAt(squareTopology.key(square(2, 0)))).toEqual(
-      new RangeError('The piece at tray index 1 does not fit at 2,0.'),
+    // Issue #246: the error carries the key as its `cause`, and the edge delivers its text.
+    const error = TrayPosition.of(1).misfitAt(squareTopology.key(square(2, 0)));
+    expect(error).toEqual(
+      new RangeError('The piece at tray index 1 does not fit at its cell.', {
+        cause: CoordKey.of('2,0'),
+      }),
     );
+    expect(delivered(error.cause as CoordKey)).toBe('2,0');
   });
 
   // A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails

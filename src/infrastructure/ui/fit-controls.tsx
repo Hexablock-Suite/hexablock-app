@@ -10,7 +10,7 @@ import {
 } from '../../domain/variants/hexa-fit/fit-move';
 import { PieceId } from '../../domain/variants/hexa-fit/piece-id';
 import { fittedCellSize } from '../board/board-fit';
-import type { BoardLayout } from '../board/board-layout';
+import { cellBoxOf, type BoardLayout } from '../board/board-layout';
 import { BoardView } from '../board/board-view';
 import type { CellRenderer } from '../board/cell-renderer';
 import { PieceStone } from '../board/fit-cell-renderer';
@@ -34,9 +34,14 @@ interface Choice {
   readonly turn: number;
 }
 
-// The width of the drawing of a tray piece, and its largest cell.
-const PREVIEW = 40;
-const PREVIEW_CELL = 14;
+// The face of a tray piece, its border and the margin between the border and the drawing
+// (#299). The face is wider than 48, the cell size that the board gives a finger.
+const FACE = 60;
+const FACE_BORDER = 2;
+const PREVIEW_MARGIN = 6;
+// The largest width and the largest height of the drawing of a tray piece. It is also
+// the largest cell, so the drawing of a single cell fills the face too.
+const PREVIEW = FACE - 2 * (FACE_BORDER + PREVIEW_MARGIN);
 
 // The two looks of a tray piece, as the two looks of a figure choice: the chosen piece
 // is sun-yellow, and each other piece has a white face on the light panel of the sign.
@@ -51,12 +56,9 @@ interface PreviewSpace {
   readonly anchor: boolean;
 }
 
+// It draws each space in the outline of the figure, as the board does (#296).
 const PREVIEW_RENDERER: CellRenderer<PreviewSpace> = {
-  render: ({ piece, anchor }) => (
-    <View style={styles.previewSpace}>
-      <PieceStone piece={piece} anchor={anchor} />
-    </View>
-  ),
+  render: ({ piece, anchor }, shape) => <PieceStone piece={piece} anchor={anchor} shape={shape} />,
 };
 
 // The move controls of Hexa Fit (classes.md decision 14, issue #175). The game registry
@@ -209,8 +211,13 @@ function TrayPiece<TCoord>({
   readonly onPress: () => void;
 }) {
   const cells = piece.turns[turn] ?? [];
-  const size = fittedCellSize(cells, layoutOf, PREVIEW, PREVIEW_CELL);
   const unit = layoutOf(1);
+  // `fittedCellSize()` fits only the width. A piece can be higher than wide at a rotation
+  // step, so the height of the drawing also limits the cell size.
+  const size = Math.min(
+    fittedCellSize(cells, layoutOf, PREVIEW, PREVIEW),
+    PREVIEW / heightOf(cells, unit),
+  );
   const colors = checked ? LOOKS.chosen : LOOKS.other;
   return (
     <Pressable
@@ -251,6 +258,17 @@ function TrayPiece<TCoord>({
       )}
     </Pressable>
   );
+}
+
+// The height of the drawing of `cells` in the layout `unit` of size 1, in cell sizes:
+// from the top of the topmost outline to the bottom of the lowest outline.
+// A drawing with no cell has the height 0, so it sets no limit.
+function heightOf<TCoord>(cells: readonly TCoord[], unit: BoardLayout<TCoord>): number {
+  if (cells.length === 0) return 0;
+  const boxes = cells.map((at) => cellBoxOf(unit, at));
+  const top = Math.min(...boxes.map(({ origin }) => origin.y));
+  const bottom = Math.max(...boxes.map(({ origin, shape }) => origin.y + shape.height));
+  return bottom - top;
 }
 
 const styles = StyleSheet.create({
@@ -306,7 +324,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: space.sm,
-    minHeight: 60 + lip.sm,
+    minHeight: FACE + lip.sm,
   },
   piece: {
     paddingBottom: lip.sm,
@@ -322,16 +340,12 @@ const styles = StyleSheet.create({
   face: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 60,
-    height: 60,
+    width: FACE,
+    height: FACE,
     borderRadius: radius.md,
-    borderWidth: 2,
+    borderWidth: FACE_BORDER,
   },
   pressed: {
     transform: [{ translateY: lip.sm }],
-  },
-  previewSpace: {
-    width: '92%',
-    aspectRatio: 1,
   },
 });

@@ -24,6 +24,7 @@ import { phaseNameOf } from '../../support/engine/phase-name';
 import { square, squareTopology, type SquareCoord } from '../../support/engine/square-topology';
 import { MATCH_ID } from '../../support/engine/match-id';
 import { TIMER_ID } from '../../support/engine/entity-ids';
+import { delivered } from '../../support/engine/value-receiver';
 
 // `TimedRulesDecorator` times a game around any rules (issue 157, classes.md decision 19, D14).
 // `FakeRules` extends `BaseGameRules` and calls its own `evaluate()`, as a variant rules class does.
@@ -86,7 +87,7 @@ function factsOf(
     cells: state
       .boardCopy()
       .occupiedCells()
-      .map(([at, cell]) => [squareTopology.key(at), cell.value]),
+      .map(([at, cell]) => [delivered(squareTopology.key(at)), cell.value]),
     score: state.scoreSoFar(),
     phase: phaseNameOf(engine.currentPhase()),
     log: rules.log,

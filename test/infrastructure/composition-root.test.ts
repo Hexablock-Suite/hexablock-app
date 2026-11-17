@@ -169,6 +169,20 @@ describe('CompositionRoot', () => {
       expect(figures.every((figure, i) => figure.equals(FIGURES[i]))).toBe(true);
     });
 
+    // Issue #297: the stones of the home screen and of the map take the shape of the figure.
+    // The root gives the outline of the origin cell of each figure that it offers, scaled
+    // so that the longer side of its box is the size that the screen asks for.
+    it('should_give_the_shape_of_the_origin_cell_when_a_screen_asks_for_an_offered_figure', () => {
+      const root = testRoot();
+
+      const shapes = root.figures().map((figure) => root.figureShape(figure, 60));
+
+      expect(shapes.map(({ corners }) => corners.length)).toEqual([6, 4, 3]);
+      for (const { width, height } of shapes) expect(Math.max(width, height)).toBeCloseTo(60);
+      // The triangle of the origin points up: one corner at the top.
+      expect(shapes[2]?.corners[0]?.y).toBeCloseTo(0);
+    });
+
     it('should_give_the_registry_of_the_hexagon_when_the_caller_names_no_figure', () => {
       const root = testRoot();
 
@@ -185,6 +199,22 @@ describe('CompositionRoot', () => {
         ['hexa-lines', 'hexa-sort', 'hexa-merge'],
         ['hexa-lines', 'hexa-sort', 'hexa-merge'],
       ]);
+    });
+
+    // Issue #298: each entry declares the world colors of its game, so a game has one color
+    // on every figure, and the four games have four colors.
+    it('should_give_each_game_one_color_on_every_figure_when_each_entry_declares_its_colors', () => {
+      const root = testRoot();
+      const hexagon = root.registry();
+
+      for (const figure of FIGURES) {
+        const registry = root.registry(figure);
+        for (const id of registry.gameIds()) {
+          expect(registry.gameOf(id).tone).toEqual(hexagon.gameOf(id).tone);
+        }
+      }
+      const tones = hexagon.gameIds().map((id) => hexagon.gameOf(id).tone.tone);
+      expect(new Set(tones).size).toBe(FOUR_VARIANTS.length);
     });
 
     // A board region of size 5 holds 61 hexagons, 25 squares or 50 triangles,

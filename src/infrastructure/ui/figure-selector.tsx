@@ -1,14 +1,14 @@
-import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { FigureChoice } from '../../adapters/home-presenter';
-import { Hexagon } from './hex-stone';
+import type { CellShape } from '../board/board-layout';
+import { FigureOutline } from './figure-stone';
 import { lip, palette, radius, serif, space } from './theme';
+import { useFigureShapes } from './use-home-presenter';
 import { WoodSign } from './wood';
 
-// The width of the glyph of a figure, and its height as an equilateral triangle.
+// The longer side of the glyph of a figure.
 const GLYPH = 26;
-const GLYPH_HEIGHT = (GLYPH / 2) * Math.sqrt(3);
 
 // The two looks of a choice, as the two looks of `LipButton`: the chosen figure is sun-yellow,
 // and each other figure has a white face on the light panel of the sign.
@@ -21,14 +21,6 @@ const LOOKS = {
     border: palette.trim,
   },
 } as const;
-
-// The glyph of each figure, by the text of its `TopologyId`. The glyph is decoration:
-// the name of the figure below it carries the meaning. A figure with no glyph shows its name.
-const GLYPHS: Readonly<Record<string, (color: string) => ReactNode>> = {
-  hex: (color) => <Hexagon size={GLYPH} color={color} />,
-  square: (color) => <View style={[styles.square, { backgroundColor: color }]} />,
-  triangle: (color) => <View style={[styles.triangle, { borderBottomColor: color }]} />,
-};
 
 // The figure selector of the home screen (APP-FR-16, issue #171): one choice for each board figure
 // of the composition root, on a wood sign with its label. The choices make a radio group,
@@ -45,6 +37,7 @@ export function FigureSelector({
   readonly chosen: string;
   readonly onChoose: (id: string) => void;
 }) {
+  const shapeOf = useFigureShapes();
   return (
     <WoodSign style={styles.sign}>
       <Text style={styles.label}>{label}</Text>
@@ -53,6 +46,7 @@ export function FigureSelector({
           <Choice
             key={figure.id}
             figure={figure}
+            glyph={shapeOf(figure.id, GLYPH)}
             checked={figure.id === chosen}
             onPress={() => onChoose(figure.id)}
           />
@@ -63,12 +57,17 @@ export function FigureSelector({
 }
 
 // One figure of the selector: its glyph and its name on a face over a lip.
+// The glyph is `glyph`, the shape of the figure from the composition root (#297),
+// which the layout of the figure gives. So the selector does not branch on the figure. The glyph is decoration:
+// the name of the figure below it carries the meaning.
 function Choice({
   figure,
+  glyph,
   checked,
   onPress,
 }: {
   readonly figure: FigureChoice;
+  readonly glyph: CellShape;
   readonly checked: boolean;
   readonly onPress: () => void;
 }) {
@@ -95,7 +94,7 @@ function Choice({
               accessibilityElementsHidden
               importantForAccessibility="no-hide-descendants"
             >
-              {GLYPHS[figure.id]?.(colors.ink)}
+              <FigureOutline shape={glyph} layers={[{ scale: 1, fill: colors.ink }]} />
             </View>
             <Text style={[styles.name, { color: colors.ink }]} numberOfLines={1}>
               {figure.name}
@@ -152,22 +151,8 @@ const styles = StyleSheet.create({
   },
   glyph: {
     alignItems: 'center',
-    height: GLYPH_HEIGHT,
+    height: GLYPH,
     justifyContent: 'center',
-  },
-  square: {
-    borderRadius: 3,
-    height: GLYPH_HEIGHT,
-    width: GLYPH_HEIGHT,
-  },
-  triangle: {
-    borderBottomWidth: GLYPH_HEIGHT,
-    borderLeftColor: 'transparent',
-    borderLeftWidth: GLYPH / 2,
-    borderRightColor: 'transparent',
-    borderRightWidth: GLYPH / 2,
-    height: 0,
-    width: 0,
   },
   name: {
     fontFamily: serif,

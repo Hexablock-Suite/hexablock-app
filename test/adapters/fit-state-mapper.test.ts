@@ -7,6 +7,7 @@ import { Piece } from '../../src/domain/engine/piece';
 import { CellNode, ShapeGroup } from '../../src/domain/engine/shape-node';
 import { FitView } from '../../src/domain/variants/hexa-fit/fit-state';
 import { PieceId } from '../../src/domain/variants/hexa-fit/piece-id';
+import { delivered } from '../support/engine/value-receiver';
 
 // Issue #175: `FitStateMapper` turns the cells and the payload of a Fit response into the data
 // of the Fit screen (classes.md decision 14). The payload is a closed `FitView`, so the mapper
@@ -15,7 +16,7 @@ import { PieceId } from '../../src/domain/variants/hexa-fit/piece-id';
 const topology = new HexGeometry().createTopology();
 
 // The keys of a list of hexagon coordinates, so a test compares coordinates by value.
-const keysOf = (cells: readonly HexCoord[]) => cells.map((c) => topology.key(c));
+const keysOf = (cells: readonly HexCoord[]) => cells.map((c) => delivered(topology.key(c)));
 
 function piece(id: string, cells: readonly HexCoord[]): Piece<PieceId, HexCoord> {
   return new Piece(new ShapeGroup(cells.map((c) => new CellNode(c))), PieceId.of(id));
@@ -41,7 +42,7 @@ describe('FitStateMapper', () => {
 
     const payload = mapper.toPayload(new FitView([domino, single], [PieceId.of('a')], Moves.of(2)));
 
-    const origin = topology.key(hex(0, 0));
+    const origin = delivered(topology.key(hex(0, 0)));
     expect({
       ...payload,
       tray: payload.tray.map((each) => ({ piece: each.piece, turns: each.turns.map(keysOf) })),
@@ -51,7 +52,7 @@ describe('FitStateMapper', () => {
           piece: 'b',
           turns: [hex(1, 0), hex(0, 1), hex(-1, 1), hex(-1, 0), hex(0, -1), hex(1, -1)].map((c) => [
             origin,
-            topology.key(c),
+            delivered(topology.key(c)),
           ]),
         },
         { piece: 'c', turns: Array.from({ length: 6 }, () => [origin]) },

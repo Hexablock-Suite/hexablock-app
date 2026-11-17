@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { CoordKey } from '../../../../src/domain/engine/coord-key';
 import { Moves } from '../../../../src/domain/engine/moves';
 import { Score } from '../../../../src/domain/engine/score';
 import { Turns } from '../../../../src/domain/engine/turns';
@@ -105,7 +106,7 @@ describe('FitState', () => {
         .snapshot()
         .boardCopy()
         .occupiedCells()
-        .map(([c, id]) => `${squareTopology.key(c)}=${delivered(id)}`);
+        .map(([c, id]) => `${delivered(squareTopology.key(c))}=${delivered(id)}`);
     const results: unknown[] = [];
 
     results.push(state.place(A, Placement.of(Turns.of(0), square(2, 0), squareTopology)));
@@ -135,7 +136,7 @@ describe('FitState', () => {
     const before = { cells: state.snapshot().boardCopy().occupiedCells(), placed: state.placed() };
 
     expect(() => state.place(A, Placement.of(Turns.of(0), square(5, 0), squareTopology))).toThrow(
-      new RangeError('The coordinate 6,0 is outside the board.'),
+      new RangeError('The coordinate is outside the board.', { cause: CoordKey.of('6,0') }),
     );
     expect({ cells: state.snapshot().boardCopy().occupiedCells(), placed: state.placed() }).toEqual(
       before,

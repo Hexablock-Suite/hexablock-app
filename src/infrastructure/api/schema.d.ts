@@ -400,9 +400,28 @@ export interface components {
             /** @description The section of the game: the Fit section or the Sort section. */
             section: components["schemas"]["FitSectionDto"] | components["schemas"]["SortSectionDto"];
         };
+        UnavailableLevelDto: {
+            /**
+             * @description The gameId of the stored level.
+             * @example hexa-fit
+             */
+            gameId: string;
+            /**
+             * @description The levelId of the stored level.
+             * @example fit-01
+             */
+            levelId: string;
+            /**
+             * @description The code of the first rule that the stored level breaks, as docs/level-format.md names it.
+             * @example invalid-section
+             */
+            reason: string;
+        };
         LevelsDto: {
             /** @description The levels, by gameId and then by levelId in an answer. */
             levels: components["schemas"]["LevelDto"][];
+            /** @description Only in an answer, and only when a stored level breaks a rule: each such level, by gameId and then by levelId. The levels field holds every other level. The update ignores this field. */
+            unavailable?: components["schemas"]["UnavailableLevelDto"][];
         };
         ScoreEntryDto: {
             /**
@@ -724,7 +743,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Every stored level, by gameId and levelId. */
+            /** @description Every stored level, by gameId and levelId. A stored level that breaks a rule is not in levels: unavailable names it with the code of its rule. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -748,14 +767,14 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Every level of the batch is saved. The body is empty. */
+            /** @description Every level of the batch is saved. A level replaces a stored level that breaks a rule. The body is empty. */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            /** @description The body has the wrong shape, or a level breaks a rule: a value of the common part, its section, A5, a lower version than the stored one, or a gameId with no level files. Each detail names one level by its gameId and levelId. A level problem saves no level of the batch, except a lower version, which saves the other levels. */
+            /** @description The body has the wrong shape, or a level breaks a rule: a value of the common part, its section, A5, a lower version than the stored one, or a gameId with no level files. Over a stored level that breaks a rule, a lower version than its stored version is rejected too, when that stored version is valid. Each detail names one level by its gameId and levelId. A level problem saves no level of the batch, except a lower version, which saves the other levels. */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -766,6 +785,15 @@ export interface operations {
             };
             /** @description The bearer token is missing, malformed, expired or signed with another key. */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+            /** @description The account of the token is not in the list of level editors of the configuration. An empty or unset list lets no account update. No level is saved. */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };

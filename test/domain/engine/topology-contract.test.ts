@@ -83,7 +83,7 @@ const nameOf = (member: GridAxis | GridDirection) => delivered(member as unknown
 // so one table holds three coordinate types with no cast.
 function contract<TCoord>(row: Row<TCoord>): () => void {
   const { topology } = row;
-  const keyOf = (c: TCoord) => topology.key(c);
+  const keyOf = (c: TCoord) => delivered(topology.key(c));
   const sortedKeys = (cells: Iterable<TCoord>) => [...cells].map(keyOf).toSorted();
   const areNeighbors = (a: TCoord, b: TCoord) =>
     topology.neighbors(a).map(keyOf).includes(keyOf(b));

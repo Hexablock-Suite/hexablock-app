@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { BundledLevelRepository } from '../../../src/adapters/bundled-level-repository';
@@ -19,6 +20,7 @@ import { GameStage } from '../../../src/infrastructure/ui/game-stage';
 import { gameUseCases } from '../../support/application/game-use-cases';
 import { ManualClock } from '../../support/engine/manual-clock';
 import { occupiedSpaces, pressSpace } from '../../support/ui/board-spaces';
+import { outlinesIn } from '../../support/ui/cell-outlines';
 
 // Issue #175: the player plays Hexa Fit on the game screen. `GameStage` shows the board with
 // `FitCellRenderer`, and `FitControls` show the tray, the rotate button and the move count.
@@ -46,10 +48,22 @@ async function firstBundledLevel(): Promise<FitLevel<HexCoord>> {
   return definition.buildWith(new FitLevelBuilder(geometry));
 }
 
+// Every bundled Fit level, as the level repository of the app gives it, built with the Fit
+// level builder. The list grows when a task adds a level file (#49).
+async function bundledLevels(): Promise<FitLevel<HexCoord>[]> {
+  const definitions = await new BundledLevelRepository().list(GameId.of('hexa-fit'));
+  return definitions.map((definition) => definition.buildWith(new FitLevelBuilder(geometry)));
+}
+
 // Opens the game screen on the level `fit-01` with the screen parts of Fit.
 async function openFirstBundledLevel(clock = new ManualClock()): Promise<void> {
+  await openLevel(await firstBundledLevel(), clock);
+}
+
+// Opens the game screen on the Fit level `level` with the screen parts of Fit.
+async function openLevel(level: FitLevel<HexCoord>, clock = new ManualClock()): Promise<void> {
   const { startGame, applyMove, undoMove, redoMove } = gameUseCases(
-    new FitFactory(geometry, await firstBundledLevel(), clock),
+    new FitFactory(geometry, level, clock),
   );
   const presenter = new GamePresenter(
     startGame,
@@ -84,6 +98,61 @@ const redoButton = () => screen.getByRole('button', { name: 'Rehacer' });
 
 async function choose(id: string): Promise<void> {
   await fireEvent.press(piece(id));
+}
+
+// A drawn host element, as the queries of the screen give it.
+type Drawn = ReturnType<typeof screen.getByTestId>;
+
+// The size of a tray piece and of its drawing, in density-independent pixels.
+interface TrayMeasure {
+  // The width and the height of the face, inside its border.
+  readonly face: { readonly width: number; readonly height: number };
+  // The width of the face, with its border.
+  readonly faceWidth: number;
+  // The cell size of the drawing, and the width and the height of the frame of the drawing.
+  readonly cell: number;
+  readonly width: number;
+  readonly height: number;
+}
+
+// Every element below `element`, `element` included.
+function descendants(element: Drawn): Drawn[] {
+  const children = (element.children ?? []).filter(
+    (child): child is Drawn => typeof child !== 'string',
+  );
+  return [element, ...children.flatMap(descendants)];
+}
+
+// The flat style of `element`.
+function styleOf(element: Drawn): Record<string, unknown> {
+  return (StyleSheet.flatten(element.props.style) ?? {}) as Record<string, unknown>;
+}
+
+// The face of the tray piece `id` and its drawing. The face is the element with a border.
+// The drawing is the frame of `BoardView` below the face: it carries the name of the piece.
+// Each child of the frame is the square touch box of one cell, with the side of the cell size.
+function measureOf(id: string): TrayMeasure {
+  const radio = piece(id);
+  const below = descendants(radio).slice(1);
+  const face = below.find((each) => typeof styleOf(each).borderWidth === 'number');
+  const frame = below.find((each) => each.props.accessibilityLabel === `Pieza ${id}`);
+  if (face === undefined || frame === undefined) {
+    throw new RangeError(`The tray piece ${id} has no face or no drawing.`);
+  }
+  const faceStyle = styleOf(face);
+  const border = Number(faceStyle.borderWidth);
+  const [box] = descendants(frame).slice(1);
+  if (box === undefined) throw new RangeError(`The drawing of the tray piece ${id} is empty.`);
+  return {
+    face: {
+      width: Number(faceStyle.width) - 2 * border,
+      height: Number(faceStyle.height) - 2 * border,
+    },
+    faceWidth: Number(faceStyle.width),
+    cell: Number(styleOf(box).width),
+    width: Number(styleOf(frame).width),
+    height: Number(styleOf(frame).height),
+  };
 }
 
 describe('FitControls', () => {
@@ -221,5 +290,55 @@ describe('FitControls', () => {
     expect(occupiedSpaces()).toEqual([0, 1, 2, 3, 4, 5]);
     expect(trayPieces()).toEqual([]);
     expect(screen.getByText('Todas las piezas están en la figura.')).toBeOnTheScreen();
+  });
+
+  // Issue #296: the tray draws each piece through `BoardView`, so each space of a piece
+  // shows the outline of the figure, as the board does. `fit-01` is a level on the hexagon.
+  it('should_draw_each_space_of_each_tray_piece_as_a_hexagon_when_the_figure_is_the_hexagon', async () => {
+    await openFirstBundledLevel();
+
+    const drawn = ['a', 'b', 'c'].map((id) => outlinesIn(piece(id)));
+
+    expect(drawn.map((outlines) => outlines.length)).toEqual([6, 4, 2]);
+    expect(new Set(drawn.flat().map(({ corners, points }) => `${corners}:${points}`))).toEqual(
+      new Set(['6:pointy']),
+    );
+  });
+
+  // Issue #299: the drawing of a tray piece fills its face, with a margin, in the width
+  // and in the height, at each rotation step. The test reads every piece of every bundled
+  // Fit level, so it holds the single cell, the widest piece and each level that #49 adds.
+  // The face stays at least 48 wide, the cell size that the board gives a finger.
+  it('should_fill_the_face_with_a_margin_at_each_rotation_step_when_the_tray_draws_each_piece_of_the_bundled_levels', async () => {
+    const MARGIN = 4;
+    const FILL = 0.75;
+    const steps = [...geometry.createTopology().fullTurn().shorter()].length;
+    const levels = await bundledLevels();
+    expect(levels.length).toBeGreaterThan(0);
+
+    for (const level of levels) {
+      await openLevel(level);
+      for (const label of trayPieces()) {
+        const id = String(label).replace('Pieza ', '');
+        await choose(id);
+        for (let step = 0; step < steps; step += 1) {
+          const measure = measureOf(id);
+          const where = `piece ${id} at step ${step}: ${JSON.stringify(measure)}`;
+          expect({ where, faceWidth: measure.faceWidth >= 48 }).toEqual({ where, faceWidth: true });
+          expect({
+            where,
+            cell: measure.cell > 0,
+            width: measure.width <= measure.face.width - 2 * MARGIN,
+            height: measure.height <= measure.face.height - 2 * MARGIN,
+            fills:
+              measure.width >= FILL * measure.face.width ||
+              measure.height >= FILL * measure.face.height,
+          }).toEqual({ where, cell: true, width: true, height: true, fills: true });
+          await fireEvent.press(screen.getByRole('button', { name: 'Girar' }));
+        }
+        await choose(id);
+      }
+      await screen.unmount();
+    }
   });
 });
