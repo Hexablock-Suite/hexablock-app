@@ -77,10 +77,10 @@ const isList = (value: unknown, item: (each: unknown) => boolean) =>
   Array.isArray(value) && value.length > 0 && value.every(item);
 
 describe('bundled Fit levels', () => {
-  it('should_hold_three_levels_or_more_in_the_order_of_their_ids_when_the_folder_is_read', () => {
+  it('should_hold_fifteen_levels_or_more_in_the_order_of_their_ids_when_the_folder_is_read', () => {
     const files = bundledFiles();
 
-    expect(files.length).toBeGreaterThanOrEqual(3);
+    expect(files.length).toBeGreaterThanOrEqual(15);
     expect(files.map(([name, file]) => [name, file.levelId, file.order])).toEqual(
       files.map((_, index) => {
         const id = `fit-${String(index + 1).padStart(2, '0')}`;

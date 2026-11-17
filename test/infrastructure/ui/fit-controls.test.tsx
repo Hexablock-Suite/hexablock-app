@@ -340,5 +340,7 @@ describe('FitControls', () => {
       }
       await screen.unmount();
     }
-  });
+    // The test plays every piece of every bundled Fit level, so its time grows with each level
+    // file. With the 15 levels of #49 it takes about 13 s, so it gets a limit of 60 s.
+  }, 60_000);
 });

@@ -13,10 +13,11 @@ import { ProgressRecord } from '../../src/domain/engine/progress-model';
 import { Score } from '../../src/domain/engine/score';
 import { Stars } from '../../src/domain/engine/stars';
 import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-store';
+import { delivered } from '../support/engine/value-receiver';
 
 // `ListAchievements` gives each achievement of its list with its status: completed or in
 // progress (issue #188). The level achievements read the saved progress of a game and the levels
-// of that game. The tests run the real `BundledLevelRepository` (three Fit levels and three Sort
+// of that game. The tests run the real `BundledLevelRepository` (15 Fit levels and 10 Sort
 // levels) and the real `LocalProgressRepository` over the in-memory `KeyValueStore`.
 
 const FIT = GameId.of('hexa-fit');
@@ -50,6 +51,12 @@ async function progressWith(
   }
   await repository.save(progress);
   return repository;
+}
+
+// The ids of the bundled levels of the game `gameId`, in the order of the repository.
+async function bundledIds(gameId: GameId): Promise<string[]> {
+  const levels = await new BundledLevelRepository().list(gameId);
+  return levels.map((level) => delivered(level.levelId()));
 }
 
 // `ListAchievements` over the bundled levels and the progress `progress`.
@@ -99,7 +106,7 @@ describe('ListAchievements', () => {
     );
     const every = await listOf(
       achievements,
-      await progressWith(FIT, ['fit-01', 'fit-02', 'fit-03']),
+      await progressWith(FIT, await bundledIds(FIT)),
     ).execute({});
 
     expect(rowsOf(some)).toEqual([

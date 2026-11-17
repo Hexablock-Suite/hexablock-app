@@ -1,0 +1,33 @@
+{
+  "gameId": "hexa-sort",
+  "levelId": "sort-07",
+  "order": 7,
+  "version": 1,
+  "topology": "hex",
+  "section": {
+    "radius": 2,
+    "goals": 3,
+    "source": {
+      "stacks": [
+        ["yellow", "yellow", "red", "red", "red", "red"],
+        ["red", "red", "red", "blue", "blue", "blue"],
+        ["blue", "blue", "blue", "blue"],
+        ["green", "green", "green", "red", "red", "red"],
+        ["blue", "blue", "blue"],
+        ["yellow", "yellow", "yellow", "yellow", "green", "green", "green"],
+        ["green", "green", "green", "green"]
+      ]
+    },
+    "stars": [
+      {
+        "maxMoves": 11
+      },
+      {
+        "maxMoves": 9
+      },
+      {
+        "maxMoves": 7
+      }
+    ]
+  }
+}

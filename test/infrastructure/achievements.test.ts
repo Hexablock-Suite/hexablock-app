@@ -1,8 +1,10 @@
 /** @jest-environment node */
+import { readdirSync, readFileSync } from 'node:fs';
+import path from 'node:path';
+
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
 import fit01 from '../../src/adapters/levels/fit/fit-01.json';
 import fit02 from '../../src/adapters/levels/fit/fit-02.json';
-import fit03 from '../../src/adapters/levels/fit/fit-03.json';
 import type { MoveResult } from '../../src/application/move-result';
 import type { Result } from '../../src/application/result';
 import { SaveProgress } from '../../src/application/save-progress';
@@ -25,6 +27,7 @@ import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-s
 import { gameUseCases, valueOf } from '../support/application/game-use-cases';
 import { RecordingLogger } from '../support/application/recording-logger';
 import { ManualClock } from '../support/engine/manual-clock';
+import { repoRoot } from '../support/run-tool';
 
 // Issue #188: the composition root lists the achievements of the player over the saved progress
 // of the device. The tests give the root an in-memory `KeyValueStore` in place of the device.
@@ -45,6 +48,15 @@ const SEVEN = [
 ];
 
 type FitFile = typeof fit01;
+
+// Every bundled Fit level file, in the order of the names.
+function bundledFitFiles(): FitFile[] {
+  const folder = path.join(repoRoot, 'src/adapters/levels/fit');
+  return readdirSync(folder)
+    .filter((name) => name.endsWith('.json'))
+    .sort()
+    .map((name) => JSON.parse(readFileSync(path.join(folder, name), 'utf8')) as FitFile);
+}
 
 // The ids of the completed achievements of a success, or the code of a failure.
 function completedOf(result: Result<AchievementSummary[]>): string[] | string {
@@ -119,17 +131,19 @@ describe('CompositionRoot achievements', () => {
   });
 
   // Done when of issue #188: a test earns one achievement through a played game, and the
-  // achievement is still there after the app restarts. Three won Fit levels earn
-  // «win 3 levels of Hexa Fit» and, with three bundled Fit levels, «win every Hexa Fit level».
-  it('should_keep_the_fit_achievements_completed_after_a_restart_when_three_fit_levels_are_won', async () => {
+  // achievement is still there after the app restarts. Every bundled Fit level won earns
+  // «win 3 levels of Hexa Fit» and «win every Hexa Fit level».
+  it('should_keep_the_fit_achievements_completed_after_a_restart_when_every_fit_level_is_won', async () => {
     const store = new InMemoryKeyValueStore();
     const before = await rootOver(store).listAchievements().execute({});
 
     const outcomes: Outcome[] = [];
-    for (const file of [fit01, fit02, fit03]) outcomes.push(await playAndSave(file, store));
+    const files = bundledFitFiles();
+    for (const file of files) outcomes.push(await playAndSave(file, store));
     const played = await rootOver(store).listAchievements().execute({});
     const restarted = await rootOver(store).listAchievements().execute({});
 
+    expect(files.map((file) => file.levelId)).toContain('fit-15');
     expect(outcomes.every((outcome) => Outcome.victory.equals(outcome))).toBe(true);
     expect(completedOf(before)).toEqual([]);
     expect(completedOf(played)).toEqual(['fit-3', 'fit-all']);

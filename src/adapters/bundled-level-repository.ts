@@ -5,9 +5,28 @@ import type { LevelId } from '../domain/engine/level-id';
 import fit01 from './levels/fit/fit-01.json';
 import fit02 from './levels/fit/fit-02.json';
 import fit03 from './levels/fit/fit-03.json';
+import fit04 from './levels/fit/fit-04.json';
+import fit05 from './levels/fit/fit-05.json';
+import fit06 from './levels/fit/fit-06.json';
+import fit07 from './levels/fit/fit-07.json';
+import fit08 from './levels/fit/fit-08.json';
+import fit09 from './levels/fit/fit-09.json';
+import fit10 from './levels/fit/fit-10.json';
+import fit11 from './levels/fit/fit-11.json';
+import fit12 from './levels/fit/fit-12.json';
+import fit13 from './levels/fit/fit-13.json';
+import fit14 from './levels/fit/fit-14.json';
+import fit15 from './levels/fit/fit-15.json';
 import sort01 from './levels/sort/sort-01.json';
 import sort02 from './levels/sort/sort-02.json';
 import sort03 from './levels/sort/sort-03.json';
+import sort04 from './levels/sort/sort-04.json';
+import sort05 from './levels/sort/sort-05.json';
+import sort06 from './levels/sort/sort-06.json';
+import sort07 from './levels/sort/sort-07.json';
+import sort08 from './levels/sort/sort-08.json';
+import sort09 from './levels/sort/sort-09.json';
+import sort10 from './levels/sort/sort-10.json';
 
 // The part of a level file that this adapter reads: the common part of the shared level format
 // (hexablock-api `docs/level-format.md`, DS-6) and the section of the game.
@@ -23,7 +42,33 @@ export interface LevelFile {
 // Every level file that the app bundles. Metro and Jest load each JSON file as an object,
 // so the files need no file system on the device. A new level file adds one import here.
 // The test of this adapter reads the folders, so a file that this list misses fails it.
-const BUNDLED: readonly LevelFile[] = [fit01, fit02, fit03, sort01, sort02, sort03];
+const BUNDLED: readonly LevelFile[] = [
+  fit01,
+  fit02,
+  fit03,
+  fit04,
+  fit05,
+  fit06,
+  fit07,
+  fit08,
+  fit09,
+  fit10,
+  fit11,
+  fit12,
+  fit13,
+  fit14,
+  fit15,
+  sort01,
+  sort02,
+  sort03,
+  sort04,
+  sort05,
+  sort06,
+  sort07,
+  sort08,
+  sort09,
+  sort10,
+];
 
 // Adapter of the `LevelRepository` port over the level files of the app
 // (classes.md decisions 24 and 58, issue #168, A6). The files live in `src/adapters/levels/`,

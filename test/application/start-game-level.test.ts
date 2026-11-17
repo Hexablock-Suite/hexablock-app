@@ -161,7 +161,7 @@ describe('StartGame with a level id', () => {
     const lines = startGameOf(LINES, linesFactory());
 
     const errors = [
-      errorOf(await startGame.execute({ levelId: LevelId.of('fit-09') })),
+      errorOf(await startGame.execute({ levelId: LevelId.of('fit-99') })),
       errorOf(await lines.startGame.execute({ levelId: LevelId.of('fit-01') })),
     ];
 

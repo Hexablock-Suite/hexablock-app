@@ -94,7 +94,7 @@ describe('LevelGameFactories', () => {
   });
 
   it('should_reject_with_the_level_id_as_cause_when_the_game_has_no_level_with_the_id', async () => {
-    const missing = LevelId.of('fit-09');
+    const missing = LevelId.of('fit-99');
 
     await expect(fitFactories().factoryFor(missing)).rejects.toThrow(
       new RangeError('The game has no level with this id.', { cause: missing }),
