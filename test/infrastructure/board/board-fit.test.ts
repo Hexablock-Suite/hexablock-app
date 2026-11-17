@@ -4,6 +4,8 @@ import { square } from '../../../src/domain/engine/square-topology';
 import { fittedCellSize } from '../../../src/infrastructure/board/board-fit';
 import { HexLayout } from '../../../src/infrastructure/board/hex-layout';
 import { SquareLayout } from '../../../src/infrastructure/board/square-layout';
+import { triangle } from '../../../src/domain/engine/triangle-topology';
+import { TriangleLayout } from '../../../src/infrastructure/board/triangle-layout';
 
 // Issue #170: the game screen draws the whole board in the width of the screen.
 // `fittedCellSize()` reads only the layout of the figure, so it fits every figure.
@@ -18,6 +20,17 @@ describe('fittedCellSize', () => {
     const row = Array.from({ length: 9 }, (_, q) => hex(q - 4, 0));
 
     expect(fittedCellSize(row, hexLayoutOf, 270, 48)).toBeCloseTo(30, 9);
+  });
+
+  // Issue #296: the board fits the whole outline of each cell. A row of three triangles
+  // is 2√3 cell sizes wide: the outer centers lie √3 sizes apart, and each end triangle
+  // reaches √3/2 of a size past its center.
+  it('should_fit_the_whole_outline_of_each_triangle_when_the_figure_is_the_triangle', () => {
+    const row = [triangle(0, 0), triangle(1, 0), triangle(2, 0)];
+
+    expect(
+      fittedCellSize(row, (size) => new TriangleLayout(size), 20 * Math.sqrt(3), 48),
+    ).toBeCloseTo(10, 9);
   });
 
   it('should_give_the_largest_size_when_the_board_fits_at_that_size', () => {
