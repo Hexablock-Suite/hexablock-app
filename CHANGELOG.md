@@ -8,6 +8,7 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 
 ### Changed
 
+- Regenerate `src/infrastructure/api/schema.d.ts` against hexablock-api `main`: `GET /levels` may list the stored levels that break a rule in `unavailable` (Hexablock-Suite/hexablock-api#156). The pact still passes.
 - Regenerate `src/infrastructure/api/schema.d.ts` against hexablock-api `main`: `PUT /levels` now answers 403 when the account is not a level editor (Hexablock-Suite/hexablock-api#145). The pact still passes.
 - Record D25 in `docs/REQUIREMENTS.md`: the Hexa Lines tray fills again with the next 3 pieces when its last piece is placed ([#301](https://github.com/Hexablock-Suite/hexablock-app/issues/301), decision A of 2026-11-17). It leaves «Still to define (team)». No code changes.
 
