@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import type { BoardLayout } from './board-layout';
+import { cellBoxOf, type BoardLayout } from './board-layout';
 import type { CellRenderer } from './cell-renderer';
 
 export interface BoardViewProps<TCellView, TCoord> {
@@ -21,13 +21,16 @@ export interface BoardViewProps<TCellView, TCoord> {
 // The handler of a board with no move controls: a press plays nothing.
 function ignoreSpace(): void {}
 
-// Draws the cells of a board of any figure (D3, D4, issue #165).
+// Draws the cells of a board of any figure (D3, D4, issues #165 and #296).
 // It reads only the pairs that it takes and never calls a method of `Board` or of a photo (#234).
-// The layout of the figure gives the place of each cell, and the renderer of the variant
-// draws the cell in a square box at that place. `BoardView` never asks which figure
+// The layout of the figure gives the place and the outline of each cell.
+// Each cell gets a square touch box around its inner circle, with the side `cellSize()`.
+// The touch boxes of two neighbors hold no center of the other, so a press never reaches
+// a neighbor. The renderer of the variant draws the cell and its outline over that box,
+// and the outline can reach past it (#296). `BoardView` never asks which figure
 // or which game it draws, so it holds no branch on them.
-// The frame of the board wraps the boxes of the cells that it draws.
-// So the leftmost box starts at the left side of the frame, and the topmost box at its top side.
+// The frame of the board wraps the outlines of the cells that it draws.
+// So the leftmost outline starts at the left side of the frame, and the topmost at its top side.
 // The center of each cell is unique, so it is also the React key of the box.
 // Each box takes a press and hands its coordinate and its cell view to `onPressSpace` (#175).
 // The board carries the accessible name, so the screen reader skips each box.
@@ -39,27 +42,41 @@ export function BoardView<TCellView, TCoord>({
   onPressSpace = ignoreSpace,
 }: BoardViewProps<TCellView, TCoord>) {
   const size = layout.cellSize();
-  const placed = cells.map(([at, cell]) => ({ at, center: layout.centerOf(at), cell }));
-  const xs = placed.map(({ center }) => center.x);
-  const ys = placed.map(({ center }) => center.y);
-  const left = Math.min(...xs);
-  const top = Math.min(...ys);
+  const placed = cells.map(([at, cell]) => ({
+    at,
+    cell,
+    center: layout.centerOf(at),
+    ...cellBoxOf(layout, at),
+  }));
+  const left = Math.min(...placed.map(({ origin }) => origin.x));
+  const top = Math.min(...placed.map(({ origin }) => origin.y));
   // With no cell, the minimum is Infinity and the maximum is -Infinity, so the frame is empty.
-  const width = Math.max(0, Math.max(...xs) - left + size);
-  const height = Math.max(0, Math.max(...ys) - top + size);
+  const width = Math.max(
+    0,
+    Math.max(...placed.map(({ origin, shape }) => origin.x + shape.width)) - left,
+  );
+  const height = Math.max(
+    0,
+    Math.max(...placed.map(({ origin, shape }) => origin.y + shape.height)) - top,
+  );
   return (
     <View accessibilityLabel={label} style={[styles.board, { width, height }]}>
-      {placed.map(({ at, center, cell }) => (
+      {placed.map(({ at, cell, center, shape }) => (
         <Pressable
           key={`${center.x},${center.y}`}
           accessible={false}
           onPress={() => onPressSpace(at, cell)}
           style={[
             styles.cell,
-            { left: center.x - left, top: center.y - top, width: size, height: size },
+            {
+              left: center.x - size / 2 - left,
+              top: center.y - size / 2 - top,
+              width: size,
+              height: size,
+            },
           ]}
         >
-          {renderer.render(cell)}
+          {renderer.render(cell, shape)}
         </Pressable>
       ))}
     </View>

@@ -5,7 +5,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { FigureSelector } from '../src/infrastructure/ui/figure-selector';
-import { HexStone } from '../src/infrastructure/ui/hex-stone';
+import { FigureStone } from '../src/infrastructure/ui/figure-stone';
 import { Scenery } from '../src/infrastructure/ui/scenery';
 import {
   WORLD_TONE_COUNT,
@@ -16,12 +16,11 @@ import {
   space,
   worldTone,
 } from '../src/infrastructure/ui/theme';
-import { useHomePresenter } from '../src/infrastructure/ui/use-home-presenter';
+import { useFigureShapes, useHomePresenter } from '../src/infrastructure/ui/use-home-presenter';
 import { LipButton } from '../src/infrastructure/ui/wood';
 
-// The width of one decorative stone, and its height: a flat-topped hexagon.
+// The longer side of one decorative stone.
 const STONE = 58;
-const STONE_HEIGHT = (STONE / 2) * Math.sqrt(3);
 
 // The home screen, the MVP view of `HomePresenter` (#169). It shows the suite name and opens
 // the game selector map on its own route (S3-11 in #151, a proposal that waits for the team).
@@ -30,10 +29,12 @@ const STONE_HEIGHT = (STONE / 2) * Math.sqrt(3);
 // The player chooses the figure in the figure selector, and the hexagon, the first figure,
 // is chosen when the screen opens. The play button passes the text of the chosen figure
 // to the map, so the map lists the games of that figure.
+// The decorative stones take the shape of the chosen figure (#297, APP-FR-16).
 // Every visible text comes from the text catalog through the presenter (APP-FR-11).
 export default function HomeScreen() {
   const view = useHomePresenter().home();
   const [figure, setFigure] = useState(view.figures[0]?.id ?? '');
+  const stone = useFigureShapes()(figure, STONE);
   const insets = useSafeAreaInsets();
   return (
     <View
@@ -69,7 +70,7 @@ export default function HomeScreen() {
             key={position}
             style={[position > 0 && styles.nextStone, position % 2 === 1 && styles.raised]}
           >
-            <HexStone size={STONE} colors={worldTone(position)} />
+            <FigureStone shape={stone} colors={worldTone(position)} />
           </View>
         ))}
       </View>
@@ -149,10 +150,10 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   nextStone: {
-    marginLeft: -STONE * 0.25 + space.xs,
+    marginLeft: space.xs,
   },
   raised: {
-    transform: [{ translateY: -STONE_HEIGHT / 2 - 2 }],
+    transform: [{ translateY: -STONE / 3 }],
   },
   controls: {
     alignItems: 'center',

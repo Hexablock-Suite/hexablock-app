@@ -8,6 +8,7 @@ import type { IVariantFactory } from '../domain/engine/variant-factory';
 import type { BoardLayout } from './board/board-layout';
 import type { CellRenderer } from './board/cell-renderer';
 import type { MoveControls } from './ui/move-controls';
+import type { WorldTone } from './ui/theme';
 
 // What a caller does with the id, the variant factory and the level variant of one registered game.
 // The registry holds variants with different type arguments, so it hides them.
@@ -39,17 +40,21 @@ export interface ScreenParts<TCell, TCoord, TView, TCellView, TPayloadView, TMov
   layoutOf(size: number): BoardLayout<TCoord>;
 }
 
-// One game of the registry: its id, its variant factory, its optional level variant
-// and its screen parts, with the type arguments hidden. `registered()` checks that the parts fit the factory,
+// One game of the registry: its id, its variant factory, its optional level variant,
+// its screen parts and its world colors, with the type arguments hidden.
+// The map draws the stone of the game in `tone` on every figure (#298), so a game keeps its
+// color when the list of a figure has no entry for another game. `registered()` checks that the parts fit the factory,
 // so a screen only passes the cell views of the mapper to the renderer of the same entry.
 export interface RegisteredGame {
   readonly gameId: GameId;
   readonly screen: ScreenParts<unknown, unknown, unknown, unknown, unknown, unknown>;
+  readonly tone: WorldTone;
   withFactory<TResult>(use: FactoryUse<TResult>): TResult;
 }
 
-// The registered game `gameId` with the variant factory `factory` and the screen parts
-// `screen`. This is the one place that pairs a `GameId` with its factory. The factory keeps
+// The registered game `gameId` with the variant factory `factory`, the screen parts `screen`
+// and the world colors `tone` of the game on the map (#298). The colors are required,
+// so the type checker makes a fifth variant declare its own. This is the one place that pairs a `GameId` with its factory. The factory keeps
 // its id private and answers `isFor()` (classes.md decision 30, issue #234), and `GameFactory`
 // cannot check the pair, because the engine never branches on a game id. So the entry asks
 // the factory here. A factory that does not build the game of `gameId` throws a RangeError.
@@ -70,6 +75,7 @@ export function registered<
   gameId: GameId,
   factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>,
   screen: ScreenParts<TCell, TCoord, ViewOf<TState>, TCellView, TPayloadView, TMove>,
+  tone: WorldTone,
   levels?: LevelVariant<TCell, TCoord, TMove, TState>,
 ): RegisteredGame {
   if (!factory.isFor(gameId)) {
@@ -78,6 +84,7 @@ export function registered<
   return Object.freeze({
     gameId,
     screen,
+    tone,
     withFactory: <TResult>(use: FactoryUse<TResult>) => use.use(gameId, factory, levels),
   });
 }

@@ -1,44 +1,42 @@
 import type { ReactNode } from 'react';
-import { StyleSheet, View } from 'react-native';
 
 import type { SpaceView } from '../../adapters/space-state-mapper';
-import { lip, palette, radius } from '../ui/theme';
+import { lip, palette } from '../ui/theme';
+import type { CellShape } from './board-layout';
 import type { CellRenderer } from './cell-renderer';
+import { CellOutline, type OutlineLayer } from './cell-outline';
 
-// The default cell renderer of the game registry (D3, classes.md decision 14, issue #170).
-// It draws inside the circle of the cell, so it fits every figure. A free space is a socket
-// in the wood of the board: a dark hole with a light rim. An occupied space is a sun stone
-// with a lip below it. The rim and the fill tell the two apart, not only the color.
-// Each «Play … on the game screen» task (#174 to #177) registers the renderer of its variant
-// in its place. The board carries the accessible name, so the screen reader skips each space.
+// The share of the outline of the cell that a socket and a stone take.
+// The rest is the wood of the board between two spaces.
+const SOCKET_SCALE = 0.82;
+const STONE_SCALE = 0.86;
+
+// A socket in the wood of the board: a dark hole with a light rim.
+const SOCKET: readonly OutlineLayer[] = [
+  { scale: SOCKET_SCALE, fill: palette.socket, stroke: palette.trim, strokeWidth: 2 },
+];
+
+// A sun stone with a lip below it.
+const STONE: readonly OutlineLayer[] = [
+  { scale: STONE_SCALE, fill: palette.sunDeep, drop: lip.sm },
+  { scale: STONE_SCALE, fill: palette.sun, stroke: palette.sunDeep, strokeWidth: 2 },
+];
+
+// The default cell renderer of the game registry (D3, classes.md decision 14, issues #170 and #296).
+// It draws the outline of the cell that the layout of the figure gives, so it fits every figure.
+// A free space is a socket in the wood of the board: a dark hole with a light rim.
+// An occupied space is a sun stone with a lip below it. The rim and the fill tell the two apart,
+// not only the color. Each «Play … on the game screen» task (#174 to #177) registers the renderer
+// of its variant in its place. The board carries the accessible name, so the screen reader skips
+// each space.
 export class SpaceCellRenderer implements CellRenderer<SpaceView> {
-  render(cell: SpaceView): ReactNode {
+  render(cell: SpaceView, shape: CellShape): ReactNode {
     return (
-      <View
+      <CellOutline
         testID={cell.occupied ? 'space-occupied' : 'space-free'}
-        accessibilityElementsHidden
-        importantForAccessibility="no-hide-descendants"
-        style={[styles.space, cell.occupied ? styles.stone : styles.socket]}
+        shape={shape}
+        layers={cell.occupied ? STONE : SOCKET}
       />
     );
   }
 }
-
-const styles = StyleSheet.create({
-  space: {
-    aspectRatio: 1,
-    borderRadius: radius.pill,
-    borderWidth: 2,
-  },
-  socket: {
-    width: '78%',
-    backgroundColor: palette.socket,
-    borderColor: palette.trim,
-  },
-  stone: {
-    width: '86%',
-    backgroundColor: palette.sun,
-    borderColor: palette.sunDeep,
-    boxShadow: `0 ${lip.sm}px 0 ${palette.sunDeep}, inset 0 3px 0 rgba(255, 255, 255, 0.35)`,
-  },
-});
