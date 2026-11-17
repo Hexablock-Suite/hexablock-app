@@ -215,15 +215,18 @@ export interface components {
             userId: string;
         };
         LevelResultDto: {
-            /** @example fit-01 */
+            /**
+             * @description A non-blank text with no control character (U+0000 to U+001F, U+007F).
+             * @example fit-01
+             */
             levelId: string;
             /**
-             * @description A non-negative integer.
+             * @description A non-negative integer that fits the integer column of the store.
              * @example 3
              */
             stars: number;
             /**
-             * @description A non-negative integer.
+             * @description A non-negative integer that fits the integer column of the store.
              * @example 12
              */
             moves: number;
@@ -378,7 +381,7 @@ export interface components {
              */
             gameId: string;
             /**
-             * @description A non-blank text, unique in its game.
+             * @description A non-blank text, unique in its game, with no control character (U+0000 to U+001F, U+007F).
              * @example fit-01
              */
             levelId: string;
@@ -665,7 +668,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProgressDto"];
                 };
             };
-            /** @description A field is missing or breaks its rule. */
+            /** @description A field is missing or breaks its rule, the API holds no level of a result, or a result carries more stars than its level has star thresholds. */
             400: {
                 headers: {
                     [name: string]: unknown;
