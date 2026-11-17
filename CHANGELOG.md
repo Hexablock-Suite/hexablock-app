@@ -6,6 +6,10 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 
 ## [Unreleased]
 
+### Added
+
+- Slide the tiles of Hexa Merge with a swipe on the board, and with the keyboard on the web ([#292](https://github.com/Hexablock-Suite/hexablock-app/issues/292), classes.md decision 14). A swipe plays the way of the figure whose angle is nearest to its own, and a swipe shorter than 24 px plays nothing. On the web the arrow keys and the keys Q, E, Z and C play the way nearest to the angle of the key, and a repeated key plays once. A press that starts on a slide button or on the undo button stays a press, and the ring of slide buttons stays for the screen reader. `app/_layout.tsx` wraps the app in `GestureHandlerRootView` of `react-native-gesture-handler`, already a dependency. View 4.1 shows the change, and its PNG image is exported again.
+
 ### Changed
 
 - Regenerate `src/infrastructure/api/schema.d.ts` against hexablock-api `main`: `PUT /levels` now answers 403 when the account is not a level editor (Hexablock-Suite/hexablock-api#145). The pact still passes.

@@ -84,7 +84,8 @@
           MergeStateMapper and MergeControls, the parts of Hexa Merge, implement the same two
           strategies. GamePresenter also undoes and redoes a move through the UseCase port, and
           GameViewModel holds the undo and the redo of a variant with undo, which FitControls show
-          as two buttons. MergeControls show the undo only, because Merge never redoes.
+          as two buttons. MergeControls show the undo only, because Merge never redoes. Since #292
+          MergeControls also play a slide with a swipe on the board and, on the web, with a key.
         </desc>
         <defs>
           <marker
@@ -1757,7 +1758,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          GameScreen and BoardView are React components of layer 4, not classes.
+          GameScreen and BoardView are React components of layer 4, not classes. MergeControls also
+          take a swipe on the board and, on the web, a key (#292).
         </text>
 
         <!-- Legend -->
