@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { textCatalog } from '../../../src/adapters/texts/text-catalog';
@@ -57,9 +58,11 @@ async function referenceMove(gameId: GameId): Promise<MoveResult<unknown, unknow
 
 async function show(session: GameSession, onBack = jest.fn()) {
   await render(
-    <SafeAreaProvider initialMetrics={METRICS}>
-      <GameStage title="Hexa Fit" {...session} onBack={onBack} />
-    </SafeAreaProvider>,
+    <GestureHandlerRootView>
+      <SafeAreaProvider initialMetrics={METRICS}>
+        <GameStage title="Hexa Fit" {...session} onBack={onBack} />
+      </SafeAreaProvider>
+    </GestureHandlerRootView>,
   );
   await screen.findByText('En juego');
 }
