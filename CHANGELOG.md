@@ -13,6 +13,7 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 
 ### Changed
 
+- `docs/architecture/classes.drawio` keeps a hand-made order, and its look reads better. `docs/architecture/classes.layout.json` fixes the order of the groups and the boxes, and `pin.mjs` of the tool `drawio-clases` writes that file from a diagram that a person moved in draw.io. A `use` line is thin and lives in the layer `use lines`, and a group of 12 boxes or more has a frame per view. The generator now lives in the organization repository, and its settings live in `docs/architecture/classes.config.json`.
 - Regenerate `src/infrastructure/api/schema.d.ts` against hexablock-api `main`: the level board answers 404 when the level definitions do not hold the levelId for the gameId (Hexablock-Suite/hexablock-api#164). The pact still passes.
 - Regenerate `src/infrastructure/api/schema.d.ts` against hexablock-api `main`: the descriptions of the incoming bounds and of the 400 answer of `POST /progress` (Hexablock-Suite/hexablock-api#166). The types of the fields do not change.
 - Regenerate `src/infrastructure/api/schema.d.ts` against hexablock-api `main`: the 401 answers also cover a token that names a user who is no longer stored (Hexablock-Suite/hexablock-api#162). The pact still passes.
