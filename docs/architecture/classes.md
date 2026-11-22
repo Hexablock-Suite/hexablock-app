@@ -39,9 +39,13 @@ The five class views of the use case flows draw 12 to 17 classes, because a flow
 - A solid box is a type that existed in the code at the commit of the last generation. The title of each page names that commit. A dashed box with `«planned»` is design from the views of this page that the code does not have yet. It keeps the `«Sprint N»` of its view when the view gives one.
 - `members not designed yet` marks a planned class that no view details.
 - `«dataType»` marks a type in the code that only carries data; it has no operations by design.
+- A line of structure (extends, implements, composition) is thick. A `use` line is thin and light, and it lives in the draw.io layer `use lines`. Hide that layer in Edit > Layers to read the structure alone.
+- Inside a group of 12 boxes or more, a frame holds the boxes of one view of this page. The frame title is the file name of the view in [`classes/views/`](classes/views/), for example `view engine-1-turn` for `engine-1-turn.png`.
 - The pages follow the reading rules of the next section, and each page has a legend.
 
-The file is generated from the code at that commit plus the views of this page. A hand edit is lost at the next generation.
+The file is generated from the code at that commit plus the views of this page, by the tool [`drawio-clases`](https://github.com/Hexablock-Suite/.github/tree/main/tools/drawio-clases) of the organization repository. The README of the tool gives the commands. [`classes.config.json`](classes.config.json) maps the folders and the views to layers and parts. [`classes.layout.json`](classes.layout.json) fixes the order of the groups of each band and of the boxes of each group.
+
+A hand edit of that order survives. Move the boxes in draw.io, run `pin.mjs` of the tool to write the order into `classes.layout.json`, and generate the file again. Commit `classes.drawio` and `classes.layout.json` together. Any other hand edit is lost at the next generation: a pixel position, a line route, a text or a style.
 
 ## How to read it
 

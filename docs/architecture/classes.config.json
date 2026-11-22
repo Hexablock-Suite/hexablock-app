@@ -1,0 +1,58 @@
+{
+  "repo": "hexablock-app",
+  "parts": [
+    { "id": "engine", "title": "Engine", "layers": [1] },
+    { "id": "variants", "title": "Variants", "layers": [1] },
+    { "id": "usecases", "title": "Use cases", "layers": [2] },
+    { "id": "adapters", "title": "Adapters", "layers": [3, 4] }
+  ],
+  "folders": [
+    { "path": "src/domain/engine/", "layer": 1, "part": "engine" },
+    { "path": "src/domain/variants/", "layer": 1, "part": "variants" },
+    { "path": "src/application/", "layer": 2, "part": "usecases" },
+    { "path": "src/adapters/", "layer": 3, "part": "adapters" },
+    { "path": "src/infrastructure/", "layer": 4, "part": "adapters" }
+  ],
+  "views": {
+    "overview-engine": "engine",
+    "engine-": "engine",
+    "overview-variants": "variants",
+    "variant-": "variants",
+    "map-3-usecases": "usecases",
+    "uc-": "usecases",
+    "map-4-adapters": "adapters",
+    "ad-": "adapters",
+    "flow-": null
+  },
+  "patterns": {
+    "GameEngine->IGameRules": "Strategy",
+    "GameEngine->IScoringPolicy": "Strategy",
+    "Board->GridTopology": "Strategy",
+    "GamePresenter->StateMapper": "Strategy",
+    "ScoringDecorator->IScoringPolicy": "Decorator",
+    "ComboMultiplierDecorator->LinesScoring": "Decorator",
+    "TimedRulesDecorator->IGameRules": "Decorator",
+    "UseCaseAspect->UseCase": "Decorator",
+    "GameEngine->MoveHistory": "Command",
+    "MoveHistory->MoveCommand": "Command",
+    "RedoableHistory->MoveCommand": "Command",
+    "ShapeGroup->ShapeNode": "Composite",
+    "GameEventBus->GameEventListener": "Observer",
+    "LocalProgressRepository->KeyValueStore": "Adapter",
+    "BoardBuilder->GeometryFactory": "Abstract Factory",
+    "LinesFactory->GeometryFactory": "Abstract Factory",
+    "GameEngine->GamePhase": "State",
+    "GameEngine->BoardState": "Aggregate",
+    "GameEngine->LevelTimer": "Aggregate"
+  },
+  "stereotypeFor": {},
+  "staleMembers": [
+    { "type": "LinesRules", "member": "pieces", "equivalent": ["LinesState.source"] },
+    { "type": "MergeRules", "member": "spawn", "equivalent": ["MergeState.tiles"] },
+    { "type": "SortRules", "member": "pieces", "equivalent": ["SortState.source"] },
+    { "type": "Slide", "member": "direction", "equivalent": ["Slide.axis", "Slide.toward"] },
+    { "type": "SortLevel", "member": "board", "equivalent": ["SortLevel.size"] },
+    { "type": "SortLevel", "member": "goals", "equivalent": ["SortLevel.goalsNeeded"] },
+    { "type": "SortState", "member": "tray", "equivalent": ["SortState.offered"] }
+  ]
+}
