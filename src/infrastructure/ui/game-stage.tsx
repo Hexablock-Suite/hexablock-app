@@ -11,7 +11,7 @@ import { BoardView } from '../board/board-view';
 import type { CellRenderer } from '../board/cell-renderer';
 import type { MoveControls } from './move-controls';
 import { Scenery } from './scenery';
-import { column, lip, palette, radius, serif, shadow, space } from './theme';
+import { column, CONTENT_WIDTH, lip, palette, radius, serif, shadow, space } from './theme';
 import { LipButton, WoodSign } from './wood';
 
 // The largest cell of the board. A cell of 48 is wide enough for a finger.
@@ -19,8 +19,15 @@ const LARGEST_CELL = 48;
 // The wood frame of the board and the dark face inside it.
 const FRAME = 6;
 const FACE = space.md;
-// The width that the board loses to the side of the screen, the frame and the face.
-const BOARD_GUTTER = 2 * (space.lg + FRAME + FACE);
+// The width that the board loses to the frame and the face.
+const FRAME_GUTTER = 2 * (FRAME + FACE);
+
+// The width that the board takes in a window of the width `width` (#319). The content column
+// fills the window less the side padding of the screen, up to `CONTENT_WIDTH` (#287).
+// The frame and the face sit inside that column.
+function boardWidthIn(width: number): number {
+  return Math.min(width - 2 * space.lg, CONTENT_WIDTH) - FRAME_GUTTER;
+}
 
 export interface GameStageProps<TCellView> {
   // The name of the game, as the game selector shows it.
@@ -42,7 +49,7 @@ export interface GameStageProps<TCellView> {
 // of its game. It keeps the presenter, the cell renderer and the figure layout that it receives.
 // It starts the game when it opens, and it shows each view model that the presenter gives:
 // `BoardView` with every space of the board, the score, the time of a timed game (#175)
-// and the outcome. The board takes the widest cell size that fits the screen.
+// and the outcome. The board takes the widest cell size that fits the content column.
 // A failed use case shows its text below the board. It names no variant, so it serves every game.
 // The move controls of the game lay out the board with their own parts (#175): the stage gives
 // them the view model, the board and `play()`, which calls `GamePresenter.onMove()`.
@@ -63,7 +70,7 @@ export function GameStage<TCellView>({
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const coords = view.cells.map(([at]) => at);
-  const size = fittedCellSize(coords, layoutOf, width - BOARD_GUTTER, LARGEST_CELL);
+  const size = fittedCellSize(coords, layoutOf, boardWidthIn(width), LARGEST_CELL);
   return (
     <View
       style={[
