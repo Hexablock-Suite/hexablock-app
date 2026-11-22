@@ -6,7 +6,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { AchievementSection } from '../src/adapters/achievements-presenter';
 import { HexStone } from '../src/infrastructure/ui/hex-stone';
 import { Scenery } from '../src/infrastructure/ui/scenery';
-import { palette, radius, serif, space, type WorldTone } from '../src/infrastructure/ui/theme';
+import {
+  column,
+  palette,
+  radius,
+  serif,
+  space,
+  type WorldTone,
+} from '../src/infrastructure/ui/theme';
 import { useAchievements } from '../src/infrastructure/ui/use-achievements';
 import { LipButton, WoodSign } from '../src/infrastructure/ui/wood';
 
@@ -104,7 +111,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: palette.sky,
   },
+  // The lists fill the screen of a phone and stay in the content column on a wide window.
   content: {
+    ...column,
     flexGrow: 1,
     paddingHorizontal: space.lg,
   },

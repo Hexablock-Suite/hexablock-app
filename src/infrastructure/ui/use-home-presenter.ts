@@ -5,6 +5,7 @@ import { DEFAULT_LANGUAGE, textCatalog } from '../../adapters/texts/text-catalog
 import { GameId } from '../../domain/engine/game-id';
 import { TopologyId } from '../../domain/engine/geometry-factory';
 import type { CellShape } from '../board/board-layout';
+import { CompositionRoot } from '../composition-root';
 import { useCompositionRoot } from '../composition-root-provider';
 import type { WorldTone } from './theme';
 
@@ -14,7 +15,25 @@ import type { WorldTone } from './theme';
 // So a fifth variant adds one registry entry and the selector shows it.
 // The screens show the default language until the player can choose one (#163).
 export function useHomePresenter(figure: TopologyId = TopologyId.hex): HomePresenter {
-  const root = useCompositionRoot();
+  return homePresenterOf(useCompositionRoot(), figure);
+}
+
+// The ids of the games of every board figure, in the order of the figures and of the registry.
+// Each id comes once. The web export renders one page of the game route for each id (#287),
+// so a reload of a game screen in the browser finds its page. The export runs it in Node
+// at build time, outside the root layout, so it builds its own composition root.
+export function gameRouteIds(): string[] {
+  const root = new CompositionRoot();
+  const ids = root.figures().flatMap((figure) =>
+    homePresenterOf(root, figure)
+      .gameSelector()
+      .games.map(({ id }) => id),
+  );
+  return [...new Set(ids)];
+}
+
+// The home presenter over the registry of the board figure `figure` of the root `root`.
+function homePresenterOf(root: CompositionRoot, figure: TopologyId): HomePresenter {
   return new HomePresenter(
     root.registry(figure).gameIds(),
     root.figures(),

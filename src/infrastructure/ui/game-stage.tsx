@@ -11,7 +11,7 @@ import { BoardView } from '../board/board-view';
 import type { CellRenderer } from '../board/cell-renderer';
 import type { MoveControls } from './move-controls';
 import { Scenery } from './scenery';
-import { lip, palette, radius, serif, shadow, space } from './theme';
+import { column, lip, palette, radius, serif, shadow, space } from './theme';
 import { LipButton, WoodSign } from './wood';
 
 // The largest cell of the board. A cell of 48 is wide enough for a finger.
@@ -73,64 +73,66 @@ export function GameStage<TCellView>({
     >
       <StatusBar style="dark" />
       <Scenery />
-      <View style={styles.top}>
-        <LipButton label={view.back} look="panel" onPress={onBack} />
-      </View>
-      <WoodSign style={styles.titleSign}>
-        <Text accessibilityRole="header" style={styles.title}>
-          {title}
-        </Text>
-      </WoodSign>
-      <WoodSign style={styles.statusSign}>
-        <View style={styles.status}>
-          <View accessible style={styles.score}>
-            <Text style={styles.scoreLabel}>{view.scoreLabel}</Text>
-            <Text style={styles.scoreValue}>{view.score}</Text>
-          </View>
-          {view.time === undefined ? null : (
-            <View accessible testID="play-time" style={styles.score}>
-              <Text style={styles.scoreLabel}>{view.time.label}</Text>
-              <Text style={styles.scoreValue}>{view.time.value}</Text>
-            </View>
-          )}
-          <Text accessibilityLiveRegion="polite" style={styles.outcome}>
-            {view.outcome}
-          </Text>
+      <View style={styles.column}>
+        <View style={styles.top}>
+          <LipButton label={view.back} look="panel" onPress={onBack} />
         </View>
-      </WoodSign>
-      {controls.render({
-        model: view,
-        texts,
-        layoutOf,
-        play: (move) => void presenter.onMove(move),
-        undo: () => void presenter.onUndo(),
-        redo: () => void presenter.onRedo(),
-        board: (onPressSpace) => (
-          <View style={styles.boardArea}>
-            <View style={styles.frame}>
-              <View style={styles.face}>
-                <BoardView
-                  cells={view.cells}
-                  layout={layoutOf(size)}
-                  renderer={renderer}
-                  label={view.board}
-                  onPressSpace={onPressSpace}
-                />
+        <WoodSign style={styles.titleSign}>
+          <Text accessibilityRole="header" style={styles.title}>
+            {title}
+          </Text>
+        </WoodSign>
+        <WoodSign style={styles.statusSign}>
+          <View style={styles.status}>
+            <View accessible style={styles.score}>
+              <Text style={styles.scoreLabel}>{view.scoreLabel}</Text>
+              <Text style={styles.scoreValue}>{view.score}</Text>
+            </View>
+            {view.time === undefined ? null : (
+              <View accessible testID="play-time" style={styles.score}>
+                <Text style={styles.scoreLabel}>{view.time.label}</Text>
+                <Text style={styles.scoreValue}>{view.time.value}</Text>
+              </View>
+            )}
+            <Text accessibilityLiveRegion="polite" style={styles.outcome}>
+              {view.outcome}
+            </Text>
+          </View>
+        </WoodSign>
+        {controls.render({
+          model: view,
+          texts,
+          layoutOf,
+          play: (move) => void presenter.onMove(move),
+          undo: () => void presenter.onUndo(),
+          redo: () => void presenter.onRedo(),
+          board: (onPressSpace) => (
+            <View style={styles.boardArea}>
+              <View style={styles.frame}>
+                <View style={styles.face}>
+                  <BoardView
+                    cells={view.cells}
+                    layout={layoutOf(size)}
+                    renderer={renderer}
+                    label={view.board}
+                    onPressSpace={onPressSpace}
+                  />
+                </View>
               </View>
             </View>
+          ),
+        })}
+        {view.error === undefined ? null : (
+          <View
+            accessible
+            accessibilityRole="alert"
+            accessibilityLiveRegion="assertive"
+            style={styles.error}
+          >
+            <Text style={styles.errorText}>{view.error}</Text>
           </View>
-        ),
-      })}
-      {view.error === undefined ? null : (
-        <View
-          accessible
-          accessibilityRole="alert"
-          accessibilityLiveRegion="assertive"
-          style={styles.error}
-        >
-          <Text style={styles.errorText}>{view.error}</Text>
-        </View>
-      )}
+        )}
+      </View>
     </View>
   );
 }
@@ -154,6 +156,12 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: space.lg,
     backgroundColor: palette.sky,
+  },
+  // The parts of the stage fill the screen of a phone and stay in the content column
+  // on a wide window (#287). The scenery stays outside the column, so it fills the window.
+  column: {
+    ...column,
+    flex: 1,
   },
   top: {
     alignItems: 'flex-start',

@@ -57,6 +57,15 @@ export const WORLD_TONE_COUNT = WORLD_TONES.length;
 
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32, xxxl: 48 } as const;
 
+// The widest column of the content of a screen, in points (#287). On a phone the column fills
+// the screen. On a wide window, as the web build on a desktop, the content stays in a centered
+// column, and the scenery still fills the window. The column is a style, not a measure
+// of the window, so the server render of the web export and the browser give the same layout.
+export const CONTENT_WIDTH = 560;
+
+// The style of the centered content column. A screen gives it to the view that holds its content.
+export const column = { width: '100%', maxWidth: CONTENT_WIDTH, alignSelf: 'center' } as const;
+
 export const radius = { sm: 8, md: 14, lg: 22, pill: 999 } as const;
 
 // The height of the lip below a button, a sign or a stone. A pressed button sinks by its lip.

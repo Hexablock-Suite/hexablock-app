@@ -107,8 +107,10 @@ function Choice({
 }
 
 const styles = StyleSheet.create({
+  // The sign is at most 360 points wide, and it stays centered on a wider screen (#287).
   sign: {
-    alignSelf: 'stretch',
+    alignSelf: 'center',
+    width: '100%',
     maxWidth: 360,
   },
   label: {

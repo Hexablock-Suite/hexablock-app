@@ -5,6 +5,7 @@ import { GameId } from '../../src/domain/engine/game-id';
 import { GameStage } from '../../src/infrastructure/ui/game-stage';
 import { useGameSession } from '../../src/infrastructure/ui/game-session';
 import {
+  gameRouteIds,
   useHomePresenter,
   useRouteFigure,
   type RouteFigure,
@@ -28,6 +29,13 @@ export default function GameScreen() {
     return <Redirect href={{ pathname: '/map', params: { figure: figure.param } }} />;
   }
   return <Game key={`${figure.param}/${game.id}`} game={game} figure={figure} />;
+}
+
+// The pages of this route that the web export renders, one for each registered game (#287).
+// Expo Router calls it at build time when `web.output` is `static`. A static page holds
+// no query: it shows the hexagon, and the browser draws the page again for another figure.
+export function generateStaticParams(): { gameId: string }[] {
+  return gameRouteIds().map((gameId) => ({ gameId }));
 }
 
 // One registered game on one board figure. The session lives as long as the screen of the game.
