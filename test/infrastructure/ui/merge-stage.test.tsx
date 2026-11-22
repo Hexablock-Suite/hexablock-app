@@ -126,6 +126,30 @@ function targetFourSession(): GameSession {
   };
 }
 
+// The picture of the ring of slide buttons in a new Merge screen: the hub, each button and
+// its chevron, with their styles. A new root computes the ways of the slides again.
+async function ringPicture(): Promise<string> {
+  await show(realMergeSession(new RecordingLogger()));
+  const ring = screen.getByRole('button', { name: SIX_SLIDES[0] }).parent;
+  const picture = JSON.stringify(stylesOf(ring));
+  await screen.unmount();
+  return picture;
+}
+
+interface StyledNode {
+  readonly props: { readonly style?: unknown };
+  readonly children: readonly (StyledNode | string)[];
+}
+
+// The flat style of `node` and of each node below it, in the order of the tree.
+function stylesOf(node: StyledNode | null): unknown[] {
+  if (node === null) return [];
+  return [
+    StyleSheet.flatten(node.props.style as never) ?? {},
+    ...node.children.flatMap((child) => (typeof child === 'string' ? [] : stylesOf(child))),
+  ];
+}
+
 const prompt = () => screen.queryByRole('header', { name: '¡Lo lograste!' });
 const undoButton = () => screen.getByRole('button', { name: 'Deshacer' });
 const scoreOf = (session: GameSession) => session.presenter.viewModel().score;
@@ -257,6 +281,29 @@ describe('Merge on the game screen', () => {
     expect(promptAfterUndo).toBeNull();
     expect(session.presenter.viewModel().payload).toEqual({ targetReached: true });
     expect(prompt()).not.toBeNull();
+  });
+
+  // Issue #318: the web server renders the screen in Node, and the browser hydrates it.
+  // The language lets each engine round `Math.sin`, `Math.cos` and `Math.atan2` in its own way,
+  // so the last bit of a result can differ. The ring of slide buttons must not show that bit,
+  // or the style of the server HTML differs from the style of the client.
+  // So this test renders the ring twice, the second time with those functions one bit off,
+  // and compares the two pictures of the ring.
+  it('should_render_the_same_slide_ring_when_the_math_functions_round_the_last_bit_differently', async () => {
+    const exact = await ringPicture();
+    const offByOneBit = (exactOf: (...args: number[]) => number) => {
+      return (...args: number[]) => exactOf(...args) * (1 + Number.EPSILON);
+    };
+    const { sin, cos, atan2 } = Math;
+    jest.spyOn(Math, 'sin').mockImplementation(offByOneBit(sin));
+    jest.spyOn(Math, 'cos').mockImplementation(offByOneBit(cos));
+    jest.spyOn(Math, 'atan2').mockImplementation(offByOneBit(atan2));
+
+    const rounded = await ringPicture();
+    jest.restoreAllMocks();
+
+    expect(exact).toContain('"left":');
+    expect(rounded).toEqual(exact);
   });
 
   // Lines and Sort keep `BoardOnlyControls`, the default controls, and Fit has `FitControls`
