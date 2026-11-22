@@ -9,6 +9,7 @@ import { FigureStone } from '../src/infrastructure/ui/figure-stone';
 import { Scenery } from '../src/infrastructure/ui/scenery';
 import {
   WORLD_TONE_COUNT,
+  column,
   palette,
   radius,
   serif,
@@ -155,9 +156,10 @@ const styles = StyleSheet.create({
   raised: {
     transform: [{ translateY: -STONE / 3 }],
   },
+  // The controls fill the screen of a phone and stay in the content column on a wide window.
   controls: {
+    ...column,
     alignItems: 'center',
-    alignSelf: 'stretch',
     gap: space.xl,
   },
 });

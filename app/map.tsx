@@ -7,7 +7,7 @@ import type { GameChoice } from '../src/adapters/home-presenter';
 import type { CellShape } from '../src/infrastructure/board/board-layout';
 import { FigureStone } from '../src/infrastructure/ui/figure-stone';
 import { Scenery } from '../src/infrastructure/ui/scenery';
-import { palette, serif, space, type WorldTone } from '../src/infrastructure/ui/theme';
+import { column, palette, serif, space, type WorldTone } from '../src/infrastructure/ui/theme';
 import {
   useFigureShapes,
   useGameTones,
@@ -120,7 +120,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: palette.sky,
   },
+  // The path of the worlds fills the screen of a phone and stays in the content column
+  // on a wide window, so the worlds keep their zig-zag near the center.
   content: {
+    ...column,
     flexGrow: 1,
     paddingHorizontal: space.lg,
   },
