@@ -31,14 +31,14 @@ How they were taken, on 2026-11-22:
 - `pnpm web:build` built the export, and `npx expo serve` served `dist/` on `localhost`.
 - A Playwright 1.64.1 script outside the repository drove headless Chromium with a fresh profile. The script set the viewport with `viewport: { width, height }`. A `--window-size` flag gives a wrong width in headless Chromium (#319), so the script never used it.
 - The home screen, the map and the achievements screen opened by their address. Each game screen opened with a click on its world on the map, on the hexagon. A reload of each game screen also opens it.
-- The script kept the browser console of each screen. No screen showed an error or a warning. The console shows only the log lines of the use cases, such as `StartGame: success`.
+- The script kept the browser console of each screen. With the hexagon, the default figure, no screen showed an error or a warning. The console shows only the log lines of the use cases, such as `StartGame: success`.
 
 ## What works on the web
 
 Measured in the export on 2026-11-22, in headless Chromium:
 
 - Each screen of the table opens at both widths, and the flow between them works: home, map, game screen and back, and the achievements screen.
-- The four game screens start their game and draw the board. Each page hydrates with no error or warning, also after a reload of a game screen.
+- The four game screens start their game and draw the board. With the hexagon, each page hydrates with no error or warning, also after a reload of a game screen. Another figure gives a hydration error on a reload (see below, #333).
 - On a wide window the content of each screen stays in a centered column of at most 560 points (`CONTENT_WIDTH` in `src/infrastructure/ui/theme.ts`), and the scenery fills the window. On a phone the column fills the screen.
 - The device storage works on the web with no second adapter. `DeviceKeyValueStore` uses AsyncStorage, and AsyncStorage keeps each value in the `localStorage` of the browser. The test wrote the key `progress:hexa-fit` with three won Fit levels into `localStorage` and reloaded the achievements screen. The screen listed «Gana 3 niveles de Hexa Fit» as completed. No screen of the app writes a value yet, so the test proved the read only. The write of the AsyncStorage web module is `window.localStorage.setItem()`.
 - Hexa Merge also takes the arrow keys and Q, E, Z and C on the web (#292).
