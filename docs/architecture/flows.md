@@ -2,7 +2,7 @@
 
 Status: draft for team review, 2026-11-04.
 
-This page shows how one use case crosses the four Clean layers of the client. In the class of 2026-11-03 the professor asked to see a pair of use cases and how the layers interact in each. He also wanted to see how the product talks to the backend. So this page has one flow for each path that shows something new: `ApplyMove` stays inside the app, `SaveProgress` sends a result to `hexablock-api`, `StartGame` wires a variant from its factory, `UndoMove` runs the Command history, and `Login` signs in against the backend and keeps the session. The other use cases follow one of these paths, and the table [Other use cases](#other-use-cases) names it. Each flow has two views with the same class names:
+This page shows how one use case crosses the four Clean layers of the client. In the class of 2026-11-03 the professor asked to see a pair of use cases and how the layers interact in each. He also wanted to see how the product talks to the backend. So this page has one flow for each path that shows something new: `ApplyMove` stays inside the app, `SaveProgress` saves a result on the device and its diagrams draw the path to `hexablock-api` (D27 moves that path to `SyncProgress`), `StartGame` wires a variant from its factory, `UndoMove` runs the Command history, and `Login` signs in against the backend and keeps the session. The other use cases follow one of these paths, and the table [Other use cases](#other-use-cases) names it. Each flow has two views with the same class names:
 
 - A class view of the use case only. It draws every class of the slice, from the screen to the engine, in the layer bands of parts 3 and 4 of [classes.md](classes.md).
 - A UML sequence diagram. It shows the calls in time order, from the screen to the inner layers and back.
@@ -25,14 +25,16 @@ View 3.2 of [classes.md](classes.md) shows `ApplyMove` with layers 2 and 1 only,
 
 ## Use case 2: save progress
 
-`SaveProgress` (APP-FR-09, APP-FR-13) saves the result of a finished game. `VictoryScreen` gives the `GameResult` to `ResultPresenter`, which calls the `UseCase` port. `SaveProgress` loads the `GameProgress` of its game through the `ProgressRepository` port, or starts one when the game has none, records the result in it with its `IProgressModel` strategy, and saves it through the same port (S3-04, classes.md decisions 56 and 57). `ApiProgressRepository` in layer 4 implements that port: `ApiDtoMapper` makes a `ProgressDto`, and `ApiClient` sends it to `ProgressController.sync()` of `hexablock-api` (API-FR-02). The response comes back to the screen as a `Result` with no value. `LocalProgressRepository` in layer 3 implements the same port over `KeyValueStore` (#164), and view 4.2 shows it.
+`SaveProgress` (APP-FR-09, APP-FR-13) saves the result of a finished game. `VictoryScreen` gives the `GameResult` to `ResultPresenter`, which calls the `UseCase` port. `SaveProgress` loads the `GameProgress` of its game through the `ProgressRepository` port, or starts one when the game has none, records the result in it with its `IProgressModel` strategy, and saves it through the same port (S3-04, classes.md decisions 56 and 57). `LocalProgressRepository` in layer 3 implements that port over `KeyValueStore` (#164), and view 4.2 shows it. `SaveProgress` always saves to the local repository and needs no session, so a player with no account saves in the same way (D27 in [REQUIREMENTS.md](../REQUIREMENTS.md)). The response comes back to the screen as a `Result` with no value. The path to the backend belongs to `SyncProgress`, not to `SaveProgress`: it pushes the local progress through its gateway port to `ProgressController.sync()` of `hexablock-api` (API-FR-02) and merges the answer into `GameProgress` with the rule of DS-12. #46 builds `SyncProgress` and its gateway port.
+
+The diagrams of this flow still draw the path before D27: `ApiProgressRepository` in layer 4 implements `ProgressRepository`, `ApiDtoMapper` makes a `ProgressDto`, and `ApiClient` sends it to `ProgressController.sync()`. #46 draws them again with `SyncProgress` ([Proposals in these views](#proposals-in-these-views)).
 
 This flow takes `SaveProgress` and not `SyncLeaderboard`, for two reasons:
 
-- APP-FR-13 says that the app sends its local progress to the backend, and `SaveProgress` serves it. View 4.2 shows the HTTP path of its port: `ApiProgressRepository` keeps `ApiClient` and `ApiDtoMapper.toProgressDto()`.
+- APP-FR-13 says that the app sends its local progress to the backend. `SaveProgress` keeps that progress, and its diagrams draw the HTTP path that `SyncProgress` takes over (D27).
 - No view gives `ApiLeaderboardGateway` a member, and no view says what `SyncLeaderboard` does with its `ProgressRepository`. A sequence diagram of it would invent its steps.
 
-The same endpoint is use case 1 of the API flows, in `hexablock-api/docs/architecture/flows.md`.
+The endpoint that `SyncProgress` calls is use case 1 of the API flows, in `hexablock-api/docs/architecture/flows.md`.
 
 ### Class view
 
@@ -76,7 +78,7 @@ Why this use case: it is the only path through the Command pattern and the capab
 
 `Login` (APP-FR-12) signs the player in. The player sends the credentials on `AccountScreen`. `AccountPresenter` calls the `UseCase` port, and `Login` calls the `AccountGateway` port. `ApiAccountGateway` in layer 4 implements that port: `ApiDtoMapper` makes a `CredentialsDto`, and `ApiClient` sends it to `AuthController.signIn()` of `hexablock-api` (API-FR-01). On success, `ApiDtoMapper` turns the `TokenDto` into a `Session`, and `Login` writes it through the `SessionStore` port, which `SessionManager` implements. On a rejected sign-in, `Login` returns a failed `Result`.
 
-Why this use case: it is the second path to the backend, and the only one that writes the session that `AuthorizationAspect` reads before `SaveProgress` and `SyncLeaderboard` run (view 3.1). It also shows a use case that touches no entity: the view has no layer 1 band. `SessionManager` is the single-scope driver of decision 18.
+Why this use case: it is the second path to the backend, and the only one that writes the session that `AuthorizationAspect` reads before `SyncProgress` and `SyncLeaderboard` run (D27). `SaveProgress` and `ListLevels` need no session. It also shows a use case that touches no entity: the view has no layer 1 band. `SessionManager` is the single-scope driver of decision 18.
 
 The same endpoint is use case 2 of the API flows, in `hexablock-api/docs/architecture/flows.md`.
 
@@ -92,13 +94,14 @@ The same endpoint is use case 2 of the API flows, in `hexablock-api/docs/archite
 
 Each other use case follows the path of one flow above. Its own classes are in the views of Part 3 and Part 4 of [classes.md](classes.md).
 
-| Use case          | Path                                                                                                                                                                                                                                    |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `RedoMove`        | Same path as flow 4: it asks `GameEngine.canRedo()` and calls `GameEngine.redo()`, and the root asks the `IRedoable` of its history. In Hexa Fit, `RedoableHistory` redoes the last undone `MoveCommand` with its `after` photo (#178). |
-| `ListLevels`      | Same path as flow 2, except that it reads: it calls `LevelRepository.list()` and `ProgressRepository.load()` and returns one `LevelSummary` per level of the chosen figure. `BundledLevelRepository` gives the bundled levels (A6).     |
-| `SyncLeaderboard` | Same path as flow 2, except that it goes through the `LeaderboardGateway` port and `ApiLeaderboardGateway`. No view gives `ApiLeaderboardGateway` a member yet.                                                                         |
-| `Register`        | Same path as flow 5, except that it calls `AccountGateway.register()`, and the HTTP call goes to `AuthController.signUp()`.                                                                                                             |
-| `UpdateSettings`  | Same path as flow 5 up to the port, except that it stays in the app: `LocalSettingsStore` in layer 3 implements the `SettingsStore` port over `KeyValueStore`. No HTTP call runs.                                                       |
+| Use case          | Path                                                                                                                                                                                                                                                                                        |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `RedoMove`        | Same path as flow 4: it asks `GameEngine.canRedo()` and calls `GameEngine.redo()`, and the root asks the `IRedoable` of its history. In Hexa Fit, `RedoableHistory` redoes the last undone `MoveCommand` with its `after` photo (#178).                                                     |
+| `ListLevels`      | Same path as flow 2, except that it reads: it calls `LevelRepository.list()` and `ProgressRepository.load()` and returns one `LevelSummary` per level of the chosen figure. `BundledLevelRepository` gives the bundled levels (A6). It reads the local progress and needs no session (D27). |
+| `SyncProgress`    | Planned by D27 (#46). Same path to the backend as the flow 2 diagrams, except that it goes through its own gateway port and needs the session. It pushes the local progress and merges the answer into `GameProgress` with the rule of DS-12. No view draws it yet.                         |
+| `SyncLeaderboard` | Same path to the backend as the flow 2 diagrams, except that it goes through the `LeaderboardGateway` port and `ApiLeaderboardGateway`. No view gives `ApiLeaderboardGateway` a member yet.                                                                                                 |
+| `Register`        | Same path as flow 5, except that it calls `AccountGateway.register()`, and the HTTP call goes to `AuthController.signUp()`.                                                                                                                                                                 |
+| `UpdateSettings`  | Same path as flow 5 up to the port, except that it stays in the app: `LocalSettingsStore` in layer 3 implements the `SettingsStore` port over `KeyValueStore`. No HTTP call runs.                                                                                                           |
 
 ## How to read the class views
 
@@ -126,8 +129,8 @@ Each other use case follows the path of one flow above. Its own classes are in t
 ## Proposals in these views
 
 - `ApplyMoveRequest` holds the move only. `ResultPresenter.onFinish()` and `ApiClient.syncProgress()` are planned members. Today `ApiClient` has `getHealth()` only.
-- The composition root binds `ProgressRepository` to `ApiProgressRepository` for a signed-in player. This is an assumption for team review: the docs do not say yet when `LocalProgressRepository` runs instead.
-- Flow 2: `SaveProgress`, the `ProgressRepository` port, `GameProgress` and `LocalProgressRepository` are code since #164, but the composition root does not build `SaveProgress` yet. `VictoryScreen`, `ResultPresenter`, `ApiProgressRepository`, `ApiDtoMapper.toProgressDto()` and `ApiClient.syncProgress()` are planned.
+- The composition root binds `ProgressRepository` to `LocalProgressRepository` for every player, with or without an account (D27 in [REQUIREMENTS.md](../REQUIREMENTS.md), decided on 2026-11-19 and 2026-11-22 on #325). The local key carries the user, and the progress played without an account merges into the first account that signs in. #45 and #46 build the key with the user, the anonymous space and `SyncProgress`.
+- Flow 2: `SaveProgress`, the `ProgressRepository` port, `GameProgress` and `LocalProgressRepository` are code since #164, but the composition root does not build `SaveProgress` yet. `VictoryScreen`, `ResultPresenter`, `ApiDtoMapper.toProgressDto()` and `ApiClient.syncProgress()` are planned. The class view and the sequence diagram of flow 2 still show the path before D27, where `ApiProgressRepository` implements `ProgressRepository`. #46 draws them again with `SyncProgress` and its gateway port, which have no code yet.
 - The route path of `ProgressController.sync()` waits on the OpenAPI export of the endpoint.
 - `ListLevels`, the `LevelRepository` port and `BundledLevelRepository` are code since #168, but the composition root does not build `ListLevels` yet, because no screen calls it. Its request holds the game and the chosen figure. It lists only the levels of that figure, in the order of their files, and each level is completed, open or locked (decision 58 of [classes.md](classes.md); S3-12 and S3-08 in #151, «Propuesta, pendiente del equipo»). A figure with no level gives an empty list.
 - Flow 1: the move controls of `GameScreen` are planned (#174 to #177). `GamePresenter.onEvent(event: GameEvent)` is a planned member, for `GameEventBus` (view 4.3 of [classes.md](classes.md)).
