@@ -272,8 +272,12 @@ corepack enable pnpm
 pnpm install          # also installs the git hooks (prepare script)
 pnpm start            # Expo dev server; scan the QR code with Expo Go
 pnpm android          # open on an Android emulator or device
-pnpm web              # open in the browser
+pnpm web              # open in the browser (dev server)
+pnpm web:build        # export the web build to dist/ (one static page per route)
+npx expo serve        # serve dist/ on a local address to open the export in a browser
 ```
+
+The web build is a tool for the team, not a deliverable (#287): it shows the layout, the texts and the flow between the screens on any machine. It does not prove the phone. `app.json` sets `web.output` to `static`, so `pnpm web:build` renders one HTML page for each route at build time, and the browser hydrates it. The Expo 58 docs offer `single`, `static` and `server`. `server` renders each page on a request and needs a server to host, and the team hosts none. `single` renders no page, so it would also hide a hydration defect such as #318. With `static` the dev server of `pnpm web` renders each page too, so such a defect still shows. The game route lists its pages with `generateStaticParams()`, so a reload of a game screen finds its page. `dist/` is git-ignored. [docs/web/README.md](docs/web/README.md) holds the screenshots of each screen at a phone width and at a desktop width, what works on the web and what does not.
 
 When `fnm use` does not take effect in the shell, run a command through `fnm exec --using=26`, for example `fnm exec --using=26 pnpm verify`.
 

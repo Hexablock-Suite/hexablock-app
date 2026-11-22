@@ -2,6 +2,7 @@ import path from 'node:path';
 
 import { fireEvent, renderRouter, screen, testRouter } from 'expo-router/testing-library';
 
+import { generateStaticParams } from '../../app/game/[gameId]';
 import { repoRoot } from '../support/run-tool';
 import { occupiedSpaces, pressSpace } from '../support/ui/board-spaces';
 
@@ -96,5 +97,12 @@ describe('game route', () => {
     expect(screen).toHavePathname('/map');
     expect(app.getSearchParams()).toEqual({ figure: 'triangle' });
     expect(screen.queryByRole('button', { name: /^Hexa Fit/ })).toBeNull();
+  });
+
+  // Issue #287: the web export renders one page of the game route for each registered game,
+  // so a reload of a game screen finds its page. Each id comes once, though Lines, Sort
+  // and Merge are on every figure.
+  it('should_list_each_registered_game_once_when_the_web_export_asks_for_the_game_pages', () => {
+    expect(generateStaticParams()).toEqual(FOUR_BOARDS.map(({ id }) => ({ gameId: id })));
   });
 });

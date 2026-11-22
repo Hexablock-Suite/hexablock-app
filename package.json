@@ -8,6 +8,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "web:build": "expo export --platform web",
     "lint": "vp lint --deny-warnings",
     "format": "vp fmt",
     "format:check": "vp fmt --check",
