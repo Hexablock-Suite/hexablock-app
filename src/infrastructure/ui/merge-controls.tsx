@@ -166,6 +166,10 @@ interface Ring {
 
 // The places of the buttons on the ring, inside the smallest box that holds them.
 // The radius keeps a gap between two neighbor buttons and around the hub.
+// Each center falls on a whole pixel (issue #318). The language lets each engine round
+// `Math.sin` and `Math.cos` in its own way, so the last bit of a result can differ between
+// the web server and the browser. A whole pixel hides that bit, so the style of the server HTML
+// matches the style of the client, and the screen hydrates with no warning.
 function ringOf(ways: readonly SlideWay[]): Ring {
   const turns = ways.map((way) => way.angle).sort((a, b) => a - b);
   const steps = turns.map((angle, i) => (turns[i + 1] ?? turns[0] + 2 * Math.PI) - angle);
@@ -173,8 +177,8 @@ function ringOf(ways: readonly SlideWay[]): Ring {
   const reach = Math.max((BUTTON + GAP) / (2 * Math.sin(narrowest / 2)), (BUTTON + HUB) / 2 + GAP);
   const centers = ways.map((way) => ({
     way,
-    x: reach * Math.cos(way.angle),
-    y: reach * Math.sin(way.angle),
+    x: Math.round(reach * Math.cos(way.angle)),
+    y: Math.round(reach * Math.sin(way.angle)),
   }));
   const left = Math.min(...centers.map(({ x }) => x)) - BUTTON / 2;
   const top = Math.min(...centers.map(({ y }) => y)) - BUTTON / 2;
@@ -203,7 +207,10 @@ interface SlideButtonProps {
 // One slide button: a light face with a chevron that points along the way, over a wood lip.
 // A pressed button sinks onto its lip, and its bounds do not change. The screen reader reads
 // the label, for example «Deslizar al este».
+// The chevron turns by whole degrees, for the same reason as the ring: the angle of a way comes
+// from `Math.atan2`, and its last bit can differ between the server and the browser (#318).
 function SlideButton({ label, angle, left, top, onPress }: SlideButtonProps) {
+  const degrees = Math.round((angle * 180) / Math.PI);
   return (
     <Pressable
       accessibilityRole="button"
@@ -216,7 +223,7 @@ function SlideButton({ label, angle, left, top, onPress }: SlideButtonProps) {
         <>
           <View style={styles.slideLip} />
           <View style={[styles.slideFace, pressed && styles.pressed]}>
-            <View style={[styles.chevron, { transform: [{ rotate: `${angle}rad` }] }]}>
+            <View style={[styles.chevron, { transform: [{ rotate: `${degrees}deg` }] }]}>
               <View style={[styles.arm, styles.upperArm]} />
               <View style={[styles.arm, styles.lowerArm]} />
             </View>
