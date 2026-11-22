@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -9,6 +10,7 @@ import type { Score } from '../../../src/domain/engine/score';
 import { CompositionRoot } from '../../../src/infrastructure/composition-root';
 import { gameSessionOf, type GameSession } from '../../../src/infrastructure/ui/game-session';
 import { GameStage } from '../../../src/infrastructure/ui/game-stage';
+import { CONTENT_WIDTH, space } from '../../../src/infrastructure/ui/theme';
 import { valueOf } from '../../support/application/game-use-cases';
 import { RecordingLogger } from '../../support/application/recording-logger';
 import { ManualClock } from '../../support/engine/manual-clock';
@@ -65,6 +67,66 @@ async function show(session: GameSession, onBack = jest.fn()) {
     </GestureHandlerRootView>,
   );
   await screen.findByText('En juego');
+}
+
+// The window of the screen. `useWindowDimensions()` reads it, and the stage fits the board to it.
+const JEST_WINDOW = Dimensions.get('window');
+
+function setWindowWidth(width: number): void {
+  Dimensions.set({ window: { ...JEST_WINDOW, width } });
+}
+
+// The text of a game id.
+function slugOf(gameId: GameId): string {
+  let slug = '';
+  gameId.deliverTo({ receive: (value) => (slug = value) });
+  return slug;
+}
+
+// The rendered width of the board and of its wood frame. The frame width adds the side padding
+// of the dark face and of the frame around the board, as the rendered styles give them.
+function boardWidths(): { board: number; frame: number } {
+  const board = screen.getByLabelText('Tablero');
+  const face = board.parent;
+  const frame = face?.parent;
+  const paddingOf = (style: unknown) => Number(StyleSheet.flatten(style as never)?.padding ?? 0);
+  const width = Number(StyleSheet.flatten(board.props.style).width);
+  return {
+    board: width,
+    frame: width + 2 * paddingOf(face?.props.style) + 2 * paddingOf(frame?.props.style),
+  };
+}
+
+// The margin of a frame of the width `frame` in a window of the width `width`, in hundredths
+// of a point, so the rounding of the board width does not count.
+const marginOf = (width: number, frame: number) => Math.round(((width - frame) / 2) * 100) / 100;
+
+// The rendered widths of the board of each registered game on each board figure, in a window
+// of the width `width`: one row of the figure, the game id, the board width and the frame width.
+async function boardsAt(width: number): Promise<[string, string, number, number][]> {
+  setWindowWidth(width);
+  const rows: [string, string, number, number][] = [];
+  const figures = testRoot().figures();
+  for (const figure of figures) {
+    for (const gameId of testRoot().registry(figure).gameIds()) {
+      await render(
+        <GestureHandlerRootView>
+          <SafeAreaProvider initialMetrics={METRICS}>
+            <GameStage
+              title="Hexa"
+              {...gameSessionOf(testRoot(), gameId, textCatalog.es, figure)}
+              onBack={jest.fn()}
+            />
+          </SafeAreaProvider>
+        </GestureHandlerRootView>,
+      );
+      await screen.findByText('En juego');
+      const { board, frame } = boardWidths();
+      rows.push([JSON.stringify(figure), slugOf(gameId), board, frame]);
+      await screen.unmount();
+    }
+  }
+  return rows;
 }
 
 // The renderer hides each space from the screen reader, because the board carries the name.
@@ -175,5 +237,67 @@ describe('GameStage', () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Mapa' }));
 
     expect(onBack).toHaveBeenCalledTimes(1);
+  });
+
+  // Issue #319: the board keeps a side margin, and no cell touches the screen edge.
+  // The board of Hexa Lines is a hexagon of radius 5, and its middle row holds 9 cells.
+  // The frame keeps the 16-point screen padding on each side, so the outer cells of that row
+  // lie 16 + 6 + 12 = 34 points from each screen edge.
+  describe('board margin', () => {
+    afterEach(() => setWindowWidth(JEST_WINDOW.width));
+
+    it('should_keep_the_hexa_lines_frame_16_points_from_each_screen_edge_when_the_window_is_360_375_or_430_wide', async () => {
+      const shown: [number, number, number, string][] = [];
+      for (const width of [360, 375, 430]) {
+        setWindowWidth(width);
+        await show(gameSessionOf(testRoot(), GameId.of('hexa-lines'), textCatalog.es));
+        const { board, frame } = boardWidths();
+        const spaces = free().length + occupied().length;
+        shown.push([width, spaces, marginOf(width, frame), (board / 9).toFixed(2)]);
+        await screen.unmount();
+      }
+
+      // One row for each width: the spaces, the margin of the frame and the cell size.
+      expect(shown).toEqual([
+        [360, 61, 16, '32.44'],
+        [375, 61, 16, '34.11'],
+        [430, 61, 16, '40.22'],
+      ]);
+    });
+
+    it('should_keep_every_frame_at_least_16_points_from_each_screen_edge_when_the_window_is_360_375_or_430_wide', async () => {
+      const tooWide: unknown[] = [];
+      let boards = 0;
+      for (const width of [360, 375, 430]) {
+        for (const [figure, game, board, frame] of await boardsAt(width)) {
+          boards += 1;
+          if (board <= 0 || marginOf(width, frame) < space.lg) tooWide.push([width, figure, game]);
+        }
+      }
+
+      // Hexa Lines, Hexa Sort and Hexa Merge on each of the three figures, and Hexa Fit
+      // on the hexagon only: 10 boards at each width.
+      expect([boards, tooWide]).toEqual([30, []]);
+    });
+
+    // A wide window, as the web build on a desktop (#287). The content stays in the column
+    // of `CONTENT_WIDTH` points, so the frame of the board fits that column too.
+    // The cells keep the largest size of 48 points when the board fits at that size.
+    it('should_keep_every_frame_inside_the_content_column_when_the_window_is_1280_wide', async () => {
+      const rows = await boardsAt(1280);
+      const outside = rows.filter(([, , , frame]) => frame > CONTENT_WIDTH);
+      const lines = rows
+        .filter(([, game]) => game === 'hexa-lines')
+        .map(([figure, , board]) => [figure, Math.round(board * 100) / 100]);
+
+      expect(outside).toEqual([]);
+      // Hexa Lines on the hexagon is 9 cells of 48 points wide. On the triangle its board
+      // is wider than the column at 48 points, so it fills the column less the frame.
+      expect(lines).toEqual([
+        ['{"name":"hex"}', 432],
+        ['{"name":"square"}', 240],
+        ['{"name":"triangle"}', CONTENT_WIDTH - 2 * (6 + space.md)],
+      ]);
+    });
   });
 });
