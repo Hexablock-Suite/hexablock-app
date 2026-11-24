@@ -26,18 +26,42 @@ describe('CI contract', () => {
     );
   });
 
-  it('should_verify_pact_and_api_types_against_backend_main_when_job_contract_runs', () => {
+  it('should_verify_pact_and_api_types_against_the_selected_api_revision_when_job_contract_runs', () => {
     const workflow = read('.github/workflows/ci.yml');
     const contractJob = workflow.split(/^ {2}contract:\n/m)[1] ?? '';
     const scripts = JSON.parse(read('package.json')).scripts;
 
     expect(workflow).toMatch(/^ {2}contract:\n {4}name: contract$/m);
-    expect(contractJob).toMatch(/repository: Hexablock-Suite\/hexablock-api\n {10}ref: main/);
-    expect(contractJob).toMatch(/curl --silent --fail "\$BACKEND_URL\/health"/);
+    expect(contractJob).toMatch(
+      /repository: Hexablock-Suite\/hexablock-api\n {10}ref: \$\{\{ env\.API_REF != '' && env\.API_REF \|\| 'main' \}\}/,
+    );
+    expect(contractJob).toMatch(/curl --silent --fail "\$BACKEND_URL\/v1\/health"/);
     expect(contractJob).toMatch(/^ {6}- run: pnpm contract:verify\n {6}- run: pnpm api:check$/m);
     expect(scripts['contract:verify']).toBe('node scripts/contract/verify-provider.mjs');
     expect(scripts['api:check']).toBe('node scripts/contract/api-types.mjs check');
     expect(scripts['api:generate']).toBe('node scripts/contract/api-types.mjs generate');
+  });
+
+  it('should_reject_a_paired_api_revision_that_is_not_a_full_commit_sha_when_set', () => {
+    const contractJob = read('.github/workflows/ci.yml').split(/^ {2}contract:\n/m)[1] ?? '';
+
+    // The paired ref must be immutable full commit SHA evidence. An invalid or
+    // unresolvable ref fails the job; it never falls back to main.
+    expect(contractJob).toMatch(
+      /^ {6}- name: validate the paired API revision\n(?: {8}#[^\n]*\n)* {8}if: env\.API_REF != ''$/m,
+    );
+    expect(contractJob).toContain('API_REF must be a full 40-character commit SHA when set');
+  });
+
+  it('should_verify_api_main_by_default_when_no_paired_api_revision_is_set', () => {
+    const contractJob = read('.github/workflows/ci.yml').split(/^ {2}contract:\n/m)[1] ?? '';
+
+    // The empty-ref expression falls back to main only when API_REF is unset.
+    // A set-but-invalid ref never reaches this fallback: the checkout fails.
+    expect(contractJob).toMatch(/ref: \$\{\{ env\.API_REF != '' && env\.API_REF \|\| 'main' \}\}/);
+    expect(contractJob).toMatch(
+      /^ {6}# serves \/v1\. Empty or removed restores the normal API main verification\.$/m,
+    );
   });
 
   it('should_mirror_verify_commands_when_pre_push_hook_runs', () => {

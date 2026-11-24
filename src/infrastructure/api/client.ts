@@ -3,7 +3,7 @@ import createClient from 'openapi-fetch';
 import type { paths } from './schema';
 
 export type HealthResponse =
-  paths['/health']['get']['responses'][200]['content']['application/json'];
+  paths['/v1/health']['get']['responses'][200]['content']['application/json'];
 
 export type ApiClient = {
   getHealth: () => Promise<HealthResponse>;
@@ -15,9 +15,9 @@ export function createApiClient(baseUrl: string): ApiClient {
 
   return {
     async getHealth() {
-      const { data, response } = await client.GET('/health');
+      const { data, response } = await client.GET('/v1/health');
       if (data === undefined) {
-        throw new Error(`GET /health failed with status ${response.status}`);
+        throw new Error(`GET /v1/health failed with status ${response.status}`);
       }
       return data;
     },

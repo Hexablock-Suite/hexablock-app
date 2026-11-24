@@ -31,7 +31,7 @@ describe('health contract', () => {
       await pact
         .addInteraction()
         .uponReceiving('a health check')
-        .withRequest('GET', '/health')
+        .withRequest('GET', '/v1/health')
         .willRespondWith(200, (builder) => builder.jsonBody({ status: 'ok' }))
         .executeTest(async (mockServer) => {
           const health = await createApiClient(mockServer.url).getHealth();
@@ -55,7 +55,7 @@ describe('health contract', () => {
     });
 
     it('should_pass_contract_verify_when_backend_honors_the_pact', async () => {
-      backend = await startFakeBackend({ '/health': { status: 200, body: { status: 'ok' } } });
+      backend = await startFakeBackend({ '/v1/health': { status: 200, body: { status: 'ok' } } });
 
       const result = await runNodeScript('scripts/contract/verify-provider.mjs', [], {
         BACKEND_URL: backend.url,
@@ -65,7 +65,7 @@ describe('health contract', () => {
     });
 
     it('should_fail_contract_verify_when_backend_breaks_the_health_body', async () => {
-      backend = await startFakeBackend({ '/health': { status: 200, body: { status: 'down' } } });
+      backend = await startFakeBackend({ '/v1/health': { status: 200, body: { status: 'down' } } });
 
       const result = await runNodeScript('scripts/contract/verify-provider.mjs', [], {
         BACKEND_URL: backend.url,

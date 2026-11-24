@@ -31,8 +31,10 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm verify
 
-  # Starts backend main and checks the client contract against it:
+  # Starts the selected API revision and checks the client contract against it:
   # the committed pact (pnpm contract:verify) and the generated API types (pnpm api:check).
+  # API_REF selects the revision: empty verifies API main; a paired transition sets
+  # one full commit SHA (issue #346, hexablock-api issue #173).
   contract:
     name: contract
     runs-on: ubuntu-latest
@@ -42,12 +44,25 @@ jobs:
       PACT_DO_NOT_TRACK: 'true'
       PORT: '3000'
       BACKEND_URL: http://localhost:3000
+      # Paired transition (app issue #346): verify against the API commit that
+      # serves /v1. Empty or removed restores the normal API main verification.
+      API_REF: d3e2e35acb95df119e5d1c8bb191a2b3193208e5
     steps:
       - uses: actions/checkout@v7
+      - name: validate the paired API revision
+        # A paired revision must be a full commit SHA, so the checked-out
+        # revision is immutable. An invalid or unresolvable ref fails the job;
+        # it never falls back to main.
+        if: env.API_REF != ''
+        run: |
+          if ! echo "$API_REF" | grep -qE '^[0-9a-f]{40}$'; then
+            echo "API_REF must be a full 40-character commit SHA when set, got: $API_REF" >&2
+            exit 1
+          fi
       - uses: actions/checkout@v7
         with:
           repository: Hexablock-Suite/hexablock-api
-          ref: main
+          ref: ${{ env.API_REF != '' && env.API_REF || 'main' }}
           path: hexablock-api
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
@@ -58,10 +73,10 @@ jobs:
             pnpm-lock.yaml
             hexablock-api/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
-      - name: Build and start backend main
+      - name: Build and start the selected API revision
         working-directory: hexablock-api
         # The API reads JWT_SECRET when it starts. The example values of
-        # hexablock-api start it, and /health reads no database and no token.
+        # hexablock-api start it, and /v1/health reads no database and no token.
         run: |
           pnpm install --frozen-lockfile
           pnpm build
@@ -69,7 +84,7 @@ jobs:
       - name: Wait for backend health
         run: |
           for _ in $(seq 1 30); do
-            if curl --silent --fail "$BACKEND_URL/health"; then exit 0; fi
+            if curl --silent --fail "$BACKEND_URL/v1/health"; then exit 0; fi
             sleep 1
           done
           cat "$RUNNER_TEMP/backend.log"

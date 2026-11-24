@@ -13,7 +13,7 @@ const verifier = new Verifier({
   providerBaseUrl: process.env.BACKEND_URL ?? 'http://localhost:3000',
   pactUrls: [path.join(repoRoot, 'pacts/hexablock-app-hexablock-api.json')],
   logLevel: 'warn',
-  // GET /health needs no provider state.
+  // GET /v1/health needs no provider state.
   // When an interaction declares a state with given(), add stateChangeUrl here.
   // It points at a backend test route that prepares that state before each interaction.
 });
