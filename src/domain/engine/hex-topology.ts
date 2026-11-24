@@ -222,6 +222,10 @@ export class HexTopology implements GridTopology<HexCoord, HexAxis, HexDirection
     return c.plus(offset);
   }
 
+  translationOffset(from: HexCoord, to: HexCoord): HexCoord {
+    return to.plus(from.opposite());
+  }
+
   *line(axis: HexAxis, through: HexCoord, contains: (c: HexCoord) => boolean): Iterable<HexCoord> {
     // The check still runs when a caller casts another value to an axis.
     // The error carries that value as its `cause`, and the edge delivers its text (issue #237).

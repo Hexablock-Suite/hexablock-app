@@ -212,6 +212,10 @@ export class SquareTopology implements GridTopology<SquareCoord, SquareAxis, Squ
     return c.plus(offset);
   }
 
+  translationOffset(from: SquareCoord, to: SquareCoord): SquareCoord {
+    return to.plus(from.opposite());
+  }
+
   *line(
     axis: SquareAxis,
     through: SquareCoord,

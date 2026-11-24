@@ -31,6 +31,10 @@ function rhombus(): Piece<ReturnType<typeof fakeCell>, TriangleCoord> {
 const oddOffset = triangle(1, 0);
 
 describe('Piece translation on the triangle topology double', () => {
+  it('should_find_no_translation_when_the_triangles_face_opposite_ways', () => {
+    expect(triangleTopology.translationOffset(triangle(1, 1), triangle(2, 1))).toBeUndefined();
+  });
+
   it('should_move_each_cell_through_the_topology_when_the_offset_is_odd', () => {
     const moved = rhombus().translated(oddOffset, triangleTopology);
 

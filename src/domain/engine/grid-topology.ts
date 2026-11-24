@@ -48,6 +48,8 @@ export interface GridTopology<
   axes(): TAxis[];
   rotate(c: TCoord, turns: Turns): TCoord;
   translate(c: TCoord, offset: TCoord): TCoord;
+  // The offset that translates `from` to `to`, if translation can reach `to`.
+  translationOffset(from: TCoord, to: TCoord): TCoord | undefined;
   // The coordinates on one axis through `through`, in order, while `contains` is true.
   line(axis: TAxis, through: TCoord, contains: (c: TCoord) => boolean): Iterable<TCoord>;
   // The coordinates at distance `radius` from `center`. Radius 0 gives the center.

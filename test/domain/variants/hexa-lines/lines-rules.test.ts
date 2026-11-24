@@ -144,6 +144,23 @@ describe('Hexa Lines rules', () => {
     }
   });
 
+  it('should_keep_the_game_playing_when_a_piece_only_fits_at_the_left_of_a_lower_triangle_row', () => {
+    const onlyFree = triangle(1, 1);
+    const board = linesState(triangleTopology, 2, { tray: [] }).snapshot().boardCopy();
+    const state = linesState(triangleTopology, 2, {
+      filled: board.coordinates().filter((cell) => !cell.equals(onlyFree)),
+      tray: [piece(triangle(0, 0))],
+    });
+    const rules = new LinesRules<TriangleCoord>();
+    const valid = new PlacePiece(TrayPosition.of(0), triangle(0, 1));
+
+    expect(rules.isValid(state, valid)).toBe(true);
+    expect(rules.evaluate(state)).toBe(Outcome.playing);
+    const moves = [...rules.validMoves(state)];
+    expect(moves).toHaveLength(1);
+    expect(moves[0]?.equals(valid, triangleTopology)).toBe(true);
+  });
+
   it('should_clear_the_full_line_on_each_of_the_three_axes_when_the_topology_is_triangular', () => {
     const topology: GridTopology<TriangleCoord> = triangleTopology;
     const axes = topology.axes();

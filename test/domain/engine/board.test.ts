@@ -35,6 +35,7 @@ const stripTopology: GridTopology<number> = {
   axes: () => [X],
   rotate: (c, turns) => turns.applyTo(c, (at) => -at, stripTopology),
   translate: (c, offset) => c + offset,
+  translationOffset: (from, to) => to - from,
   *line(_axis, through, contains) {
     let start = through;
     while (contains(start - 1)) start -= 1;
@@ -54,6 +55,14 @@ function newBoard(): Board<string, number> {
 }
 
 describe('Board', () => {
+  it('should_align_a_piece_anchor_with_each_free_cell_when_the_board_is_irregular', () => {
+    const board = new Board<string, number>(BOARD_ID, BoardShape.of([0, 2, 5]), stripTopology);
+    board.occupy(2, 'blue');
+
+    expect([...board.candidatePlacementOffsets(3)]).toEqual([-3, 2]);
+    expect(board.occupiedCells()).toEqual([[2, 'blue']]);
+  });
+
   it('should_return_undefined_when_cell_is_empty', () => {
     expect(newBoard().occupantAt(2)).toBeUndefined();
   });
