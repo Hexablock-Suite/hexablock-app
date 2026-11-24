@@ -56,11 +56,19 @@ function newBoard(): Board<string, number> {
 
 describe('Board', () => {
   it('should_align_a_piece_anchor_with_each_free_cell_when_the_board_is_irregular', () => {
-    const board = new Board<string, number>(BOARD_ID, BoardShape.of([0, 2, 5]), stripTopology);
+    const board = new Board<string | undefined, number>(
+      BOARD_ID,
+      BoardShape.of([0, 2, 5, 7]),
+      stripTopology,
+    );
     board.occupy(2, 'blue');
+    board.occupy(7, undefined);
 
     expect([...board.candidatePlacementOffsets(3)]).toEqual([-3, 2]);
-    expect(board.occupiedCells()).toEqual([[2, 'blue']]);
+    expect(board.occupiedCells()).toEqual([
+      [2, 'blue'],
+      [7, undefined],
+    ]);
   });
 
   it('should_return_undefined_when_cell_is_empty', () => {

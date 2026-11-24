@@ -260,7 +260,8 @@ export class Board<TCell, TCoord, TAxis extends GridAxis = GridAxis>
   // A caller still checks whether the rest of the piece fits.
   *candidatePlacementOffsets(anchor: TCoord): Iterable<TCoord> {
     for (const at of this.coordinates()) {
-      if (this.occupantAt(at) !== undefined) continue;
+      // Check the space, not its value: an undefined cell still occupies it.
+      if (this.content.find(this.topology.key(at))?.occupiedCell() !== undefined) continue;
       const offset = this.topology.translationOffset(anchor, at);
       if (offset !== undefined) yield offset;
     }
