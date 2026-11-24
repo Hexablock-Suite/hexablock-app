@@ -144,6 +144,7 @@ function sortPoints(stacks: number[]): number {
     stacks.map(TileCount.of),
     undefined,
     new FixedListPieceSource([]),
+    Moves.of(0),
     new SortView(undefined, goalsDone, goal),
   );
   return turnScore(new SortScoring<SquareCoord>(), after);

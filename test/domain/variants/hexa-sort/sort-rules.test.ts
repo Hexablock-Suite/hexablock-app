@@ -2,6 +2,7 @@
 import { Outcome } from '../../../../src/domain/engine/outcome';
 import { Board } from '../../../../src/domain/engine/board';
 import { PlayingPhase } from '../../../../src/domain/engine/game-phase';
+import { Moves } from '../../../../src/domain/engine/moves';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import type { RandomSource } from '../../../../src/domain/engine/random-source';
 import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
@@ -29,7 +30,7 @@ import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-polic
 
 // The rules of issue #93 and the accepted rules of issue #56: a tie goes to the stack
 // whose coordinate key comes first in key order.
-// Every test drives the game through `GameEngine.play()`, so it uses only the rules contract.
+// The turn tests drive the game through `GameEngine`, so they use only the rules contract.
 
 describe('SortRules contract', () => {
   it('should_extend_the_base_rules_when_the_variant_implements_the_contract', () => {
@@ -38,6 +39,21 @@ describe('SortRules contract', () => {
 });
 
 describe('SortRules placement', () => {
+  it('should_count_only_accepted_moves_when_placements_are_accepted_and_rejected', () => {
+    const game = sortGame(sortState({ board: row(3), offered: [stack('red'), stack('blue')] }));
+
+    expect(game.snapshot().moveCount()).toEqual(Moves.of(0));
+
+    expect(game.tryPlay(place(0)).wasAccepted()).toBe(true);
+    expect(game.snapshot().moveCount()).toEqual(Moves.of(1));
+
+    expect(game.tryPlay(place(0)).wasAccepted()).toBe(false);
+    expect(game.snapshot().moveCount()).toEqual(Moves.of(1));
+
+    expect(game.tryPlay(place(2)).wasAccepted()).toBe(true);
+    expect(game.snapshot().moveCount()).toEqual(Moves.of(2));
+  });
+
   it('should_put_the_offered_stack_on_the_cell_and_offer_the_next_when_the_cell_is_empty', () => {
     const game = sortGame(sortState({ board: row(3), offered: [stack('red'), stack('blue')] }));
 
@@ -135,6 +151,7 @@ describe('SortRules transfer', () => {
     expect(chipsAt(game, 2)).toEqual(['red', 'red', 'red']);
     expect(chipsAt(game, 1)).toEqual([]);
     expect(chipsAt(game, 0)).toEqual(['blue', 'blue', 'blue']);
+    expect(game.snapshot().moveCount()).toEqual(Moves.of(1));
   });
 });
 
@@ -154,6 +171,7 @@ describe('SortRules goal', () => {
     expect(chipsAt(game, 1)).toEqual([]);
     expect(state.goalsReached()).toEqual(ClearedStacks.of(1));
     expect(state.clearedStackHeights()).toEqual([TileCount.of(11)]);
+    expect(state.moveCount()).toEqual(Moves.of(1));
   });
 
   it('should_keep_the_stack_when_its_top_run_is_nine', () => {
@@ -404,6 +422,7 @@ describe('SortRules atomic turn', () => {
       clearedTiles: [...state.clearedStackHeights()],
       placedAt: state.lastPlacedAt(),
       score: state.scoreSoFar(),
+      moves: state.moveCount(),
     });
     const before = facts(engine.snapshot());
 
