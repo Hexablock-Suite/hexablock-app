@@ -115,6 +115,22 @@
           >
             <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
           </marker>
+          <marker
+            id="rules-diamond-hollow"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon
+              points="0 5, 9 0, 18 5, 9 10"
+              fill="#ffffff"
+              stroke="#17212a"
+              stroke-width="1"
+            />
+          </marker>
         </defs>
 
         <rect width="100%" height="100%" fill="#f3f5f6" />
@@ -238,13 +254,13 @@
           stroke-dasharray="5,4"
           marker-end="url(#rules-triangle)"
         />
-        <!-- TimedRulesDecorator keeps the IGameRules it wraps as inner: use with role and multiplicity (decision 23) -->
+        <!-- TimedRulesDecorator decorates the IGameRules it wraps: hollow diamond at the decorator, decorate 1 at the wrapped type (decision 23) -->
         <path
           d="M848 336 V136 Q848 128 840 128 H616"
           fill="none"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          marker-end="url(#rules-open)"
+          marker-start="url(#rules-diamond-hollow)"
         />
         <!-- TimedRulesDecorator holds the LevelTimer it receives as timer: use -->
         <line
@@ -309,9 +325,9 @@
         >
           rules
         </text>
-        <rect x="622" y="112" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="622" y="112" width="48" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="640"
+          x="646"
           y="121"
           fill="#7d8a94"
           font-size="8"
@@ -319,7 +335,7 @@
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          inner
+          decorate
         </text>
         <rect x="848" y="588" width="36" height="12" rx="2" fill="#f9f4dc" />
         <text
@@ -986,6 +1002,24 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Use · attribute, parameter, return, local or new
+        </text>
+        <line
+          x1="520"
+          y1="808"
+          x2="548"
+          y2="808"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#rules-diamond-hollow)"
+        />
+        <text
+          x="556"
+          y="812"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aggregation · decorator to the type it wraps
         </text>
         <rect
           x="24"
