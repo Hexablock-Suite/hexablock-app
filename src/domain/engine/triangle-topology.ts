@@ -75,6 +75,14 @@ export class TriangleCoord {
     return TriangleCoord.of(this.col + 2 * offset.col + offset.row, this.row + offset.row);
   }
 
+  // Undo the row's right shift, then convert the remaining columns to lattice steps.
+  // A half-step would flip the triangle, so there is no translation in that case.
+  offsetTo(other: TriangleCoord): TriangleCoord | undefined {
+    const row = other.row - this.row;
+    const col = (other.col - this.col - row) / 2;
+    return Number.isInteger(col) ? TriangleCoord.of(col, row) : undefined;
+  }
+
   // This coordinate after a sixth of a turn around the origin vertex:
   // (x, y, z) becomes (1 - y, 1 - z, 1 - x).
   // The step changes the orientation of the triangle, so no triangle stays in its place.
@@ -302,6 +310,10 @@ export class TriangleTopology implements GridTopology<
   // The offset counts lattice cells, so every translation keeps the orientation of each triangle.
   translate(c: TriangleCoord, offset: TriangleCoord): TriangleCoord {
     return c.translated(offset);
+  }
+
+  translationOffset(from: TriangleCoord, to: TriangleCoord): TriangleCoord | undefined {
+    return from.offsetTo(to);
   }
 
   *line(

@@ -5,6 +5,11 @@ import {
 } from '../adapters/fit-state-mapper';
 import { fitLevelVariant, sortLevelVariant } from '../adapters/level-game-factories';
 import {
+  LinesStateMapper,
+  type LinesCellView,
+  type LinesPayloadView,
+} from '../adapters/lines-state-mapper';
+import {
   MergeStateMapper,
   type MergeCellView,
   type MergePayloadView,
@@ -14,7 +19,6 @@ import {
   type SortCellView,
   type SortPayloadView,
 } from '../adapters/sort-state-mapper';
-import { SpaceStateMapper, type SpaceView } from '../adapters/space-state-mapper';
 import { BoardShape } from '../domain/engine/board-shape';
 import type { Clock } from '../domain/engine/clock';
 import { Color } from '../domain/engine/color';
@@ -32,6 +36,7 @@ import { Seed } from '../domain/engine/seed';
 import { CellNode, ShapeGroup } from '../domain/engine/shape-node';
 import { SquareGeometry } from '../domain/engine/square-geometry';
 import { TriangleGeometry } from '../domain/engine/triangle-geometry';
+import { triangle, type TriangleCoord } from '../domain/engine/triangle-topology';
 import { FitFactory } from '../domain/variants/hexa-fit/fit-factory';
 import { FitLevel } from '../domain/variants/hexa-fit/fit-level';
 import type { FitMove } from '../domain/variants/hexa-fit/fit-move';
@@ -39,6 +44,8 @@ import type { FitView } from '../domain/variants/hexa-fit/fit-state';
 import { FitStarThreshold } from '../domain/variants/hexa-fit/fit-stars';
 import { PieceId } from '../domain/variants/hexa-fit/piece-id';
 import { LinesFactory, LinesSettings } from '../domain/variants/hexa-lines/lines-factory';
+import type { LinesView } from '../domain/variants/hexa-lines/lines-state';
+import type { PlacePiece } from '../domain/variants/hexa-lines/place-piece';
 import { MergeFactory, MergeSettings } from '../domain/variants/hexa-merge/merge-factory';
 import type { MergeView } from '../domain/variants/hexa-merge/merge-state';
 import { MergeTile } from '../domain/variants/hexa-merge/merge-tile';
@@ -49,19 +56,19 @@ import type { PlaceStack } from '../domain/variants/hexa-sort/place-stack';
 import { SortFactory } from '../domain/variants/hexa-sort/sort-factory';
 import { SortLevel } from '../domain/variants/hexa-sort/sort-level';
 import type { SortView } from '../domain/variants/hexa-sort/sort-state';
-import { cellBoxOf, type BoardLayout, type CellShape } from './board/board-layout';
+import { cellBoxOf, valuesOf, type BoardLayout, type CellShape } from './board/board-layout';
 import { FitCellRenderer } from './board/fit-cell-renderer';
 import { HexLayout } from './board/hex-layout';
+import { LinesCellRenderer } from './board/lines-cell-renderer';
 import { MergeCellRenderer } from './board/merge-cell-renderer';
 import { slideWays } from './board/slide-ways';
 import { SortCellRenderer } from './board/sort-cell-renderer';
-import { SpaceCellRenderer } from './board/space-cell-renderer';
 import { SquareLayout } from './board/square-layout';
 import { TriangleLayout } from './board/triangle-layout';
 import { registered, type RegisteredGame, type ScreenParts } from './game-registry';
 import { FitControls } from './ui/fit-controls';
+import { LinesControls } from './ui/lines-controls';
 import { MergeControls } from './ui/merge-controls';
-import { BoardOnlyControls } from './ui/move-controls';
 import { SortControls } from './ui/sort-controls';
 import { worldTone } from './ui/theme';
 
@@ -92,6 +99,7 @@ export interface BoardFigure<TCoord> {
   readonly id: TopologyId;
   readonly geometry: GeometryFactory<TCoord>;
   readonly fitLevel?: FitLevel<TCoord>;
+  linesPlacementAt?(at: TCoord): TCoord;
   layoutOf(size: number): BoardLayout<TCoord>;
 }
 
@@ -104,8 +112,22 @@ export function boardFigures(): BoardFigure<unknown>[] {
   return [
     boardFigure(TopologyId.hex, new HexGeometry(), (size) => new HexLayout(size), firstFitLevel()),
     boardFigure(TopologyId.square, new SquareGeometry(), (size) => new SquareLayout(size)),
-    boardFigure(TopologyId.triangle, new TriangleGeometry(), (size) => new TriangleLayout(size)),
+    {
+      ...boardFigure(
+        TopologyId.triangle,
+        new TriangleGeometry(),
+        (size) => new TriangleLayout(size),
+      ),
+      linesPlacementAt: triangleLinesPlacementAt,
+    },
   ];
+}
+
+// A tap picks a lattice cell, which holds the up triangle and the down triangle beside it.
+// Lines shapes have their origin on the up triangle. The domain move takes lattice steps.
+function triangleLinesPlacementAt(at: TriangleCoord): TriangleCoord {
+  const [col, row] = valuesOf(at);
+  return triangle(Math.floor((col - row) / 2), row);
 }
 
 // The games of the registry of the board figure `figure`, in the order of the game selector.
@@ -121,8 +143,7 @@ export function boardFigures(): BoardFigure<unknown>[] {
 // Fit and Sort also take their `LevelVariant` on the geometry of the figure, so `StartGame`
 // starts a bundled level by its id (#172). The Fit level and the Sort level of each entry
 // are first content: a start with no level id starts them until the level selector (#173).
-// Fit (#175), Sort (#176) and Merge (#177) each choose their state mapper, cell renderer
-// and move controls. Lines keeps the default screen parts until #174.
+// Each variant chooses its state mapper, cell renderer and move controls (#174 to #177).
 // Each entry declares the world colors of its game on the map (#298): orange for Lines,
 // green for Fit, pink for Sort and blue for Merge, the colors of the team prototype.
 // So a game keeps its color on the square and on the triangle, where Fit has no entry.
@@ -144,7 +165,7 @@ export function registeredGames<TCoord>(
           nonEmpty(LINES_COLORS),
         ),
       ),
-      defaultScreen(figure),
+      linesScreen(figure),
       worldTone(0),
     ),
     ...fitOn(figure, clock),
@@ -202,16 +223,21 @@ function fitOn<TCoord>(figure: BoardFigure<TCoord>, clock: Clock): RegisteredGam
   ];
 }
 
-// The default screen parts on the board figure `figure`: the mapper and the renderer that tell
-// a free space from an occupied one, the controls that show the board alone,
-// and the layout of the figure (D4, issue #165).
-function defaultScreen<TCoord>(
+// The screen parts of Hexa Lines (#174, S3-07 proposed).
+function linesScreen<TCoord>(
   figure: BoardFigure<TCoord>,
-): ScreenParts<unknown, TCoord, unknown, SpaceView, undefined> {
+): ScreenParts<
+  Color,
+  TCoord,
+  LinesView<TCoord>,
+  LinesCellView,
+  LinesPayloadView<TCoord>,
+  PlacePiece<TCoord>
+> {
   return {
-    mapper: new SpaceStateMapper(),
-    renderer: new SpaceCellRenderer(),
-    controls: new BoardOnlyControls(),
+    mapper: new LinesStateMapper(),
+    renderer: new LinesCellRenderer(),
+    controls: new LinesControls(figure.linesPlacementAt),
     layoutOf: (size) => figure.layoutOf(size),
   };
 }

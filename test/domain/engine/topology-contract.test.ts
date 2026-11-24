@@ -215,6 +215,15 @@ function contract<TCoord>(row: Row<TCoord>): () => void {
       }
     });
 
+    it('should_recover_the_offset_when_a_cell_has_been_translated', () => {
+      for (const from of row.samples) {
+        for (const offset of row.offsets) {
+          const to = topology.translate(from, offset);
+          expect(topology.translationOffset(from, to)).toEqual(offset);
+        }
+      }
+    });
+
     it('should_keep_two_cells_neighbors_when_both_translate_by_one_offset', () => {
       for (const c of row.samples) {
         for (const n of topology.neighbors(c)) {

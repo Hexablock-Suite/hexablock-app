@@ -81,6 +81,7 @@ export interface ReadonlyBoard<TCell, TCoord, TAxis extends GridAxis = GridAxis>
   fullTurn(): Turns;
   turned(piece: Piece<TCell, TCoord>, turns: Turns): Piece<TCell, TCoord>;
   moved(piece: Piece<TCell, TCoord>, offset: TCoord): Piece<TCell, TCoord>;
+  candidatePlacementOffsets(anchor: TCoord): Iterable<TCoord>;
   line(axis: TAxis, through: TCoord): Iterable<TCoord>;
   ring(center: TCoord, radius: Radius): Iterable<TCoord>;
   neighborhood(c: TCoord): Iterable<TCoord>;
@@ -253,6 +254,17 @@ export class Board<TCell, TCoord, TAxis extends GridAxis = GridAxis>
   // The board does not cut the piece: a cell of the moved piece can lie outside the board.
   moved(piece: Piece<TCell, TCoord>, offset: TCoord): Piece<TCell, TCoord> {
     return piece.translated(offset, this.topology);
+  }
+
+  // Aligns one cell of a piece with each free space it can reach by translation.
+  // A caller still checks whether the rest of the piece fits.
+  *candidatePlacementOffsets(anchor: TCoord): Iterable<TCoord> {
+    for (const at of this.coordinates()) {
+      // Check the space, not its value: an undefined cell still occupies it.
+      if (this.content.find(this.topology.key(at))?.occupiedCell() !== undefined) continue;
+      const offset = this.topology.translationOffset(anchor, at);
+      if (offset !== undefined) yield offset;
+    }
   }
 
   // A line through a coordinate outside the shape is empty.

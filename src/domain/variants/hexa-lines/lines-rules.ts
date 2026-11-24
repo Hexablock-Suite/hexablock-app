@@ -20,13 +20,16 @@ export class LinesRules<TCoord> extends BaseGameRules<PlacePiece<TCoord>, LinesS
     return state.canPlace(move);
   }
 
-  // A lazy generator: each tray piece at each offset that a board cell gives.
+  // A lazy generator: align one cell of each tray piece with each reachable free space.
   // The «no tray piece fits» end reads only its first move (classes.md decision 33).
   *validMoves(state: LinesState<TCoord>): Iterable<PlacePiece<TCoord>> {
     const photo = state.snapshot();
-    const offsets = photo.boardCopy().coordinates();
-    for (const index of photo.trayPieces().keys()) {
+    const board = photo.boardCopy();
+    for (const [index, piece] of photo.trayPieces().entries()) {
       const position = TrayPosition.of(index);
+      const [anchor] = piece.coveredCoordinates();
+      const offsets =
+        anchor === undefined ? board.coordinates() : board.candidatePlacementOffsets(anchor);
       for (const at of offsets) {
         const move = new PlacePiece(position, at);
         if (state.canPlace(move)) yield move;
