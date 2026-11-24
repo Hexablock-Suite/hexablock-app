@@ -35,6 +35,7 @@ export class SortRules<TCoord> extends BaseGameRules<PlaceStack<TCoord>, SortSta
 
   apply(state: SortState<TCoord>, move: PlaceStack<TCoord>): SortState<TCoord> {
     state.placeOfferedStack(move.cell());
+    state.countMove();
     return state;
   }
 

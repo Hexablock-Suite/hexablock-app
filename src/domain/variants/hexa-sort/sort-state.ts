@@ -2,6 +2,7 @@ import type { Board, ReadonlyBoard } from '../../engine/board';
 import { BoardSnapshot, checkOwnSnapshot, type BoardState } from '../../engine/board-state';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { MatchId } from '../../engine/match-id';
+import { Moves } from '../../engine/moves';
 import { Score } from '../../engine/score';
 import type { IPieceSource } from '../../engine/piece-source';
 import type { Piece } from '../../engine/piece';
@@ -40,7 +41,7 @@ export class SortView<TCoord> {
 }
 
 // The photo of a Sort state (classes.md decision 34): the board, the score, the offered stack,
-// the goals, the facts of the last turn and the piece source at its position.
+// the goals, the move count, the facts of the last turn and the piece source at its position.
 // The source is a value (classes.md decision 51), so the photo shares it with the state,
 // and a reader that draws from it changes nothing.
 // `view()` gives the offered stack and the goal counts for the screen.
@@ -62,6 +63,7 @@ export class SortSnapshot<TCoord> extends BoardSnapshot<ColorStack, TCoord> {
     clearedTiles: readonly TileCount[],
     private readonly placedAt: TCoord | undefined,
     private readonly source: IPieceSource<Piece<ColorStack, TCoord>>,
+    private readonly moves: Moves,
     private readonly shown: SortView<TCoord>,
   ) {
     super(stateId, matchId, board, score);
@@ -72,6 +74,11 @@ export class SortSnapshot<TCoord> extends BoardSnapshot<ColorStack, TCoord> {
   // The stack that the player places next, or `undefined` when the source has ended.
   offeredStack(): Piece<ColorStack, TCoord> | undefined {
     return this.offered;
+  }
+
+  // The count of the accepted moves of the game.
+  moveCount(): Moves {
+    return this.moves;
   }
 
   // The count of the stacks that the game has cleared.
@@ -109,7 +116,7 @@ export class SortSnapshot<TCoord> extends BoardSnapshot<ColorStack, TCoord> {
 // Its identity is its own `GameStateId`, and `equals()` compares only that identity.
 // It also keeps the `MatchId` of its game, and `belongsTo()` reads it.
 // It changes only through `placeOfferedStack()`, `moveRun()`, `clearStack()`,
-// `offerNext()`, `addPoints()` and `restore()`. The rules decide when to call them.
+// `offerNext()`, `countMove()`, `addPoints()` and `restore()`. The rules decide when to call them.
 // A refused input throws a RangeError and leaves the whole state as it was.
 // The scoring, the rules and the use cases ask the photo of `snapshot()`, never a field.
 // The piece source lives in the state (classes.md decision 31). The level chooses it:
@@ -131,9 +138,10 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
     private clearedTiles: TileCount[],
     private placedAt: TCoord | undefined,
     private score: Score,
+    private moves: Moves = Moves.of(0),
   ) {}
 
-  // A new game: no goal done, no score, and the first stack of the source on offer.
+  // A new game: no goals, moves or points yet, and the first stack of the source on offer.
   static start<TCoord>(values: {
     stateId: GameStateId;
     matchId: MatchId;
@@ -221,6 +229,11 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
     this.clearedTiles.push(stack.tileCount());
   }
 
+  // Adds one move after an accepted placement.
+  countMove(): void {
+    this.moves = this.moves.plusOne();
+  }
+
   // The engine adds the points of a turn in place. `Score.add()` refuses a total
   // above the largest safe integer, and the score stays as it was.
   addPoints(points: Score): void {
@@ -242,6 +255,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
       this.clearedTiles,
       this.placedAt,
       this.source,
+      this.moves,
       new SortView(this.offered, this.goalsDone, this.goalsNeeded),
     );
   }
@@ -258,6 +272,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
     this.clearedTiles = [...snapshot.clearedStackHeights()];
     this.placedAt = snapshot.lastPlacedAt();
     this.score = snapshot.scoreSoFar();
+    this.moves = snapshot.moveCount();
   }
 
   // True when this state is the state of the match `match`.
@@ -295,6 +310,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
       [...this.clearedTiles],
       this.placedAt,
       this.score,
+      this.moves,
     );
   }
 }

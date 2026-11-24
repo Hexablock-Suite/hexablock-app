@@ -1,3 +1,4 @@
+import type { ValueReceiver } from '../../engine/value-receiver';
 import { ClearedStacks } from './cleared-stacks';
 
 // The goal of one Hexa Sort level: the count of stacks that the player must clear to win.
@@ -14,6 +15,10 @@ export class GoalCount {
       throw new RangeError(`A goal count needs a whole number of 1 or more, not ${value}.`);
     }
     return new GoalCount(value);
+  }
+
+  deliverTo(receiver: ValueReceiver<number>): void {
+    receiver.receive(this.value);
   }
 
   // Two goal counts are equal when they hold the same value.

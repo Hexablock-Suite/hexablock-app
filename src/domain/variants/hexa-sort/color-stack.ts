@@ -1,4 +1,5 @@
 import type { Color } from '../../engine/color';
+import type { ValueReceiver } from '../../engine/value-receiver';
 import { TileCount } from './tile-count';
 
 // The cell of Hexa Sort: a stack of colored tiles (statement §1.3).
@@ -20,6 +21,11 @@ export class ColorStack {
 
   static empty(): ColorStack {
     return new ColorStack([]);
+  }
+
+  // Gives the frozen list of colors to an adapter, from bottom to top.
+  deliverTo(receiver: ValueReceiver<readonly Color[]>): void {
+    receiver.receive(this.chips);
   }
 
   // Tells how many tiles the stack holds, as a `TileCount` (issue #232).

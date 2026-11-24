@@ -1,13 +1,22 @@
 /** @jest-environment node */
 import { CoordKey } from '../../../../src/domain/engine/coord-key';
+import { Moves } from '../../../../src/domain/engine/moves';
 import { Score } from '../../../../src/domain/engine/score';
 import { ClearedStacks } from '../../../../src/domain/variants/hexa-sort/cleared-stacks';
+import { SortRules } from '../../../../src/domain/variants/hexa-sort/sort-rules';
 import type { SortState } from '../../../../src/domain/variants/hexa-sort/sort-state';
 import { TileCount } from '../../../../src/domain/variants/hexa-sort/tile-count';
 import { GameStateId } from '../../../../src/domain/engine/game-state-id';
 import { MatchId } from '../../../../src/domain/engine/match-id';
 import { square, type SquareCoord } from '../../../support/engine/square-topology';
-import { names, row, sortState, stack, tiles } from '../../../support/variants/hexa-sort/sort-game';
+import {
+  names,
+  place,
+  row,
+  sortState,
+  stack,
+  tiles,
+} from '../../../support/variants/hexa-sort/sort-game';
 
 // R7: the Sort state is an entity. It changes only through its business methods,
 // and a refused input leaves the whole state as it was.
@@ -187,6 +196,33 @@ describe('SortState', () => {
       new RangeError('The sum of two scores cannot pass the largest safe integer.'),
     );
     expect(state.snapshot().scoreSoFar()).toEqual(Score.of(110));
+  });
+
+  it('should_recover_the_saved_move_count_when_restoring_an_earlier_snapshot', () => {
+    const state = sortState({ board: row(3), offered: [stack('red'), stack('blue')] });
+    const rules = new SortRules<SquareCoord>();
+    rules.playTurn(state, place(0));
+    const saved = state.snapshot();
+    rules.playTurn(state, place(2));
+    const later = state.snapshot();
+
+    state.restore(saved);
+
+    expect(saved.moveCount()).toEqual(Moves.of(1));
+    expect(later.moveCount()).toEqual(Moves.of(2));
+    expect(state.snapshot().moveCount()).toEqual(Moves.of(1));
+  });
+
+  it('should_keep_the_move_count_independently_when_the_state_is_cloned', () => {
+    const state = sortState({ board: row(3), offered: [stack('red'), stack('blue')] });
+    const rules = new SortRules<SquareCoord>();
+    rules.playTurn(state, place(0));
+    const copy = state.clone();
+
+    rules.playTurn(copy, place(2));
+
+    expect(state.snapshot().moveCount()).toEqual(Moves.of(1));
+    expect(copy.snapshot().moveCount()).toEqual(Moves.of(2));
   });
 
   // The state has its own `GameStateId`, and it still knows its match (classes.md decision 26).
