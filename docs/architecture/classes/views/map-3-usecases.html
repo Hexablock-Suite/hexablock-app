@@ -72,10 +72,10 @@
         <title id="mapuc-title">HexaBlock use cases map · UML class diagram</title>
         <desc id="mapuc-desc">
           Overview map of the 46 layer 2 classes in 8 groups, with LevelDefinition of layer 1 as a
-          dashed chip. Each line joins two classes: UseCaseAspect implements UseCase and keeps the
-          inner one, StartGame, SaveProgress and Register each implement UseCase for their group,
-          and RedoMove, SyncLeaderboard and UpdateSettings keep an output port. No line touches a
-          group frame. Each group names the view that shows its members.
+          dashed chip. Each line joins two classes: UseCaseAspect implements UseCase and decorates
+          the one it wraps, StartGame, SaveProgress and Register each implement UseCase for their
+          group, and RedoMove, SyncLeaderboard and UpdateSettings keep an output port. No line
+          touches a group frame. Each group names the view that shows its members.
         </desc>
         <defs>
           <marker
@@ -447,13 +447,13 @@
           stroke-dasharray="5,4"
           marker-end="url(#mapuc-triangle)"
         />
-        <!-- UseCaseAspect keeps the inner UseCase it wraps as inner: use with role and multiplicity (view 3.1) -->
+        <!-- UseCaseAspect decorates the UseCase it wraps: hollow diamond at the decorator, decorate 1 at the wrapped type (decision 23, view 3.1) -->
         <path
           d="M536,126 L536,276"
           fill="none"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          marker-end="url(#mapuc-open)"
+          marker-start="url(#mapuc-diamond-hollow)"
         />
         <!-- StartGame implements UseCase: realization, one for the game use cases (view 3.2) -->
         <path
@@ -508,9 +508,9 @@
         />
 
         <!-- Arrow labels: role and multiplicity at the target end -->
-        <rect x="542" y="226" width="40" height="12" rx="2" fill="#efe7f8" />
+        <rect x="542" y="226" width="56" height="12" rx="2" fill="#efe7f8" />
         <text
-          x="562"
+          x="570"
           y="235"
           fill="#7d8a94"
           font-size="8"
@@ -518,7 +518,7 @@
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          inner 1
+          decorate 1
         </text>
         <rect x="346" y="646" width="40" height="12" rx="2" fill="#efe7f8" />
         <text
@@ -1770,6 +1770,24 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Realization · class to the interface it implements
+        </text>
+        <line
+          x1="680"
+          y1="1334"
+          x2="708"
+          y2="1334"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#mapuc-diamond-hollow)"
+        />
+        <text
+          x="716"
+          y="1338"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aggregation · decorator to the type it wraps
         </text>
 
         <rect

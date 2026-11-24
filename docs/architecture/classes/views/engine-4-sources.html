@@ -128,6 +128,22 @@
           >
             <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
           </marker>
+          <marker
+            id="sources-diamond-hollow"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon
+              points="0 5, 9 0, 18 5, 9 10"
+              fill="#ffffff"
+              stroke="#17212a"
+              stroke-width="1"
+            />
+          </marker>
         </defs>
 
         <rect width="100%" height="100%" fill="#f3f5f6" />
@@ -259,15 +275,15 @@
           stroke-dasharray="5,4"
           marker-end="url(#sources-triangle)"
         />
-        <!-- ScoringDecorator keeps the IScoringPolicy it wraps as inner: use with role and multiplicity (decision 23) -->
+        <!-- ScoringDecorator decorates the IScoringPolicy it wraps: hollow diamond at the decorator, decorate 1 at the wrapped type (decision 23) -->
         <line
           x1="824"
           y1="228"
           x2="824"
           y2="164"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          marker-end="url(#sources-open)"
+          marker-start="url(#sources-diamond-hollow)"
         />
         <!-- IProgressModel records a GameResult: use -->
         <line
@@ -281,9 +297,9 @@
         />
 
         <!-- Arrow labels -->
-        <rect x="828" y="168" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="828" y="168" width="48" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="846"
+          x="852"
           y="177"
           fill="#7d8a94"
           font-size="8"
@@ -291,7 +307,7 @@
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          inner
+          decorate
         </text>
         <rect x="538" y="592" width="44" height="12" rx="2" fill="#f9f4dc" />
         <text
@@ -1890,6 +1906,24 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Use · attribute, parameter, return, local or new
+        </text>
+        <line
+          x1="424"
+          y1="1388"
+          x2="452"
+          y2="1388"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#sources-diamond-hollow)"
+        />
+        <text
+          x="460"
+          y="1392"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aggregation · decorator to the type it wraps
         </text>
         <rect
           x="704"

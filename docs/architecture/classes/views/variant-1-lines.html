@@ -252,7 +252,7 @@
           marker-end="url(#lines-open)"
           stroke="#5b6873"
         />
-        <!-- ComboMultiplierDecorator keeps the LinesScoring it wraps as inner, a private field of its base ScoringDecorator: use with role and multiplicity (decision 23) -->
+        <!-- ComboMultiplierDecorator binds LinesScoring as the TInner of its base: use «bind». The base declares inner, so the hollow diamond sits on the base in view engine-4, not here (decision 23) -->
         <line
           x1="664"
           y1="280"
@@ -298,9 +298,9 @@
         >
           «create»
         </text>
-        <rect x="536" y="264" width="48" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="536" y="264" width="36" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="560"
+          x="554"
           y="273"
           fill="#7d8a94"
           font-size="8"
@@ -308,7 +308,7 @@
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          inner
+          «bind»
         </text>
         <rect x="708" y="326" width="144" height="12" rx="2" fill="#f9f4dc" />
         <text
@@ -323,18 +323,6 @@
           «bind» TState → LinesState
         </text>
 
-        <rect x="538" y="284" width="12" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="544"
-          y="293"
-          fill="#17212a"
-          font-size="8"
-          font-weight="600"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          1
-        </text>
         <!-- Lollipops: engine interface and its binding -->
         <line x1="56" y1="534" x2="56" y2="545" stroke="#17212a" stroke-width="1" />
         <circle cx="56" cy="550" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />

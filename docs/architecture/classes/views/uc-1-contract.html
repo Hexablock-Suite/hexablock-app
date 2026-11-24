@@ -112,6 +112,22 @@
           >
             <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
           </marker>
+          <marker
+            id="uccontract-diamond-hollow"
+            markerWidth="18"
+            markerHeight="10"
+            refX="0"
+            refY="5"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon
+              points="0 5, 9 0, 18 5, 9 10"
+              fill="#ffffff"
+              stroke="#17212a"
+              stroke-width="1"
+            />
+          </marker>
         </defs>
 
         <rect width="100%" height="100%" fill="#f3f5f6" />
@@ -221,15 +237,15 @@
           stroke-dasharray="5,4"
           marker-end="url(#uccontract-triangle)"
         />
-        <!-- UseCaseAspect keeps the UseCase it wraps as inner: use with role and multiplicity (decision 23) -->
+        <!-- UseCaseAspect decorates the UseCase it wraps: hollow diamond at the decorator, decorate 1 at the wrapped type (decision 23) -->
         <line
           x1="528"
           y1="264"
           x2="528"
           y2="168"
-          stroke="#5b6873"
+          stroke="#17212a"
           stroke-width="1"
-          marker-end="url(#uccontract-open)"
+          marker-start="url(#uccontract-diamond-hollow)"
         />
         <!-- RetryAspect extends UseCaseAspect: inheritance -->
         <path
@@ -313,7 +329,7 @@
         </text>
 
         <!-- Role names and multiplicities at the part end -->
-        <rect x="534" y="195" width="38" height="12" rx="2" fill="#efe7f8" />
+        <rect x="534" y="195" width="53" height="12" rx="2" fill="#efe7f8" />
         <text
           x="536"
           y="204"
@@ -322,7 +338,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="start"
         >
-          inner
+          decorate
           <tspan font-weight="600">1</tspan>
         </text>
         <rect x="444" y="567" width="43" height="12" rx="2" fill="#efe7f8" />
@@ -798,6 +814,24 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Use · attribute, parameter, return, local or new
+        </text>
+        <line
+          x1="520"
+          y1="836"
+          x2="548"
+          y2="836"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-start="url(#uccontract-diamond-hollow)"
+        />
+        <text
+          x="556"
+          y="840"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Aggregation · decorator to the type it wraps
         </text>
 
         <rect
