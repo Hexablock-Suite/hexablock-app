@@ -2,18 +2,18 @@
 import { FitStateMapper } from '../../src/adapters/fit-state-mapper';
 import { MergeStateMapper } from '../../src/adapters/merge-state-mapper';
 import { SortStateMapper } from '../../src/adapters/sort-state-mapper';
-import { SpaceStateMapper } from '../../src/adapters/space-state-mapper';
+import { LinesStateMapper } from '../../src/adapters/lines-state-mapper';
 import { GameId } from '../../src/domain/engine/game-id';
 import { TopologyId } from '../../src/domain/engine/geometry-factory';
 import { LevelId } from '../../src/domain/engine/level-id';
 import { FitCellRenderer } from '../../src/infrastructure/board/fit-cell-renderer';
 import { MergeCellRenderer } from '../../src/infrastructure/board/merge-cell-renderer';
 import { SortCellRenderer } from '../../src/infrastructure/board/sort-cell-renderer';
-import { SpaceCellRenderer } from '../../src/infrastructure/board/space-cell-renderer';
+import { LinesCellRenderer } from '../../src/infrastructure/board/lines-cell-renderer';
 import { CompositionRoot } from '../../src/infrastructure/composition-root';
 import { FitControls } from '../../src/infrastructure/ui/fit-controls';
 import { MergeControls } from '../../src/infrastructure/ui/merge-controls';
-import { BoardOnlyControls } from '../../src/infrastructure/ui/move-controls';
+import { LinesControls } from '../../src/infrastructure/ui/lines-controls';
 import { SortControls } from '../../src/infrastructure/ui/sort-controls';
 import { errorOf, valueOf } from '../support/application/game-use-cases';
 import { RecordingLogger } from '../support/application/recording-logger';
@@ -144,9 +144,8 @@ describe('CompositionRoot', () => {
       return [variantIdOf(id), mapper.constructor, renderer.constructor, controls.constructor];
     });
 
-    const defaults = [SpaceStateMapper, SpaceCellRenderer, BoardOnlyControls];
     expect(parts).toEqual([
-      ['hexa-lines', ...defaults],
+      ['hexa-lines', LinesStateMapper, LinesCellRenderer, LinesControls],
       ['hexa-fit', FitStateMapper, FitCellRenderer, FitControls],
       ['hexa-sort', SortStateMapper, SortCellRenderer, SortControls],
       ['hexa-merge', MergeStateMapper, MergeCellRenderer, MergeControls],
