@@ -75,6 +75,18 @@ describe('game route', () => {
     expect(screen.queryAllByRole('radio')).toEqual([]);
   });
 
+  it('should_place_the_offer_without_showing_undo_when_the_sort_player_presses_a_free_space', async () => {
+    await renderRouter(appDir, { initialUrl: '/map' });
+    await fireEvent.press(screen.getByRole('button', { name: /^Hexa Sort/ }));
+    await screen.findByText('En juego');
+
+    expect(occupiedSpaces()).toEqual([]);
+    await pressSpace(0);
+
+    expect(occupiedSpaces()).toEqual([0]);
+    expect(screen.queryByRole('button', { name: 'Deshacer' })).toBeNull();
+  });
+
   it('should_return_to_the_map_when_the_player_presses_the_map_button', async () => {
     await renderRouter(appDir, { initialUrl: '/map' });
     await fireEvent.press(screen.getByRole('button', { name: /^Hexa Sort/ }));

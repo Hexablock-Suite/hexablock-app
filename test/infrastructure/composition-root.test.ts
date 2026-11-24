@@ -1,17 +1,20 @@
 /** @jest-environment node */
 import { FitStateMapper } from '../../src/adapters/fit-state-mapper';
 import { MergeStateMapper } from '../../src/adapters/merge-state-mapper';
+import { SortStateMapper } from '../../src/adapters/sort-state-mapper';
 import { SpaceStateMapper } from '../../src/adapters/space-state-mapper';
 import { GameId } from '../../src/domain/engine/game-id';
 import { TopologyId } from '../../src/domain/engine/geometry-factory';
 import { LevelId } from '../../src/domain/engine/level-id';
 import { FitCellRenderer } from '../../src/infrastructure/board/fit-cell-renderer';
 import { MergeCellRenderer } from '../../src/infrastructure/board/merge-cell-renderer';
+import { SortCellRenderer } from '../../src/infrastructure/board/sort-cell-renderer';
 import { SpaceCellRenderer } from '../../src/infrastructure/board/space-cell-renderer';
 import { CompositionRoot } from '../../src/infrastructure/composition-root';
 import { FitControls } from '../../src/infrastructure/ui/fit-controls';
 import { MergeControls } from '../../src/infrastructure/ui/merge-controls';
 import { BoardOnlyControls } from '../../src/infrastructure/ui/move-controls';
+import { SortControls } from '../../src/infrastructure/ui/sort-controls';
 import { errorOf, valueOf } from '../support/application/game-use-cases';
 import { RecordingLogger } from '../support/application/recording-logger';
 import { BOARD_ID } from '../support/engine/entity-ids';
@@ -131,10 +134,9 @@ describe('CompositionRoot', () => {
     expect(errorOf(result).code).toBe('no-running-game');
   });
 
-  // Issue #175: the registry gives Hexa Fit its own state mapper, cell renderer and move
-  // controls. Issue #177 gives Hexa Merge its own parts too. Lines and Sort keep the default
-  // parts until their own tasks (#174, #176).
-  it('should_give_hexa_fit_and_hexa_merge_their_mappers_renderers_and_controls_when_the_root_builds_the_registry', () => {
+  // Fit (#175), Sort (#176) and Merge (#177) each have their own screen parts.
+  // Lines keeps the default parts until #174.
+  it('should_give_fit_sort_and_merge_their_mappers_renderers_and_controls_when_the_root_builds_the_registry', () => {
     const registry = testRoot().registry();
 
     const parts = registry.gameIds().map((id) => {
@@ -146,7 +148,7 @@ describe('CompositionRoot', () => {
     expect(parts).toEqual([
       ['hexa-lines', ...defaults],
       ['hexa-fit', FitStateMapper, FitCellRenderer, FitControls],
-      ['hexa-sort', ...defaults],
+      ['hexa-sort', SortStateMapper, SortCellRenderer, SortControls],
       ['hexa-merge', MergeStateMapper, MergeCellRenderer, MergeControls],
     ]);
   });

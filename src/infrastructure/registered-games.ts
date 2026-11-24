@@ -9,6 +9,11 @@ import {
   type MergeCellView,
   type MergePayloadView,
 } from '../adapters/merge-state-mapper';
+import {
+  SortStateMapper,
+  type SortCellView,
+  type SortPayloadView,
+} from '../adapters/sort-state-mapper';
 import { SpaceStateMapper, type SpaceView } from '../adapters/space-state-mapper';
 import { BoardShape } from '../domain/engine/board-shape';
 import type { Clock } from '../domain/engine/clock';
@@ -38,14 +43,18 @@ import { MergeFactory, MergeSettings } from '../domain/variants/hexa-merge/merge
 import type { MergeView } from '../domain/variants/hexa-merge/merge-state';
 import { MergeTile } from '../domain/variants/hexa-merge/merge-tile';
 import type { Slide } from '../domain/variants/hexa-merge/slide';
+import type { ColorStack } from '../domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../domain/variants/hexa-sort/goal-count';
+import type { PlaceStack } from '../domain/variants/hexa-sort/place-stack';
 import { SortFactory } from '../domain/variants/hexa-sort/sort-factory';
 import { SortLevel } from '../domain/variants/hexa-sort/sort-level';
+import type { SortView } from '../domain/variants/hexa-sort/sort-state';
 import { cellBoxOf, type BoardLayout, type CellShape } from './board/board-layout';
 import { FitCellRenderer } from './board/fit-cell-renderer';
 import { HexLayout } from './board/hex-layout';
 import { MergeCellRenderer } from './board/merge-cell-renderer';
 import { slideWays } from './board/slide-ways';
+import { SortCellRenderer } from './board/sort-cell-renderer';
 import { SpaceCellRenderer } from './board/space-cell-renderer';
 import { SquareLayout } from './board/square-layout';
 import { TriangleLayout } from './board/triangle-layout';
@@ -53,6 +62,7 @@ import { registered, type RegisteredGame, type ScreenParts } from './game-regist
 import { FitControls } from './ui/fit-controls';
 import { MergeControls } from './ui/merge-controls';
 import { BoardOnlyControls } from './ui/move-controls';
+import { SortControls } from './ui/sort-controls';
 import { worldTone } from './ui/theme';
 
 // The count of seeds: the unsigned 32-bit integers (classes.md decision 48).
@@ -72,6 +82,7 @@ const MERGE_TARGET = MergeTile.of(2048);
 const LINES_COLORS = [Color.of('red'), Color.of('blue'), Color.of('green'), Color.of('yellow')];
 const SORT_COLORS = [Color.of('red'), Color.of('blue'), Color.of('green')];
 const SORT_GOALS = GoalCount.of(3);
+const SORT_PREVIEW_SIZE = 38;
 
 // One board figure that the player can choose (APP-FR-16, issue #171): the `TopologyId` of its
 // geometry family, its `GeometryFactory`, the screen layout of the figure for a cell size,
@@ -110,11 +121,8 @@ export function boardFigures(): BoardFigure<unknown>[] {
 // Fit and Sort also take their `LevelVariant` on the geometry of the figure, so `StartGame`
 // starts a bundled level by its id (#172). The Fit level and the Sort level of each entry
 // are first content: a start with no level id starts them until the level selector (#173).
-// Each game shows its board with the default screen parts on the layout of the figure (#170).
-// Each «Play … on the game screen» task (#174 to #177) gives its game the state mapper,
-// the cell renderer and the move controls of its variant in place of `defaultScreen()`.
-// Fit has its own parts since #175: `fitScreen()`. Merge has its own parts since #177:
-// `mergeScreen()`.
+// Fit (#175), Sort (#176) and Merge (#177) each choose their state mapper, cell renderer
+// and move controls. Lines keeps the default screen parts until #174.
 // Each entry declares the world colors of its game on the map (#298): orange for Lines,
 // green for Fit, pink for Sort and blue for Merge, the colors of the team prototype.
 // So a game keeps its color on the square and on the triangle, where Fit has no entry.
@@ -146,7 +154,7 @@ export function registeredGames<TCoord>(
         geometry,
         SortLevel.seeded(SMALL_BOARD, SORT_GOALS, seedFrom(random), nonEmpty(SORT_COLORS)),
       ),
-      defaultScreen(figure),
+      sortScreen(figure),
       worldTone(2),
       sortLevelVariant(geometry),
     ),
@@ -225,6 +233,25 @@ function fitScreen<TCoord>(
     mapper: new FitStateMapper(figure.geometry.createTopology()),
     renderer: new FitCellRenderer(),
     controls: new FitControls(),
+    layoutOf: (size) => figure.layoutOf(size),
+  };
+}
+
+// The screen parts of Hexa Sort (#176). The offer uses the outline of the origin cell.
+function sortScreen<TCoord>(
+  figure: BoardFigure<TCoord>,
+): ScreenParts<
+  ColorStack,
+  TCoord,
+  SortView<TCoord>,
+  SortCellView,
+  SortPayloadView,
+  PlaceStack<TCoord>
+> {
+  return {
+    mapper: new SortStateMapper(),
+    renderer: new SortCellRenderer(),
+    controls: new SortControls(originShape(figure, SORT_PREVIEW_SIZE)),
     layoutOf: (size) => figure.layoutOf(size),
   };
 }
