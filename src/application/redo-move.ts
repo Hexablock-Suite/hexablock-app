@@ -3,7 +3,7 @@ import type { Cloneable } from '../domain/engine/cloneable';
 import { Outcome } from '../domain/engine/outcome';
 import type { GameRepository } from './game-repository';
 import { moveResultOf, type MoveResult, type ViewOf } from './move-result';
-import { caughtError, Result, UseCaseError } from './result';
+import { caughtError, FailureCode, Result, UseCaseError } from './result';
 import type { UseCase } from './use-case';
 
 // The request of `RedoMove`. It has no member: the running game holds its undone moves.
@@ -32,15 +32,17 @@ export class RedoMove<
     try {
       const engine = this.games.current();
       if (engine === undefined) {
-        return Result.failure(new UseCaseError('no-running-game', 'No game is running.'));
+        return Result.failure(new UseCaseError(FailureCode.noRunningGame, 'No game is running.'));
       }
       if (!engine.canRedo()) {
-        return Result.failure(new UseCaseError('nothing-to-redo', 'No move can be redone.'));
+        return Result.failure(
+          new UseCaseError(FailureCode.nothingToRedo, 'No move can be redone.'),
+        );
       }
       engine.redo();
       return Result.success(moveResultOf(engine, Outcome.playing));
     } catch (thrown) {
-      return Result.failure(caughtError('redo-failed', thrown));
+      return Result.failure(caughtError(FailureCode.redoFailed, thrown));
     }
   }
 }

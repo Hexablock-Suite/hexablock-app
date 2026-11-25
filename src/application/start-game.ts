@@ -5,7 +5,7 @@ import { Outcome } from '../domain/engine/outcome';
 import type { GameFactories } from './game-factories';
 import type { GameRepository } from './game-repository';
 import { moveResultOf, type MoveResult, type ViewOf } from './move-result';
-import { caughtError, Result } from './result';
+import { caughtError, FailureCode, Result } from './result';
 import type { UseCase } from './use-case';
 
 // The request of `StartGame` (S3-13 in #151, issue #172). `levelId` names the level
@@ -43,7 +43,7 @@ export class StartGame<
       this.games.replace(engine);
       return Result.success(moveResultOf(engine, Outcome.playing));
     } catch (thrown) {
-      return Result.failure(caughtError('start-failed', thrown));
+      return Result.failure(caughtError(FailureCode.startFailed, thrown));
     }
   }
 }

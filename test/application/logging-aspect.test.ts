@@ -140,7 +140,9 @@ describe('LoggingAspect', () => {
 
   it('should_return_the_inner_result_unchanged_and_pass_the_request_when_the_aspect_wraps_a_use_case', async () => {
     const success = new FixedUseCase(Result.success(7));
-    const failure = new FixedUseCase(Result.failure(new UseCaseError('boom', 'It failed.', true)));
+    const failure = new FixedUseCase(
+      Result.failure(new UseCaseError('move-failed', 'It failed.', true)),
+    );
     const logger = new RecordingLogger();
 
     const ok = await new LoggingAspect(success, logger, 'Fixed').execute('first');
@@ -157,7 +159,7 @@ describe('LoggingAspect', () => {
 
   it('should_pass_a_frozen_entry_with_no_message_and_no_time_when_the_aspect_logs_a_call', async () => {
     const logger = new RecordingLogger();
-    const error = new UseCaseError('boom', 'It failed.');
+    const error = new UseCaseError('move-failed', 'It failed.');
 
     await new LoggingAspect(new FixedUseCase(Result.success(1)), logger, 'Fixed').execute('a');
     await new LoggingAspect(new FixedUseCase(Result.failure(error)), logger, 'Fixed').execute('b');
@@ -173,12 +175,12 @@ describe('LoggingAspect', () => {
     // The entry is frozen, but its error is the object of the `Result`.
     // `UseCaseError` is frozen too, so a logger cannot change what the caller gets.
     const logger = new ChangingLogger();
-    const inner = new FixedUseCase(Result.failure(new UseCaseError('boom', 'It failed.')));
+    const inner = new FixedUseCase(Result.failure(new UseCaseError('move-failed', 'It failed.')));
 
     const result = await new LoggingAspect(inner, logger, 'Fixed').execute('x');
 
     expect(result).toBe(inner.result);
-    expect([errorOf(result).code, errorOf(result).message]).toEqual(['boom', 'It failed.']);
+    expect([errorOf(result).code, errorOf(result).message]).toEqual(['move-failed', 'It failed.']);
     expect(logger.writeErrors).toHaveLength(2);
     expect(logger.writeErrors.every((error) => error instanceof TypeError)).toBe(true);
   });
@@ -284,7 +286,9 @@ describe('UseCaseAspect', () => {
 
   it('should_return_the_inner_result_unchanged_when_the_plain_aspect_wraps_a_use_case', async () => {
     const success = new FixedUseCase(Result.success(7));
-    const failure = new FixedUseCase(Result.failure(new UseCaseError('boom', 'It failed.', true)));
+    const failure = new FixedUseCase(
+      Result.failure(new UseCaseError('move-failed', 'It failed.', true)),
+    );
 
     expect(await new PassThroughAspect(success).execute('a')).toBe(success.result);
     expect(await new PassThroughAspect(failure).execute('b')).toBe(failure.result);

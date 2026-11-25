@@ -1,3 +1,26 @@
+// The code of each failure of a use case (classes.md decision 62, issue #322).
+// It is the one list of codes. A use case builds each error from it and never writes
+// the text of a code. A presenter maps the codes with a `Record<FailureCode, TextKey>`.
+// So a new code goes into this list, and the type check then asks every presenter for its text.
+// The type has the name of the list, so `FailureCode.moveRejected` gives one code.
+export const FailureCode = Object.freeze({
+  startFailed: 'start-failed',
+  noRunningGame: 'no-running-game',
+  moveRejected: 'move-rejected',
+  moveFailed: 'move-failed',
+  publishFailed: 'publish-failed',
+  noUndo: 'no-undo',
+  nothingToUndo: 'nothing-to-undo',
+  undoFailed: 'undo-failed',
+  nothingToRedo: 'nothing-to-redo',
+  redoFailed: 'redo-failed',
+  saveFailed: 'save-failed',
+  listFailed: 'list-failed',
+  unexpectedFailure: 'unexpected-failure',
+} as const);
+
+export type FailureCode = (typeof FailureCode)[keyof typeof FailureCode];
+
 // The error of a failed use case (classes.md decision 28). It is a value object.
 // `code` names the failure for the presenter, `message` explains it,
 // and `RetryAspect` runs the use case again while `retryable` is true.
@@ -5,7 +28,7 @@
 // An empty or blank `code` throws a `RangeError`, because the presenter reads it (G117.6).
 export class UseCaseError {
   constructor(
-    readonly code: string,
+    readonly code: FailureCode,
     readonly message: string,
     readonly retryable = false,
     readonly cause?: unknown,
@@ -39,7 +62,7 @@ const NO_TEXT = 'The thrown value has no text.';
 // The error keeps the thrown value as its `cause`.
 // `String()` throws for a value without a prototype or with a `toString` that throws.
 // Then the message is fixed, so this function never throws for any thrown value (issue #138).
-export function caughtError(code: string, thrown: unknown): UseCaseError {
+export function caughtError(code: FailureCode, thrown: unknown): UseCaseError {
   return new UseCaseError(code, textOf(thrown), false, thrown);
 }
 

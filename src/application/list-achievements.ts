@@ -1,7 +1,7 @@
 import type { Achievement } from './achievement';
 import type { LevelRepository } from './level-repository';
 import type { ProgressRepository } from './progress-repository';
-import { caughtError, Result } from './result';
+import { caughtError, FailureCode, Result } from './result';
 import type { UseCase } from './use-case';
 
 // The request of `ListAchievements`. It has no member: the list holds every achievement.
@@ -48,7 +48,7 @@ export class ListAchievements implements UseCase<ListAchievementsRequest, Achiev
       }
       return Result.success(summaries);
     } catch (thrown) {
-      return Result.failure(caughtError('list-failed', thrown));
+      return Result.failure(caughtError(FailureCode.listFailed, thrown));
     }
   }
 }

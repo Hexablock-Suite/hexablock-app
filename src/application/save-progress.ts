@@ -2,7 +2,7 @@ import type { GameId } from '../domain/engine/game-id';
 import { GameProgress } from '../domain/engine/game-progress';
 import type { GameResult, IProgressModel } from '../domain/engine/progress-model';
 import type { ProgressRepository } from './progress-repository';
-import { caughtError, Result } from './result';
+import { caughtError, FailureCode, Result } from './result';
 import type { UseCase } from './use-case';
 
 // Saves the result of a finished game in the local progress of its game
@@ -32,7 +32,7 @@ export class SaveProgress implements UseCase<GameResult, void> {
       await this.repository.save(progress);
       return Result.success(undefined);
     } catch (thrown) {
-      return Result.failure(caughtError('save-failed', thrown));
+      return Result.failure(caughtError(FailureCode.saveFailed, thrown));
     }
   }
 }

@@ -2,11 +2,11 @@
 import { GamePresenter, type GameViewModel } from '../../src/adapters/game-presenter';
 import { SpaceStateMapper } from '../../src/adapters/space-state-mapper';
 import type { StateMapper } from '../../src/adapters/state-mapper';
-import { textCatalog } from '../../src/adapters/texts/text-catalog';
+import { textCatalog, type TextKey } from '../../src/adapters/texts/text-catalog';
 import type { ApplyMoveRequest } from '../../src/application/apply-move';
 import type { MoveResult } from '../../src/application/move-result';
 import type { RedoMoveRequest } from '../../src/application/redo-move';
-import { Result, UseCaseError } from '../../src/application/result';
+import { FailureCode, Result, UseCaseError } from '../../src/application/result';
 import type { StartGameRequest } from '../../src/application/start-game';
 import type { UndoMoveRequest } from '../../src/application/undo-move';
 import type { UseCase } from '../../src/application/use-case';
@@ -63,7 +63,7 @@ function response(
   });
 }
 
-function failure(code: string): Result<MoveResult<string, Coord, number>> {
+function failure(code: FailureCode): Result<MoveResult<string, Coord, number>> {
   return Result.failure(new UseCaseError(code, 'An English message that no screen shows.'));
 }
 
@@ -452,6 +452,61 @@ describe('GamePresenter undo and redo', () => {
       'There is no move to redo',
       'The game could not go on. Go back to the map and open the game again.',
     ]);
+  });
+
+  // Issue #322: the presenter has a text for every failure code. Three codes have their own
+  // text, and every other code shows the general text `play.error`.
+  it('should_show_a_catalog_text_for_every_failure_code_when_a_use_case_fails', async () => {
+    const own: Partial<Record<FailureCode, TextKey>> = {
+      'move-rejected': 'play.error.move-rejected',
+      'nothing-to-undo': 'play.error.nothing-to-undo',
+      'nothing-to-redo': 'play.error.nothing-to-redo',
+    };
+    const codes = Object.values(FailureCode);
+    const languages = [textCatalog.es, textCatalog.en];
+
+    const shown = await Promise.all(
+      languages.map(async (texts) => {
+        const { presenter } = presenterWith([START], codes.map(failure), texts);
+        await presenter.onStart();
+        const errors: (string | undefined)[] = [];
+        for (const code of codes) {
+          await presenter.onMove(code);
+          errors.push(presenter.viewModel().error);
+        }
+        return errors;
+      }),
+    );
+
+    expect(codes).toHaveLength(13);
+    expect(shown).toEqual(
+      languages.map((texts) => codes.map((code) => texts[own[code] ?? 'play.error'])),
+    );
+  });
+
+  // Issue #322: a text table of a presenter is a `Record` over `FailureCode`, so a new
+  // code with no text fails `pnpm typecheck`. Jest does not type-check: the directive
+  // below fails the type check when a table without one code compiles.
+  it('should_refuse_a_text_table_without_one_code_when_the_type_check_reads_it', () => {
+    const withoutOne = {
+      'no-running-game': 'play.error',
+      'move-rejected': 'play.error.move-rejected',
+      'move-failed': 'play.error',
+      'publish-failed': 'play.error',
+      'start-failed': 'play.error',
+      'no-undo': 'play.error',
+      'nothing-to-undo': 'play.error.nothing-to-undo',
+      'undo-failed': 'play.error',
+      'nothing-to-redo': 'play.error.nothing-to-redo',
+      'redo-failed': 'play.error',
+      'save-failed': 'play.error',
+      'list-failed': 'play.error',
+    } as const;
+
+    // @ts-expect-error The table lacks `unexpected-failure`, so it is not a text table.
+    const table: Readonly<Record<FailureCode, TextKey>> = withoutOne;
+
+    expect(Object.keys(table)).not.toContain(FailureCode.unexpectedFailure);
   });
 });
 
