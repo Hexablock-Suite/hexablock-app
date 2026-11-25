@@ -20,6 +20,7 @@ import type { HexCoord } from '../../../src/domain/engine/hex-topology';
 import { LevelDefinition } from '../../../src/domain/engine/level-definition';
 import { SquareGeometry } from '../../../src/domain/engine/square-geometry';
 import { TriangleGeometry } from '../../../src/domain/engine/triangle-geometry';
+import { Turns } from '../../../src/domain/engine/turns';
 import { FitFactory } from '../../../src/domain/variants/hexa-fit/fit-factory';
 import type { FitLevel } from '../../../src/domain/variants/hexa-fit/fit-level';
 import { FitLevelBuilder } from '../../../src/domain/variants/hexa-fit/fit-level-builder';
@@ -28,9 +29,13 @@ import { FitCellRenderer } from '../../../src/infrastructure/board/fit-cell-rend
 import { HexLayout } from '../../../src/infrastructure/board/hex-layout';
 import { SquareLayout } from '../../../src/infrastructure/board/square-layout';
 import { TriangleLayout } from '../../../src/infrastructure/board/triangle-layout';
+import { CompositionRoot } from '../../../src/infrastructure/composition-root';
+import { boardFigures } from '../../../src/infrastructure/registered-games';
 import { FitControls } from '../../../src/infrastructure/ui/fit-controls';
 import { GameStage } from '../../../src/infrastructure/ui/game-stage';
+import type { MoveControls } from '../../../src/infrastructure/ui/move-controls';
 import { gameUseCases } from '../../support/application/game-use-cases';
+import { RecordingLogger } from '../../support/application/recording-logger';
 import { ManualClock } from '../../support/engine/manual-clock';
 import { occupiedSpaces, pressSpace } from '../../support/ui/board-spaces';
 import { outlinesIn } from '../../support/ui/cell-outlines';
@@ -77,8 +82,12 @@ async function openFirstBundledLevel(clock = new ManualClock()): Promise<void> {
 }
 
 // Opens the game screen on the Fit level `level` with the screen parts of Fit.
-async function openLevel(level: FitLevel<HexCoord>, clock = new ManualClock()): Promise<void> {
-  await openLevelOn({ geometry, layoutOf: (size) => new HexLayout(size) }, level, clock);
+async function openLevel(
+  level: FitLevel<HexCoord>,
+  clock = new ManualClock(),
+  controls?: ScreenControls,
+): Promise<void> {
+  await openLevelOn({ geometry, layoutOf: (size) => new HexLayout(size) }, level, clock, controls);
 }
 
 // A board figure of the game screen: its geometry and the layout of its spaces.
@@ -87,12 +96,17 @@ interface ScreenFigure<TCoord> {
   readonly layoutOf: (size: number) => BoardLayout<TCoord>;
 }
 
+// The move controls of the game screen. By default they are the Fit controls with no step
+// of the figure, as the hexagon and the square have them.
+type ScreenControls = MoveControls<unknown, unknown, unknown, unknown>;
+
 // Opens the game screen on the Fit level `level` of the board figure `figure`
 // with the screen parts of Fit.
 async function openLevelOn<TCoord>(
   figure: ScreenFigure<TCoord>,
   level: FitLevel<TCoord>,
   clock = new ManualClock(),
+  controls: ScreenControls = new FitControls(),
 ): Promise<void> {
   const { startGame, applyMove, undoMove, redoMove } = gameUseCases(
     new FitFactory(figure.geometry, level, clock),
@@ -112,7 +126,7 @@ async function openLevelOn<TCoord>(
         presenter={presenter}
         renderer={new FitCellRenderer()}
         layoutOf={figure.layoutOf}
-        controls={new FitControls()}
+        controls={controls}
         texts={textCatalog.es}
         onBack={jest.fn()}
       />
@@ -239,6 +253,89 @@ function measureOf(id: string): TrayMeasure {
     width: Number(styleOf(frame).width),
     height: Number(styleOf(frame).height),
   };
+}
+
+// One placement of a witness: the piece, its rotation step and its offset (A5).
+interface WitnessPlacement {
+  readonly piece: string;
+  readonly rotation: number;
+  readonly at: readonly number[];
+}
+
+// A Fit level on the triangle with the values of its figure cells and of its witness.
+interface TriangleOrderLevel {
+  readonly levelId: string;
+  readonly level: FitLevel<unknown>;
+  readonly figure: readonly (readonly number[])[];
+  readonly witness: readonly WitnessPlacement[];
+}
+
+// Every order of the items of `items`.
+function ordersOf<T>(items: readonly T[]): T[][] {
+  if (items.length <= 1) return [[...items]];
+  return items.flatMap((item, index) =>
+    ordersOf([...items.slice(0, index), ...items.slice(index + 1)]).map((rest) => [item, ...rest]),
+  );
+}
+
+// The board figure `figureId` of the app, with its geometry, its layout and its first Fit level (#354).
+function appFigure(figureId: TopologyId) {
+  const figure = boardFigures().find(({ id }) => id.equals(figureId));
+  if (figure?.fitLevel === undefined) throw new RangeError('The app has no Fit level there.');
+  return { figure, level: figure.fitLevel };
+}
+
+// The triangle figure of the app and its first Fit level.
+function appTriangle() {
+  return appFigure(TopologyId.triangle);
+}
+
+// The Fit controls that the composition root registers for the board figure `figureId`.
+function appFitControls(figureId: TopologyId): ScreenControls {
+  const root = new CompositionRoot({ clock: new ManualClock(), logger: new RecordingLogger() });
+  return root.registry(figureId).gameOf(GameId.of('hexa-fit')).screen.controls;
+}
+
+// Plays the placements of `order` on the game screen of the triangle, as a player does:
+// the player picks each piece, presses the rotate button once for each rotation step and presses
+// the space where the origin of the piece lies in the placement. The origin of a turned piece
+// is the origin cell after the turns of the topology.
+// It gives, for each press, whether the pressed space holds a piece after it,
+// and whether the screen shows the victory at the end.
+async function playOrderOnTriangle(
+  { level, figure }: TriangleOrderLevel,
+  order: readonly WitnessPlacement[],
+  controls: ScreenControls,
+): Promise<{ readonly landed: boolean[]; readonly won: boolean }> {
+  const { figure: board } = appTriangle();
+  const { geometry: shapes } = board;
+  await openLevelOn(board, level, new ManualClock(), controls);
+  const cells = figure.map((values) => shapes.createCoord([...values]));
+  const indexes = readingIndexes(cells, board.layoutOf(1));
+  const topology = shapes.createTopology();
+  const origin = shapes.createCoord([0, 0]);
+  const spaceOf = (target: unknown) => {
+    const key = topology.key(target);
+    const cell = cells.find((each) => topology.key(each).equals(key));
+    return cell === undefined ? -1 : (indexes.get(cell) ?? -1);
+  };
+  const landed: boolean[] = [];
+  for (const { piece: id, rotation, at } of order) {
+    await choose(id);
+    for (let step = 0; step < rotation; step += 1) {
+      await fireEvent.press(screen.getByRole('button', { name: 'Girar' }));
+    }
+    const target = topology.translate(
+      topology.rotate(origin, Turns.of(rotation)),
+      shapes.createCoord([...at]),
+    );
+    const space = spaceOf(target);
+    await pressSpace(space);
+    landed.push(occupiedSpaces().includes(space));
+  }
+  const won = screen.queryByText('¡Victoria!') !== null;
+  await screen.unmount();
+  return { landed, won };
 }
 
 describe('FitControls', () => {
@@ -381,9 +478,11 @@ describe('FitControls', () => {
   // Issue #354 and the trap of #174: on the triangle each cell points up or down, and
   // a placement keeps the orientation of each cell. So the player plays the witness of each
   // bundled square and triangle level on the screen, and each level is won.
-  // The press gives the pressed cell to the move as the offset of the piece. On the triangle
-  // an offset counts lattice cells, so the piece can cover other cells than the pressed one:
-  // each triangle witness names as its offset a cell of the figure that is free at its turn.
+  // These Fit controls have no step of the figure, so the press gives the pressed cell to the
+  // move as the offset of the piece. On the triangle an offset counts lattice cells, so the
+  // piece can cover other cells than the pressed one: each triangle witness names as its offset
+  // a cell of the figure that is free at its turn. The controls of the app ask the triangle
+  // figure for the offset (#365), and the test of every order below plays them.
   it('should_reach_the_victory_outcome_when_the_player_plays_the_witness_of_each_square_and_triangle_level', async () => {
     const square = {
       geometry: new SquareGeometry(),
@@ -409,6 +508,79 @@ describe('FitControls', () => {
       ['fit-triangle-01', true],
       ['fit-triangle-02', true],
       ['fit-triangle-03', true],
+    ]);
+  });
+
+  // Issue #365: on the triangle an offset counts lattice cells, and one lattice cell holds
+  // an up triangle and a down triangle. So the Fit controls ask the triangle figure for the
+  // offset of a press: the origin of the chosen piece, at its rotation step, lands on the
+  // pressed space. The test plays every order of the pieces of the first Fit level of
+  // the triangle and of `fit-triangle-01` to `fit-triangle-03`, with each piece at the
+  // rotation and the place of the witness. Each press covers the pressed space, and each
+  // order wins. The first level has no witness: the domino on (0,0) and the single cell on (2,0).
+  it('should_place_the_piece_on_the_pressed_space_and_win_when_the_player_places_the_pieces_of_a_triangle_level_in_any_order', async () => {
+    const controls = appFitControls(TopologyId.triangle);
+    const { level: first } = appTriangle();
+    const levels: TriangleOrderLevel[] = [
+      {
+        levelId: 'first',
+        level: first,
+        figure: [
+          [0, 0],
+          [1, 0],
+          [2, 0],
+        ],
+        witness: [
+          { piece: 'a', rotation: 0, at: [0, 0] },
+          { piece: 'b', rotation: 0, at: [1, 0] },
+        ],
+      },
+      ...[fitTriangle01, fitTriangle02, fitTriangle03].map((file) => ({
+        levelId: file.levelId,
+        level: LevelDefinition.of(file).buildWith(
+          new FitLevelBuilder(appTriangle().figure.geometry),
+        ),
+        figure: file.section.figure,
+        witness: file.section.witness,
+      })),
+    ];
+    const failed: string[] = [];
+
+    for (const each of levels) {
+      for (const order of ordersOf(each.witness)) {
+        const { landed, won } = await playOrderOnTriangle(each, order, controls);
+        if (!won || landed.includes(false)) {
+          failed.push(`${each.levelId} ${order.map(({ piece: id }) => id).join('')}: ${landed}`);
+        }
+      }
+    }
+
+    expect(failed).toEqual([]);
+    // The test plays 38 orders on the screen, so it gets a limit of 60 s.
+  }, 60_000);
+
+  // Issue #365 keeps the hexagon and the square as they are: their figures give no step,
+  // so the Fit controls of the root put the origin of the turned piece on the pressed space.
+  // On `fit-01` the domino `b` turned once on space 2 covers spaces 2 and 5. On the first
+  // square level, (0,0) (1,0) (2,0), the domino `a` turned twice on space 1 covers spaces 0 and 1.
+  it('should_place_the_origin_of_the_turned_piece_on_the_pressed_space_when_the_figure_is_the_hexagon_or_the_square', async () => {
+    const rotate = () => screen.getByRole('button', { name: 'Girar' });
+    await openLevel(await firstBundledLevel(), new ManualClock(), appFitControls(TopologyId.hex));
+    await choose('b');
+    await fireEvent.press(rotate());
+    await pressSpace(2);
+    const onHexagon = occupiedSpaces();
+    await screen.unmount();
+    const { figure: square, level } = appFigure(TopologyId.square);
+    await openLevelOn(square, level, new ManualClock(), appFitControls(TopologyId.square));
+    await choose('a');
+    await fireEvent.press(rotate());
+    await fireEvent.press(rotate());
+    await pressSpace(1);
+
+    expect([onHexagon, occupiedSpaces()]).toEqual([
+      [2, 5],
+      [0, 1],
     ]);
   });
 

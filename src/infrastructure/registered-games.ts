@@ -36,6 +36,7 @@ import { CellNode, ShapeGroup } from '../domain/engine/shape-node';
 import { SquareGeometry } from '../domain/engine/square-geometry';
 import { TriangleGeometry } from '../domain/engine/triangle-geometry';
 import { triangle, type TriangleCoord } from '../domain/engine/triangle-topology';
+import type { Turns } from '../domain/engine/turns';
 import { FitFactory } from '../domain/variants/hexa-fit/fit-factory';
 import { FitLevel } from '../domain/variants/hexa-fit/fit-level';
 import type { FitMove } from '../domain/variants/hexa-fit/fit-move';
@@ -93,12 +94,15 @@ const SORT_PREVIEW_SIZE = 38;
 // One board figure that the player can choose (APP-FR-16, issue #171): the `TopologyId` of its
 // geometry family, its `GeometryFactory`, the screen layout of the figure for a cell size,
 // and the Fit level of the first content on the figure, if the figure has one.
+// A figure whose offsets do not count cells, as the triangle, also gives the step from a pressed
+// cell to the offset of a Lines move and of a Fit place move (#174, #365).
 // `boardFigure()` builds each one, so the geometry, the layout and the level name one coordinate type.
 export interface BoardFigure<TCoord> {
   readonly id: TopologyId;
   readonly geometry: GeometryFactory<TCoord>;
   readonly fitLevel?: FitLevel<TCoord>;
   linesPlacementAt?(at: TCoord): TCoord;
+  fitPlacementAt?(at: TCoord, rotation: Turns): TCoord;
   layoutOf(size: number): BoardLayout<TCoord>;
 }
 
@@ -131,6 +135,7 @@ export function boardFigures(): BoardFigure<unknown>[] {
         firstFitLevel(TopologyId.triangle, triangle),
       ),
       linesPlacementAt: triangleLinesPlacementAt,
+      fitPlacementAt: triangleFitPlacementAt,
     },
   ];
 }
@@ -138,6 +143,29 @@ export function boardFigures(): BoardFigure<unknown>[] {
 // A tap picks a lattice cell, which holds the up triangle and the down triangle beside it.
 // Lines shapes have their origin on the up triangle. The domain move takes lattice steps.
 function triangleLinesPlacementAt(at: TriangleCoord): TriangleCoord {
+  return latticeCellOf(at);
+}
+
+// The topology of the triangle. It turns the origin of a Fit piece.
+const TRIANGLES = new TriangleGeometry().createTopology();
+
+// A press puts the origin of the chosen Fit piece, at its rotation step, on the pressed cell (#365).
+// A step of the triangle turns around the origin vertex, so the turned origin is another cell.
+// The offset of the move counts lattice cells: it is the lattice cell of the pressed cell
+// minus the lattice cell of the turned origin. When the pressed cell has the orientation of
+// the turned origin, the origin lands on it. Else the origin lands on the other triangle
+// of the same lattice cell, as a Lines shape does.
+function triangleFitPlacementAt(at: TriangleCoord, rotation: Turns): TriangleCoord {
+  const [col, row] = valuesOf(latticeCellOf(at));
+  const [originCol, originRow] = valuesOf(
+    latticeCellOf(TRIANGLES.rotate(triangle(0, 0), rotation)),
+  );
+  return triangle(col - originCol, row - originRow);
+}
+
+// The lattice cell of a triangle: the lattice cell (i, j) holds the up triangle (2i + j, j)
+// and the down triangle on its right.
+function latticeCellOf(at: TriangleCoord): TriangleCoord {
   const [col, row] = valuesOf(at);
   return triangle(Math.floor((col - row) / 2), row);
 }
@@ -270,7 +298,7 @@ function fitScreen<TCoord>(
   return {
     mapper: new FitStateMapper(figure.geometry.createTopology()),
     renderer: new FitCellRenderer(),
-    controls: new FitControls(),
+    controls: new FitControls(figure.fitPlacementAt),
     layoutOf: (size) => figure.layoutOf(size),
   };
 }
