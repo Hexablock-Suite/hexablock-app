@@ -1,5 +1,7 @@
 import type { Board, ReadonlyBoard } from '../../engine/board';
 import { BoardSnapshot, checkOwnSnapshot, type BoardState } from '../../engine/board-state';
+import type { GameEvent } from '../../engine/game-events';
+import type { GameId } from '../../engine/game-id';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { MatchId } from '../../engine/match-id';
 import { Moves } from '../../engine/moves';
@@ -9,6 +11,7 @@ import type { Piece } from '../../engine/piece';
 import { ClearedStacks } from './cleared-stacks';
 import { ColorStack } from './color-stack';
 import type { GoalCount } from './goal-count';
+import { StackCleared } from './stack-cleared';
 import type { TileCount } from './tile-count';
 
 // The receiver of the data of a `SortView`. An adapter of the edge implements it,
@@ -47,10 +50,14 @@ export class SortView<TCoord> {
 // `view()` gives the offered stack and the goal counts for the screen.
 // Every field is private (issue #245). The rules ask `offeredStack()`, `lastPlacedAt()`,
 // `goalsReached()` and `goal()`, the scoring asks `clearedStackHeights()`, and
-// `SortState.restore()` asks the facts of the state. The photo keeps a frozen list
-// of the cleared heights, and it is frozen itself.
+// `SortState.restore()` asks the facts of the state, and `GameEngine` asks
+// `eventsOfLastMove()` (issue #361). The photo keeps a frozen list of the cleared heights
+// and one of the cleared cells, and it is frozen itself.
+// The cleared cells come last and are optional, so a photo that a test builds with heights only
+// keeps working. Such a photo gives no event.
 export class SortSnapshot<TCoord> extends BoardSnapshot<ColorStack, TCoord> {
   private readonly clearedTiles: readonly TileCount[];
+  private readonly clearedAt: readonly TCoord[];
 
   constructor(
     stateId: GameStateId,
@@ -65,9 +72,11 @@ export class SortSnapshot<TCoord> extends BoardSnapshot<ColorStack, TCoord> {
     private readonly source: IPieceSource<Piece<ColorStack, TCoord>>,
     private readonly moves: Moves,
     private readonly shown: SortView<TCoord>,
+    clearedAt: readonly TCoord[] = [],
   ) {
     super(stateId, matchId, board, score);
     this.clearedTiles = Object.freeze([...clearedTiles]);
+    this.clearedAt = Object.freeze([...clearedAt]);
     Object.freeze(this);
   }
 
@@ -94,6 +103,21 @@ export class SortSnapshot<TCoord> extends BoardSnapshot<ColorStack, TCoord> {
   // The height of each stack that the last turn cleared, in the order of the clears.
   clearedStackHeights(): readonly TileCount[] {
     return this.clearedTiles;
+  }
+
+  // The cell of each stack that the last turn cleared, in the order of the clears.
+  // Only `SortState.restore()` needs it.
+  clearedStackCells(): readonly TCoord[] {
+    return this.clearedAt;
+  }
+
+  // One `StackCleared` event for each stack that the last turn cleared, in the order of
+  // the clears (issue #361). Each event pairs a cleared cell with the height of its stack.
+  eventsOfLastMove(game: GameId, match: MatchId): readonly GameEvent[] {
+    return this.clearedAt.flatMap((at, i) => {
+      const height = this.clearedTiles[i];
+      return height === undefined ? [] : [new StackCleared(game, match, at, height)];
+    });
   }
 
   // The cell of the last placed stack, or `undefined` before the first move.
@@ -125,7 +149,9 @@ export class SortSnapshot<TCoord> extends BoardSnapshot<ColorStack, TCoord> {
 // `goalsDone` counts the cleared stacks, as a `ClearedStacks` (classes.md decision 42).
 // `goalsNeeded` is the goal of the level, a `GoalCount`.
 // `clearedTiles` holds the `TileCount` of each stack that the last turn cleared (issue #232),
-// so the Sort scoring (issue #98) can read it. `placedAt` is the cell of the last move.
+// so the Sort scoring (issue #98) can read it. `clearedAt` holds the cell of each of those
+// stacks, in the same order, so the photo gives one `StackCleared` event per stack (issue #361).
+// `placedAt` is the cell of the last move.
 export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
   private constructor(
     private readonly stateId: GameStateId,
@@ -139,6 +165,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
     private placedAt: TCoord | undefined,
     private score: Score,
     private moves: Moves = Moves.of(0),
+    private clearedAt: TCoord[] = [],
   ) {}
 
   // A new game: no goals, moves or points yet, and the first stack of the source on offer.
@@ -195,6 +222,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
     this.board.occupy(at, this.offered.occupant());
     this.placedAt = at;
     this.clearedTiles = [];
+    this.clearedAt = [];
     this.offerNext();
   }
 
@@ -217,7 +245,8 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
   }
 
   // Removes the whole stack at `at` and counts one goal. The cell keeps an empty stack,
-  // and `clearedTiles` keeps the tile count of the stack for the scoring (#98).
+  // `clearedTiles` keeps the tile count of the stack for the scoring (#98), and `clearedAt`
+  // keeps its cell for the event of the clear (issue #361).
   // A cell with no tile throws a RangeError.
   clearStack(at: TCoord): void {
     const stack = this.board.occupantAt(at);
@@ -227,6 +256,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
     this.board.occupy(at, ColorStack.empty());
     this.goalsDone = this.goalsDone.plusOne();
     this.clearedTiles.push(stack.tileCount());
+    this.clearedAt.push(at);
   }
 
   // Adds one move after an accepted placement.
@@ -257,6 +287,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
       this.source,
       this.moves,
       new SortView(this.offered, this.goalsDone, this.goalsNeeded),
+      this.clearedAt,
     );
   }
 
@@ -270,6 +301,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
     this.offered = snapshot.offeredStack();
     this.goalsDone = snapshot.goalsReached();
     this.clearedTiles = [...snapshot.clearedStackHeights()];
+    this.clearedAt = [...snapshot.clearedStackCells()];
     this.placedAt = snapshot.lastPlacedAt();
     this.score = snapshot.scoreSoFar();
     this.moves = snapshot.moveCount();
@@ -311,6 +343,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
       this.placedAt,
       this.score,
       this.moves,
+      [...this.clearedAt],
     );
   }
 }

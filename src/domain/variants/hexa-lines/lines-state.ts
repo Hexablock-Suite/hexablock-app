@@ -1,6 +1,8 @@
 import type { Board, ReadonlyBoard } from '../../engine/board';
 import { BoardSnapshot, checkOwnSnapshot, type BoardState } from '../../engine/board-state';
 import type { Color } from '../../engine/color';
+import type { GameEvent } from '../../engine/game-events';
+import type { GameId } from '../../engine/game-id';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { MatchId } from '../../engine/match-id';
 import { Score } from '../../engine/score';
@@ -9,6 +11,7 @@ import type { Piece } from '../../engine/piece';
 import type { IPieceSource } from '../../engine/piece-source';
 import { CellCount } from './cell-count';
 import { LineCount } from './line-count';
+import { LinesCleared } from './lines-cleared';
 import type { PlacePiece } from './place-piece';
 import { Streak } from './streak';
 
@@ -40,14 +43,16 @@ export class LinesView<TCoord> {
 }
 
 // The photo of a Lines state (classes.md decision 34): the board, the score, the tray,
-// the three facts of the last placement and the piece source at its position.
+// the facts of the last placement and the piece source at its position.
 // The source is a value (classes.md decision 51), so the photo shares it with the state,
 // and a reader that draws from it changes nothing. `view()` gives the tray for the screen.
 // Every field is private (issue #245). The rules ask `trayPieces()`, the scoring asks
 // `lastPlacedCells()`, `lastCombo()` and `currentStreak()`, and `LinesState.restore()` asks
-// every query. The photo keeps a frozen copy of the tray, and it is frozen itself.
+// every query. `GameEngine` asks `eventsOfLastMove()` (issue #361).
+// The photo keeps a frozen copy of the tray and of the cleared cells, and it is frozen itself.
 export class LinesSnapshot<TCoord> extends BoardSnapshot<Color, TCoord> {
   private readonly tray: readonly Piece<Color, TCoord>[];
+  private readonly clearedCells: readonly TCoord[];
 
   constructor(
     stateId: GameStateId,
@@ -58,11 +63,13 @@ export class LinesSnapshot<TCoord> extends BoardSnapshot<Color, TCoord> {
     private readonly streak: Streak,
     private readonly linesCleared: LineCount,
     private readonly cellsPlaced: CellCount,
+    clearedCells: readonly TCoord[],
     private readonly source: IPieceSource<Piece<Color, TCoord>>,
     private readonly shown: LinesView<TCoord>,
   ) {
     super(stateId, matchId, board, score);
     this.tray = Object.freeze([...tray]);
+    this.clearedCells = Object.freeze([...clearedCells]);
     Object.freeze(this);
   }
 
@@ -86,9 +93,21 @@ export class LinesSnapshot<TCoord> extends BoardSnapshot<Color, TCoord> {
     return this.cellsPlaced;
   }
 
+  // The cells that the last placement cleared, in the order of the wave: the order in which
+  // the rules found the full lines, each cell once. Only `LinesState.restore()` needs it.
+  lastClearedCells(): readonly TCoord[] {
+    return this.clearedCells;
+  }
+
   // The piece source at its position. Only `LinesState.restore()` needs it.
   pieceSource(): IPieceSource<Piece<Color, TCoord>> {
     return this.source;
+  }
+
+  // One `LinesCleared` event when the last placement cleared a line, or none (issue #361).
+  eventsOfLastMove(game: GameId, match: MatchId): readonly GameEvent[] {
+    if (this.linesCleared.isNone()) return [];
+    return [new LinesCleared(game, match, this.linesCleared, this.clearedCells)];
   }
 
   view(): LinesView<TCoord> {
@@ -109,6 +128,8 @@ export class LinesSnapshot<TCoord> extends BoardSnapshot<Color, TCoord> {
 // `linesCleared` is the combo of the last placement: the count of distinct full lines it cleared.
 // `streak` counts the placements in a row that cleared at least one line.
 // `cellsPlaced` is the count of cells that the last placement put on the board.
+// `clearedCells` holds the cells that the last placement cleared, in the order of the wave.
+// The photo gives the `LinesCleared` event of the placement from it (issue #361).
 // The scoring of issue 97 reads the three fields, because the policy keeps no game data.
 // The three counts are value objects (issue #232): a `Streak`, a `LineCount` and a `CellCount`.
 // Each one checks its own value, and the score is a `Score`, which checks its own value too.
@@ -124,6 +145,7 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
     private linesCleared: LineCount = LineCount.of(0),
     private cellsPlaced: CellCount = CellCount.of(0),
     private score: Score = Score.of(0),
+    private clearedCells: readonly TCoord[] = [],
   ) {
     checkTray(tray);
   }
@@ -163,6 +185,7 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
   }
 
   // Vacates every cell of the full lines. A cell that two lines share is vacated once.
+  // The state keeps the vacated cells in the order of the lines and of their cells.
   // The combo is the count of lines. The streak grows by one when the count is 1 or more,
   // and it goes back to 0 when the count is 0.
   // A line that holds a free cell, or a cell outside the board, throws a RangeError.
@@ -177,9 +200,11 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
     }
     const linesCleared = LineCount.of(lines.length);
     const streak = this.streak.after(linesCleared);
-    for (const c of cleared.values()) this.board.vacate(c);
+    const clearedCells = cleared.values();
+    for (const c of clearedCells) this.board.vacate(c);
     this.streak = streak;
     this.linesCleared = linesCleared;
+    this.clearedCells = clearedCells;
   }
 
   // The engine adds the points of a turn in place. `Score.add()` refuses a total
@@ -212,6 +237,7 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
       this.streak,
       this.linesCleared,
       this.cellsPlaced,
+      this.clearedCells,
       this.source,
       new LinesView(this.tray),
     );
@@ -229,6 +255,7 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
     this.streak = snapshot.currentStreak();
     this.linesCleared = snapshot.lastCombo();
     this.cellsPlaced = snapshot.lastPlacedCells();
+    this.clearedCells = snapshot.lastClearedCells();
     this.score = snapshot.scoreSoFar();
   }
 
@@ -244,6 +271,7 @@ export class LinesState<TCoord> implements BoardState<Color, TCoord> {
       this.linesCleared,
       this.cellsPlaced,
       this.score,
+      this.clearedCells,
     );
   }
 

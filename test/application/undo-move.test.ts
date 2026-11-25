@@ -17,7 +17,7 @@ import type { Score } from '../../src/domain/engine/score';
 import type { MergeFactory } from '../../src/domain/variants/hexa-merge/merge-factory';
 import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-store';
 import { RecordingPublisher } from '../support/application/recording-publisher';
-import { dataOf } from '../support/engine/game-over';
+import { dataOf, gameOversIn } from '../support/engine/game-over';
 import { PlayingPhase } from '../../src/domain/engine/game-phase';
 import type { IPieceSource } from '../../src/domain/engine/piece-source';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
@@ -325,7 +325,7 @@ async function playToTheEnd(factory: MergeFactory<HexCoord>, undoOnce: boolean) 
   let score = valueOf(await startGame.execute({})).score;
   let kept = 0;
   let undone: { before: Score; after: Score; undone: Score } | undefined;
-  for (let turn = 0; events.events.length === 0; turn += 1) {
+  for (let turn = 0; gameOversIn(events.events).length === 0; turn += 1) {
     if (turn === MOST_TURNS) throw new RangeError('The Merge game did not end.');
     const slide = firstValidMove(
       factory.createRules(),
@@ -342,7 +342,8 @@ async function playToTheEnd(factory: MergeFactory<HexCoord>, undoOnce: boolean) 
       score = played.score;
     }
   }
-  return { undone, finalScore: dataOf(events.events[0]).finalScore, kept: Moves.of(kept) };
+  const [ended] = gameOversIn(events.events);
+  return { undone, finalScore: dataOf(ended).finalScore, kept: Moves.of(kept) };
 }
 
 // One game of a variant with no history: its first move, a refused undo and the facts around it.

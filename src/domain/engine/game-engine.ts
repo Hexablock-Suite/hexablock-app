@@ -114,7 +114,8 @@ export class GameEngine<
   }
 
   // One turn: receive the move, let the rules validate, apply, resolve and evaluate it
-  // (template method `playTurn()`), score it, and record `GameOver` when the game ends.
+  // (template method `playTurn()`), score it, record the events of the move, and record
+  // `GameOver` when the game ends.
   // A rejected move returns `playing`. Call `tryPlay()` to tell it from an accepted move.
   play(move: TMove): Outcome {
     return this.tryPlay(move).leadsTo();
@@ -123,8 +124,9 @@ export class GameEngine<
   // The same turn as `play()`. It returns the `Resolution` of the turn, which also says
   // whether the rules accepted the move. So the `ApplyMove` use case can return a failure
   // for a rejected move (issue 100). A rejected move always has the outcome `playing`.
-  // A turn that ends the game records one `GameOver` event when the engine saves the turn
-  // (classes.md decision 29). The engine builds the event inside the turn, so an error there
+  // An accepted turn records the events of its move, which the photo after the move gives
+  // (issue #361). A turn that ends the game also records one `GameOver` event, after them,
+  // when the engine saves the turn (classes.md decision 29). A rejected move records no event. The engine builds the event inside the turn, so an error there
   // leaves the turn unsaved. The engine calls no publisher, so no publisher failure reaches
   // the turn (issue #233).
   // The rollback covers the whole state and the phase. A piece source lives in the state
@@ -154,7 +156,7 @@ export class GameEngine<
     this.state = turn.next;
     this.current = turn.phase;
     this.remember(move, turn.before, turn.after);
-    if (turn.ended !== undefined) this.recorded.push(turn.ended);
+    this.recorded.push(...turn.events);
     // The engine builds the resolution, so the caller gets a real `Resolution` from any rules.
     return Resolution.resolved().evaluated(turn.outcome);
   }
@@ -190,7 +192,9 @@ export class GameEngine<
   // `before` and `after` are the Mementos: the photos of the state before and after the move,
   // points included (classes.md decision 34, issue #178). They are taken inside the turn,
   // so a photo that throws leaves the turn unsaved.
-  // `ended` is the `GameOver` event of a turn that ends the game, or `undefined`.
+  // `events` are the events of the turn, in their order: the events of the move that the photo
+  // after the move gives (issue #361), then the `GameOver` of a turn that ends the game.
+  // The root builds each event with its own ids. It reads no variant event by name.
   private resolveTurn(
     state: TState,
     move: TMove,
@@ -201,7 +205,7 @@ export class GameEngine<
         outcome: Outcome;
         before: SnapshotOf<TState>;
         after: SnapshotOf<TState>;
-        ended: GameOver | undefined;
+        events: readonly GameEvent[];
       }
     | undefined {
     const next = copy(state);
@@ -211,13 +215,17 @@ export class GameEngine<
     next.addPoints(this.scoring.score(before, photoOf(next)));
     const after = photoOf(next);
     const phase = resolution.phaseAfter(this.current);
+    const ended = this.gameOverOf(next, resolution);
     return {
       next,
       phase,
       outcome: resolution.leadsTo(),
       before,
       after,
-      ended: this.gameOverOf(next, resolution),
+      events: [
+        ...after.eventsOfLastMove(this.gameId, this.matchId),
+        ...(ended === undefined ? [] : [ended]),
+      ],
     };
   }
 
