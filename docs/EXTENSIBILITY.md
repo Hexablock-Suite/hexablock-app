@@ -68,3 +68,22 @@ If Hexa Fill keeps levels on the backend, the backend adds a section for it in t
 ## Check
 
 Before the defense, a branch adds Hexa Fill with these steps. Its diff must touch no file under `src/domain/engine/`, `src/application/` or the four other variant folders (APP-NFR-06). The same check applies to the three jury variations in view 2 of the [extensibility diagram](architecture/extensibility.md): a new board size, a new scoring policy and a new piece shape.
+
+### Rehearsal of 2026-11-25
+
+The base is `main` at `3ca471d`. Each jury variation is one commit on its own branch. The branches stay as evidence, and nobody merges them. For each branch, `git diff --name-only origin/main...<branch> -- src/domain/engine src/application` prints nothing, and no folder of another variant changes.
+
+| Variation          | Branch and commit                                        | Change                                                                                                                 | Files                                                                                                                                                                                                                 | `pnpm verify`          |
+| ------------------ | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| New board size     | `odjaramillo/app-53-rehearsal-board-size`, `759a8f5`     | Hexa Merge goes from `RegionSize.of(3)` to `RegionSize.of(4)`: 19 to 37 hexagons, 9 to 16 squares, 18 to 32 triangles. | `src/infrastructure/registered-games.ts` (a new constant for the Merge board, which `MergeSettings.of()` and the slide controls use), `test/infrastructure/composition-root.test.ts`, `test/app/game-screen.test.tsx` | 175 suites, 1799 tests |
+| New scoring policy | `odjaramillo/app-53-rehearsal-scoring-policy`, `4a433db` | In Hexa Merge, the slide that first makes the target tile scores a bonus of 1000 points.                               | New `src/domain/variants/hexa-merge/target-bonus-decorator.ts`, which extends the engine `ScoringDecorator`, with its test; one line of `createScoring()` in `merge-factory.ts`, with its test                        | 176 suites, 1803 tests |
+| New piece shape    | `odjaramillo/app-53-rehearsal-piece-shape`, `87c72ec`    | Hexa Lines on the hexagon draws one more shape, a hook of four cells.                                                  | `src/infrastructure/registered-games.ts` (the shape is data of the hexagon figure, added to the shapes of the geometry), new `test/infrastructure/registered-games.test.ts`                                           | 176 suites, 1800 tests |
+
+The rehearsal showed these facts. [#369](https://github.com/Hexablock-Suite/hexablock-app/issues/369) holds the fixes.
+
+- The place of a board size and of a Lines piece shape is `src/infrastructure/registered-games.ts`. This page and view 2 of the [extensibility diagram](architecture/extensibility.md) do not name that file as their place.
+- The comments of the three geometry files of the engine say «A new shape is one new line». They send a developer to an engine file.
+- A size change edits the expected numbers of two outer-layer tests.
+- A new generic bound in a variant folder needs a row in the README table «Variant bounds» (`test/docs/generic-bounds.test.ts`).
+
+To repeat the rehearsal before the defense, cherry-pick the commit of each branch on the `main` of that day. Then run `pnpm verify` and the `git diff --name-only` check above.
