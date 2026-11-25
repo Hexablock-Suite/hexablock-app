@@ -151,7 +151,7 @@ The variant classes stay generic over `TCoord`, like the engine, so a variant ru
 
 ![The use case contract: every use case implements UseCase, and the aspect decorators wrap it for logging, timing, retry and authorization; the Logger port takes a UseCaseLogEntry](classes/views/uc-1-contract.png)
 
-The footnote of this view and of view 3.4 still says that `AuthorizationAspect` wraps `SaveProgress`. Since D27 in [REQUIREMENTS.md](../REQUIREMENTS.md) (#325), `SaveProgress` and `ListLevels` need no session, and the aspect wraps the sync use cases, `SyncProgress` and `SyncLeaderboard`. #46 draws the views again with `SyncProgress`.
+Since D27 in [REQUIREMENTS.md](../REQUIREMENTS.md) (#325), `SaveProgress` and `ListLevels` need no session, and `AuthorizationAspect` wraps the sync use cases, `SyncProgress` and `SyncLeaderboard`. The footnote of this view and of view 3.4 says so since #338. #46 adds the `SyncProgress` box to the views.
 
 ### View 3.2: playing a game
 
