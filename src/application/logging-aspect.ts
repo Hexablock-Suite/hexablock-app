@@ -5,7 +5,7 @@ import { UseCaseAspect } from './use-case-aspect';
 
 // Logs each call of the inner use case through the `Logger` port (APP-NFR-11, view 3.1).
 // It passes one `UseCaseLogEntry` per call and formats no message (classes.md decision 37).
-// It reads no time: `TimingAspect` measures the call with the engine `Clock`.
+// It reads no time yet. Issue #343 adds the duration of the call to its one entry.
 // An empty or blank `name` throws a `RangeError`, because the log names the call by it (G118.4).
 // A logger that throws gives an `unexpected-failure` `Result` from `execute()`.
 export class LoggingAspect<TRequest, TResponse> extends UseCaseAspect<TRequest, TResponse> {

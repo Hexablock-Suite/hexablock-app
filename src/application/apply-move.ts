@@ -4,7 +4,7 @@ import type { GameEvent } from '../domain/engine/game-events';
 import type { GameEventPublisher } from './game-event-publisher';
 import { logEntryOf, type Logger } from './logger';
 import { moveResultOf, type MoveResult, type ViewOf } from './move-result';
-import { caughtError, Result, UseCaseError } from './result';
+import { caughtError, FailureCode, Result, UseCaseError } from './result';
 import type { GameRepository } from './game-repository';
 import type { UseCase } from './use-case';
 
@@ -43,16 +43,18 @@ export class ApplyMove<
     try {
       const engine = this.games.current();
       if (engine === undefined) {
-        return Result.failure(new UseCaseError('no-running-game', 'No game is running.'));
+        return Result.failure(new UseCaseError(FailureCode.noRunningGame, 'No game is running.'));
       }
       const turn = engine.tryPlay(request.move);
       this.deliver(engine.takeEvents());
       if (!turn.wasAccepted()) {
-        return Result.failure(new UseCaseError('move-rejected', 'The rules rejected the move.'));
+        return Result.failure(
+          new UseCaseError(FailureCode.moveRejected, 'The rules rejected the move.'),
+        );
       }
       return Result.success(moveResultOf(engine, turn.leadsTo()));
     } catch (thrown) {
-      return Result.failure(caughtError('move-failed', thrown));
+      return Result.failure(caughtError(FailureCode.moveFailed, thrown));
     }
   }
 
@@ -73,7 +75,7 @@ export class ApplyMove<
   private logPublishFailure(error: unknown): void {
     try {
       this.logger.log(
-        logEntryOf('ApplyMove', Result.failure(caughtError('publish-failed', error))),
+        logEntryOf('ApplyMove', Result.failure(caughtError(FailureCode.publishFailed, error))),
       );
     } catch {
       return;

@@ -1,7 +1,7 @@
 import type { ApplyMoveRequest } from '../application/apply-move';
 import type { MoveResult } from '../application/move-result';
 import type { RedoMoveRequest } from '../application/redo-move';
-import type { Result, UseCaseError } from '../application/result';
+import type { FailureCode, Result, UseCaseError } from '../application/result';
 import type { StartGameRequest } from '../application/start-game';
 import type { UndoMoveRequest } from '../application/undo-move';
 import type { UseCase } from '../application/use-case';
@@ -51,13 +51,25 @@ const OUTCOME_TEXTS: readonly (readonly [Outcome, TextKey])[] = [
   [Outcome.gameOver, 'play.outcome.game-over'],
 ];
 
-// The failures with their own text. Every other failure shows the general text `play.error`.
+// The text of each failure code (issue #322, classes.md decision 62). The table is a `Record`
+// over the closed set of codes, so a new code with no text fails the type check.
+// Three failures have their own text. Every other failure shows the general text `play.error`.
 // A quick second tap on undo or redo can find no move left (#178): its text says so.
-const ERROR_TEXTS: readonly (readonly [string, TextKey])[] = [
-  ['move-rejected', 'play.error.move-rejected'],
-  ['nothing-to-undo', 'play.error.nothing-to-undo'],
-  ['nothing-to-redo', 'play.error.nothing-to-redo'],
-];
+const ERROR_TEXTS: Readonly<Record<FailureCode, TextKey>> = {
+  'start-failed': 'play.error',
+  'no-running-game': 'play.error',
+  'move-rejected': 'play.error.move-rejected',
+  'move-failed': 'play.error',
+  'publish-failed': 'play.error',
+  'no-undo': 'play.error',
+  'nothing-to-undo': 'play.error.nothing-to-undo',
+  'undo-failed': 'play.error',
+  'nothing-to-redo': 'play.error.nothing-to-redo',
+  'redo-failed': 'play.error',
+  'save-failed': 'play.error',
+  'list-failed': 'play.error',
+  'unexpected-failure': 'play.error',
+};
 
 // The presenter of the game screen (MVP, issue #170). It lives in layer 3 and imports no React.
 // It calls `StartGame`, `ApplyMove`, `UndoMove` and `RedoMove` (#178) through the `UseCase`
@@ -70,7 +82,7 @@ const ERROR_TEXTS: readonly (readonly [string, TextKey])[] = [
 // the root answers `canUndo` and `canRedo`, so the presenter reads no history (#178).
 // A failed `Result` never throws (decision 28): the presenter keeps the last board and shows
 // the text of the failure. A rejected move and an undo or a redo that finds no move have their
-// own texts, and any other failure has one general text.
+// own texts, and any other failure has one general text. The table of texts names every code.
 // Every text comes from the catalog of one language (APP-FR-11).
 // A view attaches to see each new view model. It sees the current one at once.
 export class GamePresenter<TCell, TCoord, TMove, TView, TCellView, TPayloadView> {
@@ -188,8 +200,7 @@ export class GamePresenter<TCell, TCoord, TMove, TView, TCellView, TPayloadView>
   }
 
   private errorText(error: UseCaseError): string {
-    const found = ERROR_TEXTS.find(([code]) => code === error.code);
-    return this.texts[found === undefined ? 'play.error' : found[1]];
+    return this.texts[ERROR_TEXTS[error.code]];
   }
 }
 

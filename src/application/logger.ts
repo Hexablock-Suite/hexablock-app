@@ -2,7 +2,8 @@ import type { Result, UseCaseError } from './result';
 
 // The record of one use case call (classes.md decision 37). It is a value object.
 // It holds data, never a message: the `Logger` adapter of layer 4 writes the text.
-// `elapsedMs` comes only from `TimingAspect`, and `error` only from a failed `Result`.
+// `error` comes only from a failed `Result`.
+// `elapsedMs` has no writer yet. `ConsoleLogger` reads it, and issue #343 gives it its writer.
 export interface UseCaseLogEntry {
   readonly useCase: string;
   readonly outcome: 'success' | 'failure';

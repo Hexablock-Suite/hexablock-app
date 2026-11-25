@@ -2,7 +2,7 @@
 import { BundledLevelRepository } from '../../src/adapters/bundled-level-repository';
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
 import type { LevelRepository } from '../../src/application/level-repository';
-import { LevelStatus, type LevelSummary } from '../../src/application/level-summary';
+import type { LevelSummary } from '../../src/application/level-summary';
 import { ListLevels, type ListLevelsRequest } from '../../src/application/list-levels';
 import type { ProgressRepository } from '../../src/application/progress-repository';
 import { Result } from '../../src/application/result';
@@ -14,6 +14,7 @@ import { TopologyId } from '../../src/domain/engine/geometry-factory';
 import { HexGeometry } from '../../src/domain/engine/hex-geometry';
 import { LevelDefinition } from '../../src/domain/engine/level-definition';
 import { LevelId } from '../../src/domain/engine/level-id';
+import { LevelStatus } from '../../src/domain/engine/level-status';
 import { Moves } from '../../src/domain/engine/moves';
 import { GameResult, ProgressRecord } from '../../src/domain/engine/progress-model';
 import { Score } from '../../src/domain/engine/score';

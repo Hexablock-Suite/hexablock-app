@@ -1,10 +1,11 @@
 /** @jest-environment node */
 import { BundledLevelRepository } from '../../src/adapters/bundled-level-repository';
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
-import { EveryLevelWon, LevelsWon, type Achievement } from '../../src/application/achievement';
+import type { Achievement } from '../../src/application/achievement';
 import { ListAchievements, type AchievementSummary } from '../../src/application/list-achievements';
 import type { ProgressRepository } from '../../src/application/progress-repository';
 import type { Result } from '../../src/application/result';
+import { EveryLevelWon, LevelsWon } from '../../src/domain/engine/achievement-goal';
 import { GameId } from '../../src/domain/engine/game-id';
 import { GameProgress } from '../../src/domain/engine/game-progress';
 import { LevelId } from '../../src/domain/engine/level-id';
@@ -68,7 +69,7 @@ describe('ListAchievements', () => {
   // «Win 3 levels of Hexa Fit»: three won levels complete it, two do not.
   // A level is won when the progress keeps a result of it, zero stars included (S3-12).
   it('should_complete_a_count_of_won_levels_when_the_progress_keeps_that_many_levels', async () => {
-    const achievement = { id: 'fit-3', goal: new LevelsWon(FIT, 3) };
+    const achievement = { id: 'fit-3', goal: LevelsWon.of(FIT, 3) };
 
     const two = await listOf([achievement], await progressWith(FIT, ['fit-01', 'fit-02'])).execute(
       {},
@@ -86,7 +87,7 @@ describe('ListAchievements', () => {
   it('should_keep_a_count_of_won_levels_in_progress_when_another_game_won_the_levels', async () => {
     const progress = await progressWith(FIT, ['fit-01', 'fit-02', 'fit-03']);
 
-    const result = await listOf([{ id: 'sort-3', goal: new LevelsWon(SORT, 3) }], progress).execute(
+    const result = await listOf([{ id: 'sort-3', goal: LevelsWon.of(SORT, 3) }], progress).execute(
       {},
     );
 
@@ -125,7 +126,7 @@ describe('ListAchievements', () => {
     const progress = await progressWith(FIT, ['fit-01', 'fit-02', 'fit-03']);
 
     const result = await listOf(
-      [{ id: 'merge-256' }, { id: 'fit-3', goal: new LevelsWon(FIT, 3) }, { id: 'sort-goals' }],
+      [{ id: 'merge-256' }, { id: 'fit-3', goal: LevelsWon.of(FIT, 3) }, { id: 'sort-goals' }],
       progress,
     ).execute({});
 
@@ -142,7 +143,7 @@ describe('ListAchievements', () => {
       save: () => Promise.resolve(),
     };
 
-    const result = await listOf([{ id: 'fit-3', goal: new LevelsWon(FIT, 3) }], broken).execute({});
+    const result = await listOf([{ id: 'fit-3', goal: LevelsWon.of(FIT, 3) }], broken).execute({});
 
     expect(rowsOf(result)).toBe('list-failed');
     expect(result.ok ? undefined : result.error.message).toBe('The store is gone.');
@@ -162,7 +163,7 @@ describe('ListAchievements', () => {
     for (const count of [0, -1, 2.5, Number.NaN]) {
       let caught: unknown;
       try {
-        new LevelsWon(FIT, count);
+        LevelsWon.of(FIT, count);
       } catch (error) {
         caught = error;
       }

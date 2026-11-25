@@ -1,8 +1,5 @@
-import { caughtError, Result } from './result';
+import { caughtError, FailureCode, Result } from './result';
 import type { UseCase } from './use-case';
-
-// The code of a failure that an exception causes inside an aspect (issue 132).
-const UNEXPECTED_FAILURE = 'unexpected-failure';
 
 // The abstract Decorator of the use cases (classes.md decision 9, view 3.1, A2).
 // It implements `UseCase` and keeps the inner use case it wraps.
@@ -18,7 +15,7 @@ export abstract class UseCaseAspect<TRequest, TResponse> implements UseCase<TReq
     try {
       return await this.around(request);
     } catch (thrown) {
-      return Result.failure(caughtError(UNEXPECTED_FAILURE, thrown));
+      return Result.failure(caughtError(FailureCode.unexpectedFailure, thrown));
     }
   }
 
@@ -30,7 +27,18 @@ export abstract class UseCaseAspect<TRequest, TResponse> implements UseCase<TReq
     try {
       return await this.inner.execute(request);
     } catch (thrown) {
-      return Result.failure(caughtError(UNEXPECTED_FAILURE, thrown));
+      return Result.failure(caughtError(FailureCode.unexpectedFailure, thrown));
     }
   }
+}
+
+// Wraps `useCase` in the aspects of `aspects`, from the outside in (issue #323).
+// Each entry builds one aspect around the use case that it gets.
+// The first entry gives the outer aspect: it sees the call first and the result last.
+// An empty list gives `useCase` itself.
+export function wrapInAspects<TRequest, TResponse>(
+  useCase: UseCase<TRequest, TResponse>,
+  aspects: readonly ((inner: UseCase<TRequest, TResponse>) => UseCase<TRequest, TResponse>)[],
+): UseCase<TRequest, TResponse> {
+  return aspects.reduceRight((inner, aspect) => aspect(inner), useCase);
 }

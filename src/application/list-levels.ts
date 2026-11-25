@@ -2,11 +2,11 @@ import type { GameId } from '../domain/engine/game-id';
 import type { GameProgress } from '../domain/engine/game-progress';
 import type { TopologyId } from '../domain/engine/geometry-factory';
 import type { LevelDefinition } from '../domain/engine/level-definition';
-import type { Stars } from '../domain/engine/stars';
+import { LevelStatus } from '../domain/engine/level-status';
 import type { LevelRepository } from './level-repository';
-import { LevelStatus, type LevelSummary } from './level-summary';
+import type { LevelSummary } from './level-summary';
 import type { ProgressRepository } from './progress-repository';
-import { caughtError, Result } from './result';
+import { caughtError, FailureCode, Result } from './result';
 import type { UseCase } from './use-case';
 
 // The request of `ListLevels`: the game and the figure that the player chose (S3-08 in #151).
@@ -23,11 +23,9 @@ export interface ListLevelsRequest {
 //   A level builder refuses a level of another figure, so a level of another figure
 //   cannot start. A figure with no level gives an empty list.
 // - The list follows the `order` of each level file, not the order of the repository.
-// - A level is completed when the progress keeps the stars of a result of it,
-//   zero stars included. The first level of the list is open. The level after a completed level
-//   is open, and every other level is locked (S3-12). The order counts only the levels
-//   of the chosen figure, so a level of another figure never locks a level of this figure.
-// A game with no saved progress has no completed level.
+// - `LevelStatus.ofEach()` gives the status of each level (S3-12, issue #326): completed, open
+//   or locked. The use case gives it only the levels of the chosen figure, in order,
+//   so a level of another figure never locks a level of this figure.
 // No exception leaves `execute()`. A port that throws gives a `list-failed` failure.
 export class ListLevels implements UseCase<ListLevelsRequest, LevelSummary[]> {
   constructor(
@@ -42,7 +40,7 @@ export class ListLevels implements UseCase<ListLevelsRequest, LevelSummary[]> {
       const onFigure = levels.filter((level) => level.isPlayedOn(request.figure));
       return Result.success(summariesOf(inOrder(onFigure), progress));
     } catch (thrown) {
-      return Result.failure(caughtError('list-failed', thrown));
+      return Result.failure(caughtError(FailureCode.listFailed, thrown));
     }
   }
 }
@@ -57,27 +55,15 @@ function inOrder(levels: readonly LevelDefinition[]): LevelDefinition[] {
   });
 }
 
-// One summary per level, in order. The status of each level reads the status of the level before.
+// One summary per level, in order, with the status that `LevelStatus.ofEach()` gives.
+// The stars exist only for a level whose result the progress keeps.
 function summariesOf(
   levels: readonly LevelDefinition[],
   progress: GameProgress | undefined,
 ): LevelSummary[] {
-  const summaries: LevelSummary[] = [];
-  let before: LevelStatus | undefined;
-  for (const level of levels) {
+  return LevelStatus.ofEach(levels, progress).map(([level, status]) => {
     const levelId = level.levelId();
     const stars = progress?.starsOf(levelId);
-    const status = statusOf(stars, before);
-    summaries.push(stars === undefined ? { levelId, status } : { levelId, status, stars });
-    before = status;
-  }
-  return summaries;
-}
-
-// The status of a level from its stars and from the status of the level before it (S3-12).
-// The first level has no level before it.
-function statusOf(stars: Stars | undefined, before: LevelStatus | undefined): LevelStatus {
-  if (stars !== undefined) return LevelStatus.completed;
-  if (before === undefined || before.equals(LevelStatus.completed)) return LevelStatus.open;
-  return LevelStatus.locked;
+    return stars === undefined ? { levelId, status } : { levelId, status, stars };
+  });
 }
