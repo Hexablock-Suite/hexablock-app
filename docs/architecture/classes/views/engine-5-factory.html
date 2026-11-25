@@ -177,7 +177,7 @@
           x="496"
           y="64"
           width="496"
-          height="304"
+          height="312"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -221,7 +221,7 @@
 
         <rect
           x="496"
-          y="380"
+          y="388"
           width="496"
           height="116"
           rx="8"
@@ -232,7 +232,7 @@
         />
         <text
           x="508"
-          y="396"
+          y="404"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -322,9 +322,9 @@
         <!-- GameOver extends GameEvent: generalization -->
         <line
           x1="884"
-          y1="208"
+          y1="216"
           x2="884"
-          y2="188"
+          y2="196"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#factory-triangle)"
@@ -440,16 +440,16 @@
           x="792"
           y="92"
           width="184"
-          height="96"
+          height="104"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="792" y1="140" x2="976" y2="140" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="792" y1="132" x2="976" y2="132" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="884"
-          y="110"
+          y="107"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -460,7 +460,7 @@
         </text>
         <text
           x="884"
-          y="128"
+          y="123"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -470,18 +470,21 @@
         >
           GameEvent
         </text>
-        <text x="808" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="808" y="148" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - gameId: GameId
         </text>
-        <line x1="792" y1="164" x2="976" y2="164" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="808" y="180" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          # withGameId(deliver): void
+        <line x1="792" y1="156" x2="976" y2="156" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="808" y="172" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          # withGameId(deliver: (gameId:
+        </text>
+        <text x="819" y="188" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          GameId) =&gt; void): void
         </text>
 
         <!-- Class: GameOver (domain event) -->
         <rect
           x="792"
-          y="208"
+          y="216"
           width="184"
           height="152"
           rx="6"
@@ -489,10 +492,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="792" y1="248" x2="976" y2="248" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="792" y1="256" x2="976" y2="256" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="884"
-          y="223"
+          y="231"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -503,7 +506,7 @@
         </text>
         <text
           x="884"
-          y="239"
+          y="247"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -512,23 +515,23 @@
         >
           GameOver
         </text>
-        <text x="808" y="264" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="808" y="272" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - matchId: MatchId
         </text>
-        <text x="808" y="280" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="808" y="288" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - outcome: Outcome
         </text>
-        <text x="808" y="296" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="808" y="304" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - finalScore: Score
         </text>
-        <line x1="792" y1="304" x2="976" y2="304" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="808" y="320" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="792" y1="312" x2="976" y2="312" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="808" y="328" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + isVictory(): boolean
         </text>
-        <text x="808" y="336" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="808" y="344" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + deliverTo(receiver:
         </text>
-        <text x="819" y="352" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="819" y="360" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           GameOverReceiver): void
         </text>
 
@@ -598,17 +601,17 @@
         <!-- GameOver keeps the final Score as finalScore: use with role and multiplicity (decision 23). The line runs near the top of GameOver, so its label fits above GameOver, under GameEvent. -->
         <line
           x1="792"
-          y1="216"
+          y1="224"
           x2="740"
-          y2="216"
+          y2="224"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#factory-open)"
         />
-        <rect x="742" y="195" width="62" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="742" y="203" width="62" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="744"
-          y="204"
+          y="212"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -769,7 +772,7 @@
         <!-- Class: Clock (interface of the engine) -->
         <rect
           x="512"
-          y="408"
+          y="416"
           width="200"
           height="72"
           rx="6"
@@ -777,10 +780,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="512" y1="456" x2="712" y2="456" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="512" y1="464" x2="712" y2="464" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="612"
-          y="426"
+          y="434"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -791,7 +794,7 @@
         </text>
         <text
           x="612"
-          y="444"
+          y="452"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -800,14 +803,14 @@
         >
           Clock
         </text>
-        <text x="528" y="472" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="528" y="480" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + now(): ClockReading
         </text>
 
         <!-- Class: RandomSource (interface of the engine) -->
         <rect
           x="776"
-          y="408"
+          y="416"
           width="200"
           height="72"
           rx="6"
@@ -815,10 +818,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="776" y1="456" x2="976" y2="456" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="776" y1="464" x2="976" y2="464" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="876"
-          y="426"
+          y="434"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -829,7 +832,7 @@
         </text>
         <text
           x="876"
-          y="444"
+          y="452"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -838,7 +841,7 @@
         >
           RandomSource
         </text>
-        <text x="792" y="472" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="792" y="480" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + next(): RandomDraw
         </text>
 
