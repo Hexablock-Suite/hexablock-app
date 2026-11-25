@@ -23,6 +23,7 @@ import type { MergeTile } from './merge-tile';
 import { DEFAULT_FOUR_CHANCE, mergeTileSource } from './merge-tile-source';
 import type { NewTile } from './new-tile';
 import type { Slide } from './slide';
+import { TargetBonusDecorator } from './target-bonus-decorator';
 
 // The count of tiles on the first board. Statement §1.4 does not give it.
 // The value follows 2048, as the chance of a 4 does (issue 57): two tiles.
@@ -125,7 +126,7 @@ export class MergeFactory<TCoord> implements IVariantFactory<
   }
 
   createScoring(): IScoringPolicy<MergeState<MergeTile, TCoord, GridAxis>> {
-    return new MergeScoring<TCoord, GridAxis>();
+    return new TargetBonusDecorator(new MergeScoring<TCoord, GridAxis>());
   }
 
   createPieceSource(): SeededPieceSource<NewTile<MergeTile>> {

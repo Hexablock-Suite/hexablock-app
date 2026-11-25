@@ -11,10 +11,16 @@ import {
   MergeSettings,
 } from '../../../../src/domain/variants/hexa-merge/merge-factory';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
+import { MergeState } from '../../../../src/domain/variants/hexa-merge/merge-state';
+import { SlideSense, Slide } from '../../../../src/domain/variants/hexa-merge/slide';
+import { hex, HexAxis } from '../../../../src/domain/engine/hex-topology';
 import { firstValidMove, startVariant } from '../../../support/engine/variant-game';
 import {
+  mergeBoard,
   mergeFactory,
+  mergeGame,
   mergeStateOf,
+  noNewTiles,
   valueOf,
   values,
 } from '../../../support/variants/hexa-merge/merge-game';
@@ -107,6 +113,23 @@ describe('MergeFactory', () => {
     }
 
     expect(tiles.every((tile) => tile.equals(MergeTile.of(4)))).toBe(true);
+  });
+
+  // The jury variation of issue #53: the factory picks the target bonus over the Merge scoring.
+  it('should_add_the_target_bonus_when_the_merge_factory_scoring_scores_the_slide_that_makes_the_target', () => {
+    const board = mergeBoard(3);
+    board.occupy(hex(-2, 0), MergeTile.of(1024));
+    board.occupy(hex(-1, 0), MergeTile.of(1024));
+    const { engine } = mergeGame(
+      new MergeState(STATE_ID, MATCH_ID, board, noNewTiles()),
+      MergeTile.of(2048),
+      mergeFactory().createScoring(),
+    );
+
+    engine.play(Slide.of(HexAxis.q, SlideSense.forward));
+
+    // 2048 for the merge + 1000 for the target. The Merge scoring alone gives 2048.
+    expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(3048));
   });
 
   it('should_fill_every_cell_and_stop_when_the_board_has_fewer_cells_than_the_start_tiles', () => {
