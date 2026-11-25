@@ -11,6 +11,8 @@ import { LevelId } from '../../src/domain/engine/level-id';
 import { Turns } from '../../src/domain/engine/turns';
 import { PlaceFitPiece } from '../../src/domain/variants/hexa-fit/fit-move';
 import { PieceId } from '../../src/domain/variants/hexa-fit/piece-id';
+import { StackCleared } from '../../src/domain/variants/hexa-sort/stack-cleared';
+import { TileCount } from '../../src/domain/variants/hexa-sort/tile-count';
 import { FitCellRenderer } from '../../src/infrastructure/board/fit-cell-renderer';
 import { MergeCellRenderer } from '../../src/infrastructure/board/merge-cell-renderer';
 import { SortCellRenderer } from '../../src/infrastructure/board/sort-cell-renderer';
@@ -20,9 +22,11 @@ import { FitControls } from '../../src/infrastructure/ui/fit-controls';
 import { MergeControls } from '../../src/infrastructure/ui/merge-controls';
 import { LinesControls } from '../../src/infrastructure/ui/lines-controls';
 import { SortControls } from '../../src/infrastructure/ui/sort-controls';
+import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-store';
 import { errorOf, valueOf } from '../support/application/game-use-cases';
 import { RecordingLogger } from '../support/application/recording-logger';
 import { BOARD_ID } from '../support/engine/entity-ids';
+import { MATCH_ID } from '../support/engine/match-id';
 import { withGeometryOf } from '../support/engine/geometry-of';
 import { ManualClock } from '../support/engine/manual-clock';
 import { firstMoveOf } from '../support/engine/variant-game';
@@ -298,11 +302,19 @@ describe('CompositionRoot', () => {
   // it to the `ApplyMove` of every game. The first Fit level of a figure ends with a victory
   // after two moves, so each game records one `GameOver`. The Fit games of the hexagon and of
   // the square have two `ApplyMove` over two repositories, and both publish to the same bus.
+  // Issue #363: the listener saves the counters of the achievements through one
+  // `LocalAchievementCounterRepository` over the local store of the drivers, so a goal of Sort
+  // that the listener hears reaches that store.
   it('should_give_one_bus_with_the_counter_listener_to_every_apply_move_when_the_root_wires_the_games', async () => {
     const subscribe = jest.spyOn(GameEventBus.prototype, 'subscribe');
     const publish = jest.spyOn(GameEventBus.prototype, 'publish');
     try {
-      const root = testRoot();
+      const store = new InMemoryKeyValueStore();
+      const root = new CompositionRoot({
+        clock: new ManualClock(),
+        logger: new RecordingLogger(),
+        store,
+      });
 
       for (const figure of [TopologyId.hex, TopologyId.square]) {
         const { startGame, applyMove } = root.gameUseCases(GameId.of('hexa-fit'), figure);
@@ -323,9 +335,32 @@ describe('CompositionRoot', () => {
       expect(publish).toHaveBeenCalledTimes(2);
       expect(publish.mock.contexts).toEqual([bus, bus]);
       expect(publish.mock.contexts.every((context) => context === bus)).toBe(true);
+      const listener = subscribe.mock.calls[0][0] as AchievementCounterListener;
+      listener.onEvent(new StackCleared(GameId.of('hexa-sort'), MATCH_ID, 0, TileCount.of(6)));
+      await listener.saved();
+      await expect(store.get('achievement-counters:hexa-sort')).resolves.toBe(
+        '{"version":1,"best":0,"total":1}',
+      );
     } finally {
       subscribe.mockRestore();
       publish.mockRestore();
+    }
+  });
+
+  // Issue #363: a root with no local store has no place to save the counters,
+  // so it subscribes no counter listener. Its bus still takes the events of every move.
+  it('should_subscribe_no_counter_listener_when_the_root_has_no_local_store', async () => {
+    const subscribe = jest.spyOn(GameEventBus.prototype, 'subscribe');
+    try {
+      const root = testRoot();
+      const { startGame, applyMove } = root.gameUseCases(GameId.of('hexa-lines'));
+      valueOf(await startGame.execute({}));
+
+      valueOf(await applyMove.execute({ move: firstMoveIn(root, GameId.of('hexa-lines')) }));
+
+      expect(subscribe).not.toHaveBeenCalled();
+    } finally {
+      subscribe.mockRestore();
     }
   });
 
