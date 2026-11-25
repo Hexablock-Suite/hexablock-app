@@ -64,7 +64,7 @@
       <h1>Presenting a game: presenter, view model, state mapper and board</h1>
 
       <svg
-        viewBox="0 0 1040 1421"
+        viewBox="0 0 1040 1453"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="adpresenter-title adpresenter-desc"
@@ -197,7 +197,7 @@
           x="400"
           y="60"
           width="600"
-          height="388"
+          height="404"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -281,9 +281,9 @@
           stroke-width="1"
           marker-end="url(#adpresenter-open)"
         />
-        <!-- BoardView reads GameViewModel: use, down from layer 4 to layer 3 -->
+        <!-- GameScreen, with the GameStage that it renders, reads GameViewModel: use, down from layer 4 to layer 3. BoardView receives only the cells -->
         <path
-          d="M664 184 H1000 Q1008 184 1008 192 V568 Q1008 576 1000 576 H888 Q880 576 880 584 V620"
+          d="M352 192 H376 Q384 192 384 200 V512 Q384 520 392 520 H1000 Q1008 520 1008 528 V568 Q1008 576 1000 576 H888 Q880 576 880 584 V620"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -302,9 +302,9 @@
         <!-- BoardView keeps the BoardLayout of the figure: use with role and multiplicity -->
         <line
           x1="544"
-          y1="232"
+          y1="248"
           x2="544"
-          y2="256"
+          y2="272"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adpresenter-open)"
@@ -312,9 +312,9 @@
         <!-- HexLayout implements BoardLayout: realization with binding -->
         <line
           x1="496"
-          y1="392"
+          y1="408"
           x2="496"
-          y2="344"
+          y2="360"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -323,9 +323,9 @@
         <!-- SquareLayout implements BoardLayout: realization with binding -->
         <line
           x1="656"
-          y1="392"
+          y1="408"
           x2="656"
-          y2="344"
+          y2="360"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -334,9 +334,9 @@
         <!-- TriangleLayout implements BoardLayout: realization with binding -->
         <line
           x1="816"
-          y1="392"
+          y1="408"
           x2="816"
-          y2="344"
+          y2="360"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -367,7 +367,7 @@
           x1="72"
           y1="768"
           x2="72"
-          y2="724"
+          y2="740"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -420,7 +420,7 @@
           x1="252"
           y1="972"
           x2="252"
-          y2="724"
+          y2="740"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -438,7 +438,7 @@
         />
         <!-- MergeStateMapper implements StateMapper: realization with binding -->
         <path
-          d="M200 890 H238 V724"
+          d="M200 890 H238 V740"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -483,10 +483,10 @@
         >
           BUILDS
         </text>
-        <rect x="78" y="730" width="152" height="24" rx="2" fill="#e2ebf8" />
+        <rect x="78" y="742" width="152" height="24" rx="2" fill="#e2ebf8" />
         <text
           x="154"
-          y="739"
+          y="751"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -497,7 +497,7 @@
         </text>
         <text
           x="154"
-          y="750"
+          y="762"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -507,10 +507,10 @@
           TPayloadView → undefined
         </text>
 
-        <rect x="499" y="358" width="74" height="24" rx="2" fill="#cfdcf3" />
+        <rect x="499" y="374" width="74" height="24" rx="2" fill="#cfdcf3" />
         <text
           x="536"
-          y="367"
+          y="383"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -521,7 +521,7 @@
         </text>
         <text
           x="536"
-          y="378"
+          y="394"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -530,10 +530,10 @@
         >
           → HexCoord
         </text>
-        <rect x="662" y="358" width="76" height="24" rx="2" fill="#cfdcf3" />
+        <rect x="662" y="374" width="76" height="24" rx="2" fill="#cfdcf3" />
         <text
           x="700"
-          y="367"
+          y="383"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -544,7 +544,7 @@
         </text>
         <text
           x="700"
-          y="378"
+          y="394"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -553,10 +553,10 @@
         >
           → SquareCoord
         </text>
-        <rect x="822" y="358" width="76" height="24" rx="2" fill="#cfdcf3" />
+        <rect x="822" y="374" width="76" height="24" rx="2" fill="#cfdcf3" />
         <text
           x="860"
-          y="367"
+          y="383"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -567,7 +567,7 @@
         </text>
         <text
           x="860"
-          y="378"
+          y="394"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -588,10 +588,10 @@
           renderer
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="548" y="238" width="44" height="12" rx="2" fill="#cfdcf3" />
+        <rect x="548" y="254" width="44" height="12" rx="2" fill="#cfdcf3" />
         <text
           x="550"
-          y="247"
+          y="263"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -877,7 +877,7 @@
           x="424"
           y="88"
           width="240"
-          height="144"
+          height="160"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -906,19 +906,22 @@
           src/infrastructure/board/board-view.tsx
         </text>
         <text x="440" y="160" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - cells: [TCoord, TCellView][]
+          + cells: [TCoord, TCellView][]
         </text>
         <text x="440" y="176" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - layout: BoardLayout&lt;TCoord&gt;
+          + layout: BoardLayout&lt;TCoord&gt;
         </text>
         <text x="440" y="192" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - renderer: CellRenderer&lt;TCellView&gt;
+          + renderer: CellRenderer&lt;TCellView&gt;
         </text>
         <text x="440" y="208" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - label: string
+          + label: string
         </text>
         <text x="440" y="224" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - onPressSpace: (at, cell) =&gt; void
+          + onPressSpace?: (at: TCoord,
+        </text>
+        <text x="451" y="240" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          cell: TCellView) =&gt; void
         </text>
         <!-- Class: CellRenderer (interface of the board Strategy, D3) -->
         <rect
@@ -963,7 +966,7 @@
         <!-- Class: BoardLayout (interface of the layout Strategy, D4 and D11) -->
         <rect
           x="424"
-          y="256"
+          y="272"
           width="464"
           height="88"
           rx="6"
@@ -971,10 +974,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="424" y1="300" x2="888" y2="300" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="424" y1="316" x2="888" y2="316" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="656"
-          y="274"
+          y="290"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -985,7 +988,7 @@
         </text>
         <text
           x="656"
-          y="292"
+          y="308"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -994,19 +997,19 @@
         >
           BoardLayout
         </text>
-        <text x="440" y="313" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="440" y="329" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + cellSize(): number
         </text>
-        <text x="440" y="326" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="440" y="342" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + centerOf(at: TCoord): ScreenPoint
         </text>
-        <text x="440" y="339" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="440" y="355" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + outlineOf(at: TCoord): ScreenPoint[]
         </text>
         <!-- Class: HexLayout (the layout of the hexagon figure) -->
         <rect
           x="424"
-          y="392"
+          y="408"
           width="144"
           height="40"
           rx="6"
@@ -1016,7 +1019,7 @@
         />
         <text
           x="496"
-          y="417"
+          y="433"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1028,7 +1031,7 @@
         <!-- Class: SquareLayout (the layout of the square figure) -->
         <rect
           x="584"
-          y="392"
+          y="408"
           width="144"
           height="40"
           rx="6"
@@ -1038,7 +1041,7 @@
         />
         <text
           x="656"
-          y="417"
+          y="433"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1050,7 +1053,7 @@
         <!-- Class: TriangleLayout (the layout of the triangle figure) -->
         <rect
           x="744"
-          y="392"
+          y="408"
           width="144"
           height="40"
           rx="6"
@@ -1060,7 +1063,7 @@
         />
         <text
           x="816"
-          y="417"
+          y="433"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1191,7 +1194,7 @@
           x="44"
           y="620"
           width="236"
-          height="104"
+          height="120"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1227,7 +1230,10 @@
           + freeView(): TCellView
         </text>
         <text x="60" y="716" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + toPayload(p: TView): TPayloadView
+          + toPayload(payload: TView):
+        </text>
+        <text x="71" y="732" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          TPayloadView
         </text>
 
         <!-- Class: SpaceStateMapper (the default state mapper of the registry, #170) -->
@@ -1588,7 +1594,7 @@
         </text>
         <rect
           x="856"
-          y="246"
+          y="262"
           width="44"
           height="18"
           rx="2"
@@ -1599,7 +1605,7 @@
         />
         <text
           x="878"
-          y="258"
+          y="274"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1771,19 +1777,39 @@
           FigureStone and FigureSelector draw the origin cell of a figure, which
           CompositionRoot.figureShape() gives from its BoardLayout, with CellOutline (#297).
         </text>
+        <text
+          x="24"
+          y="1300"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          The GameScreen box stands for the route and the GameStage that it renders: GameStage holds
+          presenter and controls, reads GameViewModel and renders BoardView.
+        </text>
+        <text
+          x="24"
+          y="1316"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          BoardView receives only the cells of GameViewModel, and its five props are public and
+          read-only.
+        </text>
 
         <!-- Legend -->
         <line
           x1="24"
-          y1="1308"
+          y1="1340"
           x2="1016"
-          y2="1308"
+          y2="1340"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1326"
+          y="1358"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1794,9 +1820,9 @@
 
         <line
           x1="24"
-          y1="1344"
+          y1="1376"
           x2="52"
-          y2="1344"
+          y2="1376"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -1804,7 +1830,7 @@
         />
         <text
           x="60"
-          y="1348"
+          y="1380"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1813,16 +1839,16 @@
         </text>
         <line
           x1="144"
-          y1="1344"
+          y1="1376"
           x2="172"
-          y2="1344"
+          y2="1376"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adpresenter-open)"
         />
         <text
           x="180"
-          y="1348"
+          y="1380"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1832,7 +1858,7 @@
 
         <rect
           x="24"
-          y="1364"
+          y="1396"
           width="28"
           height="12"
           rx="2"
@@ -1842,7 +1868,7 @@
         />
         <text
           x="60"
-          y="1373"
+          y="1405"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1851,7 +1877,7 @@
         </text>
         <rect
           x="184"
-          y="1364"
+          y="1396"
           width="28"
           height="12"
           rx="2"
@@ -1861,7 +1887,7 @@
         />
         <text
           x="220"
-          y="1373"
+          y="1405"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1870,7 +1896,7 @@
         </text>
         <rect
           x="344"
-          y="1364"
+          y="1396"
           width="28"
           height="12"
           rx="2"
@@ -1880,7 +1906,7 @@
         />
         <text
           x="380"
-          y="1373"
+          y="1405"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1889,7 +1915,7 @@
         </text>
         <rect
           x="504"
-          y="1364"
+          y="1396"
           width="28"
           height="12"
           rx="2"
@@ -1900,7 +1926,7 @@
         />
         <text
           x="540"
-          y="1373"
+          y="1405"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1909,7 +1935,7 @@
         </text>
         <rect
           x="744"
-          y="1364"
+          y="1396"
           width="28"
           height="12"
           rx="2"
@@ -1920,7 +1946,7 @@
         />
         <text
           x="780"
-          y="1373"
+          y="1405"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1930,7 +1956,7 @@
 
         <rect
           x="24"
-          y="1388"
+          y="1420"
           width="28"
           height="12"
           rx="2"
@@ -1941,7 +1967,7 @@
         />
         <text
           x="60"
-          y="1398"
+          y="1430"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1950,7 +1976,7 @@
         </text>
         <rect
           x="280"
-          y="1388"
+          y="1420"
           width="28"
           height="12"
           rx="2"
@@ -1960,7 +1986,7 @@
         />
         <text
           x="316"
-          y="1398"
+          y="1430"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
