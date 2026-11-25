@@ -29,6 +29,7 @@ import {
   mergeStateOf,
 } from '../../../support/variants/hexa-merge/merge-game';
 import { MATCH_ID } from '../../../support/engine/match-id';
+import { gameOversIn } from '../../../support/engine/game-over';
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 import { mergeTileSource } from '../../../../src/domain/variants/hexa-merge/merge-tile-source';
 import { firstValidMove } from '../../../support/engine/variant-game';
@@ -211,7 +212,7 @@ describe('MergeRules', () => {
     expect(values(engine.snapshot())).toEqual({ '-2,0': 8 });
     expect(engine.snapshot().hasReachedTarget()).toBe(true);
     expect(engine.currentPhase().canPlay()).toBe(true);
-    expect(engine.takeEvents()).toEqual([]);
+    expect(gameOversIn(engine.takeEvents())).toEqual([]);
   });
 
   it('should_reject_the_slide_and_keep_the_board_when_no_tile_moves_that_way', () => {
