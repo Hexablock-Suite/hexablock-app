@@ -4,7 +4,7 @@
 
 The log below names the tool of every task. Three setups appear in it:
 
-- **Claude Code.** The parent sessions that direct the work and their `odd-worker` writing subagent hold most of the rows of the log. The rows of 2026-10-24 to 2026-11-08 record Claude Code without a model name; since the row of 2026-11-09 the log names the models: Claude Fable 5.2 directs the session, and Claude Opus 5.5 writes the code and the documents as its `odd-worker` subagent, in about 30 rows.
+- **Claude Code.** The parent sessions that direct the work and their `odd-worker` writing subagent hold most of the rows of the log. The log names Claude Opus 5.5 from the row of 2026-11-06 on; from the row of 2026-11-09 on, Claude Fable 5.2 directs the session and Claude Opus 5.5 writes the code and the documents as its `odd-worker` subagent, a pattern of about 30 rows.
 - **OpenCode.** OpenCode with GLM-5.3-Flash implemented the /v1 route prefix of the API (#346, row of 2026-11-23).
 - **Pi.** Pi implemented three board issues on 2026-11-24 and widened the determinism lint rule (#324, the note below the table).
 
