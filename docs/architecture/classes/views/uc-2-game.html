@@ -76,9 +76,10 @@
           the GameRepository output port, which holds at most one GameEngine; StartGame asks its
           GameFactories output port for the GameFactory of the level of the request and asks that
           GameFactory for the started game, and ApplyMove plays the move on the GameEngine of layer
-          1, delivers the events that the engine records to the GameEventPublisher port and passes a
-          publisher failure to the Logger port; each use case answers with a plain MoveResult, and
-          UndoMove and RedoMove ask the root offersUndo(), canUndo(), undo(), canRedo() and redo().
+          1 and delivers the events that the engine records to the GameEventPublisher port; its
+          MoveResult carries each failed delivery in failedDeliveries; each use case answers with a
+          plain MoveResult, and UndoMove and RedoMove ask the root offersUndo(), canUndo(), undo(),
+          canRedo() and redo().
         </desc>
         <defs>
           <marker
@@ -274,7 +275,7 @@
         />
         <!-- ApplyMove calls GameEngine.tryPlay(): use -->
         <path
-          d="M688 828 V916 Q688 924 680 924 H424"
+          d="M688 812 V916 Q688 924 680 924 H424"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -591,7 +592,7 @@
           x="632"
           y="672"
           width="328"
-          height="156"
+          height="140"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -637,16 +638,13 @@
           - games: GameRepository&lt;TCell, TCoord, TMove, TState&gt;
         </text>
         <text x="648" y="764" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - logger: Logger
-        </text>
-        <text x="648" y="780" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - events: GameEventPublisher
         </text>
-        <line x1="632" y1="788" x2="960" y2="788" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
-        <text x="648" y="804" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="632" y1="772" x2="960" y2="772" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <text x="648" y="788" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + execute(request: ApplyMoveRequest&lt;TMove&gt;):
         </text>
-        <text x="664" y="820" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="664" y="804" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Promise&lt;Result&lt;MoveResult&lt;TCell, TCoord&gt;&gt;&gt;
         </text>
 
@@ -1004,7 +1002,8 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           After the turn, ApplyMove takes the events that GameEngine records and delivers each one
-          to its GameEventPublisher port (#233).
+          to its GameEventPublisher port (#233). A failed delivery goes into
+          MoveResult.failedDeliveries (#342).
         </text>
 
         <!-- Legend -->

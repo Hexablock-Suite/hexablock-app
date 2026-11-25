@@ -43,9 +43,8 @@ import {
   MemoryGameRepository,
   valueOf,
 } from '../support/application/game-use-cases';
-import { RecordingLogger } from '../support/application/recording-logger';
 import { RecordingPublisher } from '../support/application/recording-publisher';
-import type { UseCaseLogEntry } from '../../src/application/logger';
+import { UseCaseError } from '../../src/application/result';
 import { fakeCell, type FakeCell } from '../support/engine/fake-cell';
 import {
   emptyState,
@@ -116,13 +115,6 @@ class PhaseReadingPublisher implements GameEventPublisher {
   publish(event: GameEvent): void {
     const phase = this.games?.running().currentPhase();
     this.received.push([dataOf(event), phase === undefined ? 'none' : phaseNameOf(phase)]);
-  }
-}
-
-// A logger that fails on every entry.
-class BrokenLogger extends RecordingLogger {
-  override log(_entry: UseCaseLogEntry): void {
-    throw new Error('The log is down.');
   }
 }
 
@@ -383,12 +375,9 @@ describe('StartGame and ApplyMove', () => {
   it('should_deliver_one_game_over_with_the_id_of_the_generator_after_the_turn_when_apply_move_plays_the_last_move', async () => {
     const publisher = new PhaseReadingPublisher();
     const factory = fitFactory();
-    const { games, startGame, applyMove } = gameUseCases(
-      factory,
-      publisher,
-      new RecordingLogger(),
-      { next: () => MATCH_ID },
-    );
+    const { games, startGame, applyMove } = gameUseCases(factory, publisher, {
+      next: () => MATCH_ID,
+    });
     publisher.watch(games);
     valueOf(await startGame.execute({}));
     const move = firstMoveOf(factory);
@@ -454,11 +443,7 @@ describe('StartGame and ApplyMove', () => {
   });
 
   it('should_return_a_move_failed_failure_when_the_repository_throws_on_current', async () => {
-    const applyMove = new ApplyMove(
-      new ThrowingRepository('current'),
-      new RecordingLogger(),
-      new RecordingPublisher(),
-    );
+    const applyMove = new ApplyMove(new ThrowingRepository('current'), new RecordingPublisher());
 
     const error = errorOf(
       await applyMove.execute({ move: new PlacePiece(TrayPosition.of(0), square(0, 0)) }),
@@ -530,17 +515,19 @@ describe('StartGame and ApplyMove', () => {
   });
 
   // The engine saves the turn before it publishes, so the answer shows the saved turn
-  // and the publisher failure goes to the log (issue 132, G117.2, classes.md decision 29).
-  it('should_return_the_saved_turn_and_log_the_publisher_failure_when_the_publisher_throws_after_the_turn_is_saved', async () => {
+  // and carries the publisher failure as a failed delivery (issues 132 and #342, G117.2,
+  // classes.md decision 29). `ApplyMove` takes no logger: `LoggingAspect` writes the log.
+  it('should_return_the_saved_turn_with_one_publish_failed_delivery_when_the_publisher_throws_after_the_turn_is_saved', async () => {
     const factory = fitFactory();
-    const { games, logger, startGame, applyMove } = gameUseCases(factory, new ThrowingPublisher());
+    const { games, startGame, applyMove } = gameUseCases(factory, new ThrowingPublisher());
     valueOf(await startGame.execute({}));
     const move = firstMoveOf(factory);
 
     const played = valueOf(await applyMove.execute({ move }));
 
     const saved = games.running().snapshot();
-    expect({ ...played, payload: viewData(played.payload) }).toEqual({
+    const { failedDeliveries, ...turn } = played;
+    expect({ ...turn, payload: viewData(turn.payload) }).toEqual({
       cells: saved.boardCopy().occupiedCells(),
       freeSpaces: saved.boardCopy().freeSpaces(),
       score: saved.scoreSoFar(),
@@ -553,34 +540,37 @@ describe('StartGame and ApplyMove', () => {
     });
     expect(saved.boardCopy().occupiedCells()).not.toEqual([]);
     expect(games.running().currentPhase()).toBe(VictoryPhase.instance);
-    expect(logger.entries).toHaveLength(1);
-    const [entry] = logger.entries;
-    expect([entry.useCase, entry.outcome, entry.error?.code, entry.error?.message]).toEqual([
-      'ApplyMove',
-      'failure',
+    expect(failedDeliveries).toHaveLength(1);
+    const [failed] = failedDeliveries ?? [];
+    expect(failed).toBeInstanceOf(UseCaseError);
+    expect([failed?.code, failed?.message, failed?.retryable]).toEqual([
       'publish-failed',
       'The event bus is down.',
+      false,
     ]);
-    expect(entry.error?.cause).toEqual(new Error('The event bus is down.'));
+    expect(failed?.cause).toEqual(new Error('The event bus is down.'));
+    expect(Object.isFrozen(failedDeliveries)).toBe(true);
   });
 
-  // The answer tells what the engine saved, so a logger that throws cannot turn it into
-  // move-failed (decision 29). A logging aspect around the call reports the broken logger.
-  it('should_return_the_saved_turn_when_the_logger_throws_after_a_publisher_failure', async () => {
+  // A turn whose events all reach the publisher keeps the fields of decision 29 and no other.
+  it('should_return_a_move_result_with_no_failed_deliveries_field_when_the_publisher_takes_every_event', async () => {
     const factory = fitFactory();
-    const { games, startGame, applyMove } = gameUseCases(
-      factory,
-      new ThrowingPublisher(),
-      new BrokenLogger(),
-    );
+    const { startGame, applyMove } = gameUseCases(factory, new RecordingPublisher());
     valueOf(await startGame.execute({}));
-    const move = firstMoveOf(factory);
 
-    const played = valueOf(await applyMove.execute({ move }));
+    const played = valueOf(await applyMove.execute({ move: firstMoveOf(factory) }));
 
-    expect(played.outcome).toBe(Outcome.victory);
-    expect(played.cells).toEqual(games.running().snapshot().boardCopy().occupiedCells());
-    expect(games.running().currentPhase()).toBe(VictoryPhase.instance);
+    expect(Object.keys(played).sort()).toEqual([
+      'canRedo',
+      'canUndo',
+      'cells',
+      'elapsedMs',
+      'freeSpaces',
+      'hasUndo',
+      'outcome',
+      'payload',
+      'score',
+    ]);
   });
 
   it('should_answer_the_next_move_as_a_finished_game_does_when_the_publisher_threw_on_the_last_turn', async () => {
@@ -595,7 +585,7 @@ describe('StartGame and ApplyMove', () => {
     ]);
   });
 
-  it('should_return_a_move_failed_failure_and_log_nothing_when_the_rules_throw_before_the_turn_is_saved', async () => {
+  it('should_return_a_move_failed_failure_and_publish_nothing_when_the_rules_throw_before_the_turn_is_saved', async () => {
     const games = new MemoryGameRepository<FakeCell, SquareCoord, FakeMove, FakeState>();
     const publisher = new RecordingPublisher();
     const engine = new GameEngine(
@@ -606,10 +596,9 @@ describe('StartGame and ApplyMove', () => {
     );
     engine.start(emptyState());
     games.replace(engine);
-    const logger = new RecordingLogger();
 
     const error = errorOf(
-      await new ApplyMove(games, logger, publisher).execute({
+      await new ApplyMove(games, publisher).execute({
         move: { at: square(0, 0), cell: fakeCell(1) },
       }),
     );
@@ -624,7 +613,7 @@ describe('StartGame and ApplyMove', () => {
       Score.of(0),
       'playing',
     ]);
-    expect([logger.entries, publisher.events]).toEqual([[], []]);
+    expect(publisher.events).toEqual([]);
   });
 
   it('should_leave_the_engine_unchanged_when_a_caller_changes_the_cells_of_a_move_result', async () => {

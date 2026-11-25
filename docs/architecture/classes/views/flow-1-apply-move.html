@@ -74,11 +74,11 @@
           GamePresenter and reads GameViewModel. In layer 3, GamePresenter keeps the StateMapper
           strategy, builds GameViewModel and uses the UseCase input port; InMemoryGameRepository
           implements the GameRepository port. In layer 2, ApplyMove implements UseCase, takes an
-          ApplyMoveRequest, builds a MoveResult and keeps the GameRepository, Logger and
-          GameEventPublisher ports. In layer 1, ApplyMove plays the move on GameEngine, which keeps
-          the IGameRules strategy. ApplyMove then takes the events that GameEngine records and reads
-          the occupied cells and the free spaces of Board. Every dependency between layers points
-          down.
+          ApplyMoveRequest, builds a MoveResult and keeps the GameRepository and GameEventPublisher
+          ports; the MoveResult carries each failed delivery of the publisher in failedDeliveries.
+          In layer 1, ApplyMove plays the move on GameEngine, which keeps the IGameRules strategy.
+          ApplyMove then takes the events that GameEngine records and reads the occupied cells and
+          the free spaces of Board. Every dependency between layers points down.
         </desc>
         <defs>
           <marker
@@ -294,7 +294,7 @@
         />
         <!-- ApplyMove calls GameEngine.tryPlay() and snapshot(): use, down from layer 2 to layer 1 -->
         <path
-          d="M600 836 V904 Q600 912 608 912 H692 Q700 912 700 920 V928"
+          d="M600 820 V904 Q600 912 608 912 H692 Q700 912 700 920 V928"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -302,7 +302,7 @@
         />
         <!-- ApplyMove reads the cells of Board: use, down from layer 2 to layer 1 -->
         <path
-          d="M316 836 V904 Q316 912 308 912 H178 Q170 912 170 920 V928"
+          d="M316 820 V904 Q316 912 308 912 H178 Q170 912 170 920 V928"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -807,7 +807,7 @@
           x="300"
           y="680"
           width="328"
-          height="156"
+          height="140"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -853,16 +853,13 @@
           - games: GameRepository&lt;TCell, TCoord, TMove, TState&gt;
         </text>
         <text x="316" y="772" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - logger: Logger
-        </text>
-        <text x="316" y="788" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - events: GameEventPublisher
         </text>
-        <line x1="300" y1="796" x2="628" y2="796" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
-        <text x="316" y="812" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="300" y1="780" x2="628" y2="780" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <text x="316" y="796" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + execute(request: ApplyMoveRequest&lt;TMove&gt;):
         </text>
-        <text x="332" y="828" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="332" y="812" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Promise&lt;Result&lt;MoveResult&lt;TCell, TCoord&gt;&gt;&gt;
         </text>
         <!-- Class: MoveResult (value object, response model) -->
@@ -870,7 +867,7 @@
           x="40"
           y="652"
           width="210"
-          height="200"
+          height="216"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -925,6 +922,9 @@
         </text>
         <text x="56" y="844" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + elapsedMs?: ElapsedTime
+        </text>
+        <text x="56" y="860" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + failedDeliveries?: UseCaseError[]
         </text>
         <!-- Class: Board (engine; no role label of a pattern, decision 23) -->
         <rect
@@ -1428,7 +1428,8 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           After the turn, ApplyMove takes the events that GameEngine records and delivers each one
-          to its GameEventPublisher port (#233). A publisher failure only goes to the Logger port.
+          to its GameEventPublisher port (#233). A failed delivery goes into
+          MoveResult.failedDeliveries (#342).
         </text>
         <text
           x="24"

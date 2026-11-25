@@ -53,6 +53,29 @@ describe('ConsoleLogger', () => {
     expect(sink.lines).toEqual(['UndoMove: failure no-undo (The variant has no undo.) in 3 ms']);
   });
 
+  // A success can carry failed deliveries (issue #342). The line shows each one after the outcome.
+  it('should_write_each_failed_delivery_after_the_outcome_when_the_entry_holds_failed_deliveries', () => {
+    const sink = new RecordingSink();
+    const failedDeliveries = [
+      new UseCaseError('publish-failed', 'The event bus is down.'),
+      new UseCaseError('publish-failed', 'The event bus is still down.'),
+    ];
+
+    new ConsoleLogger(sink).log(logEntryOf('ApplyMove', Result.success({ failedDeliveries })));
+    new ConsoleLogger(sink).log({
+      useCase: 'ApplyMove',
+      outcome: 'success',
+      elapsedMs: 4,
+      failedDeliveries: [failedDeliveries[0]],
+    });
+
+    expect(sink.lines).toEqual([
+      'ApplyMove: success, failed delivery publish-failed (The event bus is down.)' +
+        ', failed delivery publish-failed (The event bus is still down.)',
+      'ApplyMove: success, failed delivery publish-failed (The event bus is down.) in 4 ms',
+    ]);
+  });
+
   it('should_write_to_the_console_when_no_sink_is_given', () => {
     const info = jest.spyOn(console, 'info').mockImplementation(() => undefined);
 
