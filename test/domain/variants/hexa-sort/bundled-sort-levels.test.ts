@@ -2,8 +2,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { HexGeometry } from '../../../../src/domain/engine/hex-geometry';
-import { hex, type HexCoord } from '../../../../src/domain/engine/hex-topology';
+import type { GeometryFactory } from '../../../../src/domain/engine/geometry-factory';
 import { LevelDefinition } from '../../../../src/domain/engine/level-definition';
 import { Moves } from '../../../../src/domain/engine/moves';
 import { Outcome } from '../../../../src/domain/engine/outcome';
@@ -13,6 +12,7 @@ import { PlaceStack } from '../../../../src/domain/variants/hexa-sort/place-stac
 import { SortFactory } from '../../../../src/domain/variants/hexa-sort/sort-factory';
 import type { SortLevel } from '../../../../src/domain/variants/hexa-sort/sort-level';
 import { SortLevelBuilder } from '../../../../src/domain/variants/hexa-sort/sort-level-builder';
+import { withGeometryOf } from '../../../support/engine/geometry-of';
 import { startVariant } from '../../../support/engine/variant-game';
 import { repoRoot } from '../../../support/run-tool';
 import { names } from '../../../support/variants/hexa-sort/sort-game';
@@ -21,9 +21,58 @@ import { sortLevelFile } from '../../../support/variants/hexa-sort/sort-level-fi
 // The bundled Sort levels (issue #167, APP-FR-05, A4). Each file follows the shared level format
 // of hexablock-api `docs/level-format.md`. The test reads every file of the folder,
 // so a new level file joins the test with no change here.
+// Since #354 the folder also holds levels on the square and on the triangle. Each test reads
+// a file through the geometry of the figure that its `topology` names. Each new level gives
+// a fixed list of stacks, because #352 and #353 change the seeded stacks.
 
 const folder = path.join(repoRoot, 'src/adapters/levels/sort');
-const geometry = new HexGeometry();
+
+// The figures of the bundled levels: the prefix of the level ids of each figure, the least count
+// of levels on it, the count of cells of a board of radius r, and three cells of that board
+// where no two cells are neighbors. APP-FR-05 asks for 10 Sort levels, and the hexagon holds them.
+// The square and the triangle hold 3 levels each (decision of #354). Their regions grow
+// from a corner: the radius r gives a side of r + 1 squares, or of r + 1 pairs of triangles.
+const FIGURES: readonly {
+  readonly topology: string;
+  readonly prefix: string;
+  readonly least: number;
+  readonly cells: (radius: number) => number;
+  readonly apart: readonly (readonly [number, number])[];
+}[] = [
+  {
+    topology: 'hex',
+    prefix: 'sort-',
+    least: 10,
+    cells: (r) => 3 * r * (r + 1) + 1,
+    apart: [
+      [0, 0],
+      [2, 0],
+      [-2, 0],
+    ],
+  },
+  {
+    topology: 'square',
+    prefix: 'sort-square-',
+    least: 3,
+    cells: (r) => (r + 1) ** 2,
+    apart: [
+      [0, 0],
+      [2, 0],
+      [0, 2],
+    ],
+  },
+  {
+    topology: 'triangle',
+    prefix: 'sort-triangle-',
+    least: 3,
+    cells: (r) => 2 * (r + 1) ** 2,
+    apart: [
+      [0, 0],
+      [2, 0],
+      [4, 0],
+    ],
+  },
+];
 
 // The fields of the level file, as the file writes them.
 type SourceEntry = { seed: number; colors: string[] } | { stacks: string[][] };
@@ -49,20 +98,72 @@ function bundledFiles(): [string, LevelFile][] {
     .map((name) => [name, JSON.parse(readFileSync(path.join(folder, name), 'utf8')) as LevelFile]);
 }
 
-function built(file: LevelFile): SortLevel {
+function built<TCoord>(file: LevelFile, geometry: GeometryFactory<TCoord>): SortLevel {
   return LevelDefinition.of(file).buildWith(new SortLevelBuilder(geometry));
 }
 
-// The offered stack of a new game of `factory`, at the start and after each of three placements.
+// The figure of the topology of `file`.
+function figureOf(file: LevelFile): (typeof FIGURES)[number] {
+  const figure = FIGURES.find(({ topology }) => topology === file.topology);
+  if (figure === undefined) throw new RangeError(`No figure has the topology ${file.topology}.`);
+  return figure;
+}
+
+// The topology of each bundled file, once each, in the order of the names.
+const topologiesOf = (files: [string, LevelFile][]) => [
+  ...new Set(files.map(([, file]) => file.topology)),
+];
+
+// The offered stack of a new game of the level of `file`, at the start and after each
+// of three placements, for each of two games that start from one built level.
 // No two of the three cells are neighbors, so no run moves and no stack clears.
-function offeredInGame(factory: SortFactory<HexCoord>): string[][] {
-  const { engine } = startVariant(factory);
-  const offered = [names(engine.snapshot().offeredStack()?.occupant())];
-  for (const at of [hex(0, 0), hex(2, 0), hex(-2, 0)]) {
-    engine.play(PlaceStack.on(at));
-    offered.push(names(engine.snapshot().offeredStack()?.occupant()));
-  }
-  return offered;
+function offeredInTwoGames(file: LevelFile): string[][][] {
+  return withGeometryOf(file.topology, {
+    use: (geometry) => {
+      const factory = new SortFactory(geometry, built(file, geometry));
+      return [0, 1].map(() => {
+        const { engine } = startVariant(factory);
+        const offered = [names(engine.snapshot().offeredStack()?.occupant())];
+        for (const at of figureOf(file).apart) {
+          engine.play(PlaceStack.on(geometry.createCoord([...at])));
+          offered.push(names(engine.snapshot().offeredStack()?.occupant()));
+        }
+        return offered;
+      });
+    },
+  });
+}
+
+// The first photo of a new game of the level of `file`: the count of cells of its board,
+// whether its goal is the goal of the file, and the names of the offered stack.
+function firstPhoto(file: LevelFile): { cells: number; goal: boolean; offered: string[] } {
+  return withGeometryOf(file.topology, {
+    use: (geometry) => {
+      const { engine } = startVariant(new SortFactory(geometry, built(file, geometry)));
+      const photo = engine.snapshot();
+      return {
+        cells: photo.boardCopy().coordinates().length,
+        goal: photo.goal().equals(GoalCount.of(file.section.goals)),
+        offered: names(photo.offeredStack()?.occupant()),
+      };
+    },
+  });
+}
+
+// The outcomes of the placements of `plan` in a new game of the level of `file`,
+// and the stars of a play with as many moves as the plan.
+function planPlay(
+  file: LevelFile,
+  plan: readonly (readonly [number, number])[],
+): { outcomes: Outcome[]; stars: Stars } {
+  return withGeometryOf(file.topology, {
+    use: (geometry) => {
+      const level = built(file, geometry);
+      const { engine } = startVariant(new SortFactory(geometry, level));
+      const outcomes = plan.map((at) => engine.play(PlaceStack.on(geometry.createCoord([...at]))));
+      return { outcomes, stars: level.starsFor(Moves.of(plan.length), undefined) };
+    },
+  });
 }
 
 // The cells where a player places the stacks of each fixed level, one cell for each move.
@@ -154,6 +255,54 @@ const PLANS: Readonly<Record<string, readonly [number, number][]>> = {
     [-2, 0],
     [-2, 2],
   ],
+  // Square: the three red runs make one stack of 10 red tiles.
+  'sort-square-01.json': [
+    [0, 0],
+    [1, 0],
+    [0, 1],
+  ],
+  // Square: a tie of two red runs goes to the cell (0, 0), and the blue run below joins the blue stack.
+  'sort-square-02.json': [
+    [0, 0],
+    [2, 0],
+    [1, 0],
+    [2, 1],
+  ],
+  // Square: red clears first, then blue and green. The yellow tiles are a decoy.
+  'sort-square-03.json': [
+    [0, 0],
+    [2, 0],
+    [0, 1],
+    [1, 0],
+    [2, 2],
+    [1, 1],
+    [2, 1],
+    [1, 2],
+  ],
+  // Triangle: the three red runs make one stack of 10 red tiles.
+  'sort-triangle-01.json': [
+    [2, 0],
+    [1, 0],
+    [3, 0],
+  ],
+  // Triangle: a tie of two red runs goes to the cell (2, 0), and the blue run below joins the blue stack.
+  'sort-triangle-02.json': [
+    [2, 0],
+    [4, 0],
+    [3, 0],
+    [4, 1],
+  ],
+  // Triangle: red clears first, then blue and green. The yellow tiles are a decoy.
+  'sort-triangle-03.json': [
+    [2, 0],
+    [4, 0],
+    [2, 1],
+    [3, 0],
+    [7, 2],
+    [3, 1],
+    [4, 1],
+    [3, 2],
+  ],
 };
 
 // The fields of each object of the format, in the order of its table.
@@ -182,16 +331,24 @@ const isSource = (value: unknown) => {
 };
 
 describe('bundled Sort levels', () => {
-  it('should_hold_ten_levels_or_more_in_the_order_of_their_ids_when_the_folder_is_read', () => {
+  // Each figure numbers its levels from 1, and the id of a level names its figure (#354).
+  // So a new level of one figure moves no id of another figure: an id is the key of a saved
+  // result (classes.md decision 57). The test groups the files by `topology`, so an id
+  // whose prefix names another figure fails it.
+  it('should_number_the_levels_of_each_figure_from_one_in_the_order_of_their_ids_when_the_folder_is_read', () => {
     const files = bundledFiles();
 
-    expect(files.length).toBeGreaterThanOrEqual(10);
-    expect(files.map(([name, file]) => [name, file.levelId, file.order])).toEqual(
-      files.map((_, index) => {
-        const id = `sort-${String(index + 1).padStart(2, '0')}`;
-        return [`${id}.json`, id, index + 1];
-      }),
-    );
+    expect(topologiesOf(files)).toEqual(FIGURES.map(({ topology }) => topology));
+    for (const { topology, prefix, least } of FIGURES) {
+      const group = files.filter(([, file]) => file.topology === topology);
+      expect([topology, group.length >= least]).toEqual([topology, true]);
+      expect(group.map(([name, file]) => [name, file.levelId, file.order])).toEqual(
+        group.map((_, index) => {
+          const id = `${prefix}${String(index + 1).padStart(2, '0')}`;
+          return [`${id}.json`, id, index + 1];
+        }),
+      );
+    }
   });
 
   // The format document: each object holds exactly the fields of its table, each list holds
@@ -204,7 +361,7 @@ describe('bundled Sort levels', () => {
         hasFields(file, LEVEL_FIELDS) || 'level fields',
         file.gameId === 'hexa-sort' || 'gameId',
         (isWhole(file.version) && file.version >= 1) || 'version',
-        file.topology === 'hex' || 'topology',
+        FIGURES.some(({ topology }) => topology === file.topology) || 'topology',
         hasFields(section, SECTION_FIELDS) || 'section fields',
         (isWhole(section.radius) && section.radius >= 1) || 'radius',
         (isWhole(section.goals) && section.goals >= 1) || 'goals',
@@ -229,26 +386,22 @@ describe('bundled Sort levels', () => {
     expect(first).toEqual(sortLevelFile());
   });
 
-  // On hex, the board of radius r holds 3r(r + 1) + 1 cells. A fixed level offers its first
-  // stack first, and a seeded level offers one tile of one of its colors (decision 47).
+  // On hex, the board of radius r holds 3r(r + 1) + 1 cells, on the square (r + 1)² cells
+  // and on the triangle 2(r + 1)² cells. A fixed level offers its first stack first,
+  // and a seeded level offers one tile of one of its colors (decision 47).
   it('should_start_each_level_with_its_board_its_goal_and_its_first_stack_when_the_sort_factory_builds_it', () => {
     for (const [name, file] of bundledFiles()) {
-      const { radius, goals, source } = file.section;
-      const { engine } = startVariant(new SortFactory(geometry, built(file)));
+      const { radius, source } = file.section;
 
-      const photo = engine.snapshot();
+      const { cells, goal, offered } = firstPhoto(file);
 
-      const offered = names(photo.offeredStack()?.occupant());
       const [tile] = offered;
       const firstStack =
         'stacks' in source
           ? offered.join() === source.stacks[0]?.join()
           : offered.length === 1 && tile !== undefined && source.colors.includes(tile);
-      expect([name, photo.boardCopy().coordinates().length]).toEqual([
-        name,
-        3 * radius * (radius + 1) + 1,
-      ]);
-      expect([name, photo.goal().equals(GoalCount.of(goals))]).toEqual([name, true]);
+      expect([name, cells]).toEqual([name, figureOf(file).cells(radius)]);
+      expect([name, goal]).toEqual([name, true]);
       expect([name, firstStack]).toEqual([name, true]);
     }
   });
@@ -259,10 +412,7 @@ describe('bundled Sort levels', () => {
     const files = bundledFiles();
 
     for (const [name, file] of files) {
-      const factory = new SortFactory(geometry, built(file));
-
-      const first = offeredInGame(factory);
-      const second = offeredInGame(factory);
+      const [first = [], second] = offeredInTwoGames(file);
 
       expect([name, first.length, first.every((stack) => stack.length > 0)]).toEqual([
         name,
@@ -278,7 +428,7 @@ describe('bundled Sort levels', () => {
   // The stars are cumulative, and the time of a Sort play changes no star.
   it('should_give_the_stars_of_its_file_when_a_bundled_level_counts_the_stars_of_a_play', () => {
     const [[, first]] = bundledFiles();
-    const level = built(first);
+    const level = withGeometryOf(first.topology, { use: (geometry) => built(first, geometry) });
     const starsOf = (moves: number) => level.starsFor(Moves.of(moves), undefined);
 
     expect(starsOf(35)).toEqual(Stars.of(1));
@@ -287,24 +437,20 @@ describe('bundled Sort levels', () => {
   });
 
   // A fixed level can be won. Its plan meets the threshold of its last star,
-  // so the third star can be won.
+  // so the third star can be won. Each plan plays on the geometry of its figure (#354).
   it('should_win_each_fixed_level_with_every_star_when_the_player_places_its_stacks_by_its_plan', () => {
     const fixed = bundledFiles().filter(([, file]) => 'stacks' in file.section.source);
 
+    expect(topologiesOf(fixed)).toEqual(FIGURES.map(({ topology }) => topology));
     expect(fixed.map(([name]) => name)).toEqual(Object.keys(PLANS));
     for (const [name, file] of fixed) {
       const plan = PLANS[name] ?? [];
-      const level = built(file);
-      const { engine } = startVariant(new SortFactory(geometry, level));
 
-      const outcomes = plan.map(([q, r]) => engine.play(PlaceStack.on(hex(q, r))));
+      const { outcomes, stars } = planPlay(file, plan);
 
       const playing = plan.slice(1).map(() => Outcome.playing);
       expect([name, outcomes]).toEqual([name, [...playing, Outcome.victory]]);
-      expect([name, level.starsFor(Moves.of(plan.length), undefined)]).toEqual([
-        name,
-        Stars.of(file.section.stars.length),
-      ]);
+      expect([name, stars]).toEqual([name, Stars.of(file.section.stars.length)]);
     }
   });
 });
