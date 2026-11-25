@@ -64,7 +64,7 @@
       <h1>Wiring: the drivers and the composition root</h1>
 
       <svg
-        viewBox="0 0 1040 1317"
+        viewBox="0 0 1040 1365"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="adwiring-title adwiring-desc"
@@ -104,7 +104,7 @@
           x="24"
           y="24"
           width="992"
-          height="720"
+          height="768"
           rx="8"
           fill="#cfdcf3"
           stroke="rgba(30,58,138,0.50)"
@@ -125,7 +125,7 @@
         <!-- Layer zone: layer 3, interface adapters -->
         <rect
           x="24"
-          y="752"
+          y="800"
           width="992"
           height="292"
           rx="8"
@@ -135,7 +135,7 @@
         />
         <text
           x="40"
-          y="772"
+          y="820"
           fill="#1d4ed8"
           font-size="8"
           font-weight="500"
@@ -252,7 +252,7 @@
           x1="460"
           y1="572"
           x2="460"
-          y2="800"
+          y2="848"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adwiring-open)"
@@ -262,7 +262,7 @@
           x1="640"
           y1="572"
           x2="640"
-          y2="800"
+          y2="848"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adwiring-open)"
@@ -272,7 +272,7 @@
           x1="336"
           y1="572"
           x2="336"
-          y2="800"
+          y2="848"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adwiring-open)"
@@ -282,7 +282,7 @@
           x1="580"
           y1="572"
           x2="580"
-          y2="928"
+          y2="976"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adwiring-open)"
@@ -357,10 +357,10 @@
         >
           «create»
         </text>
-        <rect x="464" y="772" width="47" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="464" y="820" width="47" height="12" rx="2" fill="#e2ebf8" />
         <text
           x="466"
-          y="781"
+          y="829"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -369,10 +369,10 @@
         >
           «create»
         </text>
-        <rect x="644" y="772" width="47" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="644" y="820" width="47" height="12" rx="2" fill="#e2ebf8" />
         <text
           x="646"
-          y="781"
+          y="829"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -384,7 +384,7 @@
 
         <text
           x="342"
-          y="778"
+          y="826"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -393,10 +393,10 @@
         >
           «create»
         </text>
-        <rect x="527" y="904" width="47" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="527" y="952" width="47" height="12" rx="2" fill="#e2ebf8" />
         <text
           x="572"
-          y="913"
+          y="961"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -654,7 +654,7 @@
           x="48"
           y="596"
           width="272"
-          height="132"
+          height="180"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -694,6 +694,15 @@
           + fitLevel?: FitLevel‹TCoord›
         </text>
         <text x="64" y="716" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + linesPlacementAt?(at: TCoord): TCoord
+        </text>
+        <text x="64" y="732" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + fitPlacementAt?(at: TCoord,
+        </text>
+        <text x="80" y="748" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          rotation: Turns): TCoord
+        </text>
+        <text x="64" y="764" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + layoutOf(size: number): BoardLayout‹TCoord›
         </text>
 
@@ -757,7 +766,7 @@
         <!-- Class: LevelGameFactories (adapter of the GameFactories port, one per game and figure) -->
         <rect
           x="184"
-          y="800"
+          y="848"
           width="160"
           height="40"
           rx="6"
@@ -767,7 +776,7 @@
         />
         <text
           x="264"
-          y="825"
+          y="873"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -780,7 +789,7 @@
         <!-- Class: GameEventBus (adapter of the publisher port, detailed in view 4.3, #362) -->
         <rect
           x="360"
-          y="800"
+          y="848"
           width="200"
           height="40"
           rx="6"
@@ -790,7 +799,7 @@
         />
         <text
           x="460"
-          y="825"
+          y="873"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -803,7 +812,7 @@
         <!-- Class: InMemoryGameRepository (adapter, repository of the game aggregate) -->
         <rect
           x="600"
-          y="800"
+          y="848"
           width="336"
           height="76"
           rx="6"
@@ -811,10 +820,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="600" y1="848" x2="936" y2="848" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="600" y1="896" x2="936" y2="896" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="768"
-          y="818"
+          y="866"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -825,7 +834,7 @@
         </text>
         <text
           x="768"
-          y="836"
+          y="884"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -834,14 +843,14 @@
         >
           InMemoryGameRepository
         </text>
-        <text x="616" y="864" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="616" y="912" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - game: GameEngine&lt;TCell, TCoord, TMove, TState&gt; [0..1]
         </text>
 
         <!-- UML template box: type parameters on the top-right corner -->
         <rect
           x="780"
-          y="790"
+          y="838"
           width="156"
           height="18"
           rx="2"
@@ -852,7 +861,7 @@
         />
         <text
           x="858"
-          y="802"
+          y="850"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -864,7 +873,7 @@
         <!-- Class: LocalProgressRepository (adapter of ProgressRepository over KeyValueStore, #164 and #188) -->
         <rect
           x="544"
-          y="928"
+          y="976"
           width="272"
           height="72"
           rx="6"
@@ -872,10 +881,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="544" y1="976" x2="816" y2="976" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="544" y1="1024" x2="816" y2="1024" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="680"
-          y="946"
+          y="994"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -886,7 +895,7 @@
         </text>
         <text
           x="680"
-          y="964"
+          y="1012"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -895,7 +904,13 @@
         >
           LocalProgressRepository
         </text>
-        <text x="560" y="992" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text
+          x="560"
+          y="1040"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
           - store: KeyValueStore
         </text>
 
@@ -925,31 +940,31 @@
         <text x="795" y="102" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           SessionStore
         </text>
-        <line x1="376" y1="840" x2="376" y2="856" stroke="#17212a" stroke-width="1" />
-        <circle cx="376" cy="861" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="387" y="864" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="376" y1="888" x2="376" y2="904" stroke="#17212a" stroke-width="1" />
+        <circle cx="376" cy="909" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="387" y="912" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           GameEventPublisher
         </text>
-        <line x1="616" y1="876" x2="616" y2="892" stroke="#17212a" stroke-width="1" />
-        <circle cx="616" cy="897" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="627" y="900" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="616" y1="924" x2="616" y2="940" stroke="#17212a" stroke-width="1" />
+        <circle cx="616" cy="945" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="627" y="948" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           GameRepository‹TCell, TCoord, TMove, TState›
         </text>
 
-        <line x1="200" y1="840" x2="200" y2="856" stroke="#17212a" stroke-width="1" />
-        <circle cx="200" cy="861" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="211" y="864" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="200" y1="888" x2="200" y2="904" stroke="#17212a" stroke-width="1" />
+        <circle cx="200" cy="909" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="211" y="912" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           GameFactories‹TCell,
         </text>
-        <text x="211" y="876" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="211" y="924" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           TCoord, TMove, TState›
         </text>
 
-        <line x1="560" y1="1000" x2="560" y2="1016" stroke="#17212a" stroke-width="1" />
-        <circle cx="560" cy="1021" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="560" y1="1048" x2="560" y2="1064" stroke="#17212a" stroke-width="1" />
+        <circle cx="560" cy="1069" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="571"
-          y="1024"
+          y="1072"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -960,7 +975,7 @@
         <!-- Footnote -->
         <text
           x="24"
-          y="1068"
+          y="1116"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -970,7 +985,7 @@
         </text>
         <text
           x="24"
-          y="1084"
+          y="1132"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -980,7 +995,7 @@
         </text>
         <text
           x="24"
-          y="1100"
+          y="1148"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -990,7 +1005,7 @@
         </text>
         <text
           x="24"
-          y="1116"
+          y="1164"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1000,7 +1015,7 @@
         </text>
         <text
           x="24"
-          y="1132"
+          y="1180"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1012,7 +1027,7 @@
 
         <text
           x="24"
-          y="1148"
+          y="1196"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1024,7 +1039,7 @@
 
         <text
           x="24"
-          y="1164"
+          y="1212"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1035,7 +1050,7 @@
         </text>
         <text
           x="24"
-          y="1180"
+          y="1228"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1048,15 +1063,15 @@
           <!-- Legend -->
           <line
             x1="24"
-            y1="1188"
+            y1="1236"
             x2="1016"
-            y2="1188"
+            y2="1236"
             stroke="rgba(23,33,42,0.10)"
             stroke-width="0.8"
           />
           <text
             x="24"
-            y="1206"
+            y="1254"
             fill="#5b6873"
             font-size="8"
             font-family="'IBM Plex Mono', monospace"
@@ -1067,16 +1082,16 @@
 
           <line
             x1="24"
-            y1="1224"
+            y1="1272"
             x2="52"
-            y2="1224"
+            y2="1272"
             stroke="#5b6873"
             stroke-width="1"
             marker-end="url(#adwiring-open)"
           />
           <text
             x="60"
-            y="1228"
+            y="1276"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1086,7 +1101,7 @@
 
           <rect
             x="24"
-            y="1244"
+            y="1292"
             width="28"
             height="12"
             rx="2"
@@ -1096,7 +1111,7 @@
           />
           <rect
             x="56"
-            y="1244"
+            y="1292"
             width="28"
             height="12"
             rx="2"
@@ -1106,7 +1121,7 @@
           />
           <text
             x="92"
-            y="1253"
+            y="1301"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1115,7 +1130,7 @@
           </text>
           <rect
             x="216"
-            y="1244"
+            y="1292"
             width="28"
             height="12"
             rx="2"
@@ -1126,7 +1141,7 @@
           />
           <text
             x="252"
-            y="1253"
+            y="1301"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1135,7 +1150,7 @@
           </text>
           <rect
             x="440"
-            y="1244"
+            y="1292"
             width="28"
             height="12"
             rx="2"
@@ -1146,7 +1161,7 @@
           />
           <text
             x="476"
-            y="1253"
+            y="1301"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1155,7 +1170,7 @@
           </text>
           <rect
             x="616"
-            y="1244"
+            y="1292"
             width="28"
             height="12"
             rx="2"
@@ -1165,7 +1180,7 @@
           />
           <text
             x="652"
-            y="1253"
+            y="1301"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1173,11 +1188,11 @@
             Teal · focal class
           </text>
 
-          <line x1="24" y1="1274" x2="40" y2="1274" stroke="#17212a" stroke-width="1" />
-          <circle cx="45" cy="1274" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          <line x1="24" y1="1322" x2="40" y2="1322" stroke="#17212a" stroke-width="1" />
+          <circle cx="45" cy="1322" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
           <text
             x="60"
-            y="1278"
+            y="1326"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"

@@ -137,6 +137,26 @@ describe('ProgressRecord', () => {
     expect(levelRecord.starsOf(LevelId.of('l2'))).toBeUndefined();
     expect(highScore.starsOf(LevelId.of('l1'))).toBeUndefined();
   });
+
+  // Issue #372: a progress asks each record whether it is of its game.
+  // The record keeps its game id private, so the record answers.
+  it('should_tell_whether_it_is_of_a_game_when_a_record_is_asked_for_its_game', () => {
+    const levelRecord = ProgressRecord.of({
+      gameId,
+      score: Score.of(0),
+      levelId: LevelId.of('l1'),
+      stars: Stars.of(2),
+    });
+    const highScore = ProgressRecord.of({ gameId, score: Score.of(36) });
+    const otherGame = GameId.of('other-game');
+
+    expect([
+      levelRecord.isOfGame(GameId.of('fake-game')),
+      highScore.isOfGame(GameId.of('fake-game')),
+      levelRecord.isOfGame(otherGame),
+      highScore.isOfGame(otherGame),
+    ]).toEqual([true, true, false, false]);
+  });
 });
 
 // The order of DS-4 and DS-12 (issues #240 and #156): a level ranks by its stars, then by
