@@ -4,7 +4,9 @@ import { CellNode, ShapeGroup, type ShapeNode } from './shape-node';
 
 // The piece shapes as data. Each cell is relative to the origin of the piece.
 // The statement gives 1 to 5 cells per piece and no list, so this list is a design choice.
-// A new shape is one new line (the piece shape row of statement §8).
+// This list is the base set of the family, for every game on this figure.
+// A jury variation never edits it (APP-NFR-06): a new Lines shape is data of one board figure
+// in src/infrastructure/registered-games.ts (docs/EXTENSIBILITY.md, issue #369).
 const pieces: readonly (readonly HexCoord[])[] = [
   [hex(0, 0)],
   [hex(0, 0), hex(1, 0)],

@@ -78,8 +78,12 @@ const SEEDS = 2 ** 32;
 // (19 cells), as docs/REQUIREMENTS.md §1 gives them. A hex region of size n has radius n - 1.
 // The square and the triangle take the same region sizes: 25 squares or 50 triangles
 // for Lines, and 9 squares or 18 triangles for Sort and Merge (#171).
+// Each game has its own value, so a new board size of one game changes one line here
+// (the jury variation «a new board size» of APP-NFR-06, issue #369).
+// The Merge value goes to `MergeSettings` and to the slide controls of the Merge screen.
 const LINES_BOARD = RegionSize.of(5);
-const SMALL_BOARD = RegionSize.of(3);
+const SORT_BOARD = RegionSize.of(3);
+const MERGE_BOARD = RegionSize.of(3);
 
 // The tile that a Merge player tries to make, as in 2048 (A3).
 const MERGE_TARGET = MergeTile.of(2048);
@@ -185,19 +189,30 @@ export function registeredGames<TCoord>(
       GameId.of('hexa-sort'),
       new SortFactory(
         geometry,
-        SortLevel.seeded(SMALL_BOARD, SORT_GOALS, seedFrom(random), nonEmpty(SORT_COLORS)),
+        SortLevel.seeded(SORT_BOARD, SORT_GOALS, seedFrom(random), nonEmpty(SORT_COLORS)),
       ),
       sortScreen(figure),
       worldTone(2),
       sortLevelVariant(geometry),
     ),
-    registered(
-      GameId.of('hexa-merge'),
-      new MergeFactory(geometry, MergeSettings.of(SMALL_BOARD, seedFrom(random), MERGE_TARGET)),
-      mergeScreen(figure),
-      worldTone(3),
-    ),
+    mergeOn(figure, random, MERGE_BOARD),
   ];
+}
+
+// The Hexa Merge entry on the board figure `figure`, with a board region of size `board`
+// and its seed from `random` (issue #369). The one value `board` goes to `MergeSettings`
+// and to the slide controls, so each way on the screen follows the lines of the board.
+export function mergeOn<TCoord>(
+  figure: BoardFigure<TCoord>,
+  random: RandomSource,
+  board: RegionSize,
+): RegisteredGame {
+  return registered(
+    GameId.of('hexa-merge'),
+    new MergeFactory(figure.geometry, MergeSettings.of(board, seedFrom(random), MERGE_TARGET)),
+    mergeScreen(figure, board),
+    worldTone(3),
+  );
 }
 
 // The shape of the origin cell of the board figure `figure` (issue #297), from the outline that
@@ -296,16 +311,17 @@ function sortScreen<TCoord>(
 
 // The screen parts of Hexa Merge on the board figure `figure` (#177): `MergeStateMapper`,
 // `MergeCellRenderer`, `MergeControls` with one slide for each axis and sense of the topology
-// of the figure, and the layout of the figure. The slides take the board region of the Merge
-// factory, so each way on the screen follows the lines of that board.
+// of the figure, and the layout of the figure. The slides take the board region `board`
+// of the Merge factory, so each way on the screen follows the lines of that board.
 function mergeScreen<TCoord>(
   figure: BoardFigure<TCoord>,
+  board: RegionSize,
 ): ScreenParts<MergeTile, TCoord, MergeView, MergeCellView, MergePayloadView, Slide<GridAxis>> {
   return {
     mapper: new MergeStateMapper(),
     renderer: new MergeCellRenderer(),
     controls: new MergeControls(
-      slideWays(figure.geometry.createTopology(), SMALL_BOARD, figure.layoutOf(1)),
+      slideWays(figure.geometry.createTopology(), board, figure.layoutOf(1)),
     ),
     layoutOf: (size) => figure.layoutOf(size),
   };
