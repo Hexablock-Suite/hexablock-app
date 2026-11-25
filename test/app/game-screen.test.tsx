@@ -5,6 +5,7 @@ import { fireEvent, renderRouter, screen, testRouter } from 'expo-router/testing
 import { generateStaticParams } from '../../app/game/[gameId]';
 import { repoRoot } from '../support/run-tool';
 import { occupiedSpaces, pressSpace } from '../support/ui/board-spaces';
+import { outlinesIn } from '../support/ui/cell-outlines';
 
 // The routes of `app/`, with the root layout and its composition root.
 const appDir = path.join(repoRoot, 'app');
@@ -108,7 +109,11 @@ describe('game route', () => {
 
     expect(screen).toHavePathname('/map');
     expect(app.getSearchParams()).toEqual({ figure: 'triangle' });
-    expect(screen.queryByRole('button', { name: /^Hexa Fit/ })).toBeNull();
+    // Since #354 Fit is on the map of every figure. The marker of a world on the map of the
+    // triangle has the shape of the triangle (#297).
+    expect(
+      new Set(outlinesIn(screen.getByRole('button', { name: /^Hexa Sort/ })).map((o) => o.corners)),
+    ).toEqual(new Set([3]));
   });
 
   // Issue #287: the web export renders one page of the game route for each registered game,

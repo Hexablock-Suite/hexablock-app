@@ -27,7 +27,6 @@ import { GameId } from '../domain/engine/game-id';
 import { TopologyId, type GeometryFactory } from '../domain/engine/geometry-factory';
 import type { GridAxis } from '../domain/engine/grid-topology';
 import { HexGeometry } from '../domain/engine/hex-geometry';
-import { hex, type HexCoord } from '../domain/engine/hex-topology';
 import { Moves } from '../domain/engine/moves';
 import { Piece } from '../domain/engine/piece';
 import type { RandomSource } from '../domain/engine/random-source';
@@ -106,17 +105,30 @@ export interface BoardFigure<TCoord> {
 // The board figures, in the order of the figure selector. The first one, the hexagon,
 // is the default figure. The composition root builds one registry for each figure.
 // The registry hides the coordinate type, as it hides the types of each variant.
-// The first content has one Fit level, on the hexagon. Every bundled Fit level is hex too,
-// so Fit offers no level on the square and on the triangle.
+// The first content has one Fit level on each figure (#354), so Fit has an entry on each map.
 export function boardFigures(): BoardFigure<unknown>[] {
+  const hexagon = new HexGeometry();
+  const square = new SquareGeometry();
+  const triangle = new TriangleGeometry();
   return [
-    boardFigure(TopologyId.hex, new HexGeometry(), (size) => new HexLayout(size), firstFitLevel()),
-    boardFigure(TopologyId.square, new SquareGeometry(), (size) => new SquareLayout(size)),
+    boardFigure(
+      TopologyId.hex,
+      hexagon,
+      (size) => new HexLayout(size),
+      firstFitLevel(TopologyId.hex, hexagon),
+    ),
+    boardFigure(
+      TopologyId.square,
+      square,
+      (size) => new SquareLayout(size),
+      firstFitLevel(TopologyId.square, square),
+    ),
     {
       ...boardFigure(
         TopologyId.triangle,
-        new TriangleGeometry(),
+        triangle,
         (size) => new TriangleLayout(size),
+        firstFitLevel(TopologyId.triangle, triangle),
       ),
       linesPlacementAt: triangleLinesPlacementAt,
     },
@@ -146,7 +158,7 @@ function triangleLinesPlacementAt(at: TriangleCoord): TriangleCoord {
 // Each variant chooses its state mapper, cell renderer and move controls (#174 to #177).
 // Each entry declares the world colors of its game on the map (#298): orange for Lines,
 // green for Fit, pink for Sort and blue for Merge, the colors of the team prototype.
-// So a game keeps its color on the square and on the triangle, where Fit has no entry.
+// So a game keeps its color on every figure, whatever the place of its entry.
 export function registeredGames<TCoord>(
   figure: BoardFigure<TCoord>,
   clock: Clock,
@@ -313,16 +325,24 @@ function seedFrom(random: RandomSource): Seed {
   return seed;
 }
 
-// A Fit level of three cells in a row and two pieces, a domino and a single cell.
+// The Fit level of the first content on the figure `topology` with the geometry `geometry`:
+// three cells in a row and two pieces, a domino and a single cell.
+// The cells (0, 0), (1, 0) and (2, 0) are a row on each figure (#354). On the triangle
+// they point up, down and up, and the domino and the single cell start on an up triangle.
 // It can be won: the domino covers the first two cells, and the single cell covers the third.
-// The fewest moves are 2, so the third star can be won.
+// On the triangle an offset counts lattice cells, so the offset (1, 0) moves
+// the single cell to the third cell. The fewest moves are 2, so the third star can be won.
 // A start with no level id starts this level. A start with a level id starts the bundled
 // level of that id (#172).
-function firstFitLevel(): FitLevel<HexCoord> {
+function firstFitLevel<TCoord>(
+  topology: TopologyId,
+  geometry: GeometryFactory<TCoord>,
+): FitLevel<TCoord> {
+  const at = (col: number, row: number) => geometry.createCoord([col, row]);
   return FitLevel.of(
-    TopologyId.hex,
-    BoardShape.of([hex(0, 0), hex(1, 0), hex(2, 0)]),
-    [fitPiece('a', [hex(0, 0), hex(1, 0)]), fitPiece('b', [hex(0, 0)])],
+    topology,
+    BoardShape.of([at(0, 0), at(1, 0), at(2, 0)]),
+    [fitPiece('a', [at(0, 0), at(1, 0)]), fitPiece('b', [at(0, 0)])],
     [fitStar(8, 120_000), fitStar(4, 60_000), fitStar(2, 30_000)],
   );
 }
@@ -336,7 +356,7 @@ function fitStar(maxMoves: number, maxElapsedMs: number): FitStarThreshold {
 }
 
 // A Fit piece with the id `id` over the cells `cells`, relative to the origin of the piece.
-function fitPiece(id: string, cells: readonly HexCoord[]): Piece<PieceId, HexCoord> {
+function fitPiece<TCoord>(id: string, cells: readonly TCoord[]): Piece<PieceId, TCoord> {
   return new Piece(new ShapeGroup(cells.map((c) => new CellNode(c))), PieceId.of(id));
 }
 
