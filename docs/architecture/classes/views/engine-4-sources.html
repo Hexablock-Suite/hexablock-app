@@ -277,9 +277,9 @@
         />
         <!-- ScoringDecorator decorates the IScoringPolicy it wraps: hollow diamond at the decorator, decorate 1 at the wrapped type (decision 23) -->
         <line
-          x1="824"
+          x1="776"
           y1="228"
-          x2="824"
+          x2="776"
           y2="164"
           stroke="#17212a"
           stroke-width="1"
@@ -297,9 +297,9 @@
         />
 
         <!-- Arrow labels -->
-        <rect x="828" y="168" width="48" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="780" y="168" width="48" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="852"
+          x="804"
           y="177"
           fill="#7d8a94"
           font-size="8"
@@ -323,9 +323,9 @@
         </text>
 
         <!-- Multiplicities -->
-        <rect x="806" y="168" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="758" y="168" width="12" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="812"
+          x="764"
           y="177"
           fill="#17212a"
           font-size="8"
@@ -337,9 +337,9 @@
         </text>
 
         <!-- Lollipop: SeededPieceSource implements IRandomSeeded -->
-        <line x1="100" y1="356" x2="100" y2="368" stroke="#17212a" stroke-width="1" />
-        <circle cx="100" cy="357" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="112" y="376" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="100" y1="372" x2="100" y2="384" stroke="#17212a" stroke-width="1" />
+        <circle cx="100" cy="373" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="112" y="392" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           IRandomSeeded
         </text>
 
@@ -392,7 +392,7 @@
           x="68"
           y="220"
           width="264"
-          height="136"
+          height="152"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -431,9 +431,12 @@
           - draw: (random: RandomSource) =&gt; TPiece
         </text>
         <text x="84" y="332" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + take(): PieceDraw&lt;TPiece&gt;
+          + take(): readonly [piece: TPiece,
         </text>
-        <text x="84" y="348" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="95" y="348" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          rest: SeededPieceSource&lt;TPiece&gt;]
+        </text>
+        <text x="84" y="364" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + isSeededWith(seed: Seed): boolean
         </text>
 
@@ -442,7 +445,7 @@
           x="344"
           y="220"
           width="216"
-          height="104"
+          height="136"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -478,7 +481,13 @@
           - index: number
         </text>
         <text x="360" y="316" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + take(): PieceDraw&lt;TPiece&gt;
+          + take(): readonly [
+        </text>
+        <text x="371" y="332" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          piece: TPiece, rest:
+        </text>
+        <text x="371" y="348" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          FixedListPieceSource&lt;TPiece&gt;]
         </text>
 
         <!-- Class: IScoringPolicy (interface of the Strategy and the Decorator: only «interface», decision 23) -->
@@ -557,7 +566,7 @@
           ScoringDecorator
         </text>
         <text x="680" y="292" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - inner: IScoringPolicy&lt;TState&gt;
+          - inner: TInner
         </text>
 
         <!-- Class: IProgressModel (interface of the Strategy: only «interface», decision 23) -->
@@ -601,20 +610,20 @@
           GameProgress): void
         </text>
 
-        <!-- SeededPieceSource keeps the Mulberry32Random it creates as random: use with role and multiplicity (decision 23) -->
+        <!-- SeededPieceSource keeps a RandomSource as random: use with role and multiplicity to the type of the field (decision 23). The ball is the RandomSource that Mulberry32Random implements -->
         <line
           x1="256"
-          y1="356"
+          y1="372"
           x2="256"
           y2="392"
           stroke-width="1"
           marker-end="url(#sources-open)"
           stroke="#5b6873"
         />
-        <rect x="262" y="366" width="40" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="262" y="376" width="40" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="282"
-          y="375"
+          y="385"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -623,10 +632,10 @@
         >
           random
         </text>
-        <rect x="236" y="368" width="12" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="236" y="376" width="12" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="242"
-          y="377"
+          y="385"
           fill="#17212a"
           font-size="8"
           font-weight="600"
@@ -638,16 +647,16 @@
 
         <!-- SeededPieceSource keeps its Seed as seed: use with role and multiplicity (decision 23) -->
         <polyline
-          points="320,356 320,374 452,374 452,400"
+          points="320,372 320,386 452,386 452,400"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#sources-open)"
         />
-        <rect x="372" y="361" width="28" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="372" y="373" width="28" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="386"
-          y="370"
+          y="382"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -671,9 +680,9 @@
         <!-- Mulberry32Random.from() reads the first state of the Seed: use -->
         <line
           x1="332"
-          y1="480"
+          y1="496"
           x2="352"
-          y2="480"
+          y2="496"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#sources-open)"
@@ -735,7 +744,7 @@
         <!-- Class: Mulberry32Random -->
         <rect
           x="68"
-          y="392"
+          y="408"
           width="264"
           height="120"
           rx="6"
@@ -743,11 +752,11 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="68" y1="432" x2="332" y2="432" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="68" y1="456" x2="332" y2="456" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="68" y1="448" x2="332" y2="448" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="68" y1="472" x2="332" y2="472" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="200"
-          y="417"
+          y="433"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -756,12 +765,12 @@
         >
           Mulberry32Random
         </text>
-        <text x="84" y="448" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="84" y="464" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - state: GeneratorState
         </text>
         <text
           x="84"
-          y="472"
+          y="488"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -769,17 +778,17 @@
         >
           + from(seed: Seed): Mulberry32Random
         </text>
-        <text x="84" y="488" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="84" y="504" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + next(): RandomDraw
         </text>
-        <text x="84" y="504" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="84" y="520" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + clone(): Mulberry32Random
         </text>
 
-        <!-- Lollipop: Mulberry32Random implements RandomSource -->
-        <line x1="100" y1="512" x2="100" y2="522" stroke="#17212a" stroke-width="1" />
-        <circle cx="100" cy="511" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="112" y="530" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <!-- Lollipop: Mulberry32Random implements RandomSource. The random use of SeededPieceSource ends on the ball -->
+        <line x1="256" y1="402" x2="256" y2="408" stroke="#17212a" stroke-width="1" />
+        <circle cx="256" cy="397" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="266" y="404" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           RandomSource
         </text>
 
@@ -1784,10 +1793,10 @@
           TState
         </text>
         <rect
-          x="868"
-          y="218"
-          width="48"
-          height="18"
+          x="792"
+          y="208"
+          width="124"
+          height="30"
           rx="2"
           fill="#ffffff"
           stroke="#5b6873"
@@ -1795,14 +1804,24 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="892"
-          y="230"
+          x="854"
+          y="219"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TState
+          TState, TInner extends
+        </text>
+        <text
+          x="854"
+          y="231"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          IScoringPolicy‹TState›
         </text>
 
         <!-- Footnote: classes the budget leaves out -->
