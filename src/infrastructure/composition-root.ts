@@ -86,7 +86,8 @@ export interface RootDrivers {
 // Every use case of the root goes through `decorate()`, which gives it its aspects (#323).
 // With the local store of its drivers, the root builds one `LocalProgressRepository` and keeps it
 // for every consumer of the saved progress (#323). Over it, the root builds `ListAchievements` once
-// (#188), with its one level repository and the achievements of `registeredAchievements()`.
+// (#188), with its one level repository, the one counter repository of the listener (#364)
+// and the achievements of `registeredAchievements()`.
 export class CompositionRoot {
   private readonly games: ReadonlyMap<TopologyId, GameRegistry>;
   private readonly boards: ReadonlyMap<TopologyId, BoardFigure<unknown>>;
@@ -111,19 +112,20 @@ export class CompositionRoot {
     this.logger = drivers.logger;
     this.ids = new SequentialMatchIds(drivers.clock);
     const events = new GameEventBus();
-    if (drivers.store !== undefined) {
-      const counters = new LocalAchievementCounterRepository(drivers.store);
-      events.subscribe(new AchievementCounterListener(counters));
-    }
+    const counters =
+      drivers.store === undefined
+        ? undefined
+        : new LocalAchievementCounterRepository(drivers.store);
+    if (counters !== undefined) events.subscribe(new AchievementCounterListener(counters));
     this.events = events;
     this.levels = new BundledLevelRepository();
     this.progress =
       drivers.store === undefined ? undefined : new LocalProgressRepository(drivers.store);
     this.achievements =
-      this.progress === undefined
+      this.progress === undefined || counters === undefined
         ? undefined
         : this.decorate(
-            new ListAchievements(this.levels, this.progress, registeredAchievements()),
+            new ListAchievements(this.levels, this.progress, counters, registeredAchievements()),
             'ListAchievements',
           );
   }

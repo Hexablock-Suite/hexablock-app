@@ -72,11 +72,12 @@
         <title id="mapuc-title">HexaBlock use cases map · UML class diagram</title>
         <desc id="mapuc-desc">
           Overview map of the 43 layer 2 classes in 8 groups, with LevelDefinition, LevelStatus,
-          AchievementGoal, LevelsWon and EveryLevelWon of layer 1 as dashed chips (#326). Each line
-          joins two classes: UseCaseAspect implements UseCase and decorates the one it wraps,
-          StartGame, SaveProgress and Register each implement UseCase for their group, and RedoMove,
-          SyncLeaderboard and UpdateSettings keep an output port. No line touches a group frame.
-          Each group names the view that shows its members.
+          AchievementGoal, LevelsWon, EveryLevelWon, BestCountReached and TotalCountReached of layer
+          1 as dashed chips (#326, #364). Each line joins two classes: UseCaseAspect implements
+          UseCase and decorates the one it wraps, StartGame, SaveProgress and Register each
+          implement UseCase for their group, and RedoMove, SyncLeaderboard and UpdateSettings keep
+          an output port. No line touches a group frame. Each group names the view that shows its
+          members.
         </desc>
         <defs>
           <marker
@@ -1761,6 +1762,66 @@
             </tspan>
           </text>
         </g>
+        <!-- BestCountReached lives in layer 1 since #364: a dashed chip -->
+        <g data-class="BestCountReached">
+          <rect
+            x="440"
+            y="1172"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#5b6873"
+            stroke-width="1"
+            stroke-dasharray="4,3"
+          />
+          <text
+            x="520"
+            y="1184"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            engine · view 3.6
+          </text>
+          <text x="520" y="1197" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              BestCountReached
+            </tspan>
+          </text>
+        </g>
+        <!-- TotalCountReached lives in layer 1 since #364: a dashed chip -->
+        <g data-class="TotalCountReached">
+          <rect
+            x="616"
+            y="1172"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#5b6873"
+            stroke-width="1"
+            stroke-dasharray="4,3"
+          />
+          <text
+            x="696"
+            y="1184"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            engine · view 3.6
+          </text>
+          <text x="696" y="1197" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              TotalCountReached
+            </tspan>
+          </text>
+        </g>
         <!-- Footnote -->
         <text
           x="24"
@@ -1780,7 +1841,7 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           The dashed chips live in layer 1: LevelDefinition (decision 24), and LevelStatus and the
-          goals of the achievements since #326 (decisions 58 and 60).
+          goals of the achievements since #326 and #364 (decisions 58 and 60).
         </text>
         <!-- The legend sits 16 lower than before: the footnote has one more line since #326. -->
         <g transform="translate(0 16)">
