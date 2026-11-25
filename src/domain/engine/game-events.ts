@@ -7,8 +7,10 @@ import type { Score } from './score';
 // `GameEngine` records each event when it saves the turn, and tells nobody.
 // `ApplyMove` takes the events after the turn and delivers them to the publisher port
 // (classes.md decisions 25 and 29).
-// `GameOver` is the only event today. The documents name planned events, such as
-// `LineCleared`, `StackMerged`, `TileMerged` and `TargetReached`, so the base stays (#233).
+// The engine has one concrete event, `GameOver`. The variants add the events of a move
+// (issue #361): `LinesCleared`, `TileMerged` and `StackCleared`. The photo of the state
+// after a move builds them with the ids that `GameEngine` gives, so the engine names
+// no variant event.
 // Every event belongs to one game. The base keeps the `GameId` private, and no operation
 // returns it. A private member also makes the type nominal: only a subclass is a `GameEvent`.
 export abstract class GameEvent {
