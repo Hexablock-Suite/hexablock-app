@@ -729,7 +729,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-decoration="underline"
         >
-          colors: Color[]): SortLevel
+          colors: readonly [Color, ...Color[]]): SortLevel
         </text>
         <text
           x="80"
@@ -1096,7 +1096,14 @@
           - value: number
         </text>
         <line x1="744" y1="612" x2="1000" y2="612" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="760" y="628" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text
+          x="760"
+          y="628"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
           + of(value: number): GoalCount
         </text>
         <text x="760" y="644" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
@@ -1352,7 +1359,7 @@
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            Not drawn: StackMerged extends GameEvent. PlaceStack is the move (decision 43).
+            Not drawn: StackCleared extends GameEvent (#361). PlaceStack is the move (decision 43).
             SortRules extends BaseGameRules (Part 1, view 7).
           </text>
           <text

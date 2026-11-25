@@ -64,7 +64,7 @@
       <h1>The turn: Template Method over Strategy</h1>
 
       <svg
-        viewBox="0 0 1040 1361"
+        viewBox="0 0 1040 1377"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="engine-turn-title engine-turn-desc"
@@ -78,14 +78,14 @@
           turns, which ApplyMove takes with takeEvents() and delivers, and bounding its TState
           parameter by BoardState and Cloneable of TState in its template box. A dark dashed frame
           marks the boundary of the game aggregate: the root and its internal entities, the
-          BoardState, the Board of the state and the LevelTimer of a timed game. The root joins the
-          state and the timer with a filled diamond, the state keeps its board, and the reference
-          boxes of the board and the timer name views 2 and 3. The optional MoveHistory and the
-          optional timer stay inside: the root answers for them with undo(), redo(), canUndo(),
-          canRedo(), offersUndo() and elapsedTime(). BoardState is an entity inside the GameEngine
-          aggregate: its own GameStateId is its identity, it keeps the MatchId of its game, its
-          fields are private, and it changes in place only through its business methods. Its
-          snapshot() creates a BoardSnapshot, the immutable photo of the Memento pattern:
+          BoardState, the Board of the state and the timer of a timed game. The root joins the state
+          and the timer, an ITimed, with a filled diamond. BoardState declares no board, and the
+          reference boxes of the board and of ITimed name views 2 and 3. The optional MoveHistory
+          and the optional timer stay inside: the root answers for them with undo(), redo(),
+          canUndo(), canRedo(), offersUndo() and elapsedTime(). BoardState is an entity inside the
+          GameEngine aggregate: its own GameStateId is its identity, it keeps the MatchId of its
+          game, its fields are private, and it changes in place only through its business methods.
+          Its snapshot() creates a BoardSnapshot, the immutable photo of the Memento pattern:
           GameEngine.snapshot() returns it, IScoringPolicy reads two of them, and MoveHistory keeps
           them for the undo. BoardSnapshot is abstract and its fields are private: a reader asks
           isPhotoOf(), belongsTo(), boardCopy() and scoreSoFar(), and each variant photo implements
@@ -332,7 +332,7 @@
           stroke-width="1"
           marker-start="url(#t-diamond-filled)"
         />
-        <!-- GameEngine holds the LevelTimer of a timed game as timer: composition from the root to an internal entity -->
+        <!-- GameEngine holds the timer of a timed game as an ITimed: composition from the root to an internal entity, to the type of the field -->
         <line
           x1="616"
           y1="648"
@@ -341,16 +341,6 @@
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#t-diamond-filled)"
-        />
-        <!-- BoardState keeps its Board as board: use with role and multiplicity -->
-        <line
-          x1="520"
-          y1="984"
-          x2="520"
-          y2="1024"
-          stroke="#5b6873"
-          stroke-width="1"
-          marker-end="url(#t-open)"
         />
 
         <!-- Rules return a Resolution: use, through the return type of resolve() and playTurn() -->
@@ -495,18 +485,6 @@
         >
           timer
         </text>
-        <rect x="524" y="1004" width="30" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="539"
-          y="1013"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          board
-        </text>
         <rect x="874" y="984" width="30" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="889"
@@ -548,18 +526,6 @@
         <text
           x="860"
           y="993"
-          fill="#17212a"
-          font-size="8"
-          font-weight="600"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          1
-        </text>
-        <rect x="506" y="1004" width="12" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="512"
-          y="1013"
           fill="#17212a"
           font-size="8"
           font-weight="600"
@@ -931,8 +897,14 @@
         <text x="776" y="296" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + checkAcceptsUndo(): void
         </text>
-        <text x="776" y="312" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + after(o: Outcome): GamePhase
+        <text
+          x="776"
+          y="312"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + after(outcome: Outcome): GamePhase
         </text>
         <text x="776" y="328" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + pause(): GamePhase
@@ -1038,7 +1010,7 @@
           SnapshotOf&lt;this&gt;): void
         </text>
 
-        <!-- Reference box: LevelTimer, detailed in part 1 · view 3 -->
+        <!-- Reference box: ITimed, the type of the timer field, detailed in part 1 · view 3 -->
         <rect
           x="552"
           y="696"
@@ -1071,7 +1043,7 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          LevelTimer
+          ITimed
         </text>
         <!-- Reference box: Board, detailed in part 1 · view 2 -->
         <rect
@@ -1208,7 +1180,7 @@
           x="52"
           y="788"
           width="284"
-          height="196"
+          height="212"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1274,6 +1246,17 @@
         <text
           x="68"
           y="976"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          textLength="260"
+          lengthAdjust="spacingAndGlyphs"
+        >
+          + eventsOfLastMove(GameId, MatchId): GameEvent[]
+        </text>
+        <text
+          x="68"
+          y="992"
           fill="#17212a"
           font-size="9"
           font-style="italic"
@@ -1660,18 +1643,28 @@
             The phase, the history and the two Strategies are parts of the aggregate too: each one
             stays in the frame of its pattern, and the root keeps it with a use (decision 23).
           </text>
+          <text
+            x="24"
+            y="864"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            BoardState declares no board: each variant state keeps its Board. The root keeps its
+            timer as an ITimed, and LevelTimer of view 3 implements it, so the timer box is ITimed.
+          </text>
           <!-- Legend -->
           <line
             x1="24"
-            y1="872"
+            y1="888"
             x2="1016"
-            y2="872"
+            y2="888"
             stroke="rgba(23,33,42,0.10)"
             stroke-width="0.8"
           />
           <text
             x="24"
-            y="890"
+            y="906"
             fill="#5b6873"
             font-size="8"
             font-family="'IBM Plex Mono', monospace"
@@ -1682,16 +1675,16 @@
 
           <line
             x1="24"
-            y1="908"
+            y1="924"
             x2="52"
-            y2="908"
+            y2="924"
             stroke="#17212a"
             stroke-width="1"
             marker-start="url(#t-diamond-filled)"
           />
           <text
             x="60"
-            y="912"
+            y="928"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1700,16 +1693,16 @@
           </text>
           <line
             x1="304"
-            y1="908"
+            y1="924"
             x2="332"
-            y2="908"
+            y2="924"
             stroke="#5b6873"
             stroke-width="1"
             marker-end="url(#t-open)"
           />
           <text
             x="340"
-            y="912"
+            y="928"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1718,7 +1711,7 @@
           </text>
           <rect
             x="24"
-            y="928"
+            y="944"
             width="28"
             height="12"
             rx="2"
@@ -1728,7 +1721,7 @@
           />
           <text
             x="60"
-            y="937"
+            y="953"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1737,7 +1730,7 @@
           </text>
           <rect
             x="184"
-            y="928"
+            y="944"
             width="28"
             height="12"
             rx="2"
@@ -1748,7 +1741,7 @@
           />
           <text
             x="220"
-            y="937"
+            y="953"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1757,7 +1750,7 @@
           </text>
           <rect
             x="344"
-            y="928"
+            y="944"
             width="28"
             height="12"
             rx="2"
@@ -1768,7 +1761,7 @@
           />
           <text
             x="380"
-            y="937"
+            y="953"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1777,7 +1770,7 @@
           </text>
           <rect
             x="584"
-            y="928"
+            y="944"
             width="28"
             height="12"
             rx="2"
@@ -1788,7 +1781,7 @@
           />
           <text
             x="620"
-            y="937"
+            y="953"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1797,7 +1790,7 @@
           </text>
           <rect
             x="24"
-            y="952"
+            y="968"
             width="28"
             height="12"
             rx="2"
@@ -1808,7 +1801,7 @@
           />
           <text
             x="60"
-            y="961"
+            y="977"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1817,7 +1810,7 @@
           </text>
           <rect
             x="264"
-            y="952"
+            y="968"
             width="28"
             height="12"
             rx="2"
@@ -1827,7 +1820,7 @@
           />
           <text
             x="300"
-            y="961"
+            y="977"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"

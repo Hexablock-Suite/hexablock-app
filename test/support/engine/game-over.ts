@@ -39,6 +39,12 @@ export function gameOverOf(event: GameEvent): GameOver {
   return event;
 }
 
+// The `GameOver` events of a list, in their order. A turn also records the events of its move
+// (issue #361), so a test of the end of a game keeps only the `GameOver` events.
+export function gameOversIn(events: readonly GameEvent[]): GameOver[] {
+  return events.filter((event): event is GameOver => event instanceof GameOver);
+}
+
 // The data that a `GameOver` event delivers to one receiver. Another event throws,
 // and so does an event that delivers its data no time or more than one time.
 export function dataOf(event: GameEvent): GameOverData {

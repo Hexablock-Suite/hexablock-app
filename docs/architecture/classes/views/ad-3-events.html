@@ -64,7 +64,7 @@
       <h1>Game events and sound: Observer and Facade</h1>
 
       <svg
-        viewBox="0 0 1040 864"
+        viewBox="0 0 1040 1012"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="adevents-title adevents-desc"
@@ -73,7 +73,8 @@
         <desc id="adevents-desc">
           Class diagram across layers 4, 3, 2 and 1 showing GameEventBus in layer 3 implementing the
           GameEventPublisher port of layer 2 and holding many GameEventListener objects,
-          GamePresenter and AudioManager, the audio facade of layer 4, implementing
+          AchievementCounterListener, the first listener, which counts the events of a move of each
+          game, GamePresenter and AudioManager, the audio facade of layer 4, implementing
           GameEventListener, AudioManager playing through an external SoundLibrary, and
           GameEventPublisher publishing GameEvent of layer 1.
         </desc>
@@ -143,7 +144,7 @@
           x="24"
           y="264"
           width="992"
-          height="208"
+          height="320"
           rx="8"
           fill="#e2ebf8"
           stroke="rgba(29,78,216,0.40)"
@@ -164,7 +165,7 @@
         <!-- Layer zone: layer 2, use cases -->
         <rect
           x="24"
-          y="480"
+          y="592"
           width="992"
           height="120"
           rx="8"
@@ -174,7 +175,7 @@
         />
         <text
           x="40"
-          y="500"
+          y="612"
           fill="#7e22ce"
           font-size="8"
           font-weight="500"
@@ -186,7 +187,7 @@
         <!-- Layer zone: layer 1, entities -->
         <rect
           x="24"
-          y="608"
+          y="720"
           width="992"
           height="104"
           rx="8"
@@ -196,7 +197,7 @@
         />
         <text
           x="40"
-          y="628"
+          y="740"
           fill="#b45309"
           font-size="8"
           font-weight="500"
@@ -234,7 +235,7 @@
           x="304"
           y="304"
           width="688"
-          height="148"
+          height="272"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -301,7 +302,7 @@
           x1="816"
           y1="436"
           x2="816"
-          y2="512"
+          y2="624"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -309,7 +310,7 @@
         />
         <!-- GameEventPublisher publishes GameEvent: use, down from layer 2 to layer 1 -->
         <path
-          d="M760 584 V668 H620"
+          d="M760 696 V780 H620"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -317,6 +318,18 @@
         />
 
         <!-- Arrow labels -->
+        <!-- The realization of GameEventListener by GamePresenter is planned -->
+        <text
+          data-requirement="APP-FR-10"
+          x="270"
+          y="377"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          «Sprint 4»
+        </text>
         <rect x="570" y="108" width="60" height="12" rx="2" fill="#cfdcf3" />
         <text
           x="600"
@@ -329,10 +342,10 @@
         >
           PLAYS WITH
         </text>
-        <rect x="640" y="648" width="56" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="640" y="760" width="56" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="668"
-          y="657"
+          y="769"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -379,6 +392,9 @@
           text-anchor="middle"
         >
           AudioManager
+          <tspan data-requirement="APP-FR-10" fill="#5b6873" font-size="8" font-weight="400">
+            «Sprint 4»
+          </tspan>
         </text>
         <text x="336" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - muted: boolean
@@ -426,6 +442,9 @@
           text-anchor="middle"
         >
           SoundLibrary
+          <tspan data-requirement="APP-FR-10" fill="#5b6873" font-size="8" font-weight="400">
+            «Sprint 4»
+          </tspan>
         </text>
         <text x="656" y="156" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           library to choose
@@ -467,6 +486,74 @@
         </text>
         <text x="336" y="412" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + onEvent(event: GameEvent): void
+        </text>
+
+        <!-- AchievementCounterListener implements GameEventListener: realization (#362) -->
+        <line
+          x1="440"
+          y1="460"
+          x2="440"
+          y2="420"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#adevents-triangle)"
+        />
+        <!-- AchievementCounterListener counts the events of a move: use, down from layer 3 to layer 1 -->
+        <line
+          x1="500"
+          y1="564"
+          x2="500"
+          y2="760"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#adevents-open)"
+        />
+        <rect x="506" y="640" width="44" height="12" rx="2" fill="#efe7f8" />
+        <text
+          x="528"
+          y="649"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          COUNTS
+        </text>
+
+        <!-- Class: AchievementCounterListener (the first listener of the bus, #362) -->
+        <rect
+          x="320"
+          y="460"
+          width="320"
+          height="104"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="320" y1="500" x2="640" y2="500" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="320" y1="524" x2="640" y2="524" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="480"
+          y="485"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          AchievementCounterListener
+        </text>
+        <text x="336" y="516" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - games: { gameId, counts }[]
+        </text>
+        <text x="336" y="540" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + onEvent(event: GameEvent): void
+        </text>
+        <text x="336" y="556" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + countsOf(gameId: GameId): AchievementCounts
         </text>
 
         <!-- Class: GameEventBus (focal) -->
@@ -544,18 +631,18 @@
         <!-- Class: GameEventPublisher (interface, output port of layer 2, issue 233) -->
         <rect
           x="716"
-          y="512"
-          width="200"
+          y="624"
+          width="220"
           height="72"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="716" y1="560" x2="916" y2="560" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="716" y1="672" x2="936" y2="672" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="816"
-          y="530"
+          y="642"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -566,7 +653,7 @@
         </text>
         <text
           x="816"
-          y="548"
+          y="660"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -575,14 +662,14 @@
         >
           GameEventPublisher
         </text>
-        <text x="728" y="576" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="728" y="688" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + publish(event: GameEvent): void
         </text>
 
         <!-- Reference box: GameEvent (abstract), detailed in Part 1 view 5 -->
         <rect
           x="440"
-          y="648"
+          y="760"
           width="180"
           height="40"
           rx="6"
@@ -593,7 +680,7 @@
         />
         <text
           x="530"
-          y="662"
+          y="774"
           fill="#7d8a94"
           font-size="7"
           font-weight="500"
@@ -605,7 +692,7 @@
         </text>
         <text
           x="530"
-          y="678"
+          y="790"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -619,7 +706,7 @@
         <!-- Footnote -->
         <text
           x="24"
-          y="736"
+          y="848"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -630,7 +717,7 @@
         </text>
         <text
           x="24"
-          y="752"
+          y="864"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -638,12 +725,22 @@
           The composition root creates AudioManager once and injects it, so the app has one audio
           manager (decision 18). The score display listens to the bus too.
         </text>
-
-        <!-- Legend -->
-        <line x1="24" y1="776" x2="1016" y2="776" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="794"
+          y="880"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          The root builds one GameEventBus, subscribes AchievementCounterListener to it and gives it
+          to every ApplyMove (#362). A listener that throws does not stop the others.
+        </text>
+
+        <!-- Legend -->
+        <line x1="24" y1="904" x2="1016" y2="904" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <text
+          x="24"
+          y="922"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -654,9 +751,9 @@
 
         <line
           x1="24"
-          y1="812"
+          y1="940"
           x2="52"
-          y2="812"
+          y2="940"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -664,7 +761,7 @@
         />
         <text
           x="60"
-          y="816"
+          y="944"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -673,16 +770,16 @@
         </text>
         <line
           x1="144"
-          y1="812"
+          y1="940"
           x2="172"
-          y2="812"
+          y2="940"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adevents-open)"
         />
         <text
           x="180"
-          y="816"
+          y="944"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -692,7 +789,7 @@
 
         <rect
           x="24"
-          y="832"
+          y="960"
           width="28"
           height="12"
           rx="2"
@@ -702,7 +799,7 @@
         />
         <rect
           x="56"
-          y="832"
+          y="960"
           width="28"
           height="12"
           rx="2"
@@ -712,7 +809,7 @@
         />
         <rect
           x="88"
-          y="832"
+          y="960"
           width="28"
           height="12"
           rx="2"
@@ -722,7 +819,7 @@
         />
         <rect
           x="120"
-          y="832"
+          y="960"
           width="28"
           height="12"
           rx="2"
@@ -732,7 +829,7 @@
         />
         <text
           x="156"
-          y="841"
+          y="969"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -741,7 +838,7 @@
         </text>
         <rect
           x="264"
-          y="832"
+          y="960"
           width="28"
           height="12"
           rx="2"
@@ -752,7 +849,7 @@
         />
         <text
           x="300"
-          y="841"
+          y="969"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -761,7 +858,7 @@
         </text>
         <rect
           x="488"
-          y="832"
+          y="960"
           width="28"
           height="12"
           rx="2"
@@ -772,7 +869,7 @@
         />
         <text
           x="524"
-          y="841"
+          y="969"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -781,7 +878,7 @@
         </text>
         <rect
           x="720"
-          y="832"
+          y="960"
           width="28"
           height="12"
           rx="2"
@@ -791,12 +888,32 @@
         />
         <text
           x="756"
-          y="841"
+          y="969"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
+        </text>
+        <!-- Legend: the «Sprint N» marker of a planned class or member -->
+        <text
+          x="24"
+          y="989"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          «Sprint N»
+        </text>
+        <text
+          x="92"
+          y="989"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Planned design, not in the code yet · N is the docs/ROADMAP.md sprint of the requirement
+          it serves
         </text>
       </svg>
     </div>

@@ -1,11 +1,20 @@
 /** @jest-environment node */
 import { BundledLevelRepository } from '../../src/adapters/bundled-level-repository';
+import { LocalAchievementCounterRepository } from '../../src/adapters/local-achievement-counter-repository';
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
 import type { Achievement } from '../../src/application/achievement';
 import { ListAchievements, type AchievementSummary } from '../../src/application/list-achievements';
+import type { AchievementCounterRepository } from '../../src/application/achievement-counter-repository';
 import type { ProgressRepository } from '../../src/application/progress-repository';
 import type { Result } from '../../src/application/result';
-import { EveryLevelWon, LevelsWon } from '../../src/domain/engine/achievement-goal';
+import { AchievementCount } from '../../src/domain/engine/achievement-count';
+import { AchievementCounters } from '../../src/domain/engine/achievement-counters';
+import {
+  BestCountReached,
+  EveryLevelWon,
+  LevelsWon,
+  TotalCountReached,
+} from '../../src/domain/engine/achievement-goal';
 import { GameId } from '../../src/domain/engine/game-id';
 import { GameProgress } from '../../src/domain/engine/game-progress';
 import { LevelId } from '../../src/domain/engine/level-id';
@@ -24,6 +33,7 @@ import { delivered } from '../support/engine/value-receiver';
 const FIT = GameId.of('hexa-fit');
 const SORT = GameId.of('hexa-sort');
 const LINES = GameId.of('hexa-lines');
+const MERGE = GameId.of('hexa-merge');
 
 // The ids and the statuses of a success, or the code of a failure.
 function rowsOf(result: Result<AchievementSummary[]>): [string, boolean][] | string {
@@ -60,9 +70,31 @@ async function bundledIds(gameId: GameId): Promise<string[]> {
   return levels.map((level) => delivered(level.levelId()));
 }
 
-// `ListAchievements` over the bundled levels and the progress `progress`.
-function listOf(achievements: readonly Achievement[], progress: ProgressRepository) {
-  return new ListAchievements(new BundledLevelRepository(), progress, achievements);
+// `ListAchievements` over the bundled levels, the progress `progress` and the counters `counters`.
+// By default no game has saved counters.
+function listOf(
+  achievements: readonly Achievement[],
+  progress: ProgressRepository,
+  counters: AchievementCounterRepository = new LocalAchievementCounterRepository(
+    new InMemoryKeyValueStore(),
+  ),
+) {
+  return new ListAchievements(new BundledLevelRepository(), progress, counters, achievements);
+}
+
+// A counter repository with the saved counters of the game `gameId`: the best count `best`
+// and the total `total`.
+async function countersWith(
+  gameId: GameId,
+  best: number,
+  total: number,
+): Promise<AchievementCounterRepository> {
+  const repository = new LocalAchievementCounterRepository(new InMemoryKeyValueStore());
+  const counters = AchievementCounters.start(gameId);
+  counters.recordBest(AchievementCount.of(best));
+  counters.addToTotal(AchievementCount.of(total));
+  await repository.save(counters);
+  return repository;
 }
 
 describe('ListAchievements', () => {
@@ -135,6 +167,52 @@ describe('ListAchievements', () => {
       ['fit-3', true],
       ['sort-goals', false],
     ]);
+  });
+
+  // The goals of the counters read the saved counters of their game (issue #364): a best count
+  // and a total. The counters of one game never count for another game.
+  it('should_complete_a_goal_of_the_counters_when_the_saved_counters_of_its_game_reach_its_count', async () => {
+    const achievements = [
+      { id: 'merge-256', goal: BestCountReached.of(MERGE, AchievementCount.of(256)) },
+      { id: 'merge-2048', goal: BestCountReached.of(MERGE, AchievementCount.of(2048)) },
+      { id: 'sort-goals', goal: TotalCountReached.of(SORT, AchievementCount.of(10)) },
+      { id: 'lines-combo', goal: BestCountReached.of(LINES, AchievementCount.of(3)) },
+    ];
+    const progress = await progressWith(FIT, []);
+
+    const none = await listOf(achievements, progress).execute({});
+    const merged = await listOf(achievements, progress, await countersWith(MERGE, 256, 10)).execute(
+      {},
+    );
+
+    expect(rowsOf(none)).toEqual([
+      ['merge-256', false],
+      ['merge-2048', false],
+      ['sort-goals', false],
+      ['lines-combo', false],
+    ]);
+    expect(rowsOf(merged)).toEqual([
+      ['merge-256', true],
+      ['merge-2048', false],
+      ['sort-goals', false],
+      ['lines-combo', false],
+    ]);
+  });
+
+  it('should_fail_with_list_failed_when_the_counter_repository_throws', async () => {
+    const broken: AchievementCounterRepository = {
+      load: () => Promise.reject(new Error('The counters are gone.')),
+      save: () => Promise.resolve(),
+    };
+
+    const result = await listOf(
+      [{ id: 'sort-goals', goal: TotalCountReached.of(SORT, AchievementCount.of(10)) }],
+      await progressWith(FIT, []),
+      broken,
+    ).execute({});
+
+    expect(rowsOf(result)).toBe('list-failed');
+    expect(result.ok ? undefined : result.error.message).toBe('The counters are gone.');
   });
 
   it('should_fail_with_list_failed_when_the_progress_repository_throws', async () => {

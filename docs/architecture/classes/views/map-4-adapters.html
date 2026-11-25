@@ -64,22 +64,23 @@
       <h1>Adapters, presenters and drivers at a glance</h1>
 
       <svg
-        viewBox="0 0 1040 1667"
+        viewBox="0 0 1040 1683"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="mapad-title mapad-desc"
       >
         <title id="mapad-title">HexaBlock adapters map · UML class diagram</title>
         <desc id="mapad-desc">
-          Overview map of the 66 classes of layers 4 and 3 in 13 groups. The composition root group
+          Overview map of the 67 classes of layers 4 and 3 in 13 groups. The composition root group
           holds CompositionRoot, GameRegistry and BoardFigure, the drivers group holds
           SequentialMatchIds, the move controls group holds MoveControls, FitControls, MergeControls
-          and BoardOnlyControls, and the events group holds NullGameEventPublisher. Each line joins
-          two classes: GameScreen renders BoardView and keeps its GamePresenter and its
-          MoveControls, CompositionRoot creates InMemoryGameRepository, DeviceKeyValueStore
-          implements KeyValueStore, GamePresenter keeps its StateMapper and LocalProgressRepository
-          keeps its KeyValueStore. No line touches a group frame. Each group names the view that
-          shows its members.
+          and BoardOnlyControls, and the events group holds GameEventBus, GameEventListener,
+          AchievementCounterListener and NullGameEventPublisher. Each line joins two classes:
+          GameScreen renders BoardView and keeps its GamePresenter and its MoveControls,
+          CompositionRoot creates InMemoryGameRepository, DeviceKeyValueStore implements
+          KeyValueStore, GamePresenter keeps its StateMapper and LocalProgressRepository keeps its
+          KeyValueStore. No line touches a group frame. Each group names the view that shows its
+          members.
         </desc>
         <defs>
           <marker
@@ -521,7 +522,7 @@
           x="464"
           y="1040"
           width="520"
-          height="128"
+          height="178"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -591,7 +592,7 @@
           x="368"
           y="1242"
           width="480"
-          height="78"
+          height="122"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -1874,6 +1875,24 @@
             </tspan>
           </text>
         </g>
+        <g data-class="LocalAchievementCounterRepository">
+          <rect
+            x="480"
+            y="1168"
+            width="320"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="640" y="1189" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              LocalAchievementCounterRepository
+            </tspan>
+          </text>
+        </g>
+
         <!-- Chips: view models -->
         <g data-class="GameViewModel">
           <rect
@@ -2022,6 +2041,23 @@
             </tspan>
           </text>
         </g>
+        <g data-class="AchievementCounterListener">
+          <rect
+            x="528"
+            y="1314"
+            width="184"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="620" y="1335" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              AchievementCounterListener
+            </tspan>
+          </text>
+        </g>
 
         <!-- Footnote -->
         <text
@@ -2095,8 +2131,18 @@
           registeredAchievements() of layer 4 gives ListAchievements its achievements. Their goals
           live in layer 1 since #326.
         </text>
-        <!-- The last footnote line and the legend sit 16 lower than before: the footnote has one more line since #326. -->
-        <g transform="translate(0 16)">
+        <text
+          x="24"
+          y="1542"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          LocalAchievementCounterRepository saves the counters of the achievements over the same
+          KeyValueStore, and AchievementCounterListener writes them (#363).
+        </text>
+        <!-- The last footnote line and the legend sit 32 lower than before: the footnote has one more line since #326 and one more since #363. -->
+        <g transform="translate(0 32)">
           <text
             x="24"
             y="1526"
@@ -2104,7 +2150,8 @@
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            RootLayout, BoardView and the screens are React components of layer 4, not classes.
+            RootLayout, BoardView and the screens are React components of layer 4, not classes. The
+            GameScreen chip stands for the route and the GameStage that it renders.
           </text>
 
           <!-- Legend -->

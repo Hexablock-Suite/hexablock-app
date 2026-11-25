@@ -1,5 +1,7 @@
 import type { ReadonlyBoard } from './board';
 import type { Cloneable } from './cloneable';
+import type { GameEvent } from './game-events';
+import type { GameId } from './game-id';
 import type { GameStateId } from './game-state-id';
 import type { GridAxis } from './grid-topology';
 import type { MatchId } from './match-id';
@@ -49,6 +51,16 @@ export abstract class BoardSnapshot<TCell, TCoord, TAxis extends GridAxis = Grid
   // and a state takes it back with `restore()`.
   scoreSoFar(): Score {
     return this.score;
+  }
+
+  // The events of the move that led to this photo, in their order (issue #361).
+  // `GameEngine` asks the photo after an accepted move, and it gives the ids of its game, so the
+  // root builds each event (classes.md decision 29). A variant photo builds the events of its
+  // variant from the facts of the last move that it keeps. The engine names no variant event.
+  // This photo keeps no fact of a move, so it gives no event. The parameters exist for a
+  // variant photo, so this base ignores them.
+  eventsOfLastMove(_game: GameId, _match: MatchId): readonly GameEvent[] {
+    return [];
   }
 
   // The data that the screen of the variant draws. Each variant photo narrows the type.

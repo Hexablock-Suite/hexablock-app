@@ -1,4 +1,5 @@
 import { Score } from '../../engine/score';
+import type { ValueReceiver } from '../../engine/value-receiver';
 
 // The points of each cleared line, before any multiplier.
 // The value codes the accepted rule of issue #59 (D22, 2026-11-06).
@@ -10,6 +11,8 @@ const POINTS_PER_LINE = 10;
 // A count of lines is a safe integer of 0 or more. Any other number throws a RangeError.
 // A negative zero is stored as 0. The object is frozen, so no caller writes the value.
 // The value is private, and no operation returns it: the count gives its points as a `Score`.
+// `deliverTo()` gives the number to an adapter of the edge: the counter of the achievements
+// keeps the most lines at once (issue #363).
 export class LineCount {
   private constructor(private readonly value: number) {
     Object.freeze(this);
@@ -27,6 +30,12 @@ export class LineCount {
   // Two counts are equal when they hold the same value.
   equals(other: LineCount): boolean {
     return this.value === other.value;
+  }
+
+  // Gives the number of lines to `receiver`. It returns nothing.
+  // No code of the domain or of the use cases calls it (rule R-no-delivery-call).
+  deliverTo(receiver: ValueReceiver<number>): void {
+    receiver.receive(this.value);
   }
 
   // True when the placement cleared no line.
