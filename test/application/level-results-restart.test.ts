@@ -159,11 +159,15 @@ function runOf(game: LevelGame, store: KeyValueStore) {
 }
 
 // The rows after a won first level: it is completed with `stars`, the second level is open,
-// and every later level stays locked (S3-12). The later ids come from the bundled levels.
+// and every later level stays locked (S3-12). The later ids come from the bundled levels
+// of the hex figure. The levels of the square and of the triangle (#354) are not on its list.
 async function rowsAfterWin(game: LevelGame, stars: number): Promise<Row[]> {
   const [first, second] = game.levelIds;
   const levels = await new BundledLevelRepository().list(game.gameId);
-  const later = levels.slice(2).map((level) => delivered(level.levelId()));
+  const later = levels
+    .filter((level) => level.isPlayedOn(TopologyId.hex))
+    .slice(2)
+    .map((level) => delivered(level.levelId()));
   return [
     { level: first, status: 'completed', stars },
     { level: second, status: 'open' },

@@ -1,0 +1,24 @@
+{
+  "gameId": "hexa-sort",
+  "levelId": "sort-triangle-03",
+  "order": 3,
+  "version": 1,
+  "topology": "triangle",
+  "section": {
+    "radius": 2,
+    "goals": 3,
+    "source": {
+      "stacks": [
+        ["red", "red", "red", "red"],
+        ["blue", "blue", "blue", "blue"],
+        ["green", "green", "green", "red", "red", "red"],
+        ["red", "red", "red", "blue", "blue", "blue"],
+        ["yellow", "yellow"],
+        ["green", "green", "green", "green"],
+        ["blue", "blue", "blue"],
+        ["green", "green", "green"]
+      ]
+    },
+    "stars": [{ "maxMoves": 10 }, { "maxMoves": 9 }, { "maxMoves": 8 }]
+  }
+}

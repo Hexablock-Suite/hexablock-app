@@ -31,6 +31,7 @@ import { fitLevelFile, squareFitLevelFile } from '../support/variants/hexa-fit/f
 // `KeyValueStore`. A level is won when `SaveProgress` saves its result.
 
 const FIT = GameId.of('hexa-fit');
+const SORT = GameId.of('hexa-sort');
 const LINES = GameId.of('hexa-lines');
 const geometry = new HexGeometry();
 const onHex: ListLevelsRequest = { gameId: FIT, figure: TopologyId.hex };
@@ -65,10 +66,15 @@ const fitPlay = (moves: number, ms: number) =>
     elapsedMs: ElapsedTime.ofMs(ms),
   });
 
-// The ids of the bundled Fit levels after the first two, in the order of the repository.
+// The ids of the bundled Fit levels of the hexagon after the first two, in the order
+// of the repository. The levels of the square and of the triangle (#354) are not on the list
+// of the hexagon.
 async function laterFitIds(): Promise<string[]> {
   const levels = await new BundledLevelRepository().list(FIT);
-  return levels.slice(2).map((level) => delivered(level.levelId()));
+  return levels
+    .filter((level) => level.isPlayedOn(TopologyId.hex))
+    .slice(2)
+    .map((level) => delivered(level.levelId()));
 }
 
 // `ListLevels` over the bundled levels, and `SaveProgress` of the first Fit level,
@@ -135,8 +141,9 @@ describe('ListLevels', () => {
 
   // The open point of S3-08: the list of a figure with no level is empty, and it is no failure.
   // A game with no levels, such as Hexa Lines, gives the same empty list.
+  // Since #354 every figure has bundled Fit levels, so the repository holds only a hex level.
   it('should_give_an_empty_list_when_no_level_of_the_game_is_played_on_the_chosen_figure', async () => {
-    const { list } = fitUseCases();
+    const { list } = fitUseCases(new BundledLevelRepository([fitLevelFile()]));
 
     const results = [
       await list.execute({ gameId: FIT, figure: TopologyId.triangle }),
@@ -144,6 +151,38 @@ describe('ListLevels', () => {
     ];
 
     expect(results).toEqual([Result.success([]), Result.success([])]);
+  });
+
+  // Done when of issue #354: with the square or the triangle chosen, Fit and Sort list
+  // their bundled levels of that figure, in order. The first level is open,
+  // and the others are locked.
+  it('should_list_the_bundled_fit_and_sort_levels_of_the_figure_when_the_square_or_the_triangle_is_chosen', async () => {
+    const { list } = fitUseCases();
+    const rows: [string, Row[] | string][] = [];
+
+    for (const [figure, name] of [
+      [TopologyId.square, 'square'],
+      [TopologyId.triangle, 'triangle'],
+    ] as const) {
+      for (const [gameId, game] of [
+        [FIT, 'fit'],
+        [SORT, 'sort'],
+      ] as const) {
+        rows.push([`${game} on ${name}`, rowsOf(await list.execute({ gameId, figure }))]);
+      }
+    }
+
+    const levelsOf = (prefix: string): Row[] => [
+      { level: `${prefix}-01`, status: 'open' },
+      { level: `${prefix}-02`, status: 'locked' },
+      { level: `${prefix}-03`, status: 'locked' },
+    ];
+    expect(rows).toEqual([
+      ['fit on square', levelsOf('fit-square')],
+      ['sort on square', levelsOf('sort-square')],
+      ['fit on triangle', levelsOf('fit-triangle')],
+      ['sort on triangle', levelsOf('sort-triangle')],
+    ]);
   });
 
   it('should_open_only_the_first_level_when_the_game_has_no_saved_progress', async () => {
