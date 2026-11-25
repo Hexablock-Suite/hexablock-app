@@ -18,7 +18,7 @@ So sprint 0 is the design week, and it holds no code. Sprints 1 to 5 are the fiv
 
 ## Dates
 
-Every sprint runs from Monday to Sunday. The dates come from the course calendar.
+Every sprint runs from Monday to Sunday, except sprint 5, which closes on Friday 2026-12-11 with the first defense day. The dates come from the course calendar.
 
 | Date                | What                                                                                      | Sprint |
 | ------------------- | ----------------------------------------------------------------------------------------- | ------ |
