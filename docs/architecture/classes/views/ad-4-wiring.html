@@ -64,7 +64,7 @@
       <h1>Wiring: the drivers and the composition root</h1>
 
       <svg
-        viewBox="0 0 1040 1317"
+        viewBox="0 0 1040 1349"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="adwiring-title adwiring-desc"
@@ -81,7 +81,9 @@
           LevelGameFactories, which implements the GameFactories port, in layer 3, so single-scope
           injection replaces a classic Singleton. With a store in its drivers it creates
           LocalProgressRepository once, keeps it as progress for every consumer of the saved
-          progress, and builds ListAchievements over it once, and listAchievements() gives it.
+          progress, and builds ListAchievements over it once, and listAchievements() gives it. It
+          also answers loadProgress(gameId) with one LoadProgress per game, which reads the saved
+          progress of that game back (#181).
         </desc>
         <defs>
           <marker
@@ -289,7 +291,7 @@
         />
         <!-- CompositionRoot reads each BoardFigure of boardFigures() and builds its GameRegistry: use with a verb, inside layer 4 -->
         <path
-          d="M272 452 H192 Q184 452 184 460 V596"
+          d="M272 452 H192 Q184 452 184 460 V636"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -574,7 +576,7 @@
           x="272"
           y="272"
           width="408"
-          height="300"
+          height="332"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -648,11 +650,17 @@
         <text x="304" y="556" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           AchievementSummary[]›
         </text>
+        <text x="288" y="572" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + loadProgress(gameId: GameId): UseCase‹LoadProgressRequest,
+        </text>
+        <text x="304" y="588" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          GameProgress | undefined›
+        </text>
 
         <!-- Class: BoardFigure (the board figure that the player chooses, #171) -->
         <rect
           x="48"
-          y="596"
+          y="636"
           width="272"
           height="132"
           rx="6"
@@ -660,11 +668,11 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="48" y1="640" x2="320" y2="640" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="48" y1="700" x2="320" y2="700" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="48" y1="680" x2="320" y2="680" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="48" y1="740" x2="320" y2="740" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="184"
-          y="614"
+          y="654"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -675,7 +683,7 @@
         </text>
         <text
           x="184"
-          y="632"
+          y="672"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -684,23 +692,23 @@
         >
           BoardFigure
         </text>
-        <text x="64" y="656" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="696" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + id: TopologyId
         </text>
-        <text x="64" y="672" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="712" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + geometry: GeometryFactory‹TCoord›
         </text>
-        <text x="64" y="688" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="728" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + fitLevel?: FitLevel‹TCoord›
         </text>
-        <text x="64" y="716" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="756" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + layoutOf(size: number): BoardLayout‹TCoord›
         </text>
 
         <!-- UML template box of BoardFigure: type parameter on the top-right corner -->
         <rect
           x="276"
-          y="586"
+          y="626"
           width="44"
           height="18"
           rx="2"
@@ -711,7 +719,7 @@
         />
         <text
           x="298"
-          y="598"
+          y="638"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1040,11 +1048,21 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
+          It answers loadProgress(gameId) with one LoadProgress per game over that repository
+          (#181). A root with no store offers neither, and asking throws a RangeError.
+        </text>
+        <text
+          x="24"
+          y="1196"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
           registeredAchievements() gives it the seven achievements. Their goals, LevelsWon and
           EveryLevelWon, live in layer 1 since #326 (view 3.6).
         </text>
-        <!-- The legend sits 16 lower than before: the footnote has one more line since #326. -->
-        <g transform="translate(0 16)">
+        <!-- The legend sits 32 lower than before: the footnote has two more lines since #181. -->
+        <g transform="translate(0 32)">
           <!-- Legend -->
           <line
             x1="24"
