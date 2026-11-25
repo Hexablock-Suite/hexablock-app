@@ -1,5 +1,7 @@
 import { GameId } from '../domain/engine/game-id';
+import type { GameProgress } from '../domain/engine/game-progress';
 import type { TopologyId } from '../domain/engine/geometry-factory';
+import type { ProgressRecord } from '../domain/engine/progress-model';
 import type { TextKey, Texts } from './texts/text-catalog';
 
 // One board figure of the figure selector (#171).
@@ -34,6 +36,9 @@ export interface GameChoice {
   readonly name: string;
   // The place of the game on the map, for example «Estación Línea».
   readonly place: string;
+  // The saved high score of the game as one text, for example «Récord 36» (#181).
+  // It exists only when the saved progress of the game keeps a high score.
+  readonly highScore?: string;
 }
 
 // The view model of the game selector map.
@@ -48,21 +53,29 @@ export interface GameSelectorViewModel {
 // The key of the name of a game in the text catalog: `game.<id>.name`.
 const GAME_NAME = /^game\.([a-z0-9-]+)\.name$/;
 
+// The saved progress of each game, as the map hook loads it (#181). Each pair joins a `GameId`
+// with the progress that the device keeps for it, or `undefined` when the game has none.
+export type SavedProgresses = readonly (readonly [GameId, GameProgress | undefined])[];
+
 // The presenter of the home screen and of the game selector map (MVP, issue #169).
 // It lives in layer 3 and imports no React. A route gives it the ids of the registered games,
-// the board figures of the composition root (#171) and the texts of one language,
-// so a test builds it without a screen.
+// the board figures of the composition root (#171), the texts of one language and, since #181,
+// the saved progress of each game, so a test builds it without a screen.
 // The selector lists the games in the order of the registry. So a fifth variant adds one entry
 // to the registry and its texts to the catalog, and this presenter does not change.
 // `GameId` keeps its text private. The presenter finds the texts of a game with `GameId.equals()`:
 // it compares the id of each game that the catalog names with the registered id.
 // `TopologyId` delivers its text to a receiver (issue #237). A presenter is an adapter of the
 // edge, so it takes that text as the id of a figure and finds its name under `figure.<id>`.
+// The choice of a game whose saved progress keeps a high score also carries the record text:
+// the presenter reads the `Score` of the high score through `deliverTo()`, the one exit of a
+// value (rule R-no-delivery-call), and composes it with the `map.highScore` text of the catalog.
 export class HomePresenter {
   constructor(
     private readonly games: readonly GameId[],
     private readonly figures: readonly TopologyId[],
     private readonly texts: Texts,
+    private readonly saved: SavedProgresses = [],
   ) {}
 
   // A figure that the catalog does not name throws a RangeError.
@@ -100,7 +113,35 @@ export class HomePresenter {
   private choiceOf(gameId: GameId): GameChoice {
     const id = this.namedIds().find((candidate) => GameId.of(candidate).equals(gameId));
     if (id === undefined) throw new RangeError('The text catalog names no game with this id.');
-    return { id, name: this.text(`game.${id}.name`), place: this.text(`game.${id}.place`) };
+    const choice = { id, name: this.text(`game.${id}.name`), place: this.text(`game.${id}.place`) };
+    const highScore = this.highScoreText(gameId);
+    return highScore === undefined ? choice : { ...choice, highScore };
+  }
+
+  // The record text of the saved progress of `gameId`, or `undefined` when the game has no
+  // saved progress or its progress keeps no high score. The presenter is an adapter of the
+  // edge, so it receives the values through `deliverTo()` (rule R-no-delivery-call).
+  private highScoreText(gameId: GameId): string | undefined {
+    const progress = this.saved.find(([game]) => game.equals(gameId))?.[1];
+    if (progress === undefined) return undefined;
+    let highScore: ProgressRecord | undefined;
+    progress.deliverTo({
+      receive: (_id, record) => {
+        highScore = record;
+      },
+    });
+    if (highScore === undefined) return undefined;
+    let score = 0;
+    highScore.deliverTo({
+      receive: (_id, scoreValue) => {
+        scoreValue.deliverTo({
+          receive: (value) => {
+            score = value;
+          },
+        });
+      },
+    });
+    return `${this.text('map.highScore')} ${score}`;
   }
 
   // The id of each game that the catalog names, from its keys `game.<id>.name`.

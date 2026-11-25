@@ -2,7 +2,10 @@
 import { HomePresenter } from '../../src/adapters/home-presenter';
 import { textCatalog } from '../../src/adapters/texts/text-catalog';
 import { GameId } from '../../src/domain/engine/game-id';
+import { GameProgress } from '../../src/domain/engine/game-progress';
 import { TopologyId } from '../../src/domain/engine/geometry-factory';
+import { ProgressRecord } from '../../src/domain/engine/progress-model';
+import { Score } from '../../src/domain/engine/score';
 
 // Issue #169: `HomePresenter` gives the view models of the home screen and of the game
 // selector map. It takes the ids of the registered games, the board figures of the root
@@ -145,5 +148,47 @@ describe('HomePresenter', () => {
     expect(() => presenter.gameSelector()).toThrow(
       new RangeError('The text catalog has no text for the key "game.hexa-fill.place".'),
     );
+  });
+
+  // Issue #181: the presenter receives the saved progress of each game from the hook of the
+  // map, and the choice of a game with a high score carries the composed record text.
+  it('should_add_the_record_text_to_a_choice_when_the_saved_progress_keeps_a_high_score', () => {
+    const LINES = GameId.of('hexa-lines');
+    const FIT = GameId.of('hexa-fit');
+    const progress = GameProgress.start(LINES);
+    progress.recordScore(ProgressRecord.of({ gameId: LINES, score: Score.of(36) }));
+    const saved: readonly (readonly [GameId, GameProgress | undefined])[] = [
+      [LINES, progress],
+      [FIT, undefined],
+    ];
+
+    const games = new HomePresenter(FOUR_GAMES, THREE_FIGURES, textCatalog.es, saved).gameSelector()
+      .games;
+
+    expect(games[0]).toEqual({
+      id: 'hexa-lines',
+      name: 'Hexa Lines',
+      place: 'Estación Línea',
+      highScore: 'Récord 36',
+    });
+    expect(games[1]).toEqual({ id: 'hexa-fit', name: 'Hexa Fit', place: 'La Colmena' });
+  });
+
+  // The record text composes the `map.highScore` text of each language with the score, so
+  // both catalogs show it.
+  it('should_compose_the_record_text_of_each_language_when_the_presenter_reads_the_catalog', () => {
+    const LINES = GameId.of('hexa-lines');
+    const progress = GameProgress.start(LINES);
+    progress.recordScore(ProgressRecord.of({ gameId: LINES, score: Score.of(2048) }));
+
+    const spanish = new HomePresenter(FOUR_GAMES, THREE_FIGURES, textCatalog.es, [
+      [LINES, progress],
+    ]).gameSelector().games[0];
+    const english = new HomePresenter(FOUR_GAMES, THREE_FIGURES, textCatalog.en, [
+      [LINES, progress],
+    ]).gameSelector().games[0];
+
+    expect(spanish?.highScore).toBe('Récord 2048');
+    expect(english?.highScore).toBe('High score 2048');
   });
 });

@@ -1,8 +1,15 @@
 import path from 'node:path';
 
-import { fireEvent, renderRouter, screen, testRouter } from 'expo-router/testing-library';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { fireEvent, renderRouter, screen, testRouter, within } from 'expo-router/testing-library';
 import { StyleSheet } from 'react-native';
 
+import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
+import { GameId } from '../../src/domain/engine/game-id';
+import { GameProgress } from '../../src/domain/engine/game-progress';
+import { ProgressRecord } from '../../src/domain/engine/progress-model';
+import { Score } from '../../src/domain/engine/score';
+import { DeviceKeyValueStore } from '../../src/infrastructure/device-key-value-store';
 import { spaces } from '../support/ui/board-spaces';
 import { outlinesIn } from '../support/ui/cell-outlines';
 import { repoRoot } from '../support/run-tool';
@@ -47,7 +54,27 @@ const FIGURE_SHAPES = [
 
 // Issue #169: the game selector map lists the games of the registry and opens each one.
 // Since #170 the game route shows `GameScreen`, whose header names the game.
+// Since #181 the map reads the saved progress of the device through the composition root,
+// and the real root logs each use case call, so the tests keep the console quiet.
 describe('GameSelectorScreen', () => {
+  let info: jest.SpyInstance;
+
+  beforeEach(async () => {
+    info = jest.spyOn(console, 'info').mockImplementation(() => undefined);
+    await AsyncStorage.clear();
+  });
+
+  afterEach(() => {
+    info.mockRestore();
+  });
+
+  // Saves a high score on the device, as the victory screen of #180 will do.
+  async function saveHighScore(gameId: GameId, score: number): Promise<void> {
+    const progress = GameProgress.start(gameId);
+    progress.recordScore(ProgressRecord.of({ gameId, score: Score.of(score) }));
+    await new LocalProgressRepository(new DeviceKeyValueStore()).save(progress);
+  }
+
   // The check of APP-FR-01 (#36): a UI test opens each of the four variants from the selector.
   it('should_open_each_of_the_four_variants_when_the_player_picks_it_on_the_map', async () => {
     const app = await renderRouter(appDir, { initialUrl: '/map' });
@@ -66,6 +93,23 @@ describe('GameSelectorScreen', () => {
       '/game/hexa-sort',
       '/game/hexa-merge',
     ]);
+  });
+
+  // Issue #181: the sign of each world also shows the saved high score of its game. The
+  // device keeps one for Hexa Lines and for Hexa Merge, and none for Fit and Sort.
+  it('should_show_the_record_of_lines_and_merge_when_the_map_opens_after_a_restart', async () => {
+    await saveHighScore(GameId.of('hexa-lines'), 36);
+    await saveHighScore(GameId.of('hexa-merge'), 2048);
+
+    await renderRouter(appDir, { initialUrl: '/map' });
+
+    expect(
+      within(screen.getByRole('button', { name: /^Hexa Lines/ })).getByText('Récord 36'),
+    ).toBeOnTheScreen();
+    expect(
+      within(screen.getByRole('button', { name: /^Hexa Merge/ })).getByText('Récord 2048'),
+    ).toBeOnTheScreen();
+    expect(screen.getAllByText(/Récord/)).toHaveLength(2);
   });
 
   it('should_return_to_the_home_screen_when_the_player_presses_back', async () => {
