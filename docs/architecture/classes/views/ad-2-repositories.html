@@ -64,7 +64,7 @@
       <h1>Repositories: Adapter over storage and HTTP</h1>
 
       <svg
-        viewBox="0 0 1040 904"
+        viewBox="0 0 1040 924"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="adrepos-title adrepos-desc"
@@ -421,6 +421,9 @@
           text-anchor="middle"
         >
           ApiDtoMapper
+          <tspan data-requirement="APP-FR-13" fill="#5b6873" font-size="8" font-weight="400">
+            «Sprint 4»
+          </tspan>
         </text>
         <text x="392" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + toProgressDto(progress: GameProgress): ProgressDto
@@ -466,6 +469,9 @@
           text-anchor="middle"
         >
           ApiProgressRepository
+          <tspan data-requirement="APP-FR-13" fill="#5b6873" font-size="8" font-weight="400">
+            «Sprint 4»
+          </tspan>
         </text>
         <text x="760" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - client: ApiClient
@@ -895,6 +901,26 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
+        </text>
+        <!-- Legend: the «Sprint N» marker of a planned class or member -->
+        <text
+          x="24"
+          y="901"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          «Sprint N»
+        </text>
+        <text
+          x="92"
+          y="901"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Planned design, not in the code yet · N is the docs/ROADMAP.md sprint of the requirement
+          it serves
         </text>
       </svg>
     </div>

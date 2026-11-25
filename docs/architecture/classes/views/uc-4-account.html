@@ -64,7 +64,7 @@
       <h1>Account and settings: session and settings ports</h1>
 
       <svg
-        viewBox="0 0 1040 780"
+        viewBox="0 0 1040 800"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="ucaccount-title ucaccount-desc"
@@ -392,6 +392,9 @@
           text-anchor="middle"
         >
           Register
+          <tspan data-requirement="APP-FR-12" fill="#5b6873" font-size="8" font-weight="400">
+            «Sprint 4»
+          </tspan>
         </text>
         <text
           x="184"
@@ -453,6 +456,9 @@
           text-anchor="middle"
         >
           Login
+          <tspan data-requirement="APP-FR-12" fill="#5b6873" font-size="8" font-weight="400">
+            «Sprint 4»
+          </tspan>
         </text>
         <text
           x="488"
@@ -512,6 +518,9 @@
           text-anchor="middle"
         >
           UpdateSettings
+          <tspan data-requirement="APP-FR-10" fill="#5b6873" font-size="8" font-weight="400">
+            «Sprint 4»
+          </tspan>
         </text>
         <text
           x="840"
@@ -568,6 +577,9 @@
           text-anchor="middle"
         >
           SessionStore
+          <tspan data-requirement="APP-FR-12" fill="#5b6873" font-size="8" font-weight="400">
+            «Sprint 4»
+          </tspan>
         </text>
         <text x="280" y="404" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + read(): Promise&lt;Session | undefined&gt;
@@ -612,6 +624,9 @@
           text-anchor="middle"
         >
           SettingsStore
+          <tspan data-requirement="APP-FR-10" fill="#5b6873" font-size="8" font-weight="400">
+            «Sprint 4»
+          </tspan>
         </text>
         <text x="720" y="404" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + load(): Promise&lt;Settings&gt;
@@ -653,6 +668,9 @@
           text-anchor="middle"
         >
           AccountGateway
+          <tspan data-requirement="APP-FR-12" fill="#5b6873" font-size="8" font-weight="400">
+            «Sprint 4»
+          </tspan>
         </text>
         <text x="168" y="548" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + register(credentials: Credentials): Promise&lt;Session&gt;
@@ -694,6 +712,9 @@
           text-anchor="middle"
         >
           Session
+          <tspan data-requirement="APP-FR-12" fill="#5b6873" font-size="8" font-weight="400">
+            «Sprint 4»
+          </tspan>
         </text>
         <text x="624" y="548" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + token: string
@@ -850,6 +871,26 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Lollipop · input port + binding
+        </text>
+        <!-- Legend: the «Sprint N» marker of a planned class or member -->
+        <text
+          x="24"
+          y="777"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          «Sprint N»
+        </text>
+        <text
+          x="92"
+          y="777"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Planned design, not in the code yet · N is the docs/ROADMAP.md sprint of the requirement
+          it serves
         </text>
       </svg>
     </div>

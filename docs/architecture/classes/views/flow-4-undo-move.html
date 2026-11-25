@@ -479,7 +479,7 @@
         <line x1="40" y1="272" x2="440" y2="272" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <line x1="40" y1="312" x2="440" y2="312" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="56" y="288" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - undoMove: UseCase&lt;void, MoveResult&lt;TCell, TCoord&gt;&gt;
+          - undoMove: UseCase&lt;UndoMoveRequest, MoveResult&lt;TCell, TCoord&gt;&gt;
         </text>
         <text x="56" y="304" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           applyMove, mapper: flow 1
@@ -712,7 +712,7 @@
           failed Result when offersUndo() or canUndo() is false
         </text>
         <text x="316" y="672" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + execute(request: void):
+          + execute(request: UndoMoveRequest):
         </text>
         <text x="332" y="688" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Promise&lt;Result&lt;MoveResult&lt;TCell, TCoord&gt;&gt;&gt;
@@ -1272,7 +1272,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          GameScreen is a React component of layer 4, not a class.
+          GameScreen is a React component of layer 4, not a class. Its box stands for the route and
+          the GameStage that it renders.
         </text>
         <!-- Legend -->
         <line
