@@ -80,7 +80,8 @@
           the bundled levels, and creates NullGameEventPublisher, InMemoryGameRepository and
           LevelGameFactories, which implements the GameFactories port, in layer 3, so single-scope
           injection replaces a classic Singleton. With a store in its drivers it creates
-          LocalProgressRepository and builds ListAchievements once, and listAchievements() gives it.
+          LocalProgressRepository once, keeps it as progress for every consumer of the saved
+          progress, and builds ListAchievements over it once, and listAchievements() gives it.
         </desc>
         <defs>
           <marker
@@ -172,7 +173,7 @@
           x="256"
           y="240"
           width="728"
-          height="332"
+          height="340"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -249,7 +250,7 @@
         <!-- CompositionRoot creates NullGameEventPublisher: use «create», down from layer 4 to layer 3 -->
         <line
           x1="460"
-          y1="556"
+          y1="572"
           x2="460"
           y2="800"
           stroke="#5b6873"
@@ -259,7 +260,7 @@
         <!-- CompositionRoot creates one InMemoryGameRepository per game and figure: use «create», down from layer 4 to layer 3 -->
         <line
           x1="640"
-          y1="556"
+          y1="572"
           x2="640"
           y2="800"
           stroke="#5b6873"
@@ -269,7 +270,7 @@
         <!-- CompositionRoot creates one LevelGameFactories per game and figure: use «create», down from layer 4 to layer 3 -->
         <line
           x1="336"
-          y1="556"
+          y1="572"
           x2="336"
           y2="800"
           stroke="#5b6873"
@@ -279,7 +280,7 @@
         <!-- CompositionRoot creates LocalProgressRepository over the store of its drivers: use «create», down from layer 4 to layer 3 -->
         <line
           x1="580"
-          y1="556"
+          y1="572"
           x2="580"
           y2="928"
           stroke="#5b6873"
@@ -573,7 +574,7 @@
           x="272"
           y="272"
           width="408"
-          height="284"
+          height="300"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -582,7 +583,7 @@
         <rect x="272" y="272" width="408" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
         <rect x="272" y="312" width="408" height="8" fill="rgba(15,111,116,0.10)" />
         <line x1="272" y1="320" x2="680" y2="320" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
-        <line x1="272" y1="460" x2="680" y2="460" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <line x1="272" y1="476" x2="680" y2="476" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text
           x="476"
           y="290"
@@ -621,27 +622,30 @@
           - levels: LevelRepository
         </text>
         <text x="288" y="416" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - wired: Map‹RegisteredGame, GameUseCases›
+          - progress: ProgressRepository [0..1]
         </text>
         <text x="288" y="432" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - wired: Map‹RegisteredGame, GameUseCases›
+        </text>
+        <text x="288" y="448" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - achievements: UseCase‹ListAchievementsRequest,
         </text>
-        <text x="304" y="448" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="304" y="464" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           AchievementSummary[]› [0..1]
         </text>
-        <text x="288" y="476" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="288" y="492" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + figures(): TopologyId[]
         </text>
-        <text x="288" y="492" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="288" y="508" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + registry(figure: TopologyId = hex): GameRegistry
         </text>
-        <text x="288" y="508" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="288" y="524" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + gameUseCases(gameId: GameId, figure: TopologyId = hex): GameUseCases
         </text>
-        <text x="288" y="524" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="288" y="540" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + listAchievements(): UseCase‹ListAchievementsRequest,
         </text>
-        <text x="304" y="540" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="304" y="556" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           AchievementSummary[]›
         </text>
 
