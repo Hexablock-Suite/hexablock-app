@@ -46,7 +46,6 @@ jobs:
       BACKEND_URL: http://localhost:3000
       # Paired transition (app issue #346): verify against the API commit that
       # serves /v1. Empty or removed restores the normal API main verification.
-      API_REF: d3e2e35acb95df119e5d1c8bb191a2b3193208e5
     steps:
       - uses: actions/checkout@v7
       - name: validate the paired API revision

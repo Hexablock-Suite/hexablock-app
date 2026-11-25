@@ -15,6 +15,10 @@ const LINK = /\/(?:issues|pull)\/(\d+)\)/g;
 const RELEASED: Record<string, number[]> = {
   '0.0.0': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 23],
   '0.1.0': [63, 67, 68, 69, 70, 71, 72, 73, 74, 75, 86],
+  '0.3.0': [
+    49, 145, 156, 162, 164, 166, 246, 287, 292, 296, 297, 298, 299, 301, 315, 317, 318, 319, 321,
+    325,
+  ],
 };
 
 // Returns true when the YYYY-MM-DD text names a day of the calendar.
