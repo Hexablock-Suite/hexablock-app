@@ -32,6 +32,7 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 
 ### Fixed
 
+- `GameProgress` refuses a progress record of another game ([#372](https://github.com/Hexablock-Suite/hexablock-app/issues/372), APP-FR-09, classes.md decision 56). `recordScore()` and `recordLevel()` ask the record `isOfGame()` and throw a `RangeError` for a record of another game, and the progress stays as it was. `SaveProgress` turns that error into a `save-failed` failure before it saves anything. View `engine-4-sources` shows the new query, and its PNG image is exported again.
 - The determinism lint rule now rejects `performance.now()`, `crypto.randomUUID()`, `crypto.getRandomValues()` and `Date()` in domain and application code ([#324](https://github.com/Hexablock-Suite/hexablock-app/issues/324)).
 - Keep Hexa Lines playing on a triangular board when a piece still fits. The board finds candidate placements by aligning a piece cell with a free space through the topology, rather than treating a triangle coordinate as a move offset.
 

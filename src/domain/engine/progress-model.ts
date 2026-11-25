@@ -84,6 +84,8 @@ export class GameResult {
 // So the record has no check of its own: a `Score`, a `LevelId`, `Stars`, `Moves`
 // and an `ElapsedTime` are valid when they exist.
 // Every field is private (issue #240). A progress keeps the best record with `improves()`.
+// A progress asks `isOfGame()` before it records a record, so it keeps only the records
+// of its own game (issue #372).
 // A repository of the edge receives the fields through `deliverTo()` (issue #164).
 export class ProgressRecord {
   private constructor(
@@ -124,6 +126,12 @@ export class ProgressRecord {
       sameOptional(this.elapsedMs, other.elapsedMs, (left, right) => left.equals(right)) &&
       this.gameId.equals(other.gameId)
     );
+  }
+
+  // Tells if this record is a record of the game `gameId`.
+  // A record with no level id, as in Lines and Merge, has a game too.
+  isOfGame(gameId: GameId): boolean {
+    return this.gameId.equals(gameId);
   }
 
   // Tells if this record and `other` are the results of one level.
