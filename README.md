@@ -27,7 +27,49 @@ The full product table and every requirement are in [docs/REQUIREMENTS.md](docs/
 
 ## Demo / Screenshots
 
-TODO: add screenshots or a short video of each variant.
+The pictures come from the web build (`pnpm web:build`, [#287](https://github.com/Hexablock-Suite/hexablock-app/issues/287)), which lets the team open every screen in a browser. Each screen was captured at a phone viewport of 430 × 932 and at a desktop viewport of 1280 × 800. The web build is a tool for the team and not a deliverable: [no screen of this page was seen on a phone](docs/web/README.md), and [docs/web/prototype-differences.md](docs/web/prototype-differences.md) compares the screens with the team prototype. [How the screenshots were taken](docs/web/README.md#the-screenshots).
+
+**Game selector map**
+
+![Game selector map on a phone viewport of 430 by 932: the world of each game on the hexagon figure](docs/web/screenshots/map-phone.png)
+
+![Game selector map on a desktop viewport of 1280 by 800](docs/web/screenshots/map-desktop.png)
+
+**Home**
+
+![Home screen on a phone viewport of 430 by 932: the four games, the figure selector and the achievements button](docs/web/screenshots/home-phone.png)
+
+![Home screen on a desktop viewport of 1280 by 800](docs/web/screenshots/home-desktop.png)
+
+**Achievements**
+
+![Achievements screen on a phone viewport of 430 by 932: each achievement as in progress or completed](docs/web/screenshots/achievements-phone.png)
+
+![Achievements screen on a desktop viewport of 1280 by 800](docs/web/screenshots/achievements-desktop.png)
+
+**Hexa Lines**
+
+![Hexa Lines game screen on a phone viewport of 430 by 932: the triangular board, the tray of pieces and the score](docs/web/screenshots/game-hexa-lines-phone.png)
+
+![Hexa Lines game screen on a desktop viewport of 1280 by 800](docs/web/screenshots/game-hexa-lines-desktop.png)
+
+**Hexa Fit**
+
+![Hexa Fit game screen on a phone viewport of 430 by 932: the square board, the pieces to fit and the score](docs/web/screenshots/game-hexa-fit-phone.png)
+
+![Hexa Fit game screen on a desktop viewport of 1280 by 800](docs/web/screenshots/game-hexa-fit-desktop.png)
+
+**Hexa Sort**
+
+![Hexa Sort game screen on a phone viewport of 430 by 932: the offered stack, the board and the goal](docs/web/screenshots/game-hexa-sort-phone.png)
+
+![Hexa Sort game screen on a desktop viewport of 1280 by 800](docs/web/screenshots/game-hexa-sort-desktop.png)
+
+**Hexa Merge**
+
+![Hexa Merge game screen on a phone viewport of 430 by 932: the board of tiles, the slide buttons and the score](docs/web/screenshots/game-hexa-merge-phone.png)
+
+![Hexa Merge game screen on a desktop viewport of 1280 by 800](docs/web/screenshots/game-hexa-merge-desktop.png)
 
 ## Architecture
 
@@ -324,7 +366,7 @@ Test titles follow `should_<expected_result>_when_<condition>`. The linter and `
 
 ## AI Usage Documentation
 
-TODO: summarize AI tool use here; the full log lives in [AI_USAGE.md](AI_USAGE.md).
+Every task that an AI tool did is logged in [AI_USAGE.md](AI_USAGE.md), one row per pull request with the date, the task, the tool and what the team changed (APP-NFR-22). Claude Code holds most of the rows: the parent sessions run on Claude Fable 5.2 and write through Claude Opus 5.5 as an `odd-worker` subagent; OpenCode with GLM-5.3-Flash and Pi appear in their own rows. The log also names the auxiliary tools outside the repository, and its Critical Evaluation section records where the output helped, where it was wrong and how the team verified it.
 
 ## Contributing
 
