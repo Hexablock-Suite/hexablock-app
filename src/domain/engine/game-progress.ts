@@ -9,6 +9,9 @@ import type { Stars } from './stars';
 // because the device keeps one progress per game. Two progresses are equal when they belong
 // to one game, whatever they keep.
 // A progress model records each result in it (`IProgressModel`).
+// The progress takes only the records of its own game (APP-FR-09, issue #372).
+// `recordScore()` and `recordLevel()` throw a RangeError for a record of another game,
+// and the progress stays as it was. The progress asks the record with `isOfGame()`.
 // The progress asks each record whether it `improves()` the stored record.
 // So it keeps the best record by the order of DS-4 and DS-12, and a tie keeps the stored record.
 // Every field is private. A repository of the edge receives the fields through `deliverTo()`
@@ -34,7 +37,9 @@ export class GameProgress {
 
   // Keeps `record` as the high score when it improves the stored high score,
   // or when the progress has no high score yet.
+  // A record of another game throws a RangeError, and the progress stays as it was.
   recordScore(record: ProgressRecord): void {
+    this.refuseAnotherGame(record);
     if (this.highScore === undefined || record.improves(this.highScore)) {
       this.highScore = record;
     }
@@ -42,7 +47,9 @@ export class GameProgress {
 
   // Keeps `record` as the result of its level when it improves the stored result of that level,
   // or when the level has no result yet.
+  // A record of another game throws a RangeError, and the progress stays as it was.
   recordLevel(record: ProgressRecord): void {
+    this.refuseAnotherGame(record);
     const index = this.levels.findIndex((stored) => stored.isForSameLevelAs(record));
     const stored = this.levels[index];
     if (stored === undefined) {
@@ -68,6 +75,15 @@ export class GameProgress {
       if (stars !== undefined) return stars;
     }
     return undefined;
+  }
+
+  // Throws a RangeError when `record` is a record of another game.
+  // The check is the same for every game, so the engine does not branch on the game (APP-NFR-08).
+  private refuseAnotherGame(record: ProgressRecord): void {
+    const ofThisGame = record.isOfGame(this.gameId);
+    if (!ofThisGame) {
+      throw new RangeError('A progress records only the results of its own game.');
+    }
   }
 
   // Gives the game id, the high score and the record of each level to `receiver`.
