@@ -1,11 +1,16 @@
 /** @jest-environment node */
+import { AchievementCounterListener } from '../../src/adapters/achievement-counter-listener';
 import { FitStateMapper } from '../../src/adapters/fit-state-mapper';
+import { GameEventBus } from '../../src/adapters/game-event-bus';
 import { MergeStateMapper } from '../../src/adapters/merge-state-mapper';
 import { SortStateMapper } from '../../src/adapters/sort-state-mapper';
 import { LinesStateMapper } from '../../src/adapters/lines-state-mapper';
 import { GameId } from '../../src/domain/engine/game-id';
 import { TopologyId } from '../../src/domain/engine/geometry-factory';
 import { LevelId } from '../../src/domain/engine/level-id';
+import { Turns } from '../../src/domain/engine/turns';
+import { PlaceFitPiece } from '../../src/domain/variants/hexa-fit/fit-move';
+import { PieceId } from '../../src/domain/variants/hexa-fit/piece-id';
 import { FitCellRenderer } from '../../src/infrastructure/board/fit-cell-renderer';
 import { MergeCellRenderer } from '../../src/infrastructure/board/merge-cell-renderer';
 import { SortCellRenderer } from '../../src/infrastructure/board/sort-cell-renderer';
@@ -18,6 +23,7 @@ import { SortControls } from '../../src/infrastructure/ui/sort-controls';
 import { errorOf, valueOf } from '../support/application/game-use-cases';
 import { RecordingLogger } from '../support/application/recording-logger';
 import { BOARD_ID } from '../support/engine/entity-ids';
+import { withGeometryOf } from '../support/engine/geometry-of';
 import { ManualClock } from '../support/engine/manual-clock';
 import { firstMoveOf } from '../support/engine/variant-game';
 import { variantIdOf } from '../support/variants/variant-id';
@@ -286,6 +292,41 @@ describe('CompositionRoot', () => {
         new RangeError('The root offers no board figure with this id.'),
       );
     });
+  });
+
+  // Issue #362: the root builds one `GameEventBus`, subscribes its first listener to it, and gives
+  // it to the `ApplyMove` of every game. The first Fit level of a figure ends with a victory
+  // after two moves, so each game records one `GameOver`. The Fit games of the hexagon and of
+  // the square have two `ApplyMove` over two repositories, and both publish to the same bus.
+  it('should_give_one_bus_with_the_counter_listener_to_every_apply_move_when_the_root_wires_the_games', async () => {
+    const subscribe = jest.spyOn(GameEventBus.prototype, 'subscribe');
+    const publish = jest.spyOn(GameEventBus.prototype, 'publish');
+    try {
+      const root = testRoot();
+
+      for (const figure of [TopologyId.hex, TopologyId.square]) {
+        const { startGame, applyMove } = root.gameUseCases(GameId.of('hexa-fit'), figure);
+        valueOf(await startGame.execute({}));
+        for (const move of withGeometryOf(figure === TopologyId.hex ? 'hex' : 'square', {
+          use: (geometry) => [
+            new PlaceFitPiece(PieceId.of('a'), Turns.of(0), geometry.createCoord([0, 0])),
+            new PlaceFitPiece(PieceId.of('b'), Turns.of(0), geometry.createCoord([2, 0])),
+          ],
+        })) {
+          valueOf(await applyMove.execute({ move }));
+        }
+      }
+
+      expect(subscribe).toHaveBeenCalledTimes(1);
+      expect(subscribe.mock.calls[0][0]).toBeInstanceOf(AchievementCounterListener);
+      const bus = subscribe.mock.contexts[0];
+      expect(publish).toHaveBeenCalledTimes(2);
+      expect(publish.mock.contexts).toEqual([bus, bus]);
+      expect(publish.mock.contexts.every((context) => context === bus)).toBe(true);
+    } finally {
+      subscribe.mockRestore();
+      publish.mockRestore();
+    }
   });
 
   // Issue #172 (S3-13 in #151, option D): the root builds one `StartGame` for each game,
