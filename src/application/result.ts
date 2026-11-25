@@ -15,6 +15,7 @@ export const FailureCode = Object.freeze({
   nothingToRedo: 'nothing-to-redo',
   redoFailed: 'redo-failed',
   saveFailed: 'save-failed',
+  loadFailed: 'load-failed',
   listFailed: 'list-failed',
   unexpectedFailure: 'unexpected-failure',
 } as const);

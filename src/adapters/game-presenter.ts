@@ -67,6 +67,7 @@ const ERROR_TEXTS: Readonly<Record<FailureCode, TextKey>> = {
   'nothing-to-redo': 'play.error.nothing-to-redo',
   'redo-failed': 'play.error',
   'save-failed': 'play.error',
+  'load-failed': 'play.error',
   'list-failed': 'play.error',
   'unexpected-failure': 'play.error',
 };
