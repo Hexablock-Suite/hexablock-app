@@ -2,7 +2,7 @@
 import { BundledLevelRepository } from '../../src/adapters/bundled-level-repository';
 import type { KeyValueStore } from '../../src/adapters/key-value-store';
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
-import { LevelStatus, type LevelSummary } from '../../src/application/level-summary';
+import type { LevelSummary } from '../../src/application/level-summary';
 import { ListLevels } from '../../src/application/list-levels';
 import { Result } from '../../src/application/result';
 import { SaveProgress } from '../../src/application/save-progress';
@@ -12,6 +12,7 @@ import { TopologyId } from '../../src/domain/engine/geometry-factory';
 import { HexGeometry } from '../../src/domain/engine/hex-geometry';
 import type { LevelDefinition } from '../../src/domain/engine/level-definition';
 import { LevelId } from '../../src/domain/engine/level-id';
+import { LevelStatus } from '../../src/domain/engine/level-status';
 import { Moves } from '../../src/domain/engine/moves';
 import {
   GameResult,

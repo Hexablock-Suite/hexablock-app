@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { LevelStatus } from '../../src/application/level-summary';
+import { LevelStatus } from '../../src/domain/engine/level-status';
 
 // The status of a level in the list of levels is a closed set of three instances
 // (issue #168, S3-12 in #151). It follows the form of `Outcome` (classes.md decision 45).

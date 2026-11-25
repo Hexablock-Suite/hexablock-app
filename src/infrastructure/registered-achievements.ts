@@ -1,4 +1,5 @@
-import { EveryLevelWon, LevelsWon, type Achievement } from '../application/achievement';
+import type { Achievement } from '../application/achievement';
+import { EveryLevelWon, LevelsWon } from '../domain/engine/achievement-goal';
 import { GameId } from '../domain/engine/game-id';
 
 // The achievements of the player, in the order of the achievements screen (issue #188).
@@ -16,8 +17,8 @@ export function registeredAchievements(): Achievement[] {
     { id: 'lines-combo' },
     { id: 'merge-256' },
     { id: 'merge-2048' },
-    { id: 'fit-3', goal: new LevelsWon(fit, 3) },
-    { id: 'sort-3', goal: new LevelsWon(sort, 3) },
+    { id: 'fit-3', goal: LevelsWon.of(fit, 3) },
+    { id: 'sort-3', goal: LevelsWon.of(sort, 3) },
     { id: 'fit-all', goal: new EveryLevelWon(fit) },
     { id: 'sort-goals' },
   ];
