@@ -275,9 +275,9 @@ describe('GameStage', () => {
         }
       }
 
-      // Hexa Lines, Hexa Sort and Hexa Merge on each of the three figures, and Hexa Fit
-      // on the hexagon only: 10 boards at each width.
-      expect([boards, tooWide]).toEqual([30, []]);
+      // The four games on each of the three figures: 12 boards at each width.
+      // Since #354 Hexa Fit has a first level on the square and on the triangle too.
+      expect([boards, tooWide]).toEqual([36, []]);
     });
 
     // A wide window, as the web build on a desktop (#287). The content stays in the column

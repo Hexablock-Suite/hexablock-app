@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fireEvent, renderRouter, screen, testRouter } from 'expo-router/testing-library';
 import { StyleSheet } from 'react-native';
 
+import { spaces } from '../support/ui/board-spaces';
 import { outlinesIn } from '../support/ui/cell-outlines';
 import { repoRoot } from '../support/run-tool';
 
@@ -83,45 +84,53 @@ describe('GameSelectorScreen', () => {
     expect(screen.getByRole('header', { name: 'Mapa de mundos' })).toBeOnTheScreen();
   });
 
-  // Issue #171: the map lists the games of the chosen figure. The first content has a Fit level
-  // only on the hexagon, so Fit offers no level on the square (S3-08 in #151, a proposal).
-  it('should_list_the_games_of_the_figure_when_the_route_names_the_square', async () => {
-    await renderRouter(appDir, { initialUrl: '/map?figure=square' });
+  // Issue #171: the map lists the games of the chosen figure. Fit offers only the levels
+  // of the figure (S3-08 in #151, a proposal). Since #354 the square and the triangle have
+  // a first Fit level, so their maps show Fit, and Fit starts its first level of three cells.
+  it('should_list_the_four_games_and_start_the_first_fit_level_when_the_route_names_the_square_or_the_triangle', async () => {
+    const seen: [string, string[], number][] = [];
 
-    const shown = FOUR_VARIANTS.filter(
-      (name) => screen.queryByRole('button', { name: new RegExp(`^${name}`) }) !== null,
-    );
+    for (const figure of ['square', 'triangle']) {
+      await renderRouter(appDir, { initialUrl: `/map?figure=${figure}` });
+      const shown = FOUR_VARIANTS.filter(
+        (name) => screen.queryByRole('button', { name: new RegExp(`^${name}`) }) !== null,
+      );
+      await fireEvent.press(screen.getByRole('button', { name: /^Hexa Fit/ }));
+      await screen.findByText('En juego');
+      seen.push([figure, shown, spaces().length]);
+      await screen.unmount();
+    }
 
-    expect(shown).toEqual(['Hexa Lines', 'Hexa Sort', 'Hexa Merge']);
+    expect(seen).toEqual([
+      ['square', FOUR_VARIANTS, 3],
+      ['triangle', FOUR_VARIANTS, 3],
+    ]);
   });
 
-  // Issue #298: a game keeps its color on the map of every figure. Fit has no entry on the square,
-  // so Sort and Merge take another place in the list there.
+  // Issue #298: a game keeps its color on the map of every figure.
   it('should_show_each_game_in_one_color_when_the_maps_of_the_hexagon_and_the_square_list_it', async () => {
-    const games = ['Hexa Sort', 'Hexa Merge'];
     await renderRouter(appDir, { initialUrl: '/map' });
-    const onHexagon = games.map(colorsOfWorld);
+    const onHexagon = FOUR_VARIANTS.map(colorsOfWorld);
     await testRouter.replace('/map?figure=square');
-    expect(screen.queryByRole('button', { name: /^Hexa Fit/ })).toBeNull();
-    const onSquare = games.map(colorsOfWorld);
+    const onSquare = FOUR_VARIANTS.map(colorsOfWorld);
 
     expect(onHexagon.every((colors) => colors.length > 0)).toBe(true);
-    expect(onHexagon[0]).not.toEqual(onHexagon[1]);
+    expect(new Set(onHexagon.map((colors) => JSON.stringify(colors))).size).toBe(4);
     expect(onSquare).toEqual(onHexagon);
   });
 
-  // Issue #298: the side of a world follows its place in the list, not the game, so the path
-  // keeps its zig-zag on the square, where Fit has no entry.
-  it('should_put_the_worlds_on_alternate_sides_when_the_square_has_no_fit_entry', async () => {
+  // Issue #298: the side of a world follows its place in the list, so the path zig-zags.
+  // Since #354 the square lists the four games, as the hexagon does.
+  it('should_put_the_worlds_on_alternate_sides_when_the_map_of_the_square_opens', async () => {
     await renderRouter(appDir, { initialUrl: '/map?figure=square' });
 
-    const sides = ['Hexa Lines', 'Hexa Sort', 'Hexa Merge'].map(
+    const sides = FOUR_VARIANTS.map(
       (name) =>
         StyleSheet.flatten(screen.getByRole('button', { name: new RegExp(`^${name}`) }).props.style)
           .alignSelf,
     );
 
-    expect(sides).toEqual(['flex-start', 'flex-end', 'flex-start']);
+    expect(sides).toEqual(['flex-start', 'flex-end', 'flex-start', 'flex-end']);
   });
 
   // Issue #297: the marker of each game on the map has the shape of the figure of the map
@@ -159,8 +168,10 @@ describe('GameSelectorScreen', () => {
     expect(screen.getByRole('header', { name: 'HexaBlock Suite' })).toBeOnTheScreen();
   });
 
-  it('should_go_to_the_map_of_the_figure_when_the_game_route_names_a_game_of_another_figure', async () => {
-    const app = await renderRouter(appDir, { initialUrl: '/game/hexa-fit?figure=triangle' });
+  // Since #354 every registered game runs on every figure, so the route names a game id
+  // that no registry of the root holds.
+  it('should_go_to_the_map_of_the_figure_when_the_game_route_names_no_game_of_that_figure', async () => {
+    const app = await renderRouter(appDir, { initialUrl: '/game/hexa-fill?figure=triangle' });
 
     expect(screen).toHavePathname('/map');
     expect(app.getSearchParams()).toEqual({ figure: 'triangle' });

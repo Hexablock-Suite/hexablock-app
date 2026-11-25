@@ -5,16 +5,29 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { BundledLevelRepository } from '../../../src/adapters/bundled-level-repository';
 import { FitStateMapper } from '../../../src/adapters/fit-state-mapper';
 import fit01 from '../../../src/adapters/levels/fit/fit-01.json';
+import fitSquare01 from '../../../src/adapters/levels/fit/fit-square-01.json';
+import fitSquare02 from '../../../src/adapters/levels/fit/fit-square-02.json';
+import fitSquare03 from '../../../src/adapters/levels/fit/fit-square-03.json';
+import fitTriangle01 from '../../../src/adapters/levels/fit/fit-triangle-01.json';
+import fitTriangle02 from '../../../src/adapters/levels/fit/fit-triangle-02.json';
+import fitTriangle03 from '../../../src/adapters/levels/fit/fit-triangle-03.json';
 import { GamePresenter } from '../../../src/adapters/game-presenter';
 import { textCatalog } from '../../../src/adapters/texts/text-catalog';
 import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
 import { GameId } from '../../../src/domain/engine/game-id';
+import { TopologyId, type GeometryFactory } from '../../../src/domain/engine/geometry-factory';
 import type { HexCoord } from '../../../src/domain/engine/hex-topology';
+import { LevelDefinition } from '../../../src/domain/engine/level-definition';
+import { SquareGeometry } from '../../../src/domain/engine/square-geometry';
+import { TriangleGeometry } from '../../../src/domain/engine/triangle-geometry';
 import { FitFactory } from '../../../src/domain/variants/hexa-fit/fit-factory';
 import type { FitLevel } from '../../../src/domain/variants/hexa-fit/fit-level';
 import { FitLevelBuilder } from '../../../src/domain/variants/hexa-fit/fit-level-builder';
+import type { BoardLayout } from '../../../src/infrastructure/board/board-layout';
 import { FitCellRenderer } from '../../../src/infrastructure/board/fit-cell-renderer';
 import { HexLayout } from '../../../src/infrastructure/board/hex-layout';
+import { SquareLayout } from '../../../src/infrastructure/board/square-layout';
+import { TriangleLayout } from '../../../src/infrastructure/board/triangle-layout';
 import { FitControls } from '../../../src/infrastructure/ui/fit-controls';
 import { GameStage } from '../../../src/infrastructure/ui/game-stage';
 import { gameUseCases } from '../../support/application/game-use-cases';
@@ -48,11 +61,14 @@ async function firstBundledLevel(): Promise<FitLevel<HexCoord>> {
   return definition.buildWith(new FitLevelBuilder(geometry));
 }
 
-// Every bundled Fit level, as the level repository of the app gives it, built with the Fit
-// level builder. The list grows when a task adds a level file (#49).
+// Every bundled Fit level on the hexagon, as the level repository of the app gives it, built
+// with the Fit level builder. The list grows when a task adds a level file (#49).
+// The levels of the square and of the triangle (#354) need their own geometry.
 async function bundledLevels(): Promise<FitLevel<HexCoord>[]> {
   const definitions = await new BundledLevelRepository().list(GameId.of('hexa-fit'));
-  return definitions.map((definition) => definition.buildWith(new FitLevelBuilder(geometry)));
+  return definitions
+    .filter((definition) => definition.isPlayedOn(TopologyId.hex))
+    .map((definition) => definition.buildWith(new FitLevelBuilder(geometry)));
 }
 
 // Opens the game screen on the level `fit-01` with the screen parts of Fit.
@@ -62,15 +78,31 @@ async function openFirstBundledLevel(clock = new ManualClock()): Promise<void> {
 
 // Opens the game screen on the Fit level `level` with the screen parts of Fit.
 async function openLevel(level: FitLevel<HexCoord>, clock = new ManualClock()): Promise<void> {
+  await openLevelOn({ geometry, layoutOf: (size) => new HexLayout(size) }, level, clock);
+}
+
+// A board figure of the game screen: its geometry and the layout of its spaces.
+interface ScreenFigure<TCoord> {
+  readonly geometry: GeometryFactory<TCoord>;
+  readonly layoutOf: (size: number) => BoardLayout<TCoord>;
+}
+
+// Opens the game screen on the Fit level `level` of the board figure `figure`
+// with the screen parts of Fit.
+async function openLevelOn<TCoord>(
+  figure: ScreenFigure<TCoord>,
+  level: FitLevel<TCoord>,
+  clock = new ManualClock(),
+): Promise<void> {
   const { startGame, applyMove, undoMove, redoMove } = gameUseCases(
-    new FitFactory(geometry, level, clock),
+    new FitFactory(figure.geometry, level, clock),
   );
   const presenter = new GamePresenter(
     startGame,
     applyMove,
     undoMove,
     redoMove,
-    new FitStateMapper(geometry.createTopology()),
+    new FitStateMapper(figure.geometry.createTopology()),
     textCatalog.es,
   );
   await render(
@@ -79,7 +111,7 @@ async function openLevel(level: FitLevel<HexCoord>, clock = new ManualClock()): 
         title="Hexa Fit"
         presenter={presenter}
         renderer={new FitCellRenderer()}
-        layoutOf={(size) => new HexLayout(size)}
+        layoutOf={figure.layoutOf}
         controls={new FitControls()}
         texts={textCatalog.es}
         onBack={jest.fn()}
@@ -98,6 +130,60 @@ const redoButton = () => screen.getByRole('button', { name: 'Rehacer' });
 
 async function choose(id: string): Promise<void> {
   await fireEvent.press(piece(id));
+}
+
+// The fields of a bundled Fit level file that a play of its witness reads.
+interface WitnessFile {
+  readonly levelId: string;
+  readonly order: number;
+  readonly topology: string;
+  readonly section: {
+    readonly figure: number[][];
+    readonly witness: readonly { piece: string; rotation: number; at: number[] }[];
+  };
+}
+
+// The index in reading order of the space of each cell of `cells`: row by row from the top,
+// and from left to right in each row, as `spaces()` reads the board. The layout of size 1
+// gives the center of each cell. The board places each space in the same order at any size.
+function readingIndexes<TCoord>(
+  cells: readonly TCoord[],
+  layout: BoardLayout<TCoord>,
+): Map<TCoord, number> {
+  const centers = cells.map((cell) => ({ cell, ...layout.centerOf(cell) }));
+  centers.sort((a, b) => (Math.abs(a.y - b.y) < 1e-6 ? a.x - b.x : a.y - b.y));
+  return new Map(centers.map(({ cell }, index) => [cell, index]));
+}
+
+// Plays the witness of `file` on the game screen of the board figure `figure`, as a player does:
+// the player picks each piece, presses the rotate button once for each rotation step and presses
+// the space of the cell that the witness names as the offset of the piece.
+// It gives the id of the level and whether the screen shows the victory.
+async function playWitnessOn<TCoord>(
+  figure: ScreenFigure<TCoord>,
+  file: WitnessFile,
+): Promise<[string, boolean]> {
+  const { geometry: shapes } = figure;
+  const level = LevelDefinition.of(file).buildWith(new FitLevelBuilder(shapes));
+  await openLevelOn(figure, level);
+  const cells = file.section.figure.map((values) => shapes.createCoord(values));
+  const indexes = readingIndexes(cells, figure.layoutOf(1));
+  const topology = shapes.createTopology();
+  const spaceOf = (values: number[]) => {
+    const key = topology.key(shapes.createCoord(values));
+    const cell = cells.find((each) => topology.key(each).equals(key));
+    return cell === undefined ? -1 : (indexes.get(cell) ?? -1);
+  };
+  for (const { piece: id, rotation, at } of file.section.witness) {
+    await choose(id);
+    for (let step = 0; step < rotation; step += 1) {
+      await fireEvent.press(screen.getByRole('button', { name: 'Girar' }));
+    }
+    await pressSpace(spaceOf(at));
+  }
+  const won = screen.queryByText('¡Victoria!') !== null;
+  await screen.unmount();
+  return [file.levelId, won];
 }
 
 // A drawn host element, as the queries of the screen give it.
@@ -290,6 +376,40 @@ describe('FitControls', () => {
     expect(occupiedSpaces()).toEqual([0, 1, 2, 3, 4, 5]);
     expect(trayPieces()).toEqual([]);
     expect(screen.getByText('Todas las piezas están en la figura.')).toBeOnTheScreen();
+  });
+
+  // Issue #354 and the trap of #174: on the triangle each cell points up or down, and
+  // a placement keeps the orientation of each cell. So the player plays the witness of each
+  // bundled square and triangle level on the screen, and each level is won.
+  // The press gives the pressed cell to the move as the offset of the piece. On the triangle
+  // an offset counts lattice cells, so the piece can cover other cells than the pressed one:
+  // each triangle witness names as its offset a cell of the figure that is free at its turn.
+  it('should_reach_the_victory_outcome_when_the_player_plays_the_witness_of_each_square_and_triangle_level', async () => {
+    const square = {
+      geometry: new SquareGeometry(),
+      layoutOf: (size: number) => new SquareLayout(size),
+    };
+    const triangle = {
+      geometry: new TriangleGeometry(),
+      layoutOf: (size: number) => new TriangleLayout(size),
+    };
+    const played: [string, boolean][] = [];
+
+    for (const file of [fitSquare01, fitSquare02, fitSquare03]) {
+      played.push(await playWitnessOn(square, file));
+    }
+    for (const file of [fitTriangle01, fitTriangle02, fitTriangle03]) {
+      played.push(await playWitnessOn(triangle, file));
+    }
+
+    expect(played).toEqual([
+      ['fit-square-01', true],
+      ['fit-square-02', true],
+      ['fit-square-03', true],
+      ['fit-triangle-01', true],
+      ['fit-triangle-02', true],
+      ['fit-triangle-03', true],
+    ]);
   });
 
   // Issue #296: the tray draws each piece through `BoardView`, so each space of a piece

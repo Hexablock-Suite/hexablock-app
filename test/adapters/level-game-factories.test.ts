@@ -117,7 +117,7 @@ describe('LevelGameFactories', () => {
   });
 
   // S3-08 in #151: a level runs only on the figure that its topology names.
-  // Every bundled level is hex, so the Sort factories of the square refuse `sort-01`.
+  // `sort-01` is a hex level, so the Sort factories of the square refuse it.
   it('should_reject_the_level_when_its_topology_is_not_the_figure_of_the_variant', async () => {
     const factories = new LevelGameFactories(
       SORT,

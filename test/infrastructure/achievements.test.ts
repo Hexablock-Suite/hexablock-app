@@ -10,8 +10,7 @@ import type { Result } from '../../src/application/result';
 import { SaveProgress } from '../../src/application/save-progress';
 import type { AchievementSummary } from '../../src/application/list-achievements';
 import { GameId } from '../../src/domain/engine/game-id';
-import { HexGeometry } from '../../src/domain/engine/hex-geometry';
-import type { HexCoord } from '../../src/domain/engine/hex-topology';
+import type { GeometryFactory } from '../../src/domain/engine/geometry-factory';
 import { LevelDefinition } from '../../src/domain/engine/level-definition';
 import { LevelId } from '../../src/domain/engine/level-id';
 import { Moves } from '../../src/domain/engine/moves';
@@ -26,6 +25,7 @@ import { CompositionRoot } from '../../src/infrastructure/composition-root';
 import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-store';
 import { gameUseCases, valueOf } from '../support/application/game-use-cases';
 import { RecordingLogger } from '../support/application/recording-logger';
+import { withGeometryOf } from '../support/engine/geometry-of';
 import { ManualClock } from '../support/engine/manual-clock';
 import { repoRoot } from '../support/run-tool';
 
@@ -34,7 +34,6 @@ import { repoRoot } from '../support/run-tool';
 // A new root over the same store is a restart of the app: the store keeps what the old root saved.
 
 const FIT = GameId.of('hexa-fit');
-const geometry = new HexGeometry();
 
 // The achievements of issue #188, in the order of the screen.
 const SEVEN = [
@@ -67,7 +66,10 @@ function completedOf(result: Result<AchievementSummary[]>): string[] | string {
 
 // The place move of each witness entry of a bundled Fit level: the piece turns,
 // and then it moves by `at`.
-function witnessMoves(file: FitFile): PlaceFitPiece<HexCoord>[] {
+function witnessMoves<TCoord>(
+  file: FitFile,
+  geometry: GeometryFactory<TCoord>,
+): PlaceFitPiece<TCoord>[] {
   return file.section.witness.map(
     (entry) =>
       new PlaceFitPiece(
@@ -81,13 +83,24 @@ function witnessMoves(file: FitFile): PlaceFitPiece<HexCoord>[] {
 // Plays the bundled Fit level of `file` to its end through `StartGame` and `ApplyMove`, with the
 // moves of its witness. Then it saves the result through `SaveProgress` over the local progress
 // of `store`, as the victory screen of #180 does. It gives the outcome of the last move.
+// The level plays on the geometry of the figure that its `topology` names (#354).
 async function playAndSave(file: FitFile, store: InMemoryKeyValueStore): Promise<Outcome> {
+  return withGeometryOf(file.topology, { use: (geometry) => playAndSaveOn(geometry, file, store) });
+}
+
+async function playAndSaveOn<TCoord>(
+  geometry: GeometryFactory<TCoord>,
+  file: FitFile,
+  store: InMemoryKeyValueStore,
+): Promise<Outcome> {
   const level = LevelDefinition.of(file).buildWith(new FitLevelBuilder(geometry));
   const factory = new FitFactory(geometry, level, new ManualClock());
   const { startGame, applyMove } = gameUseCases(factory);
   valueOf(await startGame.execute({}));
-  let last: MoveResult<unknown, HexCoord> | undefined;
-  for (const move of witnessMoves(file)) last = valueOf(await applyMove.execute({ move }));
+  let last: MoveResult<unknown, TCoord> | undefined;
+  for (const move of witnessMoves(file, geometry)) {
+    last = valueOf(await applyMove.execute({ move }));
+  }
   if (last === undefined) throw new RangeError('The witness holds no move.');
   const save = new SaveProgress(
     new LocalProgressRepository(store),
@@ -132,7 +145,8 @@ describe('CompositionRoot achievements', () => {
 
   // Done when of issue #188: a test earns one achievement through a played game, and the
   // achievement is still there after the app restarts. Every bundled Fit level won earns
-  // «win 3 levels of Hexa Fit» and «win every Hexa Fit level».
+  // «win 3 levels of Hexa Fit» and «win every Hexa Fit level». Since #354 every Fit level
+  // includes the levels of the square and of the triangle.
   it('should_keep_the_fit_achievements_completed_after_a_restart_when_every_fit_level_is_won', async () => {
     const store = new InMemoryKeyValueStore();
     const before = await rootOver(store).listAchievements().execute({});

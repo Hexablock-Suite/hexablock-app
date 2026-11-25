@@ -1,6 +1,7 @@
 // A square Fit level in the shared level format: a figure of 2 x 2 squares and two dominoes.
 // The witness turns the second domino by a half turn (issue #168, S3-08 in #151).
-// Every bundled level is hex today, so this level exists only in test/.
+// This level exists only in test/. It is not the bundled level `fit-square-01` of #354:
+// a test gives it to the repository in place of the bundled files.
 // Its order is 2, so the list of a square figure shows a first level that is not level 1.
 export function squareFitLevelFile() {
   return {

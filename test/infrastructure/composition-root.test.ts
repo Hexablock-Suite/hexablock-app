@@ -191,14 +191,15 @@ describe('CompositionRoot', () => {
     });
 
     // S3-08 in #151 («Propuesta, pendiente del equipo»): Fit offers only the levels whose
-    // `topology` names the chosen figure. The first content has one Fit level, on the hexagon.
-    it('should_offer_fit_only_on_the_hexagon_when_only_the_hexagon_has_a_fit_level', () => {
+    // `topology` names the chosen figure. Since #354 each figure has a first Fit level,
+    // so the map of each figure shows the four games.
+    it('should_offer_fit_on_every_figure_when_each_figure_has_a_first_fit_level', () => {
       const root = testRoot();
 
       expect(FIGURES.map((figure) => root.registry(figure).gameIds().map(variantIdOf))).toEqual([
         FOUR_VARIANTS,
-        ['hexa-lines', 'hexa-sort', 'hexa-merge'],
-        ['hexa-lines', 'hexa-sort', 'hexa-merge'],
+        FOUR_VARIANTS,
+        FOUR_VARIANTS,
       ]);
     });
 
@@ -220,6 +221,7 @@ describe('CompositionRoot', () => {
 
     // A board region of size 5 holds 61 hexagons, 25 squares or 50 triangles,
     // and a region of size 3 holds 19 hexagons, 9 squares or 18 triangles.
+    // The first Fit level of each figure has three cells in a row.
     it('should_build_each_board_on_the_geometry_of_the_figure_when_the_figure_is_chosen', () => {
       const root = testRoot();
 
@@ -234,8 +236,8 @@ describe('CompositionRoot', () => {
 
       expect(spaces).toEqual([
         [61, 3, 19, 19],
-        [25, 9, 9],
-        [50, 18, 18],
+        [25, 3, 9, 9],
+        [50, 3, 18, 18],
       ]);
     });
 
@@ -254,11 +256,7 @@ describe('CompositionRoot', () => {
         played.push(ids);
       }
 
-      expect(played).toEqual([
-        FOUR_VARIANTS,
-        ['hexa-lines', 'hexa-sort', 'hexa-merge'],
-        ['hexa-lines', 'hexa-sort', 'hexa-merge'],
-      ]);
+      expect(played).toEqual([FOUR_VARIANTS, FOUR_VARIANTS, FOUR_VARIANTS]);
     });
 
     it('should_answer_no_running_game_when_the_game_started_only_on_another_figure', async () => {
@@ -276,7 +274,7 @@ describe('CompositionRoot', () => {
     });
 
     it('should_throw_a_range_error_when_the_game_is_not_registered_on_the_figure', () => {
-      expect(() => testRoot().gameUseCases(GameId.of('hexa-fit'), TopologyId.square)).toThrow(
+      expect(() => testRoot().gameUseCases(GameId.of('hexa-fill'), TopologyId.square)).toThrow(
         new RangeError('The registry holds no game with this id.'),
       );
     });
@@ -302,7 +300,7 @@ describe('CompositionRoot', () => {
       expect(started.freeSpaces).toHaveLength(7);
     });
 
-    // Hexa Lines has no levels. Every bundled Sort level is hex, so the square refuses it (S3-08).
+    // Hexa Lines has no levels. `sort-01` is a hex level, so the square refuses it (S3-08).
     it('should_answer_start_failed_when_the_game_on_the_figure_has_no_level_with_the_id', async () => {
       const root = testRoot();
 
@@ -322,6 +320,40 @@ describe('CompositionRoot', () => {
       expect(errors.map((error) => [error.code, error.message])).toEqual([
         ['start-failed', 'The game has no level with this id.'],
         ['start-failed', 'A Sort level builder cannot build the board of another topology.'],
+      ]);
+    });
+
+    // Issue #354: the square and the triangle have their own Fit and Sort levels.
+    // A start with no level id starts the first Fit level of the figure: three cells in a row.
+    // A start with the id of the first bundled level of the figure starts that level:
+    // the Fit level `fit-<figure>-01` has six cells, and a Sort board of radius 2
+    // has 9 squares or 18 triangles.
+    it('should_start_the_first_fit_and_sort_levels_of_the_figure_when_the_square_or_the_triangle_is_chosen', async () => {
+      const root = testRoot();
+      const FIT = GameId.of('hexa-fit');
+      const SORT = GameId.of('hexa-sort');
+      const started: [string, number, number, number][] = [];
+
+      for (const [figure, name] of [
+        [TopologyId.square, 'square'],
+        [TopologyId.triangle, 'triangle'],
+      ] as const) {
+        const fit = root.gameUseCases(FIT, figure).startGame;
+        const sort = root.gameUseCases(SORT, figure).startGame;
+        const first = valueOf(await fit.execute({}));
+        const fitLevel = valueOf(await fit.execute({ levelId: LevelId.of(`fit-${name}-01`) }));
+        const sortLevel = valueOf(await sort.execute({ levelId: LevelId.of(`sort-${name}-01`) }));
+        started.push([
+          name,
+          first.freeSpaces.length,
+          fitLevel.freeSpaces.length,
+          sortLevel.freeSpaces.length,
+        ]);
+      }
+
+      expect(started).toEqual([
+        ['square', 3, 6, 9],
+        ['triangle', 3, 6, 18],
       ]);
     });
   });

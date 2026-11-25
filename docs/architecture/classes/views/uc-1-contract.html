@@ -718,7 +718,7 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Every use case implements UseCase. The composition root wraps each one, for example new
-          LoggingAspect(new AuthorizationAspect(saveProgress)).
+          LoggingAspect(new AuthorizationAspect(syncProgress)).
         </text>
         <text
           x="24"
@@ -727,7 +727,7 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          AuthorizationAspect wraps SaveProgress and SyncLeaderboard; RetryAspect wraps the backend
+          AuthorizationAspect wraps SyncProgress and SyncLeaderboard; RetryAspect wraps the backend
           calls. Clock is an interface of the engine.
         </text>
         <text
