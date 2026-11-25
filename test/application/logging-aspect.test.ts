@@ -2,6 +2,7 @@
 import { Outcome } from '../../src/domain/engine/outcome';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import type { GameEventPublisher } from '../../src/application/game-event-publisher';
 import type { Logger, UseCaseLogEntry } from '../../src/application/logger';
 import { LoggingAspect } from '../../src/application/logging-aspect';
 import { Result, UseCaseError } from '../../src/application/result';
@@ -9,6 +10,7 @@ import type { UseCase } from '../../src/application/use-case';
 import { UseCaseAspect } from '../../src/application/use-case-aspect';
 import type { BoardState } from '../../src/domain/engine/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
+import type { GameEvent } from '../../src/domain/engine/game-events';
 import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
 import { PlacePiece } from '../../src/domain/variants/hexa-lines/place-piece';
 import { TrayPosition } from '../../src/domain/variants/hexa-lines/tray-position';
@@ -50,6 +52,13 @@ class FixedUseCase implements UseCase<string, number> {
   async execute(request: string): Promise<Result<number>> {
     this.requests.push(request);
     return this.result;
+  }
+}
+
+// A publisher that fails on every event.
+class ThrowingPublisher implements GameEventPublisher {
+  publish(_event: GameEvent): void {
+    throw new Error('The event bus is down.');
   }
 }
 
@@ -122,6 +131,26 @@ describe('LoggingAspect', () => {
       ['UndoMove', 'success'],
       ['UndoMove', 'failure'],
     ]);
+  });
+
+  // A publisher failure leaves the call a success (decision 29). The success carries the failed
+  // delivery, so the one entry of the aspect carries it too (issue #342, decision 37).
+  it('should_log_exactly_one_success_entry_that_carries_the_failed_delivery_when_apply_move_answers_with_a_failed_delivery', async () => {
+    const logger = new RecordingLogger();
+    const factory = fitFactory();
+    const { startGame, applyMove } = gameUseCases(factory, new ThrowingPublisher());
+    valueOf(await startGame.execute({}));
+    const aspect = new LoggingAspect(applyMove, logger, 'ApplyMove');
+
+    const played = valueOf(await aspect.execute({ move: firstMoveOf(factory) }));
+
+    const failed = played.failedDeliveries ?? [];
+    expect(failed.map((error) => error.code)).toEqual(['publish-failed']);
+    expect(logger.entries).toEqual([
+      { useCase: 'ApplyMove', outcome: 'success', failedDeliveries: failed },
+    ]);
+    expect(logger.entries[0].failedDeliveries?.[0]).toBe(failed[0]);
+    expect(Object.isFrozen(logger.entries[0].failedDeliveries)).toBe(true);
   });
 
   it('should_log_a_failure_entry_with_the_use_case_error_when_the_inner_use_case_fails', async () => {
@@ -198,8 +227,8 @@ describe('LoggingAspect', () => {
   });
 
   it('should_keep_aspect_code_out_of_the_use_cases_when_the_use_case_source_is_read', () => {
-    // `ApplyMove` takes the `Logger` port only to report a publisher failure after the
-    // engine saves the turn (issue 132). It holds no aspect and logs no call.
+    // `ApplyMove` holds no aspect and logs no call. Its success carries a publisher failure,
+    // and `LoggingAspect` writes it (issue #342).
     const read = (file: string) =>
       readFileSync(join(__dirname, '../../src/application', file), 'utf8');
     for (const file of ['start-game.ts', 'apply-move.ts']) {
@@ -208,6 +237,13 @@ describe('LoggingAspect', () => {
     }
     expect(read('start-game.ts')).not.toMatch(/\b(Logger|UseCaseLogEntry)\b/);
     expect(read('start-game.ts')).not.toMatch(/from '\.\/logger'/);
+  });
+
+  // `LoggingAspect` is the only writer of the log (issue #342, decision 37).
+  it('should_find_no_logger_in_apply_move_when_its_source_is_read', () => {
+    const source = readFileSync(join(__dirname, '../../src/application/apply-move.ts'), 'utf8');
+
+    expect(source).not.toMatch(/Logger|logEntryOf|from '\.\/logger'/);
   });
 
   // The log names the call by `name`, so an empty name helps no one (G118.4).

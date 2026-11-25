@@ -5,7 +5,6 @@ import { GameId } from '../../src/domain/engine/game-id';
 import { PlayingPhase } from '../../src/domain/engine/game-phase';
 import { Score } from '../../src/domain/engine/score';
 import { errorOf, MemoryGameRepository } from '../support/application/game-use-cases';
-import { RecordingLogger } from '../support/application/recording-logger';
 import { RecordingPublisher } from '../support/application/recording-publisher';
 import { fakeCell, type FakeCell } from '../support/engine/fake-cell';
 import {
@@ -36,8 +35,7 @@ function overflowingGame() {
   state.addPoints(FULL);
   engine.start(state);
   games.replace(engine);
-  const logger = new RecordingLogger();
-  return { engine, publisher, logger, applyMove: new ApplyMove(games, logger, publisher) };
+  return { engine, publisher, applyMove: new ApplyMove(games, publisher) };
 }
 
 const MOVE: FakeMove = { at: square(0, 0), cell: fakeCell(1) };
@@ -57,7 +55,7 @@ describe('a total score that passes the largest safe integer', () => {
   });
 
   it('should_leave_the_turn_unsaved_when_the_points_of_the_turn_pass_the_largest_safe_integer', async () => {
-    const { engine, publisher, logger, applyMove } = overflowingGame();
+    const { engine, publisher, applyMove } = overflowingGame();
 
     await applyMove.execute({ move: MOVE });
 
@@ -66,7 +64,6 @@ describe('a total score that passes the largest safe integer', () => {
     expect(after.scoreSoFar()).toEqual(FULL);
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(publisher.events).toEqual([]);
-    expect(logger.entries).toEqual([]);
   });
 
   it('should_throw_a_range_error_and_keep_the_game_when_the_engine_plays_that_turn', () => {

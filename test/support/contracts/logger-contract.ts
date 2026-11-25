@@ -30,6 +30,19 @@ export function describeLoggerContract(name: string, make: () => LoggerUnderTest
       expect(subject.written()).toBe(1);
     });
 
+    // A success can carry failed deliveries (issue #342). They stay in the record of the call.
+    it('should_write_one_record_when_a_success_carries_failed_deliveries', () => {
+      const subject = make();
+      const failedDeliveries = [
+        new UseCaseError('publish-failed', 'The event bus is down.'),
+        new UseCaseError('publish-failed', 'The event bus is still down.'),
+      ];
+
+      subject.logger.log(logEntryOf('ApplyMove', Result.success({ failedDeliveries })));
+
+      expect(subject.written()).toBe(1);
+    });
+
     it('should_write_one_record_per_entry_when_an_entry_holds_the_elapsed_time', () => {
       const subject = make();
 

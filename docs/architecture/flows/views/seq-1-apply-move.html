@@ -1666,8 +1666,8 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           After tryPlay(), ApplyMove takes the events that GameEngine recorded and publishes each
-          one to the GameEventPublisher port (#233). A publisher failure only goes to the Logger
-          port, and the answer stays the same.
+          one to the GameEventPublisher port (#233). A publisher failure keeps the answer a success,
+          and MoveResult.failedDeliveries carries it (#342).
         </text>
         <!-- Legend -->
         <line
