@@ -6,7 +6,7 @@ import type { Stars } from '../domain/engine/stars';
 import type { LevelRepository } from './level-repository';
 import { LevelStatus, type LevelSummary } from './level-summary';
 import type { ProgressRepository } from './progress-repository';
-import { caughtError, Result } from './result';
+import { caughtError, FailureCode, Result } from './result';
 import type { UseCase } from './use-case';
 
 // The request of `ListLevels`: the game and the figure that the player chose (S3-08 in #151).
@@ -42,7 +42,7 @@ export class ListLevels implements UseCase<ListLevelsRequest, LevelSummary[]> {
       const onFigure = levels.filter((level) => level.isPlayedOn(request.figure));
       return Result.success(summariesOf(inOrder(onFigure), progress));
     } catch (thrown) {
-      return Result.failure(caughtError('list-failed', thrown));
+      return Result.failure(caughtError(FailureCode.listFailed, thrown));
     }
   }
 }

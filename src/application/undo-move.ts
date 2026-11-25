@@ -3,7 +3,7 @@ import type { Cloneable } from '../domain/engine/cloneable';
 import { Outcome } from '../domain/engine/outcome';
 import type { GameRepository } from './game-repository';
 import { moveResultOf, type MoveResult, type ViewOf } from './move-result';
-import { caughtError, Result, UseCaseError } from './result';
+import { caughtError, FailureCode, Result, UseCaseError } from './result';
 import type { UseCase } from './use-case';
 
 // The request of `UndoMove`. It has no member: the running game holds the history.
@@ -31,18 +31,20 @@ export class UndoMove<
     try {
       const engine = this.games.current();
       if (engine === undefined) {
-        return Result.failure(new UseCaseError('no-running-game', 'No game is running.'));
+        return Result.failure(new UseCaseError(FailureCode.noRunningGame, 'No game is running.'));
       }
       if (!engine.offersUndo()) {
-        return Result.failure(new UseCaseError('no-undo', 'The variant has no undo.'));
+        return Result.failure(new UseCaseError(FailureCode.noUndo, 'The variant has no undo.'));
       }
       if (!engine.canUndo()) {
-        return Result.failure(new UseCaseError('nothing-to-undo', 'No move can be undone.'));
+        return Result.failure(
+          new UseCaseError(FailureCode.nothingToUndo, 'No move can be undone.'),
+        );
       }
       engine.undo();
       return Result.success(moveResultOf(engine, Outcome.playing));
     } catch (thrown) {
-      return Result.failure(caughtError('undo-failed', thrown));
+      return Result.failure(caughtError(FailureCode.undoFailed, thrown));
     }
   }
 }

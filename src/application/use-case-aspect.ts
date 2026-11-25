@@ -1,8 +1,5 @@
-import { caughtError, Result } from './result';
+import { caughtError, FailureCode, Result } from './result';
 import type { UseCase } from './use-case';
-
-// The code of a failure that an exception causes inside an aspect (issue 132).
-const UNEXPECTED_FAILURE = 'unexpected-failure';
 
 // The abstract Decorator of the use cases (classes.md decision 9, view 3.1, A2).
 // It implements `UseCase` and keeps the inner use case it wraps.
@@ -18,7 +15,7 @@ export abstract class UseCaseAspect<TRequest, TResponse> implements UseCase<TReq
     try {
       return await this.around(request);
     } catch (thrown) {
-      return Result.failure(caughtError(UNEXPECTED_FAILURE, thrown));
+      return Result.failure(caughtError(FailureCode.unexpectedFailure, thrown));
     }
   }
 
@@ -30,7 +27,7 @@ export abstract class UseCaseAspect<TRequest, TResponse> implements UseCase<TReq
     try {
       return await this.inner.execute(request);
     } catch (thrown) {
-      return Result.failure(caughtError(UNEXPECTED_FAILURE, thrown));
+      return Result.failure(caughtError(FailureCode.unexpectedFailure, thrown));
     }
   }
 }

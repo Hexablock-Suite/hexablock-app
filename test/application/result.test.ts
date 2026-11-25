@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { caughtError, Result, UseCaseError } from '../../src/application/result';
+import { caughtError, type FailureCode, Result, UseCaseError } from '../../src/application/result';
 
 // `Result` holds a value or an error, never both (classes.md decision 28, issue 100).
 
@@ -45,13 +45,15 @@ describe('Result', () => {
   });
 
   // The presenter picks its message by `code`, so an empty code helps no one (G117.6).
+  // `FailureCode` refuses a blank code at compile time. A cast or a JavaScript caller can
+  // still pass one, so the constructor keeps its check.
   it('should_throw_a_range_error_when_a_use_case_error_gets_an_empty_or_blank_code', () => {
     for (const code of ['', '  ', '\t']) {
-      expect(() => new UseCaseError(code, 'It failed.')).toThrow(
+      expect(() => new UseCaseError(code as FailureCode, 'It failed.')).toThrow(
         new RangeError('A use case error needs a code.'),
       );
     }
-    expect(new UseCaseError(' boom ', 'It failed.').code).toBe(' boom ');
+    expect(new UseCaseError(' boom ' as FailureCode, 'It failed.').code).toBe(' boom ');
   });
 
   it('should_keep_the_thrown_value_as_the_cause_when_caught_error_builds_the_error', () => {
@@ -65,7 +67,7 @@ describe('Result', () => {
       false,
     ]);
     expect(error.cause).toBe(thrown);
-    expect(new UseCaseError('boom', 'It failed.').cause).toBeUndefined();
+    expect(new UseCaseError('move-failed', 'It failed.').cause).toBeUndefined();
   });
 
   // Issue 138: `String()` throws a TypeError for a value without a prototype or with a
@@ -94,6 +96,6 @@ describe('Result', () => {
     const result = Result.success({ score: 1 });
 
     expect(Object.isFrozen(result)).toBe(true);
-    expect(Object.isFrozen(new UseCaseError('code', 'message'))).toBe(true);
+    expect(Object.isFrozen(new UseCaseError('save-failed', 'message'))).toBe(true);
   });
 });
