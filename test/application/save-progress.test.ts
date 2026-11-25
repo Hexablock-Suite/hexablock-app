@@ -32,6 +32,8 @@ import { linesFactory } from '../support/variants/hexa-lines/lines-game';
 
 const FIT = GameId.of('hexa-fit');
 const LINES = GameId.of('hexa-lines');
+const SORT = GameId.of('hexa-sort');
+const MERGE = GameId.of('hexa-merge');
 
 // A Fit level of one domino with two star thresholds: one move in 5 s or less gives one star,
 // and one move in 2 s or less gives the second star (D22).
@@ -193,5 +195,43 @@ describe('SaveProgress', () => {
     expect(result.error.code).toBe('save-failed');
     expect(result.error.cause).toBeInstanceOf(RangeError);
     await expect(store.get('progress:hexa-lines')).resolves.toBe('{"version":2}');
+  });
+
+  // Issue #372: the progress of a game refuses a result of another game. So the use case
+  // gives a `save-failed` failure before it saves anything, and the store keeps its progress.
+  it('should_give_a_save_failed_failure_and_keep_the_stored_progress_when_the_result_is_of_another_game', async () => {
+    const store = new InMemoryKeyValueStore();
+    const { saveFit, saveLines } = useCases(store);
+    await saveFit.execute(fitPlay(1, 3000));
+    await saveLines.execute(linesPlay(36));
+    const savedFit = await store.get('progress:hexa-fit');
+    const savedLines = await store.get('progress:hexa-lines');
+    // A Sort play of a level with the id of the Fit level, and a Merge score with no level id.
+    const sortPlay = GameResult.of({
+      gameId: SORT,
+      score: Score.of(0),
+      moves: Moves.of(1),
+      levelId: LevelId.of('fit-01'),
+      elapsedMs: ElapsedTime.ofMs(1000),
+    });
+    const mergePlay = GameResult.of({ gameId: MERGE, score: Score.of(900), moves: Moves.of(4) });
+
+    const results = [await saveFit.execute(sortPlay), await saveLines.execute(mergePlay)];
+    const fit = await new LocalProgressRepository(store).load(FIT);
+    const lines = await new LocalProgressRepository(store).load(LINES);
+
+    expect(results.map((result) => (result.ok ? 'success' : result.error.code))).toEqual([
+      'save-failed',
+      'save-failed',
+    ]);
+    expect(
+      results.map((result) => (result.ok ? undefined : result.error.cause instanceof RangeError)),
+    ).toEqual([true, true]);
+    await expect(store.get('progress:hexa-fit')).resolves.toBe(savedFit);
+    await expect(store.get('progress:hexa-lines')).resolves.toBe(savedLines);
+    expect(fit?.keeps(fitRecord(1, 1, 3000))).toBe(true);
+    expect(fit?.keeps(fitRecord(2, 1, 1000))).toBe(false);
+    expect(lines?.keeps(linesRecord(36))).toBe(true);
+    expect(lines?.keeps(linesRecord(900))).toBe(false);
   });
 });
