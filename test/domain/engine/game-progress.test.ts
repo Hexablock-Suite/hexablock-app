@@ -9,7 +9,7 @@ import { Moves } from '../../../src/domain/engine/moves';
 import { GameResult, ProgressRecord } from '../../../src/domain/engine/progress-model';
 import { Score } from '../../../src/domain/engine/score';
 import { Stars } from '../../../src/domain/engine/stars';
-import { contentOf } from '../../support/engine/progress-content';
+import { contentOf, sameContent } from '../../support/engine/progress-content';
 
 // The local progress of one game is one object with the high score and the best result
 // of each level (S3-04, issue #156). A progress model records each result in it.
@@ -146,6 +146,56 @@ describe('GameProgress', () => {
 
     expect(progress.starsOf(LevelId.of('l2'))).toBeUndefined();
     expect(GameProgress.start(gameId).starsOf(LevelId.of('l1'))).toBeUndefined();
+  });
+
+  // Issue #372: a progress keeps only the records of its own game (APP-FR-09).
+  // A record of another game throws a RangeError, and the progress stays as it was.
+  const otherGame = GameId.of('other-game');
+  const refusal = new RangeError('A progress records only the results of its own game.');
+
+  // A record with no level id, as in Lines and Merge, has a game too.
+  it('should_throw_a_range_error_and_keep_the_progress_when_a_score_of_another_game_is_recorded', () => {
+    const progress = GameProgress.start(gameId);
+    progress.recordScore(highScore(35));
+    const unchanged = GameProgress.start(gameId);
+    unchanged.recordScore(highScore(35));
+    const fresh = GameProgress.start(gameId);
+    const otherScore = ProgressRecord.of({ gameId: otherGame, score: Score.of(90) });
+
+    expect(() => progress.recordScore(otherScore)).toThrow(refusal);
+    expect(() => fresh.recordScore(otherScore)).toThrow(refusal);
+
+    expect(sameContent(progress, unchanged)).toBe(true);
+    expect(sameContent(fresh, GameProgress.start(gameId))).toBe(true);
+    expect(progress.keeps(otherScore)).toBe(false);
+    expect(fresh.keeps(otherScore)).toBe(false);
+  });
+
+  it('should_throw_a_range_error_and_keep_the_progress_when_a_level_result_of_another_game_is_recorded', () => {
+    const progress = GameProgress.start(gameId);
+    progress.recordLevel(levelRecord('l1', 1, 9, 1000));
+    const unchanged = GameProgress.start(gameId);
+    unchanged.recordLevel(levelRecord('l1', 1, 9, 1000));
+    const otherLevel = (level: string) =>
+      ProgressRecord.of({
+        gameId: otherGame,
+        score: Score.of(0),
+        levelId: LevelId.of(level),
+        stars: Stars.of(3),
+        moves: Moves.of(1),
+        elapsedMs: ElapsedTime.ofMs(100),
+      });
+    const otherHighScore = ProgressRecord.of({ gameId: otherGame, score: Score.of(90) });
+
+    // A better result of a stored level, a result of a new level, and a record with no level id.
+    expect(() => progress.recordLevel(otherLevel('l1'))).toThrow(refusal);
+    expect(() => progress.recordLevel(otherLevel('l2'))).toThrow(refusal);
+    expect(() => progress.recordLevel(otherHighScore)).toThrow(refusal);
+
+    expect(sameContent(progress, unchanged)).toBe(true);
+    expect(progress.keeps(otherLevel('l1'))).toBe(false);
+    expect(progress.starsOf(LevelId.of('l1'))?.equals(Stars.of(1))).toBe(true);
+    expect(progress.starsOf(LevelId.of('l2'))).toBeUndefined();
   });
 });
 

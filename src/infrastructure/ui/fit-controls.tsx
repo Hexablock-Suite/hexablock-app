@@ -67,7 +67,8 @@ const PREVIEW_RENDERER: CellRenderer<PreviewSpace> = {
 // the undo button and the redo button take a move back and play it again (#178).
 // The player picks a piece of the tray, turns it by the rotation step of the topology
 // and presses a free space: the origin of the piece goes there. A piece only turns, and it never
-// mirrors (C7). A press on a space of a placed piece takes that piece back to the tray.
+// mirrors (C7). The board figure can give the step from the pressed space and the rotation step
+// to the offset of the move, as the triangle does (#365). With no step, the offset is the space. A press on a space of a placed piece takes that piece back to the tray.
 // Each press plays a `PlaceFitPiece` or a `RemoveFitPiece` through `GamePresenter.onMove()`.
 // The rules decide: a piece that does not fit gives the rejected move text of the presenter,
 // and it stays chosen.
@@ -77,12 +78,25 @@ export class FitControls<TCoord> implements MoveControls<
   FitPayloadView<TCoord>,
   FitMove<TCoord>
 > {
+  constructor(private readonly placementAt: (at: TCoord, rotation: Turns) => TCoord = (at) => at) {}
+
   render(props: FitProps<TCoord>): ReactNode {
-    return <FitPlay {...props} />;
+    return <FitPlay {...props} placementAt={this.placementAt} />;
   }
 }
 
-function FitPlay<TCoord>({ model, texts, layoutOf, play, undo, redo, board }: FitProps<TCoord>) {
+function FitPlay<TCoord>({
+  model,
+  texts,
+  layoutOf,
+  play,
+  undo,
+  redo,
+  board,
+  placementAt,
+}: FitProps<TCoord> & {
+  readonly placementAt: (at: TCoord, rotation: Turns) => TCoord;
+}) {
   const [chosen, setChosen] = useState<Choice | undefined>();
   const tray = model.payload?.tray ?? [];
   const current = tray.find((each) => each.piece === chosen?.piece);
@@ -98,7 +112,8 @@ function FitPlay<TCoord>({ model, texts, layoutOf, play, undo, redo, board }: Fi
     if (cell.piece !== undefined) {
       play(new RemoveFitPiece(PieceId.of(cell.piece)));
     } else if (current !== undefined) {
-      play(new PlaceFitPiece(PieceId.of(current.piece), Turns.of(turn), at));
+      const rotation = Turns.of(turn);
+      play(new PlaceFitPiece(PieceId.of(current.piece), rotation, placementAt(at, rotation)));
     }
   };
   const choose = (piece: string) =>
