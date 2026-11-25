@@ -1,6 +1,8 @@
 import type { Board, ReadonlyBoard } from '../../engine/board';
 import { BoardSnapshot, checkOwnSnapshot, type BoardState } from '../../engine/board-state';
 import { CoordKeyMap } from '../../engine/coord-key-map';
+import type { GameEvent } from '../../engine/game-events';
+import type { GameId } from '../../engine/game-id';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { GridAxis } from '../../engine/grid-topology';
 import type { MatchId } from '../../engine/match-id';
@@ -9,6 +11,7 @@ import type { IPieceSource } from '../../engine/piece-source';
 import type { IMergeable } from './mergeable';
 import type { NewTile } from './new-tile';
 import type { Slide } from './slide';
+import { TileMerged } from './tile-merged';
 
 // The receiver of the data of a `MergeView`. An adapter of the edge implements it,
 // for example the state mapper of the Merge screen. No code of `src/domain/` or
@@ -36,7 +39,8 @@ export class MergeView {
 // with the state, and a reader that draws from it changes nothing.
 // `view()` gives whether the target exists for the screen.
 // Every field is private (issue #245). The rules ask `boardCopy()`, the scoring asks
-// `mergedTiles()`, and `MergeState.restore()` asks every query. The photo keeps a frozen list
+// `mergedTiles()`, `GameEngine` asks `eventsOfLastMove()` (issue #361), and
+// `MergeState.restore()` asks every query. The photo keeps a frozen list
 // of the merged tiles, and it is frozen itself.
 export class MergeSnapshot<
   TCell extends IMergeable<TCell>,
@@ -73,6 +77,12 @@ export class MergeSnapshot<
   // The source of the new tiles at its position. Only `MergeState.restore()` needs it.
   tileSource(): IPieceSource<NewTile<TCell>> {
     return this.tiles;
+  }
+
+  // One `TileMerged` event for each tile that the last slide made, in the order of the merges
+  // (issue #361). A slide with no merge gives no event.
+  eventsOfLastMove(game: GameId, match: MatchId): readonly GameEvent[] {
+    return this.merged.map((tile) => new TileMerged(game, match, tile));
   }
 
   view(): MergeView {

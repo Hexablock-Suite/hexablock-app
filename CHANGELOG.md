@@ -18,6 +18,7 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 - Play Hexa Sort on the shared game screen ([#176](https://github.com/Hexablock-Suite/hexablock-app/issues/176)). The screen shows the offered stack and the level goal. Press a free space to place the stack. A cleared space can be used again. Sort counts each accepted placement once, keeps the count in its snapshot, and offers no undo or redo.
 
 - The app consumes the API under the URI prefix `/v1` ([#346](https://github.com/Hexablock-Suite/hexablock-app/issues/346), paired with hexablock-api#173): `createApiClient().getHealth()` calls `/v1/health`, the consumer pact interaction and the CI contract job ask the `/v1` routes, `src/infrastructure/api/schema.d.ts` is regenerated against the paired API revision, and D28 of `docs/REQUIREMENTS.md` mirrors API-NFR-15 of the API.
+- The engine records the events of a move, `LinesCleared`, `TileMerged` and `StackCleared`, and `ApplyMove` delivers them before `GameOver` ([#361](https://github.com/Hexablock-Suite/hexablock-app/issues/361), classes.md decision 26). Each variant photo gives the events of its last move through `eventsOfLastMove()`, and the root builds each event with its `GameId` and `MatchId`. An undo keeps the events, so a counter keeps a move that the player later undid. Views `engine-1-turn`, `flow-1-apply-move`, `uc-2-game`, `variant-1-lines`, `variant-3-sort` and `variant-4-merge` show the events, and their PNG images are exported again.
 
 ### Changed
 
