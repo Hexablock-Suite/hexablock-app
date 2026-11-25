@@ -22,8 +22,8 @@ export const FailureCode = Object.freeze({
 export type FailureCode = (typeof FailureCode)[keyof typeof FailureCode];
 
 // The error of a failed use case (classes.md decision 28). It is a value object.
-// `code` names the failure for the presenter, `message` explains it,
-// and `RetryAspect` runs the use case again while `retryable` is true.
+// `code` names the failure for the presenter, and `message` explains it.
+// `retryable` has no reader yet. It stays only if issue #46 needs a retry of the sync.
 // `cause` keeps the caught value, so the log still shows a programming error.
 // An empty or blank `code` throws a `RangeError`, because the presenter reads it (G117.6).
 export class UseCaseError {

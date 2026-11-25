@@ -31,3 +31,14 @@ export abstract class UseCaseAspect<TRequest, TResponse> implements UseCase<TReq
     }
   }
 }
+
+// Wraps `useCase` in the aspects of `aspects`, from the outside in (issue #323).
+// Each entry builds one aspect around the use case that it gets.
+// The first entry gives the outer aspect: it sees the call first and the result last.
+// An empty list gives `useCase` itself.
+export function wrapInAspects<TRequest, TResponse>(
+  useCase: UseCase<TRequest, TResponse>,
+  aspects: readonly ((inner: UseCase<TRequest, TResponse>) => UseCase<TRequest, TResponse>)[],
+): UseCase<TRequest, TResponse> {
+  return aspects.reduceRight((inner, aspect) => aspect(inner), useCase);
+}
