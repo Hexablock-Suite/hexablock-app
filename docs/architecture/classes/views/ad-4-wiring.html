@@ -64,7 +64,7 @@
       <h1>Wiring: the drivers and the composition root</h1>
 
       <svg
-        viewBox="0 0 1040 1301"
+        viewBox="0 0 1040 1317"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="adwiring-title adwiring-desc"
@@ -1029,146 +1029,158 @@
           ListAchievements (view 3.6) once over the same LevelRepository and LocalProgressRepository
           (#188).
         </text>
-
-        <!-- Legend -->
-        <line
-          x1="24"
-          y1="1188"
-          x2="1016"
-          y2="1188"
-          stroke="rgba(23,33,42,0.10)"
-          stroke-width="0.8"
-        />
         <text
           x="24"
-          y="1206"
+          y="1180"
           fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          letter-spacing="0.18em"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
         >
-          LEGEND
+          registeredAchievements() gives it the seven achievements. Their goals, LevelsWon and
+          EveryLevelWon, live in layer 1 since #326 (view 3.6).
         </text>
+        <!-- The legend sits 16 lower than before: the footnote has one more line since #326. -->
+        <g transform="translate(0 16)">
+          <!-- Legend -->
+          <line
+            x1="24"
+            y1="1188"
+            x2="1016"
+            y2="1188"
+            stroke="rgba(23,33,42,0.10)"
+            stroke-width="0.8"
+          />
+          <text
+            x="24"
+            y="1206"
+            fill="#5b6873"
+            font-size="8"
+            font-family="'IBM Plex Mono', monospace"
+            letter-spacing="0.18em"
+          >
+            LEGEND
+          </text>
 
-        <line
-          x1="24"
-          y1="1224"
-          x2="52"
-          y2="1224"
-          stroke="#5b6873"
-          stroke-width="1"
-          marker-end="url(#adwiring-open)"
-        />
-        <text
-          x="60"
-          y="1228"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Use · attribute, parameter, return, local or new
-        </text>
+          <line
+            x1="24"
+            y1="1224"
+            x2="52"
+            y2="1224"
+            stroke="#5b6873"
+            stroke-width="1"
+            marker-end="url(#adwiring-open)"
+          />
+          <text
+            x="60"
+            y="1228"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Use · attribute, parameter, return, local or new
+          </text>
 
-        <rect
-          x="24"
-          y="1244"
-          width="28"
-          height="12"
-          rx="2"
-          fill="#cfdcf3"
-          stroke="rgba(30,58,138,0.50)"
-          stroke-width="1"
-        />
-        <rect
-          x="56"
-          y="1244"
-          width="28"
-          height="12"
-          rx="2"
-          fill="#e2ebf8"
-          stroke="rgba(29,78,216,0.40)"
-          stroke-width="1"
-        />
-        <text
-          x="92"
-          y="1253"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Zones · layers 4 and 3
-        </text>
-        <rect
-          x="216"
-          y="1244"
-          width="28"
-          height="12"
-          rx="2"
-          fill="none"
-          stroke="rgba(91,104,115,0.55)"
-          stroke-width="1"
-          stroke-dasharray="4,4"
-        />
-        <text
-          x="252"
-          y="1253"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Dashed frame · GoF pattern or principle
-        </text>
-        <rect
-          x="440"
-          y="1244"
-          width="28"
-          height="12"
-          rx="2"
-          fill="#ffffff"
-          stroke="#5b6873"
-          stroke-width="0.8"
-          stroke-dasharray="4,3"
-        />
-        <text
-          x="476"
-          y="1253"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Corner box · type parameters
-        </text>
-        <rect
-          x="616"
-          y="1244"
-          width="28"
-          height="12"
-          rx="2"
-          fill="rgba(15,111,116,0.10)"
-          stroke="#0f6f74"
-          stroke-width="1"
-        />
-        <text
-          x="652"
-          y="1253"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Teal · focal class
-        </text>
+          <rect
+            x="24"
+            y="1244"
+            width="28"
+            height="12"
+            rx="2"
+            fill="#cfdcf3"
+            stroke="rgba(30,58,138,0.50)"
+            stroke-width="1"
+          />
+          <rect
+            x="56"
+            y="1244"
+            width="28"
+            height="12"
+            rx="2"
+            fill="#e2ebf8"
+            stroke="rgba(29,78,216,0.40)"
+            stroke-width="1"
+          />
+          <text
+            x="92"
+            y="1253"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Zones · layers 4 and 3
+          </text>
+          <rect
+            x="216"
+            y="1244"
+            width="28"
+            height="12"
+            rx="2"
+            fill="none"
+            stroke="rgba(91,104,115,0.55)"
+            stroke-width="1"
+            stroke-dasharray="4,4"
+          />
+          <text
+            x="252"
+            y="1253"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Dashed frame · GoF pattern or principle
+          </text>
+          <rect
+            x="440"
+            y="1244"
+            width="28"
+            height="12"
+            rx="2"
+            fill="#ffffff"
+            stroke="#5b6873"
+            stroke-width="0.8"
+            stroke-dasharray="4,3"
+          />
+          <text
+            x="476"
+            y="1253"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Corner box · type parameters
+          </text>
+          <rect
+            x="616"
+            y="1244"
+            width="28"
+            height="12"
+            rx="2"
+            fill="rgba(15,111,116,0.10)"
+            stroke="#0f6f74"
+            stroke-width="1"
+          />
+          <text
+            x="652"
+            y="1253"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Teal · focal class
+          </text>
 
-        <line x1="24" y1="1274" x2="40" y2="1274" stroke="#17212a" stroke-width="1" />
-        <circle cx="45" cy="1274" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text
-          x="60"
-          y="1278"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Lollipop · interface or port it implements + binding
-        </text>
+          <line x1="24" y1="1274" x2="40" y2="1274" stroke="#17212a" stroke-width="1" />
+          <circle cx="45" cy="1274" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          <text
+            x="60"
+            y="1278"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Lollipop · interface or port it implements + binding
+          </text>
+        </g>
       </svg>
     </div>
   </body>

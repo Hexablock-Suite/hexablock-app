@@ -64,18 +64,19 @@
       <h1>The use cases at a glance</h1>
 
       <svg
-        viewBox="0 0 1040 1374"
+        viewBox="0 0 1040 1390"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="mapuc-title mapuc-desc"
       >
         <title id="mapuc-title">HexaBlock use cases map · UML class diagram</title>
         <desc id="mapuc-desc">
-          Overview map of the 46 layer 2 classes in 8 groups, with LevelDefinition of layer 1 as a
-          dashed chip. Each line joins two classes: UseCaseAspect implements UseCase and decorates
-          the one it wraps, StartGame, SaveProgress and Register each implement UseCase for their
-          group, and RedoMove, SyncLeaderboard and UpdateSettings keep an output port. No line
-          touches a group frame. Each group names the view that shows its members.
+          Overview map of the 42 layer 2 classes in 8 groups, with LevelDefinition, LevelStatus,
+          AchievementGoal, LevelsWon and EveryLevelWon of layer 1 as dashed chips (#326). Each line
+          joins two classes: UseCaseAspect implements UseCase and decorates the one it wraps,
+          StartGame, SaveProgress and Register each implement UseCase for their group, and RedoMove,
+          SyncLeaderboard and UpdateSettings keep an output port. No line touches a group frame.
+          Each group names the view that shows its members.
         </desc>
         <defs>
           <marker
@@ -1510,6 +1511,7 @@
             </tspan>
           </text>
         </g>
+        <!-- LevelStatus lives in layer 1 since #326: a dashed chip -->
         <g data-class="LevelStatus">
           <rect
             x="616"
@@ -1518,8 +1520,9 @@
             height="34"
             rx="4"
             fill="#ffffff"
-            stroke="#17212a"
+            stroke="#5b6873"
             stroke-width="1"
+            stroke-dasharray="4,3"
           />
           <text
             x="696"
@@ -1530,7 +1533,7 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            value object
+            engine · view 3.3
           </text>
           <text x="696" y="1045" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
@@ -1556,6 +1559,7 @@
             </tspan>
           </text>
         </g>
+        <!-- AchievementGoal lives in layer 1 since #326: a dashed chip -->
         <g data-class="AchievementGoal">
           <rect
             x="264"
@@ -1564,8 +1568,9 @@
             height="34"
             rx="4"
             fill="#ffffff"
-            stroke="#17212a"
+            stroke="#5b6873"
             stroke-width="1"
+            stroke-dasharray="4,3"
           />
           <text
             x="344"
@@ -1576,7 +1581,7 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            interface
+            engine · view 3.6
           </text>
           <text x="344" y="1147" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
@@ -1584,6 +1589,7 @@
             </tspan>
           </text>
         </g>
+        <!-- LevelsWon lives in layer 1 since #326: a dashed chip -->
         <g data-class="LevelsWon">
           <rect
             x="440"
@@ -1592,15 +1598,28 @@
             height="34"
             rx="4"
             fill="#ffffff"
-            stroke="#17212a"
+            stroke="#5b6873"
             stroke-width="1"
+            stroke-dasharray="4,3"
           />
-          <text x="520" y="1143" fill="#17212a" text-anchor="middle">
+          <text
+            x="520"
+            y="1134"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            engine · view 3.6
+          </text>
+          <text x="520" y="1147" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               LevelsWon
             </tspan>
           </text>
         </g>
+        <!-- EveryLevelWon lives in layer 1 since #326: a dashed chip -->
         <g data-class="EveryLevelWon">
           <rect
             x="616"
@@ -1609,10 +1628,22 @@
             height="34"
             rx="4"
             fill="#ffffff"
-            stroke="#17212a"
+            stroke="#5b6873"
             stroke-width="1"
+            stroke-dasharray="4,3"
           />
-          <text x="696" y="1143" fill="#17212a" text-anchor="middle">
+          <text
+            x="696"
+            y="1134"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            engine · view 3.6
+          </text>
+          <text x="696" y="1147" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               EveryLevelWon
             </tspan>
@@ -1711,180 +1742,192 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Layer 3 implements every output port (Part 4). Use cases also use layer 1: the engine, the
-          variant factory, the progress model and LevelDefinition, the dashed chip (decision 24).
+          variant factory and the progress model.
         </text>
-
-        <!-- Legend -->
-        <line
-          x1="24"
-          y1="1298"
-          x2="1016"
-          y2="1298"
-          stroke="rgba(23,33,42,0.10)"
-          stroke-width="0.8"
-        />
         <text
           x="24"
-          y="1316"
+          y="1290"
           fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          letter-spacing="0.18em"
-        >
-          LEGEND
-        </text>
-
-        <line
-          x1="24"
-          y1="1334"
-          x2="52"
-          y2="1334"
-          stroke="#5b6873"
-          stroke-width="1"
-          marker-end="url(#mapuc-open)"
-        />
-        <text
-          x="60"
-          y="1338"
-          fill="#5b6873"
-          font-size="8.5"
+          font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Use · class to class: role and multiplicity, or a verb; no line touches a frame
+          The dashed chips live in layer 1: LevelDefinition (decision 24), and LevelStatus and the
+          goals of the achievements since #326 (decisions 58 and 60).
         </text>
-        <line
-          x1="384"
-          y1="1334"
-          x2="412"
-          y2="1334"
-          stroke="#17212a"
-          stroke-width="1"
-          stroke-dasharray="5,4"
-          marker-end="url(#mapuc-triangle)"
-        />
-        <text
-          x="420"
-          y="1338"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Realization · class to the interface it implements
-        </text>
-        <line
-          x1="680"
-          y1="1334"
-          x2="708"
-          y2="1334"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#mapuc-diamond-hollow)"
-        />
-        <text
-          x="716"
-          y="1338"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Aggregation · decorator to the type it wraps
-        </text>
-
-        <rect
-          x="24"
-          y="1354"
-          width="28"
-          height="12"
-          rx="2"
-          fill="#efe7f8"
-          stroke="rgba(126,34,206,0.40)"
-          stroke-width="1"
-        />
-        <text
-          x="60"
-          y="1363"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Zone · Clean layer
-        </text>
-        <rect
-          x="184"
-          y="1354"
-          width="28"
-          height="12"
-          rx="2"
-          fill="none"
-          stroke="rgba(91,104,115,0.55)"
-          stroke-width="1"
-          stroke-dasharray="4,4"
-        />
-        <text
-          x="220"
-          y="1363"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Dashed frame · group (pattern and source)
-        </text>
-        <rect
-          x="432"
-          y="1354"
-          width="28"
-          height="12"
-          rx="2"
-          fill="#ffffff"
-          stroke="#17212a"
-          stroke-width="1"
-        />
-        <text
-          x="468"
-          y="1363"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Chip · one class, name only
-        </text>
-        <text
-          x="632"
-          y="1363"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          <tspan
-            fill="#1d4ed8"
+        <!-- The legend sits 16 lower than before: the footnote has one more line since #326. -->
+        <g transform="translate(0 16)">
+          <!-- Legend -->
+          <line
+            x1="24"
+            y1="1298"
+            x2="1016"
+            y2="1298"
+            stroke="rgba(23,33,42,0.10)"
+            stroke-width="0.8"
+          />
+          <text
+            x="24"
+            y="1316"
+            fill="#5b6873"
             font-size="8"
-            font-weight="500"
             font-family="'IBM Plex Mono', monospace"
-            letter-spacing="0.14em"
+            letter-spacing="0.18em"
           >
-            VIEW n
-          </tspan>
-          · the view with its members
-        </text>
-        <rect
-          x="824"
-          y="1354"
-          width="28"
-          height="12"
-          rx="2"
-          fill="rgba(15,111,116,0.10)"
-          stroke="#0f6f74"
-          stroke-width="1"
-        />
-        <text
-          x="860"
-          y="1363"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Teal · focal class
-        </text>
+            LEGEND
+          </text>
+
+          <line
+            x1="24"
+            y1="1334"
+            x2="52"
+            y2="1334"
+            stroke="#5b6873"
+            stroke-width="1"
+            marker-end="url(#mapuc-open)"
+          />
+          <text
+            x="60"
+            y="1338"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Use · class to class: role and multiplicity, or a verb; no line touches a frame
+          </text>
+          <line
+            x1="384"
+            y1="1334"
+            x2="412"
+            y2="1334"
+            stroke="#17212a"
+            stroke-width="1"
+            stroke-dasharray="5,4"
+            marker-end="url(#mapuc-triangle)"
+          />
+          <text
+            x="420"
+            y="1338"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Realization · class to the interface it implements
+          </text>
+          <line
+            x1="680"
+            y1="1334"
+            x2="708"
+            y2="1334"
+            stroke="#17212a"
+            stroke-width="1"
+            marker-start="url(#mapuc-diamond-hollow)"
+          />
+          <text
+            x="716"
+            y="1338"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Aggregation · decorator to the type it wraps
+          </text>
+
+          <rect
+            x="24"
+            y="1354"
+            width="28"
+            height="12"
+            rx="2"
+            fill="#efe7f8"
+            stroke="rgba(126,34,206,0.40)"
+            stroke-width="1"
+          />
+          <text
+            x="60"
+            y="1363"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Zone · Clean layer
+          </text>
+          <rect
+            x="184"
+            y="1354"
+            width="28"
+            height="12"
+            rx="2"
+            fill="none"
+            stroke="rgba(91,104,115,0.55)"
+            stroke-width="1"
+            stroke-dasharray="4,4"
+          />
+          <text
+            x="220"
+            y="1363"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Dashed frame · group (pattern and source)
+          </text>
+          <rect
+            x="432"
+            y="1354"
+            width="28"
+            height="12"
+            rx="2"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="468"
+            y="1363"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Chip · one class, name only
+          </text>
+          <text
+            x="632"
+            y="1363"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            <tspan
+              fill="#1d4ed8"
+              font-size="8"
+              font-weight="500"
+              font-family="'IBM Plex Mono', monospace"
+              letter-spacing="0.14em"
+            >
+              VIEW n
+            </tspan>
+            · the view with its members
+          </text>
+          <rect
+            x="824"
+            y="1354"
+            width="28"
+            height="12"
+            rx="2"
+            fill="rgba(15,111,116,0.10)"
+            stroke="#0f6f74"
+            stroke-width="1"
+          />
+          <text
+            x="860"
+            y="1363"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Teal · focal class
+          </text>
+        </g>
       </svg>
     </div>
   </body>

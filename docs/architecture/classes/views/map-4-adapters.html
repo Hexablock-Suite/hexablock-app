@@ -64,7 +64,7 @@
       <h1>Adapters, presenters and drivers at a glance</h1>
 
       <svg
-        viewBox="0 0 1040 1651"
+        viewBox="0 0 1040 1667"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="mapad-title mapad-desc"
@@ -2092,182 +2092,195 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          RootLayout, BoardView and the screens are React components of layer 4, not classes.
+          registeredAchievements() of layer 4 gives ListAchievements its achievements. Their goals
+          live in layer 1 since #326.
         </text>
-
-        <!-- Legend -->
-        <line
-          x1="24"
-          y1="1550"
-          x2="1016"
-          y2="1550"
-          stroke="rgba(23,33,42,0.10)"
-          stroke-width="0.8"
-        />
-        <text
-          x="24"
-          y="1568"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          letter-spacing="0.18em"
-        >
-          LEGEND
-        </text>
-
-        <line
-          x1="24"
-          y1="1585"
-          x2="52"
-          y2="1585"
-          stroke="#5b6873"
-          stroke-width="1"
-          marker-end="url(#mapad-open)"
-        />
-        <text
-          x="60"
-          y="1589"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Use · class to class: role and multiplicity, or a verb; no line touches a frame
-        </text>
-        <line
-          x1="384"
-          y1="1585"
-          x2="412"
-          y2="1585"
-          stroke="#17212a"
-          stroke-width="1"
-          stroke-dasharray="5,4"
-          marker-end="url(#mapad-triangle)"
-        />
-        <text
-          x="420"
-          y="1589"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Realization · class to the interface it implements
-        </text>
-
-        <rect
-          x="24"
-          y="1606"
-          width="28"
-          height="12"
-          rx="2"
-          fill="none"
-          stroke="rgba(91,104,115,0.55)"
-          stroke-width="1"
-          stroke-dasharray="4,4"
-        />
-        <text
-          x="60"
-          y="1615"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Dashed frame · group (pattern and source)
-        </text>
-        <rect
-          x="272"
-          y="1606"
-          width="28"
-          height="12"
-          rx="2"
-          fill="#ffffff"
-          stroke="#17212a"
-          stroke-width="1"
-        />
-        <text
-          x="308"
-          y="1615"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Chip · one class, name only
-        </text>
-        <text
-          x="472"
-          y="1615"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          <tspan
-            fill="#1d4ed8"
-            font-size="8"
-            font-weight="500"
-            font-family="'IBM Plex Mono', monospace"
-            letter-spacing="0.14em"
+        <!-- The last footnote line and the legend sit 16 lower than before: the footnote has one more line since #326. -->
+        <g transform="translate(0 16)">
+          <text
+            x="24"
+            y="1526"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
           >
-            VIEW n
-          </tspan>
-          · the view with its members
-        </text>
-        <rect
-          x="664"
-          y="1606"
-          width="28"
-          height="12"
-          rx="2"
-          fill="rgba(15,111,116,0.10)"
-          stroke="#0f6f74"
-          stroke-width="1"
-        />
-        <text
-          x="700"
-          y="1615"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Teal · focal class
-        </text>
+            RootLayout, BoardView and the screens are React components of layer 4, not classes.
+          </text>
 
-        <rect
-          x="24"
-          y="1631"
-          width="28"
-          height="12"
-          rx="2"
-          fill="#cfdcf3"
-          stroke="rgba(30,58,138,0.50)"
-          stroke-width="1"
-        />
-        <text
-          x="60"
-          y="1640"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Zone · layer 4, frameworks and drivers
-        </text>
-        <rect
-          x="272"
-          y="1631"
-          width="28"
-          height="12"
-          rx="2"
-          fill="#e2ebf8"
-          stroke="rgba(29,78,216,0.40)"
-          stroke-width="1"
-        />
-        <text
-          x="308"
-          y="1640"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Zone · layer 3, interface adapters
-        </text>
+          <!-- Legend -->
+          <line
+            x1="24"
+            y1="1550"
+            x2="1016"
+            y2="1550"
+            stroke="rgba(23,33,42,0.10)"
+            stroke-width="0.8"
+          />
+          <text
+            x="24"
+            y="1568"
+            fill="#5b6873"
+            font-size="8"
+            font-family="'IBM Plex Mono', monospace"
+            letter-spacing="0.18em"
+          >
+            LEGEND
+          </text>
+
+          <line
+            x1="24"
+            y1="1585"
+            x2="52"
+            y2="1585"
+            stroke="#5b6873"
+            stroke-width="1"
+            marker-end="url(#mapad-open)"
+          />
+          <text
+            x="60"
+            y="1589"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Use · class to class: role and multiplicity, or a verb; no line touches a frame
+          </text>
+          <line
+            x1="384"
+            y1="1585"
+            x2="412"
+            y2="1585"
+            stroke="#17212a"
+            stroke-width="1"
+            stroke-dasharray="5,4"
+            marker-end="url(#mapad-triangle)"
+          />
+          <text
+            x="420"
+            y="1589"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Realization · class to the interface it implements
+          </text>
+
+          <rect
+            x="24"
+            y="1606"
+            width="28"
+            height="12"
+            rx="2"
+            fill="none"
+            stroke="rgba(91,104,115,0.55)"
+            stroke-width="1"
+            stroke-dasharray="4,4"
+          />
+          <text
+            x="60"
+            y="1615"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Dashed frame · group (pattern and source)
+          </text>
+          <rect
+            x="272"
+            y="1606"
+            width="28"
+            height="12"
+            rx="2"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="308"
+            y="1615"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Chip · one class, name only
+          </text>
+          <text
+            x="472"
+            y="1615"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            <tspan
+              fill="#1d4ed8"
+              font-size="8"
+              font-weight="500"
+              font-family="'IBM Plex Mono', monospace"
+              letter-spacing="0.14em"
+            >
+              VIEW n
+            </tspan>
+            · the view with its members
+          </text>
+          <rect
+            x="664"
+            y="1606"
+            width="28"
+            height="12"
+            rx="2"
+            fill="rgba(15,111,116,0.10)"
+            stroke="#0f6f74"
+            stroke-width="1"
+          />
+          <text
+            x="700"
+            y="1615"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Teal · focal class
+          </text>
+
+          <rect
+            x="24"
+            y="1631"
+            width="28"
+            height="12"
+            rx="2"
+            fill="#cfdcf3"
+            stroke="rgba(30,58,138,0.50)"
+            stroke-width="1"
+          />
+          <text
+            x="60"
+            y="1640"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Zone · layer 4, frameworks and drivers
+          </text>
+          <rect
+            x="272"
+            y="1631"
+            width="28"
+            height="12"
+            rx="2"
+            fill="#e2ebf8"
+            stroke="rgba(29,78,216,0.40)"
+            stroke-width="1"
+          />
+          <text
+            x="308"
+            y="1640"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Zone · layer 3, interface adapters
+          </text>
+        </g>
       </svg>
     </div>
   </body>
