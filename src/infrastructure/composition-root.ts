@@ -3,6 +3,7 @@ import { BundledLevelRepository } from '../adapters/bundled-level-repository';
 import { GameEventBus } from '../adapters/game-event-bus';
 import { InMemoryGameRepository } from '../adapters/in-memory-game-repository';
 import type { KeyValueStore } from '../adapters/key-value-store';
+import { LocalAchievementCounterRepository } from '../adapters/local-achievement-counter-repository';
 import { LocalProgressRepository } from '../adapters/local-progress-repository';
 import { LevelGameFactories } from '../adapters/level-game-factories';
 import { ApplyMove, type ApplyMoveRequest } from '../application/apply-move';
@@ -79,10 +80,14 @@ export interface RootDrivers {
 // It builds the use cases of a game the first time a caller asks for them.
 // The one `GameEventBus` goes to every `ApplyMove`, which delivers the events of each turn (#233).
 // The root subscribes the listeners to it once: today `AchievementCounterListener` (#362).
+// With the local store of its drivers, the root builds one `LocalAchievementCounterRepository`
+// and gives it to that listener, which saves the counters of the achievements (#363).
+// A root with no store has no place for the counters, so it subscribes no counter listener.
 // Every use case of the root goes through `decorate()`, which gives it its aspects (#323).
 // With the local store of its drivers, the root builds one `LocalProgressRepository` and keeps it
 // for every consumer of the saved progress (#323). Over it, the root builds `ListAchievements` once
-// (#188), with its one level repository and the achievements of `registeredAchievements()`.
+// (#188), with its one level repository, the one counter repository of the listener (#364)
+// and the achievements of `registeredAchievements()`.
 export class CompositionRoot {
   private readonly games: ReadonlyMap<TopologyId, GameRegistry>;
   private readonly boards: ReadonlyMap<TopologyId, BoardFigure<unknown>>;
@@ -107,16 +112,20 @@ export class CompositionRoot {
     this.logger = drivers.logger;
     this.ids = new SequentialMatchIds(drivers.clock);
     const events = new GameEventBus();
-    events.subscribe(new AchievementCounterListener());
+    const counters =
+      drivers.store === undefined
+        ? undefined
+        : new LocalAchievementCounterRepository(drivers.store);
+    if (counters !== undefined) events.subscribe(new AchievementCounterListener(counters));
     this.events = events;
     this.levels = new BundledLevelRepository();
     this.progress =
       drivers.store === undefined ? undefined : new LocalProgressRepository(drivers.store);
     this.achievements =
-      this.progress === undefined
+      this.progress === undefined || counters === undefined
         ? undefined
         : this.decorate(
-            new ListAchievements(this.levels, this.progress, registeredAchievements()),
+            new ListAchievements(this.levels, this.progress, counters, registeredAchievements()),
             'ListAchievements',
           );
   }

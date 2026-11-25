@@ -64,7 +64,7 @@
       <h1>Achievements: the screen, its presenter and ListAchievements</h1>
 
       <svg
-        viewBox="0 0 1040 1644"
+        viewBox="0 0 1040 1860"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="ucach-title ucach-desc"
@@ -76,11 +76,13 @@
           AchievementsPresenter in layer 3 keeps the UseCase input port and its
           AchievementsViewModel, which holds two AchievementSection values: in progress and
           completed. ListAchievements in layer 2 implements UseCase, keeps LevelRepository,
-          ProgressRepository and a list of Achievement values, and returns one AchievementSummary
-          per achievement. An Achievement keeps an optional AchievementGoal, a Strategy of layer 1
-          that LevelsWon and EveryLevelWon implement. ProgressRepository loads GameProgress of layer
-          1. The goals count the levels that LevelStatus.ofEach() of layer 1 gives as completed, and
-          LevelStatus reads GameProgress (#326).
+          ProgressRepository, AchievementCounterRepository and a list of Achievement values, and
+          returns one AchievementSummary per achievement. An Achievement keeps an optional
+          AchievementGoal, a Strategy of layer 1 that LevelsWon, EveryLevelWon, BestCountReached and
+          TotalCountReached implement. AchievementCounterRepository loads AchievementCounters of
+          layer 1, and AchievementGoal reads them (#364). ProgressRepository loads GameProgress of
+          layer 1. The goals count the levels that LevelStatus.ofEach() of layer 1 gives as
+          completed, and LevelStatus reads GameProgress (#326).
         </desc>
         <defs>
           <marker
@@ -178,7 +180,7 @@
           x="24"
           y="1028"
           width="992"
-          height="332"
+          height="548"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -255,7 +257,7 @@
         />
         <!-- LevelsWon implements AchievementGoal: realization -->
         <path
-          d="M680 1200 V1168"
+          d="M680 1216 V1184"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -264,7 +266,7 @@
         />
         <!-- EveryLevelWon implements AchievementGoal: realization -->
         <path
-          d="M896 1200 V1168"
+          d="M896 1216 V1184"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -273,7 +275,7 @@
         />
         <!-- ListAchievements keeps the LevelRepository it receives as levels: use with role and multiplicity (decision 23) -->
         <path
-          d="M120 776 V828"
+          d="M120 792 V828"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -281,7 +283,7 @@
         />
         <!-- ListAchievements keeps the ProgressRepository it receives as progress: use with role and multiplicity (decision 23) -->
         <path
-          d="M352 768 H400 Q408 768 408 776 V924"
+          d="M352 784 H384 Q392 784 392 792 V924"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -289,7 +291,7 @@
         />
         <!-- LevelsWon counts the levels that LevelStatus.ofEach() gives as completed: use (#326) -->
         <path
-          d="M544 1260 H512"
+          d="M544 1276 H512"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -297,7 +299,7 @@
         />
         <!-- LevelStatus.ofEach() reads the GameProgress it receives as progress: use with role and multiplicity -->
         <path
-          d="M376 1136 V1104"
+          d="M272 1136 V1104"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -305,13 +307,72 @@
         />
         <!-- ProgressRepository loads the GameProgress of one game: use, down from layer 2 to layer 1 -->
         <path
-          d="M360 996 V1064"
+          d="M256 996 V1064"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#ucach-open)"
         />
+        <!-- ListAchievements keeps the AchievementCounterRepository it receives as counters: use with role and multiplicity (#364) -->
+        <path
+          d="M352 768 H408 Q416 768 416 776 V860 Q416 868 424 868 H440"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucach-open)"
+        />
+        <!-- AchievementCounterRepository loads the AchievementCounters of one game: use, down from layer 2 to layer 1 (#363) -->
+        <path
+          d="M480 916 V1064"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucach-open)"
+        />
+        <!-- AchievementGoal.isReachedBy() reads the AchievementCounters it receives: use (#364) -->
+        <path
+          d="M584 1088 H552"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucach-open)"
+        />
+        <!-- BestCountReached and TotalCountReached implement AchievementGoal: realization, one shared head (#364) -->
+        <path
+          d="M660 1384 V1368 H788"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+        />
+        <path
+          d="M896 1384 V1368 H788"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+        />
+        <path
+          d="M788 1368 V1184"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#ucach-triangle)"
+        />
         <!-- Arrow labels -->
+        <rect x="354" y="752" width="56" height="12" rx="2" fill="#efe7f8" />
+        <text
+          x="356"
+          y="761"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          counters
+          <tspan font-weight="600">1</tspan>
+        </text>
         <rect x="356" y="211" width="58" height="12" rx="2" fill="#e2ebf8" />
         <text
           x="358"
@@ -396,9 +457,9 @@
           goal
           <tspan font-weight="600">0..1</tspan>
         </text>
-        <rect x="380" y="1114" width="70" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="276" y="1114" width="70" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="382"
+          x="278"
           y="1123"
           fill="#17212a"
           font-size="8"
@@ -420,9 +481,9 @@
           levels
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="348" y="905" width="56" height="12" rx="2" fill="#efe7f8" />
+        <rect x="332" y="905" width="56" height="12" rx="2" fill="#efe7f8" />
         <text
-          x="402"
+          x="386"
           y="914"
           fill="#17212a"
           font-size="8"
@@ -670,7 +731,7 @@
           x="64"
           y="620"
           width="288"
-          height="156"
+          height="172"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -679,7 +740,7 @@
         <rect x="64" y="620" width="288" height="60" rx="6" fill="rgba(15,111,116,0.10)" />
         <rect x="64" y="672" width="288" height="8" fill="rgba(15,111,116,0.10)" />
         <line x1="64" y1="680" x2="352" y2="680" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
-        <line x1="64" y1="736" x2="352" y2="736" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <line x1="64" y1="752" x2="352" y2="752" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text
           x="208"
           y="638"
@@ -720,12 +781,15 @@
           - progress: ProgressRepository
         </text>
         <text x="80" y="728" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - counters: AchievementCounterRepository
+        </text>
+        <text x="80" y="744" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - achievements: Achievement[*]
         </text>
-        <text x="80" y="752" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="768" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + execute(request: ListAchievementsRequest):
         </text>
-        <text x="96" y="768" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="96" y="784" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Promise‹Result‹AchievementSummary[]››
         </text>
         <!-- Class: AchievementSummary (value object, the response model of ListAchievements) -->
@@ -884,7 +948,7 @@
         </text>
         <!-- Reference box: GameProgress, detailed in part 3 · view 3.3 -->
         <rect
-          x="296"
+          x="176"
           y="1064"
           width="160"
           height="40"
@@ -895,7 +959,7 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="376"
+          x="256"
           y="1078"
           fill="#7d8a94"
           font-size="7"
@@ -907,7 +971,7 @@
           VIEW 3.3
         </text>
         <text
-          x="376"
+          x="256"
           y="1094"
           fill="#17212a"
           font-size="12"
@@ -922,7 +986,7 @@
           x="584"
           y="1064"
           width="408"
-          height="104"
+          height="120"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -976,12 +1040,21 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          progress: GameProgress [0..1]): boolean
+          progress: GameProgress [0..1],
+        </text>
+        <text
+          x="616"
+          y="1176"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          counters: AchievementCounters [0..1]): boolean
         </text>
         <!-- Class: LevelsWon (a piece of the Strategy pattern: the footnote names it, decision 23; a count of won levels of one game) -->
         <rect
           x="544"
-          y="1200"
+          y="1216"
           width="232"
           height="136"
           rx="6"
@@ -989,11 +1062,11 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="544" y1="1240" x2="776" y2="1240" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="544" y1="1280" x2="776" y2="1280" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="544" y1="1256" x2="776" y2="1256" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="544" y1="1296" x2="776" y2="1296" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="660"
-          y="1225"
+          y="1241"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1004,7 +1077,7 @@
         </text>
         <text
           x="560"
-          y="1256"
+          y="1272"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1013,7 +1086,7 @@
         </text>
         <text
           x="560"
-          y="1272"
+          y="1288"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1022,7 +1095,7 @@
         </text>
         <text
           x="560"
-          y="1296"
+          y="1312"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1032,7 +1105,7 @@
         </text>
         <text
           x="576"
-          y="1312"
+          y="1328"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1042,7 +1115,7 @@
         </text>
         <text
           x="560"
-          y="1328"
+          y="1344"
           fill="#5b6873"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1052,7 +1125,7 @@
         <!-- Class: EveryLevelWon (a piece of the Strategy pattern: the footnote names it, decision 23; every level of one game) -->
         <rect
           x="800"
-          y="1200"
+          y="1216"
           width="192"
           height="104"
           rx="6"
@@ -1060,11 +1133,11 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="800" y1="1240" x2="992" y2="1240" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="800" y1="1264" x2="992" y2="1264" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="800" y1="1256" x2="992" y2="1256" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="800" y1="1280" x2="992" y2="1280" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="896"
-          y="1225"
+          y="1241"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1075,7 +1148,7 @@
         </text>
         <text
           x="816"
-          y="1256"
+          y="1272"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1084,7 +1157,7 @@
         </text>
         <text
           x="816"
-          y="1280"
+          y="1296"
           fill="#5b6873"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1093,7 +1166,7 @@
         </text>
         <text
           x="832"
-          y="1296"
+          y="1312"
           fill="#5b6873"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1181,14 +1254,260 @@
         <text x="80" y="1288" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: LevelStatus): boolean
         </text>
+        <!-- Class: AchievementCounterRepository (interface, port, #363; ListAchievements loads the counters through it since #364) -->
+        <rect
+          x="440"
+          y="828"
+          width="232"
+          height="88"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="440" y1="876" x2="672" y2="876" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="556"
+          y="846"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «port» «repository»
+        </text>
+        <text
+          x="556"
+          y="864"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          AchievementCounterRepository
+        </text>
+        <text x="456" y="892" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + load(gameId: GameId): Promise‹
+        </text>
+        <text x="472" y="908" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          AchievementCounters | undefined›
+        </text>
+        <!-- Reference box: AchievementCounters, detailed in part 3 · view 3.3 (#363) -->
+        <rect
+          x="400"
+          y="1064"
+          width="152"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="476"
+          y="1078"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          VIEW 3.3
+        </text>
+        <text
+          x="476"
+          y="1094"
+          fill="#17212a"
+          font-size="11"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          AchievementCounters
+        </text>
+        <!-- Class: BestCountReached (a piece of the Strategy pattern: the footnote names it, decision 23; a best count of one game, #364) -->
+        <rect
+          x="544"
+          y="1384"
+          width="232"
+          height="152"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="544" y1="1424" x2="776" y2="1424" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="544" y1="1464" x2="776" y2="1464" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="660"
+          y="1409"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          BestCountReached
+        </text>
+        <text
+          x="560"
+          y="1440"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          - game: GameId
+        </text>
+        <text
+          x="560"
+          y="1456"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          - count: AchievementCount
+        </text>
+        <text
+          x="560"
+          y="1480"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + of(gameId: GameId,
+        </text>
+        <text
+          x="576"
+          y="1496"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          count: AchievementCount):
+        </text>
+        <text
+          x="576"
+          y="1512"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          BestCountReached
+        </text>
+        <text
+          x="560"
+          y="1528"
+          fill="#5b6873"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          implements gameId(), isReachedBy()
+        </text>
+        <!-- Class: TotalCountReached (a piece of the Strategy pattern: the footnote names it, decision 23; a total of one game, #364) -->
+        <rect
+          x="800"
+          y="1384"
+          width="192"
+          height="168"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="800" y1="1424" x2="992" y2="1424" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="800" y1="1464" x2="992" y2="1464" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="896"
+          y="1409"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          TotalCountReached
+        </text>
+        <text
+          x="816"
+          y="1440"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          - game: GameId
+        </text>
+        <text
+          x="816"
+          y="1456"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          - count: AchievementCount
+        </text>
+        <text
+          x="816"
+          y="1480"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + of(gameId: GameId,
+        </text>
+        <text
+          x="832"
+          y="1496"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          count: AchievementCount):
+        </text>
+        <text
+          x="832"
+          y="1512"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          TotalCountReached
+        </text>
+        <text
+          x="816"
+          y="1528"
+          fill="#5b6873"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          implements gameId(),
+        </text>
+        <text
+          x="832"
+          y="1544"
+          fill="#5b6873"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          isReachedBy()
+        </text>
         <!-- Lollipops: input port each use case implements, with its binding -->
         <line x1="80" y1="620" x2="80" y2="604" stroke="#17212a" stroke-width="1" />
         <circle cx="80" cy="599" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text x="91" y="602" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           UseCase‹ListAchievementsRequest, AchievementSummary[]›
         </text>
-        <!-- The footnote and the legend sit 240 lower than before: layer 1 holds the goals and LevelStatus since #326. -->
-        <g transform="translate(0 240)">
+        <!-- The footnote and the legend sit 456 lower than before: layer 1 holds the goals and LevelStatus since #326, and the goals of the counters since #364. -->
+        <g transform="translate(0 456)">
           <!-- Footnote: what the view leaves out -->
           <text
             x="24"
@@ -1207,8 +1526,8 @@
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            An achievement with no goal stays in progress. ListAchievements loads the levels and the
-            progress of each game
+            An achievement with no goal stays in progress. ListAchievements loads the levels, the
+            progress and the counters of each game
           </text>
           <text
             x="24"
@@ -1247,8 +1566,8 @@
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            The saved progress keeps each won level, so a completed achievement stays after a
-            restart (#188). Four achievements
+            The saved progress and the saved counters keep a completed achievement after a restart
+            (#188, #364).
           </text>
           <text
             x="24"
@@ -1257,8 +1576,8 @@
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            have no goal: no game event gives the lines of one placement, the tile of a merge or the
-            goals of a Sort game yet.
+            BestCountReached reads the best count and TotalCountReached the total of
+            AchievementCounters (#364).
           </text>
           <text
             x="24"
@@ -1277,8 +1596,8 @@
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            AchievementGoal is the interface of a Strategy. LevelsWon and EveryLevelWon implement it
-            (decision 23).
+            AchievementGoal is the interface of a Strategy. The four goals implement it (decision
+            23).
           </text>
           <text
             x="24"

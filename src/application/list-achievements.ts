@@ -1,7 +1,9 @@
 import type { GameId } from '../domain/engine/game-id';
+import type { AchievementCounters } from '../domain/engine/achievement-counters';
 import type { GameProgress } from '../domain/engine/game-progress';
 import type { LevelDefinition } from '../domain/engine/level-definition';
 import type { Achievement } from './achievement';
+import type { AchievementCounterRepository } from './achievement-counter-repository';
 import type { LevelRepository } from './level-repository';
 import type { ProgressRepository } from './progress-repository';
 import { caughtError, FailureCode, Result } from './result';
@@ -19,11 +21,12 @@ export interface AchievementSummary {
 }
 
 // Lists the achievements of the player with their status (issue #188).
-// It writes nothing. It loads the levels and the saved progress of the game of each goal,
-// once per game, through `LevelRepository` and `ProgressRepository`, and passes them to the goal.
-// A goal of the domain decides with them and calls no repository (issue #326).
-// The saved progress keeps each won level, so a completed achievement stays completed
-// after a restart of the app.
+// It writes nothing. It loads the levels, the saved progress and the saved counters of the game
+// of each goal, once per game, through `LevelRepository`, `ProgressRepository` and
+// `AchievementCounterRepository`, and passes them to the goal. A goal of the domain decides with
+// them and calls no repository (issues #326 and #364). The saved progress keeps each won level,
+// and the saved counters keep the best count and the total of each game, so a completed
+// achievement stays completed after a restart of the app.
 // - The list follows the order of `achievements`, the list that the composition root gives.
 // - An achievement is completed when its goal is reached. An achievement with no goal
 //   stays in progress.
@@ -34,6 +37,7 @@ export class ListAchievements implements UseCase<ListAchievementsRequest, Achiev
   constructor(
     private readonly levels: LevelRepository,
     private readonly progress: ProgressRepository,
+    private readonly counters: AchievementCounterRepository,
     private readonly achievements: readonly Achievement[],
   ) {
     achievements.forEach(({ id }, index) => {
@@ -52,8 +56,8 @@ export class ListAchievements implements UseCase<ListAchievementsRequest, Achiev
           summaries.push({ id, completed: false });
           continue;
         }
-        const { levels, progress } = await this.savedGame(goal.gameId(), games);
-        summaries.push({ id, completed: goal.isReachedBy(levels, progress) });
+        const { levels, progress, counters } = await this.savedGame(goal.gameId(), games);
+        summaries.push({ id, completed: goal.isReachedBy(levels, progress, counters) });
       }
       return Result.success(summaries);
     } catch (thrown) {
@@ -61,22 +65,24 @@ export class ListAchievements implements UseCase<ListAchievementsRequest, Achiev
     }
   }
 
-  // The levels and the progress of the game `gameId`. Each game loads once per `execute()`:
+  // The levels, the progress and the counters of the game `gameId`. Each game loads once per `execute()`:
   // `games` keeps each game that this call already loaded.
   private async savedGame(gameId: GameId, games: SavedGame[]): Promise<SavedGame> {
     const loaded = games.find((game) => game.gameId.equals(gameId));
     if (loaded !== undefined) return loaded;
     const levels = await this.levels.list(gameId);
     const progress = await this.progress.load(gameId);
-    const game = { gameId, levels, progress };
+    const counters = await this.counters.load(gameId);
+    const game = { gameId, levels, progress, counters };
     games.push(game);
     return game;
   }
 }
 
-// The data of one game that the goals read: its levels and its saved progress.
+// The data of one game that the goals read: its levels, its saved progress and its saved counters.
 interface SavedGame {
   readonly gameId: GameId;
   readonly levels: readonly LevelDefinition[];
   readonly progress: GameProgress | undefined;
+  readonly counters: AchievementCounters | undefined;
 }
