@@ -2,3 +2,4 @@
 export const startedAt = Date.now();
 export const jitter = Math.random();
 export const today = new Date();
+export const todayText = Date();

@@ -23,6 +23,12 @@ const noAmbientNondeterminism = defineRule({
       dateNow: 'Domain and application code must not use Date.now. Inject a clock.',
       newDate:
         'Domain and application code must not call new Date() without arguments. Inject a clock.',
+      performanceNow: 'Domain and application code must not use performance.now. Inject a clock.',
+      cryptoRandomUUID:
+        'Domain and application code must not use crypto.randomUUID. Inject an ID generator.',
+      cryptoGetRandomValues:
+        'Domain and application code must not use crypto.getRandomValues. Inject a seeded random source.',
+      dateCall: 'Domain and application code must not call Date(). Inject a clock.',
     },
   },
   create(context) {
@@ -33,6 +39,20 @@ const noAmbientNondeterminism = defineRule({
         }
         if (isMember(node, 'Date', 'now')) {
           context.report({ node, messageId: 'dateNow' });
+        }
+        if (isMember(node, 'performance', 'now')) {
+          context.report({ node, messageId: 'performanceNow' });
+        }
+        if (isMember(node, 'crypto', 'randomUUID')) {
+          context.report({ node, messageId: 'cryptoRandomUUID' });
+        }
+        if (isMember(node, 'crypto', 'getRandomValues')) {
+          context.report({ node, messageId: 'cryptoGetRandomValues' });
+        }
+      },
+      CallExpression(node) {
+        if (node.callee.type === 'Identifier' && node.callee.name === 'Date') {
+          context.report({ node, messageId: 'dateCall' });
         }
       },
       NewExpression(node) {
