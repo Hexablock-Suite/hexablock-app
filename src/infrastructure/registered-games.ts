@@ -75,12 +75,15 @@ import { worldTone } from './ui/theme';
 // The count of seeds: the unsigned 32-bit integers (classes.md decision 48).
 const SEEDS = 2 ** 32;
 
-// The hexagon of radius 4 of Hexa Lines (61 cells), and of radius 2 of Sort and Merge
+// The hexagon of radius 4 of Hexa Lines (61 cells), and of radius 2 of Sort
 // (19 cells), as docs/REQUIREMENTS.md §1 gives them. A hex region of size n has radius n - 1.
 // The square and the triangle take the same region sizes: 25 squares or 50 triangles
-// for Lines, and 9 squares or 18 triangles for Sort and Merge (#171).
+// for Lines, and 9 squares or 18 triangles for Sort (#171).
+// Hexa Merge plays on the hexagon of radius 3 (37 cells), 16 squares or 32 triangles:
+// the jury variation «a new board size» of APP-NFR-06 (#53).
 const LINES_BOARD = RegionSize.of(5);
 const SMALL_BOARD = RegionSize.of(3);
+const MERGE_BOARD = RegionSize.of(4);
 
 // The tile that a Merge player tries to make, as in 2048 (A3).
 const MERGE_TARGET = MergeTile.of(2048);
@@ -181,7 +184,7 @@ export function registeredGames<TCoord>(
     ),
     registered(
       GameId.of('hexa-merge'),
-      new MergeFactory(geometry, MergeSettings.of(SMALL_BOARD, seedFrom(random), MERGE_TARGET)),
+      new MergeFactory(geometry, MergeSettings.of(MERGE_BOARD, seedFrom(random), MERGE_TARGET)),
       mergeScreen(figure),
       worldTone(3),
     ),
@@ -293,7 +296,7 @@ function mergeScreen<TCoord>(
     mapper: new MergeStateMapper(),
     renderer: new MergeCellRenderer(),
     controls: new MergeControls(
-      slideWays(figure.geometry.createTopology(), SMALL_BOARD, figure.layoutOf(1)),
+      slideWays(figure.geometry.createTopology(), MERGE_BOARD, figure.layoutOf(1)),
     ),
     layoutOf: (size) => figure.layoutOf(size),
   };

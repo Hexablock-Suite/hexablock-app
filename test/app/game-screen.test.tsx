@@ -10,13 +10,14 @@ import { occupiedSpaces, pressSpace } from '../support/ui/board-spaces';
 const appDir = path.join(repoRoot, 'app');
 
 // The Spanish name of each registered game and the count of spaces of its first board:
-// the hexagon of radius 4 of Lines, the first Fit level of three cells, and the hexagon
-// of radius 2 of Sort and Merge (docs/REQUIREMENTS.md §1).
+// the hexagon of radius 4 of Lines, the first Fit level of three cells, the hexagon
+// of radius 2 of Sort (docs/REQUIREMENTS.md §1), and the hexagon of radius 3 of Merge
+// (the jury variation «a new board size» of APP-NFR-06, #53).
 const FOUR_BOARDS = [
   { id: 'hexa-lines', name: 'Hexa Lines', spaces: 61 },
   { id: 'hexa-fit', name: 'Hexa Fit', spaces: 3 },
   { id: 'hexa-sort', name: 'Hexa Sort', spaces: 19 },
-  { id: 'hexa-merge', name: 'Hexa Merge', spaces: 19 },
+  { id: 'hexa-merge', name: 'Hexa Merge', spaces: 37 },
 ];
 
 // Issue #170: the game route, `GameScreen`, shows the game that the registry holds for

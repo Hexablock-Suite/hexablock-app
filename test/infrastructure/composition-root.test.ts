@@ -219,7 +219,8 @@ describe('CompositionRoot', () => {
     });
 
     // A board region of size 5 holds 61 hexagons, 25 squares or 50 triangles,
-    // and a region of size 3 holds 19 hexagons, 9 squares or 18 triangles.
+    // a region of size 3 holds 19 hexagons, 9 squares or 18 triangles,
+    // and a region of size 4 holds 37 hexagons, 16 squares or 32 triangles.
     it('should_build_each_board_on_the_geometry_of_the_figure_when_the_figure_is_chosen', () => {
       const root = testRoot();
 
@@ -233,10 +234,29 @@ describe('CompositionRoot', () => {
       });
 
       expect(spaces).toEqual([
-        [61, 3, 19, 19],
-        [25, 9, 9],
-        [50, 18, 18],
+        [61, 3, 19, 37],
+        [25, 9, 16],
+        [50, 18, 32],
       ]);
+    });
+
+    // The jury variation «a new board size» (APP-NFR-06, issue #53): Hexa Merge plays on a
+    // region of size 4, radius 3. The size is configuration of the game list.
+    // A region of size 4 holds 37 hexagons, 16 squares or 32 triangles.
+    it('should_build_a_merge_board_of_37_hexagons_16_squares_or_32_triangles_when_the_merge_board_has_size_4', () => {
+      const root = testRoot();
+      const merge = GameId.of('hexa-merge');
+
+      const spaces = FIGURES.map((figure) =>
+        root
+          .registry(figure)
+          .gameOf(merge)
+          .withFactory({
+            use: (_gameId, factory) => factory.createBoard(BOARD_ID).coordinates().length,
+          }),
+      );
+
+      expect(spaces).toEqual([37, 16, 32]);
     });
 
     it('should_start_each_game_and_accept_one_move_when_the_game_runs_on_each_figure', async () => {
