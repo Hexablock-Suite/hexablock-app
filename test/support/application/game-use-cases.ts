@@ -15,7 +15,6 @@ import type { MatchIdGenerator } from '../../../src/domain/engine/match-id-gener
 import type { IVariantFactory } from '../../../src/domain/engine/variant-factory';
 import { CountingMatchIds } from '../engine/match-id';
 import { gameIdOf } from '../engine/variant-game';
-import { RecordingLogger } from './recording-logger';
 import { RecordingPublisher } from './recording-publisher';
 
 // Helpers for the game use case tests. They exist only in test/.
@@ -66,8 +65,8 @@ export function factoriesOf<
 }
 
 // The game use cases of one variant over one shared repository.
-// `ApplyMove` delivers the events of each turn to `events`, and it writes a publisher
-// failure to `logger` (issues 132 and 233).
+// `ApplyMove` delivers the events of each turn to `events`. Its success carries each publisher
+// failure as a failed delivery (issues 132, 233 and #342).
 // `ids` gives the id of each game that `StartGame` opens. The first state of each game
 // and its board take ids that `GameFactory` builds from that id (issue #236).
 export function gameUseCases<
@@ -79,15 +78,13 @@ export function gameUseCases<
 >(
   factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>,
   events: GameEventPublisher = new RecordingPublisher(),
-  logger: RecordingLogger = new RecordingLogger(),
   ids: MatchIdGenerator = new CountingMatchIds(),
 ) {
   const games = new MemoryGameRepository<TCell, TCoord, TMove, TState>();
   return {
     games,
-    logger,
     startGame: new StartGame(factoriesOf(new GameFactory(gameIdOf(factory), factory, ids)), games),
-    applyMove: new ApplyMove(games, logger, events),
+    applyMove: new ApplyMove(games, events),
     undoMove: new UndoMove(games),
     redoMove: new RedoMove(games),
   };

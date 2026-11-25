@@ -4,6 +4,7 @@ import type { ElapsedTime } from '../domain/engine/elapsed-time';
 import type { GameEngine } from '../domain/engine/game-engine';
 import type { Outcome } from '../domain/engine/outcome';
 import type { Score } from '../domain/engine/score';
+import type { UseCaseError } from './result';
 
 // The data that a state gives to the screen of its variant: the return type of `view()`
 // on the photo of the state. The use cases read it through the type of the state,
@@ -29,6 +30,9 @@ export type ViewOf<TState> = SnapshotOf<TState> extends { view(): infer TView } 
 // `elapsedMs` exists only for a timed game. It asks the root for the time of play
 // when the response is built.
 // It carries the `ElapsedTime` value object of the timer, by the same rule as `score` (issue #204).
+// `failedDeliveries` exists only when the publisher refused an event of the turn (issue #342).
+// It holds one `publish-failed` `UseCaseError` per refused event. The turn is saved all the same,
+// so the call is a success (decision 29). `logEntryOf()` copies the list into the log entry.
 export interface MoveResult<TCell, TCoord, TView = unknown> {
   readonly cells: [TCoord, TCell][];
   readonly freeSpaces: TCoord[];
@@ -39,6 +43,7 @@ export interface MoveResult<TCell, TCoord, TView = unknown> {
   readonly hasUndo: boolean;
   readonly payload: TView;
   readonly elapsedMs?: ElapsedTime;
+  readonly failedDeliveries?: readonly UseCaseError[];
 }
 
 // Builds the response from the engine: the photo of the state and the queries of the root.

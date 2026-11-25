@@ -153,7 +153,6 @@ export class CompositionRoot {
       use: (id, variant, levels) =>
         wire(
           new LevelGameFactories(id, variant, this.ids, this.levels, levels),
-          this.logger,
           this.events,
           (useCase, name) => this.decorate(useCase, name),
         ),
@@ -190,18 +189,17 @@ type Decorate = <TRequest, TResponse>(
 ) => UseCase<TRequest, TResponse>;
 
 // The game use cases of the game of `factories` over one new repository, each through
-// `decorate`. Every game shares the id generator, the logger, the publisher
-// and the level repository, so each one exists once in the app.
+// `decorate`. Every game shares the id generator, the publisher and the level repository,
+// so each one exists once in the app. The logger reaches a use case only through `decorate`.
 function wire<TState extends BoardState<unknown, unknown> & Cloneable<TState>>(
   factories: GameFactories<unknown, unknown, unknown, TState>,
-  logger: Logger,
   events: GameEventPublisher,
   decorate: Decorate,
 ): GameUseCases<unknown, unknown, unknown, ViewOf<TState>> {
   const games = new InMemoryGameRepository<unknown, unknown, unknown, TState>();
   return {
     startGame: decorate(new StartGame(factories, games), 'StartGame'),
-    applyMove: decorate(new ApplyMove(games, logger, events), 'ApplyMove'),
+    applyMove: decorate(new ApplyMove(games, events), 'ApplyMove'),
     undoMove: decorate(new UndoMove(games), 'UndoMove'),
     redoMove: decorate(new RedoMove(games), 'RedoMove'),
   };
