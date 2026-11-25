@@ -8,6 +8,7 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 
 ### Added
 
+- Fit and Sort levels on the square and on the triangle ([#354](https://github.com/Hexablock-Suite/hexablock-app/issues/354)). Each of the two figures has 3 Fit levels and 3 Sort levels, `fit-square-01` to `sort-triangle-03`, numbered from 1 on each figure, and the new Sort levels use a fixed list of stacks. The map shows Fit on every figure, and Fit starts a first level of three cells in a row there. APP-FR-16 no longer says that every bundled level is hex.
 - `docs/REQUIREMENTS.md` §12 classifies each business rule of the app as enterprise, application or mixed, with who defines it, how often it changes, where it lives in the code today and where it must live ([#339](https://github.com/Hexablock-Suite/hexablock-app/issues/339)). The rows that are not in place yet name the issue that moves or builds them: #277, #45 and #46.
 - Play Hexa Lines on the shared game screen ([#174](https://github.com/Hexablock-Suite/hexablock-app/issues/174)). Pick a piece from the tray and tap the board to place it. A rejected placement keeps the selection. The tray refills after the last piece is placed, and the screen offers no undo or redo.
 
