@@ -258,7 +258,7 @@ The cross-cutting concerns of §3.5 are our own decorators over the generic use 
   - `TimingAspect` measures each call with the engine `Clock` and logs it through `Logger`.
   - `RetryAspect` runs the inner use case again while the error of its `Result` is retryable.
   - `AuthorizationAspect` reads the `SessionStore` port before the use cases that talk to the backend run: `SyncLeaderboard` and the planned `SyncProgress`. `SaveProgress` and `ListLevels` need no session (D27 in `docs/REQUIREMENTS.md`).
-- The composition root wraps each use case, for example `new LoggingAspect(new AuthorizationAspect(syncLeaderboard))`.
+- The composition root gives each use case its aspects in one place, `decorate(useCase, name)` (#323). `wrapInAspects()` builds the chain from the outside in, so the first aspect sees the call first and the result last. Today the chain holds `LoggingAspect` only. A later chain reads, for example, `new LoggingAspect(new AuthorizationAspect(syncLeaderboard))`.
 
 The use cases are generic, so one aspect covers the four variants, and the use case it wraps holds no line of the aspect's code (APP-NFR-11). An aspect never calls `Date.now`: it reads the time through `Clock` (rule R-domain-determinism). A new aspect extends `UseCaseAspect`. `UseCaseAspect` and `LoggingAspect` are in [`src/application/`](src/application/), and the suite `test/application/logging-aspect.test.ts` wraps the use cases of the four variants with one `LoggingAspect`. The other three aspects are not coded yet. See [view 3.1](docs/architecture/classes.md#view-31-the-use-case-contract-and-its-aspects).
 
