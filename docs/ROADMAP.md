@@ -20,15 +20,16 @@ So sprint 0 is the design week, and it holds no code. Sprints 1 to 5 are the fiv
 
 Every sprint runs from Monday to Sunday. The dates come from the course calendar.
 
-| Date                | What                                                                                       | Sprint |
-| ------------------- | ------------------------------------------------------------------------------------------ | ------ |
-| 2026-11-16 (Monday) | Second partial exam of the course                                                          | 3      |
-| 2026-11-29 (Sunday) | Forum «Clean, Hexagonal y patrones MV», closes at 23:59; each answer uses the project app  | 4      |
-| 2026-12-04 (Friday) | Third partial exam of the course                                                           | 5      |
-| 2026-12-07 (Monday) | Final project delivery in the class plan (first day); the class plan also names 2026-12-11 | —      |
-| 2026-12-14 (Monday) | Project delivery in the course statement, and final grades                                 | —      |
+| Date                | What                                                                                      | Sprint |
+| ------------------- | ----------------------------------------------------------------------------------------- | ------ |
+| 2026-11-16 (Monday) | Second partial exam of the course                                                         | 3      |
+| 2026-11-29 (Sunday) | Forum «Clean, Hexagonal y patrones MV», closes at 23:59; each answer uses the project app | 4      |
+| 2026-12-04 (Friday) | Last class of theory of the course                                                        | 5      |
+| 2026-12-07 (Monday) | Third partial exam of the course                                                          | 5      |
+| 2026-12-11 (Friday) | First day of defense of the final project                                                 | 5      |
+| 2026-12-14 (Monday) | Second day of defense of the final project, and final grades                              | —      |
 
-The class plan and the statement give different delivery dates. Q1 in `REQUIREMENTS.md` asks the professor which one is the deadline. Until he answers, we plan against the earliest date, 2026-12-07 (A8). So sprint 5 closes on Sunday 2026-12-06 with the delivery tag `v1.0.0`.
+The professor answered Q1 in `REQUIREMENTS.md`: the final project is defended on Friday 2026-12-11 and Monday 2026-12-14, and the grades come on 2026-12-14 (A8). So sprint 5 holds a code freeze on Friday 2026-12-04; the days of 2026-12-05 to 2026-12-07 are only study for the third partial; and the days of 2026-12-08 to 2026-12-10 hold the defense rehearsal and fixes only. Sprint 5 closes on the first defense day, Friday 2026-12-11, with the delivery tag `v1.0.0` (APP-NFR-23).
 
 ## Releases
 
@@ -151,9 +152,9 @@ The app signs in, syncs progress, shows the leaderboards and takes levels from t
 
 App pull request 15 and backend pull request 9 added the three diagrams of each repository. The backend added its `docs/EXTENSIBILITY.md` on 2026-11-17 (hexablock-api#141).
 
-## Sprint 5 — Delivery (2026-11-30 to 2026-12-06), tag `v1.0.0`
+## Sprint 5 — Delivery (2026-11-30 to 2026-12-11), tag `v1.0.0`
 
-The extensibility rehearsal, the README of each repository and the delivery release. The sprint is short on new work, because the third partial exam falls on Friday 2026-12-04.
+The extensibility rehearsal, the README of each repository and the delivery release. The sprint holds a code freeze on Friday 2026-12-04, the last class of theory: from that day the team changes only what the defense needs. The days of 2026-12-05 to 2026-12-07 are only study for the third partial exam of Monday 2026-12-07, and the days of 2026-12-08 to 2026-12-10 hold the defense rehearsal and fixes only, before the defenses of Friday 2026-12-11 and Monday 2026-12-14. The open issues #293 and #294 are out of the defense path: the sprint can close without them.
 
 | ID         | Exit check                                                                                                      |
 | ---------- | --------------------------------------------------------------------------------------------------------------- |
