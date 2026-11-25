@@ -64,7 +64,7 @@
       <h1>Adapters, presenters and drivers at a glance</h1>
 
       <svg
-        viewBox="0 0 1040 1667"
+        viewBox="0 0 1040 1683"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="mapad-title mapad-desc"
@@ -522,7 +522,7 @@
           x="464"
           y="1040"
           width="520"
-          height="128"
+          height="178"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -1875,6 +1875,24 @@
             </tspan>
           </text>
         </g>
+        <g data-class="LocalAchievementCounterRepository">
+          <rect
+            x="480"
+            y="1168"
+            width="320"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="640" y="1189" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              LocalAchievementCounterRepository
+            </tspan>
+          </text>
+        </g>
+
         <!-- Chips: view models -->
         <g data-class="GameViewModel">
           <rect
@@ -2113,8 +2131,18 @@
           registeredAchievements() of layer 4 gives ListAchievements its achievements. Their goals
           live in layer 1 since #326.
         </text>
-        <!-- The last footnote line and the legend sit 16 lower than before: the footnote has one more line since #326. -->
-        <g transform="translate(0 16)">
+        <text
+          x="24"
+          y="1542"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          LocalAchievementCounterRepository saves the counters of the achievements over the same
+          KeyValueStore, and AchievementCounterListener writes them (#363).
+        </text>
+        <!-- The last footnote line and the legend sit 32 lower than before: the footnote has one more line since #326 and one more since #363. -->
+        <g transform="translate(0 32)">
           <text
             x="24"
             y="1526"
