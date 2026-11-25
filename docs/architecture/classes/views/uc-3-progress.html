@@ -81,8 +81,8 @@
           locked) whose ofEach() gives the status of each level from GameProgress (#326), and
           SyncLeaderboard uses LeaderboardGateway and ProgressRepository. LevelRepository also finds
           the one level of a game that a start names by its id (#172). SaveProgress keeps the GameId
-          of its game and returns no value; LoadProgress keeps the GameId of its game and answers the
-          whole GameProgress. ProgressRepository loads and saves the GameProgress of one game in
+          of its game and returns no value; LoadProgress keeps the GameId of its game and answers
+          the whole GameProgress. ProgressRepository loads and saves the GameProgress of one game in
           layer 1: one object with the high score and the best result of each level, which gives the
           stars of a level with starsOf() and delivers its data to a repository of the edge with
           deliverTo().
@@ -883,13 +883,31 @@
         >
           GameProgress
         </text>
-        <text x="632" y="1012" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text
+          x="632"
+          y="1012"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
           - gameId: GameId
         </text>
-        <text x="632" y="1028" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text
+          x="632"
+          y="1028"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
           - highScore: ProgressRecord [0..1]
         </text>
-        <text x="632" y="1044" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text
+          x="632"
+          y="1044"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
           - levels: ProgressRecord [*]
         </text>
         <line x1="616" y1="1052" x2="952" y2="1052" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
@@ -903,22 +921,58 @@
         >
           + start(gameId: GameId): GameProgress
         </text>
-        <text x="632" y="1084" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text
+          x="632"
+          y="1084"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
           + recordScore(record: ProgressRecord): void
         </text>
-        <text x="632" y="1100" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text
+          x="632"
+          y="1100"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
           + recordLevel(record: ProgressRecord): void
         </text>
-        <text x="632" y="1116" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text
+          x="632"
+          y="1116"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
           + keeps(record: ProgressRecord): boolean
         </text>
-        <text x="632" y="1132" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text
+          x="632"
+          y="1132"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
           + starsOf(levelId: LevelId): Stars [0..1]
         </text>
-        <text x="632" y="1148" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text
+          x="632"
+          y="1148"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
           + equals(other: GameProgress): boolean
         </text>
-        <text x="632" y="1164" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text
+          x="632"
+          y="1164"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
           + deliverTo(receiver: GameProgressReceiver): void
         </text>
 
