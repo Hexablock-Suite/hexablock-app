@@ -33,7 +33,7 @@ import { Piece } from '../domain/engine/piece';
 import type { RandomSource } from '../domain/engine/random-source';
 import { RegionSize } from '../domain/engine/region-size';
 import { Seed } from '../domain/engine/seed';
-import { CellNode, ShapeGroup } from '../domain/engine/shape-node';
+import { CellNode, ShapeGroup, type ShapeNode } from '../domain/engine/shape-node';
 import { SquareGeometry } from '../domain/engine/square-geometry';
 import { TriangleGeometry } from '../domain/engine/triangle-geometry';
 import { triangle, type TriangleCoord } from '../domain/engine/triangle-topology';
@@ -91,14 +91,23 @@ const SORT_COLORS = [Color.of('red'), Color.of('blue'), Color.of('green')];
 const SORT_GOALS = GoalCount.of(3);
 const SORT_PREVIEW_SIZE = 38;
 
+// The Lines piece shapes on the hexagon beyond the shapes of `HexGeometry`: the hook of four cells.
+// A shape is data of the game, so a new shape is one new line here (the piece shape row of §8).
+// It changes no engine file and no variant file (APP-NFR-06).
+const LINES_HEX_SHAPES: readonly (readonly HexCoord[])[] = [
+  [hex(0, 0), hex(1, 0), hex(2, 0), hex(0, 1)],
+];
+
 // One board figure that the player can choose (APP-FR-16, issue #171): the `TopologyId` of its
 // geometry family, its `GeometryFactory`, the screen layout of the figure for a cell size,
-// and the Fit level of the first content on the figure, if the figure has one.
+// the Fit level of the first content on the figure, if the figure has one, and the Lines piece
+// shapes of the figure beyond the shapes of its geometry, if the figure has some.
 // `boardFigure()` builds each one, so the geometry, the layout and the level name one coordinate type.
 export interface BoardFigure<TCoord> {
   readonly id: TopologyId;
   readonly geometry: GeometryFactory<TCoord>;
   readonly fitLevel?: FitLevel<TCoord>;
+  readonly linesShapes?: readonly ShapeNode<TCoord>[];
   linesPlacementAt?(at: TCoord): TCoord;
   layoutOf(size: number): BoardLayout<TCoord>;
 }
@@ -110,7 +119,15 @@ export interface BoardFigure<TCoord> {
 // so Fit offers no level on the square and on the triangle.
 export function boardFigures(): BoardFigure<unknown>[] {
   return [
-    boardFigure(TopologyId.hex, new HexGeometry(), (size) => new HexLayout(size), firstFitLevel()),
+    {
+      ...boardFigure(
+        TopologyId.hex,
+        new HexGeometry(),
+        (size) => new HexLayout(size),
+        firstFitLevel(),
+      ),
+      linesShapes: LINES_HEX_SHAPES.map(shapeOf),
+    },
     boardFigure(TopologyId.square, new SquareGeometry(), (size) => new SquareLayout(size)),
     {
       ...boardFigure(
@@ -161,7 +178,7 @@ export function registeredGames<TCoord>(
         LinesSettings.of(
           LINES_BOARD,
           seedFrom(random),
-          nonEmpty(geometry.createPieceShapes()),
+          nonEmpty([...geometry.createPieceShapes(), ...(figure.linesShapes ?? [])]),
           nonEmpty(LINES_COLORS),
         ),
       ),
@@ -337,7 +354,12 @@ function fitStar(maxMoves: number, maxElapsedMs: number): FitStarThreshold {
 
 // A Fit piece with the id `id` over the cells `cells`, relative to the origin of the piece.
 function fitPiece(id: string, cells: readonly HexCoord[]): Piece<PieceId, HexCoord> {
-  return new Piece(new ShapeGroup(cells.map((c) => new CellNode(c))), PieceId.of(id));
+  return new Piece(shapeOf(cells), PieceId.of(id));
+}
+
+// The piece shape over the cells `cells`, relative to the origin of the piece.
+function shapeOf<TCoord>(cells: readonly TCoord[]): ShapeGroup<TCoord> {
+  return new ShapeGroup(cells.map((c) => new CellNode(c)));
 }
 
 // The list as a list of one item or more. An empty list throws a RangeError.
