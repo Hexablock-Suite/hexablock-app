@@ -1,4 +1,6 @@
 import type { AchievementCounterRepository } from '../application/achievement-counter-repository';
+import type { Logger } from '../application/logger';
+import { caughtError, FailureCode } from '../application/result';
 import { AchievementCount } from '../domain/engine/achievement-count';
 import { AchievementCounters } from '../domain/engine/achievement-counters';
 import type { GameEvent } from '../domain/engine/game-events';
@@ -30,13 +32,17 @@ const ONE_GOAL = AchievementCount.of(1);
 // event queues one save: it loads the counters of its game, or starts them, changes them and
 // saves them. A save starts only after the save before it ends, so two events of one move never
 // overwrite each other. A save that fails, for example over a saved text that the repository
-// cannot read, writes nothing, and the saves after it still run. `saved()` waits for every
-// queued save and throws one `Error` with the failures as its `cause`.
+// cannot read, writes nothing, and the saves after it still run. The listener reports each failed
+// save at once through the `Logger` port of layer 2 (issue #384). The entry names this listener
+// and holds a `save-failed` `UseCaseError` with the thrown value as its `cause`. The listener
+// keeps no failure. A logger that throws stops no save. `saved()` waits for every queued save.
 export class AchievementCounterListener implements GameEventListener {
   private queue: Promise<void> = Promise.resolve();
-  private failures: unknown[] = [];
 
-  constructor(private readonly counters: AchievementCounterRepository) {}
+  constructor(
+    private readonly counters: AchievementCounterRepository,
+    private readonly logger: Logger,
+  ) {}
 
   onEvent(event: GameEvent): void {
     if (event instanceof LinesCleared) {
@@ -62,27 +68,31 @@ export class AchievementCounterListener implements GameEventListener {
     }
   }
 
-  // Waits for every save that the events heard so far queued. When saves failed since the last
-  // call, it throws one `Error` with those failures as its `cause`, in their order.
+  // Waits for every save that the events heard so far queued. It never throws: the logger
+  // already has each failed save.
   async saved(): Promise<void> {
     await this.queue;
-    const failures = this.failures;
-    this.failures = [];
-    if (failures.length > 0) {
-      const saves = failures.length === 1 ? 'save' : 'saves';
-      throw new Error(`${failures.length} ${saves} of the achievement counters failed.`, {
-        cause: failures,
-      });
-    }
   }
 
   // Queues the save of `step` on the counters of the game `gameId`.
   private enqueue(gameId: GameId, step: Step): void {
     this.queue = this.queue
       .then(() => this.save(gameId, step))
-      .catch((failure: unknown) => {
-        this.failures.push(failure);
+      .catch((failure: unknown) => this.report(failure));
+  }
+
+  // Writes one `save-failed` entry for the failed save to the logger.
+  // A logger that throws has no other place to report to, so the listener ignores its error.
+  private report(failure: unknown): void {
+    try {
+      this.logger.log({
+        useCase: 'AchievementCounterListener',
+        outcome: 'failure',
+        error: caughtError(FailureCode.saveFailed, failure),
       });
+    } catch {
+      // The queue goes on with the next save.
+    }
   }
 
   private async save(gameId: GameId, step: Step): Promise<void> {

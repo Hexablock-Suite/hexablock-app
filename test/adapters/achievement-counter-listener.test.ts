@@ -3,6 +3,7 @@ import { AchievementCounterListener } from '../../src/adapters/achievement-count
 import { GameEventBus } from '../../src/adapters/game-event-bus';
 import { LocalAchievementCounterRepository } from '../../src/adapters/local-achievement-counter-repository';
 import { ApplyMove } from '../../src/application/apply-move';
+import type { Logger, UseCaseLogEntry } from '../../src/application/logger';
 import { GameOver } from '../../src/domain/engine/game-events';
 import { GameId } from '../../src/domain/engine/game-id';
 import { hex, HexAxis } from '../../src/domain/engine/hex-topology';
@@ -15,6 +16,7 @@ import { TileCount } from '../../src/domain/variants/hexa-sort/tile-count';
 import { Slide, SlideSense } from '../../src/domain/variants/hexa-merge/slide';
 import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-store';
 import { MemoryGameRepository, valueOf } from '../support/application/game-use-cases';
+import { RecordingLogger } from '../support/application/recording-logger';
 import { countsOf } from '../support/engine/counters-content';
 import { MATCH_ID } from '../support/engine/match-id';
 import { square, squareTopology } from '../support/engine/square-topology';
@@ -34,6 +36,7 @@ import {
 // over the store, so they survive a restart. Lines keeps its most lines at once as the best count,
 // Merge keeps its highest tile as the best count, and Sort adds each cleared stack, one goal,
 // to the total.
+// Issue #384: a failed save of the counters goes to the `Logger` port, one entry per failed save.
 
 const LINES = GameId.of('hexa-lines');
 const MERGE = GameId.of('hexa-merge');
@@ -46,14 +49,32 @@ async function playThrough(bus: GameEventBus, engine: unknown, move: unknown): P
   valueOf(await new ApplyMove(games, bus).execute({ move }));
 }
 
-// A bus with one listener that saves its counters in `store`.
-function counting(store = new InMemoryKeyValueStore()) {
+// A bus with one listener that saves its counters in `store` and logs each failed save.
+function counting(store = new InMemoryKeyValueStore(), logger: Logger = new RecordingLogger()) {
   const counters = new LocalAchievementCounterRepository(store);
-  const listener = new AchievementCounterListener(counters);
+  const listener = new AchievementCounterListener(counters, logger);
   const bus = new GameEventBus();
   bus.subscribe(listener);
   return { store, counters, listener, bus };
 }
+
+// The name, the outcome, the code and the message of each log entry, in the order of the log.
+function logged(entries: readonly UseCaseLogEntry[]) {
+  return entries.map(({ useCase, outcome, error }) => ({
+    useCase,
+    outcome,
+    code: error?.code,
+    message: error?.message,
+  }));
+}
+
+const UNREADABLE = {
+  useCase: 'AchievementCounterListener',
+  outcome: 'failure',
+  code: 'save-failed',
+  message:
+    'The saved counters of the achievements of a game have a version that this app does not read.',
+};
 
 // A piece of two cells on (0, 0) and (1, 0) fills the row 0 and the columns 0 and 1: 3 lines.
 const threeLines = () => ({
@@ -147,17 +168,43 @@ describe('AchievementCounterListener', () => {
     await expect(store.get('achievement-counters:hexa-lines')).resolves.toBeUndefined();
   });
 
-  // A saved text that the repository cannot read stays in the store. The next event of
-  // another game is still saved, and `saved()` throws the failure once.
-  it('should_keep_the_unreadable_text_and_throw_from_saved_when_the_saved_counters_cannot_be_read', async () => {
-    const { store, counters, listener, bus } = counting();
+  // Issue #384: a saved text that the repository cannot read stays in the store. Each failed
+  // save writes one `save-failed` entry to the logger when it fails, and the listener keeps no
+  // failure. The event of another game between them is still saved, and `saved()` only waits.
+  it('should_log_one_save_failed_entry_per_failed_save_and_keep_the_unreadable_text_when_the_saved_counters_cannot_be_read', async () => {
+    const logger = new RecordingLogger();
+    const { store, counters, listener, bus } = counting(undefined, logger);
+    await store.set('achievement-counters:hexa-lines', '{"version":9}');
+    const first = threeLines();
+    const second = oneLine();
+
+    await playThrough(bus, first.engine, first.move);
+    listener.onEvent(SORT_GOAL);
+    await playThrough(bus, second.engine, second.move);
+    await listener.saved();
+    const afterTheSaves = logged(logger.entries);
+    await listener.saved();
+
+    expect(afterTheSaves).toEqual([UNREADABLE, UNREADABLE]);
+    expect(logged(logger.entries)).toEqual([UNREADABLE, UNREADABLE]);
+    await expect(store.get('achievement-counters:hexa-lines')).resolves.toBe('{"version":9}');
+    expect(countsOf(await counters.load(SORT))).toEqual({ best: 0, total: 1 });
+  });
+
+  // Issue #384: a logger that throws on a failed save does not stop the queue.
+  it('should_still_save_the_next_event_when_the_logger_throws_on_a_failed_save', async () => {
+    const broken: Logger = {
+      log: () => {
+        throw new Error('The log is down.');
+      },
+    };
+    const { store, counters, listener, bus } = counting(undefined, broken);
     await store.set('achievement-counters:hexa-lines', '{"version":9}');
     const lines = threeLines();
 
     await playThrough(bus, lines.engine, lines.move);
     listener.onEvent(SORT_GOAL);
 
-    await expect(listener.saved()).rejects.toThrow('1 save of the achievement counters failed.');
     await expect(listener.saved()).resolves.toBeUndefined();
     await expect(store.get('achievement-counters:hexa-lines')).resolves.toBe('{"version":9}');
     expect(countsOf(await counters.load(SORT))).toEqual({ best: 0, total: 1 });
