@@ -2,7 +2,7 @@
 
 This page explains how to add a fifth variant. The example is Hexa Fill, the game that statement §3.1 names («por ejemplo, Hexa Fill: pintar celdas con restricciones»). Its rules are not designed yet, so every `Fill` name below is a placeholder.
 
-The steps follow the [class diagram](architecture/classes.md) and the [extensibility diagram](architecture/extensibility.md). The engine, the four variants and the first use cases exist in `src/`. The composition root and its game registry exist too (#162), and so do the home screen, the game selector map and `HomePresenter` (#169), and the figure selector of the home screen (#171). The other classes of layers 3 and 4 that the steps name are planned. Some engine classes are planned too, for example the progress models and `RedoableHistory`. When a planned class exists, this page names its real file.
+The steps follow the [class diagram](architecture/classes.md) and the [extensibility diagram](architecture/extensibility.md). The engine, the four variants and the first use cases exist in `src/`. The composition root and its game registry exist too (#162), and so do the home screen, the game selector map and `HomePresenter` (#169), and the figure selector of the home screen (#171). The other classes of layers 3 and 4 that the steps name exist too: the state mappers in `src/adapters/`, the cell renderers in `src/infrastructure/board/`, and the move controls [`LinesControls`](../src/infrastructure/ui/lines-controls.tsx), [`FitControls`](../src/infrastructure/ui/fit-controls.tsx), [`SortControls`](../src/infrastructure/ui/sort-controls.tsx) and [`MergeControls`](../src/infrastructure/ui/merge-controls.tsx) in `src/infrastructure/ui/` (#174 to #177). The engine classes that the steps name exist: the progress models `HighScoreProgress` and `LevelProgress` in [`progress-model.ts`](../src/domain/engine/progress-model.ts), and [`RedoableHistory`](../src/domain/engine/redoable-history.ts), which `FitFactory` picks.
 
 ## The rule
 
@@ -65,9 +65,36 @@ If Hexa Fill keeps levels on the backend, the backend adds a section for it in t
 | 4     | `CompositionRoot`, `GameRegistry`, the HTTP client and repositories, the drivers, `BoardView`, `AudioManager`, and the home, game selector map, game, level selector, victory and defeat routes                                                                                                                                                                                                   |
 | gates | `.dependency-cruiser.cjs` and the architecture tests                                                                                                                                                                                                                                                                                                                                              |
 
+## The three jury variations
+
+In the defense the jury proposes «un nuevo tamaño de tablero, una política de puntuación distinta o una nueva forma de pieza» (§3.1). Each variation below names its real file. No variation edits a file of `src/domain/engine/`, of `src/application/` or of another variant (APP-NFR-06). A comment of an engine file is part of the engine too. View 2 of the [extensibility diagram](architecture/extensibility.md) draws the same places.
+
+### A new board size
+
+1. For Hexa Lines or Hexa Merge, change the constant of the game in [`src/infrastructure/registered-games.ts`](../src/infrastructure/registered-games.ts): `LINES_BOARD` or `MERGE_BOARD`. Each game has its own constant, so the change resizes one game only. The factory passes the size to `BoardBuilder.withRegion(size)`, and no factory file changes. For Hexa Merge, `mergeOn()` gives the one value to `MergeSettings.of()` and to the slide controls of the Merge screen, so the ways on the screen follow the lines of the new board (#369).
+2. For Hexa Sort, change `radius` in the level file of the level, in `src/adapters/levels/sort/`. `SortLevelBuilder` turns it into the `RegionSize` of the board. `SORT_BOARD` in `registered-games.ts` is the size of the seeded Sort level of the first content.
+3. Edit the expected numbers of the outer-layer tests that pin a board size: `should_build_each_board_on_the_geometry_of_the_figure_when_the_figure_is_chosen` in `test/infrastructure/composition-root.test.ts`, which counts the cells of each board on each figure, and `FOUR_BOARDS` in `test/app/game-screen.test.tsx`, which counts the spaces of the first board of each game. A region of size n holds 3n(n − 1) + 1 hexagons, n² squares or 2n² triangles.
+4. Change the board row of the comparison table in `docs/REQUIREMENTS.md` §1, for example «Hexagon, radius 2 (19 cells)» (rule R-requirements in `AGENTS.md`).
+
+### A new scoring policy
+
+1. In the folder of the variant, `src/domain/variants/hexa-<name>/`, write a class that implements `IScoringPolicy<TState>`, or a bonus that extends the engine `ScoringDecorator`.
+2. Return it from `createScoring()` of the factory of the variant, for example `merge-factory.ts`. This line is a change of the same variant, not of the engine.
+3. Test the policy in its own suite in `test/domain/variants/hexa-<name>/`, and test the factory line in the factory suite.
+4. When the class bounds a type parameter, add a row to the README table «Variant bounds». `test/docs/generic-bounds.test.ts` fails on a bound in a variant folder with no row (APP-NFR-05).
+5. When the policy changes the points of the game, change the README section «Scoring» (APP-FR-06). `test/docs/scoring-docs.test.ts` checks it. Add the class to the `IScoringPolicy` row of the extension-points table of the [extensibility diagram](architecture/extensibility.md).
+
+### A new piece shape
+
+A shape is data of one figure. It cannot be written once for every figure: the same pair of numbers names another cell on the triangle than on the hexagon.
+
+1. For Hexa Fit, add the piece to `pieces` in the level file, in `src/adapters/levels/fit/`, or to `firstFitLevel()` in `registered-games.ts` for the level of the first content. `FitLevelBuilder` checks it.
+2. For Hexa Lines, add the shape as data of its board figure in [`src/infrastructure/registered-games.ts`](../src/infrastructure/registered-games.ts), and give `LinesSettings.of()` the shapes of the geometry followed by the shapes of the figure. The first shape of a figure also adds the optional list `linesShapes` to `BoardFigure` and fills it in `boardFigures()`, as the rehearsal branch `odjaramillo/app-53-rehearsal-piece-shape` does. The lists in `HexGeometry`, `SquareGeometry` and `TriangleGeometry` are the base set of each geometry family, and they do not change.
+3. Test that the Lines pieces of that figure include the new shape, in a test of `test/infrastructure/` that draws the pieces of the registry entry.
+
 ## Check
 
-Before the defense, a branch adds Hexa Fill with these steps. Its diff must touch no file under `src/domain/engine/`, `src/application/` or the four other variant folders (APP-NFR-06). The same check applies to the three jury variations in view 2 of the [extensibility diagram](architecture/extensibility.md): a new board size, a new scoring policy and a new piece shape.
+Before the defense, a branch adds Hexa Fill with these steps. Its diff must touch no file under `src/domain/engine/`, `src/application/` or the four other variant folders (APP-NFR-06). The same check applies to the [three jury variations](#the-three-jury-variations): a new board size, a new scoring policy and a new piece shape.
 
 ### Rehearsal of 2026-11-25
 
@@ -79,11 +106,11 @@ The base is `main` at `3ca471d`. Each jury variation is one commit on its own br
 | New scoring policy | `odjaramillo/app-53-rehearsal-scoring-policy`, `4a433db` | In Hexa Merge, the slide that first makes the target tile scores a bonus of 1000 points.                               | New `src/domain/variants/hexa-merge/target-bonus-decorator.ts`, which extends the engine `ScoringDecorator`, with its test; one line of `createScoring()` in `merge-factory.ts`, with its test                        | 176 suites, 1803 tests |
 | New piece shape    | `odjaramillo/app-53-rehearsal-piece-shape`, `87c72ec`    | Hexa Lines on the hexagon draws one more shape, a hook of four cells.                                                  | `src/infrastructure/registered-games.ts` (the shape is data of the hexagon figure, added to the shapes of the geometry), new `test/infrastructure/registered-games.test.ts`                                           | 176 suites, 1800 tests |
 
-The rehearsal showed these facts. [#369](https://github.com/Hexablock-Suite/hexablock-app/issues/369) holds the fixes.
+The rehearsal showed these facts, and [#369](https://github.com/Hexablock-Suite/hexablock-app/issues/369) fixed the documents and the code:
 
-- The place of a board size and of a Lines piece shape is `src/infrastructure/registered-games.ts`. This page and view 2 of the [extensibility diagram](architecture/extensibility.md) do not name that file as their place.
-- The comments of the three geometry files of the engine say «A new shape is one new line». They send a developer to an engine file.
-- A size change edits the expected numbers of two outer-layer tests.
-- A new generic bound in a variant folder needs a row in the README table «Variant bounds» (`test/docs/generic-bounds.test.ts`).
+- The place of a board size and of a Lines piece shape is `src/infrastructure/registered-games.ts`. The section «The three jury variations» and view 2 of the [extensibility diagram](architecture/extensibility.md) now name that file.
+- The comments of the three geometry files of the engine said «A new shape is one new line», and sent a developer to an engine file. They now name the file of a new Lines shape.
+- Sort and Merge shared one board constant, and the slide controls of Merge read it apart from `MergeSettings`. Each game now has its own constant, and `mergeOn()` gives the Merge value to both.
+- A size change edits the expected numbers of two outer-layer tests, and a new generic bound in a variant folder needs a row in the README table «Variant bounds». The steps above name both.
 
 To repeat the rehearsal before the defense, cherry-pick the commit of each branch on the `main` of that day. Then run `pnpm verify` and the `git diff --name-only` check above.

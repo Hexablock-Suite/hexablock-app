@@ -8,7 +8,9 @@ import { triangle, TriangleTopology, type TriangleCoord } from './triangle-topol
 // A translation keeps the orientation of each triangle, so a piece covers only cells
 // of its own orientations. The list holds 11 up triangles and 11 down triangles,
 // so the pieces can fill both kinds of cell.
-// A new shape is one new line (the piece shape row of statement §8).
+// This list is the base set of the family, for every game on this figure.
+// A jury variation never edits it (APP-NFR-06): a new Lines shape is data of one board figure
+// in src/infrastructure/registered-games.ts (docs/EXTENSIBILITY.md, issue #369).
 const pieces: readonly (readonly TriangleCoord[])[] = [
   [triangle(0, 0)],
   [triangle(0, 0), triangle(1, 0)],

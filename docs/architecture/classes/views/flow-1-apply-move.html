@@ -63,7 +63,7 @@
       <p class="eyebrow">Use case flow · ApplyMove · class view</p>
       <h1>ApplyMove across the four layers: the classes of one move</h1>
       <svg
-        viewBox="0 0 1040 1386"
+        viewBox="0 0 1040 1406"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="flowmove-title flowmove-desc"
@@ -560,6 +560,7 @@
         </text>
         <text x="336" y="344" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + onEvent(event: GameEvent): void
+          <tspan data-requirement="APP-FR-10" fill="#5b6873" font-size="8">«Sprint 4»</tspan>
         </text>
         <text x="336" y="360" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + viewModel(): GameViewModel
@@ -569,7 +570,7 @@
           x="48"
           y="224"
           width="220"
-          height="104"
+          height="120"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -605,9 +606,12 @@
           + freeView(): TCellView
         </text>
         <text x="64" y="320" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + toPayload(p: TView): TPayloadView
+          + toPayload(payload: TView):
         </text>
-        <!-- Class: GameViewModel (value object) -->
+        <text x="75" y="336" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          TPayloadView
+        </text>
+        <!-- Class: GameViewModel (interface, value object) -->
         <rect
           x="816"
           y="224"
@@ -627,7 +631,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «value object»
+          «interface» «value object»
         </text>
         <text
           x="908"
@@ -725,7 +729,7 @@
         <text x="266" y="612" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + execute(request: TRequest): Promise&lt;Result&lt;TResponse&gt;&gt;
         </text>
-        <!-- Class: ApplyMoveRequest (value object, request model) -->
+        <!-- Class: ApplyMoveRequest (interface, value object, request model) -->
         <rect
           x="40"
           y="548"
@@ -743,9 +747,9 @@
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
-          letter-spacing="0.08em"
+          letter-spacing="0"
         >
-          «value object» «request»
+          «interface» «value object» «request»
         </text>
         <text
           x="135"
@@ -862,7 +866,7 @@
         <text x="332" y="812" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Promise&lt;Result&lt;MoveResult&lt;TCell, TCoord&gt;&gt;&gt;
         </text>
-        <!-- Class: MoveResult (value object, response model) -->
+        <!-- Class: MoveResult (interface, value object, response model) -->
         <rect
           x="40"
           y="652"
@@ -880,9 +884,9 @@
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
-          letter-spacing="0.08em"
+          letter-spacing="0"
         >
-          «value object» «response»
+          «interface» «value object» «response»
         </text>
         <text
           x="145"
@@ -1438,7 +1442,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          GameScreen is a React component of layer 4, not a class.
+          GameScreen is a React component of layer 4, not a class. Its box stands for the route and
+          the GameStage that it renders.
         </text>
         <!-- Legend -->
         <line
@@ -1610,6 +1615,26 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
+        </text>
+        <!-- Legend: the «Sprint N» marker of a planned class or member -->
+        <text
+          x="24"
+          y="1357"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          «Sprint N»
+        </text>
+        <text
+          x="92"
+          y="1357"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Planned design, not in the code yet · N is the docs/ROADMAP.md sprint of the requirement
+          it serves
         </text>
       </svg>
     </div>

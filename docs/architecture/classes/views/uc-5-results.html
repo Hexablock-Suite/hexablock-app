@@ -532,7 +532,7 @@
           unexpected-failure
         </text>
 
-        <!-- Class: MoveResult (value object, response model) -->
+        <!-- Class: MoveResult (interface, value object, response model) -->
         <rect
           x="360"
           y="450"
@@ -553,7 +553,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «value object» «response model»
+          «interface» «value object» «response model»
         </text>
         <text
           x="520"
@@ -691,6 +691,16 @@
         >
           A presenter maps every FailureCode to a text with Record&lt;FailureCode, TextKey&gt;, so a
           new code with no text fails the type check (decision 62).
+        </text>
+        <text
+          x="24"
+          y="784"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          The Result box sums up a union type and its companion object: the union of { ok: true,
+          value } and { ok: false, error }, and the object Result with success() and failure().
         </text>
 
         <!-- Legend -->

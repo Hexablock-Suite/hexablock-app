@@ -234,9 +234,9 @@
         />
         <!-- LevelTimer implements ITimed: realization -->
         <line
-          x1="248"
+          x1="304"
           y1="392"
-          x2="296"
+          x2="344"
           y2="392"
           stroke="#17212a"
           stroke-width="1"
@@ -487,17 +487,17 @@
         <rect
           x="72"
           y="356"
-          width="176"
+          width="232"
           height="208"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="72" y1="404" x2="248" y2="404" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="72" y1="476" x2="248" y2="476" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="72" y1="404" x2="304" y2="404" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="72" y1="476" x2="304" y2="476" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="160"
+          x="188"
           y="374"
           fill="#5b6873"
           font-size="8"
@@ -508,7 +508,7 @@
           «entity»
         </text>
         <text
-          x="160"
+          x="188"
           y="392"
           fill="#17212a"
           font-size="12"
@@ -524,11 +524,23 @@
         <text x="88" y="436" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - clock: Clock
         </text>
-        <text x="88" y="452" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - startedAt: ClockReading
+        <text
+          x="88"
+          y="452"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          - startedAt: ClockReading | undefined
         </text>
-        <text x="88" y="468" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - stoppedAt: ClockReading
+        <text
+          x="88"
+          y="468"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          - stoppedAt: ClockReading | undefined
         </text>
         <text x="88" y="492" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: LevelTimer):
@@ -548,7 +560,7 @@
 
         <!-- Class: ITimed (interface) -->
         <rect
-          x="296"
+          x="344"
           y="356"
           width="176"
           height="72"
@@ -557,9 +569,9 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="296" y1="404" x2="472" y2="404" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="344" y1="404" x2="520" y2="404" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="384"
+          x="432"
           y="374"
           fill="#5b6873"
           font-size="8"
@@ -570,7 +582,7 @@
           «interface»
         </text>
         <text
-          x="384"
+          x="432"
           y="392"
           fill="#17212a"
           font-size="12"
@@ -580,7 +592,7 @@
         >
           ITimed
         </text>
-        <text x="312" y="420" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="360" y="420" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + elapsedMs(): ElapsedTime
         </text>
 
