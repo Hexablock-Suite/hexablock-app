@@ -46,6 +46,7 @@ Expo changes every SDK. Read the docs for the installed major version (`https://
 - Keep the required README and AI_USAGE headings. Gate: `test/docs/docs-skeleton.test.ts`. <!-- rule: R-docs-headings -->
 - Log AI use per task in `AI_USAGE.md`. Gate: no gate. <!-- rule: R-ai-usage-log -->
 - Add Expo and React Native packages with `npx expo install`. Gate: no gate (`npx expo-doctor` runs by hand). <!-- rule: R-expo-install -->
+- Document every entry of `dependencies` and `devDependencies` of `package.json` in `docs/DEPENDENCIES.md` with a truthful reason. Gate: `test/gates/dependencies-gate.test.ts`. <!-- rule: R-dependencies-doc -->
 - Do not create or edit `ios/` or `android/` by hand; configure native behavior in `app.json`. Gate: no gate. <!-- rule: R-no-native-folders -->
 - Release the APK by pushing a `v*` tag; `.github/workflows/release-apk.yml` builds it from `npx expo prebuild` and attaches it to a GitHub Release. Never commit `android/` or a keystore. Gate: `test/gates/release-apk.test.ts` (it pins the workflow, not a green build). <!-- rule: R-apk-release -->
 - Close each sprint of `docs/ROADMAP.md` with a `v0.N.0` tag, the same tag as hexablock-api; the final delivery is `v1.0.0`. Before you push the tag, move the `## [Unreleased]` entries of `CHANGELOG.md` into a `## [x.y.z] - YYYY-MM-DD` section for that version. Gate: `test/docs/changelog.test.ts` (it pins the CHANGELOG format, not the tag). <!-- rule: R-sprint-release -->
