@@ -64,7 +64,7 @@
       <h1>Wiring: the drivers and the composition root</h1>
 
       <svg
-        viewBox="0 0 1040 1421"
+        viewBox="0 0 1040 1437"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="adwiring-title adwiring-desc"
@@ -77,10 +77,12 @@
           MatchIdGenerator interfaces, and the planned AudioManager and SessionManager. It reads
           each BoardFigure, the hexagon, the square and the triangle, keeps one GameRegistry for
           each figure, which maps each GameId to its registered game, keeps the LevelRepository of
-          the bundled levels, and creates NullGameEventPublisher, InMemoryGameRepository and
+          the bundled levels, and creates GameEventBus, InMemoryGameRepository and
           LevelGameFactories, which implements the GameFactories port, in layer 3, so single-scope
-          injection replaces a classic Singleton. With a store in its drivers it creates
-          LocalProgressRepository once, keeps it as progress for every consumer of the saved
+          injection replaces a classic Singleton. With a store in its drivers it also creates one
+          LocalAchievementCounterRepository, which implements the AchievementCounterRepository port,
+          and gives it to the counter listener of the bus (#363). With a store in its drivers it
+          creates LocalProgressRepository once, keeps it as progress for every consumer of the saved
           progress, and builds ListAchievements over it once, and listAchievements() gives it. It
           also answers loadProgress(gameId) with one LoadProgress per game, which reads the saved
           progress of that game back (#181).
@@ -249,7 +251,7 @@
           stroke-width="1"
           marker-end="url(#adwiring-open)"
         />
-        <!-- CompositionRoot creates NullGameEventPublisher: use «create», down from layer 4 to layer 3 -->
+        <!-- CompositionRoot creates the one GameEventBus: use «create», down from layer 4 to layer 3 -->
         <line
           x1="460"
           y1="604"
@@ -284,6 +286,16 @@
           x1="580"
           y1="604"
           x2="580"
+          y2="1016"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#adwiring-open)"
+        />
+        <!-- CompositionRoot creates LocalAchievementCounterRepository over the store of its drivers and gives it to AchievementCounterListener: use «create», down from layer 4 to layer 3 (#363) -->
+        <line
+          x1="352"
+          y1="604"
+          x2="352"
           y2="1016"
           stroke="#5b6873"
           stroke-width="1"
@@ -385,12 +397,12 @@
         </text>
 
         <text
-          x="342"
-          y="866"
+          x="332"
+          y="880"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
+          text-anchor="end"
           letter-spacing="0.06em"
         >
           «create»
@@ -403,6 +415,19 @@
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="end"
+          letter-spacing="0.06em"
+        >
+          «create»
+        </text>
+
+        <rect x="356" y="992" width="47" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="358"
+          y="1001"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
           letter-spacing="0.06em"
         >
           «create»
@@ -717,7 +742,7 @@
         <!-- UML template box of BoardFigure: type parameter on the top-right corner -->
         <rect
           x="276"
-          y="626"
+          y="586"
           width="44"
           height="18"
           rx="2"
@@ -794,7 +819,7 @@
           LevelGameFactories
         </text>
 
-        <!-- Class: NullGameEventPublisher (adapter, stands in for GameEventBus of view 4.3) -->
+        <!-- Class: GameEventBus (adapter of the publisher port, detailed in view 4.3, #362) -->
         <rect
           x="360"
           y="888"
@@ -814,7 +839,7 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          NullGameEventPublisher
+          GameEventBus
         </text>
 
         <!-- Class: InMemoryGameRepository (adapter, repository of the game aggregate) -->
@@ -828,7 +853,7 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="600" y1="936" x2="936" y2="936" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="600" y1="896" x2="936" y2="896" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="768"
           y="906"
@@ -922,7 +947,62 @@
           - store: KeyValueStore
         </text>
 
+        <!-- Class: LocalAchievementCounterRepository (adapter of AchievementCounterRepository over KeyValueStore, #363) -->
+        <rect
+          x="296"
+          y="1016"
+          width="240"
+          height="72"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="296" y1="1064" x2="536" y2="1064" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="416"
+          y="1034"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «repository»
+        </text>
+        <text
+          x="416"
+          y="1052"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          LocalAchievementCounterRepository
+        </text>
+        <text
+          x="312"
+          y="1080"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          - store: KeyValueStore
+        </text>
+
         <!-- Lollipops: interface or port each class implements, with its binding -->
+        <line x1="312" y1="1088" x2="312" y2="1104" stroke="#17212a" stroke-width="1" />
+        <circle cx="312" cy="1109" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text
+          x="323"
+          y="1112"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          AchievementCounterRepository
+        </text>
         <line x1="80" y1="120" x2="80" y2="104" stroke="#17212a" stroke-width="1" />
         <circle cx="80" cy="99" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text x="91" y="102" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
@@ -1018,8 +1098,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          NullGameEventPublisher goes to ApplyMove and stands in for GameEventBus of view 4.3.
-          InMemoryGameRepository keeps the aggregate root for layer 2 only (decision 29).
+          One GameEventBus goes to every ApplyMove, with AchievementCounterListener subscribed (view
+          4.3). InMemoryGameRepository keeps the root for layer 2 only (decision 29).
         </text>
         <text
           x="24"
@@ -1063,8 +1143,18 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          It answers loadProgress(gameId) with one LoadProgress per game over that repository
-          (#181). A root with no store offers neither, and asking throws a RangeError.
+          registeredAchievements() gives it the seven achievements. Their goals live in layer 1
+          since #326 and #364 (view 3.6).
+        </text>
+        <text
+          x="24"
+          y="1300"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          It answers loadProgress(gameId) with one LoadProgress per game over the progress
+          repository (#181). A root with no store offers neither, and asking throws a RangeError.
         </text>
         <text
           x="24"
@@ -1073,11 +1163,12 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          registeredAchievements() gives it the seven achievements. Their goals, LevelsWon and
-          EveryLevelWon, live in layer 1 since #326 (view 3.6).
+          Over the same store, the root builds one LocalAchievementCounterRepository and gives it to
+          AchievementCounterListener, which saves the counters (#363), and to ListAchievements
+          (#364).
         </text>
-        <!-- The legend sits 72 lower than before: the footnote has two more lines since #326 and #181, and the composition root box grew. -->
-        <g transform="translate(0 72)">
+        <!-- The legend sits 32 lower than before: the footnote has one more line since #326 and one more since #363. -->
+        <g transform="translate(0 88)">
           <!-- Legend -->
           <line
             x1="24"

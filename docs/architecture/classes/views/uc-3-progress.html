@@ -64,7 +64,7 @@
       <h1>Progress, levels and leaderboard: use cases over output ports</h1>
 
       <svg
-        viewBox="0 0 1040 1608"
+        viewBox="0 0 1040 1624"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="ucprogress-title ucprogress-desc"
@@ -85,7 +85,9 @@
           the whole GameProgress. ProgressRepository loads and saves the GameProgress of one game in
           layer 1: one object with the high score and the best result of each level, which gives the
           stars of a level with starsOf() and delivers its data to a repository of the edge with
-          deliverTo().
+          deliverTo(). AchievementCounterRepository loads and saves the AchievementCounters of one
+          game in layer 1 (#363): its own aggregate, with a best count and a total, each an
+          AchievementCount.
         </desc>
         <defs>
           <marker
@@ -215,7 +217,7 @@
           x="456"
           y="224"
           width="464"
-          height="356"
+          height="468"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -320,6 +322,59 @@
           stroke-width="1"
           marker-end="url(#ucprogress-open)"
         />
+        <!-- AchievementCounterRepository loads and saves the AchievementCounters of one game: use, down from layer 2 to layer 1 (#363) -->
+        <line
+          x1="488"
+          y1="684"
+          x2="488"
+          y2="932"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucprogress-open)"
+        />
+        <!-- AchievementCounters keeps its best count and its total as AchievementCount values: use with role and multiplicity (#363) -->
+        <line
+          x1="200"
+          y1="1160"
+          x2="200"
+          y2="1192"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucprogress-open)"
+        />
+        <line
+          x1="400"
+          y1="1160"
+          x2="400"
+          y2="1192"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucprogress-open)"
+        />
+        <rect x="204" y="1170" width="34" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="206"
+          y="1179"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          best
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <rect x="404" y="1170" width="38" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="406"
+          y="1179"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          total
+          <tspan font-weight="600">1</tspan>
+        </text>
 
         <!-- Arrow labels -->
         <rect x="364" y="116" width="48" height="12" rx="2" fill="#efe7f8" />
@@ -849,6 +904,259 @@
           + top(gameId: GameId, levelId?: string): Promise&lt;LeaderboardEntry[]&gt;
         </text>
 
+        <!-- Class: AchievementCounterRepository (interface, port, #363) -->
+        <rect
+          x="472"
+          y="596"
+          width="432"
+          height="88"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="472" y1="644" x2="904" y2="644" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="688"
+          y="614"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «port» «repository»
+        </text>
+        <text
+          x="688"
+          y="632"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          AchievementCounterRepository
+        </text>
+        <text x="488" y="660" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + load(gameId: GameId): Promise&lt;AchievementCounters | undefined&gt;
+        </text>
+        <text x="488" y="676" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + save(counters: AchievementCounters): Promise&lt;void&gt;
+        </text>
+
+        <!-- Class: AchievementCounters (aggregate root of the counters of the achievements of one game, #363) -->
+        <rect
+          x="96"
+          y="932"
+          width="408"
+          height="228"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="96" y1="980" x2="504" y2="980" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="300"
+          y="950"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «entity» «aggregate root»
+        </text>
+        <text
+          x="300"
+          y="968"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          AchievementCounters
+        </text>
+        <text x="112" y="996" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - gameId: GameId
+        </text>
+        <text
+          x="112"
+          y="1012"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          - best: AchievementCount
+        </text>
+        <text
+          x="112"
+          y="1028"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          - total: AchievementCount
+        </text>
+        <line x1="96" y1="1036" x2="504" y2="1036" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="112"
+          y="1052"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + start(gameId: GameId): AchievementCounters
+        </text>
+        <text
+          x="112"
+          y="1068"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + recordBest(count: AchievementCount): void
+        </text>
+        <text
+          x="112"
+          y="1084"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + addToTotal(count: AchievementCount): void
+        </text>
+        <text
+          x="112"
+          y="1100"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + bestReaches(count: AchievementCount): boolean
+        </text>
+        <text
+          x="112"
+          y="1116"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + totalReaches(count: AchievementCount): boolean
+        </text>
+        <text
+          x="112"
+          y="1132"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + equals(other: AchievementCounters): boolean
+        </text>
+        <text
+          x="112"
+          y="1148"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + deliverTo(receiver: AchievementCountersReceiver): void
+        </text>
+
+        <!-- Class: AchievementCount (value object, #363) -->
+        <rect
+          x="96"
+          y="1192"
+          width="408"
+          height="160"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="96" y1="1240" x2="504" y2="1240" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="300"
+          y="1210"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="300"
+          y="1228"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          AchievementCount
+        </text>
+        <text
+          x="112"
+          y="1256"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          - value: number
+        </text>
+        <line x1="96" y1="1264" x2="504" y2="1264" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="112"
+          y="1280"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + of(value: number): AchievementCount
+        </text>
+        <text
+          x="112"
+          y="1296"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + equals(other: AchievementCount): boolean
+        </text>
+        <text
+          x="112"
+          y="1312"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + isAtLeast(other: AchievementCount): boolean
+        </text>
+        <text
+          x="112"
+          y="1328"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + plus(other: AchievementCount): AchievementCount
+        </text>
+        <text
+          x="112"
+          y="1344"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + deliverTo(receiver: ValueReceiver&lt;number&gt;): void
+        </text>
+
         <!-- Class: GameProgress (aggregate root, S3-04, issue 156) -->
         <rect
           x="616"
@@ -1092,7 +1400,7 @@
           UseCase‹GameId, LeaderboardEntry[]›
         </text>
 
-        <!-- The footnote and the legend sit 372 lower than the layer zones: layer 1 holds LevelStatus since #326, and LoadProgress joined the use cases in #181. -->
+        <!-- The footnote and the legend sit 372 lower than the layer zones: layer 1 holds LevelStatus since #326, and LoadProgress joined the use cases in #181 and the counters in #363. -->
         <g transform="translate(0 372)">
           <!-- Footnote: classes the budget leaves out -->
           <text
@@ -1178,18 +1486,28 @@
             LevelStatus.ofEach() gives each level its status: the first level is open, and a won
             level opens the next one, also with zero stars (S3-12, S3-08, decision 58, #326).
           </text>
+          <text
+            x="24"
+            y="1140"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            AchievementCounters keeps the counters of the achievements of one game in its own
+            aggregate, apart from GameProgress (#363).
+          </text>
           <!-- Legend -->
           <line
             x1="24"
-            y1="1148"
+            y1="1164"
             x2="1016"
-            y2="1148"
+            y2="1164"
             stroke="rgba(23,33,42,0.10)"
             stroke-width="0.8"
           />
           <text
             x="24"
-            y="1166"
+            y="1182"
             fill="#5b6873"
             font-size="8"
             font-family="'IBM Plex Mono', monospace"
@@ -1200,16 +1518,16 @@
 
           <line
             x1="24"
-            y1="1184"
+            y1="1200"
             x2="52"
-            y2="1184"
+            y2="1200"
             stroke="#5b6873"
             stroke-width="1"
             marker-end="url(#ucprogress-open)"
           />
           <text
             x="60"
-            y="1188"
+            y="1204"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1219,7 +1537,7 @@
 
           <rect
             x="24"
-            y="1204"
+            y="1220"
             width="28"
             height="12"
             rx="2"
@@ -1229,7 +1547,7 @@
           />
           <text
             x="60"
-            y="1213"
+            y="1229"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1238,7 +1556,7 @@
           </text>
           <rect
             x="184"
-            y="1204"
+            y="1220"
             width="28"
             height="12"
             rx="2"
@@ -1249,7 +1567,7 @@
           />
           <text
             x="220"
-            y="1213"
+            y="1229"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1258,7 +1576,7 @@
           </text>
           <rect
             x="424"
-            y="1204"
+            y="1220"
             width="28"
             height="12"
             rx="2"
@@ -1268,18 +1586,18 @@
           />
           <text
             x="460"
-            y="1213"
+            y="1229"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
           >
             Teal · focal class
           </text>
-          <line x1="600" y1="1210" x2="616" y2="1210" stroke="#17212a" stroke-width="1" />
-          <circle cx="621" cy="1210" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          <line x1="600" y1="1226" x2="616" y2="1226" stroke="#17212a" stroke-width="1" />
+          <circle cx="621" cy="1226" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
           <text
             x="636"
-            y="1213"
+            y="1229"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
