@@ -33,6 +33,8 @@ A new variant adds classes and data. It changes no engine file, no other variant
 
 ## Files that a fifth variant adds
 
+The role of each new class decides its layer ([the rule of layers 3 and 4](architecture/layers.md#the-rule-of-layers-3-and-4)). A conversion that the team writes and that imports no package, such as `FillStateMapper`, goes in layer 3. A React component, such as `FillCellRenderer`, goes in layer 4.
+
 | Layer | Where                                              | What                                                                                                         |
 | ----- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
 | 1     | `src/domain/variants/hexa-fill/`                   | `FillCell`, `FillMove`, `FillState` with its photo `FillSnapshot`, `FillRules`, `FillScoring`, `FillFactory` |

@@ -9,8 +9,8 @@ import {
   type FitMove,
 } from '../../domain/variants/hexa-fit/fit-move';
 import { PieceId } from '../../domain/variants/hexa-fit/piece-id';
-import { fittedCellSize } from '../board/board-fit';
-import { cellBoxOf, type BoardLayout } from '../board/board-layout';
+import { fittedCellSize } from '../../adapters/board/board-fit';
+import { cellBoxOf, type BoardLayout } from '../../adapters/board/board-layout';
 import { BoardView } from '../board/board-view';
 import type { CellRenderer } from '../board/cell-renderer';
 import { PieceStone } from '../board/fit-cell-renderer';

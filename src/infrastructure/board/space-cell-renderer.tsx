@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 import type { SpaceView } from '../../adapters/space-view';
 import { lip, palette } from '../ui/theme';
-import type { CellShape } from './board-layout';
+import type { CellShape } from '../../adapters/board/board-layout';
 import type { CellRenderer } from './cell-renderer';
 import { CellOutline, type OutlineLayer } from './cell-outline';
 

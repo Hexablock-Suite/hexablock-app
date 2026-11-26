@@ -7,12 +7,12 @@ import { Outcome } from '../../../src/domain/engine/outcome';
 import { Score } from '../../../src/domain/engine/score';
 import { square, type SquareCoord } from '../../../src/domain/engine/square-topology';
 import { triangle, type TriangleCoord } from '../../../src/domain/engine/triangle-topology';
-import { cellBoxOf, type BoardLayout } from '../../../src/infrastructure/board/board-layout';
+import { cellBoxOf, type BoardLayout } from '../../../src/adapters/board/board-layout';
 import { BoardView } from '../../../src/infrastructure/board/board-view';
 import type { CellRenderer } from '../../../src/infrastructure/board/cell-renderer';
-import { HexLayout } from '../../../src/infrastructure/board/hex-layout';
-import { SquareLayout } from '../../../src/infrastructure/board/square-layout';
-import { TriangleLayout } from '../../../src/infrastructure/board/triangle-layout';
+import { HexLayout } from '../../../src/adapters/board/hex-layout';
+import { SquareLayout } from '../../../src/adapters/board/square-layout';
+import { TriangleLayout } from '../../../src/adapters/board/triangle-layout';
 
 // Issue #165: `BoardView` draws the cells of a `MoveResult` on any figure.
 // The layout of the figure places each cell, and a fake `CellRenderer` draws it.

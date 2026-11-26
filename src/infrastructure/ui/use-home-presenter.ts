@@ -5,7 +5,7 @@ import { HomePresenter, type SavedProgresses } from '../../adapters/home-present
 import { DEFAULT_LANGUAGE, textCatalog } from '../../adapters/texts/text-catalog';
 import { GameId } from '../../domain/engine/game-id';
 import { TopologyId } from '../../domain/engine/geometry-factory';
-import type { CellShape } from '../board/board-layout';
+import type { CellShape } from '../../adapters/board/board-layout';
 import { CompositionRoot } from '../composition-root';
 import { useCompositionRoot } from '../composition-root-provider';
 import type { WorldTone } from './theme';

@@ -12,13 +12,9 @@ import { RegionSize } from '../../../src/domain/engine/region-size';
 import { SquareGeometry } from '../../../src/domain/engine/square-geometry';
 import type { GridAxis } from '../../../src/domain/engine/grid-topology';
 import type { Slide } from '../../../src/domain/variants/hexa-merge/slide';
-import { HexLayout } from '../../../src/infrastructure/board/hex-layout';
-import {
-  slideWays,
-  type Compass,
-  type SlideWay,
-} from '../../../src/infrastructure/board/slide-ways';
-import { SquareLayout } from '../../../src/infrastructure/board/square-layout';
+import { HexLayout } from '../../../src/adapters/board/hex-layout';
+import { slideWays, type Compass, type SlideWay } from '../../../src/adapters/board/slide-ways';
+import { SquareLayout } from '../../../src/adapters/board/square-layout';
 import { CompositionRoot } from '../../../src/infrastructure/composition-root';
 import { gameSessionOf, type GameSession } from '../../../src/infrastructure/ui/game-session';
 import { GameStage } from '../../../src/infrastructure/ui/game-stage';

@@ -3,7 +3,7 @@ import { StyleSheet, Text } from 'react-native';
 
 import type { MergeCellView } from '../../adapters/merge-state-mapper';
 import { lip, palette, serif, tileTone } from '../ui/theme';
-import type { CellShape } from './board-layout';
+import type { CellShape } from '../../adapters/board/board-layout';
 import type { CellRenderer } from './cell-renderer';
 import { CellOutline } from './cell-outline';
 import { SpaceCellRenderer } from './space-cell-renderer';
