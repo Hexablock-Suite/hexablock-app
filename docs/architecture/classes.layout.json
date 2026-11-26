@@ -374,20 +374,14 @@
             "AudioManager",
             "ApiLevelRepository",
             "DefeatScreen",
-            "GameSelectorScreen",
             "ApiLeaderboardGateway",
             "SoundLibrary",
             "LeaderboardScreen",
-            "HomeScreen",
-            "RootLayout",
-            "GameScreen",
             "SessionManager",
             "VictoryScreen",
             "ApiAccountGateway",
             "AccountScreen",
-            "LevelSelectorScreen",
-            "ApiDtoMapper",
-            "AchievementsScreen"
+            "ApiDtoMapper"
           ]
         }
       ]
@@ -1057,23 +1051,17 @@
           "group": "infrastructure|planned",
           "types": [
             "ApiProgressRepository",
-            "GameSelectorScreen",
             "SoundLibrary",
             "AudioManager",
             "ApiLevelRepository",
             "ApiAccountGateway",
             "ApiLeaderboardGateway",
             "DefeatScreen",
-            "HomeScreen",
             "LeaderboardScreen",
             "ApiDtoMapper",
             "SessionManager",
-            "LevelSelectorScreen",
-            "RootLayout",
-            "GameScreen",
             "VictoryScreen",
-            "AccountScreen",
-            "AchievementsScreen"
+            "AccountScreen"
           ]
         },
         {
