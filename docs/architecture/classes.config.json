@@ -4,15 +4,16 @@
     { "id": "engine", "title": "Engine", "layers": [1] },
     { "id": "variants", "title": "Variants", "layers": [1] },
     { "id": "usecases", "title": "Use cases", "layers": [2] },
-    { "id": "adapters", "title": "Adapters", "layers": [3, 4] }
+    { "id": "adapters", "title": "Adapters", "layers": [3] },
+    { "id": "infrastructure", "title": "Infrastructure", "layers": [4] }
   ],
   "folders": [
     { "path": "src/domain/engine/", "layer": 1, "part": "engine" },
     { "path": "src/domain/variants/", "layer": 1, "part": "variants" },
     { "path": "src/application/", "layer": 2, "part": "usecases" },
     { "path": "src/adapters/", "layer": 3, "part": "adapters" },
-    { "path": "src/infrastructure/", "layer": 4, "part": "adapters" },
-    { "path": "app/", "layer": 4, "part": "adapters" }
+    { "path": "src/infrastructure/", "layer": 4, "part": "infrastructure" },
+    { "path": "app/", "layer": 4, "part": "infrastructure" }
   ],
   "views": {
     "overview-engine": "engine",
