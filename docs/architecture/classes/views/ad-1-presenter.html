@@ -77,15 +77,15 @@
           layout gives the outline of each cell, and the renderer draws that outline (#296),
           BoardView reading GameViewModel, GamePresenter building GameViewModel, mapping each
           occupied cell, each free space and the payload of the plain MoveResult through the
-          StateMapper strategy that the default SpaceStateMapper and FitStateMapper implement, and
-          calling the UseCase input port of layer 2, which returns a Result. GameScreen also keeps
-          the MoveControls strategy of the game, which FitControls and the default BoardOnlyControls
-          implement; the controls take a press on a space of BoardView and play a move.
-          MergeStateMapper and MergeControls, the parts of Hexa Merge, implement the same two
-          strategies. GamePresenter also undoes and redoes a move through the UseCase port, and
-          GameViewModel holds the undo and the redo of a variant with undo, which FitControls show
-          as two buttons. MergeControls show the undo only, because Merge never redoes. Since #292
-          MergeControls also play a slide with a swipe on the board and, on the web, with a key.
+          StateMapper strategy that FitStateMapper and MergeStateMapper implement, and calling the
+          UseCase input port of layer 2, which returns a Result. GameScreen also keeps the
+          MoveControls strategy of the game, which FitControls and MergeControls implement; the
+          controls take a press on a space of BoardView and play a move. Each variant registers its
+          own state mapper, cell renderer and move controls, and the registry has no default parts.
+          GamePresenter also undoes and redoes a move through the UseCase port, and GameViewModel
+          holds the undo and the redo of a variant with undo, which FitControls show as two buttons.
+          MergeControls show the undo only, because Merge never redoes. Since #292 MergeControls
+          also play a slide with a swipe on the board and, on the web, with a key.
         </desc>
         <defs>
           <marker
@@ -362,17 +362,6 @@
           stroke-width="1"
           marker-end="url(#adpresenter-open)"
         />
-        <!-- SpaceStateMapper implements StateMapper: realization with binding -->
-        <line
-          x1="72"
-          y1="768"
-          x2="72"
-          y2="740"
-          stroke="#17212a"
-          stroke-width="1"
-          stroke-dasharray="5,4"
-          marker-end="url(#adpresenter-triangle)"
-        />
         <!-- GamePresenter keeps the UseCase input port it receives as applyMove: use with role and multiplicity, down from layer 3 to layer 2 -->
         <line
           x1="528"
@@ -398,17 +387,6 @@
           x1="112"
           y1="376"
           x2="112"
-          y2="316"
-          stroke="#17212a"
-          stroke-width="1"
-          stroke-dasharray="5,4"
-          marker-end="url(#adpresenter-triangle)"
-        />
-        <!-- BoardOnlyControls implements MoveControls: realization -->
-        <line
-          x1="296"
-          y1="376"
-          x2="296"
           y2="316"
           stroke="#17212a"
           stroke-width="1"
@@ -483,30 +461,6 @@
         >
           BUILDS
         </text>
-        <rect x="78" y="742" width="152" height="24" rx="2" fill="#e2ebf8" />
-        <text
-          x="154"
-          y="751"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          «bind» TCellView → SpaceView
-        </text>
-        <text
-          x="154"
-          y="762"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          TPayloadView → undefined
-        </text>
-
         <rect x="499" y="374" width="74" height="24" rx="2" fill="#cfdcf3" />
         <text
           x="536"
@@ -1236,29 +1190,6 @@
           TPayloadView
         </text>
 
-        <!-- Class: SpaceStateMapper (the default state mapper of the registry, #170) -->
-        <rect
-          x="44"
-          y="768"
-          width="156"
-          height="40"
-          rx="6"
-          fill="#ffffff"
-          stroke="#17212a"
-          stroke-width="1"
-        />
-        <text
-          x="122"
-          y="793"
-          fill="#17212a"
-          font-size="12"
-          font-weight="600"
-          font-family="'IBM Plex Sans', sans-serif"
-          text-anchor="middle"
-        >
-          SpaceStateMapper
-        </text>
-
         <!-- Class: MoveControls (interface of the move controls Strategy, D3, #175: only «interface», and the footnote names the pattern, decision 23) -->
         <rect
           x="48"
@@ -1317,28 +1248,6 @@
           text-anchor="middle"
         >
           FitControls
-        </text>
-        <!-- Class: BoardOnlyControls (the default move controls of the registry, #175) -->
-        <rect
-          x="208"
-          y="376"
-          width="128"
-          height="40"
-          rx="6"
-          fill="#ffffff"
-          stroke="#17212a"
-          stroke-width="1"
-        />
-        <text
-          x="272"
-          y="401"
-          fill="#17212a"
-          font-size="12"
-          font-weight="600"
-          font-family="'IBM Plex Sans', sans-serif"
-          text-anchor="middle"
-        >
-          BoardOnlyControls
         </text>
         <!-- Class: FitStateMapper (the state mapper of Hexa Fit, #175) -->
         <rect
@@ -1694,8 +1603,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          SpaceStateMapper, SpaceCellRenderer and BoardOnlyControls are the default parts of the
-          registry (#170, #175). MoveControls is the interface of a Strategy (D3).
+          Each variant registers its own state mapper, cell renderer and move controls: the registry
+          has no default parts. MoveControls is the interface of a Strategy (D3).
         </text>
         <text
           x="24"
@@ -1704,8 +1613,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          FitStateMapper, FitCellRenderer and FitControls are the parts of Hexa Fit (#175). #174,
-          #176 and #177 add the parts of the other variants.
+          FitStateMapper, FitCellRenderer and FitControls are the parts of Hexa Fit (#175). The view
+          leaves out the parts of Lines and Sort (#174, #176).
         </text>
         <text
           x="24"

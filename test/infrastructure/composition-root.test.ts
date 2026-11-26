@@ -151,8 +151,8 @@ describe('CompositionRoot', () => {
     expect(errorOf(result).code).toBe('no-running-game');
   });
 
-  // Fit (#175), Sort (#176) and Merge (#177) each have their own screen parts.
-  // Lines keeps the default parts until #174.
+  // Lines (#174), Fit (#175), Sort (#176) and Merge (#177) each have their own screen parts,
+  // and the registry has no default parts.
   it('should_give_fit_sort_and_merge_their_mappers_renderers_and_controls_when_the_root_builds_the_registry', () => {
     const registry = testRoot().registry();
 

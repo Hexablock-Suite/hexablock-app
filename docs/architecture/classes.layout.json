@@ -262,7 +262,6 @@
           "group": "adapters|src/adapters",
           "types": [
             "AchievementSection",
-            "SpaceStateMapper",
             "AchievementItem",
             "AchievementsViewModel",
             "SpaceView",
@@ -367,7 +366,6 @@
             "GameSession",
             "GameStageProps",
             "WorldTone",
-            "BoardOnlyControls",
             "RouteFigure",
             "TileTone",
             "MergeControls"
@@ -1002,7 +1000,6 @@
             "AchievementSection",
             "KeyValueStore",
             "AchievementItem",
-            "SpaceStateMapper",
             "SpaceView",
             "MergePayloadView",
             "MergeCellView",
@@ -1066,7 +1063,6 @@
           "types": [
             "MoveControls",
             "MoveControlsProps",
-            "BoardOnlyControls",
             "WorldTone",
             "GameStageProps",
             "GameSession",

@@ -77,12 +77,12 @@
           call and every use case and aspect implements, and the output ports GameRepository,
           GameFactories, LevelRepository, GameEventPublisher, ProgressRepository and Logger, which
           the use cases use. In layer 3, InMemoryGameRepository, LevelGameFactories,
-          BundledLevelRepository, NullGameEventPublisher and LocalProgressRepository implement the
-          output ports, and LocalProgressRepository keeps its data through the KeyValueStore
-          interface. In layer 4, ConsoleLogger implements Logger, DeviceKeyValueStore implements
-          KeyValueStore, and SystemClock, SeededRandomSource and SequentialMatchIds implement the
-          engine interfaces Clock, RandomSource and MatchIdGenerator. The routes use the presenters,
-          and CompositionRoot creates the adapters. The use cases and the presenters use the generic
+          BundledLevelRepository, GameEventBus and LocalProgressRepository implement the output
+          ports, and LocalProgressRepository keeps its data through the KeyValueStore interface. In
+          layer 4, ConsoleLogger implements Logger, DeviceKeyValueStore implements KeyValueStore,
+          and SystemClock, SeededRandomSource and SequentialMatchIds implement the engine interfaces
+          Clock, RandomSource and MatchIdGenerator. The routes use the presenters, and
+          CompositionRoot creates the adapters. The use cases and the presenters use the generic
           engine, and the four variants implement its contracts. Every arrow points inward, toward
           layer 1, or stays inside one layer. A dashed border marks a planned part.
         </desc>
@@ -290,7 +290,7 @@
           stroke-dasharray="5,4"
           marker-end="url(#layers-triangle)"
         />
-        <!-- NullGameEventPublisher implements the GameEventPublisher port: realization, from layer 3 to the edge of layer 2 -->
+        <!-- GameEventBus implements the GameEventPublisher port: realization, from layer 3 to the edge of layer 2 -->
         <path
           d="M645.5 396 L645.5 478"
           fill="none"
@@ -710,7 +710,7 @@
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          Space, Fit, Merge cell renderers
+          Space cell renderer · GameStage
         </text>
         <text
           x="402"
@@ -719,7 +719,7 @@
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          GameStage · MoveControls
+          MoveControls interface
         </text>
         <text
           x="402"
@@ -728,7 +728,7 @@
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          BoardOnly, Fit, Merge controls
+          cell renderers and controls of
         </text>
         <text
           x="402"
@@ -737,16 +737,16 @@
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          screen hooks and wood signs
+          Lines, Fit, Sort and Merge
         </text>
         <text
           x="402"
           y="190"
-          fill="#7d8a94"
+          fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          planned: other cell renderers
+          screen hooks and wood signs
         </text>
         <!-- Component: HTTP client, src/infrastructure/api/ (decision 22) -->
         <rect
@@ -1028,7 +1028,7 @@
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          SpaceStateMapper
+          LinesStateMapper
         </text>
         <text
           x="150"
@@ -1046,7 +1046,7 @@
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          MergeStateMapper
+          Sort, MergeStateMapper
         </text>
         <!-- Component: text catalog, src/adapters/texts/ (APP-FR-11) -->
         <rect
@@ -1141,15 +1141,6 @@
           font-family="'IBM Plex Mono', monospace"
         >
           LocalSettingsStore: SettingsStore
-        </text>
-        <text
-          x="490"
-          y="315"
-          fill="#7d8a94"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          GameEventBus: GameEventPublisher
         </text>
         <!-- Interface: KeyValueStore, the driver interface of layer 3 -->
         <rect
@@ -1320,11 +1311,11 @@
         >
           BundledLevelRepository
         </text>
-        <!-- Component: NullGameEventPublisher -->
+        <!-- Component: GameEventBus, the publisher of the composition root (#362) -->
         <rect
-          x="577.0"
+          x="597.5"
           y="370"
-          width="137"
+          width="96"
           height="26"
           rx="4"
           fill="#ffffff"
@@ -1340,7 +1331,7 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          NullGameEventPublisher
+          GameEventBus
         </text>
         <!-- Component: LocalProgressRepository -->
         <rect
