@@ -209,7 +209,6 @@
             "GameRepository",
             "ListAchievements",
             "LoggingAspect",
-            "AchievementGoal",
             "Achievement",
             "Result",
             "UseCase",
@@ -218,7 +217,6 @@
             "Logger",
             "UseCaseAspect",
             "UseCaseError",
-            "LevelsWon",
             "UseCaseLogEntry",
             "ProgressRepository",
             "StartGameRequest",
@@ -228,10 +226,8 @@
             "ListLevels",
             "MoveResult",
             "ListLevelsRequest",
-            "LevelStatus",
             "LevelSummary",
             "LevelRepository",
-            "EveryLevelWon",
             "GameEventPublisher",
             "SaveProgress"
           ]
@@ -296,13 +292,8 @@
         {
           "group": "adapters|planned",
           "types": [
-            "GameEventListener",
             "LeaderboardPresenter",
-            "LevelSelectorPresenter",
-            "SortStateMapper",
-            "GameEventBus",
             "AccountPresenter",
-            "LinesStateMapper",
             "ResultPresenter",
             "LocalSettingsStore"
           ]
@@ -329,7 +320,7 @@
       ],
       "4": [
         {
-          "group": "adapters|src/infrastructure",
+          "group": "infrastructure|src/infrastructure",
           "types": [
             "CompositionRoot",
             "RootDrivers",
@@ -348,11 +339,11 @@
           ]
         },
         {
-          "group": "adapters|src/infrastructure/api",
+          "group": "infrastructure|src/infrastructure/api",
           "types": ["ApiClient", "HealthResponse"]
         },
         {
-          "group": "adapters|src/infrastructure/board",
+          "group": "infrastructure|src/infrastructure/board",
           "types": [
             "CellRenderer",
             "BoardViewProps",
@@ -363,7 +354,7 @@
           ]
         },
         {
-          "group": "adapters|src/infrastructure/ui",
+          "group": "infrastructure|src/infrastructure/ui",
           "types": [
             "MoveControls",
             "FitControls",
@@ -377,11 +368,10 @@
           ]
         },
         {
-          "group": "adapters|planned",
+          "group": "infrastructure|planned",
           "types": [
             "ApiProgressRepository",
             "AudioManager",
-            "BoardView",
             "ApiLevelRepository",
             "DefeatScreen",
             "GameSelectorScreen",
@@ -389,8 +379,6 @@
             "SoundLibrary",
             "LeaderboardScreen",
             "HomeScreen",
-            "SortCellRenderer",
-            "LinesCellRenderer",
             "RootLayout",
             "GameScreen",
             "SessionManager",
@@ -591,13 +579,11 @@
             "StartGame",
             "UndoMove",
             "SaveProgress",
-            "EveryLevelWon",
             "MoveResult",
             "ListLevelsRequest",
             "LevelSummary",
             "GameFactories",
             "RedoMove",
-            "LevelsWon",
             "ApplyMove"
           ]
         }
@@ -620,24 +606,19 @@
       ],
       "4": [
         {
-          "group": "ref|adapters",
+          "group": "ref|infrastructure",
           "types": [
             "CompositionRoot",
             "RootDrivers",
             "RegisteredGame",
             "MergeControls",
-            "HexLayout",
             "GameRegistry",
             "RouteFigure",
             "BoardFigure",
             "FactoryUse",
-            "DeliversValues",
-            "SlideWay",
             "SystemClock",
             "SequentialMatchIds",
-            "SeededRandomSource",
-            "TriangleLayout",
-            "SquareLayout"
+            "SeededRandomSource"
           ]
         }
       ]
@@ -794,8 +775,8 @@
       ],
       "4": [
         {
-          "group": "ref|adapters",
-          "types": ["MergeControls", "FitControls", "SlideWay", "BoardFigure"]
+          "group": "ref|infrastructure",
+          "types": ["MergeControls", "FitControls", "BoardFigure"]
         }
       ]
     },
@@ -862,15 +843,12 @@
             "AchievementSummary",
             "Result",
             "LoggingAspect",
-            "AchievementGoal",
             "LevelRepository",
             "ProgressRepository",
             "Logger",
-            "EveryLevelWon",
             "RedoMove",
             "ListAchievementsRequest",
             "MoveResult",
-            "LevelsWon",
             "GameRepository",
             "StartGame",
             "UndoMove",
@@ -879,7 +857,6 @@
             "LevelSummary",
             "ListLevels",
             "ListLevelsRequest",
-            "LevelStatus",
             "StartGameRequest",
             "SaveProgress"
           ]
@@ -904,7 +881,7 @@
       ],
       "4": [
         {
-          "group": "ref|adapters",
+          "group": "ref|infrastructure",
           "types": [
             "CompositionRoot",
             "RootDrivers",
@@ -929,9 +906,7 @@
             "Turns",
             "LevelDefinition",
             "GridAxis",
-            "MatchId",
             "IVariantFactory",
-            "Clock",
             "GridTopology",
             "SquareCoord",
             "Piece",
@@ -939,42 +914,31 @@
             "GameEvent",
             "Outcome",
             "GameProgress",
-            "Mulberry32Random",
             "ValueReceiver",
-            "GeometryFactory",
-            "RandomDraw",
             "HexCoord",
-            "RandomSource",
-            "ClockReading",
-            "Seed",
             "LevelId",
             "TriangleCoord"
           ]
         },
         {
           "group": "ref|variants",
-          "types": ["FitLevel", "PieceId", "FitMove", "FitView", "MergeTile", "Slide", "MergeView"]
+          "types": ["PieceId", "FitView", "MergeTile", "Slide", "MergeView"]
         }
       ],
       "2": [
         {
           "group": "ref|usecases",
           "types": [
-            "ListAchievements",
             "UseCase",
             "ProgressRepository",
-            "LoggingAspect",
             "Logger",
-            "UseCaseLogEntry",
             "AchievementSummary",
             "ListAchievementsRequest",
             "LevelRepository",
             "Result",
             "UseCaseError",
             "ApplyMoveRequest",
-            "SessionStore",
             "GameRepository",
-            "AccountGateway",
             "MoveResult",
             "StartGameRequest",
             "RedoMoveRequest",
@@ -988,13 +952,8 @@
         {
           "group": "adapters|planned",
           "types": [
-            "GameEventListener",
             "LeaderboardPresenter",
-            "LevelSelectorPresenter",
-            "SortStateMapper",
-            "GameEventBus",
             "AccountPresenter",
-            "LinesStateMapper",
             "ResultPresenter",
             "LocalSettingsStore"
           ]
@@ -1053,14 +1012,16 @@
             "DeliversValues"
           ]
         }
-      ],
+      ]
+    },
+    "part-infrastructure": {
       "4": [
         {
-          "group": "adapters|src/infrastructure/api",
+          "group": "infrastructure|src/infrastructure/api",
           "types": ["ApiClient", "HealthResponse"]
         },
         {
-          "group": "adapters|src/infrastructure",
+          "group": "infrastructure|src/infrastructure",
           "types": [
             "CompositionRoot",
             "GameRegistry",
@@ -1079,7 +1040,7 @@
           ]
         },
         {
-          "group": "adapters|src/infrastructure/ui",
+          "group": "infrastructure|src/infrastructure/ui",
           "types": [
             "MoveControls",
             "MoveControlsProps",
@@ -1093,25 +1054,22 @@
           ]
         },
         {
-          "group": "adapters|planned",
+          "group": "infrastructure|planned",
           "types": [
             "ApiProgressRepository",
             "GameSelectorScreen",
             "SoundLibrary",
             "AudioManager",
             "ApiLevelRepository",
-            "BoardView",
             "ApiAccountGateway",
             "ApiLeaderboardGateway",
             "DefeatScreen",
-            "SortCellRenderer",
             "HomeScreen",
             "LeaderboardScreen",
             "ApiDtoMapper",
             "SessionManager",
             "LevelSelectorScreen",
             "RootLayout",
-            "LinesCellRenderer",
             "GameScreen",
             "VictoryScreen",
             "AccountScreen",
@@ -1119,7 +1077,7 @@
           ]
         },
         {
-          "group": "adapters|src/infrastructure/board",
+          "group": "infrastructure|src/infrastructure/board",
           "types": [
             "CellRenderer",
             "SpaceCellRenderer",
