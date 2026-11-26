@@ -1,6 +1,5 @@
 /** @jest-environment node */
 import { GamePresenter, type GameViewModel } from '../../src/adapters/game-presenter';
-import { SpaceStateMapper } from '../../src/adapters/space-state-mapper';
 import type { StateMapper } from '../../src/adapters/state-mapper';
 import { textCatalog, type TextKey } from '../../src/adapters/texts/text-catalog';
 import type { ApplyMoveRequest } from '../../src/application/apply-move';
@@ -507,21 +506,5 @@ describe('GamePresenter undo and redo', () => {
     const table: Readonly<Record<FailureCode, TextKey>> = withoutOne;
 
     expect(Object.keys(table)).not.toContain(FailureCode.unexpectedFailure);
-  });
-});
-
-// The default mapper of the registry (#170): it shows whether a space is free or occupied,
-// so the game screen draws the board of any game before its variant has a mapper.
-describe('SpaceStateMapper', () => {
-  it('should_tell_a_free_space_from_an_occupied_one_whatever_the_cell_is_when_it_maps_a_board', () => {
-    const mapper = new SpaceStateMapper();
-
-    expect([
-      mapper.freeView(),
-      mapper.toView('red'),
-      mapper.toView(undefined),
-      mapper.toView(0),
-    ]).toEqual([{ occupied: false }, { occupied: true }, { occupied: true }, { occupied: true }]);
-    expect(mapper.toPayload({ tray: [] })).toBeUndefined();
   });
 });

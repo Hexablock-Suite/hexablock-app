@@ -71,10 +71,10 @@
       >
         <title id="mapad-title">HexaBlock adapters map · UML class diagram</title>
         <desc id="mapad-desc">
-          Overview map of the 67 classes of layers 4 and 3 in 13 groups. The composition root group
+          Overview map of the 65 classes of layers 4 and 3 in 13 groups. The composition root group
           holds CompositionRoot, GameRegistry and BoardFigure, the drivers group holds
-          SequentialMatchIds, the move controls group holds MoveControls, FitControls, MergeControls
-          and BoardOnlyControls, and the events group holds GameEventBus, GameEventListener,
+          SequentialMatchIds, the move controls group holds MoveControls, FitControls and
+          MergeControls, and the events group holds GameEventBus, GameEventListener,
           AchievementCounterListener and NullGameEventPublisher. Each line joins two classes:
           GameScreen renders BoardView and keeps its GamePresenter and its MoveControls,
           CompositionRoot creates InMemoryGameRepository, DeviceKeyValueStore implements
@@ -1012,23 +1012,6 @@
             </tspan>
           </text>
         </g>
-        <g data-class="BoardOnlyControls">
-          <rect
-            x="464"
-            y="336"
-            width="152"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text x="540" y="357" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              BoardOnlyControls
-            </tspan>
-          </text>
-        </g>
         <g data-class="MergeControls">
           <rect
             x="632"
@@ -1761,23 +1744,6 @@
             </tspan>
           </text>
         </g>
-        <g data-class="SpaceStateMapper">
-          <rect
-            x="224"
-            y="1168"
-            width="136"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text x="292" y="1189" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              SpaceStateMapper
-            </tspan>
-          </text>
-        </g>
         <!-- Chips: repositories -->
         <g data-class="LocalProgressRepository">
           <rect
@@ -2087,8 +2053,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          GameRegistry maps each GameId to its variant factory and its screen parts (#170), by
-          default SpaceStateMapper, SpaceCellRenderer and BoardOnlyControls.
+          GameRegistry maps each GameId to its variant factory and its screen parts (#170), and each
+          variant registers its own state mapper, cell renderer and move controls.
         </text>
         <text
           x="24"

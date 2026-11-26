@@ -3,7 +3,7 @@ import type { ReactElement } from 'react';
 
 import type { FitCellView } from '../../../src/adapters/fit-state-mapper';
 import type { MergeCellView } from '../../../src/adapters/merge-state-mapper';
-import type { SpaceView } from '../../../src/adapters/space-state-mapper';
+import type { SpaceView } from '../../../src/adapters/space-view';
 import { hex, type HexCoord } from '../../../src/domain/engine/hex-topology';
 import { square, type SquareCoord } from '../../../src/domain/engine/square-topology';
 import { triangle, type TriangleCoord } from '../../../src/domain/engine/triangle-topology';
