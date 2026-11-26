@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import type { SortCellView, SortPayloadView } from '../../adapters/sort-state-mapper';
 import { PlaceStack } from '../../domain/variants/hexa-sort/place-stack';
-import type { CellShape } from '../board/board-layout';
+import type { CellShape } from '../../adapters/board/board-layout';
 import { StackStone } from '../board/sort-cell-renderer';
 import type { MoveControls, MoveControlsProps } from './move-controls';
 import { palette, radius, serif, space } from './theme';

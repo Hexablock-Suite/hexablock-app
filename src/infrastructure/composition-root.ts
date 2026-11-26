@@ -16,6 +16,8 @@ import {
 } from '../application/list-achievements';
 import type { GameFactories } from '../application/game-factories';
 import type { LevelRepository } from '../application/level-repository';
+import type { LevelSummary } from '../application/level-summary';
+import { ListLevels, type ListLevelsRequest } from '../application/list-levels';
 import type { Logger } from '../application/logger';
 import { LoggingAspect } from '../application/logging-aspect';
 import type { MoveResult, ViewOf } from '../application/move-result';
@@ -32,7 +34,7 @@ import type { GameId } from '../domain/engine/game-id';
 import type { GameProgress } from '../domain/engine/game-progress';
 import { TopologyId } from '../domain/engine/geometry-factory';
 import type { MatchIdGenerator } from '../domain/engine/match-id-generator';
-import type { CellShape } from './board/board-layout';
+import type { CellShape } from '../adapters/board/board-layout';
 import { ConsoleLogger } from './console-logger';
 import { GameRegistry, type RegisteredGame } from './game-registry';
 import { registeredAchievements } from './registered-achievements';
@@ -93,8 +95,9 @@ export interface RootDrivers {
 // (#188), with its one level repository, the one counter repository of the listener (#364)
 // and the achievements of `registeredAchievements()`, and it offers `loadProgress(gameId)` (#181):
 // one `LoadProgress` per call, which reads the saved progress of that game through the one
-// repository. The store is optional: a root with no store offers neither, and asking for it
-// throws a `RangeError`, as for a board figure that the root does not offer.
+// repository. Over the same two repositories, it builds `ListLevels` once for the level selector
+// (#173). The store is optional: a root with no store offers none of the three, and asking for
+// one throws a `RangeError`, as for a board figure that the root does not offer.
 export class CompositionRoot {
   private readonly games: ReadonlyMap<TopologyId, GameRegistry>;
   private readonly boards: ReadonlyMap<TopologyId, BoardFigure<unknown>>;
@@ -105,6 +108,7 @@ export class CompositionRoot {
   private readonly progress: ProgressRepository | undefined;
   private readonly wired = new Map<RegisteredGame, GameUseCases>();
   private readonly achievements: UseCase<ListAchievementsRequest, AchievementSummary[]> | undefined;
+  private readonly levelList: UseCase<ListLevelsRequest, LevelSummary[]> | undefined;
 
   constructor(drivers: RootDrivers = { clock: new SystemClock(), logger: new ConsoleLogger() }) {
     const random = SeededRandomSource.fromClock(drivers.clock);
@@ -137,6 +141,10 @@ export class CompositionRoot {
             new ListAchievements(this.levels, this.progress, counters, registeredAchievements()),
             'ListAchievements',
           );
+    this.levelList =
+      this.progress === undefined
+        ? undefined
+        : this.decorate(new ListLevels(this.levels, this.progress), 'ListLevels');
   }
 
   // The board figures that the player can choose, in the order of the figure selector (#171).
@@ -191,6 +199,17 @@ export class CompositionRoot {
       throw new RangeError('The root has no local store, so it lists no achievements.');
     }
     return this.achievements;
+  }
+
+  // `ListLevels` over the levels of the root and the saved progress of the device (#173).
+  // The level selector lists the levels of one game on one figure with it. Each call gives
+  // the same use case. A root with no local store does not offer it, so it throws a RangeError,
+  // as for a board figure that it does not offer.
+  listLevels(): UseCase<ListLevelsRequest, LevelSummary[]> {
+    if (this.levelList === undefined) {
+      throw new RangeError('The root has no local store, so it lists no levels.');
+    }
+    return this.levelList;
   }
 
   // The saved progress of the game `gameId` (S3-16 in #151, #181). The use case is stateless,

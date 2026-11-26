@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { FigureChoice } from '../../adapters/home-presenter';
-import type { CellShape } from '../board/board-layout';
+import type { CellShape } from '../../adapters/board/board-layout';
 import { FigureOutline } from './figure-stone';
 import { lip, palette, radius, serif, space } from './theme';
 import { useFigureShapes } from './use-home-presenter';

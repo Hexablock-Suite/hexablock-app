@@ -6,10 +6,10 @@ import { SquareGeometry } from '../../../src/domain/engine/square-geometry';
 import { SquareAxis } from '../../../src/domain/engine/square-topology';
 import { TriangleGeometry } from '../../../src/domain/engine/triangle-geometry';
 import { Slide, SlideSense } from '../../../src/domain/variants/hexa-merge/slide';
-import { HexLayout } from '../../../src/infrastructure/board/hex-layout';
-import { slideWays, type SlideWay } from '../../../src/infrastructure/board/slide-ways';
-import { SquareLayout } from '../../../src/infrastructure/board/square-layout';
-import { TriangleLayout } from '../../../src/infrastructure/board/triangle-layout';
+import { HexLayout } from '../../../src/adapters/board/hex-layout';
+import { slideWays, type SlideWay } from '../../../src/adapters/board/slide-ways';
+import { SquareLayout } from '../../../src/adapters/board/square-layout';
+import { TriangleLayout } from '../../../src/adapters/board/triangle-layout';
 
 // Issue #177: the player slides the Merge tiles in each direction that the topology gives.
 // `slideWays()` gives one slide per axis and sense of the topology, with the way that

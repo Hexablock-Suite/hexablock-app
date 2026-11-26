@@ -6,7 +6,7 @@ import type { MergeCellView, MergePayloadView } from '../../adapters/merge-state
 import type { Texts } from '../../adapters/texts/text-catalog';
 import type { GridAxis } from '../../domain/engine/grid-topology';
 import type { Slide } from '../../domain/variants/hexa-merge/slide';
-import type { SlideWay } from '../board/slide-ways';
+import type { SlideWay } from '../../adapters/board/slide-ways';
 import { Hexagon, HexStone } from './hex-stone';
 import type { MoveControls, MoveControlsProps } from './move-controls';
 import { swipedWay, useSlideKeys } from './slide-input';

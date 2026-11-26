@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 
-import type { CellShape } from '../board/board-layout';
+import type { CellShape } from '../../adapters/board/board-layout';
 import { CellOutline, type OutlineLayer } from '../board/cell-outline';
 import { lip, palette, type WorldTone } from './theme';
 

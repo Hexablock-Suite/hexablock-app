@@ -4,7 +4,7 @@ import { GamePresenter } from '../../adapters/game-presenter';
 import { DEFAULT_LANGUAGE, textCatalog, type Texts } from '../../adapters/texts/text-catalog';
 import type { GameId } from '../../domain/engine/game-id';
 import { TopologyId } from '../../domain/engine/geometry-factory';
-import type { BoardLayout } from '../board/board-layout';
+import type { BoardLayout } from '../../adapters/board/board-layout';
 import type { CellRenderer } from '../board/cell-renderer';
 import type { CompositionRoot } from '../composition-root';
 import { useCompositionRoot } from '../composition-root-provider';

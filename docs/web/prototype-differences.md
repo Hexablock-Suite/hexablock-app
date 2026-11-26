@@ -23,7 +23,7 @@ This list compares the web export of the app with the team prototype, https://pr
 - The sign of a world in the prototype holds the place and three stars. The sign in the app holds the game name and the place, and no stars.
 - The prototype shows the total of stars and a settings button at the top. The app shows a back button, «ATRÁS», and the title «Mapa de mundos».
 - A tap on a world in the prototype opens a sheet with the place, the game, «Niveles 0 / 6» or «Tu mejor 0», «JUGAR» and «¿CÓMO JUGAR?». A tap in the app opens the game screen.
-- Hexa Fit and Hexa Sort open a level selector of six levels in the prototype, with levels 2 to 6 locked. The app opens the first level (#173 adds the level selector).
+- Hexa Fit and Hexa Sort open a level selector of six levels in the prototype, with levels 2 to 6 locked. The app also opens a level selector (#173), with every level of the chosen figure shown as completed, open or locked.
 
 ## Game screens
 

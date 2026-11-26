@@ -56,15 +56,20 @@ import type { PlaceStack } from '../domain/variants/hexa-sort/place-stack';
 import { SortFactory } from '../domain/variants/hexa-sort/sort-factory';
 import { SortLevel } from '../domain/variants/hexa-sort/sort-level';
 import type { SortView } from '../domain/variants/hexa-sort/sort-state';
-import { cellBoxOf, valuesOf, type BoardLayout, type CellShape } from './board/board-layout';
+import {
+  cellBoxOf,
+  valuesOf,
+  type BoardLayout,
+  type CellShape,
+} from '../adapters/board/board-layout';
 import { FitCellRenderer } from './board/fit-cell-renderer';
-import { HexLayout } from './board/hex-layout';
+import { HexLayout } from '../adapters/board/hex-layout';
 import { LinesCellRenderer } from './board/lines-cell-renderer';
 import { MergeCellRenderer } from './board/merge-cell-renderer';
-import { slideWays } from './board/slide-ways';
+import { slideWays } from '../adapters/board/slide-ways';
 import { SortCellRenderer } from './board/sort-cell-renderer';
-import { SquareLayout } from './board/square-layout';
-import { TriangleLayout } from './board/triangle-layout';
+import { SquareLayout } from '../adapters/board/square-layout';
+import { TriangleLayout } from '../adapters/board/triangle-layout';
 import { registered, type RegisteredGame, type ScreenParts } from './game-registry';
 import { FitControls } from './ui/fit-controls';
 import { LinesControls } from './ui/lines-controls';
