@@ -71,13 +71,14 @@
       >
         <title id="mapuc-title">HexaBlock use cases map · UML class diagram</title>
         <desc id="mapuc-desc">
-          Overview map of the 43 layer 2 classes in 8 groups, with LevelDefinition, LevelStatus,
-          AchievementGoal, LevelsWon, EveryLevelWon, BestCountReached and TotalCountReached of layer
-          1 as dashed chips (#326, #364). Each line joins two classes: UseCaseAspect implements
-          UseCase and decorates the one it wraps, StartGame, SaveProgress and Register each
-          implement UseCase for their group, and RedoMove, SyncLeaderboard and UpdateSettings keep
-          an output port. No line touches a group frame. Each group names the view that shows its
-          members.
+          Overview map of the 44 layer 2 classes in 8 groups, AchievementCounterRepository of #363
+          among the output ports, the achievements of #188 among them, with LevelDefinition,
+          LevelStatus, AchievementGoal, LevelsWon, EveryLevelWon, BestCountReached and
+          TotalCountReached of layer 1 as dashed chips (#326, #364). Each line joins two classes:
+          UseCaseAspect implements UseCase and decorates the one it wraps, StartGame, SaveProgress,
+          LoadProgress and Register each implement UseCase for their group, and RedoMove,
+          SyncLeaderboard and UpdateSettings keep an output port. No line touches a group frame.
+          Each group names the view that shows its members.
         </desc>
         <defs>
           <marker
@@ -267,7 +268,7 @@
           x="436"
           y="382"
           width="192"
-          height="178"
+          height="228"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -475,6 +476,15 @@
           stroke-dasharray="5,4"
           marker-end="url(#mapuc-triangle)"
         />
+        <!-- LoadProgress implements UseCase: realization, one for the progress use cases (view 3.3) -->
+        <path
+          d="M612,477 L656,477 L656,293 L612,293"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#mapuc-triangle)"
+        />
         <!-- Register implements UseCase: realization, one for the account use cases (view 3.4) -->
         <path
           d="M800,410 L800,285 L612,285"
@@ -494,7 +504,7 @@
         />
         <!-- SyncLeaderboard keeps the ProgressRepository as progress: use with role and multiplicity (view 3.3) -->
         <path
-          d="M500,544 L500,718"
+          d="M500,594 L500,718"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -777,7 +787,7 @@
             </tspan>
           </text>
         </g>
-        <g data-class="ListLevels">
+        <g data-class="LoadProgress">
           <rect
             x="452"
             y="460"
@@ -790,11 +800,11 @@
           />
           <text x="532" y="481" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              ListLevels
+              LoadProgress
             </tspan>
           </text>
         </g>
-        <g data-class="SyncLeaderboard">
+        <g data-class="ListLevels">
           <rect
             x="452"
             y="510"
@@ -806,6 +816,23 @@
             stroke-width="1"
           />
           <text x="532" y="531" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              ListLevels
+            </tspan>
+          </text>
+        </g>
+        <g data-class="SyncLeaderboard">
+          <rect
+            x="452"
+            y="560"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="532" y="581" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               SyncLeaderboard
             </tspan>

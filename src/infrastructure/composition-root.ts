@@ -8,6 +8,7 @@ import { LocalProgressRepository } from '../adapters/local-progress-repository';
 import { LevelGameFactories } from '../adapters/level-game-factories';
 import { ApplyMove, type ApplyMoveRequest } from '../application/apply-move';
 import type { GameEventPublisher } from '../application/game-event-publisher';
+import { LoadProgress, type LoadProgressRequest } from '../application/load-progress';
 import {
   ListAchievements,
   type AchievementSummary,
@@ -28,6 +29,7 @@ import type { BoardState } from '../domain/engine/board-state';
 import type { Clock } from '../domain/engine/clock';
 import type { Cloneable } from '../domain/engine/cloneable';
 import type { GameId } from '../domain/engine/game-id';
+import type { GameProgress } from '../domain/engine/game-progress';
 import { TopologyId } from '../domain/engine/geometry-factory';
 import type { MatchIdGenerator } from '../domain/engine/match-id-generator';
 import type { CellShape } from './board/board-layout';
@@ -52,7 +54,7 @@ export interface GameUseCases<TCell = unknown, TCoord = unknown, TMove = unknown
 // The drivers that a test may replace. The app takes the system clock, the console logger
 // and `DeviceKeyValueStore`, which `CompositionRootProvider` builds (#188).
 // The store stays optional. A root with no store reads no saved progress,
-// so it lists no achievements.
+// so it lists no achievements and loads no progress.
 export interface RootDrivers {
   readonly clock: Clock;
   readonly logger: Logger;
@@ -87,7 +89,10 @@ export interface RootDrivers {
 // With the local store of its drivers, the root builds one `LocalProgressRepository` and keeps it
 // for every consumer of the saved progress (#323). Over it, the root builds `ListAchievements` once
 // (#188), with its one level repository, the one counter repository of the listener (#364)
-// and the achievements of `registeredAchievements()`.
+// and the achievements of `registeredAchievements()`, and it offers `loadProgress(gameId)` (#181):
+// one `LoadProgress` per call, which reads the saved progress of that game through the one
+// repository. The store is optional: a root with no store offers neither, and asking for it
+// throws a `RangeError`, as for a board figure that the root does not offer.
 export class CompositionRoot {
   private readonly games: ReadonlyMap<TopologyId, GameRegistry>;
   private readonly boards: ReadonlyMap<TopologyId, BoardFigure<unknown>>;
@@ -182,6 +187,17 @@ export class CompositionRoot {
       throw new RangeError('The root has no local store, so it lists no achievements.');
     }
     return this.achievements;
+  }
+
+  // The saved progress of the game `gameId` (S3-16 in #151, #181). The use case is stateless,
+  // so each call gives a new one over the one repository, as `decorate()` wraps it. A root with
+  // no local store does not offer it, so it throws a RangeError, as for a board figure that
+  // it does not offer.
+  loadProgress(gameId: GameId): UseCase<LoadProgressRequest, GameProgress | undefined> {
+    if (this.progress === undefined) {
+      throw new RangeError('The root has no local store, so it loads no progress.');
+    }
+    return this.decorate(new LoadProgress(this.progress, gameId), 'LoadProgress');
   }
 
   // The one place that gives a use case of the root its aspects (#323). `name` names the use case

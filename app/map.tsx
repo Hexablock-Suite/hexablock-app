@@ -1,18 +1,21 @@
 import { Redirect, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { GameChoice } from '../src/adapters/home-presenter';
 import type { CellShape } from '../src/infrastructure/board/board-layout';
+import { useCompositionRoot } from '../src/infrastructure/composition-root-provider';
 import { FigureStone } from '../src/infrastructure/ui/figure-stone';
 import { Scenery } from '../src/infrastructure/ui/scenery';
 import { column, palette, serif, space, type WorldTone } from '../src/infrastructure/ui/theme';
 import {
+  homePresenterOf,
   useFigureShapes,
   useGameTones,
-  useHomePresenter,
   useRouteFigure,
+  useSavedProgresses,
   type RouteFigure,
 } from '../src/infrastructure/ui/use-home-presenter';
 import { LipButton, WoodSign } from '../src/infrastructure/ui/wood';
@@ -33,9 +36,14 @@ export default function GameSelectorScreen() {
   return <GameSelector figure={figure} />;
 }
 
-// The map of the games of the board figure `figure`.
+// The map of the games of the board figure `figure`. It renders before the saved progress
+// arrives, and the hook of the map re-renders it with the records (#181).
 function GameSelector({ figure }: { readonly figure: RouteFigure }) {
-  const view = useHomePresenter(figure.figure).gameSelector();
+  const root = useCompositionRoot();
+  // The registered games of the figure, once per figure, so the load runs once per list.
+  const games = useMemo(() => root.registry(figure.figure).gameIds(), [root, figure.figure]);
+  const saved = useSavedProgresses(games);
+  const view = homePresenterOf(root, figure.figure, saved).gameSelector();
   const toneOf = useGameTones(figure.figure);
   const stone = useFigureShapes()(figure.param, STONE);
   const insets = useSafeAreaInsets();
@@ -75,6 +83,7 @@ function GameSelector({ figure }: { readonly figure: RouteFigure }) {
 }
 
 // One world of the map: the stone of the game and its sign with the name and the place.
+// The sign also shows the saved high score of the game when the device keeps one (#181).
 // The stone has `shape`, the shape of the board figure of the map (#297, APP-FR-16).
 // The stone takes `tone`, the colors that the registry entry of the game declares, so a game
 // keeps its color on every figure (#298).
@@ -108,6 +117,9 @@ function World({
           <WoodSign style={styles.worldSign}>
             <Text style={styles.name}>{game.name}</Text>
             <Text style={styles.place}>{game.place}</Text>
+            {game.highScore === undefined ? null : (
+              <Text style={styles.record}>{game.highScore}</Text>
+            )}
           </WoodSign>
         </>
       )}
@@ -173,5 +185,11 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
     textAlign: 'center',
     textTransform: 'uppercase',
+  },
+  record: {
+    color: palette.ink,
+    fontFamily: serif,
+    fontSize: 12,
+    textAlign: 'center',
   },
 });

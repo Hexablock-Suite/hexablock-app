@@ -1,6 +1,7 @@
 import { useLocalSearchParams } from 'expo-router';
+import { useEffect, useState } from 'react';
 
-import { HomePresenter } from '../../adapters/home-presenter';
+import { HomePresenter, type SavedProgresses } from '../../adapters/home-presenter';
 import { DEFAULT_LANGUAGE, textCatalog } from '../../adapters/texts/text-catalog';
 import { GameId } from '../../domain/engine/game-id';
 import { TopologyId } from '../../domain/engine/geometry-factory';
@@ -32,13 +33,49 @@ export function gameRouteIds(): string[] {
   return [...new Set(ids)];
 }
 
-// The home presenter over the registry of the board figure `figure` of the root `root`.
-function homePresenterOf(root: CompositionRoot, figure: TopologyId): HomePresenter {
+// The home presenter over the registry of the board figure `figure` of the root `root`,
+// with the saved progress that the map hook loaded, by default none (#181).
+export function homePresenterOf(
+  root: CompositionRoot,
+  figure: TopologyId,
+  saved: SavedProgresses = [],
+): HomePresenter {
   return new HomePresenter(
     root.registry(figure).gameIds(),
     root.figures(),
     textCatalog[DEFAULT_LANGUAGE],
+    saved,
   );
+}
+
+// The saved progress of each registered game `games`, as the map shows it (#181). The hook
+// loads the progress of each game once per list, through `loadProgress(gameId)` of the root.
+// A failed load keeps no entry, and the screen shows no score: the `LoggingAspect` already
+// logged the failure. A root with no store throws a `RangeError` before the call, so the catch
+// keeps no entry either. The screen renders before the progress arrives and re-renders with it.
+// `games` must stay the same list between renders, as the `useMemo` of the screen gives it.
+export function useSavedProgresses(games: readonly GameId[]): SavedProgresses {
+  const root = useCompositionRoot();
+  const [saved, setSaved] = useState<SavedProgresses>([]);
+  useEffect(() => {
+    let active = true;
+    void Promise.all(
+      games.map(async (gameId) => {
+        try {
+          const result = await root.loadProgress(gameId).execute({});
+          return result.ok ? ([gameId, result.value] as const) : undefined;
+        } catch {
+          return undefined;
+        }
+      }),
+    ).then((pairs) => {
+      if (active) setSaved(pairs.filter((pair) => pair !== undefined));
+    });
+    return () => {
+      active = false;
+    };
+  }, [root, games]);
+  return saved;
 }
 
 // The world colors of each game on the map of the board figure `figure` (#298), from the entry

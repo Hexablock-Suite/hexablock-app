@@ -64,7 +64,7 @@
       <h1>Wiring: the drivers and the composition root</h1>
 
       <svg
-        viewBox="0 0 1040 1381"
+        viewBox="0 0 1040 1437"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="adwiring-title adwiring-desc"
@@ -83,7 +83,9 @@
           LocalAchievementCounterRepository, which implements the AchievementCounterRepository port,
           and gives it to the counter listener of the bus (#363). With a store in its drivers it
           creates LocalProgressRepository once, keeps it as progress for every consumer of the saved
-          progress, and builds ListAchievements over it once, and listAchievements() gives it.
+          progress, and builds ListAchievements over it once, and listAchievements() gives it. It
+          also answers loadProgress(gameId) with one LoadProgress per game, which reads the saved
+          progress of that game back (#181).
         </desc>
         <defs>
           <marker
@@ -106,7 +108,7 @@
           x="24"
           y="24"
           width="992"
-          height="768"
+          height="808"
           rx="8"
           fill="#cfdcf3"
           stroke="rgba(30,58,138,0.50)"
@@ -127,7 +129,7 @@
         <!-- Layer zone: layer 3, interface adapters -->
         <rect
           x="24"
-          y="800"
+          y="840"
           width="992"
           height="292"
           rx="8"
@@ -137,7 +139,7 @@
         />
         <text
           x="40"
-          y="820"
+          y="860"
           fill="#1d4ed8"
           font-size="8"
           font-weight="500"
@@ -252,9 +254,9 @@
         <!-- CompositionRoot creates the one GameEventBus: use «create», down from layer 4 to layer 3 -->
         <line
           x1="460"
-          y1="572"
+          y1="604"
           x2="460"
-          y2="848"
+          y2="888"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adwiring-open)"
@@ -262,9 +264,9 @@
         <!-- CompositionRoot creates one InMemoryGameRepository per game and figure: use «create», down from layer 4 to layer 3 -->
         <line
           x1="640"
-          y1="572"
+          y1="604"
           x2="640"
-          y2="848"
+          y2="888"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adwiring-open)"
@@ -272,9 +274,9 @@
         <!-- CompositionRoot creates one LevelGameFactories per game and figure: use «create», down from layer 4 to layer 3 -->
         <line
           x1="336"
-          y1="572"
+          y1="604"
           x2="336"
-          y2="848"
+          y2="888"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adwiring-open)"
@@ -282,9 +284,9 @@
         <!-- CompositionRoot creates LocalProgressRepository over the store of its drivers: use «create», down from layer 4 to layer 3 -->
         <line
           x1="580"
-          y1="572"
+          y1="604"
           x2="580"
-          y2="976"
+          y2="1016"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adwiring-open)"
@@ -292,16 +294,16 @@
         <!-- CompositionRoot creates LocalAchievementCounterRepository over the store of its drivers and gives it to AchievementCounterListener: use «create», down from layer 4 to layer 3 (#363) -->
         <line
           x1="352"
-          y1="572"
+          y1="604"
           x2="352"
-          y2="976"
+          y2="1016"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adwiring-open)"
         />
         <!-- CompositionRoot reads each BoardFigure of boardFigures() and builds its GameRegistry: use with a verb, inside layer 4 -->
         <path
-          d="M272 452 H192 Q184 452 184 460 V596"
+          d="M272 452 H192 Q184 452 184 460 V636"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -369,10 +371,10 @@
         >
           «create»
         </text>
-        <rect x="464" y="820" width="47" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="464" y="860" width="47" height="12" rx="2" fill="#e2ebf8" />
         <text
           x="466"
-          y="829"
+          y="869"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -381,10 +383,10 @@
         >
           «create»
         </text>
-        <rect x="644" y="820" width="47" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="644" y="860" width="47" height="12" rx="2" fill="#e2ebf8" />
         <text
           x="646"
-          y="829"
+          y="869"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -396,7 +398,7 @@
 
         <text
           x="332"
-          y="840"
+          y="880"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -405,10 +407,10 @@
         >
           «create»
         </text>
-        <rect x="527" y="952" width="47" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="527" y="992" width="47" height="12" rx="2" fill="#e2ebf8" />
         <text
           x="572"
-          y="961"
+          y="1001"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -418,10 +420,10 @@
           «create»
         </text>
 
-        <rect x="356" y="952" width="47" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="356" y="992" width="47" height="12" rx="2" fill="#e2ebf8" />
         <text
           x="358"
-          y="961"
+          y="1001"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -599,7 +601,7 @@
           x="272"
           y="272"
           width="408"
-          height="300"
+          height="332"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -673,11 +675,17 @@
         <text x="304" y="556" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           AchievementSummary[]›
         </text>
+        <text x="288" y="572" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + loadProgress(gameId: GameId): UseCase‹LoadProgressRequest,
+        </text>
+        <text x="304" y="588" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          GameProgress | undefined›
+        </text>
 
         <!-- Class: BoardFigure (the board figure that the player chooses, #171) -->
         <rect
           x="48"
-          y="596"
+          y="636"
           width="272"
           height="180"
           rx="6"
@@ -685,11 +693,11 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="48" y1="640" x2="320" y2="640" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="48" y1="700" x2="320" y2="700" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="48" y1="680" x2="320" y2="680" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="48" y1="740" x2="320" y2="740" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="184"
-          y="614"
+          y="654"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -700,7 +708,7 @@
         </text>
         <text
           x="184"
-          y="632"
+          y="672"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -709,25 +717,25 @@
         >
           BoardFigure
         </text>
-        <text x="64" y="656" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="696" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + id: TopologyId
         </text>
-        <text x="64" y="672" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="712" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + geometry: GeometryFactory‹TCoord›
         </text>
-        <text x="64" y="688" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="728" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + fitLevel?: FitLevel‹TCoord›
         </text>
-        <text x="64" y="716" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="756" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + linesPlacementAt?(at: TCoord): TCoord
         </text>
-        <text x="64" y="732" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="772" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + fitPlacementAt?(at: TCoord,
         </text>
-        <text x="80" y="748" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="788" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           rotation: Turns): TCoord
         </text>
-        <text x="64" y="764" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="804" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + layoutOf(size: number): BoardLayout‹TCoord›
         </text>
 
@@ -745,7 +753,7 @@
         />
         <text
           x="298"
-          y="598"
+          y="638"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -791,7 +799,7 @@
         <!-- Class: LevelGameFactories (adapter of the GameFactories port, one per game and figure) -->
         <rect
           x="184"
-          y="848"
+          y="888"
           width="160"
           height="40"
           rx="6"
@@ -801,7 +809,7 @@
         />
         <text
           x="264"
-          y="873"
+          y="913"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -814,7 +822,7 @@
         <!-- Class: GameEventBus (adapter of the publisher port, detailed in view 4.3, #362) -->
         <rect
           x="360"
-          y="848"
+          y="888"
           width="200"
           height="40"
           rx="6"
@@ -824,7 +832,7 @@
         />
         <text
           x="460"
-          y="873"
+          y="913"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -837,7 +845,7 @@
         <!-- Class: InMemoryGameRepository (adapter, repository of the game aggregate) -->
         <rect
           x="600"
-          y="848"
+          y="888"
           width="336"
           height="76"
           rx="6"
@@ -848,7 +856,7 @@
         <line x1="600" y1="896" x2="936" y2="896" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="768"
-          y="866"
+          y="906"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -859,7 +867,7 @@
         </text>
         <text
           x="768"
-          y="884"
+          y="924"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -868,14 +876,14 @@
         >
           InMemoryGameRepository
         </text>
-        <text x="616" y="912" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="616" y="952" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - game: GameEngine&lt;TCell, TCoord, TMove, TState&gt; [0..1]
         </text>
 
         <!-- UML template box: type parameters on the top-right corner -->
         <rect
           x="780"
-          y="838"
+          y="878"
           width="156"
           height="18"
           rx="2"
@@ -886,7 +894,7 @@
         />
         <text
           x="858"
-          y="850"
+          y="890"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -898,7 +906,7 @@
         <!-- Class: LocalProgressRepository (adapter of ProgressRepository over KeyValueStore, #164 and #188) -->
         <rect
           x="544"
-          y="976"
+          y="1016"
           width="272"
           height="72"
           rx="6"
@@ -906,10 +914,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="544" y1="1024" x2="816" y2="1024" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="544" y1="1064" x2="816" y2="1064" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="680"
-          y="994"
+          y="1034"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -920,7 +928,7 @@
         </text>
         <text
           x="680"
-          y="1012"
+          y="1052"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -931,7 +939,7 @@
         </text>
         <text
           x="560"
-          y="1040"
+          y="1080"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -942,7 +950,7 @@
         <!-- Class: LocalAchievementCounterRepository (adapter of AchievementCounterRepository over KeyValueStore, #363) -->
         <rect
           x="296"
-          y="976"
+          y="1016"
           width="240"
           height="72"
           rx="6"
@@ -950,10 +958,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="296" y1="1024" x2="536" y2="1024" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="296" y1="1064" x2="536" y2="1064" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="416"
-          y="994"
+          y="1034"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -964,7 +972,7 @@
         </text>
         <text
           x="416"
-          y="1012"
+          y="1052"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -975,7 +983,7 @@
         </text>
         <text
           x="312"
-          y="1040"
+          y="1080"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -984,11 +992,11 @@
         </text>
 
         <!-- Lollipops: interface or port each class implements, with its binding -->
-        <line x1="312" y1="1048" x2="312" y2="1064" stroke="#17212a" stroke-width="1" />
-        <circle cx="312" cy="1069" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="312" y1="1088" x2="312" y2="1104" stroke="#17212a" stroke-width="1" />
+        <circle cx="312" cy="1109" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="323"
-          y="1072"
+          y="1112"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1020,31 +1028,31 @@
         <text x="795" y="102" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           SessionStore
         </text>
-        <line x1="376" y1="888" x2="376" y2="904" stroke="#17212a" stroke-width="1" />
-        <circle cx="376" cy="909" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="387" y="912" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="376" y1="928" x2="376" y2="944" stroke="#17212a" stroke-width="1" />
+        <circle cx="376" cy="949" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="387" y="952" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           GameEventPublisher
         </text>
-        <line x1="616" y1="924" x2="616" y2="940" stroke="#17212a" stroke-width="1" />
-        <circle cx="616" cy="945" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="627" y="948" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="616" y1="964" x2="616" y2="980" stroke="#17212a" stroke-width="1" />
+        <circle cx="616" cy="985" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="627" y="988" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           GameRepository‹TCell, TCoord, TMove, TState›
         </text>
 
-        <line x1="200" y1="888" x2="200" y2="904" stroke="#17212a" stroke-width="1" />
-        <circle cx="200" cy="909" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="211" y="912" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="200" y1="928" x2="200" y2="944" stroke="#17212a" stroke-width="1" />
+        <circle cx="200" cy="949" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="211" y="952" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           GameFactories‹TCell,
         </text>
-        <text x="211" y="924" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="211" y="964" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           TCoord, TMove, TState›
         </text>
 
-        <line x1="560" y1="1048" x2="560" y2="1064" stroke="#17212a" stroke-width="1" />
-        <circle cx="560" cy="1069" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="560" y1="1088" x2="560" y2="1104" stroke="#17212a" stroke-width="1" />
+        <circle cx="560" cy="1109" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="571"
-          y="1072"
+          y="1112"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1055,7 +1063,7 @@
         <!-- Footnote -->
         <text
           x="24"
-          y="1116"
+          y="1156"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1065,7 +1073,7 @@
         </text>
         <text
           x="24"
-          y="1132"
+          y="1172"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1075,7 +1083,7 @@
         </text>
         <text
           x="24"
-          y="1148"
+          y="1188"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1085,7 +1093,7 @@
         </text>
         <text
           x="24"
-          y="1164"
+          y="1204"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1095,7 +1103,7 @@
         </text>
         <text
           x="24"
-          y="1180"
+          y="1220"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1107,7 +1115,7 @@
 
         <text
           x="24"
-          y="1196"
+          y="1236"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1119,7 +1127,7 @@
 
         <text
           x="24"
-          y="1212"
+          y="1252"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1130,7 +1138,7 @@
         </text>
         <text
           x="24"
-          y="1228"
+          y="1268"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1140,7 +1148,17 @@
         </text>
         <text
           x="24"
-          y="1244"
+          y="1300"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          It answers loadProgress(gameId) with one LoadProgress per game over the progress
+          repository (#181). A root with no store offers neither, and asking throws a RangeError.
+        </text>
+        <text
+          x="24"
+          y="1284"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1150,7 +1168,7 @@
           (#364).
         </text>
         <!-- The legend sits 32 lower than before: the footnote has one more line since #326 and one more since #363. -->
-        <g transform="translate(0 32)">
+        <g transform="translate(0 88)">
           <!-- Legend -->
           <line
             x1="24"

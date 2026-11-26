@@ -22,6 +22,7 @@ export const en = {
   'figure.triangle': 'Triangle',
   'map.title': 'World map',
   'map.back': 'Back',
+  'map.highScore': 'High score',
   'play.back': 'Map',
   'play.board': 'Board',
   'play.score': 'Score',

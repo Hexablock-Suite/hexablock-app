@@ -15,7 +15,14 @@ import { repoRoot } from '../support/run-tool';
 const ROOT_SOURCE = path.join(repoRoot, 'src/infrastructure/composition-root.ts');
 
 // The use cases that the root builds today.
-const USE_CASES = ['StartGame', 'ApplyMove', 'UndoMove', 'RedoMove', 'ListAchievements'];
+const USE_CASES = [
+  'StartGame',
+  'ApplyMove',
+  'UndoMove',
+  'RedoMove',
+  'ListAchievements',
+  'LoadProgress',
+];
 
 // The number of matches of `pattern` in `text`.
 function countOf(text: string, pattern: RegExp): number {
@@ -52,6 +59,7 @@ describe('CompositionRoot decorate', () => {
     await undoMove.execute({});
     await redoMove.execute({});
     await root.listAchievements().execute({});
+    await root.loadProgress(GameId.of('hexa-lines')).execute({});
 
     expect(logger.entries.map((entry) => [entry.useCase, entry.outcome])).toEqual([
       ['ApplyMove', 'failure'],
@@ -59,6 +67,7 @@ describe('CompositionRoot decorate', () => {
       ['UndoMove', 'failure'],
       ['RedoMove', 'failure'],
       ['ListAchievements', 'success'],
+      ['LoadProgress', 'success'],
     ]);
   });
 

@@ -22,6 +22,7 @@ export const es = {
   'figure.triangle': 'Triángulo',
   'map.title': 'Mapa de mundos',
   'map.back': 'Atrás',
+  'map.highScore': 'Récord',
   'play.back': 'Mapa',
   'play.board': 'Tablero',
   'play.score': 'Puntos',

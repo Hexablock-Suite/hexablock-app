@@ -5,9 +5,13 @@ import { GameEventBus } from '../../src/adapters/game-event-bus';
 import { MergeStateMapper } from '../../src/adapters/merge-state-mapper';
 import { SortStateMapper } from '../../src/adapters/sort-state-mapper';
 import { LinesStateMapper } from '../../src/adapters/lines-state-mapper';
+import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
 import { GameId } from '../../src/domain/engine/game-id';
+import { GameProgress } from '../../src/domain/engine/game-progress';
 import { TopologyId } from '../../src/domain/engine/geometry-factory';
 import { LevelId } from '../../src/domain/engine/level-id';
+import { ProgressRecord } from '../../src/domain/engine/progress-model';
+import { Score } from '../../src/domain/engine/score';
 import { Turns } from '../../src/domain/engine/turns';
 import { PlaceFitPiece } from '../../src/domain/variants/hexa-fit/fit-move';
 import { PieceId } from '../../src/domain/variants/hexa-fit/piece-id';
@@ -166,6 +170,40 @@ describe('CompositionRoot', () => {
     expect(() => testRoot().gameUseCases(GameId.of('hexa-fill'))).toThrow(
       new RangeError('The registry holds no game with this id.'),
     );
+  });
+
+  // Issue #181: the root offers `LoadProgress` over its one local progress repository,
+  // as it offers `ListAchievements`. A root with no store offers neither.
+  it('should_throw_a_range_error_when_a_root_with_no_store_is_asked_for_the_saved_progress', () => {
+    const root = testRoot();
+
+    expect(() => root.loadProgress(GameId.of('hexa-lines'))).toThrow(RangeError);
+    expect(() => root.loadProgress(GameId.of('hexa-lines'))).toThrow(
+      'The root has no local store, so it loads no progress.',
+    );
+  });
+
+  // The read goes through the decorated use case: a saved high score of the device comes back
+  // as the progress that keeps it.
+  it('should_load_the_saved_progress_of_a_game_when_the_root_has_a_store', async () => {
+    const LINES = GameId.of('hexa-lines');
+    const store = new InMemoryKeyValueStore();
+    const root = new CompositionRoot({
+      clock: new ManualClock(),
+      logger: new RecordingLogger(),
+      store,
+    });
+    const saved = GameProgress.start(LINES);
+    saved.recordScore(ProgressRecord.of({ gameId: LINES, score: Score.of(36) }));
+    await new LocalProgressRepository(store).save(saved);
+
+    const result = await root.loadProgress(LINES).execute({});
+
+    expect(
+      result.ok
+        ? result.value?.keeps(ProgressRecord.of({ gameId: LINES, score: Score.of(36) }))
+        : false,
+    ).toBe(true);
   });
 
   // Issue #171: the player chooses the board figure on the home screen (APP-FR-16).
