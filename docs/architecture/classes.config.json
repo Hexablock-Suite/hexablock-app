@@ -11,7 +11,8 @@
     { "path": "src/domain/variants/", "layer": 1, "part": "variants" },
     { "path": "src/application/", "layer": 2, "part": "usecases" },
     { "path": "src/adapters/", "layer": 3, "part": "adapters" },
-    { "path": "src/infrastructure/", "layer": 4, "part": "adapters" }
+    { "path": "src/infrastructure/", "layer": 4, "part": "adapters" },
+    { "path": "app/", "layer": 4, "part": "adapters" }
   ],
   "views": {
     "overview-engine": "engine",
