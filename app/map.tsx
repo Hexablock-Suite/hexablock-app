@@ -13,6 +13,7 @@ import { column, palette, serif, space, type WorldTone } from '../src/infrastruc
 import {
   homePresenterOf,
   useFigureShapes,
+  useGameLevels,
   useGameTones,
   useRouteFigure,
   useSavedProgresses,
@@ -26,8 +27,9 @@ const STONE = 84;
 // The game selector map, the MVP view of `HomePresenter` (#169). It is its own route after
 // the home screen (S3-11 in #151, a proposal that waits for the team). It shows one world for
 // each game of the registry, in the order of the registry, on a path that climbs from the grass.
-// A tap on a world opens the game route with the id of the game. #173 sends Fit and Sort
-// to the level selector first, and #170 builds the game screen on the game route.
+// A tap on a world opens the level selector of a game with levels, Fit and Sort (#173),
+// and the game route of a game with none, Lines and Merge (#170). The registry entry of each
+// game says whether it has levels, so the map does not branch on the game id.
 // The map lists the games of the board figure that its route names, by default the hexagon,
 // and passes the figure on to the game route (#171). A text that names no figure goes home.
 export default function GameSelectorScreen() {
@@ -45,6 +47,7 @@ function GameSelector({ figure }: { readonly figure: RouteFigure }) {
   const saved = useSavedProgresses(games);
   const view = homePresenterOf(root, figure.figure, saved).gameSelector();
   const toneOf = useGameTones(figure.figure);
+  const hasLevels = useGameLevels(figure.figure);
   const stone = useFigureShapes()(figure.param, STONE);
   const insets = useSafeAreaInsets();
   return (
@@ -73,6 +76,7 @@ function GameSelector({ figure }: { readonly figure: RouteFigure }) {
               tone={toneOf(game.id)}
               shape={stone}
               figure={figure.param}
+              hasLevels={hasLevels(game.id)}
               position={position}
             />
           ))}
@@ -89,25 +93,33 @@ function GameSelector({ figure }: { readonly figure: RouteFigure }) {
 // keeps its color on every figure (#298).
 // The worlds take turns on the left and on the right side of the path by their place in the
 // list, not by the game. So the path keeps its zig-zag when a figure has no entry for a game.
-// A tap opens the game on the board figure whose text is `figure`.
+// A tap opens the game on the board figure whose text is `figure`: the level selector of a game
+// with levels (#173), or else the game route.
 function World({
   game,
   tone,
   shape,
   figure,
+  hasLevels,
   position,
 }: {
   readonly game: GameChoice;
   readonly tone: WorldTone;
   readonly shape: CellShape;
   readonly figure: string;
+  readonly hasLevels: boolean;
   readonly position: number;
 }) {
+  const params = { gameId: game.id, figure };
   return (
     <Pressable
       accessibilityRole="button"
       onPress={() =>
-        router.push({ pathname: '/game/[gameId]', params: { gameId: game.id, figure } })
+        router.push(
+          hasLevels
+            ? { pathname: '/levels/[gameId]', params }
+            : { pathname: '/game/[gameId]', params },
+        )
       }
       style={[styles.world, position % 2 === 0 ? styles.left : styles.right]}
     >
