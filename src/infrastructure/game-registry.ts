@@ -42,6 +42,8 @@ export interface ScreenParts<TCell, TCoord, TView, TCellView, TPayloadView, TMov
 
 // One game of the registry: its id, its variant factory, its optional level variant,
 // its screen parts and its world colors, with the type arguments hidden.
+// `hasLevels` tells whether the game has a level variant. The map opens the level selector
+// for a game with levels, and the game route for a game with none (#173).
 // The map draws the stone of the game in `tone` on every figure (#298), so a game keeps its
 // color when the list of a figure has no entry for another game. `registered()` checks that the parts fit the factory,
 // so a screen only passes the cell views of the mapper to the renderer of the same entry.
@@ -49,6 +51,7 @@ export interface RegisteredGame {
   readonly gameId: GameId;
   readonly screen: ScreenParts<unknown, unknown, unknown, unknown, unknown, unknown>;
   readonly tone: WorldTone;
+  readonly hasLevels: boolean;
   withFactory<TResult>(use: FactoryUse<TResult>): TResult;
 }
 
@@ -85,6 +88,7 @@ export function registered<
     gameId,
     screen,
     tone,
+    hasLevels: levels !== undefined,
     withFactory: <TResult>(use: FactoryUse<TResult>) => use.use(gameId, factory, levels),
   });
 }

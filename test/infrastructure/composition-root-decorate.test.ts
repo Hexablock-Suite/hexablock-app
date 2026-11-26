@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { GameId } from '../../src/domain/engine/game-id';
+import { TopologyId } from '../../src/domain/engine/geometry-factory';
 import { CompositionRoot } from '../../src/infrastructure/composition-root';
 import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-store';
 import { RecordingLogger } from '../support/application/recording-logger';
@@ -22,6 +23,7 @@ const USE_CASES = [
   'RedoMove',
   'ListAchievements',
   'LoadProgress',
+  'ListLevels',
 ];
 
 // The number of matches of `pattern` in `text`.
@@ -60,6 +62,7 @@ describe('CompositionRoot decorate', () => {
     await redoMove.execute({});
     await root.listAchievements().execute({});
     await root.loadProgress(GameId.of('hexa-lines')).execute({});
+    await root.listLevels().execute({ gameId: GameId.of('hexa-fit'), figure: TopologyId.hex });
 
     expect(logger.entries.map((entry) => [entry.useCase, entry.outcome])).toEqual([
       ['ApplyMove', 'failure'],
@@ -68,6 +71,7 @@ describe('CompositionRoot decorate', () => {
       ['RedoMove', 'failure'],
       ['ListAchievements', 'success'],
       ['LoadProgress', 'success'],
+      ['ListLevels', 'success'],
     ]);
   });
 
