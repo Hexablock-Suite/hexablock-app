@@ -231,7 +231,7 @@ export interface components {
              */
             moves: number;
             /**
-             * @description A non-negative integer.
+             * @description A non-negative integer of at most 2147483647, the same largest value as the stars and the moves.
              * @example 45000
              */
             elapsedMs: number;
