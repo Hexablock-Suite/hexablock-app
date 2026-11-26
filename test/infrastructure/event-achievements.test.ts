@@ -34,7 +34,10 @@ import {
 
 // A bus with the listener of the counters over `store`.
 function counting(store: InMemoryKeyValueStore) {
-  const listener = new AchievementCounterListener(new LocalAchievementCounterRepository(store));
+  const listener = new AchievementCounterListener(
+    new LocalAchievementCounterRepository(store),
+    new RecordingLogger(),
+  );
   const bus = new GameEventBus();
   bus.subscribe(listener);
   return { listener, bus };

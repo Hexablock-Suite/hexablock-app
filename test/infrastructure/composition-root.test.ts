@@ -463,6 +463,42 @@ describe('CompositionRoot', () => {
     }
   });
 
+  // Issue #384: a failed save of the counters reaches the logger of the root. The saved counters
+  // of Hexa Sort have a version that the app does not read, so the save of a Sort goal fails.
+  it('should_log_one_save_failed_entry_through_the_logger_of_the_root_when_a_counter_save_fails', async () => {
+    const subscribe = jest.spyOn(GameEventBus.prototype, 'subscribe');
+    try {
+      const store = new InMemoryKeyValueStore();
+      await store.set('achievement-counters:hexa-sort', '{"version":9}');
+      const logger = new RecordingLogger();
+      new CompositionRoot({ clock: new ManualClock(), logger, store });
+      const listener = subscribe.mock.calls[0][0] as AchievementCounterListener;
+
+      listener.onEvent(new StackCleared(GameId.of('hexa-sort'), MATCH_ID, 0, TileCount.of(6)));
+      await listener.saved();
+
+      expect(
+        logger.entries.map(({ useCase, outcome, error }) => ({
+          useCase,
+          outcome,
+          code: error?.code,
+          message: error?.message,
+        })),
+      ).toEqual([
+        {
+          useCase: 'AchievementCounterListener',
+          outcome: 'failure',
+          code: 'save-failed',
+          message:
+            'The saved counters of the achievements of a game have a version that this app does not read.',
+        },
+      ]);
+      await expect(store.get('achievement-counters:hexa-sort')).resolves.toBe('{"version":9}');
+    } finally {
+      subscribe.mockRestore();
+    }
+  });
+
   // Issue #363: a root with no local store has no place to save the counters,
   // so it subscribes no counter listener. Its bus still takes the events of every move.
   it('should_subscribe_no_counter_listener_when_the_root_has_no_local_store', async () => {

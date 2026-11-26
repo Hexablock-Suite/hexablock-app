@@ -1,6 +1,8 @@
 import { UseCaseError, type Result } from './result';
 
 // The record of one use case call (classes.md decision 37). It is a value object.
+// `AchievementCounterListener` of layer 3 also writes one failure entry for each failed save of
+// the counters (issue #384).
 // It holds data, never a message: the `Logger` adapter of layer 4 writes the text.
 // `error` comes only from a failed `Result`.
 // `elapsedMs` has no writer yet. `ConsoleLogger` reads it, and issue #343 gives it its writer.

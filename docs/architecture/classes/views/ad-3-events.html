@@ -64,7 +64,7 @@
       <h1>Game events and sound: Observer and Facade</h1>
 
       <svg
-        viewBox="0 0 1040 1012"
+        viewBox="0 0 1040 1028"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="adevents-title adevents-desc"
@@ -74,9 +74,9 @@
           Class diagram across layers 4, 3, 2 and 1 showing GameEventBus in layer 3 implementing the
           GameEventPublisher port of layer 2 and holding many GameEventListener objects,
           AchievementCounterListener, the first listener, which counts the events of a move of each
-          game, GamePresenter and AudioManager, the audio facade of layer 4, implementing
-          GameEventListener, AudioManager playing through an external SoundLibrary, and
-          GameEventPublisher publishing GameEvent of layer 1.
+          game and logs each failed save of the counters, GamePresenter and AudioManager, the audio
+          facade of layer 4, implementing GameEventListener, AudioManager playing through an
+          external SoundLibrary, and GameEventPublisher publishing GameEvent of layer 1.
         </desc>
         <defs>
           <marker
@@ -235,7 +235,7 @@
           x="304"
           y="304"
           width="688"
-          height="272"
+          height="276"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -491,7 +491,7 @@
         <!-- AchievementCounterListener implements GameEventListener: realization (#362) -->
         <line
           x1="440"
-          y1="460"
+          y1="444"
           x2="440"
           y2="420"
           stroke="#17212a"
@@ -502,7 +502,7 @@
         <!-- AchievementCounterListener counts the events of a move: use, down from layer 3 to layer 1 -->
         <line
           x1="500"
-          y1="564"
+          y1="572"
           x2="500"
           y2="760"
           stroke="#5b6873"
@@ -525,19 +525,19 @@
         <!-- Class: AchievementCounterListener (the first listener of the bus, #362) -->
         <rect
           x="320"
-          y="460"
+          y="444"
           width="320"
-          height="104"
+          height="128"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="320" y1="500" x2="640" y2="500" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="320" y1="524" x2="640" y2="524" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="320" y1="476" x2="640" y2="476" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="320" y1="532" x2="640" y2="532" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="480"
-          y="485"
+          y="465"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -546,14 +546,20 @@
         >
           AchievementCounterListener
         </text>
-        <text x="336" y="516" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - games: { gameId, counts }[]
+        <text x="336" y="492" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - counters: AchievementCounterRepository
         </text>
-        <text x="336" y="540" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="336" y="508" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - logger: Logger
+        </text>
+        <text x="336" y="524" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - queue: Promise&lt;void&gt;
+        </text>
+        <text x="336" y="548" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + onEvent(event: GameEvent): void
         </text>
-        <text x="336" y="556" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + countsOf(gameId: GameId): AchievementCounts
+        <text x="336" y="564" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + saved(): Promise&lt;void&gt;
         </text>
 
         <!-- Class: GameEventBus (focal) -->
@@ -735,186 +741,206 @@
           The root builds one GameEventBus, subscribes AchievementCounterListener to it and gives it
           to every ApplyMove (#362). A listener that throws does not stop the others.
         </text>
-
-        <!-- Legend -->
-        <line x1="24" y1="904" x2="1016" y2="904" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="922"
+          y="896"
           fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          letter-spacing="0.18em"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
         >
-          LEGEND
+          AchievementCounterListener queues each save of the counters, and it writes each failed
+          save to the Logger port of the root as one save-failed entry (#384).
         </text>
 
-        <line
-          x1="24"
-          y1="940"
-          x2="52"
-          y2="940"
-          stroke="#17212a"
-          stroke-width="1"
-          stroke-dasharray="5,4"
-          marker-end="url(#adevents-triangle)"
-        />
-        <text
-          x="60"
-          y="944"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Realization
-        </text>
-        <line
-          x1="144"
-          y1="940"
-          x2="172"
-          y2="940"
-          stroke="#5b6873"
-          stroke-width="1"
-          marker-end="url(#adevents-open)"
-        />
-        <text
-          x="180"
-          y="944"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Use · attribute, parameter, return, local or new
-        </text>
+        <!-- The legend sits 16 lower than before: the footnote has one more line since #384. -->
+        <g transform="translate(0 16)">
+          <!-- Legend -->
+          <line
+            x1="24"
+            y1="904"
+            x2="1016"
+            y2="904"
+            stroke="rgba(23,33,42,0.10)"
+            stroke-width="0.8"
+          />
+          <text
+            x="24"
+            y="922"
+            fill="#5b6873"
+            font-size="8"
+            font-family="'IBM Plex Mono', monospace"
+            letter-spacing="0.18em"
+          >
+            LEGEND
+          </text>
 
-        <rect
-          x="24"
-          y="960"
-          width="28"
-          height="12"
-          rx="2"
-          fill="#cfdcf3"
-          stroke="rgba(30,58,138,0.50)"
-          stroke-width="1"
-        />
-        <rect
-          x="56"
-          y="960"
-          width="28"
-          height="12"
-          rx="2"
-          fill="#e2ebf8"
-          stroke="rgba(29,78,216,0.40)"
-          stroke-width="1"
-        />
-        <rect
-          x="88"
-          y="960"
-          width="28"
-          height="12"
-          rx="2"
-          fill="#efe7f8"
-          stroke="rgba(126,34,206,0.40)"
-          stroke-width="1"
-        />
-        <rect
-          x="120"
-          y="960"
-          width="28"
-          height="12"
-          rx="2"
-          fill="#f9f4dc"
-          stroke="rgba(180,83,9,0.45)"
-          stroke-width="1"
-        />
-        <text
-          x="156"
-          y="969"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Zones · layers 4 to 1
-        </text>
-        <rect
-          x="264"
-          y="960"
-          width="28"
-          height="12"
-          rx="2"
-          fill="none"
-          stroke="rgba(91,104,115,0.55)"
-          stroke-width="1"
-          stroke-dasharray="4,4"
-        />
-        <text
-          x="300"
-          y="969"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Dashed frame · GoF pattern or principle
-        </text>
-        <rect
-          x="488"
-          y="960"
-          width="28"
-          height="12"
-          rx="2"
-          fill="#ffffff"
-          stroke="#7d8a94"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-        />
-        <text
-          x="524"
-          y="969"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Reference box · detailed in another view
-        </text>
-        <rect
-          x="720"
-          y="960"
-          width="28"
-          height="12"
-          rx="2"
-          fill="rgba(15,111,116,0.10)"
-          stroke="#0f6f74"
-          stroke-width="1"
-        />
-        <text
-          x="756"
-          y="969"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Teal · focal class
-        </text>
-        <!-- Legend: the «Sprint N» marker of a planned class or member -->
-        <text
-          x="24"
-          y="989"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          «Sprint N»
-        </text>
-        <text
-          x="92"
-          y="989"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Planned design, not in the code yet · N is the docs/ROADMAP.md sprint of the requirement
-          it serves
-        </text>
+          <line
+            x1="24"
+            y1="940"
+            x2="52"
+            y2="940"
+            stroke="#17212a"
+            stroke-width="1"
+            stroke-dasharray="5,4"
+            marker-end="url(#adevents-triangle)"
+          />
+          <text
+            x="60"
+            y="944"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Realization
+          </text>
+          <line
+            x1="144"
+            y1="940"
+            x2="172"
+            y2="940"
+            stroke="#5b6873"
+            stroke-width="1"
+            marker-end="url(#adevents-open)"
+          />
+          <text
+            x="180"
+            y="944"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Use · attribute, parameter, return, local or new
+          </text>
+
+          <rect
+            x="24"
+            y="960"
+            width="28"
+            height="12"
+            rx="2"
+            fill="#cfdcf3"
+            stroke="rgba(30,58,138,0.50)"
+            stroke-width="1"
+          />
+          <rect
+            x="56"
+            y="960"
+            width="28"
+            height="12"
+            rx="2"
+            fill="#e2ebf8"
+            stroke="rgba(29,78,216,0.40)"
+            stroke-width="1"
+          />
+          <rect
+            x="88"
+            y="960"
+            width="28"
+            height="12"
+            rx="2"
+            fill="#efe7f8"
+            stroke="rgba(126,34,206,0.40)"
+            stroke-width="1"
+          />
+          <rect
+            x="120"
+            y="960"
+            width="28"
+            height="12"
+            rx="2"
+            fill="#f9f4dc"
+            stroke="rgba(180,83,9,0.45)"
+            stroke-width="1"
+          />
+          <text
+            x="156"
+            y="969"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Zones · layers 4 to 1
+          </text>
+          <rect
+            x="264"
+            y="960"
+            width="28"
+            height="12"
+            rx="2"
+            fill="none"
+            stroke="rgba(91,104,115,0.55)"
+            stroke-width="1"
+            stroke-dasharray="4,4"
+          />
+          <text
+            x="300"
+            y="969"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Dashed frame · GoF pattern or principle
+          </text>
+          <rect
+            x="488"
+            y="960"
+            width="28"
+            height="12"
+            rx="2"
+            fill="#ffffff"
+            stroke="#7d8a94"
+            stroke-width="1"
+            stroke-dasharray="4,3"
+          />
+          <text
+            x="524"
+            y="969"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Reference box · detailed in another view
+          </text>
+          <rect
+            x="720"
+            y="960"
+            width="28"
+            height="12"
+            rx="2"
+            fill="rgba(15,111,116,0.10)"
+            stroke="#0f6f74"
+            stroke-width="1"
+          />
+          <text
+            x="756"
+            y="969"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Teal · focal class
+          </text>
+          <!-- Legend: the «Sprint N» marker of a planned class or member -->
+          <text
+            x="24"
+            y="989"
+            fill="#17212a"
+            font-size="8.5"
+            font-family="'IBM Plex Mono', monospace"
+          >
+            «Sprint N»
+          </text>
+          <text
+            x="92"
+            y="989"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Planned design, not in the code yet · N is the docs/ROADMAP.md sprint of the requirement
+            it serves
+          </text>
+        </g>
       </svg>
     </div>
   </body>
