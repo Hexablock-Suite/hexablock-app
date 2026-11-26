@@ -34,10 +34,10 @@ The five class views of the use case flows draw 12 to 17 classes, because a flow
 
 ## Whole model in draw.io
 
-[`classes.drawio`](classes.drawio) holds the whole class model in one draw.io file, with 5 pages. Open it in draw.io or diagrams.net.
+[`classes.drawio`](classes.drawio) holds the whole class model in one draw.io file, with 6 pages. Open it in draw.io or diagrams.net.
 
 - Page 1, `All classes`, holds every class, interface and type of the model once, by layer: layer 4 at the top and layer 1 at the bottom, so every dependency points down.
-- Pages 2 to 5, `Engine`, `Variants`, `Use cases` and `Adapters`, hold one part each. A part page shows the types of its part in full. A grey box with the name only is a type of another part that one of its lines touches, and its eyebrow names the page that details it.
+- Pages 2 to 6, `Engine`, `Variants`, `Use cases`, `Adapters` and `Infrastructure`, hold one part each. A part page shows the types of its part in full. A grey box with the name only is a type of another part that one of its lines touches, and its eyebrow names the page that details it.
 - A solid box is a type that existed in the code at the commit of the last generation. The title of each page names that commit. A dashed box with `«planned»` is design from the views of this page that the code does not have yet. It keeps the `«Sprint N»` of its view when the view gives one.
 - `members not designed yet` marks a planned class that no view details.
 - A box with no operation says why. `«dataType»` marks a class in the code with no operation: it only carries data. No class of the app needs it today, so no legend lists it. An interface with no operation carries `«interface»`, next to the stereotypes of its views, such as `«value object»`, and never `«dataType»` on top. A union of literals, such as `Language`, carries `«enumeration»` and one literal per line. A type alias, such as `FitMove` or `ApiClient`, carries no kind word: its box shows its name and the aliased type or its members. **The change of 2026-11-24:** until that day the generator put `«dataType»` on every type in the code with no operation, interfaces included, and printed `«union»` and `«type»` as stereotypes. The views `variant-2-fit`, `flow-2-save-progress` and `flow-5-login` drew `«type»` on `FitMove` and `ApiClient` until then.
