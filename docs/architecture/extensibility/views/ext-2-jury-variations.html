@@ -73,12 +73,15 @@
         </title>
         <desc id="ext-2-jury-variations-desc">
           Three columns, one per jury variation of statement §3.1. A new board size is configuration
-          data passed to BoardBuilder.withRegion(size). A new scoring policy is a class that
-          implements IScoringPolicy or extends ScoringDecorator. A new piece shape is data, a
-          ShapeGroup of CellNode cells. Below them, GameEngine does not change. The policy reads two
-          photos of the state, before and after the move. No box carries a role label of a pattern:
-          the title of each frame names the pattern of its extension point, Builder, Strategy or
-          Composite.
+          data: the Sort level file, or the board constant of Lines or Merge in
+          src/infrastructure/registered-games.ts, which the factory passes to
+          BoardBuilder.withRegion(size). A new scoring policy is a class that implements
+          IScoringPolicy or extends ScoringDecorator in the variant folder. A new piece shape is
+          data, a ShapeGroup of CellNode cells: the Fit level file, or a Lines shape of one board
+          figure in src/infrastructure/registered-games.ts. Below them, GameEngine does not change.
+          The policy reads two photos of the state, before and after the move. No box carries a role
+          label of a pattern: the title of each frame names the pattern of its extension point,
+          Builder, Strategy or Composite.
         </desc>
         <defs>
           <marker
@@ -342,7 +345,7 @@
           Sort: radius in the level file
         </text>
         <text x="80" y="198" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          Lines, Merge: their factory
+          Lines, Merge: registered-games.ts
         </text>
         <rect x="392" y="100" width="240" height="104" rx="6" fill="#f9f4dc" />
         <rect
@@ -446,7 +449,7 @@
           Fit: pieces in the level file
         </text>
         <text x="736" y="198" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          Lines: its piece list
+          Lines: one figure, registered-games.ts
         </text>
         <!-- Row B: the extension point that takes it -->
         <!-- Class: BoardBuilder (DDD factory of the board; the frame names its pattern, decision 23) -->
@@ -735,8 +738,9 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Board size: level data, or the size that the Lines or Merge factory passes to
-          BoardBuilder.withRegion(size) (decision 15).
+          Board size: the Sort level file, or the Lines or Merge constant in
+          src/infrastructure/registered-games.ts, which the factory passes to
+          BoardBuilder.withRegion(size).
         </text>
         <text
           x="24"
@@ -756,7 +760,7 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Piece shape: data, a ShapeGroup of CellNode cells (§8). Fit reads it from the level file;
-          Lines keeps its own piece list.
+          a Lines shape is data of one figure in src/infrastructure/registered-games.ts.
         </text>
         <text
           x="24"

@@ -6,7 +6,9 @@ import { square, SquareTopology, type SquareCoord } from './square-topology';
 // The statement gives 1 to 5 cells per piece and no list, so this list is a design choice.
 // The list has the same seven forms as the hexagonal list, so the figure of the board
 // does not change the sizes of the pieces (APP-FR-16).
-// A new shape is one new line (the piece shape row of statement §8).
+// This list is the base set of the family, for every game on this figure.
+// A jury variation never edits it (APP-NFR-06): a new Lines shape is data of one board figure
+// in src/infrastructure/registered-games.ts (docs/EXTENSIBILITY.md, issue #369).
 const pieces: readonly (readonly SquareCoord[])[] = [
   [square(0, 0)],
   [square(0, 0), square(1, 0)],
