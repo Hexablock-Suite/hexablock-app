@@ -5,7 +5,7 @@ import type { BoardState } from '../domain/engine/board-state';
 import type { Cloneable } from '../domain/engine/cloneable';
 import type { GameId } from '../domain/engine/game-id';
 import type { IVariantFactory } from '../domain/engine/variant-factory';
-import type { BoardLayout } from './board/board-layout';
+import type { BoardLayout } from '../adapters/board/board-layout';
 import type { CellRenderer } from './board/cell-renderer';
 import type { MoveControls } from './ui/move-controls';
 import type { WorldTone } from './ui/theme';
@@ -28,8 +28,9 @@ export interface FactoryUse<TResult> {
 
 // The parts of the game screen that one game chooses (classes.md decision 14, issue #170,
 // S3-07 in #151, «Propuesta, pendiente del equipo»): the state mapper of layer 3, the cell
-// renderer of layer 4, the move controls of layer 4 (#175) and the layout of the board figure
-// for a cell size in density-independent pixels. The mapper and the renderer name one `TCellView`.
+// renderer of layer 4, the move controls of layer 4 (#175) and the layout of layer 3 of the
+// board figure for a cell size in density-independent pixels. The mapper and the renderer name
+// one `TCellView`.
 // The layout names the coordinate of the factory, so the figure and the factory stay paired.
 // The controls read the cell views and the payload view of the mapper and play the move
 // of the factory.
@@ -42,6 +43,8 @@ export interface ScreenParts<TCell, TCoord, TView, TCellView, TPayloadView, TMov
 
 // One game of the registry: its id, its variant factory, its optional level variant,
 // its screen parts and its world colors, with the type arguments hidden.
+// `hasLevels` tells whether the game has a level variant. The map opens the level selector
+// for a game with levels, and the game route for a game with none (#173).
 // The map draws the stone of the game in `tone` on every figure (#298), so a game keeps its
 // color when the list of a figure has no entry for another game. `registered()` checks that the parts fit the factory,
 // so a screen only passes the cell views of the mapper to the renderer of the same entry.
@@ -49,6 +52,7 @@ export interface RegisteredGame {
   readonly gameId: GameId;
   readonly screen: ScreenParts<unknown, unknown, unknown, unknown, unknown, unknown>;
   readonly tone: WorldTone;
+  readonly hasLevels: boolean;
   withFactory<TResult>(use: FactoryUse<TResult>): TResult;
 }
 
@@ -85,6 +89,7 @@ export function registered<
     gameId,
     screen,
     tone,
+    hasLevels: levels !== undefined,
     withFactory: <TResult>(use: FactoryUse<TResult>) => use.use(gameId, factory, levels),
   });
 }

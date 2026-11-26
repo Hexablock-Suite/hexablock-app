@@ -1,11 +1,11 @@
 /** @jest-environment node */
 import { hex } from '../../../src/domain/engine/hex-topology';
 import { square } from '../../../src/domain/engine/square-topology';
-import { fittedCellSize } from '../../../src/infrastructure/board/board-fit';
-import { HexLayout } from '../../../src/infrastructure/board/hex-layout';
-import { SquareLayout } from '../../../src/infrastructure/board/square-layout';
+import { fittedCellSize } from '../../../src/adapters/board/board-fit';
+import { HexLayout } from '../../../src/adapters/board/hex-layout';
+import { SquareLayout } from '../../../src/adapters/board/square-layout';
 import { triangle } from '../../../src/domain/engine/triangle-topology';
-import { TriangleLayout } from '../../../src/infrastructure/board/triangle-layout';
+import { TriangleLayout } from '../../../src/adapters/board/triangle-layout';
 
 // Issue #170: the game screen draws the whole board in the width of the screen.
 // `fittedCellSize()` reads only the layout of the figure, so it fits every figure.

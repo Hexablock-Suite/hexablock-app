@@ -262,7 +262,6 @@
           "group": "adapters|src/adapters",
           "types": [
             "AchievementSection",
-            "SpaceStateMapper",
             "AchievementItem",
             "AchievementsViewModel",
             "SpaceView",
@@ -311,6 +310,21 @@
         {
           "group": "adapters|src/adapters/texts",
           "types": ["Texts", "Language", "TextKey"]
+        },
+        {
+          "group": "adapters|src/adapters/board",
+          "types": [
+            "CellShape",
+            "CellBox",
+            "ScreenPoint",
+            "BoardLayout",
+            "HexLayout",
+            "TriangleLayout",
+            "SquareLayout",
+            "Compass",
+            "SlideWay",
+            "DeliversValues"
+          ]
         }
       ],
       "4": [
@@ -342,20 +356,10 @@
           "types": [
             "CellRenderer",
             "BoardViewProps",
-            "CellShape",
-            "CellBox",
-            "ScreenPoint",
-            "BoardLayout",
             "SpaceCellRenderer",
-            "HexLayout",
             "FitCellRenderer",
             "MergeCellRenderer",
-            "TriangleLayout",
-            "SquareLayout",
-            "Compass",
-            "OutlineLayer",
-            "SlideWay",
-            "DeliversValues"
+            "OutlineLayer"
           ]
         },
         {
@@ -367,7 +371,6 @@
             "GameSession",
             "GameStageProps",
             "WorldTone",
-            "BoardOnlyControls",
             "RouteFigure",
             "TileTone",
             "MergeControls"
@@ -1002,7 +1005,6 @@
             "AchievementSection",
             "KeyValueStore",
             "AchievementItem",
-            "SpaceStateMapper",
             "SpaceView",
             "MergePayloadView",
             "MergeCellView",
@@ -1035,6 +1037,21 @@
         {
           "group": "adapters|src/adapters/texts",
           "types": ["Texts", "Language", "TextKey"]
+        },
+        {
+          "group": "adapters|src/adapters/board",
+          "types": [
+            "CellShape",
+            "CellBox",
+            "ScreenPoint",
+            "BoardLayout",
+            "TriangleLayout",
+            "HexLayout",
+            "SquareLayout",
+            "Compass",
+            "SlideWay",
+            "DeliversValues"
+          ]
         }
       ],
       "4": [
@@ -1066,7 +1083,6 @@
           "types": [
             "MoveControls",
             "MoveControlsProps",
-            "BoardOnlyControls",
             "WorldTone",
             "GameStageProps",
             "GameSession",
@@ -1106,21 +1122,11 @@
           "group": "adapters|src/infrastructure/board",
           "types": [
             "CellRenderer",
-            "CellShape",
-            "CellBox",
-            "ScreenPoint",
-            "BoardLayout",
             "SpaceCellRenderer",
-            "TriangleLayout",
             "MergeCellRenderer",
             "BoardViewProps",
             "FitCellRenderer",
-            "HexLayout",
-            "SquareLayout",
-            "Compass",
-            "OutlineLayer",
-            "SlideWay",
-            "DeliversValues"
+            "OutlineLayer"
           ]
         }
       ]

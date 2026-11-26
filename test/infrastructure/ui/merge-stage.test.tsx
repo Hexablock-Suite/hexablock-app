@@ -306,8 +306,8 @@ describe('Merge on the game screen', () => {
     expect(rounded).toEqual(exact);
   });
 
-  // Lines and Sort keep `BoardOnlyControls`, the default controls, and Fit has `FitControls`
-  // (#175). So no other game shows a slide button.
+  // Lines, Fit and Sort have their own controls, `LinesControls`, `FitControls` and
+  // `SortControls` (#174 to #176). So no other game shows a slide button.
   it('should_show_no_slide_button_when_another_game_opens', async () => {
     const root = new CompositionRoot({ clock: new ManualClock(), logger: new RecordingLogger() });
     for (const id of ['hexa-lines', 'hexa-fit', 'hexa-sort']) {

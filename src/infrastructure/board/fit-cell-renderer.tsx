@@ -2,9 +2,9 @@ import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import type { FitCellView } from '../../adapters/fit-state-mapper';
-import type { SpaceView } from '../../adapters/space-state-mapper';
+import type { SpaceView } from '../../adapters/space-view';
 import { lip, palette, radius, worldTone, type WorldTone } from '../ui/theme';
-import type { CellShape } from './board-layout';
+import type { CellShape } from '../../adapters/board/board-layout';
 import type { CellRenderer } from './cell-renderer';
 import { CellOutline } from './cell-outline';
 import { SpaceCellRenderer } from './space-cell-renderer';
@@ -16,7 +16,7 @@ const STONE_SCALE = 0.9;
 
 // The cell renderer of Hexa Fit (D3, classes.md decision 14, issues #175 and #296). The game
 // registry of the composition root pairs it with `FitStateMapper`, so both name `FitCellView`.
-// A free space of the figure is the socket of the default renderer. A space that a piece covers
+// A free space of the figure is the socket of `SpaceCellRenderer`. A space that a piece covers
 // is a stone in the color of the piece, with a light rim and a lip below it. So the spaces of one
 // piece share one color, and the rim parts two pieces that touch.
 // It draws the outline of the cell that the layout of the figure gives, so it fits every figure.

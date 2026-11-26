@@ -1,6 +1,6 @@
 import type { LinesCellView } from '../../adapters/lines-state-mapper';
 import { lip, palette, worldTone } from '../ui/theme';
-import type { CellShape } from './board-layout';
+import type { CellShape } from '../../adapters/board/board-layout';
 import type { CellRenderer } from './cell-renderer';
 import { CellOutline } from './cell-outline';
 import { SpaceCellRenderer } from './space-cell-renderer';

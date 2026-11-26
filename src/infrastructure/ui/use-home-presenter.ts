@@ -5,7 +5,7 @@ import { HomePresenter, type SavedProgresses } from '../../adapters/home-present
 import { DEFAULT_LANGUAGE, textCatalog } from '../../adapters/texts/text-catalog';
 import { GameId } from '../../domain/engine/game-id';
 import { TopologyId } from '../../domain/engine/geometry-factory';
-import type { CellShape } from '../board/board-layout';
+import type { CellShape } from '../../adapters/board/board-layout';
 import { CompositionRoot } from '../composition-root';
 import { useCompositionRoot } from '../composition-root-provider';
 import type { WorldTone } from './theme';
@@ -30,6 +30,21 @@ export function gameRouteIds(): string[] {
       .gameSelector()
       .games.map(({ id }) => id),
   );
+  return [...new Set(ids)];
+}
+
+// The ids of the games with levels of every board figure, in the order of the figures and of the
+// registry. Each id comes once. The web export renders one page of the level selector route for
+// each id (#173), as it does for the game route (#287).
+export function levelRouteIds(): string[] {
+  const root = new CompositionRoot();
+  const ids = root.figures().flatMap((figure) => {
+    const registry = root.registry(figure);
+    return homePresenterOf(root, figure)
+      .gameSelector()
+      .games.filter(({ id }) => registry.gameOf(GameId.of(id)).hasLevels)
+      .map(({ id }) => id);
+  });
   return [...new Set(ids)];
 }
 
@@ -85,6 +100,16 @@ export function useSavedProgresses(games: readonly GameId[]): SavedProgresses {
 export function useGameTones(figure: TopologyId): (gameId: string) => WorldTone {
   const registry = useCompositionRoot().registry(figure);
   return (gameId) => registry.gameOf(GameId.of(gameId)).tone;
+}
+
+// Whether each game on the map of the board figure `figure` has levels (#173), from the entry
+// of the game in the registry of that figure. The map opens the level selector of a game with
+// levels, Fit and Sort, and the game route of a game with none, Lines and Merge. The map passes
+// the `id` of a `GameChoice`, so no screen branches on the game id.
+// An id that the registry does not hold throws a RangeError.
+export function useGameLevels(figure: TopologyId): (gameId: string) => boolean {
+  const registry = useCompositionRoot().registry(figure);
+  return (gameId) => registry.gameOf(GameId.of(gameId)).hasLevels;
 }
 
 // The shape of a board figure for a stone or a glyph (#297), from the composition root.

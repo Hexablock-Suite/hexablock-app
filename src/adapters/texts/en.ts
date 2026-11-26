@@ -10,6 +10,8 @@
 // The texts of the achievements screen live under `achievements.<part>`, and the name of each
 // achievement lives under `achievement.<id>`, where `<id>` is the id that the composition root
 // gives to the achievement (#188).
+// The texts of the level selector live under `levels.<part>`, and the text of each status
+// of a level under `levels.status.<status>` (#173).
 export const en = {
   'home.title': 'HexaBlock Suite',
   'home.brand': 'HexaBlock',
@@ -79,6 +81,16 @@ export const en = {
   'achievements.completed': 'Completed',
   'achievements.none-in-progress': 'Every achievement is complete.',
   'achievements.none-completed': 'No achievement is complete yet.',
+  'levels.title': 'Levels',
+  'levels.back': 'Map',
+  'levels.loading': 'Loading the levels',
+  'levels.error': 'The levels could not be read. Go back to the map and open them again.',
+  'levels.none': 'There are no levels for this figure yet.',
+  'levels.level': 'Level',
+  'levels.stars': 'Stars',
+  'levels.status.completed': 'Completed',
+  'levels.status.open': 'Open',
+  'levels.status.locked': 'Locked',
   'achievement.lines-combo': 'Clear 3 lines at once',
   'achievement.merge-256': 'Reach 256 in Hexa Merge',
   'achievement.merge-2048': 'Reach 2048 in Hexa Merge',

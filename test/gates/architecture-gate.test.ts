@@ -62,6 +62,13 @@ describe('architecture gate (dependency-cruiser)', () => {
     expect(result.output).toContain('adapters-imports-only-inner-layers');
   });
 
+  it('should_fail_arch_when_adapter_imports_a_package', () => {
+    const result = cruise('adapters-imports-package');
+
+    expect(result.status).not.toBe(0);
+    expect(result.output).toContain('adapters-imports-only-inner-layers');
+  });
+
   it('should_pass_arch_when_layers_point_inward', () => {
     const result = cruise('clean');
 

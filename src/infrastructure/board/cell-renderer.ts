@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import type { CellShape } from './board-layout';
+import type { CellShape } from '../../adapters/board/board-layout';
 
 // Strategy (D3, classes.md decision 14, issues #165 and #296): draws one cell of a variant.
 // `BoardView` places each cell and hands the cell and its shape to the renderer of the variant.

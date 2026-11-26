@@ -1,7 +1,9 @@
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
+import { useState } from 'react';
 
 import type { GameChoice } from '../../src/adapters/home-presenter';
 import { GameId } from '../../src/domain/engine/game-id';
+import { LevelId } from '../../src/domain/engine/level-id';
 import { GameStage } from '../../src/infrastructure/ui/game-stage';
 import { useGameSession } from '../../src/infrastructure/ui/game-session';
 import {
@@ -17,10 +19,12 @@ import {
 // over the use cases of the composition root, and the cell renderer, the move controls and the
 // figure layout of its registry entry (#175). `GameStage` shows the board, the score, the outcome
 // and the move controls of the game.
+// The level selector also opens it with the id of the chosen level in the `levelId` parameter
+// (#173), and the game starts at that level. A route with no level id starts the game with none.
 // A text that names no figure goes home. An id that names no game of the figure goes back
 // to the map of the figure.
 export default function GameScreen() {
-  const { gameId } = useLocalSearchParams<{ gameId: string }>();
+  const { gameId, levelId } = useLocalSearchParams<{ gameId: string; levelId?: string }>();
   const figure = useRouteFigure();
   const games = useHomePresenter(figure?.figure).gameSelector().games;
   if (figure === undefined) return <Redirect href="/" />;
@@ -28,7 +32,14 @@ export default function GameScreen() {
   if (game === undefined) {
     return <Redirect href={{ pathname: '/map', params: { figure: figure.param } }} />;
   }
-  return <Game key={`${figure.param}/${game.id}`} game={game} figure={figure} />;
+  return (
+    <Game
+      key={`${figure.param}/${game.id}/${levelId ?? ''}`}
+      game={game}
+      figure={figure}
+      levelId={levelId}
+    />
+  );
 }
 
 // The pages of this route that the web export renders, one for each registered game (#287).
@@ -38,10 +49,22 @@ export function generateStaticParams(): { gameId: string }[] {
   return gameRouteIds().map((gameId) => ({ gameId }));
 }
 
-// One registered game on one board figure. The session lives as long as the screen of the game.
-// The map button goes back to the map of the figure.
-function Game({ game, figure }: { readonly game: GameChoice; readonly figure: RouteFigure }) {
+// One registered game on one board figure, at the level whose text is `levelId` when the route
+// names one. The session and the level id live as long as the screen of the game.
+// A blank level id names no level. The map button goes back to the map of the figure.
+function Game({
+  game,
+  figure,
+  levelId,
+}: {
+  readonly game: GameChoice;
+  readonly figure: RouteFigure;
+  readonly levelId?: string;
+}) {
   const session = useGameSession(GameId.of(game.id), figure.figure);
+  const [level] = useState(() =>
+    levelId === undefined || levelId.trim() === '' ? undefined : LevelId.of(levelId),
+  );
   return (
     <GameStage
       title={game.name}
@@ -51,6 +74,7 @@ function Game({ game, figure }: { readonly game: GameChoice; readonly figure: Ro
       layoutOf={session.layoutOf}
       texts={session.texts}
       onBack={() => router.dismissTo({ pathname: '/map', params: { figure: figure.param } })}
+      levelId={level}
     />
   );
 }
