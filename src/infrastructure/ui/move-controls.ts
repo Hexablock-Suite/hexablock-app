@@ -33,15 +33,3 @@ export interface MoveControlsProps<TCoord, TCellView, TPayloadView, TMove> {
 export interface MoveControls<TCoord, TCellView, TPayloadView, TMove> {
   render(props: MoveControlsProps<TCoord, TCellView, TPayloadView, TMove>): ReactNode;
 }
-
-// The handler of a board with no move controls: a press plays nothing.
-function ignoreSpace(): void {}
-
-// The default move controls of the game registry (issue #175): the board alone.
-// A press on a space plays nothing, and the controls show no undo and no redo. Each «Play … on the game screen» task (#174, #176, #177)
-// registers the controls of its variant in their place.
-export class BoardOnlyControls implements MoveControls<unknown, unknown, unknown, unknown> {
-  render(props: MoveControlsProps<unknown, unknown, unknown, unknown>): ReactNode {
-    return props.board(ignoreSpace);
-  }
-}
