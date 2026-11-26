@@ -10,7 +10,6 @@ import { GameProgress } from '../../src/domain/engine/game-progress';
 import { ProgressRecord } from '../../src/domain/engine/progress-model';
 import { Score } from '../../src/domain/engine/score';
 import { DeviceKeyValueStore } from '../../src/infrastructure/device-key-value-store';
-import { spaces } from '../support/ui/board-spaces';
 import { outlinesIn } from '../support/ui/cell-outlines';
 import { repoRoot } from '../support/run-tool';
 
@@ -76,6 +75,8 @@ describe('GameSelectorScreen', () => {
   }
 
   // The check of APP-FR-01 (#36): a UI test opens each of the four variants from the selector.
+  // Since #173 a tap on Fit or Sort opens its level selector, and Lines and Merge keep the direct
+  // route to the game.
   it('should_open_each_of_the_four_variants_when_the_player_picks_it_on_the_map', async () => {
     const app = await renderRouter(appDir, { initialUrl: '/map' });
     const opened: string[] = [];
@@ -89,8 +90,8 @@ describe('GameSelectorScreen', () => {
 
     expect(opened).toEqual([
       '/game/hexa-lines',
-      '/game/hexa-fit',
-      '/game/hexa-sort',
+      '/levels/hexa-fit',
+      '/levels/hexa-sort',
       '/game/hexa-merge',
     ]);
   });
@@ -130,8 +131,8 @@ describe('GameSelectorScreen', () => {
 
   // Issue #171: the map lists the games of the chosen figure. Fit offers only the levels
   // of the figure (S3-08 in #151, a proposal). Since #354 the square and the triangle have
-  // a first Fit level, so their maps show Fit, and Fit starts its first level of three cells.
-  it('should_list_the_four_games_and_start_the_first_fit_level_when_the_route_names_the_square_or_the_triangle', async () => {
+  // three Fit levels, so their maps show Fit. Since #173 Fit opens the selector of those levels.
+  it('should_list_the_four_games_and_the_three_fit_levels_when_the_route_names_the_square_or_the_triangle', async () => {
     const seen: [string, string[], number][] = [];
 
     for (const figure of ['square', 'triangle']) {
@@ -140,8 +141,8 @@ describe('GameSelectorScreen', () => {
         (name) => screen.queryByRole('button', { name: new RegExp(`^${name}`) }) !== null,
       );
       await fireEvent.press(screen.getByRole('button', { name: /^Hexa Fit/ }));
-      await screen.findByText('En juego');
-      seen.push([figure, shown, spaces().length]);
+      await screen.findByText('Abierto');
+      seen.push([figure, shown, screen.getAllByRole('button', { name: /^Nivel \d+/ }).length]);
       await screen.unmount();
     }
 

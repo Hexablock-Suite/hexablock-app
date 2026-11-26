@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { GamePresenter, GameViewModel } from '../../adapters/game-presenter';
 import type { Texts } from '../../adapters/texts/text-catalog';
+import type { LevelId } from '../../domain/engine/level-id';
 import { fittedCellSize } from '../board/board-fit';
 import type { BoardLayout } from '../board/board-layout';
 import { BoardView } from '../board/board-view';
@@ -42,12 +43,16 @@ export interface GameStageProps<TCellView> {
   readonly texts: Texts;
   // Goes back to the game selector map.
   readonly onBack: () => void;
+  // The level that the player chose on the level selector (#173). A game with no levels,
+  // or a route that names no level, starts with none.
+  readonly levelId?: LevelId;
 }
 
 // The stage of the game screen, the MVP view of `GamePresenter` (issue #170, S3-07 in #151,
 // a proposal that waits for the team). `GameScreen`, the game route, renders it with the session
 // of its game. It keeps the presenter, the cell renderer and the figure layout that it receives.
-// It starts the game when it opens, and it shows each view model that the presenter gives:
+// It starts the game when it opens, with the level of `levelId` when the route names one (#173),
+// and it shows each view model that the presenter gives:
 // `BoardView` with every space of the board, the score, the time of a timed game (#175)
 // and the outcome. The board takes the widest cell size that fits the content column.
 // A failed use case shows its text below the board. It names no variant, so it serves every game.
@@ -65,8 +70,9 @@ export function GameStage<TCellView>({
   layoutOf,
   texts,
   onBack,
+  levelId,
 }: GameStageProps<TCellView>) {
-  const view = useGameViewModel(presenter);
+  const view = useGameViewModel(presenter, levelId);
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const coords = view.cells.map(([at]) => at);
@@ -145,16 +151,18 @@ export function GameStage<TCellView>({
 }
 
 // The view model that the presenter shows last. The screen attaches as the view of
-// the presenter and starts the game. It detaches when it closes.
+// the presenter and starts the game, at the level `levelId` when it has one.
+// It detaches when it closes.
 function useGameViewModel<TCellView>(
   presenter: GamePresenter<unknown, unknown, unknown, unknown, TCellView, unknown>,
+  levelId: LevelId | undefined,
 ): GameViewModel<unknown, TCellView, unknown> {
   const [model, setModel] = useState(() => presenter.viewModel());
   useEffect(() => {
     presenter.attach({ show: setModel });
-    void presenter.onStart();
+    void presenter.onStart(levelId);
     return () => presenter.detach();
-  }, [presenter]);
+  }, [presenter, levelId]);
   return model;
 }
 

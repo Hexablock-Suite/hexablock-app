@@ -64,7 +64,7 @@
       <h1>Wiring: the drivers and the composition root</h1>
 
       <svg
-        viewBox="0 0 1040 1437"
+        viewBox="0 0 1040 1453"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="adwiring-title adwiring-desc"
@@ -85,7 +85,8 @@
           creates LocalProgressRepository once, keeps it as progress for every consumer of the saved
           progress, and builds ListAchievements over it once, and listAchievements() gives it. It
           also answers loadProgress(gameId) with one LoadProgress per game, which reads the saved
-          progress of that game back (#181).
+          progress of that game back (#181), and it builds ListLevels once over the same two
+          repositories for the level selector, and listLevels() gives it (#173).
         </desc>
         <defs>
           <marker
@@ -177,7 +178,7 @@
           x="256"
           y="240"
           width="728"
-          height="340"
+          height="376"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -610,7 +611,7 @@
         <rect x="272" y="272" width="408" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
         <rect x="272" y="312" width="408" height="8" fill="rgba(15,111,116,0.10)" />
         <line x1="272" y1="320" x2="680" y2="320" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
-        <line x1="272" y1="476" x2="680" y2="476" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <line x1="272" y1="470" x2="680" y2="470" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text
           x="476"
           y="290"
@@ -633,52 +634,59 @@
         >
           CompositionRoot
         </text>
-        <text x="288" y="336" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <!-- The members of CompositionRoot keep a pitch of 14 since #173, so listLevels() fits the box. -->
+        <text x="288" y="334" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - games: Map‹TopologyId, GameRegistry›
         </text>
-        <text x="288" y="352" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="288" y="348" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - logger: Logger
         </text>
-        <text x="288" y="368" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="288" y="362" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - ids: MatchIdGenerator
         </text>
-        <text x="288" y="384" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="288" y="376" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - events: GameEventPublisher
         </text>
-        <text x="288" y="400" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="288" y="390" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - levels: LevelRepository
         </text>
-        <text x="288" y="416" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="288" y="404" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - progress: ProgressRepository [0..1]
         </text>
-        <text x="288" y="432" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="288" y="418" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - wired: Map‹RegisteredGame, GameUseCases›
         </text>
-        <text x="288" y="448" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="288" y="432" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - achievements: UseCase‹ListAchievementsRequest,
         </text>
-        <text x="304" y="464" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="304" y="446" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           AchievementSummary[]› [0..1]
         </text>
-        <text x="288" y="492" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="288" y="460" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - levelList: UseCase‹ListLevelsRequest, LevelSummary[]› [0..1]
+        </text>
+        <text x="288" y="486" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + figures(): TopologyId[]
         </text>
-        <text x="288" y="508" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="288" y="500" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + registry(figure: TopologyId = hex): GameRegistry
         </text>
-        <text x="288" y="524" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="288" y="514" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + gameUseCases(gameId: GameId, figure: TopologyId = hex): GameUseCases
         </text>
-        <text x="288" y="540" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="288" y="528" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + listAchievements(): UseCase‹ListAchievementsRequest,
         </text>
-        <text x="304" y="556" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="304" y="542" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           AchievementSummary[]›
         </text>
-        <text x="288" y="572" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="288" y="556" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + listLevels(): UseCase‹ListLevelsRequest, LevelSummary[]›
+        </text>
+        <text x="288" y="570" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + loadProgress(gameId: GameId): UseCase‹LoadProgressRequest,
         </text>
-        <text x="304" y="588" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="304" y="584" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           GameProgress | undefined›
         </text>
 
@@ -742,7 +750,7 @@
         <!-- UML template box of BoardFigure: type parameter on the top-right corner -->
         <rect
           x="276"
-          y="586"
+          y="627"
           width="44"
           height="18"
           rx="2"
@@ -1154,7 +1162,18 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           It answers loadProgress(gameId) with one LoadProgress per game over the progress
-          repository (#181). A root with no store offers neither, and asking throws a RangeError.
+          repository (#181). A root with no store offers none of them, and asking throws a
+          RangeError.
+        </text>
+        <text
+          x="24"
+          y="1316"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          It builds ListLevels once over the LevelRepository and LocalProgressRepository, and
+          listLevels() gives it to the level selector (#173).
         </text>
         <text
           x="24"
@@ -1167,8 +1186,8 @@
           AchievementCounterListener, which saves the counters (#363), and to ListAchievements
           (#364).
         </text>
-        <!-- The legend sits 32 lower than before: the footnote has one more line since #326 and one more since #363. -->
-        <g transform="translate(0 88)">
+        <!-- The legend sits 48 lower than before: the footnote has one more line since #326, one more since #363 and one more since #173. -->
+        <g transform="translate(0 104)">
           <!-- Legend -->
           <line
             x1="24"

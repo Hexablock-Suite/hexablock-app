@@ -10,8 +10,10 @@ import { GameId } from '../../src/domain/engine/game-id';
 import { GameProgress } from '../../src/domain/engine/game-progress';
 import { TopologyId } from '../../src/domain/engine/geometry-factory';
 import { LevelId } from '../../src/domain/engine/level-id';
+import { LevelStatus } from '../../src/domain/engine/level-status';
 import { ProgressRecord } from '../../src/domain/engine/progress-model';
 import { Score } from '../../src/domain/engine/score';
+import { Stars } from '../../src/domain/engine/stars';
 import { Turns } from '../../src/domain/engine/turns';
 import { PlaceFitPiece } from '../../src/domain/variants/hexa-fit/fit-move';
 import { PieceId } from '../../src/domain/variants/hexa-fit/piece-id';
@@ -30,6 +32,7 @@ import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-s
 import { errorOf, valueOf } from '../support/application/game-use-cases';
 import { RecordingLogger } from '../support/application/recording-logger';
 import { BOARD_ID } from '../support/engine/entity-ids';
+import { delivered } from '../support/engine/value-receiver';
 import { MATCH_ID } from '../support/engine/match-id';
 import { withGeometryOf } from '../support/engine/geometry-of';
 import { ManualClock } from '../support/engine/manual-clock';
@@ -204,6 +207,81 @@ describe('CompositionRoot', () => {
         ? result.value?.keeps(ProgressRecord.of({ gameId: LINES, score: Score.of(36) }))
         : false,
     ).toBe(true);
+  });
+
+  // Issue #173: the root builds `ListLevels` once over its one local progress repository,
+  // as it builds `ListAchievements`. A root with no store does not offer it.
+  it('should_throw_a_range_error_when_a_root_with_no_store_is_asked_for_the_levels', () => {
+    const root = testRoot();
+
+    expect(() => root.listLevels()).toThrow(RangeError);
+    expect(() => root.listLevels()).toThrow('The root has no local store, so it lists no levels.');
+  });
+
+  // The level selector and `LoadProgress` read one saved progress: a won level that the device
+  // keeps is completed in the list, and the next level opens (#323).
+  it('should_list_the_saved_level_as_completed_when_the_root_has_a_store', async () => {
+    const FIT = GameId.of('hexa-fit');
+    const store = new InMemoryKeyValueStore();
+    const root = new CompositionRoot({
+      clock: new ManualClock(),
+      logger: new RecordingLogger(),
+      store,
+    });
+    const won = ProgressRecord.of({
+      gameId: FIT,
+      score: Score.of(0),
+      levelId: LevelId.of('fit-01'),
+      stars: Stars.of(2),
+    });
+    const saved = GameProgress.start(FIT);
+    saved.recordLevel(won);
+    await new LocalProgressRepository(store).save(saved);
+
+    const listed = await root.listLevels().execute({ gameId: FIT, figure: TopologyId.hex });
+    const loaded = await root.loadProgress(FIT).execute({});
+
+    const summaries = listed.ok ? listed.value : [];
+    expect(root.listLevels()).toBe(root.listLevels());
+    expect(summaries).toHaveLength(15);
+    expect(
+      summaries
+        .slice(0, 3)
+        .map(({ levelId, status, stars }) => [
+          delivered(levelId),
+          [LevelStatus.completed, LevelStatus.open, LevelStatus.locked].findIndex((each) =>
+            each.equals(status),
+          ),
+          stars === undefined ? undefined : delivered(stars),
+        ]),
+    ).toEqual([
+      ['fit-01', 0, 2],
+      ['fit-02', 1, undefined],
+      ['fit-03', 2, undefined],
+    ]);
+    expect(loaded.ok ? loaded.value?.keeps(won) : false).toBe(true);
+  });
+
+  // Issue #173: the map opens the level selector for a game with levels. The registry entry
+  // of each game says whether it has levels: Fit and Sort have them on every figure.
+  it('should_mark_only_fit_and_sort_as_games_with_levels_when_the_root_is_built', () => {
+    const root = testRoot();
+
+    const marks = root.figures().map((figure) =>
+      root
+        .registry(figure)
+        .gameIds()
+        .map((gameId) => [variantIdOf(gameId), root.registry(figure).gameOf(gameId).hasLevels]),
+    );
+
+    expect(marks).toEqual(
+      root.figures().map(() => [
+        ['hexa-lines', false],
+        ['hexa-fit', true],
+        ['hexa-sort', true],
+        ['hexa-merge', false],
+      ]),
+    );
   });
 
   // Issue #171: the player chooses the board figure on the home screen (APP-FR-16).
