@@ -84,6 +84,8 @@ export interface RootDrivers {
 // The root subscribes the listeners to it once: today `AchievementCounterListener` (#362).
 // With the local store of its drivers, the root builds one `LocalAchievementCounterRepository`
 // and gives it to that listener, which saves the counters of the achievements (#363).
+// The listener also takes the logger of the drivers, so a failed save of the counters reaches the
+// log (#384).
 // A root with no store has no place for the counters, so it subscribes no counter listener.
 // Every use case of the root goes through `decorate()`, which gives it its aspects (#323).
 // With the local store of its drivers, the root builds one `LocalProgressRepository` and keeps it
@@ -121,7 +123,9 @@ export class CompositionRoot {
       drivers.store === undefined
         ? undefined
         : new LocalAchievementCounterRepository(drivers.store);
-    if (counters !== undefined) events.subscribe(new AchievementCounterListener(counters));
+    if (counters !== undefined) {
+      events.subscribe(new AchievementCounterListener(counters, drivers.logger));
+    }
     this.events = events;
     this.levels = new BundledLevelRepository();
     this.progress =
