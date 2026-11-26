@@ -8,7 +8,8 @@ export interface ScreenPoint {
 
 // The screen layout of one board figure (D4, D11, classes.md decision 17, issues #165 and #296).
 // The topology of the domain does the coordinate calculations of a figure.
-// Its layout does the screen side in layer 4, so the domain knows no screen.
+// Its layout does the screen side in layer 3, so the domain knows no screen.
+// The layout is a pure conversion, so it imports no package (docs/architecture/layers.md).
 // One layout exists per figure: `HexLayout`, `SquareLayout` and `TriangleLayout`.
 // `BoardView` reads only this interface, so it never branches on the figure.
 // Each cell holds the largest circle that fits inside it. `cellSize()` gives the diameter

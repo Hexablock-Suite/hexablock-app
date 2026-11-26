@@ -9,13 +9,18 @@ import { repoRoot } from '../support/run-tool';
 // through `CellRenderer` (D3, D4). So it never branches on the figure or on the game id.
 // The gate reads `src/infrastructure/board/board-view.tsx`. The file holds no `if`, `switch`,
 // conditional expression, `&&`, `||`, `??` or table lookup (`table[key]`).
-// It imports only React, React Native and the two interfaces of its folder, so it cannot
-// name a figure, a layout class, a geometry, a topology or a game id. Since #170 it takes
-// the pairs of `GameViewModel.cells`, so it imports no response model either.
+// It imports only React, React Native, `BoardLayout` of layer 3 and `CellRenderer` of its
+// folder, so it cannot name a figure, a layout class, a geometry, a topology or a game id.
+// Since #170 it takes the pairs of `GameViewModel.cells`, so it imports no response model either.
 
 const boardView = path.join(repoRoot, 'src/infrastructure/board/board-view.tsx');
 
-const ALLOWED_IMPORTS = new Set(['react', 'react-native', './board-layout', './cell-renderer']);
+const ALLOWED_IMPORTS = new Set([
+  'react',
+  'react-native',
+  '../../adapters/board/board-layout',
+  './cell-renderer',
+]);
 
 const LOGICAL_OPERATORS = new Set([
   ts.SyntaxKind.AmpersandAmpersandToken,
@@ -59,7 +64,7 @@ describe('BoardView gate', () => {
 
   it('should_report_each_branch_lookup_and_import_when_a_view_chooses_by_the_figure', () => {
     const source = [
-      "import { HexLayout } from './hex-layout';",
+      "import { HexLayout } from '../../adapters/board/hex-layout';",
       "import { TopologyId } from '../../domain/engine/geometry-factory';",
       'export function Wrong({ id, gameId, sizes }) {',
       '  if (id.equals(TopologyId.hex)) return null;',

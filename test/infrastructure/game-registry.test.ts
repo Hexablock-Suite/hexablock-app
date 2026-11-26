@@ -1,6 +1,6 @@
 /** @jest-environment node */
 import { GameId } from '../../src/domain/engine/game-id';
-import { HexLayout } from '../../src/infrastructure/board/hex-layout';
+import { HexLayout } from '../../src/adapters/board/hex-layout';
 import { GameRegistry, registered, type ScreenParts } from '../../src/infrastructure/game-registry';
 import { worldTone } from '../../src/infrastructure/ui/theme';
 import { fitFactory } from '../support/variants/hexa-fit/fit-game';

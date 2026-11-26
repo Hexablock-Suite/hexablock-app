@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 import type { GameViewModel } from '../../adapters/game-presenter';
 import type { Texts } from '../../adapters/texts/text-catalog';
-import type { BoardLayout } from '../board/board-layout';
+import type { BoardLayout } from '../../adapters/board/board-layout';
 
 // What the game screen gives to the move controls of one game (issue #175).
 export interface MoveControlsProps<TCoord, TCellView, TPayloadView, TMove> {

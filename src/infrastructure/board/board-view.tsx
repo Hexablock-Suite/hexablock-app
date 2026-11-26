@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { cellBoxOf, type BoardLayout } from './board-layout';
+import { cellBoxOf, type BoardLayout } from '../../adapters/board/board-layout';
 import type { CellRenderer } from './cell-renderer';
 
 export interface BoardViewProps<TCellView, TCoord> {

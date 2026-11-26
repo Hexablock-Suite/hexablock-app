@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Svg, { Polygon } from 'react-native-svg';
 
-import type { CellShape } from './board-layout';
+import type { CellShape } from '../../adapters/board/board-layout';
 
 // One layer of the drawing of a cell: the outline of the cell, made smaller toward the center
 // of the cell by `scale` and moved `drop` points down, with its fill and its line.

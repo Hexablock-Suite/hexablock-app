@@ -7,15 +7,15 @@ import type { SpaceView } from '../../../src/adapters/space-view';
 import { hex, type HexCoord } from '../../../src/domain/engine/hex-topology';
 import { square, type SquareCoord } from '../../../src/domain/engine/square-topology';
 import { triangle, type TriangleCoord } from '../../../src/domain/engine/triangle-topology';
-import type { BoardLayout } from '../../../src/infrastructure/board/board-layout';
+import type { BoardLayout } from '../../../src/adapters/board/board-layout';
 import { BoardView } from '../../../src/infrastructure/board/board-view';
 import type { CellRenderer } from '../../../src/infrastructure/board/cell-renderer';
 import { FitCellRenderer } from '../../../src/infrastructure/board/fit-cell-renderer';
-import { HexLayout } from '../../../src/infrastructure/board/hex-layout';
+import { HexLayout } from '../../../src/adapters/board/hex-layout';
 import { MergeCellRenderer } from '../../../src/infrastructure/board/merge-cell-renderer';
 import { SpaceCellRenderer } from '../../../src/infrastructure/board/space-cell-renderer';
-import { SquareLayout } from '../../../src/infrastructure/board/square-layout';
-import { TriangleLayout } from '../../../src/infrastructure/board/triangle-layout';
+import { SquareLayout } from '../../../src/adapters/board/square-layout';
+import { TriangleLayout } from '../../../src/adapters/board/triangle-layout';
 import { outlinesIn, type Outline } from '../../support/ui/cell-outlines';
 
 // Issue #296: each space of the board shows the shape of its figure (APP-FR-16).

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Platform } from 'react-native';
 
-import { nearestWay, type SlideWay } from '../board/slide-ways';
+import { nearestWay, type SlideWay } from '../../adapters/board/slide-ways';
 
 // A swipe shorter than this length in px plays nothing (issue #292, as the team prototype).
 export const SWIPE_THRESHOLD = 24;

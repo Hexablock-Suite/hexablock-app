@@ -34,7 +34,7 @@ import type { GameId } from '../domain/engine/game-id';
 import type { GameProgress } from '../domain/engine/game-progress';
 import { TopologyId } from '../domain/engine/geometry-factory';
 import type { MatchIdGenerator } from '../domain/engine/match-id-generator';
-import type { CellShape } from './board/board-layout';
+import type { CellShape } from '../adapters/board/board-layout';
 import { ConsoleLogger } from './console-logger';
 import { GameRegistry, type RegisteredGame } from './game-registry';
 import { registeredAchievements } from './registered-achievements';

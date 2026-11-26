@@ -10,10 +10,10 @@ import {
   valuesOf,
   type BoardLayout,
   type ScreenPoint,
-} from '../../../src/infrastructure/board/board-layout';
-import { HexLayout } from '../../../src/infrastructure/board/hex-layout';
-import { SquareLayout } from '../../../src/infrastructure/board/square-layout';
-import { TriangleLayout } from '../../../src/infrastructure/board/triangle-layout';
+} from '../../../src/adapters/board/board-layout';
+import { HexLayout } from '../../../src/adapters/board/hex-layout';
+import { SquareLayout } from '../../../src/adapters/board/square-layout';
+import { TriangleLayout } from '../../../src/adapters/board/triangle-layout';
 
 // Issue #165: the screen layout of each board figure (D4, D11).
 // A layout gives the center of the circle inside each cell, and the diameter of that circle.

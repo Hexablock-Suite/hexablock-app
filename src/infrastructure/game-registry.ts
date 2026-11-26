@@ -5,7 +5,7 @@ import type { BoardState } from '../domain/engine/board-state';
 import type { Cloneable } from '../domain/engine/cloneable';
 import type { GameId } from '../domain/engine/game-id';
 import type { IVariantFactory } from '../domain/engine/variant-factory';
-import type { BoardLayout } from './board/board-layout';
+import type { BoardLayout } from '../adapters/board/board-layout';
 import type { CellRenderer } from './board/cell-renderer';
 import type { MoveControls } from './ui/move-controls';
 import type { WorldTone } from './ui/theme';
@@ -28,8 +28,9 @@ export interface FactoryUse<TResult> {
 
 // The parts of the game screen that one game chooses (classes.md decision 14, issue #170,
 // S3-07 in #151, «Propuesta, pendiente del equipo»): the state mapper of layer 3, the cell
-// renderer of layer 4, the move controls of layer 4 (#175) and the layout of the board figure
-// for a cell size in density-independent pixels. The mapper and the renderer name one `TCellView`.
+// renderer of layer 4, the move controls of layer 4 (#175) and the layout of layer 3 of the
+// board figure for a cell size in density-independent pixels. The mapper and the renderer name
+// one `TCellView`.
 // The layout names the coordinate of the factory, so the figure and the factory stay paired.
 // The controls read the cell views and the payload view of the mapper and play the move
 // of the factory.

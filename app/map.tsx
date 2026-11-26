@@ -5,7 +5,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { GameChoice } from '../src/adapters/home-presenter';
-import type { CellShape } from '../src/infrastructure/board/board-layout';
+import type { CellShape } from '../src/adapters/board/board-layout';
 import { useCompositionRoot } from '../src/infrastructure/composition-root-provider';
 import { FigureStone } from '../src/infrastructure/ui/figure-stone';
 import { Scenery } from '../src/infrastructure/ui/scenery';
