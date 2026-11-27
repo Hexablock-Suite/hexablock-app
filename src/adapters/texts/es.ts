@@ -121,6 +121,8 @@ export const es = {
     'El nombre de usuario lleva de 3 a 32 letras, dígitos, puntos, guiones o guiones bajos, y la contraseña de 8 a 128 caracteres.',
   'account.error.backend-unreachable':
     'El servidor no responde. Revisa la conexión e inténtalo otra vez.',
+  'account.error.sign-in-after-sign-up-failed':
+    'Tu cuenta se creó, pero no se pudo iniciar sesión. Inicia sesión.',
   'account.error': 'No se pudo completar. Inténtalo otra vez.',
   'achievement.lines-combo': 'Completa 3 líneas a la vez',
   'achievement.merge-256': 'Llega a 256 en Hexa Merge',

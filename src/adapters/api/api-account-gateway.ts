@@ -21,6 +21,8 @@ const SIGN_UP: Refusals = new Map([
 const SIGN_IN: Refusals = new Map([[401, FailureCode.wrongCredentials]]);
 // A 401 just after a sign-in is no answer about the credentials, so it names no code.
 const CURRENT_USER: Refusals = new Map();
+// The message of a failed sign-in after a sign-up. It is fixed, so it holds no part of a body.
+const SIGN_IN_AFTER_SIGN_UP = 'The sign-up created the account, but the sign-in after it failed.';
 
 // Adapter of the `AccountGateway` port over hexablock-api (APP-FR-12, classes.md decisions 11
 // and 22, flows.md use case 5). It lives in layer 3, `src/adapters/api/`, and calls the backend
@@ -31,7 +33,9 @@ const CURRENT_USER: Refusals = new Map();
 // request that sends the token. A sign-up creates the account, then signs it in.
 // A known status throws the `AccountFailure` of its code, and a call with no answer throws the
 // `AccountFailure` of `backend-unreachable`. Any other failure goes on as it is, and the use case
-// gives its own code.
+// gives its own code. One exception: any failure of the sign-in after a sign-up throws the
+// `AccountFailure` of `sign-in-after-sign-up-failed`. The account exists then, so the player must
+// sign in and not sign up again. The failure keeps the caught value as its `cause`.
 export class ApiAccountGateway implements AccountGateway {
   constructor(
     private readonly api: AccountApi,
@@ -40,7 +44,11 @@ export class ApiAccountGateway implements AccountGateway {
 
   async register(credentials: Credentials): Promise<Session> {
     await answerOf(() => this.api.signUp(this.mapper.toCredentialsDto(credentials)), SIGN_UP);
-    return this.login(credentials);
+    try {
+      return await this.login(credentials);
+    } catch (thrown) {
+      throw new AccountFailure(FailureCode.signInAfterSignUpFailed, SIGN_IN_AFTER_SIGN_UP, thrown);
+    }
   }
 
   async login(credentials: Credentials): Promise<Session> {

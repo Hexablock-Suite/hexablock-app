@@ -121,6 +121,8 @@ export const en = {
     'A username has 3 to 32 letters, digits, dots, hyphens or underscores, and a password has 8 to 128 characters.',
   'account.error.backend-unreachable':
     'The server does not answer. Check the connection and try again.',
+  'account.error.sign-in-after-sign-up-failed':
+    'Your account was created, but the sign-in did not finish. Sign in.',
   'account.error': 'That did not work. Try again.',
   'achievement.lines-combo': 'Clear 3 lines at once',
   'achievement.merge-256': 'Reach 256 in Hexa Merge',

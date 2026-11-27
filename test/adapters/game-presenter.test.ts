@@ -548,7 +548,7 @@ describe('GamePresenter undo and redo', () => {
       }),
     );
 
-    expect(codes).toHaveLength(21);
+    expect(codes).toHaveLength(22);
     expect(shown).toEqual(
       languages.map((texts) => codes.map((code) => texts[own[code] ?? 'play.error'])),
     );

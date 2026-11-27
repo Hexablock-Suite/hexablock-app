@@ -104,6 +104,7 @@ describe('AccountPresenter', () => {
     [FailureCode.wrongCredentials, 'account.error.wrong-credentials'],
     [FailureCode.invalidCredentials, 'account.error.invalid-credentials'],
     [FailureCode.backendUnreachable, 'account.error.backend-unreachable'],
+    [FailureCode.signInAfterSignUpFailed, 'account.error.sign-in-after-sign-up-failed'],
     [FailureCode.registerFailed, 'account.error'],
     [FailureCode.loginFailed, 'account.error'],
     [FailureCode.unexpectedFailure, 'account.error'],

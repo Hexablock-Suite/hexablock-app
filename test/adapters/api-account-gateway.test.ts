@@ -121,6 +121,30 @@ describe('ApiAccountGateway', () => {
     },
   );
 
+  // The account exists after the sign-up, so a failed sign-in after it must not say that the
+  // sign-up failed. A retry of the sign-up would give `username-taken` for the own account.
+  it.each([
+    ['a sign-in with no answer', { signIn: refusal(undefined) }],
+    ['a sign-in that answers 500', { signIn: refusal(500) }],
+    [
+      'a sign-in that throws a plain error',
+      { signIn: () => Promise.reject(new TypeError('boom')) },
+    ],
+    ['a user request with no answer', { currentUser: refusal(undefined) }],
+  ] as const)(
+    'should_throw_the_sign_in_after_sign_up_failure_when_the_sign_in_after_a_sign_up_fails',
+    async (_case, answers) => {
+      const api = new FakeAccountApi(answers);
+
+      const thrown = await errorOf(new ApiAccountGateway(api, new ApiDtoMapper()).register(ADA));
+
+      expect(thrown).toBeInstanceOf(AccountFailure);
+      expect((thrown as AccountFailure).code).toBe(FailureCode.signInAfterSignUpFailed);
+      expect((thrown as AccountFailure).message).not.toContain(ADA.password);
+      expect(api.calls[0]).toBe(`signUp ${body}`);
+    },
+  );
+
   it('should_not_sign_in_when_the_sign_up_fails', async () => {
     const api = new FakeAccountApi({ signUp: refusal(409) });
 

@@ -24,6 +24,7 @@ export const FailureCode = Object.freeze({
   backendUnreachable: 'backend-unreachable',
   registerFailed: 'register-failed',
   loginFailed: 'login-failed',
+  signInAfterSignUpFailed: 'sign-in-after-sign-up-failed',
   unexpectedFailure: 'unexpected-failure',
 } as const);
 

@@ -4,21 +4,26 @@ import type { Session } from './session';
 import type { SessionStore } from './session-store';
 
 // The failure codes of a sign-up or a sign-in that the backend gives, or that its silence gives.
+// `sign-in-after-sign-up-failed` names a sign-up that creates the account and a sign-in after it
+// that fails. Then the account exists, and the player signs in.
 export type AccountFailureCode =
   | typeof FailureCode.usernameTaken
   | typeof FailureCode.wrongCredentials
   | typeof FailureCode.invalidCredentials
-  | typeof FailureCode.backendUnreachable;
+  | typeof FailureCode.backendUnreachable
+  | typeof FailureCode.signInAfterSignUpFailed;
 
 // The error that an `AccountGateway` throws for a known failure (APP-FR-12): the backend refuses
 // the request, or it gives no answer. `code` is the failure code of the use case.
 // Any other thrown value is a failure of the gateway itself.
+// `cause` keeps the caught value of a failure that the gateway names, so the log still shows it.
 export class AccountFailure extends Error {
   constructor(
     readonly code: AccountFailureCode,
     message: string,
+    cause?: unknown,
   ) {
-    super(message);
+    super(message, cause === undefined ? undefined : { cause });
     this.name = 'AccountFailure';
   }
 }
@@ -28,7 +33,8 @@ export class AccountFailure extends Error {
 // implements it (decision 22). Each operation gives the session of the account.
 // A known failure throws an `AccountFailure`.
 export interface AccountGateway {
-  // Creates the account and signs it in.
+  // Creates the account and signs it in. A failed sign-in after the sign-up throws the
+  // `AccountFailure` of `sign-in-after-sign-up-failed`, because the account exists.
   register(credentials: Credentials): Promise<Session>;
   // Signs the account in.
   login(credentials: Credentials): Promise<Session>;

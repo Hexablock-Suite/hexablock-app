@@ -73,6 +73,7 @@ const ERROR_TEXTS: Readonly<Record<FailureCode, TextKey>> = {
   'backend-unreachable': 'result.error',
   'register-failed': 'result.error',
   'login-failed': 'result.error',
+  'sign-in-after-sign-up-failed': 'result.error',
   'unexpected-failure': 'result.error',
 };
 

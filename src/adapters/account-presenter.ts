@@ -30,7 +30,7 @@ export interface AccountView {
 
 // The text of each failure code (issue #322, classes.md decision 62). The table is a `Record`
 // over the closed set of codes, so a new code with no text fails the type check.
-// The four failures of the account have their own text. Every other failure shows the general
+// The five failures of the account have their own text. Every other failure shows the general
 // text `account.error`, `register-failed` and `login-failed` too.
 const ERROR_TEXTS: Readonly<Record<FailureCode, TextKey>> = {
   'start-failed': 'account.error',
@@ -53,6 +53,7 @@ const ERROR_TEXTS: Readonly<Record<FailureCode, TextKey>> = {
   'backend-unreachable': 'account.error.backend-unreachable',
   'register-failed': 'account.error',
   'login-failed': 'account.error',
+  'sign-in-after-sign-up-failed': 'account.error.sign-in-after-sign-up-failed',
   'unexpected-failure': 'account.error',
 };
 

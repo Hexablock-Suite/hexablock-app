@@ -85,6 +85,7 @@ const ERROR_TEXTS: Readonly<Record<FailureCode, TextKey>> = {
   'backend-unreachable': 'play.error',
   'register-failed': 'play.error',
   'login-failed': 'play.error',
+  'sign-in-after-sign-up-failed': 'play.error',
   'unexpected-failure': 'play.error',
 };
 
