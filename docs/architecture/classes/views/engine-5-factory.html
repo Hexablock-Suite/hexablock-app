@@ -76,7 +76,9 @@
           a variant, LevelDefinition, the data of one level file with its level id and its order,
           which directs the ILevelBuilder builder and tells the list of levels its figure and its
           order, the abstract GameEvent with GameEnded, the domain event that the root records when
-          a game ends, the Clock and RandomSource interfaces that layer 4 implements (a variant
+          a game ends, with a note that GameEngine records it in the turn that ends a match, the
+          Clock and RandomSource interfaces that layer 4 implements, with a note that GameFactory
+          uses neither and the composition root injects both into the variant factories (a variant
           factory draws a new Seed of the RandomSource in each match), and the MatchIdGenerator
           interface that gives the MatchId of each new match. Each reading of the Clock is a
           ClockReading value object (view 3). The internal ids are local value objects that keep the
@@ -224,7 +226,7 @@
           x="496"
           y="388"
           width="496"
-          height="116"
+          height="176"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -436,6 +438,41 @@
           + createHistory(): MoveHistory&lt;TMove, SnapshotOf&lt;TState&gt;&gt; [0..1]
         </text>
 
+        <!-- Note: why the Observer frame has no line to GameFactory (#422). GameEngine creates GameEnded in the turn that ends a match. -->
+        <path
+          d="M512 92 H762 L772 102 V148 H512 Z"
+          fill="#fffdf4"
+          stroke="#7d8a94"
+          stroke-width="1"
+        />
+        <path d="M762 92 V102 H772" fill="none" stroke="#7d8a94" stroke-width="1" />
+        <text
+          x="522"
+          y="110"
+          fill="#5b6873"
+          font-size="9"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          No line to GameFactory: GameEngine records
+        </text>
+        <text
+          x="522"
+          y="124"
+          fill="#5b6873"
+          font-size="9"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          one GameEnded in the turn that ends a match
+        </text>
+        <text
+          x="522"
+          y="138"
+          fill="#5b6873"
+          font-size="9"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          (view 1). GameEnded carries the final Score.
+        </text>
         <!-- Class: GameEvent (abstract, domain event) -->
         <rect
           x="792"
@@ -846,6 +883,41 @@
           + next(): RandomDraw
         </text>
 
+        <!-- Note: why Clock and RandomSource stand with no line (#422). GameFactory uses neither, and the variant factories of Part 2 take them. -->
+        <path
+          d="M512 500 H966 L976 510 V556 H512 Z"
+          fill="#fffdf4"
+          stroke="#7d8a94"
+          stroke-width="1"
+        />
+        <path d="M966 500 V510 H976" fill="none" stroke="#7d8a94" stroke-width="1" />
+        <text
+          x="522"
+          y="518"
+          fill="#5b6873"
+          font-size="9"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          No line: GameFactory uses neither interface. The composition root injects both into
+        </text>
+        <text
+          x="522"
+          y="532"
+          fill="#5b6873"
+          font-size="9"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          the variant factories (Part 2). FitFactory and SortFactory give the Clock to their
+        </text>
+        <text
+          x="522"
+          y="546"
+          fill="#5b6873"
+          font-size="9"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          LevelTimer. LinesFactory, MergeFactory and SortFactory draw a new Seed in each match.
+        </text>
         <!-- Class: MatchIdGenerator (interface of the engine) -->
         <rect
           x="512"
