@@ -31,7 +31,6 @@ import { Moves } from '../domain/engine/moves';
 import { Piece } from '../domain/engine/piece';
 import type { RandomSource } from '../domain/engine/random-source';
 import { RegionSize } from '../domain/engine/region-size';
-import { Seed } from '../domain/engine/seed';
 import { CellNode, ShapeGroup } from '../domain/engine/shape-node';
 import { SquareGeometry } from '../domain/engine/square-geometry';
 import { TriangleGeometry } from '../domain/engine/triangle-geometry';
@@ -76,9 +75,6 @@ import { LinesControls } from './ui/lines-controls';
 import { MergeControls } from './ui/merge-controls';
 import { SortControls } from './ui/sort-controls';
 import { worldTone } from './ui/theme';
-
-// The count of seeds: the unsigned 32-bit integers (classes.md decision 48).
-const SEEDS = 2 ** 32;
 
 // The hexagon of radius 4 of Hexa Lines (61 cells), and of radius 2 of Sort and Merge
 // (19 cells), as docs/REQUIREMENTS.md §1 gives them. A hex region of size n has radius n - 1.
@@ -185,7 +181,8 @@ function latticeCellOf(at: TriangleCoord): TriangleCoord {
 // checks the pair with `isFor()` (issue #234).
 // Every variant factory takes the `GeometryFactory` of the figure, so the choice of the figure
 // changes only that argument, and no engine or variant file differs (APP-FR-16, #171).
-// Lines, Sort and Merge draw their seed from `random`, so each run of the app gets new pieces.
+// Lines, Merge and the default Sort level take `random`, and each match draws a new seed from it,
+// so each match of the app gets new pieces (issue #417). A Sort level file keeps its seed.
 // Fit takes the clock for its level timer (classes.md decision 19).
 // Fit offers only the levels whose `topology` names the figure (S3-08 in #151,
 // «Propuesta, pendiente del equipo»). A figure with no Fit level has no Fit entry.
@@ -209,10 +206,10 @@ export function registeredGames<TCoord>(
         geometry,
         LinesSettings.of(
           LINES_BOARD,
-          seedFrom(random),
           nonEmpty(geometry.createPieceShapes()),
           nonEmpty(LINES_COLORS),
         ),
+        random,
       ),
       linesScreen(figure),
       worldTone(0),
@@ -222,18 +219,19 @@ export function registeredGames<TCoord>(
       GameId.of('hexa-sort'),
       new SortFactory(
         geometry,
-        SortLevel.seeded(SORT_BOARD, SORT_GOALS, seedFrom(random), nonEmpty(SORT_COLORS)),
+        SortLevel.seededEachMatch(SORT_BOARD, SORT_GOALS, nonEmpty(SORT_COLORS)),
+        random,
       ),
       sortScreen(figure),
       worldTone(2),
-      sortLevelVariant(geometry),
+      sortLevelVariant(geometry, random),
     ),
     mergeOn(figure, random, MERGE_BOARD),
   ];
 }
 
 // The Hexa Merge entry on the board figure `figure`, with a board region of size `board`
-// and its seed from `random` (issue #369). The one value `board` goes to `MergeSettings`
+// (issue #369). Each match draws its seed from `random` (issue #417). The one value `board` goes to `MergeSettings`
 // and to the slide controls, so each way on the screen follows the lines of the board.
 export function mergeOn<TCoord>(
   figure: BoardFigure<TCoord>,
@@ -242,7 +240,7 @@ export function mergeOn<TCoord>(
 ): RegisteredGame {
   return registered(
     GameId.of('hexa-merge'),
-    new MergeFactory(figure.geometry, MergeSettings.of(board, seedFrom(random), MERGE_TARGET)),
+    new MergeFactory(figure.geometry, MergeSettings.of(board, MERGE_TARGET), random),
     mergeScreen(figure, board),
     worldTone(3),
   );
@@ -326,14 +324,7 @@ function fitScreen<TCoord>(
 // The screen parts of Hexa Sort (#176). The offer uses the outline of the origin cell.
 function sortScreen<TCoord>(
   figure: BoardFigure<TCoord>,
-): ScreenParts<
-  ColorStack,
-  TCoord,
-  SortView<TCoord>,
-  SortCellView,
-  SortPayloadView,
-  PlaceStack<TCoord>
-> {
+): ScreenParts<ColorStack, TCoord, SortView, SortCellView, SortPayloadView, PlaceStack<TCoord>> {
   return {
     mapper: new SortStateMapper(),
     renderer: new SortCellRenderer(),
@@ -358,20 +349,6 @@ function mergeScreen<TCoord>(
     ),
     layoutOf: (size) => figure.layoutOf(size),
   };
-}
-
-// One seed from the next draw of `random`: a whole number of 0 to 4294967295.
-// The draw keeps its number private, so it delivers the number to this module of the edge
-// (rule R-no-delivery-call, issue #243).
-function seedFrom(random: RandomSource): Seed {
-  let seed: Seed | undefined;
-  random.next().deliverTo({
-    receive: (draw) => {
-      seed = Seed.of(Math.floor(draw * SEEDS));
-    },
-  });
-  if (seed === undefined) throw new Error('The draw delivered no number.');
-  return seed;
 }
 
 // The Fit level of the first content on the figure `topology` with the geometry `geometry`:

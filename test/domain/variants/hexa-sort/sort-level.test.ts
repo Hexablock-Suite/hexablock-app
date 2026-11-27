@@ -14,6 +14,7 @@ import { SortLevel } from '../../../../src/domain/variants/hexa-sort/sort-level'
 import { SortStarThreshold } from '../../../../src/domain/variants/hexa-sort/sort-stars';
 import { Stars } from '../../../../src/domain/engine/stars';
 import { names, stack } from '../../../support/variants/hexa-sort/sort-game';
+import { seededRandom } from '../../../support/engine/step-random';
 
 // A Sort level is a value object that holds the data of its piece source:
 // the seed, or the fixed list of stacks (issue 209, classes.md decision 47).
@@ -31,10 +32,10 @@ function fixed(...stacks: ColorStack[]): SortLevel {
 // The stacks that a new source of the level gives first, as color names.
 function firstStacks(level: SortLevel, count: number): string[][] {
   const found: string[][] = [];
-  let source = new SortFactory(new SquareGeometry(), level).createPieceSource();
+  let source = new SortFactory(new SquareGeometry(), level, seededRandom(1)).createPieceSource();
   while (found.length < count && source.hasNext()) {
-    const [piece, rest] = source.take();
-    found.push(names(piece.occupant()));
+    const [offered, rest] = source.take();
+    found.push(names(offered));
     source = rest;
   }
   return found;

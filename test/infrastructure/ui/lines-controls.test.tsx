@@ -7,7 +7,6 @@ import { Color } from '../../../src/domain/engine/color';
 import { GameId } from '../../../src/domain/engine/game-id';
 import { TopologyId } from '../../../src/domain/engine/geometry-factory';
 import { RegionSize } from '../../../src/domain/engine/region-size';
-import { Seed } from '../../../src/domain/engine/seed';
 import { CellNode } from '../../../src/domain/engine/shape-node';
 import { TriangleGeometry } from '../../../src/domain/engine/triangle-geometry';
 import { triangle } from '../../../src/domain/engine/triangle-topology';
@@ -17,6 +16,7 @@ import { GameStage } from '../../../src/infrastructure/ui/game-stage';
 import { gameUseCases } from '../../support/application/game-use-cases';
 import { RecordingLogger } from '../../support/application/recording-logger';
 import { ManualClock } from '../../support/engine/manual-clock';
+import { seededRandom } from '../../support/engine/step-random';
 import { occupiedSpaces, pressSpace } from '../../support/ui/board-spaces';
 import { linesFactory } from '../../support/variants/hexa-lines/lines-game';
 
@@ -119,12 +119,8 @@ it('should_place_at_the_up_triangle_when_that_triangle_is_tapped', async () => {
 async function placeOnTriangle(index: number): Promise<void> {
   const factory = new LinesFactory(
     new TriangleGeometry(),
-    LinesSettings.of(
-      RegionSize.of(3),
-      Seed.of(1),
-      [new CellNode(triangle(0, 0))],
-      [Color.of('red')],
-    ),
+    LinesSettings.of(RegionSize.of(3), [new CellNode(triangle(0, 0))], [Color.of('red')]),
+    seededRandom(1),
   );
   await openGame(TopologyId.triangle, factory);
   await fireEvent.press(tray()[0]);

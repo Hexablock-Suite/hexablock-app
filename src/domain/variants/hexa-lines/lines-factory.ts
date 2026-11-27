@@ -10,12 +10,12 @@ import type { GeometryFactory } from '../../engine/geometry-factory';
 import { HighScoreProgress } from '../../engine/high-score-progress';
 import type { MatchId } from '../../engine/match-id';
 import { Piece } from '../../engine/piece';
-import { FixedListPieceSource, SeededPieceSource } from '../../engine/piece-source';
+import { frozenListOf } from '../../engine/frozen-list';
+import { SeededPieceSource } from '../../engine/piece-source';
 import type { RandomSource } from '../../engine/random-source';
 import type { RegionSize } from '../../engine/region-size';
 import type { IGameRules } from '../../engine/rules';
 import type { IScoringPolicy } from '../../engine/scoring-policy';
-import type { Seed } from '../../engine/seed';
 import type { ShapeNode } from '../../engine/shape-node';
 import type { IVariantFactory } from '../../engine/variant-factory';
 import { ComboMultiplierDecorator } from './combo-multiplier-decorator';
@@ -24,19 +24,17 @@ import { LinesScoring } from './lines-scoring';
 import { LinesState } from './lines-state';
 import type { PlacePiece } from './place-piece';
 
-// The settings of one Hexa Lines game: the board region, the seed of the pieces,
-// and the piece shapes and colors that the source draws from.
+// The settings of one Hexa Lines game: the board region, and the piece shapes and colors
+// that the source draws from. The settings hold no seed: each match draws its own (issue #417).
 // It is a value object (classes.md decision 48, issue #210), in the form of `FitLevel`:
 // it never changes, its fields are private, and two settings are equal when their parts are equal.
 // An object literal is no longer the settings of a game.
 // The settings guard their own invariant: each list holds one item or more, and no `undefined`.
-// `of()` copies each list and freezes the copy, and the object is frozen.
+// `of()` copies each list with `frozenListOf()`, and the object is frozen.
 // So a change to an array of the caller does not change the settings.
-// The seed is a `Seed`, which checks its own range.
 export class LinesSettings<TCoord> {
   private constructor(
     private readonly size: RegionSize,
-    private readonly seed: Seed,
     private readonly shapes: readonly ShapeNode<TCoord>[],
     private readonly colors: readonly Color[],
   ) {
@@ -44,32 +42,26 @@ export class LinesSettings<TCoord> {
   }
 
   // A list with no item throws a RangeError, because a draw needs a shape and a color to pick.
-  // `FixedListPieceSource` holds the check of `undefined`, so the settings read its copy.
+  // `frozenListOf()` copies each list and refuses `undefined`.
   static of<TCoord>(
     size: RegionSize,
-    seed: Seed,
     shapes: readonly [ShapeNode<TCoord>, ...ShapeNode<TCoord>[]],
     colors: readonly [Color, ...Color[]],
   ): LinesSettings<TCoord> {
-    const shapesCopy = [...new FixedListPieceSource<ShapeNode<TCoord>>(shapes)];
-    const colorsCopy = [...new FixedListPieceSource<Color>(colors)];
+    const shapesCopy = frozenListOf(shapes);
+    const colorsCopy = frozenListOf(colors);
     if (shapesCopy.length === 0) {
       throw new RangeError('The Lines settings need one shape or more.');
     }
     if (colorsCopy.length === 0) {
       throw new RangeError('The Lines settings need one color or more.');
     }
-    return new LinesSettings(size, seed, Object.freeze(shapesCopy), Object.freeze(colorsCopy));
+    return new LinesSettings(size, shapesCopy, colorsCopy);
   }
 
   // The size of the board region of the game.
   boardSize(): RegionSize {
     return this.size;
-  }
-
-  // The seed of the piece source of the game.
-  pieceSeed(): Seed {
-    return this.seed;
   }
 
   // One piece of the game. The draw reads two numbers of `random`:
@@ -78,14 +70,13 @@ export class LinesSettings<TCoord> {
     return new Piece(pick(this.shapes, random), pick(this.colors, random));
   }
 
-  // Two settings are equal when they hold the same size, the same seed, and equal shapes
+  // Two settings are equal when they hold the same size, and equal shapes
   // and equal colors in the same order. A draw picks a shape and a color by its place in the list.
   // Two shapes are equal when they cover the same coordinates.
   // The topology compares the coordinates, because `TCoord` has no bound (classes.md decision 16).
   equals(other: LinesSettings<TCoord>, topology: { key(c: TCoord): CoordKey }): boolean {
     return (
       this.size.equals(other.size) &&
-      this.seed.equals(other.seed) &&
       this.shapes.length === other.shapes.length &&
       this.shapes.every((shape, i) => {
         const theirs = other.shapes[i];
@@ -99,7 +90,9 @@ export class LinesSettings<TCoord> {
 
 // Abstract Factory (classes.md decision 31): the whole family of Hexa Lines.
 // The geometry comes by composition (APP-FR-16, D11), so the factory runs on any figure.
-// The seed comes by injection (R-domain-determinism), so the same seed gives the same game.
+// The random source comes by injection (R-domain-determinism, classes.md decision 25).
+// Each match draws a new seed from it, so a replay gets other pieces (issue #417).
+// A source with the same draws gives the same game (APP-NFR-07).
 export class LinesFactory<TCoord> implements IVariantFactory<
   Color,
   TCoord,
@@ -111,6 +104,7 @@ export class LinesFactory<TCoord> implements IVariantFactory<
   constructor(
     private readonly geometry: GeometryFactory<TCoord>,
     private readonly settings: LinesSettings<TCoord>,
+    private readonly random: RandomSource,
   ) {}
 
   // True when `gameId` names Hexa Lines. The id stays private (issue #234).
@@ -131,11 +125,11 @@ export class LinesFactory<TCoord> implements IVariantFactory<
     return new ComboMultiplierDecorator(new LinesScoring<TCoord>());
   }
 
-  // A new source for each game, built from the data of the settings.
-  // The settings give the seed, and they draw each piece.
+  // A new source for each match, from a new seed of the random source of the factory.
+  // The settings draw each piece.
   createPieceSource(): SeededPieceSource<Piece<Color, TCoord>> {
     const { settings } = this;
-    return new SeededPieceSource(settings.pieceSeed(), (random: RandomSource) =>
+    return new SeededPieceSource(this.random.next().pickSeed(), (random: RandomSource) =>
       settings.drawPiece(random),
     );
   }

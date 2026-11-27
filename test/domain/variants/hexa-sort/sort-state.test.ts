@@ -30,7 +30,7 @@ function facts(state: SortState<SquareCoord>) {
       .boardCopy()
       .occupiedCells()
       .map(([at, cell]) => [at, names(cell)]),
-    offered: offered === undefined ? undefined : names(offered.occupant()),
+    offered: offered === undefined ? undefined : names(offered),
     left: state.snapshot().pieceSource().hasNext(),
     goalsDone: state.snapshot().goalsReached(),
     clearedTiles: [...state.snapshot().clearedStackHeights()],
@@ -48,7 +48,7 @@ describe('SortState', () => {
     expect(names(state.snapshot().boardCopy().occupantAt(square(1, 0)))).toEqual(['red']);
     expect(state.snapshot().lastPlacedAt()).toEqual(square(1, 0));
     expect(state.snapshot().clearedStackHeights()).toEqual([]);
-    expect(names(state.snapshot().offeredStack()?.occupant())).toEqual(['blue', 'blue']);
+    expect(names(state.snapshot().offeredStack())).toEqual(['blue', 'blue']);
     expect(state.snapshot().pieceSource().hasNext()).toBe(false);
   });
 

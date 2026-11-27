@@ -58,7 +58,7 @@ import {
 import { A, fitFactory, fitStateOf } from '../support/variants/hexa-fit/fit-game';
 import { linesFactory, red } from '../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../support/variants/hexa-merge/merge-game';
-import { sortFactory, stack, stackPiece } from '../support/variants/hexa-sort/sort-game';
+import { sortFactory, stack } from '../support/variants/hexa-sort/sort-game';
 import { CountingMatchIds, MATCH_ID } from '../support/engine/match-id';
 import {
   fitViewData,
@@ -227,11 +227,12 @@ function sortFactoryWithFailingSource(): IVariantFactory<
   ColorStack,
   SquareCoord,
   PlaceStack<SquareCoord>,
-  SortState<SquareCoord>
+  SortState<SquareCoord>,
+  ColorStack
 > {
   const factory = sortFactory();
-  const pieces = new FixedListPieceSource([stack('red')].map(stackPiece));
-  const source: IPieceSource<Piece<ColorStack, SquareCoord>> = {
+  const pieces = new FixedListPieceSource([stack('red')]);
+  const source: IPieceSource<ColorStack> = {
     hasNext: () => pieces.hasNext(),
     take: () => {
       throw new RangeError('The level source cannot be read.');
@@ -871,7 +872,7 @@ describe('the variant data of MoveResult', () => {
       canRedo: false,
       hasUndo: false,
       payload: {
-        offered: stackPiece(stack('blue')),
+        offered: stack('blue'),
         goalsDone: ClearedStacks.of(0),
         goalsNeeded: GoalCount.of(5),
       },

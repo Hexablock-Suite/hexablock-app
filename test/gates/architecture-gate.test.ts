@@ -41,6 +41,15 @@ describe('architecture gate (dependency-cruiser)', () => {
     expect(result.output).toContain('variants-isolated');
   });
 
+  // Issue #423: Hexa Sort binds `TPiece` to `ColorStack`, as Hexa Merge binds it to `NewTile`.
+  // So neither variant imports the cell-made `Piece` or the shape Composite of the engine.
+  it('should_fail_arch_when_sort_imports_the_cell_made_piece_of_the_engine', () => {
+    const result = cruise('sort-imports-piece');
+
+    expect(result.status).not.toBe(0);
+    expect(result.output).toContain('sort-and-merge-no-cell-piece');
+  });
+
   it('should_fail_arch_when_application_imports_an_adapter', () => {
     const result = cruise('application-imports-outside');
 

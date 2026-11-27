@@ -12,6 +12,7 @@ import { SortLevel } from '../../../../src/domain/variants/hexa-sort/sort-level'
 import { SortLevelBuilder } from '../../../../src/domain/variants/hexa-sort/sort-level-builder';
 import { SortStarThreshold } from '../../../../src/domain/variants/hexa-sort/sort-stars';
 import { BOARD_ID } from '../../../support/engine/entity-ids';
+import { seededRandom } from '../../../support/engine/step-random';
 import { stack } from '../../../support/variants/hexa-sort/sort-game';
 import {
   sortFixedSource,
@@ -72,7 +73,9 @@ describe('SortLevelBuilder', () => {
   it('should_give_every_cell_within_the_radius_when_the_sort_factory_builds_the_board_of_the_level', () => {
     const cells = [1, 2, 3].map((radius) => {
       const level = built(withSection((section) => ({ ...section, radius })));
-      return new SortFactory(hexGeometry, level).createBoard(BOARD_ID).coordinates().length;
+      return new SortFactory(hexGeometry, level, seededRandom(1))
+        .createBoard(BOARD_ID)
+        .coordinates().length;
     });
 
     expect(cells).toEqual([7, 19, 37]);

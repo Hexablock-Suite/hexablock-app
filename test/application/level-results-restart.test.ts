@@ -27,6 +27,7 @@ import { SortFactory } from '../../src/domain/variants/hexa-sort/sort-factory';
 import { SortLevelBuilder } from '../../src/domain/variants/hexa-sort/sort-level-builder';
 import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-store';
 import { ManualClock } from '../support/engine/manual-clock';
+import { seededRandom } from '../support/engine/step-random';
 import { delivered } from '../support/engine/value-receiver';
 
 // The integration tests of APP-NFR-15 for the two games with levels (issue #183, APP-FR-09).
@@ -89,6 +90,7 @@ const SORT: LevelGame = {
     new SortFactory(
       geometry,
       definition.buildWith(new SortLevelBuilder(geometry)),
+      seededRandom(1),
     ).createProgressModel(),
   best: { moves: 36, stars: 1 },
   worse: [

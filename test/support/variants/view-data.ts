@@ -48,8 +48,8 @@ export function fitViewData<TCoord>(view: FitView<TCoord>): {
 }
 
 // The offered stack and the two goal counts that a Sort view delivers.
-export function sortViewData<TCoord>(view: SortView<TCoord>): {
-  readonly offered: Piece<ColorStack, TCoord> | undefined;
+export function sortViewData(view: SortView): {
+  readonly offered: ColorStack | undefined;
   readonly goalsDone: ClearedStacks;
   readonly goalsNeeded: GoalCount;
 } {

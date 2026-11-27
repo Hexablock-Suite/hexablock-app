@@ -10,7 +10,7 @@ import { firstValidMove } from '../../support/engine/variant-game';
 import { A, fitFactory } from '../../support/variants/hexa-fit/fit-game';
 import { linesState, piece } from '../../support/variants/hexa-lines/lines-game';
 import { mergeBoard, mergeState, noNewTiles } from '../../support/variants/hexa-merge/merge-game';
-import { row, stack, stackPiece, tiles } from '../../support/variants/hexa-sort/sort-game';
+import { row, stack, tiles } from '../../support/variants/hexa-sort/sort-game';
 import { PlacePiece } from '../../../src/domain/variants/hexa-lines/place-piece';
 import { TrayPosition } from '../../../src/domain/variants/hexa-lines/tray-position';
 import { MATCH_ID } from '../../support/engine/match-id';
@@ -36,7 +36,7 @@ describe('the view of each variant state', () => {
   // `deliverTo()` calls the receiver once with every datum of the view, and it returns nothing.
   it('should_deliver_its_data_once_and_return_nothing_when_each_view_gets_a_receiver', () => {
     const tray = [piece(square(0, 0))];
-    const offered = stackPiece(stack('red'));
+    const offered = stack('red');
     const calls: unknown[][] = [];
     const keep = (...data: unknown[]) => {
       calls.push(data);
@@ -84,7 +84,7 @@ describe('the view of each variant state', () => {
   });
 
   it('should_build_the_view_from_the_offered_stack_and_the_goals_when_a_sort_state_builds_its_view', () => {
-    const offered = stackPiece(stack('red'));
+    const offered = stack('red');
     const goalsNeeded = GoalCount.of(3);
     const state = SortState.start({
       stateId: STATE_ID,

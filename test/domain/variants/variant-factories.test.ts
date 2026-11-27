@@ -23,7 +23,6 @@ import { LevelTimer } from '../../../src/domain/engine/level-timer';
 import { MoveHistory } from '../../../src/domain/engine/move-history';
 import { Piece } from '../../../src/domain/engine/piece';
 import { RegionSize } from '../../../src/domain/engine/region-size';
-import { Seed } from '../../../src/domain/engine/seed';
 import { CellNode, ShapeGroup } from '../../../src/domain/engine/shape-node';
 import { SquareGeometry } from '../../../src/domain/engine/square-geometry';
 import { TriangleGeometry } from '../../../src/domain/engine/triangle-geometry';
@@ -58,6 +57,7 @@ import { mergeFactory } from '../../support/variants/hexa-merge/merge-game';
 import { sortFactory } from '../../support/variants/hexa-sort/sort-game';
 import { BOARD_ID } from '../../support/engine/entity-ids';
 import { MATCH_ID } from '../../support/engine/match-id';
+import { seededRandom } from '../../support/engine/step-random';
 import { delivered } from '../../support/engine/value-receiver';
 import { fitViewData } from '../../support/variants/view-data';
 
@@ -132,10 +132,10 @@ function undosAfter<
 
 // The #64 check (APP-FR-16). The settings hold no coordinate,
 // so the argument of `startMerge()` is the only thing that changes between two figures.
-const mergeSettings = MergeSettings.of(RegionSize.of(2), Seed.of(7), MergeTile.of(2048));
+const mergeSettings = MergeSettings.of(RegionSize.of(2), MergeTile.of(2048));
 
 function startMerge<TCoord>(geometry: GeometryFactory<TCoord>) {
-  const factory = new MergeFactory(geometry, mergeSettings);
+  const factory = new MergeFactory(geometry, mergeSettings, seededRandom(7));
   const { engine, rules } = startVariant(factory);
   const board = engine.snapshot().boardCopy();
   const tiles = board.occupiedCells().length;
@@ -168,7 +168,8 @@ function figureTests<TCoord>(
     it('should_start_lines_on_the_region_of_the_geometry_when_the_lines_factory_gets_it', () => {
       const factory = new LinesFactory(
         geometry,
-        LinesSettings.of(size, Seed.of(1), [new CellNode(origin)], [Color.of('red')]),
+        LinesSettings.of(size, [new CellNode(origin)], [Color.of('red')]),
+        seededRandom(1),
       );
       const { engine, rules } = startVariant(factory);
       const start = engine.snapshot();
@@ -189,6 +190,7 @@ function figureTests<TCoord>(
       const factory = new SortFactory(
         geometry,
         SortLevel.fixed(size, GoalCount.of(5), [offered, offered]),
+        seededRandom(1),
       );
       const { engine, rules } = startVariant(factory);
       const start = engine.snapshot();
@@ -197,12 +199,7 @@ function figureTests<TCoord>(
 
       expect(keys(start.boardCopy().coordinates())).toEqual(region);
       expect(start.boardCopy().occupiedCells()).toEqual([]);
-      expect(
-        start
-          .offeredStack()
-          ?.occupant()
-          .equals(ColorStack.of([Color.of('red')])),
-      ).toBe(true);
+      expect(start.offeredStack()?.equals(ColorStack.of([Color.of('red')]))).toBe(true);
       expect(outcome).toBe(Outcome.playing);
       expect(engine.snapshot().boardCopy().occupiedCells()).toHaveLength(1);
     });
@@ -338,6 +335,7 @@ describe('IVariantFactory', () => {
       SortLevel.fixed(RegionSize.of(2), GoalCount.of(5), [
         ColorStack.of([Color.of('red')]),
       ]).withStars([SortStarThreshold.of(Moves.of(5)), SortStarThreshold.of(Moves.of(3))]),
+      seededRandom(1),
     );
     sort.createProgressModel().record(
       GameResult.of({
