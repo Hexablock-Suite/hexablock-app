@@ -311,7 +311,12 @@
             "LeaderboardPresenter",
             "AccountPresenter",
             "ResultPresenter",
-            "LocalSettingsStore"
+            "LocalSettingsStore",
+            "ApiProgressRepository",
+            "ApiLevelRepository",
+            "ApiLeaderboardGateway",
+            "ApiAccountGateway",
+            "ApiDtoMapper"
           ]
         },
         {
@@ -332,6 +337,10 @@
             "SlideWay",
             "DeliversValues"
           ]
+        },
+        {
+          "group": "adapters|src/adapters/api",
+          "types": ["HealthApi", "HealthDto"]
         }
       ],
       "4": [
@@ -356,7 +365,7 @@
         },
         {
           "group": "infrastructure|src/infrastructure/api",
-          "types": ["ApiClient", "HealthResponse"]
+          "types": ["ApiClient"]
         },
         {
           "group": "infrastructure|src/infrastructure/board",
@@ -387,18 +396,13 @@
         {
           "group": "infrastructure|planned",
           "types": [
-            "ApiProgressRepository",
             "AudioManager",
-            "ApiLevelRepository",
             "DefeatScreen",
-            "ApiLeaderboardGateway",
             "SoundLibrary",
             "LeaderboardScreen",
             "SessionManager",
             "VictoryScreen",
-            "ApiAccountGateway",
-            "AccountScreen",
-            "ApiDtoMapper"
+            "AccountScreen"
           ]
         }
       ]
@@ -901,7 +905,9 @@
             "ResultPresenter",
             "GamePresenter",
             "LevelGameFactories",
-            "BundledLevelRepository"
+            "BundledLevelRepository",
+            "ApiAccountGateway",
+            "ApiProgressRepository"
           ]
         }
       ],
@@ -913,9 +919,7 @@
             "RootDrivers",
             "ConsoleLogger",
             "GameUseCases",
-            "ApiAccountGateway",
-            "SessionManager",
-            "ApiProgressRepository"
+            "SessionManager"
           ]
         }
       ]
@@ -981,7 +985,12 @@
             "LeaderboardPresenter",
             "AccountPresenter",
             "ResultPresenter",
-            "LocalSettingsStore"
+            "LocalSettingsStore",
+            "ApiProgressRepository",
+            "ApiLevelRepository",
+            "ApiLeaderboardGateway",
+            "ApiAccountGateway",
+            "ApiDtoMapper"
           ]
         },
         {
@@ -1036,6 +1045,10 @@
             "SlideWay",
             "DeliversValues"
           ]
+        },
+        {
+          "group": "adapters|src/adapters/api",
+          "types": ["HealthApi", "HealthDto"]
         }
       ]
     },
@@ -1043,7 +1056,7 @@
       "4": [
         {
           "group": "infrastructure|src/infrastructure/api",
-          "types": ["ApiClient", "HealthResponse"]
+          "types": ["ApiClient"]
         },
         {
           "group": "infrastructure|src/infrastructure",
@@ -1082,15 +1095,10 @@
         {
           "group": "infrastructure|planned",
           "types": [
-            "ApiProgressRepository",
             "SoundLibrary",
             "AudioManager",
-            "ApiLevelRepository",
-            "ApiAccountGateway",
-            "ApiLeaderboardGateway",
             "DefeatScreen",
             "LeaderboardScreen",
-            "ApiDtoMapper",
             "SessionManager",
             "VictoryScreen",
             "AccountScreen"

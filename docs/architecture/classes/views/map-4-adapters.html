@@ -64,7 +64,7 @@
       <h1>Adapters, presenters and drivers at a glance</h1>
 
       <svg
-        viewBox="0 0 1040 1837"
+        viewBox="0 0 1040 1981"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="mapad-title mapad-desc"
@@ -148,7 +148,7 @@
           x="24"
           y="766"
           width="992"
-          height="774"
+          height="918"
           rx="8"
           fill="#e2ebf8"
           stroke="rgba(29,78,216,0.40)"
@@ -342,12 +342,12 @@
         >
           VIEW 4.1
         </text>
-        <!-- Group: HTTP repositories (layer 4, decision 22) -->
+        <!-- Group: HTTP client (layer 4, the driver of the transport interfaces of layer 3, decision 22) -->
         <rect
           x="392"
           y="416"
-          width="520"
-          height="128"
+          width="280"
+          height="80"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -363,10 +363,10 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.14em"
         >
-          HTTP REPOSITORIES · ADAPTER · api/
+          HTTP CLIENT · DRIVER · api/
         </text>
         <text
-          x="900"
+          x="660"
           y="432"
           fill="#1d4ed8"
           font-size="8"
@@ -375,7 +375,7 @@
           text-anchor="end"
           letter-spacing="0.14em"
         >
-          VIEW 4.2
+          FLOW 2
         </text>
         <!-- Group: composition root -->
         <rect
@@ -1271,11 +1271,11 @@
             </tspan>
           </text>
         </g>
-        <!-- Chips: HTTP repositories -->
-        <g data-class="ApiProgressRepository">
+        <!-- Chips: HTTP client -->
+        <g data-class="ApiClient">
           <rect
             x="408"
-            y="444"
+            y="448"
             width="152"
             height="34"
             rx="4"
@@ -1283,77 +1283,20 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="484" y="465" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              ApiProgressRepository
-            </tspan>
+          <text
+            x="484"
+            y="460"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            driver
           </text>
-        </g>
-        <g data-class="ApiLevelRepository">
-          <rect
-            x="576"
-            y="444"
-            width="152"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text x="652" y="465" fill="#17212a" text-anchor="middle">
+          <text x="484" y="473" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              ApiLevelRepository
-            </tspan>
-          </text>
-        </g>
-        <g data-class="ApiLeaderboardGateway">
-          <rect
-            x="744"
-            y="444"
-            width="152"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text x="820" y="465" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              ApiLeaderboardGateway
-            </tspan>
-          </text>
-        </g>
-        <g data-class="ApiAccountGateway">
-          <rect
-            x="408"
-            y="494"
-            width="152"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text x="484" y="515" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              ApiAccountGateway
-            </tspan>
-          </text>
-        </g>
-        <g data-class="ApiDtoMapper">
-          <rect
-            x="576"
-            y="494"
-            width="152"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text x="652" y="515" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              ApiDtoMapper
+              ApiClient
             </tspan>
           </text>
         </g>
@@ -2101,30 +2044,236 @@
             </tspan>
           </text>
         </g>
+        <!-- Group: HTTP repositories and transport interfaces (layer 3, decision 22, #404) -->
+        <rect
+          x="40"
+          y="1524"
+          width="960"
+          height="128"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="52"
+          y="1540"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          HTTP REPOSITORIES · ADAPTER · api/
+        </text>
+        <text
+          x="988"
+          y="1540"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+          letter-spacing="0.14em"
+        >
+          VIEW 4.2 · FLOWS 2, 5
+        </text>
+        <!-- Chips: HTTP repositories and transport interfaces -->
+        <g data-class="ApiProgressRepository">
+          <rect
+            x="56"
+            y="1552"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="132" y="1573" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              ApiProgressRepository
+            </tspan>
+          </text>
+        </g>
+        <g data-class="ApiLevelRepository">
+          <rect
+            x="224"
+            y="1552"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="300" y="1573" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              ApiLevelRepository
+            </tspan>
+          </text>
+        </g>
+        <g data-class="ApiLeaderboardGateway">
+          <rect
+            x="392"
+            y="1552"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="468" y="1573" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              ApiLeaderboardGateway
+            </tspan>
+          </text>
+        </g>
+        <g data-class="ApiAccountGateway">
+          <rect
+            x="560"
+            y="1552"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="636" y="1573" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              ApiAccountGateway
+            </tspan>
+          </text>
+        </g>
+        <g data-class="ApiDtoMapper">
+          <rect
+            x="728"
+            y="1552"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="804" y="1573" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              ApiDtoMapper
+            </tspan>
+          </text>
+        </g>
+        <g data-class="HealthApi">
+          <rect
+            x="56"
+            y="1602"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="132"
+            y="1614"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="132" y="1627" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              HealthApi
+            </tspan>
+          </text>
+        </g>
+        <g data-class="ProgressApi">
+          <rect
+            x="224"
+            y="1602"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="300"
+            y="1614"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="300" y="1627" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              ProgressApi
+            </tspan>
+          </text>
+        </g>
+        <g data-class="AccountApi">
+          <rect
+            x="392"
+            y="1602"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="468"
+            y="1614"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="468" y="1627" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              AccountApi
+            </tspan>
+          </text>
+        </g>
         <!-- Footnote -->
         <text
           x="24"
-          y="1568"
+          y="1712"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          The local repositories of layer 3 and the HTTP repositories of layer 4 implement the
-          output ports of Part 3 (decision 22).
+          The local repositories and the HTTP repositories of layer 3 implement the output ports of
+          Part 3 (decision 22, #404).
         </text>
         <text
           x="24"
-          y="1584"
+          y="1728"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Layer 4 also implements KeyValueStore of layer 3 and the engine interfaces Clock,
-          RandomSource and MatchIdGenerator.
+          Layer 4 implements KeyValueStore and the transport interfaces of layer 3, such as
+          HealthApi with ApiClient, and the engine interfaces Clock, RandomSource and
+          MatchIdGenerator.
         </text>
         <text
           x="24"
-          y="1600"
+          y="1744"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2134,7 +2283,7 @@
         </text>
         <text
           x="24"
-          y="1616"
+          y="1760"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2144,7 +2293,7 @@
         </text>
         <text
           x="24"
-          y="1632"
+          y="1776"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2155,7 +2304,7 @@
 
         <text
           x="24"
-          y="1648"
+          y="1792"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2165,7 +2314,7 @@
         </text>
         <text
           x="24"
-          y="1664"
+          y="1808"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2175,7 +2324,7 @@
         </text>
         <text
           x="24"
-          y="1680"
+          y="1824"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2186,7 +2335,7 @@
         <!-- The last footnote line and the legend sit 32 lower than before: the footnote has one more line since #326 and one more since #363. -->
         <text
           x="24"
-          y="1696"
+          y="1840"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2197,7 +2346,7 @@
         <g transform="translate(0 96)">
           <text
             x="24"
-            y="1616"
+            y="1760"
             fill="#5b6873"
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2209,15 +2358,15 @@
           <!-- Legend -->
           <line
             x1="24"
-            y1="1640"
+            y1="1784"
             x2="1016"
-            y2="1640"
+            y2="1784"
             stroke="rgba(23,33,42,0.10)"
             stroke-width="0.8"
           />
           <text
             x="24"
-            y="1658"
+            y="1802"
             fill="#5b6873"
             font-size="8"
             font-family="'IBM Plex Mono', monospace"
@@ -2228,16 +2377,16 @@
 
           <line
             x1="24"
-            y1="1675"
+            y1="1819"
             x2="52"
-            y2="1675"
+            y2="1819"
             stroke="#5b6873"
             stroke-width="1"
             marker-end="url(#mapad-open)"
           />
           <text
             x="60"
-            y="1679"
+            y="1823"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2246,9 +2395,9 @@
           </text>
           <line
             x1="384"
-            y1="1675"
+            y1="1819"
             x2="412"
-            y2="1675"
+            y2="1819"
             stroke="#17212a"
             stroke-width="1"
             stroke-dasharray="5,4"
@@ -2256,7 +2405,7 @@
           />
           <text
             x="420"
-            y="1679"
+            y="1823"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2266,7 +2415,7 @@
 
           <rect
             x="24"
-            y="1696"
+            y="1840"
             width="28"
             height="12"
             rx="2"
@@ -2277,7 +2426,7 @@
           />
           <text
             x="60"
-            y="1705"
+            y="1849"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2286,7 +2435,7 @@
           </text>
           <rect
             x="272"
-            y="1696"
+            y="1840"
             width="28"
             height="12"
             rx="2"
@@ -2296,7 +2445,7 @@
           />
           <text
             x="308"
-            y="1705"
+            y="1849"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2305,7 +2454,7 @@
           </text>
           <text
             x="472"
-            y="1705"
+            y="1849"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2323,7 +2472,7 @@
           </text>
           <rect
             x="664"
-            y="1696"
+            y="1840"
             width="28"
             height="12"
             rx="2"
@@ -2333,7 +2482,7 @@
           />
           <text
             x="700"
-            y="1705"
+            y="1849"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2343,7 +2492,7 @@
 
           <rect
             x="24"
-            y="1721"
+            y="1865"
             width="28"
             height="12"
             rx="2"
@@ -2353,7 +2502,7 @@
           />
           <text
             x="60"
-            y="1730"
+            y="1874"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2362,7 +2511,7 @@
           </text>
           <rect
             x="272"
-            y="1721"
+            y="1865"
             width="28"
             height="12"
             rx="2"
@@ -2372,7 +2521,7 @@
           />
           <text
             x="308"
-            y="1730"
+            y="1874"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"

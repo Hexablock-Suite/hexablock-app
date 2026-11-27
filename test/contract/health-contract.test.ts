@@ -3,6 +3,7 @@ import path from 'node:path';
 
 import { PactV4 } from '@pact-foundation/pact';
 
+import type { HealthApi } from '../../src/adapters/api/health-api';
 import { createApiClient } from '../../src/infrastructure/api/client';
 import { startFakeBackend, type FakeBackend } from '../support/fake-backend';
 import { repoRoot, runNodeScript } from '../support/run-tool';
@@ -34,7 +35,9 @@ describe('health contract', () => {
         .withRequest('GET', '/v1/health')
         .willRespondWith(200, (builder) => builder.jsonBody({ status: 'ok' }))
         .executeTest(async (mockServer) => {
-          const health = await createApiClient(mockServer.url).getHealth();
+          // The client of layer 4 implements the transport interface of layer 3 (decision 22).
+          const api: HealthApi = createApiClient(mockServer.url);
+          const health = await api.getHealth();
 
           expect(health).toEqual({ status: 'ok' });
         });

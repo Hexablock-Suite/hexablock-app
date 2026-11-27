@@ -98,7 +98,7 @@ The client follows Clean Architecture with four layers (statement §3.4). Every 
 
 **Use case flows.** [docs/architecture/flows.md](docs/architecture/flows.md) follows five use cases through the four layers, each with a class view and a sequence diagram: `ApplyMove` stays inside the app, `SaveProgress` saves a result on the device (its diagrams still draw the path to `hexablock-api`, which D27 gives to the planned `SyncProgress`), `StartGame` wires a variant from its factory, `UndoMove` runs the Command history, and `Login` signs in against the backend and keeps the session. A table there names the path of every other use case.
 
-One placement differs from statement §3.4 on purpose. The statement puts the repository implementations and the DTO mappers in layer 3, interface adapters. The HTTP repositories and their DTO mapper live in layer 4, `src/infrastructure/api/`, next to the HTTP client, and implement the layer 2 ports directly. In layer 3 they needed a `BackendApi` port whose methods named transport types, which ties the use cases to the shape of the HTTP data. The local repositories stay in layer 3. The role of a class decides its layer, and this placement is the one exception of that rule, with the reason of Q7 ([the rule of layers 3 and 4](docs/architecture/layers.md#the-rule-of-layers-3-and-4)). See Q7 in [docs/architecture/layers.md](docs/architecture/layers.md) and decision 22 in [docs/architecture/classes.md](docs/architecture/classes.md).
+The HTTP repositories follow statement §3.4 too (Q7, option A3, #404). The planned HTTP repositories and their DTO mapper live in layer 3, `src/adapters/api/`, next to the DTO types that `pnpm api:generate` writes there, and they reach the backend through one transport interface per resource. `ApiClient` in layer 4, `src/infrastructure/api/`, is the driver: it implements those interfaces with `openapi-fetch`. Every class that implements a port lives in layer 3, and layer 4 keeps only the frameworks and the glue code, so the rule of layers 3 and 4 has no exception ([the rule of layers 3 and 4](docs/architecture/layers.md#the-rule-of-layers-3-and-4)). See Q7 in [docs/architecture/layers.md](docs/architecture/layers.md) and decision 22 in [docs/architecture/classes.md](docs/architecture/classes.md).
 
 Two placements are still open with the professor: where the cell renderers live (Q8) and where the composition root lives (Q9). The code puts the root in `src/infrastructure/composition-root.ts` (S3-06 in #151, «Propuesta, pendiente del equipo»), and the answer to Q9 can move it. It puts the board components in `src/infrastructure/board/` (S3-07 in #151, «Propuesta, pendiente del equipo»), and the answer to Q8 can move them. Both are in [docs/architecture/layers.md](docs/architecture/layers.md).
 
@@ -357,7 +357,7 @@ Contract tests ([Pact](https://docs.pact.io/)) run inside `pnpm test`. The consu
 ```bash
 export BACKEND_URL=http://localhost:3000
 pnpm contract:verify  # the backend honors the committed pact
-pnpm api:check        # src/infrastructure/api/schema.d.ts matches the backend OpenAPI document
+pnpm api:check        # schema.d.ts and dto.d.ts match the backend OpenAPI document
 ```
 
 The CI job `contract` builds and starts hexablock-api `main`, then runs both commands.

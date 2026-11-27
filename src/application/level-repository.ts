@@ -6,7 +6,7 @@ import type { LevelId } from '../domain/progress/level-id';
 // It gives the `LevelDefinition` of each level of one game: the data of one level file.
 // A level is data that the player never changes, so the port only reads.
 // `BundledLevelRepository` in layer 3 implements it over the level files of the app,
-// so the bundled levels work offline (APP-FR-15). `ApiLevelRepository` of layer 4 is planned.
+// so the bundled levels work offline (APP-FR-15). `ApiLevelRepository` of layer 3 is planned.
 // `ListLevels` asks for the levels of a game, and the definition answers the questions
 // of the list: its level id, its order and its figure.
 // `LevelGameFactories` asks for the one level that a game starts (issue #172).

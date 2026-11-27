@@ -63,7 +63,7 @@
       <p class="eyebrow">Use case flow · Login · class view</p>
       <h1>Login across the layers: the classes of one sign-in</h1>
       <svg
-        viewBox="0 0 1040 1186"
+        viewBox="0 0 1100 1186"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="flowlogin-title flowlogin-desc"
@@ -71,12 +71,13 @@
         <title id="flowlogin-title">HexaBlock Login flow · UML class diagram</title>
         <desc id="flowlogin-desc">
           Cross-layer class diagram of the Login use case only. In layer 4, AccountScreen uses
-          AccountPresenter; ApiAccountGateway keeps ApiDtoMapper and ApiClient and implements the
-          AccountGateway port of layer 2; SessionManager implements the SessionStore port of layer
-          2. In layer 3, AccountPresenter uses the UseCase input port. In layer 2, Login implements
-          UseCase, takes Credentials and keeps the AccountGateway and SessionStore ports;
-          AccountGateway returns a Session. Login touches no entity of layer 1. Every dependency
-          between layers points down.
+          AccountPresenter; ApiClient, the driver, implements the AccountApi transport interface of
+          layer 3 (decision 22); SessionManager implements the SessionStore port of layer 2. In
+          layer 3, AccountPresenter uses the UseCase input port, and ApiAccountGateway keeps
+          ApiDtoMapper and AccountApi and implements the AccountGateway port of layer 2. In layer 2,
+          Login implements UseCase, takes Credentials and keeps the AccountGateway and SessionStore
+          ports; AccountGateway returns a Session. Login touches no entity of layer 1. Every
+          dependency between layers points down.
         </desc>
         <defs>
           <marker
@@ -107,8 +108,8 @@
         <rect
           x="24"
           y="24"
-          width="992"
-          height="312"
+          width="1052"
+          height="176"
           rx="8"
           fill="#cfdcf3"
           stroke="rgba(30,58,138,0.50)"
@@ -128,9 +129,9 @@
         <!-- Layer zone: layer 3 -->
         <rect
           x="24"
-          y="344"
-          width="992"
-          height="156"
+          y="208"
+          width="1052"
+          height="292"
           rx="8"
           fill="#e2ebf8"
           stroke="rgba(29,78,216,0.40)"
@@ -138,7 +139,7 @@
         />
         <text
           x="40"
-          y="364"
+          y="228"
           fill="#1d4ed8"
           font-size="8"
           font-weight="500"
@@ -151,7 +152,7 @@
         <rect
           x="24"
           y="508"
-          width="992"
+          width="1052"
           height="464"
           rx="8"
           fill="#efe7f8"
@@ -170,25 +171,34 @@
           LAYER 2 · USE CASES · src/application/
         </text>
         <!-- Relationships (drawn before boxes) -->
-        <!-- ApiAccountGateway keeps the ApiDtoMapper it receives as mapper: use with role and multiplicity, inside layer 4 -->
+        <!-- ApiAccountGateway keeps the ApiDtoMapper it receives as mapper: use with role and multiplicity, inside layer 3 -->
         <path
-          d="M680 236 H648 Q640 236 640 228 V176"
+          d="M740 380 V356"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#flowlogin-open)"
         />
-        <!-- ApiAccountGateway keeps the ApiClient it receives as client: use with role and multiplicity, inside layer 4 -->
+        <!-- ApiAccountGateway keeps the AccountApi it receives as api: use with role and multiplicity, inside layer 3 -->
         <path
-          d="M830 208 V172"
+          d="M940 380 V316"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#flowlogin-open)"
+        />
+        <!-- ApiClient implements AccountApi: realization, down from layer 4 to layer 3 (decision 22) -->
+        <path
+          d="M930 164 V232"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#flowlogin-triangle)"
         />
         <!-- AccountScreen keeps the AccountPresenter it receives as the presenter prop: use with role and multiplicity, down from layer 4 to layer 3 -->
         <path
-          d="M480 296 V388"
+          d="M480 144 V388"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -203,9 +213,9 @@
           stroke-dasharray="5,4"
           marker-end="url(#flowlogin-triangle)"
         />
-        <!-- ApiAccountGateway implements AccountGateway: realization, down from layer 4 to layer 2 -->
+        <!-- ApiAccountGateway implements AccountGateway: realization, down from layer 3 to layer 2 -->
         <path
-          d="M840 320 V688"
+          d="M860 492 V688"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -287,10 +297,10 @@
           RETURNS
         </text>
         <!-- Role names and multiplicities at the part end -->
-        <rect x="644" y="183" width="45.4" height="12" rx="2" fill="#cfdcf3" />
+        <rect x="742" y="362" width="42" height="12" rx="2" fill="#e2ebf8" />
         <text
-          x="646"
-          y="192"
+          x="744"
+          y="371"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -299,16 +309,16 @@
           mapper
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="834" y="187" width="45.4" height="12" rx="2" fill="#cfdcf3" />
+        <rect x="942" y="330" width="28" height="12" rx="2" fill="#e2ebf8" />
         <text
-          x="836"
-          y="196"
+          x="944"
+          y="339"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="start"
         >
-          client
+          api
           <tspan font-weight="600">1</tspan>
         </text>
         <rect x="484" y="371" width="59.8" height="12" rx="2" fill="#e2ebf8" />
@@ -393,18 +403,19 @@
         </text>
         <!-- Class: ApiDtoMapper (DTO mapper) -->
         <rect
-          x="360"
-          y="56"
-          width="300"
-          height="120"
+          x="500"
+          y="232"
+          width="280"
+          height="124"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
+        <line x1="500" y1="280" x2="780" y2="280" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="510"
-          y="74"
+          x="640"
+          y="250"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -414,8 +425,8 @@
           «mapper»
         </text>
         <text
-          x="510"
-          y="92"
+          x="640"
+          y="268"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -427,33 +438,44 @@
             «Sprint 4»
           </tspan>
         </text>
-        <line x1="360" y1="104" x2="660" y2="104" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="376" y="120" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="516" y="296" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + toCredentialsDto(credentials: Credentials):
         </text>
-        <text x="392" y="136" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="532" y="308" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           CredentialsDto
         </text>
-        <text x="376" y="152" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="516" y="324" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + toSession(dto: TokenDto): Session
         </text>
-        <text x="376" y="168" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="516" y="348" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           other mappings: view 4.2
         </text>
-        <!-- Class: ApiClient (HTTP client, a type alias with no kind word) -->
+        <!-- Class: ApiClient (HTTP client, a type alias: the driver of the transport interfaces of layer 3, decision 22) -->
         <rect
-          x="700"
+          x="800"
           y="56"
           width="260"
-          height="116"
+          height="108"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
+        <line x1="800" y1="112" x2="1060" y2="112" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="830"
-          y="84"
+          x="930"
+          y="74"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «driver»
+        </text>
+        <text
+          x="930"
+          y="92"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -463,31 +485,72 @@
           ApiClient
         </text>
         <text
-          x="830"
-          y="98"
+          x="930"
+          y="106"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          api/client.ts
+        </text>
+        <text x="816" y="128" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + getHealth(): Promise&lt;HealthDto&gt;
+        </text>
+        <text x="816" y="144" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + signIn(body: CredentialsDto):
+        </text>
+        <text x="832" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Promise&lt;TokenDto&gt;
+          <tspan data-requirement="APP-FR-12" fill="#5b6873" font-size="8">«Sprint 4»</tspan>
+        </text>
+        <!-- Class: AccountApi (transport interface of layer 3, decision 22) -->
+        <rect
+          x="800"
+          y="232"
+          width="260"
+          height="84"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="800" y1="280" x2="1060" y2="280" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="930"
+          y="250"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          api/client.ts
+          «interface»
         </text>
-        <line x1="700" y1="116" x2="960" y2="116" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="716" y="132" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + getHealth(): Promise&lt;HealthResponse&gt;
+        <text
+          x="930"
+          y="268"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          AccountApi
+          <tspan data-requirement="APP-FR-12" fill="#5b6873" font-size="8" font-weight="400">
+            «Sprint 4»
+          </tspan>
         </text>
-        <text x="716" y="148" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="816" y="296" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + signIn(body: CredentialsDto):
         </text>
-        <text x="732" y="164" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="832" y="308" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Promise&lt;TokenDto&gt;
-          <tspan data-requirement="APP-FR-12" fill="#5b6873" font-size="8">«Sprint 4»</tspan>
         </text>
         <!-- Class: AccountScreen (component, route) -->
         <rect
           x="360"
-          y="208"
+          y="56"
           width="260"
           height="88"
           rx="6"
@@ -497,7 +560,7 @@
         />
         <text
           x="490"
-          y="226"
+          y="74"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -508,7 +571,7 @@
         </text>
         <text
           x="490"
-          y="244"
+          y="92"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -520,17 +583,17 @@
             «Sprint 4»
           </tspan>
         </text>
-        <line x1="360" y1="256" x2="620" y2="256" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="376" y="272" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="360" y1="104" x2="620" y2="104" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="376" y="120" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - presenter: AccountPresenter
         </text>
-        <text x="376" y="288" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="376" y="136" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           sends the credentials
         </text>
         <!-- Class: ApiAccountGateway (a piece of the Adapter pattern: the footnote names it, decision 23) -->
         <rect
-          x="680"
-          y="208"
+          x="700"
+          y="380"
           width="320"
           height="112"
           rx="6"
@@ -538,9 +601,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
+        <line x1="700" y1="428" x2="1020" y2="428" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="840"
-          y="238"
+          x="860"
+          y="409"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -552,15 +616,14 @@
             «Sprint 4»
           </tspan>
         </text>
-        <line x1="680" y1="256" x2="1000" y2="256" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="680" y1="296" x2="1000" y2="296" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="696" y="272" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - client: ApiClient
+        <line x1="700" y1="468" x2="1020" y2="468" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="716" y="444" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - api: AccountApi
         </text>
-        <text x="696" y="288" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="716" y="460" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - mapper: ApiDtoMapper
         </text>
-        <text x="696" y="312" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="716" y="484" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + login(credentials: Credentials): Promise&lt;Session&gt;
         </text>
         <!-- Class: AccountPresenter -->
@@ -904,7 +967,7 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Login asks the AccountGateway port for a Session and writes it through the SessionStore
-          port. ApiAccountGateway, an Adapter, implements
+          port. ApiAccountGateway, an Adapter of layer 3, implements
         </text>
         <text
           x="24"
@@ -913,8 +976,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          AccountGateway: ApiDtoMapper makes a CredentialsDto, and ApiClient sends it to
-          AuthController.signIn() of hexablock-api (API-FR-01).
+          AccountGateway: ApiDtoMapper makes a CredentialsDto, and ApiClient, the driver, sends it
+          through AccountApi to AuthController.signIn() of hexablock-api (API-FR-01).
         </text>
         <text
           x="24"
@@ -939,7 +1002,7 @@
         <line
           x1="24"
           y1="1090"
-          x2="1016"
+          x2="1076"
           y2="1090"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
