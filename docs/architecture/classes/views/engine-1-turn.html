@@ -80,21 +80,22 @@
           marks the boundary of the game aggregate: the root and its internal entities, the
           BoardState, the Board of the state and the timer of a timed game. The root joins the state
           and the timer, an ITimed, with a filled diamond. BoardState declares no board, and the
-          reference boxes of the board and of ITimed name views 2 and 3. The optional MoveHistory
-          and the optional timer stay inside: the root answers for them with undo(), redo(),
-          canUndo(), canRedo(), offersUndo() and elapsedTime(). BoardState is an entity inside the
-          GameEngine aggregate: its own GameStateId is its identity, it keeps the MatchId of its
-          game, its fields are private, and it changes in place only through its business methods.
-          Its snapshot() creates a BoardSnapshot, the immutable photo of the Memento pattern:
-          GameEngine.snapshot() returns it, IScoringPolicy reads two of them as SnapshotOf of its
-          TState, the photo type that snapshot() gives, and MoveHistory keeps them for the undo.
-          BoardSnapshot is abstract and its fields are private: a reader asks isPhotoOf(),
-          belongsTo(), boardCopy() and scoreSoFar(), and each variant photo implements view().
-          Resolution is a value object: it holds no state, its two fields are private, a reader asks
-          wasAccepted(), endsTheGame(), phaseAfter() and leadsTo(), and equals() compares accepted
-          and outcome. Score is the value object of the score and of the points of a turn:
-          IScoringPolicy returns one, BoardState adds it, and BoardSnapshot gives the score with
-          scoreSoFar().
+          reference boxes of the board and of ITimed name views 2 and 3. IGameRules declares only
+          validMoves() and playTurn() (decision 21). The optional history, an IUndoable that
+          declares the five members the root calls (decision 27), and the optional timer stay
+          inside: the root answers for them with undo(), redo(), canUndo(), canRedo(), offersUndo()
+          and elapsedTime(). BoardState is an entity inside the GameEngine aggregate: its own
+          GameStateId is its identity, it keeps the MatchId of its game, its fields are private, and
+          it changes in place only through its business methods. Its snapshot() creates a
+          BoardSnapshot, the immutable photo of the Memento pattern: GameEngine.snapshot() returns
+          it, IScoringPolicy reads two of them as SnapshotOf of its TState, the photo type that
+          snapshot() gives, and the history keeps them for the undo. BoardSnapshot is abstract and
+          its fields are private: a reader asks isPhotoOf(), belongsTo(), boardCopy() and
+          scoreSoFar(), and each variant photo implements view(). Resolution is a value object: it
+          holds no state, its two fields are private, a reader asks wasAccepted(), endsTheGame(),
+          phaseAfter() and leadsTo(), and equals() compares accepted and outcome. Score is the value
+          object of the score and of the points of a turn: IScoringPolicy returns one, BoardState
+          adds it, and BoardSnapshot gives the score with scoreSoFar().
         </desc>
         <defs>
           <marker
@@ -255,7 +256,7 @@
           x="744"
           y="384"
           width="252"
-          height="164"
+          height="196"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -305,7 +306,7 @@
           stroke-width="1"
           marker-end="url(#t-open)"
         />
-        <!-- GameEngine keeps zero or one MoveHistory it receives as history: use with role and multiplicity -->
+        <!-- GameEngine keeps zero or one IUndoable it receives as history: use with role and multiplicity -->
         <line
           x1="680"
           y1="428"
@@ -346,7 +347,7 @@
 
         <!-- Rules return a Resolution: use, through the return type of resolve() and playTurn() -->
         <path
-          d="M52,352 H32 V644 H52"
+          d="M52,288 H32 V644 H52"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -704,7 +705,7 @@
           textLength="278"
           lengthAdjust="spacingAndGlyphs"
         >
-          - history: MoveHistory&lt;TMove, SnapshotOf&lt;TState&gt;&gt; [0..1]
+          - history: IUndoable&lt;TMove, SnapshotOf&lt;TState&gt;&gt; [0..1]
         </text>
         <text x="396" y="408" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - timer: ITimed [0..1]
@@ -713,7 +714,7 @@
           + start(initial: TState): void
         </text>
         <text x="396" y="448" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + play(move: TMove): Outcome
+          + tryPlay(move: TMove): Resolution
         </text>
         <text x="396" y="464" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + takeEvents(): readonly GameEvent[]
@@ -765,7 +766,7 @@
           x="52"
           y="200"
           width="280"
-          height="168"
+          height="104"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -795,25 +796,12 @@
           IGameRules
         </text>
         <text x="68" y="264" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + isValid(state: TState, move: TMove): boolean
-        </text>
-        <text x="68" y="280" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + validMoves(state: TState): Iterable&lt;TMove&gt;
         </text>
-        <text x="68" y="296" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + apply(state: TState, move: TMove): TState
-        </text>
-        <text x="68" y="312" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + resolve(state: TState): Resolution
-        </text>
-        <text x="68" y="328" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + evaluate(state: TState): Outcome
-        </text>
-
-        <text x="68" y="344" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="280" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + playTurn(state: TState, move: TMove):
         </text>
-        <text x="84" y="360" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="84" y="296" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Resolution
         </text>
         <!-- Class: IScoringPolicy (interface) -->
@@ -938,41 +926,73 @@
           + resume(): GamePhase
         </text>
 
-        <!-- Class: MoveHistory -->
+        <!-- Class: IUndoable (interface, the history that the root depends on; MoveHistory of view 3 implements it, decision 27) -->
         <rect
           x="760"
           y="412"
           width="220"
-          height="120"
+          height="152"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="760" y1="452" x2="980" y2="452" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="760" y1="492" x2="980" y2="492" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="760" y1="460" x2="980" y2="460" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="870"
-          y="437"
+          y="430"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface»
+        </text>
+        <text
+          x="870"
+          y="448"
           fill="#17212a"
           font-size="12"
           font-weight="600"
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          MoveHistory
+          IUndoable
         </text>
-        <text x="776" y="468" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - done: MoveCommand[]
-        </text>
-        <text x="776" y="484" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - limit: UndoLimit [0..1]
-        </text>
-        <text x="776" y="508" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="776" y="476" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + record(command:
         </text>
-        <text x="784" y="524" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text
+          x="784"
+          y="492"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          textLength="186"
+          lengthAdjust="spacingAndGlyphs"
+        >
           MoveCommand&lt;TMove, TMemento&gt;): void
+        </text>
+        <text x="776" y="508" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + clear(): void
+        </text>
+        <text x="776" y="524" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + canUndo(): boolean
+        </text>
+        <text x="776" y="540" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + undo(): void
+        </text>
+        <text
+          x="776"
+          y="556"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          textLength="194"
+          lengthAdjust="spacingAndGlyphs"
+        >
+          + redoable(): IRedoable | undefined
         </text>
 
         <!-- Class: BoardState (interface, entity inside the aggregate) -->
@@ -1644,9 +1664,9 @@
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            Aggregate root: MatchId is its identity. A game changes only through play() and undo(),
-            and only while currentPhase().canPlay() is true. snapshot() returns the photo (decisions
-            26, 34).
+            Aggregate root: MatchId is its identity. A game changes only through tryPlay(), undo()
+            and redo(), while currentPhase().canPlay() is true. snapshot() returns the photo
+            (decisions 26, 34).
           </text>
           <text
             x="24"
@@ -1666,8 +1686,9 @@
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            IGameRules.evaluate(), GameEngine.play() and GamePhase.after() also use Outcome. Every
-            field of BoardSnapshot is private, and the photo is frozen (decisions 7 and 34).
+            BaseGameRules.evaluate() and GamePhase.after() also use Outcome, and tryPlay() returns
+            the Resolution. Every field of BoardSnapshot is private, and the photo is frozen
+            (decisions 7 and 34).
           </text>
           <text
             x="24"
@@ -1696,8 +1717,9 @@
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            BoardState declares no board: each variant state keeps its Board. The root keeps its
-            timer as an ITimed, and LevelTimer of view 3 implements it, so the timer box is ITimed.
+            BoardState declares no board: each variant state keeps its Board. The root keeps the
+            timer as an ITimed and the history as an IUndoable: view 3 draws LevelTimer and
+            MoveHistory.
           </text>
           <!-- Legend -->
           <line
