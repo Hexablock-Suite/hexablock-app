@@ -223,7 +223,7 @@
         />
         <!-- CompositionRoot creates InMemoryGameRepository and the other adapters: use, from layer 4 into layer 3 -->
         <path
-          d="M340 147 L340 512"
+          d="M340 160 L340 512"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -448,10 +448,10 @@
         >
           uses
         </text>
-        <rect x="316.4" y="162" width="47.199999999999996" height="12" rx="2" fill="#cfdcf3" />
+        <rect x="316.4" y="175" width="47.199999999999996" height="12" rx="2" fill="#cfdcf3" />
         <text
           x="340"
-          y="171"
+          y="184"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -598,7 +598,7 @@
           x="232"
           y="60"
           width="148"
-          height="87"
+          height="100"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -652,6 +652,15 @@
           font-family="'IBM Plex Mono', monospace"
         >
           CompositionRootProvider
+        </text>
+        <text
+          x="242"
+          y="151"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          ScreenServices
         </text>
         <!-- Component: board and screen parts, src/infrastructure/board/ and ui/ (Q8) -->
         <rect
@@ -2324,7 +2333,7 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           CompositionRoot creates the drivers, the adapters, the use cases and the variant factories
-          once. Layer 4 keeps no dependency rule.
+          once. Layer 4 keeps one rule: only CompositionRootProvider imports CompositionRoot (#411).
         </text>
         <text
           x="24"
