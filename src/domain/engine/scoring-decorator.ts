@@ -7,9 +7,10 @@ import type { IScoringPolicy } from './scoring-policy';
 // Each bonus extends it and changes the inner score in `score()`.
 // `inner` is private, as every attribute of the domain (issue #231). A bonus reads no field
 // of this class: it calls `super.score()` for the inner score.
-// `TInner` binds the type of the inner policy, such as `LinesScoring` for
-// `ComboMultiplierDecorator` (view variant-1-lines). A bonus that reads a member of its base
-// policy keeps its own private reference of that type and passes it to `super()`.
+// `TInner` binds the type of the inner policy. A bonus that reads a member of its base
+// policy binds that type, keeps its own private reference of it and passes it to `super()`.
+// A bonus that reads no member keeps the default `IScoringPolicy<TState>`, as
+// `ComboMultiplierDecorator` does (issue #427, view variant-1-lines).
 export abstract class ScoringDecorator<
   TState,
   TInner extends IScoringPolicy<TState> = IScoringPolicy<TState>,

@@ -1,5 +1,6 @@
 /** @jest-environment node */
 import { Score } from '../../../../src/domain/shared/score';
+import { ComboFactor } from '../../../../src/domain/variants/hexa-lines/combo-factor';
 import { LineCount } from '../../../../src/domain/variants/hexa-lines/line-count';
 import { Streak } from '../../../../src/domain/variants/hexa-lines/streak';
 
@@ -45,13 +46,50 @@ describe('Streak', () => {
     );
   });
 
-  // The combo multiplier is `lines + streak - 1` (issue #59, D22).
-  it('should_give_the_combo_bonus_of_the_lines_when_the_streak_multiplies_the_line_bonus', () => {
-    expect(Streak.of(1).comboBonus(LineCount.of(1)).equals(Score.of(0))).toBe(true);
-    expect(Streak.of(2).comboBonus(LineCount.of(1)).equals(Score.of(10))).toBe(true);
-    expect(Streak.of(1).comboBonus(LineCount.of(2)).equals(Score.of(20))).toBe(true);
-    expect(Streak.of(2).comboBonus(LineCount.of(2)).equals(Score.of(40))).toBe(true);
-    expect(Streak.of(3).comboBonus(LineCount.of(0)).equals(Score.of(0))).toBe(true);
+  // The combo multiplier is `lines + streak - 1` (issue #59, D22). The streak builds it
+  // as a `ComboFactor` from the lines (issue #427).
+  it('should_build_the_factor_lines_plus_streak_minus_one_when_the_streak_builds_the_combo_factor', () => {
+    const factor = (streak: number, lines: number) =>
+      Streak.of(streak).comboFactor(LineCount.of(lines));
+
+    expect(factor(1, 1).equals(ComboFactor.of(1))).toBe(true);
+    expect(factor(2, 1).equals(ComboFactor.of(2))).toBe(true);
+    expect(factor(1, 2).equals(ComboFactor.of(2))).toBe(true);
+    expect(factor(2, 2).equals(ComboFactor.of(3))).toBe(true);
+  });
+
+  // The points of issue #232 stay: the line count applies the factor that the streak builds.
+  it('should_give_the_combo_bonus_of_the_lines_when_the_line_count_applies_the_factor_of_the_streak', () => {
+    const bonus = (streak: number, lines: number) =>
+      LineCount.of(lines).comboBonus(Streak.of(streak).comboFactor(LineCount.of(lines)));
+
+    expect(bonus(1, 1).equals(Score.of(0))).toBe(true);
+    expect(bonus(2, 1).equals(Score.of(10))).toBe(true);
+    expect(bonus(1, 2).equals(Score.of(20))).toBe(true);
+    expect(bonus(2, 2).equals(Score.of(40))).toBe(true);
+  });
+
+  // A clearing placement has a streak of 1 or more, so a streak of 0 is a photo that no game
+  // makes. The formula still holds for it, as before issue #427: one line gives factor 0, whose
+  // bonus throws, two lines give factor 1, and no line gives -1, which throws.
+  it('should_keep_the_formula_of_the_factor_when_the_photo_has_a_streak_of_zero', () => {
+    const bonus = (lines: number) =>
+      LineCount.of(lines).comboBonus(Streak.of(0).comboFactor(LineCount.of(lines)));
+
+    expect(() => bonus(1)).toThrow(RangeError);
+    expect(bonus(2).equals(Score.of(0))).toBe(true);
+    expect(bonus(3).equals(Score.of(30))).toBe(true);
+    expect(() => Streak.of(0).comboFactor(LineCount.of(0))).toThrow(RangeError);
+  });
+
+  // A streak is not a count of lines (issue #427).
+  it('should_reject_at_compile_time_when_a_caller_asks_the_streak_for_the_old_combo_bonus', () => {
+    const bonuses = [
+      // @ts-expect-error The streak builds a `ComboFactor`, and `LineCount` applies it.
+      () => Streak.of(1).comboBonus(LineCount.of(1)),
+    ];
+
+    expect(bonuses).toHaveLength(1);
   });
 
   // A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails
