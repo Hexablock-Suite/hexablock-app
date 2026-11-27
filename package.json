@@ -19,6 +19,8 @@
     "contract:verify": "node scripts/contract/verify-provider.mjs",
     "api:generate": "node scripts/contract/api-types.mjs generate",
     "api:check": "node scripts/contract/api-types.mjs check",
+    "levels:load": "node scripts/contract/bundled-levels.mjs load",
+    "levels:check": "node scripts/contract/bundled-levels.mjs check",
     "verify": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm pact:check && pnpm arch",
     "prepare": "vp config --no-agent"
   },
