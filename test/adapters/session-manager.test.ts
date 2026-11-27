@@ -43,6 +43,21 @@ describe('SessionManager', () => {
     });
   });
 
+  // V8 quotes the text in the message of a JSON parse error, so the message would hold the token.
+  it('should_throw_a_syntax_error_that_quotes_no_part_of_the_text_when_the_kept_session_is_not_json', async () => {
+    const secrets = new InMemorySecretStore();
+    await secrets.set('session', 'eyJSECRETtoken');
+
+    const thrown = await new SessionManager(secrets).read().then(
+      () => undefined,
+      (error: unknown) => error,
+    );
+
+    expect(thrown).toBeInstanceOf(SyntaxError);
+    expect((thrown as SyntaxError).message).not.toContain('eyJSECRETtoken');
+    expect((thrown as SyntaxError).message).not.toContain('SECRET');
+  });
+
   it.each([
     ['another version', { version: 2, token: 'a', userId: 'b' }],
     ['no token', { version: 1, userId: 'b' }],

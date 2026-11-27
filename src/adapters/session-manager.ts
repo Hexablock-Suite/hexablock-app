@@ -10,6 +10,7 @@ const KEY = 'session';
 const VERSION = 1;
 const INVALID = 'The kept session is not valid.';
 const UNKNOWN_VERSION = 'The kept session has a version that this app does not read.';
+const NOT_JSON = 'The kept session is not JSON.';
 
 // The saved session: the version of the shape, the bearer token and the id of the account.
 interface SavedSession {
@@ -24,20 +25,32 @@ interface SavedSession {
 // It lives in layer 3, as every adapter of a port does (#437). The driver of layer 4,
 // `DeviceSecretStore`, holds the storage package. The composition root builds one manager
 // and gives it to `Register` and `Login` (single scope, decision 18).
-// A kept text that is not JSON throws a `SyntaxError`. A kept session of another version
-// or of the wrong shape throws a `RangeError`, and so does a blank token or user id.
+// A kept text that is not JSON throws a `SyntaxError` with a fixed message. The message of
+// `JSON.parse` can quote the text, and so the token, so the manager does not pass it on.
+// A kept session of another version or of the wrong shape throws a `RangeError`, and so does a
+// blank token or user id.
 export class SessionManager implements SessionStore {
   constructor(private readonly secrets: SecretStore) {}
 
   async read(): Promise<Session | undefined> {
     const text = await this.secrets.get(KEY);
     if (text === undefined) return undefined;
-    return sessionOf(JSON.parse(text));
+    return sessionOf(parsed(text));
   }
 
   async write(session: Session): Promise<void> {
     const saved: SavedSession = { version: VERSION, token: session.token, userId: session.userId };
     await this.secrets.set(KEY, JSON.stringify(saved));
+  }
+}
+
+// The value of a kept JSON text. A text that is not JSON throws a `SyntaxError` that quotes no
+// part of the text.
+function parsed(text: string): unknown {
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new SyntaxError(NOT_JSON);
   }
 }
 
