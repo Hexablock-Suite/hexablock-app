@@ -64,7 +64,7 @@
       <h1>Hexa Lines: a Decorator over the scoring strategy</h1>
 
       <svg
-        viewBox="0 0 1040 1168"
+        viewBox="0 0 1040 1416"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="lines-title lines-desc"
@@ -73,16 +73,19 @@
         <desc id="lines-desc">
           Class diagram of layer 1 for the Hexa Lines variant. LinesFactory creates LinesRules and
           ComboMultiplierDecorator. ComboMultiplierDecorator extends the engine ScoringDecorator,
-          binding TState to LinesState, and wraps LinesScoring. LinesRules uses LinesState as TState
-          and PlacePiece as TMove. Lollipops show the engine interface each variant class
-          implements, with its binding. LinesState is an entity inside the GameEngine aggregate: its
-          own GameStateId is its identity, it keeps the MatchId of its game, and it changes in place
-          only through its business methods. LinesSettings is a value object that LinesFactory
-          holds: the board size, and the shapes and the colors that a draw picks from. LinesFactory
-          also holds the RandomSource of the root, and each match draws a new Seed from it. Streak,
-          LineCount and CellCount are the three counts of the last placement that LinesState keeps:
-          value objects that give their points as a Score. A PlacePiece names its tray piece with a
-          TrayPosition (issue 232).
+          binding TState to LinesState. It binds no inner type, because it reads no member of
+          LinesScoring, and LinesFactory wraps a LinesScoring in it (issue 427). LinesRules uses
+          LinesState as TState and PlacePiece as TMove. Lollipops show the engine interface each
+          variant class implements, with its binding. LinesState is an entity inside the GameEngine
+          aggregate: its own GameStateId is its identity, it keeps the MatchId of its game, and it
+          changes in place only through its business methods. LinesSettings is a value object that
+          LinesFactory holds: the board size, and the shapes and the colors that a draw picks from.
+          LinesFactory also holds the RandomSource of the root, and each match draws a new Seed from
+          it. Streak, LineCount and CellCount are the three counts of the last placement that
+          LinesState keeps: value objects that give their points as a Score. A PlacePiece names its
+          tray piece with a TrayPosition (issue 232). ComboFactor is the combo multiplier lines +
+          streak - 1: Streak builds it from the lines, and LineCount applies it to its line bonus
+          (issue 427).
         </desc>
         <defs>
           <marker
@@ -143,7 +146,7 @@
           x="24"
           y="24"
           width="992"
-          height="944"
+          height="1160"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -253,16 +256,7 @@
           marker-end="url(#lines-open)"
           stroke="#5b6873"
         />
-        <!-- ComboMultiplierDecorator binds LinesScoring as the TInner of its base: use «bind». The base declares inner, so the hollow diamond sits on the base in view engine-4, not here (decision 23) -->
-        <line
-          x1="664"
-          y1="280"
-          x2="532"
-          y2="280"
-          stroke-width="1"
-          marker-end="url(#lines-open)"
-          stroke="#5b6873"
-        />
+        <!-- ComboMultiplierDecorator binds no inner type (#427): it reads no member of LinesScoring, so no «bind» line joins them. The base declares inner, so the hollow diamond sits on the base in view engine-4, not here (decision 23) -->
         <!-- ComboMultiplierDecorator extends ScoringDecorator: generalization with binding -->
         <line
           x1="700"
@@ -298,18 +292,6 @@
           letter-spacing="0.06em"
         >
           «create»
-        </text>
-        <rect x="536" y="264" width="36" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="554"
-          y="273"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          «bind»
         </text>
         <rect x="708" y="326" width="144" height="12" rx="2" fill="#f9f4dc" />
         <text
@@ -1177,10 +1159,10 @@
           + after(lines: LineCount): Streak
         </text>
         <text x="52" y="896" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + comboBonus(lines: LineCount):
+          + comboFactor(lines: LineCount):
         </text>
         <text x="63" y="912" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          Score
+          ComboFactor
         </text>
 
         <!-- Class: LineCount (value object, issue 232) -->
@@ -1188,7 +1170,7 @@
           x="268"
           y="760"
           width="212"
-          height="192"
+          height="208"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1244,10 +1226,13 @@
           + bonus(): Score
         </text>
         <text x="284" y="928" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + comboBonus(streak: LineCount):
+          + comboFactor(): ComboFactor
         </text>
-        <text x="295" y="944" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          Score
+        <text x="284" y="944" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + comboBonus(factor:
+        </text>
+        <text x="295" y="960" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          ComboFactor): Score
         </text>
 
         <!-- Class: CellCount (value object, issue 232) -->
@@ -1372,10 +1357,121 @@
           + misfitAt(at: CoordKey): RangeError
         </text>
 
+        <!-- Streak builds ComboFactor, and LineCount builds and applies it: use (issue 427) -->
+        <line
+          x1="180"
+          y1="920"
+          x2="180"
+          y2="1000"
+          stroke-width="1"
+          marker-end="url(#lines-open)"
+          stroke="#5b6873"
+        />
+        <line
+          x1="340"
+          y1="968"
+          x2="340"
+          y2="1000"
+          stroke-width="1"
+          marker-end="url(#lines-open)"
+          stroke="#5b6873"
+        />
+
+        <!-- Class: ComboFactor (value object, issue 427) -->
+        <rect
+          x="148"
+          y="1000"
+          width="244"
+          height="168"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="148" y1="1048" x2="392" y2="1048" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="270"
+          y="1018"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «value object»
+        </text>
+        <text
+          x="270"
+          y="1036"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          ComboFactor
+        </text>
+        <text
+          x="164"
+          y="1064"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          - value: number
+        </text>
+        <line x1="148" y1="1072" x2="392" y2="1072" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="164"
+          y="1088"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + of(value: number): ComboFactor
+        </text>
+        <text
+          x="164"
+          y="1104"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + equals(other: ComboFactor): boolean
+        </text>
+        <text
+          x="164"
+          y="1120"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + inStreak(oneLine: ComboFactor):
+        </text>
+        <text
+          x="175"
+          y="1136"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          ComboFactor
+        </text>
+        <text
+          x="164"
+          y="1152"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + extraOn(bonus: Score): Score
+        </text>
+
         <!-- Footnote: classes the budget leaves out -->
         <text
           x="24"
-          y="992"
+          y="1208"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1385,7 +1481,7 @@
         </text>
         <text
           x="24"
-          y="1008"
+          y="1224"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1396,7 +1492,7 @@
 
         <text
           x="24"
-          y="1024"
+          y="1240"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1407,17 +1503,17 @@
         </text>
         <text
           x="24"
-          y="1040"
+          y="1256"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Streak, LineCount, CellCount and TrayPosition keep their numbers private (issue 232): each
-          count gives its points as a Score, and the Streak gives the combo bonus.
+          count gives its points as a Score.
         </text>
         <text
           x="24"
-          y="1056"
+          y="1272"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1425,18 +1521,38 @@
           LinesSnapshot keeps its fields private (#245): trayPieces(), currentStreak(), lastCombo()
           and lastPlacedCells(); LinesView delivers its tray with deliverTo().
         </text>
+        <text
+          x="24"
+          y="1288"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          ComboFactor is the multiplier lines + streak - 1 (issue 427): the Streak builds it from
+          the lines, and the LineCount applies it to its line bonus.
+        </text>
+        <text
+          x="24"
+          y="1304"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          ComboMultiplierDecorator binds no inner type (issue 427): it reads no member of
+          LinesScoring, and LinesFactory wraps a new LinesScoring in it.
+        </text>
         <!-- Legend -->
         <line
           x1="24"
-          y1="1080"
+          y1="1328"
           x2="1016"
-          y2="1080"
+          y2="1328"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1098"
+          y="1346"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1447,16 +1563,16 @@
 
         <line
           x1="24"
-          y1="1116"
+          y1="1364"
           x2="52"
-          y2="1116"
+          y2="1364"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#lines-triangle)"
         />
         <text
           x="60"
-          y="1120"
+          y="1368"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1465,16 +1581,16 @@
         </text>
         <line
           x1="144"
-          y1="1116"
+          y1="1364"
           x2="172"
-          y2="1116"
+          y2="1364"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#lines-open)"
         />
         <text
           x="180"
-          y="1120"
+          y="1368"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1483,7 +1599,7 @@
         </text>
         <rect
           x="24"
-          y="1136"
+          y="1384"
           width="28"
           height="12"
           rx="2"
@@ -1493,7 +1609,7 @@
         />
         <text
           x="60"
-          y="1145"
+          y="1393"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1502,7 +1618,7 @@
         </text>
         <rect
           x="184"
-          y="1136"
+          y="1384"
           width="28"
           height="12"
           rx="2"
@@ -1513,7 +1629,7 @@
         />
         <text
           x="220"
-          y="1145"
+          y="1393"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1522,7 +1638,7 @@
         </text>
         <rect
           x="424"
-          y="1136"
+          y="1384"
           width="28"
           height="12"
           rx="2"
@@ -1533,7 +1649,7 @@
         />
         <text
           x="460"
-          y="1145"
+          y="1393"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1542,7 +1658,7 @@
         </text>
         <rect
           x="600"
-          y="1136"
+          y="1384"
           width="28"
           height="12"
           rx="2"
@@ -1552,18 +1668,18 @@
         />
         <text
           x="636"
-          y="1145"
+          y="1393"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
         </text>
-        <line x1="760" y1="1142" x2="776" y2="1142" stroke="#17212a" stroke-width="1" />
-        <circle cx="781" cy="1142" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="760" y1="1390" x2="776" y2="1390" stroke="#17212a" stroke-width="1" />
+        <circle cx="781" cy="1390" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="796"
-          y="1145"
+          y="1393"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

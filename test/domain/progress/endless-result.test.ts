@@ -44,12 +44,11 @@ describe('an endless GameResult', () => {
   it('should_throw_a_range_error_and_keep_the_progress_when_a_level_model_records_an_endless_result', () => {
     const progress = GameProgress.start(FIT);
 
-    expect(() =>
-      new LevelProgress(oneStar).record(
-        GameResult.endless({ gameId: FIT, score: Score.of(0) }),
-        progress,
-      ),
-    ).toThrow(new RangeError('An endless result has no moves, so no level counts its stars.'));
+    const endless = GameResult.endless({ gameId: FIT, score: Score.of(0) });
+    const refusal = new RangeError('An endless result has no moves, so no level counts its stars.');
+
+    expect(() => LevelProgress.byMoves(oneStar).record(endless, progress)).toThrow(refusal);
+    expect(() => LevelProgress.byMovesAndTime(oneStar).record(endless, progress)).toThrow(refusal);
     expect(progress.starsOf(LevelId.of('fit-01'))).toBeUndefined();
   });
 });

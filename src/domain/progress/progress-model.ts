@@ -2,7 +2,7 @@ import type { ElapsedTime } from '../shared/elapsed-time';
 import type { GameId } from '../shared/game-id';
 import type { GameProgress } from './game-progress';
 import type { LevelId } from './level-id';
-import type { ILevelStars } from './level-progress';
+import type { IStarsByMoves, IStarsByMovesAndTime } from './level-progress';
 import type { Moves } from '../shared/moves';
 import type { Score } from '../shared/score';
 import type { Stars } from './stars';
@@ -78,14 +78,31 @@ export class GameResult {
     });
   }
 
-  // The stars that `level` gives to the play of this result.
+  // The stars that `level`, a level with no timer, gives to the play of this result.
+  // The result gives its moves to the level, and the level answers.
+  // An endless result has no moves, so it throws a RangeError.
+  starsByMoves(level: IStarsByMoves): Stars {
+    return level.starsFor(this.levelMoves());
+  }
+
+  // The stars that `level`, a timed level, gives to the play of this result.
   // The result gives its moves and its time to the level, and the level answers.
   // An endless result has no moves, so it throws a RangeError.
-  starsBy(level: ILevelStars): Stars {
+  // A timed level always gives its time, so a result with no time throws a RangeError too.
+  starsByMovesAndTime(level: IStarsByMovesAndTime): Stars {
+    const moves = this.levelMoves();
+    if (this.elapsedMs === undefined) {
+      throw new RangeError('A timed level counts its stars only with the time of the play.');
+    }
+    return level.starsFor(moves, this.elapsedMs);
+  }
+
+  // The moves of the play of a level. An endless result has none, so it throws a RangeError.
+  private levelMoves(): Moves {
     if (this.moves === undefined) {
       throw new RangeError('An endless result has no moves, so no level counts its stars.');
     }
-    return level.starsFor(this.moves, this.elapsedMs);
+    return this.moves;
   }
 }
 

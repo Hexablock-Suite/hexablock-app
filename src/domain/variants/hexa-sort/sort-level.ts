@@ -1,15 +1,15 @@
 import type { Color } from '../../engine/color';
-import type { ElapsedTime } from '../../shared/elapsed-time';
-import type { ILevelStars } from '../../progress/level-progress';
+import type { IStarsByMoves } from '../../progress/level-progress';
 import type { Moves } from '../../shared/moves';
 import { frozenListOf } from '../../engine/frozen-list';
 import type { RandomSource } from '../../engine/random-source';
 import type { RegionSize } from '../../engine/region-size';
 import type { Seed } from '../../engine/seed';
+import { starsOf } from '../../progress/star-count';
 import type { Stars } from '../../progress/stars';
 import { ColorStack } from './color-stack';
 import type { GoalCount } from './goal-count';
-import { SortPlay, sortStars, type SortStarThreshold } from './sort-stars';
+import { SortPlay, type SortStarThreshold } from './sort-stars';
 
 // The data of the piece source of a level. A level picks one of three kinds (A4).
 // A seeded supply holds the seed and the colors that a draw picks from.
@@ -44,9 +44,9 @@ export interface SortSourceBuilders<TSource> {
 // So a change to the array of the caller does not change the level.
 // `SortLevelBuilder` builds the level from a level file through a factory method (#167).
 // The level also holds the thresholds of its stars, and `LevelProgress` asks it for the stars
-// of a play through `ILevelStars` (issue #156). A level holds no threshold until
+// of a play through `IStarsByMoves` (issues #156 and #424). A level holds no threshold until
 // `withStars()` gives them. `SortLevelBuilder` gives it the thresholds of the file.
-export class SortLevel implements ILevelStars {
+export class SortLevel implements IStarsByMoves {
   private constructor(
     private readonly size: RegionSize,
     private readonly goalsNeeded: GoalCount,
@@ -114,11 +114,11 @@ export class SortLevel implements ILevelStars {
     return new SortLevel(this.size, this.goalsNeeded, this.supply, Object.freeze([...stars]));
   }
 
-  // The stars of a won play of this level: `sortStars()` counts the leading thresholds
+  // The stars of a won play of this level: `starsOf()` counts the leading thresholds
   // that the moves of the play meet (D22, classes.md decision 36).
-  // A Sort level has no timer, so the time of the play changes no star.
-  starsFor(moves: Moves, _elapsedMs: ElapsedTime | undefined): Stars {
-    return sortStars(SortPlay.of(moves), this.stars);
+  // A Sort level has no timer, so it takes no time (issue #424).
+  starsFor(moves: Moves): Stars {
+    return starsOf(SortPlay.of(moves), this.stars);
   }
 
   // Two levels are equal when they hold the same size, the same goal, equal source data

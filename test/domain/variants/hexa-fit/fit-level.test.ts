@@ -164,14 +164,20 @@ describe('FitLevel', () => {
     expect(starsOf(level, 4, 30000)).toEqual(Stars.of(1));
   });
 
-  // A Fit level always has a timer, so a play with no time is a fault of the caller.
-  it('should_throw_a_range_error_with_no_value_in_its_message_when_the_play_has_no_elapsed_time', () => {
+  // A Fit level always has a timer, so it takes the time of each play (issue #424).
+  // `GameResult` refuses a result with no time before it asks the level.
+  // A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails
+  // when the line compiles, because then the directive is unused.
+  it('should_reject_at_compile_time_when_a_caller_counts_the_stars_of_a_play_with_no_time', () => {
     const level = FitLevel.of(TopologyId.square, row(2), [domino(A)], [star(4, 30000)]);
+    const counts = [
+      // @ts-expect-error A Fit level needs the time of the play.
+      () => level.starsFor(Moves.of(4), undefined),
+      // @ts-expect-error A Fit level needs the time of the play.
+      () => level.starsFor(Moves.of(4)),
+    ];
 
-    const count = () => level.starsFor(Moves.of(4), undefined);
-
-    expect(count).toThrow(
-      new RangeError('A Fit level counts its stars only with the time of the play.'),
-    );
+    expect(counts).toHaveLength(2);
+    expect(starsOf(level, 4, 30000)).toEqual(Stars.of(1));
   });
 });

@@ -3,6 +3,7 @@ import { Outcome } from '../../../../src/domain/engine/outcome';
 import { ElapsedTime } from '../../../../src/domain/shared/elapsed-time';
 import { Moves } from '../../../../src/domain/shared/moves';
 import { Score } from '../../../../src/domain/shared/score';
+import { starsOf } from '../../../../src/domain/progress/star-count';
 import { Stars } from '../../../../src/domain/progress/stars';
 import { Board } from '../../../../src/domain/engine/board';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
@@ -18,11 +19,7 @@ import {
   FIT_POINTS_PER_TURN,
   FitScoring,
 } from '../../../../src/domain/variants/hexa-fit/fit-scoring';
-import {
-  FitPlay,
-  FitStarThreshold,
-  fitStars,
-} from '../../../../src/domain/variants/hexa-fit/fit-stars';
+import { FitPlay, FitStarThreshold } from '../../../../src/domain/variants/hexa-fit/fit-stars';
 import { FitState } from '../../../../src/domain/variants/hexa-fit/fit-state';
 import { PieceId } from '../../../../src/domain/variants/hexa-fit/piece-id';
 import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
@@ -150,37 +147,38 @@ describe('FitPlay.isWithin', () => {
   });
 });
 
-describe('fitStars', () => {
+// One star count serves Fit and Sort (issue #424): `starsOf` with Fit thresholds.
+describe('starsOf with Fit thresholds', () => {
   it('should_give_the_star_when_the_moves_and_the_time_meet_both_thresholds', () => {
-    expect(fitStars(play(10, 60_000), ONE_STAR)).toEqual(Stars.of(1));
+    expect(starsOf(play(10, 60_000), ONE_STAR)).toEqual(Stars.of(1));
   });
 
   it('should_give_a_stars_value_object_when_the_stars_are_counted', () => {
-    expect(fitStars(play(10, 60_000), ONE_STAR)).toBeInstanceOf(Stars);
-    expect(fitStars(play(10, 60_000), ONE_STAR).equals(Stars.of(1))).toBe(true);
+    expect(starsOf(play(10, 60_000), ONE_STAR)).toBeInstanceOf(Stars);
+    expect(starsOf(play(10, 60_000), ONE_STAR).equals(Stars.of(1))).toBe(true);
   });
 
   it('should_give_no_star_when_only_the_moves_meet_the_threshold', () => {
-    expect(fitStars(play(10, 60_001), ONE_STAR)).toEqual(Stars.of(0));
+    expect(starsOf(play(10, 60_001), ONE_STAR)).toEqual(Stars.of(0));
   });
 
   it('should_give_no_star_when_only_the_time_meets_the_threshold', () => {
-    expect(fitStars(play(11, 60_000), ONE_STAR)).toEqual(Stars.of(0));
+    expect(starsOf(play(11, 60_000), ONE_STAR)).toEqual(Stars.of(0));
   });
 
   it('should_give_no_star_when_neither_threshold_is_met', () => {
-    expect(fitStars(play(11, 60_001), ONE_STAR)).toEqual(Stars.of(0));
+    expect(starsOf(play(11, 60_001), ONE_STAR)).toEqual(Stars.of(0));
   });
 
   it('should_count_each_star_whose_two_thresholds_are_met_when_the_level_has_three_stars', () => {
     const threeStars = [star(20, 120_000), star(12, 90_000), star(8, 30_000)];
 
-    expect(fitStars(play(10, 60_000), threeStars)).toEqual(Stars.of(2));
+    expect(starsOf(play(10, 60_000), threeStars)).toEqual(Stars.of(2));
   });
 
   it('should_give_no_star_when_the_level_lists_no_threshold', () => {
     // A level with no star gives 0, even for a perfect play.
-    expect(fitStars(play(0, 0), [])).toEqual(Stars.of(0));
+    expect(starsOf(play(0, 0), [])).toEqual(Stars.of(0));
   });
 
   it('should_give_no_star_when_the_play_meets_star_two_but_not_star_one', () => {
@@ -188,19 +186,19 @@ describe('fitStars', () => {
     const byMoves = [star(10, 30_000), star(20, 60_000)];
     const byTime = [star(20, 30_000), star(20, 60_000)];
 
-    expect(fitStars(play(15, 45_000), byMoves)).toEqual(Stars.of(0));
-    expect(fitStars(play(10, 45_000), byTime)).toEqual(Stars.of(0));
+    expect(starsOf(play(15, 45_000), byMoves)).toEqual(Stars.of(0));
+    expect(starsOf(play(10, 45_000), byTime)).toEqual(Stars.of(0));
   });
 
   it('should_stop_at_the_first_missed_star_when_a_later_star_is_met', () => {
     const stars = [star(20, 120_000), star(10, 30_000), star(30, 120_000)];
 
-    expect(fitStars(play(15, 60_000), stars)).toEqual(Stars.of(1));
+    expect(starsOf(play(15, 60_000), stars)).toEqual(Stars.of(1));
   });
 
   // `Moves` checks the count, so no play holds a count that no game gives (issue #137).
   it('should_throw_a_range_error_when_the_moves_are_not_a_safe_integer_of_zero_or_more', () => {
-    const played = (moves: number) => () => fitStars(play(moves, 0), ONE_STAR);
+    const played = (moves: number) => () => starsOf(play(moves, 0), ONE_STAR);
 
     for (const moves of [-1, 1.5, Number.NaN, Number.POSITIVE_INFINITY, 2 ** 53]) {
       expect(played(moves)).toThrow(RangeError);
@@ -216,7 +214,7 @@ describe('fitStars', () => {
 
   // `ElapsedTime` checks the time. Before issue #204 a time could be decimal.
   it('should_throw_a_range_error_when_the_elapsed_time_is_not_a_safe_integer_of_zero_or_more', () => {
-    const played = (elapsedMs: number) => () => fitStars(play(0, elapsedMs), ONE_STAR);
+    const played = (elapsedMs: number) => () => starsOf(play(0, elapsedMs), ONE_STAR);
 
     for (const elapsedMs of [-1, 0.5, Number.NaN, Number.POSITIVE_INFINITY, Number.MAX_VALUE]) {
       expect(played(elapsedMs)).toThrow(RangeError);
@@ -231,7 +229,7 @@ describe('fitStars', () => {
   });
 
   it('should_check_the_moves_and_the_time_when_the_level_lists_no_threshold', () => {
-    expect(() => fitStars(play(-1, 0), [])).toThrow(RangeError);
-    expect(() => fitStars(play(0, -1), [])).toThrow(RangeError);
+    expect(() => starsOf(play(-1, 0), [])).toThrow(RangeError);
+    expect(() => starsOf(play(0, -1), [])).toThrow(RangeError);
   });
 });

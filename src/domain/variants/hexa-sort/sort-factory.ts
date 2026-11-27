@@ -98,8 +98,8 @@ export class SortFactory<TCoord> implements IVariantFactory<
   }
 
   // Hexa Sort keeps the best result of each level. The level counts the stars of a play
-  // by its moves (D22, classes.md decision 36).
+  // by its moves (D22, classes.md decision 36), so the model counts by the moves only (#424).
   createProgressModel(): LevelProgress {
-    return new LevelProgress(this.level);
+    return LevelProgress.byMoves(this.level);
   }
 }

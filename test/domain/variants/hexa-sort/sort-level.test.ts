@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { Color } from '../../../../src/domain/engine/color';
 import { ElapsedTime } from '../../../../src/domain/shared/elapsed-time';
-import type { ILevelStars } from '../../../../src/domain/progress/level-progress';
+import type { IStarsByMoves } from '../../../../src/domain/progress/level-progress';
 import { Moves } from '../../../../src/domain/shared/moves';
 import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
@@ -155,28 +155,41 @@ describe('SortLevel', () => {
   });
 
   // A Sort level holds the thresholds of its stars and counts the stars of a play by its moves
-  // (D22, classes.md decision 36, issue #156). `LevelProgress` asks it through `ILevelStars`.
+  // (D22, classes.md decision 36, issue #156). `LevelProgress` asks it through `IStarsByMoves`.
   it('should_count_the_leading_thresholds_that_the_moves_meet_when_the_level_has_thresholds', () => {
     const thresholds = [SortStarThreshold.of(Moves.of(20)), SortStarThreshold.of(Moves.of(10))];
-    const levels: ILevelStars[] = [
+    const levels: IStarsByMoves[] = [
       fixed(stack('red')).withStars(thresholds),
       SortLevel.seeded(SIZE, GOAL, Seed.of(7), [red]).withStars(thresholds),
     ];
     thresholds.push(SortStarThreshold.of(Moves.of(1)));
 
     for (const level of levels) {
-      expect(level.starsFor(Moves.of(10), undefined).equals(Stars.of(2))).toBe(true);
-      expect(level.starsFor(Moves.of(15), undefined).equals(Stars.of(1))).toBe(true);
-      expect(level.starsFor(Moves.of(21), undefined).equals(Stars.of(0))).toBe(true);
-      // A Sort level has no timer, so a time changes no star.
-      expect(level.starsFor(Moves.of(10), ElapsedTime.ofMs(99_000)).equals(Stars.of(2))).toBe(true);
+      expect(level.starsFor(Moves.of(10)).equals(Stars.of(2))).toBe(true);
+      expect(level.starsFor(Moves.of(15)).equals(Stars.of(1))).toBe(true);
+      expect(level.starsFor(Moves.of(21)).equals(Stars.of(0))).toBe(true);
     }
+  });
+
+  // A Sort level has no timer, so it takes no time (issue #424).
+  // A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails
+  // when the line compiles, because then the directive is unused.
+  it('should_reject_at_compile_time_when_a_caller_gives_a_sort_level_the_time_of_a_play', () => {
+    const level = fixed(stack('red')).withStars([SortStarThreshold.of(Moves.of(10))]);
+    const counts = [
+      // @ts-expect-error A Sort level counts its stars by the moves only.
+      () => level.starsFor(Moves.of(10), ElapsedTime.ofMs(99_000)),
+      // @ts-expect-error A Sort level counts its stars by the moves only.
+      () => level.starsFor(Moves.of(10), undefined),
+    ];
+
+    expect(counts).toHaveLength(2);
   });
 
   // A factory method gives a level with no threshold. `SortLevelBuilder` gives a level
   // the thresholds of its file with `withStars()` (#167).
   it('should_give_no_star_when_the_level_holds_no_threshold', () => {
-    expect(fixed(stack('red')).starsFor(Moves.of(0), undefined).equals(Stars.of(0))).toBe(true);
+    expect(fixed(stack('red')).starsFor(Moves.of(0)).equals(Stars.of(0))).toBe(true);
   });
 
   it('should_not_be_equal_when_two_levels_hold_other_star_thresholds', () => {

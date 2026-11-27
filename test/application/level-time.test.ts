@@ -6,11 +6,12 @@ import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
 import { GameId } from '../../src/domain/shared/game-id';
 import { Moves } from '../../src/domain/shared/moves';
 import { GameResult } from '../../src/domain/progress/progress-model';
+import { starsOf } from '../../src/domain/progress/star-count';
 import { Stars } from '../../src/domain/progress/stars';
 import { Turns } from '../../src/domain/engine/turns';
 import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
 import { PlaceFitPiece } from '../../src/domain/variants/hexa-fit/fit-move';
-import { FitPlay, FitStarThreshold, fitStars } from '../../src/domain/variants/hexa-fit/fit-stars';
+import { FitPlay, FitStarThreshold } from '../../src/domain/variants/hexa-fit/fit-stars';
 import { gameUseCases, valueOf } from '../support/application/game-use-cases';
 import { ManualClock } from '../support/engine/manual-clock';
 import { delivered } from '../support/engine/value-receiver';
@@ -81,7 +82,7 @@ describe('The time of a Fit level', () => {
       ),
     ).toBe(true);
     expect(
-      fitStars(FitPlay.of({ moves: Moves.of(3), elapsedMs: ElapsedTime.ofMs(5_000) }), [
+      starsOf(FitPlay.of({ moves: Moves.of(3), elapsedMs: ElapsedTime.ofMs(5_000) }), [
         star(3, 5_000),
         star(3, 4_999),
       ]),

@@ -115,13 +115,42 @@ describe('Hexa Lines scoring', () => {
     }
   });
 
+  // The line bonus is private (issue #427): the base policy gives it inside `score()`.
   it('should_give_the_line_bonus_as_a_score_when_the_base_policy_reads_the_cleared_lines', () => {
     const photoOf = (lines: number) =>
       linesState(squareTopology, 1, { tray: [], linesCleared: LineCount.of(lines) }).snapshot();
     const base = new LinesScoring<SquareCoord>();
 
-    expect(base.lineBonus(photoOf(2))).toEqual(Score.of(20));
-    expect(base.lineBonus(photoOf(0))).toEqual(Score.of(0));
+    expect(base.score(photoOf(2), photoOf(2))).toEqual(Score.of(20));
+    expect(base.score(photoOf(0), photoOf(0))).toEqual(Score.of(0));
+  });
+
+  // A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails
+  // when the line compiles, because then the directive is unused.
+  it('should_reject_at_compile_time_when_a_caller_asks_the_base_policy_for_the_line_bonus', () => {
+    const photo = linesState(squareTopology, 1, { tray: [] }).snapshot();
+    const readers = [
+      // @ts-expect-error `LinesScoring.lineBonus()` is private (issue #427).
+      () => new LinesScoring<SquareCoord>().lineBonus(photo),
+    ];
+
+    expect(readers).toHaveLength(1);
+  });
+
+  // The decorator reads no member of `LinesScoring`, so it binds no inner type (issue #427).
+  // It wraps any scoring policy of the Lines state and adds the combo bonus to its score.
+  it('should_add_the_combo_bonus_to_any_inner_policy_when_the_decorator_binds_no_inner_type', () => {
+    const flat: IScoringPolicy<LinesState<SquareCoord>> = { score: () => Score.of(5) };
+    const after = linesState(squareTopology, 1, {
+      tray: [],
+      linesCleared: LineCount.of(2),
+      streak: Streak.of(1),
+    }).snapshot();
+
+    // 5 from the inner policy, plus 10 × 2 lines × (2 + 1 - 2) for the combo.
+    expect(new ComboMultiplierDecorator<SquareCoord>(flat).score(after, after)).toEqual(
+      Score.of(25),
+    );
   });
 
   it('should_add_ten_points_for_the_line_when_the_first_clearing_placement_clears_one_line', () => {
