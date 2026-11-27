@@ -4,7 +4,6 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { fireGestureHandler, getByGestureTestId } from 'react-native-gesture-handler/jest-utils';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { textCatalog } from '../../../src/adapters/texts/text-catalog';
 import { GameId } from '../../../src/domain/shared/game-id';
 import { TopologyId } from '../../../src/domain/shared/topology-id';
 import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
@@ -16,7 +15,7 @@ import { HexLayout } from '../../../src/adapters/board/hex-layout';
 import { slideWays, type Compass, type SlideWay } from '../../../src/adapters/board/slide-ways';
 import { SquareLayout } from '../../../src/adapters/board/square-layout';
 import { CompositionRoot } from '../../../src/infrastructure/composition-root';
-import { gameSessionOf, type GameSession } from '../../../src/infrastructure/ui/game-session';
+import type { GameSession } from '../../../src/infrastructure/ui/screen-services';
 import { GameStage } from '../../../src/infrastructure/ui/game-stage';
 import { RecordingLogger } from '../../support/application/recording-logger';
 import { ManualClock } from '../../support/engine/manual-clock';
@@ -65,7 +64,7 @@ const KEY_WAYS: readonly (readonly [string, Compass, Compass])[] = [
 // The Merge session of the real composition root on `figure`, with a manual clock.
 function mergeSession(figure: TopologyId): GameSession {
   const root = new CompositionRoot({ clock: new ManualClock(), logger: new RecordingLogger() });
-  return gameSessionOf(root, GameId.of('hexa-merge'), textCatalog.es, figure);
+  return root.gameSession(GameId.of('hexa-merge'), figure);
 }
 
 async function show(session: GameSession): Promise<void> {

@@ -64,7 +64,7 @@
       <h1>Wiring: the drivers and the composition root</h1>
 
       <svg
-        viewBox="0 0 1040 1453"
+        viewBox="0 0 1040 1469"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="adwiring-title adwiring-desc"
@@ -84,9 +84,11 @@
           and gives it to the counter listener of the bus (#363). With a store in its drivers it
           creates LocalProgressRepository once, keeps it as progress for every consumer of the saved
           progress, and builds ListAchievements over it once, and listAchievements() gives it. It
-          also answers loadProgress(gameId) with one LoadProgress per game, which reads the saved
-          progress of that game back (#181), and it builds ListLevels once over the same two
-          repositories for the level selector, and listLevels() gives it (#173).
+          also builds one LoadProgress over it, which reads the saved progress of the game of each
+          request back, and loadProgress() gives it (#181, #410). It builds ListLevels once over the
+          same two repositories for the level selector, and listLevels() gives it (#173).
+          CompositionRoot implements ScreenServices, the closed interface of the screens, and builds
+          the presenter of each screen (#411).
         </desc>
         <defs>
           <marker
@@ -684,7 +686,7 @@
           + listLevels(): UseCase‹ListLevelsRequest, LevelSummary[]›
         </text>
         <text x="288" y="570" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + loadProgress(gameId: GameId): UseCase‹LoadProgressRequest,
+          + loadProgress(): UseCase‹LoadProgressRequest,
         </text>
         <text x="304" y="584" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           GameProgress | undefined›
@@ -1000,6 +1002,12 @@
         </text>
 
         <!-- Lollipops: interface or port each class implements, with its binding -->
+        <!-- CompositionRoot implements ScreenServices, the closed interface of the screens (#411) -->
+        <line x1="680" y1="540" x2="696" y2="540" stroke="#17212a" stroke-width="1" />
+        <circle cx="701" cy="540" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="712" y="543" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          ScreenServices
+        </text>
         <line x1="312" y1="1088" x2="312" y2="1104" stroke="#17212a" stroke-width="1" />
         <circle cx="312" cy="1109" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
@@ -1161,8 +1169,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          It answers loadProgress(gameId) with one LoadProgress per game over the progress
-          repository (#181). A root with no store offers none of them, and asking throws a
+          It builds one LoadProgress over the progress repository, and loadProgress() gives it for
+          every game (#181, #410). A root with no store offers none of them, and asking throws a
           RangeError.
         </text>
         <text
@@ -1186,8 +1194,18 @@
           AchievementCounterListener, which saves the counters (#363), and to ListAchievements
           (#364).
         </text>
-        <!-- The legend sits 48 lower than before: the footnote has one more line since #326, one more since #363 and one more since #173. -->
-        <g transform="translate(0 104)">
+        <text
+          x="24"
+          y="1332"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          It implements ScreenServices: it builds a new presenter for each screen, and the hook of
+          the screen keeps it. A hook sees only ScreenServices (decision 18, #411).
+        </text>
+        <!-- The legend sits 64 lower than before: the footnote has one more line since #326, one more since #363, one more since #173 and one more since #411. -->
+        <g transform="translate(0 120)">
           <!-- Legend -->
           <line
             x1="24"

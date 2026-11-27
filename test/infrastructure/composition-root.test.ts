@@ -184,8 +184,8 @@ describe('CompositionRoot', () => {
   it('should_throw_a_range_error_when_a_root_with_no_store_is_asked_for_the_saved_progress', () => {
     const root = testRoot();
 
-    expect(() => root.loadProgress(GameId.of('hexa-lines'))).toThrow(RangeError);
-    expect(() => root.loadProgress(GameId.of('hexa-lines'))).toThrow(
+    expect(() => root.loadProgress()).toThrow(RangeError);
+    expect(() => root.loadProgress()).toThrow(
       'The root has no local store, so it loads no progress.',
     );
   });
@@ -204,13 +204,41 @@ describe('CompositionRoot', () => {
     saved.recordScore(ProgressRecord.of({ gameId: LINES, score: Score.of(36) }));
     await new LocalProgressRepository(store).save(saved);
 
-    const result = await root.loadProgress(LINES).execute({});
+    const result = await root.loadProgress().execute({ gameId: LINES });
 
     expect(
       result.ok
         ? result.value?.keeps(ProgressRecord.of({ gameId: LINES, score: Score.of(36) }))
         : false,
     ).toBe(true);
+  });
+
+  // Issue #410: the request of `LoadProgress` names the game, so the root builds one
+  // `LoadProgress`, as it builds one `ListLevels`. Each call gives that one use case,
+  // and it reads the saved progress of every game.
+  it('should_give_one_load_progress_for_every_game_when_the_root_has_a_store', async () => {
+    const LINES = GameId.of('hexa-lines');
+    const store = new InMemoryKeyValueStore();
+    const root = new CompositionRoot({
+      clock: new ManualClock(),
+      logger: new RecordingLogger(),
+      store,
+    });
+    const saved = GameProgress.start(LINES);
+    saved.recordScore(ProgressRecord.of({ gameId: LINES, score: Score.of(36) }));
+    await new LocalProgressRepository(store).save(saved);
+    const load = root.loadProgress();
+
+    const lines = await load.execute({ gameId: LINES });
+    const merge = await load.execute({ gameId: GameId.of('hexa-merge') });
+
+    expect(root.loadProgress() === load).toBe(true);
+    expect(
+      lines.ok
+        ? lines.value?.keeps(ProgressRecord.of({ gameId: LINES, score: Score.of(36) }))
+        : false,
+    ).toBe(true);
+    expect(merge.ok ? merge.value : 'failed').toBeUndefined();
   });
 
   // Issue #173: the root builds `ListLevels` once over its one local progress repository,
@@ -243,7 +271,7 @@ describe('CompositionRoot', () => {
     await new LocalProgressRepository(store).save(saved);
 
     const listed = await root.listLevels().execute({ gameId: FIT, figure: TopologyId.hex });
-    const loaded = await root.loadProgress(FIT).execute({});
+    const loaded = await root.loadProgress().execute({ gameId: FIT });
 
     const summaries = listed.ok ? listed.value : [];
     expect(root.listLevels()).toBe(root.listLevels());

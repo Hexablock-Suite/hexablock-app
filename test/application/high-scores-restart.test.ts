@@ -54,7 +54,7 @@ function runOf(game: ScoredGame, store: KeyValueStore) {
     },
     // Reads the saved progress of the game through `LoadProgress`.
     load(): Promise<Result<GameProgress | undefined>> {
-      return new LoadProgress(repository, game.gameId).execute({});
+      return new LoadProgress(repository).execute({ gameId: game.gameId });
     },
   };
 }
