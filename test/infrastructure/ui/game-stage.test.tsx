@@ -6,6 +6,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { textCatalog } from '../../../src/adapters/texts/text-catalog';
 import type { MoveResult } from '../../../src/application/move-result';
 import { GameId } from '../../../src/domain/shared/game-id';
+import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
 import type { Score } from '../../../src/domain/shared/score';
 import { CompositionRoot } from '../../../src/infrastructure/composition-root';
 import { gameSessionOf, type GameSession } from '../../../src/infrastructure/ui/game-session';
@@ -14,7 +15,6 @@ import { CONTENT_WIDTH, space } from '../../../src/infrastructure/ui/theme';
 import { valueOf } from '../../support/application/game-use-cases';
 import { RecordingLogger } from '../../support/application/recording-logger';
 import { ManualClock } from '../../support/engine/manual-clock';
-import { firstMoveOf } from '../../support/engine/variant-game';
 import { pressSpace } from '../../support/ui/board-spaces';
 
 // Issue #170: `GameStage`, the view of the game screen, shows the board of a game, its score
@@ -34,12 +34,29 @@ function testRoot(logger = new RecordingLogger()): CompositionRoot {
   return new CompositionRoot({ clock: new ManualClock(), logger });
 }
 
-// The first valid move of a new game of the registered game `gameId`.
+// The origin of the hexagon, the default board figure.
+const ORIGIN = new HexGeometry().createCoord([0, 0]);
+
+// The first intent of each game on the hexagon, as its move controls send it (#405): a press
+// or a slide that the rules accept on a new board. Lines places its first tray piece on the
+// origin, Fit places the single cell `b` of its first level on the origin, Sort places
+// the offered stack on the origin, and Merge slides east.
+const FIRST_INTENTS: Readonly<Record<string, unknown>> = {
+  'hexa-lines': { position: 0, at: ORIGIN },
+  'hexa-fit': { kind: 'place', piece: 'b', rotation: 0, at: ORIGIN },
+  'hexa-sort': { at: ORIGIN },
+  'hexa-merge': { toward: 'east' },
+};
+
+// The first intent of a new game of the registered game `gameId`.
+function firstIntentOf(gameId: GameId): unknown {
+  return FIRST_INTENTS[slugOf(gameId)];
+}
+
+// The move of the first intent of the registered game `gameId`: the move mapper
+// of its registry entry builds it.
 function firstMoveIn(root: CompositionRoot, gameId: GameId): unknown {
-  return root
-    .registry()
-    .gameOf(gameId)
-    .withFactory({ use: (_gameId, factory) => firstMoveOf(factory) });
+  return root.registry().gameOf(gameId).screen.moves.toMove(firstIntentOf(gameId));
 }
 
 // The number of a score, as the screen shows it.
@@ -162,7 +179,7 @@ describe('GameStage', () => {
       const expected = await referenceMove(gameId);
       await show(session);
 
-      await act(() => session.presenter.onMove(firstMoveIn(root, gameId)));
+      await act(() => session.presenter.onMove(firstIntentOf(gameId)));
 
       expect([id, occupied().length, free().length]).toEqual([
         id,
@@ -183,12 +200,12 @@ describe('GameStage', () => {
     const root = testRoot();
     const gameId = GameId.of('hexa-lines');
     const session = gameSessionOf(root, gameId, textCatalog.es);
-    const move = firstMoveIn(root, gameId);
+    const intent = firstIntentOf(gameId);
     await show(session);
-    await act(() => session.presenter.onMove(move));
+    await act(() => session.presenter.onMove(intent));
     const board = [free().length, occupied().length];
 
-    await act(() => session.presenter.onMove(move));
+    await act(() => session.presenter.onMove(intent));
 
     expect(screen.getByRole('alert')).toHaveTextContent('Esa jugada no se puede hacer');
     expect([free().length, occupied().length]).toEqual(board);

@@ -15,7 +15,7 @@ import type { MoveControls } from './move-controls';
 // and the texts of the screen (#175). The registry hides the type of a cell view,
 // so the session keeps it hidden too.
 export interface GameSession {
-  readonly presenter: GamePresenter<unknown, unknown, unknown, unknown, unknown, unknown>;
+  readonly presenter: GamePresenter<unknown, unknown, unknown, unknown, unknown, unknown, unknown>;
   readonly renderer: CellRenderer<unknown>;
   readonly controls: MoveControls<unknown, unknown, unknown, unknown>;
   readonly layoutOf: (size: number) => BoardLayout<unknown>;
@@ -25,7 +25,7 @@ export interface GameSession {
 // The session of the game `gameId` in the composition root `root`, with the texts `texts`,
 // on the board figure `figure`, by default the hexagon (#171).
 // The presenter takes `StartGame`, `ApplyMove`, `UndoMove` and `RedoMove` (#178) of the root,
-// each inside its logging aspect, and the state mapper of the registry entry. An id that the registry of the figure
+// each inside its logging aspect, and the state mapper and the move mapper (#405) of the registry entry. An id that the registry of the figure
 // does not hold throws a RangeError.
 export function gameSessionOf(
   root: CompositionRoot,
@@ -36,7 +36,15 @@ export function gameSessionOf(
   const { screen } = root.registry(figure).gameOf(gameId);
   const { startGame, applyMove, undoMove, redoMove } = root.gameUseCases(gameId, figure);
   return {
-    presenter: new GamePresenter(startGame, applyMove, undoMove, redoMove, screen.mapper, texts),
+    presenter: new GamePresenter(
+      startGame,
+      applyMove,
+      undoMove,
+      redoMove,
+      screen.mapper,
+      screen.moves,
+      texts,
+    ),
     renderer: screen.renderer,
     controls: screen.controls,
     layoutOf: (size) => screen.layoutOf(size),

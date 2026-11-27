@@ -11,11 +11,16 @@ import { repoRoot } from '../support/run-tool';
 // only the use case port, the response model, the result, the requests of the four game
 // use cases (the undo and the redo since #178), three values of the domain, the state mapper
 // and the text catalog. The third value is the `LevelId` that `onStart()` passes
-// to `StartGame` (issue #172). It holds no name of a variant
+// to `StartGame` (issue #172). Since #405 the presenter also imports the generic `MoveMapper`,
+// and the gate reads `src/adapters/move-mapper.ts` too. It holds no name of a variant
 // class (a name that starts with `Lines`, `Fit`, `Sort` or `Merge`) and no text of a variant
 // id, such as `'hexa-lines'`.
 
-const files = ['src/adapters/game-presenter.ts', 'src/adapters/state-mapper.ts'];
+const files = [
+  'src/adapters/game-presenter.ts',
+  'src/adapters/move-mapper.ts',
+  'src/adapters/state-mapper.ts',
+];
 
 const ALLOWED_IMPORTS = new Set([
   '../application/apply-move',
@@ -28,6 +33,7 @@ const ALLOWED_IMPORTS = new Set([
   '../domain/engine/outcome',
   '../domain/progress/level-id',
   '../domain/shared/score',
+  './move-mapper',
   './state-mapper',
   './texts/text-catalog',
 ]);

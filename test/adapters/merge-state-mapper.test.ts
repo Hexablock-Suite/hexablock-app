@@ -1,5 +1,6 @@
 /** @jest-environment node */
 import { GamePresenter } from '../../src/adapters/game-presenter';
+import { MergeMoveMapper } from '../../src/adapters/merge-move-mapper';
 import { MergeStateMapper } from '../../src/adapters/merge-state-mapper';
 import { textCatalog } from '../../src/adapters/texts/text-catalog';
 import { MergeView } from '../../src/domain/variants/hexa-merge/merge-state';
@@ -41,6 +42,7 @@ describe('MergeStateMapper', () => {
       undoMove,
       redoMove,
       new MergeStateMapper(),
+      new MergeMoveMapper([]),
       textCatalog.es,
     );
 

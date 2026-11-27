@@ -83,6 +83,22 @@ module.exports = {
       to: { path: layer('domain/variants') },
     },
     {
+      name: 'board-layouts-no-variants',
+      comment:
+        'The board layouts of layer 3 (src/adapters/board/) serve every variant, so they import no variant (issue #409).',
+      severity: 'error',
+      from: { path: layer('adapters/board') },
+      to: { path: layer('domain/variants') },
+    },
+    {
+      name: 'ui-no-variants',
+      comment:
+        'The move controls send a plain intent, and a move mapper of layer 3 builds the domain move: no file of src/infrastructure/ui/ imports a variant (issue #405).',
+      severity: 'error',
+      from: { path: layer('infrastructure/ui') },
+      to: { path: layer('domain/variants') },
+    },
+    {
       name: 'adapters-imports-only-inner-layers',
       comment:
         'Adapter code imports only domain, application and adapter code: no driver, package or Node module.',

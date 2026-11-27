@@ -33,7 +33,15 @@ function boardWidthIn(width: number): number {
 export interface GameStageProps<TCellView> {
   // The name of the game, as the game selector shows it.
   readonly title: string;
-  readonly presenter: GamePresenter<unknown, unknown, unknown, unknown, TCellView, unknown>;
+  readonly presenter: GamePresenter<
+    unknown,
+    unknown,
+    unknown,
+    unknown,
+    TCellView,
+    unknown,
+    unknown
+  >;
   // The cell renderer, the move controls and the figure layout that the registry chooses
   // for the game.
   readonly renderer: CellRenderer<TCellView>;
@@ -57,7 +65,8 @@ export interface GameStageProps<TCellView> {
 // and the outcome. The board takes the widest cell size that fits the content column.
 // A failed use case shows its text below the board. It names no variant, so it serves every game.
 // The move controls of the game lay out the board with their own parts (#175): the stage gives
-// them the view model, the board and `play()`, which calls `GamePresenter.onMove()`.
+// them the view model, the board and `play()`, which gives the intent of the controls
+// to `GamePresenter.onMove()` (#405).
 // It also gives them `undo()` and `redo()`, which call `GamePresenter.onUndo()` and `onRedo()`
 // (#178). So the undo path of the stage names no variant, and each game shows its own buttons.
 // Every visible text comes from the presenter or from the texts that the controls get,
@@ -116,7 +125,7 @@ export function GameStage<TCellView>({
           model: view,
           texts,
           layoutOf,
-          play: (move) => void presenter.onMove(move),
+          play: (intent) => void presenter.onMove(intent),
           undo: () => void presenter.onUndo(),
           redo: () => void presenter.onRedo(),
           board: (onPressSpace) => (
@@ -154,7 +163,7 @@ export function GameStage<TCellView>({
 // the presenter and starts the game, at the level `levelId` when it has one.
 // It detaches when it closes.
 function useGameViewModel<TCellView>(
-  presenter: GamePresenter<unknown, unknown, unknown, unknown, TCellView, unknown>,
+  presenter: GamePresenter<unknown, unknown, unknown, unknown, TCellView, unknown, unknown>,
   levelId: LevelId | undefined,
 ): GameViewModel<unknown, TCellView, unknown> {
   const [model, setModel] = useState(() => presenter.viewModel());

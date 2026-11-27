@@ -1,19 +1,24 @@
+import { FitMoveMapper, type FitIntent } from '../adapters/fit-move-mapper';
 import {
   FitStateMapper,
   type FitCellView,
   type FitPayloadView,
 } from '../adapters/fit-state-mapper';
 import { fitLevelVariant, sortLevelVariant } from '../adapters/level-game-factories';
+import { LinesMoveMapper, type LinesIntent } from '../adapters/lines-move-mapper';
 import {
   LinesStateMapper,
   type LinesCellView,
   type LinesPayloadView,
 } from '../adapters/lines-state-mapper';
+import { MergeMoveMapper, type MergeIntent } from '../adapters/merge-move-mapper';
+import { slideWays } from '../adapters/merge-slide-ways';
 import {
   MergeStateMapper,
   type MergeCellView,
   type MergePayloadView,
 } from '../adapters/merge-state-mapper';
+import { SortMoveMapper, type SortIntent } from '../adapters/sort-move-mapper';
 import {
   SortStateMapper,
   type SortCellView,
@@ -66,7 +71,6 @@ import { FitCellRenderer } from './board/fit-cell-renderer';
 import { HexLayout } from '../adapters/board/hex-layout';
 import { LinesCellRenderer } from './board/lines-cell-renderer';
 import { MergeCellRenderer } from './board/merge-cell-renderer';
-import { slideWays } from '../adapters/board/slide-ways';
 import { SortCellRenderer } from './board/sort-cell-renderer';
 import { SquareLayout } from '../adapters/board/square-layout';
 import { TriangleLayout } from '../adapters/board/triangle-layout';
@@ -190,7 +194,8 @@ function latticeCellOf(at: TriangleCoord): TriangleCoord {
 // Fit and Sort also take their `LevelVariant` on the geometry of the figure, so `StartGame`
 // starts a bundled level by its id (#172). The Fit level and the Sort level of each entry
 // are first content: a start with no level id starts them until the level selector (#173).
-// Each variant chooses its state mapper, cell renderer and move controls (#174 to #177).
+// Each variant chooses its state mapper, cell renderer and move controls (#174 to #177),
+// and its move mapper (#405).
 // Each entry declares the world colors of its game on the map (#298): orange for Lines,
 // green for Fit, pink for Sort and blue for Merge, the colors of the team prototype.
 // So a game keeps its color on every figure, whatever the place of its entry.
@@ -282,7 +287,8 @@ function fitOn<TCoord>(figure: BoardFigure<TCoord>, clock: Clock): RegisteredGam
   ];
 }
 
-// The screen parts of Hexa Lines (#174, S3-07 proposed).
+// The screen parts of Hexa Lines (#174, S3-07 proposed). The move mapper takes the step
+// of the figure from a pressed space to the offset of the move (#405).
 function linesScreen<TCoord>(
   figure: BoardFigure<TCoord>,
 ): ScreenParts<
@@ -291,19 +297,22 @@ function linesScreen<TCoord>(
   LinesView<TCoord>,
   LinesCellView,
   LinesPayloadView<TCoord>,
-  PlacePiece<TCoord>
+  PlacePiece<TCoord>,
+  LinesIntent<TCoord>
 > {
   return {
     mapper: new LinesStateMapper(),
     renderer: new LinesCellRenderer(),
-    controls: new LinesControls(figure.linesPlacementAt),
+    controls: new LinesControls(),
+    moves: new LinesMoveMapper(figure.linesPlacementAt),
     layoutOf: (size) => figure.layoutOf(size),
   };
 }
 
 // The screen parts of Hexa Fit on the board figure `figure` (issue #175): its state mapper
-// over the topology of the figure, its cell renderer, its move controls and the layout
-// of the figure.
+// over the topology of the figure, its cell renderer, its move controls, its move mapper with
+// the step of the figure from a pressed space to the offset of a place move (#365, #405)
+// and the layout of the figure.
 function fitScreen<TCoord>(
   figure: BoardFigure<TCoord>,
 ): ScreenParts<
@@ -312,12 +321,14 @@ function fitScreen<TCoord>(
   FitView<TCoord>,
   FitCellView,
   FitPayloadView<TCoord>,
-  FitMove<TCoord>
+  FitMove<TCoord>,
+  FitIntent<TCoord>
 > {
   return {
     mapper: new FitStateMapper(figure.geometry.createTopology()),
     renderer: new FitCellRenderer(),
-    controls: new FitControls(figure.fitPlacementAt),
+    controls: new FitControls(),
+    moves: new FitMoveMapper(figure.fitPlacementAt),
     layoutOf: (size) => figure.layoutOf(size),
   };
 }
@@ -325,29 +336,48 @@ function fitScreen<TCoord>(
 // The screen parts of Hexa Sort (#176). The offer uses the outline of the origin cell.
 function sortScreen<TCoord>(
   figure: BoardFigure<TCoord>,
-): ScreenParts<ColorStack, TCoord, SortView, SortCellView, SortPayloadView, PlaceStack<TCoord>> {
+): ScreenParts<
+  ColorStack,
+  TCoord,
+  SortView,
+  SortCellView,
+  SortPayloadView,
+  PlaceStack<TCoord>,
+  SortIntent<TCoord>
+> {
   return {
     mapper: new SortStateMapper(),
     renderer: new SortCellRenderer(),
     controls: new SortControls(originShape(figure, SORT_PREVIEW_SIZE)),
+    moves: new SortMoveMapper(),
     layoutOf: (size) => figure.layoutOf(size),
   };
 }
 
 // The screen parts of Hexa Merge on the board figure `figure` (#177): `MergeStateMapper`,
-// `MergeCellRenderer`, `MergeControls` with one slide for each axis and sense of the topology
-// of the figure, and the layout of the figure. The slides take the board region `board`
-// of the Merge factory, so each way on the screen follows the lines of that board.
+// `MergeCellRenderer`, `MergeControls` with one way for each axis and sense of the topology
+// of the figure, `MergeMoveMapper` with the slide of each way (#405), and the layout
+// of the figure. The ways take the board region `board` of the Merge factory, so each way
+// on the screen follows the lines of that board. The controls read only the compass name
+// and the angle of each way.
 function mergeScreen<TCoord>(
   figure: BoardFigure<TCoord>,
   board: RegionSize,
-): ScreenParts<MergeTile, TCoord, MergeView, MergeCellView, MergePayloadView, Slide<GridAxis>> {
+): ScreenParts<
+  MergeTile,
+  TCoord,
+  MergeView,
+  MergeCellView,
+  MergePayloadView,
+  Slide<GridAxis>,
+  MergeIntent
+> {
+  const ways = slideWays(figure.geometry.createTopology(), board, figure.layoutOf(1));
   return {
     mapper: new MergeStateMapper(),
     renderer: new MergeCellRenderer(),
-    controls: new MergeControls(
-      slideWays(figure.geometry.createTopology(), board, figure.layoutOf(1)),
-    ),
+    controls: new MergeControls(ways),
+    moves: new MergeMoveMapper(ways),
     layoutOf: (size) => figure.layoutOf(size),
   };
 }

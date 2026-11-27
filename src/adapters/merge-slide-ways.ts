@@ -1,8 +1,8 @@
-import { CoordKeyMap } from '../../domain/engine/coord-key-map';
-import type { GridAxis, GridTopology } from '../../domain/engine/grid-topology';
-import type { RegionSize } from '../../domain/engine/region-size';
-import { SLIDE_SENSES, Slide } from '../../domain/variants/hexa-merge/slide';
-import type { BoardLayout } from './board-layout';
+import { CoordKeyMap } from '../domain/engine/coord-key-map';
+import type { GridAxis, GridTopology } from '../domain/engine/grid-topology';
+import type { RegionSize } from '../domain/engine/region-size';
+import { SLIDE_SENSES, Slide } from '../domain/variants/hexa-merge/slide';
+import type { BoardLayout } from './board/board-layout';
 
 // The eight compass names of a way on the screen, counterclockwise from the east.
 // The text catalog names each one under `play.merge.slide.<name>`.
@@ -19,14 +19,20 @@ const COMPASS = [
 
 export type Compass = (typeof COMPASS)[number];
 
-// One slide of Hexa Merge with the way that its tiles go on the screen (issue #177).
+// One way that the tiles of a Merge board go on the screen (issue #177).
 // `angle` is the angle of the way in radians, from the east. The screen `y` grows down,
 // so a positive angle turns clockwise, as a CSS rotation does. `compass` is the nearest
-// of the eight compass names.
-export interface SlideWay {
-  readonly move: Slide<GridAxis>;
+// of the eight compass names. The move controls read only these two fields, so they name
+// no class of the variant (issue #405).
+export interface ScreenWay {
   readonly compass: Compass;
   readonly angle: number;
+}
+
+// One slide of Hexa Merge with its way on the screen (issue #177). `MergeMoveMapper` keeps
+// these pairs and gives the slide of a way (issue #405).
+export interface SlideWay extends ScreenWay {
+  readonly move: Slide<GridAxis>;
 }
 
 // The slides of a Merge board of the region `size` on `topology`: one for each axis and sense,
@@ -83,7 +89,7 @@ const TIE = 1e-9;
 // A swipe and a key give their angle, and each figure answers with its own ways, so the
 // function holds no branch on the figure. When two ways are equally near, the first of them
 // wins, in the order of `slideWays()`: clockwise from the north.
-export function nearestWay(ways: readonly SlideWay[], angle: number): SlideWay {
+export function nearestWay<TWay extends ScreenWay>(ways: readonly TWay[], angle: number): TWay {
   const gaps = ways.map((way) => angleBetween(way.angle, angle));
   const nearest = Math.min(...gaps);
   return ways[gaps.findIndex((gap) => gap - nearest < TIE)];

@@ -9,13 +9,15 @@ import { mergeFactory } from '../support/variants/hexa-merge/merge-game';
 import { variantIdOf } from '../support/variants/variant-id';
 
 // The screen parts of a game in these tests: a mapper that maps every space to nothing,
-// a renderer that draws nothing, controls that draw nothing and the hexagon layout.
+// a renderer that draws nothing, controls that draw nothing, a move mapper that gives each
+// intent as its move and the hexagon layout.
 // A node test renders no component.
 function screenParts(): ScreenParts<unknown, unknown, unknown, unknown, undefined> {
   return {
     mapper: { toView: () => undefined, freeView: () => undefined, toPayload: () => undefined },
     renderer: { render: () => null },
     controls: { render: () => null },
+    moves: { toMove: (intent) => intent },
     layoutOf: (size) => new HexLayout(size),
   };
 }

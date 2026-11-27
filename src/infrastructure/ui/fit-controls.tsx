@@ -1,14 +1,8 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import type { FitIntent } from '../../adapters/fit-move-mapper';
 import type { FitCellView, FitPayloadView, FitTrayPiece } from '../../adapters/fit-state-mapper';
-import { Turns } from '../../domain/engine/turns';
-import {
-  PlaceFitPiece,
-  RemoveFitPiece,
-  type FitMove,
-} from '../../domain/variants/hexa-fit/fit-move';
-import { PieceId } from '../../domain/variants/hexa-fit/piece-id';
 import { fittedCellSize } from '../../adapters/board/board-fit';
 import { cellBoxOf, type BoardLayout } from '../../adapters/board/board-layout';
 import { BoardView } from '../board/board-view';
@@ -22,7 +16,7 @@ type FitProps<TCoord> = MoveControlsProps<
   TCoord,
   FitCellView,
   FitPayloadView<TCoord>,
-  FitMove<TCoord>
+  FitIntent<TCoord>
 >;
 
 // One action of the view model with its label and its state: the undo or the redo (#178).
@@ -67,36 +61,25 @@ const PREVIEW_RENDERER: CellRenderer<PreviewSpace> = {
 // the undo button and the redo button take a move back and play it again (#178).
 // The player picks a piece of the tray, turns it by the rotation step of the topology
 // and presses a free space: the origin of the piece goes there. A piece only turns, and it never
-// mirrors (C7). The board figure can give the step from the pressed space and the rotation step
-// to the offset of the move, as the triangle does (#365). With no step, the offset is the space. A press on a space of a placed piece takes that piece back to the tray.
-// Each press plays a `PlaceFitPiece` or a `RemoveFitPiece` through `GamePresenter.onMove()`.
+// mirrors (C7). A press on a space of a placed piece takes that piece back to the tray.
+// Each press sends a `FitIntent` through `GamePresenter.onMove()`: the text id of the piece,
+// the rotation step as a number and the pressed space (#405). `FitMoveMapper` of layer 3
+// builds the `PlaceFitPiece` or the `RemoveFitPiece`, with the step of the board figure from
+// the pressed space to the offset of the move (#365).
 // The rules decide: a piece that does not fit gives the rejected move text of the presenter,
 // and it stays chosen.
 export class FitControls<TCoord> implements MoveControls<
   TCoord,
   FitCellView,
   FitPayloadView<TCoord>,
-  FitMove<TCoord>
+  FitIntent<TCoord>
 > {
-  constructor(private readonly placementAt: (at: TCoord, rotation: Turns) => TCoord = (at) => at) {}
-
   render(props: FitProps<TCoord>): ReactNode {
-    return <FitPlay {...props} placementAt={this.placementAt} />;
+    return <FitPlay {...props} />;
   }
 }
 
-function FitPlay<TCoord>({
-  model,
-  texts,
-  layoutOf,
-  play,
-  undo,
-  redo,
-  board,
-  placementAt,
-}: FitProps<TCoord> & {
-  readonly placementAt: (at: TCoord, rotation: Turns) => TCoord;
-}) {
+function FitPlay<TCoord>({ model, texts, layoutOf, play, undo, redo, board }: FitProps<TCoord>) {
   const [chosen, setChosen] = useState<Choice | undefined>();
   const tray = model.payload?.tray ?? [];
   const current = tray.find((each) => each.piece === chosen?.piece);
@@ -110,10 +93,9 @@ function FitPlay<TCoord>({
 
   const onPressSpace = (at: TCoord, cell: FitCellView) => {
     if (cell.piece !== undefined) {
-      play(new RemoveFitPiece(PieceId.of(cell.piece)));
+      play({ kind: 'remove', piece: cell.piece });
     } else if (current !== undefined) {
-      const rotation = Turns.of(turn);
-      play(new PlaceFitPiece(PieceId.of(current.piece), rotation, placementAt(at, rotation)));
+      play({ kind: 'place', piece: current.piece, rotation: turn, at });
     }
   };
   const choose = (piece: string) =>
