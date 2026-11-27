@@ -77,8 +77,9 @@
           TCell to MergeTile on MergeRules and creating MergeScoring, each variant class marked with
           the engine interface it implements and its binding. MergeState is an entity inside the
           GameEngine aggregate: its own GameStateId is its identity, it keeps the MatchId of its
-          game, and it changes in place only through its business methods. MergeSettings, Chance and
-          NewTile are value objects: the settings hold the board size, the target tile and the
+          game, and it changes in place only through its business methods. It keeps the target tile,
+          as SortState keeps its goal, so MergeRules holds no target (#426). MergeSettings, Chance
+          and NewTile are value objects: the settings hold the board size, the target tile and the
           chance of a 4, and a NewTile is one draw of the tile source. MergeFactory holds the
           RandomSource of the root, and each match draws a new Seed from it with pickSeed(). The
           engine RandomDraw is one draw of the random source from 0 up to 1: the place of a NewTile,
@@ -381,7 +382,7 @@
           x="344"
           y="272"
           width="276"
-          height="88"
+          height="72"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -401,10 +402,7 @@
         >
           MergeRules
         </text>
-        <text x="360" y="336" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - target: TCell
-        </text>
-        <text x="360" y="352" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="360" y="336" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           slide to the edge, merge on collision
         </text>
 
@@ -447,7 +445,7 @@
           stroke-width="1"
         />
         <line x1="384" y1="496" x2="600" y2="496" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="384" y1="616" x2="600" y2="616" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="384" y1="630" x2="600" y2="630" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="492"
           y="466"
@@ -486,28 +484,28 @@
           IPieceSource&lt;NewTile&lt;TCell&gt;&gt;
         </text>
         <text x="400" y="582" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - targetReached: boolean
+          - target: TCell
         </text>
         <text x="400" y="596" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - merged: TCell[]
+          - targetReached: boolean
         </text>
         <text x="400" y="610" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - merged: TCell[]
+        </text>
+        <text x="400" y="624" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - score: Score
         </text>
-        <text x="400" y="632" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="400" y="646" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + addNewTile(): void
         </text>
-        <text x="400" y="646" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="400" y="660" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + canSlide(slide: Slide&lt;TAxis&gt;):
         </text>
-        <text x="408" y="660" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="408" y="674" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           boolean
         </text>
-        <text x="400" y="674" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + slide(slide: Slide&lt;TAxis&gt;, target:
-        </text>
-        <text x="408" y="688" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          TCell): void
+        <text x="400" y="688" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + slide(slide: Slide&lt;TAxis&gt;): void
         </text>
         <text x="400" y="702" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + addPoints(points: Score): void
@@ -615,7 +613,7 @@
           x="640"
           y="664"
           width="300"
-          height="144"
+          height="160"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -657,14 +655,24 @@
         >
           + forward, backward: SlideSense
         </text>
-        <line x1="640" y1="752" x2="940" y2="752" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="656" y="768" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text
+          x="656"
+          y="760"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + all: SlideSense[]
+        </text>
+        <line x1="640" y1="768" x2="940" y2="768" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="656" y="784" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: SlideSense): boolean
         </text>
-        <text x="656" y="784" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="656" y="800" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + fromLeadingEdge(line: TCoord[]): TCoord[]
         </text>
-        <text x="656" y="800" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="656" y="816" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + deliverTo(receiver: ValueReceiver&lt;string&gt;): void
         </text>
         <!-- Class: IMergeable (engine interface, the bound) -->
@@ -893,9 +901,9 @@
         <text x="675" y="368" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           IScoringPolicy‹MergeState‹MergeTile››
         </text>
-        <line x1="600" y1="830" x2="616" y2="830" stroke="#17212a" stroke-width="1" />
-        <circle cx="621" cy="830" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="632" y="833" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="600" y1="840" x2="616" y2="840" stroke="#17212a" stroke-width="1" />
+        <circle cx="621" cy="840" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="632" y="843" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           BoardState‹TCell, TCoord›
         </text>
 
