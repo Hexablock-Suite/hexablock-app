@@ -56,7 +56,6 @@
     { "type": "SortRules", "member": "pieces", "equivalent": ["SortState.source"] },
     { "type": "Slide", "member": "direction", "equivalent": ["Slide.axis", "Slide.toward"] },
     { "type": "SortLevel", "member": "board", "equivalent": ["SortLevel.size"] },
-    { "type": "SortLevel", "member": "goals", "equivalent": ["SortLevel.goalsNeeded"] },
-    { "type": "SortState", "member": "tray", "equivalent": ["SortState.offered"] }
+    { "type": "SortLevel", "member": "goals", "equivalent": ["SortLevel.goalsNeeded"] }
   ]
 }
