@@ -64,7 +64,7 @@
       <h1>Undo and redo: Command and segregated capabilities</h1>
 
       <svg
-        viewBox="0 0 1040 992"
+        viewBox="0 0 1040 1072"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="history-title history-desc"
@@ -76,7 +76,9 @@
           through IRedoable and keeping the undone MoveCommand objects, and LevelTimer implementing
           the separate ITimed capability. LevelTimer is an entity inside the GameEngine aggregate:
           its LevelTimerId is its identity, and equals() compares two timers by that id. The timer
-          keeps its start and its stop as two ClockReading values, and ClockReading.elapsedSince()
+          keeps its start, its stop and the start of a pause as ClockReading values, and the sum of
+          the ended pauses as an ElapsedTime. GameEngine pauses and resumes it through ITimed, and
+          elapsedMs() leaves the paused spans out (decision 19, #428). ClockReading.elapsedSince()
           gives the ElapsedTime between two readings: never negative, in whole milliseconds. Each
           MoveCommand keeps two TMemento values, the immutable photos of the state before and after
           the move, which BoardState.snapshot() gives (view 1, decision 34): undo() gives back the
@@ -128,7 +130,7 @@
           x="24"
           y="24"
           width="992"
-          height="752"
+          height="816"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -174,7 +176,7 @@
           x="56"
           y="328"
           width="920"
-          height="252"
+          height="316"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -256,20 +258,30 @@
         />
         <!-- LevelTimer keeps the ClockReading of its start as startedAt: use with role and multiplicity -->
         <line
-          x1="112"
-          y1="564"
-          x2="112"
-          y2="616"
+          x1="96"
+          y1="628"
+          x2="96"
+          y2="680"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#history-open)"
         />
         <!-- LevelTimer keeps the ClockReading of its stop as stoppedAt: use with role and multiplicity -->
         <line
-          x1="208"
-          y1="564"
-          x2="208"
-          y2="616"
+          x1="180"
+          y1="628"
+          x2="180"
+          y2="680"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#history-open)"
+        />
+        <!-- LevelTimer keeps the ClockReading of the pause in progress as pausedAt: use with role and multiplicity (#428) -->
+        <line
+          x1="264"
+          y1="628"
+          x2="264"
+          y2="680"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#history-open)"
@@ -300,10 +312,10 @@
         >
           undone
         </text>
-        <rect x="114" y="592" width="74" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="98" y="656" width="74" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="116"
-          y="601"
+          x="100"
+          y="665"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -312,16 +324,28 @@
           startedAt
           <tspan font-weight="600">0..1</tspan>
         </text>
-        <rect x="210" y="592" width="74" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="182" y="656" width="74" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="212"
-          y="601"
+          x="184"
+          y="665"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="start"
         >
           stoppedAt
+          <tspan font-weight="600">0..1</tspan>
+        </text>
+        <rect x="266" y="656" width="70" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="268"
+          y="665"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          pausedAt
           <tspan font-weight="600">0..1</tspan>
         </text>
         <!-- Multiplicities -->
@@ -490,14 +514,14 @@
           x="72"
           y="356"
           width="232"
-          height="208"
+          height="272"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
         <line x1="72" y1="404" x2="304" y2="404" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="72" y1="476" x2="304" y2="476" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="72" y1="508" x2="304" y2="508" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="188"
           y="374"
@@ -544,19 +568,37 @@
         >
           - stoppedAt: ClockReading | undefined
         </text>
-        <text x="88" y="492" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + equals(other: LevelTimer):
+        <text
+          x="88"
+          y="484"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          - pausedAt: ClockReading | undefined
+        </text>
+        <text x="88" y="500" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - pausedFor: ElapsedTime
         </text>
         <text x="88" y="524" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + start(): void
-        </text>
-        <text x="88" y="540" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + stop(): void
+          + equals(other: LevelTimer):
         </text>
         <text x="88" y="556" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + start(): void
+        </text>
+        <text x="88" y="572" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + stop(): void
+        </text>
+        <text x="88" y="588" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + pause(): void
+        </text>
+        <text x="88" y="604" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + resume(): void
+        </text>
+        <text x="88" y="620" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + elapsedMs(): ElapsedTime
         </text>
-        <text x="99" y="508" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="99" y="540" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           boolean
         </text>
 
@@ -565,7 +607,7 @@
           x="344"
           y="356"
           width="176"
-          height="72"
+          height="104"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -596,6 +638,12 @@
         </text>
         <text x="360" y="420" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + elapsedMs(): ElapsedTime
+        </text>
+        <text x="360" y="436" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + pause(): void
+        </text>
+        <text x="360" y="452" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + resume(): void
         </text>
 
         <!-- Class: IUndoable (interface: the history that GameEngine depends on, decision 27) -->
@@ -711,7 +759,7 @@
         <!-- Class: ClockReading (value object, decision 25) -->
         <rect
           x="72"
-          y="616"
+          y="680"
           width="320"
           height="144"
           rx="6"
@@ -719,10 +767,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="72" y1="664" x2="392" y2="664" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="72" y1="728" x2="392" y2="728" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="232"
-          y="634"
+          y="698"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -733,7 +781,7 @@
         </text>
         <text
           x="232"
-          y="652"
+          y="716"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -742,13 +790,13 @@
         >
           ClockReading
         </text>
-        <text x="88" y="680" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="744" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - value: number
         </text>
-        <line x1="72" y1="688" x2="392" y2="688" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="72" y1="752" x2="392" y2="752" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="88"
-          y="704"
+          y="768"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -756,13 +804,13 @@
         >
           + of(value: number): ClockReading
         </text>
-        <text x="88" y="720" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="784" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + elapsedSince(earlier: ClockReading): ElapsedTime
         </text>
-        <text x="88" y="736" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="800" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: ClockReading): boolean
         </text>
-        <text x="88" y="752" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="88" y="816" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + deliverTo(receiver: ValueReceiver&lt;number&gt;): void
         </text>
 
@@ -853,9 +901,9 @@
           TMove, TMemento
         </text>
 
-        <!-- The footnote sits below the zone, which grew by 180 for ClockReading (#238) and by 32
-             for the after photo and keepUndone() (#178). -->
-        <g transform="translate(0 212)">
+        <!-- The footnote sits below the zone, which grew by 180 for ClockReading (#238), by 32
+             for the after photo and keepUndone() (#178) and by 64 for the pause (#428). -->
+        <g transform="translate(0 276)">
           <!-- Footnote: classes the budget leaves out -->
           <text
             x="24"
@@ -921,10 +969,20 @@
             undo() gives each undone command to keepUndone(): RedoableHistory keeps it, and redo()
             gives back its after photo. A new move and clear() forget it (decisions 3 and 34, #178).
           </text>
+          <text
+            x="24"
+            y="688"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            GameEngine pauses and resumes its timer through ITimed, and elapsedMs() leaves out every
+            paused span: pausedAt and pausedFor (decision 19, #428).
+          </text>
         </g>
 
-        <!-- The legend sits 48 lower than the footnote, which has three more lines (#238, #245, #178). -->
-        <g transform="translate(0 260)">
+        <!-- The legend sits 64 lower than the footnote, which has four more lines (#238, #245, #178, #428). -->
+        <g transform="translate(0 340)">
           <!-- Legend -->
           <line
             x1="24"

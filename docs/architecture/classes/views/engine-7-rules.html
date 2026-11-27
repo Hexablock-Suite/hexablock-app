@@ -64,7 +64,7 @@
       <h1>The rules: Template Method and Decorator</h1>
 
       <svg
-        viewBox="0 0 1040 880"
+        viewBox="0 0 1040 896"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="rules-title rules-desc"
@@ -81,7 +81,8 @@
           steps isValid(), apply(), resolve() and evaluate() are protected in BaseGameRules, so only
           the template method calls them (decision 21). The decorator times playTurn() and passes
           validMoves() to its inner rules (decision 33). It hands out no timer: the root keeps the
-          same timer and answers elapsedTime() (decision 27).
+          same timer and answers elapsedTime() (decision 27). The rules know no pause: the root
+          pauses and resumes the timer, so a paused span does not count (decision 19).
         </desc>
         <defs>
           <marker
@@ -912,189 +913,209 @@
           IGameRules declares only validMoves() and playTurn(), so TimedRulesDecorator passes only
           validMoves() unchanged to the inner rules (decisions 21 and 33).
         </text>
-        <!-- Legend -->
-        <line x1="24" y1="772" x2="1016" y2="772" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="790"
+          y="768"
           fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          letter-spacing="0.18em"
-        >
-          LEGEND
-        </text>
-        <line
-          x1="24"
-          y1="808"
-          x2="52"
-          y2="808"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-end="url(#rules-triangle)"
-        />
-        <text
-          x="60"
-          y="812"
-          fill="#5b6873"
-          font-size="8.5"
+          font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Inheritance
+          The rules know no pause: GameEngine pauses and resumes the LevelTimer itself, and a paused
+          span does not count (decision 19, #428).
         </text>
-        <line
-          x1="144"
-          y1="808"
-          x2="172"
-          y2="808"
-          stroke="#17212a"
-          stroke-width="1"
-          stroke-dasharray="5,4"
-          marker-end="url(#rules-triangle)"
-        />
-        <text
-          x="180"
-          y="812"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Realization
-        </text>
-        <line
-          x1="264"
-          y1="808"
-          x2="292"
-          y2="808"
-          stroke="#5b6873"
-          stroke-width="1"
-          marker-end="url(#rules-open)"
-        />
-        <text
-          x="300"
-          y="812"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Use · attribute, parameter, return, local or new
-        </text>
-        <line
-          x1="520"
-          y1="808"
-          x2="548"
-          y2="808"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-start="url(#rules-diamond-hollow)"
-        />
-        <text
-          x="556"
-          y="812"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Aggregation · decorator to the type it wraps
-        </text>
-        <rect
-          x="24"
-          y="828"
-          width="28"
-          height="12"
-          rx="2"
-          fill="#f9f4dc"
-          stroke="rgba(180,83,9,0.45)"
-          stroke-width="1"
-        />
-        <text
-          x="60"
-          y="837"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Zone · Clean layer
-        </text>
-        <rect
-          x="184"
-          y="828"
-          width="28"
-          height="12"
-          rx="2"
-          fill="none"
-          stroke="rgba(91,104,115,0.55)"
-          stroke-width="1"
-          stroke-dasharray="4,4"
-        />
-        <text
-          x="220"
-          y="837"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Dashed frame · GoF pattern or principle
-        </text>
-        <rect
-          x="440"
-          y="828"
-          width="28"
-          height="12"
-          rx="2"
-          fill="#ffffff"
-          stroke="#5b6873"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-        />
-        <text
-          x="476"
-          y="837"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Corner box · type parameters
-        </text>
-        <rect
-          x="648"
-          y="828"
-          width="28"
-          height="12"
-          rx="2"
-          fill="#ffffff"
-          stroke="#7d8a94"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-        />
-        <text
-          x="684"
-          y="837"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Reference box · detailed in another view
-        </text>
-        <rect
-          x="24"
-          y="852"
-          width="28"
-          height="12"
-          rx="2"
-          fill="rgba(15,111,116,0.10)"
-          stroke="#0f6f74"
-          stroke-width="1"
-        />
-        <text
-          x="60"
-          y="861"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Teal · focal class
-        </text>
+        <!-- The legend sits 16 lower for the footnote line of #428. -->
+        <g transform="translate(0 16)">
+          <!-- Legend -->
+          <line
+            x1="24"
+            y1="772"
+            x2="1016"
+            y2="772"
+            stroke="rgba(23,33,42,0.10)"
+            stroke-width="0.8"
+          />
+          <text
+            x="24"
+            y="790"
+            fill="#5b6873"
+            font-size="8"
+            font-family="'IBM Plex Mono', monospace"
+            letter-spacing="0.18em"
+          >
+            LEGEND
+          </text>
+          <line
+            x1="24"
+            y1="808"
+            x2="52"
+            y2="808"
+            stroke="#17212a"
+            stroke-width="1"
+            marker-end="url(#rules-triangle)"
+          />
+          <text
+            x="60"
+            y="812"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Inheritance
+          </text>
+          <line
+            x1="144"
+            y1="808"
+            x2="172"
+            y2="808"
+            stroke="#17212a"
+            stroke-width="1"
+            stroke-dasharray="5,4"
+            marker-end="url(#rules-triangle)"
+          />
+          <text
+            x="180"
+            y="812"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Realization
+          </text>
+          <line
+            x1="264"
+            y1="808"
+            x2="292"
+            y2="808"
+            stroke="#5b6873"
+            stroke-width="1"
+            marker-end="url(#rules-open)"
+          />
+          <text
+            x="300"
+            y="812"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Use · attribute, parameter, return, local or new
+          </text>
+          <line
+            x1="520"
+            y1="808"
+            x2="548"
+            y2="808"
+            stroke="#17212a"
+            stroke-width="1"
+            marker-start="url(#rules-diamond-hollow)"
+          />
+          <text
+            x="556"
+            y="812"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Aggregation · decorator to the type it wraps
+          </text>
+          <rect
+            x="24"
+            y="828"
+            width="28"
+            height="12"
+            rx="2"
+            fill="#f9f4dc"
+            stroke="rgba(180,83,9,0.45)"
+            stroke-width="1"
+          />
+          <text
+            x="60"
+            y="837"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Zone · Clean layer
+          </text>
+          <rect
+            x="184"
+            y="828"
+            width="28"
+            height="12"
+            rx="2"
+            fill="none"
+            stroke="rgba(91,104,115,0.55)"
+            stroke-width="1"
+            stroke-dasharray="4,4"
+          />
+          <text
+            x="220"
+            y="837"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Dashed frame · GoF pattern or principle
+          </text>
+          <rect
+            x="440"
+            y="828"
+            width="28"
+            height="12"
+            rx="2"
+            fill="#ffffff"
+            stroke="#5b6873"
+            stroke-width="1"
+            stroke-dasharray="4,3"
+          />
+          <text
+            x="476"
+            y="837"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Corner box · type parameters
+          </text>
+          <rect
+            x="648"
+            y="828"
+            width="28"
+            height="12"
+            rx="2"
+            fill="#ffffff"
+            stroke="#7d8a94"
+            stroke-width="1"
+            stroke-dasharray="4,3"
+          />
+          <text
+            x="684"
+            y="837"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Reference box · detailed in another view
+          </text>
+          <rect
+            x="24"
+            y="852"
+            width="28"
+            height="12"
+            rx="2"
+            fill="rgba(15,111,116,0.10)"
+            stroke="#0f6f74"
+            stroke-width="1"
+          />
+          <text
+            x="60"
+            y="861"
+            fill="#5b6873"
+            font-size="8.5"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            Teal · focal class
+          </text>
+        </g>
       </svg>
     </div>
   </body>
