@@ -1,11 +1,16 @@
 import { AchievementCounterListener } from '../adapters/achievement-counter-listener';
+import { AchievementsPresenter } from '../adapters/achievements-presenter';
 import { BundledLevelRepository } from '../adapters/bundled-level-repository';
 import { GameEventBus } from '../adapters/game-event-bus';
+import { GamePresenter } from '../adapters/game-presenter';
+import { HomePresenter, type SavedProgresses } from '../adapters/home-presenter';
 import { InMemoryGameRepository } from '../adapters/in-memory-game-repository';
 import type { KeyValueStore } from '../adapters/key-value-store';
 import { LocalAchievementCounterRepository } from '../adapters/local-achievement-counter-repository';
 import { LocalProgressRepository } from '../adapters/local-progress-repository';
 import { LevelGameFactories } from '../adapters/level-game-factories';
+import { LevelSelectorPresenter } from '../adapters/level-selector-presenter';
+import { DEFAULT_LANGUAGE, textCatalog, type Texts } from '../adapters/texts/text-catalog';
 import { ApplyMove, type ApplyMoveRequest } from '../application/apply-move';
 import type { GameEventPublisher } from '../application/game-event-publisher';
 import { LoadProgress, type LoadProgressRequest } from '../application/load-progress';
@@ -42,6 +47,8 @@ import { boardFigures, originShape, registeredGames, type BoardFigure } from './
 import { SeededRandomSource } from './seeded-random-source';
 import { SequentialMatchIds } from './sequential-match-ids';
 import { SystemClock } from './system-clock';
+import type { GameSession, ScreenServices } from './ui/screen-services';
+import type { WorldTone } from './ui/theme';
 
 // The game use cases of one game. Each one is behind the `UseCase` input port (decision 9)
 // and inside its aspects, so a presenter never sees a concrete use case.
@@ -96,12 +103,18 @@ export interface RootDrivers {
 // With the local store of its drivers, the root builds one `LocalProgressRepository` and keeps it
 // for every consumer of the saved progress (#323). Over it, the root builds `ListAchievements` once
 // (#188), with its one level repository, the one counter repository of the listener (#364)
-// and the achievements of `registeredAchievements()`, and it offers `loadProgress(gameId)` (#181):
-// one `LoadProgress` per call, which reads the saved progress of that game through the one
-// repository. Over the same two repositories, it builds `ListLevels` once for the level selector
+// and the achievements of `registeredAchievements()`. Over the same repository it builds
+// `LoadProgress` once (#181, #410): its request names the game, so it reads every game.
+// Over the same two repositories, it builds `ListLevels` once for the level selector
 // (#173). The store is optional: a root with no store offers none of the three, and asking for
 // one throws a `RangeError`, as for a board figure that the root does not offer.
-export class CompositionRoot {
+// The root implements `ScreenServices`, the closed interface of the screens (#411). It builds
+// the presenter of each screen over its use cases: `HomePresenter`, `AchievementsPresenter`,
+// `LevelSelectorPresenter` and the `GamePresenter` of a game session. Each call builds a new
+// presenter, and the hook of a screen keeps it for the life of that screen. The React context
+// holds the root as `ScreenServices`, so a hook asks for no other piece of the root.
+// The screens show the default language until the player can choose one (#163).
+export class CompositionRoot implements ScreenServices {
   private readonly games: ReadonlyMap<TopologyId, GameRegistry>;
   private readonly boards: ReadonlyMap<TopologyId, BoardFigure<unknown>>;
   private readonly logger: Logger;
@@ -112,6 +125,8 @@ export class CompositionRoot {
   private readonly wired = new Map<RegisteredGame, GameUseCases>();
   private readonly achievements: UseCase<ListAchievementsRequest, AchievementSummary[]> | undefined;
   private readonly levelList: UseCase<ListLevelsRequest, LevelSummary[]> | undefined;
+  private readonly texts: Texts = textCatalog[DEFAULT_LANGUAGE];
+  private readonly progressLoad: UseCase<LoadProgressRequest, GameProgress | undefined> | undefined;
 
   constructor(drivers: RootDrivers = { clock: new SystemClock(), logger: new ConsoleLogger() }) {
     const random = SeededRandomSource.fromClock(drivers.clock);
@@ -148,6 +163,10 @@ export class CompositionRoot {
       this.progress === undefined
         ? undefined
         : this.decorate(new ListLevels(this.levels, this.progress), 'ListLevels');
+    this.progressLoad =
+      this.progress === undefined
+        ? undefined
+        : this.decorate(new LoadProgress(this.progress), 'LoadProgress');
   }
 
   // The board figures that the player can choose, in the order of the figure selector (#171).
@@ -216,15 +235,79 @@ export class CompositionRoot {
     return this.levelList;
   }
 
-  // The saved progress of the game `gameId` (S3-16 in #151, #181). The use case is stateless,
-  // so each call gives a new one over the one repository, as `decorate()` wraps it. A root with
+  // `LoadProgress` over the saved progress of the device (S3-16 in #151, #181). Its request
+  // names the game (#410), so each call gives the same use case for every game. A root with
   // no local store does not offer it, so it throws a RangeError, as for a board figure that
   // it does not offer.
-  loadProgress(gameId: GameId): UseCase<LoadProgressRequest, GameProgress | undefined> {
-    if (this.progress === undefined) {
+  loadProgress(): UseCase<LoadProgressRequest, GameProgress | undefined> {
+    if (this.progressLoad === undefined) {
       throw new RangeError('The root has no local store, so it loads no progress.');
     }
-    return this.decorate(new LoadProgress(this.progress, gameId), 'LoadProgress');
+    return this.progressLoad;
+  }
+
+  // The presenter of the home screen and of the game selector map of the board figure `figure`,
+  // by default the hexagon (#169, #411). It holds the ids of the registry of that figure,
+  // the board figures of the root and the saved progress `saved` of the games, by default none.
+  homePresenter(figure: TopologyId = TopologyId.hex, saved: SavedProgresses = []): HomePresenter {
+    return new HomePresenter(this.registry(figure).gameIds(), this.figures(), this.texts, saved);
+  }
+
+  // The ids of the registered games of the board figure `figure`, in the order of its registry.
+  // A figure that the root does not offer throws a RangeError.
+  gameIds(figure: TopologyId): GameId[] {
+    return this.registry(figure).gameIds();
+  }
+
+  // The world colors of the game `gameId` on the board figure `figure` (#298), from its entry.
+  // An id that the registry of the figure does not hold throws a RangeError.
+  gameTone(figure: TopologyId, gameId: GameId): WorldTone {
+    return this.registry(figure).gameOf(gameId).tone;
+  }
+
+  // Whether the game `gameId` has levels on the board figure `figure` (#173), from its entry.
+  // An id that the registry of the figure does not hold throws a RangeError.
+  hasLevels(figure: TopologyId, gameId: GameId): boolean {
+    return this.registry(figure).gameOf(gameId).hasLevels;
+  }
+
+  // A new presenter of the achievements screen over `listAchievements()` (#188, #411).
+  // A root with no local store throws the RangeError of `listAchievements()`.
+  achievementsPresenter(): AchievementsPresenter {
+    return new AchievementsPresenter(this.listAchievements(), this.texts);
+  }
+
+  // A new presenter of the level selector of the game `gameId` on the board figure `figure`,
+  // over `listLevels()` (#173, #411). A root with no local store throws the RangeError
+  // of `listLevels()`.
+  levelSelectorPresenter(gameId: GameId, figure: TopologyId): LevelSelectorPresenter {
+    return new LevelSelectorPresenter(this.listLevels(), { gameId, figure }, this.texts);
+  }
+
+  // A new session of the game `gameId` on the board figure `figure`, by default the hexagon
+  // (#170, #171, #411). Its `GamePresenter` takes the four game use cases of `gameUseCases()`,
+  // so two sessions of one game on one figure share its running game. It also takes the state
+  // mapper and the move mapper (#405) of the registry entry. The session also holds the screen
+  // parts of the registry entry. An id that the registry of the figure does not hold
+  // throws a RangeError.
+  gameSession(gameId: GameId, figure: TopologyId = TopologyId.hex): GameSession {
+    const { screen } = this.registry(figure).gameOf(gameId);
+    const { startGame, applyMove, undoMove, redoMove } = this.gameUseCases(gameId, figure);
+    return {
+      presenter: new GamePresenter(
+        startGame,
+        applyMove,
+        undoMove,
+        redoMove,
+        screen.mapper,
+        screen.moves,
+        this.texts,
+      ),
+      renderer: screen.renderer,
+      controls: screen.controls,
+      layoutOf: (size) => screen.layoutOf(size),
+      texts: this.texts,
+    };
   }
 
   // The one place that gives a use case of the root its aspects (#323). `name` names the use case

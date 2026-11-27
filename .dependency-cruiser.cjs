@@ -106,6 +106,14 @@ module.exports = {
       from: { path: layer('adapters') },
       to: { pathNot: '(?:^|/)src/(?:domain|application|adapters)/' },
     },
+    {
+      name: 'only-provider-imports-root',
+      comment:
+        'Only the provider of the root imports the composition root. A hook or a route reads the closed interface ScreenServices (issue #411).',
+      severity: 'error',
+      from: { pathNot: '(?:^|/)src/infrastructure/root-provider\\.tsx$' },
+      to: { path: '(?:^|/)src/infrastructure/composition-root\\.ts$' },
+    },
   ],
   options: {
     doNotFollow: { path: 'node_modules' },

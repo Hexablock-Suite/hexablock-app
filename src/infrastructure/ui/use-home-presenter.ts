@@ -1,83 +1,42 @@
 import { useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-import { HomePresenter, type SavedProgresses } from '../../adapters/home-presenter';
-import { DEFAULT_LANGUAGE, textCatalog } from '../../adapters/texts/text-catalog';
+import type { HomePresenter, SavedProgresses } from '../../adapters/home-presenter';
 import { GameId } from '../../domain/shared/game-id';
 import { TopologyId } from '../../domain/shared/topology-id';
 import type { CellShape } from '../../adapters/board/board-layout';
-import { CompositionRoot } from '../composition-root';
-import { useCompositionRoot } from '../composition-root-provider';
+import { useScreenServices } from './screen-services';
 import type { WorldTone } from './theme';
 
-// The presenter of the home screen and of the game selector map (#169).
-// It takes the ids of the registered games from the game registry of the board figure `figure`,
-// by default the hexagon, and the board figures of the composition root (#171).
+// The presenter of the home screen and of the game selector map (#169), from the composition
+// root (#411). It holds the ids of the registered games of the board figure `figure`,
+// by default the hexagon, the board figures of the root (#171) and the saved progress `saved`
+// that the map hook loaded, by default none (#181).
 // So a fifth variant adds one registry entry and the selector shows it.
-// The screens show the default language until the player can choose one (#163).
-export function useHomePresenter(figure: TopologyId = TopologyId.hex): HomePresenter {
-  return homePresenterOf(useCompositionRoot(), figure);
-}
-
-// The ids of the games of every board figure, in the order of the figures and of the registry.
-// Each id comes once. The web export renders one page of the game route for each id (#287),
-// so a reload of a game screen in the browser finds its page. The export runs it in Node
-// at build time, outside the root layout, so it builds its own composition root.
-export function gameRouteIds(): string[] {
-  const root = new CompositionRoot();
-  const ids = root.figures().flatMap((figure) =>
-    homePresenterOf(root, figure)
-      .gameSelector()
-      .games.map(({ id }) => id),
-  );
-  return [...new Set(ids)];
-}
-
-// The ids of the games with levels of every board figure, in the order of the figures and of the
-// registry. Each id comes once. The web export renders one page of the level selector route for
-// each id (#173), as it does for the game route (#287).
-export function levelRouteIds(): string[] {
-  const root = new CompositionRoot();
-  const ids = root.figures().flatMap((figure) => {
-    const registry = root.registry(figure);
-    return homePresenterOf(root, figure)
-      .gameSelector()
-      .games.filter(({ id }) => registry.gameOf(GameId.of(id)).hasLevels)
-      .map(({ id }) => id);
-  });
-  return [...new Set(ids)];
-}
-
-// The home presenter over the registry of the board figure `figure` of the root `root`,
-// with the saved progress that the map hook loaded, by default none (#181).
-export function homePresenterOf(
-  root: CompositionRoot,
-  figure: TopologyId,
+export function useHomePresenter(
+  figure: TopologyId = TopologyId.hex,
   saved: SavedProgresses = [],
 ): HomePresenter {
-  return new HomePresenter(
-    root.registry(figure).gameIds(),
-    root.figures(),
-    textCatalog[DEFAULT_LANGUAGE],
-    saved,
-  );
+  return useScreenServices().homePresenter(figure, saved);
 }
 
-// The saved progress of each registered game `games`, as the map shows it (#181). The hook
-// loads the progress of each game once per list, through `loadProgress(gameId)` of the root.
-// A failed load keeps no entry, and the screen shows no score: the `LoggingAspect` already
-// logged the failure. A root with no store throws a `RangeError` before the call, so the catch
-// keeps no entry either. The screen renders before the progress arrives and re-renders with it.
-// `games` must stay the same list between renders, as the `useMemo` of the screen gives it.
-export function useSavedProgresses(games: readonly GameId[]): SavedProgresses {
-  const root = useCompositionRoot();
+// The saved progress of each registered game of the board figure `figure`, as the map shows it
+// (#181). The hook loads the progress of each game once per figure, through the one
+// `LoadProgress` of the root (#410). A failed load keeps no entry, and the screen shows no score:
+// the `LoggingAspect` already logged the failure. A root with no store throws a `RangeError`
+// before the call, so the catch keeps no entry either. The screen renders before the progress
+// arrives and re-renders with it.
+export function useSavedProgresses(figure: TopologyId): SavedProgresses {
+  const services = useScreenServices();
+  // The registered games of the figure, once per figure, so the load runs once per list.
+  const games = useMemo(() => services.gameIds(figure), [services, figure]);
   const [saved, setSaved] = useState<SavedProgresses>([]);
   useEffect(() => {
     let active = true;
     void Promise.all(
       games.map(async (gameId) => {
         try {
-          const result = await root.loadProgress(gameId).execute({});
+          const result = await services.loadProgress().execute({ gameId });
           return result.ok ? ([gameId, result.value] as const) : undefined;
         } catch {
           return undefined;
@@ -89,7 +48,7 @@ export function useSavedProgresses(games: readonly GameId[]): SavedProgresses {
     return () => {
       active = false;
     };
-  }, [root, games]);
+  }, [services, games]);
   return saved;
 }
 
@@ -98,8 +57,8 @@ export function useSavedProgresses(games: readonly GameId[]): SavedProgresses {
 // The presenter takes its ids from the same registry, so each id has an entry.
 // An id that the registry does not hold throws a RangeError.
 export function useGameTones(figure: TopologyId): (gameId: string) => WorldTone {
-  const registry = useCompositionRoot().registry(figure);
-  return (gameId) => registry.gameOf(GameId.of(gameId)).tone;
+  const services = useScreenServices();
+  return (gameId) => services.gameTone(figure, GameId.of(gameId));
 }
 
 // Whether each game on the map of the board figure `figure` has levels (#173), from the entry
@@ -108,8 +67,8 @@ export function useGameTones(figure: TopologyId): (gameId: string) => WorldTone 
 // the `id` of a `GameChoice`, so no screen branches on the game id.
 // An id that the registry does not hold throws a RangeError.
 export function useGameLevels(figure: TopologyId): (gameId: string) => boolean {
-  const registry = useCompositionRoot().registry(figure);
-  return (gameId) => registry.gameOf(GameId.of(gameId)).hasLevels;
+  const services = useScreenServices();
+  return (gameId) => services.hasLevels(figure, GameId.of(gameId));
 }
 
 // The shape of a board figure for a stone or a glyph (#297), from the composition root.
@@ -117,8 +76,8 @@ export function useGameLevels(figure: TopologyId): (gameId: string) => boolean {
 // and the size of the longer side of the shape. So no screen branches on the figure.
 // A text that names no figure of the root throws a RangeError.
 export function useFigureShapes(): (figure: string, size: number) => CellShape {
-  const root = useCompositionRoot();
-  return (figure, size) => root.figureShape(TopologyId.of(figure), size);
+  const services = useScreenServices();
+  return (figure, size) => services.figureShape(TopologyId.of(figure), size);
 }
 
 // The board figure of a route (#171): its `TopologyId`, and its text for the next route.

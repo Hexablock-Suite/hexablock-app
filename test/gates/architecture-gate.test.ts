@@ -121,6 +121,16 @@ describe('architecture gate (dependency-cruiser)', () => {
     expect(result.output).toContain('ui-no-variants');
   });
 
+  // Issue #411: a hook or a route reads the closed interface of the screens, never the whole
+  // composition root. Only the provider of the root imports it.
+  it('should_fail_arch_when_a_module_other_than_the_root_provider_imports_the_composition_root', () => {
+    const result = cruise('hook-imports-root');
+
+    expect(result.status).not.toBe(0);
+    expect(result.output).toContain('only-provider-imports-root');
+    expect(result.output).toContain('src/infrastructure/ui/use-figures.ts');
+  });
+
   it('should_pass_arch_when_layers_point_inward', () => {
     const result = cruise('clean');
 

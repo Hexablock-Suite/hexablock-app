@@ -75,19 +75,19 @@
           SyncLeaderboard, each implementing the UseCase input port with its binding, and the output
           ports they use: SaveProgress and LoadProgress use ProgressRepository, SaveProgress to
           record each result in the progress of its game and LoadProgress to read the saved progress
-          of its game back, or undefined when the game has none (#181); ListLevels uses
-          LevelRepository and ProgressRepository, takes the game and the chosen figure and returns
-          LevelSummary values, each with a LevelStatus of layer 1, a closed set (completed, open,
-          locked) whose ofEach() gives the status of each level from GameProgress (#326), and
+          of the game of its request back, or undefined when the game has none (#181); ListLevels
+          uses LevelRepository and ProgressRepository, takes the game and the chosen figure and
+          returns LevelSummary values, each with a LevelStatus of layer 1, a closed set (completed,
+          open, locked) whose ofEach() gives the status of each level from GameProgress (#326), and
           SyncLeaderboard uses LeaderboardGateway and ProgressRepository. LevelRepository also finds
           the one level of a game that a start names by its id (#172). SaveProgress keeps the GameId
-          of its game and returns no value; LoadProgress keeps the GameId of its game and answers
-          the whole GameProgress. ProgressRepository loads and saves the GameProgress of one game in
-          layer 1: one object with the high score and the best result of each level, which gives the
-          stars of a level with starsOf() and delivers its data to a repository of the edge with
-          deliverTo(). AchievementCounterRepository loads and saves the AchievementCounters of one
-          game in layer 1 (#363): its own aggregate, with a best count and a total, each an
-          AchievementCount.
+          of its game and returns no value; LoadProgress takes the GameId in its request, as
+          ListLevels does (#410), and answers the whole GameProgress. ProgressRepository loads and
+          saves the GameProgress of one game in layer 1: one object with the high score and the best
+          result of each level, which gives the stars of a level with starsOf() and delivers its
+          data to a repository of the edge with deliverTo(). AchievementCounterRepository loads and
+          saves the AchievementCounters of one game in layer 1 (#363): its own aggregate, with a
+          best count and a total, each an AchievementCount.
         </desc>
         <defs>
           <marker
@@ -659,15 +659,15 @@
         <text x="80" y="588" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - repository: ProgressRepository
         </text>
-        <text x="80" y="604" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - gameId: GameId
-        </text>
-        <line x1="64" y1="628" x2="304" y2="628" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="80" y="644" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="64" y1="612" x2="304" y2="612" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="80" y="628" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + execute(request: LoadProgressRequest):
         </text>
+        <text x="96" y="644" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Promise&lt;Result&lt;GameProgress |
+        </text>
         <text x="96" y="660" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          Promise&lt;Result&lt;GameProgress | undefined&gt;&gt;
+          undefined&gt;&gt;
         </text>
 
         <!-- Class: SyncLeaderboard (use case) -->
@@ -1457,8 +1457,9 @@
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            LoadProgress (#181) reads the progress of its game back, or undefined when the game has
-            none, and it starts no progress. A port that throws gives the load-failed failure.
+            LoadProgress (#181) reads the progress of the game of its request back (#410), or
+            undefined when the game has none. It starts no progress. A port that throws gives
+            load-failed.
           </text>
           <text
             x="24"
