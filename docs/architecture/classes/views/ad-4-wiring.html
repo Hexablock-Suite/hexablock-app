@@ -64,7 +64,7 @@
       <h1>Wiring: the drivers and the composition root</h1>
 
       <svg
-        viewBox="0 0 1100 1976"
+        viewBox="0 0 1100 1992"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="adwiring-title adwiring-desc"
@@ -75,23 +75,25 @@
           src/infrastructure/composition-root.ts, creating each driver once: SeededRandomSource,
           ConsoleLogger and SequentialMatchIds, which implement the RandomSource, Logger and
           MatchIdGenerator interfaces, and the planned AudioManager. It receives ApiClient, the
-          transport that implements AccountApi, ProgressApi and LeaderboardApi. It reads each
-          BoardFigure, the hexagon, the square and the triangle, keeps one GameRegistry for each
-          figure, which maps each GameId to its registered game, keeps the LevelRepository of the
-          bundled levels, and creates GameEventBus, InMemoryGameRepository and LevelGameFactories,
-          which implements the GameFactories port, in layer 3, so single-scope injection replaces a
-          classic Singleton. With a store in its drivers it also creates one
-          LocalAchievementCounterRepository, which implements the AchievementCounterRepository port,
-          and gives it to the counter listener of the bus (#363). With a store in its drivers it
-          creates LocalProgressRepository once, which implements ProgressRepository and
-          AnonymousProgress, keeps it as progress for every consumer of the saved progress, and
-          builds ListAchievements, LoadProgress and ListLevels over it once (#181, #188, #173,
-          #410). It creates the one SessionManager and the one ApiDtoMapper (#45), and gives
-          Register and Login the LocalProgressRepository in its anonymous role with the id of each
-          game, so a sign-in merges the anonymous progress (#46). For the sync (#46) it creates
-          ApiProgressGateway over the transport and that mapper, and builds SyncProgress once
-          through decorate() over SessionManager, LocalProgressRepository and the gateway. It gives
-          SyncProgress to each ResultPresenter of gameSession() and to the AccountPresenter of
+          transport that implements AccountApi, ProgressApi, LeaderboardApi and LevelsApi. It reads
+          each BoardFigure, the hexagon, the square and the triangle, keeps one GameRegistry for
+          each figure, which maps each GameId to its registered game, keeps the one LevelRepository,
+          which is a CombinedLevelRepository over BundledLevelRepository and ApiLevelRepository with
+          the transport and BundledLevelRepository alone without it, and starts the first refresh()
+          of the backend levels (#48, decision 68), and creates GameEventBus, InMemoryGameRepository
+          and LevelGameFactories, which implements the GameFactories port, in layer 3, so
+          single-scope injection replaces a classic Singleton. With a store in its drivers it also
+          creates one LocalAchievementCounterRepository, which implements the
+          AchievementCounterRepository port, and gives it to the counter listener of the bus (#363).
+          With a store in its drivers it creates LocalProgressRepository once, which implements
+          ProgressRepository and AnonymousProgress, keeps it as progress for every consumer of the
+          saved progress, and builds ListAchievements, LoadProgress and ListLevels over it once
+          (#181, #188, #173, #410). It creates the one SessionManager and the one ApiDtoMapper
+          (#45), and gives Register and Login the LocalProgressRepository in its anonymous role with
+          the id of each game, so a sign-in merges the anonymous progress (#46). For the sync (#46)
+          it creates ApiProgressGateway over the transport and that mapper, and builds SyncProgress
+          once through decorate() over SessionManager, LocalProgressRepository and the gateway. It
+          gives SyncProgress to each ResultPresenter of gameSession() and to the AccountPresenter of
           accountPresenter(). CompositionRoot implements ScreenServices, the closed interface of the
           screens, and builds the presenter of each screen (#411). For the leaderboards (#47) it
           creates ApiLeaderboardGateway over the transport and the same mapper, builds
@@ -226,7 +228,7 @@
         <!-- Relationships (drawn before boxes). CompositionRoot creates each driver and adapter: a use «create». It keeps one GameRegistry for each board figure in an attribute: a use with the attribute name. It reads each BoardFigure in its constructor and receives the transport in its drivers: a use with a verb. -->
         <!-- CompositionRoot creates the planned AudioManager: use «create» -->
         <path
-          d="M272,344 H136 Q128,344 128,336 V160"
+          d="M272 344 H136 Q128 344 128 336 V160"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -234,7 +236,7 @@
         />
         <!-- CompositionRoot creates SeededRandomSource from the clock: use «create» -->
         <path
-          d="M272,296 H248 Q240,296 240,288 V200"
+          d="M272 296 H248 Q240 296 240 288 V200"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -262,7 +264,7 @@
         />
         <!-- CompositionRoot receives ApiClient, the transport that CompositionRootProvider passes as drivers.api (#45, #46) -->
         <path
-          d="M728,296 H868 Q876,296 876,288 V176"
+          d="M728 296 H868 Q876 296 876 288 V176"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -280,7 +282,7 @@
         />
         <!-- CompositionRoot reads each BoardFigure of boardFigures() and builds its GameRegistry: use with a verb, inside layer 4 -->
         <path
-          d="M272,452 H192 Q184,452 184,460 V696"
+          d="M272 452 H192 Q184 452 184 460 V696"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -338,7 +340,7 @@
         />
         <!-- CompositionRoot creates the one SessionManager in layer 3: use «create» (#45). It gives it to Register, Login, LocalProgressRepository and SyncProgress (#46) -->
         <path
-          d="M728,550 H952 Q960,550 960,558 V1094 Q960,1102 952,1102 H944"
+          d="M728 550 H952 Q960 550 960 558 V1094 Q960 1102 952 1102 H944"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -346,7 +348,7 @@
         />
         <!-- CompositionRoot creates a ResultPresenter in gameSession() and gives it SyncProgress: use «create» (#46) -->
         <path
-          d="M728,534 H972 Q980,534 980,542 V1198 Q980,1206 972,1206 H156 Q148,1206 148,1214 V1274"
+          d="M728 534 H972 Q980 534 980 542 V1198 Q980 1206 972 1206 H156 Q148 1206 148 1214 V1274"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -354,7 +356,7 @@
         />
         <!-- CompositionRoot creates the AccountPresenter in accountPresenter() and gives it SyncProgress: use «create» (#46) -->
         <path
-          d="M728,518 H992 Q1000,518 1000,526 V1210 Q1000,1218 992,1218 H380 Q372,1218 372,1226 V1274"
+          d="M728 518 H992 Q1000 518 1000 526 V1210 Q1000 1218 992 1218 H380 Q372 1218 372 1226 V1274"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -362,7 +364,7 @@
         />
         <!-- CompositionRoot creates the one ApiDtoMapper: use «create» (#45, #46) -->
         <path
-          d="M728,486 H1032 Q1040,486 1040,494 V1234 Q1040,1242 1032,1242 H648 Q640,1242 640,1250 V1274"
+          d="M728 486 H1032 Q1040 486 1040 494 V1234 Q1040 1242 1032 1242 H648 Q640 1242 640 1250 V1274"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -370,7 +372,7 @@
         />
         <!-- CompositionRoot creates ApiProgressGateway over drivers.api and the one ApiDtoMapper: use «create» (#46) -->
         <path
-          d="M728,470 H1052 Q1060,470 1060,478 V1246 Q1060,1254 1052,1254 H920 Q912,1254 912,1262 V1274"
+          d="M728 470 H1052 Q1060 470 1060 478 V1246 Q1060 1254 1052 1254 H920 Q912 1254 912 1262 V1274"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -378,7 +380,7 @@
         />
         <!-- CompositionRoot creates SyncProgress once through decorate(), over SessionManager, LocalProgressRepository and ApiProgressGateway: use «create», down from layer 4 to layer 2 (#46) -->
         <path
-          d="M728,502 H1012 Q1020,502 1020,510 V1222 Q1020,1230 1012,1230 H524 Q516,1230 516,1238 V1478 Q516,1486 508,1486 H432"
+          d="M728 502 H1012 Q1020 502 1020 510 V1222 Q1020 1230 1012 1230 H524 Q516 1230 516 1238 V1478 Q516 1486 508 1486 H432"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -396,7 +398,7 @@
         />
         <!-- ResultPresenter calls SyncProgress after each save through useCases.syncProgress(): use with role and multiplicity (#46) -->
         <path
-          d="M148,1338 V1348 Q148,1356 156,1356 H292 Q300,1356 300,1364 V1466"
+          d="M148 1338 V1348 Q148 1356 156 1356 H292 Q300 1356 300 1364 V1466"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -881,7 +883,7 @@
           AchievementSummary[]› [0..1]
         </text>
         <text x="288" y="462" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - levelList: UseCase‹ListLevelsRequest, LevelSummary[]› [0..1]
+          - levelList: UseCase‹ListLevelsRequest, LevelList› [0..1]
         </text>
         <text x="288" y="476" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - sync: UseCase‹SyncProgressRequest, void› [0..1]
@@ -902,7 +904,7 @@
           AchievementSummary[]›
         </text>
         <text x="288" y="572" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + listLevels(): UseCase‹ListLevelsRequest, LevelSummary[]›
+          + listLevels(): UseCase‹ListLevelsRequest, LevelList›
         </text>
         <text x="288" y="586" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + loadProgress(): UseCase‹LoadProgressRequest,
@@ -1490,11 +1492,14 @@
         <text x="579" y="102" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           MatchIdGenerator
         </text>
-        <!-- ApiClient implements the transport interfaces AccountApi, ProgressApi and LeaderboardApi (#45, #46, #47) -->
+        <!-- ApiClient implements the transport interfaces AccountApi, ProgressApi, LeaderboardApi and LevelsApi (#45, #46, #47, #48) -->
         <line x1="800" y1="120" x2="800" y2="104" stroke="#17212a" stroke-width="1" />
         <circle cx="800" cy="99" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="811" y="102" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          AccountApi, ProgressApi, LeaderboardApi
+        <text x="811" y="98" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          AccountApi, ProgressApi,
+        </text>
+        <text x="811" y="110" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          LeaderboardApi, LevelsApi
         </text>
         <line x1="200" y1="982" x2="200" y2="998" stroke="#17212a" stroke-width="1" />
         <circle cx="200" cy="1003" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
@@ -1643,13 +1648,22 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          StartGame takes one LevelGameFactories per game and figure over the one
-          BundledLevelRepository (#172), and the one LocalProgressRepository, so it refuses a locked
-          level (#397).
+          StartGame takes one LevelGameFactories per game and figure over the one LevelRepository
+          (#172), and the one LocalProgressRepository, so it refuses a locked level (#397).
         </text>
         <text
           x="24"
           y="1650"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          The one LevelRepository (#48, decision 68): with drivers.api, CombinedLevelRepository over
+          BundledLevelRepository and ApiLevelRepository, whose first refresh() the root starts.
+        </text>
+        <text
+          x="24"
+          y="1666"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1660,7 +1674,7 @@
         </text>
         <text
           x="24"
-          y="1666"
+          y="1682"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1670,7 +1684,7 @@
         </text>
         <text
           x="24"
-          y="1682"
+          y="1698"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1681,7 +1695,7 @@
         </text>
         <text
           x="24"
-          y="1698"
+          y="1714"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1692,7 +1706,7 @@
         </text>
         <text
           x="24"
-          y="1714"
+          y="1730"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1702,7 +1716,7 @@
         </text>
         <text
           x="24"
-          y="1730"
+          y="1746"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1712,7 +1726,7 @@
         </text>
         <text
           x="24"
-          y="1746"
+          y="1762"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1722,7 +1736,7 @@
         </text>
         <text
           x="24"
-          y="1762"
+          y="1778"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1733,7 +1747,7 @@
         </text>
         <text
           x="24"
-          y="1778"
+          y="1794"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1743,7 +1757,7 @@
         </text>
         <text
           x="24"
-          y="1794"
+          y="1810"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1753,7 +1767,7 @@
         </text>
         <text
           x="24"
-          y="1810"
+          y="1826"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1763,7 +1777,7 @@
         </text>
         <text
           x="24"
-          y="1826"
+          y="1842"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1773,7 +1787,7 @@
         </text>
         <text
           x="24"
-          y="1842"
+          y="1858"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1785,15 +1799,15 @@
         <!-- Legend -->
         <line
           x1="24"
-          y1="1866"
+          y1="1882"
           x2="1076"
-          y2="1866"
+          y2="1882"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1884"
+          y="1900"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1803,16 +1817,16 @@
         </text>
         <line
           x1="24"
-          y1="1902"
+          y1="1918"
           x2="52"
-          y2="1902"
+          y2="1918"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adwiring-open)"
         />
         <text
           x="60"
-          y="1906"
+          y="1922"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1821,7 +1835,7 @@
         </text>
         <rect
           x="24"
-          y="1922"
+          y="1938"
           width="28"
           height="12"
           rx="2"
@@ -1831,7 +1845,7 @@
         />
         <rect
           x="56"
-          y="1922"
+          y="1938"
           width="28"
           height="12"
           rx="2"
@@ -1841,7 +1855,7 @@
         />
         <rect
           x="88"
-          y="1922"
+          y="1938"
           width="28"
           height="12"
           rx="2"
@@ -1851,7 +1865,7 @@
         />
         <text
           x="124"
-          y="1931"
+          y="1947"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1860,7 +1874,7 @@
         </text>
         <rect
           x="248"
-          y="1922"
+          y="1938"
           width="28"
           height="12"
           rx="2"
@@ -1871,7 +1885,7 @@
         />
         <text
           x="284"
-          y="1931"
+          y="1947"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1880,7 +1894,7 @@
         </text>
         <rect
           x="472"
-          y="1922"
+          y="1938"
           width="28"
           height="12"
           rx="2"
@@ -1891,7 +1905,7 @@
         />
         <text
           x="508"
-          y="1931"
+          y="1947"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1900,7 +1914,7 @@
         </text>
         <rect
           x="648"
-          y="1922"
+          y="1938"
           width="28"
           height="12"
           rx="2"
@@ -1911,7 +1925,7 @@
         />
         <text
           x="684"
-          y="1931"
+          y="1947"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1920,7 +1934,7 @@
         </text>
         <rect
           x="872"
-          y="1922"
+          y="1938"
           width="28"
           height="12"
           rx="2"
@@ -1930,18 +1944,18 @@
         />
         <text
           x="908"
-          y="1931"
+          y="1947"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
         </text>
-        <line x1="24" y1="1952" x2="40" y2="1952" stroke="#17212a" stroke-width="1" />
-        <circle cx="45" cy="1952" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="24" y1="1968" x2="40" y2="1968" stroke="#17212a" stroke-width="1" />
+        <circle cx="45" cy="1968" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="60"
-          y="1956"
+          y="1972"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

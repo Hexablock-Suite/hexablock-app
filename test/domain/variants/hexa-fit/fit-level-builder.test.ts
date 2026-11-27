@@ -73,6 +73,7 @@ describe('FitLevelBuilder', () => {
     const file = {
       levelId: 'fit-square-01',
       order: 1,
+      version: 1,
       topology: 'square',
       section: {
         figure: [

@@ -63,7 +63,7 @@
       <p class="eyebrow">Use case flow · StartGame · sequence diagram</p>
       <h1>StartGame step by step: one new game from the screen to the engine and back</h1>
       <svg
-        viewBox="0 0 2172 2460"
+        viewBox="0 0 2172 2476"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="seqstart-title seqstart-desc"
@@ -77,22 +77,23 @@
           LevelStatus.ofEach(), and a locked level ends the call with a level-locked failure.
           StartGame asks its GameFactories port, which LevelGameFactories of layer 3 implements, for
           the GameFactory of the level. In an alt fragment, a request with a level id makes
-          LevelGameFactories ask BundledLevelRepository for the LevelDefinition of the level, create
-          the level builder of the variant and give it to LevelDefinition.buildWith(), which calls
-          withTopology(), withSection() and build() on the builder. LevelGameFactories then creates
-          the variant factory of the built level and a GameFactory over it. A request with no level
-          id gets the registered GameFactory. StartGame calls createGame() on that GameFactory in
-          layer 1. GameFactory asks the MatchIdGenerator for one new MatchId, builds the GameStateId
-          and the BoardId from it, and asks the IVariantFactory for the timer with the MatchId, the
-          rules, the scoring and the history. It wraps the rules of a timed game in
-          TimedRulesDecorator, creates GameEngine with the MatchId and the timer, and asks the
-          IVariantFactory for the first state with the three ids. The variant factory builds the
-          board with BoardBuilder, with a region for Lines, Sort and Merge or with the figure of the
-          level for Fit, and BoardBuilder asks its GeometryFactory for the topology. GameFactory
-          starts GameEngine and returns it. StartGame keeps it in InMemoryGameRepository through the
-          GameRepository port, reads the photo of the state, the occupied cells and the free spaces
-          of its board, and returns a Result with a MoveResult. GamePresenter maps the cells as in
-          flow 1 and GameScreen renders the board.
+          LevelGameFactories ask the LevelRepository, CombinedLevelRepository with the transport
+          (#48, decision 68), for the LevelDefinition of the level, create the level builder of the
+          variant and give it to LevelDefinition.buildWith(), which calls withTopology(),
+          withSection() and build() on the builder. LevelGameFactories then creates the variant
+          factory of the built level and a GameFactory over it. A request with no level id gets the
+          registered GameFactory. StartGame calls createGame() on that GameFactory in layer 1.
+          GameFactory asks the MatchIdGenerator for one new MatchId, builds the GameStateId and the
+          BoardId from it, and asks the IVariantFactory for the timer with the MatchId, the rules,
+          the scoring and the history. It wraps the rules of a timed game in TimedRulesDecorator,
+          creates GameEngine with the MatchId and the timer, and asks the IVariantFactory for the
+          first state with the three ids. The variant factory builds the board with BoardBuilder,
+          with a region for Lines, Sort and Merge or with the figure of the level for Fit, and
+          BoardBuilder asks its GeometryFactory for the topology. GameFactory starts GameEngine and
+          returns it. StartGame keeps it in InMemoryGameRepository through the GameRepository port,
+          reads the photo of the state, the occupied cells and the free spaces of its board, and
+          returns a Result with a MoveResult. GamePresenter maps the cells as in flow 1 and
+          GameScreen renders the board.
         </desc>
         <defs>
           <marker
@@ -360,7 +361,7 @@
         >
           implements GameFactories
         </text>
-        <!-- Lifeline: levels : BundledLevelRepository -->
+        <!-- Lifeline: levels : CombinedLevelRepository (with the transport; BundledLevelRepository alone without it, decision 68) -->
         <rect
           x="570"
           y="24"
@@ -402,7 +403,7 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          BundledLevelRepository
+          CombinedLevelRepository
         </text>
         <text
           x="650"
@@ -2821,20 +2822,31 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           of the level for Fit. BoardBuilder asks its GeometryFactory for the topology. A failed
-          step returns Result.failure(error) (decision 28). No HTTP call runs.
+          step returns Result.failure(error) (decision 28). No call waits for HTTP.
+        </text>
+        <text
+          x="24"
+          y="2366"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          With the transport, levels is CombinedLevelRepository, and without it
+          BundledLevelRepository. ApiLevelRepository answers from memory and starts its refresh in
+          the background (decision 68).
         </text>
         <!-- Legend -->
         <line
           x1="24"
-          y1="2382"
+          y1="2398"
           x2="2148"
-          y2="2382"
+          y2="2398"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="2400"
+          y="2416"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -2844,16 +2856,16 @@
         </text>
         <line
           x1="24"
-          y1="2418"
+          y1="2434"
           x2="52"
-          y2="2418"
+          y2="2434"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqstart-call)"
         />
         <text
           x="60"
-          y="2421"
+          y="2437"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2862,9 +2874,9 @@
         </text>
         <line
           x1="245"
-          y1="2418"
+          y1="2434"
           x2="273"
-          y2="2418"
+          y2="2434"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
@@ -2872,7 +2884,7 @@
         />
         <text
           x="281"
-          y="2421"
+          y="2437"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2881,16 +2893,16 @@
         </text>
         <line
           x1="447.1"
-          y1="2411"
+          y1="2427"
           x2="447.1"
-          y2="2425"
+          y2="2441"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
         />
         <rect
           x="443.1"
-          y="2414"
+          y="2430"
           width="8"
           height="8"
           fill="#ffffff"
@@ -2899,7 +2911,7 @@
         />
         <text
           x="469.1"
-          y="2421"
+          y="2437"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2908,7 +2920,7 @@
         </text>
         <rect
           x="644.7"
-          y="2412"
+          y="2428"
           width="28"
           height="12"
           rx="1"
@@ -2918,7 +2930,7 @@
         />
         <text
           x="680.7"
-          y="2421"
+          y="2437"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2927,7 +2939,7 @@
         </text>
         <rect
           x="24"
-          y="2434"
+          y="2450"
           width="28"
           height="12"
           rx="2"
@@ -2937,7 +2949,7 @@
         />
         <text
           x="60"
-          y="2443"
+          y="2459"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2946,7 +2958,7 @@
         </text>
         <rect
           x="179.2"
-          y="2434"
+          y="2450"
           width="28"
           height="12"
           rx="2"
@@ -2956,7 +2968,7 @@
         />
         <text
           x="215.2"
-          y="2443"
+          y="2459"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2965,7 +2977,7 @@
         </text>
         <rect
           x="334.4"
-          y="2434"
+          y="2450"
           width="28"
           height="12"
           rx="2"
@@ -2975,7 +2987,7 @@
         />
         <text
           x="370.4"
-          y="2443"
+          y="2459"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2984,7 +2996,7 @@
         </text>
         <rect
           x="489.6"
-          y="2434"
+          y="2450"
           width="28"
           height="12"
           rx="2"
@@ -2994,7 +3006,7 @@
         />
         <text
           x="525.6"
-          y="2443"
+          y="2459"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

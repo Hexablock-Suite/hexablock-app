@@ -64,7 +64,7 @@
       <h1>The four Clean layers: ports, adapters and drivers</h1>
 
       <svg
-        viewBox="0 0 1040 1432"
+        viewBox="0 0 1040 1448"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="layers-title layers-desc"
@@ -77,14 +77,17 @@
           call and every use case and aspect implements, and the output ports GameRepository,
           GameFactories, LevelRepository, GameEventPublisher, ProgressRepository and Logger, which
           the use cases use. In layer 3, InMemoryGameRepository, LevelGameFactories,
-          BundledLevelRepository, GameEventBus and LocalProgressRepository implement the output
-          ports, LocalProgressRepository keeps its data through the KeyValueStore interface, and the
-          board components of layer 4 use the board layouts of layer 3. The HTTP adapters of layer 3
-          hold the transport interfaces HealthApi, AccountApi and ProgressApi, ApiAccountGateway,
-          ApiProgressGateway, ApiDtoMapper and the DTO types, and ApiClient of layer 4 implements
-          the transport interfaces (decision 22). Since #46 ApiProgressGateway implements the
-          ProgressGateway port, and LocalProgressRepository also implements the AnonymousProgress
-          port and reads SessionStore for its key. In layer 4, ConsoleLogger implements Logger,
+          CombinedLevelRepository, BundledLevelRepository, GameEventBus and LocalProgressRepository
+          implement the output ports, LocalProgressRepository keeps its data through the
+          KeyValueStore interface, and the board components of layer 4 use the board layouts of
+          layer 3. The HTTP adapters of layer 3 hold the transport interfaces HealthApi, AccountApi,
+          ProgressApi, LeaderboardApi and LevelsApi, ApiAccountGateway, ApiProgressGateway,
+          ApiLeaderboardGateway, ApiLevelRepository, ApiDtoMapper and the DTO types, and ApiClient
+          of layer 4 implements the transport interfaces (decision 22). Since #46 ApiProgressGateway
+          implements the ProgressGateway port, and LocalProgressRepository also implements the
+          AnonymousProgress port and reads SessionStore for its key. Since #48 ApiLevelRepository
+          implements the LevelRepository port, and CombinedLevelRepository joins it with
+          BundledLevelRepository (decision 68). In layer 4, ConsoleLogger implements Logger,
           DeviceKeyValueStore implements KeyValueStore, DeviceSecretStore implements SecretStore,
           and SystemClock, SeededRandomSource and SequentialMatchIds implement the engine interfaces
           Clock, RandomSource and MatchIdGenerator. The routes use the presenters, and
@@ -271,7 +274,7 @@
         />
         <!-- ConsoleLogger implements the Logger port: realization, from layer 4 to the edge of layer 2 -->
         <path
-          d="M868.0 200 L868.0 578"
+          d="M868 200 L868 578"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -289,7 +292,7 @@
         />
         <!-- The presenters call the input port UseCase: use, from layer 3 to the edge of layer 2 -->
         <path
-          d="M225.0 543 L225.0 578"
+          d="M225 543 L225 578"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -306,16 +309,16 @@
         />
         <!-- LevelGameFactories implements the GameFactories port: realization, from layer 3 to the edge of layer 2 -->
         <path
-          d="M421.0 496 L421.0 578"
+          d="M421 496 L421 578"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
           marker-end="url(#layers-triangle)"
         />
-        <!-- BundledLevelRepository implements the LevelRepository port: realization, from layer 3 to the edge of layer 2 -->
+        <!-- CombinedLevelRepository and BundledLevelRepository implement the LevelRepository port: realization, from layer 3 to the edge of layer 2 -->
         <path
-          d="M526.5 538 L526.5 578"
+          d="M526.5 552 L526.5 578"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -384,7 +387,7 @@
         />
         <!-- The use cases use the GameFactories port: use, inside layer 2 -->
         <path
-          d="M421.0 672 L421.0 614"
+          d="M421 672 L421 614"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -416,7 +419,7 @@
         />
         <!-- The use cases use the Logger port: use, inside layer 2 -->
         <path
-          d="M868.0 672 L868.0 614"
+          d="M868 672 L868 614"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -432,7 +435,7 @@
         />
         <!-- Hexa Lines implements the contracts of the engine: realization, inside layer 1 -->
         <path
-          d="M200.0 1079 L200.0 1037"
+          d="M200 1079 L200 1037"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -441,7 +444,7 @@
         />
         <!-- Hexa Fit implements the contracts of the engine: realization, inside layer 1 -->
         <path
-          d="M412.0 1079 L412.0 1037"
+          d="M412 1079 L412 1037"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -450,7 +453,7 @@
         />
         <!-- Hexa Sort implements the contracts of the engine: realization, inside layer 1 -->
         <path
-          d="M624.0 1079 L624.0 1037"
+          d="M624 1079 L624 1037"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -459,7 +462,7 @@
         />
         <!-- Hexa Merge implements the contracts of the engine: realization, inside layer 1 -->
         <path
-          d="M836.0 1079 L836.0 1037"
+          d="M836 1079 L836 1037"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -1195,7 +1198,7 @@
         >
           one key, two texts
         </text>
-        <!-- Component: HTTP adapters, src/adapters/api/ (decision 22, #404), with the gateway of the sync (#46) -->
+        <!-- Component: HTTP adapters, src/adapters/api/ (decision 22, #404), with the gateway of the sync (#46) and the backend levels (#48) -->
         <rect
           x="560"
           y="230"
@@ -1267,11 +1270,11 @@
         <text
           x="570"
           y="334"
-          fill="#7d8a94"
+          fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          planned: ApiLevelRepository
+          LevelsApi · ApiLevelRepository
         </text>
         <!-- Component: planned adapters -->
         <rect
@@ -1523,12 +1526,12 @@
         >
           LevelGameFactories
         </text>
-        <!-- Component: BundledLevelRepository -->
+        <!-- Component: CombinedLevelRepository and BundledLevelRepository: the root joins the bundled levels and the backend levels (#48, decision 68) -->
         <rect
-          x="458.0"
+          x="456.0"
           y="512"
-          width="137"
-          height="26"
+          width="141"
+          height="40"
           rx="4"
           fill="#ffffff"
           stroke="#17212a"
@@ -1536,7 +1539,18 @@
         />
         <text
           x="526.5"
-          y="531"
+          y="528"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          CombinedLevelRepository
+        </text>
+        <text
+          x="526.5"
+          y="543"
           fill="#17212a"
           font-size="10"
           font-weight="600"
@@ -2539,13 +2553,22 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Planned: ApiLevelRepository implements LevelRepository (decision 22). ApiAccountGateway
-          implements AccountGateway since #45, and ApiLeaderboardGateway LeaderboardGateway since
-          #47.
+          ApiAccountGateway implements AccountGateway since #45, and ApiLeaderboardGateway
+          LeaderboardGateway since #47.
         </text>
         <text
           x="24"
           y="1315"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Since #48 ApiLevelRepository implements LevelRepository over LevelsApi, and
+          CombinedLevelRepository joins it with BundledLevelRepository (decision 68).
+        </text>
+        <text
+          x="24"
+          y="1331"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2555,7 +2578,7 @@
         </text>
         <text
           x="24"
-          y="1331"
+          y="1347"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2566,15 +2589,15 @@
         <!-- Legend -->
         <line
           x1="24"
-          y1="1355"
+          y1="1371"
           x2="1016"
-          y2="1355"
+          y2="1371"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1373"
+          y="1389"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -2584,16 +2607,16 @@
         </text>
         <line
           x1="24"
-          y1="1391"
+          y1="1407"
           x2="52"
-          y2="1391"
+          y2="1407"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#layers-open)"
         />
         <text
           x="60"
-          y="1395"
+          y="1411"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2602,9 +2625,9 @@
         </text>
         <line
           x1="264"
-          y1="1391"
+          y1="1407"
           x2="292"
-          y2="1391"
+          y2="1407"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -2612,7 +2635,7 @@
         />
         <text
           x="300"
-          y="1395"
+          y="1411"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2621,7 +2644,7 @@
         </text>
         <rect
           x="560"
-          y="1385"
+          y="1401"
           width="28"
           height="12"
           rx="2"
@@ -2631,7 +2654,7 @@
         />
         <text
           x="596"
-          y="1395"
+          y="1411"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2640,7 +2663,7 @@
         </text>
         <rect
           x="816"
-          y="1385"
+          y="1401"
           width="28"
           height="12"
           rx="2"
@@ -2651,7 +2674,7 @@
         />
         <text
           x="852"
-          y="1395"
+          y="1411"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2660,7 +2683,7 @@
         </text>
         <rect
           x="24"
-          y="1409"
+          y="1425"
           width="28"
           height="12"
           rx="2"
@@ -2670,7 +2693,7 @@
         />
         <text
           x="60"
-          y="1419"
+          y="1435"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2679,7 +2702,7 @@
         </text>
         <rect
           x="264"
-          y="1409"
+          y="1425"
           width="28"
           height="12"
           rx="2"
@@ -2689,7 +2712,7 @@
         />
         <text
           x="300"
-          y="1419"
+          y="1435"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2698,7 +2721,7 @@
         </text>
         <rect
           x="504"
-          y="1409"
+          y="1425"
           width="28"
           height="12"
           rx="2"
@@ -2708,7 +2731,7 @@
         />
         <text
           x="540"
-          y="1419"
+          y="1435"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2717,7 +2740,7 @@
         </text>
         <rect
           x="744"
-          y="1409"
+          y="1425"
           width="28"
           height="12"
           rx="2"
@@ -2727,7 +2750,7 @@
         />
         <text
           x="780"
-          y="1419"
+          y="1435"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

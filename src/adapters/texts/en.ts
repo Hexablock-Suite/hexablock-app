@@ -11,7 +11,8 @@
 // achievement lives under `achievement.<id>`, where `<id>` is the id that the composition root
 // gives to the achievement (#188).
 // The texts of the level selector live under `levels.<part>`, and the text of each status
-// of a level under `levels.status.<status>` (#173).
+// of a level under `levels.status.<status>` (#173). The section of the unavailable levels has
+// its title and its status text there too (#307).
 // The texts of the victory screen and of the defeat screen live under `result.<part>` (#180).
 // The texts of the account screen live under `account.<part>`, and the text of each failure of
 // a sign-up or a sign-in under `account.error.<code>` (#45).
@@ -110,6 +111,8 @@ export const en = {
   'levels.status.completed': 'Completed',
   'levels.status.open': 'Open',
   'levels.status.locked': 'Locked',
+  'levels.status.unavailable': 'Not available',
+  'levels.unavailable': 'Unavailable levels',
   'account.title': 'Account',
   'account.back': 'Back',
   'account.username': 'Username',

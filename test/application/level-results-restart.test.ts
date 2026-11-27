@@ -158,7 +158,7 @@ function runOf(game: LevelGame, store: KeyValueStore) {
     async list(): Promise<Row[] | string> {
       const list = new ListLevels(levels, progress);
       const result = await list.execute({ gameId: game.gameId, figure: TopologyId.hex });
-      return result.ok ? result.value.map(rowOf) : result.error.code;
+      return result.ok ? result.value.levels.map(rowOf) : result.error.code;
     },
   };
 }

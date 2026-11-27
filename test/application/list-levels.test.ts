@@ -2,7 +2,7 @@
 import { BundledLevelRepository } from '../../src/adapters/bundled-level-repository';
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
 import type { LevelRepository } from '../../src/application/level-repository';
-import type { LevelSummary } from '../../src/application/level-summary';
+import type { LevelList, LevelSummary } from '../../src/application/level-summary';
 import { ListLevels, type ListLevelsRequest } from '../../src/application/list-levels';
 import type { ProgressRepository } from '../../src/application/progress-repository';
 import { Result } from '../../src/application/result';
@@ -55,8 +55,15 @@ function rowOf(summary: LevelSummary): Row {
 }
 
 // The rows of a success, or the code of a failure.
-function rowsOf(result: Result<LevelSummary[]>): Row[] | string {
-  return result.ok ? result.value.map(rowOf) : result.error.code;
+function rowsOf(result: Result<LevelList>): Row[] | string {
+  return result.ok ? result.value.levels.map(rowOf) : result.error.code;
+}
+
+// The text of each unavailable level of a success (#307), or the code of a failure.
+function unavailableOf(result: Result<LevelList>): string[] | string {
+  return result.ok
+    ? result.value.unavailable.map((levelId) => delivered(levelId))
+    : result.error.code;
 }
 
 // The result of one play of the bundled Fit level `fit-01`.
@@ -153,7 +160,10 @@ describe('ListLevels', () => {
       await list.execute({ gameId: LINES, figure: TopologyId.hex }),
     ];
 
-    expect(results).toEqual([Result.success([]), Result.success([])]);
+    expect(results).toEqual([
+      Result.success({ levels: [], unavailable: [] }),
+      Result.success({ levels: [], unavailable: [] }),
+    ]);
   });
 
   // Done when of issue #354: with the square or the triangle chosen, Fit and Sort list
@@ -228,12 +238,36 @@ describe('ListLevels', () => {
     ]);
   });
 
+  // Issue #307: the list gives each level of the game that the repository names as unavailable,
+  // apart from the levels. Such a level has no figure and no order, so it stays out of the chain
+  // of open levels, and every figure of the game names it. Another game names none of them.
+  it('should_give_the_unavailable_levels_of_the_game_apart_from_the_levels_when_the_repository_names_them', async () => {
+    const bundled = new BundledLevelRepository([fitLevelFile()]);
+    const { list } = fitUseCases({
+      list: (gameId) => bundled.list(gameId),
+      levelOf: (gameId, levelId) => bundled.levelOf(gameId, levelId),
+      unavailable: async (gameId) => (gameId.equals(FIT) ? [LevelId.of('fit-16')] : []),
+    });
+
+    const hex = await list.execute(onHex);
+    const triangle = await list.execute({ gameId: FIT, figure: TopologyId.triangle });
+    const lines = await list.execute({ gameId: LINES, figure: TopologyId.hex });
+
+    expect([rowsOf(hex), unavailableOf(hex)]).toEqual([
+      [{ level: 'fit-01', status: 'open' }],
+      ['fit-16'],
+    ]);
+    expect([rowsOf(triangle), unavailableOf(triangle)]).toEqual([[], ['fit-16']]);
+    expect([rowsOf(lines), unavailableOf(lines)]).toEqual([[], []]);
+  });
+
   // No exception leaves `execute()` (classes.md decision 28).
   it('should_fail_with_list_failed_when_a_port_throws', async () => {
     const error = new Error('The store is gone.');
     const brokenLevels: LevelRepository = {
       list: () => Promise.reject(error),
       levelOf: () => Promise.reject(error),
+      unavailable: () => Promise.reject(error),
     };
     const brokenProgress: ProgressRepository = {
       load: () => Promise.reject(error),

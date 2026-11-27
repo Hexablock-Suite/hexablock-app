@@ -1,9 +1,10 @@
 import path from 'node:path';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Slot } from 'expo-router';
 import { fireEvent, renderRouter, screen, within } from 'expo-router/testing-library';
 
-import { generateStaticParams } from '../../app/levels/[gameId]';
+import LevelSelectorScreen, { generateStaticParams } from '../../app/levels/[gameId]';
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
 import { GameId } from '../../src/domain/shared/game-id';
 import { GameProgress } from '../../src/domain/progress/game-progress';
@@ -11,7 +12,16 @@ import { LevelId } from '../../src/domain/progress/level-id';
 import { ProgressRecord } from '../../src/domain/progress/progress-model';
 import { Score } from '../../src/domain/shared/score';
 import { Stars } from '../../src/domain/progress/stars';
+import { CompositionRoot } from '../../src/infrastructure/composition-root';
+import { ConsoleLogger } from '../../src/infrastructure/console-logger';
 import { DeviceKeyValueStore } from '../../src/infrastructure/device-key-value-store';
+import { SystemClock } from '../../src/infrastructure/system-clock';
+import { ScreenServicesContext } from '../../src/infrastructure/ui/screen-services';
+import {
+  AnsweringLevelsApi,
+  backendWithLevels,
+  flushPromises,
+} from '../support/adapters/levels-api-double';
 import { repoRoot } from '../support/run-tool';
 import { spaces } from '../support/ui/board-spaces';
 import { saveIn } from '../support/adapters/saved-progress';
@@ -155,6 +165,47 @@ describe('level selector route', () => {
     ).toBeOnTheScreen();
     expect(screen.queryAllByRole('button', { name: /^Nivel \d+/ })).toEqual([]);
     getItem.mockRestore();
+  });
+
+  // Issue #307: a level that the backend lists as unavailable shows in its own section after the
+  // levels, as not available, with no leaderboard button, and a press does not start it. The test
+  // reaches no backend, so its layout gives the screen a root over a backend double that has
+  // answered.
+  it('should_show_an_unavailable_backend_level_apart_and_keep_it_disabled_when_the_backend_lists_it', async () => {
+    const root = new CompositionRoot({
+      clock: new SystemClock(),
+      logger: new ConsoleLogger(),
+      store: new DeviceKeyValueStore(),
+      api: backendWithLevels(
+        new AnsweringLevelsApi(
+          [],
+          [{ gameId: 'hexa-fit', levelId: 'fit-16', reason: 'invalid-section' }],
+        ),
+      ),
+    });
+    await flushPromises();
+    function Layout() {
+      return (
+        <ScreenServicesContext value={root}>
+          <Slot />
+        </ScreenServicesContext>
+      );
+    }
+    const app = await renderRouter(
+      { _layout: Layout, 'levels/[gameId]': LevelSelectorScreen },
+      { initialUrl: '/levels/hexa-fit' },
+    );
+    const unavailable = await screen.findByRole('button', { name: /^fit-16/ });
+
+    await fireEvent.press(unavailable);
+
+    expect(screen.getByRole('header', { name: 'Niveles no disponibles' })).toBeOnTheScreen();
+    expect(within(unavailable).getByText('No disponible')).toBeOnTheScreen();
+    expect(screen.queryByText('invalid-section')).toBeNull();
+    expect(unavailable).toBeDisabled();
+    expect(levelButtons()).toHaveLength(15);
+    expect(screen.queryAllByRole('button', { name: 'Clasificación' })).toHaveLength(0);
+    expect(app.getPathname()).toBe('/levels/hexa-fit');
   });
 
   it('should_go_to_the_map_when_the_level_route_names_no_registered_game', async () => {

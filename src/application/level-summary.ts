@@ -13,3 +13,12 @@ export interface LevelSummary {
   readonly status: LevelStatus;
   readonly stars?: Stars;
 }
+
+// The plain response model of `ListLevels` (#307): one summary per level of the chosen figure,
+// in order, and apart from them the id of each unavailable level of the game.
+// An unavailable level has no figure and no order, so it has no status and no place in the
+// chain of open levels. The player cannot start it.
+export interface LevelList {
+  readonly levels: LevelSummary[];
+  readonly unavailable: LevelId[];
+}

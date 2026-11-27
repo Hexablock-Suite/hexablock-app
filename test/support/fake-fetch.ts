@@ -38,6 +38,13 @@ export function fakeFetch(routes: FakeRoutes, unreachable = false): FakeFetch {
   };
 }
 
+// The requests of `fake` other than the requests of the levels, in the order of arrival. The
+// composition root asks the backend for its levels when it is built and when a screen reads the
+// levels (#48), so a test of another resource reads its own requests with it.
+export function requestsBesideLevels(fake: FakeFetch): FakeRequest[] {
+  return fake.requests.filter(({ url }) => url !== '/v1/levels');
+}
+
 // Replaces the global `fetch` with `fake` until the spy is restored.
 export function useFakeFetch(fake: FakeFetch): jest.SpyInstance {
   return jest
