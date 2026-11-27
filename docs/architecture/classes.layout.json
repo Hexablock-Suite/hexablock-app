@@ -68,7 +68,6 @@
             "RandomSource",
             "Cloneable",
             "GeneratorState",
-            "GridDirection",
             "Piece",
             "BoardId",
             "HexDirection",
@@ -89,8 +88,7 @@
             "IPieceSource",
             "SeededPieceSource",
             "IRandomSeeded",
-            "PieceDraw",
-            "Range"
+            "PieceDraw"
           ]
         },
         {
@@ -477,7 +475,6 @@
             "TriangleTopology",
             "Board",
             "RegionSize",
-            "GridDirection",
             "MoveHistory",
             "CellNode",
             "HexGeometry",
@@ -506,8 +503,7 @@
             "SquareDirection",
             "IUndoable",
             "Ordered",
-            "VictoryPhase",
-            "Range"
+            "VictoryPhase"
           ]
         },
         {
@@ -736,7 +732,6 @@
             "IScoringPolicy",
             "ILevelBuilder",
             "BoardSnapshot",
-            "GridDirection",
             "BoardShape",
             "ShapeNode",
             "CoordKey",

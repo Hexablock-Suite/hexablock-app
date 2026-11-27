@@ -8,6 +8,7 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 
 ### Removed
 
+- `GridTopology` takes two type parameters ([#416](https://github.com/Hexablock-Suite/hexablock-app/issues/416), option A; decision 16): `neighbor()`, `directions()`, `TDirection` and `GridDirection` had no production caller and are gone, and each topology keeps its direction class private for `neighbors()`, which a test of the neighbor order pins. The unused `Range<T>` is gone ([#418](https://github.com/Hexablock-Suite/hexablock-app/issues/418), option A; decision 38); `Ordered<T>` stays for `Distance` and `CoordKey`, and APP-NFR-25 names `Range<T>` for a future interval limit, as hexablock-api does. D4, D10, decisions 16, 17, 38 and 45, the README and views 2, 4 and 6 with their PNG follow.
 - `NullGameEventPublisher` and its test ([#412](https://github.com/Hexablock-Suite/hexablock-app/issues/412), option A on the issue): it had no caller since #362, and a root with no store already builds the bus with no listener. The contract of the port still runs on `GameEventBus` and on `RecordingPublisher`, now in a file of its own. The gate that catches the next module with no importer is measured in #433.
 
 ### Added
