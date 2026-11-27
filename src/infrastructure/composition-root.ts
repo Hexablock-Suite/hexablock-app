@@ -81,6 +81,9 @@ export interface RootDrivers {
 // the `GameFactories` port, which `LevelGameFactories`
 // implements over the level repository and the level variant of the game. So one `StartGame`
 // starts every level of its game by the level id of the request (S3-13 in #151, option D, #172).
+// Each `StartGame` also takes the one level repository, the progress repository, the id of its
+// game and its figure, and it refuses a locked level (#397). A root with no store gives it
+// no progress repository, so only the first level of each figure starts.
 // It builds the use cases of a game the first time a caller asks for them.
 // The one `GameEventBus` goes to every `ApplyMove`, which delivers the events of each turn (#233).
 // The root subscribes the listeners to it once: today `AchievementCounterListener` (#362).
@@ -183,6 +186,7 @@ export class CompositionRoot {
       use: (id, variant, levels) =>
         wire(
           new LevelGameFactories(id, variant, this.ids, this.levels, levels),
+          { levels: this.levels, progress: this.progress, gameId: id, figure },
           this.events,
           (useCase, name) => this.decorate(useCase, name),
         ),
@@ -240,17 +244,31 @@ type Decorate = <TRequest, TResponse>(
   name: string,
 ) => UseCase<TRequest, TResponse>;
 
+// What `StartGame` reads to refuse a locked level (#397): the one level repository and the
+// progress repository of the root, the id of the game and the figure.
+interface LevelLock {
+  readonly levels: LevelRepository;
+  readonly progress: ProgressRepository | undefined;
+  readonly gameId: GameId;
+  readonly figure: TopologyId;
+}
+
 // The game use cases of the game of `factories` over one new repository, each through
 // `decorate`. Every game shares the id generator, the event bus and the level repository,
 // so each one exists once in the app. The logger reaches a use case only through `decorate`.
+// `StartGame` also takes `lock`, so it can refuse a locked level (#397).
 function wire<TState extends BoardState<unknown, unknown> & Cloneable<TState>>(
   factories: GameFactories<unknown, unknown, unknown, TState>,
+  lock: LevelLock,
   events: GameEventPublisher,
   decorate: Decorate,
 ): GameUseCases<unknown, unknown, unknown, ViewOf<TState>> {
   const games = new InMemoryGameRepository<unknown, unknown, unknown, TState>();
   return {
-    startGame: decorate(new StartGame(factories, games), 'StartGame'),
+    startGame: decorate(
+      new StartGame(factories, games, lock.levels, lock.progress, lock.gameId, lock.figure),
+      'StartGame',
+    ),
     applyMove: decorate(new ApplyMove(games, events), 'ApplyMove'),
     undoMove: decorate(new UndoMove(games), 'UndoMove'),
     redoMove: decorate(new RedoMove(games), 'RedoMove'),

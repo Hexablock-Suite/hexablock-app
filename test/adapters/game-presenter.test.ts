@@ -282,6 +282,36 @@ describe('GamePresenter', () => {
     ]);
   });
 
+  // Issue #397: `StartGame` refuses a locked level, and the screen says why in each language.
+  it('should_show_the_locked_level_text_and_no_board_when_start_game_answers_level_locked', async () => {
+    const spanish = presenterWith([failure('level-locked')]);
+    const english = presenterWith([failure('level-locked')], [], textCatalog.en);
+
+    await spanish.presenter.onStart(LevelId.of('fit-09'));
+    await english.presenter.onStart(LevelId.of('fit-09'));
+
+    expect([spanish.presenter.viewModel(), english.presenter.viewModel()]).toEqual([
+      {
+        back: 'Mapa',
+        board: 'Tablero',
+        scoreLabel: 'Puntos',
+        score: 0,
+        outcome: 'Preparando el tablero',
+        cells: [],
+        error: 'Ese nivel está bloqueado. Gana el nivel anterior para abrirlo.',
+      },
+      {
+        back: 'Map',
+        board: 'Board',
+        scoreLabel: 'Score',
+        score: 0,
+        outcome: 'Setting up the board',
+        cells: [],
+        error: 'That level is locked. Win the level before it to open it.',
+      },
+    ]);
+  });
+
   it('should_give_the_english_texts_when_the_presenter_gets_the_english_catalog', async () => {
     const { presenter } = presenterWith(
       [response([['b', 'red']], ['a', 'c'], 0)],
@@ -453,13 +483,14 @@ describe('GamePresenter undo and redo', () => {
     ]);
   });
 
-  // Issue #322: the presenter has a text for every failure code. Three codes have their own
-  // text, and every other code shows the general text `play.error`.
+  // Issue #322: the presenter has a text for every failure code. Four codes have their own
+  // text (`level-locked` since #397), and every other code shows the general text `play.error`.
   it('should_show_a_catalog_text_for_every_failure_code_when_a_use_case_fails', async () => {
     const own: Partial<Record<FailureCode, TextKey>> = {
       'move-rejected': 'play.error.move-rejected',
       'nothing-to-undo': 'play.error.nothing-to-undo',
       'nothing-to-redo': 'play.error.nothing-to-redo',
+      'level-locked': 'play.error.level-locked',
     };
     const codes = Object.values(FailureCode);
     const languages = [textCatalog.es, textCatalog.en];
@@ -477,7 +508,7 @@ describe('GamePresenter undo and redo', () => {
       }),
     );
 
-    expect(codes).toHaveLength(14);
+    expect(codes).toHaveLength(15);
     expect(shown).toEqual(
       languages.map((texts) => codes.map((code) => texts[own[code] ?? 'play.error'])),
     );

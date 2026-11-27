@@ -23,8 +23,13 @@ import {
 // (#173), and the game starts at that level. A route with no level id starts the game with none.
 // A text that names no figure goes home. An id that names no game of the figure goes back
 // to the map of the figure.
+// The route does not protect a level: `StartGame` refuses a locked level, and the screen shows
+// the text of that failure (#397). A repeated parameter reaches the route as a list,
+// so the route reads the first value of `gameId` and of `levelId`.
 export default function GameScreen() {
-  const { gameId, levelId } = useLocalSearchParams<{ gameId: string; levelId?: string }>();
+  const params = useLocalSearchParams<{ gameId: string | string[]; levelId?: string | string[] }>();
+  const gameId = firstOf(params.gameId);
+  const levelId = firstOf(params.levelId);
   const figure = useRouteFigure();
   const games = useHomePresenter(figure?.figure).gameSelector().games;
   if (figure === undefined) return <Redirect href="/" />;
@@ -40,6 +45,11 @@ export default function GameScreen() {
       levelId={levelId}
     />
   );
+}
+
+// The first value of a route parameter. A repeated parameter arrives as a list.
+function firstOf(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
 }
 
 // The pages of this route that the web export renders, one for each registered game (#287).

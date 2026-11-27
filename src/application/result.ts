@@ -17,6 +17,7 @@ export const FailureCode = Object.freeze({
   saveFailed: 'save-failed',
   loadFailed: 'load-failed',
   listFailed: 'list-failed',
+  levelLocked: 'level-locked',
   unexpectedFailure: 'unexpected-failure',
 } as const);
 
