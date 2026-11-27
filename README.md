@@ -98,7 +98,7 @@ The client follows Clean Architecture with four layers (statement §3.4). Every 
 
 **Use case flows.** [docs/architecture/flows.md](docs/architecture/flows.md) follows five use cases through the four layers, each with a class view and a sequence diagram: `ApplyMove` stays inside the app, `SaveProgress` saves a result on the device (its diagrams still draw the path to `hexablock-api`, which D27 gives to the planned `SyncProgress`), `StartGame` wires a variant from its factory, `UndoMove` runs the Command history, and `Login` signs in against the backend and keeps the session. A table there names the path of every other use case.
 
-The HTTP repositories follow statement §3.4 too (Q7, option A3, #404). The planned HTTP repositories and their DTO mapper live in layer 3, `src/adapters/api/`, next to the DTO types that `pnpm api:generate` writes there, and they reach the backend through one transport interface per resource. `ApiClient` in layer 4, `src/infrastructure/api/`, is the driver: it implements those interfaces with `openapi-fetch`. Every class that implements a port lives in layer 3, and layer 4 keeps only the frameworks and the glue code, so the rule of layers 3 and 4 has no exception ([the rule of layers 3 and 4](docs/architecture/layers.md#the-rule-of-layers-3-and-4)). See Q7 in [docs/architecture/layers.md](docs/architecture/layers.md) and decision 22 in [docs/architecture/classes.md](docs/architecture/classes.md).
+The HTTP repositories follow statement §3.4 too (Q7, option A3, #404). The HTTP repositories and their DTO mapper live in layer 3, `src/adapters/api/`, next to the DTO types that `pnpm api:generate` writes there, and they reach the backend through one transport interface per resource. `ApiClient` in layer 4, `src/infrastructure/api/`, is the driver: it implements those interfaces with `openapi-fetch`. Since #45 `ApiAccountGateway` and `ApiDtoMapper` sign the player up and in through the transport interface `AccountApi`, and `SessionManager` keeps the session in the secure storage of the device through the driver interface `SecretStore`, which `DeviceSecretStore` of layer 4 implements with `expo-secure-store`. Every class that implements a port lives in layer 3, and layer 4 keeps only the frameworks and the glue code, so the rule of layers 3 and 4 has no exception ([the rule of layers 3 and 4](docs/architecture/layers.md#the-rule-of-layers-3-and-4)). See Q7 in [docs/architecture/layers.md](docs/architecture/layers.md) and decision 22 in [docs/architecture/classes.md](docs/architecture/classes.md).
 
 Two placements are still open with the professor: where the cell renderers live (Q8) and where the composition root lives (Q9). The code puts the root in `src/infrastructure/composition-root.ts` (S3-06 in #151, «Propuesta, pendiente del equipo»), and the answer to Q9 can move it. It puts the board components in `src/infrastructure/board/` (S3-07 in #151, «Propuesta, pendiente del equipo»), and the answer to Q8 can move them. Both are in [docs/architecture/layers.md](docs/architecture/layers.md).
 
@@ -325,6 +325,12 @@ The API client in `src/infrastructure/api/` uses types generated from the backen
 pnpm api:generate     # reads $BACKEND_URL/docs-json (default http://localhost:3000)
 ```
 
+The app signs up and signs in against the backend at the address of the build variable `EXPO_PUBLIC_API_URL` (#45). With no value it uses `http://localhost:3000`. Expo writes the value into the bundle when it builds the app, so a phone needs an address that it can reach, such as the address of the computer in the local network:
+
+```bash
+EXPO_PUBLIC_API_URL=http://192.168.1.20:3000 pnpm start
+```
+
 To build the installable Android APK, push a version tag. The `Release APK` workflow runs `npx expo prebuild --platform android` and `./gradlew assembleRelease` on JDK 17, then attaches the APK to a GitHub Release. A manual run (Actions tab, `workflow_dispatch`) keeps the APK as a workflow artifact only. The APK is signed with the React Native debug keystore, so Android asks to allow installs from unknown sources.
 
 ```bash
@@ -348,12 +354,11 @@ pnpm pact:check       # fails when pnpm test rewrote a pact file that is not com
 pnpm verify           # lint, format:check, typecheck, test, pact:check, arch; CI job verify
 ```
 
-Contract tests ([Pact](https://docs.pact.io/)) run inside `pnpm test`. The consumer test calls the real API client against a Pact mock server and writes `pacts/hexablock-app-hexablock-api.json`, which is committed. The backend CI verifies that file from this repository's `main`. Against a running backend:
+Contract tests ([Pact](https://docs.pact.io/)) run inside `pnpm test`. The consumer tests call the real API client against a Pact mock server and write `pacts/hexablock-app-hexablock-api.json`, which is committed. The backend CI verifies that file from this repository's `main`. The interactions of the account (#45) declare provider states, so `pnpm contract:verify` sets up each state through the state-change endpoint of hexablock-api #151. Only the provider composition of the API mounts that endpoint: start it in hexablock-api with `PORT=3001 node --env-file=.env.example scripts/contract/start-provider.js`. Against a running backend:
 
 ```bash
-export BACKEND_URL=http://localhost:3000
-pnpm contract:verify  # the backend honors the committed pact
-pnpm api:check        # schema.d.ts and dto.d.ts match the backend OpenAPI document
+BACKEND_URL=http://localhost:3001 pnpm contract:verify  # the provider composition honors the committed pact
+BACKEND_URL=http://localhost:3000 pnpm api:check        # schema.d.ts and dto.d.ts match the backend OpenAPI document
 ```
 
 The bundled level files of `src/adapters/levels/fit/` and `src/adapters/levels/sort/` must also be stored in the backend: since hexablock-api #146 the board of a level that the backend does not hold answers 404, and a sync with a result of that level answers 400. Two commands keep the backend in step with the files (hexablock-api [#158](https://github.com/Hexablock-Suite/hexablock-api/issues/158)):
@@ -367,7 +372,7 @@ pnpm levels:check     # fails when a bundled file differs from its copy in GET /
 
 `pnpm levels:load` sends the files in one batch. The backend saves no level of a batch that holds a broken level, so the command fails and prints each problem. A repeated load is safe: an equal version replaces the stored copy. When the backend keeps a higher version of a level (rule S3-10), it saves the other levels, and the command names that level and passes. `pnpm levels:check` fails when the backend holds no copy of a bundled level, holds a copy that breaks a rule, or holds a copy with the same or a lower version that differs from the file. A stored copy with a higher version is no drift. A level that only the backend holds is no drift either (APP-FR-15). Whoever deploys the API runs `pnpm levels:load` against it before it takes traffic, then `pnpm levels:check`; no workflow deploys the API (decision of 2026-11-27 on hexablock-api #158).
 
-The CI job `contract` starts a Postgres service, migrates the database, then builds and starts hexablock-api `main` and runs `pnpm contract:verify` and `pnpm api:check`. Then it signs up a level editor, starts the API again with the id of that account in `LEVEL_EDITOR_IDS`, and runs `pnpm levels:load` and `pnpm levels:check`. Last, it runs `test/contract/bundled-levels-sync.test.ts` with `BUNDLED_LEVELS_LIVE=1`: the test loads the bundled levels, signs up a new player, syncs a result of `fit-01` and reads it back from `GET /v1/progress/hexa-fit`. Every other run skips that test, because it needs a real backend with a database.
+The CI job `contract` starts a Postgres service, migrates the database, then builds and starts hexablock-api `main`. It also starts the provider composition of the same revision on port 3001, runs `pnpm contract:verify` against it, and runs `pnpm api:check` against the API. Then it signs up a level editor, starts the API again with the id of that account in `LEVEL_EDITOR_IDS`, and runs `pnpm levels:load` and `pnpm levels:check`. Last, it runs `test/contract/bundled-levels-sync.test.ts` with `BUNDLED_LEVELS_LIVE=1`: the test loads the bundled levels, signs up a new player, syncs a result of `fit-01` and reads it back from `GET /v1/progress/hexa-fit`. Every other run skips that test, because it needs a real backend with a database.
 
 Test titles follow `should_<expected_result>_when_<condition>`. The linter and `test/gates/test-title-gate.test.ts` reject other `it` and `test` titles. Tests check behavior through the public interface of the engine and the use cases. Test doubles replace only the boundaries: the layer 2 ports, such as `GameEventPublisher`, and the engine interfaces `Clock` and `RandomSource` (APP-NFR-12). A rules suite may also pass an `IScoringPolicy` double, because the scoring of each variant has its own suites.
 
