@@ -6,8 +6,8 @@ import { MergeTile } from './merge-tile';
 import { NewTile } from './new-tile';
 
 // The chance that a new tile is a 4. Else it is a 2 (statement §1.4 says «2 o 4»).
-// The value codes against the proposal on issue #57, «Propuesta, pendiente del equipo»
-// (overnight queue, 2026-11-06): a 2 with 0.9 and a 4 with 0.1, as in 2048.
+// The value follows D23 of `docs/REQUIREMENTS.md`. The team accepted the proposal on issue #57
+// on 2026-11-16: a 2 with 0.9 and a 4 with 0.1, as in 2048.
 export const DEFAULT_FOUR_CHANCE = Chance.of(0.1);
 
 // The source of the new Merge tiles (APP-NFR-07). It reuses the engine `SeededPieceSource`,

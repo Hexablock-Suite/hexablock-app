@@ -159,7 +159,8 @@ export class SortSnapshot<TCoord> extends BoardSnapshot<ColorStack, TCoord> {
 // `tray` holds `TRAY_SIZE` slots (issue #353). The player places the stack of one slot,
 // and that slot stays empty until the three slots are empty. Then the tray takes
 // the next stacks of the source. A finite source can give fewer stacks, so the other slots
-// stay empty («Propuesta, pendiente del equipo» of #353). An empty tray offers no move.
+// stay empty: option A of #353, decided on 2026-11-27 (D29 of `docs/REQUIREMENTS.md`).
+// An empty tray offers no move.
 // `goalsDone` counts the cleared stacks, as a `ClearedStacks` (classes.md decision 42).
 // `goalsNeeded` is the goal of the level, a `GoalCount`.
 // `clearedTiles` holds the `TileCount` of each stack that the last turn cleared (issue #232),
