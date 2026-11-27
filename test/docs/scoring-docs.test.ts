@@ -2,6 +2,7 @@
 import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
 import { Moves } from '../../src/domain/shared/moves';
 import { Score } from '../../src/domain/shared/score';
+import { starsOf } from '../../src/domain/progress/star-count';
 import { Stars } from '../../src/domain/progress/stars';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -10,7 +11,7 @@ import { Board } from '../../src/domain/engine/board';
 import { FixedListPieceSource } from '../../src/domain/engine/piece-source';
 import { RegionSize } from '../../src/domain/engine/region-size';
 import { FIT_POINTS_PER_TURN } from '../../src/domain/variants/hexa-fit/fit-scoring';
-import { FitPlay, FitStarThreshold, fitStars } from '../../src/domain/variants/hexa-fit/fit-stars';
+import { FitPlay, FitStarThreshold } from '../../src/domain/variants/hexa-fit/fit-stars';
 import { ComboMultiplierDecorator } from '../../src/domain/variants/hexa-lines/combo-multiplier-decorator';
 import { CellCount } from '../../src/domain/variants/hexa-lines/cell-count';
 import { LineCount } from '../../src/domain/variants/hexa-lines/line-count';
@@ -41,10 +42,12 @@ const variants = ['Hexa Lines', 'Hexa Merge', 'Hexa Sort', 'Hexa Fit'];
 const scoringFiles = [
   'src/domain/variants/hexa-lines/lines-scoring.ts',
   'src/domain/variants/hexa-lines/combo-multiplier-decorator.ts',
+  'src/domain/variants/hexa-lines/combo-factor.ts',
   'src/domain/variants/hexa-merge/merge-scoring.ts',
   'src/domain/variants/hexa-sort/sort-scoring.ts',
   'src/domain/variants/hexa-fit/fit-scoring.ts',
   'src/domain/variants/hexa-fit/fit-stars.ts',
+  'src/domain/progress/star-count.ts',
 ];
 
 // The value of each constant that the README names, as the scoring code gives it.
@@ -177,7 +180,7 @@ function workedExamples(): string[] {
   });
   const fit = [60_000, 60_001].map((elapsedMs) => {
     const play = FitPlay.of({ moves: Moves.of(10), elapsedMs: ElapsedTime.ofMs(elapsedMs) });
-    const stars = fitStars(play, [star]);
+    const stars = starsOf(play, [star]);
     return `play of 10 moves and ${grouped(elapsedMs)} ms gets ${stars.equals(Stars.of(1)) ? 'the star' : 'no star'}`;
   });
   return [

@@ -1,11 +1,8 @@
 /** @jest-environment node */
 import { Moves } from '../../../../src/domain/shared/moves';
+import { starsOf } from '../../../../src/domain/progress/star-count';
 import { Stars } from '../../../../src/domain/progress/stars';
-import {
-  SortPlay,
-  SortStarThreshold,
-  sortStars,
-} from '../../../../src/domain/variants/hexa-sort/sort-stars';
+import { SortPlay, SortStarThreshold } from '../../../../src/domain/variants/hexa-sort/sort-stars';
 
 // The Sort stars of D22, the accepted rule of issue #59: a won Sort level gets stars by moves.
 // Each star has one threshold, a move count. The stars are cumulative: star N needs star N-1.
@@ -65,46 +62,47 @@ describe('SortPlay.isWithin', () => {
   });
 });
 
-describe('sortStars', () => {
+// One star count serves Fit and Sort (issue #424): `starsOf` with Sort thresholds.
+describe('starsOf with Sort thresholds', () => {
   it('should_give_every_star_when_the_play_meets_every_threshold', () => {
-    expect(sortStars(play(9), THREE_STARS)).toEqual(Stars.of(3));
+    expect(starsOf(play(9), THREE_STARS)).toEqual(Stars.of(3));
   });
 
   it('should_give_a_stars_value_object_when_the_stars_are_counted', () => {
-    expect(sortStars(play(9), THREE_STARS)).toBeInstanceOf(Stars);
-    expect(sortStars(play(9), THREE_STARS).equals(Stars.of(3))).toBe(true);
+    expect(starsOf(play(9), THREE_STARS)).toBeInstanceOf(Stars);
+    expect(starsOf(play(9), THREE_STARS).equals(Stars.of(3))).toBe(true);
   });
 
   it('should_give_no_star_when_the_play_meets_no_threshold', () => {
-    expect(sortStars(play(31), THREE_STARS)).toEqual(Stars.of(0));
+    expect(starsOf(play(31), THREE_STARS)).toEqual(Stars.of(0));
   });
 
   it('should_give_the_star_when_the_moves_equal_its_threshold', () => {
-    expect(sortStars(play(30), THREE_STARS)).toEqual(Stars.of(1));
-    expect(sortStars(play(20), THREE_STARS)).toEqual(Stars.of(2));
-    expect(sortStars(play(10), THREE_STARS)).toEqual(Stars.of(3));
+    expect(starsOf(play(30), THREE_STARS)).toEqual(Stars.of(1));
+    expect(starsOf(play(20), THREE_STARS)).toEqual(Stars.of(2));
+    expect(starsOf(play(10), THREE_STARS)).toEqual(Stars.of(3));
   });
 
   it('should_give_no_star_when_the_play_meets_star_two_but_not_star_one', () => {
     const stars: readonly SortStarThreshold[] = [star(10), star(20)];
 
-    expect(sortStars(play(15), stars)).toEqual(Stars.of(0));
+    expect(starsOf(play(15), stars)).toEqual(Stars.of(0));
   });
 
   it('should_stop_at_the_first_missed_star_when_a_later_star_is_met', () => {
     const stars: readonly SortStarThreshold[] = [star(20), star(10), star(30)];
 
-    expect(sortStars(play(15), stars)).toEqual(Stars.of(1));
+    expect(starsOf(play(15), stars)).toEqual(Stars.of(1));
   });
 
   it('should_give_no_star_when_the_level_has_no_threshold', () => {
-    expect(sortStars(play(0), [])).toEqual(Stars.of(0));
+    expect(starsOf(play(0), [])).toEqual(Stars.of(0));
   });
 
   // Issue 137: NaN fails every comparison, so without the check `moves: NaN` wins every star.
   // `Moves` holds the check, so no play holds a count that no game gives.
   it('should_throw_a_range_error_when_the_moves_are_not_a_safe_integer_of_zero_or_more', () => {
-    const played = (moves: number) => () => sortStars(play(moves), THREE_STARS);
+    const played = (moves: number) => () => starsOf(play(moves), THREE_STARS);
 
     for (const moves of [Number.NaN, -1, 1.5, Number.POSITIVE_INFINITY, 2 ** 53]) {
       expect(played(moves)).toThrow(RangeError);
@@ -113,7 +111,7 @@ describe('sortStars', () => {
       );
     }
     // A level without thresholds still checks the moves.
-    expect(() => sortStars(play(Number.NaN), [])).toThrow(RangeError);
+    expect(() => starsOf(play(Number.NaN), [])).toThrow(RangeError);
     // -0 counts as 0. The largest safe integer is a valid count.
     expect(played(0)()).toEqual(Stars.of(3));
     expect(played(-0)()).toEqual(Stars.of(3));

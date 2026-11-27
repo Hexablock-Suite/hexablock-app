@@ -167,7 +167,7 @@ function planPlay(
       const outcomes = plan.map((at) =>
         playMove(engine, PlaceStack.on(geometry.createCoord([...at]))),
       );
-      return { outcomes, stars: level.starsFor(Moves.of(plan.length), undefined) };
+      return { outcomes, stars: level.starsFor(Moves.of(plan.length)) };
     },
   });
 }
@@ -435,7 +435,7 @@ describe('bundled Sort levels', () => {
   it('should_give_the_stars_of_its_file_when_a_bundled_level_counts_the_stars_of_a_play', () => {
     const [[, first]] = bundledFiles();
     const level = withGeometryOf(first.topology, { use: (geometry) => built(first, geometry) });
-    const starsOf = (moves: number) => level.starsFor(Moves.of(moves), undefined);
+    const starsOf = (moves: number) => level.starsFor(Moves.of(moves));
 
     expect(starsOf(35)).toEqual(Stars.of(1));
     expect(starsOf(20)).toEqual(Stars.of(3));
