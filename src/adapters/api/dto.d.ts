@@ -290,6 +290,11 @@ export interface components {
              * @example 0b6f6a4e-1c2d-4e5f-8a9b-0c1d2e3f4a5b
              */
             userId: string;
+            /**
+             * @description The username of the account of the player, as the player typed it at sign-up (#230).
+             * @example ada
+             */
+            username: string;
             /** @example 2048 */
             highScore: number;
         };
@@ -304,6 +309,11 @@ export interface components {
              * @example 0b6f6a4e-1c2d-4e5f-8a9b-0c1d2e3f4a5b
              */
             userId: string;
+            /**
+             * @description The username of the account of the player, as the player typed it at sign-up (#230).
+             * @example ada
+             */
+            username: string;
             /**
              * @description The total of the stars.
              * @example 9
@@ -344,6 +354,11 @@ export interface components {
              * @example 0b6f6a4e-1c2d-4e5f-8a9b-0c1d2e3f4a5b
              */
             userId: string;
+            /**
+             * @description The username of the account of the player, as the player typed it at sign-up (#230).
+             * @example ada
+             */
+            username: string;
             /** @example 3 */
             stars: number;
             /** @example 12 */
