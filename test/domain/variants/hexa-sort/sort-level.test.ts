@@ -25,6 +25,10 @@ const red = Color.of('red');
 const blue = Color.of('blue');
 const green = Color.of('green');
 
+// True when a drawn stack holds 2 to 6 tiles, and each one is red (issue #352).
+const onlyRed = (tiles: readonly string[]) =>
+  tiles.length >= 2 && tiles.length <= 6 && tiles.every((tile) => tile === 'red');
+
 function fixed(...stacks: ColorStack[]): SortLevel {
   return SortLevel.fixed(SIZE, GOAL, stacks);
 }
@@ -112,7 +116,7 @@ describe('SortLevel', () => {
       const level = SortLevel.seeded(SIZE, GOAL, Seed.of(seed), [red]);
 
       expect(level.equals(SortLevel.seeded(SIZE, GOAL, Seed.of(seed), [red]))).toBe(true);
-      expect(firstStacks(level, 2)).toEqual([['red'], ['red']]);
+      expect(firstStacks(level, 2).map(onlyRed)).toEqual([true, true]);
     }
   });
 
@@ -150,7 +154,7 @@ describe('SortLevel', () => {
 
     expect(firstStacks(level, 5)).toEqual([['red']]);
     expect(level.equals(fixed(stack('red')))).toBe(true);
-    expect(firstStacks(seeded, 3)).toEqual([['red'], ['red'], ['red']]);
+    expect(firstStacks(seeded, 3).map(onlyRed)).toEqual([true, true, true]);
     expect(seeded.equals(SortLevel.seeded(SIZE, GOAL, Seed.of(7), [red]))).toBe(true);
   });
 
@@ -218,18 +222,18 @@ describe('SortLevel', () => {
     expect(level.equals(fixed(stack('red')))).toBe(true);
   });
 
-  it('should_draw_one_tile_of_a_level_color_when_a_seeded_level_gives_a_stack', () => {
+  // APP-NFR-07 and issue #352: the seed fixes every part of each drawn stack.
+  it('should_draw_the_same_stacks_twice_when_two_sources_of_a_seeded_level_start_from_one_seed', () => {
     const level = SortLevel.seeded(SIZE, GOAL, Seed.of(42), [red, blue, green]);
 
     const stacks = firstStacks(level, 30);
 
     expect(stacks).toHaveLength(30);
     for (const tiles of stacks) {
-      expect(tiles).toHaveLength(1);
-      expect(['red', 'blue', 'green']).toContain(tiles[0]);
+      expect(tiles.every((tile) => ['red', 'blue', 'green'].includes(tile))).toBe(true);
     }
     // The seed fixes the sequence, and a sequence of 30 draws holds each color.
-    expect(new Set(stacks.map((tiles) => tiles[0])).size).toBe(3);
+    expect(new Set(stacks.flat()).size).toBe(3);
     expect(firstStacks(SortLevel.seeded(SIZE, GOAL, Seed.of(42), [red, blue, green]), 30)).toEqual(
       stacks,
     );

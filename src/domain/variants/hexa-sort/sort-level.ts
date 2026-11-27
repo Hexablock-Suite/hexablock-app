@@ -11,6 +11,11 @@ import { ColorStack } from './color-stack';
 import type { GoalCount } from './goal-count';
 import { SortPlay, type SortStarThreshold } from './sort-stars';
 
+// The draw of a seeded stack follows the team prototype (issue #352, decision of 2026-11-24).
+// A stack holds 2 to 6 tiles in 1 to 3 runs of one color each. Only this file reads them.
+const STACK_HEIGHTS = Object.freeze([2, 3, 4, 5, 6]);
+const RUN_COUNTS = Object.freeze([1, 2, 3]);
+
 // The data of the piece source of a level. A level picks one of three kinds (A4).
 // A seeded supply holds the seed and the colors that a draw picks from.
 // A supply seeded each match holds only the colors: the factory draws a new seed for each match
@@ -96,13 +101,13 @@ export class SortLevel implements IStarsByMoves {
   // Gives the data of the piece source to the builder of its kind, and returns what it builds.
   // So the caller builds the source and asks no question about the kind.
   // A seeded level gives its seed and its draw, and a level seeded each match gives its draw only.
-  // Each draw reads one number and gives a stack of one tile, of the color that the number picks.
+  // Each draw gives a stack of the colors of the level, as `drawStack()` tells (issue #352).
   // A fixed level gives its frozen list of stacks.
   sourceWith<TSource>(builders: SortSourceBuilders<TSource>): TSource {
     const supply = this.supply;
     if ('stacks' in supply) return builders.fixed(supply.stacks);
     const { colors } = supply;
-    const draw = (random: RandomSource) => ColorStack.of([random.next().pick(colors)]);
+    const draw = (random: RandomSource) => drawStack(random, colors);
     if ('seed' in supply) return builders.seeded(supply.seed, draw);
     return builders.seededEachMatch(draw);
   }
@@ -146,6 +151,29 @@ function colorsOf(colors: readonly Color[]): readonly Color[] {
   const copy = frozenListOf(colors);
   if (copy.length === 0) throw new RangeError('A seeded Sort level needs one color or more.');
   return copy;
+}
+
+// One seeded stack of `colors` (issue #352). The random source draws every part of it,
+// so one seed gives the same stacks (APP-NFR-07). The draws come in this order:
+// the height, the count of runs, the run of each tile after the first tile of each run,
+// and then the color of each run, from the bottom run up.
+// The count of runs is never more than the height and never more than the colors.
+// Each run holds 1 tile or more, and the random source gives each other tile to a run.
+// Each run takes a color other than the color of the run below it, so two runs next to each
+// other never join. The transfer moves the top run (D21), so the last color is on top.
+function drawStack(random: RandomSource, colors: readonly Color[]): ColorStack {
+  const height = random.next().pick(STACK_HEIGHTS);
+  const runs = Math.min(height, random.next().pick(RUN_COUNTS), colors.length);
+  const places = Array.from({ length: runs }, (_, run) => run);
+  const extra = Array.from({ length: height - runs }, () => random.next().pick(places));
+  const sizes = places.map((run) => 1 + extra.filter((each) => each === run).length);
+  const chips: Color[] = [];
+  for (const size of sizes) {
+    const below = chips.at(-1);
+    const color = random.next().pick(colors.filter((each) => below?.equals(each) !== true));
+    chips.push(...Array.from({ length: size }, () => color));
+  }
+  return ColorStack.of(chips);
 }
 
 // True when both supplies are of one kind and hold equal data in the same order.
