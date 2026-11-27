@@ -35,6 +35,7 @@ import {
 } from '../../support/engine/fake-game';
 import { square, type SquareCoord } from '../../support/engine/square-topology';
 import { MATCH_ID } from '../../support/engine/match-id';
+import { playMove } from '../../support/engine/play-move';
 
 // APP-NFR-04: the piece source, the scoring policy and the progress model swap,
 // and no engine file changes. Every implementation here is a dummy that exists only in test/.
@@ -170,9 +171,9 @@ function playGame(
     moves += 1;
     // A turn that throws is played once more.
     try {
-      outcome = engine.play(at);
+      outcome = playMove(engine, at);
     } catch {
-      outcome = engine.play(at);
+      outcome = playMove(engine, at);
     }
     subscriber.listen(engine.takeEvents());
   }
@@ -278,12 +279,12 @@ describe('swapping the piece source, the scoring policy and the progress model',
       new OnePerMove(),
     );
     engine.start(sourceState(sources.counting()));
-    for (const at of sourceState(sources.counting()).board.coordinates()) engine.play(at);
+    for (const at of sourceState(sources.counting()).board.coordinates()) playMove(engine, at);
     subscriber.listen(engine.takeEvents());
     const full = engine.snapshot();
 
-    expect(() => engine.play(square(0, 0))).toThrow(RangeError);
-    expect(() => engine.play(square(0, 0))).toThrow('game-over phase');
+    expect(() => playMove(engine, square(0, 0))).toThrow(RangeError);
+    expect(() => playMove(engine, square(0, 0))).toThrow('game-over phase');
     expect(engine.currentPhase()).toBe(GameOverPhase.instance);
     expect(engine.snapshot().boardCopy().occupiedCells()).toEqual(full.boardCopy().occupiedCells());
     expect(engine.snapshot().scoreSoFar()).toEqual(full.scoreSoFar());

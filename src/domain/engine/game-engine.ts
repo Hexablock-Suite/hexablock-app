@@ -6,18 +6,17 @@ import type { GameId } from '../shared/game-id';
 import { PlayingPhase, ResolvingPhase, type GamePhase } from './game-phase';
 import type { MatchId } from './match-id';
 import { MoveCommand } from './move-command';
-import type { MoveHistory } from './move-history';
 import type { Outcome } from './outcome';
 import { Resolution } from './resolution';
 import type { IGameRules } from './rules';
 import type { IScoringPolicy } from './scoring-policy';
 import type { ITimed } from './timed';
-import type { IRedoable } from './undo-capabilities';
+import type { IRedoable, IUndoable } from './undo-capabilities';
 
 // The aggregate root of one game (classes.md decision 26).
 // It is an entity: its `MatchId` is its identity, and the id never changes.
 // `GameFactory` gives each new game the id of a generator. `gameId` only names the variant.
-// A game changes only through `play()`, `undo()` and `redo()`, and each acts only
+// A game changes only through `tryPlay()`, `undo()` and `redo()`, and each acts only
 // while `currentPhase().canPlay()` is true. `snapshot()` returns the photo of the state,
 // which is immutable, so no caller changes the game through it (classes.md decision 34).
 // The engine depends only on the interfaces of the rules and the scoring (Strategy, D1).
@@ -47,7 +46,7 @@ export class GameEngine<
     private readonly gameId: GameId,
     private readonly rules: IGameRules<TMove, TState>,
     private readonly scoring: IScoringPolicy<TState>,
-    private readonly history?: MoveHistory<TMove, SnapshotOf<TState>>,
+    private readonly history?: IUndoable<TMove, SnapshotOf<TState>>,
     private readonly timer?: ITimed,
   ) {}
 
@@ -115,13 +114,9 @@ export class GameEngine<
 
   // One turn: receive the move, let the rules validate, apply, resolve and evaluate it
   // (template method `playTurn()`), score it, record the events of the move, and record
-  // `GameOver` when the game ends.
-  // A rejected move returns `playing`. Call `tryPlay()` to tell it from an accepted move.
-  play(move: TMove): Outcome {
-    return this.tryPlay(move).leadsTo();
-  }
-
-  // The same turn as `play()`. It returns the `Resolution` of the turn, which also says
+  // `GameOver` when the game ends. It is the one entry of a turn (classes.md decision 26,
+  // issue #415): `ApplyMove` calls it.
+  // It returns the `Resolution` of the turn, which also says
   // whether the rules accepted the move. So the `ApplyMove` use case can return a failure
   // for a rejected move (issue 100). A rejected move always has the outcome `playing`.
   // An accepted turn records the events of its move, which the photo after the move gives

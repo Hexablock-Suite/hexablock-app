@@ -17,11 +17,12 @@ import {
   linesState,
   piece,
 } from '../../../support/variants/hexa-lines/lines-game';
+import { playMove } from '../../../support/engine/play-move';
 
 // The scoring of Hexa Lines (issue 97, APP-FR-06, statement §1.1).
 // It codes the accepted rule of issue #59 (D22): 1 point per placed cell and 10 per cleared line, and the line bonus
 // multiplied by `lines + streak - 1` through `ComboMultiplierDecorator`.
-// The tests play through `GameEngine.play()`.
+// The tests play through `GameEngine.tryPlay()`.
 
 const origin = square(0, 0);
 const one = piece(origin);
@@ -40,11 +41,11 @@ function twoClearingPlacements(scoring: IScoringPolicy<LinesState<SquareCoord>>)
     }),
     scoring,
   );
-  engine.play(new PlacePiece(TrayPosition.of(0), square(0, 0)));
+  playMove(engine, new PlacePiece(TrayPosition.of(0), square(0, 0)));
   const first = engine.snapshot().scoreSoFar();
-  engine.play(new PlacePiece(TrayPosition.of(0), square(0, 1)));
+  playMove(engine, new PlacePiece(TrayPosition.of(0), square(0, 1)));
   const second = engine.snapshot().scoreSoFar();
-  engine.play(new PlacePiece(TrayPosition.of(0), square(2, 2)));
+  playMove(engine, new PlacePiece(TrayPosition.of(0), square(2, 2)));
   return [first, second, engine.snapshot().scoreSoFar()];
 }
 
@@ -57,7 +58,7 @@ function comboPlacement(scoring: IScoringPolicy<LinesState<SquareCoord>>) {
     }),
     scoring,
   );
-  engine.play(new PlacePiece(TrayPosition.of(0), origin));
+  playMove(engine, new PlacePiece(TrayPosition.of(0), origin));
   return engine.snapshot();
 }
 
@@ -73,9 +74,9 @@ function comboInAStreak(scoring: IScoringPolicy<LinesState<SquareCoord>>) {
     }),
     scoring,
   );
-  engine.play(new PlacePiece(TrayPosition.of(0), square(0, 1)));
+  playMove(engine, new PlacePiece(TrayPosition.of(0), square(0, 1)));
   const first = engine.snapshot().scoreSoFar();
-  engine.play(new PlacePiece(TrayPosition.of(0), origin));
+  playMove(engine, new PlacePiece(TrayPosition.of(0), origin));
   return { first, state: engine.snapshot() };
 }
 
@@ -87,7 +88,7 @@ describe('Hexa Lines scoring', () => {
       decorated(),
     );
 
-    engine.play(new PlacePiece(TrayPosition.of(0), square(1, 2)));
+    playMove(engine, new PlacePiece(TrayPosition.of(0), square(1, 2)));
 
     const state = engine.snapshot();
     expect(state.lastCombo()).toEqual(LineCount.of(0));
@@ -129,7 +130,7 @@ describe('Hexa Lines scoring', () => {
       decorated(),
     );
 
-    engine.play(new PlacePiece(TrayPosition.of(0), origin));
+    playMove(engine, new PlacePiece(TrayPosition.of(0), origin));
 
     const state = engine.snapshot();
     expect([state.lastCombo(), state.currentStreak()]).toEqual([LineCount.of(1), Streak.of(1)]);

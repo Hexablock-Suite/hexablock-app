@@ -16,6 +16,7 @@ import {
 } from '../support/engine/fake-game';
 import { square, type SquareCoord } from '../support/engine/square-topology';
 import { MATCH_ID } from '../support/engine/match-id';
+import { playMove } from '../support/engine/play-move';
 
 // The score of the state is the largest safe integer, so one more point passes it.
 const FULL = Score.of(Number.MAX_SAFE_INTEGER);
@@ -69,7 +70,7 @@ describe('a total score that passes the largest safe integer', () => {
   it('should_throw_a_range_error_and_keep_the_game_when_the_engine_plays_that_turn', () => {
     const { engine } = overflowingGame();
 
-    expect(() => engine.play(MOVE)).toThrow(
+    expect(() => playMove(engine, MOVE)).toThrow(
       new RangeError('The sum of two scores cannot pass the largest safe integer.'),
     );
 

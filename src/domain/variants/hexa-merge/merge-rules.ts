@@ -30,7 +30,7 @@ export class MergeRules<
     super();
   }
 
-  isValid(state: MergeState<TCell, TCoord, TAxis>, slide: Slide<TAxis>): boolean {
+  protected isValid(state: MergeState<TCell, TCoord, TAxis>, slide: Slide<TAxis>): boolean {
     return state.canSlide(slide);
   }
 
@@ -43,7 +43,7 @@ export class MergeRules<
     }
   }
 
-  apply(
+  protected apply(
     state: MergeState<TCell, TCoord, TAxis>,
     slide: Slide<TAxis>,
   ): MergeState<TCell, TCoord, TAxis> {
@@ -57,12 +57,12 @@ export class MergeRules<
   // «Propuesta, pendiente del equipo», fixes the rest: a 2 with 0.9 and a 4 with 0.1
   // (`mergeTileSource()`), and undo restores the photo with its source, so the same tile comes back.
   // A board with no empty cell, or a source that has ended, gets no new tile.
-  resolve(state: MergeState<TCell, TCoord, TAxis>): Resolution {
+  protected resolve(state: MergeState<TCell, TCoord, TAxis>): Resolution {
     state.addNewTile();
     return Resolution.resolved();
   }
 
-  evaluate(state: MergeState<TCell, TCoord, TAxis>): Outcome {
+  protected evaluate(state: MergeState<TCell, TCoord, TAxis>): Outcome {
     return this.noValidMove(state) ? Outcome.gameOver : Outcome.playing;
   }
 }

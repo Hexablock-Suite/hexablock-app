@@ -8,7 +8,9 @@ import { MoveHistory } from '../../../src/domain/engine/move-history';
 import { FixedListPieceSource } from '../../../src/domain/engine/piece-source';
 import { RedoableHistory } from '../../../src/domain/engine/redoable-history';
 import { Resolution } from '../../../src/domain/engine/resolution';
-import type { IRedoable } from '../../../src/domain/engine/undo-capabilities';
+import { GameFactory } from '../../../src/domain/engine/game-factory';
+import type { MoveCommand } from '../../../src/domain/engine/move-command';
+import type { IRedoable, IUndoable } from '../../../src/domain/engine/undo-capabilities';
 import { fakeCell, type FakeCell } from '../../support/engine/fake-cell';
 import {
   emptyState,
@@ -17,6 +19,7 @@ import {
   OnePointScoring,
   SourceRules,
   sourceState,
+  fakeGameFactory,
   type FakeMove,
   type FakeSnapshot,
   type SourceSnapshot,
@@ -31,6 +34,7 @@ import {
 } from '../../support/engine/square-topology';
 import { MATCH_ID } from '../../support/engine/match-id';
 import { delivered } from '../../support/engine/value-receiver';
+import { playMove } from '../../support/engine/play-move';
 
 // `GameEngine` takes the state back through its own undo (classes.md decisions 27 and 34).
 // The root is the only door: a caller asks `undo()`, `redo()`, `canUndo()`, `canRedo()` and
@@ -149,6 +153,75 @@ class CountingRedoHistory extends MoveHistory<FakeMove, FakeSnapshot> implements
   }
 }
 
+// A history that the test writes by hand. It is no `MoveHistory`: it only implements
+// `IUndoable`, the capability that the root depends on (issue #414, classes.md decision 27).
+// It writes the name of each call, so a test sees what the root asks.
+class HandHistory implements IUndoable<FakeMove, FakeSnapshot> {
+  readonly calls: string[] = [];
+  private readonly done: MoveCommand<FakeMove, FakeSnapshot>[] = [];
+
+  record(command: MoveCommand<FakeMove, FakeSnapshot>): void {
+    this.calls.push('record');
+    this.done.push(command);
+  }
+
+  clear(): void {
+    this.calls.push('clear');
+    this.done.length = 0;
+  }
+
+  canUndo(): boolean {
+    return this.done.length > 0;
+  }
+
+  undo(): void {
+    this.calls.push('undo');
+    this.done.at(-1)?.undo();
+    this.done.pop();
+  }
+
+  redoable(): IRedoable | undefined {
+    return undefined;
+  }
+}
+
+describe('GameEngine undo through IUndoable', () => {
+  it('should_undo_through_a_hand_written_history_when_the_history_implements_iundoable', () => {
+    const history = new HandHistory();
+    const engine = new GameEngine(
+      MATCH_ID,
+      GameId.of('fake-game'),
+      new FakeRules(),
+      new OnePointScoring(),
+      history,
+    );
+    engine.start(emptyState());
+    playMove(engine, moveAt(0));
+    const couldUndo = engine.canUndo();
+
+    engine.undo();
+
+    expect(couldUndo).toBe(true);
+    expect(filled(engine.snapshot().boardCopy())).toEqual([]);
+    expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(0));
+    expect([engine.canUndo(), engine.canRedo()]).toEqual([false, false]);
+    expect(history.calls).toEqual(['clear', 'record', 'undo']);
+  });
+
+  it('should_give_the_game_the_history_of_the_factory_when_the_factory_creates_an_iundoable', () => {
+    const history = new HandHistory();
+    const factory = { ...fakeGameFactory(), createHistory: () => history };
+    const engine = new GameFactory(GameId.of('fake-game'), factory, {
+      next: () => MATCH_ID,
+    }).createGame();
+
+    playMove(engine, moveAt(0));
+
+    expect(engine.offersUndo()).toBe(true);
+    expect(history.calls).toEqual(['clear', 'record']);
+  });
+});
+
 describe('GameEngine undo through the root', () => {
   it('should_offer_no_undo_and_refuse_undo_and_redo_when_the_engine_has_no_history', () => {
     const engine = new GameEngine(
@@ -158,7 +231,7 @@ describe('GameEngine undo through the root', () => {
       new OnePointScoring(),
     );
     engine.start(emptyState());
-    engine.play(moveAt(0));
+    playMove(engine, moveAt(0));
     const played = factsOf(engine);
 
     expect([engine.offersUndo(), engine.canUndo(), engine.canRedo()]).toEqual([
@@ -179,7 +252,7 @@ describe('GameEngine undo through the root', () => {
 
   it('should_refuse_the_redo_and_change_nothing_when_the_history_cannot_redo', () => {
     const { engine } = historyGame();
-    engine.play(moveAt(0));
+    playMove(engine, moveAt(0));
     const played = factsOf(engine);
 
     expect(engine.canRedo()).toBe(false);
@@ -224,9 +297,9 @@ describe('GameEngine undo through the root', () => {
 
   it('should_give_back_the_board_and_the_score_before_the_move_when_the_capability_undoes_it', () => {
     const { engine } = historyGame();
-    engine.play(moveAt(0));
+    playMove(engine, moveAt(0));
     const afterFirst = factsOf(engine);
-    engine.play(moveAt(1));
+    playMove(engine, moveAt(1));
 
     expect(engine.canUndo()).toBe(true);
     engine.undo();
@@ -247,10 +320,10 @@ describe('GameEngine undo through the root', () => {
       history,
     );
     engine.start(sourceState(new FixedListPieceSource(pieces)));
-    engine.play(square(0, 0));
+    playMove(engine, square(0, 0));
 
     engine.undo();
-    engine.play(square(1, 0));
+    playMove(engine, square(1, 0));
 
     // The draw of the undone move comes back, so the new move gets the same piece.
     expect(filled(engine.snapshot().boardCopy())).toEqual([['1,0', 1]]);
@@ -259,7 +332,7 @@ describe('GameEngine undo through the root', () => {
 
   it('should_keep_the_old_state_when_a_caller_changes_a_snapshot_after_a_move', () => {
     const { engine } = historyGame();
-    engine.play(moveAt(0));
+    playMove(engine, moveAt(0));
 
     // The photo shows a read-only board. A cast reaches its copy of the board.
     const photo = engine.snapshot();
@@ -285,7 +358,7 @@ describe('GameEngine undo through the root', () => {
     const { engine } = historyGame(rules);
     rules.armed = true;
 
-    expect(() => engine.play(moveAt(0))).toThrow('resolve failed');
+    expect(() => playMove(engine, moveAt(0))).toThrow('resolve failed');
 
     expect(engine.canUndo()).toBe(false);
     expect(factsOf(engine)).toEqual({ cells: [], score: Score.of(0), phase: 'playing' });
@@ -298,18 +371,18 @@ describe('GameEngine undo through the root', () => {
     // After the rules, the first photo is the Memento: the photo of the state before the move.
     budget.left = 0;
 
-    expect(() => engine.play(moveAt(0))).toThrow('photo failed');
+    expect(() => playMove(engine, moveAt(0))).toThrow('photo failed');
 
     budget.left = Number.POSITIVE_INFINITY;
     expect(engine.canUndo()).toBe(false);
     expect(factsOf(engine)).toEqual({ cells: [], score: Score.of(0), phase: 'playing' });
-    expect(engine.play(moveAt(0))).toBe(Outcome.playing);
+    expect(playMove(engine, moveAt(0))).toBe(Outcome.playing);
     expect(engine.canUndo()).toBe(true);
   });
 
   it('should_forget_the_moves_and_keep_the_end_of_the_game_when_the_last_move_ends_it', () => {
     const { engine } = historyGame(new FakeRules(), 1);
-    engine.play(moveAt(0));
+    playMove(engine, moveAt(0));
     const finished = factsOf(engine);
 
     expect(finished.phase).toBe('game-over');
@@ -328,7 +401,7 @@ describe('GameEngine undo through the root', () => {
 
   it('should_refuse_the_undo_and_change_nothing_when_the_game_is_paused', () => {
     const { engine } = historyGame();
-    engine.play(moveAt(0));
+    playMove(engine, moveAt(0));
     const played = factsOf(engine);
     engine.pause();
 
@@ -345,7 +418,7 @@ describe('GameEngine undo through the root', () => {
     expect(factsOf(engine)).toEqual({ cells: [], score: Score.of(0), phase: 'playing' });
   });
 
-  // `play()` enters the resolving phase before it calls the scoring.
+  // `tryPlay()` enters the resolving phase before it calls the scoring.
   // The resolving phase refuses an undo, so the turn of the reentrant call stays whole.
   it('should_refuse_a_reentrant_undo_and_keep_both_moves_when_the_scoring_asks_for_it_in_a_turn', () => {
     const scoring = new UndoingScoring();
@@ -357,10 +430,10 @@ describe('GameEngine undo through the root', () => {
       new MoveHistory<FakeMove, FakeSnapshot>(),
     );
     engine.start(emptyState());
-    engine.play(moveAt(0));
+    playMove(engine, moveAt(0));
     scoring.game = engine;
 
-    engine.play(moveAt(1));
+    playMove(engine, moveAt(1));
 
     expect(scoring.innerError).toBeInstanceOf(RangeError);
     expect(scoring.innerError).toEqual(
@@ -383,7 +456,7 @@ describe('GameEngine undo through the root', () => {
 
   it('should_forget_the_moves_of_the_old_game_when_the_engine_starts_again', () => {
     const { engine } = historyGame();
-    engine.play(moveAt(0));
+    playMove(engine, moveAt(0));
 
     engine.start(emptyState());
 
@@ -395,8 +468,8 @@ describe('GameEngine undo through the root', () => {
   // The command gives back the photo after its move, so the redo gives back the same game.
   it('should_give_back_the_board_and_the_score_after_the_move_when_a_move_is_undone_and_redone', () => {
     const { engine } = redoGame();
-    engine.play(moveAt(0));
-    engine.play(moveAt(1));
+    playMove(engine, moveAt(0));
+    playMove(engine, moveAt(1));
     const played = factsOf(engine);
     engine.undo();
     engine.undo();
@@ -413,10 +486,10 @@ describe('GameEngine undo through the root', () => {
 
   it('should_forget_the_undone_moves_when_a_new_move_is_played_after_an_undo', () => {
     const { engine } = redoGame();
-    engine.play(moveAt(0));
+    playMove(engine, moveAt(0));
     engine.undo();
 
-    engine.play(moveAt(1));
+    playMove(engine, moveAt(1));
 
     expect(engine.canRedo()).toBe(false);
     expect(() => engine.redo()).toThrow(new RangeError('The history has no move to redo.'));
@@ -425,7 +498,7 @@ describe('GameEngine undo through the root', () => {
 
   it('should_refuse_the_redo_and_change_nothing_when_the_game_is_paused', () => {
     const { engine } = redoGame();
-    engine.play(moveAt(0));
+    playMove(engine, moveAt(0));
     engine.undo();
     engine.pause();
 

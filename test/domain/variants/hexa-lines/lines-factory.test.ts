@@ -29,6 +29,7 @@ import { MATCH_ID } from '../../../support/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 import { delivered } from '../../../support/engine/value-receiver';
 import { StepRandom } from '../../../support/engine/step-random';
+import { playMove } from '../../../support/engine/play-move';
 
 // The Lines factory creates the whole family of Hexa Lines (issue 99, classes.md decision 31).
 
@@ -105,7 +106,10 @@ describe('LinesFactory', () => {
 
     const initial = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
     const { engine, rules } = startVariant(factory);
-    const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, engine.snapshot())));
+    const outcome = playMove(
+      engine,
+      firstValidMove(rules, liveStateOf(factory, engine.snapshot())),
+    );
 
     expect(factory.isFor(GameId.of('hexa-lines'))).toBe(true);
     expect(factory.createBoard(BOARD_ID).coordinates()).toHaveLength(9);
@@ -152,7 +156,7 @@ describe('LinesFactory', () => {
       linesFactory().createScoring(),
     );
 
-    engine.play(new PlacePiece(TrayPosition.of(0), square(0, 0)));
+    playMove(engine, new PlacePiece(TrayPosition.of(0), square(0, 0)));
 
     expect(engine.snapshot().lastCombo()).toEqual(LineCount.of(2));
     // 1 cell + 10 × 2 lines × (2 + 1 - 1). The base scoring alone gives 21.

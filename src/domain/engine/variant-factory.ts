@@ -6,12 +6,12 @@ import type { GameId } from '../shared/game-id';
 import type { GameStateId } from './game-state-id';
 import type { LevelTimer } from './level-timer';
 import type { MatchId } from './match-id';
-import type { MoveHistory } from './move-history';
 import type { Piece } from './piece';
 import type { IPieceSource } from './piece-source';
 import type { IProgressModel } from '../progress/progress-model';
 import type { IGameRules } from './rules';
 import type { IScoringPolicy } from './scoring-policy';
+import type { IUndoable } from './undo-capabilities';
 
 // Abstract Factory (statement §3.3, classes.md decision 31). One factory per variant
 // creates the whole family of its game: the rules, the scoring, the piece source,
@@ -52,6 +52,6 @@ export interface IVariantFactory<
   createPieceSource(): IPieceSource<TPiece> | undefined;
   createBoard(boardId: BoardId): Board<TCell, TCoord>;
   createInitialState(matchId: MatchId, stateId: GameStateId, boardId: BoardId): TState;
-  createHistory(): MoveHistory<TMove, SnapshotOf<TState>> | undefined;
+  createHistory(): IUndoable<TMove, SnapshotOf<TState>> | undefined;
   createProgressModel(): IProgressModel;
 }

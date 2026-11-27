@@ -6,6 +6,7 @@ import { PieceRegister } from '../../../../src/domain/variants/hexa-fit/piece-re
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { square } from '../../../support/engine/square-topology';
+import { accepts, playedOn } from '../../../support/engine/variant-game';
 import { delivered } from '../../../support/engine/value-receiver';
 import { A, B, C, threeDominoFitFactory } from '../../../support/variants/hexa-fit/fit-game';
 
@@ -117,9 +118,9 @@ describe('a Fit game with an equal piece id that is another object', () => {
 
     expect(other).not.toBe(B);
     expect(state.piece(other)).toBe(state.piece(B));
-    expect(rules.isValid(state, place)).toBe(true);
+    expect(accepts(rules, state, place)).toBe(true);
 
-    rules.apply(state, place);
+    playedOn(rules, state, place);
 
     expect(state.placementOf(PieceId.of('b'))).toBeDefined();
     expect(state.placed()).toEqual([B]);
@@ -131,7 +132,7 @@ describe('a Fit game with an equal piece id that is another object', () => {
         .map(([id]) => delivered(id)),
     ).toEqual(['b']);
 
-    rules.apply(state, new RemoveFitPiece(PieceId.of('b')));
+    playedOn(rules, state, new RemoveFitPiece(PieceId.of('b')));
 
     expect(state.placed()).toEqual([]);
     expect(state.placementOf(B)).toBeUndefined();
