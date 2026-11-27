@@ -7,7 +7,7 @@ import type { Logger, UseCaseLogEntry } from '../../src/application/logger';
 import { AchievementCount } from '../../src/domain/achievements/achievement-count';
 import type { AchievementCounters } from '../../src/domain/achievements/achievement-counters';
 import type { CountsForAchievements } from '../../src/domain/achievements/counts-for-achievements';
-import { GameEvent, GameOver } from '../../src/domain/engine/game-events';
+import { GameEvent, GameEnded } from '../../src/domain/engine/game-events';
 import { GameId } from '../../src/domain/shared/game-id';
 import type { ValueReceiver } from '../../src/domain/shared/value-receiver';
 import { hex, HexAxis } from '../../src/domain/engine/hex-topology';
@@ -193,10 +193,10 @@ describe('AchievementCounterListener', () => {
     expect(countsOf(await counters.load(fill))).toEqual({ best: 0, total: 10 });
   });
 
-  it('should_save_nothing_when_the_listener_hears_only_a_game_over', async () => {
+  it('should_save_nothing_when_the_listener_hears_only_a_game_ended_event', async () => {
     const { store, counters, listener } = counting();
 
-    listener.onEvent(new GameOver(LINES, MATCH_ID, Outcome.gameOver, Score.of(10)));
+    listener.onEvent(new GameEnded(LINES, MATCH_ID, Outcome.gameOver, Score.of(10)));
     await listener.saved();
 
     await expect(counters.load(LINES)).resolves.toBeUndefined();

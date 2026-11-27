@@ -9,8 +9,8 @@ import { Slide, SlideSense } from './slide';
 // Strategy (D1): the rules of Hexa Merge (statement §1.4). It extends `BaseGameRules`,
 // so the engine runs the turn through the template method `playTurn()` (decision 21).
 // Bounded generic (§3.1, decision 8): a cell only needs to merge with an equal cell.
-// The rules code against the proposal on issue #57, «Propuesta, pendiente del equipo»
-// (overnight queue, 2026-11-06). The team has not decided it yet:
+// The rules follow D23 of `docs/REQUIREMENTS.md`. The team accepted the proposal on issue #57
+// on 2026-11-16, as it stands:
 // - A slide reads each line from its leading edge, the edge that the tiles move toward.
 // - A tile merges at most once per move. So `2 2 2` gives `4 2`, and `4 2 2` gives `4 4`.
 // A slide that changes no cell is not valid. The game ends when no slide changes the board
@@ -48,8 +48,8 @@ export class MergeRules<
 
   // A new tile appears on an empty cell after each accepted slide (§1.4, issue #95).
   // It comes from the source in the state (classes.md decision 31), so the cell and the
-  // value both come from one seeded source (APP-NFR-07). The proposal on issue #57,
-  // «Propuesta, pendiente del equipo», fixes the rest: a 2 with 0.9 and a 4 with 0.1
+  // value both come from one seeded source (APP-NFR-07). D23 of `docs/REQUIREMENTS.md`,
+  // accepted on 2026-11-16, fixes the rest: a 2 with 0.9 and a 4 with 0.1
   // (`mergeTileSource()`), and undo restores the photo with its source, so the same tile comes back.
   // A board with no empty cell, or a source that has ended, gets no new tile.
   protected resolve(state: MergeState<TCell, TCoord, TAxis>): Resolution {

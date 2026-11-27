@@ -72,21 +72,21 @@
         <title id="merge-title">HexaBlock Hexa Merge variant · UML class diagram</title>
         <desc id="merge-desc">
           Class diagram of the Hexa Merge variant in layer 1 showing MergeRules bounding its TCell
-          parameter by the engine interface IMergeable, MergeTile implementing IMergeable with T
-          bound to MergeTile, MergeRules typed by MergeState and Slide, and MergeFactory binding
-          TCell to MergeTile on MergeRules and creating MergeScoring, each variant class marked with
-          the engine interface it implements and its binding. MergeState is an entity inside the
-          GameEngine aggregate: its own GameStateId is its identity, it keeps the MatchId of its
-          game, and it changes in place only through its business methods. It keeps the target tile,
-          as SortState keeps its goal, so MergeRules holds no target (#426). MergeSettings, Chance
-          and NewTile are value objects: the settings hold the board size, the target tile and the
-          chance of a 4, and a NewTile is one draw of the tile source. MergeFactory holds the
-          RandomSource of the root, and each match draws a new Seed from it with pickSeed(). The
-          engine RandomDraw is one draw of the random source from 0 up to 1: the place of a NewTile,
-          and the draw that a Chance compares. It replaced the Merge Draw of issue 232 (issue 243).
-          The undo of a slide goes through GameEngine.undo(), and MergeState.restore() takes back
-          the MergeSnapshot before the slide with its tile source, so the same slide draws the same
-          new tile (#179).
+          parameter by the interface IMergeable of the Merge folder, MergeTile implementing
+          IMergeable with T bound to MergeTile, MergeRules typed by MergeState and Slide, and
+          MergeFactory binding TCell to MergeTile on MergeRules and creating MergeScoring, each
+          variant class marked with the engine interface it implements and its binding. MergeState
+          is an entity inside the GameEngine aggregate: its own GameStateId is its identity, it
+          keeps the MatchId of its game, and it changes in place only through its business methods.
+          It keeps the target tile, as SortState keeps its goal, so MergeRules holds no target
+          (#426). MergeSettings, Chance and NewTile are value objects: the settings hold the board
+          size, the target tile and the chance of a 4, and a NewTile is one draw of the tile source.
+          MergeFactory holds the RandomSource of the root, and each match draws a new Seed from it
+          with pickSeed(). The engine RandomDraw is one draw of the random source from 0 up to 1:
+          the place of a NewTile, and the draw that a Chance compares. It replaced the Merge Draw of
+          issue 232 (issue 243). The undo of a slide goes through GameEngine.undo(), and
+          MergeState.restore() takes back the MergeSnapshot before the slide with its tile source,
+          so the same slide draws the same new tile (#179).
         </desc>
         <defs>
           <marker
@@ -675,7 +675,7 @@
         <text x="656" y="816" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + deliverTo(receiver: ValueReceiver&lt;string&gt;): void
         </text>
-        <!-- Class: IMergeable (engine interface, the bound) -->
+        <!-- Class: IMergeable (interface of the Merge folder, the bound) -->
         <rect
           x="64"
           y="452"
@@ -689,7 +689,7 @@
         <line x1="64" y1="508" x2="304" y2="508" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="184"
-          y="468"
+          y="474"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -700,19 +700,7 @@
         </text>
         <text
           x="184"
-          y="480"
-          fill="#7d8a94"
-          font-size="7"
-          font-weight="500"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.14em"
-        >
-          engine
-        </text>
-        <text
-          x="184"
-          y="498"
+          y="494"
           fill="#17212a"
           font-size="12"
           font-weight="600"

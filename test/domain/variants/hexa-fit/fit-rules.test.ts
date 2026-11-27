@@ -4,7 +4,7 @@ import { Moves } from '../../../../src/domain/shared/moves';
 import { Score } from '../../../../src/domain/shared/score';
 import { Board } from '../../../../src/domain/engine/board';
 import { BoardShape } from '../../../../src/domain/engine/board-shape';
-import { GameOver } from '../../../../src/domain/engine/game-events';
+import { GameEnded } from '../../../../src/domain/engine/game-events';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
 import { GameId } from '../../../../src/domain/shared/game-id';
 import { PlayingPhase, VictoryPhase } from '../../../../src/domain/engine/game-phase';
@@ -33,7 +33,7 @@ import {
   triangleTopology,
   type TriangleCoord,
 } from '../../../support/engine/triangle-topology';
-import { gameOverOf } from '../../../support/engine/game-over';
+import { gameEndedOf } from '../../../support/engine/game-ended';
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 import { delivered } from '../../../support/engine/value-receiver';
@@ -256,7 +256,7 @@ describe('FitRules', () => {
     expect(cellsOf(engine.snapshot())).toEqual(['0,1=a', '1,1=a']);
   });
 
-  it('should_win_and_record_game_over_when_the_pieces_cover_the_figure_exactly', () => {
+  it('should_win_and_record_game_ended_when_the_pieces_cover_the_figure_exactly', () => {
     const engine = engineOn(dominoLevel());
     playMove(engine, new PlaceFitPiece(A, NO_TURN, square(0, 0)));
 
@@ -267,8 +267,8 @@ describe('FitRules', () => {
     expect(trayOf(engine.snapshot())).toEqual([]);
     const events = engine.takeEvents();
     expect(events).toHaveLength(1);
-    expect(events[0]).toBeInstanceOf(GameOver);
-    expect(gameOverOf(events[0]).isVictory()).toBe(true);
+    expect(events[0]).toBeInstanceOf(GameEnded);
+    expect(gameEndedOf(events[0]).isVictory()).toBe(true);
   });
 
   it('should_keep_playing_and_never_lose_when_no_tray_piece_fits', () => {

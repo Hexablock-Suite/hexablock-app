@@ -48,7 +48,7 @@ export abstract class BoardSnapshot<TCell, TCoord, TAxis extends GridAxis = Grid
   }
 
   // The score of the game at the moment of the photo. Three readers need the value itself:
-  // the `GameOver` event carries the final score, `moveResultOf()` puts it in `MoveResult`,
+  // the `GameEnded` event carries the final score, `moveResultOf()` puts it in `MoveResult`,
   // and a state takes it back with `restore()`.
   scoreSoFar(): Score {
     return this.score;

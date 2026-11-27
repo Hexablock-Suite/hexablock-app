@@ -124,7 +124,8 @@ export class LinesSnapshot<TCoord> extends BoardSnapshot<Color, TCoord> {
 // The scoring, the rules and the use cases ask the photo of `snapshot()`, never a field.
 // The source lives in the state, so the engine copy and rollback cover it (classes.md decision 31).
 // The source is a value: a draw replaces it with the next source (classes.md decision 51).
-// `streak` and `linesCleared` follow the proposal on issue 58, «Propuesta, pendiente del equipo».
+// `streak` and `linesCleared` follow D24 of `docs/REQUIREMENTS.md`.
+// The team accepted that rule of issue #58 on 2026-11-16.
 // `linesCleared` is the combo of the last placement: the count of distinct full lines it cleared.
 // `streak` counts the placements in a row that cleared at least one line.
 // `cellsPlaced` is the count of cells that the last placement put on the board.

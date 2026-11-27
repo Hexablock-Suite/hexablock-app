@@ -449,7 +449,7 @@ describe('CompositionRoot', () => {
 
   // Issue #362: the root builds one `GameEventBus`, subscribes its first listener to it, and gives
   // it to the `ApplyMove` of every game. The first Fit level of a figure ends with a victory
-  // after two moves, so each game records one `GameOver`. The Fit games of the hexagon and of
+  // after two moves, so each game records one `GameEnded`. The Fit games of the hexagon and of
   // the square have two `ApplyMove` over two repositories, and both publish to the same bus.
   // Issue #363: the listener saves the counters of the achievements through one
   // `LocalAchievementCounterRepository` over the local store of the drivers, so a goal of Sort

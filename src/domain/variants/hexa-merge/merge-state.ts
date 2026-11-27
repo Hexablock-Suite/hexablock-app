@@ -224,7 +224,7 @@ export class MergeState<
   // It returns `undefined` when the slide changes no cell. It checks the axis at runtime,
   // because a cast passes the compiler. The state reads no field of the slide: it asks
   // the slide for its lines and for the order of each line (classes.md decision 43).
-  // The proposal on issue #57, «Propuesta, pendiente del equipo», fixes the packing:
+  // D23 of `docs/REQUIREMENTS.md` fixes the packing. The team accepted it on 2026-11-16 (#57):
   // a slide reads each line from its leading edge, and a tile merges at most once per move.
   private planOf(slide: Slide<TAxis>): { cells: [TCoord, TCell][]; merged: TCell[] } | undefined {
     const { board } = this;
