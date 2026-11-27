@@ -30,6 +30,7 @@ describe('HomePresenter', () => {
       suite: 'Suite',
       play: 'Jugar',
       achievements: 'Logros',
+      account: 'Cuenta',
       figure: 'Figura del tablero',
       figures: [
         { id: 'hex', name: 'Hexágono' },
@@ -43,6 +44,7 @@ describe('HomePresenter', () => {
       suite: 'Suite',
       play: 'Play',
       achievements: 'Achievements',
+      account: 'Account',
       figure: 'Board figure',
       figures: [
         { id: 'hex', name: 'Hexagon' },
