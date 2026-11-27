@@ -74,6 +74,44 @@ describe('account route', () => {
     expect(backend.requests[1]?.headers.authorization).toBe(`Bearer ${TOKEN}`);
   });
 
+  // The sign-up creates the account, and the sign-in after it fails.
+  it('should_tell_the_player_to_sign_in_when_the_sign_up_succeeds_and_the_sign_in_after_it_fails', async () => {
+    spy.mockRestore();
+    backend = fakeFetch({
+      '/v1/auth/register': { status: 201, body: {} },
+      '/v1/auth/login': { status: 500, body: { statusCode: 500 } },
+    });
+    spy = useFakeFetch(backend);
+    await renderRouter(appDir, { initialUrl: '/account' });
+
+    await send('Crear cuenta', 'correct horse battery');
+
+    expect(
+      await screen.findByRole('alert', {
+        name: 'Tu cuenta se creó, pero no se pudo iniciar sesión. Inicia sesión.',
+      }),
+    ).toBeOnTheScreen();
+  });
+
+  it('should_clear_the_password_field_when_the_sign_in_succeeds', async () => {
+    await renderRouter(appDir, { initialUrl: '/account' });
+
+    await send('Iniciar sesión', 'correct horse battery');
+
+    expect(await screen.findByText('Sesión iniciada como ada')).toBeOnTheScreen();
+    expect(screen.getByLabelText('Contraseña').props.value).toBe('');
+    expect(screen.getByLabelText('Nombre de usuario').props.value).toBe('ada');
+  });
+
+  it('should_clear_the_password_field_when_the_sign_in_fails', async () => {
+    await renderRouter(appDir, { initialUrl: '/account' });
+
+    await send('Iniciar sesión', 'wrong horse battery');
+
+    expect(await screen.findByRole('alert')).toBeOnTheScreen();
+    expect(screen.getByLabelText('Contraseña').props.value).toBe('');
+  });
+
   it('should_show_the_error_text_as_an_alert_when_the_backend_refuses_the_password', async () => {
     await renderRouter(appDir, { initialUrl: '/account' });
 

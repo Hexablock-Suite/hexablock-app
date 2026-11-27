@@ -6,13 +6,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Scenery } from '../src/infrastructure/ui/scenery';
 import { column, palette, radius, serif, space } from '../src/infrastructure/ui/theme';
-import { useAccount } from '../src/infrastructure/ui/use-account';
+import { useAccount, type AccountForm } from '../src/infrastructure/ui/use-account';
 import { LipButton, WoodSign } from '../src/infrastructure/ui/wood';
 
 // The account screen, the MVP view of `AccountPresenter` (#45, APP-FR-12, flows.md use case 5).
 // The player types a username and a password, and signs up or signs in. While a request runs, the
 // screen shows the busy text and takes no second press. A success shows the signed-in text, and
 // a failure shows its text as an alert. The password field hides what the player types.
+// When a request ends, with a success or a failure, the screen clears the password field. So the
+// typed password does not stay in the state of the screen.
 // The back button goes to the screen before, or home when the route opened first.
 // Every visible text comes from the text catalog through the presenter (APP-FR-11).
 export default function AccountScreen() {
@@ -21,6 +23,10 @@ export default function AccountScreen() {
   const [password, setPassword] = useState('');
   const insets = useSafeAreaInsets();
   const busy = model.busy !== undefined;
+  // Sends the form with `action`, then clears the password when the request ends.
+  const send = (action: (form: AccountForm) => Promise<void>) => {
+    void action({ username, password }).finally(() => setPassword(''));
+  };
   return (
     <View style={styles.screen}>
       <StatusBar style="dark" />
@@ -70,17 +76,12 @@ export default function AccountScreen() {
           </View>
         </WoodSign>
         <View style={styles.actions}>
-          <LipButton
-            label={model.signIn}
-            look="sun"
-            disabled={busy}
-            onPress={() => signIn({ username, password })}
-          />
+          <LipButton label={model.signIn} look="sun" disabled={busy} onPress={() => send(signIn)} />
           <LipButton
             label={model.signUp}
             look="panel"
             disabled={busy}
-            onPress={() => signUp({ username, password })}
+            onPress={() => send(signUp)}
           />
         </View>
         {model.busy === undefined ? null : (

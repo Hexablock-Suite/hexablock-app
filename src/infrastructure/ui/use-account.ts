@@ -9,14 +9,15 @@ export interface AccountForm {
   readonly password: string;
 }
 
-// The view model of the account screen and its two actions (#45). The composition root builds
+// The view model of the account screen and its two actions (#45). Each action gives a promise
+// that settles when the request ends, so the screen can clear the password then. The composition root builds
 // one `AccountPresenter` over its `Register` and `Login`, and the hook keeps it for the life of
 // the screen. The screen attaches as the view of the presenter when it opens, and detaches when
 // it closes.
 export function useAccount(): {
   readonly model: AccountViewModel;
-  readonly signUp: (form: AccountForm) => void;
-  readonly signIn: (form: AccountForm) => void;
+  readonly signUp: (form: AccountForm) => Promise<void>;
+  readonly signIn: (form: AccountForm) => Promise<void>;
 } {
   const services = useScreenServices();
   const [presenter] = useState(() => services.accountPresenter());
@@ -27,7 +28,7 @@ export function useAccount(): {
   }, [presenter]);
   return {
     model,
-    signUp: (form) => void presenter.onRegister(form),
-    signIn: (form) => void presenter.onLogin(form),
+    signUp: (form) => presenter.onRegister(form),
+    signIn: (form) => presenter.onLogin(form),
   };
 }
