@@ -4,7 +4,11 @@ import { GameId } from '../../../src/domain/shared/game-id';
 import { GameProgress } from '../../../src/domain/progress/game-progress';
 import { HighScoreProgress } from '../../../src/domain/progress/high-score-progress';
 import { LevelId } from '../../../src/domain/progress/level-id';
-import { LevelProgress, type ILevelStars } from '../../../src/domain/progress/level-progress';
+import {
+  LevelProgress,
+  type IStarsByMoves,
+  type IStarsByMovesAndTime,
+} from '../../../src/domain/progress/level-progress';
 import { Moves } from '../../../src/domain/shared/moves';
 import { GameResult, ProgressRecord } from '../../../src/domain/progress/progress-model';
 import { Score } from '../../../src/domain/shared/score';
@@ -224,9 +228,17 @@ describe('HighScoreProgress', () => {
 describe('LevelProgress', () => {
   // The star rule of a test level: three stars for 10 moves or fewer, and one star above.
   // The level has no time limit, so the time gives no star.
-  class TenMovesForThreeStars implements ILevelStars {
+  class TenMovesForThreeStars implements IStarsByMoves {
     starsFor(moves: Moves): Stars {
       return moves.isFewerThan(Moves.of(11)) ? Stars.of(3) : Stars.of(1);
+    }
+  }
+  // The star rule of a timed test level: two stars for 10 moves or fewer in 5 seconds or less,
+  // one star for 10 moves or fewer in more time, and no star above 10 moves.
+  class TenMovesInFiveSeconds implements IStarsByMovesAndTime {
+    starsFor(moves: Moves, elapsedMs: ElapsedTime): Stars {
+      if (Moves.of(10).isFewerThan(moves)) return Stars.of(0);
+      return ElapsedTime.ofMs(5_000).isShorterThan(elapsedMs) ? Stars.of(1) : Stars.of(2);
     }
   }
   const result = (moves: number, ms: number) =>
@@ -239,7 +251,7 @@ describe('LevelProgress', () => {
     });
 
   it('should_keep_the_best_result_of_the_level_when_the_model_records_two_results', () => {
-    const model = new LevelProgress(new TenMovesForThreeStars());
+    const model = LevelProgress.byMoves(new TenMovesForThreeStars());
     const progress = GameProgress.start(gameId);
 
     // More stars win.
@@ -254,5 +266,63 @@ describe('LevelProgress', () => {
     expect(progress.keeps(levelRecord('l1', 3, 7, 6000))).toBe(true);
     expect(progress.keeps(levelRecord('l1', 3, 7, 9500))).toBe(false);
     expect(progress.keeps(levelRecord('l1', 3, 8, 9000))).toBe(false);
+  });
+
+  // Issue #424: a timed level counts the stars by the moves and the time of the play.
+  it('should_count_the_stars_by_the_moves_and_the_time_when_the_model_counts_a_timed_level', () => {
+    const model = LevelProgress.byMovesAndTime(new TenMovesInFiveSeconds());
+    const progress = GameProgress.start(gameId);
+
+    model.record(result(10, 6_000), progress);
+    expect(progress.keeps(levelRecord('l1', 1, 10, 6_000))).toBe(true);
+
+    model.record(result(10, 5_000), progress);
+    expect(progress.keeps(levelRecord('l1', 2, 10, 5_000))).toBe(true);
+  });
+
+  // A level with no timer gives the moves only, and its result keeps no time.
+  it('should_count_the_stars_by_the_moves_only_when_the_model_counts_a_level_with_no_timer', () => {
+    const model = LevelProgress.byMoves(new TenMovesForThreeStars());
+    const progress = GameProgress.start(gameId);
+    const untimed = GameResult.of({
+      gameId,
+      score: Score.of(0),
+      moves: Moves.of(9),
+      levelId: LevelId.of('l1'),
+    });
+
+    model.record(untimed, progress);
+
+    expect(progress.keeps(levelRecord('l1', 3, 9))).toBe(true);
+  });
+
+  // A timed level always gives the time of the play, so a result with no time is a fault.
+  it('should_throw_a_range_error_and_keep_the_progress_when_a_timed_level_counts_a_result_with_no_time', () => {
+    const model = LevelProgress.byMovesAndTime(new TenMovesInFiveSeconds());
+    const progress = GameProgress.start(gameId);
+    const untimed = GameResult.of({
+      gameId,
+      score: Score.of(0),
+      moves: Moves.of(4),
+      levelId: LevelId.of('l1'),
+    });
+
+    expect(() => model.record(untimed, progress)).toThrow(
+      new RangeError('A timed level counts its stars only with the time of the play.'),
+    );
+    expect(progress.starsOf(LevelId.of('l1'))).toBeUndefined();
+  });
+
+  // A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails
+  // when the line compiles, because then the directive is unused.
+  it('should_reject_at_compile_time_when_a_timed_star_rule_counts_by_the_moves_only', () => {
+    const models = [
+      // @ts-expect-error A timed level needs the time of the play (issue #424).
+      () => LevelProgress.byMoves(new TenMovesInFiveSeconds()),
+      // @ts-expect-error The model has no public constructor: a factory picks the star rule.
+      () => new LevelProgress(new TenMovesForThreeStars()),
+    ];
+
+    expect(models).toHaveLength(2);
   });
 });
