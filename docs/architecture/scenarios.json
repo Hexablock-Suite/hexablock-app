@@ -1,0 +1,186 @@
+{
+  "scenarios": [
+    {
+      "id": "fifth-variant",
+      "title": "A fifth variant: Hexa Fill",
+      "source": "docs/EXTENSIBILITY.md",
+      "extensionPoints": [
+        "IVariantFactory",
+        "BaseGameRules",
+        "IScoringPolicy",
+        "BoardState",
+        "BoardSnapshot",
+        "StateMapper",
+        "MoveMapper",
+        "CellRenderer",
+        "MoveControls"
+      ],
+      "adds": [
+        {
+          "name": "FillCell",
+          "kind": "class",
+          "stereotypes": ["value object"],
+          "file": "src/domain/variants/hexa-fill/fill-cell.ts"
+        },
+        {
+          "name": "FillMove",
+          "kind": "class",
+          "stereotypes": ["value object"],
+          "file": "src/domain/variants/hexa-fill/fill-move.ts"
+        },
+        {
+          "name": "FillState",
+          "kind": "class",
+          "stereotypes": ["entity"],
+          "file": "src/domain/variants/hexa-fill/fill-state.ts",
+          "implements": "BoardState"
+        },
+        {
+          "name": "FillSnapshot",
+          "kind": "class",
+          "stereotypes": [],
+          "file": "src/domain/variants/hexa-fill/fill-state.ts",
+          "extends": "BoardSnapshot"
+        },
+        {
+          "name": "FillRules",
+          "kind": "class",
+          "stereotypes": [],
+          "file": "src/domain/variants/hexa-fill/fill-rules.ts",
+          "extends": "BaseGameRules"
+        },
+        {
+          "name": "FillScoring",
+          "kind": "class",
+          "stereotypes": [],
+          "file": "src/domain/variants/hexa-fill/fill-scoring.ts",
+          "implements": "IScoringPolicy"
+        },
+        {
+          "name": "FillFactory",
+          "kind": "class",
+          "stereotypes": ["factory"],
+          "file": "src/domain/variants/hexa-fill/fill-factory.ts",
+          "implements": "IVariantFactory"
+        },
+        {
+          "name": "FillStateMapper",
+          "kind": "class",
+          "stereotypes": [],
+          "file": "src/adapters/fill-state-mapper.ts",
+          "implements": "StateMapper"
+        },
+        {
+          "name": "FillMoveMapper",
+          "kind": "class",
+          "stereotypes": [],
+          "file": "src/adapters/fill-move-mapper.ts",
+          "implements": "MoveMapper"
+        },
+        {
+          "name": "FillCellRenderer",
+          "kind": "class",
+          "stereotypes": [],
+          "file": "src/infrastructure/board/fill-cell-renderer.tsx",
+          "implements": "CellRenderer"
+        },
+        {
+          "name": "FillControls",
+          "kind": "class",
+          "stereotypes": [],
+          "file": "src/infrastructure/ui/fill-controls.tsx",
+          "implements": "MoveControls"
+        }
+      ],
+      "edits": [
+        {
+          "file": "src/infrastructure/registered-games.ts",
+          "change": "one entry in registeredGames()"
+        },
+        {
+          "file": "src/adapters/texts/en.ts",
+          "change": "game.hexa-fill.name and game.hexa-fill.place in English"
+        },
+        {
+          "file": "src/adapters/texts/es.ts",
+          "change": "game.hexa-fill.name and game.hexa-fill.place in Spanish"
+        }
+      ],
+      "unchanged": [
+        "GameEngine",
+        "GameFactory",
+        "LinesFactory",
+        "FitFactory",
+        "SortFactory",
+        "MergeFactory",
+        "ApplyMove",
+        "HomePresenter",
+        "GamePresenter",
+        "CompositionRoot",
+        "GameRegistry"
+      ]
+    },
+    {
+      "id": "new-geometry",
+      "title": "A new geometry: a 3D board",
+      "source": "docs/architecture/extensibility.md",
+      "extensionPoints": ["GeometryFactory", "GridTopology", "BoardLayout"],
+      "adds": [
+        {
+          "name": "Coord3D",
+          "kind": "class",
+          "stereotypes": ["value object"],
+          "file": "src/domain/engine/topology-3d.ts"
+        },
+        {
+          "name": "Topology3D",
+          "kind": "class",
+          "stereotypes": [],
+          "file": "src/domain/engine/topology-3d.ts",
+          "implements": "GridTopology"
+        },
+        {
+          "name": "Geometry3D",
+          "kind": "class",
+          "stereotypes": ["factory"],
+          "file": "src/domain/engine/geometry-3d.ts",
+          "implements": "GeometryFactory"
+        },
+        {
+          "name": "Layout3D",
+          "kind": "class",
+          "stereotypes": [],
+          "file": "src/adapters/board/layout-3d.ts",
+          "implements": "BoardLayout"
+        }
+      ],
+      "edits": [
+        {
+          "file": "src/domain/shared/topology-id.ts",
+          "change": "one more TopologyId instance in the closed set"
+        },
+        {
+          "file": "src/infrastructure/registered-games.ts",
+          "change": "one entry in boardFigures()"
+        },
+        {
+          "file": "src/adapters/texts/en.ts",
+          "change": "the name of the figure under figure.<id> in English"
+        },
+        {
+          "file": "src/adapters/texts/es.ts",
+          "change": "the name of the figure under figure.<id> in Spanish"
+        }
+      ],
+      "unchanged": [
+        "GameEngine",
+        "BoardBuilder",
+        "LinesFactory",
+        "FitFactory",
+        "SortFactory",
+        "MergeFactory",
+        "ApplyMove"
+      ]
+    }
+  ]
+}

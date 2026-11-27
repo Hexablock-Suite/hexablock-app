@@ -2,7 +2,7 @@
 
 Status: draft for review with the team, 2026-10-31.
 
-Statement §4.3 asks for a «Diagrama que muestre el motor genérico en el centro y las cuatro variantes como extensiones, resaltando los puntos de extensión (interfaces que una quinta variante debería implementar)». This page answers it for the client in four views. View 1 is that diagram. Views 2 to 4 show the other extensions that the requirements declare: the jury variations, the geometry family and the extension points outside the engine. Class names come from the [class diagram](classes.md). IDs such as D4 and APP-NFR-06 refer to [`docs/REQUIREMENTS.md`](../REQUIREMENTS.md). [`docs/EXTENSIBILITY.md`](../EXTENSIBILITY.md) gives the file-by-file steps that APP-NFR-06 asks for.
+Statement §4.3 asks for a «Diagrama que muestre el motor genérico en el centro y las cuatro variantes como extensiones, resaltando los puntos de extensión (interfaces que una quinta variante debería implementar)». This page answers it for the client in three views and two scenarios. View 1 is that diagram. Views 2 and 4 show the jury variations and the extension points outside the engine. The [scenarios](#scenarios) show a fifth variant and a new geometry on the model of the code. Class names come from the [class diagram](classes.md). IDs such as D4 and APP-NFR-06 refer to [`docs/REQUIREMENTS.md`](../REQUIREMENTS.md). [`docs/EXTENSIBILITY.md`](../EXTENSIBILITY.md) gives the file-by-file steps that APP-NFR-06 asks for.
 
 ## How to read it
 
@@ -40,12 +40,6 @@ In the defense the jury proposes «un nuevo tamaño de tablero, una política de
 | Scoring policy | A class that implements `IScoringPolicy<TState>`, or a `ScoringDecorator` for a bonus (§8) | The variant folder, `src/domain/variants/<variant>/`. The variant factory returns it from `createScoring()`                                                                                                                                                                                                                           | `GameEngine`, which calls `score()` as before                                   |
 | Piece shape    | A piece definition as data: a `ShapeGroup` of `CellNode` cells (§8)                        | The Fit level file (`FitLevel.pieces`), or for Hexa Lines the data of one board figure in `src/infrastructure/registered-games.ts`, after the shapes of the geometry                                                                                                                                                                  | `Piece`, `IPieceSource`, `GameEngine`, the piece lists of the geometry families |
 
-## View 3: the geometry axis
-
-A new geometry adds one family: a coordinate type, a topology and the piece shapes (decision 17, D11). It adds one instance to the closed set of `TopologyId` in `src/domain/shared/topology-id.ts`, which decision 45 keeps closed (#207), and it changes no other engine file and no variant. `HexGeometry`, `SquareGeometry` and `TriangleGeometry` are the three real families, one for each board figure that the player chooses (APP-FR-16), and the engine tests run on the square and triangle families (D4, APP-NFR-13). A 3D board is a declared variation in §8 of the requirements. Each variant factory receives a `GeometryFactory`, so a new geometry needs no class for each game, and a new game needs no class for each geometry. No line touches an axis frame. Each variant factory implements `IVariantFactory`, which creates the `IGameRules` that `GameEngine` keeps as `rules`. Each variant factory also keeps a `GeometryFactory` as `geometry`: the line from `MergeFactory` stands for all four. `HexGeometry`, `SquareGeometry` and `TriangleGeometry` implement `GeometryFactory`. No line joins a variant class to a geometry class, because a variant factory keeps the engine interface `GeometryFactory`, not a geometry class.
-
-![The geometry axis: the generic GameEngine in the center keeps IGameRules, which IVariantFactory creates; the variant factories implement IVariantFactory and keep a GeometryFactory, which the geometry families implement; above it, the variant factories LinesFactory, FitFactory, SortFactory, MergeFactory and the declared FillFactory; below it, HexGeometry, SquareGeometry and TriangleGeometry, and the declared Geometry3D](extensibility/views/ext-3-geometry-axis.png)
-
 ## View 4: outside the engine
 
 Layers 2 to 4 have their own extension points. The view shows only the ones that §8 or the class diagram declare.
@@ -58,6 +52,36 @@ Layers 2 to 4 have their own extension points. The view shows only the ones that
 - **Desktop and a game with no board (D5).** Both are planned seams with no class yet. A game with no board needs a `GameModule` contract that a registry entry can hold, and the layer of that contract is open.
 
 ![Outside the engine: local and HTTP adapters in layer 3 implement the output ports of layer 2, ApiClient in layer 4 is the driver of the HTTP adapters, with the two level origins of A6; GameEventBus implements GameEventPublisher, the port of layer 2, and AudioManager listens to it; the aspects extend UseCaseAspect; GameRegistry in layer 4 keeps its RegisteredGame entries; the declared DesktopLayout, GameModule, NewStorageAdapter, NewListener and CachingAspect are placeholders](extensibility/views/ext-4-outer-layers.png)
+
+## Scenarios
+
+A scenario says what a developer adds, implements and edits for one kind of change, and what stays the same. [`scenarios.json`](scenarios.json) holds the scenarios of the client. The class diagram page of the tool `drawio-clases` in Hexablock-Suite/.github draws each scenario on the model of the code, and the tool exports one image per scenario. The check of the tool stops a scenario that names a type that the code does not have, so a scenario cannot drift from the code as a hand-made view can.
+
+The image keeps the bands of the class diagram: layer 4 at the top and layer 1 at the bottom. Each group that holds an unchanged type fades. Each extension point has a thick border. Each added box is dashed, and its name is a placeholder. Each type of an edited file carries the mark `edited`. The side panel names the source of the steps and each edited file with its change. A click on a box of the page shows its members and its relations.
+
+The scenario `new-geometry` replaces view 3, the geometry axis, which left in #395. The other views keep their numbers.
+
+### A fifth variant
+
+[Open the scenario on the page](https://hexablock-suite.github.io/.github/#app~fifth-variant). It follows the [steps](../EXTENSIBILITY.md#steps) of `docs/EXTENSIBILITY.md` for Hexa Fill, without levels and without events. A later scenario covers the levels and the events.
+
+- **Extension points.** `FillFactory` implements `IVariantFactory`, `FillRules` extends `BaseGameRules`, `FillScoring` implements `IScoringPolicy`, `FillState` implements `BoardState`, and its photo `FillSnapshot` extends `BoardSnapshot`. `FillStateMapper` implements `StateMapper`, `FillMoveMapper` implements `MoveMapper` (#405), `FillCellRenderer` implements `CellRenderer`, and `FillControls` implement `MoveControls`.
+- **Added files.** `FillCell`, `FillMove`, `FillState`, `FillSnapshot`, `FillRules`, `FillScoring` and `FillFactory` in `src/domain/variants/hexa-fill/`, `FillStateMapper` and `FillMoveMapper` in `src/adapters/`, `FillCellRenderer` in `src/infrastructure/board/` and `FillControls` in `src/infrastructure/ui/` ([the files that a fifth variant adds](../EXTENSIBILITY.md#files-that-a-fifth-variant-adds)).
+- **Edited files.** One entry in `registeredGames()` of `src/infrastructure/registered-games.ts`, and the texts `game.hexa-fill.name` and `game.hexa-fill.place` in `src/adapters/texts/en.ts` and `es.ts` ([the files outside the new folders that change](../EXTENSIBILITY.md#files-outside-the-new-folders-that-change)).
+- **Unchanged.** `GameEngine`, `GameFactory`, the four variant factories, `ApplyMove`, `HomePresenter`, `GamePresenter`, `CompositionRoot` and `GameRegistry` ([the files that do not change](../EXTENSIBILITY.md#files-that-do-not-change)).
+
+![A fifth variant, Hexa Fill, on the model of the code: the extension points IVariantFactory, BaseGameRules, IScoringPolicy, BoardState, BoardSnapshot, StateMapper, MoveMapper, CellRenderer and MoveControls are lit; the dashed added boxes FillCell, FillMove, FillState, FillSnapshot, FillRules, FillScoring and FillFactory sit in the group variants/hexa-fill, FillStateMapper and FillMoveMapper in layer 3 and FillCellRenderer and FillControls in layer 4; registered-games.ts and the two text files are edited; the groups of GameEngine, GameFactory, the four variant factories, ApplyMove, HomePresenter, GamePresenter, CompositionRoot and GameRegistry fade](extensibility/scenarios/fifth-variant.png)
+
+### A new geometry
+
+[Open the scenario on the page](https://hexablock-suite.github.io/.github/#app~new-geometry). A new geometry adds one family: a coordinate type, a topology and the piece shapes (decision 17, D11). `HexGeometry`, `SquareGeometry` and `TriangleGeometry` in `src/domain/engine/` are the three real families, one for each board figure that the player chooses (APP-FR-16), and the engine tests run on the square and triangle families (D4, APP-NFR-13). A 3D board is a declared variation in §8 of the requirements, so the scenario adds a 3D family next to the three real ones. Each variant factory receives a `GeometryFactory`, so a new geometry needs no class for each game, and a new game needs no class for each geometry. A variant factory keeps the engine interface `GeometryFactory`, not a geometry class, so no variant changes.
+
+- **Extension points.** `Geometry3D` implements `GeometryFactory`, `Topology3D` implements `GridTopology`, and `Layout3D` implements `BoardLayout`.
+- **Added files.** `Coord3D` and `Topology3D` in `src/domain/engine/topology-3d.ts`, as each topology file of the engine holds its coordinate, and `Geometry3D` in `src/domain/engine/geometry-3d.ts`. `Layout3D` goes in `src/adapters/board/`, next to the layouts of the three figures (decision 17).
+- **Edited files.** The new family adds one instance to the closed set of `TopologyId` in `src/domain/shared/topology-id.ts` (#420). Decision 45 keeps that set closed (#207): the constructor throws «The set of topologies is closed.» for any other instance. The new figure is one entry in `boardFigures()` of `src/infrastructure/registered-games.ts`, with its geometry and its layout, and its name is the text `figure.<id>` in `src/adapters/texts/en.ts` and `es.ts`.
+- **Unchanged.** `GameEngine`, `BoardBuilder`, the four variant factories and `ApplyMove`. The change adds two files to `src/domain/engine/` and edits no file there, and no variant changes. The one domain file that it edits is `topology-id.ts` of `src/domain/shared/`.
+
+![A new geometry, a 3D board, on the model of the code: the extension points GeometryFactory, GridTopology and BoardLayout are lit; the dashed added boxes Coord3D, Topology3D and Geometry3D sit in the engine group of layer 1 and Layout3D in layer 3; topology-id.ts with TopologyId, registered-games.ts and the two text files are edited; the groups of GameEngine, BoardBuilder, the four variant factories and ApplyMove fade](extensibility/scenarios/new-geometry.png)
 
 ## Extension points by variant
 
@@ -92,3 +116,5 @@ The capability classes `MoveHistory`, `RedoableHistory`, `LevelTimer` and `Seede
 ## Render the images
 
 The views come from the HTML files in [`extensibility/views/`](extensibility/views/). They follow the same rules as the class diagram: open a file in a browser to see the drawing, and export the `.png` image again after each edit with `/diagram-design:export-diagram docs/architecture/extensibility/views/<view>.html --png-only`. Commit each `.html` file together with its `.png` image.
+
+The scenario images come from [`scenarios.json`](scenarios.json) and the code. After a change of either, export them again with `page/export.mjs` of `drawio-clases`, as the README of the tool says in «Render», «Scenario images», and copy each image to `extensibility/scenarios/<id>.png`. Commit the images with the change. The [page](https://hexablock-suite.github.io/.github/) builds from the `main` of this repository, so it shows a changed scenario after its next build.
