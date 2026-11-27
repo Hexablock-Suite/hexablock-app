@@ -1,7 +1,8 @@
 import type { ListLevelsRequest } from '../application/list-levels';
-import type { LevelSummary } from '../application/level-summary';
+import type { LevelList, LevelSummary } from '../application/level-summary';
 import type { Result } from '../application/result';
 import type { UseCase } from '../application/use-case';
+import type { LevelId } from '../domain/progress/level-id';
 import { LevelStatus } from '../domain/progress/level-status';
 import { valueOf } from './delivered';
 import type { TextKey, Texts } from './texts/text-catalog';
@@ -26,6 +27,13 @@ export interface LevelChoice {
   readonly leaderboard?: string;
 }
 
+// The section of the unavailable levels of the game (#307): its title and one choice per level.
+// Each choice names its level by its id, says that the level is not available, and does not start.
+export interface UnavailableSection {
+  readonly title: string;
+  readonly levels: readonly LevelChoice[];
+}
+
 // The view model of the level selector (MVP, layers.md, issue #173). It is plain data
 // that the presenter builds again after the answer of `ListLevels`.
 export interface LevelSelectorViewModel {
@@ -41,6 +49,9 @@ export interface LevelSelectorViewModel {
   readonly empty?: string;
   // The text of a failed answer. A later success clears it.
   readonly error?: string;
+  // The unavailable levels of the game, after the levels (#307). It exists only when the game has
+  // one. A failed answer keeps the section of the answer before it.
+  readonly unavailable?: UnavailableSection;
 }
 
 // The view of MVP: the screen that shows each new view model.
@@ -67,6 +78,10 @@ const STATUS_TEXTS: readonly (readonly [LevelStatus, TextKey])[] = [
 // with `valueOf()` of `delivered.ts` (rule R-no-delivery-call, issue #408).
 // A completed level also carries the label of the button of its leaderboard (#47).
 // A figure with no level gives an empty list, and the screen shows the text of no levels.
+// Since #307 the presenter also shows each unavailable level of the game in its own section after
+// the levels. A choice of the section names its level by its id, because the level has no place in
+// the list, and shows only the text of an unavailable level, never the code of the broken rule.
+// It does not start, and it has no button of a leaderboard.
 // A failed `Result` never throws (decision 28): the presenter keeps its levels and shows
 // the text of the failure. A view attaches to see each new view model. It sees the current one
 // at once.
@@ -75,7 +90,7 @@ export class LevelSelectorPresenter {
   private view: LevelSelectorView | undefined;
 
   constructor(
-    private readonly listLevels: UseCase<ListLevelsRequest, LevelSummary[]>,
+    private readonly listLevels: UseCase<ListLevelsRequest, LevelList>,
     private readonly request: ListLevelsRequest,
     private readonly texts: Texts,
   ) {
@@ -107,16 +122,31 @@ export class LevelSelectorPresenter {
     this.present(await this.listLevels.execute(this.request));
   }
 
-  private present(result: Result<LevelSummary[]>): void {
-    const { title, back, levels } = this.model;
+  private present(result: Result<LevelList>): void {
+    const { title, back, levels, unavailable } = this.model;
     if (!result.ok) {
-      this.model = { title, back, levels, error: this.texts['levels.error'] };
-    } else if (result.value.length === 0) {
-      this.model = { title, back, levels: [], empty: this.texts['levels.none'] };
+      const kept = unavailable === undefined ? {} : { unavailable };
+      this.model = { title, back, levels, error: this.texts['levels.error'], ...kept };
     } else {
-      this.model = { title, back, levels: result.value.map((each, at) => this.choiceOf(each, at)) };
+      const choices = result.value.levels.map((each, at) => this.choiceOf(each, at));
+      const empty = choices.length === 0 ? { empty: this.texts['levels.none'] } : {};
+      this.model = { title, back, levels: choices, ...empty, ...this.sectionOf(result.value) };
     }
     this.view?.show(this.model);
+  }
+
+  // The section of the unavailable levels of `list`, or nothing when the game has none (#307).
+  private sectionOf(list: LevelList): { unavailable?: UnavailableSection } {
+    if (list.unavailable.length === 0) return {};
+    const levels = list.unavailable.map((levelId) => this.unavailableChoiceOf(levelId));
+    return { unavailable: { title: this.texts['levels.unavailable'], levels } };
+  }
+
+  // The choice of the unavailable level `levelId`: it names the level by its id and does not start.
+  private unavailableChoiceOf(levelId: LevelId): LevelChoice {
+    const id = valueOf(levelId);
+    const status = this.texts['levels.status.unavailable'];
+    return { id, name: id, status, completed: false, playable: false };
   }
 
   // The choice of the level `summary` at the place `at` of the list.

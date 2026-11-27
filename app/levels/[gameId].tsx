@@ -41,6 +41,9 @@ const LOCKED_STONE: WorldTone = { tone: palette.trim, wash: palette.panel };
 // open or locked, with the stars of a completed level. A press on a level that is not locked
 // opens the game route with the id of the level, and a locked level does not start.
 // A completed level also shows a button that opens the leaderboard of that level (#47).
+// After the levels, a section with its own header lists each unavailable level of the game (#307):
+// the backend keeps the level, but the level breaks a rule. Its row names the level by its id,
+// says that it is not available and is disabled, as a locked row is. It has no leaderboard button.
 // The screen shows a loading text until the first answer, the text of no levels when the figure
 // has none, and the text of a failed read as an alert. The map button goes back to the map
 // of the figure. Every visible text comes from the text catalog (APP-FR-11).
@@ -138,6 +141,23 @@ function LevelSelector({
                 }
               />
             ))}
+            {view.unavailable === undefined ? null : (
+              <View style={styles.section}>
+                <Text accessibilityRole="header" style={styles.sectionTitle}>
+                  {view.unavailable.title}
+                </Text>
+                {view.unavailable.levels.map((level, position) => (
+                  <Level
+                    key={level.id}
+                    level={level}
+                    shape={stone}
+                    position={position}
+                    onStart={() => undefined}
+                    onBoard={() => undefined}
+                  />
+                ))}
+              </View>
+            )}
           </View>
         </WoodSign>
       </ScrollView>
@@ -224,6 +244,20 @@ const styles = StyleSheet.create({
     color: palette.woodDark,
     fontFamily: serif,
     fontSize: 20,
+    marginBottom: space.xs,
+  },
+  // The section of the unavailable levels starts below the last level, after a rule.
+  section: {
+    alignSelf: 'stretch',
+    borderTopColor: palette.woodDark,
+    borderTopWidth: 1,
+    marginTop: space.md,
+    paddingTop: space.sm,
+  },
+  sectionTitle: {
+    color: palette.woodDark,
+    fontFamily: serif,
+    fontSize: 17,
     marginBottom: space.xs,
   },
   note: {

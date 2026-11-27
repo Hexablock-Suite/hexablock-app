@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { ResultPresenter, type ResultViewModel } from '../../src/adapters/result-presenter';
 import { textCatalog } from '../../src/adapters/texts/text-catalog';
-import type { LevelSummary } from '../../src/application/level-summary';
+import type { LevelList, LevelSummary } from '../../src/application/level-summary';
 import type { ListLevelsRequest } from '../../src/application/list-levels';
 import type { MoveResult } from '../../src/application/move-result';
 import type { SyncProgressRequest } from '../../src/application/sync-progress';
@@ -38,13 +38,19 @@ class SavingUseCase implements UseCase<GameResult, void> {
   }
 }
 
-// A `ListLevels` port that keeps each request and answers `answer`.
-class ListingUseCase implements UseCase<ListLevelsRequest, LevelSummary[]> {
+// A `ListLevels` port that keeps each request and answers `answer`. A list of summaries answers
+// those levels with no unavailable level.
+class ListingUseCase implements UseCase<ListLevelsRequest, LevelList> {
   readonly requests: ListLevelsRequest[] = [];
+  private readonly answer: Result<LevelList>;
 
-  constructor(private readonly answer: Result<LevelSummary[]>) {}
+  constructor(answer: Result<LevelSummary[]>) {
+    this.answer = answer.ok
+      ? Result.success({ levels: answer.value, unavailable: [] })
+      : Result.failure(answer.error);
+  }
 
-  async execute(request: ListLevelsRequest): Promise<Result<LevelSummary[]>> {
+  async execute(request: ListLevelsRequest): Promise<Result<LevelList>> {
     this.requests.push(request);
     return this.answer;
   }
