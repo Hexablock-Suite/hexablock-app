@@ -64,23 +64,25 @@
       <h1>The use cases at a glance</h1>
 
       <svg
-        viewBox="0 0 1040 1506"
+        viewBox="0 0 1040 1556"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="mapuc-title mapuc-desc"
       >
         <title id="mapuc-title">HexaBlock use cases map · UML class diagram</title>
         <desc id="mapuc-desc">
-          Overview map of the 50 layer 2 classes in 8 groups, AchievementCounterRepository of #363
+          Overview map of the 56 layer 2 classes in 8 groups, AchievementCounterRepository of #363
           among the output ports, SyncProgress of #46 among the progress use cases with its ports
           AnonymousProgress and ProgressGateway, its request SyncProgressRequest and its error
-          SyncFailure, the achievements of #188 among them, with LevelDefinition, LevelStatus,
-          AchievementGoal, LevelsWon, EveryLevelWon, BestCountReached and TotalCountReached of layer
-          1 as dashed chips (#326, #364). Each line joins two classes: UseCaseAspect implements
-          UseCase and decorates the one it wraps, StartGame, SaveProgress, LoadProgress and Register
-          each implement UseCase for their group, and RedoMove, SyncLeaderboard and UpdateSettings
-          keep an output port. No line touches a group frame. Each group names the view that shows
-          its members.
+          SyncFailure, the owner ProgressOwner and the merge AnonymousMerge of #46 among the models
+          with LoadProgressRequest, UndoMoveRequest, RedoMoveRequest and FailureCode, the
+          achievements of #188 among them, with LevelDefinition, LevelStatus, AchievementGoal,
+          LevelsWon, EveryLevelWon, BestCountReached and TotalCountReached of layer 1 as dashed
+          chips (#326, #364). Each line joins two classes: UseCaseAspect implements UseCase and
+          decorates the one it wraps, StartGame, SaveProgress, LoadProgress and Register each
+          implement UseCase for their group, and RedoMove, SyncLeaderboard and UpdateSettings keep
+          an output port. No line touches a group frame. Each group names the view that shows its
+          members.
         </desc>
         <defs>
           <marker
@@ -141,7 +143,7 @@
           x="24"
           y="24"
           width="992"
-          height="1322"
+          height="1372"
           rx="8"
           fill="#efe7f8"
           stroke="rgba(126,34,206,0.40)"
@@ -375,7 +377,7 @@
           x="56"
           y="942"
           width="928"
-          height="228"
+          height="278"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -409,7 +411,7 @@
         <!-- Group: achievements -->
         <rect
           x="56"
-          y="1194"
+          y="1244"
           width="928"
           height="128"
           rx="8"
@@ -420,7 +422,7 @@
         />
         <text
           x="68"
-          y="1210"
+          y="1260"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -431,7 +433,7 @@
         </text>
         <text
           x="972"
-          y="1210"
+          y="1260"
           fill="#1d4ed8"
           font-size="8"
           font-weight="500"
@@ -1759,11 +1761,11 @@
             </tspan>
           </text>
         </g>
-        <!-- Chips: achievements -->
-        <g data-class="ListAchievements">
+        <!-- The request of LoadProgress (#410), and the owner of the progress and the merge of a sign-in (#46) -->
+        <g data-class="LoadProgressRequest">
           <rect
-            x="88"
-            y="1222"
+            x="440"
+            y="1120"
             width="160"
             height="34"
             rx="4"
@@ -1771,106 +1773,55 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="168" y="1243" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              ListAchievements
-            </tspan>
-          </text>
-        </g>
-        <!-- AchievementGoal lives in layer 1 since #326: a dashed chip -->
-        <g data-class="AchievementGoal">
-          <rect
-            x="264"
-            y="1222"
-            width="160"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#5b6873"
-            stroke-width="1"
-            stroke-dasharray="4,3"
-          />
-          <text
-            x="344"
-            y="1234"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            engine · view 3.6
-          </text>
-          <text x="344" y="1247" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              AchievementGoal
-            </tspan>
-          </text>
-        </g>
-        <!-- LevelsWon lives in layer 1 since #326: a dashed chip -->
-        <g data-class="LevelsWon">
-          <rect
-            x="440"
-            y="1222"
-            width="160"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#5b6873"
-            stroke-width="1"
-            stroke-dasharray="4,3"
-          />
           <text
             x="520"
-            y="1234"
+            y="1132"
             fill="#5b6873"
             font-size="7"
             font-family="'IBM Plex Mono', monospace"
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            engine · view 3.6
+            value object
           </text>
-          <text x="520" y="1247" fill="#17212a" text-anchor="middle">
+          <text x="520" y="1145" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              LevelsWon
+              LoadProgressRequest
             </tspan>
           </text>
         </g>
-        <!-- EveryLevelWon lives in layer 1 since #326: a dashed chip -->
-        <g data-class="EveryLevelWon">
+        <g data-class="ProgressOwner">
           <rect
             x="616"
-            y="1222"
+            y="1120"
             width="160"
             height="34"
             rx="4"
             fill="#ffffff"
-            stroke="#5b6873"
+            stroke="#17212a"
             stroke-width="1"
-            stroke-dasharray="4,3"
           />
           <text
             x="696"
-            y="1234"
+            y="1132"
             fill="#5b6873"
             font-size="7"
             font-family="'IBM Plex Mono', monospace"
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            engine · view 3.6
+            value object · view 3.3
           </text>
-          <text x="696" y="1247" fill="#17212a" text-anchor="middle">
+          <text x="696" y="1145" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              EveryLevelWon
+              ProgressOwner
             </tspan>
           </text>
         </g>
-        <g data-class="Achievement">
+        <g data-class="AnonymousMerge">
           <rect
             x="792"
-            y="1222"
+            y="1120"
             width="160"
             height="34"
             rx="4"
@@ -1880,7 +1831,7 @@
           />
           <text
             x="872"
-            y="1234"
+            y="1132"
             fill="#5b6873"
             font-size="7"
             font-family="'IBM Plex Mono', monospace"
@@ -1889,13 +1840,99 @@
           >
             value object
           </text>
-          <text x="872" y="1247" fill="#17212a" text-anchor="middle">
+          <text x="872" y="1145" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              Achievement
+              AnonymousMerge
             </tspan>
           </text>
         </g>
-        <g data-class="ListAchievementsRequest">
+        <!-- The requests of UndoMove and RedoMove, and the failure codes of UseCaseError -->
+        <g data-class="UndoMoveRequest">
+          <rect
+            x="88"
+            y="1170"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="168"
+            y="1182"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="168" y="1195" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              UndoMoveRequest
+            </tspan>
+          </text>
+        </g>
+        <g data-class="RedoMoveRequest">
+          <rect
+            x="264"
+            y="1170"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="344"
+            y="1182"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="344" y="1195" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              RedoMoveRequest
+            </tspan>
+          </text>
+        </g>
+        <g data-class="FailureCode">
+          <rect
+            x="440"
+            y="1170"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="520"
+            y="1182"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            enumeration
+          </text>
+          <text x="520" y="1195" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              FailureCode
+            </tspan>
+          </text>
+        </g>
+        <!-- Chips: achievements -->
+        <g data-class="ListAchievements">
           <rect
             x="88"
             y="1272"
@@ -1906,24 +1943,14 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text
-            x="168"
-            y="1284"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            value object
-          </text>
-          <text x="168" y="1297" fill="#17212a" text-anchor="middle">
+          <text x="168" y="1293" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              ListAchievementsRequest
+              ListAchievements
             </tspan>
           </text>
         </g>
-        <g data-class="AchievementSummary">
+        <!-- AchievementGoal lives in layer 1 since #326: a dashed chip -->
+        <g data-class="AchievementGoal">
           <rect
             x="264"
             y="1272"
@@ -1931,8 +1958,9 @@
             height="34"
             rx="4"
             fill="#ffffff"
-            stroke="#17212a"
+            stroke="#5b6873"
             stroke-width="1"
+            stroke-dasharray="4,3"
           />
           <text
             x="344"
@@ -1943,16 +1971,16 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            value object
+            engine · view 3.6
           </text>
           <text x="344" y="1297" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              AchievementSummary
+              AchievementGoal
             </tspan>
           </text>
         </g>
-        <!-- BestCountReached lives in layer 1 since #364: a dashed chip -->
-        <g data-class="BestCountReached">
+        <!-- LevelsWon lives in layer 1 since #326: a dashed chip -->
+        <g data-class="LevelsWon">
           <rect
             x="440"
             y="1272"
@@ -1977,12 +2005,12 @@
           </text>
           <text x="520" y="1297" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              BestCountReached
+              LevelsWon
             </tspan>
           </text>
         </g>
-        <!-- TotalCountReached lives in layer 1 since #364: a dashed chip -->
-        <g data-class="TotalCountReached">
+        <!-- EveryLevelWon lives in layer 1 since #326: a dashed chip -->
+        <g data-class="EveryLevelWon">
           <rect
             x="616"
             y="1272"
@@ -2007,6 +2035,150 @@
           </text>
           <text x="696" y="1297" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              EveryLevelWon
+            </tspan>
+          </text>
+        </g>
+        <g data-class="Achievement">
+          <rect
+            x="792"
+            y="1272"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="872"
+            y="1284"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="872" y="1297" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              Achievement
+            </tspan>
+          </text>
+        </g>
+        <g data-class="ListAchievementsRequest">
+          <rect
+            x="88"
+            y="1322"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="168"
+            y="1334"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="168" y="1347" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              ListAchievementsRequest
+            </tspan>
+          </text>
+        </g>
+        <g data-class="AchievementSummary">
+          <rect
+            x="264"
+            y="1322"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="344"
+            y="1334"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="344" y="1347" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              AchievementSummary
+            </tspan>
+          </text>
+        </g>
+        <!-- BestCountReached lives in layer 1 since #364: a dashed chip -->
+        <g data-class="BestCountReached">
+          <rect
+            x="440"
+            y="1322"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#5b6873"
+            stroke-width="1"
+            stroke-dasharray="4,3"
+          />
+          <text
+            x="520"
+            y="1334"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            engine · view 3.6
+          </text>
+          <text x="520" y="1347" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              BestCountReached
+            </tspan>
+          </text>
+        </g>
+        <!-- TotalCountReached lives in layer 1 since #364: a dashed chip -->
+        <g data-class="TotalCountReached">
+          <rect
+            x="616"
+            y="1322"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#5b6873"
+            stroke-width="1"
+            stroke-dasharray="4,3"
+          />
+          <text
+            x="696"
+            y="1334"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            engine · view 3.6
+          </text>
+          <text x="696" y="1347" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               TotalCountReached
             </tspan>
           </text>
@@ -2014,7 +2186,7 @@
         <!-- Footnote -->
         <text
           x="24"
-          y="1374"
+          y="1424"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2024,7 +2196,7 @@
         </text>
         <text
           x="24"
-          y="1390"
+          y="1440"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2034,16 +2206,16 @@
         </text>
         <text
           x="24"
-          y="1406"
+          y="1456"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          SyncProgress, its ports AnonymousProgress and ProgressGateway, SyncProgressRequest and
-          SyncFailure exist since #46 (decision 66).
+          SyncProgress, its ports AnonymousProgress and ProgressGateway, SyncProgressRequest,
+          SyncFailure, ProgressOwner and AnonymousMerge exist since #46 (decision 66).
         </text>
-        <!-- The legend sits 32 lower than before: the footnote has one more line since #326 and one more since #46. -->
-        <g transform="translate(0 32)">
+        <!-- The legend sits 82 lower than before: the footnote has one more line since #326 and one more since #46, and the models group has one more row since #46. -->
+        <g transform="translate(0 82)">
           <!-- Legend -->
           <line
             x1="24"
