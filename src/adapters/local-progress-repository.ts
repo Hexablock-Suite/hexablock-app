@@ -7,17 +7,9 @@ import { Moves } from '../domain/shared/moves';
 import { ProgressRecord } from '../domain/progress/progress-model';
 import { Score } from '../domain/shared/score';
 import { Stars } from '../domain/progress/stars';
+import { onlyValue, optionalValueOf, valueOf } from './delivered';
 import type { KeyValueStore } from './key-value-store';
-import {
-  isObject,
-  numberIn,
-  onlyValue,
-  optionalNumberIn,
-  optionalOf,
-  optionalTextIn,
-  optionalValueOf,
-  valueOf,
-} from './saved-json';
+import { isObject, numberIn, optionalNumberIn, optionalOf, optionalTextIn } from './saved-json';
 
 // The version of the saved shape. A new shape gets a new number, so a later app can tell
 // an old saved progress from a new one.
