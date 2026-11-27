@@ -25,7 +25,8 @@ const STONE = 58;
 
 // The home screen, the MVP view of `HomePresenter` (#169). It shows the suite name and opens
 // the game selector map on its own route (S3-11 in #151, a proposal that waits for the team).
-// A side button below the play button opens the achievements screen (#188).
+// A side button below the play button opens the achievements screen (#188), and another one
+// opens the account screen (#45).
 // The settings stay on this screen: the language (#163) joins the board figure (#171).
 // The player chooses the figure in the figure selector, and the hexagon, the first figure,
 // is chosen when the screen opens. The play button passes the text of the chosen figure
@@ -92,6 +93,7 @@ export default function HomeScreen() {
           look="panel"
           onPress={() => router.push('/achievements')}
         />
+        <LipButton label={view.account} look="panel" onPress={() => router.push('/account')} />
       </View>
     </View>
   );
