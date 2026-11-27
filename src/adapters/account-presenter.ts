@@ -1,7 +1,9 @@
 import type { Credentials } from '../application/credentials';
-import type { FailureCode, Result } from '../application/result';
+import { FailureCode, type Result } from '../application/result';
 import type { Session } from '../application/session';
+import type { SyncProgressRequest } from '../application/sync-progress';
 import type { UseCase } from '../application/use-case';
+import type { GameId } from '../domain/shared/game-id';
 import type { TextKey, Texts } from './texts/text-catalog';
 
 // The view model of the account screen (MVP, issue #45, APP-FR-12). It is plain data.
@@ -26,6 +28,12 @@ export interface AccountViewModel {
 // The view of MVP: the screen that shows each new view model.
 export interface AccountView {
   show(model: AccountViewModel): void;
+}
+
+// The sync after a sign-in (#46, D27): `SyncProgress` and the id of each registered game.
+export interface SignInSync {
+  readonly syncProgress: UseCase<SyncProgressRequest, void>;
+  readonly gameIds: readonly GameId[];
 }
 
 // The text of each failure code (issue #322, classes.md decision 62). The table is a `Record`
@@ -54,6 +62,8 @@ const ERROR_TEXTS: Readonly<Record<FailureCode, TextKey>> = {
   'register-failed': 'account.error',
   'login-failed': 'account.error',
   'sign-in-after-sign-up-failed': 'account.error.sign-in-after-sign-up-failed',
+  'session-expired': 'account.error.session-expired',
+  'sync-failed': 'account.error',
   'unexpected-failure': 'account.error',
 };
 
@@ -64,6 +74,11 @@ const ERROR_TEXTS: Readonly<Record<FailureCode, TextKey>> = {
 // While a request runs, the view model holds the busy text. A success shows the signed-in text
 // with the username of the form. A failed `Result` never throws (decision 28): the presenter
 // shows the text of its code. Every text comes from the catalog of one language (APP-FR-11).
+// After a successful sign-up or sign-in, it syncs the progress of each game of `sync` (#46, D27):
+// `SyncProgress` merges the progress played with no account into the account and sends it.
+// A sync that gives `session-expired` stops the sync and shows its text, because the backend
+// refused the new token. Any other failed sync keeps the signed-in text: the local progress keeps
+// every result, and the next save syncs again. With no `sync`, the presenter syncs nothing.
 // A view attaches to see each new view model. It sees the current one at once.
 export class AccountPresenter {
   private model: AccountViewModel;
@@ -73,6 +88,7 @@ export class AccountPresenter {
     private readonly register: UseCase<Credentials, Session>,
     private readonly login: UseCase<Credentials, Session>,
     private readonly texts: Texts,
+    private readonly sync?: SignInSync,
   ) {
     this.model = this.form();
   }
@@ -108,11 +124,27 @@ export class AccountPresenter {
   ): Promise<void> {
     this.present({ ...this.form(), busy: this.texts['account.busy'] });
     const result: Result<Session> = await useCase.execute(credentials);
-    this.present(
-      result.ok
-        ? { ...this.form(), signedIn: `${this.texts['account.signed-in']} ${credentials.username}` }
-        : { ...this.form(), error: this.texts[ERROR_TEXTS[result.error.code]] },
-    );
+    if (!result.ok) {
+      this.present({ ...this.form(), error: this.texts[ERROR_TEXTS[result.error.code]] });
+      return;
+    }
+    this.present({
+      ...this.form(),
+      signedIn: `${this.texts['account.signed-in']} ${credentials.username}`,
+    });
+    await this.syncEachGame();
+  }
+
+  // Syncs the progress of each game in turn. A `session-expired` stops the sync and shows its text.
+  private async syncEachGame(): Promise<void> {
+    if (this.sync === undefined) return;
+    for (const gameId of this.sync.gameIds) {
+      const result = await this.sync.syncProgress.execute({ gameId });
+      if (!result.ok && result.error.code === FailureCode.sessionExpired) {
+        this.present({ ...this.form(), error: this.texts[ERROR_TEXTS[result.error.code]] });
+        return;
+      }
+    }
   }
 
   // The labels of the form, with no answer.

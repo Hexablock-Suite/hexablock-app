@@ -34,6 +34,7 @@ import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-polic
 import { playMove } from '../../../support/engine/play-move';
 import { startVariant } from '../../../support/engine/variant-game';
 import { seededRandom } from '../../../support/engine/step-random';
+import { ManualClock } from '../../../support/engine/manual-clock';
 
 // The rules of issue #93 and the accepted rules of issue #56: a tie goes to the stack
 // whose coordinate key comes first in key order.
@@ -339,7 +340,7 @@ describe('SortRules colors', () => {
 // The first `count` stacks that a new source of `level` gives.
 function drawnStacks(level: SortLevel, count: number): ColorStack[] {
   const found: ColorStack[] = [];
-  const factory = new SortFactory(new SquareGeometry(), level, seededRandom(1));
+  const factory = new SortFactory(new SquareGeometry(), level, seededRandom(1), new ManualClock());
   for (const drawn of factory.createPieceSource()) {
     if (found.length === count) break;
     found.push(drawn);
@@ -413,7 +414,12 @@ describe('SortRules piece source (A4)', () => {
   it('should_offer_the_same_stacks_when_two_games_use_the_same_seed', () => {
     const level = seededLevel(7, ['red', 'blue', 'green']);
     const play = () => {
-      const factory = new SortFactory(new SquareGeometry(), level, seededRandom(1));
+      const factory = new SortFactory(
+        new SquareGeometry(),
+        level,
+        seededRandom(1),
+        new ManualClock(),
+      );
       const { engine } = startVariant(factory);
       const tray = trayOf(engine.snapshot());
       playMove(engine, placeFrom(1, 0, 0));

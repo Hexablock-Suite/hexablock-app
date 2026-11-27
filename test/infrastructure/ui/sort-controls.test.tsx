@@ -35,7 +35,7 @@ async function openLevel(stacks: readonly (readonly string[])[]): Promise<void> 
     stacks.map((stack) => ColorStack.of(stack.map(Color.of))),
   );
   const { startGame, applyMove, undoMove, redoMove } = gameUseCases(
-    new SortFactory(new HexGeometry(), level, seededRandom(1)),
+    new SortFactory(new HexGeometry(), level, seededRandom(1), new ManualClock()),
   );
   const presenter = new GamePresenter(
     startGame,

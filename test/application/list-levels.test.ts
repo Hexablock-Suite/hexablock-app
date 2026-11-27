@@ -25,6 +25,8 @@ import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-s
 import { ManualClock } from '../support/engine/manual-clock';
 import { delivered } from '../support/engine/value-receiver';
 import { fitLevelFile, squareFitLevelFile } from '../support/variants/hexa-fit/fit-level-file';
+import { saveIn } from '../support/adapters/saved-progress';
+import { ProgressOwner } from '../../src/application/progress-owner';
 
 // `ListLevels` lists the levels of a game on the chosen figure with their status and stars
 // (issue #168, APP-FR-02, S3-12 and S3-08 in #151). The tests run the real
@@ -215,7 +217,7 @@ describe('ListLevels', () => {
         stars: Stars.of(1),
       }),
     );
-    await progress.save(saved);
+    await saveIn(progress, saved);
 
     const result = await list.execute(onHex);
 
@@ -235,7 +237,8 @@ describe('ListLevels', () => {
     };
     const brokenProgress: ProgressRepository = {
       load: () => Promise.reject(error),
-      save: () => Promise.resolve(),
+      owner: () => Promise.resolve(ProgressOwner.anonymous),
+      update: () => Promise.resolve(),
     };
     const { progress } = fitUseCases();
 

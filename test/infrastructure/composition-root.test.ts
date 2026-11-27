@@ -38,6 +38,7 @@ import { withGeometryOf } from '../support/engine/geometry-of';
 import { ManualClock } from '../support/engine/manual-clock';
 import { firstMoveOf } from '../support/engine/variant-game';
 import { variantIdOf } from '../support/variants/variant-id';
+import { saveIn } from '../support/adapters/saved-progress';
 
 // Issue #162: the composition root wires the layers in one place. It builds the drivers and
 // the adapters, the game use cases of each registered game and the aspects around them.
@@ -202,7 +203,7 @@ describe('CompositionRoot', () => {
     });
     const saved = GameProgress.start(LINES);
     saved.recordScore(ProgressRecord.of({ gameId: LINES, score: Score.of(36) }));
-    await new LocalProgressRepository(store).save(saved);
+    await saveIn(new LocalProgressRepository(store), saved);
 
     const result = await root.loadProgress().execute({ gameId: LINES });
 
@@ -226,7 +227,7 @@ describe('CompositionRoot', () => {
     });
     const saved = GameProgress.start(LINES);
     saved.recordScore(ProgressRecord.of({ gameId: LINES, score: Score.of(36) }));
-    await new LocalProgressRepository(store).save(saved);
+    await saveIn(new LocalProgressRepository(store), saved);
     const load = root.loadProgress();
 
     const lines = await load.execute({ gameId: LINES });
@@ -268,7 +269,7 @@ describe('CompositionRoot', () => {
     });
     const saved = GameProgress.start(FIT);
     saved.recordLevel(won);
-    await new LocalProgressRepository(store).save(saved);
+    await saveIn(new LocalProgressRepository(store), saved);
 
     const listed = await root.listLevels().execute({ gameId: FIT, figure: TopologyId.hex });
     const loaded = await root.loadProgress().execute({ gameId: FIT });
@@ -574,7 +575,7 @@ describe('CompositionRoot', () => {
           stars: Stars.of(2),
         }),
       );
-      await new LocalProgressRepository(store).save(saved);
+      await saveIn(new LocalProgressRepository(store), saved);
       const { startGame } = root.gameUseCases(FIT);
 
       const started = valueOf(await startGame.execute({ levelId: LevelId.of('fit-02') }));

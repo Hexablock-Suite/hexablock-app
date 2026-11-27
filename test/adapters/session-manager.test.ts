@@ -21,6 +21,66 @@ describe('SessionManager', () => {
     await expect(new SessionManager(secrets).read()).resolves.toEqual(ADA);
   });
 
+  // #46: a refused token clears the session, so the next screen asks the player to sign in.
+  it('should_give_no_session_to_a_new_manager_when_the_kept_session_is_cleared', async () => {
+    const secrets = new InMemorySecretStore();
+    await new SessionManager(secrets).write(ADA);
+
+    await new SessionManager(secrets).clear();
+
+    await expect(new SessionManager(secrets).read()).resolves.toBeUndefined();
+  });
+
+  // Judgment-day round 1, F3: the progress belongs to the last signed-in user. A refused token
+  // clears the token only, so the owner of the progress stays.
+  it('should_keep_the_owner_when_the_kept_session_is_cleared', async () => {
+    const secrets = new InMemorySecretStore();
+    await new SessionManager(secrets).write(ADA);
+
+    await new SessionManager(secrets).clear();
+
+    await expect(new SessionManager(secrets).owner()).resolves.toBe(ADA.userId);
+    expect(JSON.parse((await secrets.get('session')) ?? '')).toEqual({
+      version: 2,
+      userId: ADA.userId,
+    });
+  });
+
+  it('should_give_no_owner_when_no_player_signed_in', async () => {
+    await expect(new SessionManager(new InMemorySecretStore()).owner()).resolves.toBeUndefined();
+  });
+
+  it('should_make_the_new_player_the_owner_when_another_player_signs_in_after_a_clear', async () => {
+    const sessions = new SessionManager(new InMemorySecretStore());
+    await sessions.write(ADA);
+    await sessions.clear();
+
+    await sessions.write(GRACE);
+
+    await expect(sessions.owner()).resolves.toBe(GRACE.userId);
+    await expect(sessions.read()).resolves.toEqual(GRACE);
+  });
+
+  // F3: a session kept by #45 has the version 1. The app still reads it, with its owner.
+  it('should_give_the_session_and_its_owner_when_the_kept_session_has_the_version_1', async () => {
+    const secrets = new InMemorySecretStore();
+    await secrets.set(
+      'session',
+      JSON.stringify({ version: 1, token: 'token-of-ada', userId: ADA.userId }),
+    );
+
+    await expect(new SessionManager(secrets).read()).resolves.toEqual(ADA);
+    await expect(new SessionManager(secrets).owner()).resolves.toBe(ADA.userId);
+  });
+
+  it('should_keep_no_session_when_a_manager_with_no_session_is_cleared', async () => {
+    const sessions = new SessionManager(new InMemorySecretStore());
+
+    await sessions.clear();
+
+    await expect(sessions.read()).resolves.toBeUndefined();
+  });
+
   it('should_give_back_the_last_session_when_a_second_session_replaces_the_first', async () => {
     const sessions = new SessionManager(new InMemorySecretStore());
 
@@ -37,7 +97,7 @@ describe('SessionManager', () => {
     await new SessionManager(secrets).write(ADA);
 
     expect(JSON.parse((await secrets.get('session')) ?? '')).toEqual({
-      version: 1,
+      version: 2,
       token: 'token-of-ada',
       userId: '0b6f6a4e-1c2d-4e5f-8a9b-0c1d2e3f4a5b',
     });
@@ -59,7 +119,8 @@ describe('SessionManager', () => {
   });
 
   it.each([
-    ['another version', { version: 2, token: 'a', userId: 'b' }],
+    ['another version', { version: 3, token: 'a', userId: 'b' }],
+    ['no user id', { version: 2, token: 'a' }],
     ['no token', { version: 1, userId: 'b' }],
     ['a blank user id', { version: 1, token: 'a', userId: ' ' }],
     ['a list', [1]],

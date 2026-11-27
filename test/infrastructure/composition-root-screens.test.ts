@@ -2,6 +2,7 @@
 import { AccountPresenter } from '../../src/adapters/account-presenter';
 import { AchievementsPresenter } from '../../src/adapters/achievements-presenter';
 import type { AccountApi } from '../../src/adapters/api/account-api';
+import type { ProgressApi } from '../../src/adapters/api/progress-api';
 import { SessionManager } from '../../src/adapters/session-manager';
 import { GamePresenter } from '../../src/adapters/game-presenter';
 import { HomePresenter } from '../../src/adapters/home-presenter';
@@ -21,6 +22,7 @@ import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-s
 import { InMemorySecretStore } from '../support/adapters/in-memory-secret-store';
 import { RecordingLogger } from '../support/application/recording-logger';
 import { ManualClock } from '../support/engine/manual-clock';
+import { saveIn } from '../support/adapters/saved-progress';
 
 // Issue #411: the composition root builds the presenter of each screen and answers the questions
 // of the hooks through the closed interface `ScreenServices`. A hook keeps only React state.
@@ -39,7 +41,7 @@ describe('CompositionRoot screens', () => {
     const store = new InMemoryKeyValueStore();
     const saved = GameProgress.start(LINES);
     saved.recordScore(ProgressRecord.of({ gameId: LINES, score: Score.of(36) }));
-    await new LocalProgressRepository(store).save(saved);
+    await saveIn(new LocalProgressRepository(store), saved);
     const services = servicesOver(store);
     const loaded = await services.loadProgress().execute({ gameId: LINES });
     const levels = services.levelSelectorPresenter(FIT, TopologyId.hex);
@@ -111,10 +113,12 @@ describe('CompositionRoot screens', () => {
   it('should_build_an_account_presenter_that_keeps_the_session_when_the_root_has_a_backend_and_a_secure_store', async () => {
     const secrets = new InMemorySecretStore();
     const logger = new RecordingLogger();
-    const api: AccountApi = {
+    const api: AccountApi & ProgressApi = {
       signUp: () => Promise.resolve(),
       signIn: () => Promise.resolve({ accessToken: 'token-of-ada' }),
       currentUser: () => Promise.resolve({ userId: '0b6f6a4e-1c2d-4e5f-8a9b-0c1d2e3f4a5b' }),
+      syncProgress: (_token, body) =>
+        Promise.resolve({ gameId: body.gameId, highScore: null, updatedAt: '', results: [] }),
     };
     const services: ScreenServices = new CompositionRoot({
       clock: new ManualClock(),

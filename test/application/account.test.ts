@@ -10,6 +10,9 @@ import { FailureCode, type Result } from '../../src/application/result';
 import { Session } from '../../src/application/session';
 import type { SessionStore } from '../../src/application/session-store';
 import type { UseCase } from '../../src/application/use-case';
+import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
+import { GameId } from '../../src/domain/shared/game-id';
+import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-store';
 
 // APP-FR-12 (#45): the player signs up and signs in, and the app keeps the session.
 
@@ -26,9 +29,18 @@ class KeptSessions implements SessionStore {
     return Promise.resolve(this.written.at(-1));
   }
 
+  owner(): Promise<string | undefined> {
+    return Promise.resolve(this.written.at(-1)?.userId);
+  }
+
   write(session: Session): Promise<void> {
     if (this.failing) return Promise.reject(new Error('The secure storage is locked.'));
     this.written.push(session);
+    return Promise.resolve();
+  }
+
+  clear(): Promise<void> {
+    this.written.length = 0;
     return Promise.resolve();
   }
 }
@@ -139,5 +151,62 @@ describe.each([
 
     expect(codeOf(result)).toBe(failed);
     expect(result.ok ? undefined : result.error.message).toBe('The secure storage is locked.');
+  });
+});
+
+// Judgment-day round 1, F3 and F4: at sign-in the progress played with no account merges into the
+// key of the user locally, before any request, and the anonymous key is forgotten only after the
+// merged progress is saved.
+describe('Login and the progress played with no account', () => {
+  const FIT = GameId.of('hexa-fit');
+  const ANONYMOUS = '{"version":1,"levels":[{"score":0,"levelId":"fit-01","stars":3,"moves":3}]}';
+
+  // A store whose writes reject once `failing` is set, as a full disk does.
+  class FullDisk extends InMemoryKeyValueStore {
+    failing = false;
+    override set(key: string, value: string): Promise<void> {
+      if (this.failing) return Promise.reject(new Error('The disk is full.'));
+      return super.set(key, value);
+    }
+  }
+
+  it('should_merge_the_anonymous_progress_into_the_key_of_the_user_when_the_player_signs_in', async () => {
+    const store = new FullDisk();
+    await store.set('progress:hexa-fit', ANONYMOUS);
+    const sessions = new KeptSessions();
+    const repository = new LocalProgressRepository(store, sessions);
+
+    const result = await new Login(
+      gatewayOf(() => Promise.resolve(SESSION)),
+      sessions,
+      {
+        anonymous: repository,
+        gameIds: [FIT],
+      },
+    ).execute(ADA);
+
+    expect(result.ok).toBe(true);
+    await expect(store.get(`progress:${SESSION.userId}:hexa-fit`)).resolves.toBe(ANONYMOUS);
+    await expect(store.get('progress:hexa-fit')).resolves.toBeUndefined();
+  });
+
+  it('should_keep_the_anonymous_progress_and_give_login_failed_when_the_merged_progress_cannot_be_saved', async () => {
+    const store = new FullDisk();
+    await store.set('progress:hexa-fit', ANONYMOUS);
+    store.failing = true;
+    const sessions = new KeptSessions();
+    const repository = new LocalProgressRepository(store, sessions);
+
+    const result = await new Login(
+      gatewayOf(() => Promise.resolve(SESSION)),
+      sessions,
+      {
+        anonymous: repository,
+        gameIds: [FIT],
+      },
+    ).execute(ADA);
+
+    expect(codeOf(result)).toBe(FailureCode.loginFailed);
+    await expect(store.get('progress:hexa-fit')).resolves.toBe(ANONYMOUS);
   });
 });

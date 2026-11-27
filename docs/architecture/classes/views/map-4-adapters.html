@@ -64,7 +64,7 @@
       <h1>Adapters, presenters and drivers at a glance</h1>
 
       <svg
-        viewBox="0 0 1040 1997"
+        viewBox="0 0 1040 2013"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="mapad-title mapad-desc"
@@ -75,14 +75,15 @@
           layer 3 holds BoardLayout, HexLayout, SquareLayout and TriangleLayout (#393). The
           composition root group holds CompositionRoot, GameRegistry, BoardFigure and the
           ScreenServices interface of the screens (#411), the drivers group holds SequentialMatchIds
-          and DeviceSecretStore, the repositories group holds SessionManager (#45), the move
-          controls group holds MoveControls, FitControls and MergeControls, and the events group
-          holds GameEventBus, GameEventListener and AchievementCounterListener. Each line joins two
-          classes: GameScreen renders BoardView and keeps its GamePresenter and its MoveControls,
-          CompositionRoot creates InMemoryGameRepository, DeviceKeyValueStore implements
-          KeyValueStore, DeviceSecretStore implements SecretStore, GamePresenter keeps its
-          StateMapper and LocalProgressRepository keeps its KeyValueStore. No line touches a group
-          frame. Each group names the view that shows its members.
+          and DeviceSecretStore, the repositories group holds SessionManager (#45), the HTTP group
+          holds ApiProgressGateway (#46), the move controls group holds MoveControls, FitControls
+          and MergeControls, and the events group holds GameEventBus, GameEventListener and
+          AchievementCounterListener. Each line joins two classes: GameScreen renders BoardView and
+          keeps its GamePresenter and its MoveControls, CompositionRoot creates
+          InMemoryGameRepository, DeviceKeyValueStore implements KeyValueStore, DeviceSecretStore
+          implements SecretStore, GamePresenter keeps its StateMapper and LocalProgressRepository
+          keeps its KeyValueStore. No line touches a group frame. Each group names the view that
+          shows its members.
         </desc>
         <defs>
           <marker
@@ -2135,7 +2136,7 @@
           VIEW 4.2 · FLOWS 2, 5
         </text>
         <!-- Chips: HTTP repositories and transport interfaces -->
-        <g data-class="ApiProgressRepository">
+        <g data-class="ApiProgressGateway">
           <rect
             x="56"
             y="1552"
@@ -2148,7 +2149,7 @@
           />
           <text x="132" y="1573" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              ApiProgressRepository
+              ApiProgressGateway
             </tspan>
           </text>
         </g>
@@ -2426,7 +2427,19 @@
           Since #45 SessionManager of layer 3 keeps the session through SecretStore, and
           DeviceSecretStore of layer 4 implements SecretStore over the secure store (decision 65).
         </text>
-        <g transform="translate(0 112)">
+        <!-- The last footnote line and the legend sit 16 lower again: the footnote has one more line since #46. -->
+        <text
+          x="24"
+          y="1872"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Since #46 ApiProgressGateway implements ProgressGateway over ProgressApi, and
+          LocalProgressRepository reads the owner of the progress from SessionManager for its key
+          (decision 66).
+        </text>
+        <g transform="translate(0 128)">
           <text
             x="24"
             y="1760"

@@ -548,7 +548,8 @@ describe('GamePresenter undo and redo', () => {
       }),
     );
 
-    expect(codes).toHaveLength(22);
+    // #46 adds `session-expired` and `sync-failed`.
+    expect(codes).toHaveLength(24);
     expect(shown).toEqual(
       languages.map((texts) => codes.map((code) => texts[own[code] ?? 'play.error'])),
     );

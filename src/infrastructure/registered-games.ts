@@ -229,10 +229,11 @@ export function registeredGames<TCoord>(
         geometry,
         SortLevel.seededEachMatch(SORT_BOARD, SORT_GOALS, nonEmpty(SORT_COLORS)),
         random,
+        clock,
       ),
       sortScreen(figure),
       worldTone(2),
-      sortLevelVariant(geometry, random),
+      sortLevelVariant(geometry, random, clock),
     ),
     mergeOn(figure, random, MERGE_BOARD),
   ];

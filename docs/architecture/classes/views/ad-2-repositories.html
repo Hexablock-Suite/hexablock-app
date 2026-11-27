@@ -64,19 +64,22 @@
       <h1>Repositories: Adapter over storage and HTTP</h1>
 
       <svg
-        viewBox="0 0 1100 1048"
+        viewBox="0 0 1100 1116"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="adrepos-title adrepos-desc"
       >
         <title id="adrepos-title">HexaBlock repositories · UML class diagram</title>
         <desc id="adrepos-desc">
-          Class diagram across layers 4, 3 and 2 showing ApiProgressRepository in layer 3, which
-          holds the ProgressApi transport interface and the ApiDtoMapper of layer 3 and implements
-          the ProgressRepository port of layer 2. ApiClient in layer 4, the driver, implements
-          ProgressApi (decision 22, #404). LocalProgressRepository in layer 3 holds the
-          KeyValueStore driver interface of layer 3 and implements the same port with load() and
-          save(): it keeps the GameProgress of each game as plain JSON in the store.
+          Class diagram across layers 4, 3 and 2 showing ApiProgressGateway in layer 3, which holds
+          the ProgressApi transport interface and the ApiDtoMapper of layer 3 and implements the
+          ProgressGateway port of layer 2 (decisions 22 and 66, #46). ApiClient in layer 4, the
+          driver, implements ProgressApi. LocalProgressRepository in layer 3 holds the KeyValueStore
+          driver interface of layer 3, the SessionStore port and one queue per key, and implements
+          two ports: ProgressRepository with owner(), load() and update(), and AnonymousProgress
+          with mergeAnonymousInto(). It keeps the GameProgress of each game as plain JSON in the
+          store, under a key with the owner, the last signed-in user that SessionStore keeps, or
+          under the anonymous key for the anonymous owner (decision 66).
           LocalAchievementCounterRepository in layer 3 holds the same KeyValueStore and implements
           the AchievementCounterRepository port of layer 2: it keeps the AchievementCounters of each
           game as plain JSON with a version under its own key (#363). DeviceKeyValueStore implements
@@ -119,7 +122,6 @@
         </defs>
 
         <rect width="100%" height="100%" fill="#f3f5f6" />
-        <!-- Layer zones: outer to inner, top to bottom -->
         <rect
           x="24"
           y="24"
@@ -145,7 +147,7 @@
           x="24"
           y="216"
           width="1052"
-          height="472"
+          height="508"
           rx="8"
           fill="#e2ebf8"
           stroke="rgba(29,78,216,0.40)"
@@ -164,7 +166,7 @@
         </text>
         <rect
           x="24"
-          y="696"
+          y="732"
           width="1052"
           height="100"
           rx="8"
@@ -174,7 +176,7 @@
         />
         <text
           x="40"
-          y="716"
+          y="752"
           fill="#7e22ce"
           font-size="8"
           font-weight="500"
@@ -188,7 +190,7 @@
           x="40"
           y="60"
           width="1020"
-          height="140"
+          height="144"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -210,7 +212,7 @@
           x="40"
           y="248"
           width="312"
-          height="128"
+          height="144"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -232,7 +234,7 @@
           x="368"
           y="248"
           width="692"
-          height="424"
+          height="464"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -253,7 +255,7 @@
         <!-- Relationships (drawn before boxes) -->
         <!-- DeviceKeyValueStore implements KeyValueStore: realization, down from layer 4 to layer 3 -->
         <path
-          d="M300 180 V272"
+          d="M300 192 V272"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -262,7 +264,7 @@
         />
         <!-- ApiClient implements ProgressApi: realization, down from layer 4 to layer 3 (decision 22) -->
         <path
-          d="M884 188 V276"
+          d="M902 192 V276"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -271,7 +273,7 @@
         />
         <!-- LocalProgressRepository keeps the KeyValueStore it receives as store: use with role and multiplicity (decision 23) -->
         <path
-          d="M384 316 H336"
+          d="M384 312 H336"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -279,23 +281,23 @@
         />
         <!-- LocalAchievementCounterRepository keeps the KeyValueStore it receives as store: use with role and multiplicity (decision 23, #363) -->
         <path
-          d="M384 474 H210 Q202 474 202 466 V360"
+          d="M384 596 H210 Q202 596 202 588 V376"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adrepos-open)"
         />
-        <!-- ApiProgressRepository keeps the ProgressApi it receives as api: use with role and multiplicity -->
+        <!-- ApiProgressGateway keeps the ProgressApi it receives as api: use with role and multiplicity -->
         <path
-          d="M820 396 V360"
+          d="M840 396 V360"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adrepos-open)"
         />
-        <!-- ApiProgressRepository keeps the ApiDtoMapper it receives as mapper: use with role and multiplicity -->
+        <!-- ApiProgressGateway keeps the ApiDtoMapper it receives as mapper: use with role and multiplicity -->
         <path
-          d="M940 484 V516"
+          d="M940 520 V552"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -303,16 +305,33 @@
         />
         <!-- LocalProgressRepository implements ProgressRepository: realization, down from layer 3 to layer 2 -->
         <path
-          d="M718 388 V732"
+          d="M700 516 V744 Q700 752 692 752 H620 Q612 752 612 760 V768"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
           marker-end="url(#adrepos-triangle)"
         />
-        <!-- ApiProgressRepository implements ProgressRepository: realization, down from layer 3 to layer 2 -->
+        <!-- LocalProgressRepository implements AnonymousProgress, the second role of the one repository of the progress (#46, decision 66) -->
         <path
-          d="M1016 440 H1028 Q1036 440 1036 448 V700 Q1036 708 1028 708 H900 Q892 708 892 716 V732"
+          d="M714 516 V768"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#adrepos-triangle)"
+        />
+        <!-- LocalProgressRepository keeps the SessionStore it receives as sessions: the key carries the owner (#46, decision 66) -->
+        <path
+          d="M728 516 V732 Q728 740 736 740 H876 Q884 740 884 748 V768"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#adrepos-open)"
+        />
+        <!-- ApiProgressGateway implements ProgressGateway: realization, down from layer 3 to layer 2 (#46, decision 66) -->
+        <path
+          d="M1044 458 H1048 Q1052 458 1052 462 V768"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -321,19 +340,18 @@
         />
         <!-- LocalAchievementCounterRepository implements AchievementCounterRepository: realization, down from layer 3 to layer 2 (#363) -->
         <path
-          d="M546 536 V732"
+          d="M438 664 V768"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
           marker-end="url(#adrepos-triangle)"
         />
-
         <!-- Role names and multiplicities at the part end -->
-        <rect x="342" y="300" width="38" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="340" y="297" width="40" height="12" rx="2" fill="#e2ebf8" />
         <text
-          x="344"
-          y="309"
+          x="342"
+          y="306"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -342,10 +360,10 @@
           store
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="208" y="366" width="38" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="206" y="381" width="40" height="12" rx="2" fill="#e2ebf8" />
         <text
-          x="210"
-          y="375"
+          x="208"
+          y="390"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -354,10 +372,10 @@
           store
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="826" y="366" width="28" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="844" y="373" width="30" height="12" rx="2" fill="#e2ebf8" />
         <text
-          x="828"
-          y="375"
+          x="846"
+          y="382"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -366,10 +384,10 @@
           api
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="946" y="492" width="42" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="944" y="531" width="45" height="12" rx="2" fill="#e2ebf8" />
         <text
-          x="948"
-          y="501"
+          x="946"
+          y="540"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -378,22 +396,33 @@
           mapper
           <tspan font-weight="600">1</tspan>
         </text>
-
+        <rect x="888" y="753" width="69" height="12" rx="2" fill="#efe7f8" />
+        <text
+          x="890"
+          y="762"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          sessions
+          <tspan font-weight="600">0..1</tspan>
+        </text>
         <!-- Class: DeviceKeyValueStore (a driver; a piece of the Adapter pattern: the frame names it, decision 23) -->
         <rect
           x="48"
-          y="92"
+          y="88"
           width="288"
-          height="88"
+          height="104"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="48" y1="140" x2="336" y2="140" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="48" y1="136" x2="336" y2="136" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="192"
-          y="121"
+          y="117"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -402,27 +431,30 @@
         >
           DeviceKeyValueStore
         </text>
-        <text x="64" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="152" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + get(key: string): Promise&lt;string | undefined&gt;
         </text>
-        <text x="64" y="172" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="64" y="168" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + set(key: string, value: string): Promise&lt;void&gt;
+        </text>
+        <text x="64" y="184" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + remove(key: string): Promise&lt;void&gt;
         </text>
         <!-- Class: ApiClient (the driver of the transport interfaces of layer 3, decision 22) -->
         <rect
-          x="752"
-          y="80"
-          width="264"
-          height="108"
+          x="760"
+          y="68"
+          width="284"
+          height="124"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="752" y1="136" x2="1016" y2="136" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="760" y1="124" x2="1044" y2="124" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="884"
-          y="98"
+          x="902"
+          y="86"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -432,8 +464,8 @@
           «driver»
         </text>
         <text
-          x="884"
-          y="116"
+          x="902"
+          y="104"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -443,8 +475,8 @@
           ApiClient
         </text>
         <text
-          x="884"
-          y="130"
+          x="902"
+          y="118"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -452,22 +484,24 @@
         >
           api/client.ts
         </text>
-        <text x="768" y="152" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="776" y="140" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + getHealth(): Promise&lt;HealthDto&gt;
         </text>
-        <text x="768" y="168" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + syncProgress(body: ProgressDto):
+        <text x="776" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + syncProgress(token: string,
         </text>
-        <text x="784" y="180" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          Promise&lt;ProgressDto&gt;
-          <tspan data-requirement="APP-FR-13" fill="#5b6873" font-size="8">«Sprint 4»</tspan>
+        <text x="792" y="168" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          body: SyncProgressDto): Promise&lt;ProgressDto&gt;
+        </text>
+        <text x="776" y="184" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          account calls: flow 5
         </text>
         <!-- Class: KeyValueStore (interface of layer 3) -->
         <rect
           x="48"
           y="272"
           width="288"
-          height="88"
+          height="104"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -502,20 +536,23 @@
         <text x="64" y="352" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + set(key: string, value: string): Promise&lt;void&gt;
         </text>
-        <!-- Class: ProgressApi (transport interface of layer 3, decision 22) -->
+        <text x="64" y="368" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + remove(key: string): Promise&lt;void&gt;
+        </text>
+        <!-- Class: ProgressApi (transport interface of layer 3, decision 22, #46) -->
         <rect
-          x="752"
+          x="760"
           y="276"
-          width="264"
+          width="284"
           height="84"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="752" y1="324" x2="1016" y2="324" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="760" y1="324" x2="1044" y2="324" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="884"
+          x="902"
           y="294"
           fill="#5b6873"
           font-size="8"
@@ -526,7 +563,7 @@
           «interface»
         </text>
         <text
-          x="884"
+          x="902"
           y="312"
           fill="#17212a"
           font-size="12"
@@ -535,39 +572,37 @@
           text-anchor="middle"
         >
           ProgressApi
-          <tspan data-requirement="APP-FR-13" fill="#5b6873" font-size="8" font-weight="400">
-            «Sprint 4»
-          </tspan>
         </text>
-        <text x="768" y="340" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + syncProgress(body: ProgressDto):
+        <text x="776" y="340" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + syncProgress(token: string,
         </text>
-        <text x="784" y="352" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          Promise&lt;ProgressDto&gt;
+        <text x="792" y="352" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          body: SyncProgressDto): Promise&lt;ProgressDto&gt;
         </text>
-        <!-- Class: ApiProgressRepository (focal; a piece of the Adapter pattern: the frame names it, decision 23) -->
+        <!-- Class: ApiProgressGateway (focal; a piece of the Adapter pattern: the frame names it, decisions 22 and 66) -->
         <rect
-          x="752"
+          x="760"
           y="396"
-          width="264"
-          height="88"
+          width="284"
+          height="124"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
           stroke-width="1"
         />
-        <rect x="752" y="396" width="264" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
-        <rect x="752" y="436" width="264" height="8" fill="rgba(15,111,116,0.10)" />
+        <rect x="760" y="396" width="284" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="760" y="436" width="284" height="8" fill="rgba(15,111,116,0.10)" />
         <line
-          x1="752"
+          x1="760"
           y1="444"
-          x2="1016"
+          x2="1044"
           y2="444"
           stroke="rgba(15,111,116,0.40)"
           stroke-width="1"
         />
+        <line x1="760" y1="484" x2="1044" y2="484" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="884"
+          x="902"
           y="414"
           fill="#5b6873"
           font-size="8"
@@ -575,10 +610,10 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «repository»
+          «gateway»
         </text>
         <text
-          x="884"
+          x="902"
           y="432"
           fill="#17212a"
           font-size="12"
@@ -586,32 +621,35 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          ApiProgressRepository
-          <tspan data-requirement="APP-FR-13" fill="#5b6873" font-size="8" font-weight="400">
-            «Sprint 4»
-          </tspan>
+          ApiProgressGateway
         </text>
-        <text x="768" y="460" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="776" y="460" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - api: ProgressApi
         </text>
-        <text x="768" y="476" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="776" y="476" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - mapper: ApiDtoMapper
+        </text>
+        <text x="776" y="500" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + sync(session: Session,
+        </text>
+        <text x="792" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          progress: GameProgress): Promise&lt;GameProgress&gt;
         </text>
         <!-- Class: ApiDtoMapper (DTO mapper) -->
         <rect
-          x="752"
-          y="516"
-          width="264"
-          height="140"
+          x="760"
+          y="552"
+          width="284"
+          height="144"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="752" y1="564" x2="1016" y2="564" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="760" y1="600" x2="1044" y2="600" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="884"
-          y="534"
+          x="902"
+          y="570"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -621,8 +659,8 @@
           «mapper»
         </text>
         <text
-          x="884"
-          y="552"
+          x="902"
+          y="588"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -631,47 +669,40 @@
         >
           ApiDtoMapper
         </text>
-        <text x="768" y="580" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + toProgressDto(progress: GameProgress):
+        <text x="776" y="616" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + toSyncProgressDto(progress: GameProgress):
         </text>
-        <text x="784" y="592" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          ProgressDto
-          <tspan data-requirement="APP-FR-13" fill="#5b6873" font-size="8" font-weight="400">
-            «Sprint 4»
-          </tspan>
+        <text x="792" y="628" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          SyncProgressDto
         </text>
-        <text x="768" y="608" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + toProgress(dto: ProgressDto):
+        <text x="776" y="644" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + toGameProgress(dto: ProgressDto): GameProgress
         </text>
-        <text x="784" y="620" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          GameProgress
-          <tspan data-requirement="APP-FR-13" fill="#5b6873" font-size="8" font-weight="400">
-            «Sprint 4»
-          </tspan>
-        </text>
-        <text x="768" y="636" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="776" y="660" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + toLevelDefinition(dto: LevelDto):
         </text>
-        <text x="784" y="648" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="792" y="672" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           LevelDefinition
           <tspan data-requirement="APP-FR-15" fill="#5b6873" font-size="8" font-weight="400">
             «Sprint 4»
           </tspan>
         </text>
-        <!-- Class: LocalProgressRepository (a piece of the Adapter pattern: the frame names it, decision 23) -->
+        <text x="776" y="688" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          account mappings: flow 5
+        </text>
+        <!-- Class: LocalProgressRepository (a piece of the Adapter pattern: the frame names it, decision 23; two roles since #46, decision 66; the owner and the queue since its judgment-day round 1) -->
         <rect
           x="384"
           y="276"
-          width="344"
-          height="112"
+          width="352"
+          height="240"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="384" y1="324" x2="728" y2="324" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="556"
+          x="560"
           y="294"
           fill="#5b6873"
           font-size="8"
@@ -682,7 +713,7 @@
           «repository»
         </text>
         <text
-          x="556"
+          x="560"
           y="312"
           fill="#17212a"
           font-size="12"
@@ -692,31 +723,57 @@
         >
           LocalProgressRepository
         </text>
-        <line x1="384" y1="348" x2="728" y2="348" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="384" y1="324" x2="736" y2="324" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="400" y="340" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - store: KeyValueStore
         </text>
-        <text x="400" y="364" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + load(gameId: GameId): Promise&lt;GameProgress | undefined&gt;
+        <text x="400" y="356" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - sessions: SessionStore [0..1]
         </text>
-        <text x="400" y="380" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + save(progress: GameProgress): Promise&lt;void&gt;
+        <text x="400" y="372" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - queues: Map&lt;string, Promise&lt;void&gt;&gt;
+        </text>
+        <line x1="384" y1="380" x2="736" y2="380" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="400" y="396" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + owner(): Promise&lt;ProgressOwner&gt;
+        </text>
+        <text x="400" y="412" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + load(owner: ProgressOwner, gameId: GameId):
+        </text>
+        <text x="416" y="428" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Promise&lt;GameProgress | undefined&gt;
+        </text>
+        <text x="400" y="444" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + update(owner: ProgressOwner, gameId: GameId,
+        </text>
+        <text x="416" y="460" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          change: (progress: GameProgress) =&gt; void):
+        </text>
+        <text x="416" y="476" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Promise&lt;void&gt;
+        </text>
+        <text x="400" y="492" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + mergeAnonymousInto(owner: ProgressOwner,
+        </text>
+        <text x="416" y="508" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          gameId: GameId): Promise&lt;void&gt;
         </text>
         <!-- Class: LocalAchievementCounterRepository (adapter of AchievementCounterRepository over KeyValueStore, #363; a piece of the Adapter pattern: the frame names it) -->
         <rect
           x="384"
-          y="412"
-          width="324"
+          y="540"
+          width="304"
           height="124"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="384" y1="460" x2="708" y2="460" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="384" y1="588" x2="688" y2="588" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="384" y1="612" x2="688" y2="612" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="546"
-          y="430"
+          x="536"
+          y="558"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -726,8 +783,8 @@
           «repository»
         </text>
         <text
-          x="546"
-          y="448"
+          x="536"
+          y="576"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -736,25 +793,23 @@
         >
           LocalAchievementCounterRepository
         </text>
-        <line x1="384" y1="484" x2="708" y2="484" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="400" y="476" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="400" y="604" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - store: KeyValueStore
         </text>
-        <text x="400" y="500" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="400" y="628" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + load(gameId: GameId):
         </text>
-        <text x="416" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="416" y="640" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Promise&lt;AchievementCounters | undefined&gt;
         </text>
-        <text x="400" y="528" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="400" y="656" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + save(counters: AchievementCounters): Promise&lt;void&gt;
         </text>
-
         <!-- Reference box: AchievementCounterRepository, detailed in view 3.3 (#363) -->
         <rect
-          x="436"
-          y="732"
-          width="220"
+          x="340"
+          y="768"
+          width="196"
           height="40"
           rx="6"
           fill="#ffffff"
@@ -763,8 +818,8 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="546"
-          y="746"
+          x="438"
+          y="782"
           fill="#7d8a94"
           font-size="7"
           font-weight="500"
@@ -775,8 +830,8 @@
           VIEW 3.3
         </text>
         <text
-          x="546"
-          y="762"
+          x="438"
+          y="798"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -785,12 +840,11 @@
         >
           AchievementCounterRepository
         </text>
-
         <!-- Reference box: ProgressRepository, detailed in view 3.3 -->
         <rect
-          x="700"
-          y="732"
-          width="220"
+          x="548"
+          y="768"
+          width="128"
           height="40"
           rx="6"
           fill="#ffffff"
@@ -799,8 +853,8 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="810"
-          y="746"
+          x="612"
+          y="782"
           fill="#7d8a94"
           font-size="7"
           font-weight="500"
@@ -811,8 +865,8 @@
           VIEW 3.3
         </text>
         <text
-          x="810"
-          y="762"
+          x="612"
+          y="798"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -821,30 +875,146 @@
         >
           ProgressRepository
         </text>
+        <!-- Reference box: AnonymousProgress, detailed in view 3.3 (#46) -->
+        <rect
+          x="688"
+          y="768"
+          width="136"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="756"
+          y="782"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          VIEW 3.3
+        </text>
+        <text
+          x="756"
+          y="798"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          AnonymousProgress
+        </text>
+        <!-- Reference box: SessionStore, detailed in view 3.4 (#45, #46) -->
+        <rect
+          x="836"
+          y="768"
+          width="96"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="884"
+          y="782"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          VIEW 3.4
+        </text>
+        <text
+          x="884"
+          y="798"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          SessionStore
+        </text>
+        <!-- Reference box: ProgressGateway, detailed in view 3.3 (#46) -->
+        <rect
+          x="944"
+          y="768"
+          width="120"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="1004"
+          y="782"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          VIEW 3.3
+        </text>
+        <text
+          x="1004"
+          y="798"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          ProgressGateway
+        </text>
         <!-- Footnote: classes the budget leaves out -->
         <text
           x="24"
-          y="820"
+          y="856"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          The other HTTP repositories live in layer 3 too and implement their layer 2 port:
-          ApiLevelRepository, ApiLeaderboardGateway and ApiAccountGateway (decision 22).
+          ApiProgressGateway implements ProgressGateway since #46: it sends POST /v1/progress
+          through ProgressApi, and a 401 throws the SyncFailure of session-expired (decision 66).
         </text>
         <text
           x="24"
-          y="836"
+          y="872"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Each one keeps the transport interface of its resource, such as ProgressApi, and
-          ApiClient, the driver of layer 4, implements each one. The DTO types come from dto.d.ts.
+          The other HTTP adapters live in layer 3 too and implement their layer 2 port:
+          ApiAccountGateway since #45, and ApiLevelRepository and ApiLeaderboardGateway, planned
+          (decision 22).
         </text>
         <text
           x="24"
-          y="852"
+          y="888"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Each one keeps the transport interface of its resource, and ApiClient, the driver of layer
+          4, implements each one. The DTO types come from dto.d.ts.
+        </text>
+        <text
+          x="24"
+          y="904"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -854,27 +1024,39 @@
         </text>
         <text
           x="24"
-          y="868"
+          y="920"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
           A level result goes to the backend as stars, moves and elapsedMs, the field names of
-          GameResult.
+          GameResult. A level result with no time stays local (DS-5).
         </text>
         <text
           x="24"
-          y="884"
+          y="936"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          LocalProgressRepository saves the GameProgress of each game as plain JSON under the key
-          progress:&lt;game id&gt; and reads each value with deliverTo() (decision 57, #164).
+          LocalProgressRepository saves the GameProgress of each game as plain JSON under
+          progress:&lt;user id&gt;:&lt;game id&gt; for the owner, the last signed-in user, and under
+          progress:&lt;game id&gt; for the anonymous owner.
         </text>
         <text
           x="24"
-          y="900"
+          y="952"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          It reads each value with deliverTo() (decision 57, #164). update() runs in one queue per
+          key. As AnonymousProgress it merges progress:&lt;game id&gt; into the owner, then forgets
+          it (decision 66).
+        </text>
+        <text
+          x="24"
+          y="968"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -884,10 +1066,10 @@
           (#363).
         </text>
         <!-- Legend -->
-        <line x1="24" y1="916" x2="1076" y2="916" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <line x1="24" y1="984" x2="1076" y2="984" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="934"
+          y="1002"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -898,9 +1080,9 @@
 
         <line
           x1="24"
-          y1="952"
+          y1="1020"
           x2="52"
-          y2="952"
+          y2="1020"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -908,7 +1090,7 @@
         />
         <text
           x="60"
-          y="956"
+          y="1024"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -917,16 +1099,16 @@
         </text>
         <line
           x1="144"
-          y1="952"
+          y1="1020"
           x2="172"
-          y2="952"
+          y2="1020"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adrepos-open)"
         />
         <text
           x="180"
-          y="956"
+          y="1024"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -936,7 +1118,7 @@
 
         <rect
           x="24"
-          y="972"
+          y="1040"
           width="28"
           height="12"
           rx="2"
@@ -946,7 +1128,7 @@
         />
         <text
           x="60"
-          y="981"
+          y="1049"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -955,7 +1137,7 @@
         </text>
         <rect
           x="184"
-          y="972"
+          y="1040"
           width="28"
           height="12"
           rx="2"
@@ -965,7 +1147,7 @@
         />
         <text
           x="220"
-          y="981"
+          y="1049"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -974,7 +1156,7 @@
         </text>
         <rect
           x="344"
-          y="972"
+          y="1040"
           width="28"
           height="12"
           rx="2"
@@ -984,7 +1166,7 @@
         />
         <text
           x="380"
-          y="981"
+          y="1049"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -993,7 +1175,7 @@
         </text>
         <rect
           x="504"
-          y="972"
+          y="1040"
           width="28"
           height="12"
           rx="2"
@@ -1004,7 +1186,7 @@
         />
         <text
           x="540"
-          y="981"
+          y="1049"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1013,7 +1195,7 @@
         </text>
         <rect
           x="760"
-          y="972"
+          y="1040"
           width="28"
           height="12"
           rx="2"
@@ -1024,7 +1206,7 @@
         />
         <text
           x="796"
-          y="981"
+          y="1049"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1034,7 +1216,7 @@
 
         <rect
           x="24"
-          y="996"
+          y="1064"
           width="28"
           height="12"
           rx="2"
@@ -1044,7 +1226,7 @@
         />
         <text
           x="60"
-          y="1005"
+          y="1073"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1054,7 +1236,7 @@
         <!-- Legend: the «Sprint N» marker of a planned class or member -->
         <text
           x="24"
-          y="1025"
+          y="1093"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1063,7 +1245,7 @@
         </text>
         <text
           x="92"
-          y="1025"
+          y="1093"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

@@ -53,6 +53,8 @@ export const en = {
   'result.back': 'Back to the map',
   'result.error.save': 'The result could not be saved.',
   'result.error': 'The game could not close. Go back to the map.',
+  'result.session-expired': 'Your session expired. Sign in to keep your progress on the server.',
+  'result.sign-in': 'Sign in',
   'play.fit.moves': 'Moves',
   'play.fit.tray': 'Piece tray',
   'play.fit.piece': 'Piece',
@@ -123,6 +125,7 @@ export const en = {
     'The server does not answer. Check the connection and try again.',
   'account.error.sign-in-after-sign-up-failed':
     'Your account was created, but the sign-in did not finish. Sign in.',
+  'account.error.session-expired': 'Your session expired. Sign in again.',
   'account.error': 'That did not work. Try again.',
   'achievement.lines-combo': 'Clear 3 lines at once',
   'achievement.merge-256': 'Reach 256 in Hexa Merge',

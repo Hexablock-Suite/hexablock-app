@@ -38,6 +38,7 @@ import { startVariant } from '../support/engine/variant-game';
 import { linesFactory } from '../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../support/variants/hexa-merge/merge-game';
 import { viewData } from '../support/variants/view-data';
+import { ProgressOwner } from '../../src/application/progress-owner';
 
 // Issue #172 (S3-13 in #151, option D): `StartGameRequest` names the level, and `StartGame`
 // asks its `GameFactories` port for the factory of that level. The composition root builds
@@ -64,6 +65,7 @@ const sortFactoryOf = (file: typeof sort01 | typeof sort02) =>
     geometry,
     LevelDefinition.of(file).buildWith(new SortLevelBuilder(geometry)),
     seededRandom(1),
+    new ManualClock(),
   );
 
 // A progress repository that keeps a won result of each level of `won` for the game `gameId`.
@@ -81,8 +83,9 @@ function progressWith(gameId: GameId, ...won: string[]): ProgressRepository {
     );
   }
   return {
+    owner: async () => ProgressOwner.anonymous,
     load: async () => (won.length === 0 ? undefined : progress),
-    save: async () => undefined,
+    update: async () => undefined,
   };
 }
 
@@ -120,7 +123,11 @@ function startGameOf<
 const fitGame = (progress = progressWith(FIT, 'fit-01', 'fit-02')) =>
   startGameOf(FIT, fitFactoryOf(fit01), fitLevelVariant(geometry, clock), progress);
 const sortGame = () =>
-  startGameOf(SORT, sortFactoryOf(sort02), sortLevelVariant(geometry, seededRandom(1)));
+  startGameOf(
+    SORT,
+    sortFactoryOf(sort02),
+    sortLevelVariant(geometry, seededRandom(1), new ManualClock()),
+  );
 
 // The cells, the free spaces and the view data of a new game of `factory`.
 function startOf<
@@ -308,7 +315,8 @@ describe('StartGame with a locked level', () => {
       load: async () => {
         throw new Error('The progress cannot be read.');
       },
-      save: async () => undefined,
+      owner: async () => ProgressOwner.anonymous,
+      update: async () => undefined,
     };
     const { games, startGame } = fitGame(broken);
 
@@ -322,7 +330,11 @@ describe('StartGame with a locked level', () => {
   // of a game with levels start as before.
   it('should_read_no_progress_when_the_request_names_no_level', async () => {
     const load = jest.fn(async () => undefined);
-    const { startGame } = fitGame({ load, save: async () => undefined });
+    const { startGame } = fitGame({
+      owner: async () => ProgressOwner.anonymous,
+      load,
+      update: async () => undefined,
+    });
 
     const started = valueOf(await startGame.execute({}));
 

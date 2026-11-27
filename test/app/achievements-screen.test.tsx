@@ -15,6 +15,7 @@ import { Stars } from '../../src/domain/progress/stars';
 import { DeviceKeyValueStore } from '../../src/infrastructure/device-key-value-store';
 import { delivered } from '../support/engine/value-receiver';
 import { repoRoot } from '../support/run-tool';
+import { saveIn } from '../support/adapters/saved-progress';
 
 // The routes of `app/`, with the root layout and its composition root.
 const appDir = path.join(repoRoot, 'app');
@@ -47,7 +48,7 @@ async function saveEveryWonFitLevel(): Promise<void> {
       }),
     );
   }
-  await new LocalProgressRepository(new DeviceKeyValueStore()).save(progress);
+  await saveIn(new LocalProgressRepository(new DeviceKeyValueStore()), progress);
 }
 
 // The names in the section of the screen whose test id is `section`, in the order of the screen.

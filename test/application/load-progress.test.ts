@@ -8,6 +8,8 @@ import { GameProgress } from '../../src/domain/progress/game-progress';
 import { ProgressRecord } from '../../src/domain/progress/progress-model';
 import { Score } from '../../src/domain/shared/score';
 import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-store';
+import { saveIn } from '../support/adapters/saved-progress';
+import { ProgressOwner } from '../../src/application/progress-owner';
 
 // `LoadProgress` reads the saved progress of one game (S3-16 in #151, issue #181, APP-FR-04).
 // The tests run the real `LocalProgressRepository` over the in-memory `KeyValueStore`, and
@@ -25,7 +27,7 @@ describe('LoadProgress', () => {
     const repository = new LocalProgressRepository(new InMemoryKeyValueStore());
     const progress = GameProgress.start(LINES);
     progress.recordScore(highScoreOf(36));
-    await repository.save(progress);
+    await saveIn(repository, progress);
 
     const result = await new LoadProgress(repository).execute({ gameId: LINES });
 
@@ -47,7 +49,7 @@ describe('LoadProgress', () => {
     const repository = new LocalProgressRepository(new InMemoryKeyValueStore());
     const progress = GameProgress.start(LINES);
     progress.recordScore(highScoreOf(36));
-    await repository.save(progress);
+    await saveIn(repository, progress);
     const useCase = new LoadProgress(repository);
 
     const lines = await useCase.execute({ gameId: LINES });
@@ -60,7 +62,8 @@ describe('LoadProgress', () => {
   it('should_fail_with_load_failed_when_the_progress_repository_throws', async () => {
     const broken: ProgressRepository = {
       load: () => Promise.reject(new Error('The store is gone.')),
-      save: () => Promise.resolve(),
+      owner: () => Promise.resolve(ProgressOwner.anonymous),
+      update: () => Promise.resolve(),
     };
 
     const result = await new LoadProgress(broken).execute({ gameId: LINES });

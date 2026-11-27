@@ -27,6 +27,8 @@ import { MATCH_ID } from '../../engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../engine/entity-ids';
 import { boardLike } from '../../engine/variant-game';
 import { seededRandom } from '../../engine/step-random';
+import { ManualClock } from '../../engine/manual-clock';
+import type { Clock } from '../../../../src/domain/engine/clock';
 
 // Hexa Sort test helpers. The board uses the square topology double (D4), so the tests
 // prove that the Sort rules ask the topology for the neighbors and assume no hexagon.
@@ -138,14 +140,17 @@ export function chipsAt(game: SortGame, col: number, row = 0): string[] {
 
 // A Sort factory on a 2 × 2 square board. The level offers `offered` from a fixed list.
 // The helper wraps `goalsNeeded` in a `GoalCount`, so 0 throws.
+// `clock` times each level (issue #46). A test that reads the time passes its own clock.
 export function sortFactory(
   offered: readonly ColorStack[] = [stack('red'), stack('blue')],
   goalsNeeded = 5,
+  clock: Clock = new ManualClock(),
 ): SortFactory<SquareCoord> {
   return new SortFactory(
     new SquareGeometry(),
     SortLevel.fixed(RegionSize.of(2), GoalCount.of(goalsNeeded), offered),
     seededRandom(1),
+    clock,
   );
 }
 

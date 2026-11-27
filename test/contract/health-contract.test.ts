@@ -6,6 +6,7 @@ import { MatchersV3, PactV4 } from '@pact-foundation/pact';
 import type { AccountApi } from '../../src/adapters/api/account-api';
 import { ApiFailure } from '../../src/adapters/api/api-failure';
 import type { HealthApi } from '../../src/adapters/api/health-api';
+import type { ProgressApi } from '../../src/adapters/api/progress-api';
 import { createApiClient } from '../../src/infrastructure/api/client';
 import { startFakeBackend, type FakeBackend, type FakeRoutes } from '../support/fake-backend';
 import { repoRoot, runNodeScript } from '../support/run-tool';
@@ -30,6 +31,16 @@ const JSON_HEADERS = { 'Content-Type': 'application/json' };
 // token that the provider state `a signed-in account exists` gives.
 const EXAMPLE_TOKEN = 'a-token';
 const EXAMPLE_USER = '00000000-0000-4000-8000-000000000001';
+// #46: the sync of one result of a stored level. The provider state `a level is stored` stores the
+// example level of the level format, which has three star thresholds.
+const SYNCED_LEVEL = { gameId: 'hexa-fit', levelId: 'fit-01' };
+const SYNC_BODY = {
+  gameId: 'hexa-fit',
+  results: [{ levelId: 'fit-01', stars: 3, moves: 10, elapsedMs: 45000 }],
+};
+const EXAMPLE_UPDATED_AT = '2026-11-27T10:00:00.000Z';
+// A token that the backend refuses: it is not a signed token of the API.
+const REFUSED_TOKEN = 'a-refused-token';
 
 // The interactions of the pact, in the order of the consumer tests below.
 const DESCRIPTIONS = [
@@ -40,6 +51,8 @@ const DESCRIPTIONS = [
   'a sign-in',
   'a sign-in with a wrong password',
   'the signed-in user',
+  'a progress sync',
+  'a progress sync with a refused token',
 ];
 
 // The `ApiFailure` that `call` rejects with. A call that resolves fails the test.
@@ -199,6 +212,73 @@ describe('client contract', () => {
 
           await expect(api.currentUser(EXAMPLE_TOKEN)).resolves.toEqual({ userId: EXAMPLE_USER });
         });
+    });
+
+    // #46 (APP-FR-13): the app sends the local progress of one game with the token of the session,
+    // and the backend answers with the progress entry of the user and the game after the sync.
+    it('should_send_the_token_and_the_progress_and_give_the_entry_when_the_app_syncs_the_progress', async () => {
+      await pact
+        .addInteraction()
+        .given('a signed-in account exists', { username: ADA.username })
+        .given('a level is stored', SYNCED_LEVEL)
+        .uponReceiving('a progress sync')
+        .withRequest('POST', '/v1/progress', (builder) =>
+          builder
+            .headers({
+              ...JSON_HEADERS,
+              Authorization: MatchersV3.fromProviderState(
+                'Bearer ${accessToken}',
+                `Bearer ${EXAMPLE_TOKEN}`,
+              ),
+            })
+            .jsonBody(SYNC_BODY),
+        )
+        .willRespondWith(200, (builder) =>
+          builder.jsonBody({
+            gameId: 'hexa-fit',
+            highScore: null,
+            updatedAt: MatchersV3.regex(
+              '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$',
+              EXAMPLE_UPDATED_AT,
+            ),
+            results: MatchersV3.eachLike({
+              levelId: MatchersV3.string('fit-01'),
+              stars: MatchersV3.integer(3),
+              moves: MatchersV3.integer(10),
+              elapsedMs: MatchersV3.integer(45000),
+            }),
+          }),
+        )
+        .executeTest(async (mockServer) => {
+          const api: ProgressApi = createApiClient(mockServer.url);
+
+          await expect(api.syncProgress(EXAMPLE_TOKEN, SYNC_BODY)).resolves.toEqual({
+            ...SYNC_BODY,
+            highScore: null,
+            updatedAt: EXAMPLE_UPDATED_AT,
+          });
+        });
+    });
+
+    // The token lives 24 hours and has no refresh. The gateway maps this 401 to `session-expired`.
+    it('should_reject_with_the_status_401_when_the_backend_refuses_the_token_of_the_sync', async () => {
+      await pact
+        .addInteraction()
+        .uponReceiving('a progress sync with a refused token')
+        .withRequest('POST', '/v1/progress', (builder) =>
+          builder
+            .headers({ ...JSON_HEADERS, Authorization: `Bearer ${REFUSED_TOKEN}` })
+            .jsonBody(SYNC_BODY),
+        )
+        .willRespondWith(401)
+        .executeTest(async (mockServer) => {
+          const api: ProgressApi = createApiClient(mockServer.url);
+
+          const failure = await failureOf(api.syncProgress(REFUSED_TOKEN, SYNC_BODY));
+
+          expect(failure.status).toBe(401);
+          expect(failure.message).not.toContain(REFUSED_TOKEN);
+        });
 
       const written = JSON.parse(readFileSync(pactFile, 'utf8'));
       expect(
@@ -218,8 +298,9 @@ describe('client contract', () => {
     });
 
     // A fake provider that honors every interaction of the pact (hexablock-api #151).
-    // It keeps the provider state that the verifier set up before the current interaction,
-    // and it gives the token of the state `a signed-in account exists`.
+    // It keeps the provider state that the verifier set up last before the current interaction,
+    // and it gives the token of the state `a signed-in account exists`. An interaction of #46 sets up
+    // two states, and the sync answers only the token of the state.
     function fakeProvider(health: unknown = { status: 'ok' }): FakeRoutes {
       let state = '';
       return {
@@ -244,6 +325,17 @@ describe('client contract', () => {
         '/v1/auth/me': (request) =>
           request.headers.authorization === `Bearer ${STATE_TOKEN}`
             ? { status: 200, body: { userId: EXAMPLE_USER } }
+            : { status: 401, body: { statusCode: 401 } },
+        '/v1/progress': (request) =>
+          request.headers.authorization === `Bearer ${STATE_TOKEN}`
+            ? {
+                status: 200,
+                body: {
+                  ...(JSON.parse(request.body) as object),
+                  highScore: null,
+                  updatedAt: EXAMPLE_UPDATED_AT,
+                },
+              }
             : { status: 401, body: { statusCode: 401 } },
       };
     }
@@ -274,12 +366,21 @@ describe('client contract', () => {
         .map(({ state }) => state)
         .filter((state) => state !== undefined && state !== '');
       const me = requests.find(({ url }) => url === '/v1/auth/me');
+      const syncs = requests.filter(({ url }) => url === '/v1/progress');
 
       expect(result.status).toBe(0);
       expect(new Set(setUp)).toEqual(
-        new Set(['no account exists', 'an account exists', 'a signed-in account exists']),
+        new Set([
+          'no account exists',
+          'an account exists',
+          'a signed-in account exists',
+          'a level is stored',
+        ]),
       );
       expect(me?.headers.authorization).toBe(`Bearer ${STATE_TOKEN}`);
+      expect(new Set(syncs.map(({ headers }) => headers.authorization))).toEqual(
+        new Set([`Bearer ${STATE_TOKEN}`, `Bearer ${REFUSED_TOKEN}`]),
+      );
     });
 
     it('should_fail_contract_verify_when_backend_breaks_the_health_body', async () => {

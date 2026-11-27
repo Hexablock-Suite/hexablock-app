@@ -63,7 +63,7 @@
       <p class="eyebrow">Use case flow · Login · class view</p>
       <h1>Login across the layers: the classes of one sign-in</h1>
       <svg
-        viewBox="0 0 1100 1250"
+        viewBox="0 0 1100 1266"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="flowlogin-title flowlogin-desc"
@@ -77,8 +77,10 @@
           input port; ApiAccountGateway keeps ApiDtoMapper and AccountApi and implements the
           AccountGateway port of layer 2; SessionManager keeps SecretStore and implements the
           SessionStore port of layer 2. In layer 2, Login implements UseCase, takes Credentials and
-          keeps the AccountGateway and SessionStore ports; AccountGateway returns a Session. Login
-          touches no entity of layer 1. Every dependency between layers points down.
+          keeps the AccountGateway and SessionStore ports and an optional AnonymousMerge;
+          AccountGateway returns a Session. SessionStore also gives owner(), the user of the last
+          sign-in, and clear() forgets the token and keeps that owner (#46). Login touches no entity
+          of layer 1. Every dependency between layers points down.
         </desc>
         <defs>
           <marker
@@ -207,7 +209,7 @@
         />
         <!-- DeviceSecretStore implements SecretStore: realization, down from layer 4 to layer 3 (#45) -->
         <path
-          d="M320 152 V232"
+          d="M320 168 V232"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -216,7 +218,7 @@
         />
         <!-- SessionManager keeps the SecretStore it receives as secrets: use with role and multiplicity, inside layer 3 -->
         <path
-          d="M180 380 V320"
+          d="M180 380 V336"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -224,7 +226,7 @@
         />
         <!-- SessionManager implements SessionStore: realization, down from layer 3 to layer 2 (decision 18) -->
         <path
-          d="M300 492 V736"
+          d="M300 524 V736"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -275,7 +277,7 @@
         />
         <!-- Login takes Credentials: use -->
         <path
-          d="M500 876 V916"
+          d="M500 892 V916"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -290,10 +292,10 @@
           marker-end="url(#flowlogin-open)"
         />
         <!-- Arrow labels -->
-        <rect x="502" y="891" width="34.4" height="12" rx="2" fill="#efe7f8" />
+        <rect x="502" y="897" width="34.4" height="12" rx="2" fill="#efe7f8" />
         <text
           x="506"
-          y="900"
+          y="906"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -404,7 +406,7 @@
           x="40"
           y="56"
           width="300"
-          height="96"
+          height="112"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -449,12 +451,15 @@
         <text x="56" y="144" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + set(key: string, value: string): Promise&lt;void&gt;
         </text>
+        <text x="56" y="160" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + remove(key: string): Promise&lt;void&gt;
+        </text>
         <!-- Class: SecretStore (driver interface of layer 3, #45) -->
         <rect
           x="40"
           y="232"
           width="300"
-          height="88"
+          height="104"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -489,12 +494,15 @@
         <text x="56" y="312" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + set(key: string, value: string): Promise&lt;void&gt;
         </text>
+        <text x="56" y="328" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + remove(key: string): Promise&lt;void&gt;
+        </text>
         <!-- Class: SessionManager (adapter of SessionStore, single scope, decision 18) -->
         <rect
           x="40"
           y="380"
           width="280"
-          height="112"
+          height="144"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -520,7 +528,13 @@
           + read(): Promise&lt;Session | undefined&gt;
         </text>
         <text x="56" y="484" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + owner(): Promise&lt;string | undefined&gt;
+        </text>
+        <text x="56" y="500" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + write(session: Session): Promise&lt;void&gt;
+        </text>
+        <text x="56" y="516" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + clear(): Promise&lt;void&gt;
         </text>
         <!-- Class: ApiDtoMapper (DTO mapper) -->
         <rect
@@ -824,7 +838,7 @@
           x="40"
           y="736"
           width="280"
-          height="104"
+          height="120"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -857,17 +871,20 @@
           + read(): Promise&lt;Session | undefined&gt;
         </text>
         <text x="56" y="816" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + owner(): Promise&lt;string | undefined&gt;
+        </text>
+        <text x="56" y="832" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + write(session: Session): Promise&lt;void&gt;
         </text>
-        <text x="56" y="832" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          no clear() yet: decision 65
+        <text x="56" y="848" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + clear(): Promise&lt;void&gt;
         </text>
         <!-- Class: Login (focal, use case) -->
         <rect
           x="380"
           y="736"
           width="240"
-          height="140"
+          height="156"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -909,17 +926,20 @@
           APP-FR-12
         </text>
         <line x1="380" y1="796" x2="620" y2="796" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
-        <line x1="380" y1="836" x2="620" y2="836" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <line x1="380" y1="852" x2="620" y2="852" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text x="396" y="812" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - accounts: AccountGateway
         </text>
         <text x="396" y="828" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - session: SessionStore
         </text>
-        <text x="396" y="852" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="396" y="844" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - merge: AnonymousMerge [0..1]
+        </text>
+        <text x="396" y="868" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + execute(request: Credentials):
         </text>
-        <text x="412" y="868" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="412" y="884" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Promise&lt;Result&lt;Session&gt;&gt;
         </text>
         <!-- Class: AccountGateway (interface, output port) -->
@@ -1117,20 +1137,31 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          AccountScreen is a React component of layer 4, not a class.
+          AccountScreen is a React component of layer 4, not a class. Since #46 the signed-in user
+          becomes the owner of the local progress (decision 66).
+        </text>
+        <text
+          x="24"
+          y="1146"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          With merge, an AnonymousMerge, Login then merges the progress played with no account into
+          that user through the AnonymousProgress port of view 3.3.
         </text>
         <!-- Legend -->
         <line
           x1="24"
-          y1="1154"
+          y1="1170"
           x2="1076"
-          y2="1154"
+          y2="1170"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1172"
+          y="1188"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1140,9 +1171,9 @@
         </text>
         <line
           x1="24"
-          y1="1190"
+          y1="1206"
           x2="52"
-          y2="1190"
+          y2="1206"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -1150,7 +1181,7 @@
         />
         <text
           x="60"
-          y="1193"
+          y="1209"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1159,16 +1190,16 @@
         </text>
         <line
           x1="155.7"
-          y1="1190"
+          y1="1206"
           x2="183.7"
-          y2="1190"
+          y2="1206"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#flowlogin-open)"
         />
         <text
           x="191.7"
-          y="1193"
+          y="1209"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1177,7 +1208,7 @@
         </text>
         <rect
           x="461.3"
-          y="1184"
+          y="1200"
           width="28"
           height="12"
           rx="2"
@@ -1188,7 +1219,7 @@
         />
         <text
           x="497.3"
-          y="1193"
+          y="1209"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1197,7 +1228,7 @@
         </text>
         <rect
           x="743.4000000000001"
-          y="1184"
+          y="1200"
           width="28"
           height="12"
           rx="2"
@@ -1207,7 +1238,7 @@
         />
         <text
           x="779.4"
-          y="1193"
+          y="1209"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1216,7 +1247,7 @@
         </text>
         <rect
           x="24"
-          y="1206"
+          y="1222"
           width="28"
           height="12"
           rx="2"
@@ -1226,7 +1257,7 @@
         />
         <text
           x="60"
-          y="1215"
+          y="1231"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1235,7 +1266,7 @@
         </text>
         <rect
           x="169.8"
-          y="1206"
+          y="1222"
           width="28"
           height="12"
           rx="2"
@@ -1245,7 +1276,7 @@
         />
         <text
           x="205.8"
-          y="1215"
+          y="1231"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1254,7 +1285,7 @@
         </text>
         <rect
           x="315.6"
-          y="1206"
+          y="1222"
           width="28"
           height="12"
           rx="2"
@@ -1264,7 +1295,7 @@
         />
         <text
           x="351.6"
-          y="1215"
+          y="1231"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1273,7 +1304,7 @@
         </text>
         <rect
           x="461.40000000000003"
-          y="1206"
+          y="1222"
           width="28"
           height="12"
           rx="2"
@@ -1284,7 +1315,7 @@
         />
         <text
           x="497.4"
-          y="1215"
+          y="1231"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1294,7 +1325,7 @@
         <!-- Legend: the «Sprint N» marker of a planned class or member -->
         <text
           x="24"
-          y="1235"
+          y="1251"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1303,7 +1334,7 @@
         </text>
         <text
           x="92"
-          y="1235"
+          y="1251"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

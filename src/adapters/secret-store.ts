@@ -9,4 +9,6 @@ export interface SecretStore {
   get(key: string): Promise<string | undefined>;
   // Keeps the value under the key. It replaces the value that the key held before.
   set(key: string, value: string): Promise<void>;
+  // Forgets the value of the key. A key with no value changes nothing (issue #46).
+  remove(key: string): Promise<void>;
 }

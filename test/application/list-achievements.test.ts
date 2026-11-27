@@ -24,6 +24,8 @@ import { Score } from '../../src/domain/shared/score';
 import { Stars } from '../../src/domain/progress/stars';
 import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-store';
 import { delivered } from '../support/engine/value-receiver';
+import { saveIn } from '../support/adapters/saved-progress';
+import { ProgressOwner } from '../../src/application/progress-owner';
 
 // `ListAchievements` gives each achievement of its list with its status: completed or in
 // progress (issue #188). The level achievements read the saved progress of a game and the levels
@@ -60,7 +62,7 @@ async function progressWith(
       }),
     );
   }
-  await repository.save(progress);
+  await saveIn(repository, progress);
   return repository;
 }
 
@@ -223,7 +225,8 @@ describe('ListAchievements', () => {
   it('should_fail_with_list_failed_when_the_progress_repository_throws', async () => {
     const broken: ProgressRepository = {
       load: () => Promise.reject(new Error('The store is gone.')),
-      save: () => Promise.resolve(),
+      owner: () => Promise.resolve(ProgressOwner.anonymous),
+      update: () => Promise.resolve(),
     };
 
     const result = await listOf(

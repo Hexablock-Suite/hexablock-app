@@ -64,7 +64,7 @@
       <h1>Achievements: the screen, its presenter and ListAchievements</h1>
 
       <svg
-        viewBox="0 0 1040 1860"
+        viewBox="0 0 1040 1892"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="ucach-title ucach-desc"
@@ -82,8 +82,9 @@
           TotalCountReached implement. Each goal has a private constructor and a static of(), and
           isReachedBy() takes three required parameters (#406). AchievementCounterRepository loads
           AchievementCounters of layer 1, and AchievementGoal reads them (#364). ProgressRepository
-          loads GameProgress of layer 1. The goals count the levels that LevelStatus.ofEach() of
-          layer 1 gives as completed, and LevelStatus reads GameProgress (#326).
+          gives the owner of the progress with owner() and loads GameProgress of layer 1 for that
+          owner (#46). The goals count the levels that LevelStatus.ofEach() of layer 1 gives as
+          completed, and LevelStatus reads GameProgress (#326).
         </desc>
         <defs>
           <marker
@@ -159,7 +160,7 @@
           x="24"
           y="460"
           width="992"
-          height="552"
+          height="584"
           rx="8"
           fill="#efe7f8"
           stroke="rgba(126,34,206,0.40)"
@@ -179,7 +180,7 @@
         <!-- Layer zone: layer 1, entities -->
         <rect
           x="24"
-          y="1028"
+          y="1060"
           width="992"
           height="548"
           rx="8"
@@ -189,7 +190,7 @@
         />
         <text
           x="40"
-          y="1048"
+          y="1080"
           fill="#b45309"
           font-size="8"
           font-weight="500"
@@ -250,7 +251,7 @@
         />
         <!-- Achievement keeps its AchievementGoal as goal: use with role and multiplicity, down from layer 2 to layer 1 (#326) -->
         <path
-          d="M640 756 H680 Q688 756 688 764 V1064"
+          d="M640 756 H680 Q688 756 688 764 V1096"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -258,7 +259,7 @@
         />
         <!-- LevelsWon implements AchievementGoal: realization -->
         <path
-          d="M680 1216 V1184"
+          d="M680 1248 V1216"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -267,7 +268,7 @@
         />
         <!-- EveryLevelWon implements AchievementGoal: realization -->
         <path
-          d="M896 1216 V1184"
+          d="M896 1248 V1216"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -292,7 +293,7 @@
         />
         <!-- LevelsWon counts the levels that LevelStatus.ofEach() gives as completed: use (#326) -->
         <path
-          d="M544 1276 H512"
+          d="M544 1308 H512"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -300,7 +301,7 @@
         />
         <!-- LevelStatus.ofEach() reads the GameProgress it receives as progress: use with role and multiplicity -->
         <path
-          d="M272 1136 V1104"
+          d="M272 1168 V1136"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -308,7 +309,7 @@
         />
         <!-- ProgressRepository loads the GameProgress of one game: use, down from layer 2 to layer 1 -->
         <path
-          d="M256 996 V1064"
+          d="M256 1028 V1096"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -324,7 +325,7 @@
         />
         <!-- AchievementCounterRepository loads the AchievementCounters of one game: use, down from layer 2 to layer 1 (#363) -->
         <path
-          d="M480 916 V1064"
+          d="M480 916 V1096"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -332,7 +333,7 @@
         />
         <!-- AchievementGoal.isReachedBy() reads the AchievementCounters it receives: use (#364) -->
         <path
-          d="M584 1088 H552"
+          d="M584 1120 H552"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -340,21 +341,21 @@
         />
         <!-- BestCountReached and TotalCountReached implement AchievementGoal: realization, one shared head (#364) -->
         <path
-          d="M660 1384 V1376 H788"
+          d="M660 1416 V1408 H788"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
         />
         <path
-          d="M896 1384 V1376 H788"
+          d="M896 1416 V1408 H788"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
         />
         <path
-          d="M788 1376 V1184"
+          d="M788 1408 V1216"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -458,10 +459,10 @@
           goal
           <tspan font-weight="600">0..1</tspan>
         </text>
-        <rect x="276" y="1114" width="70" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="276" y="1146" width="70" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="278"
-          y="1123"
+          y="1155"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -910,18 +911,17 @@
         <text x="80" y="892" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + list(gameId: GameId): Promise‹LevelDefinition[]›
         </text>
-        <!-- Class: ProgressRepository (interface, port) -->
+        <!-- Class: ProgressRepository (interface, port: the members that ListAchievements calls; the owner is explicit since #46, decision 66) -->
         <rect
           x="64"
           y="924"
           width="352"
-          height="72"
+          height="104"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="64" y1="972" x2="416" y2="972" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="240"
           y="942"
@@ -944,13 +944,20 @@
         >
           ProgressRepository
         </text>
+        <line x1="64" y1="972" x2="416" y2="972" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="80" y="988" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + load(gameId: GameId): Promise‹GameProgress | undefined›
+          + owner(): Promise‹ProgressOwner›
+        </text>
+        <text x="80" y="1004" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + load(owner: ProgressOwner, gameId: GameId):
+        </text>
+        <text x="96" y="1020" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Promise‹GameProgress | undefined›
         </text>
         <!-- Reference box: GameProgress, detailed in part 3 · view 3.3 -->
         <rect
           x="176"
-          y="1064"
+          y="1096"
           width="160"
           height="40"
           rx="6"
@@ -961,7 +968,7 @@
         />
         <text
           x="256"
-          y="1078"
+          y="1110"
           fill="#7d8a94"
           font-size="7"
           font-weight="500"
@@ -973,7 +980,7 @@
         </text>
         <text
           x="256"
-          y="1094"
+          y="1126"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -985,7 +992,7 @@
         <!-- Class: AchievementGoal (interface of the Strategy in layer 1 since #326: only «interface», the footnote names the pattern, decision 23) -->
         <rect
           x="584"
-          y="1064"
+          y="1096"
           width="408"
           height="120"
           rx="6"
@@ -993,10 +1000,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="584" y1="1112" x2="992" y2="1112" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="584" y1="1144" x2="992" y2="1144" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="788"
-          y="1082"
+          y="1114"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1007,7 +1014,7 @@
         </text>
         <text
           x="788"
-          y="1100"
+          y="1132"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1018,7 +1025,7 @@
         </text>
         <text
           x="600"
-          y="1128"
+          y="1160"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1027,7 +1034,7 @@
         </text>
         <text
           x="600"
-          y="1144"
+          y="1176"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1036,7 +1043,7 @@
         </text>
         <text
           x="616"
-          y="1160"
+          y="1192"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1045,7 +1052,7 @@
         </text>
         <text
           x="616"
-          y="1176"
+          y="1208"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1055,7 +1062,7 @@
         <!-- Class: LevelsWon (a piece of the Strategy pattern: the footnote names it, decision 23; a count of won levels of one game) -->
         <rect
           x="544"
-          y="1216"
+          y="1248"
           width="232"
           height="152"
           rx="6"
@@ -1063,11 +1070,11 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="544" y1="1256" x2="776" y2="1256" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="544" y1="1296" x2="776" y2="1296" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="544" y1="1288" x2="776" y2="1288" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="544" y1="1328" x2="776" y2="1328" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="660"
-          y="1241"
+          y="1273"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1078,7 +1085,7 @@
         </text>
         <text
           x="560"
-          y="1272"
+          y="1304"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1087,7 +1094,7 @@
         </text>
         <text
           x="560"
-          y="1288"
+          y="1320"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1096,7 +1103,7 @@
         </text>
         <text
           x="560"
-          y="1312"
+          y="1344"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1106,7 +1113,7 @@
         </text>
         <text
           x="576"
-          y="1328"
+          y="1360"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1116,7 +1123,7 @@
         </text>
         <text
           x="576"
-          y="1344"
+          y="1376"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1126,7 +1133,7 @@
         </text>
         <text
           x="560"
-          y="1360"
+          y="1392"
           fill="#5b6873"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1136,7 +1143,7 @@
         <!-- Class: EveryLevelWon (a piece of the Strategy pattern: the footnote names it, decision 23; every level of one game) -->
         <rect
           x="800"
-          y="1216"
+          y="1248"
           width="192"
           height="136"
           rx="6"
@@ -1144,11 +1151,11 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="800" y1="1256" x2="992" y2="1256" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="800" y1="1280" x2="992" y2="1280" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="800" y1="1288" x2="992" y2="1288" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="800" y1="1312" x2="992" y2="1312" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="896"
-          y="1241"
+          y="1273"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1159,7 +1166,7 @@
         </text>
         <text
           x="816"
-          y="1272"
+          y="1304"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1168,7 +1175,7 @@
         </text>
         <text
           x="816"
-          y="1296"
+          y="1328"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1178,7 +1185,7 @@
         </text>
         <text
           x="832"
-          y="1312"
+          y="1344"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1188,7 +1195,7 @@
         </text>
         <text
           x="816"
-          y="1328"
+          y="1360"
           fill="#5b6873"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1197,7 +1204,7 @@
         </text>
         <text
           x="832"
-          y="1344"
+          y="1376"
           fill="#5b6873"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1207,7 +1214,7 @@
         <!-- Class: LevelStatus (value object of layer 1, view 3.3: ofEach() holds the rule of a won, open and locked level, #326) -->
         <rect
           x="64"
-          y="1136"
+          y="1168"
           width="448"
           height="160"
           rx="6"
@@ -1215,11 +1222,11 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="64" y1="1184" x2="512" y2="1184" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="64" y1="1224" x2="512" y2="1224" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="64" y1="1216" x2="512" y2="1216" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="64" y1="1256" x2="512" y2="1256" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="288"
-          y="1154"
+          y="1186"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1230,7 +1237,7 @@
         </text>
         <text
           x="288"
-          y="1172"
+          y="1204"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1239,12 +1246,12 @@
         >
           LevelStatus
         </text>
-        <text x="80" y="1200" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="1232" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - name: string
         </text>
         <text
           x="80"
-          y="1216"
+          y="1248"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1254,7 +1261,7 @@
         </text>
         <text
           x="80"
-          y="1240"
+          y="1272"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1264,7 +1271,7 @@
         </text>
         <text
           x="96"
-          y="1256"
+          y="1288"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1274,7 +1281,7 @@
         </text>
         <text
           x="96"
-          y="1272"
+          y="1304"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1282,7 +1289,7 @@
         >
           [LevelDefinition, LevelStatus][*]
         </text>
-        <text x="80" y="1288" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="1320" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: LevelStatus): boolean
         </text>
         <!-- Class: AchievementCounterRepository (interface, port, #363; ListAchievements loads the counters through it since #364) -->
@@ -1328,7 +1335,7 @@
         <!-- Reference box: AchievementCounters, detailed in part 3 · view 3.3 (#363) -->
         <rect
           x="400"
-          y="1064"
+          y="1096"
           width="152"
           height="40"
           rx="6"
@@ -1339,7 +1346,7 @@
         />
         <text
           x="476"
-          y="1078"
+          y="1110"
           fill="#7d8a94"
           font-size="7"
           font-weight="500"
@@ -1351,7 +1358,7 @@
         </text>
         <text
           x="476"
-          y="1094"
+          y="1126"
           fill="#17212a"
           font-size="11"
           font-weight="600"
@@ -1363,7 +1370,7 @@
         <!-- Class: BestCountReached (a piece of the Strategy pattern: the footnote names it, decision 23; a best count of one game, #364) -->
         <rect
           x="544"
-          y="1384"
+          y="1416"
           width="232"
           height="152"
           rx="6"
@@ -1371,11 +1378,11 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="544" y1="1424" x2="776" y2="1424" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="544" y1="1464" x2="776" y2="1464" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="544" y1="1456" x2="776" y2="1456" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="544" y1="1496" x2="776" y2="1496" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="660"
-          y="1409"
+          y="1441"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1386,7 +1393,7 @@
         </text>
         <text
           x="560"
-          y="1440"
+          y="1472"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1395,7 +1402,7 @@
         </text>
         <text
           x="560"
-          y="1456"
+          y="1488"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1404,7 +1411,7 @@
         </text>
         <text
           x="560"
-          y="1480"
+          y="1512"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1414,7 +1421,7 @@
         </text>
         <text
           x="576"
-          y="1496"
+          y="1528"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1424,7 +1431,7 @@
         </text>
         <text
           x="576"
-          y="1512"
+          y="1544"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1434,7 +1441,7 @@
         </text>
         <text
           x="560"
-          y="1528"
+          y="1560"
           fill="#5b6873"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1444,7 +1451,7 @@
         <!-- Class: TotalCountReached (a piece of the Strategy pattern: the footnote names it, decision 23; a total of one game, #364) -->
         <rect
           x="800"
-          y="1384"
+          y="1416"
           width="192"
           height="168"
           rx="6"
@@ -1452,11 +1459,11 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="800" y1="1424" x2="992" y2="1424" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="800" y1="1464" x2="992" y2="1464" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="800" y1="1456" x2="992" y2="1456" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="800" y1="1496" x2="992" y2="1496" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="896"
-          y="1409"
+          y="1441"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1467,7 +1474,7 @@
         </text>
         <text
           x="816"
-          y="1440"
+          y="1472"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1476,7 +1483,7 @@
         </text>
         <text
           x="816"
-          y="1456"
+          y="1488"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1485,7 +1492,7 @@
         </text>
         <text
           x="816"
-          y="1480"
+          y="1512"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1495,7 +1502,7 @@
         </text>
         <text
           x="832"
-          y="1496"
+          y="1528"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1505,7 +1512,7 @@
         </text>
         <text
           x="832"
-          y="1512"
+          y="1544"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1515,7 +1522,7 @@
         </text>
         <text
           x="816"
-          y="1528"
+          y="1560"
           fill="#5b6873"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1524,7 +1531,7 @@
         </text>
         <text
           x="832"
-          y="1544"
+          y="1576"
           fill="#5b6873"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1542,7 +1549,7 @@
           <!-- Footnote: what the view leaves out -->
           <text
             x="24"
-            y="1144"
+            y="1176"
             fill="#5b6873"
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1552,17 +1559,17 @@
           </text>
           <text
             x="24"
-            y="1160"
+            y="1192"
             fill="#5b6873"
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            An achievement with no goal stays in progress. ListAchievements loads the levels, the
-            progress and the counters of each game
+            An achievement with no goal stays in progress. ListAchievements reads the owner once and
+            loads the levels, the progress of that owner and the counters of each game
           </text>
           <text
             x="24"
-            y="1176"
+            y="1208"
             fill="#5b6873"
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1572,7 +1579,7 @@
           </text>
           <text
             x="24"
-            y="1192"
+            y="1224"
             fill="#5b6873"
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1582,7 +1589,7 @@
           </text>
           <text
             x="24"
-            y="1208"
+            y="1240"
             fill="#5b6873"
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1592,7 +1599,7 @@
           </text>
           <text
             x="24"
-            y="1224"
+            y="1256"
             fill="#5b6873"
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1602,7 +1609,7 @@
           </text>
           <text
             x="24"
-            y="1240"
+            y="1272"
             fill="#5b6873"
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1612,7 +1619,7 @@
           </text>
           <text
             x="24"
-            y="1256"
+            y="1288"
             fill="#5b6873"
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1622,7 +1629,7 @@
           </text>
           <text
             x="24"
-            y="1272"
+            y="1304"
             fill="#5b6873"
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1632,7 +1639,7 @@
           </text>
           <text
             x="24"
-            y="1288"
+            y="1320"
             fill="#5b6873"
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1644,15 +1651,15 @@
             <!-- Legend -->
             <line
               x1="24"
-              y1="1288"
+              y1="1320"
               x2="1016"
-              y2="1288"
+              y2="1320"
               stroke="rgba(23,33,42,0.10)"
               stroke-width="0.8"
             />
             <text
               x="24"
-              y="1306"
+              y="1338"
               fill="#5b6873"
               font-size="8"
               font-family="'IBM Plex Mono', monospace"
@@ -1662,16 +1669,16 @@
             </text>
             <line
               x1="24"
-              y1="1324"
+              y1="1356"
               x2="52"
-              y2="1324"
+              y2="1356"
               stroke="#5b6873"
               stroke-width="1"
               marker-end="url(#ucach-open)"
             />
             <text
               x="60"
-              y="1328"
+              y="1360"
               fill="#5b6873"
               font-size="8.5"
               font-family="'IBM Plex Sans', sans-serif"
@@ -1680,9 +1687,9 @@
             </text>
             <line
               x1="304"
-              y1="1324"
+              y1="1356"
               x2="332"
-              y2="1324"
+              y2="1356"
               stroke="#17212a"
               stroke-width="1"
               stroke-dasharray="5,4"
@@ -1690,7 +1697,7 @@
             />
             <text
               x="340"
-              y="1328"
+              y="1360"
               fill="#5b6873"
               font-size="8.5"
               font-family="'IBM Plex Sans', sans-serif"
@@ -1699,7 +1706,7 @@
             </text>
             <rect
               x="24"
-              y="1344"
+              y="1376"
               width="28"
               height="12"
               rx="2"
@@ -1709,7 +1716,7 @@
             />
             <text
               x="60"
-              y="1353"
+              y="1385"
               fill="#5b6873"
               font-size="8.5"
               font-family="'IBM Plex Sans', sans-serif"
@@ -1718,7 +1725,7 @@
             </text>
             <rect
               x="424"
-              y="1344"
+              y="1376"
               width="28"
               height="12"
               rx="2"
@@ -1728,18 +1735,18 @@
             />
             <text
               x="460"
-              y="1353"
+              y="1385"
               fill="#5b6873"
               font-size="8.5"
               font-family="'IBM Plex Sans', sans-serif"
             >
               Teal · focal class
             </text>
-            <line x1="600" y1="1350" x2="616" y2="1350" stroke="#17212a" stroke-width="1" />
-            <circle cx="621" cy="1350" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+            <line x1="600" y1="1382" x2="616" y2="1382" stroke="#17212a" stroke-width="1" />
+            <circle cx="621" cy="1382" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
             <text
               x="636"
-              y="1353"
+              y="1385"
               fill="#5b6873"
               font-size="8.5"
               font-family="'IBM Plex Sans', sans-serif"
@@ -1748,7 +1755,7 @@
             </text>
             <rect
               x="784"
-              y="1344"
+              y="1376"
               width="28"
               height="12"
               rx="2"
@@ -1759,7 +1766,7 @@
             />
             <text
               x="820"
-              y="1353"
+              y="1385"
               fill="#5b6873"
               font-size="8.5"
               font-family="'IBM Plex Sans', sans-serif"

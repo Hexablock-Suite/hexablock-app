@@ -12,6 +12,7 @@ import type { Stars } from './stars';
 // The progress takes only the records of its own game (APP-FR-09, issue #372).
 // `recordScore()` and `recordLevel()` throw a RangeError for a record of another game,
 // and the progress stays as it was. The progress asks the record with `isOfGame()`.
+// `mergeWith()` merges another progress of the game in the same way (issue #46).
 // The progress asks each record whether it `improves()` the stored record.
 // So it keeps the best record by the order of DS-4 and DS-12, and a tie keeps the stored record.
 // Every field is private. A repository of the edge receives the fields through `deliverTo()`
@@ -57,6 +58,20 @@ export class GameProgress {
     } else if (record.improves(stored)) {
       this.levels[index] = record;
     }
+  }
+
+  // Merges `other`, a progress of the same game, into this progress (issue #46, D27).
+  // The sync merges the answer of the backend with it, and the first sign-in merges the progress
+  // played with no account. Each record of `other` goes through `recordScore()` or
+  // `recordLevel()`, so the best record stays by the rule of DS-12, and a tie keeps the record
+  // of this progress. `other` does not change.
+  // A progress of another game throws a RangeError, and this progress stays as it was.
+  mergeWith(other: GameProgress): void {
+    if (!this.equals(other)) {
+      throw new RangeError('A progress merges only a progress of its own game.');
+    }
+    if (other.highScore !== undefined) this.recordScore(other.highScore);
+    for (const record of other.levels) this.recordLevel(record);
   }
 
   // Tells if the progress keeps `record` as its high score or as the result of its level.

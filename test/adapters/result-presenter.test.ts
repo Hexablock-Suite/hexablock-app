@@ -4,6 +4,7 @@ import { textCatalog } from '../../src/adapters/texts/text-catalog';
 import type { LevelSummary } from '../../src/application/level-summary';
 import type { ListLevelsRequest } from '../../src/application/list-levels';
 import type { MoveResult } from '../../src/application/move-result';
+import type { SyncProgressRequest } from '../../src/application/sync-progress';
 import { FailureCode, Result, UseCaseError } from '../../src/application/result';
 import type { UseCase } from '../../src/application/use-case';
 import { Outcome } from '../../src/domain/engine/outcome';
@@ -49,6 +50,18 @@ class ListingUseCase implements UseCase<ListLevelsRequest, LevelSummary[]> {
   }
 }
 
+// A `SyncProgress` port that keeps each request and answers `answer` (#46).
+class SyncingUseCase implements UseCase<SyncProgressRequest, void> {
+  readonly requests: SyncProgressRequest[] = [];
+
+  constructor(private readonly answer: Result<void> = Result.success(undefined)) {}
+
+  async execute(request: SyncProgressRequest): Promise<Result<void>> {
+    this.requests.push(request);
+    return this.answer;
+  }
+}
+
 // The levels of Fit on the square after a won `fit-01`: the next level is open.
 const AFTER_FIRST: LevelSummary[] = [
   { levelId: LevelId.of('fit-01'), status: LevelStatus.completed, stars: Stars.of(3) },
@@ -88,6 +101,7 @@ function presenterWith(
     list?: ListingUseCase;
     saveThrows?: boolean;
     texts?: typeof textCatalog.es;
+    sync?: SyncingUseCase;
   } = {},
 ) {
   const save = options.save ?? new SavingUseCase();
@@ -105,6 +119,7 @@ function presenterWith(
         return save;
       },
       listLevels: () => list,
+      ...(options.sync === undefined ? {} : { syncProgress: () => options.sync! }),
     },
     options.texts ?? textCatalog.es,
   );
@@ -315,5 +330,109 @@ describe('ResultPresenter', () => {
       back: 'Back to the map',
       next: { label: 'Next level', levelId: 'fit-02' },
     });
+  });
+
+  // #46 (APP-FR-13, D27): after each save with a session the progress of the game goes to the
+  // backend. `SyncProgress` sends nothing with no session, so the presenter always asks it.
+  it('should_sync_the_progress_of_the_game_after_the_save_when_a_result_is_saved', async () => {
+    const sync = new SyncingUseCase();
+    const { presenter, save } = presenterWith(FIT, { sync });
+
+    await presenter.onFinish(
+      finalResponse(Outcome.victory, 0, { levelId: 'fit-01', moves: 3, elapsedMs: 9000 }),
+    );
+
+    expect(save.saved).toHaveLength(1);
+    expect(sync.requests).toHaveLength(1);
+    expect(sync.requests[0]?.gameId.equals(FIT)).toBe(true);
+    expect(presenter.viewModel()?.signIn).toBeUndefined();
+    expect(presenter.viewModel()?.error).toBeUndefined();
+  });
+
+  it('should_sync_nothing_when_the_save_fails_or_nothing_is_saved', async () => {
+    const sync = new SyncingUseCase();
+    const failed = presenterWith(FIT, {
+      sync,
+      save: new SavingUseCase(
+        Result.failure(new UseCaseError(FailureCode.saveFailed, 'The disk is full.')),
+      ),
+    });
+    const lost = presenterWith(FIT, { sync });
+
+    await failed.presenter.onFinish(
+      finalResponse(Outcome.victory, 0, { levelId: 'fit-01', moves: 3, elapsedMs: 9000 }),
+    );
+    await lost.presenter.onFinish(
+      finalResponse(Outcome.gameOver, 0, { levelId: 'fit-01', moves: 3 }),
+    );
+
+    expect(sync.requests).toHaveLength(0);
+  });
+
+  // The token lives 24 hours and has no refresh. `SyncProgress` clears the session, and the result
+  // asks the player to sign in. The result stays, because the local progress keeps it.
+  it('should_ask_the_player_to_sign_in_and_keep_the_result_when_the_sync_gives_session_expired', async () => {
+    const sync = new SyncingUseCase(
+      Result.failure(
+        new UseCaseError(FailureCode.sessionExpired, 'POST /v1/progress answered 401.'),
+      ),
+    );
+    const { presenter, shown } = presenterWith(LINES, { sync });
+
+    await presenter.onFinish(finalResponse(Outcome.gameOver, 36));
+
+    const model = presenter.viewModel();
+    expect(model?.signIn).toEqual({
+      text: textCatalog.es['result.session-expired'],
+      label: textCatalog.es['result.sign-in'],
+    });
+    expect(model?.title).toBe(textCatalog.es['result.defeat']);
+    expect(model?.score).toBe(36);
+    expect(model?.error).toBeUndefined();
+    expect(shown.at(-1)).toBe(model);
+  });
+
+  // A player with no network plays on: a failed sync shows nothing, and the log keeps it.
+  it('should_show_the_result_with_no_error_when_the_sync_fails_another_way', async () => {
+    const sync = new SyncingUseCase(
+      Result.failure(new UseCaseError(FailureCode.backendUnreachable, 'No answer.')),
+    );
+    const { presenter } = presenterWith(LINES, { sync });
+
+    await presenter.onFinish(finalResponse(Outcome.gameOver, 36));
+
+    expect(presenter.viewModel()?.error).toBeUndefined();
+    expect(presenter.viewModel()?.signIn).toBeUndefined();
+    expect(presenter.viewModel()?.score).toBe(36);
+  });
+
+  it('should_keep_the_result_closed_when_the_player_closes_it_before_the_sync_ends', async () => {
+    let answer: (result: Result<void>) => void = () => undefined;
+    const slow: UseCase<SyncProgressRequest, void> = {
+      execute: () => new Promise((resolve) => (answer = resolve)),
+    };
+    const presenter = new ResultPresenter(
+      LINES,
+      TopologyId.square,
+      {
+        saveProgressOf: async () => new SavingUseCase(),
+        listLevels: () => new ListingUseCase(Result.success(AFTER_FIRST)),
+        syncProgress: () => slow,
+      },
+      textCatalog.es,
+    );
+
+    const finished = presenter.onFinish(finalResponse(Outcome.gameOver, 36));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(presenter.viewModel()?.score).toBe(36);
+    presenter.onClose();
+    answer(
+      Result.failure(
+        new UseCaseError(FailureCode.sessionExpired, 'POST /v1/progress answered 401.'),
+      ),
+    );
+    await finished;
+
+    expect(presenter.viewModel()).toBeUndefined();
   });
 });

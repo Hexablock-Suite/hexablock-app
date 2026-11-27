@@ -12,6 +12,7 @@ import { Score } from '../../src/domain/shared/score';
 import { DeviceKeyValueStore } from '../../src/infrastructure/device-key-value-store';
 import { outlinesIn } from '../support/ui/cell-outlines';
 import { repoRoot } from '../support/run-tool';
+import { saveIn } from '../support/adapters/saved-progress';
 
 // The routes of `app/`, with the root layout and its composition root.
 const appDir = path.join(repoRoot, 'app');
@@ -71,7 +72,7 @@ describe('GameSelectorScreen', () => {
   async function saveHighScore(gameId: GameId, score: number): Promise<void> {
     const progress = GameProgress.start(gameId);
     progress.recordScore(ProgressRecord.of({ gameId, score: Score.of(score) }));
-    await new LocalProgressRepository(new DeviceKeyValueStore()).save(progress);
+    await saveIn(new LocalProgressRepository(new DeviceKeyValueStore()), progress);
   }
 
   // The check of APP-FR-01 (#36): a UI test opens each of the four variants from the selector.

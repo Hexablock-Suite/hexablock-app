@@ -16,4 +16,8 @@ export class DeviceKeyValueStore implements KeyValueStore {
   async set(key: string, value: string): Promise<void> {
     await AsyncStorage.setItem(key, value);
   }
+
+  async remove(key: string): Promise<void> {
+    await AsyncStorage.removeItem(key);
+  }
 }

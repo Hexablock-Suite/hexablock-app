@@ -67,6 +67,7 @@ export function generateStaticParams(): { gameId: string }[] {
 // When a game ends, the victory screen or the defeat screen of the result presenter of the
 // session opens over the stage (#180). The next level opens this route with the id of that level.
 // A retry and a new game close the result and start the game again at the same level.
+// The request to sign in of a result (#46) opens the account screen over the game.
 function Game({
   game,
   figure,
@@ -82,6 +83,7 @@ function Game({
   );
   const result = useResult(session.result);
   const toMap = () => router.dismissTo({ pathname: '/map', params: { figure: figure.param } });
+  const toAccount = () => router.push('/account');
   const playAgain = () => {
     session.result.onClose();
     void session.presenter.onStart(level);
@@ -109,9 +111,10 @@ function Game({
           }
           onNewGame={playAgain}
           onBack={toMap}
+          onSignIn={toAccount}
         />
       ) : (
-        <DefeatScreen model={result} onRetry={playAgain} onBack={toMap} />
+        <DefeatScreen model={result} onRetry={playAgain} onBack={toMap} onSignIn={toAccount} />
       )}
     </>
   );

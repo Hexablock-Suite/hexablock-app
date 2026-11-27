@@ -14,6 +14,7 @@ import { Stars } from '../../src/domain/progress/stars';
 import { DeviceKeyValueStore } from '../../src/infrastructure/device-key-value-store';
 import { repoRoot } from '../support/run-tool';
 import { spaces } from '../support/ui/board-spaces';
+import { saveIn } from '../support/adapters/saved-progress';
 
 // The routes of `app/`, with the root layout and its composition root.
 const appDir = path.join(repoRoot, 'app');
@@ -34,7 +35,7 @@ async function saveWonLevel(gameId: string, levelId: string): Promise<void> {
       stars: Stars.of(2),
     }),
   );
-  await new LocalProgressRepository(new DeviceKeyValueStore()).save(progress);
+  await saveIn(new LocalProgressRepository(new DeviceKeyValueStore()), progress);
 }
 
 // The button of each level on the open selector, in the order of the screen.

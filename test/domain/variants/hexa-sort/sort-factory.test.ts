@@ -29,6 +29,7 @@ import {
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 import { playMove } from '../../../support/engine/play-move';
+import { ManualClock } from '../../../support/engine/manual-clock';
 
 // The Sort factory creates the whole family of Hexa Sort (issue 99, classes.md decision 31).
 
@@ -63,6 +64,7 @@ function eachMatchFactory(random: StepRandom): SortFactory<SquareCoord> {
     new SquareGeometry(),
     SortLevel.seededEachMatch(RegionSize.of(2), GoalCount.of(5), colors),
     random,
+    new ManualClock(),
   );
 }
 
@@ -92,12 +94,14 @@ describe('SortFactory', () => {
   it('should_draw_the_same_stacks_in_each_match_when_the_level_file_holds_its_seed', () => {
     const geometry = new HexGeometry();
     const level = LevelDefinition.of(sort01).buildWith(new SortLevelBuilder(geometry));
-    const factory = new SortFactory(geometry, level, new StepRandom([0.1, 0.6]));
+    const factory = new SortFactory(geometry, level, new StepRandom([0.1, 0.6]), new ManualClock());
 
     const first = stacksOfMatch(factory);
 
     expect(stacksOfMatch(factory)).toEqual(first);
-    expect(stacksOfMatch(new SortFactory(geometry, level, new StepRandom([0.9])))).toEqual(first);
+    expect(
+      stacksOfMatch(new SortFactory(geometry, level, new StepRandom([0.9]), new ManualClock())),
+    ).toEqual(first);
   });
 
   it('should_start_the_level_and_place_one_stack_when_the_sort_factory_builds_it', () => {
@@ -145,11 +149,18 @@ describe('SortFactory', () => {
     ];
 
     for (const level of levels) {
-      const factory = new SortFactory(new SquareGeometry(), level, seededRandom(1));
+      const factory = new SortFactory(
+        new SquareGeometry(),
+        level,
+        seededRandom(1),
+        new ManualClock(),
+      );
       const first = trayInGame(factory);
       const second = trayInGame(factory);
       // A second factory of an equal level draws the same stacks too.
-      const third = trayInGame(new SortFactory(new SquareGeometry(), level, seededRandom(1)));
+      const third = trayInGame(
+        new SortFactory(new SquareGeometry(), level, seededRandom(1), new ManualClock()),
+      );
 
       expect(first).toHaveLength(3);
       for (const tiles of first[0] ?? []) expect(tiles).not.toEqual([]);
@@ -173,7 +184,12 @@ describe('SortFactory', () => {
     ];
 
     for (const level of levels) {
-      const factory = new SortFactory(new SquareGeometry(), level, seededRandom(1));
+      const factory = new SortFactory(
+        new SquareGeometry(),
+        level,
+        seededRandom(1),
+        new ManualClock(),
+      );
       const { engine: first } = startVariant(factory);
       const { engine: second } = startVariant(factory);
       const start = trayOf(second.snapshot());
@@ -191,7 +207,12 @@ describe('SortFactory', () => {
 
   it('should_build_a_new_source_from_the_level_data_when_the_sort_factory_creates_the_piece_source', () => {
     const level = SortLevel.fixed(RegionSize.of(2), GoalCount.of(1), [stack('red'), stack('blue')]);
-    const factory = new SortFactory(new SquareGeometry(), level, seededRandom(1));
+    const factory = new SortFactory(
+      new SquareGeometry(),
+      level,
+      seededRandom(1),
+      new ManualClock(),
+    );
 
     const one = factory.createPieceSource();
     const other = factory.createPieceSource();

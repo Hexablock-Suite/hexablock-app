@@ -123,7 +123,7 @@ describe('LevelGameFactories', () => {
       sortFactory(),
       new CountingMatchIds(),
       new BundledLevelRepository(),
-      sortLevelVariant(new SquareGeometry(), seededRandom(1)),
+      sortLevelVariant(new SquareGeometry(), seededRandom(1), new ManualClock()),
     );
 
     await expect(factories.factoryFor(LevelId.of('sort-01'))).rejects.toThrow(

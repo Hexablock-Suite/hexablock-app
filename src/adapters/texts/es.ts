@@ -53,6 +53,9 @@ export const es = {
   'result.back': 'Volver al mapa',
   'result.error.save': 'No se pudo guardar el resultado.',
   'result.error': 'No se pudo cerrar la partida. Vuelve al mapa.',
+  'result.session-expired':
+    'Tu sesión venció. Inicia sesión para guardar tu progreso en el servidor.',
+  'result.sign-in': 'Iniciar sesión',
   'play.fit.moves': 'Movimientos',
   'play.fit.tray': 'Bandeja de piezas',
   'play.fit.piece': 'Pieza',
@@ -123,6 +126,7 @@ export const es = {
     'El servidor no responde. Revisa la conexión e inténtalo otra vez.',
   'account.error.sign-in-after-sign-up-failed':
     'Tu cuenta se creó, pero no se pudo iniciar sesión. Inicia sesión.',
+  'account.error.session-expired': 'Tu sesión venció. Inicia sesión otra vez.',
   'account.error': 'No se pudo completar. Inténtalo otra vez.',
   'achievement.lines-combo': 'Completa 3 líneas a la vez',
   'achievement.merge-256': 'Llega a 256 en Hexa Merge',

@@ -28,6 +28,187 @@
       "type": "Synchronous/HTTP"
     },
     {
+      "description": "a progress sync",
+      "pending": false,
+      "providerStates": [
+        {
+          "name": "a signed-in account exists",
+          "params": {
+            "username": "ada"
+          }
+        },
+        {
+          "name": "a level is stored",
+          "params": {
+            "gameId": "hexa-fit",
+            "levelId": "fit-01"
+          }
+        }
+      ],
+      "request": {
+        "body": {
+          "content": {
+            "gameId": "hexa-fit",
+            "results": [
+              {
+                "elapsedMs": 45000,
+                "levelId": "fit-01",
+                "moves": 10,
+                "stars": 3
+              }
+            ]
+          },
+          "contentType": "application/json",
+          "encoded": false
+        },
+        "generators": {
+          "header": {
+            "Authorization": {
+              "expression": "Bearer ${accessToken}",
+              "type": "ProviderState"
+            }
+          }
+        },
+        "headers": {
+          "Authorization": [
+            "Bearer a-token"
+          ],
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "matchingRules": {
+          "header": {
+            "Authorization": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          }
+        },
+        "method": "POST",
+        "path": "/v1/progress"
+      },
+      "response": {
+        "body": {
+          "content": {
+            "gameId": "hexa-fit",
+            "highScore": null,
+            "results": [
+              {
+                "elapsedMs": 45000,
+                "levelId": "fit-01",
+                "moves": 10,
+                "stars": 3
+              }
+            ],
+            "updatedAt": "2026-11-27T10:00:00.000Z"
+          },
+          "contentType": "application/json",
+          "encoded": false
+        },
+        "headers": {
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "matchingRules": {
+          "body": {
+            "$.results": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            },
+            "$.results[*].elapsedMs": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "integer"
+                }
+              ]
+            },
+            "$.results[*].levelId": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.results[*].moves": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "integer"
+                }
+              ]
+            },
+            "$.results[*].stars": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "integer"
+                }
+              ]
+            },
+            "$.updatedAt": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      },
+      "type": "Synchronous/HTTP"
+    },
+    {
+      "description": "a progress sync with a refused token",
+      "pending": false,
+      "request": {
+        "body": {
+          "content": {
+            "gameId": "hexa-fit",
+            "results": [
+              {
+                "elapsedMs": 45000,
+                "levelId": "fit-01",
+                "moves": 10,
+                "stars": 3
+              }
+            ]
+          },
+          "contentType": "application/json",
+          "encoded": false
+        },
+        "headers": {
+          "Authorization": [
+            "Bearer a-refused-token"
+          ],
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "method": "POST",
+        "path": "/v1/progress"
+      },
+      "response": {
+        "status": 401
+      },
+      "type": "Synchronous/HTTP"
+    },
+    {
       "description": "a sign-in",
       "pending": false,
       "providerStates": [

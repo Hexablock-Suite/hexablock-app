@@ -11,7 +11,8 @@ export interface LoadProgressRequest {
 }
 
 // Reads the saved progress of one game from the device (APP-FR-04, S3-16 in #151, issue #181).
-// It loads the `GameProgress` of the game of the request through the `ProgressRepository` port
+// It loads the `GameProgress` of the game of the request through the `ProgressRepository` port,
+// for the owner of the progress that the port gives (#46),
 // and returns it as it is: `undefined` when the game has no saved progress. It writes nothing,
 // and it never starts a progress: the answer of a game without one is no progress (decision 56).
 // The request names the game, as the request of `ListLevels` does (#410). So one `LoadProgress`
@@ -22,7 +23,8 @@ export class LoadProgress implements UseCase<LoadProgressRequest, GameProgress |
 
   async execute(request: LoadProgressRequest): Promise<Result<GameProgress | undefined>> {
     try {
-      return Result.success(await this.repository.load(request.gameId));
+      const owner = await this.repository.owner();
+      return Result.success(await this.repository.load(owner, request.gameId));
     } catch (thrown) {
       return Result.failure(caughtError(FailureCode.loadFailed, thrown));
     }

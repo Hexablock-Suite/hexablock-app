@@ -1,4 +1,7 @@
+import type { AnonymousProgress } from '../application/anonymous-progress';
+import { ProgressOwner } from '../application/progress-owner';
 import type { ProgressRepository } from '../application/progress-repository';
+import type { SessionStore } from '../application/session-store';
 import { ElapsedTime } from '../domain/shared/elapsed-time';
 import type { GameId } from '../domain/shared/game-id';
 import { GameProgress } from '../domain/progress/game-progress';
@@ -36,8 +39,20 @@ interface SavedProgress {
 }
 
 // Adapter of the `ProgressRepository` port over the local storage (classes.md decision 57,
-// issue #164). It keeps the progress of each game as one JSON text under the key
-// `progress:<game id>` of a `KeyValueStore`.
+// issue #164). It keeps the progress of each game as one JSON text in a `KeyValueStore`.
+// The key carries the owner (D27, issue #46, classes.md decision 66). The key of a user is
+// `progress:<user id>:<game id>`, so two accounts on one device do not share progress. The key of
+// the anonymous owner is `progress:<game id>`: the anonymous space, the key of every progress saved
+// before #46. A game id has no `:`, so the two keys never meet.
+// `owner()` reads the owner from `sessions`: the last signed-in user, kept apart from the token,
+// so a refused token keeps the owner. An owner that cannot be read, and a repository with no
+// `sessions`, give the anonymous owner. Every other call takes the owner that the use case read.
+// `update()` runs load, change and save in one queue per key, so two changes of one progress never
+// overlap and no change is lost (#46, judgment-day round 1).
+// It also implements `AnonymousProgress`, the second role of the one repository of the progress:
+// `mergeAnonymousInto()` merges the anonymous space into the key of a user and forgets it after the
+// save. A device that signed in under #45 kept its progress in the anonymous space. So the first
+// `load()` or `update()` of a user whose key is empty merges the anonymous space into that key.
 // The saved JSON holds plain numbers and texts. The adapter reads each value of the domain
 // with `deliverTo(receiver)`, the one exit of a value (rule R-no-delivery-call), and never asks
 // a domain object for its text. On a load it builds each value object again with its factory
@@ -46,36 +61,107 @@ interface SavedProgress {
 // A saved text that is not JSON throws a `SyntaxError`. A saved progress of another version
 // or of the wrong shape throws a `RangeError`, and so does a value that its value object
 // refuses. The adapter never writes over a saved progress that it cannot read.
-export class LocalProgressRepository implements ProgressRepository {
-  constructor(private readonly store: KeyValueStore) {}
+export class LocalProgressRepository implements ProgressRepository, AnonymousProgress {
+  // The last write of each key. A new write of a key waits for it.
+  private readonly queues = new Map<string, Promise<void>>();
 
-  async load(gameId: GameId): Promise<GameProgress | undefined> {
-    const text = await this.store.get(keyOf(gameId));
+  constructor(
+    private readonly store: KeyValueStore,
+    private readonly sessions?: SessionStore,
+  ) {}
+
+  async owner(): Promise<ProgressOwner> {
+    const userId = await this.sessions?.owner().catch(() => undefined);
+    return userId === undefined ? ProgressOwner.anonymous : ProgressOwner.of(userId);
+  }
+
+  async load(owner: ProgressOwner, gameId: GameId): Promise<GameProgress | undefined> {
+    await this.adoptAnonymous(owner, gameId);
+    return this.loadAt(keyOf(owner, gameId), gameId);
+  }
+
+  async update(
+    owner: ProgressOwner,
+    gameId: GameId,
+    change: (progress: GameProgress) => void,
+  ): Promise<void> {
+    await this.adoptAnonymous(owner, gameId);
+    await this.changeAt(keyOf(owner, gameId), gameId, change);
+  }
+
+  mergeAnonymousInto(owner: ProgressOwner, gameId: GameId): Promise<void> {
+    if (owner.equals(ProgressOwner.anonymous)) return Promise.resolve();
+    const anonymousKey = keyOf(ProgressOwner.anonymous, gameId);
+    return this.queued(anonymousKey, async () => {
+      const anonymous = await this.loadAt(anonymousKey, gameId);
+      if (anonymous === undefined) return;
+      await this.changeAt(keyOf(owner, gameId), gameId, (progress) =>
+        progress.mergeWith(anonymous),
+      );
+      await this.store.remove(anonymousKey);
+    });
+  }
+
+  // Merges the anonymous space into the key of the user `owner` when that key holds no progress:
+  // the progress of a device that signed in under #45.
+  private async adoptAnonymous(owner: ProgressOwner, gameId: GameId): Promise<void> {
+    if (owner.equals(ProgressOwner.anonymous)) return;
+    if ((await this.store.get(keyOf(owner, gameId))) !== undefined) return;
+    await this.mergeAnonymousInto(owner, gameId);
+  }
+
+  // Loads the progress under `key`, or starts one, gives it to `change` and saves it, in the
+  // queue of `key`.
+  private changeAt(
+    key: string,
+    gameId: GameId,
+    change: (progress: GameProgress) => void,
+  ): Promise<void> {
+    return this.queued(key, async () => {
+      const progress = (await this.loadAt(key, gameId)) ?? GameProgress.start(gameId);
+      change(progress);
+      await this.store.set(key, JSON.stringify(savedOf(progress)));
+    });
+  }
+
+  // Runs `work` after the last work of `key` ends, whatever its result.
+  private queued(key: string, work: () => Promise<void>): Promise<void> {
+    const run = (this.queues.get(key) ?? Promise.resolve()).then(work);
+    const settled = run.catch(() => undefined);
+    this.queues.set(key, settled);
+    void settled.then(() => {
+      if (this.queues.get(key) === settled) this.queues.delete(key);
+    });
+    return run;
+  }
+
+  // The progress of the game `gameId` saved under `key`, or `undefined` when the key holds none.
+  private async loadAt(key: string, gameId: GameId): Promise<GameProgress | undefined> {
+    const text = await this.store.get(key);
     if (text === undefined) return undefined;
     return progressOf(gameId, JSON.parse(text));
   }
-
-  async save(progress: GameProgress): Promise<void> {
-    const { key, saved } = onlyValue<{ key: string; saved: SavedProgress }>((keep) =>
-      progress.deliverTo({
-        receive: (gameId, highScore, levels) =>
-          keep({
-            key: keyOf(gameId),
-            saved: {
-              version: VERSION,
-              highScore: highScore === undefined ? undefined : savedRecordOf(highScore),
-              levels: levels.map(savedRecordOf),
-            },
-          }),
-      }),
-    );
-    await this.store.set(key, JSON.stringify(saved));
-  }
 }
 
-// The key of the progress of a game in the store.
-function keyOf(gameId: GameId): string {
-  return `progress:${valueOf(gameId)}`;
+// The key of the progress of the game `gameId` of `owner`.
+function keyOf(owner: ProgressOwner, gameId: GameId): string {
+  return owner.userId === undefined
+    ? `progress:${valueOf(gameId)}`
+    : `progress:${owner.userId}:${valueOf(gameId)}`;
+}
+
+// The saved form of `progress`.
+function savedOf(progress: GameProgress): SavedProgress {
+  return onlyValue<SavedProgress>((keep) =>
+    progress.deliverTo({
+      receive: (_gameId, highScore, levels) =>
+        keep({
+          version: VERSION,
+          highScore: highScore === undefined ? undefined : savedRecordOf(highScore),
+          levels: levels.map(savedRecordOf),
+        }),
+    }),
+  );
 }
 
 // The plain form of a record. The key of the store names the game,
