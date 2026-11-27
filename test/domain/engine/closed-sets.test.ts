@@ -1,19 +1,16 @@
 /** @jest-environment node */
 import { TopologyId } from '../../../src/domain/shared/topology-id';
-import { hex, HexAxis, HexDirection, HexTopology } from '../../../src/domain/engine/hex-topology';
+import { hex, HexAxis, HexTopology } from '../../../src/domain/engine/hex-topology';
 import { Outcome } from '../../../src/domain/engine/outcome';
-import {
-  square,
-  SquareAxis,
-  SquareDirection,
-  SquareTopology,
-} from '../../../src/domain/engine/square-topology';
+import { square, SquareAxis, SquareTopology } from '../../../src/domain/engine/square-topology';
 import {
   triangle,
   TriangleAxis,
-  TriangleDirection,
   TriangleTopology,
 } from '../../../src/domain/engine/triangle-topology';
+import * as hexFile from '../../../src/domain/engine/hex-topology';
+import * as squareFile from '../../../src/domain/engine/square-topology';
+import * as triangleFile from '../../../src/domain/engine/triangle-topology';
 import type { ValueReceiver } from '../../../src/domain/shared/value-receiver';
 import { deliveries, RecordingReceiver } from '../../support/engine/value-receiver';
 
@@ -43,37 +40,12 @@ const table: readonly Row[] = [
     ['hex', 'square', 'triangle'],
   ],
   ['HexAxis', HexAxis, [HexAxis.q, HexAxis.r, HexAxis.s], ['q', 'r', 's']],
-  [
-    'HexDirection',
-    HexDirection,
-    [
-      HexDirection.east,
-      HexDirection.west,
-      HexDirection.southEast,
-      HexDirection.northWest,
-      HexDirection.southWest,
-      HexDirection.northEast,
-    ],
-    ['east', 'west', 'south-east', 'north-west', 'south-west', 'north-east'],
-  ],
   ['SquareAxis', SquareAxis, [SquareAxis.col, SquareAxis.row], ['col', 'row']],
-  [
-    'SquareDirection',
-    SquareDirection,
-    [SquareDirection.north, SquareDirection.east, SquareDirection.south, SquareDirection.west],
-    ['north', 'east', 'south', 'west'],
-  ],
   [
     'TriangleAxis',
     TriangleAxis,
     [TriangleAxis.row, TriangleAxis.downRight, TriangleAxis.downLeft],
     ['row', 'down-right', 'down-left'],
-  ],
-  [
-    'TriangleDirection',
-    TriangleDirection,
-    [TriangleDirection.left, TriangleDirection.right, TriangleDirection.vertical],
-    ['left', 'right', 'vertical'],
   ],
 ];
 
@@ -154,33 +126,31 @@ describe('TopologyId', () => {
   });
 });
 
-describe('the axes and the directions of a topology', () => {
-  it('should_give_its_axis_and_direction_instances_when_a_topology_is_read', () => {
+describe('the axes and the neighbors of a topology', () => {
+  // Issue #416 (decision 16): a slide is an axis and a sense, so no topology names a direction.
+  // Each direction class stays private to the file of its topology, for `neighbors()`.
+  it('should_offer_no_direction_when_a_topology_or_the_file_of_its_topology_is_read', () => {
+    const topologies = [new HexTopology(), new SquareTopology(), new TriangleTopology()];
+    const files = [hexFile, squareFile, triangleFile];
+
+    expect(
+      topologies.map((topology) => [
+        Reflect.has(topology, 'neighbor'),
+        Reflect.has(topology, 'directions'),
+      ]),
+    ).toEqual(topologies.map(() => [false, false]));
+    expect(
+      files.flatMap((file) => Object.keys(file)).filter((name) => /Direction/.test(name)),
+    ).toEqual([]);
+  });
+
+  it('should_give_its_axis_instances_when_a_topology_is_read', () => {
     expect(new HexTopology().axes()).toEqual([HexAxis.q, HexAxis.r, HexAxis.s]);
-    expect(new HexTopology().directions()).toEqual([
-      HexDirection.east,
-      HexDirection.west,
-      HexDirection.southEast,
-      HexDirection.northWest,
-      HexDirection.southWest,
-      HexDirection.northEast,
-    ]);
     expect(new SquareTopology().axes()).toEqual([SquareAxis.col, SquareAxis.row]);
-    expect(new SquareTopology().directions()).toEqual([
-      SquareDirection.north,
-      SquareDirection.east,
-      SquareDirection.south,
-      SquareDirection.west,
-    ]);
     expect(new TriangleTopology().axes()).toEqual([
       TriangleAxis.row,
       TriangleAxis.downRight,
       TriangleAxis.downLeft,
-    ]);
-    expect(new TriangleTopology().directions()).toEqual([
-      TriangleDirection.left,
-      TriangleDirection.right,
-      TriangleDirection.vertical,
     ]);
   });
 
@@ -200,11 +170,33 @@ describe('the axes and the directions of a topology', () => {
     expect(TriangleAxis.downLeft.backward(triangle(1, 0))).toEqual(triangle(1, -1));
   });
 
-  it('should_give_the_neighbor_when_a_direction_steps_from_a_cell', () => {
-    expect(HexDirection.northEast.neighborOf(hex(1, 1))).toEqual(hex(2, 0));
-    expect(SquareDirection.north.neighborOf(square(1, 1))).toEqual(square(1, 0));
-    expect(TriangleDirection.vertical.neighborOf(triangle(0, 0))).toEqual(triangle(0, 1));
-    expect(TriangleDirection.vertical.neighborOf(triangle(1, 0))).toEqual(triangle(1, -1));
+  // Each private direction of a topology gives one neighbor, in the order of `neighbors()`.
+  it('should_give_one_neighbor_per_direction_in_order_when_the_neighbors_of_a_cell_are_read', () => {
+    expect(new HexTopology().neighbors(hex(1, 1))).toEqual([
+      hex(2, 1),
+      hex(2, 0),
+      hex(1, 0),
+      hex(0, 1),
+      hex(0, 2),
+      hex(1, 2),
+    ]);
+    expect(new SquareTopology().neighbors(square(1, 1))).toEqual([
+      square(1, 0),
+      square(2, 1),
+      square(1, 2),
+      square(0, 1),
+    ]);
+    // The `vertical` neighbor lies below an up triangle and above a down triangle.
+    expect(new TriangleTopology().neighbors(triangle(0, 0))).toEqual([
+      triangle(-1, 0),
+      triangle(1, 0),
+      triangle(0, 1),
+    ]);
+    expect(new TriangleTopology().neighbors(triangle(1, 0))).toEqual([
+      triangle(0, 0),
+      triangle(2, 0),
+      triangle(1, -1),
+    ]);
   });
 
   // Issue #237: the error carries the axis of the other topology as its `cause`,
@@ -216,15 +208,6 @@ describe('the axes and the directions of a topology', () => {
 
     expect(read).toThrow(
       new RangeError('The hex grid has no such axis.', { cause: SquareAxis.col }),
-    );
-  });
-
-  it('should_throw_a_range_error_that_carries_the_direction_when_a_neighbor_follows_a_direction_of_another_topology', () => {
-    const follow = () =>
-      new SquareTopology().neighbor(square(0, 0), HexDirection.east as unknown as SquareDirection);
-
-    expect(follow).toThrow(
-      new RangeError('The square grid has no such direction.', { cause: HexDirection.east }),
     );
   });
 });

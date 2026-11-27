@@ -16,8 +16,7 @@ const HEX_CORNERS = [-90, -30, 30, 90, 150, 210].map((degrees) => {
 // and the cells of one `r` value make a horizontal row.
 // A step east, `q + 1`, moves one cell size to the right.
 // A step south-east, `r + 1`, moves half a size to the right and √3/2 of a size down.
-// So the circles of two neighbors touch, as `HexDirection` names the six neighbors,
-// and two neighbor hexagons share one side.
+// So the circles of two neighbors touch, and two neighbor hexagons share one side.
 export class HexLayout implements BoardLayout<HexCoord> {
   // `size` is the diameter of the circle inside a cell, in density-independent pixels.
   constructor(private readonly size: number) {}
