@@ -9,6 +9,7 @@ import { LevelStatus } from '../domain/progress/level-status';
 import { GameResult } from '../domain/progress/progress-model';
 import type { GameId } from '../domain/shared/game-id';
 import type { TopologyId } from '../domain/shared/topology-id';
+import { valueOf } from './delivered';
 import type { TextKey, Texts } from './texts/text-catalog';
 
 // The view model of the victory screen and of the defeat screen (MVP, issue #180, APP-FR-07).
@@ -125,7 +126,7 @@ export class ResultPresenter {
       victory,
       title: this.texts[victory ? 'result.victory' : 'result.defeat'],
       scoreLabel: this.texts['result.score'],
-      score: numberOf(response.score),
+      score: valueOf(response.score),
       back: this.texts['result.back'],
       ...this.choicesOf(victory, response, next?.levelId),
       ...(failure === undefined || failure.ok
@@ -150,7 +151,7 @@ export class ResultPresenter {
   ): Pick<ResultViewModel, 'next' | 'newGame' | 'retry'> {
     if (!victory) return { retry: this.texts['result.retry'] };
     if (next !== undefined) {
-      return { next: { label: this.texts['result.next-level'], levelId: idOf(next) } };
+      return { next: { label: this.texts['result.next-level'], levelId: valueOf(next) } };
     }
     return isEndless(response) ? { newGame: this.texts['result.new-game'] } : {};
   }
@@ -215,30 +216,4 @@ async function attempt<T>(code: FailureCode, call: () => Promise<Result<T>>): Pr
   } catch (thrown) {
     return Result.failure(caughtError(code, thrown));
   }
-}
-
-// A value object that delivers one number, such as `Score`.
-type DeliversNumber = { deliverTo(receiver: { receive(value: number): void }): void };
-
-// The number of a score. The presenter is an adapter of the edge, so it receives the value
-// through `deliverTo()` (rule R-no-delivery-call).
-function numberOf(source: DeliversNumber): number {
-  let value = 0;
-  source.deliverTo({
-    receive: (delivered) => {
-      value = delivered;
-    },
-  });
-  return value;
-}
-
-// The text of the level id `levelId`.
-function idOf(levelId: LevelId): string {
-  let text = '';
-  levelId.deliverTo({
-    receive: (delivered) => {
-      text = delivered;
-    },
-  });
-  return text;
 }
