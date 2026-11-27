@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SaveProgress flow · UML sequence diagram</title>
+    <title>SaveProgress and SyncProgress flow · UML sequence diagram</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
       rel="stylesheet"
@@ -60,24 +60,33 @@
   </head>
   <body>
     <div class="frame">
-      <p class="eyebrow">Use case flow · SaveProgress · sequence diagram</p>
-      <h1>SaveProgress step by step: one result from the screen to the backend and back</h1>
+      <p class="eyebrow">Use case flow · SaveProgress and SyncProgress · sequence diagram</p>
+      <h1>
+        SaveProgress and SyncProgress step by step: one result saved on the device, then sent to the
+        backend
+      </h1>
       <svg
-        viewBox="0 0 1240 856"
+        viewBox="0 0 1440 1520"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="seqsave-title seqsave-desc"
       >
-        <title id="seqsave-title">HexaBlock SaveProgress flow · UML sequence diagram</title>
+        <title id="seqsave-title">
+          HexaBlock SaveProgress and SyncProgress flow · UML sequence diagram
+        </title>
         <desc id="seqsave-desc">
-          Sequence diagram of one saved result. GamePresenter in layer 3 gives the MoveResult of the
-          last move to ResultPresenter in layer 3, which builds the GameResult and calls execute()
-          on SaveProgress in layer 2 through the UseCase port. SaveProgress loads the GameProgress
-          of the game through the ProgressRepository port, which ApiProgressRepository in layer 3
-          implements, records the result in it with IProgressModel in layer 1, and saves it through
-          the same port. ApiDtoMapper makes a ProgressDto, and ApiClient sends it over HTTP to
-          ProgressController.sync() of hexablock-api. The response travels back to ResultPresenter
-          as a Result with no value, and ResultPresenter shows its view model on VictoryScreen.
+          Sequence diagram of one saved result and of the sync after it (#46, D27). ResultPresenter
+          in layer 3 builds the GameResult and calls execute() on SaveProgress in layer 2, which
+          loads the GameProgress through LocalProgressRepository, records the result with
+          IProgressModel and saves it. LocalProgressRepository reads the session from SessionManager
+          for the key of the user. ResultPresenter shows VictoryScreen, then calls execute() on
+          SyncProgress. SyncProgress reads the session. With no session it returns and sends
+          nothing. Otherwise it loads the progress of the account and the anonymous progress; when
+          an anonymous progress exists it merges it with mergeWith(), saves the progress and forgets
+          the anonymous progress. It calls sync() on ApiProgressGateway, which maps the progress
+          with ApiDtoMapper and calls syncProgress() on ApiClient, which sends POST /v1/progress to
+          ProgressController of hexablock-api. The answer goes back as a GameProgress, SyncProgress
+          merges it and saves it, and returns a Result with no value.
         </desc>
         <defs>
           <marker
@@ -116,55 +125,11 @@
         </defs>
         <rect width="100%" height="100%" fill="#f3f5f6" />
         <!-- Lifeline headers: each names its object, its class and its layer -->
-        <!-- Lifeline: game : GamePresenter -->
-        <rect
-          x="8"
-          y="24"
-          width="128"
-          height="64"
-          rx="6"
-          fill="#e2ebf8"
-          stroke="rgba(29,78,216,0.40)"
-          stroke-width="1"
-        />
-        <text
-          x="72"
-          y="38"
-          fill="#1d4ed8"
-          font-size="7"
-          font-weight="500"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.14em"
-        >
-          LAYER 3
-        </text>
-        <text
-          x="72"
-          y="52"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          game :
-        </text>
-        <text
-          x="72"
-          y="67"
-          fill="#17212a"
-          font-size="10.5"
-          font-weight="600"
-          font-family="'IBM Plex Sans', sans-serif"
-          text-anchor="middle"
-        >
-          GamePresenter
-        </text>
         <!-- Lifeline: presenter : ResultPresenter -->
         <rect
-          x="164"
+          x="10"
           y="24"
-          width="128"
+          width="124"
           height="64"
           rx="6"
           fill="#e2ebf8"
@@ -172,7 +137,7 @@
           stroke-width="1"
         />
         <text
-          x="228"
+          x="72"
           y="38"
           fill="#1d4ed8"
           font-size="7"
@@ -184,7 +149,7 @@
           LAYER 3
         </text>
         <text
-          x="228"
+          x="72"
           y="52"
           fill="#5b6873"
           font-size="8.5"
@@ -194,7 +159,7 @@
           presenter :
         </text>
         <text
-          x="228"
+          x="72"
           y="67"
           fill="#17212a"
           font-size="10.5"
@@ -206,9 +171,9 @@
         </text>
         <!-- Lifeline: saveProgress : SaveProgress -->
         <rect
-          x="320"
+          x="138"
           y="24"
-          width="128"
+          width="124"
           height="64"
           rx="6"
           fill="#efe7f8"
@@ -216,7 +181,7 @@
           stroke-width="1"
         />
         <text
-          x="384"
+          x="200"
           y="38"
           fill="#7e22ce"
           font-size="7"
@@ -228,7 +193,7 @@
           LAYER 2
         </text>
         <text
-          x="384"
+          x="200"
           y="52"
           fill="#5b6873"
           font-size="8.5"
@@ -238,7 +203,7 @@
           saveProgress :
         </text>
         <text
-          x="384"
+          x="200"
           y="67"
           fill="#17212a"
           font-size="10.5"
@@ -249,7 +214,7 @@
           SaveProgress
         </text>
         <text
-          x="384"
+          x="200"
           y="80"
           fill="#5b6873"
           font-size="7.5"
@@ -260,9 +225,9 @@
         </text>
         <!-- Lifeline: model : IProgressModel -->
         <rect
-          x="476"
+          x="266"
           y="24"
-          width="128"
+          width="124"
           height="64"
           rx="6"
           fill="#f9f4dc"
@@ -270,7 +235,7 @@
           stroke-width="1"
         />
         <text
-          x="540"
+          x="328"
           y="38"
           fill="#b45309"
           font-size="7"
@@ -282,7 +247,7 @@
           LAYER 1
         </text>
         <text
-          x="540"
+          x="328"
           y="52"
           fill="#5b6873"
           font-size="8.5"
@@ -292,7 +257,7 @@
           model :
         </text>
         <text
-          x="540"
+          x="328"
           y="67"
           fill="#17212a"
           font-size="10.5"
@@ -303,7 +268,7 @@
           IProgressModel
         </text>
         <text
-          x="540"
+          x="328"
           y="80"
           fill="#5b6873"
           font-size="7.5"
@@ -312,11 +277,65 @@
         >
           LevelProgress, …
         </text>
-        <!-- Lifeline: repository : ApiProgressRepository -->
+        <!-- Lifeline: syncProgress : SyncProgress -->
         <rect
-          x="626"
+          x="394"
           y="24"
-          width="140"
+          width="124"
+          height="64"
+          rx="6"
+          fill="#efe7f8"
+          stroke="rgba(126,34,206,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="456"
+          y="38"
+          fill="#7e22ce"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          LAYER 2
+        </text>
+        <text
+          x="456"
+          y="52"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          syncProgress :
+        </text>
+        <text
+          x="456"
+          y="67"
+          fill="#17212a"
+          font-size="10.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          SyncProgress
+        </text>
+        <text
+          x="456"
+          y="80"
+          fill="#5b6873"
+          font-size="7.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          implements UseCase
+        </text>
+        <!-- Lifeline: sessions : SessionManager -->
+        <rect
+          x="522"
+          y="24"
+          width="124"
           height="64"
           rx="6"
           fill="#e2ebf8"
@@ -324,7 +343,7 @@
           stroke-width="1"
         />
         <text
-          x="696"
+          x="584"
           y="38"
           fill="#1d4ed8"
           font-size="7"
@@ -336,7 +355,61 @@
           LAYER 3
         </text>
         <text
-          x="696"
+          x="584"
+          y="52"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          sessions :
+        </text>
+        <text
+          x="584"
+          y="67"
+          fill="#17212a"
+          font-size="10.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          SessionManager
+        </text>
+        <text
+          x="584"
+          y="80"
+          fill="#5b6873"
+          font-size="7.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          implements SessionStore
+        </text>
+        <!-- Lifeline: repository : LocalProgressRepository -->
+        <rect
+          x="650"
+          y="24"
+          width="124"
+          height="64"
+          rx="6"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="712"
+          y="38"
+          fill="#1d4ed8"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          LAYER 3
+        </text>
+        <text
+          x="712"
           y="52"
           fill="#5b6873"
           font-size="8.5"
@@ -346,31 +419,85 @@
           repository :
         </text>
         <text
-          x="696"
+          x="712"
           y="67"
           fill="#17212a"
-          font-size="9.5"
+          font-size="9"
           font-weight="600"
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          ApiProgressRepository
+          LocalProgressRepository
         </text>
         <text
-          x="696"
+          x="712"
           y="80"
           fill="#5b6873"
           font-size="7.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          implements ProgressRepository
+          + AnonymousProgress
         </text>
-        <!-- Lifeline: mapper : ApiDtoMapper -->
+        <!-- Lifeline: progress : GameProgress -->
         <rect
-          x="788"
+          x="778"
           y="24"
-          width="128"
+          width="124"
+          height="64"
+          rx="6"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="840"
+          y="38"
+          fill="#b45309"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          LAYER 1
+        </text>
+        <text
+          x="840"
+          y="52"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          progress :
+        </text>
+        <text
+          x="840"
+          y="67"
+          fill="#17212a"
+          font-size="10.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GameProgress
+        </text>
+        <text
+          x="840"
+          y="80"
+          fill="#5b6873"
+          font-size="7.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          the account progress
+        </text>
+        <!-- Lifeline: gateway : ApiProgressGateway -->
+        <rect
+          x="906"
+          y="24"
+          width="124"
           height="64"
           rx="6"
           fill="#e2ebf8"
@@ -378,7 +505,7 @@
           stroke-width="1"
         />
         <text
-          x="852"
+          x="968"
           y="38"
           fill="#1d4ed8"
           font-size="7"
@@ -390,7 +517,61 @@
           LAYER 3
         </text>
         <text
-          x="852"
+          x="968"
+          y="52"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          gateway :
+        </text>
+        <text
+          x="968"
+          y="67"
+          fill="#17212a"
+          font-size="10.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          ApiProgressGateway
+        </text>
+        <text
+          x="968"
+          y="80"
+          fill="#5b6873"
+          font-size="7.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          implements ProgressGateway
+        </text>
+        <!-- Lifeline: mapper : ApiDtoMapper -->
+        <rect
+          x="1034"
+          y="24"
+          width="124"
+          height="64"
+          rx="6"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="1096"
+          y="38"
+          fill="#1d4ed8"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          LAYER 3
+        </text>
+        <text
+          x="1096"
           y="52"
           fill="#5b6873"
           font-size="8.5"
@@ -400,7 +581,7 @@
           mapper :
         </text>
         <text
-          x="852"
+          x="1096"
           y="67"
           fill="#17212a"
           font-size="10.5"
@@ -412,9 +593,9 @@
         </text>
         <!-- Lifeline: client : ApiClient -->
         <rect
-          x="944"
+          x="1162"
           y="24"
-          width="128"
+          width="124"
           height="64"
           rx="6"
           fill="#cfdcf3"
@@ -422,7 +603,7 @@
           stroke-width="1"
         />
         <text
-          x="1008"
+          x="1224"
           y="38"
           fill="#1e3a8a"
           font-size="7"
@@ -434,7 +615,7 @@
           LAYER 4
         </text>
         <text
-          x="1008"
+          x="1224"
           y="52"
           fill="#5b6873"
           font-size="8.5"
@@ -444,7 +625,7 @@
           client :
         </text>
         <text
-          x="1008"
+          x="1224"
           y="67"
           fill="#17212a"
           font-size="10.5"
@@ -456,9 +637,9 @@
         </text>
         <!-- Lifeline: controller : ProgressController -->
         <rect
-          x="1094"
+          x="1296"
           y="24"
-          width="140"
+          width="136"
           height="64"
           rx="6"
           fill="#e5e8ea"
@@ -466,7 +647,7 @@
           stroke-width="1"
         />
         <text
-          x="1164"
+          x="1364"
           y="38"
           fill="#5b6873"
           font-size="7"
@@ -478,7 +659,7 @@
           BACKEND · hexablock-api
         </text>
         <text
-          x="1164"
+          x="1364"
           y="52"
           fill="#5b6873"
           font-size="8.5"
@@ -488,7 +669,7 @@
           controller :
         </text>
         <text
-          x="1164"
+          x="1364"
           y="67"
           fill="#17212a"
           font-size="10.5"
@@ -499,7 +680,7 @@
           ProgressController
         </text>
         <text
-          x="1164"
+          x="1364"
           y="80"
           fill="#5b6873"
           font-size="7.5"
@@ -510,17 +691,17 @@
         </text>
         <!-- App boundary: the HTTP call leaves the app here -->
         <line
-          x1="1086"
+          x1="1289"
           y1="24"
-          x2="1086"
-          y2="636"
+          x2="1289"
+          y2="1300"
           stroke="#0f6f74"
           stroke-width="1"
           stroke-dasharray="6,3"
         />
         <text
-          x="1080"
-          y="632"
+          x="1283"
+          y="1296"
           fill="#0f6f74"
           font-size="7.5"
           font-weight="500"
@@ -531,8 +712,8 @@
           APP
         </text>
         <text
-          x="1092"
-          y="632"
+          x="1295"
+          y="1296"
           fill="#0f6f74"
           font-size="7.5"
           font-weight="500"
@@ -546,70 +727,97 @@
           x1="72"
           y1="88"
           x2="72"
-          y2="636"
+          y2="1300"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
         />
         <line
-          x1="228"
+          x1="200"
           y1="88"
-          x2="228"
-          y2="636"
+          x2="200"
+          y2="1300"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
         />
         <line
-          x1="384"
+          x1="328"
           y1="88"
-          x2="384"
-          y2="636"
+          x2="328"
+          y2="1300"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
         />
         <line
-          x1="540"
+          x1="456"
           y1="88"
-          x2="540"
-          y2="636"
+          x2="456"
+          y2="1300"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
         />
         <line
-          x1="696"
+          x1="584"
           y1="88"
-          x2="696"
-          y2="636"
+          x2="584"
+          y2="1300"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
         />
         <line
-          x1="852"
+          x1="712"
           y1="88"
-          x2="852"
-          y2="636"
+          x2="712"
+          y2="1300"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
         />
         <line
-          x1="1008"
+          x1="840"
           y1="88"
-          x2="1008"
-          y2="636"
+          x2="840"
+          y2="1300"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
         />
         <line
-          x1="1164"
+          x1="968"
           y1="88"
-          x2="1164"
-          y2="636"
+          x2="968"
+          y2="1300"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="3,3"
+        />
+        <line
+          x1="1096"
+          y1="88"
+          x2="1096"
+          y2="1300"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="3,3"
+        />
+        <line
+          x1="1224"
+          y1="88"
+          x2="1224"
+          y2="1300"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="3,3"
+        />
+        <line
+          x1="1364"
+          y1="88"
+          x2="1364"
+          y2="1300"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -619,32 +827,23 @@
           x="68"
           y="102"
           width="8"
-          height="504"
+          height="1174"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
         <rect
-          x="224"
-          y="114"
+          x="196"
+          y="172"
           width="8"
-          height="484"
+          height="248"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
         <rect
-          x="380"
-          y="174"
-          width="8"
-          height="364"
-          fill="#ffffff"
-          stroke="#17212a"
-          stroke-width="1"
-        />
-        <rect
-          x="536"
-          y="264"
+          x="324"
+          y="322"
           width="8"
           height="20"
           fill="#ffffff"
@@ -652,106 +851,280 @@
           stroke-width="1"
         />
         <rect
-          x="692"
-          y="294"
+          x="708"
+          y="202"
           width="8"
-          height="214"
+          height="98"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
         <rect
-          x="848"
-          y="324"
+          x="580"
+          y="232"
           width="8"
-          height="34"
+          height="38"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
         <rect
-          x="1004"
-          y="384"
+          x="708"
+          y="352"
           width="8"
-          height="94"
+          height="38"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
         <rect
-          x="1160"
-          y="414"
+          x="452"
+          y="472"
           width="8"
-          height="34"
+          height="764"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
         <rect
-          x="692"
-          y="204"
+          x="580"
+          y="502"
           width="8"
-          height="34"
+          height="38"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <!-- Messages, top to bottom -->
-        <!-- Message: the game presenter gives the response of the last move to the result presenter -->
+        <rect
+          x="708"
+          y="628"
+          width="8"
+          height="38"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="708"
+          y="688"
+          width="8"
+          height="38"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="836"
+          y="770"
+          width="8"
+          height="20"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="708"
+          y="800"
+          width="8"
+          height="20"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="708"
+          y="830"
+          width="8"
+          height="20"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="964"
+          y="868"
+          width="8"
+          height="278"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="1092"
+          y="898"
+          width="8"
+          height="38"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="1220"
+          y="958"
+          width="8"
+          height="98"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="1360"
+          y="988"
+          width="8"
+          height="38"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="1092"
+          y="1078"
+          width="8"
+          height="38"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="836"
+          y="1168"
+          width="8"
+          height="20"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <rect
+          x="708"
+          y="1198"
+          width="8"
+          height="20"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <!-- Combined fragments -->
+        <!-- alt: with no session SyncProgress sends nothing -->
+        <rect
+          x="84"
+          y="558"
+          width="1340"
+          height="692"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+        />
+        <path
+          d="M84 558 H118 V568 L112 574 H84 Z"
+          fill="#f3f5f6"
+          stroke="#5b6873"
+          stroke-width="1"
+        />
+        <text
+          x="89"
+          y="569"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          alt
+        </text>
+        <text x="124" y="569" fill="#5b6873" font-size="8" font-family="'IBM Plex Mono', monospace">
+          [no session]
+        </text>
         <line
-          x1="76"
+          x1="84"
+          y1="608"
+          x2="1424"
+          y2="608"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="5,3"
+        />
+        <text x="124" y="619" fill="#5b6873" font-size="8" font-family="'IBM Plex Mono', monospace">
+          [else]
+        </text>
+        <!-- opt: the first sync of an account merges the anonymous progress (D27) -->
+        <rect
+          x="432"
+          y="744"
+          width="478"
+          height="108"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+        />
+        <path
+          d="M432 744 H466 V754 L460 760 H432 Z"
+          fill="#f3f5f6"
+          stroke="#5b6873"
+          stroke-width="1"
+        />
+        <text
+          x="437"
+          y="755"
+          fill="#17212a"
+          font-size="8"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          opt
+        </text>
+        <text x="472" y="755" fill="#5b6873" font-size="8" font-family="'IBM Plex Mono', monospace">
+          [anonymous progress]
+        </text>
+        <!-- Messages, top to bottom -->
+        <circle cx="8" cy="116" r="3" fill="#17212a" />
+        <line
+          x1="8"
           y1="116"
-          x2="224"
+          x2="68"
           y2="116"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqsave-call)"
         />
-        <rect x="80" y="102" width="140" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="10.0" y="102" width="161.0" height="13" rx="2" fill="#f3f5f6" />
         <text
-          x="84"
+          x="14"
           y="112"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="start"
-          textLength="136"
-          lengthAdjust="spacingAndGlyphs"
         >
           onFinish(response: MoveResult)
         </text>
-        <!-- Self message: the result presenter builds the GameResult from the response (D26) -->
         <path
-          d="M232 126 H260 V140 H240"
+          d="M76 146 H104 V160 H84"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqsave-call)"
         />
-        <rect x="262" y="126" width="112" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="106" y="146" width="115.1" height="13" rx="2" fill="#f3f5f6" />
         <text
-          x="266"
-          y="136"
+          x="110"
+          y="156"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
         >
           builds the GameResult
         </text>
-        <!-- Message: presenter calls save -->
         <line
-          x1="232"
+          x1="76"
           y1="176"
-          x2="380"
+          x2="196"
           y2="176"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqsave-call)"
         />
-        <rect x="236" y="162" width="152.2" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="78.0" y="162" width="150.8" height="13" rx="2" fill="#f3f5f6" />
         <text
-          x="240"
+          x="82"
           y="172"
           fill="#17212a"
           font-size="8.5"
@@ -760,19 +1133,18 @@
         >
           execute(request: GameResult)
         </text>
-        <!-- Message: save calls repo to load the progress -->
         <line
-          x1="388"
+          x1="204"
           y1="206"
-          x2="692"
+          x2="708"
           y2="206"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqsave-call)"
         />
-        <rect x="484.5" y="192" width="111" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="401.0" y="192" width="110.0" height="13" rx="2" fill="#f3f5f6" />
         <text
-          x="540"
+          x="456"
           y="202"
           fill="#17212a"
           font-size="8.5"
@@ -781,21 +1153,61 @@
         >
           load(gameId: GameId)
         </text>
-        <!-- Reply: repo returns the progress to save -->
         <line
-          x1="692"
+          x1="708"
           y1="236"
-          x2="388"
+          x2="588"
           y2="236"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqsave-call)"
+        />
+        <rect x="590.0" y="222" width="150.8" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="594"
+          y="232"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          read() · the key of the user
+        </text>
+        <line
+          x1="588"
+          y1="266"
+          x2="708"
+          y2="266"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#seqsave-reply)"
         />
-        <rect x="487.05" y="222" width="105.9" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="590.0" y="252" width="79.4" height="13" rx="2" fill="#f3f5f6" />
         <text
-          x="540"
-          y="232"
+          x="594"
+          y="262"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          Session [0..1]
+        </text>
+        <line
+          x1="708"
+          y1="296"
+          x2="204"
+          y2="296"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqsave-reply)"
+        />
+        <rect x="403.6" y="282" width="104.9" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="456"
+          y="292"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -803,20 +1215,19 @@
         >
           GameProgress [0..1]
         </text>
-        <!-- Message: save calls model to record the result in the progress -->
         <line
-          x1="388"
-          y1="266"
-          x2="536"
-          y2="266"
+          x1="204"
+          y1="326"
+          x2="324"
+          y2="326"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqsave-call)"
         />
-        <rect x="392" y="252" width="131.4" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="206.0" y="312" width="130.4" height="13" rx="2" fill="#f3f5f6" />
         <text
-          x="396"
-          y="262"
+          x="210"
+          y="322"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -824,20 +1235,19 @@
         >
           record(result, progress)
         </text>
-        <!-- Message: save calls repo -->
         <line
-          x1="388"
-          y1="296"
-          x2="692"
-          y2="296"
+          x1="204"
+          y1="356"
+          x2="708"
+          y2="356"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqsave-call)"
         />
-        <rect x="464.1" y="282" width="151.8" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="380.6" y="342" width="150.8" height="13" rx="2" fill="#f3f5f6" />
         <text
-          x="540"
-          y="292"
+          x="456"
+          y="352"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -845,150 +1255,20 @@
         >
           save(progress: GameProgress)
         </text>
-        <!-- Message: repo calls mapper -->
         <line
-          x1="700"
-          y1="326"
-          x2="848"
-          y2="326"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-end="url(#seqsave-call)"
-        />
-        <rect x="704" y="312" width="198.55" height="13" rx="2" fill="#f3f5f6" />
-        <text
-          x="708"
-          y="322"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
-        >
-          toProgressDto(progress: GameProgress)
-        </text>
-        <!-- Reply: mapper returns to repo -->
-        <line
-          x1="848"
-          y1="356"
-          x2="700"
-          y2="356"
-          stroke="#5b6873"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#seqsave-reply)"
-        />
-        <rect x="741.675" y="342" width="64.65" height="13" rx="2" fill="#f3f5f6" />
-        <text
-          x="774"
-          y="352"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          ProgressDto
-        </text>
-        <!-- Message: repo calls client -->
-        <line
-          x1="700"
+          x1="708"
           y1="386"
-          x2="1004"
+          x2="204"
           y2="386"
-          stroke="#17212a"
+          stroke="#5b6873"
           stroke-width="1"
-          marker-end="url(#seqsave-call)"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqsave-reply)"
         />
-        <rect x="768.175" y="372" width="167.65" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="441.8" y="372" width="28.4" height="13" rx="2" fill="#f3f5f6" />
         <text
-          x="852"
+          x="456"
           y="382"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          syncProgress(body: ProgressDto)
-        </text>
-        <!-- Message: client calls backend -->
-        <line
-          x1="1012"
-          y1="416"
-          x2="1160"
-          y2="416"
-          stroke="#0f6f74"
-          stroke-width="1.6"
-          marker-end="url(#seqsave-http)"
-        />
-        <rect x="1016" y="402" width="183.1" height="13" rx="2" fill="#f3f5f6" />
-        <text
-          x="1020"
-          y="412"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
-        >
-          HTTP · sync(body: SyncProgressDto)
-        </text>
-        <!-- Reply: backend returns to client -->
-        <line
-          x1="1160"
-          y1="446"
-          x2="1012"
-          y2="446"
-          stroke="#0f6f74"
-          stroke-width="1.6"
-          stroke-dasharray="4,3"
-          marker-end="url(#seqsave-reply)"
-        />
-        <rect x="1016" y="432" width="147.05" height="13" rx="2" fill="#f3f5f6" />
-        <text
-          x="1020"
-          y="442"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
-        >
-          ProgressDto · HTTP response
-        </text>
-        <!-- Reply: client returns to repo -->
-        <line
-          x1="1004"
-          y1="476"
-          x2="700"
-          y2="476"
-          stroke="#5b6873"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#seqsave-reply)"
-        />
-        <rect x="819.675" y="462" width="64.65" height="13" rx="2" fill="#f3f5f6" />
-        <text
-          x="852"
-          y="472"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          ProgressDto
-        </text>
-        <!-- Reply: repo returns to save -->
-        <line
-          x1="692"
-          y1="506"
-          x2="388"
-          y2="506"
-          stroke="#5b6873"
-          stroke-width="1"
-          stroke-dasharray="4,3"
-          marker-end="url(#seqsave-reply)"
-        />
-        <rect x="525.7" y="492" width="28.6" height="13" rx="2" fill="#f3f5f6" />
-        <text
-          x="540"
-          y="502"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -996,21 +1276,527 @@
         >
           void
         </text>
-        <!-- Reply: save returns to presenter -->
         <line
-          x1="380"
+          x1="196"
+          y1="416"
+          x2="76"
+          y2="416"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqsave-reply)"
+        />
+        <rect x="78.0" y="402" width="69.2" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="82"
+          y="412"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          Result&lt;void&gt;
+        </text>
+        <path
+          d="M76 446 H104 V460 H84"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqsave-call)"
+        />
+        <rect x="106" y="446" width="104.89999999999999" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="110"
+          y="456"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          shows VictoryScreen
+        </text>
+        <line
+          x1="76"
+          y1="476"
+          x2="452"
+          y2="476"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqsave-call)"
+        />
+        <rect x="211.6" y="462" width="104.9" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="264"
+          y="472"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          execute({ gameId })
+        </text>
+        <line
+          x1="460"
+          y1="506"
+          x2="580"
+          y2="506"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqsave-call)"
+        />
+        <rect x="500.7" y="492" width="38.6" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="520"
+          y="502"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          read()
+        </text>
+        <line
+          x1="580"
           y1="536"
-          x2="232"
+          x2="460"
           y2="536"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#seqsave-reply)"
         />
-        <rect x="271.175" y="522" width="69.65" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="462.0" y="522" width="79.4" height="13" rx="2" fill="#f3f5f6" />
         <text
-          x="306"
+          x="466"
           y="532"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          Session [0..1]
+        </text>
+        <line
+          x1="452"
+          y1="588"
+          x2="76"
+          y2="588"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqsave-reply)"
+        />
+        <rect x="188.6" y="574" width="150.8" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="264"
+          y="584"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          Result&lt;void&gt; · sends nothing
+        </text>
+        <line
+          x1="460"
+          y1="632"
+          x2="708"
+          y2="632"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqsave-call)"
+        />
+        <rect x="529.0" y="618" width="110.0" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="584"
+          y="628"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          load(gameId: GameId)
+        </text>
+        <line
+          x1="708"
+          y1="662"
+          x2="460"
+          y2="662"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqsave-reply)"
+        />
+        <rect x="531.5" y="648" width="104.9" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="584"
+          y="658"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          GameProgress [0..1]
+        </text>
+        <line
+          x1="460"
+          y1="692"
+          x2="708"
+          y2="692"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqsave-call)"
+        />
+        <rect x="506.1" y="678" width="155.9" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="584"
+          y="688"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          loadAnonymous(gameId: GameId)
+        </text>
+        <line
+          x1="708"
+          y1="722"
+          x2="460"
+          y2="722"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqsave-reply)"
+        />
+        <rect x="531.5" y="708" width="104.9" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="584"
+          y="718"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          GameProgress [0..1]
+        </text>
+        <line
+          x1="460"
+          y1="774"
+          x2="836"
+          y2="774"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqsave-call)"
+        />
+        <rect x="593.0" y="760" width="110.0" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="648"
+          y="770"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          mergeWith(anonymous)
+        </text>
+        <line
+          x1="460"
+          y1="804"
+          x2="708"
+          y2="804"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqsave-call)"
+        />
+        <rect x="544.3" y="790" width="79.4" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="584"
+          y="800"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          save(progress)
+        </text>
+        <line
+          x1="460"
+          y1="834"
+          x2="708"
+          y2="834"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqsave-call)"
+        />
+        <rect x="521.4" y="820" width="125.3" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="584"
+          y="830"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          forgetAnonymous(gameId)
+        </text>
+        <line
+          x1="460"
+          y1="872"
+          x2="964"
+          y2="872"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqsave-call)"
+        />
+        <rect x="649.4" y="858" width="125.3" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="712"
+          y="868"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          sync(session, progress)
+        </text>
+        <line
+          x1="972"
+          y1="902"
+          x2="1092"
+          y2="902"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqsave-call)"
+        />
+        <rect x="974.0" y="888" width="145.7" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="978"
+          y="898"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          toSyncProgressDto(progress)
+        </text>
+        <line
+          x1="1092"
+          y1="932"
+          x2="972"
+          y2="932"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqsave-reply)"
+        />
+        <rect x="974.0" y="918" width="84.5" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="978"
+          y="928"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          SyncProgressDto
+        </text>
+        <line
+          x1="972"
+          y1="962"
+          x2="1220"
+          y2="962"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqsave-call)"
+        />
+        <rect x="1028.3" y="948" width="135.5" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="1096"
+          y="958"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          syncProgress(token, body)
+        </text>
+        <line
+          x1="1228"
+          y1="992"
+          x2="1360"
+          y2="992"
+          stroke="#0f6f74"
+          stroke-width="1.6"
+          marker-end="url(#seqsave-http)"
+        />
+        <rect x="1230.0" y="978" width="130.4" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="1234"
+          y="988"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          HTTP · POST /v1/progress
+        </text>
+        <line
+          x1="1360"
+          y1="1022"
+          x2="1228"
+          y2="1022"
+          stroke="#0f6f74"
+          stroke-width="1.6"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqsave-reply)"
+        />
+        <rect x="1230.0" y="1008" width="94.7" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="1234"
+          y="1018"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          ProgressDto · 200
+        </text>
+        <line
+          x1="1220"
+          y1="1052"
+          x2="972"
+          y2="1052"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqsave-reply)"
+        />
+        <rect x="1064.0" y="1038" width="64.1" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="1096"
+          y="1048"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          ProgressDto
+        </text>
+        <line
+          x1="972"
+          y1="1082"
+          x2="1092"
+          y2="1082"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqsave-call)"
+        />
+        <rect x="974.0" y="1068" width="104.9" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="978"
+          y="1078"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          toGameProgress(dto)
+        </text>
+        <line
+          x1="1092"
+          y1="1112"
+          x2="972"
+          y2="1112"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqsave-reply)"
+        />
+        <rect x="974.0" y="1098" width="69.2" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="978"
+          y="1108"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          GameProgress
+        </text>
+        <line
+          x1="964"
+          y1="1142"
+          x2="460"
+          y2="1142"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqsave-reply)"
+        />
+        <rect x="644.3" y="1128" width="135.5" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="712"
+          y="1138"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          GameProgress · the answer
+        </text>
+        <line
+          x1="460"
+          y1="1172"
+          x2="836"
+          y2="1172"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqsave-call)"
+        />
+        <rect x="600.6" y="1158" width="94.7" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="648"
+          y="1168"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          mergeWith(answer)
+        </text>
+        <line
+          x1="460"
+          y1="1202"
+          x2="708"
+          y2="1202"
+          stroke="#17212a"
+          stroke-width="1"
+          marker-end="url(#seqsave-call)"
+        />
+        <rect x="544.3" y="1188" width="79.4" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="584"
+          y="1198"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          save(progress)
+        </text>
+        <line
+          x1="452"
+          y1="1232"
+          x2="76"
+          y2="1232"
+          stroke="#5b6873"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+          marker-end="url(#seqsave-reply)"
+        />
+        <rect x="229.4" y="1218" width="69.2" height="13" rx="2" fill="#f3f5f6" />
+        <text
+          x="264"
+          y="1228"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1018,114 +1804,106 @@
         >
           Result&lt;void&gt;
         </text>
-        <!-- Self message: the result presenter shows its view model on VictoryScreen -->
-        <path
-          d="M232 566 H260 V580 H240"
-          fill="none"
-          stroke="#17212a"
-          stroke-width="1"
-          marker-end="url(#seqsave-call)"
-        />
-        <rect x="262" y="566" width="112" height="13" rx="2" fill="#f3f5f6" />
-        <text
-          x="266"
-          y="576"
-          fill="#17212a"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="start"
-        >
-          shows VictoryScreen
-        </text>
-        <!-- Reply: presenter returns to the game presenter -->
         <line
-          x1="224"
-          y1="596"
-          x2="76"
-          y2="596"
+          x1="68"
+          y1="1270"
+          x2="8"
+          y2="1270"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#seqsave-reply)"
         />
-        <rect x="89.35" y="582" width="121.3" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="10.0" y="1256" width="120.2" height="13" rx="2" fill="#f3f5f6" />
         <text
-          x="150"
-          y="592"
+          x="14"
+          y="1266"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
+          text-anchor="start"
         >
           Promise&lt;void&gt; resolves
         </text>
         <!-- Footnote -->
         <text
           x="24"
-          y="664"
+          y="1328"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Each header names the object, its class and its layer, with the colors of the class views.
-          The calls are the operations of the
+          The calls are the operations of the class view of flow 2. SaveProgress names only the
+          ProgressRepository port,
         </text>
         <text
           x="24"
-          y="680"
+          y="1344"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          SaveProgress class view. SaveProgress names only the ProgressRepository port, so the call
-          out to layer 3 keeps the dependency
+          and SyncProgress names only its ports, so each call out to layer 3 keeps the dependency
+          pointing down. LocalProgressRepository reads the session at each load and save: its key
+          carries the user id (D27, #46).
         </text>
         <text
           x="24"
-          y="696"
+          y="1360"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          pointing down. The thick teal call is the only one that leaves the app:
-          ProgressController.sync() is the endpoint of API-FR-02
+          After a successful save, ResultPresenter shows the result, then calls SyncProgress, so no
+          screen waits for the network. With no session, SyncProgress sends nothing. The opt
+          fragment runs once per account:
         </text>
         <text
           x="24"
-          y="712"
+          y="1376"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          (hexablock-api, class view 3.3), and its route path is not fixed yet. The composition root
-          wraps SyncProgress and SyncLeaderboard in AuthorizationAspect
+          the progress played with no account merges into the first account that signs in. The thick
+          teal call is the only one that leaves the app: POST /v1/progress of API-FR-02, guarded by
+          the token.
         </text>
         <text
           x="24"
-          y="728"
+          y="1392"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          and RetryAspect (view 3.1). A failed call comes back as Result.failure(error), never as an
-          exception (decision 28).
+          A 401 throws SyncFailure(session-expired) in the gateway; SyncProgress calls clear() on
+          SessionStore and returns Result.failure(error), and the result asks the player to sign in.
+          No answer gives
         </text>
         <text
           x="24"
-          y="744"
+          y="1408"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          When load() finds no progress, SaveProgress starts one with GameProgress.start() (S3-04,
-          #164). record() returns nothing: the progress keeps the best result by DS-4, and
-          SaveProgress returns no value.
+          backend-unreachable, any other failure sync-failed, and the local progress keeps every
+          saved result. The sign-in of flow 5 also runs SyncProgress for each registered game
+          (decision 66).
         </text>
         <!-- Legend -->
-        <line x1="24" y1="776" x2="1216" y2="776" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <line
+          x1="24"
+          y1="1440"
+          x2="1416"
+          y2="1440"
+          stroke="rgba(23,33,42,0.10)"
+          stroke-width="0.8"
+        />
         <text
           x="24"
-          y="794"
+          y="1458"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1135,16 +1913,16 @@
         </text>
         <line
           x1="24"
-          y1="812"
+          y1="1476"
           x2="52"
-          y2="812"
+          y2="1476"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqsave-call)"
         />
         <text
           x="60"
-          y="815"
+          y="1479"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1153,9 +1931,9 @@
         </text>
         <line
           x1="224"
-          y1="812"
+          y1="1476"
           x2="252"
-          y2="812"
+          y2="1476"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
@@ -1163,7 +1941,7 @@
         />
         <text
           x="260"
-          y="815"
+          y="1479"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1172,16 +1950,16 @@
         </text>
         <line
           x1="404"
-          y1="812"
+          y1="1476"
           x2="432"
-          y2="812"
+          y2="1476"
           stroke="#0f6f74"
           stroke-width="1.6"
           marker-end="url(#seqsave-http)"
         />
         <text
           x="440"
-          y="815"
+          y="1479"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1190,16 +1968,16 @@
         </text>
         <line
           x1="678"
-          y1="805"
+          y1="1469"
           x2="678"
-          y2="819"
+          y2="1483"
           stroke="#0f6f74"
           stroke-width="1"
           stroke-dasharray="6,3"
         />
         <text
           x="700"
-          y="815"
+          y="1479"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1208,16 +1986,16 @@
         </text>
         <line
           x1="818"
-          y1="805"
+          y1="1469"
           x2="818"
-          y2="819"
+          y2="1483"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
         />
         <rect
           x="814"
-          y="808"
+          y="1472"
           width="8"
           height="8"
           fill="#ffffff"
@@ -1226,7 +2004,7 @@
         />
         <text
           x="840"
-          y="815"
+          y="1479"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1234,8 +2012,36 @@
           Lifeline with activation bar
         </text>
         <rect
+          x="1004"
+          y="1470"
+          width="28"
+          height="12"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+        />
+        <text
+          x="1040"
+          y="1479"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Fragment · alt or opt with its guard
+        </text>
+        <circle cx="1250" cy="1476" r="3" fill="#17212a" />
+        <text
+          x="1262"
+          y="1479"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Found call · from GamePresenter
+        </text>
+        <rect
           x="24"
-          y="828"
+          y="1492"
           width="28"
           height="12"
           rx="2"
@@ -1245,7 +2051,7 @@
         />
         <text
           x="60"
-          y="837"
+          y="1501"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1254,7 +2060,7 @@
         </text>
         <rect
           x="224"
-          y="828"
+          y="1492"
           width="28"
           height="12"
           rx="2"
@@ -1264,7 +2070,7 @@
         />
         <text
           x="260"
-          y="837"
+          y="1501"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1273,7 +2079,7 @@
         </text>
         <rect
           x="404"
-          y="828"
+          y="1492"
           width="28"
           height="12"
           rx="2"
@@ -1283,7 +2089,7 @@
         />
         <text
           x="440"
-          y="837"
+          y="1501"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1292,7 +2098,7 @@
         </text>
         <rect
           x="664"
-          y="828"
+          y="1492"
           width="28"
           height="12"
           rx="2"
@@ -1302,7 +2108,7 @@
         />
         <text
           x="700"
-          y="837"
+          y="1501"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1311,7 +2117,7 @@
         </text>
         <rect
           x="804"
-          y="828"
+          y="1492"
           width="28"
           height="12"
           rx="2"
@@ -1321,7 +2127,7 @@
         />
         <text
           x="840"
-          y="837"
+          y="1501"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
