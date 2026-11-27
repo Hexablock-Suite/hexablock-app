@@ -24,7 +24,8 @@ interface SavedSession {
 // of a `SecretStore`, so the token never goes to the plain storage of the progress.
 // It lives in layer 3, as every adapter of a port does (#437). The driver of layer 4,
 // `DeviceSecretStore`, holds the storage package. The composition root builds one manager
-// and gives it to `Register` and `Login` (single scope, decision 18).
+// and gives it to `Register`, `Login`, `SyncProgress` and `LocalProgressRepository` (single scope,
+// decision 18). `clear()` forgets the session when the backend refuses its token (#46).
 // A kept text that is not JSON throws a `SyntaxError` with a fixed message. The message of
 // `JSON.parse` can quote the text, and so the token, so the manager does not pass it on.
 // A kept session of another version or of the wrong shape throws a `RangeError`, and so does a
@@ -41,6 +42,11 @@ export class SessionManager implements SessionStore {
   async write(session: Session): Promise<void> {
     const saved: SavedSession = { version: VERSION, token: session.token, userId: session.userId };
     await this.secrets.set(KEY, JSON.stringify(saved));
+  }
+
+  // Forgets the kept session (#46). `SyncProgress` calls it when the backend refuses the token.
+  async clear(): Promise<void> {
+    await this.secrets.remove(KEY);
   }
 }
 

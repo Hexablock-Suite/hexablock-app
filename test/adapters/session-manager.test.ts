@@ -21,6 +21,25 @@ describe('SessionManager', () => {
     await expect(new SessionManager(secrets).read()).resolves.toEqual(ADA);
   });
 
+  // #46: a refused token clears the session, so the next screen asks the player to sign in.
+  it('should_give_no_session_to_a_new_manager_when_the_kept_session_is_cleared', async () => {
+    const secrets = new InMemorySecretStore();
+    await new SessionManager(secrets).write(ADA);
+
+    await new SessionManager(secrets).clear();
+
+    await expect(new SessionManager(secrets).read()).resolves.toBeUndefined();
+    await expect(secrets.get('session')).resolves.toBeUndefined();
+  });
+
+  it('should_keep_no_session_when_a_manager_with_no_session_is_cleared', async () => {
+    const sessions = new SessionManager(new InMemorySecretStore());
+
+    await sessions.clear();
+
+    await expect(sessions.read()).resolves.toBeUndefined();
+  });
+
   it('should_give_back_the_last_session_when_a_second_session_replaces_the_first', async () => {
     const sessions = new SessionManager(new InMemorySecretStore());
 

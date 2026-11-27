@@ -1,4 +1,6 @@
+import type { AnonymousProgress } from '../application/anonymous-progress';
 import type { ProgressRepository } from '../application/progress-repository';
+import type { SessionStore } from '../application/session-store';
 import { ElapsedTime } from '../domain/shared/elapsed-time';
 import type { GameId } from '../domain/shared/game-id';
 import { GameProgress } from '../domain/progress/game-progress';
@@ -36,8 +38,14 @@ interface SavedProgress {
 }
 
 // Adapter of the `ProgressRepository` port over the local storage (classes.md decision 57,
-// issue #164). It keeps the progress of each game as one JSON text under the key
-// `progress:<game id>` of a `KeyValueStore`.
+// issue #164). It keeps the progress of each game as one JSON text in a `KeyValueStore`.
+// The key carries the user (D27, issue #46, classes.md decision 66). With a signed-in player of
+// `sessions`, the key is `progress:<user id>:<game id>`, so two accounts on one device do not
+// share progress. With no session, the key is `progress:<game id>`: the anonymous space, the key
+// of every progress saved before #46. A game id has no `:`, so the two keys never meet.
+// It also implements `AnonymousProgress`, the second role of the one repository of the progress:
+// `loadAnonymous()` and `forgetAnonymous()` read and forget the anonymous space whatever the
+// session, so `SyncProgress` merges it into the first account that signs in.
 // The saved JSON holds plain numbers and texts. The adapter reads each value of the domain
 // with `deliverTo(receiver)`, the one exit of a value (rule R-no-delivery-call), and never asks
 // a domain object for its text. On a load it builds each value object again with its factory
@@ -46,21 +54,23 @@ interface SavedProgress {
 // A saved text that is not JSON throws a `SyntaxError`. A saved progress of another version
 // or of the wrong shape throws a `RangeError`, and so does a value that its value object
 // refuses. The adapter never writes over a saved progress that it cannot read.
-export class LocalProgressRepository implements ProgressRepository {
-  constructor(private readonly store: KeyValueStore) {}
+// A repository with no `sessions` always uses the anonymous space.
+export class LocalProgressRepository implements ProgressRepository, AnonymousProgress {
+  constructor(
+    private readonly store: KeyValueStore,
+    private readonly sessions?: SessionStore,
+  ) {}
 
   async load(gameId: GameId): Promise<GameProgress | undefined> {
-    const text = await this.store.get(keyOf(gameId));
-    if (text === undefined) return undefined;
-    return progressOf(gameId, JSON.parse(text));
+    return this.loadAt(await this.keyOf(gameId), gameId);
   }
 
   async save(progress: GameProgress): Promise<void> {
-    const { key, saved } = onlyValue<{ key: string; saved: SavedProgress }>((keep) =>
+    const { gameId, saved } = onlyValue<{ gameId: GameId; saved: SavedProgress }>((keep) =>
       progress.deliverTo({
-        receive: (gameId, highScore, levels) =>
+        receive: (id, highScore, levels) =>
           keep({
-            key: keyOf(gameId),
+            gameId: id,
             saved: {
               version: VERSION,
               highScore: highScore === undefined ? undefined : savedRecordOf(highScore),
@@ -69,12 +79,36 @@ export class LocalProgressRepository implements ProgressRepository {
           }),
       }),
     );
-    await this.store.set(key, JSON.stringify(saved));
+    await this.store.set(await this.keyOf(gameId), JSON.stringify(saved));
+  }
+
+  loadAnonymous(gameId: GameId): Promise<GameProgress | undefined> {
+    return this.loadAt(anonymousKeyOf(gameId), gameId);
+  }
+
+  forgetAnonymous(gameId: GameId): Promise<void> {
+    return this.store.remove(anonymousKeyOf(gameId));
+  }
+
+  // The progress of the game `gameId` saved under `key`, or `undefined` when the key holds none.
+  private async loadAt(key: string, gameId: GameId): Promise<GameProgress | undefined> {
+    const text = await this.store.get(key);
+    if (text === undefined) return undefined;
+    return progressOf(gameId, JSON.parse(text));
+  }
+
+  // The key of the progress of a game for the signed-in player, or the anonymous key.
+  // A session that cannot be read gives the anonymous key: the web build has no secure storage
+  // (#45), and `SaveProgress` and `ListLevels` need no session (D27).
+  private async keyOf(gameId: GameId): Promise<string> {
+    const session = await this.sessions?.read().catch(() => undefined);
+    if (session === undefined) return anonymousKeyOf(gameId);
+    return `progress:${session.userId}:${valueOf(gameId)}`;
   }
 }
 
-// The key of the progress of a game in the store.
-function keyOf(gameId: GameId): string {
+// The key of the progress of a game saved with no account.
+function anonymousKeyOf(gameId: GameId): string {
   return `progress:${valueOf(gameId)}`;
 }
 

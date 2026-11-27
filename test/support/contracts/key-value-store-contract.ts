@@ -26,6 +26,28 @@ export function describeKeyValueStoreContract(name: string, make: () => KeyValue
       await expect(store.get('settings:language')).resolves.toBe('en');
     });
 
+    // #46: the progress saved with no account goes away when it merges into an account (D27).
+    it('should_give_no_value_and_keep_the_other_keys_when_the_value_of_a_key_is_removed', async () => {
+      const store = make();
+      await store.set('progress:hexa-fit', '{"level":3}');
+      await store.set('progress:hexa-sort', '{"level":5}');
+
+      await store.remove('progress:hexa-fit');
+
+      await expect(store.get('progress:hexa-fit')).resolves.toBeUndefined();
+      await expect(store.get('progress:hexa-sort')).resolves.toBe('{"level":5}');
+    });
+
+    it('should_change_nothing_when_a_key_with_no_value_is_removed', async () => {
+      const store = make();
+      await store.set('progress:hexa-sort', '{"level":5}');
+
+      await store.remove('progress:hexa-fit');
+
+      await expect(store.get('progress:hexa-fit')).resolves.toBeUndefined();
+      await expect(store.get('progress:hexa-sort')).resolves.toBe('{"level":5}');
+    });
+
     it('should_keep_each_value_under_its_own_key_when_two_keys_hold_values', async () => {
       const store = make();
 

@@ -14,4 +14,9 @@ export class InMemoryKeyValueStore implements KeyValueStore {
     this.values.set(key, value);
     return Promise.resolve();
   }
+
+  remove(key: string): Promise<void> {
+    this.values.delete(key);
+    return Promise.resolve();
+  }
 }

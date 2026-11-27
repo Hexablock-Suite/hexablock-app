@@ -27,6 +27,28 @@ export function describeSecretStoreContract(name: string, make: () => SecretStor
       await expect(store.get('session')).resolves.toBe('second');
     });
 
+    // #46: `SessionManager` forgets a refused session with `remove()`.
+    it('should_give_no_value_and_keep_the_other_keys_when_the_value_of_a_key_is_removed', async () => {
+      const store = make();
+      await store.set('session', 'a');
+      await store.set('session.backup_1', 'b');
+
+      await store.remove('session');
+
+      await expect(store.get('session')).resolves.toBeUndefined();
+      await expect(store.get('session.backup_1')).resolves.toBe('b');
+    });
+
+    it('should_change_nothing_when_a_key_with_no_value_is_removed', async () => {
+      const store = make();
+      await store.set('session.backup_1', 'b');
+
+      await store.remove('session');
+
+      await expect(store.get('session')).resolves.toBeUndefined();
+      await expect(store.get('session.backup_1')).resolves.toBe('b');
+    });
+
     it('should_keep_each_value_under_its_own_key_when_two_keys_hold_values', async () => {
       const store = make();
 

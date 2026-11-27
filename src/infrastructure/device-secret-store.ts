@@ -18,4 +18,8 @@ export class DeviceSecretStore implements SecretStore {
   async set(key: string, value: string): Promise<void> {
     await SecureStore.setItemAsync(key, value);
   }
+
+  async remove(key: string): Promise<void> {
+    await SecureStore.deleteItemAsync(key);
+  }
 }

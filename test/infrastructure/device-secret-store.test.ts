@@ -16,6 +16,10 @@ jest.mock('expo-secure-store/build/ExpoSecureStore', () => ({
       mockValues.set(key, value);
       return Promise.resolve();
     },
+    deleteValueWithKeyAsync: (key: string) => {
+      mockValues.delete(key);
+      return Promise.resolve();
+    },
   },
 }));
 

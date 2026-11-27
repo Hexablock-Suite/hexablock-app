@@ -31,6 +31,11 @@ class KeptSessions implements SessionStore {
     this.written.push(session);
     return Promise.resolve();
   }
+
+  clear(): Promise<void> {
+    this.written.length = 0;
+    return Promise.resolve();
+  }
 }
 
 // A gateway whose two operations give `answer` and record each call.
