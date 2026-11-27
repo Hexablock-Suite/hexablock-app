@@ -1,6 +1,6 @@
 import type { ElapsedTime } from '../../shared/elapsed-time';
 import type { Moves } from '../../shared/moves';
-import { Stars } from '../../progress/stars';
+import type { IStarThreshold } from '../../progress/star-count';
 
 // The moves and the elapsed time of one won Fit level.
 // `FitState` counts the moves: every accepted place, rotate and remove (issue #60).
@@ -36,7 +36,8 @@ export class FitPlay {
 // The level file holds them, and `FitLevelBuilder` reads them (classes.md decision 36).
 // It is a value object (classes.md decision 42): it never changes, and two thresholds are
 // equal when their limits are equal. The limits stay private: `isMetBy()` compares a play.
-export class FitStarThreshold {
+// `starsOf()` counts the stars of a play with these thresholds (issue #424).
+export class FitStarThreshold implements IStarThreshold<FitPlay> {
   private constructor(
     private readonly maxMoves: Moves,
     private readonly maxElapsedMs: ElapsedTime,
@@ -59,12 +60,4 @@ export class FitStarThreshold {
   isMetBy(play: FitPlay): boolean {
     return play.isWithin(this.maxMoves, this.maxElapsedMs);
   }
-}
-
-// The stars of a won Fit level, as a `Stars` value object.
-// The stars are cumulative: star N needs star N-1 (gap G110.5), as for `sortStars`.
-// So the count is the number of leading thresholds that the play meets.
-export function fitStars(play: FitPlay, thresholds: readonly FitStarThreshold[]): Stars {
-  const missed = thresholds.findIndex((threshold) => !threshold.isMetBy(play));
-  return Stars.of(missed < 0 ? thresholds.length : missed);
 }

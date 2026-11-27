@@ -104,12 +104,14 @@
             "GameProgress",
             "GameProgressReceiver",
             "ILevelBuilder",
-            "ILevelStars",
+            "IStarsByMoves",
+            "IStarsByMovesAndTime",
             "GameResult",
             "IProgressModel",
             "ProgressRecord",
             "ProgressRecordReceiver",
             "Stars",
+            "IStarThreshold",
             "LevelProgress",
             "HighScoreProgress",
             "LevelStatus"
@@ -164,6 +166,7 @@
             "LinesScoring",
             "LinesRules",
             "ComboMultiplierDecorator",
+            "ComboFactor",
             "Streak",
             "CellCount",
             "LineCount",
@@ -529,9 +532,11 @@
             "IProgressModel",
             "LevelProgress",
             "ProgressRecord",
-            "ILevelStars",
+            "IStarsByMoves",
+            "IStarsByMovesAndTime",
             "GameResult",
             "Stars",
+            "IStarThreshold",
             "LevelStatus"
           ]
         },
@@ -564,6 +569,7 @@
             "ColorStack",
             "NewTile",
             "ComboMultiplierDecorator",
+            "ComboFactor",
             "MergeState",
             "FitScoring",
             "LinesSnapshot",
@@ -764,7 +770,8 @@
             "RedoableHistory",
             "MoveHistory",
             "LevelTimer",
-            "ILevelStars",
+            "IStarsByMoves",
+            "IStarsByMovesAndTime",
             "Stars",
             "SeededPieceSource",
             "RandomSource",
@@ -807,7 +814,8 @@
             "CellCount",
             "Streak",
             "LinesSettings",
-            "ComboMultiplierDecorator"
+            "ComboMultiplierDecorator",
+            "ComboFactor"
           ]
         }
       ],

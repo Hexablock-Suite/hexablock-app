@@ -6,7 +6,7 @@ import type { SortSnapshot, SortState } from './sort-state';
 // so it codes the accepted rule of issue #59 (D22): each tile of a stack that the turn
 // clears gives `SORT_POINTS_PER_TILE`, and a turn that clears nothing gives 0.
 // `TileCount` keeps its number private (issue #232), so it gives the points of its stack.
-// A won Sort level also gets stars by moves (`sortStars`).
+// A won Sort level also gets stars by moves (`starsOf` with Sort thresholds).
 // The rules reset the cleared heights on each turn, so the photo after the turn holds only this turn.
 // The policy gives the points as a `Score` (classes.md decision 41).
 // The scoring keeps no game data (classes.md decision 26).

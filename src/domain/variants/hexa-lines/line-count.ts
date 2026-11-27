@@ -1,6 +1,7 @@
 import { AchievementCount } from '../../achievements/achievement-count';
 import { Score } from '../../shared/score';
 import type { ValueReceiver } from '../../shared/value-receiver';
+import { ComboFactor } from './combo-factor';
 
 // The points of each cleared line, before any multiplier.
 // The value codes the accepted rule of issue #59 (D22, 2026-11-06).
@@ -55,15 +56,19 @@ export class LineCount {
     return Score.of(this.value * POINTS_PER_LINE);
   }
 
-  // The points that the combo multiplier adds to the line bonus (issue #59, D22).
-  // The multiplier is `lines + streak - 1`. The base policy gives the line bonus once,
-  // so the combo adds it `multiplier - 1` more times. A placement that clears no line adds nothing.
-  // `streak` is the length of the streak as a count, because the multiplier adds it to the count
-  // of lines. `Streak.comboBonus()` gives it, so no number leaves either value object.
-  // A clearing placement has a streak of 1 or more. A streak of 0 gives a negative product,
-  // and `Score.of()` throws a RangeError.
-  comboBonus(streak: LineCount): Score {
-    if (this.isNone()) return Score.of(0);
-    return Score.of(this.value * POINTS_PER_LINE * (this.value + streak.value - 2));
+  // The combo factor of these lines in a streak of 1: the count of lines (D22, issue #427).
+  // `Streak.comboFactor()` adds the rest of the streak to it.
+  comboFactor(): ComboFactor {
+    return ComboFactor.of(this.value);
+  }
+
+  // The points that the combo factor `factor` adds to the line bonus (issue #59, D22).
+  // The base policy gives the line bonus once, so the factor adds it `factor - 1` more times.
+  // A placement that clears no line has a bonus of 0, so it adds nothing.
+  // Factor 0 comes only from one line in a streak of 0, a photo that no game makes.
+  // It takes the line bonus away once, so `Score.of()` refuses the negative points.
+  comboBonus(factor: ComboFactor): Score {
+    if (factor.equals(ComboFactor.of(0))) return Score.of(-this.value * POINTS_PER_LINE);
+    return factor.extraOn(this.bonus());
   }
 }
