@@ -75,6 +75,27 @@ describe('ElapsedTime', () => {
     expect(ElapsedTime.ofMs(60_001).isShorterThan(ElapsedTime.ofMs(60_000))).toBe(false);
   });
 
+  // The paused span of a timer adds up and leaves the time of play (issue #428).
+  it('should_give_the_sum_when_two_times_are_added', () => {
+    expect(ElapsedTime.ofMs(1_500).plus(ElapsedTime.ofMs(2_000))).toEqual(ElapsedTime.ofMs(3_500));
+    expect(ElapsedTime.ofMs(0).plus(ElapsedTime.ofMs(0))).toEqual(ElapsedTime.ofMs(0));
+  });
+
+  it('should_throw_a_range_error_when_the_sum_passes_the_largest_safe_integer', () => {
+    expect(() => ElapsedTime.ofMs(Number.MAX_SAFE_INTEGER).plus(ElapsedTime.ofMs(1))).toThrow(
+      refusal(2 ** 53),
+    );
+  });
+
+  it('should_give_the_time_left_when_a_shorter_or_equal_time_is_taken_away', () => {
+    expect(ElapsedTime.ofMs(5_000).minus(ElapsedTime.ofMs(2_000))).toEqual(ElapsedTime.ofMs(3_000));
+    expect(ElapsedTime.ofMs(5_000).minus(ElapsedTime.ofMs(5_000))).toEqual(ElapsedTime.ofMs(0));
+  });
+
+  it('should_give_zero_and_never_a_negative_time_when_a_longer_time_is_taken_away', () => {
+    expect(ElapsedTime.ofMs(2_000).minus(ElapsedTime.ofMs(5_000))).toEqual(ElapsedTime.ofMs(0));
+  });
+
   // The value leaves the object only through a receiver (issue #228).
   it('should_deliver_its_value_once_and_return_nothing_when_a_receiver_takes_it', () => {
     const receiver = new RecordingReceiver<number>();

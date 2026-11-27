@@ -26,6 +26,7 @@ import type { IRedoable, IUndoable } from './undo-capabilities';
 // a caller asks `undo()`, `redo()`, `canUndo()`, `canRedo()`, `offersUndo()` and `elapsedTime()`,
 // and the root hands out neither part (issue #234). `GameFactory` gives the same timer
 // to the root and to the `TimedRulesDecorator` that starts and stops it.
+// The root pauses and resumes the timer with the game, so a pause stops the clock (issue #428).
 // The engine is the Memento originator (decision 34). Each saved turn keeps the photo of the
 // state before the move, and `restore()` gives that photo back to the state.
 // The root only records its events, and it tells nobody (classes.md decision 52).
@@ -65,6 +66,7 @@ export class GameEngine<
   // A new game has no move to undo.
   // The state is an entity inside this aggregate, and its identity is the `MatchId` of the game.
   // A state of another match throws a RangeError, and the game stays as it was.
+  // The game is in the playing phase again, so a paused timer resumes (issue #428).
   start(initial: TState): void {
     if (!initial.belongsTo(this.matchId)) {
       throw new RangeError('The first state belongs to another match.');
@@ -72,6 +74,7 @@ export class GameEngine<
     this.state = copy(initial);
     this.current = PlayingPhase.instance;
     this.history?.clear();
+    this.timer?.resume();
   }
 
   // Takes back the last saved move (classes.md decisions 27 and 34).
@@ -163,13 +166,18 @@ export class GameEngine<
     return this.recorded.splice(0);
   }
 
+  // A pause stops the clock of a timed game (classes.md decision 19, issue #428).
+  // The timer ignores a pause before the first turn and after the end.
   pause(): void {
     this.started();
     this.current = this.current.pause();
+    this.timer?.pause();
   }
 
+  // A resume starts the clock again. The timer ignores it when the game has no pause.
   resume(): void {
     this.current = this.current.resume();
+    this.timer?.resume();
   }
 
   // The photo of the state now. It is immutable and holds a copy of the board,

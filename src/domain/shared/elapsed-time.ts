@@ -33,6 +33,19 @@ export class ElapsedTime {
     receiver.receive(this.value);
   }
 
+  // The sum of this time and `other`. A sum above the largest safe integer throws a RangeError.
+  // `LevelTimer` adds up the paused spans of a game with it (issue #428).
+  plus(other: ElapsedTime): ElapsedTime {
+    return ElapsedTime.ofMs(this.value + other.value);
+  }
+
+  // The time that is left when `other` is taken away from this time.
+  // A longer `other` gives 0, because an elapsed time is never negative.
+  // `LevelTimer` leaves the paused spans out of the time of play with it (issue #428).
+  minus(other: ElapsedTime): ElapsedTime {
+    return ElapsedTime.ofMs(Math.max(0, this.value - other.value));
+  }
+
   // Tells if this time is below `other`. An equal time is not shorter.
   // Less time is the better play, as in the backend `ElapsedTime`.
   isShorterThan(other: ElapsedTime): boolean {
