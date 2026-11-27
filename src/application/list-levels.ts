@@ -37,18 +37,23 @@ export class ListLevels implements UseCase<ListLevelsRequest, LevelSummary[]> {
     try {
       const levels = await this.levels.list(request.gameId);
       const progress = await this.progress.load(request.gameId);
-      const onFigure = levels.filter((level) => level.isPlayedOn(request.figure));
-      return Result.success(summariesOf(inOrder(onFigure), progress));
+      return Result.success(summariesOf(levelsOnFigure(levels, request.figure), progress));
     } catch (thrown) {
       return Result.failure(caughtError(FailureCode.listFailed, thrown));
     }
   }
 }
 
-// The levels in the order of their files. The sort is stable,
+// The levels that are played on `figure`, in the order of their files (S3-08).
+// `ListLevels` and `StartGame` (#397) give this list to `LevelStatus.ofEach()`,
+// so both read one order. The sort is stable,
 // so two levels of one order keep the order of the repository.
-function inOrder(levels: readonly LevelDefinition[]): LevelDefinition[] {
-  return [...levels].sort((left, right) => {
+export function levelsOnFigure(
+  levels: readonly LevelDefinition[],
+  figure: TopologyId,
+): LevelDefinition[] {
+  const onFigure = levels.filter((level) => level.isPlayedOn(figure));
+  return onFigure.sort((left, right) => {
     if (left.comesBefore(right)) return -1;
     if (right.comesBefore(left)) return 1;
     return 0;

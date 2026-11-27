@@ -39,6 +39,7 @@ export const es = {
   'play.redo': 'Rehacer',
   'play.error.nothing-to-undo': 'No hay jugada para deshacer',
   'play.error.nothing-to-redo': 'No hay jugada para rehacer',
+  'play.error.level-locked': 'Ese nivel está bloqueado. Gana el nivel anterior para abrirlo.',
   'play.fit.moves': 'Movimientos',
   'play.fit.tray': 'Bandeja de piezas',
   'play.fit.piece': 'Pieza',

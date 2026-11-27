@@ -53,8 +53,9 @@ const OUTCOME_TEXTS: readonly (readonly [Outcome, TextKey])[] = [
 
 // The text of each failure code (issue #322, classes.md decision 62). The table is a `Record`
 // over the closed set of codes, so a new code with no text fails the type check.
-// Three failures have their own text. Every other failure shows the general text `play.error`.
+// Four failures have their own text. Every other failure shows the general text `play.error`.
 // A quick second tap on undo or redo can find no move left (#178): its text says so.
+// A link can name a locked level, and `StartGame` refuses it (#397): its text says why.
 const ERROR_TEXTS: Readonly<Record<FailureCode, TextKey>> = {
   'start-failed': 'play.error',
   'no-running-game': 'play.error',
@@ -69,6 +70,7 @@ const ERROR_TEXTS: Readonly<Record<FailureCode, TextKey>> = {
   'save-failed': 'play.error',
   'load-failed': 'play.error',
   'list-failed': 'play.error',
+  'level-locked': 'play.error.level-locked',
   'unexpected-failure': 'play.error',
 };
 
@@ -82,8 +84,8 @@ const ERROR_TEXTS: Readonly<Record<FailureCode, TextKey>> = {
 // reads no clock (#175). A variant with undo shows the undo and the redo of the response:
 // the root answers `canUndo` and `canRedo`, so the presenter reads no history (#178).
 // A failed `Result` never throws (decision 28): the presenter keeps the last board and shows
-// the text of the failure. A rejected move and an undo or a redo that finds no move have their
-// own texts, and any other failure has one general text. The table of texts names every code.
+// the text of the failure. A rejected move, an undo or a redo that finds no move and a locked
+// level (#397) have their own texts, and any other failure has one general text. The table of texts names every code.
 // Every text comes from the catalog of one language (APP-FR-11).
 // A view attaches to see each new view model. It sees the current one at once.
 export class GamePresenter<TCell, TCoord, TMove, TView, TCellView, TPayloadView> {

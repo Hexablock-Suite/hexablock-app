@@ -520,12 +520,46 @@ describe('CompositionRoot', () => {
   // and its `GameFactories` port gives the factory of a bundled level by its id.
   describe('levels', () => {
     // `fit-02` has seven cells. The Fit level of a start with no level id has three.
-    it('should_start_the_bundled_level_when_the_start_game_of_the_root_gets_its_level_id', async () => {
-      const { startGame } = testRoot().gameUseCases(GameId.of('hexa-fit'));
+    // Since #397 `StartGame` reads the saved progress of the one progress repository of the root,
+    // the repository of `ListLevels`: the device keeps a won `fit-01`, so `fit-02` is open
+    // and `fit-03` is locked.
+    it('should_start_the_open_bundled_level_and_refuse_the_locked_one_when_the_start_game_of_the_root_gets_their_level_ids', async () => {
+      const FIT = GameId.of('hexa-fit');
+      const store = new InMemoryKeyValueStore();
+      const root = new CompositionRoot({
+        clock: new ManualClock(),
+        logger: new RecordingLogger(),
+        store,
+      });
+      const saved = GameProgress.start(FIT);
+      saved.recordLevel(
+        ProgressRecord.of({
+          gameId: FIT,
+          score: Score.of(0),
+          levelId: LevelId.of('fit-01'),
+          stars: Stars.of(2),
+        }),
+      );
+      await new LocalProgressRepository(store).save(saved);
+      const { startGame } = root.gameUseCases(FIT);
 
       const started = valueOf(await startGame.execute({ levelId: LevelId.of('fit-02') }));
+      const locked = errorOf(await startGame.execute({ levelId: LevelId.of('fit-03') }));
 
       expect(started.freeSpaces).toHaveLength(7);
+      expect([locked.code, locked.message]).toEqual(['level-locked', 'The level is locked.']);
+    });
+
+    // Issue #397: a root with no store has no saved progress, so only the first level
+    // of the figure is open, as `LevelStatus.ofEach()` gives it with no progress.
+    it('should_start_only_the_first_level_when_the_root_has_no_store', async () => {
+      const { startGame } = testRoot().gameUseCases(GameId.of('hexa-fit'));
+
+      const first = valueOf(await startGame.execute({ levelId: LevelId.of('fit-01') }));
+      const second = errorOf(await startGame.execute({ levelId: LevelId.of('fit-02') }));
+
+      expect(first.freeSpaces).toHaveLength(6);
+      expect(second.code).toBe('level-locked');
     });
 
     // Hexa Lines has no levels. `sort-01` is a hex level, so the square refuses it (S3-08).

@@ -39,6 +39,7 @@ export const en = {
   'play.redo': 'Redo',
   'play.error.nothing-to-undo': 'There is no move to undo',
   'play.error.nothing-to-redo': 'There is no move to redo',
+  'play.error.level-locked': 'That level is locked. Win the level before it to open it.',
   'play.fit.moves': 'Moves',
   'play.fit.tray': 'Piece tray',
   'play.fit.piece': 'Piece',

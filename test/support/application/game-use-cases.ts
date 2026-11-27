@@ -2,6 +2,7 @@ import { ApplyMove } from '../../../src/application/apply-move';
 import type { GameEventPublisher } from '../../../src/application/game-event-publisher';
 import type { GameFactories } from '../../../src/application/game-factories';
 import type { GameRepository } from '../../../src/application/game-repository';
+import type { LevelRepository } from '../../../src/application/level-repository';
 import { RedoMove } from '../../../src/application/redo-move';
 import type { Result, UseCaseError } from '../../../src/application/result';
 import { StartGame } from '../../../src/application/start-game';
@@ -10,6 +11,8 @@ import type { BoardState } from '../../../src/domain/engine/board-state';
 import type { Cloneable } from '../../../src/domain/engine/cloneable';
 import type { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameFactory } from '../../../src/domain/engine/game-factory';
+import type { GameId } from '../../../src/domain/engine/game-id';
+import { TopologyId } from '../../../src/domain/engine/geometry-factory';
 import type { LevelId } from '../../../src/domain/engine/level-id';
 import type { MatchIdGenerator } from '../../../src/domain/engine/match-id-generator';
 import type { IVariantFactory } from '../../../src/domain/engine/variant-factory';
@@ -64,6 +67,27 @@ export function factoriesOf<
   };
 }
 
+// A test double of the `LevelRepository` port for a game with no levels.
+export const noLevels: LevelRepository = {
+  list: async () => [],
+  levelOf: async () => undefined,
+};
+
+// A `StartGame` of the game `gameId` on the hexagon over `factories` and `games`, as the root
+// builds it for a game with no levels (#397). With no level, no level id can start.
+export function startGameOver<
+  TCell,
+  TCoord,
+  TMove,
+  TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
+>(
+  factories: GameFactories<TCell, TCoord, TMove, TState>,
+  games: GameRepository<TCell, TCoord, TMove, TState>,
+  gameId: GameId,
+): StartGame<TCell, TCoord, TMove, TState> {
+  return new StartGame(factories, games, noLevels, undefined, gameId, TopologyId.hex);
+}
+
 // The game use cases of one variant over one shared repository.
 // `ApplyMove` delivers the events of each turn to `events`. Its success carries each publisher
 // failure as a failed delivery (issues 132, 233 and #342).
@@ -83,7 +107,11 @@ export function gameUseCases<
   const games = new MemoryGameRepository<TCell, TCoord, TMove, TState>();
   return {
     games,
-    startGame: new StartGame(factoriesOf(new GameFactory(gameIdOf(factory), factory, ids)), games),
+    startGame: startGameOver(
+      factoriesOf(new GameFactory(gameIdOf(factory), factory, ids)),
+      games,
+      gameIdOf(factory),
+    ),
     applyMove: new ApplyMove(games, events),
     undoMove: new UndoMove(games),
     redoMove: new RedoMove(games),
