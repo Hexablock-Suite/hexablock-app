@@ -76,7 +76,8 @@
           Class diagram of layer 2 showing the use cases Register, Login and UpdateSettings, each
           implementing the UseCase input port with its binding. Register and Login use the
           AccountGateway and SessionStore output ports, UpdateSettings uses the SettingsStore output
-          port, and AccountGateway returns Session values.
+          port, and AccountGateway returns Session values and rejects with an AccountFailure that
+          carries a failure code.
         </desc>
         <defs>
           <marker
@@ -392,9 +393,6 @@
           text-anchor="middle"
         >
           Register
-          <tspan data-requirement="APP-FR-12" fill="#5b6873" font-size="8" font-weight="400">
-            «Sprint 4»
-          </tspan>
         </text>
         <text
           x="184"
@@ -456,9 +454,6 @@
           text-anchor="middle"
         >
           Login
-          <tspan data-requirement="APP-FR-12" fill="#5b6873" font-size="8" font-weight="400">
-            «Sprint 4»
-          </tspan>
         </text>
         <text
           x="488"
@@ -577,9 +572,6 @@
           text-anchor="middle"
         >
           SessionStore
-          <tspan data-requirement="APP-FR-12" fill="#5b6873" font-size="8" font-weight="400">
-            «Sprint 4»
-          </tspan>
         </text>
         <text x="280" y="404" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + read(): Promise&lt;Session | undefined&gt;
@@ -587,8 +579,8 @@
         <text x="280" y="420" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + write(session: Session): Promise&lt;void&gt;
         </text>
-        <text x="280" y="436" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + clear(): Promise&lt;void&gt;
+        <text x="280" y="436" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          no clear() yet: decision 65
         </text>
 
         <!-- Class: SettingsStore (interface, port) -->
@@ -668,9 +660,6 @@
           text-anchor="middle"
         >
           AccountGateway
-          <tspan data-requirement="APP-FR-12" fill="#5b6873" font-size="8" font-weight="400">
-            «Sprint 4»
-          </tspan>
         </text>
         <text x="168" y="548" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + register(credentials: Credentials): Promise&lt;Session&gt;
@@ -712,9 +701,6 @@
           text-anchor="middle"
         >
           Session
-          <tspan data-requirement="APP-FR-12" fill="#5b6873" font-size="8" font-weight="400">
-            «Sprint 4»
-          </tspan>
         </text>
         <text x="624" y="548" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + token: string
@@ -740,6 +726,43 @@
           UseCase‹Settings, Settings›
         </text>
 
+        <!-- Class: AccountFailure (error of the AccountGateway port, #45) -->
+        <rect
+          x="800"
+          y="484"
+          width="176"
+          height="72"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="800" y1="532" x2="976" y2="532" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="888"
+          y="502"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «error»
+        </text>
+        <text
+          x="888"
+          y="520"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          AccountFailure
+        </text>
+        <text x="816" y="548" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + code: AccountFailureCode
+        </text>
         <!-- Footnote: classes the budget leaves out -->
         <text
           x="24"
@@ -758,7 +781,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          AccountGateway and SettingsStore are proposals.
+          SettingsStore is a proposal. Register, Login and their two ports exist since #45 (decision
+          65). AccountGateway rejects with an AccountFailure.
         </text>
 
         <text
