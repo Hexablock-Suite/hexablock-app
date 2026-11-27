@@ -64,7 +64,7 @@
       <h1>Game events and sound: Observer and Facade</h1>
 
       <svg
-        viewBox="0 0 1040 1028"
+        viewBox="0 0 1040 1044"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="adevents-title adevents-desc"
@@ -74,7 +74,8 @@
           Class diagram across layers 4, 3, 2 and 1 showing GameEventBus in layer 3 implementing the
           GameEventPublisher port of layer 2 and holding many GameEventListener objects,
           AchievementCounterListener, the first listener, which counts the events of a move of each
-          game and logs each failed save of the counters, GamePresenter and AudioManager, the audio
+          game and logs each failed save of the counters (each event that counts records its own
+          count through CountsForAchievements, #406), GamePresenter and AudioManager, the audio
           facade of layer 4, implementing GameEventListener, AudioManager playing through an
           external SoundLibrary, and GameEventPublisher publishing GameEvent of layer 1.
         </desc>
@@ -751,9 +752,19 @@
           AchievementCounterListener queues each save of the counters, and it writes each failed
           save to the Logger port of the root as one save-failed entry (#384).
         </text>
+        <text
+          x="24"
+          y="912"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          An event that counts for an achievement implements CountsForAchievements of layer 1 and
+          records its own count, so the listener names no event class (#406).
+        </text>
 
-        <!-- The legend sits 16 lower than before: the footnote has one more line since #384. -->
-        <g transform="translate(0 16)">
+        <!-- The legend sits 32 lower than before: the footnote has one more line since #384 and one more since #406. -->
+        <g transform="translate(0 32)">
           <!-- Legend -->
           <line
             x1="24"
