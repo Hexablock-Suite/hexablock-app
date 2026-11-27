@@ -109,7 +109,7 @@ export class MergeFactory<TCoord> implements IVariantFactory<
   }
 
   createRules(): IGameRules<Slide<GridAxis>, MergeState<MergeTile, TCoord, GridAxis>> {
-    return new MergeRules<MergeTile, TCoord, GridAxis>(this.settings.targetTile());
+    return new MergeRules<MergeTile, TCoord, GridAxis>();
   }
 
   // Hexa Merge has no timer (classes.md decision 19).
@@ -133,6 +133,7 @@ export class MergeFactory<TCoord> implements IVariantFactory<
   }
 
   // The first tiles come from the same source as the later tiles.
+  // The state keeps the target tile of the settings (issue #426).
   createInitialState(
     matchId: MatchId,
     stateId: GameStateId,
@@ -143,6 +144,7 @@ export class MergeFactory<TCoord> implements IVariantFactory<
       matchId,
       this.createBoard(boardId),
       this.createPieceSource(),
+      this.settings.targetTile(),
     );
     for (let i = 0; i < START_TILES; i += 1) state.addNewTile();
     return state;

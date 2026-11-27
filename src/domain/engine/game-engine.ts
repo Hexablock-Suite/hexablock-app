@@ -12,6 +12,7 @@ import type { IGameRules } from './rules';
 import type { IScoringPolicy } from './scoring-policy';
 import type { ITimed } from './timed';
 import type { IRedoable, IUndoable } from './undo-capabilities';
+import type { LevelId } from '../progress/level-id';
 
 // The aggregate root of one game (classes.md decision 26).
 // It is an entity: its `MatchId` is its identity, and the id never changes.
@@ -31,6 +32,9 @@ import type { IRedoable, IUndoable } from './undo-capabilities';
 // state before the move, and `restore()` gives that photo back to the state.
 // The root only records its events, and it tells nobody (classes.md decision 52).
 // `ApplyMove` takes them with `takeEvents()` after the turn and delivers them (decision 29).
+// `levelId` names the level of the match, as `gameId` names the variant (decision 61, #180).
+// A game with no levels has none. It never changes while the match lives, and undo and redo
+// never touch it. It is not an identity of the aggregate: it names an entry of a catalogue.
 export class GameEngine<
   TCell,
   TCoord,
@@ -49,6 +53,7 @@ export class GameEngine<
     private readonly scoring: IScoringPolicy<TState>,
     private readonly history?: IUndoable<TMove, SnapshotOf<TState>>,
     private readonly timer?: ITimed,
+    private readonly levelId?: LevelId,
   ) {}
 
   // Two engines are the same game when they have the same `MatchId`.
@@ -113,6 +118,12 @@ export class GameEngine<
   // (classes.md decisions 19 and 27). So `MoveResult.elapsedMs` exists only for a timed game.
   elapsedTime(): ElapsedTime | undefined {
     return this.timer?.elapsedMs();
+  }
+
+  // The level of the match, or `undefined` for a game with no levels (decision 61).
+  // `moveResultOf()` asks it, so `MoveResult.levelId` exists only for a level.
+  levelOfMatch(): LevelId | undefined {
+    return this.levelId;
   }
 
   // One turn: receive the move, let the rules validate, apply, resolve and evaluate it

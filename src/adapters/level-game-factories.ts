@@ -9,6 +9,7 @@ import type { GeometryFactory } from '../domain/engine/geometry-factory';
 import type { LevelDefinition } from '../domain/progress/level-definition';
 import type { LevelId } from '../domain/progress/level-id';
 import type { MatchIdGenerator } from '../domain/engine/match-id-generator';
+import type { IProgressModel } from '../domain/progress/progress-model';
 import type { RandomSource } from '../domain/engine/random-source';
 import type { IVariantFactory } from '../domain/engine/variant-factory';
 import { FitFactory } from '../domain/variants/hexa-fit/fit-factory';
@@ -48,6 +49,11 @@ export interface LevelVariant<
 //   with a RangeError, and the error carries the level id as its `cause`.
 // Each `GameFactory` takes the `GameId` of the game and the one id generator of the root,
 // so the games of every level get the `MatchId` of a new match (decision 40).
+// The factory of a level also takes its level id, so each game of the level keeps it
+// (decision 61, #180).
+// `progressModelFor()` gives the progress model of the same variant factory: a level counts
+// its stars with its own star rule, so the composition root builds `SaveProgress` with the
+// model of the level of the finished game (#180).
 // This file is the code of layer 3 that knows the variants with levels:
 // `fitLevelVariant()` and `sortLevelVariant()` pair each level builder with its variant factory.
 export class LevelGameFactories<
@@ -60,7 +66,7 @@ export class LevelGameFactories<
 
   constructor(
     private readonly gameId: GameId,
-    variant: IVariantFactory<TCell, TCoord, TMove, TState, unknown>,
+    private readonly variant: IVariantFactory<TCell, TCoord, TMove, TState, unknown>,
     private readonly ids: MatchIdGenerator,
     private readonly levels: LevelRepository,
     private readonly levelVariant?: LevelVariant<TCell, TCoord, TMove, TState>,
@@ -70,11 +76,25 @@ export class LevelGameFactories<
 
   async factoryFor(levelId?: LevelId): Promise<GameFactory<TCell, TCoord, TMove, TState>> {
     if (levelId === undefined) return this.registered;
+    return new GameFactory(this.gameId, await this.variantOf(levelId), this.ids, levelId);
+  }
+
+  // The progress model of the level `levelId`, or of the registered variant factory with no
+  // level id. A level id that the game does not have rejects the promise, as `factoryFor()` does.
+  async progressModelFor(levelId?: LevelId): Promise<IProgressModel> {
+    if (levelId === undefined) return this.variant.createProgressModel();
+    return (await this.variantOf(levelId)).createProgressModel();
+  }
+
+  // The variant factory of the level `levelId` of the game.
+  private async variantOf(
+    levelId: LevelId,
+  ): Promise<IVariantFactory<TCell, TCoord, TMove, TState, unknown>> {
     const { levelVariant } = this;
     if (levelVariant === undefined) throw new RangeError(NO_LEVEL, { cause: levelId });
     const definition = await this.levels.levelOf(this.gameId, levelId);
     if (definition === undefined) throw new RangeError(NO_LEVEL, { cause: levelId });
-    return new GameFactory(this.gameId, levelVariant.factoryOf(definition), this.ids);
+    return levelVariant.factoryOf(definition);
   }
 }
 

@@ -5,6 +5,7 @@ import type { GameId } from '../shared/game-id';
 import type { GameStateId } from './game-state-id';
 import type { GridAxis } from './grid-topology';
 import type { MatchId } from './match-id';
+import type { Moves } from '../shared/moves';
 import type { Score } from '../shared/score';
 
 // The photo of one state at one moment (classes.md decisions 7, 29 and 34).
@@ -61,6 +62,13 @@ export abstract class BoardSnapshot<TCell, TCoord, TAxis extends GridAxis = Grid
   // variant photo, so this base ignores them.
   eventsOfLastMove(_game: GameId, _match: MatchId): readonly GameEvent[] {
     return [];
+  }
+
+  // The count of the accepted moves of the game, or `undefined` for a game that counts none
+  // (D26, decision 61). Every level photo, Fit and Sort, gives its own count.
+  // Lines and Merge count no moves, so this base gives none. `moveResultOf()` asks it.
+  moveCount(): Moves | undefined {
+    return undefined;
   }
 
   // The data that the screen of the variant draws. Each variant photo narrows the type.

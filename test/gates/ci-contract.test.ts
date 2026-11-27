@@ -42,6 +42,29 @@ describe('CI contract', () => {
     expect(scripts['api:generate']).toBe('node scripts/contract/api-types.mjs generate');
   });
 
+  // hexablock-api issue #158: the job loads the bundled levels into a migrated API and checks
+  // them for drift. PUT /v1/levels needs an account in LEVEL_EDITOR_IDS.
+  it('should_load_and_check_the_bundled_levels_against_a_migrated_api_when_job_contract_runs', () => {
+    const contractJob = read('.github/workflows/ci.yml').split(/^ {2}contract:\n/m)[1] ?? '';
+    const scripts = JSON.parse(read('package.json')).scripts;
+
+    expect(contractJob).toMatch(/^ {4}services:\n {6}postgres:\n {8}image: postgres:/m);
+    expect(contractJob).toMatch(
+      /^ {6}DATABASE_URL: postgres:\/\/hexablock:hexablock@localhost:5432\/hexablock$/m,
+    );
+    expect(contractJob).toMatch(/pnpm build\n {10}pnpm db:migrate\n/);
+    expect(contractJob).toContain('LEVEL_EDITOR_IDS="$user_id"');
+    expect(contractJob).toContain('LEVEL_EDITOR_TOKEN=$token');
+    expect(contractJob).toMatch(
+      /^ {6}- run: pnpm api:check\n(?:.*\n)*? {6}- run: pnpm levels:load\n {6}- run: pnpm levels:check$/m,
+    );
+    expect(contractJob).toMatch(
+      /^ {6}- run: pnpm levels:check\n(?: {6}#[^\n]*\n)* {6}- name: sync a result of a bundled level\n {8}env:\n {10}BUNDLED_LEVELS_LIVE: '1'\n {8}run: pnpm exec jest --selectProjects contract test\/contract\/bundled-levels-sync\.test\.ts$/m,
+    );
+    expect(scripts['levels:load']).toBe('node scripts/contract/bundled-levels.mjs load');
+    expect(scripts['levels:check']).toBe('node scripts/contract/bundled-levels.mjs check');
+  });
+
   it('should_reject_a_paired_api_revision_that_is_not_a_full_commit_sha_when_set', () => {
     const contractJob = read('.github/workflows/ci.yml').split(/^ {2}contract:\n/m)[1] ?? '';
 

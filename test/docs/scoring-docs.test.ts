@@ -28,7 +28,7 @@ import { TileCount } from '../../src/domain/variants/hexa-sort/tile-count';
 import { squareTopology, type SquareCoord } from '../support/engine/square-topology';
 import { repoRoot } from '../support/run-tool';
 import { linesState } from '../support/variants/hexa-lines/lines-game';
-import { mergeBoard, mergeState } from '../support/variants/hexa-merge/merge-game';
+import { mergeBoard, mergeState, TARGET } from '../support/variants/hexa-merge/merge-game';
 import { MATCH_ID } from '../support/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../support/engine/entity-ids';
 import { delivered } from '../support/engine/value-receiver';
@@ -116,6 +116,7 @@ function mergePoints(values: number[]): number {
     MATCH_ID,
     mergeBoard(),
     start.snapshot().tileSource(),
+    TARGET,
     false,
     values.map(MergeTile.of),
   );

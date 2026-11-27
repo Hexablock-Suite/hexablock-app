@@ -4,7 +4,7 @@ import { Resolution } from '../../engine/resolution';
 import { BaseGameRules } from '../../engine/rules';
 import type { IMergeable } from './mergeable';
 import type { MergeState } from './merge-state';
-import { SLIDE_SENSES, Slide } from './slide';
+import { Slide, SlideSense } from './slide';
 
 // Strategy (D1): the rules of Hexa Merge (statement §1.4). It extends `BaseGameRules`,
 // so the engine runs the turn through the template method `playTurn()` (decision 21).
@@ -16,6 +16,7 @@ import { SLIDE_SENSES, Slide } from './slide';
 // A slide that changes no cell is not valid. The game ends when no slide changes the board
 // after the new tile appears.
 // The target tile sets `targetReached` and does not end the game (A3).
+// The state keeps the target, as `SortState` keeps its goal (issue #426). So the rules pass no target.
 // The rules decide. The state changes itself in place: `MergeState.slide()` packs the tiles,
 // and `MergeState.addNewTile()` puts the new tile. The rules ask the photo of the state
 // for the axes of its board, and they ask `canSlide()`.
@@ -24,19 +25,13 @@ export class MergeRules<
   TCoord,
   TAxis extends GridAxis,
 > extends BaseGameRules<Slide<TAxis>, MergeState<TCell, TCoord, TAxis>> {
-  // The rules compare a tile with the target by `canMergeWith()`: two tiles merge
-  // exactly when they are equal (§1.4).
-  constructor(private readonly target: TCell) {
-    super();
-  }
-
   protected isValid(state: MergeState<TCell, TCoord, TAxis>, slide: Slide<TAxis>): boolean {
     return state.canSlide(slide);
   }
 
   *validMoves(state: MergeState<TCell, TCoord, TAxis>): Iterable<Slide<TAxis>> {
     for (const axis of state.snapshot().boardCopy().axes()) {
-      for (const toward of SLIDE_SENSES) {
+      for (const toward of SlideSense.all) {
         const slide = Slide.of(axis, toward);
         if (this.isValid(state, slide)) yield slide;
       }
@@ -47,7 +42,7 @@ export class MergeRules<
     state: MergeState<TCell, TCoord, TAxis>,
     slide: Slide<TAxis>,
   ): MergeState<TCell, TCoord, TAxis> {
-    state.slide(slide, this.target);
+    state.slide(slide);
     return state;
   }
 

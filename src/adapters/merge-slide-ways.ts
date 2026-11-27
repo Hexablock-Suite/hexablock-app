@@ -1,7 +1,7 @@
 import { CoordKeyMap } from '../domain/engine/coord-key-map';
 import type { GridAxis, GridTopology } from '../domain/engine/grid-topology';
 import type { RegionSize } from '../domain/engine/region-size';
-import { SLIDE_SENSES, Slide } from '../domain/variants/hexa-merge/slide';
+import { Slide, SlideSense } from '../domain/variants/hexa-merge/slide';
 import type { BoardLayout } from './board/board-layout';
 
 // The eight compass names of a way on the screen, counterclockwise from the east.
@@ -55,7 +55,7 @@ export function slideWays<TCoord>(
   };
   return topology
     .axes()
-    .flatMap((axis) => SLIDE_SENSES.map((toward) => Slide.of(axis, toward)))
+    .flatMap((axis) => SlideSense.all.map((toward) => Slide.of(axis, toward)))
     .map((move) => {
       const longest = cells
         .map((c) => [...move.lineThrough(board, c)])

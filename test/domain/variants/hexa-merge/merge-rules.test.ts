@@ -4,6 +4,8 @@ import { Seed } from '../../../../src/domain/engine/seed';
 import { Score } from '../../../../src/domain/shared/score';
 import { Board } from '../../../../src/domain/engine/board';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
+import { MoveHistory } from '../../../../src/domain/engine/move-history';
+import { UndoLimit } from '../../../../src/domain/engine/undo-limit';
 import { GameId } from '../../../../src/domain/shared/game-id';
 import { PlayingPhase } from '../../../../src/domain/engine/game-phase';
 import { hex, HexAxis, type HexCoord } from '../../../../src/domain/engine/hex-topology';
@@ -23,6 +25,7 @@ import {
   hexTopology,
   mergeGame,
   mergeState,
+  mergeStateFor,
   valueOf,
   values,
   type HexMergeState,
@@ -192,14 +195,14 @@ describe('MergeRules', () => {
 
   it('should_keep_playing_and_mark_the_target_when_a_merge_makes_the_target_tile', () => {
     const { engine } = mergeGame(
-      mergeState(
+      mergeStateFor(
+        MergeTile.of(8),
         [
           [hex(-2, 0), 4],
           [hex(0, 0), 4],
         ],
         3,
       ),
-      MergeTile.of(8),
     );
 
     const outcome = playMove(engine, Slide.of(HexAxis.q, SlideSense.forward));
@@ -333,11 +336,17 @@ describe('Merge edge cases', () => {
         HexCoord,
         Slide<HexAxis>,
         MergeState<Chip, HexCoord, HexAxis>
-      >(MATCH_ID, GameId.of('hexa-merge'), new MergeRules<Chip, HexCoord, HexAxis>(chip('aaaa')), {
+      >(MATCH_ID, GameId.of('hexa-merge'), new MergeRules<Chip, HexCoord, HexAxis>(), {
         score: () => Score.of(0),
       });
       engine.start(
-        new MergeState(STATE_ID, MATCH_ID, board, new FixedListPieceSource<NewTile<Chip>>([])),
+        new MergeState(
+          STATE_ID,
+          MATCH_ID,
+          board,
+          new FixedListPieceSource<NewTile<Chip>>([]),
+          chip('aaaa'),
+        ),
       );
       return engine;
     }
@@ -386,10 +395,57 @@ describe('Merge edge cases', () => {
   });
 });
 
+// Issue #426: the state keeps the target, and the rules pass no target.
+describe('MergeRules target', () => {
+  // An undo takes back the photo in place, so the state keeps its target.
+  // The same slide then reaches the target again.
+  it('should_reach_the_target_of_the_state_again_when_the_slide_that_made_it_is_undone_and_played_again', () => {
+    const board = new Board<MergeTile, HexCoord, HexAxis>(
+      BOARD_ID,
+      hexTopology.region(RegionSize.of(2)),
+      hexTopology,
+    );
+    board.occupy(hex(0, 0), MergeTile.of(2));
+    board.occupy(hex(1, 0), MergeTile.of(2));
+    const engine = new GameEngine<MergeTile, HexCoord, Slide<HexAxis>, HexMergeState>(
+      MATCH_ID,
+      GameId.of('hexa-merge'),
+      new MergeRules<MergeTile, HexCoord, HexAxis>(),
+      { score: () => Score.of(0) },
+      new MoveHistory(UndoLimit.of(1)),
+    );
+    const start = new MergeState(
+      STATE_ID,
+      MATCH_ID,
+      board,
+      new FixedListPieceSource<NewTile<MergeTile>>([]),
+      MergeTile.of(4),
+    );
+    const slide = Slide.of(HexAxis.q, SlideSense.backward);
+    const reached = () => engine.snapshot().hasReachedTarget();
+    const seen: boolean[] = [];
+
+    engine.start(start);
+    seen.push(reached());
+    playMove(engine, slide);
+    seen.push(reached());
+    engine.undo();
+    seen.push(reached());
+    playMove(engine, slide);
+    seen.push(reached());
+    engine.start(start);
+    seen.push(reached());
+    playMove(engine, slide);
+    seen.push(reached());
+
+    expect(seen).toEqual([false, true, false, true, false, true]);
+  });
+});
+
 // R7: the Merge state is an entity, so it keeps its object. A slide changes it in place.
 describe('MergeRules in place', () => {
   it('should_change_the_same_state_object_when_a_slide_is_applied', () => {
-    const rules = new MergeRules<MergeTile, HexCoord, HexAxis>(MergeTile.of(2048));
+    const rules = new MergeRules<MergeTile, HexCoord, HexAxis>();
     const state = mergeState([
       [hex(0, 0), 2],
       [hex(1, 0), 2],
@@ -421,7 +477,7 @@ describe('MergeRules in place', () => {
       2,
       mergeTileSource(Seed.of(3)),
     );
-    const { engine, rules } = mergeGame(start, MergeTile.of(2048), failing);
+    const { engine, rules } = mergeGame(start, failing);
     const facts = (state: MergeSnapshot<MergeTile, HexCoord, HexAxis>) => ({
       cells: state.boardCopy().occupiedCells(),
       merged: state.mergedTiles(),
@@ -443,7 +499,7 @@ describe('MergeRules in place', () => {
 // when the line compiles, because then the directive is unused.
 describe('MergeRules steps', () => {
   it('should_reject_at_compile_time_when_a_caller_asks_a_step_of_the_merge_rules', () => {
-    const rules = new MergeRules<MergeTile, HexCoord, HexAxis>(MergeTile.of(2048));
+    const rules = new MergeRules<MergeTile, HexCoord, HexAxis>();
     const askSteps = () => [
       // @ts-expect-error The step is protected (issue #413).
       rules.isValid(undefined as never, undefined as never),
