@@ -73,23 +73,24 @@
         <desc id="factory-desc">
           Class diagram of layer 1 showing the IVariantFactory abstract factory that creates the
           rules, piece source, scoring, board, progress model, initial state and optional history of
-          a variant, LevelDefinition, the data of one level file with its level id and its order,
-          which directs the ILevelBuilder builder and tells the list of levels its figure and its
-          order, the abstract GameEvent with GameEnded, the domain event that the root records when
-          a game ends, with a note that GameEngine records it in the turn that ends a match, the
-          Clock and RandomSource interfaces that layer 4 implements, with a note that GameFactory
-          uses neither and the composition root injects both into the variant factories (a variant
-          factory draws a new Seed of the RandomSource in each match), and the MatchIdGenerator
-          interface that gives the MatchId of each new match. Each reading of the Clock is a
-          ClockReading value object (view 3). The internal ids are local value objects that keep the
-          MatchId of their match: GameFactory builds the GameStateId of the first state and the
-          BoardId of its board from it, and FitFactory builds the LevelTimerId of the timer of a
-          timed game in createTimer(). GameFactory keeps the GameId of the game, an IVariantFactory
-          that answers isFor() for it and the MatchIdGenerator, wraps the rules of a timed game in
-          TimedRulesDecorator, gives the same timer to the root and creates the started GameEngine.
-          GameEnded keeps the MatchId, the Outcome and the final Score, a value object, GameEvent
-          keeps the GameId, and the fields are private: a listener asks isVictory() or receives the
-          data through deliverTo().
+          a variant, LevelDefinition, the data of one level file with its level id, its order and
+          its version, which directs the ILevelBuilder builder, tells the list of levels its figure
+          and its order, and tells with replaces() if one copy of a level replaces another copy by
+          the rule of DS-11, the abstract GameEvent with GameEnded, the domain event that the root
+          records when a game ends, with a note that GameEngine records it in the turn that ends a
+          match, the Clock and RandomSource interfaces that layer 4 implements, with a note that
+          GameFactory uses neither and the composition root injects both into the variant factories
+          (a variant factory draws a new Seed of the RandomSource in each match), and the
+          MatchIdGenerator interface that gives the MatchId of each new match. Each reading of the
+          Clock is a ClockReading value object (view 3). The internal ids are local value objects
+          that keep the MatchId of their match: GameFactory builds the GameStateId of the first
+          state and the BoardId of its board from it, and FitFactory builds the LevelTimerId of the
+          timer of a timed game in createTimer(). GameFactory keeps the GameId of the game, an
+          IVariantFactory that answers isFor() for it and the MatchIdGenerator, wraps the rules of a
+          timed game in TimedRulesDecorator, gives the same timer to the root and creates the
+          started GameEngine. GameEnded keeps the MatchId, the Outcome and the final Score, a value
+          object, GameEvent keeps the GameId, and the fields are private: a listener asks
+          isVictory() or receives the data through deliverTo().
         </desc>
         <defs>
           <marker
@@ -203,7 +204,7 @@
           x="40"
           y="380"
           width="432"
-          height="444"
+          height="464"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -661,16 +662,16 @@
         <!-- LevelDefinition gives the topology and the section to the ILevelBuilder in buildWith(): use with a verb -->
         <line
           x1="220"
-          y1="664"
+          y1="696"
           x2="220"
-          y2="704"
+          y2="732"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#factory-open)"
         />
         <text
           x="228"
-          y="687"
+          y="717"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -678,12 +679,12 @@
         >
           BUILDWITH()
         </text>
-        <!-- Class: LevelDefinition (value object, director of the builder, decision 24) -->
+        <!-- Class: LevelDefinition (value object, director of the builder, decision 24). The version and replaces() hold the rule of DS-11 (decision 68, #48). -->
         <rect
           x="52"
           y="408"
           width="360"
-          height="256"
+          height="288"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -719,15 +720,18 @@
           - order: number
         </text>
         <text x="68" y="504" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - topology: TopologyId
+          - version: number
         </text>
         <text x="68" y="520" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - topology: TopologyId
+        </text>
+        <text x="68" y="536" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - section: string
         </text>
-        <line x1="52" y1="528" x2="412" y2="528" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="52" y1="544" x2="412" y2="544" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="68"
-          y="544"
+          y="560"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -737,36 +741,46 @@
         </text>
         <text
           x="79"
-          y="560"
+          y="576"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
           text-decoration="underline"
         >
-          topology: string; section: unknown }): LevelDefinition
+          version: number; topology: string; section: unknown }):
         </text>
-        <text x="68" y="576" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + buildWith&lt;TLevel&gt;(builder: ILevelBuilder&lt;TLevel&gt;):
-        </text>
-        <text x="79" y="592" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          TLevel
+        <text
+          x="79"
+          y="592"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          LevelDefinition
         </text>
         <text x="68" y="608" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + levelId(): LevelId
+          + buildWith&lt;TLevel&gt;(builder: ILevelBuilder&lt;TLevel&gt;): TLevel
         </text>
         <text x="68" y="624" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + isPlayedOn(figure: TopologyId): boolean
+          + levelId(): LevelId
         </text>
         <text x="68" y="640" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + comesBefore(other: LevelDefinition): boolean
+          + isPlayedOn(figure: TopologyId): boolean
         </text>
         <text x="68" y="656" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + comesBefore(other: LevelDefinition): boolean
+        </text>
+        <text x="68" y="672" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + replaces(other: LevelDefinition): boolean
+        </text>
+        <text x="68" y="688" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: LevelDefinition): boolean
         </text>
         <!-- Class: ILevelBuilder (interface of the Builder: only «interface», decision 23) -->
         <rect
           x="52"
-          y="704"
+          y="732"
           width="360"
           height="104"
           rx="6"
@@ -774,10 +788,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="52" y1="752" x2="412" y2="752" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="52" y1="780" x2="412" y2="780" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="232"
-          y="722"
+          y="750"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -788,7 +802,7 @@
         </text>
         <text
           x="232"
-          y="740"
+          y="768"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -797,13 +811,13 @@
         >
           ILevelBuilder
         </text>
-        <text x="68" y="768" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="796" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + withTopology(topology: TopologyId): ILevelBuilder&lt;TLevel&gt;
         </text>
-        <text x="68" y="784" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="812" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + withSection(section: unknown): ILevelBuilder&lt;TLevel&gt;
         </text>
-        <text x="68" y="800" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="68" y="828" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + build(): TLevel
         </text>
 
@@ -1393,7 +1407,7 @@
         </text>
         <rect
           x="376"
-          y="694"
+          y="722"
           width="48"
           height="18"
           rx="2"
@@ -1404,7 +1418,7 @@
         />
         <text
           x="400"
-          y="706"
+          y="734"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
