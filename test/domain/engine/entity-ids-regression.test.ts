@@ -497,7 +497,7 @@ describe('atomicity of the state methods (T18 probe)', () => {
 
     const result = throwOf(
       () => shownBy(state),
-      () => state.slide(Slide.of('zz' as unknown as GridAxis, SlideSense.forward), MergeTile.of(8)),
+      () => state.slide(Slide.of('zz' as unknown as GridAxis, SlideSense.forward)),
     );
 
     expect(result.rangeError).toBe(true);

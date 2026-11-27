@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { SLIDE_SENSES, SlideSense } from '../../../../src/domain/variants/hexa-merge/slide';
+import { SlideSense } from '../../../../src/domain/variants/hexa-merge/slide';
 import { delivered, RecordingReceiver } from '../../../support/engine/value-receiver';
 
 // Issue #207 (classes.md decision 45): the sense of a slide is a class with two instances.
@@ -8,9 +8,14 @@ describe('SlideSense', () => {
     const instances = Object.values(SlideSense).filter((value) => value instanceof SlideSense);
 
     expect(instances).toEqual([SlideSense.forward, SlideSense.backward]);
-    expect(SLIDE_SENSES).toEqual([SlideSense.forward, SlideSense.backward]);
-    expect(SLIDE_SENSES.map(delivered)).toEqual(['forward', 'backward']);
     expect(SlideSense.forward).not.toBe(SlideSense.backward);
+  });
+
+  // Issue #426: `SlideSense.all` is the one list of the closed set.
+  it('should_list_forward_and_backward_once_when_a_caller_reads_the_closed_set', () => {
+    expect(SlideSense.all).toEqual([SlideSense.forward, SlideSense.backward]);
+    expect(SlideSense.all.map(delivered)).toEqual(['forward', 'backward']);
+    expect(Object.isFrozen(SlideSense.all)).toBe(true);
   });
 
   it('should_throw_a_range_error_when_a_cast_calls_the_constructor', () => {

@@ -12,8 +12,12 @@ export class SlideSense {
   static readonly forward = new SlideSense('forward');
   static readonly backward = new SlideSense('backward');
 
-  // The closed set.
-  private static readonly all: readonly SlideSense[] = [SlideSense.forward, SlideSense.backward];
+  // The closed set, in a frozen list. It is the one list of the senses (issue #426).
+  // The rules and the slide ways of layer 3 read it.
+  static readonly all: readonly SlideSense[] = Object.freeze([
+    SlideSense.forward,
+    SlideSense.backward,
+  ]);
 
   private constructor(private readonly name: string) {
     // `private` holds only at compile time. The set exists after the last instance,
@@ -38,8 +42,6 @@ export class SlideSense {
     receiver.receive(this.name);
   }
 }
-
-export const SLIDE_SENSES: readonly SlideSense[] = [SlideSense.forward, SlideSense.backward];
 
 // The move of Hexa Merge (§1.4): slide every tile along one direction of the topology.
 // It is a value object (classes.md decision 43): it never changes, its fields are private,

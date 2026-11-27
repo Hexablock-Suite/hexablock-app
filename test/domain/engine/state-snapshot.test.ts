@@ -28,7 +28,12 @@ import { CountingMatchIds, MATCH_ID } from '../../support/engine/match-id';
 import { square } from '../../support/engine/square-topology';
 import { A, fitFactory } from '../../support/variants/hexa-fit/fit-game';
 import { linesFactory, red } from '../../support/variants/hexa-lines/lines-game';
-import { mergeFactory, mergeState, valueOf } from '../../support/variants/hexa-merge/merge-game';
+import {
+  mergeFactory,
+  mergeState,
+  mergeStateFor,
+  valueOf,
+} from '../../support/variants/hexa-merge/merge-game';
 import {
   row,
   sortFactory,
@@ -101,12 +106,12 @@ describe('the photo of a state', () => {
   });
 
   it('should_hold_the_merge_data_in_a_frozen_photo_when_a_merge_state_takes_its_snapshot', () => {
-    const state = mergeState([
+    const state = mergeStateFor(MergeTile.of(4), [
       [hex(0, 0), 2],
       [hex(1, 0), 2],
     ]);
     const slide = Slide.of(HexAxis.q, SlideSense.forward);
-    state.slide(slide, MergeTile.of(4));
+    state.slide(slide);
 
     const photo = state.snapshot();
 
@@ -413,7 +418,7 @@ describe('the photo outside the state', () => {
       [hex(1, 0), 2],
     ]);
     const mergeBefore = merge.snapshot();
-    merge.slide(Slide.of(HexAxis.q, SlideSense.forward), MergeTile.of(2048));
+    merge.slide(Slide.of(HexAxis.q, SlideSense.forward));
 
     const fit = fitFactory().createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
 
