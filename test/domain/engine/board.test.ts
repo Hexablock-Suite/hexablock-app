@@ -14,14 +14,12 @@ import { BOARD_ID } from '../../support/engine/entity-ids';
 
 // A one-dimensional topology: a coordinate is an integer on a strip.
 // It exists only in this test, so the board test needs no real geometry.
-// The strip has one axis and two directions. Each one has `equals()`, as the engine asks.
+// The strip has one axis. It has `equals()`, as the engine asks.
 function named(name: string): { readonly name: string; equals(other: unknown): boolean } {
   const value = { name, equals: (other: unknown) => other === value };
   return value;
 }
 const X = named('x');
-const LEFT = named('left');
-const RIGHT = named('right');
 
 // One step along the strip: forward adds 1, and backward takes 1 away.
 const strip = { forward: (c: number) => c + 1, backward: (c: number) => c - 1 };
@@ -30,8 +28,6 @@ const stripTopology: GridTopology<number> = {
   fullTurn: () => Turns.of(2),
   key: (c) => CoordKey.of(String(c)),
   neighbors: (c) => [c - 1, c + 1],
-  neighbor: (c, direction) => (direction.equals(LEFT) ? c - 1 : c + 1),
-  directions: () => [LEFT, RIGHT],
   axes: () => [X],
   rotate: (c, turns) => turns.applyTo(c, (at) => -at, stripTopology),
   translate: (c, offset) => c + offset,

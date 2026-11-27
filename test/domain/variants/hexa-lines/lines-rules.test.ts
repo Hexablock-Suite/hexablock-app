@@ -25,7 +25,6 @@ import {
   squareTopology,
   SquareAxis,
   type SquareCoord,
-  type SquareDirection,
 } from '../../../support/engine/square-topology';
 import {
   triangle,
@@ -240,7 +239,7 @@ describe('Hexa Lines rules', () => {
 
   it('should_read_the_board_only_up_to_the_first_valid_move_when_a_caller_asks_for_one_move', () => {
     const reads = { count: 0 };
-    const counting: GridTopology<SquareCoord, SquareAxis, SquareDirection> = {
+    const counting: GridTopology<SquareCoord, SquareAxis> = {
       ...squareTopology,
       key: (c) => {
         reads.count += 1;
@@ -409,7 +408,7 @@ describe('Hexa Lines rules edge cases', () => {
     const failingSource = new SeededPieceSource<typeof one>(Seed.of(1), () => {
       throw new Error('The source failed.');
     });
-    const failingTopology: GridTopology<SquareCoord, SquareAxis, SquareDirection> = {
+    const failingTopology: GridTopology<SquareCoord, SquareAxis> = {
       ...squareTopology,
       translate: (c, offset) => {
         if (offset.equals(square(2, 2))) throw new Error('The topology failed.');
@@ -453,7 +452,7 @@ describe('Hexa Lines rules edge cases', () => {
   it('should_count_one_line_and_score_one_line_when_the_topology_walks_the_line_from_its_other_end', () => {
     // Gap G107.6 (issue #134). `GridTopology.line()` promises the cells in order, not the start end.
     // This square double walks a line from its far end when the cell has an odd index on the axis.
-    const reversing: GridTopology<SquareCoord, SquareAxis, SquareDirection> = {
+    const reversing: GridTopology<SquareCoord, SquareAxis> = {
       ...squareTopology,
       *line(axis, through, contains) {
         const cells = [...squareTopology.line(axis, through, contains)];

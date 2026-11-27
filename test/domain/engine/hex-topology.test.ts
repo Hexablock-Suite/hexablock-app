@@ -1,11 +1,5 @@
 /** @jest-environment node */
-import {
-  hex,
-  HexTopology,
-  HexAxis,
-  HexDirection,
-  type HexCoord,
-} from '../../../src/domain/engine/hex-topology';
+import { hex, HexTopology, HexAxis, type HexCoord } from '../../../src/domain/engine/hex-topology';
 import { Radius } from '../../../src/domain/engine/radius';
 import { RegionSize } from '../../../src/domain/engine/region-size';
 import { Turns } from '../../../src/domain/engine/turns';
@@ -74,23 +68,7 @@ describe('HexTopology', () => {
   it('should_give_six_rotation_steps_and_its_closed_names_when_the_topology_is_read', () => {
     expect(topology.fullTurn().equals(Turns.of(6))).toBe(true);
     expect(topology.axes()).toEqual([HexAxis.q, HexAxis.r, HexAxis.s]);
-    expect(topology.directions()).toEqual([
-      HexDirection.east,
-      HexDirection.west,
-      HexDirection.southEast,
-      HexDirection.northWest,
-      HexDirection.southWest,
-      HexDirection.northEast,
-    ]);
     expect(topology.axes().map(delivered)).toEqual(['q', 'r', 's']);
-    expect(topology.directions().map(delivered)).toEqual([
-      'east',
-      'west',
-      'south-east',
-      'north-west',
-      'south-west',
-      'north-east',
-    ]);
   });
 
   it('should_give_one_key_per_coordinate_when_two_keys_are_compared', () => {

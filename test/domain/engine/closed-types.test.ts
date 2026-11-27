@@ -11,6 +11,7 @@ import { RegionSize } from '../../../src/domain/engine/region-size';
 import { SquareTopology } from '../../../src/domain/engine/square-topology';
 import { TriangleTopology } from '../../../src/domain/engine/triangle-topology';
 import { Turns } from '../../../src/domain/engine/turns';
+import type { GridAxis, GridTopology } from '../../../src/domain/engine/grid-topology';
 import type { FakeCell } from '../../support/engine/fake-cell';
 import { emptyState } from '../../support/engine/fake-game';
 import {
@@ -18,18 +19,12 @@ import {
   squareTopology,
   SquareAxis,
   type SquareCoord,
-  SquareDirection,
 } from '../../support/engine/square-topology';
-import {
-  triangle,
-  triangleTopology,
-  TriangleAxis,
-  TriangleDirection,
-} from '../../support/engine/triangle-topology';
+import { triangle, triangleTopology, TriangleAxis } from '../../support/engine/triangle-topology';
 import { BOARD_ID } from '../../support/engine/entity-ids';
 
 // Issue 86: the engine signatures take closed types, not free primitives.
-// Issue #207: an axis and a direction are instances of a closed class, so a text does not compile.
+// Issue #207: an axis is an instance of a closed class, so a text does not compile.
 // A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails
 // when the line compiles, because then the directive is unused.
 
@@ -67,26 +62,21 @@ describe('closed axis classes', () => {
   });
 });
 
-describe('test double axes and directions', () => {
-  it('should_declare_their_own_axes_and_directions_when_the_doubles_are_read', () => {
+describe('test double axes', () => {
+  it('should_declare_their_own_axes_when_the_doubles_are_read', () => {
     const squareAxes: SquareAxis[] = squareTopology.axes();
-    const squareDirections: SquareDirection[] = squareTopology.directions();
     const triangleAxes: TriangleAxis[] = triangleTopology.axes();
-    const triangleDirections: TriangleDirection[] = triangleTopology.directions();
 
     expect(squareAxes).toEqual([SquareAxis.col, SquareAxis.row]);
-    expect(squareDirections).toEqual([
-      SquareDirection.north,
-      SquareDirection.east,
-      SquareDirection.south,
-      SquareDirection.west,
-    ]);
     expect(triangleAxes).toEqual([TriangleAxis.row, TriangleAxis.downRight, TriangleAxis.downLeft]);
-    expect(triangleDirections).toEqual([
-      TriangleDirection.left,
-      TriangleDirection.right,
-      TriangleDirection.vertical,
-    ]);
+  });
+
+  // Issue #416: a topology names no direction, so `GridTopology` takes two type parameters.
+  it('should_reject_at_compile_time_when_a_topology_type_names_a_third_parameter', () => {
+    // @ts-expect-error `GridTopology` has no direction parameter.
+    const typed: GridTopology<SquareCoord, SquareAxis, GridAxis> = squareTopology;
+
+    expect(typed.axes()).toEqual([SquareAxis.col, SquareAxis.row]);
   });
 
   it('should_hold_a_board_with_an_axis_class_when_a_board_state_is_typed', () => {

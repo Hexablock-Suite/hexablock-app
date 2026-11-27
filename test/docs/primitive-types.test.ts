@@ -167,7 +167,7 @@ function withoutParameters(member: ts.Node, checker: ts.TypeChecker): (ts.Node |
   return [...(member.typeParameters ?? []), typeOf(member, checker)];
 }
 
-// The classes that a type names, such as `Range` for `Range<number>`.
+// The classes that a type names, such as `Piece` for `Piece<Color, HexCoord>`.
 function classesOf(type: ts.Type): ts.ClassDeclaration[] {
   return type.getSymbol()?.declarations?.filter(ts.isClassDeclaration) ?? [];
 }
@@ -618,15 +618,12 @@ describe('primitive scan of the domain', () => {
     );
     expect(ofClosedSets.map(key).sort()).toEqual([
       'string HexAxis.deliverTo',
-      'string HexDirection.deliverTo',
       'string Outcome.deliverTo',
       'string Outcome.of',
       'string SquareAxis.deliverTo',
-      'string SquareDirection.deliverTo',
       'string TopologyId.deliverTo',
       'string TopologyId.of',
       'string TriangleAxis.deliverTo',
-      'string TriangleDirection.deliverTo',
     ]);
   });
 
