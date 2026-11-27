@@ -1,10 +1,9 @@
 /** @jest-environment node */
 import { Outcome } from '../../../../src/domain/engine/outcome';
-import { Score } from '../../../../src/domain/engine/score';
-import { GameId } from '../../../../src/domain/engine/game-id';
+import { Score } from '../../../../src/domain/shared/score';
+import { GameId } from '../../../../src/domain/shared/game-id';
 import { HexGeometry } from '../../../../src/domain/engine/hex-geometry';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
-import { Seed } from '../../../../src/domain/engine/seed';
 import { Chance } from '../../../../src/domain/variants/hexa-merge/chance';
 import {
   MergeFactory,
@@ -20,6 +19,31 @@ import {
 } from '../../../support/variants/hexa-merge/merge-game';
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
+import { seededRandom, StepRandom } from '../../../support/engine/step-random';
+
+// A Merge factory on a hexagon of 2 rings, with the target 2048.
+// Each match draws its seed from `random` (issue #417).
+function factoryWith(random: StepRandom) {
+  return new MergeFactory(
+    new HexGeometry(),
+    MergeSettings.of(RegionSize.of(2), MergeTile.of(2048)),
+    random,
+  );
+}
+
+// The tiles of a new match of `factory`: the start tiles by cell, and the next ten new tiles
+// of its source on a list of seven cells.
+function tilesOfMatch(factory: ReturnType<typeof factoryWith>): unknown[] {
+  const photo = startVariant(factory).engine.snapshot();
+  const cells = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
+  const next: [string, number][] = [];
+  for (const draw of photo.tileSource()) {
+    const [cell, tile] = draw.appearsOn(cells);
+    next.push([cell, valueOf(tile)]);
+    if (next.length === 10) break;
+  }
+  return [values(photo), next];
+}
 
 // A Merge factory on a hexagon of `size` rings, with the target 2048.
 function sizedMergeFactory(size: number, fourChance?: number) {
@@ -27,16 +51,35 @@ function sizedMergeFactory(size: number, fourChance?: number) {
     new HexGeometry(),
     MergeSettings.of(
       RegionSize.of(size),
-      Seed.of(1),
       MergeTile.of(2048),
       fourChance === undefined ? undefined : Chance.of(fourChance),
     ),
+    seededRandom(1),
   );
 }
 
 // The Merge factory creates the whole family of Hexa Merge (issue 99, classes.md decision 31).
 
 describe('MergeFactory', () => {
+  // Issue #417: each match draws a new seed, so a replay in one app session gets other tiles.
+  it('should_give_other_tiles_when_two_matches_start_with_a_random_source_that_gives_other_draws', () => {
+    const factory = factoryWith(new StepRandom([0.1, 0.6]));
+
+    const first = tilesOfMatch(factory);
+
+    expect(tilesOfMatch(factory)).not.toEqual(first);
+  });
+
+  // APP-NFR-07: the randomness comes by injection, so a fixed source gives the same game.
+  it('should_give_the_same_tiles_twice_when_the_random_source_gives_the_same_draw_each_time', () => {
+    const factory = factoryWith(new StepRandom([0.3]));
+
+    const first = tilesOfMatch(factory);
+
+    expect(tilesOfMatch(factory)).toEqual(first);
+    expect(tilesOfMatch(factoryWith(new StepRandom([0.3])))).toEqual(first);
+  });
+
   it('should_start_a_game_with_two_tiles_that_plays_one_slide_when_the_merge_factory_builds_it', () => {
     const factory = mergeFactory(7);
 
@@ -72,22 +115,6 @@ describe('MergeFactory', () => {
     expect(mergeFactory(9).createPieceSource().take()[0]).toEqual(
       mergeFactory(9).createPieceSource().take()[0],
     );
-  });
-
-  // Since issue 210 the seed checks itself, so the error comes when the settings are built,
-  // before any factory exists. Before, it came when the factory created the piece source.
-  it('should_throw_a_range_error_when_the_merge_settings_get_a_seed_that_is_not_a_32_bit_integer', () => {
-    for (const seed of [Number.NaN, Number.POSITIVE_INFINITY, 1.5, -1, 2 ** 53]) {
-      const message = `A seed must be an integer from 0 to 4294967295, not ${seed}.`;
-
-      expect(() => mergeFactory(seed)).toThrow(new RangeError(message));
-    }
-  });
-
-  it('should_give_the_game_of_seed_zero_when_the_merge_settings_hold_a_negative_zero_seed', () => {
-    expect(
-      values(mergeFactory(-0).createInitialState(MATCH_ID, STATE_ID, BOARD_ID).snapshot()),
-    ).toEqual(values(mergeFactory(0).createInitialState(MATCH_ID, STATE_ID, BOARD_ID).snapshot()));
   });
 
   // Since issue 210 the chance checks itself, so the error comes when the settings are built.

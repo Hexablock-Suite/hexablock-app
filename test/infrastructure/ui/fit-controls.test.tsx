@@ -14,10 +14,11 @@ import fitTriangle03 from '../../../src/adapters/levels/fit/fit-triangle-03.json
 import { GamePresenter } from '../../../src/adapters/game-presenter';
 import { textCatalog } from '../../../src/adapters/texts/text-catalog';
 import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
-import { GameId } from '../../../src/domain/engine/game-id';
-import { TopologyId, type GeometryFactory } from '../../../src/domain/engine/geometry-factory';
+import { GameId } from '../../../src/domain/shared/game-id';
+import type { GeometryFactory } from '../../../src/domain/engine/geometry-factory';
+import { TopologyId } from '../../../src/domain/shared/topology-id';
 import type { HexCoord } from '../../../src/domain/engine/hex-topology';
-import { LevelDefinition } from '../../../src/domain/engine/level-definition';
+import { LevelDefinition } from '../../../src/domain/progress/level-definition';
 import { SquareGeometry } from '../../../src/domain/engine/square-geometry';
 import { TriangleGeometry } from '../../../src/domain/engine/triangle-geometry';
 import { Turns } from '../../../src/domain/engine/turns';

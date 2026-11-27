@@ -1,6 +1,6 @@
 /** @jest-environment node */
-import { Moves } from '../../../../src/domain/engine/moves';
-import { Stars } from '../../../../src/domain/engine/stars';
+import { Moves } from '../../../../src/domain/shared/moves';
+import { Stars } from '../../../../src/domain/progress/stars';
 import {
   SortPlay,
   SortStarThreshold,

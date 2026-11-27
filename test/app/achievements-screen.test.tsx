@@ -5,13 +5,13 @@ import { fireEvent, renderRouter, screen, within } from 'expo-router/testing-lib
 
 import { BundledLevelRepository } from '../../src/adapters/bundled-level-repository';
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
-import { GameId } from '../../src/domain/engine/game-id';
-import { GameProgress } from '../../src/domain/engine/game-progress';
-import { LevelId } from '../../src/domain/engine/level-id';
-import { Moves } from '../../src/domain/engine/moves';
-import { ProgressRecord } from '../../src/domain/engine/progress-model';
-import { Score } from '../../src/domain/engine/score';
-import { Stars } from '../../src/domain/engine/stars';
+import { GameId } from '../../src/domain/shared/game-id';
+import { GameProgress } from '../../src/domain/progress/game-progress';
+import { LevelId } from '../../src/domain/progress/level-id';
+import { Moves } from '../../src/domain/shared/moves';
+import { ProgressRecord } from '../../src/domain/progress/progress-model';
+import { Score } from '../../src/domain/shared/score';
+import { Stars } from '../../src/domain/progress/stars';
 import { DeviceKeyValueStore } from '../../src/infrastructure/device-key-value-store';
 import { delivered } from '../support/engine/value-receiver';
 import { repoRoot } from '../support/run-tool';

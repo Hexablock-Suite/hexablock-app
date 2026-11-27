@@ -1,15 +1,12 @@
 /** @jest-environment node */
 import { SortStateMapper } from '../../src/adapters/sort-state-mapper';
 import { Color } from '../../src/domain/engine/color';
-import { hex, type HexCoord } from '../../src/domain/engine/hex-topology';
-import { Piece } from '../../src/domain/engine/piece';
-import { CellNode } from '../../src/domain/engine/shape-node';
 import { ClearedStacks } from '../../src/domain/variants/hexa-sort/cleared-stacks';
 import { ColorStack } from '../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../src/domain/variants/hexa-sort/goal-count';
 import { SortView } from '../../src/domain/variants/hexa-sort/sort-state';
 
-const mapper = new SortStateMapper<HexCoord>();
+const mapper = new SortStateMapper();
 
 describe('SortStateMapper', () => {
   it('should_map_the_colors_in_order_with_repeats_when_a_stack_occupies_the_space', () => {
@@ -38,9 +35,8 @@ describe('SortStateMapper', () => {
 
   it('should_map_goal_progress_and_the_current_stack_when_the_view_has_an_offer', () => {
     const stack = ColorStack.of([Color.of('blue'), Color.of('yellow')]);
-    const piece = new Piece(new CellNode(hex(0, 0)), stack);
 
-    expect(mapper.toPayload(new SortView(piece, ClearedStacks.of(2), GoalCount.of(4)))).toEqual({
+    expect(mapper.toPayload(new SortView(stack, ClearedStacks.of(2), GoalCount.of(4)))).toEqual({
       offered: { colors: ['blue', 'yellow'] },
       goalsDone: 2,
       goalsNeeded: 4,

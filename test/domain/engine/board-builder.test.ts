@@ -1,7 +1,8 @@
 /** @jest-environment node */
 import { Board } from '../../../src/domain/engine/board';
 import { BoardBuilder } from '../../../src/domain/engine/board-builder';
-import { TopologyId, type GeometryFactory } from '../../../src/domain/engine/geometry-factory';
+import type { GeometryFactory } from '../../../src/domain/engine/geometry-factory';
+import { TopologyId } from '../../../src/domain/shared/topology-id';
 import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
 import { hex, type HexCoord } from '../../../src/domain/engine/hex-topology';
 import { RegionSize } from '../../../src/domain/engine/region-size';

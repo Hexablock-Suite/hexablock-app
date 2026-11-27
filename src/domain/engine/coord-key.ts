@@ -1,5 +1,5 @@
 import type { Ordered } from './ordered';
-import type { ValueReceiver } from './value-receiver';
+import type { ValueReceiver } from '../shared/value-receiver';
 
 // The key of one coordinate: the identity that a topology gives in `key()` (issue #237).
 // The coordinate builds its key, and the topology gives it to the engine.

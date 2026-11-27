@@ -3,8 +3,8 @@ import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { BundledLevelRepository } from '../../src/adapters/bundled-level-repository';
-import { GameId } from '../../src/domain/engine/game-id';
-import { LevelDefinition } from '../../src/domain/engine/level-definition';
+import { GameId } from '../../src/domain/shared/game-id';
+import { LevelDefinition } from '../../src/domain/progress/level-definition';
 import { describeLevelRepositoryContract } from '../support/contracts/level-repository-contract';
 import { delivered } from '../support/engine/value-receiver';
 import { repoRoot } from '../support/run-tool';

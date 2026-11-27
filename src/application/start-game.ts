@@ -1,9 +1,9 @@
 import type { BoardState } from '../domain/engine/board-state';
 import type { Cloneable } from '../domain/engine/cloneable';
-import type { GameId } from '../domain/engine/game-id';
-import type { TopologyId } from '../domain/engine/geometry-factory';
-import type { LevelId } from '../domain/engine/level-id';
-import { LevelStatus } from '../domain/engine/level-status';
+import type { GameId } from '../domain/shared/game-id';
+import type { TopologyId } from '../domain/shared/topology-id';
+import type { LevelId } from '../domain/progress/level-id';
+import { LevelStatus } from '../domain/progress/level-status';
 import { Outcome } from '../domain/engine/outcome';
 import type { GameFactories } from './game-factories';
 import type { GameRepository } from './game-repository';

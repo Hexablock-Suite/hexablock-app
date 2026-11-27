@@ -5,10 +5,9 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { GamePresenter } from '../../../src/adapters/game-presenter';
 import { textCatalog } from '../../../src/adapters/texts/text-catalog';
-import { GameId } from '../../../src/domain/engine/game-id';
+import { GameId } from '../../../src/domain/shared/game-id';
 import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
 import { RegionSize } from '../../../src/domain/engine/region-size';
-import { Seed } from '../../../src/domain/engine/seed';
 import { MergeFactory, MergeSettings } from '../../../src/domain/variants/hexa-merge/merge-factory';
 import { MergeTile } from '../../../src/domain/variants/hexa-merge/merge-tile';
 import { CompositionRoot } from '../../../src/infrastructure/composition-root';
@@ -17,6 +16,7 @@ import { GameStage } from '../../../src/infrastructure/ui/game-stage';
 import { gameUseCases } from '../../support/application/game-use-cases';
 import { RecordingLogger } from '../../support/application/recording-logger';
 import { ManualClock } from '../../support/engine/manual-clock';
+import { seededRandom } from '../../support/engine/step-random';
 
 // Issue #177: Hexa Merge is playable on the game screen. The registry gives Merge its state
 // mapper, its cell renderer and its move controls, the `MoveControls` of #175: the board
@@ -107,7 +107,8 @@ function targetFourSession(): GameSession {
   const parts = root.registry().gameOf(GameId.of('hexa-merge')).screen;
   const factory = new MergeFactory(
     new HexGeometry(),
-    MergeSettings.of(RegionSize.of(3), Seed.of(7), MergeTile.of(4)),
+    MergeSettings.of(RegionSize.of(3), MergeTile.of(4)),
+    seededRandom(7),
   );
   const { startGame, applyMove, undoMove, redoMove } = gameUseCases(factory);
   return {

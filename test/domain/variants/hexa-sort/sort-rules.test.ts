@@ -2,7 +2,7 @@
 import { Outcome } from '../../../../src/domain/engine/outcome';
 import { Board } from '../../../../src/domain/engine/board';
 import { PlayingPhase } from '../../../../src/domain/engine/game-phase';
-import { Moves } from '../../../../src/domain/engine/moves';
+import { Moves } from '../../../../src/domain/shared/moves';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import type { RandomSource } from '../../../../src/domain/engine/random-source';
 import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
@@ -22,7 +22,6 @@ import {
   sortGame,
   sortState,
   stack,
-  stackPiece,
   tiles,
 } from '../../../support/variants/hexa-sort/sort-game';
 import { BOARD_ID } from '../../../support/engine/entity-ids';
@@ -60,7 +59,7 @@ describe('SortRules placement', () => {
     expect(game.play(place(0))).toBe(Outcome.playing);
 
     expect(chipsAt(game, 0)).toEqual(['red']);
-    expect(names(game.snapshot().offeredStack()?.occupant())).toEqual(['blue']);
+    expect(names(game.snapshot().offeredStack())).toEqual(['blue']);
   });
 
   it('should_reject_the_move_and_keep_the_state_when_the_cell_holds_a_stack', () => {
@@ -71,7 +70,7 @@ describe('SortRules placement', () => {
     expect(game.play(place(0))).toBe(Outcome.playing);
 
     expect(chipsAt(game, 0)).toEqual(['green']);
-    expect(names(game.snapshot().offeredStack()?.occupant())).toEqual(['red']);
+    expect(names(game.snapshot().offeredStack())).toEqual(['red']);
   });
 
   it('should_reject_the_move_when_the_cell_is_outside_the_board', () => {
@@ -80,7 +79,7 @@ describe('SortRules placement', () => {
     expect(game.play(place(5))).toBe(Outcome.playing);
 
     expect(game.snapshot().boardCopy().occupiedCells()).toEqual([]);
-    expect(names(game.snapshot().offeredStack()?.occupant())).toEqual(['red']);
+    expect(names(game.snapshot().offeredStack())).toEqual(['red']);
   });
 });
 
@@ -262,7 +261,7 @@ describe('SortRules colors', () => {
 describe('SortRules piece source (A4)', () => {
   it('should_offer_the_same_stacks_when_two_games_use_the_same_seed', () => {
     const colors = ['red', 'blue', 'green'];
-    const draw = (random: RandomSource) => stackPiece(stack(random.next().pick(colors)));
+    const draw = (random: RandomSource) => stack(random.next().pick(colors));
     const play = () => {
       const game = sortGame(
         sortState({ board: row(4), source: new SeededPieceSource(Seed.of(7), draw) }),
@@ -339,7 +338,7 @@ describe('SortRules edge cases', () => {
     expect(chipsAt(game, 1)).toEqual([]);
     expect(state.goalsReached()).toEqual(ClearedStacks.of(1));
     expect(state.clearedStackHeights()).toEqual([TileCount.of(13)]);
-    expect(names(state.offeredStack()?.occupant())).toEqual(['green']);
+    expect(names(state.offeredStack())).toEqual(['green']);
   });
 
   it('should_take_the_top_runs_of_every_matching_neighbor_when_the_placed_stack_has_the_longest_run', () => {
@@ -387,7 +386,7 @@ describe('SortRules edge cases', () => {
     const source = new SeededPieceSource(Seed.of(1), () => {
       draws += 1;
       if (draws > 1) throw new Error('The source failed.');
-      return stackPiece(stack('red'));
+      return stack('red');
     });
     const game = sortGame(sortState({ board: row(3), source }));
 
@@ -396,7 +395,7 @@ describe('SortRules edge cases', () => {
     const state = game.snapshot();
     expect(game.currentPhase()).toBe(PlayingPhase.instance);
     expect(state.boardCopy().occupiedCells()).toEqual([]);
-    expect(names(state.offeredStack()?.occupant())).toEqual(['red']);
+    expect(names(state.offeredStack())).toEqual(['red']);
     expect(state.lastPlacedAt()).toBeUndefined();
     expect(state.goalsReached()).toEqual(ClearedStacks.of(0));
   });

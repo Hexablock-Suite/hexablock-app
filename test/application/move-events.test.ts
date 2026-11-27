@@ -1,6 +1,6 @@
 /** @jest-environment node */
 import { ApplyMove } from '../../src/application/apply-move';
-import { GameId } from '../../src/domain/engine/game-id';
+import { GameId } from '../../src/domain/shared/game-id';
 import { hex, HexAxis } from '../../src/domain/engine/hex-topology';
 import { LineCount } from '../../src/domain/variants/hexa-lines/line-count';
 import { PlacePiece } from '../../src/domain/variants/hexa-lines/place-piece';

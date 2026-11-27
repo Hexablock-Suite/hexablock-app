@@ -64,7 +64,7 @@
       <h1>Wiring a variant: Abstract Factory, Builder, Observer and injected interfaces</h1>
 
       <svg
-        viewBox="0 0 1040 1704"
+        viewBox="0 0 1040 1736"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="factory-title factory-desc"
@@ -76,17 +76,18 @@
           a variant, LevelDefinition, the data of one level file with its level id and its order,
           which directs the ILevelBuilder builder and tells the list of levels its figure and its
           order, the abstract GameEvent with GameOver, the domain event that the root records when a
-          game ends, the Clock and RandomSource interfaces that layer 4 implements, and the
-          MatchIdGenerator interface that gives the MatchId of each new match. Each reading of the
-          Clock is a ClockReading value object (view 3). The internal ids are local value objects
-          that keep the MatchId of their match: GameFactory builds the GameStateId of the first
-          state and the BoardId of its board from it, and FitFactory builds the LevelTimerId of the
-          timer of a timed game in createTimer(). GameFactory keeps the GameId of the game, an
-          IVariantFactory that answers isFor() for it and the MatchIdGenerator, wraps the rules of a
-          timed game in TimedRulesDecorator, gives the same timer to the root and creates the
-          started GameEngine. GameOver keeps the MatchId, the Outcome and the final Score, a value
-          object, GameEvent keeps the GameId, and the fields are private: a listener asks
-          isVictory() or receives the data through deliverTo().
+          game ends, the Clock and RandomSource interfaces that layer 4 implements (a variant
+          factory draws a new Seed of the RandomSource in each match), and the MatchIdGenerator
+          interface that gives the MatchId of each new match. Each reading of the Clock is a
+          ClockReading value object (view 3). The internal ids are local value objects that keep the
+          MatchId of their match: GameFactory builds the GameStateId of the first state and the
+          BoardId of its board from it, and FitFactory builds the LevelTimerId of the timer of a
+          timed game in createTimer(). GameFactory keeps the GameId of the game, an IVariantFactory
+          that answers isFor() for it and the MatchIdGenerator, wraps the rules of a timed game in
+          TimedRulesDecorator, gives the same timer to the root and creates the started GameEngine.
+          GameOver keeps the MatchId, the Outcome and the final Score, a value object, GameEvent
+          keeps the GameId, and the fields are private: a listener asks isVictory() or receives the
+          data through deliverTo().
         </desc>
         <defs>
           <marker
@@ -146,7 +147,7 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.18em"
         >
-          LAYER 1 · ENTITIES · src/domain/engine/
+          LAYER 1 · ENTITIES · src/domain/engine/ · src/domain/shared/ · src/domain/progress/
         </text>
 
         <!-- Pattern groups -->
@@ -1340,7 +1341,7 @@
           TLevel
         </text>
 
-        <!-- The footnote and the legend sit below the zone, which grew by 640. It grew by 32 more for the delivery operation of Score (#228), by 32 more for the local ids (#236), by 248 more for LevelDefinition (#166), and by 80 more for the list of levels (#168). -->
+        <!-- The footnote and the legend sit below the zone, which grew by 640. It grew by 32 more for the delivery operation of Score (#228), by 32 more for the local ids (#236), by 248 more for LevelDefinition (#166), and by 80 more for the list of levels (#168). The footnote has two more lines for the binding of TPiece (#423) and the seed of each match (#417). -->
         <g transform="translate(0 1032)">
           <!-- Footnote: classes the budget leaves out -->
           <text
@@ -1399,18 +1400,39 @@
             (decisions 15 and 24).
           </text>
 
+          <text
+            x="24"
+            y="580"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            TPiece is a Piece by default: SortFactory binds it to ColorStack, and MergeFactory binds
+            it to NewTile (decision 6, #423).
+          </text>
+          <text
+            x="24"
+            y="596"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            LinesFactory, MergeFactory and SortFactory take the RandomSource of the root and draw a
+            new Seed in each match (decision 25, #417).
+          </text>
+
           <!-- Legend -->
           <line
             x1="24"
-            y1="584"
+            y1="616"
             x2="1016"
-            y2="584"
+            y2="616"
             stroke="rgba(23,33,42,0.10)"
             stroke-width="0.8"
           />
           <text
             x="24"
-            y="602"
+            y="634"
             fill="#5b6873"
             font-size="8"
             font-family="'IBM Plex Mono', monospace"
@@ -1421,16 +1443,16 @@
 
           <line
             x1="24"
-            y1="620"
+            y1="652"
             x2="52"
-            y2="620"
+            y2="652"
             stroke="#17212a"
             stroke-width="1"
             marker-end="url(#factory-triangle)"
           />
           <text
             x="60"
-            y="624"
+            y="656"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1439,16 +1461,16 @@
           </text>
           <line
             x1="144"
-            y1="620"
+            y1="652"
             x2="172"
-            y2="620"
+            y2="652"
             stroke="#5b6873"
             stroke-width="1"
             marker-end="url(#factory-open)"
           />
           <text
             x="180"
-            y="624"
+            y="656"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1457,7 +1479,7 @@
           </text>
           <rect
             x="24"
-            y="640"
+            y="672"
             width="28"
             height="12"
             rx="2"
@@ -1467,7 +1489,7 @@
           />
           <text
             x="60"
-            y="649"
+            y="681"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1476,7 +1498,7 @@
           </text>
           <rect
             x="184"
-            y="640"
+            y="672"
             width="28"
             height="12"
             rx="2"
@@ -1487,7 +1509,7 @@
           />
           <text
             x="220"
-            y="649"
+            y="681"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1496,7 +1518,7 @@
           </text>
           <rect
             x="424"
-            y="640"
+            y="672"
             width="28"
             height="12"
             rx="2"
@@ -1507,7 +1529,7 @@
           />
           <text
             x="460"
-            y="649"
+            y="681"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1516,7 +1538,7 @@
           </text>
           <rect
             x="600"
-            y="640"
+            y="672"
             width="28"
             height="12"
             rx="2"
@@ -1526,7 +1548,7 @@
           />
           <text
             x="636"
-            y="649"
+            y="681"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"

@@ -6,8 +6,9 @@ import ts from 'typescript';
 import { repoRoot } from '../support/run-tool';
 
 // APP-NFR-05: every bound on a generic parameter has a row, with its reason, in the README.
-// - The table «Type parameters» covers `src/domain/engine/`. A row marked `code` must exist
-//   in the engine code, and a row marked `design` is planned for a later sprint.
+// - The table «Type parameters» covers `src/domain/engine/` and its sibling folders
+//   `shared/`, `progress/` and `achievements/` (issue #420). A row marked `code` must exist
+//   in that code, and a row marked `design` is planned for a later sprint.
 // - The table «Variant bounds» covers `src/domain/variants/` and its subfolders (issue 124).
 //   Its Where column names each place in backticks: a class, a function, or `Class.method`.
 //   A `code` row covers a bound only at the places it names, and each place it names
@@ -15,7 +16,9 @@ import { repoRoot } from '../support/run-tool';
 // This scope is a design choice: a bound in the application or an adapter has no row
 // and no check here.
 
-const engineDir = path.join(repoRoot, 'src/domain/engine');
+const engineDirs = ['engine', 'shared', 'progress', 'achievements'].map((dir) =>
+  path.join(repoRoot, 'src/domain', dir),
+);
 const variantsDir = path.join(repoRoot, 'src/domain/variants');
 const readme = readFileSync(path.join(repoRoot, 'README.md'), 'utf8');
 
@@ -63,9 +66,11 @@ function boundsIn(source: string): Bound[] {
 }
 
 function codeBounds(): Bound[] {
-  return readdirSync(engineDir)
-    .filter((file) => file.endsWith('.ts'))
-    .flatMap((file) => boundsIn(readFileSync(path.join(engineDir, file), 'utf8')));
+  return engineDirs.flatMap((dir) =>
+    readdirSync(dir)
+      .filter((file) => file.endsWith('.ts'))
+      .flatMap((file) => boundsIn(readFileSync(path.join(dir, file), 'utf8'))),
+  );
 }
 
 function variantBounds(): PlacedBound[] {

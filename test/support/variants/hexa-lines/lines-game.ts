@@ -1,14 +1,13 @@
-import { Score } from '../../../../src/domain/engine/score';
+import { Score } from '../../../../src/domain/shared/score';
 import { Board, type ReadonlyBoard } from '../../../../src/domain/engine/board';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
-import { GameId } from '../../../../src/domain/engine/game-id';
+import { GameId } from '../../../../src/domain/shared/game-id';
 import { GameStateId } from '../../../../src/domain/engine/game-state-id';
 import type { MatchId } from '../../../../src/domain/engine/match-id';
 import type { GridTopology } from '../../../../src/domain/engine/grid-topology';
 import { Piece } from '../../../../src/domain/engine/piece';
 import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
-import { Seed } from '../../../../src/domain/engine/seed';
 import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
 import { CellNode, ShapeGroup, type ShapeNode } from '../../../../src/domain/engine/shape-node';
 import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
@@ -31,6 +30,7 @@ import { MATCH_ID } from '../../engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../engine/entity-ids';
 import { boardLike } from '../../engine/variant-game';
 import { delivered } from '../../engine/value-receiver';
+import { seededRandom } from '../../engine/step-random';
 
 // Builders for the Hexa Lines rules tests. They exist only in test/.
 
@@ -107,6 +107,7 @@ export function filledKeys<TCoord>(photo: { boardCopy(): ReadonlyBoard<Color, TC
 }
 
 // A Lines factory on a 3 × 3 square board. By default each piece is one red cell.
+// Each match of the factory starts from the seed `seed` (issue #417).
 export function linesFactory(
   seed = 1,
   shapes: readonly [ShapeNode<SquareCoord>, ...ShapeNode<SquareCoord>[]] = [
@@ -116,7 +117,8 @@ export function linesFactory(
 ): LinesFactory<SquareCoord> {
   return new LinesFactory(
     new SquareGeometry(),
-    LinesSettings.of(RegionSize.of(3), Seed.of(seed), shapes, colors),
+    LinesSettings.of(RegionSize.of(3), shapes, colors),
+    seededRandom(seed),
   );
 }
 

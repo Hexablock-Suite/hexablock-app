@@ -1,3 +1,4 @@
+import { frozenListOf } from './frozen-list';
 import type { RandomSource } from './random-source';
 import type { IRandomSeeded } from './random-seeded';
 import { Mulberry32Random } from './mulberry32-random';
@@ -80,17 +81,14 @@ export class SeededPieceSource<TPiece> implements IPieceSource<TPiece>, IRandomS
 
 // A finite source: it ends after its last piece, so the Fit tray is finite.
 // `take()` at the end throws a RangeError.
-// The source copies its list once and freezes the copy. Each next source shares that copy.
+// The source copies its list once with `frozenListOf()`. Each next source shares that copy.
 // A list that holds `undefined` throws a RangeError, because `undefined` is not a piece.
 export class FixedListPieceSource<TPiece> implements IPieceSource<TPiece> {
   private pieces: readonly TPiece[];
   private index = 0;
 
   constructor(pieces: readonly TPiece[]) {
-    if (pieces.includes(undefined as TPiece)) {
-      throw new RangeError('A piece list cannot hold undefined.');
-    }
-    this.pieces = Object.freeze([...pieces]);
+    this.pieces = frozenListOf(pieces);
   }
 
   hasNext(): boolean {

@@ -6,14 +6,14 @@ import { MergeStateMapper } from '../../src/adapters/merge-state-mapper';
 import { SortStateMapper } from '../../src/adapters/sort-state-mapper';
 import { LinesStateMapper } from '../../src/adapters/lines-state-mapper';
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
-import { GameId } from '../../src/domain/engine/game-id';
-import { GameProgress } from '../../src/domain/engine/game-progress';
-import { TopologyId } from '../../src/domain/engine/geometry-factory';
-import { LevelId } from '../../src/domain/engine/level-id';
-import { LevelStatus } from '../../src/domain/engine/level-status';
-import { ProgressRecord } from '../../src/domain/engine/progress-model';
-import { Score } from '../../src/domain/engine/score';
-import { Stars } from '../../src/domain/engine/stars';
+import { GameId } from '../../src/domain/shared/game-id';
+import { GameProgress } from '../../src/domain/progress/game-progress';
+import { TopologyId } from '../../src/domain/shared/topology-id';
+import { LevelId } from '../../src/domain/progress/level-id';
+import { LevelStatus } from '../../src/domain/progress/level-status';
+import { ProgressRecord } from '../../src/domain/progress/progress-model';
+import { Score } from '../../src/domain/shared/score';
+import { Stars } from '../../src/domain/progress/stars';
 import { Turns } from '../../src/domain/engine/turns';
 import { PlaceFitPiece } from '../../src/domain/variants/hexa-fit/fit-move';
 import { PieceId } from '../../src/domain/variants/hexa-fit/piece-id';
@@ -50,7 +50,10 @@ function testRoot(logger = new RecordingLogger()): CompositionRoot {
 }
 
 // The first valid move of a new game of the registered game `gameId` on the board figure
-// `figure`, by default the hexagon.
+// `figure`, by default the hexagon. Each match draws a new seed from the random source of the root
+// (issue #417). Each test root takes the same manual clock reading, so it draws the same seeds
+// in the same order. So a test that plays the move in a game of one root asks a twin root
+// for it, after the same starts.
 function firstMoveIn(root: CompositionRoot, gameId: GameId, figure = TopologyId.hex): unknown {
   return root
     .registry(figure)
@@ -77,16 +80,17 @@ describe('CompositionRoot', () => {
     expect(pairs).toEqual([true, true, true, true]);
   });
 
-  // The first move of a new game of the registered factory is valid in the game that
-  // `StartGame` opens: both start from the same factory with the same seed.
+  // The first move of a new game of the twin root is valid in the game that `StartGame` of the
+  // root opens: both games are the first match of their root, so they start from the same seed.
   it('should_start_each_game_and_accept_one_move_when_the_use_cases_come_from_the_root', async () => {
     const root = testRoot();
+    const twin = testRoot();
     const played: string[] = [];
 
     for (const gameId of root.registry().gameIds()) {
       const { startGame, applyMove } = root.gameUseCases(gameId);
       valueOf(await startGame.execute({}));
-      const move = firstMoveIn(root, gameId);
+      const move = firstMoveIn(twin, gameId);
       valueOf(await applyMove.execute({ move }));
       played.push(variantIdOf(gameId));
     }
@@ -369,6 +373,7 @@ describe('CompositionRoot', () => {
 
     it('should_start_each_game_and_accept_one_move_when_the_game_runs_on_each_figure', async () => {
       const root = testRoot();
+      const twin = testRoot();
       const played: string[][] = [];
 
       for (const figure of FIGURES) {
@@ -376,7 +381,7 @@ describe('CompositionRoot', () => {
         for (const gameId of root.registry(figure).gameIds()) {
           const { startGame, applyMove } = root.gameUseCases(gameId, figure);
           valueOf(await startGame.execute({}));
-          valueOf(await applyMove.execute({ move: firstMoveIn(root, gameId, figure) }));
+          valueOf(await applyMove.execute({ move: firstMoveIn(twin, gameId, figure) }));
           ids.push(variantIdOf(gameId));
         }
         played.push(ids);
@@ -505,10 +510,11 @@ describe('CompositionRoot', () => {
     const subscribe = jest.spyOn(GameEventBus.prototype, 'subscribe');
     try {
       const root = testRoot();
+      const twin = testRoot();
       const { startGame, applyMove } = root.gameUseCases(GameId.of('hexa-lines'));
       valueOf(await startGame.execute({}));
 
-      valueOf(await applyMove.execute({ move: firstMoveIn(root, GameId.of('hexa-lines')) }));
+      valueOf(await applyMove.execute({ move: firstMoveIn(twin, GameId.of('hexa-lines')) }));
 
       expect(subscribe).not.toHaveBeenCalled();
     } finally {

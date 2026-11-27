@@ -1,20 +1,19 @@
 import type { Board } from '../../engine/board';
 import type { BoardId } from '../../engine/board-id';
 import { BoardBuilder } from '../../engine/board-builder';
-import { GameId } from '../../engine/game-id';
+import { GameId } from '../../shared/game-id';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { GeometryFactory } from '../../engine/geometry-factory';
-import { LevelProgress } from '../../engine/level-progress';
+import { LevelProgress } from '../../progress/level-progress';
 import type { MatchId } from '../../engine/match-id';
-import { Piece } from '../../engine/piece';
 import {
   FixedListPieceSource,
   SeededPieceSource,
   type IPieceSource,
 } from '../../engine/piece-source';
+import type { RandomSource } from '../../engine/random-source';
 import type { IGameRules } from '../../engine/rules';
 import type { IScoringPolicy } from '../../engine/scoring-policy';
-import { CellNode } from '../../engine/shape-node';
 import type { IVariantFactory } from '../../engine/variant-factory';
 import type { ColorStack } from './color-stack';
 import type { SortLevel } from './sort-level';
@@ -24,18 +23,26 @@ import type { PlaceStack } from './place-stack';
 import { SortState } from './sort-state';
 
 // Abstract Factory (classes.md decision 31): the whole family of one Hexa Sort level.
+// The piece source gives `ColorStack` draws, so the factory binds `TPiece` to `ColorStack`,
+// as Hexa Merge binds it to `NewTile` (classes.md decision 6, issue #423). A stack has no shape:
+// the player names the cell of each placement.
 // The geometry comes by composition (APP-FR-16, D11), so the factory runs on any figure.
+// The random source comes by injection (R-domain-determinism, classes.md decision 25).
+// A level seeded each match draws a new seed from it in each match (issue #417).
+// A level file names its seed or its stacks, so the factory draws nothing for it.
 export class SortFactory<TCoord> implements IVariantFactory<
   ColorStack,
   TCoord,
   PlaceStack<TCoord>,
-  SortState<TCoord>
+  SortState<TCoord>,
+  ColorStack
 > {
   private readonly gameId = GameId.of('hexa-sort');
 
   constructor(
     private readonly geometry: GeometryFactory<TCoord>,
     private readonly level: SortLevel,
+    private readonly random: RandomSource,
   ) {}
 
   // True when `gameId` names Hexa Sort. The id stays private (issue #234).
@@ -57,15 +64,15 @@ export class SortFactory<TCoord> implements IVariantFactory<
   }
 
   // A new source for each game, built from the data of the level (classes.md decision 47).
-  // The level holds no source: it gives its seed and its draw, or its fixed list of stacks.
-  // So every game of one level draws the same stacks, and no game moves the source of another.
-  // A Sort piece is one cell with a stack (classes.md decision 6).
-  createPieceSource(): IPieceSource<Piece<ColorStack, TCoord>> {
-    const cell = this.pieceCell();
-    const toPiece = (stack: ColorStack) => new Piece(new CellNode(cell), stack);
-    return this.level.sourceWith<IPieceSource<Piece<ColorStack, TCoord>>>({
-      seeded: (seed, draw) => new SeededPieceSource(seed, (random) => toPiece(draw(random))),
-      fixed: (stacks) => new FixedListPieceSource(stacks.map(toPiece)),
+  // The level holds no source: it gives its seed and its draw, its draw alone,
+  // or its fixed list of stacks. A level with a seed or a fixed list gives the same stacks
+  // in every game. A level seeded each match takes a new seed of the random source in each game.
+  // No game moves the source of another.
+  createPieceSource(): IPieceSource<ColorStack> {
+    return this.level.sourceWith<IPieceSource<ColorStack>>({
+      seeded: (seed, draw) => new SeededPieceSource(seed, draw),
+      seededEachMatch: (draw) => new SeededPieceSource(this.random.next().pickSeed(), draw),
+      fixed: (stacks) => new FixedListPieceSource(stacks),
     });
   }
 
@@ -94,12 +101,5 @@ export class SortFactory<TCoord> implements IVariantFactory<
   // by its moves (D22, classes.md decision 36).
   createProgressModel(): LevelProgress {
     return new LevelProgress(this.level);
-  }
-
-  // The cell of every Sort piece: the first cell of the level region.
-  // The player names the cell of a placement, so the rules never read the cell of the piece.
-  // A shape holds one coordinate or more, so the region always has a first cell.
-  private pieceCell(): TCoord {
-    return this.geometry.createTopology().region(this.level.boardSize()).first();
   }
 }

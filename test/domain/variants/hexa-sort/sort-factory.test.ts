@@ -1,7 +1,12 @@
 /** @jest-environment node */
+import sort01 from '../../../../src/adapters/levels/sort/sort-01.json';
+import { HexGeometry } from '../../../../src/domain/engine/hex-geometry';
+import { LevelDefinition } from '../../../../src/domain/progress/level-definition';
+import { SortLevelBuilder } from '../../../../src/domain/variants/hexa-sort/sort-level-builder';
+import { seededRandom, StepRandom } from '../../../support/engine/step-random';
 import { Outcome } from '../../../../src/domain/engine/outcome';
-import { Score } from '../../../../src/domain/engine/score';
-import { GameId } from '../../../../src/domain/engine/game-id';
+import { Score } from '../../../../src/domain/shared/score';
+import { GameId } from '../../../../src/domain/shared/game-id';
 import { Color } from '../../../../src/domain/engine/color';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import { Seed } from '../../../../src/domain/engine/seed';
@@ -9,7 +14,7 @@ import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
 import { GoalCount } from '../../../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../../../src/domain/variants/hexa-sort/sort-factory';
 import { SortLevel } from '../../../../src/domain/variants/hexa-sort/sort-level';
-import { square, type SquareCoord } from '../../../../src/domain/engine/square-topology';
+import type { SquareCoord } from '../../../../src/domain/engine/square-topology';
 import { startVariant } from '../../../support/engine/variant-game';
 import {
   chipsAt,
@@ -29,15 +34,69 @@ import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 // The two cells are not neighbors, so no run moves.
 function offeredInGame(factory: SortFactory<SquareCoord>): string[][] {
   const { engine } = startVariant(factory);
-  const offered = [names(engine.snapshot().offeredStack()?.occupant())];
+  const offered = [names(engine.snapshot().offeredStack())];
   for (const move of [place(0, 0), place(1, 1)]) {
     engine.play(move);
-    offered.push(names(engine.snapshot().offeredStack()?.occupant()));
+    offered.push(names(engine.snapshot().offeredStack()));
   }
   return offered;
 }
 
+// The stacks of a new match of `factory`: the offered stack and the next eleven of its source.
+function stacksOfMatch<TCoord>(factory: SortFactory<TCoord>): string[][] {
+  const photo = startVariant(factory).engine.snapshot();
+  const found = [names(photo.offeredStack())];
+  for (const offered of photo.pieceSource()) {
+    found.push(names(offered));
+    if (found.length === 12) break;
+  }
+  return found;
+}
+
+// The default Sort game: a level whose source draws from a new seed in each match (issue #417).
+function eachMatchFactory(random: StepRandom): SortFactory<SquareCoord> {
+  const colors: [Color, ...Color[]] = [Color.of('red'), Color.of('blue'), Color.of('green')];
+  return new SortFactory(
+    new SquareGeometry(),
+    SortLevel.seededEachMatch(RegionSize.of(2), GoalCount.of(5), colors),
+    random,
+  );
+}
+
 describe('SortFactory', () => {
+  // Issue #417: the default Sort game draws a new seed in each match.
+  it('should_draw_other_stacks_when_two_matches_of_the_default_level_start_with_other_draws', () => {
+    const factory = eachMatchFactory(new StepRandom([0.1, 0.6]));
+
+    const first = stacksOfMatch(factory);
+
+    expect(first).toHaveLength(12);
+    expect(stacksOfMatch(factory)).not.toEqual(first);
+  });
+
+  // APP-NFR-07: the randomness comes by injection, so a fixed source gives the same game.
+  it('should_draw_the_same_stacks_twice_when_the_random_source_of_the_default_level_gives_one_draw', () => {
+    const factory = eachMatchFactory(new StepRandom([0.3]));
+
+    const first = stacksOfMatch(factory);
+
+    expect(stacksOfMatch(factory)).toEqual(first);
+    expect(stacksOfMatch(eachMatchFactory(new StepRandom([0.3])))).toEqual(first);
+  });
+
+  // A level file keeps its seed (A4): `sort-01` gives the same stacks in each match,
+  // whatever the random source of the factory draws.
+  it('should_draw_the_same_stacks_in_each_match_when_the_level_file_holds_its_seed', () => {
+    const geometry = new HexGeometry();
+    const level = LevelDefinition.of(sort01).buildWith(new SortLevelBuilder(geometry));
+    const factory = new SortFactory(geometry, level, new StepRandom([0.1, 0.6]));
+
+    const first = stacksOfMatch(factory);
+
+    expect(stacksOfMatch(factory)).toEqual(first);
+    expect(stacksOfMatch(new SortFactory(geometry, level, new StepRandom([0.9])))).toEqual(first);
+  });
+
   it('should_start_the_level_and_place_one_stack_when_the_sort_factory_builds_it', () => {
     const factory = sortFactory([stack('red', 'red'), stack('blue')]);
 
@@ -47,11 +106,11 @@ describe('SortFactory', () => {
 
     expect(factory.isFor(GameId.of('hexa-sort'))).toBe(true);
     expect(factory.createBoard(BOARD_ID).coordinates()).toHaveLength(4);
-    expect(names(initial.snapshot().offeredStack()?.occupant())).toEqual(['red', 'red']);
+    expect(names(initial.snapshot().offeredStack())).toEqual(['red', 'red']);
     expect(initial.snapshot().goal().equals(GoalCount.of(5))).toBe(true);
     expect(outcome).toBe(Outcome.playing);
     expect(chipsAt(engine, 0, 0)).toEqual(['red', 'red']);
-    expect(names(engine.snapshot().offeredStack()?.occupant())).toEqual(['blue']);
+    expect(names(engine.snapshot().offeredStack())).toEqual(['blue']);
     expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(0));
     expect(engine.takeEvents()).toEqual([]);
   });
@@ -83,11 +142,11 @@ describe('SortFactory', () => {
     ];
 
     for (const level of levels) {
-      const factory = new SortFactory(new SquareGeometry(), level);
+      const factory = new SortFactory(new SquareGeometry(), level, seededRandom(1));
       const first = offeredInGame(factory);
       const second = offeredInGame(factory);
       // A second factory of an equal level draws the same stacks too.
-      const third = offeredInGame(new SortFactory(new SquareGeometry(), level));
+      const third = offeredInGame(new SortFactory(new SquareGeometry(), level, seededRandom(1)));
 
       expect(first).toHaveLength(3);
       for (const tiles of first) expect(tiles).not.toEqual([]);
@@ -111,39 +170,33 @@ describe('SortFactory', () => {
     ];
 
     for (const level of levels) {
-      const factory = new SortFactory(new SquareGeometry(), level);
+      const factory = new SortFactory(new SquareGeometry(), level, seededRandom(1));
       const { engine: first } = startVariant(factory);
       const { engine: second } = startVariant(factory);
-      const start = names(second.snapshot().offeredStack()?.occupant());
+      const start = names(second.snapshot().offeredStack());
       const sourceAtStart = second.snapshot().pieceSource();
 
       first.play(place(0, 0));
       first.play(place(1, 1));
 
-      expect(names(first.snapshot().offeredStack()?.occupant())).not.toEqual([]);
-      expect(names(second.snapshot().offeredStack()?.occupant())).toEqual(start);
+      expect(names(first.snapshot().offeredStack())).not.toEqual([]);
+      expect(names(second.snapshot().offeredStack())).toEqual(start);
       expect(second.snapshot().pieceSource()).toBe(sourceAtStart);
-      expect(names(startVariant(factory).engine.snapshot().offeredStack()?.occupant())).toEqual(
-        start,
-      );
+      expect(names(startVariant(factory).engine.snapshot().offeredStack())).toEqual(start);
     }
   });
 
   it('should_build_a_new_source_from_the_level_data_when_the_sort_factory_creates_the_piece_source', () => {
     const level = SortLevel.fixed(RegionSize.of(2), GoalCount.of(1), [stack('red'), stack('blue')]);
-    const factory = new SortFactory(new SquareGeometry(), level);
+    const factory = new SortFactory(new SquareGeometry(), level, seededRandom(1));
 
     const one = factory.createPieceSource();
     const other = factory.createPieceSource();
 
     // The level holds no source, so each call builds one, and both give the stacks of the level.
+    // The source gives each stack itself: Sort binds `TPiece` to `ColorStack` (issue #423).
     expect(one).not.toBe(other);
-    expect([...one].map((piece) => names(piece.occupant()))).toEqual([['red'], ['blue']]);
-    expect([...other].map((piece) => names(piece.occupant()))).toEqual([['red'], ['blue']]);
-    // A Sort piece is one cell with a stack: the first cell of the level region.
-    expect([...one].map((piece) => piece.coveredCoordinates())).toEqual([
-      [square(0, 0)],
-      [square(0, 0)],
-    ]);
+    expect([...one].map((offered) => names(offered))).toEqual([['red'], ['blue']]);
+    expect([...other].map((offered) => names(offered))).toEqual([['red'], ['blue']]);
   });
 });

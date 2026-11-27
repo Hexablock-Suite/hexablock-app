@@ -1,6 +1,6 @@
 /** @jest-environment node */
 import { Outcome } from '../../../../src/domain/engine/outcome';
-import { Score } from '../../../../src/domain/engine/score';
+import { Score } from '../../../../src/domain/shared/score';
 import { GameOverPhase, PlayingPhase } from '../../../../src/domain/engine/game-phase';
 import type { GridTopology } from '../../../../src/domain/engine/grid-topology';
 import { GameOver } from '../../../../src/domain/engine/game-events';

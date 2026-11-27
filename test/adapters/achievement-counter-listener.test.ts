@@ -5,10 +5,10 @@ import { LocalAchievementCounterRepository } from '../../src/adapters/local-achi
 import { ApplyMove } from '../../src/application/apply-move';
 import type { Logger, UseCaseLogEntry } from '../../src/application/logger';
 import { GameOver } from '../../src/domain/engine/game-events';
-import { GameId } from '../../src/domain/engine/game-id';
+import { GameId } from '../../src/domain/shared/game-id';
 import { hex, HexAxis } from '../../src/domain/engine/hex-topology';
 import { Outcome } from '../../src/domain/engine/outcome';
-import { Score } from '../../src/domain/engine/score';
+import { Score } from '../../src/domain/shared/score';
 import { PlacePiece } from '../../src/domain/variants/hexa-lines/place-piece';
 import { TrayPosition } from '../../src/domain/variants/hexa-lines/tray-position';
 import { StackCleared } from '../../src/domain/variants/hexa-sort/stack-cleared';

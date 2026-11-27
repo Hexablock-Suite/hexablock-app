@@ -1,11 +1,11 @@
-import type { ElapsedTime } from '../../../src/domain/engine/elapsed-time';
-import type { GameId } from '../../../src/domain/engine/game-id';
-import type { GameProgress } from '../../../src/domain/engine/game-progress';
-import type { LevelId } from '../../../src/domain/engine/level-id';
-import type { Moves } from '../../../src/domain/engine/moves';
-import type { ProgressRecord } from '../../../src/domain/engine/progress-model';
-import type { Score } from '../../../src/domain/engine/score';
-import type { Stars } from '../../../src/domain/engine/stars';
+import type { ElapsedTime } from '../../../src/domain/shared/elapsed-time';
+import type { GameId } from '../../../src/domain/shared/game-id';
+import type { GameProgress } from '../../../src/domain/progress/game-progress';
+import type { LevelId } from '../../../src/domain/progress/level-id';
+import type { Moves } from '../../../src/domain/shared/moves';
+import type { ProgressRecord } from '../../../src/domain/progress/progress-model';
+import type { Score } from '../../../src/domain/shared/score';
+import type { Stars } from '../../../src/domain/progress/stars';
 
 // Readers of a progress and of a record. They exist only in test/.
 // A progress and a record keep their fields private and deliver them to a receiver (issue #164).

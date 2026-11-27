@@ -1,12 +1,12 @@
 /** @jest-environment node */
 import { Outcome } from '../../../../src/domain/engine/outcome';
-import { ElapsedTime } from '../../../../src/domain/engine/elapsed-time';
-import { Moves } from '../../../../src/domain/engine/moves';
-import { Score } from '../../../../src/domain/engine/score';
-import { Stars } from '../../../../src/domain/engine/stars';
+import { ElapsedTime } from '../../../../src/domain/shared/elapsed-time';
+import { Moves } from '../../../../src/domain/shared/moves';
+import { Score } from '../../../../src/domain/shared/score';
+import { Stars } from '../../../../src/domain/progress/stars';
 import { Board } from '../../../../src/domain/engine/board';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
-import { GameId } from '../../../../src/domain/engine/game-id';
+import { GameId } from '../../../../src/domain/shared/game-id';
 import { Piece } from '../../../../src/domain/engine/piece';
 import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../../src/domain/engine/region-size';

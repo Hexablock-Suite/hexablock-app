@@ -1,13 +1,13 @@
 /** @jest-environment node */
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
-import { ElapsedTime } from '../../src/domain/engine/elapsed-time';
-import { GameId } from '../../src/domain/engine/game-id';
-import { GameProgress } from '../../src/domain/engine/game-progress';
-import { LevelId } from '../../src/domain/engine/level-id';
-import { Moves } from '../../src/domain/engine/moves';
-import { ProgressRecord } from '../../src/domain/engine/progress-model';
-import { Score } from '../../src/domain/engine/score';
-import { Stars } from '../../src/domain/engine/stars';
+import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
+import { GameId } from '../../src/domain/shared/game-id';
+import { GameProgress } from '../../src/domain/progress/game-progress';
+import { LevelId } from '../../src/domain/progress/level-id';
+import { Moves } from '../../src/domain/shared/moves';
+import { ProgressRecord } from '../../src/domain/progress/progress-model';
+import { Score } from '../../src/domain/shared/score';
+import { Stars } from '../../src/domain/progress/stars';
 import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-store';
 import { describeProgressRepositoryContract } from '../support/contracts/progress-repository-contract';
 import { sameContent } from '../support/engine/progress-content';

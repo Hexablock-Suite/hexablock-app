@@ -1,6 +1,6 @@
 /** @jest-environment node */
 import { ClockReading } from '../../../src/domain/engine/clock-reading';
-import { ElapsedTime } from '../../../src/domain/engine/elapsed-time';
+import { ElapsedTime } from '../../../src/domain/shared/elapsed-time';
 import { deliveries, delivered, RecordingReceiver } from '../../support/engine/value-receiver';
 
 // One reading of the engine `Clock` (issue #238, classes.md decisions 19 and 25).

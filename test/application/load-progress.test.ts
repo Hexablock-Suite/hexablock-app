@@ -3,10 +3,10 @@ import { LocalProgressRepository } from '../../src/adapters/local-progress-repos
 import { LoadProgress } from '../../src/application/load-progress';
 import type { ProgressRepository } from '../../src/application/progress-repository';
 import { Result } from '../../src/application/result';
-import { GameId } from '../../src/domain/engine/game-id';
-import { GameProgress } from '../../src/domain/engine/game-progress';
-import { ProgressRecord } from '../../src/domain/engine/progress-model';
-import { Score } from '../../src/domain/engine/score';
+import { GameId } from '../../src/domain/shared/game-id';
+import { GameProgress } from '../../src/domain/progress/game-progress';
+import { ProgressRecord } from '../../src/domain/progress/progress-model';
+import { Score } from '../../src/domain/shared/score';
 import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-store';
 
 // `LoadProgress` reads the saved progress of one game (S3-16 in #151, issue #181, APP-FR-04).

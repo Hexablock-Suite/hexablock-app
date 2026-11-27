@@ -2,9 +2,9 @@ import type { ListLevelsRequest } from '../application/list-levels';
 import type { LevelSummary } from '../application/level-summary';
 import type { Result } from '../application/result';
 import type { UseCase } from '../application/use-case';
-import { LevelStatus } from '../domain/engine/level-status';
-import type { LevelId } from '../domain/engine/level-id';
-import type { Stars } from '../domain/engine/stars';
+import { LevelStatus } from '../domain/progress/level-status';
+import type { LevelId } from '../domain/progress/level-id';
+import type { Stars } from '../domain/progress/stars';
 import type { TextKey, Texts } from './texts/text-catalog';
 
 // One level on the level selector (#173).

@@ -1,4 +1,4 @@
-import type { ValueReceiver } from '../domain/engine/value-receiver';
+import type { ValueReceiver } from '../domain/shared/value-receiver';
 
 // The helpers of the local repositories that save a domain object as JSON (issues #164
 // and #363). A repository reads each value of the domain with `deliverTo(receiver)`, and it

@@ -2,6 +2,7 @@
 import { GeneratorState } from '../../../src/domain/engine/generator-state';
 import { Mulberry32Random } from '../../../src/domain/engine/mulberry32-random';
 import { SeededPieceSource } from '../../../src/domain/engine/piece-source';
+import { RandomDraw } from '../../../src/domain/engine/random-draw';
 import type { RandomSource } from '../../../src/domain/engine/random-source';
 import { Seed } from '../../../src/domain/engine/seed';
 import { delivered } from '../../support/engine/value-receiver';
@@ -41,6 +42,15 @@ describe('Seed', () => {
     expect(Seed.of(0).equals(Seed.of(-0))).toBe(true);
     expect(Seed.of(4294967295).equals(Seed.of(0xffffffff))).toBe(true);
     expect(Seed.of(0).equals(Seed.of(4294967295))).toBe(false);
+  });
+
+  // Issue #417: a variant factory draws a new seed for each match. The draw keeps its number
+  // private, so the draw itself picks the seed: the draw times 4294967296, rounded down.
+  it('should_pick_the_seed_of_the_draw_times_the_count_of_seeds_when_a_draw_picks_a_seed', () => {
+    expect(RandomDraw.of(0).pickSeed().equals(Seed.of(0))).toBe(true);
+    expect(RandomDraw.of(0.5).pickSeed().equals(Seed.of(2147483648))).toBe(true);
+    expect(RandomDraw.of(0.25).pickSeed().equals(Seed.of(1073741824))).toBe(true);
+    expect(RandomDraw.of(0.9999999999).pickSeed().equals(Seed.of(4294967295))).toBe(true);
   });
 
   it('should_refuse_a_write_when_a_caller_changes_the_seed', () => {

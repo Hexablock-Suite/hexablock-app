@@ -10,7 +10,7 @@ const SEEDS = 2 ** 32;
 // The random driver (issue #162). It implements the engine interface `RandomSource`
 // (classes.md decision 25). The same seed gives the same draws (APP-NFR-07).
 // It draws with the engine generator `Mulberry32Random`, so the app and the tests
-// share one generator. The composition root draws the seed of each game from it.
+// share one generator. Each variant factory draws the seed of each match from it (#417).
 export class SeededRandomSource implements RandomSource {
   private generator: RandomSource;
 

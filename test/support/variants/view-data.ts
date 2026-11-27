@@ -1,5 +1,5 @@
 import type { Color } from '../../../src/domain/engine/color';
-import type { Moves } from '../../../src/domain/engine/moves';
+import type { Moves } from '../../../src/domain/shared/moves';
 import type { Piece } from '../../../src/domain/engine/piece';
 import { FitView } from '../../../src/domain/variants/hexa-fit/fit-state';
 import type { PieceId } from '../../../src/domain/variants/hexa-fit/piece-id';
@@ -48,8 +48,8 @@ export function fitViewData<TCoord>(view: FitView<TCoord>): {
 }
 
 // The offered stack and the two goal counts that a Sort view delivers.
-export function sortViewData<TCoord>(view: SortView<TCoord>): {
-  readonly offered: Piece<ColorStack, TCoord> | undefined;
+export function sortViewData(view: SortView): {
+  readonly offered: ColorStack | undefined;
   readonly goalsDone: ClearedStacks;
   readonly goalsNeeded: GoalCount;
 } {

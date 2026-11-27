@@ -1,8 +1,8 @@
 /** @jest-environment node */
 import type { GridAxis } from '../../../src/domain/engine/grid-topology';
-import { Score } from '../../../src/domain/engine/score';
+import { Score } from '../../../src/domain/shared/score';
 import { BoardId } from '../../../src/domain/engine/board-id';
-import { ElapsedTime } from '../../../src/domain/engine/elapsed-time';
+import { ElapsedTime } from '../../../src/domain/shared/elapsed-time';
 import type { BoardState, SnapshotOf } from '../../../src/domain/engine/board-state';
 import type { Cloneable } from '../../../src/domain/engine/cloneable';
 import { GameEngine } from '../../../src/domain/engine/game-engine';

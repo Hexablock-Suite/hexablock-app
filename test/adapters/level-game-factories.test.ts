@@ -10,15 +10,16 @@ import fit03 from '../../src/adapters/levels/fit/fit-03.json';
 import type { BoardState } from '../../src/domain/engine/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
 import type { GameEngine } from '../../src/domain/engine/game-engine';
-import { GameId } from '../../src/domain/engine/game-id';
+import { GameId } from '../../src/domain/shared/game-id';
 import { HexGeometry } from '../../src/domain/engine/hex-geometry';
-import { LevelDefinition } from '../../src/domain/engine/level-definition';
-import { LevelId } from '../../src/domain/engine/level-id';
+import { LevelDefinition } from '../../src/domain/progress/level-definition';
+import { LevelId } from '../../src/domain/progress/level-id';
 import { SquareGeometry } from '../../src/domain/engine/square-geometry';
 import { FitFactory } from '../../src/domain/variants/hexa-fit/fit-factory';
 import { FitLevelBuilder } from '../../src/domain/variants/hexa-fit/fit-level-builder';
 import { ManualClock } from '../support/engine/manual-clock';
 import { CountingMatchIds } from '../support/engine/match-id';
+import { seededRandom } from '../support/engine/step-random';
 import { startVariant } from '../support/engine/variant-game';
 import { linesFactory } from '../support/variants/hexa-lines/lines-game';
 import { sortFactory } from '../support/variants/hexa-sort/sort-game';
@@ -124,7 +125,7 @@ describe('LevelGameFactories', () => {
       sortFactory(),
       new CountingMatchIds(),
       new BundledLevelRepository(),
-      sortLevelVariant(new SquareGeometry()),
+      sortLevelVariant(new SquareGeometry(), seededRandom(1)),
     );
 
     await expect(factories.factoryFor(LevelId.of('sort-01'))).rejects.toThrow(

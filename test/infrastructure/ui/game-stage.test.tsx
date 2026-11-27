@@ -5,8 +5,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { textCatalog } from '../../../src/adapters/texts/text-catalog';
 import type { MoveResult } from '../../../src/application/move-result';
-import { GameId } from '../../../src/domain/engine/game-id';
-import type { Score } from '../../../src/domain/engine/score';
+import { GameId } from '../../../src/domain/shared/game-id';
+import type { Score } from '../../../src/domain/shared/score';
 import { CompositionRoot } from '../../../src/infrastructure/composition-root';
 import { gameSessionOf, type GameSession } from '../../../src/infrastructure/ui/game-session';
 import { GameStage } from '../../../src/infrastructure/ui/game-stage';

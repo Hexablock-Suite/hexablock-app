@@ -4,16 +4,16 @@ import { LocalProgressRepository } from '../../src/adapters/local-progress-repos
 import { LoadProgress } from '../../src/application/load-progress';
 import { SaveProgress } from '../../src/application/save-progress';
 import { Result } from '../../src/application/result';
-import { HighScoreProgress } from '../../src/domain/engine/high-score-progress';
-import { GameId } from '../../src/domain/engine/game-id';
-import type { GameProgress } from '../../src/domain/engine/game-progress';
-import { Moves } from '../../src/domain/engine/moves';
+import { HighScoreProgress } from '../../src/domain/progress/high-score-progress';
+import { GameId } from '../../src/domain/shared/game-id';
+import type { GameProgress } from '../../src/domain/progress/game-progress';
+import { Moves } from '../../src/domain/shared/moves';
 import {
   GameResult,
   ProgressRecord,
   type IProgressModel,
-} from '../../src/domain/engine/progress-model';
-import { Score } from '../../src/domain/engine/score';
+} from '../../src/domain/progress/progress-model';
+import { Score } from '../../src/domain/shared/score';
 import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-store';
 
 // The integration tests of APP-NFR-15 for the two games with no levels (issue #181, APP-FR-04),

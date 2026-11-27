@@ -1,0 +1,1 @@
+Shared leaves of the domain: the value objects that the engine, the progress, the achievements and the variants all name. It holds `ValueReceiver`, `GameId`, `Score`, `Moves`, `ElapsedTime` and `TopologyId`. It imports no other folder of `src/domain/` (rule `shared-imports-only-shared`), and never React, React Native or Expo (decision 64 of `docs/architecture/classes.md`).

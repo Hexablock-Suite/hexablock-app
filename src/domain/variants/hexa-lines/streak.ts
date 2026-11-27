@@ -1,4 +1,4 @@
-import type { Score } from '../../engine/score';
+import type { Score } from '../../shared/score';
 import { LineCount } from './line-count';
 
 // The streak of Hexa Lines: the count of placements in a row that cleared at least one line

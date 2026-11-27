@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { TopologyId } from '../../../src/domain/engine/geometry-factory';
+import { TopologyId } from '../../../src/domain/shared/topology-id';
 import { hex, HexAxis, HexDirection, HexTopology } from '../../../src/domain/engine/hex-topology';
 import { Outcome } from '../../../src/domain/engine/outcome';
 import {
@@ -14,7 +14,7 @@ import {
   TriangleDirection,
   TriangleTopology,
 } from '../../../src/domain/engine/triangle-topology';
-import type { ValueReceiver } from '../../../src/domain/engine/value-receiver';
+import type { ValueReceiver } from '../../../src/domain/shared/value-receiver';
 import { deliveries, RecordingReceiver } from '../../support/engine/value-receiver';
 
 // Issue #207 (classes.md decision 45): a closed union of texts is a class with a closed set

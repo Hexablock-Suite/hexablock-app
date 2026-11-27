@@ -1,7 +1,7 @@
-import type { GameId } from './game-id';
+import type { GameId } from '../shared/game-id';
 import type { MatchId } from './match-id';
 import { Outcome } from './outcome';
-import type { Score } from './score';
+import type { Score } from '../shared/score';
 
 // Observer (statement §3.3). A domain event of a game.
 // `GameEngine` records each event when it saves the turn, and tells nobody.

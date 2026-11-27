@@ -1,4 +1,4 @@
-import type { ValueReceiver } from '../../engine/value-receiver';
+import type { ValueReceiver } from '../../shared/value-receiver';
 
 // The count of stacks that one Hexa Sort game cleared (classes.md decision 42, issue #204).
 // Each cleared stack counts one goal, and `GoalCount.isReachedBy()` reads the count.

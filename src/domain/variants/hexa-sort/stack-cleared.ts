@@ -1,5 +1,5 @@
 import { GameEvent } from '../../engine/game-events';
-import type { GameId } from '../../engine/game-id';
+import type { GameId } from '../../shared/game-id';
 import type { MatchId } from '../../engine/match-id';
 import type { TileCount } from './tile-count';
 

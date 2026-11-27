@@ -1,4 +1,4 @@
-import type { ValueReceiver } from '../../engine/value-receiver';
+import type { ValueReceiver } from '../../shared/value-receiver';
 
 // The cell content of Hexa Fit: the id of the piece that covers the cell (REQUIREMENTS.md §1).
 // It is a value object: it never changes. Two ids are equal when their values are equal.

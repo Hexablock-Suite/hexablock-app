@@ -23,13 +23,19 @@ afterAll(() => {
   rmSync(scratch, { recursive: true, force: true });
 });
 
-// Copies src/domain/engine/ to <scratch>/<name>/src/domain/engine/ and returns that root.
+// The engine imports the shared leaves and the progress, so the copy holds them too (issue #420).
+const GENERIC_FOLDERS = ['engine', 'shared', 'progress', 'achievements'];
+
+// Copies src/domain/engine/ and its sibling folders to <scratch>/<name>/src/domain/
+// and returns that root.
 // The copy must hold the real `game-engine.ts`, or an import added to it proves nothing.
 function copyRealEngine(name: string): string {
   const root = path.join(scratch, name);
-  cpSync(path.join(repoRoot, 'src/domain/engine'), path.join(root, 'src/domain/engine'), {
-    recursive: true,
-  });
+  for (const folder of GENERIC_FOLDERS) {
+    cpSync(path.join(repoRoot, 'src/domain', folder), path.join(root, 'src/domain', folder), {
+      recursive: true,
+    });
+  }
   expect(existsSync(path.join(root, 'src/domain/engine/game-engine.ts'))).toBe(true);
   return root;
 }
@@ -68,6 +74,20 @@ describe('architecture gate on the real engine code', () => {
 
     expect(result.status).not.toBe(0);
     expect(result.output).toContain('engine-no-variants');
+  });
+
+  // Issue #420: the real progress model imports only the shared leaves.
+  it('should_fail_progress_imports_only_shared_when_the_real_progress_model_imports_the_engine', () => {
+    const root = copyRealEngine('progress-import');
+    appendFileSync(
+      path.join(root, 'src/domain/progress/progress-model.ts'),
+      "\nexport type { GameEngine } from '../engine/game-engine';\n",
+    );
+
+    const result = cruise(root);
+
+    expect(result.status).not.toBe(0);
+    expect(result.output).toContain('progress-imports-only-shared');
   });
 
   it('should_fail_domain_no_framework_when_the_real_game_engine_imports_react', () => {

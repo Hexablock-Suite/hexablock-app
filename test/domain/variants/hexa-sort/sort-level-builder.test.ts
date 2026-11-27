@@ -1,9 +1,9 @@
 /** @jest-environment node */
 import { Color } from '../../../../src/domain/engine/color';
-import { TopologyId } from '../../../../src/domain/engine/geometry-factory';
+import { TopologyId } from '../../../../src/domain/shared/topology-id';
 import { HexGeometry } from '../../../../src/domain/engine/hex-geometry';
-import { LevelDefinition } from '../../../../src/domain/engine/level-definition';
-import { Moves } from '../../../../src/domain/engine/moves';
+import { LevelDefinition } from '../../../../src/domain/progress/level-definition';
+import { Moves } from '../../../../src/domain/shared/moves';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import { Seed } from '../../../../src/domain/engine/seed';
 import { GoalCount } from '../../../../src/domain/variants/hexa-sort/goal-count';
@@ -12,6 +12,7 @@ import { SortLevel } from '../../../../src/domain/variants/hexa-sort/sort-level'
 import { SortLevelBuilder } from '../../../../src/domain/variants/hexa-sort/sort-level-builder';
 import { SortStarThreshold } from '../../../../src/domain/variants/hexa-sort/sort-stars';
 import { BOARD_ID } from '../../../support/engine/entity-ids';
+import { seededRandom } from '../../../support/engine/step-random';
 import { stack } from '../../../support/variants/hexa-sort/sort-game';
 import {
   sortFixedSource,
@@ -72,7 +73,9 @@ describe('SortLevelBuilder', () => {
   it('should_give_every_cell_within_the_radius_when_the_sort_factory_builds_the_board_of_the_level', () => {
     const cells = [1, 2, 3].map((radius) => {
       const level = built(withSection((section) => ({ ...section, radius })));
-      return new SortFactory(hexGeometry, level).createBoard(BOARD_ID).coordinates().length;
+      return new SortFactory(hexGeometry, level, seededRandom(1))
+        .createBoard(BOARD_ID)
+        .coordinates().length;
     });
 
     expect(cells).toEqual([7, 19, 37]);

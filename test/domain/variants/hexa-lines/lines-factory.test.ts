@@ -1,9 +1,15 @@
 /** @jest-environment node */
 import { Outcome } from '../../../../src/domain/engine/outcome';
-import { Score } from '../../../../src/domain/engine/score';
-import { GameId } from '../../../../src/domain/engine/game-id';
+import { Score } from '../../../../src/domain/shared/score';
+import { GameId } from '../../../../src/domain/shared/game-id';
 import type { Piece } from '../../../../src/domain/engine/piece';
 import { CellNode, ShapeGroup } from '../../../../src/domain/engine/shape-node';
+import { RegionSize } from '../../../../src/domain/engine/region-size';
+import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
+import {
+  LinesFactory,
+  LinesSettings,
+} from '../../../../src/domain/variants/hexa-lines/lines-factory';
 import type { Color } from '../../../../src/domain/engine/color';
 import { LineCount } from '../../../../src/domain/variants/hexa-lines/line-count';
 import { PlacePiece } from '../../../../src/domain/variants/hexa-lines/place-piece';
@@ -22,6 +28,7 @@ import {
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 import { delivered } from '../../../support/engine/value-receiver';
+import { StepRandom } from '../../../support/engine/step-random';
 
 // The Lines factory creates the whole family of Hexa Lines (issue 99, classes.md decision 31).
 
@@ -49,7 +56,50 @@ function firstPieces(seed: number, count: number): string[] {
   return pieces;
 }
 
+// A Lines factory on a 3 × 3 square board with two shapes and two colors.
+// Each match draws its seed from `random` (issue #417).
+function factoryWith(random: StepRandom): LinesFactory<SquareCoord> {
+  return new LinesFactory(
+    new SquareGeometry(),
+    LinesSettings.of(RegionSize.of(3), [new CellNode(square(0, 0)), domino], [red, blue]),
+    random,
+  );
+}
+
+// The pieces of a new match of `factory`: the three tray pieces and the next nine of its source.
+function piecesOfMatch(factory: LinesFactory<SquareCoord>): string[] {
+  const photo = startVariant(factory).engine.snapshot();
+  const pieces = photo.trayPieces().map(describe_);
+  for (const piece of photo.pieceSource()) {
+    pieces.push(describe_(piece));
+    if (pieces.length === 12) break;
+  }
+  return pieces;
+}
+
 describe('LinesFactory', () => {
+  // Issue #417: each match draws a new seed, so a replay in one app session gets other pieces.
+  it('should_draw_other_pieces_when_two_matches_start_with_a_random_source_that_gives_other_draws', () => {
+    const factory = factoryWith(new StepRandom([0.1, 0.6]));
+
+    const first = piecesOfMatch(factory);
+    const second = piecesOfMatch(factory);
+
+    expect(first).toHaveLength(12);
+    expect(second).not.toEqual(first);
+  });
+
+  // APP-NFR-07: the randomness comes by injection, so a fixed source gives the same game.
+  it('should_draw_the_same_pieces_twice_when_the_random_source_gives_the_same_draw_each_time', () => {
+    const factory = factoryWith(new StepRandom([0.3]));
+
+    const first = piecesOfMatch(factory);
+
+    expect(piecesOfMatch(factory)).toEqual(first);
+    expect(piecesOfMatch(factoryWith(new StepRandom([0.3])))).toEqual(first);
+    expect(new Set(first).size).toBeGreaterThan(1);
+  });
+
   it('should_start_a_game_that_plays_one_move_when_the_lines_factory_builds_it', () => {
     const factory = linesFactory();
 
@@ -107,19 +157,5 @@ describe('LinesFactory', () => {
     expect(engine.snapshot().lastCombo()).toEqual(LineCount.of(2));
     // 1 cell + 10 × 2 lines × (2 + 1 - 1). The base scoring alone gives 21.
     expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(41));
-  });
-
-  // Since issue 210 the seed checks itself, so the error comes when the settings are built,
-  // before any factory exists. Before, it came when the factory created the piece source.
-  it('should_throw_a_range_error_when_the_lines_settings_get_a_seed_that_is_not_a_32_bit_integer', () => {
-    for (const seed of [Number.NaN, Number.POSITIVE_INFINITY, 1.5, -1, 2 ** 53]) {
-      const message = `A seed must be an integer from 0 to 4294967295, not ${seed}.`;
-
-      expect(() => linesFactory(seed)).toThrow(new RangeError(message));
-    }
-  });
-
-  it('should_draw_the_pieces_of_seed_zero_when_the_lines_settings_hold_a_negative_zero_seed', () => {
-    expect(firstPieces(-0, 12)).toEqual(firstPieces(0, 12));
   });
 });

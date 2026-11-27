@@ -1,5 +1,5 @@
 import type { GridAxis } from '../../engine/grid-topology';
-import type { ValueReceiver } from '../../engine/value-receiver';
+import type { ValueReceiver } from '../../shared/value-receiver';
 
 // The way a slide goes along the line that `Board.line()` gives: toward its last
 // coordinate (`forward`) or toward its first coordinate (`backward`).

@@ -1,5 +1,5 @@
 import type { SnapshotOf } from './board-state';
-import type { Score } from './score';
+import type { Score } from '../shared/score';
 import type { IScoringPolicy } from './scoring-policy';
 
 // The abstract Decorator of the scoring (classes.md patterns table, view engine-4, issue 146).

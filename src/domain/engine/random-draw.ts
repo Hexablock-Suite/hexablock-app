@@ -1,4 +1,8 @@
-import type { ValueReceiver } from './value-receiver';
+import { Seed } from './seed';
+import type { ValueReceiver } from '../shared/value-receiver';
+
+// The count of seeds: the unsigned 32-bit integers (classes.md decision 48).
+const SEEDS = 4294967296;
 
 // One draw of a random source: a number from 0 up to 1, without 1 (APP-NFR-07, issue #243).
 // It is a value object: it never changes, and two draws are equal when their numbers are equal.
@@ -37,8 +41,15 @@ export class RandomDraw {
     return items[Math.min(Math.floor(this.value * items.length), items.length - 1)] as T;
   }
 
+  // The seed that this draw picks: the draw times the count of seeds, rounded down (issue #417).
+  // So the draw 0 picks the seed 0, and the largest draw picks the seed 4294967295.
+  // A variant factory draws the seed of each new match with it, so no number leaves the draw.
+  pickSeed(): Seed {
+    return Seed.of(Math.floor(this.value * SEEDS));
+  }
+
   // Gives the number of the draw to `receiver`. It returns nothing.
-  // The composition root of layer 4 draws the seed of a game from it.
+  // Only an adapter of the edge receives the number.
   // No code of the domain or of the use cases calls it (rule R-no-delivery-call).
   deliverTo(receiver: ValueReceiver<number>): void {
     receiver.receive(this.value);

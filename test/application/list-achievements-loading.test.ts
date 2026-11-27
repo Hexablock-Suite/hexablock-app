@@ -6,14 +6,14 @@ import type { AchievementCounterRepository } from '../../src/application/achieve
 import type { LevelRepository } from '../../src/application/level-repository';
 import { ListAchievements } from '../../src/application/list-achievements';
 import type { ProgressRepository } from '../../src/application/progress-repository';
-import { AchievementCount } from '../../src/domain/engine/achievement-count';
+import { AchievementCount } from '../../src/domain/achievements/achievement-count';
 import {
   BestCountReached,
   EveryLevelWon,
   LevelsWon,
   TotalCountReached,
-} from '../../src/domain/engine/achievement-goal';
-import { GameId } from '../../src/domain/engine/game-id';
+} from '../../src/domain/achievements/achievement-goal';
+import { GameId } from '../../src/domain/shared/game-id';
 import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-store';
 import { delivered } from '../support/engine/value-receiver';
 

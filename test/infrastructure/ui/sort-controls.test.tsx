@@ -4,7 +4,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GamePresenter } from '../../../src/adapters/game-presenter';
 import { textCatalog } from '../../../src/adapters/texts/text-catalog';
 import { Color } from '../../../src/domain/engine/color';
-import { GameId } from '../../../src/domain/engine/game-id';
+import { GameId } from '../../../src/domain/shared/game-id';
 import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
 import { RegionSize } from '../../../src/domain/engine/region-size';
 import { ColorStack } from '../../../src/domain/variants/hexa-sort/color-stack';
@@ -16,6 +16,7 @@ import { GameStage } from '../../../src/infrastructure/ui/game-stage';
 import { gameUseCases } from '../../support/application/game-use-cases';
 import { RecordingLogger } from '../../support/application/recording-logger';
 import { ManualClock } from '../../support/engine/manual-clock';
+import { seededRandom } from '../../support/engine/step-random';
 import { occupiedSpaces, pressSpace, spaces } from '../../support/ui/board-spaces';
 import { outlinesIn } from '../../support/ui/cell-outlines';
 
@@ -34,7 +35,7 @@ async function openLevel(stacks: readonly (readonly string[])[]): Promise<void> 
     stacks.map((stack) => ColorStack.of(stack.map(Color.of))),
   );
   const { startGame, applyMove, undoMove, redoMove } = gameUseCases(
-    new SortFactory(new HexGeometry(), level),
+    new SortFactory(new HexGeometry(), level, seededRandom(1)),
   );
   const presenter = new GamePresenter(
     startGame,

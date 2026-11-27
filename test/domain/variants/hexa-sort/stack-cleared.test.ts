@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { GameId } from '../../../../src/domain/engine/game-id';
+import { GameId } from '../../../../src/domain/shared/game-id';
 import { StackCleared } from '../../../../src/domain/variants/hexa-sort/stack-cleared';
 import { TileCount } from '../../../../src/domain/variants/hexa-sort/tile-count';
 import { MATCH_ID } from '../../../support/engine/match-id';

@@ -3,7 +3,7 @@ import { GeneratorState } from './generator-state';
 // The largest seed of a game: the largest unsigned 32-bit integer.
 const MAX_SEED = 0xffffffff;
 
-// The seed of a game (APP-NFR-07, classes.md decision 48, issue #210): the same seed gives
+// The seed of a match (APP-NFR-07, classes.md decision 48, issues #210 and #417): the same seed gives
 // the same pieces. It is a value object: it never changes, and two seeds are equal
 // when their values are equal.
 // A seed is a whole number from 0 to 4294967295. Any other number throws a RangeError,

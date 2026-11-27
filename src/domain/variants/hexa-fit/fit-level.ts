@@ -1,13 +1,13 @@
 import type { BoardShape } from '../../engine/board-shape';
 import type { CoordKey } from '../../engine/coord-key';
-import type { ElapsedTime } from '../../engine/elapsed-time';
-import type { TopologyId } from '../../engine/geometry-factory';
-import type { ILevelStars } from '../../engine/level-progress';
-import type { Moves } from '../../engine/moves';
+import type { ElapsedTime } from '../../shared/elapsed-time';
+import type { TopologyId } from '../../shared/topology-id';
+import type { ILevelStars } from '../../progress/level-progress';
+import type { Moves } from '../../shared/moves';
 import type { Piece } from '../../engine/piece';
-import { FixedListPieceSource } from '../../engine/piece-source';
+import { frozenListOf } from '../../engine/frozen-list';
 import { CellNode, ShapeGroup } from '../../engine/shape-node';
-import type { Stars } from '../../engine/stars';
+import type { Stars } from '../../progress/stars';
 import { FitPlay, fitStars, type FitStarThreshold } from './fit-stars';
 import type { PieceId } from './piece-id';
 
@@ -22,7 +22,7 @@ type Family = { isOfFamily(id: TopologyId): boolean };
 // The level guards its own invariant. `of()` makes every check that needs only the level,
 // so a level with two pieces of one id cannot exist, and neither can a level
 // with a piece list that holds `undefined`.
-// `of()` copies the piece list and the list of thresholds, freezes each copy,
+// `of()` copies the piece list with `frozenListOf()` and the list of thresholds, freezes each copy,
 // and the object is frozen. So a change to an array of the caller does not change the level.
 // The level cannot check its figure, because only a topology finds a repeated coordinate.
 // `Board` makes that check when the game starts.
@@ -42,7 +42,7 @@ export class FitLevel<TCoord> implements ILevelStars {
 
   // Two pieces with the same id throw a RangeError, because a move names its piece by id.
   // The error carries the id as its `cause`, and the edge delivers its text (issue #237).
-  // `FixedListPieceSource` holds the check of `undefined`, so the level reads its copy.
+  // `frozenListOf()` copies the pieces and refuses `undefined`.
   // The thresholds of the stars come from the first star up (classes.md decision 36).
   static of<TCoord>(
     topology: TopologyId,
@@ -50,14 +50,14 @@ export class FitLevel<TCoord> implements ILevelStars {
     pieces: readonly Piece<PieceId, TCoord>[],
     stars: readonly FitStarThreshold[],
   ): FitLevel<TCoord> {
-    const copy = [...new FixedListPieceSource(pieces)];
+    const copy = frozenListOf(pieces);
     copy.forEach((piece, index) => {
       const id = piece.occupant();
       if (copy.slice(0, index).some((earlier) => earlier.occupant().equals(id))) {
         throw new RangeError('The level has two pieces with one id.', { cause: id });
       }
     });
-    return new FitLevel(topology, figure, Object.freeze(copy), Object.freeze([...stars]));
+    return new FitLevel(topology, figure, copy, Object.freeze([...stars]));
   }
 
   // The stars of a won play of this level: `fitStars()` counts the leading thresholds

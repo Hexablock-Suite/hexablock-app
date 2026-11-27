@@ -1,5 +1,5 @@
-import type { Moves } from '../../engine/moves';
-import { Stars } from '../../engine/stars';
+import type { Moves } from '../../shared/moves';
+import { Stars } from '../../progress/stars';
 
 // The moves of one won Sort level. The caller counts the moves.
 // It is a value object (classes.md decision 42): it never changes, and two plays are equal

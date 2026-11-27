@@ -5,8 +5,8 @@ import {
   type LevelSelectorViewModel,
 } from '../../adapters/level-selector-presenter';
 import { DEFAULT_LANGUAGE, textCatalog } from '../../adapters/texts/text-catalog';
-import type { GameId } from '../../domain/engine/game-id';
-import type { TopologyId } from '../../domain/engine/geometry-factory';
+import type { GameId } from '../../domain/shared/game-id';
+import type { TopologyId } from '../../domain/shared/topology-id';
 import { useCompositionRoot } from '../composition-root-provider';
 
 // The view model of the level selector of the game `gameId` on the board figure `figure` (#173).

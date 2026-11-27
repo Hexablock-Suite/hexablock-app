@@ -30,11 +30,43 @@ module.exports = {
       to: { path: layer('domain/variants') },
     },
     {
+      name: 'shared-imports-only-shared',
+      comment:
+        'The shared leaves of the domain (src/domain/shared/) import no other folder of the domain (issue #420).',
+      severity: 'error',
+      from: { path: layer('domain/shared') },
+      to: { path: layer('domain'), pathNot: layer('domain/shared') },
+    },
+    {
+      name: 'progress-imports-only-shared',
+      comment:
+        'The progress and the levels (src/domain/progress/) import only the shared leaves of the domain (issue #420).',
+      severity: 'error',
+      from: { path: layer('domain/progress') },
+      to: { path: layer('domain'), pathNot: '(?:^|/)src/domain/(?:shared|progress)/' },
+    },
+    {
+      name: 'achievements-imports-only-shared-and-progress',
+      comment:
+        'The achievements (src/domain/achievements/) import only the shared leaves and the progress (issue #420).',
+      severity: 'error',
+      from: { path: layer('domain/achievements') },
+      to: { path: layer('domain'), pathNot: '(?:^|/)src/domain/(?:shared|progress|achievements)/' },
+    },
+    {
       name: 'variants-isolated',
       comment: 'A variant never imports another variant.',
       severity: 'error',
       from: { path: '(?:^|/)src/domain/variants/([^/]+)/' },
       to: { path: layer('domain/variants'), pathNot: '(?:^|/)src/domain/variants/$1/' },
+    },
+    {
+      name: 'sort-and-merge-no-cell-piece',
+      comment:
+        'Hexa Sort and Hexa Merge bind their own TPiece (ColorStack, NewTile): they never import the cell-made Piece or the shape Composite of the engine.',
+      severity: 'error',
+      from: { path: '(?:^|/)src/domain/variants/hexa-(?:sort|merge)/' },
+      to: { path: '(?:^|/)src/domain/engine/(?:piece|shape-node)\\.ts$' },
     },
     {
       name: 'application-imports-only-domain',

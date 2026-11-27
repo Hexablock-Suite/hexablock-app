@@ -1,10 +1,10 @@
 import type { AchievementCounterRepository } from '../application/achievement-counter-repository';
 import type { Logger } from '../application/logger';
 import { caughtError, FailureCode } from '../application/result';
-import { AchievementCount } from '../domain/engine/achievement-count';
-import { AchievementCounters } from '../domain/engine/achievement-counters';
+import { AchievementCount } from '../domain/achievements/achievement-count';
+import { AchievementCounters } from '../domain/achievements/achievement-counters';
 import type { GameEvent } from '../domain/engine/game-events';
-import type { GameId } from '../domain/engine/game-id';
+import type { GameId } from '../domain/shared/game-id';
 import { LinesCleared } from '../domain/variants/hexa-lines/lines-cleared';
 import { MergeTile } from '../domain/variants/hexa-merge/merge-tile';
 import { TileMerged } from '../domain/variants/hexa-merge/tile-merged';

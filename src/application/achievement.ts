@@ -1,4 +1,4 @@
-import type { AchievementGoal } from '../domain/engine/achievement-goal';
+import type { AchievementGoal } from '../domain/achievements/achievement-goal';
 
 // One achievement of the achievements screen (issue #188). It is plain data.
 // `id` names the achievement: the presenter finds its name under `achievement.<id>` in the text

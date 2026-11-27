@@ -1,5 +1,5 @@
 import type { Color } from '../../engine/color';
-import type { ValueReceiver } from '../../engine/value-receiver';
+import type { ValueReceiver } from '../../shared/value-receiver';
 import { TileCount } from './tile-count';
 
 // The cell of Hexa Sort: a stack of colored tiles (statement §1.3).

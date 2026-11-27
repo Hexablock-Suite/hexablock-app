@@ -1,4 +1,4 @@
-import type { ValueReceiver } from '../../../src/domain/engine/value-receiver';
+import type { ValueReceiver } from '../../../src/domain/shared/value-receiver';
 
 // Receiving test doubles. They exist only in test/.
 // A value object keeps its value private and delivers it to a receiver (issue #228).

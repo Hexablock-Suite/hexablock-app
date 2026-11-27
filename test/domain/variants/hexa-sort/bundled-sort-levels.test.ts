@@ -3,10 +3,10 @@ import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import type { GeometryFactory } from '../../../../src/domain/engine/geometry-factory';
-import { LevelDefinition } from '../../../../src/domain/engine/level-definition';
-import { Moves } from '../../../../src/domain/engine/moves';
+import { LevelDefinition } from '../../../../src/domain/progress/level-definition';
+import { Moves } from '../../../../src/domain/shared/moves';
 import { Outcome } from '../../../../src/domain/engine/outcome';
-import { Stars } from '../../../../src/domain/engine/stars';
+import { Stars } from '../../../../src/domain/progress/stars';
 import { GoalCount } from '../../../../src/domain/variants/hexa-sort/goal-count';
 import { PlaceStack } from '../../../../src/domain/variants/hexa-sort/place-stack';
 import { SortFactory } from '../../../../src/domain/variants/hexa-sort/sort-factory';
@@ -14,6 +14,7 @@ import type { SortLevel } from '../../../../src/domain/variants/hexa-sort/sort-l
 import { SortLevelBuilder } from '../../../../src/domain/variants/hexa-sort/sort-level-builder';
 import { withGeometryOf } from '../../../support/engine/geometry-of';
 import { startVariant } from '../../../support/engine/variant-game';
+import { seededRandom } from '../../../support/engine/step-random';
 import { repoRoot } from '../../../support/run-tool';
 import { names } from '../../../support/variants/hexa-sort/sort-game';
 import { sortLevelFile } from '../../../support/variants/hexa-sort/sort-level-file';
@@ -120,13 +121,13 @@ const topologiesOf = (files: [string, LevelFile][]) => [
 function offeredInTwoGames(file: LevelFile): string[][][] {
   return withGeometryOf(file.topology, {
     use: (geometry) => {
-      const factory = new SortFactory(geometry, built(file, geometry));
+      const factory = new SortFactory(geometry, built(file, geometry), seededRandom(1));
       return [0, 1].map(() => {
         const { engine } = startVariant(factory);
-        const offered = [names(engine.snapshot().offeredStack()?.occupant())];
+        const offered = [names(engine.snapshot().offeredStack())];
         for (const at of figureOf(file).apart) {
           engine.play(PlaceStack.on(geometry.createCoord([...at])));
-          offered.push(names(engine.snapshot().offeredStack()?.occupant()));
+          offered.push(names(engine.snapshot().offeredStack()));
         }
         return offered;
       });
@@ -139,12 +140,14 @@ function offeredInTwoGames(file: LevelFile): string[][][] {
 function firstPhoto(file: LevelFile): { cells: number; goal: boolean; offered: string[] } {
   return withGeometryOf(file.topology, {
     use: (geometry) => {
-      const { engine } = startVariant(new SortFactory(geometry, built(file, geometry)));
+      const { engine } = startVariant(
+        new SortFactory(geometry, built(file, geometry), seededRandom(1)),
+      );
       const photo = engine.snapshot();
       return {
         cells: photo.boardCopy().coordinates().length,
         goal: photo.goal().equals(GoalCount.of(file.section.goals)),
-        offered: names(photo.offeredStack()?.occupant()),
+        offered: names(photo.offeredStack()),
       };
     },
   });
@@ -159,7 +162,7 @@ function planPlay(
   return withGeometryOf(file.topology, {
     use: (geometry) => {
       const level = built(file, geometry);
-      const { engine } = startVariant(new SortFactory(geometry, level));
+      const { engine } = startVariant(new SortFactory(geometry, level, seededRandom(1)));
       const outcomes = plan.map((at) => engine.play(PlaceStack.on(geometry.createCoord([...at]))));
       return { outcomes, stars: level.starsFor(Moves.of(plan.length), undefined) };
     },

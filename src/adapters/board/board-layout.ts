@@ -1,4 +1,4 @@
-import type { ValueReceiver } from '../../domain/engine/value-receiver';
+import type { ValueReceiver } from '../../domain/shared/value-receiver';
 
 // A point on the screen, in density-independent pixels. `x` grows to the right, and `y` grows down.
 export interface ScreenPoint {

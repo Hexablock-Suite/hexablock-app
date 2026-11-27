@@ -5,7 +5,7 @@ import type { GridAxis, GridDirection, GridTopology } from './grid-topology';
 import type { Radius } from './radius';
 import type { RegionSize } from './region-size';
 import { Turns } from './turns';
-import type { ValueReceiver } from './value-receiver';
+import type { ValueReceiver } from '../shared/value-receiver';
 
 // A coordinate holds a column and a row.
 // It is a value object (classes.md decisions 16 and 44, issue #206): it never changes,

@@ -8,7 +8,7 @@ import type { Cloneable } from '../../src/domain/engine/cloneable';
 import { GameEngine } from '../../src/domain/engine/game-engine';
 import type { GameEvent } from '../../src/domain/engine/game-events';
 import { GameFactory } from '../../src/domain/engine/game-factory';
-import { GameId } from '../../src/domain/engine/game-id';
+import { GameId } from '../../src/domain/shared/game-id';
 import { MatchId } from '../../src/domain/engine/match-id';
 import { PlayingPhase, VictoryPhase, type GamePhase } from '../../src/domain/engine/game-phase';
 import { MoveHistory } from '../../src/domain/engine/move-history';
@@ -17,9 +17,9 @@ import { Piece } from '../../src/domain/engine/piece';
 import { CellNode } from '../../src/domain/engine/shape-node';
 import { FixedListPieceSource, type IPieceSource } from '../../src/domain/engine/piece-source';
 import type { Resolution } from '../../src/domain/engine/resolution';
-import { ElapsedTime } from '../../src/domain/engine/elapsed-time';
-import { Moves } from '../../src/domain/engine/moves';
-import { Score } from '../../src/domain/engine/score';
+import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
+import { Moves } from '../../src/domain/shared/moves';
+import { Score } from '../../src/domain/shared/score';
 import type { IRedoable } from '../../src/domain/engine/undo-capabilities';
 import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
 import { PlacePiece } from '../../src/domain/variants/hexa-lines/place-piece';
@@ -58,7 +58,7 @@ import {
 import { A, fitFactory, fitStateOf } from '../support/variants/hexa-fit/fit-game';
 import { linesFactory, red } from '../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../support/variants/hexa-merge/merge-game';
-import { sortFactory, stack, stackPiece } from '../support/variants/hexa-sort/sort-game';
+import { sortFactory, stack } from '../support/variants/hexa-sort/sort-game';
 import { CountingMatchIds, MATCH_ID } from '../support/engine/match-id';
 import {
   fitViewData,
@@ -227,11 +227,12 @@ function sortFactoryWithFailingSource(): IVariantFactory<
   ColorStack,
   SquareCoord,
   PlaceStack<SquareCoord>,
-  SortState<SquareCoord>
+  SortState<SquareCoord>,
+  ColorStack
 > {
   const factory = sortFactory();
-  const pieces = new FixedListPieceSource([stack('red')].map(stackPiece));
-  const source: IPieceSource<Piece<ColorStack, SquareCoord>> = {
+  const pieces = new FixedListPieceSource([stack('red')]);
+  const source: IPieceSource<ColorStack> = {
     hasNext: () => pieces.hasNext(),
     take: () => {
       throw new RangeError('The level source cannot be read.');
@@ -871,7 +872,7 @@ describe('the variant data of MoveResult', () => {
       canRedo: false,
       hasUndo: false,
       payload: {
-        offered: stackPiece(stack('blue')),
+        offered: stack('blue'),
         goalsDone: ClearedStacks.of(0),
         goalsNeeded: GoalCount.of(5),
       },

@@ -1,4 +1,5 @@
-import { TopologyId, type GeometryFactory } from './geometry-factory';
+import type { GeometryFactory } from './geometry-factory';
+import { TopologyId } from '../shared/topology-id';
 import { CellNode, ShapeGroup, type ShapeNode } from './shape-node';
 import { triangle, TriangleTopology, type TriangleCoord } from './triangle-topology';
 
