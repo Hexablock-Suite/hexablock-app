@@ -12,6 +12,7 @@
 // gives to the achievement (#188).
 // The texts of the level selector live under `levels.<part>`, and the text of each status
 // of a level under `levels.status.<status>` (#173).
+// The texts of the victory screen and of the defeat screen live under `result.<part>` (#180).
 export const en = {
   'home.title': 'HexaBlock Suite',
   'home.brand': 'HexaBlock',
@@ -40,6 +41,15 @@ export const en = {
   'play.error.nothing-to-undo': 'There is no move to undo',
   'play.error.nothing-to-redo': 'There is no move to redo',
   'play.error.level-locked': 'That level is locked. Win the level before it to open it.',
+  'result.victory': 'You won!',
+  'result.defeat': 'End of the game',
+  'result.score': 'Final score',
+  'result.next-level': 'Next level',
+  'result.new-game': 'New game',
+  'result.retry': 'Try again',
+  'result.back': 'Back to the map',
+  'result.error.save': 'The result could not be saved.',
+  'result.error': 'The game could not close. Go back to the map.',
   'play.fit.moves': 'Moves',
   'play.fit.tray': 'Piece tray',
   'play.fit.piece': 'Piece',

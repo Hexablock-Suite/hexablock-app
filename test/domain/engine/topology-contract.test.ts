@@ -1,22 +1,11 @@
 /** @jest-environment node */
-import type {
-  GridAxis,
-  GridDirection,
-  GridTopology,
-} from '../../../src/domain/engine/grid-topology';
-import {
-  hex,
-  HexAxis,
-  HexDirection,
-  HexTopology,
-  type HexCoord,
-} from '../../../src/domain/engine/hex-topology';
+import type { GridAxis, GridTopology } from '../../../src/domain/engine/grid-topology';
+import { hex, HexAxis, HexTopology, type HexCoord } from '../../../src/domain/engine/hex-topology';
 import { Radius } from '../../../src/domain/engine/radius';
 import { RegionSize } from '../../../src/domain/engine/region-size';
 import {
   square,
   SquareAxis,
-  SquareDirection,
   SquareTopology,
   type SquareCoord,
 } from '../../../src/domain/engine/square-topology';
@@ -24,7 +13,6 @@ import {
   isUp,
   triangle,
   TriangleAxis,
-  TriangleDirection,
   TriangleTopology,
   type TriangleCoord,
 } from '../../../src/domain/engine/triangle-topology';
@@ -44,22 +32,18 @@ import { delivered } from '../../support/engine/value-receiver';
 interface Row<TCoord> {
   // The name of the grid in the error messages.
   readonly grid: string;
-  // The table erases the axis and direction classes of each topology.
+  // The table erases the axis class of each topology.
   readonly topology: GridTopology<TCoord>;
   readonly rotationSteps: number;
   readonly axes: readonly GridAxis[];
-  readonly directions: readonly GridDirection[];
-  // The names of the axes and of the directions, in the same order.
+  // The names of the axes, in the same order.
   readonly axisNames: readonly string[];
-  readonly directionNames: readonly string[];
   readonly neighborCount: number;
   // The offset that moves nothing.
   readonly origin: TCoord;
   // Different cells, with negative values, in each orientation of the grid.
   readonly samples: readonly TCoord[];
   readonly offsets: readonly TCoord[];
-  // One step per direction: the direction, the start cell and the neighbor.
-  readonly steps: readonly (readonly [GridDirection, TCoord, TCoord])[];
   // One step of rotation: the start cell and the turned cell.
   readonly turn: readonly [TCoord, TCoord];
   // Each pair holds a size and its cell count.
@@ -69,15 +53,14 @@ interface Row<TCoord> {
 }
 
 // A name that the grid lacks, and three names that every object inherits.
-// A text is no axis and no direction, so only a cast passes it to a topology.
+// A text is no axis, so only a cast passes it to a topology.
 const missingNames = ['nort', 'constructor', 'toString', '__proto__'];
 const asAxis = (name: string) => name as unknown as GridAxis;
-const asDirection = (name: string) => name as unknown as GridDirection;
 
-// The name that an axis or a direction delivers (issue #237). The table erases the classes,
+// The name that an axis delivers (issue #237). The table erases the classes,
 // and the bound has no delivery, so the cast names the operation that each real class has.
 type Named = { deliverTo(receiver: ValueReceiver<string>): void };
-const nameOf = (member: GridAxis | GridDirection) => delivered(member as unknown as Named);
+const nameOf = (member: GridAxis) => delivered(member as unknown as Named);
 
 // Gives the tests of one row. The result keeps the coordinate type of the row inside it,
 // so one table holds three coordinate types with no cast.
@@ -115,12 +98,10 @@ function contract<TCoord>(row: Row<TCoord>): () => void {
   }
 
   return () => {
-    it('should_declare_its_rotation_steps_axes_and_directions_when_it_is_read', () => {
+    it('should_declare_its_rotation_steps_and_axes_when_it_is_read', () => {
       expect(topology.fullTurn().equals(Turns.of(row.rotationSteps))).toBe(true);
       expect(topology.axes()).toEqual(row.axes);
-      expect(topology.directions()).toEqual(row.directions);
       expect(topology.axes().map(nameOf)).toEqual(row.axisNames);
-      expect(topology.directions().map(nameOf)).toEqual(row.directionNames);
     });
 
     it('should_give_one_key_per_cell_when_the_keys_of_different_cells_are_compared', () => {
@@ -137,30 +118,6 @@ function contract<TCoord>(row: Row<TCoord>): () => void {
         expect(neighbors).toHaveLength(row.neighborCount);
         expect(new Set(neighbors.map(keyOf)).size).toBe(row.neighborCount);
         expect(neighbors.every((n) => areNeighbors(n, c))).toBe(true);
-      }
-    });
-
-    it('should_reach_each_neighbor_once_when_each_direction_is_followed', () => {
-      for (const c of row.samples) {
-        const reached = topology.directions().map((d) => topology.neighbor(c, d));
-
-        expect(reached.map(keyOf).toSorted()).toEqual(sortedKeys(topology.neighbors(c)));
-      }
-    });
-
-    it('should_give_the_cell_of_that_direction_when_one_direction_is_followed', () => {
-      for (const [direction, from, to] of row.steps) {
-        expect(topology.neighbor(from, direction)).toEqual(to);
-      }
-    });
-
-    it('should_throw_a_range_error_when_a_cast_names_a_direction_that_the_grid_lacks', () => {
-      for (const name of missingNames) {
-        const follow = () => topology.neighbor(row.origin, asDirection(name));
-
-        expect(follow).toThrow(
-          new RangeError(`The ${row.grid} grid has no such direction.`, { cause: name }),
-        );
       }
     });
 
@@ -296,28 +253,11 @@ const table = [
       topology: new HexTopology(),
       rotationSteps: 6,
       axes: [HexAxis.q, HexAxis.r, HexAxis.s],
-      directions: [
-        HexDirection.east,
-        HexDirection.west,
-        HexDirection.southEast,
-        HexDirection.northWest,
-        HexDirection.southWest,
-        HexDirection.northEast,
-      ],
       axisNames: ['q', 'r', 's'],
-      directionNames: ['east', 'west', 'south-east', 'north-west', 'south-west', 'north-east'],
       neighborCount: 6,
       origin: hex(0, 0),
       samples: [hex(0, 0), hex(1, 0), hex(2, -1), hex(-3, 2)],
       offsets: [hex(1, 0), hex(0, 1), hex(-2, 3)],
-      steps: [
-        [HexDirection.east, hex(1, 1), hex(2, 1)],
-        [HexDirection.west, hex(1, 1), hex(0, 1)],
-        [HexDirection.southEast, hex(1, 1), hex(1, 2)],
-        [HexDirection.northWest, hex(1, 1), hex(1, 0)],
-        [HexDirection.southWest, hex(1, 1), hex(0, 2)],
-        [HexDirection.northEast, hex(1, 1), hex(2, 0)],
-      ],
       turn: [hex(1, 0), hex(0, 1)],
       // A hexagon: the cells at distance `size - 1` or less. Size 5 is radius 4, 61 cells.
       regionCounts: [
@@ -340,24 +280,11 @@ const table = [
       topology: new SquareTopology(),
       rotationSteps: 4,
       axes: [SquareAxis.col, SquareAxis.row],
-      directions: [
-        SquareDirection.north,
-        SquareDirection.east,
-        SquareDirection.south,
-        SquareDirection.west,
-      ],
       axisNames: ['col', 'row'],
-      directionNames: ['north', 'east', 'south', 'west'],
       neighborCount: 4,
       origin: square(0, 0),
       samples: [square(0, 0), square(1, 0), square(2, -1), square(-3, 2)],
       offsets: [square(1, 0), square(0, 1), square(-2, 3)],
-      steps: [
-        [SquareDirection.north, square(1, 1), square(1, 0)],
-        [SquareDirection.east, square(1, 1), square(2, 1)],
-        [SquareDirection.south, square(1, 1), square(1, 2)],
-        [SquareDirection.west, square(1, 1), square(0, 1)],
-      ],
       turn: [square(1, 0), square(0, 1)],
       // A square of size × size cells.
       regionCounts: [
@@ -380,20 +307,12 @@ const table = [
       topology: new TriangleTopology(),
       rotationSteps: 6,
       axes: [TriangleAxis.row, TriangleAxis.downRight, TriangleAxis.downLeft],
-      directions: [TriangleDirection.left, TriangleDirection.right, TriangleDirection.vertical],
       axisNames: ['row', 'down-right', 'down-left'],
-      directionNames: ['left', 'right', 'vertical'],
       neighborCount: 3,
       origin: triangle(0, 0),
       samples: [triangle(0, 0), triangle(1, 0), triangle(-3, 2), triangle(2, -5)],
       // An odd offset flips the orientation when code adds the components (decision 16).
       offsets: [triangle(1, 0), triangle(0, 1), triangle(-2, 3)],
-      steps: [
-        [TriangleDirection.left, triangle(0, 0), triangle(-1, 0)],
-        [TriangleDirection.right, triangle(0, 0), triangle(1, 0)],
-        [TriangleDirection.vertical, triangle(0, 0), triangle(0, 1)],
-        [TriangleDirection.vertical, triangle(1, 0), triangle(1, -1)],
-      ],
       // The center of the turn is a vertex, so no triangle stays in its place.
       turn: [triangle(0, 0), triangle(1, 0)],
       // A rhombus of size × size lattice cells, two triangles each.
@@ -425,12 +344,11 @@ describe('test support topologies', () => {
   });
 
   it('should_keep_every_member_when_a_test_spreads_a_support_topology', () => {
-    const copy: GridTopology<SquareCoord, SquareAxis, SquareDirection> = { ...squareTopology };
+    const copy: GridTopology<SquareCoord, SquareAxis> = { ...squareTopology };
     const real = new SquareTopology();
 
     expect(copy.fullTurn().equals(real.fullTurn())).toBe(true);
     expect(copy.neighbors(square(0, 0))).toEqual(real.neighbors(square(0, 0)));
-    expect(copy.neighbor(square(0, 0), SquareDirection.east)).toEqual(square(1, 0));
     const inside = [square(0, 0), square(1, 0)];
     const contains = (c: SquareCoord) => inside.some((cell) => cell.equals(c));
     expect([...copy.line(SquareAxis.col, square(0, 0), contains)]).toEqual(inside);

@@ -79,21 +79,20 @@
           from its seed and clones before each draw, the IScoringPolicy strategy wrapped by the
           abstract ScoringDecorator, and the IProgressModel strategy that records a GameResult in
           the GameProgress of its game: HighScoreProgress keeps the high score, and LevelProgress
-          keeps the result of a level with the stars that the ILevelStars of the level counts. Range
-          is the value object of a closed interval over a value object T that implements Ordered, so
-          it orders its bounds with isBefore() and with no number. Seed is the value object of a
-          seed: it checks its own number once, SeededPieceSource holds one privately and tells
-          whether it draws from a seed with isSeededWith(), and Mulberry32Random starts from one: it
-          keeps a GeneratorState and gives a RandomDraw on each next(), so no number leaves it.
-          Score is the value object of a score: IScoringPolicy returns one, and GameResult and
-          ProgressRecord hold one. Moves, ElapsedTime, Stars and LevelId are the value objects of
-          the counters: GameResult holds a Moves, a LevelId and an ElapsedTime, and ProgressRecord
-          holds a LevelId, Stars, a Moves and an ElapsedTime. Their fields are private: GameResult
-          creates the ProgressRecord of a progress model with recordWith(), and ProgressRecord tells
-          with improves() whether it is better than the stored record, by the order of DS-4.
-          ProgressRecord tells with isOfGame() whether it is a record of a game, so a GameProgress
-          refuses a record of another game. ProgressRecord gives the stars of its level with
-          starsOf(), and its value objects to a repository of the edge with deliverTo().
+          keeps the result of a level with the stars that the ILevelStars of the level counts. Seed
+          is the value object of a seed: it checks its own number once, SeededPieceSource holds one
+          privately and tells whether it draws from a seed with isSeededWith(), and Mulberry32Random
+          starts from one: it keeps a GeneratorState and gives a RandomDraw on each next(), so no
+          number leaves it. Score is the value object of a score: IScoringPolicy returns one, and
+          GameResult and ProgressRecord hold one. Moves, ElapsedTime, Stars and LevelId are the
+          value objects of the counters: GameResult holds a Moves (none for a game with no levels,
+          D26), a LevelId and an ElapsedTime, and ProgressRecord holds a LevelId, Stars, a Moves and
+          an ElapsedTime. Their fields are private: GameResult creates the ProgressRecord of a
+          progress model with recordWith(), and ProgressRecord tells with improves() whether it is
+          better than the stored record, by the order of DS-4. ProgressRecord tells with isOfGame()
+          whether it is a record of a game, so a GameProgress refuses a record of another game.
+          ProgressRecord gives the stars of its level with starsOf(), and its value objects to a
+          repository of the edge with deliverTo().
         </desc>
         <defs>
           <marker
@@ -928,7 +927,7 @@
           - score: Score
         </text>
         <text x="624" y="688" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - moves: Moves
+          - moves: Moves [0..1]
         </text>
         <text x="624" y="704" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - elapsedMs: ElapsedTime [0..1]
@@ -1083,7 +1082,7 @@
           text-anchor="start"
         >
           moves
-          <tspan font-weight="600">1</tspan>
+          <tspan font-weight="600">0..1</tspan>
         </text>
         <!-- IProgressModel records each result in the GameProgress of its game: use -->
         <line
@@ -1633,85 +1632,7 @@
         >
           ValueReceiver&lt;number&gt;): void
         </text>
-        <!-- Class: Range (value object) -->
-        <rect
-          x="640"
-          y="364"
-          width="328"
-          height="144"
-          rx="6"
-          fill="#ffffff"
-          stroke="#17212a"
-          stroke-width="1"
-        />
-        <line x1="640" y1="412" x2="968" y2="412" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text
-          x="804"
-          y="382"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «value object»
-        </text>
-        <text
-          x="804"
-          y="400"
-          fill="#17212a"
-          font-size="12"
-          font-weight="600"
-          font-family="'IBM Plex Sans', sans-serif"
-          text-anchor="middle"
-        >
-          Range
-        </text>
-        <text x="656" y="428" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - min: T
-        </text>
-        <text x="656" y="444" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - max: T
-        </text>
-        <line x1="640" y1="452" x2="968" y2="452" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text
-          x="656"
-          y="468"
-          fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-          text-decoration="underline"
-        >
-          + of(min: T, max: T): Range&lt;T&gt;
-        </text>
-        <text x="656" y="484" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + contains(value: T): boolean
-        </text>
-        <text x="656" y="500" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + equals(other: Range&lt;T&gt;): boolean
-        </text>
         <!-- UML template boxes: type parameters on the top-right corner -->
-        <rect
-          x="860"
-          y="354"
-          width="120"
-          height="18"
-          rx="2"
-          fill="#ffffff"
-          stroke="#5b6873"
-          stroke-width="0.8"
-          stroke-dasharray="4,3"
-        />
-        <text
-          x="920"
-          y="366"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          T extends Ordered‹T›
-        </text>
         <rect
           x="404"
           y="82"
@@ -1868,9 +1789,9 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          GameResult holds a Moves, a LevelId and an ElapsedTime, and ProgressRecord holds a
-          LevelId, Stars, a Moves and an ElapsedTime (decision 42). ITimed.elapsedMs() returns an
-          ElapsedTime.
+          GameResult holds a Moves [0..1] (D26), a LevelId and an ElapsedTime, and ProgressRecord
+          holds a LevelId, Stars, a Moves and an ElapsedTime (decision 42). ITimed.elapsedMs()
+          returns an ElapsedTime.
         </text>
 
         <!-- Legend -->

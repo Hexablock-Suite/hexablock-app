@@ -79,10 +79,11 @@
           HexCoord and HexTopology and SquareGeometry creating SquareCoord, the three coordinate
           value objects HexCoord, SquareCoord and TriangleCoord with private values and their own
           operations, the value object TopologyId that names a family, which each concrete factory
-          keeps private and which GeometryFactory answers with isOfFamily(), the axis and direction
-          value objects of the three topologies, each a closed set of instances that implements
-          GridAxis or GridDirection, and BoardBuilder, the builder that the class calls a DDD
-          factory, holding a GeometryFactory and creating the Board.
+          keeps private and which GeometryFactory answers with isOfFamily(), the axis value objects
+          of the three topologies, each a closed set of instances that implements GridAxis, the
+          internal direction classes that each topology keeps private for neighbors(), and
+          BoardBuilder, the builder that the class calls a DDD factory, holding a GeometryFactory
+          and creating the Board.
         </desc>
         <defs>
           <marker
@@ -1187,12 +1188,12 @@
         >
           GridAxis
         </text>
-        <!-- Class: HexDirection (value object): a closed set of instances that gives the neighbor of a cell (decision 45) -->
+        <!-- Class: HexDirection (internal): private to the file of its topology, it gives the neighbor of a cell for neighbors() (decision 16, #416) -->
         <rect
           x="72"
           y="1124"
           width="248"
-          height="192"
+          height="128"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1208,7 +1209,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «value object»
+          «internal»
         </text>
         <text
           x="196"
@@ -1222,14 +1223,11 @@
           HexDirection
         </text>
         <text x="88" y="1188" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - name: string
-        </text>
-        <text x="88" y="1204" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - step: HexCoord
         </text>
         <text
           x="88"
-          y="1220"
+          y="1204"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1239,7 +1237,7 @@
         </text>
         <text
           x="99"
-          y="1236"
+          y="1220"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1247,25 +1245,16 @@
         >
           southWest, northEast: HexDirection
         </text>
-        <line x1="72" y1="1244" x2="320" y2="1244" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="88" y="1260" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + equals(other: GridDirection): boolean
-        </text>
-        <text x="88" y="1276" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="72" y1="1228" x2="320" y2="1228" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="88" y="1244" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + neighborOf(c: HexCoord): HexCoord
         </text>
-        <text x="88" y="1292" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + deliverTo(receiver:
-        </text>
-        <text x="99" y="1308" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          ValueReceiver&lt;string&gt;): void
-        </text>
-        <!-- Class: SquareDirection (value object): a closed set of instances that gives the neighbor of a cell (decision 45) -->
+        <!-- Class: SquareDirection (internal): private to the file of its topology, it gives the neighbor of a cell for neighbors() (decision 16, #416) -->
         <rect
           x="344"
           y="1124"
           width="264"
-          height="176"
+          height="112"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1281,7 +1270,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «value object»
+          «internal»
         </text>
         <text
           x="476"
@@ -1301,7 +1290,7 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          - name: string
+          - step: SquareCoord
         </text>
         <text
           x="360"
@@ -1309,62 +1298,26 @@
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
-        >
-          - step: SquareCoord
-        </text>
-        <text
-          x="360"
-          y="1220"
-          fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
           text-decoration="underline"
         >
           + north, east, south, west: SquareDirection
         </text>
-        <line x1="344" y1="1228" x2="608" y2="1228" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="344" y1="1212" x2="608" y2="1212" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="360"
-          y="1244"
-          fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          + equals(other: GridDirection): boolean
-        </text>
-        <text
-          x="360"
-          y="1260"
+          y="1228"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
           + neighborOf(c: SquareCoord): SquareCoord
         </text>
-        <text
-          x="360"
-          y="1276"
-          fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          + deliverTo(receiver:
-        </text>
-        <text
-          x="371"
-          y="1292"
-          fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          ValueReceiver&lt;string&gt;): void
-        </text>
-        <!-- Class: TriangleDirection (value object): a closed set of instances that gives the neighbor of a cell (decision 45) -->
+        <!-- Class: TriangleDirection (internal): private to the file of its topology, it gives the neighbor of a cell for neighbors() (decision 16, #416) -->
         <rect
           x="632"
           y="1124"
           width="320"
-          height="176"
+          height="112"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1380,7 +1333,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «value object»
+          «internal»
         </text>
         <text
           x="792"
@@ -1400,7 +1353,7 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          - name: string
+          - step: OrientedStep
         </text>
         <text
           x="648"
@@ -1408,91 +1361,19 @@
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
-        >
-          - step: OrientedStep
-        </text>
-        <text
-          x="648"
-          y="1220"
-          fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
           text-decoration="underline"
         >
           + left, right, vertical: TriangleDirection
         </text>
-        <line x1="632" y1="1228" x2="952" y2="1228" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="632" y1="1212" x2="952" y2="1212" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="648"
-          y="1244"
-          fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          + equals(other: GridDirection): boolean
-        </text>
-        <text
-          x="648"
-          y="1260"
+          y="1228"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
           + neighborOf(c: TriangleCoord): TriangleCoord
-        </text>
-        <text
-          x="648"
-          y="1276"
-          fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          + deliverTo(receiver:
-        </text>
-        <text
-          x="659"
-          y="1292"
-          fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          ValueReceiver&lt;string&gt;): void
-        </text>
-        <!-- Lollipop: HexDirection implements the engine interface GridDirection -->
-        <line x1="96" y1="1316" x2="96" y2="1332" stroke="#17212a" stroke-width="1" />
-        <circle cx="96" cy="1337" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text
-          x="107"
-          y="1340"
-          fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          GridDirection
-        </text>
-        <!-- Lollipop: SquareDirection implements the engine interface GridDirection -->
-        <line x1="368" y1="1300" x2="368" y2="1316" stroke="#17212a" stroke-width="1" />
-        <circle cx="368" cy="1321" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text
-          x="379"
-          y="1324"
-          fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          GridDirection
-        </text>
-        <!-- Lollipop: TriangleDirection implements the engine interface GridDirection -->
-        <line x1="656" y1="1300" x2="656" y2="1316" stroke="#17212a" stroke-width="1" />
-        <circle cx="656" cy="1321" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text
-          x="667"
-          y="1324"
-          fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          GridDirection
         </text>
         <!-- Lollipop: HexTopology implements the engine interface GridTopology -->
         <line x1="320" y1="480" x2="320" y2="496" stroke="#17212a" stroke-width="1" />
@@ -1591,8 +1472,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          HexTopology binds TAxis and TDirection of GridTopology to HexAxis and HexDirection
-          (decision 45). An axis steps along itself, and a direction gives the neighbor of a cell.
+          HexTopology binds TAxis of GridTopology to HexAxis (decision 45), and an axis steps along
+          itself. A direction is internal to its topology file and serves only neighbors() (#416).
         </text>
         <text
           x="24"

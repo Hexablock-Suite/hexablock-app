@@ -64,7 +64,7 @@
       <h1>Results and response models: errors as values, plain data out</h1>
 
       <svg
-        viewBox="0 0 1040 920"
+        viewBox="0 0 1040 968"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="ucresult-title ucresult-desc"
@@ -136,7 +136,7 @@
           x="24"
           y="24"
           width="992"
-          height="652"
+          height="700"
           rx="8"
           fill="#efe7f8"
           stroke="rgba(126,34,206,0.40)"
@@ -182,7 +182,7 @@
           x="40"
           y="440"
           width="952"
-          height="216"
+          height="268"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -529,6 +529,9 @@
           list-failed
         </text>
         <text x="852" y="380" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          level-locked
+        </text>
+        <text x="852" y="396" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           unexpected-failure
         </text>
 
@@ -537,7 +540,7 @@
           x="360"
           y="450"
           width="320"
-          height="216"
+          height="248"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -594,6 +597,12 @@
           + elapsedMs?: ElapsedTime
         </text>
         <text x="376" y="658" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + moves?: Moves
+        </text>
+        <text x="376" y="674" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + levelId?: LevelId
+        </text>
+        <text x="376" y="690" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + failedDeliveries?: UseCaseError[]
         </text>
 
@@ -644,7 +653,7 @@
         <!-- Footnote -->
         <text
           x="24"
-          y="704"
+          y="752"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -654,7 +663,7 @@
         </text>
         <text
           x="24"
-          y="720"
+          y="768"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -664,7 +673,7 @@
         </text>
         <text
           x="24"
-          y="736"
+          y="784"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -674,7 +683,7 @@
         </text>
         <text
           x="24"
-          y="752"
+          y="800"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -684,7 +693,7 @@
         </text>
         <text
           x="24"
-          y="768"
+          y="816"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -694,7 +703,7 @@
         </text>
         <text
           x="24"
-          y="784"
+          y="832"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -704,10 +713,10 @@
         </text>
 
         <!-- Legend -->
-        <line x1="24" y1="808" x2="1016" y2="808" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <line x1="24" y1="856" x2="1016" y2="856" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="826"
+          y="874"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -718,16 +727,16 @@
 
         <line
           x1="24"
-          y1="844"
+          y1="892"
           x2="52"
-          y2="844"
+          y2="892"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#ucresult-open)"
         />
         <text
           x="60"
-          y="848"
+          y="896"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -737,7 +746,7 @@
 
         <rect
           x="24"
-          y="864"
+          y="912"
           width="28"
           height="12"
           rx="2"
@@ -747,7 +756,7 @@
         />
         <text
           x="60"
-          y="873"
+          y="921"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -756,7 +765,7 @@
         </text>
         <rect
           x="204"
-          y="864"
+          y="912"
           width="28"
           height="12"
           rx="2"
@@ -767,7 +776,7 @@
         />
         <text
           x="240"
-          y="873"
+          y="921"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -776,7 +785,7 @@
         </text>
         <rect
           x="444"
-          y="864"
+          y="912"
           width="28"
           height="12"
           rx="2"
@@ -787,7 +796,7 @@
         />
         <text
           x="480"
-          y="873"
+          y="921"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -796,7 +805,7 @@
         </text>
         <rect
           x="620"
-          y="864"
+          y="912"
           width="28"
           height="12"
           rx="2"
@@ -806,7 +815,7 @@
         />
         <text
           x="656"
-          y="873"
+          y="921"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -815,7 +824,7 @@
         </text>
         <rect
           x="24"
-          y="884"
+          y="932"
           width="28"
           height="12"
           rx="2"
@@ -826,7 +835,7 @@
         />
         <text
           x="60"
-          y="893"
+          y="941"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

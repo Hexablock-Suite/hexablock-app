@@ -121,6 +121,8 @@ function targetFourSession(): GameSession {
       parts.moves,
       textCatalog.es,
     ),
+    // The real Merge target ends no game, so the result presenter of the root never shows.
+    result: root.gameSession(GameId.of('hexa-merge')).result,
     renderer: parts.renderer,
     controls: parts.controls,
     layoutOf: (size) => parts.layoutOf(size),

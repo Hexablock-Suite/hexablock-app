@@ -559,7 +559,7 @@
           x="664"
           y="92"
           width="320"
-          height="256"
+          height="240"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -598,30 +598,27 @@
           + neighbors(c: TCoord): TCoord[]
         </text>
         <text x="680" y="212" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + directions(): TDirection[]
-        </text>
-        <text x="680" y="228" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + axes(): TAxis[]
         </text>
-        <text x="680" y="244" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="680" y="228" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + rotate(c: TCoord, turns: Turns): TCoord
         </text>
-        <text x="680" y="260" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="680" y="244" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + translate(c: TCoord, offset: TCoord): TCoord
         </text>
-        <text x="680" y="276" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="680" y="260" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + line(axis: TAxis, through: TCoord, contains:
         </text>
-        <text x="696" y="292" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="696" y="276" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           (c: TCoord) =&gt; boolean): Iterable&lt;TCoord&gt;
         </text>
-        <text x="680" y="308" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="680" y="292" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + ring(center: TCoord, radius: Radius):
         </text>
-        <text x="696" y="324" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="696" y="308" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Iterable&lt;TCoord&gt;
         </text>
-        <text x="680" y="340" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="680" y="324" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + region(size: RegionSize): BoardShape&lt;TCoord&gt;
         </text>
 
@@ -968,7 +965,7 @@
           x="820"
           y="68"
           width="176"
-          height="30"
+          height="18"
           rx="2"
           fill="#ffffff"
           stroke="#5b6873"
@@ -983,17 +980,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TCoord, TAxis extends GridAxis,
-        </text>
-        <text
-          x="908"
-          y="91"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          TDirection extends GridDirection
+          TCoord, TAxis extends GridAxis
         </text>
         <rect
           x="396"
@@ -1131,7 +1118,7 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           A ShapeGroup holds at least one child. Radius, RegionSize and Turns check a safe whole
-          number in of(). Each topology binds TAxis and TDirection to its own classes (view 6).
+          number in of(). Each topology binds TAxis to its own axis class (view 6).
         </text>
         <text
           x="24"

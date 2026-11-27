@@ -33,17 +33,36 @@ jobs:
 
   # Starts the selected API revision and checks the client contract against it:
   # the committed pact (pnpm contract:verify) and the generated API types (pnpm api:check).
+  # Then it loads the bundled levels into the API and checks them for drift
+  # (pnpm levels:load, pnpm levels:check; hexablock-api issue #158).
   # API_REF selects the revision: empty verifies API main; a paired transition sets
   # one full commit SHA (issue #346, hexablock-api issue #173).
   contract:
     name: contract
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # A throwaway Postgres with the credentials of .env.example of hexablock-api.
+    # The level load and the sign-up need the database and its migrations.
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: hexablock
+          POSTGRES_PASSWORD: hexablock
+          POSTGRES_DB: hexablock
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U hexablock -d hexablock"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 15
     env:
       VP_GIT_HOOKS: '0'
       PACT_DO_NOT_TRACK: 'true'
       PORT: '3000'
       BACKEND_URL: http://localhost:3000
+      DATABASE_URL: postgres://hexablock:hexablock@localhost:5432/hexablock
       # Paired transition (app issue #346): verify against the API commit that
       # serves /v1. Empty or removed restores the normal API main verification.
     steps:
@@ -76,10 +95,13 @@ jobs:
         working-directory: hexablock-api
         # The API reads JWT_SECRET when it starts. The example values of
         # hexablock-api start it, and /v1/health reads no database and no token.
+        # pnpm db:migrate applies the migrations of the API to DATABASE_URL.
         run: |
           pnpm install --frozen-lockfile
           pnpm build
+          pnpm db:migrate
           nohup node --env-file=.env.example dist/main.js > "$RUNNER_TEMP/backend.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/backend.pid"
       - name: Wait for backend health
         run: |
           for _ in $(seq 1 30); do
@@ -90,3 +112,43 @@ jobs:
           exit 1
       - run: pnpm contract:verify
       - run: pnpm api:check
+      - name: Sign up a level editor and restart the API with its id
+        working-directory: hexablock-api
+        # PUT /v1/levels needs an account in LEVEL_EDITOR_IDS (hexablock-api #145).
+        # The API reads that list when it starts, and a user id exists only after
+        # the sign-up. So the step signs up an account, reads its id from
+        # /v1/auth/me, and starts the API again with that id. The account lives
+        # only in the throwaway database of this job.
+        run: |
+          credentials='{"username":"level-loader","password":"contract-job-only"}'
+          curl --silent --fail -X POST -H 'Content-Type: application/json' -d "$credentials" "$BACKEND_URL/v1/auth/register"
+          token=$(curl --silent --fail -X POST -H 'Content-Type: application/json' -d "$credentials" "$BACKEND_URL/v1/auth/login" | jq -r .accessToken)
+          echo "::add-mask::$token"
+          user_id=$(curl --silent --fail -H "Authorization: Bearer $token" "$BACKEND_URL/v1/auth/me" | jq -r .userId)
+          pid=$(cat "$RUNNER_TEMP/backend.pid")
+          kill "$pid"
+          for _ in $(seq 1 30); do
+            if ! kill -0 "$pid" 2>/dev/null; then break; fi
+            sleep 1
+          done
+          LEVEL_EDITOR_IDS="$user_id" nohup node --env-file=.env.example dist/main.js >> "$RUNNER_TEMP/backend.log" 2>&1 &
+          for _ in $(seq 1 30); do
+            if curl --silent --fail "$BACKEND_URL/v1/health"; then
+              echo "LEVEL_EDITOR_TOKEN=$token" >> "$GITHUB_ENV"
+              exit 0
+            fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/backend.log"
+          exit 1
+      - run: pnpm levels:load
+      - run: pnpm levels:check
+      # Syncs a result of a bundled level after the load and reads it back
+      # (hexablock-api #158). Every run without BUNDLED_LEVELS_LIVE skips it.
+      - name: sync a result of a bundled level
+        env:
+          BUNDLED_LEVELS_LIVE: '1'
+        run: pnpm exec jest --selectProjects contract test/contract/bundled-levels-sync.test.ts
+      - name: Show the backend log
+        if: failure()
+        run: cat "$RUNNER_TEMP/backend.log"

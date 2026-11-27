@@ -116,6 +116,8 @@ describe('UndoMove', () => {
       payload: afterFirst.payload,
       // Fit is timed, and this clock does not move.
       elapsedMs: ElapsedTime.ofMs(0),
+      // Fit counts its moves (D26, #180). The undo takes back the count of the second move.
+      moves: afterFirst.moves,
     });
     expect(games.running().snapshot().boardCopy().occupiedCells()).toEqual(afterFirst.cells);
     expect(games.running().currentPhase()).toBe(PlayingPhase.instance);
@@ -138,6 +140,7 @@ describe('UndoMove', () => {
       'elapsedMs',
       'freeSpaces',
       'hasUndo',
+      'moves',
       'outcome',
       'payload',
       'score',

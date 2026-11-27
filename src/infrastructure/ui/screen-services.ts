@@ -4,6 +4,7 @@ import type { AchievementsPresenter } from '../../adapters/achievements-presente
 import type { GamePresenter } from '../../adapters/game-presenter';
 import type { HomePresenter, SavedProgresses } from '../../adapters/home-presenter';
 import type { LevelSelectorPresenter } from '../../adapters/level-selector-presenter';
+import type { ResultPresenter } from '../../adapters/result-presenter';
 import type { BoardLayout, CellShape } from '../../adapters/board/board-layout';
 import type { Texts } from '../../adapters/texts/text-catalog';
 import type { LoadProgressRequest } from '../../application/load-progress';
@@ -18,9 +19,11 @@ import type { WorldTone } from './theme';
 // What the game screen needs to show one game (issue #170): the presenter over the use cases
 // of the game, the cell renderer, the move controls and the figure layout of its registry entry,
 // and the texts of the screen (#175). The registry hides the type of a cell view,
-// so the session keeps it hidden too.
+// so the session keeps it hidden too. `result` is the presenter of the victory screen and of
+// the defeat screen, which hears the end of each game of `presenter` (#180).
 export interface GameSession {
   readonly presenter: GamePresenter<unknown, unknown, unknown, unknown, unknown, unknown, unknown>;
+  readonly result: ResultPresenter;
   readonly renderer: CellRenderer<unknown>;
   readonly controls: MoveControls<unknown, unknown, unknown, unknown>;
   readonly layoutOf: (size: number) => BoardLayout<unknown>;

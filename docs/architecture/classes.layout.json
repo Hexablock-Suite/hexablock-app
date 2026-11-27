@@ -68,7 +68,6 @@
             "RandomSource",
             "Cloneable",
             "GeneratorState",
-            "GridDirection",
             "Piece",
             "BoardId",
             "HexDirection",
@@ -89,8 +88,7 @@
             "IPieceSource",
             "SeededPieceSource",
             "IRandomSeeded",
-            "PieceDraw",
-            "Range"
+            "PieceDraw"
           ]
         },
         {
@@ -314,7 +312,12 @@
             "LinesIntent",
             "FitIntent",
             "SortIntent",
-            "MergeIntent"
+            "MergeIntent",
+            "ResultPresenter",
+            "GameEndListener",
+            "ResultUseCases",
+            "ResultViewModel",
+            "ResultView"
           ]
         },
         {
@@ -322,7 +325,6 @@
           "types": [
             "LeaderboardPresenter",
             "AccountPresenter",
-            "ResultPresenter",
             "LocalSettingsStore",
             "ApiProgressRepository",
             "ApiLevelRepository",
@@ -400,18 +402,18 @@
             "WorldTone",
             "RouteFigure",
             "TileTone",
-            "MergeControls"
+            "MergeControls",
+            "VictoryScreen",
+            "DefeatScreen"
           ]
         },
         {
           "group": "infrastructure|planned",
           "types": [
             "AudioManager",
-            "DefeatScreen",
             "SoundLibrary",
             "LeaderboardScreen",
             "SessionManager",
-            "VictoryScreen",
             "AccountScreen"
           ]
         }
@@ -477,7 +479,6 @@
             "TriangleTopology",
             "Board",
             "RegionSize",
-            "GridDirection",
             "MoveHistory",
             "CellNode",
             "HexGeometry",
@@ -506,8 +507,7 @@
             "SquareDirection",
             "IUndoable",
             "Ordered",
-            "VictoryPhase",
-            "Range"
+            "VictoryPhase"
           ]
         },
         {
@@ -736,7 +736,6 @@
             "IScoringPolicy",
             "ILevelBuilder",
             "BoardSnapshot",
-            "GridDirection",
             "BoardShape",
             "ShapeNode",
             "CoordKey",
@@ -994,7 +993,6 @@
           "types": [
             "LeaderboardPresenter",
             "AccountPresenter",
-            "ResultPresenter",
             "LocalSettingsStore",
             "ApiProgressRepository",
             "ApiLevelRepository",
@@ -1046,7 +1044,12 @@
             "MergeIntent",
             "FitStateMapper",
             "LevelGameFactories",
-            "LevelFile"
+            "LevelFile",
+            "ResultPresenter",
+            "GameEndListener",
+            "ResultUseCases",
+            "ResultViewModel",
+            "ResultView"
           ]
         },
         {
@@ -1109,7 +1112,9 @@
             "FitControls",
             "RouteFigure",
             "TileTone",
-            "MergeControls"
+            "MergeControls",
+            "VictoryScreen",
+            "DefeatScreen"
           ]
         },
         {
@@ -1117,10 +1122,8 @@
           "types": [
             "SoundLibrary",
             "AudioManager",
-            "DefeatScreen",
             "LeaderboardScreen",
             "SessionManager",
-            "VictoryScreen",
             "AccountScreen"
           ]
         },

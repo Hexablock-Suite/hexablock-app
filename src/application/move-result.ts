@@ -2,6 +2,8 @@ import type { BoardSnapshot, BoardState, SnapshotOf } from '../domain/engine/boa
 import type { Cloneable } from '../domain/engine/cloneable';
 import type { ElapsedTime } from '../domain/shared/elapsed-time';
 import type { GameEngine } from '../domain/engine/game-engine';
+import type { LevelId } from '../domain/progress/level-id';
+import type { Moves } from '../domain/shared/moves';
 import type { Outcome } from '../domain/engine/outcome';
 import type { Score } from '../domain/shared/score';
 import type { UseCaseError } from './result';
@@ -30,6 +32,10 @@ export type ViewOf<TState> = SnapshotOf<TState> extends { view(): infer TView } 
 // `elapsedMs` exists only for a timed game. It asks the root for the time of play
 // when the response is built.
 // It carries the `ElapsedTime` value object of the timer, by the same rule as `score` (issue #204).
+// `moves` exists only for a game that counts its moves, Fit and Sort: it asks the photo
+// for `moveCount()` (D26, decision 61). `levelId` exists only for a game that started at a level:
+// it asks the root for `levelOfMatch()`. Both are value objects that no use case opens.
+// The result presenter builds the saved `GameResult` from them (#180).
 // `failedDeliveries` exists only when the publisher refused an event of the turn (issue #342).
 // It holds one `publish-failed` `UseCaseError` per refused event. The turn is saved all the same,
 // so the call is a success (decision 29). `logEntryOf()` copies the list into the log entry.
@@ -43,6 +49,8 @@ export interface MoveResult<TCell, TCoord, TView = unknown> {
   readonly hasUndo: boolean;
   readonly payload: TView;
   readonly elapsedMs?: ElapsedTime;
+  readonly moves?: Moves;
+  readonly levelId?: LevelId;
   readonly failedDeliveries?: readonly UseCaseError[];
 }
 
@@ -62,6 +70,8 @@ export function moveResultOf<
 ): MoveResult<TCell, TCoord, ViewOf<TState>> {
   const snapshot = engine.snapshot() as BoardSnapshot<TCell, TCoord> & SnapshotOf<TState>;
   const elapsed = engine.elapsedTime();
+  const moves = snapshot.moveCount();
+  const levelId = engine.levelOfMatch();
   return {
     cells: snapshot.boardCopy().occupiedCells(),
     freeSpaces: snapshot.boardCopy().freeSpaces(),
@@ -72,5 +82,7 @@ export function moveResultOf<
     hasUndo: engine.offersUndo(),
     payload: snapshot.view() as ViewOf<TState>,
     ...(elapsed === undefined ? {} : { elapsedMs: elapsed }),
+    ...(moves === undefined ? {} : { moves }),
+    ...(levelId === undefined ? {} : { levelId }),
   };
 }
