@@ -15,6 +15,7 @@
 // The texts of the victory screen and of the defeat screen live under `result.<part>` (#180).
 // The texts of the account screen live under `account.<part>`, and the text of each failure of
 // a sign-up or a sign-in under `account.error.<code>` (#45).
+// The texts of the leaderboard screen live under `leaderboard.<part>` (#47).
 export const es = {
   'home.title': 'HexaBlock Suite',
   'home.brand': 'HexaBlock',
@@ -128,6 +129,22 @@ export const es = {
     'Tu cuenta se creó, pero no se pudo iniciar sesión. Inicia sesión.',
   'account.error.session-expired': 'Tu sesión venció. Inicia sesión otra vez.',
   'account.error': 'No se pudo completar. Inténtalo otra vez.',
+  'leaderboard.open': 'Clasificación',
+  'leaderboard.title': 'Clasificación global',
+  'leaderboard.level': 'Clasificación del nivel',
+  'leaderboard.back': 'Atrás',
+  'leaderboard.loading': 'Cargando la clasificación',
+  'leaderboard.none': 'Aún nadie tiene un resultado en esta clasificación.',
+  'leaderboard.points': 'puntos',
+  'leaderboard.stars': 'estrellas',
+  'leaderboard.levels': 'niveles',
+  'leaderboard.moves': 'movimientos',
+  'leaderboard.sign-in-needed': 'Inicia sesión para ver la clasificación.',
+  'leaderboard.sign-in': 'Iniciar sesión',
+  'leaderboard.no-board': 'Este nivel aún no tiene clasificación.',
+  'leaderboard.unreachable':
+    'El servidor no responde. Revisa la conexión y abre la clasificación otra vez.',
+  'leaderboard.error': 'No se pudo leer la clasificación. Vuelve atrás y ábrela otra vez.',
   'achievement.lines-combo': 'Completa 3 líneas a la vez',
   'achievement.merge-256': 'Llega a 256 en Hexa Merge',
   'achievement.merge-2048': 'Llega a 2048 en Hexa Merge',

@@ -88,6 +88,9 @@ const ERROR_TEXTS: Readonly<Record<FailureCode, TextKey>> = {
   'sign-in-after-sign-up-failed': 'play.error',
   'session-expired': 'play.error',
   'sync-failed': 'play.error',
+  'sign-in-required': 'play.error',
+  'level-has-no-board': 'play.error',
+  'leaderboard-failed': 'play.error',
   'unexpected-failure': 'play.error',
 };
 
@@ -237,7 +240,8 @@ export class GamePresenter<TCell, TCoord, TMove, TView, TCellView, TPayloadView,
 
 // A time in milliseconds as whole minutes and seconds, such as `1:05`. The presenter is an
 // adapter of the edge, so it receives the number with `valueOf()` (rule R-no-delivery-call).
-function clockText(elapsed: Delivers<number>): string {
+// `LeaderboardPresenter` shows the time of a board row with it too (#47).
+export function clockText(elapsed: Delivers<number>): string {
   const seconds = Math.floor(valueOf(elapsed) / 1000);
   return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
 }

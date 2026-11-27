@@ -83,6 +83,9 @@ const ERROR_TEXTS: Readonly<Record<FailureCode, TextKey>> = {
   'sign-in-after-sign-up-failed': 'result.error',
   'session-expired': 'result.session-expired',
   'sync-failed': 'result.error',
+  'sign-in-required': 'result.error',
+  'level-has-no-board': 'result.error',
+  'leaderboard-failed': 'result.error',
   'unexpected-failure': 'result.error',
 };
 

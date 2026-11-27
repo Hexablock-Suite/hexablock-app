@@ -166,14 +166,20 @@ describe('GameSelectorScreen', () => {
   });
 
   // Issue #298: the side of a world follows its place in the list, so the path zig-zags.
-  // Since #354 the square lists the four games, as the hexagon does.
+  // Since #354 the square lists the four games, as the hexagon does. Since #47 each world holds
+  // the world button and the leaderboard button, so the side is the side of the world.
   it('should_put_the_worlds_on_alternate_sides_when_the_map_of_the_square_opens', async () => {
     await renderRouter(appDir, { initialUrl: '/map?figure=square' });
 
+    const worlds = screen.getAllByTestId('world');
     const sides = FOUR_VARIANTS.map(
       (name) =>
-        StyleSheet.flatten(screen.getByRole('button', { name: new RegExp(`^${name}`) }).props.style)
-          .alignSelf,
+        StyleSheet.flatten(
+          worlds.find(
+            (world) =>
+              within(world).queryByRole('button', { name: new RegExp(`^${name}`) }) !== null,
+          )?.props.style,
+        ).alignSelf,
     );
 
     expect(sides).toEqual(['flex-start', 'flex-end', 'flex-start', 'flex-end']);

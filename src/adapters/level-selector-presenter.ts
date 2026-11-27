@@ -21,6 +21,9 @@ export interface LevelChoice {
   // The stars of a completed level as one text, for example «Estrellas 2».
   // It exists only for a completed level.
   readonly stars?: string;
+  // The label of the button that opens the leaderboard of the level (#47).
+  // It exists only for a completed level.
+  readonly leaderboard?: string;
 }
 
 // The view model of the level selector (MVP, layers.md, issue #173). It is plain data
@@ -62,6 +65,7 @@ const STATUS_TEXTS: readonly (readonly [LevelStatus, TextKey])[] = [
 // A completed level and an open level start; a locked level does not. The presenter is an
 // adapter of the edge, so it receives the text of the level id and the number of the stars
 // with `valueOf()` of `delivered.ts` (rule R-no-delivery-call, issue #408).
+// A completed level also carries the label of the button of its leaderboard (#47).
 // A figure with no level gives an empty list, and the screen shows the text of no levels.
 // A failed `Result` never throws (decision 28): the presenter keeps its levels and shows
 // the text of the failure. A view attaches to see each new view model. It sees the current one
@@ -124,9 +128,14 @@ export class LevelSelectorPresenter {
       completed: summary.status.equals(LevelStatus.completed),
       playable: !summary.status.equals(LevelStatus.locked),
     };
+    const board = choice.completed ? { leaderboard: this.texts['leaderboard.open'] } : {};
     return summary.stars === undefined
-      ? choice
-      : { ...choice, stars: `${this.texts['levels.stars']} ${valueOf(summary.stars)}` };
+      ? { ...choice, ...board }
+      : {
+          ...choice,
+          stars: `${this.texts['levels.stars']} ${valueOf(summary.stars)}`,
+          ...board,
+        };
   }
 }
 

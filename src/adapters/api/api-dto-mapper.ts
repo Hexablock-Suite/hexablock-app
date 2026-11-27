@@ -1,4 +1,5 @@
 import type { Credentials } from '../../application/credentials';
+import type { Leaderboard, LeaderboardRow } from '../../application/leaderboard';
 import { Session } from '../../application/session';
 import { GameProgress } from '../../domain/progress/game-progress';
 import { LevelId } from '../../domain/progress/level-id';
@@ -10,6 +11,13 @@ import { Moves } from '../../domain/shared/moves';
 import { Score } from '../../domain/shared/score';
 import { onlyValue, valueOf } from '../delivered';
 import type { CredentialsDto, CurrentUserDto, TokenDto } from './account-api';
+import type {
+  GlobalLeaderboardDto,
+  LevelEntryDto,
+  LevelLeaderboardDto,
+  ScoreEntryDto,
+  StandingEntryDto,
+} from './leaderboard-api';
 import type { LevelResultDto, ProgressDto, SyncProgressDto } from './progress-api';
 
 // The DTO mapper of the HTTP adapters (classes.md decision 22, view 4.2, #45). It turns the
@@ -72,6 +80,57 @@ export class ApiDtoMapper {
     }
     return progress;
   }
+
+  // The global board of one game (#47, S3-03): the rows of the high scores, then the rows of the
+  // standings. The backend leaves one of the two lists empty, so the board holds one kind of row.
+  // The rows keep the order and the rank of the backend. Each factory method checks its value, so a
+  // value out of its range throws a `RangeError`.
+  toGlobalLeaderboard(dto: GlobalLeaderboardDto): Leaderboard {
+    return { rows: [...dto.highScores.map(scoreRowOf), ...dto.standings.map(standingRowOf)] };
+  }
+
+  // The board of one level (#47, DS-4), with the rows in the order of the backend.
+  toLevelLeaderboard(dto: LevelLeaderboardDto): Leaderboard {
+    return { rows: dto.entries.map(levelRowOf) };
+  }
+}
+
+// The row of a high score.
+function scoreRowOf(entry: ScoreEntryDto): LeaderboardRow {
+  return {
+    rank: entry.rank,
+    username: entry.username,
+    record: { kind: 'score', score: Score.of(entry.highScore) },
+  };
+}
+
+// The row of the totals of the level results of one player.
+function standingRowOf(entry: StandingEntryDto): LeaderboardRow {
+  return {
+    rank: entry.rank,
+    username: entry.username,
+    record: {
+      kind: 'standing',
+      stars: Stars.of(entry.stars),
+      levelsCompleted: entry.levelsCompleted,
+      moves: Moves.of(entry.moves),
+      elapsed: ElapsedTime.ofMs(entry.elapsedMs),
+    },
+  };
+}
+
+// The row of the best result of one player on one level.
+function levelRowOf(entry: LevelEntryDto): LeaderboardRow {
+  return {
+    rank: entry.rank,
+    username: entry.username,
+    record: {
+      kind: 'level',
+      stars: Stars.of(entry.stars),
+      moves: Moves.of(entry.moves),
+      elapsed: ElapsedTime.ofMs(entry.elapsedMs),
+    },
+  };
 }
 
 // The number of the high score of a progress.

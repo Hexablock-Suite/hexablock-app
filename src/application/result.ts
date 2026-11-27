@@ -27,6 +27,9 @@ export const FailureCode = Object.freeze({
   signInAfterSignUpFailed: 'sign-in-after-sign-up-failed',
   sessionExpired: 'session-expired',
   syncFailed: 'sync-failed',
+  signInRequired: 'sign-in-required',
+  levelHasNoBoard: 'level-has-no-board',
+  leaderboardFailed: 'leaderboard-failed',
   unexpectedFailure: 'unexpected-failure',
 } as const);
 

@@ -49,6 +49,8 @@ export interface GameSelectorViewModel {
   readonly title: string;
   // The label of the button that goes back to the home screen.
   readonly back: string;
+  // The label of the button of each world that opens the global leaderboard of its game (#47).
+  readonly leaderboard: string;
   // The registered games, in the order of the registry.
   readonly games: readonly GameChoice[];
 }
@@ -100,6 +102,7 @@ export class HomePresenter {
     return {
       title: this.texts['map.title'],
       back: this.texts['map.back'],
+      leaderboard: this.texts['leaderboard.open'],
       games: this.games.map((gameId) => this.choiceOf(gameId)),
     };
   }

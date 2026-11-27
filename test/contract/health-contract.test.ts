@@ -6,6 +6,7 @@ import { MatchersV3, PactV4 } from '@pact-foundation/pact';
 import type { AccountApi } from '../../src/adapters/api/account-api';
 import { ApiFailure } from '../../src/adapters/api/api-failure';
 import type { HealthApi } from '../../src/adapters/api/health-api';
+import type { LeaderboardApi } from '../../src/adapters/api/leaderboard-api';
 import type { ProgressApi } from '../../src/adapters/api/progress-api';
 import { createApiClient } from '../../src/infrastructure/api/client';
 import { startFakeBackend, type FakeBackend, type FakeRoutes } from '../support/fake-backend';
@@ -41,6 +42,17 @@ const SYNC_BODY = {
 const EXAMPLE_UPDATED_AT = '2026-11-27T10:00:00.000Z';
 // A token that the backend refuses: it is not a signed token of the API.
 const REFUSED_TOKEN = 'a-refused-token';
+// #47: the boards of a stored level with results. The provider state `several accounts have results
+// on a stored level` stores the level, syncs one result of ada, grace and linus and gives the token of
+// ada. A level that no provider state stores has no board.
+const BOARD_LEVEL = { gameId: 'hexa-fit', levelId: 'fit-01' };
+const UNKNOWN_LEVEL = 'fit-99';
+const RESULTS_STATE = 'several accounts have results on a stored level';
+const EXAMPLE_ENTRY = {
+  rank: MatchersV3.integer(1),
+  userId: MatchersV3.uuid(EXAMPLE_USER),
+  username: MatchersV3.string('ada'),
+};
 
 // The interactions of the pact, in the order of the consumer tests below.
 const DESCRIPTIONS = [
@@ -53,6 +65,10 @@ const DESCRIPTIONS = [
   'the signed-in user',
   'a progress sync',
   'a progress sync with a refused token',
+  'the global leaderboard of a game',
+  'the leaderboard of a level',
+  'a leaderboard with a refused token',
+  'the leaderboard of a level that is not stored',
 ];
 
 // The `ApiFailure` that `call` rejects with. A call that resolves fails the test.
@@ -279,6 +295,146 @@ describe('client contract', () => {
           expect(failure.status).toBe(401);
           expect(failure.message).not.toContain(REFUSED_TOKEN);
         });
+    });
+
+    // #47 (APP-FR-14): the global board of Fit ranks the totals of the level results (S3-03).
+    it('should_send_the_token_and_give_the_standings_when_the_app_reads_the_global_leaderboard', async () => {
+      await pact
+        .addInteraction()
+        .given(RESULTS_STATE, BOARD_LEVEL)
+        .uponReceiving('the global leaderboard of a game')
+        .withRequest('GET', '/v1/leaderboard/hexa-fit', (builder) =>
+          builder.headers({
+            Authorization: MatchersV3.fromProviderState(
+              'Bearer ${accessToken}',
+              `Bearer ${EXAMPLE_TOKEN}`,
+            ),
+          }),
+        )
+        .willRespondWith(200, (builder) =>
+          builder.jsonBody({
+            gameId: 'hexa-fit',
+            highScores: [],
+            standings: MatchersV3.eachLike({
+              ...EXAMPLE_ENTRY,
+              stars: MatchersV3.integer(3),
+              levelsCompleted: MatchersV3.integer(1),
+              moves: MatchersV3.integer(10),
+              elapsedMs: MatchersV3.integer(45000),
+            }),
+          }),
+        )
+        .executeTest(async (mockServer) => {
+          const api: LeaderboardApi = createApiClient(mockServer.url);
+
+          await expect(api.globalLeaderboard(EXAMPLE_TOKEN, 'hexa-fit')).resolves.toEqual({
+            gameId: 'hexa-fit',
+            highScores: [],
+            standings: [
+              {
+                rank: 1,
+                userId: EXAMPLE_USER,
+                username: 'ada',
+                stars: 3,
+                levelsCompleted: 1,
+                moves: 10,
+                elapsedMs: 45000,
+              },
+            ],
+          });
+        });
+    });
+
+    // #47 (APP-FR-14): the board of one level ranks the best result of each player (DS-4).
+    it('should_send_the_token_and_give_the_entries_when_the_app_reads_the_leaderboard_of_a_level', async () => {
+      await pact
+        .addInteraction()
+        .given(RESULTS_STATE, BOARD_LEVEL)
+        .uponReceiving('the leaderboard of a level')
+        .withRequest('GET', '/v1/leaderboard/hexa-fit/levels/fit-01', (builder) =>
+          builder.headers({
+            Authorization: MatchersV3.fromProviderState(
+              'Bearer ${accessToken}',
+              `Bearer ${EXAMPLE_TOKEN}`,
+            ),
+          }),
+        )
+        .willRespondWith(200, (builder) =>
+          builder.jsonBody({
+            gameId: 'hexa-fit',
+            levelId: 'fit-01',
+            entries: MatchersV3.eachLike({
+              ...EXAMPLE_ENTRY,
+              stars: MatchersV3.integer(3),
+              moves: MatchersV3.integer(10),
+              elapsedMs: MatchersV3.integer(45000),
+            }),
+          }),
+        )
+        .executeTest(async (mockServer) => {
+          const api: LeaderboardApi = createApiClient(mockServer.url);
+
+          await expect(api.levelLeaderboard(EXAMPLE_TOKEN, 'hexa-fit', 'fit-01')).resolves.toEqual({
+            gameId: 'hexa-fit',
+            levelId: 'fit-01',
+            entries: [
+              {
+                rank: 1,
+                userId: EXAMPLE_USER,
+                username: 'ada',
+                stars: 3,
+                moves: 10,
+                elapsedMs: 45000,
+              },
+            ],
+          });
+        });
+    });
+
+    // The gateway maps this 401 to `session-expired`.
+    it('should_reject_with_the_status_401_when_the_backend_refuses_the_token_of_a_leaderboard', async () => {
+      await pact
+        .addInteraction()
+        .uponReceiving('a leaderboard with a refused token')
+        .withRequest('GET', '/v1/leaderboard/hexa-fit', (builder) =>
+          builder.headers({ Authorization: `Bearer ${REFUSED_TOKEN}` }),
+        )
+        .willRespondWith(401)
+        .executeTest(async (mockServer) => {
+          const api: LeaderboardApi = createApiClient(mockServer.url);
+
+          const failure = await failureOf(api.globalLeaderboard(REFUSED_TOKEN, 'hexa-fit'));
+
+          expect(failure.status).toBe(401);
+          expect(failure.message).not.toContain(REFUSED_TOKEN);
+        });
+    });
+
+    // The gateway maps this 404 to `level-has-no-board` (hexablock-api#134).
+    it('should_reject_with_the_status_404_when_the_backend_holds_no_level_of_the_leaderboard', async () => {
+      await pact
+        .addInteraction()
+        .given('a signed-in account exists', { username: ADA.username })
+        .uponReceiving('the leaderboard of a level that is not stored')
+        .withRequest('GET', `/v1/leaderboard/hexa-fit/levels/${UNKNOWN_LEVEL}`, (builder) =>
+          builder.headers({
+            Authorization: MatchersV3.fromProviderState(
+              'Bearer ${accessToken}',
+              `Bearer ${EXAMPLE_TOKEN}`,
+            ),
+          }),
+        )
+        .willRespondWith(404)
+        .executeTest(async (mockServer) => {
+          const api: LeaderboardApi = createApiClient(mockServer.url);
+
+          const failure = await failureOf(
+            api.levelLeaderboard(EXAMPLE_TOKEN, 'hexa-fit', UNKNOWN_LEVEL),
+          );
+
+          expect(failure.status).toBe(404);
+          expect(failure.message).not.toContain(EXAMPLE_TOKEN);
+        });
 
       const written = JSON.parse(readFileSync(pactFile, 'utf8'));
       expect(
@@ -290,6 +446,16 @@ describe('client contract', () => {
   describe('provider check script (pnpm contract:verify)', () => {
     // The token that the fake provider gives for the state `a signed-in account exists`.
     const STATE_TOKEN = 'token-of-the-provider-state';
+    // The rows of the boards of the fake provider: the result of ada on the stored level.
+    const LEVEL_ROW = {
+      rank: 1,
+      userId: EXAMPLE_USER,
+      username: 'ada',
+      stars: 3,
+      moves: 10,
+      elapsedMs: 45000,
+    };
+    const BOARD_ROW = { ...LEVEL_ROW, levelsCompleted: 1 };
     let backend: FakeBackend | undefined;
 
     afterEach(async () => {
@@ -299,15 +465,17 @@ describe('client contract', () => {
 
     // A fake provider that honors every interaction of the pact (hexablock-api #151).
     // It keeps the provider state that the verifier set up last before the current interaction,
-    // and it gives the token of the state `a signed-in account exists`. An interaction of #46 sets up
-    // two states, and the sync answers only the token of the state.
+    // and it gives the token of the states `a signed-in account exists` and `several accounts have
+    // results on a stored level`. An interaction of #46 sets up two states, and the sync answers
+    // only the token of the state. The boards of #47 answer only that token too, and only the
+    // level of the state has a board.
     function fakeProvider(health: unknown = { status: 'ok' }): FakeRoutes {
       let state = '';
       return {
         '/v1/_pact/provider-states': (request) => {
           const change = JSON.parse(request.body || '{}') as { state?: string; action?: string };
           state = change.action === 'setup' ? (change.state ?? '') : '';
-          const signedIn = state === 'a signed-in account exists';
+          const signedIn = state === 'a signed-in account exists' || state === RESULTS_STATE;
           return { status: 200, body: signedIn ? { accessToken: STATE_TOKEN } : {} };
         },
         '/v1/health': { status: 200, body: health },
@@ -336,6 +504,18 @@ describe('client contract', () => {
                   updatedAt: EXAMPLE_UPDATED_AT,
                 },
               }
+            : { status: 401, body: { statusCode: 401 } },
+        '/v1/leaderboard/hexa-fit': (request) =>
+          request.headers.authorization === `Bearer ${STATE_TOKEN}`
+            ? { status: 200, body: { gameId: 'hexa-fit', highScores: [], standings: [BOARD_ROW] } }
+            : { status: 401, body: { statusCode: 401 } },
+        '/v1/leaderboard/hexa-fit/levels/fit-01': (request) =>
+          request.headers.authorization === `Bearer ${STATE_TOKEN}`
+            ? { status: 200, body: { ...BOARD_LEVEL, entries: [LEVEL_ROW] } }
+            : { status: 401, body: { statusCode: 401 } },
+        [`/v1/leaderboard/hexa-fit/levels/${UNKNOWN_LEVEL}`]: (request) =>
+          request.headers.authorization === `Bearer ${STATE_TOKEN}`
+            ? { status: 404, body: { statusCode: 404 } }
             : { status: 401, body: { statusCode: 401 } },
       };
     }
@@ -375,6 +555,7 @@ describe('client contract', () => {
           'an account exists',
           'a signed-in account exists',
           'a level is stored',
+          RESULTS_STATE,
         ]),
       );
       expect(me?.headers.authorization).toBe(`Bearer ${STATE_TOKEN}`);

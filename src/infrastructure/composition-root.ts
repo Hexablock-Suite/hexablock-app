@@ -4,7 +4,9 @@ import { AchievementsPresenter } from '../adapters/achievements-presenter';
 import type { AccountApi } from '../adapters/api/account-api';
 import { ApiAccountGateway } from '../adapters/api/api-account-gateway';
 import { ApiDtoMapper } from '../adapters/api/api-dto-mapper';
+import { ApiLeaderboardGateway } from '../adapters/api/api-leaderboard-gateway';
 import { ApiProgressGateway } from '../adapters/api/api-progress-gateway';
+import type { LeaderboardApi } from '../adapters/api/leaderboard-api';
 import type { ProgressApi } from '../adapters/api/progress-api';
 import { BundledLevelRepository } from '../adapters/bundled-level-repository';
 import { GameEventBus } from '../adapters/game-event-bus';
@@ -15,6 +17,7 @@ import type { KeyValueStore } from '../adapters/key-value-store';
 import { LocalAchievementCounterRepository } from '../adapters/local-achievement-counter-repository';
 import { LocalProgressRepository } from '../adapters/local-progress-repository';
 import { LevelGameFactories } from '../adapters/level-game-factories';
+import { LeaderboardPresenter, type LeaderboardBoards } from '../adapters/leaderboard-presenter';
 import { LevelSelectorPresenter } from '../adapters/level-selector-presenter';
 import { ResultPresenter } from '../adapters/result-presenter';
 import type { SecretStore } from '../adapters/secret-store';
@@ -24,6 +27,8 @@ import { ApplyMove, type ApplyMoveRequest } from '../application/apply-move';
 import type { AnonymousMerge } from '../application/anonymous-progress';
 import type { Credentials } from '../application/credentials';
 import type { GameEventPublisher } from '../application/game-event-publisher';
+import { GetGlobalLeaderboard } from '../application/get-global-leaderboard';
+import { GetLevelLeaderboard } from '../application/get-level-leaderboard';
 import { LoadProgress, type LoadProgressRequest } from '../application/load-progress';
 import {
   ListAchievements,
@@ -87,14 +92,15 @@ export interface GameUseCases<TCell = unknown, TCoord = unknown, TMove = unknown
 // and `DeviceKeyValueStore`, which `CompositionRootProvider` builds (#188).
 // The store stays optional. A root with no store reads no saved progress,
 // so it lists no achievements and loads no progress.
-// `api` is the transport of the auth and the progress resources of hexablock-api, and `secrets`
-// the secure storage of the session (#45, #46): the app takes `ApiClient` and `DeviceSecretStore`.
-// Both stay optional. A root that lacks one signs no player in and syncs no progress.
+// `api` is the transport of the auth, the progress and the leaderboard resources of hexablock-api,
+// and `secrets` the secure storage of the session (#45, #46, #47): the app takes `ApiClient` and
+// `DeviceSecretStore`. Both stay optional. A root that lacks one signs no player in, syncs no
+// progress and shows no leaderboard.
 export interface RootDrivers {
   readonly clock: Clock;
   readonly logger: Logger;
   readonly store?: KeyValueStore;
-  readonly api?: AccountApi & ProgressApi;
+  readonly api?: AccountApi & ProgressApi & LeaderboardApi;
   readonly secrets?: SecretStore;
 }
 
@@ -165,6 +171,11 @@ interface AccountUseCases {
 // `ApiProgressGateway` with the same `ApiDtoMapper`. The `ResultPresenter` of each game session
 // syncs after each save, and the `AccountPresenter` syncs every registered game after a sign-in.
 // A root that lacks one of the three drivers syncs nothing.
+// The leaderboards (#47, APP-FR-14): with the transport and the secure storage, the root builds
+// one `ApiLeaderboardGateway` with the same `ApiDtoMapper`, and over it and the one
+// `SessionManager` it builds `GetGlobalLeaderboard` and `GetLevelLeaderboard` once, each through
+// `decorate()`. `leaderboardPresenter()` gives a new `LeaderboardPresenter` over both. A root that
+// lacks one of the two drivers throws a `RangeError` from `leaderboardPresenter()`.
 // The screens show the default language until the player can choose one (#163).
 export class CompositionRoot implements ScreenServices {
   private readonly games: ReadonlyMap<TopologyId, GameRegistry>;
@@ -181,6 +192,7 @@ export class CompositionRoot implements ScreenServices {
   private readonly progressLoad: UseCase<LoadProgressRequest, GameProgress | undefined> | undefined;
   private readonly account: AccountUseCases | undefined;
   private readonly sync: UseCase<SyncProgressRequest, void> | undefined;
+  private readonly leaderboards: LeaderboardBoards | undefined;
 
   constructor(drivers: RootDrivers = { clock: new SystemClock(), logger: new ConsoleLogger() }) {
     const random = SeededRandomSource.fromClock(drivers.clock);
@@ -243,6 +255,12 @@ export class CompositionRoot implements ScreenServices {
         : this.decorate(
             new SyncProgress(sessions, local, local, new ApiProgressGateway(drivers.api, mapper)),
             'SyncProgress',
+          );
+    this.leaderboards =
+      drivers.api === undefined || sessions === undefined
+        ? undefined
+        : leaderboardUseCases(new ApiLeaderboardGateway(drivers.api, mapper), sessions, (u, n) =>
+            this.decorate(u, n),
           );
   }
 
@@ -421,6 +439,23 @@ export class CompositionRoot implements ScreenServices {
     );
   }
 
+  // A new presenter of the leaderboard screen of the game `gameId` (#47): the board of the level
+  // `levelId`, or the global board of the game with no level. It reads the boards through
+  // `GetGlobalLeaderboard` and `GetLevelLeaderboard` of the root. A root with no transport or no
+  // secure storage among its drivers throws a RangeError.
+  leaderboardPresenter(gameId: GameId, levelId?: LevelId): LeaderboardPresenter {
+    if (this.leaderboards === undefined) {
+      throw new RangeError(
+        'The root has no backend or no secure store, so it shows no leaderboard.',
+      );
+    }
+    return new LeaderboardPresenter(
+      this.leaderboards,
+      levelId === undefined ? { gameId } : { gameId, levelId },
+      this.texts,
+    );
+  }
+
   // The id of each registered game of every board figure, once each, in the order of the figures.
   // The progress of a game is one for every figure, so the sync takes each game once.
   private allGameIds(): GameId[] {
@@ -506,5 +541,19 @@ function accountUseCases(
   return {
     register: decorate(new Register(accounts, session, merge), 'Register'),
     login: decorate(new Login(accounts, session, merge), 'Login'),
+  };
+}
+
+// `GetGlobalLeaderboard` and `GetLevelLeaderboard` over one gateway and the one session store
+// `session` of the root, each through `decorate` (#47). Each board has its own input port, as
+// hexablock-api#218 decided.
+function leaderboardUseCases(
+  gateway: ApiLeaderboardGateway,
+  session: SessionStore,
+  decorate: Decorate,
+): LeaderboardBoards {
+  return {
+    global: decorate(new GetGlobalLeaderboard(session, gateway), 'GetGlobalLeaderboard'),
+    level: decorate(new GetLevelLeaderboard(session, gateway), 'GetLevelLeaderboard'),
   };
 }

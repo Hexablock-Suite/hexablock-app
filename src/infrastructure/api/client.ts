@@ -3,16 +3,17 @@ import createClient from 'openapi-fetch';
 import type { AccountApi } from '../../adapters/api/account-api';
 import { ApiFailure } from '../../adapters/api/api-failure';
 import type { HealthApi } from '../../adapters/api/health-api';
+import type { LeaderboardApi } from '../../adapters/api/leaderboard-api';
 import type { ProgressApi } from '../../adapters/api/progress-api';
 import type { paths } from './schema';
 
 // The driver of the transport interfaces of layer 3 (classes.md decision 22, option A3).
 // Each interface of `src/adapters/api/` covers one resource of hexablock-api.
-export type ApiClient = HealthApi & AccountApi & ProgressApi;
+export type ApiClient = HealthApi & AccountApi & ProgressApi & LeaderboardApi;
 
 // HTTP client for hexablock-api. The types come from the backend OpenAPI document.
-// A call of `AccountApi` or `ProgressApi` that the backend does not answer with success rejects
-// with an `ApiFailure` with the status of the answer (#45, #46). A call that gets no answer rejects with an
+// A call of `AccountApi`, `ProgressApi` or `LeaderboardApi` that the backend does not answer with
+// success rejects with an `ApiFailure` with the status of the answer (#45, #46, #47). A call that gets no answer rejects with an
 // `ApiFailure` with no status. The message of a failure names the call, never a body or a token.
 export function createApiClient(baseUrl: string): ApiClient {
   const client = createClient<paths>({ baseUrl });
@@ -63,6 +64,32 @@ export function createApiClient(baseUrl: string): ApiClient {
         fetch: answerOrFail,
       });
       if (!response.ok || data === undefined) throw failureOf(response, 'POST /v1/progress');
+      return data;
+    },
+
+    // Both boards send the bearer token of the session, as the token guard of the backend reads it
+    // (#47). The message of a failure names the path with no id and no token.
+    async globalLeaderboard(token, gameId) {
+      const { data, response } = await client.GET('/v1/leaderboard/{gameId}', {
+        params: { path: { gameId } },
+        headers: { Authorization: `Bearer ${token}` },
+        fetch: answerOrFail,
+      });
+      if (!response.ok || data === undefined) {
+        throw failureOf(response, 'GET /v1/leaderboard/{gameId}');
+      }
+      return data;
+    },
+
+    async levelLeaderboard(token, gameId, levelId) {
+      const { data, response } = await client.GET('/v1/leaderboard/{gameId}/levels/{levelId}', {
+        params: { path: { gameId, levelId } },
+        headers: { Authorization: `Bearer ${token}` },
+        fetch: answerOrFail,
+      });
+      if (!response.ok || data === undefined) {
+        throw failureOf(response, 'GET /v1/leaderboard/{gameId}/levels/{levelId}');
+      }
       return data;
     },
   };

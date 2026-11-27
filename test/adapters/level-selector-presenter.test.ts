@@ -89,6 +89,7 @@ describe('LevelSelectorPresenter', () => {
           completed: true,
           playable: true,
           stars: 'Estrellas 2',
+          leaderboard: 'Clasificación',
         },
         {
           id: 'fit-02',
@@ -97,6 +98,7 @@ describe('LevelSelectorPresenter', () => {
           completed: true,
           playable: true,
           stars: 'Estrellas 0',
+          leaderboard: 'Clasificación',
         },
         { id: 'fit-03', name: 'Nivel 3', status: 'Abierto', completed: false, playable: true },
         { id: 'fit-04', name: 'Nivel 4', status: 'Bloqueado', completed: false, playable: false },
@@ -115,11 +117,18 @@ describe('LevelSelectorPresenter', () => {
       'Map',
       'Loading the levels',
     ]);
-    expect(shown[1].levels.map(({ name, status, stars }) => [name, status, stars])).toEqual([
-      ['Level 1', 'Completed', 'Stars 2'],
-      ['Level 2', 'Completed', 'Stars 0'],
-      ['Level 3', 'Open', undefined],
-      ['Level 4', 'Locked', undefined],
+    expect(
+      shown[1].levels.map(({ name, status, stars, leaderboard }) => [
+        name,
+        status,
+        stars,
+        leaderboard,
+      ]),
+    ).toEqual([
+      ['Level 1', 'Completed', 'Stars 2', 'Leaderboard'],
+      ['Level 2', 'Completed', 'Stars 0', 'Leaderboard'],
+      ['Level 3', 'Open', undefined, undefined],
+      ['Level 4', 'Locked', undefined, undefined],
     ]);
   });
 

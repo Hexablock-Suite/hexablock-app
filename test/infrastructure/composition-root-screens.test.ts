@@ -2,13 +2,17 @@
 import { AccountPresenter } from '../../src/adapters/account-presenter';
 import { AchievementsPresenter } from '../../src/adapters/achievements-presenter';
 import type { AccountApi } from '../../src/adapters/api/account-api';
+import type { LeaderboardApi } from '../../src/adapters/api/leaderboard-api';
 import type { ProgressApi } from '../../src/adapters/api/progress-api';
 import { SessionManager } from '../../src/adapters/session-manager';
 import { GamePresenter } from '../../src/adapters/game-presenter';
 import { HomePresenter } from '../../src/adapters/home-presenter';
+import { LeaderboardPresenter } from '../../src/adapters/leaderboard-presenter';
 import { LevelSelectorPresenter } from '../../src/adapters/level-selector-presenter';
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
 import { textCatalog } from '../../src/adapters/texts/text-catalog';
+import { Session } from '../../src/application/session';
+import { LevelId } from '../../src/domain/progress/level-id';
 import { GameProgress } from '../../src/domain/progress/game-progress';
 import { ProgressRecord } from '../../src/domain/progress/progress-model';
 import { GameId } from '../../src/domain/shared/game-id';
@@ -30,6 +34,13 @@ import { saveIn } from '../support/adapters/saved-progress';
 
 const LINES = GameId.of('hexa-lines');
 const FIT = GameId.of('hexa-fit');
+const ADA = '0b6f6a4e-1c2d-4e5f-8a9b-0c1d2e3f4a5b';
+
+// The boards of a backend that holds no result.
+const NO_BOARDS: LeaderboardApi = {
+  globalLeaderboard: (_token, gameId) => Promise.resolve({ gameId, highScores: [], standings: [] }),
+  levelLeaderboard: (_token, gameId, levelId) => Promise.resolve({ gameId, levelId, entries: [] }),
+};
 
 // A root over an in-memory store. The hooks see it only as `ScreenServices`.
 function servicesOver(store = new InMemoryKeyValueStore()): ScreenServices {
@@ -113,7 +124,8 @@ describe('CompositionRoot screens', () => {
   it('should_build_an_account_presenter_that_keeps_the_session_when_the_root_has_a_backend_and_a_secure_store', async () => {
     const secrets = new InMemorySecretStore();
     const logger = new RecordingLogger();
-    const api: AccountApi & ProgressApi = {
+    const api: AccountApi & ProgressApi & LeaderboardApi = {
+      ...NO_BOARDS,
       signUp: () => Promise.resolve(),
       signIn: () => Promise.resolve({ accessToken: 'token-of-ada' }),
       currentUser: () => Promise.resolve({ userId: '0b6f6a4e-1c2d-4e5f-8a9b-0c1d2e3f4a5b' }),
@@ -141,6 +153,83 @@ describe('CompositionRoot screens', () => {
       'Login success',
       'Register success',
     ]);
+  });
+
+  // #47 (APP-FR-14): the leaderboard screen reads each board through its use case of the root,
+  // with its aspects, over the transport of the backend and the session of the secure storage.
+  it('should_build_a_leaderboard_presenter_that_reads_each_board_with_the_token_of_the_session_when_the_root_has_a_backend_and_a_secure_store', async () => {
+    const secrets = new InMemorySecretStore();
+    await new SessionManager(secrets).write(new Session('token-of-ada', ADA));
+    const logger = new RecordingLogger();
+    const calls: string[] = [];
+    const row = { rank: 1, userId: ADA, username: 'ada' };
+    const api: AccountApi & ProgressApi & LeaderboardApi = {
+      signUp: () => Promise.resolve(),
+      signIn: () => Promise.resolve({ accessToken: 'token-of-ada' }),
+      currentUser: () => Promise.resolve({ userId: ADA }),
+      syncProgress: (_token, body) =>
+        Promise.resolve({ gameId: body.gameId, highScore: null, updatedAt: '', results: [] }),
+      globalLeaderboard: (token, gameId) => {
+        calls.push(`global ${token} ${gameId}`);
+        return Promise.resolve({
+          gameId,
+          highScores: [{ ...row, highScore: 2048 }],
+          standings: [],
+        });
+      },
+      levelLeaderboard: (token, gameId, levelId) => {
+        calls.push(`level ${token} ${gameId} ${levelId}`);
+        return Promise.resolve({
+          gameId,
+          levelId,
+          entries: [{ ...row, stars: 3, moves: 12, elapsedMs: 45000 }],
+        });
+      },
+    };
+    const services: ScreenServices = new CompositionRoot({
+      clock: new ManualClock(),
+      logger,
+      api,
+      secrets,
+    });
+    const global = services.leaderboardPresenter(LINES);
+    const level = services.leaderboardPresenter(FIT, LevelId.of('fit-01'));
+
+    await global.onOpen();
+    await level.onOpen();
+
+    expect(global).toBeInstanceOf(LeaderboardPresenter);
+    expect(services.leaderboardPresenter(LINES) === global).toBe(false);
+    expect(global.viewModel().rows).toEqual([
+      { id: 'ada', rank: '1', name: 'ada', value: '2048 puntos' },
+    ]);
+    expect(level.viewModel().rows).toEqual([
+      { id: 'ada', rank: '1', name: 'ada', value: '3 estrellas · 12 movimientos · 0:45' },
+    ]);
+    expect(calls).toEqual(['global token-of-ada hexa-lines', 'level token-of-ada hexa-fit fit-01']);
+    expect(logger.entries.map(({ useCase, outcome }) => `${useCase} ${outcome}`)).toEqual([
+      'GetGlobalLeaderboard success',
+      'GetLevelLeaderboard success',
+    ]);
+  });
+
+  it('should_throw_a_range_error_when_a_root_with_no_backend_or_no_secure_store_is_asked_for_a_leaderboard_presenter', () => {
+    const noBackend: ScreenServices = new CompositionRoot({
+      clock: new ManualClock(),
+      logger: new RecordingLogger(),
+      secrets: new InMemorySecretStore(),
+    });
+    const noSecrets: ScreenServices = new CompositionRoot({
+      clock: new ManualClock(),
+      logger: new RecordingLogger(),
+      api: { ...NO_BOARDS } as AccountApi & ProgressApi & LeaderboardApi,
+    });
+    const reason = new RangeError(
+      'The root has no backend or no secure store, so it shows no leaderboard.',
+    );
+
+    expect(() => noBackend.leaderboardPresenter(LINES)).toThrow(reason);
+    expect(() => noSecrets.leaderboardPresenter(FIT, LevelId.of('fit-01'))).toThrow(reason);
   });
 
   it('should_throw_a_range_error_when_a_root_with_no_backend_or_no_secure_store_is_asked_for_the_account_presenter', () => {

@@ -4,6 +4,7 @@ import type { AccountPresenter } from '../../adapters/account-presenter';
 import type { AchievementsPresenter } from '../../adapters/achievements-presenter';
 import type { GamePresenter } from '../../adapters/game-presenter';
 import type { HomePresenter, SavedProgresses } from '../../adapters/home-presenter';
+import type { LeaderboardPresenter } from '../../adapters/leaderboard-presenter';
 import type { LevelSelectorPresenter } from '../../adapters/level-selector-presenter';
 import type { ResultPresenter } from '../../adapters/result-presenter';
 import type { BoardLayout, CellShape } from '../../adapters/board/board-layout';
@@ -11,6 +12,7 @@ import type { Texts } from '../../adapters/texts/text-catalog';
 import type { LoadProgressRequest } from '../../application/load-progress';
 import type { UseCase } from '../../application/use-case';
 import type { GameProgress } from '../../domain/progress/game-progress';
+import type { LevelId } from '../../domain/progress/level-id';
 import type { GameId } from '../../domain/shared/game-id';
 import type { TopologyId } from '../../domain/shared/topology-id';
 import type { CellRenderer } from '../board/cell-renderer';
@@ -58,6 +60,9 @@ export interface ScreenServices {
   gameSession(gameId: GameId, figure: TopologyId): GameSession;
   // A new presenter of the account screen, which signs the player up or in (#45).
   accountPresenter(): AccountPresenter;
+  // A new presenter of the leaderboard screen of the game `gameId` (#47): the board of the level
+  // `levelId`, or the global board of the game with no level.
+  leaderboardPresenter(gameId: GameId, levelId?: LevelId): LeaderboardPresenter;
 }
 
 // The screen services of the app for the routes below the root layout.

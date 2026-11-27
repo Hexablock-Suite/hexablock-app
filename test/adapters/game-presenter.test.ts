@@ -548,8 +548,9 @@ describe('GamePresenter undo and redo', () => {
       }),
     );
 
-    // #46 adds `session-expired` and `sync-failed`.
-    expect(codes).toHaveLength(24);
+    // #46 adds `session-expired` and `sync-failed`. #47 adds `sign-in-required`,
+    // `level-has-no-board` and `leaderboard-failed`.
+    expect(codes).toHaveLength(27);
     expect(shown).toEqual(
       languages.map((texts) => codes.map((code) => texts[own[code] ?? 'play.error'])),
     );

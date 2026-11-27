@@ -64,20 +64,23 @@
       <h1>Adapters, presenters and drivers at a glance</h1>
 
       <svg
-        viewBox="0 0 1040 2013"
+        viewBox="0 0 1040 2029"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="mapad-title mapad-desc"
       >
         <title id="mapad-title">HexaBlock adapters map · UML class diagram</title>
         <desc id="mapad-desc">
-          Overview map of the 69 classes of layers 4 and 3 in 14 groups. The board layout group of
-          layer 3 holds BoardLayout, HexLayout, SquareLayout and TriangleLayout (#393). The
-          composition root group holds CompositionRoot, GameRegistry, BoardFigure and the
-          ScreenServices interface of the screens (#411), the drivers group holds SequentialMatchIds
-          and DeviceSecretStore, the repositories group holds SessionManager (#45), the HTTP group
-          holds ApiProgressGateway (#46), the move controls group holds MoveControls, FitControls
-          and MergeControls, and the events group holds GameEventBus, GameEventListener and
+          Overview map of the 71 classes of layers 4 and 3 in 14 groups. Since #47 the routes group
+          holds LeaderboardScreen, the presenters group LeaderboardPresenter, the view models group
+          LeaderboardViewModel, and the HTTP group ApiLeaderboardGateway and its transport interface
+          LeaderboardApi. The board layout group of layer 3 holds BoardLayout, HexLayout,
+          SquareLayout and TriangleLayout (#393). The composition root group holds CompositionRoot,
+          GameRegistry, BoardFigure and the ScreenServices interface of the screens (#411), the
+          drivers group holds SequentialMatchIds and DeviceSecretStore, the repositories group holds
+          SessionManager (#45), the HTTP group holds ApiProgressGateway (#46) and
+          ApiLeaderboardGateway (#47), the move controls group holds MoveControls, FitControls and
+          MergeControls, and the events group holds GameEventBus, GameEventListener and
           AchievementCounterListener. Each line joins two classes: GameScreen renders BoardView and
           keeps its GamePresenter and its MoveControls, CompositionRoot creates
           InMemoryGameRepository, DeviceKeyValueStore implements KeyValueStore, DeviceSecretStore
@@ -560,7 +563,7 @@
           x="56"
           y="1242"
           width="288"
-          height="176"
+          height="226"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -629,7 +632,7 @@
         <!-- Dependencies between classes of two groups (drawn before chips). Each line starts on the class that holds, calls or implements and ends on the class it needs. No line touches a frame. -->
         <!-- GameScreen renders BoardView: use with a verb, inside layer 4 (view 4.1) -->
         <path
-          d="M270 476 L270 276"
+          d="M270,476 L270,276"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -637,7 +640,7 @@
         />
         <!-- GameScreen keeps the GamePresenter it receives as presenter: use with role and multiplicity, down into layer 3 (view 4.1) -->
         <path
-          d="M352 493 L380 493 L380 790 L488 790 L488 834"
+          d="M352,493 L380,493 L380,790 L488,790 L488,834"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -645,7 +648,7 @@
         />
         <!-- GameScreen keeps the MoveControls of its game as controls: use with role and multiplicity, inside layer 4 (view 4.1) -->
         <path
-          d="M332 476 L332 404 L424 404 L424 303 L464 303"
+          d="M332,476 L332,404 L424,404 L424,303 L464,303"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -653,7 +656,7 @@
         />
         <!-- CompositionRoot creates InMemoryGameRepository: use with a verb, down into layer 3 (view 4.4). It enters the repositories group between its two labels, so it crosses no label. -->
         <path
-          d="M696 643 L724 643 L724 1024 L776 1024 L776 1068"
+          d="M696,643 L724,643 L724,1024 L776,1024 L776,1068"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -661,7 +664,7 @@
         />
         <!-- DeviceKeyValueStore implements KeyValueStore: realization, down into layer 3 (view 4.2) -->
         <path
-          d="M968 209 L1000 209 L1000 851 L968 851"
+          d="M968,209 L1000,209 L1000,851 L968,851"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -670,7 +673,7 @@
         />
         <!-- DeviceSecretStore implements SecretStore: realization, down into layer 3 (#45, view 4.4). It runs right of the line of DeviceKeyValueStore and crosses no line. -->
         <path
-          d="M968 159 L1008 159 L1008 901 L968 901"
+          d="M968,159 L1008,159 L1008,901 L968,901"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -679,7 +682,7 @@
         />
         <!-- GamePresenter keeps its StateMapper as mapper: use with role and multiplicity, inside layer 3 (view 4.1) -->
         <path
-          d="M676 851 L696 851 L696 1012 L260 1012 L260 1068"
+          d="M676,851 L696,851 L696,1012 L260,1012 L260,1068"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -687,7 +690,7 @@
         />
         <!-- LocalProgressRepository keeps its KeyValueStore as store: use with role and multiplicity, inside layer 3 (view 4.2). It leaves the repositories group left of the label of its views, so it crosses no label. -->
         <path
-          d="M826 1068 L826 868"
+          d="M826,1068 L826,868"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -1921,6 +1924,34 @@
             </tspan>
           </text>
         </g>
+        <g data-class="LeaderboardViewModel">
+          <rect
+            x="72"
+            y="1420"
+            width="172"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="158"
+            y="1432"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="158" y="1445" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              LeaderboardViewModel
+            </tspan>
+          </text>
+        </g>
         <!-- Chips: events -->
         <g data-class="GameEventBus">
           <rect
@@ -2249,6 +2280,34 @@
             </tspan>
           </text>
         </g>
+        <g data-class="LeaderboardApi">
+          <rect
+            x="728"
+            y="1602"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="804"
+            y="1614"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="804" y="1627" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              LeaderboardApi
+            </tspan>
+          </text>
+        </g>
         <g data-class="ProgressApi">
           <rect
             x="224"
@@ -2439,10 +2498,20 @@
           LocalProgressRepository reads the owner of the progress from SessionManager for its key
           (decision 66).
         </text>
+        <text
+          x="24"
+          y="1888"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Since #47 LeaderboardScreen, LeaderboardPresenter, LeaderboardViewModel,
+          ApiLeaderboardGateway and LeaderboardApi exist (view 3.7, decision 67).
+        </text>
         <g transform="translate(0 128)">
           <text
             x="24"
-            y="1760"
+            y="1776"
             fill="#5b6873"
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2454,15 +2523,15 @@
           <!-- Legend -->
           <line
             x1="24"
-            y1="1784"
+            y1="1800"
             x2="1016"
-            y2="1784"
+            y2="1800"
             stroke="rgba(23,33,42,0.10)"
             stroke-width="0.8"
           />
           <text
             x="24"
-            y="1802"
+            y="1818"
             fill="#5b6873"
             font-size="8"
             font-family="'IBM Plex Mono', monospace"
@@ -2473,16 +2542,16 @@
 
           <line
             x1="24"
-            y1="1819"
+            y1="1835"
             x2="52"
-            y2="1819"
+            y2="1835"
             stroke="#5b6873"
             stroke-width="1"
             marker-end="url(#mapad-open)"
           />
           <text
             x="60"
-            y="1823"
+            y="1839"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2491,9 +2560,9 @@
           </text>
           <line
             x1="384"
-            y1="1819"
+            y1="1835"
             x2="412"
-            y2="1819"
+            y2="1835"
             stroke="#17212a"
             stroke-width="1"
             stroke-dasharray="5,4"
@@ -2501,7 +2570,7 @@
           />
           <text
             x="420"
-            y="1823"
+            y="1839"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2511,7 +2580,7 @@
 
           <rect
             x="24"
-            y="1840"
+            y="1856"
             width="28"
             height="12"
             rx="2"
@@ -2522,7 +2591,7 @@
           />
           <text
             x="60"
-            y="1849"
+            y="1865"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2531,7 +2600,7 @@
           </text>
           <rect
             x="272"
-            y="1840"
+            y="1856"
             width="28"
             height="12"
             rx="2"
@@ -2541,7 +2610,7 @@
           />
           <text
             x="308"
-            y="1849"
+            y="1865"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2550,7 +2619,7 @@
           </text>
           <text
             x="472"
-            y="1849"
+            y="1865"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2568,7 +2637,7 @@
           </text>
           <rect
             x="664"
-            y="1840"
+            y="1856"
             width="28"
             height="12"
             rx="2"
@@ -2578,7 +2647,7 @@
           />
           <text
             x="700"
-            y="1849"
+            y="1865"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2588,7 +2657,7 @@
 
           <rect
             x="24"
-            y="1865"
+            y="1881"
             width="28"
             height="12"
             rx="2"
@@ -2598,7 +2667,7 @@
           />
           <text
             x="60"
-            y="1874"
+            y="1890"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2607,7 +2676,7 @@
           </text>
           <rect
             x="272"
-            y="1865"
+            y="1881"
             width="28"
             height="12"
             rx="2"
@@ -2617,7 +2686,7 @@
           />
           <text
             x="308"
-            y="1874"
+            y="1890"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"

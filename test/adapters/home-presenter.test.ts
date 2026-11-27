@@ -87,6 +87,7 @@ describe('HomePresenter', () => {
     expect(presenter.gameSelector()).toEqual({
       title: 'Mapa de mundos',
       back: 'Atrás',
+      leaderboard: 'Clasificación',
       games: [
         { id: 'hexa-merge', name: 'Hexa Merge', place: 'Fuente Fusión' },
         { id: 'hexa-lines', name: 'Hexa Lines', place: 'Estación Línea' },
@@ -100,6 +101,7 @@ describe('HomePresenter', () => {
     expect(new HomePresenter(FOUR_GAMES, THREE_FIGURES, textCatalog.en).gameSelector()).toEqual({
       title: 'World map',
       back: 'Back',
+      leaderboard: 'Leaderboard',
       games: [
         { id: 'hexa-lines', name: 'Hexa Lines', place: 'Line Station' },
         { id: 'hexa-fit', name: 'Hexa Fit', place: 'The Hive' },
