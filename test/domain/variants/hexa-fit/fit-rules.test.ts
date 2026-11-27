@@ -1,12 +1,12 @@
 /** @jest-environment node */
 import { Outcome } from '../../../../src/domain/engine/outcome';
-import { Moves } from '../../../../src/domain/engine/moves';
-import { Score } from '../../../../src/domain/engine/score';
+import { Moves } from '../../../../src/domain/shared/moves';
+import { Score } from '../../../../src/domain/shared/score';
 import { Board } from '../../../../src/domain/engine/board';
 import { BoardShape } from '../../../../src/domain/engine/board-shape';
 import { GameOver } from '../../../../src/domain/engine/game-events';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
-import { GameId } from '../../../../src/domain/engine/game-id';
+import { GameId } from '../../../../src/domain/shared/game-id';
 import { PlayingPhase, VictoryPhase } from '../../../../src/domain/engine/game-phase';
 import type { GridTopology } from '../../../../src/domain/engine/grid-topology';
 import { Piece } from '../../../../src/domain/engine/piece';

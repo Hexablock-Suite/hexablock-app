@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { Outcome } from '../../../../src/domain/engine/outcome';
-import { Score } from '../../../../src/domain/engine/score';
-import { GameId } from '../../../../src/domain/engine/game-id';
+import { Score } from '../../../../src/domain/shared/score';
+import { GameId } from '../../../../src/domain/shared/game-id';
 import { HexGeometry } from '../../../../src/domain/engine/hex-geometry';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import { Chance } from '../../../../src/domain/variants/hexa-merge/chance';

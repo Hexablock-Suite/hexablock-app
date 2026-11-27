@@ -1,8 +1,8 @@
-import type { GameId } from '../domain/engine/game-id';
-import type { GameProgress } from '../domain/engine/game-progress';
-import type { TopologyId } from '../domain/engine/geometry-factory';
-import type { LevelDefinition } from '../domain/engine/level-definition';
-import { LevelStatus } from '../domain/engine/level-status';
+import type { GameId } from '../domain/shared/game-id';
+import type { GameProgress } from '../domain/progress/game-progress';
+import type { TopologyId } from '../domain/shared/topology-id';
+import type { LevelDefinition } from '../domain/progress/level-definition';
+import { LevelStatus } from '../domain/progress/level-status';
 import type { LevelRepository } from './level-repository';
 import type { LevelSummary } from './level-summary';
 import type { ProgressRepository } from './progress-repository';

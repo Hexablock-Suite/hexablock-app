@@ -1,7 +1,7 @@
 import type { LevelRepository } from '../application/level-repository';
-import { GameId } from '../domain/engine/game-id';
-import { LevelDefinition } from '../domain/engine/level-definition';
-import type { LevelId } from '../domain/engine/level-id';
+import { GameId } from '../domain/shared/game-id';
+import { LevelDefinition } from '../domain/progress/level-definition';
+import type { LevelId } from '../domain/progress/level-id';
 import fit01 from './levels/fit/fit-01.json';
 import fit02 from './levels/fit/fit-02.json';
 import fit03 from './levels/fit/fit-03.json';

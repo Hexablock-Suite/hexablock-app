@@ -1,6 +1,6 @@
 import type { Clock } from './clock';
 import type { ClockReading } from './clock-reading';
-import { ElapsedTime } from './elapsed-time';
+import { ElapsedTime } from '../shared/elapsed-time';
 import type { LevelTimerId } from './level-timer-id';
 import type { ITimed } from './timed';
 

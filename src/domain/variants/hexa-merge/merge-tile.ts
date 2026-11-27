@@ -1,5 +1,5 @@
-import { Score } from '../../engine/score';
-import type { ValueReceiver } from '../../engine/value-receiver';
+import { Score } from '../../shared/score';
+import type { ValueReceiver } from '../../shared/value-receiver';
 import type { IMergeable } from './mergeable';
 
 // The cell of Hexa Merge: a value object that wraps an integer (assumption A1).

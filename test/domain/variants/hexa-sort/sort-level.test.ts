@@ -1,8 +1,8 @@
 /** @jest-environment node */
 import { Color } from '../../../../src/domain/engine/color';
-import { ElapsedTime } from '../../../../src/domain/engine/elapsed-time';
-import type { ILevelStars } from '../../../../src/domain/engine/level-progress';
-import { Moves } from '../../../../src/domain/engine/moves';
+import { ElapsedTime } from '../../../../src/domain/shared/elapsed-time';
+import type { ILevelStars } from '../../../../src/domain/progress/level-progress';
+import { Moves } from '../../../../src/domain/shared/moves';
 import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import { Seed } from '../../../../src/domain/engine/seed';
@@ -12,7 +12,7 @@ import { GoalCount } from '../../../../src/domain/variants/hexa-sort/goal-count'
 import { SortFactory } from '../../../../src/domain/variants/hexa-sort/sort-factory';
 import { SortLevel } from '../../../../src/domain/variants/hexa-sort/sort-level';
 import { SortStarThreshold } from '../../../../src/domain/variants/hexa-sort/sort-stars';
-import { Stars } from '../../../../src/domain/engine/stars';
+import { Stars } from '../../../../src/domain/progress/stars';
 import { names, stack } from '../../../support/variants/hexa-sort/sort-game';
 import { seededRandom } from '../../../support/engine/step-random';
 

@@ -2,7 +2,7 @@
 import { FitStateMapper } from '../../src/adapters/fit-state-mapper';
 import { HexGeometry } from '../../src/domain/engine/hex-geometry';
 import { hex, type HexCoord } from '../../src/domain/engine/hex-topology';
-import { Moves } from '../../src/domain/engine/moves';
+import { Moves } from '../../src/domain/shared/moves';
 import { Piece } from '../../src/domain/engine/piece';
 import { CellNode, ShapeGroup } from '../../src/domain/engine/shape-node';
 import { FitView } from '../../src/domain/variants/hexa-fit/fit-state';

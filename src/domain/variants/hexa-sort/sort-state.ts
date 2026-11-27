@@ -1,11 +1,11 @@
 import type { Board, ReadonlyBoard } from '../../engine/board';
 import { BoardSnapshot, checkOwnSnapshot, type BoardState } from '../../engine/board-state';
 import type { GameEvent } from '../../engine/game-events';
-import type { GameId } from '../../engine/game-id';
+import type { GameId } from '../../shared/game-id';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { MatchId } from '../../engine/match-id';
-import { Moves } from '../../engine/moves';
-import { Score } from '../../engine/score';
+import { Moves } from '../../shared/moves';
+import { Score } from '../../shared/score';
 import type { IPieceSource } from '../../engine/piece-source';
 import { ClearedStacks } from './cleared-stacks';
 import { ColorStack } from './color-stack';

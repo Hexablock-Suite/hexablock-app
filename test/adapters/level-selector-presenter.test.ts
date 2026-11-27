@@ -8,11 +8,11 @@ import type { ListLevelsRequest } from '../../src/application/list-levels';
 import type { LevelSummary } from '../../src/application/level-summary';
 import { Result, UseCaseError } from '../../src/application/result';
 import type { UseCase } from '../../src/application/use-case';
-import { GameId } from '../../src/domain/engine/game-id';
-import { TopologyId } from '../../src/domain/engine/geometry-factory';
-import { LevelId } from '../../src/domain/engine/level-id';
-import { LevelStatus } from '../../src/domain/engine/level-status';
-import { Stars } from '../../src/domain/engine/stars';
+import { GameId } from '../../src/domain/shared/game-id';
+import { TopologyId } from '../../src/domain/shared/topology-id';
+import { LevelId } from '../../src/domain/progress/level-id';
+import { LevelStatus } from '../../src/domain/progress/level-status';
+import { Stars } from '../../src/domain/progress/stars';
 
 // Issue #173: `LevelSelectorPresenter` calls `ListLevels` through the `UseCase` port and turns
 // the plain summaries into the view model of the level selector (MVP, layers.md). It reads

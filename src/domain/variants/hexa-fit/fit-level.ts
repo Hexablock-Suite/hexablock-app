@@ -1,13 +1,13 @@
 import type { BoardShape } from '../../engine/board-shape';
 import type { CoordKey } from '../../engine/coord-key';
-import type { ElapsedTime } from '../../engine/elapsed-time';
-import type { TopologyId } from '../../engine/geometry-factory';
-import type { ILevelStars } from '../../engine/level-progress';
-import type { Moves } from '../../engine/moves';
+import type { ElapsedTime } from '../../shared/elapsed-time';
+import type { TopologyId } from '../../shared/topology-id';
+import type { ILevelStars } from '../../progress/level-progress';
+import type { Moves } from '../../shared/moves';
 import type { Piece } from '../../engine/piece';
 import { frozenListOf } from '../../engine/frozen-list';
 import { CellNode, ShapeGroup } from '../../engine/shape-node';
-import type { Stars } from '../../engine/stars';
+import type { Stars } from '../../progress/stars';
 import { FitPlay, fitStars, type FitStarThreshold } from './fit-stars';
 import type { PieceId } from './piece-id';
 

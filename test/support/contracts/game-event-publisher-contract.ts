@@ -1,8 +1,8 @@
 import type { GameEventPublisher } from '../../../src/application/game-event-publisher';
 import { GameOver } from '../../../src/domain/engine/game-events';
-import { GameId } from '../../../src/domain/engine/game-id';
+import { GameId } from '../../../src/domain/shared/game-id';
 import { Outcome } from '../../../src/domain/engine/outcome';
-import { Score } from '../../../src/domain/engine/score';
+import { Score } from '../../../src/domain/shared/score';
 import { MATCH_ID } from '../engine/match-id';
 
 // The contract of the `GameEventPublisher` port (classes.md decision 25, issue #162).

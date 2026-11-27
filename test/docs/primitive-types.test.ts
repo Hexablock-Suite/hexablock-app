@@ -532,15 +532,16 @@ describe('primitive scan of the domain', () => {
     const ofCounters = codeUses().filter((use) =>
       /^(Moves|ElapsedTime|Stars|LevelId)\./.test(use.where),
     );
-    expect(ofCounters).toEqual([
-      { primitive: 'number', where: 'ElapsedTime.ofMs' },
-      { primitive: 'number', where: 'ElapsedTime.deliverTo' },
-      { primitive: 'string', where: 'LevelId.of' },
-      { primitive: 'string', where: 'LevelId.deliverTo' },
-      { primitive: 'number', where: 'Moves.of' },
-      { primitive: 'number', where: 'Moves.deliverTo' },
-      { primitive: 'number', where: 'Stars.of' },
-      { primitive: 'number', where: 'Stars.deliverTo' },
+    // The counters live in two folders since issue #420, so the order of the scan is not fixed.
+    expect(ofCounters.map(key).sort()).toEqual([
+      'number ElapsedTime.deliverTo',
+      'number ElapsedTime.ofMs',
+      'number Moves.deliverTo',
+      'number Moves.of',
+      'number Stars.deliverTo',
+      'number Stars.of',
+      'string LevelId.deliverTo',
+      'string LevelId.of',
     ]);
   });
 

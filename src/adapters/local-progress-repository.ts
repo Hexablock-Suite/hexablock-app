@@ -1,12 +1,12 @@
 import type { ProgressRepository } from '../application/progress-repository';
-import { ElapsedTime } from '../domain/engine/elapsed-time';
-import type { GameId } from '../domain/engine/game-id';
-import { GameProgress } from '../domain/engine/game-progress';
-import { LevelId } from '../domain/engine/level-id';
-import { Moves } from '../domain/engine/moves';
-import { ProgressRecord } from '../domain/engine/progress-model';
-import { Score } from '../domain/engine/score';
-import { Stars } from '../domain/engine/stars';
+import { ElapsedTime } from '../domain/shared/elapsed-time';
+import type { GameId } from '../domain/shared/game-id';
+import { GameProgress } from '../domain/progress/game-progress';
+import { LevelId } from '../domain/progress/level-id';
+import { Moves } from '../domain/shared/moves';
+import { ProgressRecord } from '../domain/progress/progress-model';
+import { Score } from '../domain/shared/score';
+import { Stars } from '../domain/progress/stars';
 import type { KeyValueStore } from './key-value-store';
 import {
   isObject,

@@ -1,4 +1,4 @@
-import { Score } from '../../engine/score';
+import { Score } from '../../shared/score';
 
 // The points of each tile in a cleared stack. The accepted rule of issue #59 (D22,
 // 2026-11-06): a cleared stack of 10 tiles gives 100 points.

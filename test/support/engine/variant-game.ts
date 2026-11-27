@@ -5,7 +5,7 @@ import { BoardShape } from '../../../src/domain/engine/board-shape';
 import type { BoardState, SnapshotOf } from '../../../src/domain/engine/board-state';
 import type { Cloneable } from '../../../src/domain/engine/cloneable';
 import { GameFactory } from '../../../src/domain/engine/game-factory';
-import { GameId } from '../../../src/domain/engine/game-id';
+import { GameId } from '../../../src/domain/shared/game-id';
 import type { GeometryFactory } from '../../../src/domain/engine/geometry-factory';
 import type { GridAxis, GridTopology } from '../../../src/domain/engine/grid-topology';
 import type { MatchId } from '../../../src/domain/engine/match-id';

@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { CoordKey } from '../../../../src/domain/engine/coord-key';
-import { Moves } from '../../../../src/domain/engine/moves';
-import { Score } from '../../../../src/domain/engine/score';
+import { Moves } from '../../../../src/domain/shared/moves';
+import { Score } from '../../../../src/domain/shared/score';
 import { Turns } from '../../../../src/domain/engine/turns';
 import { PieceId } from '../../../../src/domain/variants/hexa-fit/piece-id';
 import { Placement } from '../../../../src/domain/variants/hexa-fit/placement';

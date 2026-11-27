@@ -2,7 +2,7 @@
 import { Outcome } from '../../../../src/domain/engine/outcome';
 import { Board } from '../../../../src/domain/engine/board';
 import { PlayingPhase } from '../../../../src/domain/engine/game-phase';
-import { Moves } from '../../../../src/domain/engine/moves';
+import { Moves } from '../../../../src/domain/shared/moves';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import type { RandomSource } from '../../../../src/domain/engine/random-source';
 import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';

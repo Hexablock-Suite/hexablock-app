@@ -1,9 +1,9 @@
 import type { BoardSnapshot, BoardState, SnapshotOf } from '../domain/engine/board-state';
 import type { Cloneable } from '../domain/engine/cloneable';
-import type { ElapsedTime } from '../domain/engine/elapsed-time';
+import type { ElapsedTime } from '../domain/shared/elapsed-time';
 import type { GameEngine } from '../domain/engine/game-engine';
 import type { Outcome } from '../domain/engine/outcome';
-import type { Score } from '../domain/engine/score';
+import type { Score } from '../domain/shared/score';
 import type { UseCaseError } from './result';
 
 // The data that a state gives to the screen of its variant: the return type of `view()`

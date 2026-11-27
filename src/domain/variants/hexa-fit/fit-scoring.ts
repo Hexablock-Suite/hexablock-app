@@ -1,4 +1,4 @@
-import { Score } from '../../engine/score';
+import { Score } from '../../shared/score';
 import type { IScoringPolicy } from '../../engine/scoring-policy';
 import type { FitSnapshot, FitState } from './fit-state';
 

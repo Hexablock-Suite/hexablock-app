@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { Moves } from '../../../src/domain/engine/moves';
+import { Moves } from '../../../src/domain/shared/moves';
 import { FixedListPieceSource } from '../../../src/domain/engine/piece-source';
 import { MergeState } from '../../../src/domain/variants/hexa-merge/merge-state';
 import { ClearedStacks } from '../../../src/domain/variants/hexa-sort/cleared-stacks';

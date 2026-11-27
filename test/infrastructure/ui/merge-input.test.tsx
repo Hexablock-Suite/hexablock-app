@@ -5,8 +5,8 @@ import { fireGestureHandler, getByGestureTestId } from 'react-native-gesture-han
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { textCatalog } from '../../../src/adapters/texts/text-catalog';
-import { GameId } from '../../../src/domain/engine/game-id';
-import { TopologyId } from '../../../src/domain/engine/geometry-factory';
+import { GameId } from '../../../src/domain/shared/game-id';
+import { TopologyId } from '../../../src/domain/shared/topology-id';
 import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
 import { RegionSize } from '../../../src/domain/engine/region-size';
 import { SquareGeometry } from '../../../src/domain/engine/square-geometry';

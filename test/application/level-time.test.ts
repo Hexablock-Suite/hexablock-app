@@ -2,11 +2,11 @@
 import { Outcome } from '../../src/domain/engine/outcome';
 import type { BoardState } from '../../src/domain/engine/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
-import { ElapsedTime } from '../../src/domain/engine/elapsed-time';
-import { GameId } from '../../src/domain/engine/game-id';
-import { Moves } from '../../src/domain/engine/moves';
-import { GameResult } from '../../src/domain/engine/progress-model';
-import { Stars } from '../../src/domain/engine/stars';
+import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
+import { GameId } from '../../src/domain/shared/game-id';
+import { Moves } from '../../src/domain/shared/moves';
+import { GameResult } from '../../src/domain/progress/progress-model';
+import { Stars } from '../../src/domain/progress/stars';
 import { Turns } from '../../src/domain/engine/turns';
 import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
 import { PlaceFitPiece } from '../../src/domain/variants/hexa-fit/fit-move';

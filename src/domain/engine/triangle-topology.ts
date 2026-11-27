@@ -5,7 +5,7 @@ import type { GridAxis, GridDirection, GridTopology } from './grid-topology';
 import type { Radius } from './radius';
 import type { RegionSize } from './region-size';
 import { Turns } from './turns';
-import type { ValueReceiver } from './value-receiver';
+import type { ValueReceiver } from '../shared/value-receiver';
 
 // Rotation uses triangle coordinates (x, y, z): x + y + z is 1 for an up triangle
 // and 2 for a down triangle. The lattice cell (i, j) holds the up triangle

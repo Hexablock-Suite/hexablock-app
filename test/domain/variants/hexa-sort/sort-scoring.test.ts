@@ -1,6 +1,6 @@
 /** @jest-environment node */
 import { Outcome } from '../../../../src/domain/engine/outcome';
-import { Score } from '../../../../src/domain/engine/score';
+import { Score } from '../../../../src/domain/shared/score';
 import { ClearedStacks } from '../../../../src/domain/variants/hexa-sort/cleared-stacks';
 import { square } from '../../../support/engine/square-topology';
 import {

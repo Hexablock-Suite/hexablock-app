@@ -1,5 +1,5 @@
-import type { AchievementCounters } from '../domain/engine/achievement-counters';
-import type { GameId } from '../domain/engine/game-id';
+import type { AchievementCounters } from '../domain/achievements/achievement-counters';
+import type { GameId } from '../domain/shared/game-id';
 
 // Output port and repository of the counters aggregate (classes.md decisions 52 and 57,
 // issue #363, part 3 of #277). It saves and gives back the whole aggregate root,

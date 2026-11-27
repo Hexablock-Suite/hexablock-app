@@ -2,7 +2,7 @@ import { BoardId } from './board-id';
 import type { BoardState } from './board-state';
 import type { Cloneable } from './cloneable';
 import { GameEngine } from './game-engine';
-import type { GameId } from './game-id';
+import type { GameId } from '../shared/game-id';
 import { GameStateId } from './game-state-id';
 import type { LevelTimer } from './level-timer';
 import type { MatchIdGenerator } from './match-id-generator';

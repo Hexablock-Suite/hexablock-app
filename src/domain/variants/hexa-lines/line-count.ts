@@ -1,5 +1,5 @@
-import { Score } from '../../engine/score';
-import type { ValueReceiver } from '../../engine/value-receiver';
+import { Score } from '../../shared/score';
+import type { ValueReceiver } from '../../shared/value-receiver';
 
 // The points of each cleared line, before any multiplier.
 // The value codes the accepted rule of issue #59 (D22, 2026-11-06).

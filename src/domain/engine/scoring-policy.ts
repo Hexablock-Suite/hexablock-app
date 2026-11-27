@@ -1,5 +1,5 @@
 import type { SnapshotOf } from './board-state';
-import type { Score } from './score';
+import type { Score } from '../shared/score';
 
 // Strategy (statement §3.3) that the aggregate root holds. It computes the points of a turn.
 // It keeps no game data (classes.md decision 26). Each variant scoring is open (decision #59).

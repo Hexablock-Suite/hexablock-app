@@ -1,9 +1,9 @@
 /** @jest-environment node */
 import { ApplyMove } from '../../src/application/apply-move';
 import { GameEngine } from '../../src/domain/engine/game-engine';
-import { GameId } from '../../src/domain/engine/game-id';
+import { GameId } from '../../src/domain/shared/game-id';
 import { PlayingPhase } from '../../src/domain/engine/game-phase';
-import { Score } from '../../src/domain/engine/score';
+import { Score } from '../../src/domain/shared/score';
 import { errorOf, MemoryGameRepository } from '../support/application/game-use-cases';
 import { RecordingPublisher } from '../support/application/recording-publisher';
 import { fakeCell, type FakeCell } from '../support/engine/fake-cell';

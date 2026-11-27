@@ -1,12 +1,12 @@
 import type { Color } from '../../engine/color';
-import type { ElapsedTime } from '../../engine/elapsed-time';
-import type { ILevelStars } from '../../engine/level-progress';
-import type { Moves } from '../../engine/moves';
+import type { ElapsedTime } from '../../shared/elapsed-time';
+import type { ILevelStars } from '../../progress/level-progress';
+import type { Moves } from '../../shared/moves';
 import { frozenListOf } from '../../engine/frozen-list';
 import type { RandomSource } from '../../engine/random-source';
 import type { RegionSize } from '../../engine/region-size';
 import type { Seed } from '../../engine/seed';
-import type { Stars } from '../../engine/stars';
+import type { Stars } from '../../progress/stars';
 import { ColorStack } from './color-stack';
 import type { GoalCount } from './goal-count';
 import { SortPlay, sortStars, type SortStarThreshold } from './sort-stars';

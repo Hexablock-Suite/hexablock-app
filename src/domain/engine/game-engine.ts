@@ -1,8 +1,8 @@
 import type { BoardSnapshot, BoardState, SnapshotOf } from './board-state';
 import type { Cloneable } from './cloneable';
-import type { ElapsedTime } from './elapsed-time';
+import type { ElapsedTime } from '../shared/elapsed-time';
 import { GameOver, type GameEvent } from './game-events';
-import type { GameId } from './game-id';
+import type { GameId } from '../shared/game-id';
 import { PlayingPhase, ResolvingPhase, type GamePhase } from './game-phase';
 import type { MatchId } from './match-id';
 import { MoveCommand } from './move-command';

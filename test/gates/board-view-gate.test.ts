@@ -65,7 +65,7 @@ describe('BoardView gate', () => {
   it('should_report_each_branch_lookup_and_import_when_a_view_chooses_by_the_figure', () => {
     const source = [
       "import { HexLayout } from '../../adapters/board/hex-layout';",
-      "import { TopologyId } from '../../domain/engine/geometry-factory';",
+      "import { TopologyId } from '../../domain/shared/topology-id';",
       'export function Wrong({ id, gameId, sizes }) {',
       '  if (id.equals(TopologyId.hex)) return null;',
       "  switch (gameId) { case 'hexa-lines': return null; }",

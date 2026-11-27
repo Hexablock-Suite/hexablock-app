@@ -1,4 +1,4 @@
-import type { Score } from '../../engine/score';
+import type { Score } from '../../shared/score';
 import type { IScoringPolicy } from '../../engine/scoring-policy';
 import type { LinesSnapshot, LinesState } from './lines-state';
 

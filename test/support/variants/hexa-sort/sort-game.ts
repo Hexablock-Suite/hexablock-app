@@ -1,10 +1,10 @@
-import { Score } from '../../../../src/domain/engine/score';
+import { Score } from '../../../../src/domain/shared/score';
 import { Board } from '../../../../src/domain/engine/board';
 import { BoardShape } from '../../../../src/domain/engine/board-shape';
 import { Color } from '../../../../src/domain/engine/color';
 import type { CoordKey } from '../../../../src/domain/engine/coord-key';
 import { GameEngine } from '../../../../src/domain/engine/game-engine';
-import { GameId } from '../../../../src/domain/engine/game-id';
+import { GameId } from '../../../../src/domain/shared/game-id';
 import { GameStateId } from '../../../../src/domain/engine/game-state-id';
 import type { MatchId } from '../../../../src/domain/engine/match-id';
 import {

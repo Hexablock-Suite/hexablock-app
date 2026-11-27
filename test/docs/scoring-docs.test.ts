@@ -1,8 +1,8 @@
 /** @jest-environment node */
-import { ElapsedTime } from '../../src/domain/engine/elapsed-time';
-import { Moves } from '../../src/domain/engine/moves';
-import { Score } from '../../src/domain/engine/score';
-import { Stars } from '../../src/domain/engine/stars';
+import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
+import { Moves } from '../../src/domain/shared/moves';
+import { Score } from '../../src/domain/shared/score';
+import { Stars } from '../../src/domain/progress/stars';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 

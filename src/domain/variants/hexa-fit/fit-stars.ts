@@ -1,6 +1,6 @@
-import type { ElapsedTime } from '../../engine/elapsed-time';
-import type { Moves } from '../../engine/moves';
-import { Stars } from '../../engine/stars';
+import type { ElapsedTime } from '../../shared/elapsed-time';
+import type { Moves } from '../../shared/moves';
+import { Stars } from '../../progress/stars';
 
 // The moves and the elapsed time of one won Fit level.
 // `FitState` counts the moves: every accepted place, rotate and remove (issue #60).

@@ -1,4 +1,4 @@
-import { TopologyId } from '../../../../src/domain/engine/geometry-factory';
+import { TopologyId } from '../../../../src/domain/shared/topology-id';
 import { GameStateId } from '../../../../src/domain/engine/game-state-id';
 import type { MatchId } from '../../../../src/domain/engine/match-id';
 import { BoardShape } from '../../../../src/domain/engine/board-shape';

@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { Score } from '../../../../src/domain/engine/score';
+import { Score } from '../../../../src/domain/shared/score';
 import { ScoringDecorator } from '../../../../src/domain/engine/scoring-decorator';
 import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
 import { CellCount } from '../../../../src/domain/variants/hexa-lines/cell-count';

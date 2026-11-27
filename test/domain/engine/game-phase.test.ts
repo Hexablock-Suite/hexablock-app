@@ -1,8 +1,8 @@
 /** @jest-environment node */
 import { Outcome } from '../../../src/domain/engine/outcome';
-import { GameId } from '../../../src/domain/engine/game-id';
+import { GameId } from '../../../src/domain/shared/game-id';
 import { MatchId } from '../../../src/domain/engine/match-id';
-import { Score } from '../../../src/domain/engine/score';
+import { Score } from '../../../src/domain/shared/score';
 import { GameEvent, GameOver } from '../../../src/domain/engine/game-events';
 import {
   GameOverPhase,

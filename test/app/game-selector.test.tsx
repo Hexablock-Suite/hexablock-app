@@ -5,10 +5,10 @@ import { fireEvent, renderRouter, screen, testRouter, within } from 'expo-router
 import { StyleSheet } from 'react-native';
 
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
-import { GameId } from '../../src/domain/engine/game-id';
-import { GameProgress } from '../../src/domain/engine/game-progress';
-import { ProgressRecord } from '../../src/domain/engine/progress-model';
-import { Score } from '../../src/domain/engine/score';
+import { GameId } from '../../src/domain/shared/game-id';
+import { GameProgress } from '../../src/domain/progress/game-progress';
+import { ProgressRecord } from '../../src/domain/progress/progress-model';
+import { Score } from '../../src/domain/shared/score';
 import { DeviceKeyValueStore } from '../../src/infrastructure/device-key-value-store';
 import { outlinesIn } from '../support/ui/cell-outlines';
 import { repoRoot } from '../support/run-tool';

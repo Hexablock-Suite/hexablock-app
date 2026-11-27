@@ -1,6 +1,6 @@
 /** @jest-environment node */
 import { CoordKey } from '../../../../src/domain/engine/coord-key';
-import { Score } from '../../../../src/domain/engine/score';
+import { Score } from '../../../../src/domain/shared/score';
 import { Board } from '../../../../src/domain/engine/board';
 import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
 import { GameStateId } from '../../../../src/domain/engine/game-state-id';

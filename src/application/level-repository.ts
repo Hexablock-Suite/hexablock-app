@@ -1,6 +1,6 @@
-import type { GameId } from '../domain/engine/game-id';
-import type { LevelDefinition } from '../domain/engine/level-definition';
-import type { LevelId } from '../domain/engine/level-id';
+import type { GameId } from '../domain/shared/game-id';
+import type { LevelDefinition } from '../domain/progress/level-definition';
+import type { LevelId } from '../domain/progress/level-id';
 
 // Output port of the levels of a game (classes.md decisions 24 and 58, issue #168, A6).
 // It gives the `LevelDefinition` of each level of one game: the data of one level file.

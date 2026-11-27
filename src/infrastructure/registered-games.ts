@@ -22,12 +22,13 @@ import {
 import { BoardShape } from '../domain/engine/board-shape';
 import type { Clock } from '../domain/engine/clock';
 import { Color } from '../domain/engine/color';
-import { ElapsedTime } from '../domain/engine/elapsed-time';
-import { GameId } from '../domain/engine/game-id';
-import { TopologyId, type GeometryFactory } from '../domain/engine/geometry-factory';
+import { ElapsedTime } from '../domain/shared/elapsed-time';
+import { GameId } from '../domain/shared/game-id';
+import type { GeometryFactory } from '../domain/engine/geometry-factory';
+import { TopologyId } from '../domain/shared/topology-id';
 import type { GridAxis } from '../domain/engine/grid-topology';
 import { HexGeometry } from '../domain/engine/hex-geometry';
-import { Moves } from '../domain/engine/moves';
+import { Moves } from '../domain/shared/moves';
 import { Piece } from '../domain/engine/piece';
 import type { RandomSource } from '../domain/engine/random-source';
 import { RegionSize } from '../domain/engine/region-size';

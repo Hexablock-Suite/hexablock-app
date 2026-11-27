@@ -1,6 +1,6 @@
-import type { GameId } from '../domain/engine/game-id';
-import { GameProgress } from '../domain/engine/game-progress';
-import type { GameResult, IProgressModel } from '../domain/engine/progress-model';
+import type { GameId } from '../domain/shared/game-id';
+import { GameProgress } from '../domain/progress/game-progress';
+import type { GameResult, IProgressModel } from '../domain/progress/progress-model';
 import type { ProgressRepository } from './progress-repository';
 import { caughtError, FailureCode, Result } from './result';
 import type { UseCase } from './use-case';

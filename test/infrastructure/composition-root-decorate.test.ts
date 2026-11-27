@@ -2,8 +2,8 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { GameId } from '../../src/domain/engine/game-id';
-import { TopologyId } from '../../src/domain/engine/geometry-factory';
+import { GameId } from '../../src/domain/shared/game-id';
+import { TopologyId } from '../../src/domain/shared/topology-id';
 import { CompositionRoot } from '../../src/infrastructure/composition-root';
 import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-store';
 import { RecordingLogger } from '../support/application/recording-logger';

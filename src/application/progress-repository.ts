@@ -1,5 +1,5 @@
-import type { GameId } from '../domain/engine/game-id';
-import type { GameProgress } from '../domain/engine/game-progress';
+import type { GameId } from '../domain/shared/game-id';
+import type { GameProgress } from '../domain/progress/game-progress';
 
 // Output port and repository of the progress aggregate (classes.md decisions 52, 56 and 57,
 // issue #164). It saves and gives back the whole aggregate root, `GameProgress`:

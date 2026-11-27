@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { CoordKey } from '../../../../src/domain/engine/coord-key';
-import { Moves } from '../../../../src/domain/engine/moves';
-import { Score } from '../../../../src/domain/engine/score';
+import { Moves } from '../../../../src/domain/shared/moves';
+import { Score } from '../../../../src/domain/shared/score';
 import { ClearedStacks } from '../../../../src/domain/variants/hexa-sort/cleared-stacks';
 import { SortRules } from '../../../../src/domain/variants/hexa-sort/sort-rules';
 import type { SortState } from '../../../../src/domain/variants/hexa-sort/sort-state';

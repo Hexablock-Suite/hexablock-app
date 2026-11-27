@@ -1,5 +1,5 @@
-import type { AchievementCounters } from '../../../src/domain/engine/achievement-counters';
-import type { GameId } from '../../../src/domain/engine/game-id';
+import type { AchievementCounters } from '../../../src/domain/achievements/achievement-counters';
+import type { GameId } from '../../../src/domain/shared/game-id';
 import { delivered } from './value-receiver';
 
 // A reader of the counters of the achievements of one game. It exists only in test/.

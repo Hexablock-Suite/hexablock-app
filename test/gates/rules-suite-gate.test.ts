@@ -31,7 +31,13 @@ const fixtures = path.join(repoRoot, 'test/fixtures/rules-suite');
 // The variant contract is an interface, but a double of it replaces a variant class.
 const CONTRACT_INTERFACES = ['IGameRules'];
 // A test or a test helper that a variant suite reads may not double these layers.
-const PROTECTED_SOURCES = ['src/domain/engine', 'src/domain/variants'];
+const PROTECTED_SOURCES = [
+  'src/domain/engine',
+  'src/domain/shared',
+  'src/domain/progress',
+  'src/domain/achievements',
+  'src/domain/variants',
+];
 const SCANNED_TESTS = ['test/domain/variants', 'test/support/variants'];
 const MOCK_CALLS = ['mock', 'doMock', 'unstable_mockModule'];
 
@@ -311,6 +317,24 @@ describe('rules suite gate (APP-NFR-12)', () => {
       expect(found).toEqual([
         `${label}: jest.mock replaces src/domain/engine/rules`,
         `${label}: jest.doMock replaces src/domain/variants/hexa-lines/lines-rules`,
+      ]);
+    });
+
+    // Issue #420: the shared leaves, the progress and the achievements left the engine folder.
+    // A suite still may not double them.
+    it('should_report_the_double_when_a_test_replaces_a_shared_progress_or_achievement_class', () => {
+      const found = scan([
+        "jest.mock('../../../../src/domain/shared/score');",
+        "jest.mock('@/domain/progress/game-progress');",
+        "jest.doMock('@/domain/achievements/achievement-goal');",
+        'class FakeLevelId extends LevelId {}',
+      ]);
+
+      expect(found).toEqual([
+        `${label}: jest.mock replaces src/domain/shared/score`,
+        `${label}: jest.mock replaces src/domain/progress/game-progress`,
+        `${label}: jest.doMock replaces src/domain/achievements/achievement-goal`,
+        `${label}: class FakeLevelId extends LevelId`,
       ]);
     });
 

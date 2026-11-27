@@ -2,11 +2,11 @@
 import { BoardId } from '../../src/domain/engine/board-id';
 import type { BoardSnapshot, BoardState } from '../../src/domain/engine/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
-import { ElapsedTime } from '../../src/domain/engine/elapsed-time';
+import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
 import { GameStateId } from '../../src/domain/engine/game-state-id';
 import { MatchId } from '../../src/domain/engine/match-id';
 import { Outcome } from '../../src/domain/engine/outcome';
-import { Score } from '../../src/domain/engine/score';
+import { Score } from '../../src/domain/shared/score';
 import { Turns } from '../../src/domain/engine/turns';
 import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
 import { PlaceFitPiece } from '../../src/domain/variants/hexa-fit/fit-move';

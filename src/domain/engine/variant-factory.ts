@@ -2,14 +2,14 @@ import type { Board } from './board';
 import type { BoardId } from './board-id';
 import type { BoardState, SnapshotOf } from './board-state';
 import type { Cloneable } from './cloneable';
-import type { GameId } from './game-id';
+import type { GameId } from '../shared/game-id';
 import type { GameStateId } from './game-state-id';
 import type { LevelTimer } from './level-timer';
 import type { MatchId } from './match-id';
 import type { MoveHistory } from './move-history';
 import type { Piece } from './piece';
 import type { IPieceSource } from './piece-source';
-import type { IProgressModel } from './progress-model';
+import type { IProgressModel } from '../progress/progress-model';
 import type { IGameRules } from './rules';
 import type { IScoringPolicy } from './scoring-policy';
 
