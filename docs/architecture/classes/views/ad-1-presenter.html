@@ -388,7 +388,7 @@
         <!-- GamePresenter keeps the UseCase input port it receives as applyMove: use with role and multiplicity, down from layer 3 to layer 2 -->
         <line
           x1="528"
-          y1="1044"
+          y1="1060"
           x2="528"
           y2="1332"
           stroke="#5b6873"
@@ -1055,7 +1055,7 @@
           x="336"
           y="876"
           width="424"
-          height="168"
+          height="184"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -1064,7 +1064,7 @@
         <rect x="336" y="876" width="424" height="40" rx="6" fill="rgba(15,111,116,0.10)" />
         <rect x="336" y="908" width="424" height="8" fill="rgba(15,111,116,0.10)" />
         <line x1="336" y1="916" x2="760" y2="916" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
-        <line x1="336" y1="956" x2="760" y2="956" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <line x1="336" y1="972" x2="760" y2="972" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text
           x="548"
           y="901"
@@ -1082,11 +1082,11 @@
         <text x="352" y="948" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - mapper: StateMapper&lt;TCell, TView, TCellView, TPayloadView&gt;
         </text>
-        <text x="352" y="972" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + onStart(levelId: LevelId [0..1]): Promise&lt;void&gt;
+        <text x="352" y="964" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - ended: GameEndListener [0..1]
         </text>
         <text x="352" y="988" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + onMove(intent: TIntent): Promise&lt;void&gt;
+          + onStart(levelId: LevelId [0..1]): Promise&lt;void&gt;
         </text>
         <text
           x="352"
@@ -1095,7 +1095,7 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          + onUndo(): Promise&lt;void&gt;
+          + onMove(intent: TIntent): Promise&lt;void&gt;
         </text>
         <text
           x="352"
@@ -1104,7 +1104,7 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          + onRedo(): Promise&lt;void&gt;
+          + onUndo(): Promise&lt;void&gt;
         </text>
         <text
           x="352"
@@ -1113,7 +1113,171 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
+          + onRedo(): Promise&lt;void&gt;
+        </text>
+        <text
+          x="352"
+          y="1052"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
           + viewModel(): GameViewModel
+        </text>
+
+        <!-- GamePresenter keeps the GameEndListener it receives as ended: use with role and multiplicity (#180) -->
+        <line
+          x1="428"
+          y1="1060"
+          x2="428"
+          y2="1112"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#adpresenter-open)"
+        />
+        <rect x="432" y="1093" width="58" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="434"
+          y="1102"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          ended
+          <tspan font-weight="600">0..1</tspan>
+        </text>
+        <!-- ResultPresenter implements GameEndListener: realization (#180) -->
+        <line
+          x1="552"
+          y1="1168"
+          x2="520"
+          y2="1168"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#adpresenter-triangle)"
+        />
+        <!-- Class: GameEndListener (interface, #180) -->
+        <rect
+          x="344"
+          y="1112"
+          width="176"
+          height="84"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="432"
+          y="1128"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface»
+        </text>
+        <text
+          x="432"
+          y="1145"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GameEndListener
+        </text>
+        <line x1="344" y1="1156" x2="520" y2="1156" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="352"
+          y="1172"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + onFinish(response:
+        </text>
+        <text
+          x="352"
+          y="1186"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          MoveResult): Promise&lt;void&gt;
+        </text>
+        <!-- Class: ResultPresenter (#180): the presenter of VictoryScreen and DefeatScreen -->
+        <rect
+          x="552"
+          y="1128"
+          width="300"
+          height="136"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="702"
+          y="1152"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          ResultPresenter
+        </text>
+        <line x1="552" y1="1164" x2="852" y2="1164" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="568"
+          y="1180"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          - useCases: ResultUseCases
+        </text>
+        <text
+          x="568"
+          y="1196"
+          fill="#5b6873"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          builds and saves the GameResult: flow 2
+        </text>
+        <line x1="552" y1="1204" x2="852" y2="1204" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="568"
+          y="1220"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + onFinish(response: MoveResult): Promise&lt;void&gt;
+        </text>
+        <text
+          x="568"
+          y="1236"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + onClose(): void
+        </text>
+        <text
+          x="568"
+          y="1252"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          + viewModel(): ResultViewModel [0..1]
         </text>
 
         <!-- Class: GameViewModel (interface, value object) -->
@@ -1717,7 +1881,7 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           GameStage gives the board, play(), undo() and redo() to the controls of the game (#178).
-          LevelSelectorPresenter (#173), Result, Account and Leaderboard follow the same shape.
+          LevelSelectorPresenter (#173), Account and Leaderboard follow the same shape.
         </text>
         <text
           x="24"

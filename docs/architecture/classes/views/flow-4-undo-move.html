@@ -63,7 +63,7 @@
       <p class="eyebrow">Use case flow · UndoMove · class view</p>
       <h1>UndoMove across the four layers: the classes of one undo</h1>
       <svg
-        viewBox="0 0 1040 1422"
+        viewBox="0 0 1040 1478"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="flowundo-title flowundo-desc"
@@ -74,9 +74,9 @@
           GamePresenter. In layer 3, GamePresenter uses the UseCase input port, and
           InMemoryGameRepository implements the GameRepository port and keeps the running
           GameEngine. In layer 2, UndoMove implements UseCase, keeps the GameRepository port and
-          builds a MoveResult. In layer 1, GameEngine keeps zero or one MoveHistory as history and
+          builds a MoveResult. In layer 1, GameEngine keeps zero or one IUndoable as history and
           answers for it: UndoMove asks offersUndo() and canUndo() and calls undo() on GameEngine,
-          which asks its MoveHistory; MoveHistory implements IUndoable and keeps its MoveCommands as
+          which asks its history; MoveHistory implements IUndoable and keeps its MoveCommands as
           done. UndoMove reads the occupied cells and the free spaces of Board. Every dependency
           between layers points down.
         </desc>
@@ -154,7 +154,7 @@
           x="24"
           y="376"
           width="992"
-          height="360"
+          height="428"
           rx="8"
           fill="#efe7f8"
           stroke="rgba(126,34,206,0.40)"
@@ -174,7 +174,7 @@
         <!-- Layer zone: layer 1 -->
         <rect
           x="24"
-          y="760"
+          y="816"
           width="992"
           height="464"
           rx="8"
@@ -184,7 +184,7 @@
         />
         <text
           x="40"
-          y="780"
+          y="836"
           fill="#b45309"
           font-size="8"
           font-weight="500"
@@ -221,7 +221,7 @@
         />
         <!-- InMemoryGameRepository keeps zero or one running GameEngine as game: use with role and multiplicity, down from layer 3 to layer 1 -->
         <path
-          d="M980 260 H994 Q1002 260 1002 268 V854 Q1002 862 994 862 H940"
+          d="M980 260 H994 Q1002 260 1002 268 V910 Q1002 918 994 918 H940"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -254,7 +254,7 @@
         />
         <!-- UndoMove reads the cells of Board: use, down from layer 2 to layer 1 -->
         <path
-          d="M320 696 V780 Q320 788 312 788 H158 Q150 788 150 796 V808"
+          d="M320 696 V836 Q320 844 312 844 H158 Q150 844 150 852 V864"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -262,15 +262,15 @@
         />
         <!-- UndoMove asks GameEngine offersUndo() and canUndo() and calls undo(): use, down from layer 2 to layer 1 (#234) -->
         <path
-          d="M600 696 V780 Q600 788 608 788 H692 Q700 788 700 796 V808"
+          d="M600 696 V836 Q600 844 608 844 H692 Q700 844 700 852 V864"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#flowundo-open)"
         />
-        <!-- GameEngine keeps zero or one MoveHistory it receives as history: use with role and multiplicity (decision 23) -->
+        <!-- GameEngine keeps zero or one IUndoable it receives as history: use with role and multiplicity (decisions 23 and 27, #414) -->
         <path
-          d="M700 1016 V1040"
+          d="M660 928 H480"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -278,7 +278,7 @@
         />
         <!-- MoveHistory implements IUndoable: realization -->
         <path
-          d="M600 1040 V952 Q600 944 592 944 H408 Q400 944 400 936 V896"
+          d="M600 1096 V1008 Q600 1000 592 1000 H408 Q400 1000 400 992 V952"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -287,7 +287,7 @@
         />
         <!-- MoveHistory keeps each done MoveCommand as done: use with role and multiplicity (decision 23) -->
         <path
-          d="M560 1090 H260"
+          d="M560 1146 H260"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -318,10 +318,10 @@
         >
           OCCUPIEDCELLS(), FREESPACES()
         </text>
-        <rect x="602" y="775" width="39.68" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="602" y="831" width="39.68" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="606"
-          y="784"
+          y="840"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -367,10 +367,10 @@
           games
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="949.8" y="847" width="50.2" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="949.8" y="903" width="50.2" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="998"
-          y="856"
+          y="912"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -379,10 +379,10 @@
           game
           <tspan font-weight="600">0..1</tspan>
         </text>
-        <rect x="706" y="1025" width="64.6" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="484" y="913" width="64.6" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="708"
-          y="1034"
+          x="486"
+          y="922"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -391,10 +391,10 @@
           history
           <tspan font-weight="600">0..1</tspan>
         </text>
-        <rect x="262" y="1074" width="50.2" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="262" y="1130" width="50.2" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="264"
-          y="1083"
+          y="1139"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -598,7 +598,7 @@
           x="40"
           y="540"
           width="210"
-          height="216"
+          height="248"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -655,6 +655,12 @@
           + elapsedMs?: ElapsedTime
         </text>
         <text x="56" y="748" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + moves?: Moves
+        </text>
+        <text x="56" y="764" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + levelId?: LevelId
+        </text>
+        <text x="56" y="780" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + failedDeliveries?: UseCaseError[]
         </text>
         <!-- Class: UndoMove (focal, use case) -->
@@ -720,7 +726,7 @@
         <!-- Class: Board (no role label of a pattern, decision 23) -->
         <rect
           x="40"
-          y="808"
+          y="864"
           width="220"
           height="88"
           rx="6"
@@ -730,7 +736,7 @@
         />
         <text
           x="150"
-          y="838"
+          y="894"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -739,17 +745,17 @@
         >
           Board
         </text>
-        <line x1="40" y1="856" x2="260" y2="856" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="56" y="872" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="40" y1="912" x2="260" y2="912" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="56" y="928" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + occupiedCells(): [TCoord, TCell][]
         </text>
-        <text x="56" y="888" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="56" y="944" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + freeSpaces(): TCoord[]
         </text>
         <!-- Class: IUndoable (interface, capability) -->
         <rect
           x="300"
-          y="808"
+          y="864"
           width="180"
           height="88"
           rx="6"
@@ -759,7 +765,7 @@
         />
         <text
           x="390"
-          y="826"
+          y="882"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -770,7 +776,7 @@
         </text>
         <text
           x="390"
-          y="844"
+          y="900"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -779,17 +785,17 @@
         >
           IUndoable
         </text>
-        <line x1="300" y1="856" x2="480" y2="856" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="316" y="872" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="300" y1="912" x2="480" y2="912" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="316" y="928" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + canUndo(): boolean
         </text>
-        <text x="316" y="888" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="316" y="944" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + undo(): void
         </text>
         <!-- Class: GameEngine (aggregate root) -->
         <rect
           x="660"
-          y="808"
+          y="864"
           width="280"
           height="208"
           rx="6"
@@ -799,7 +805,7 @@
         />
         <text
           x="800"
-          y="826"
+          y="882"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -810,7 +816,7 @@
         </text>
         <text
           x="800"
-          y="844"
+          y="900"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -819,43 +825,67 @@
         >
           GameEngine
         </text>
-        <line x1="660" y1="856" x2="940" y2="856" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="660" y1="896" x2="940" y2="896" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="660" y1="912" x2="940" y2="912" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="660" y1="952" x2="940" y2="952" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="676"
-          y="872"
+          y="928"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
           textLength="258"
           lengthAdjust="spacingAndGlyphs"
         >
-          - history: MoveHistory&lt;TMove, SnapshotOf&lt;TState&gt;&gt; [0..1]
+          - history: IUndoable&lt;TMove, SnapshotOf&lt;TState&gt;&gt; [0..1]
         </text>
-        <text x="676" y="888" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="676" y="944" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           matchId, rules, scoring, phase, timer: view 1
         </text>
-        <text x="676" y="912" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="676" y="968" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + undo(): void
         </text>
-        <text x="676" y="928" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="676" y="984" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + canUndo(): boolean
         </text>
-        <text x="676" y="944" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text
+          x="676"
+          y="1000"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
           + canRedo(): boolean
         </text>
-        <text x="676" y="960" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text
+          x="676"
+          y="1016"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
           + offersUndo(): boolean
         </text>
-        <text x="676" y="976" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text
+          x="676"
+          y="1032"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
           + elapsedTime(): ElapsedTime | undefined
         </text>
-        <text x="676" y="992" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text
+          x="676"
+          y="1048"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
           + snapshot(): SnapshotOf&lt;TState&gt;
         </text>
         <text
           x="676"
-          y="1008"
+          y="1064"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -865,7 +895,7 @@
         <!-- Class: MoveCommand (a piece of the Command pattern: the footnote names it, decision 23) -->
         <rect
           x="40"
-          y="1040"
+          y="1096"
           width="220"
           height="160"
           rx="6"
@@ -875,7 +905,7 @@
         />
         <text
           x="150"
-          y="1070"
+          y="1126"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -884,20 +914,20 @@
         >
           MoveCommand
         </text>
-        <line x1="40" y1="1088" x2="260" y2="1088" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="40" y1="1160" x2="260" y2="1160" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="56" y="1104" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="40" y1="1144" x2="260" y2="1144" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="40" y1="1216" x2="260" y2="1216" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="56" y="1160" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - move: TMove
         </text>
-        <text x="56" y="1120" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="56" y="1176" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - before: TMemento
         </text>
-        <text x="56" y="1136" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="56" y="1192" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - after: TMemento
         </text>
         <text
           x="56"
-          y="1152"
+          y="1208"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -906,16 +936,16 @@
         >
           - restore: (memento: TMemento) =&gt; void
         </text>
-        <text x="56" y="1176" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="56" y="1232" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + undo(): void
         </text>
-        <text x="56" y="1192" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="56" y="1248" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + redo(): void
         </text>
         <!-- Class: MoveHistory (a piece of the Command pattern: the footnote names it, decision 23) -->
         <rect
           x="560"
-          y="1040"
+          y="1096"
           width="300"
           height="144"
           rx="6"
@@ -925,7 +955,7 @@
         />
         <text
           x="710"
-          y="1070"
+          y="1126"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -934,11 +964,11 @@
         >
           MoveHistory
         </text>
-        <line x1="560" y1="1088" x2="860" y2="1088" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="560" y1="1128" x2="860" y2="1128" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="560" y1="1144" x2="860" y2="1144" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="560" y1="1184" x2="860" y2="1184" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="576"
-          y="1104"
+          y="1160"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -947,7 +977,7 @@
         </text>
         <text
           x="576"
-          y="1120"
+          y="1176"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -956,7 +986,7 @@
         </text>
         <text
           x="576"
-          y="1144"
+          y="1200"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -967,7 +997,7 @@
         </text>
         <text
           x="576"
-          y="1160"
+          y="1216"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -976,7 +1006,7 @@
         </text>
         <text
           x="576"
-          y="1176"
+          y="1232"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1122,7 +1152,7 @@
         </text>
         <rect
           x="187.7"
-          y="798"
+          y="854"
           width="84.3"
           height="18"
           rx="2"
@@ -1133,7 +1163,7 @@
         />
         <text
           x="229.85"
-          y="810"
+          y="866"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1143,7 +1173,7 @@
         </text>
         <rect
           x="730"
-          y="786"
+          y="842"
           width="222"
           height="42"
           rx="2"
@@ -1154,7 +1184,7 @@
         />
         <text
           x="841"
-          y="798"
+          y="854"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1164,7 +1194,7 @@
         </text>
         <text
           x="841"
-          y="810"
+          y="866"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1174,7 +1204,7 @@
         </text>
         <text
           x="841"
-          y="822"
+          y="878"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1184,7 +1214,7 @@
         </text>
         <rect
           x="187.7"
-          y="1030"
+          y="1086"
           width="84.3"
           height="18"
           rx="2"
@@ -1195,7 +1225,7 @@
         />
         <text
           x="229.85"
-          y="1042"
+          y="1098"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1205,7 +1235,7 @@
         </text>
         <rect
           x="787.7"
-          y="1030"
+          y="1086"
           width="84.3"
           height="18"
           rx="2"
@@ -1216,7 +1246,7 @@
         />
         <text
           x="829.85"
-          y="1042"
+          y="1098"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1227,7 +1257,7 @@
         <!-- Footnote -->
         <text
           x="24"
-          y="1254"
+          y="1310"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1237,17 +1267,17 @@
         </text>
         <text
           x="24"
-          y="1270"
+          y="1326"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          asks offersUndo() and canUndo(), and calls undo(). The root asks its MoveHistory, which
-          implements IUndoable: it takes the last MoveCommand of the Command pattern,
+          asks offersUndo() and canUndo(), and calls undo(). The root asks its history, an IUndoable
+          that MoveHistory implements: it takes the last MoveCommand of the Command pattern,
         </text>
         <text
           x="24"
-          y="1286"
+          y="1342"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1257,7 +1287,7 @@
         </text>
         <text
           x="24"
-          y="1302"
+          y="1358"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1267,7 +1297,7 @@
         </text>
         <text
           x="24"
-          y="1318"
+          y="1374"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1278,15 +1308,15 @@
         <!-- Legend -->
         <line
           x1="24"
-          y1="1342"
+          y1="1398"
           x2="1016"
-          y2="1342"
+          y2="1398"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1360"
+          y="1416"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1296,9 +1326,9 @@
         </text>
         <line
           x1="24"
-          y1="1378"
+          y1="1434"
           x2="52"
-          y2="1378"
+          y2="1434"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -1306,7 +1336,7 @@
         />
         <text
           x="60"
-          y="1381"
+          y="1437"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1315,16 +1345,16 @@
         </text>
         <line
           x1="155.7"
-          y1="1378"
+          y1="1434"
           x2="183.7"
-          y2="1378"
+          y2="1434"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#flowundo-open)"
         />
         <text
           x="191.7"
-          y="1381"
+          y="1437"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1333,7 +1363,7 @@
         </text>
         <rect
           x="24"
-          y="1394"
+          y="1450"
           width="28"
           height="12"
           rx="2"
@@ -1343,7 +1373,7 @@
         />
         <text
           x="60"
-          y="1403"
+          y="1459"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1352,7 +1382,7 @@
         </text>
         <rect
           x="169.8"
-          y="1394"
+          y="1450"
           width="28"
           height="12"
           rx="2"
@@ -1362,7 +1392,7 @@
         />
         <text
           x="205.8"
-          y="1403"
+          y="1459"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1371,7 +1401,7 @@
         </text>
         <rect
           x="315.6"
-          y="1394"
+          y="1450"
           width="28"
           height="12"
           rx="2"
@@ -1381,7 +1411,7 @@
         />
         <text
           x="351.6"
-          y="1403"
+          y="1459"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1390,7 +1420,7 @@
         </text>
         <rect
           x="461.40000000000003"
-          y="1394"
+          y="1450"
           width="28"
           height="12"
           rx="2"
@@ -1400,7 +1430,7 @@
         />
         <text
           x="497.4"
-          y="1403"
+          y="1459"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1409,7 +1439,7 @@
         </text>
         <rect
           x="607.2"
-          y="1394"
+          y="1450"
           width="28"
           height="12"
           rx="2"
@@ -1420,7 +1450,7 @@
         />
         <text
           x="643.2"
-          y="1403"
+          y="1459"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1429,7 +1459,7 @@
         </text>
         <rect
           x="818.8000000000001"
-          y="1394"
+          y="1450"
           width="28"
           height="12"
           rx="2"
@@ -1439,7 +1469,7 @@
         />
         <text
           x="854.8"
-          y="1403"
+          y="1459"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

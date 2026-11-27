@@ -314,7 +314,12 @@
             "LinesIntent",
             "FitIntent",
             "SortIntent",
-            "MergeIntent"
+            "MergeIntent",
+            "ResultPresenter",
+            "GameEndListener",
+            "ResultUseCases",
+            "ResultViewModel",
+            "ResultView"
           ]
         },
         {
@@ -322,7 +327,6 @@
           "types": [
             "LeaderboardPresenter",
             "AccountPresenter",
-            "ResultPresenter",
             "LocalSettingsStore",
             "ApiProgressRepository",
             "ApiLevelRepository",
@@ -400,18 +404,18 @@
             "WorldTone",
             "RouteFigure",
             "TileTone",
-            "MergeControls"
+            "MergeControls",
+            "VictoryScreen",
+            "DefeatScreen"
           ]
         },
         {
           "group": "infrastructure|planned",
           "types": [
             "AudioManager",
-            "DefeatScreen",
             "SoundLibrary",
             "LeaderboardScreen",
             "SessionManager",
-            "VictoryScreen",
             "AccountScreen"
           ]
         }
@@ -994,7 +998,6 @@
           "types": [
             "LeaderboardPresenter",
             "AccountPresenter",
-            "ResultPresenter",
             "LocalSettingsStore",
             "ApiProgressRepository",
             "ApiLevelRepository",
@@ -1046,7 +1049,12 @@
             "MergeIntent",
             "FitStateMapper",
             "LevelGameFactories",
-            "LevelFile"
+            "LevelFile",
+            "ResultPresenter",
+            "GameEndListener",
+            "ResultUseCases",
+            "ResultViewModel",
+            "ResultView"
           ]
         },
         {
@@ -1109,7 +1117,9 @@
             "FitControls",
             "RouteFigure",
             "TileTone",
-            "MergeControls"
+            "MergeControls",
+            "VictoryScreen",
+            "DefeatScreen"
           ]
         },
         {
@@ -1117,10 +1127,8 @@
           "types": [
             "SoundLibrary",
             "AudioManager",
-            "DefeatScreen",
             "LeaderboardScreen",
             "SessionManager",
-            "VictoryScreen",
             "AccountScreen"
           ]
         },

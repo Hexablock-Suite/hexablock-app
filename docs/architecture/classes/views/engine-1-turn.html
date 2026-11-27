@@ -328,7 +328,7 @@
         />
         <!-- GameEngine holds its BoardState as state: composition from the root to an internal entity, with a hop over the outcome line -->
         <path
-          d="M460,648 V756 a 8,8 0 0,1 0,16 V792"
+          d="M460,680 V756 a 8,8 0 0,1 0,16 V792"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -337,9 +337,9 @@
         <!-- GameEngine holds the timer of a timed game as an ITimed: composition from the root to an internal entity, to the type of the field -->
         <line
           x1="616"
-          y1="648"
+          y1="680"
           x2="616"
-          y2="696"
+          y2="708"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#t-diamond-filled)"
@@ -477,10 +477,10 @@
         >
           state
         </text>
-        <rect x="620" y="676" width="32" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="624" y="688" width="32" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="636"
-          y="685"
+          x="640"
+          y="697"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -514,10 +514,10 @@
         >
           0..1
         </text>
-        <rect x="584" y="676" width="28" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="580" y="688" width="28" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="598"
-          y="685"
+          x="594"
+          y="697"
           fill="#17212a"
           font-size="8"
           font-weight="600"
@@ -643,7 +643,7 @@
           x="380"
           y="216"
           width="300"
-          height="432"
+          height="464"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -652,7 +652,7 @@
         <rect x="380" y="216" width="300" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
         <rect x="380" y="256" width="300" height="8" fill="rgba(15,111,116,0.10)" />
         <line x1="380" y1="264" x2="680" y2="264" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
-        <line x1="380" y1="416" x2="680" y2="416" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <line x1="380" y1="432" x2="680" y2="432" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text
           x="530"
           y="238"
@@ -710,48 +710,54 @@
         <text x="396" y="408" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - timer: ITimed [0..1]
         </text>
-        <text x="396" y="432" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + start(initial: TState): void
+        <text x="396" y="424" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - levelId: LevelId [0..1]
         </text>
         <text x="396" y="448" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + tryPlay(move: TMove): Resolution
+          + start(initial: TState): void
         </text>
         <text x="396" y="464" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + takeEvents(): readonly GameEvent[]
+          + tryPlay(move: TMove): Resolution
         </text>
         <text x="396" y="480" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + pause(): void
+          + takeEvents(): readonly GameEvent[]
         </text>
         <text x="396" y="496" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + resume(): void
+          + pause(): void
         </text>
         <text x="396" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + snapshot(): SnapshotOf&lt;TState&gt;
+          + resume(): void
         </text>
         <text x="396" y="528" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + currentPhase(): GamePhase
+          + snapshot(): SnapshotOf&lt;TState&gt;
         </text>
         <text x="396" y="544" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + undo(): void
+          + currentPhase(): GamePhase
         </text>
         <text x="396" y="560" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + redo(): void
+          + undo(): void
         </text>
         <text x="396" y="576" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + canUndo(): boolean
+          + redo(): void
         </text>
         <text x="396" y="592" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + canRedo(): boolean
+          + canUndo(): boolean
         </text>
         <text x="396" y="608" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + offersUndo(): boolean
+          + canRedo(): boolean
         </text>
         <text x="396" y="624" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + offersUndo(): boolean
+        </text>
+        <text x="396" y="640" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + elapsedTime(): ElapsedTime | undefined
+        </text>
+        <text x="396" y="656" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + levelOfMatch(): LevelId | undefined
         </text>
         <text
           x="396"
-          y="640"
+          y="672"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1058,7 +1064,7 @@
         <!-- Reference box: ITimed, the type of the timer field, detailed in part 1 · view 3 -->
         <rect
           x="552"
-          y="696"
+          y="708"
           width="128"
           height="40"
           rx="6"
@@ -1069,7 +1075,7 @@
         />
         <text
           x="616"
-          y="710"
+          y="722"
           fill="#7d8a94"
           font-size="7"
           font-weight="500"
@@ -1081,7 +1087,7 @@
         </text>
         <text
           x="616"
-          y="726"
+          y="738"
           fill="#17212a"
           font-size="12"
           font-weight="600"
