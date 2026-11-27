@@ -35,7 +35,6 @@
     "Board->GridTopology": "Strategy",
     "GamePresenter->StateMapper": "Strategy",
     "ScoringDecorator->IScoringPolicy": "Decorator",
-    "ComboMultiplierDecorator->LinesScoring": "Decorator",
     "TimedRulesDecorator->IGameRules": "Decorator",
     "UseCaseAspect->UseCase": "Decorator",
     "GameEngine->MoveHistory": "Command",
