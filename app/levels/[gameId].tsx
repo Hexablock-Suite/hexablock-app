@@ -40,6 +40,7 @@ const LOCKED_STONE: WorldTone = { tone: palette.trim, wash: palette.panel };
 // figure. It shows the name of the game and each level of the game on that figure as completed,
 // open or locked, with the stars of a completed level. A press on a level that is not locked
 // opens the game route with the id of the level, and a locked level does not start.
+// A completed level also shows a button that opens the leaderboard of that level (#47).
 // The screen shows a loading text until the first answer, the text of no levels when the figure
 // has none, and the text of a failed read as an alert. The map button goes back to the map
 // of the figure. Every visible text comes from the text catalog (APP-FR-11).
@@ -129,6 +130,12 @@ function LevelSelector({
                     params: { gameId: game.id, figure: figure.param, levelId: level.id },
                   })
                 }
+                onBoard={() =>
+                  router.push({
+                    pathname: '/leaderboard/[gameId]',
+                    params: { gameId: game.id, figure: figure.param, levelId: level.id },
+                  })
+                }
               />
             ))}
           </View>
@@ -140,36 +147,45 @@ function LevelSelector({
 
 // One level: the stone of its status in the shape of the figure, its name, its status and the
 // stars of a completed level. A press starts the level. A locked level is disabled.
+// A completed level also has the button of its leaderboard (#47), beside the level button,
+// so each button keeps its own name.
 function Level({
   level,
   shape,
   position,
   onStart,
+  onBoard,
 }: {
   readonly level: LevelChoice;
   readonly shape: CellShape;
   readonly position: number;
   readonly onStart: () => void;
+  readonly onBoard: () => void;
 }) {
   const tone = level.completed ? COMPLETED_STONE : level.playable ? OPEN_STONE : LOCKED_STONE;
   return (
-    <Pressable
-      accessibilityRole="button"
-      disabled={!level.playable}
-      onPress={onStart}
-      style={[styles.row, position > 0 && styles.nextRow, !level.playable && styles.locked]}
-    >
-      {({ pressed }) => (
-        <>
-          <FigureStone shape={shape} colors={tone} pressed={pressed} />
-          <View style={styles.texts}>
-            <Text style={styles.name}>{level.name}</Text>
-            <Text style={styles.status}>{level.status}</Text>
-          </View>
-          {level.stars === undefined ? null : <Text style={styles.stars}>{level.stars}</Text>}
-        </>
+    <View style={[styles.row, position > 0 && styles.nextRow]}>
+      <Pressable
+        accessibilityRole="button"
+        disabled={!level.playable}
+        onPress={onStart}
+        style={[styles.level, !level.playable && styles.locked]}
+      >
+        {({ pressed }) => (
+          <>
+            <FigureStone shape={shape} colors={tone} pressed={pressed} />
+            <View style={styles.texts}>
+              <Text style={styles.name}>{level.name}</Text>
+              <Text style={styles.status}>{level.status}</Text>
+            </View>
+            {level.stars === undefined ? null : <Text style={styles.stars}>{level.stars}</Text>}
+          </>
+        )}
+      </Pressable>
+      {level.leaderboard === undefined ? null : (
+        <LipButton label={level.leaderboard} look="panel" onPress={onBoard} />
       )}
-    </Pressable>
+    </View>
   );
 }
 
@@ -238,6 +254,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: space.md,
     paddingVertical: space.sm,
+  },
+  level: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexGrow: 1,
+    flexShrink: 1,
+    gap: space.md,
   },
   nextRow: {
     borderTopColor: palette.trim,

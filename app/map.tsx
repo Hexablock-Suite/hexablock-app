@@ -26,7 +26,8 @@ const STONE = 84;
 // the home screen (S3-11 in #151, a proposal that waits for the team). It shows one world for
 // each game of the registry, in the order of the registry, on a path that climbs from the grass.
 // A tap on a world opens the level selector of a game with levels, Fit and Sort (#173),
-// and the game route of a game with none, Lines and Merge (#170). The registry entry of each
+// and the game route of a game with none, Lines and Merge (#170). The button below each world
+// opens the global leaderboard of its game (#47). The registry entry of each
 // game says whether it has levels, so the map does not branch on the game id.
 // The map lists the games of the board figure that its route names, by default the hexagon,
 // and passes the figure on to the game route (#171). A text that names no figure goes home.
@@ -72,6 +73,7 @@ function GameSelector({ figure }: { readonly figure: RouteFigure }) {
               shape={stone}
               figure={figure.param}
               hasLevels={hasLevels(game.id)}
+              leaderboard={view.leaderboard}
               position={position}
             />
           ))}
@@ -89,13 +91,16 @@ function GameSelector({ figure }: { readonly figure: RouteFigure }) {
 // The worlds take turns on the left and on the right side of the path by their place in the
 // list, not by the game. So the path keeps its zig-zag when a figure has no entry for a game.
 // A tap opens the game on the board figure whose text is `figure`: the level selector of a game
-// with levels (#173), or else the game route.
+// with levels (#173), or else the game route. The button `leaderboard` below the world opens the
+// global leaderboard of the game (#47). It is not inside the world button, so each button keeps
+// its own name.
 function World({
   game,
   tone,
   shape,
   figure,
   hasLevels,
+  leaderboard,
   position,
 }: {
   readonly game: GameChoice;
@@ -103,34 +108,42 @@ function World({
   readonly shape: CellShape;
   readonly figure: string;
   readonly hasLevels: boolean;
+  readonly leaderboard: string;
   readonly position: number;
 }) {
   const params = { gameId: game.id, figure };
   return (
-    <Pressable
-      accessibilityRole="button"
-      onPress={() =>
-        router.push(
-          hasLevels
-            ? { pathname: '/levels/[gameId]', params }
-            : { pathname: '/game/[gameId]', params },
-        )
-      }
-      style={[styles.world, position % 2 === 0 ? styles.left : styles.right]}
-    >
-      {({ pressed }) => (
-        <>
-          <FigureStone shape={shape} colors={tone} pressed={pressed} />
-          <WoodSign style={styles.worldSign}>
-            <Text style={styles.name}>{game.name}</Text>
-            <Text style={styles.place}>{game.place}</Text>
-            {game.highScore === undefined ? null : (
-              <Text style={styles.record}>{game.highScore}</Text>
-            )}
-          </WoodSign>
-        </>
-      )}
-    </Pressable>
+    <View testID="world" style={[styles.world, position % 2 === 0 ? styles.left : styles.right]}>
+      <Pressable
+        accessibilityRole="button"
+        onPress={() =>
+          router.push(
+            hasLevels
+              ? { pathname: '/levels/[gameId]', params }
+              : { pathname: '/game/[gameId]', params },
+          )
+        }
+        style={styles.worldButton}
+      >
+        {({ pressed }) => (
+          <>
+            <FigureStone shape={shape} colors={tone} pressed={pressed} />
+            <WoodSign style={styles.worldSign}>
+              <Text style={styles.name}>{game.name}</Text>
+              <Text style={styles.place}>{game.place}</Text>
+              {game.highScore === undefined ? null : (
+                <Text style={styles.record}>{game.highScore}</Text>
+              )}
+            </WoodSign>
+          </>
+        )}
+      </Pressable>
+      <LipButton
+        label={leaderboard}
+        look="panel"
+        onPress={() => router.push({ pathname: '/leaderboard/[gameId]', params })}
+      />
+    </View>
   );
 }
 
@@ -169,6 +182,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: space.xs,
     width: 148,
+  },
+  worldButton: {
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    gap: space.xs,
   },
   left: {
     alignSelf: 'flex-start',
