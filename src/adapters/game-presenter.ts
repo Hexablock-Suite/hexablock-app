@@ -7,6 +7,7 @@ import type { UndoMoveRequest } from '../application/undo-move';
 import type { UseCase } from '../application/use-case';
 import type { LevelId } from '../domain/progress/level-id';
 import { Outcome } from '../domain/engine/outcome';
+import { valueOf, type Delivers } from './delivered';
 import type { MoveMapper } from './move-mapper';
 import type { StateMapper } from './state-mapper';
 import type { TextKey, Texts } from './texts/text-catalog';
@@ -177,7 +178,7 @@ export class GamePresenter<TCell, TCoord, TMove, TView, TCellView, TPayloadView,
   ): GameViewModel<TCoord, TCellView, TPayloadView> {
     return {
       ...this.labels(),
-      score: numberOf(response.score),
+      score: valueOf(response.score),
       outcome: this.outcomeText(response.outcome),
       cells: [
         ...response.cells.map(([at, cell]) => [at, this.mapper.toView(cell)] as const),
@@ -225,23 +226,9 @@ export class GamePresenter<TCell, TCoord, TMove, TView, TCellView, TPayloadView,
   }
 }
 
-// A value object of the engine that delivers one number, such as `Score` and `ElapsedTime`.
-type DeliversNumber = { deliverTo(receiver: { receive(value: number): void }): void };
-
-// The number of a score or of a time. The presenter is an adapter of the edge, so it receives
-// the value through `deliverTo()` (rule R-no-delivery-call).
-function numberOf(source: DeliversNumber): number {
-  let value = 0;
-  source.deliverTo({
-    receive: (delivered) => {
-      value = delivered;
-    },
-  });
-  return value;
-}
-
-// A time in milliseconds as whole minutes and seconds, such as `1:05`.
-function clockText(elapsed: DeliversNumber): string {
-  const seconds = Math.floor(numberOf(elapsed) / 1000);
+// A time in milliseconds as whole minutes and seconds, such as `1:05`. The presenter is an
+// adapter of the edge, so it receives the number with `valueOf()` (rule R-no-delivery-call).
+function clockText(elapsed: Delivers<number>): string {
+  const seconds = Math.floor(valueOf(elapsed) / 1000);
   return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
 }
