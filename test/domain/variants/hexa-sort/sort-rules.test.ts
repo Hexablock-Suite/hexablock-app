@@ -26,6 +26,7 @@ import {
 } from '../../../support/variants/hexa-sort/sort-game';
 import { BOARD_ID } from '../../../support/engine/entity-ids';
 import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
+import { playMove } from '../../../support/engine/play-move';
 
 // The rules of issue #93 and the accepted rules of issue #56: a tie goes to the stack
 // whose coordinate key comes first in key order.
@@ -56,7 +57,7 @@ describe('SortRules placement', () => {
   it('should_put_the_offered_stack_on_the_cell_and_offer_the_next_when_the_cell_is_empty', () => {
     const game = sortGame(sortState({ board: row(3), offered: [stack('red'), stack('blue')] }));
 
-    expect(game.play(place(0))).toBe(Outcome.playing);
+    expect(playMove(game, place(0))).toBe(Outcome.playing);
 
     expect(chipsAt(game, 0)).toEqual(['red']);
     expect(names(game.snapshot().offeredStack())).toEqual(['blue']);
@@ -67,7 +68,7 @@ describe('SortRules placement', () => {
       sortState({ board: row(3, [[square(0, 0), stack('green')]]), offered: [stack('red')] }),
     );
 
-    expect(game.play(place(0))).toBe(Outcome.playing);
+    expect(playMove(game, place(0))).toBe(Outcome.playing);
 
     expect(chipsAt(game, 0)).toEqual(['green']);
     expect(names(game.snapshot().offeredStack())).toEqual(['red']);
@@ -76,7 +77,7 @@ describe('SortRules placement', () => {
   it('should_reject_the_move_when_the_cell_is_outside_the_board', () => {
     const game = sortGame(sortState({ board: row(2), offered: [stack('red')] }));
 
-    expect(game.play(place(5))).toBe(Outcome.playing);
+    expect(playMove(game, place(5))).toBe(Outcome.playing);
 
     expect(game.snapshot().boardCopy().occupiedCells()).toEqual([]);
     expect(names(game.snapshot().offeredStack())).toEqual(['red']);
@@ -93,7 +94,7 @@ describe('SortRules transfer', () => {
       }),
     );
 
-    game.play(place(1));
+    playMove(game, place(1));
 
     expect(chipsAt(game, 0)).toEqual(['red', 'red', 'blue']);
     expect(chipsAt(game, 1)).toEqual(['green', 'red', 'red', 'red']);
@@ -107,7 +108,7 @@ describe('SortRules transfer', () => {
       }),
     );
 
-    game.play(place(1));
+    playMove(game, place(1));
 
     expect(chipsAt(game, 0)).toEqual(['blue', 'red', 'red', 'red']);
     expect(chipsAt(game, 1)).toEqual(['green']);
@@ -126,7 +127,7 @@ describe('SortRules transfer', () => {
       }),
     );
 
-    game.play(place(1));
+    playMove(game, place(1));
 
     expect(chipsAt(game, 0)).toEqual(['red', 'red', 'red']);
     expect(chipsAt(game, 2)).toEqual(['red', 'red']);
@@ -145,7 +146,7 @@ describe('SortRules transfer', () => {
       }),
     );
 
-    game.play(place(2));
+    playMove(game, place(2));
 
     expect(chipsAt(game, 2)).toEqual(['red', 'red', 'red']);
     expect(chipsAt(game, 1)).toEqual([]);
@@ -163,7 +164,7 @@ describe('SortRules goal', () => {
       }),
     );
 
-    expect(game.play(place(1))).toBe(Outcome.playing);
+    expect(playMove(game, place(1))).toBe(Outcome.playing);
 
     const state = game.snapshot();
     expect(chipsAt(game, 0)).toEqual([]);
@@ -181,7 +182,7 @@ describe('SortRules goal', () => {
       }),
     );
 
-    game.play(place(1));
+    playMove(game, place(1));
 
     expect(chipsAt(game, 0)).toEqual(tiles('red', 9));
     expect(game.snapshot().goalsReached()).toEqual(ClearedStacks.of(0));
@@ -196,8 +197,8 @@ describe('SortRules goal', () => {
       }),
     );
 
-    game.play(place(1));
-    game.play(place(2));
+    playMove(game, place(1));
+    playMove(game, place(2));
 
     expect(game.snapshot().goalsReached()).toEqual(ClearedStacks.of(1));
     expect(game.snapshot().clearedStackHeights()).toEqual([]);
@@ -214,7 +215,7 @@ describe('SortRules end of the game', () => {
       }),
     );
 
-    expect(game.play(place(1))).toBe(Outcome.victory);
+    expect(playMove(game, place(1))).toBe(Outcome.victory);
   });
 
   it('should_lose_when_the_board_is_full', () => {
@@ -222,14 +223,14 @@ describe('SortRules end of the game', () => {
       sortState({ board: row(2), offered: [stack('red'), stack('blue'), stack('green')] }),
     );
 
-    expect(game.play(place(0))).toBe(Outcome.playing);
-    expect(game.play(place(1))).toBe(Outcome.gameOver);
+    expect(playMove(game, place(0))).toBe(Outcome.playing);
+    expect(playMove(game, place(1))).toBe(Outcome.gameOver);
   });
 
   it('should_lose_when_the_fixed_list_has_no_stack_left', () => {
     const game = sortGame(sortState({ board: row(3), offered: [stack('red')] }));
 
-    expect(game.play(place(0))).toBe(Outcome.gameOver);
+    expect(playMove(game, place(0))).toBe(Outcome.gameOver);
     expect(game.snapshot().offeredStack()).toBeUndefined();
   });
 });
@@ -251,7 +252,7 @@ describe('SortRules colors', () => {
       }),
     );
 
-    game.play(place(1));
+    playMove(game, place(1));
 
     expect(chipsAt(game, 0)).toEqual(['blue', 'red', 'red', 'red']);
     expect(chipsAt(game, 1)).toEqual([]);
@@ -266,8 +267,8 @@ describe('SortRules piece source (A4)', () => {
       const game = sortGame(
         sortState({ board: row(4), source: new SeededPieceSource(Seed.of(7), draw) }),
       );
-      game.play(place(0));
-      game.play(place(3));
+      playMove(game, place(0));
+      playMove(game, place(3));
       return [chipsAt(game, 0), chipsAt(game, 3)];
     };
 
@@ -307,13 +308,13 @@ describe('SortRules edge cases', () => {
     );
 
     // The green tile joins the nine greens on (1, 0), and the ten greens clear that stack.
-    game.play(place(2));
+    playMove(game, place(2));
     expect(game.snapshot().goalsReached()).toEqual(ClearedStacks.of(1));
     expect(chipsAt(game, 1)).toEqual([]);
 
     // The placed red on (1, 0) ties with the red on (0, 0). The cell (1, 0) comes first
     // in `board.occupiedCells()`, but the key `0,0` comes before the key `1,0`, so (0, 0) wins.
-    game.play(place(1));
+    playMove(game, place(1));
 
     expect(chipsAt(game, 0)).toEqual(['blue', 'red', 'red']);
     expect(chipsAt(game, 1)).toEqual([]);
@@ -331,7 +332,7 @@ describe('SortRules edge cases', () => {
       }),
     );
 
-    const outcome = game.play(place(1));
+    const outcome = playMove(game, place(1));
 
     const state = game.snapshot();
     expect(outcome).toBe(Outcome.playing);
@@ -351,7 +352,7 @@ describe('SortRules edge cases', () => {
       }),
     );
 
-    game.play(place(1, 1));
+    playMove(game, place(1, 1));
 
     expect(chipsAt(game, 1, 1)).toEqual(tiles('red', 6));
     for (const at of ring)
@@ -372,7 +373,7 @@ describe('SortRules edge cases', () => {
       }),
     );
 
-    game.play(place(1, 1));
+    playMove(game, place(1, 1));
 
     expect(chipsAt(game, 1, 0)).toEqual(tiles('red', 5));
     expect(chipsAt(game, 1, 1)).toEqual([]);
@@ -390,7 +391,7 @@ describe('SortRules edge cases', () => {
     });
     const game = sortGame(sortState({ board: row(3), source }));
 
-    expect(() => game.play(place(0))).toThrow('The source failed.');
+    expect(() => playMove(game, place(0))).toThrow('The source failed.');
 
     const state = game.snapshot();
     expect(game.currentPhase()).toBe(PlayingPhase.instance);
@@ -425,7 +426,28 @@ describe('SortRules atomic turn', () => {
     });
     const before = facts(engine.snapshot());
 
-    expect(() => engine.play(place(0, 0))).toThrow('The scoring fails.');
+    expect(() => playMove(engine, place(0, 0))).toThrow('The scoring fails.');
     expect(facts(engine.snapshot())).toEqual(before);
+  });
+});
+
+// Issue #413: only the template method calls the steps (classes.md decision 21).
+// A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails
+// when the line compiles, because then the directive is unused.
+describe('SortRules steps', () => {
+  it('should_reject_at_compile_time_when_a_caller_asks_a_step_of_the_sort_rules', () => {
+    const rules = new SortRules<SquareCoord>();
+    const askSteps = () => [
+      // @ts-expect-error The step is protected (issue #413).
+      rules.isValid(undefined as never, undefined as never),
+      // @ts-expect-error The step is protected (issue #413).
+      rules.apply(undefined as never, undefined as never),
+      // @ts-expect-error The step is protected (issue #413).
+      rules.resolve(undefined as never),
+      // @ts-expect-error The step is protected (issue #413).
+      rules.evaluate(undefined as never),
+    ];
+
+    expect(askSteps).toBeInstanceOf(Function);
   });
 });

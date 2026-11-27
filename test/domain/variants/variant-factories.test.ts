@@ -61,6 +61,7 @@ import { MATCH_ID } from '../../support/engine/match-id';
 import { seededRandom } from '../../support/engine/step-random';
 import { delivered } from '../../support/engine/value-receiver';
 import { fitViewData } from '../../support/variants/view-data';
+import { playMove } from '../../support/engine/play-move';
 
 // The engine runs the four variants through one code path (issue 99, APP-FR-03).
 // `playOnce()` reads only `IVariantFactory`: it has no branch on the game id.
@@ -73,7 +74,7 @@ function playOnce<
   TPiece,
 >(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>) {
   const { engine, rules } = startVariant(factory);
-  const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, engine.snapshot())));
+  const outcome = playMove(engine, firstValidMove(rules, liveStateOf(factory, engine.snapshot())));
   return {
     gameId: variantIdOf(gameIdOf(factory)),
     outcome,
@@ -121,7 +122,7 @@ function undosAfter<
 >(factory: IVariantFactory<TCell, TCoord, TMove, TState, TPiece>, moves: number): number {
   const { engine, rules } = startVariant(factory);
   for (let played = 0; played < moves; played += 1) {
-    engine.play(firstValidMove(rules, liveStateOf(factory, engine.snapshot())));
+    playMove(engine, firstValidMove(rules, liveStateOf(factory, engine.snapshot())));
   }
   let undone = 0;
   while (engine.canUndo()) {
@@ -140,7 +141,7 @@ function startMerge<TCoord>(geometry: GeometryFactory<TCoord>) {
   const { engine, rules } = startVariant(factory);
   const board = engine.snapshot().boardCopy();
   const tiles = board.occupiedCells().length;
-  const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, engine.snapshot())));
+  const outcome = playMove(engine, firstValidMove(rules, liveStateOf(factory, engine.snapshot())));
   return { cells: board.coordinates().length, axes: board.axes(), tiles, outcome };
 }
 
@@ -175,7 +176,7 @@ function figureTests<TCoord>(
       const { engine, rules } = startVariant(factory);
       const start = engine.snapshot();
 
-      const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, start)));
+      const outcome = playMove(engine, firstValidMove(rules, liveStateOf(factory, start)));
 
       expect(region).toHaveLength(cellCount);
       expect(keys(start.boardCopy().coordinates())).toEqual(region);
@@ -196,7 +197,7 @@ function figureTests<TCoord>(
       const { engine, rules } = startVariant(factory);
       const start = engine.snapshot();
 
-      const outcome = engine.play(firstValidMove(rules, liveStateOf(factory, start)));
+      const outcome = playMove(engine, firstValidMove(rules, liveStateOf(factory, start)));
 
       expect(keys(start.boardCopy().coordinates())).toEqual(region);
       expect(start.boardCopy().occupiedCells()).toEqual([]);
@@ -211,7 +212,7 @@ function figureTests<TCoord>(
       );
       const start = engine.snapshot();
 
-      const outcome = engine.play(new PlaceFitPiece(A, Turns.of(0), origin));
+      const outcome = playMove(engine, new PlaceFitPiece(A, Turns.of(0), origin));
 
       expect(keys(start.boardCopy().coordinates())).toEqual(keys([origin, next]));
       expect(

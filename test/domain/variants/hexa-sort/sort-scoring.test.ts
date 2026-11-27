@@ -13,10 +13,11 @@ import {
 } from '../../../support/variants/hexa-sort/sort-game';
 import { SortScoring } from '../../../../src/domain/variants/hexa-sort/sort-scoring';
 import type { SquareCoord } from '../../../support/engine/square-topology';
+import { playMove } from '../../../support/engine/play-move';
 
 // The Sort scoring of issue #98. It codes the accepted rule of issue #59 (D22):
 // 10 points per tile of a cleared stack. The Sort stars have their own suite.
-// Every test drives the game through `GameEngine.play()`, so the engine adds the points.
+// Every test drives the game through `GameEngine.tryPlay()`, so the engine adds the points.
 
 describe('SortScoring', () => {
   it('should_score_ten_points_per_tile_of_the_cleared_stack_when_the_turn_clears_a_stack', () => {
@@ -30,7 +31,7 @@ describe('SortScoring', () => {
       new SortScoring<SquareCoord>(),
     );
 
-    expect(game.play(place(1))).toBe(Outcome.playing);
+    expect(playMove(game, place(1))).toBe(Outcome.playing);
 
     expect(game.snapshot().goalsReached()).toEqual(ClearedStacks.of(1));
     expect(game.snapshot().scoreSoFar()).toEqual(Score.of(110));
@@ -44,9 +45,9 @@ describe('SortScoring', () => {
       }),
       new SortScoring<SquareCoord>(),
     );
-    game.play(place(1));
+    playMove(game, place(1));
 
-    expect(game.play(place(2))).toBe(Outcome.playing);
+    expect(playMove(game, place(2))).toBe(Outcome.playing);
 
     expect(game.snapshot().goalsReached()).toEqual(ClearedStacks.of(1));
     expect(game.snapshot().scoreSoFar()).toEqual(Score.of(110));

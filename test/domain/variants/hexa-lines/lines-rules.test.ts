@@ -25,7 +25,6 @@ import {
   squareTopology,
   SquareAxis,
   type SquareCoord,
-  type SquareDirection,
 } from '../../../support/engine/square-topology';
 import {
   triangle,
@@ -41,15 +40,16 @@ import {
 } from '../../../support/variants/hexa-lines/lines-game';
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
-import { boardLike, firstValidMove } from '../../../support/engine/variant-game';
+import { accepts, boardLike, firstValidMove } from '../../../support/engine/variant-game';
 import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
 import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
 import { delivered } from '../../../support/engine/value-receiver';
+import { playMove } from '../../../support/engine/play-move';
 
 // The rules suite of Hexa Lines (issue 91, APP-NFR-02, APP-NFR-12).
 // The combo and the streak follow the proposal on issue 58,
 // «Propuesta, pendiente del equipo (cola nocturna, 2026-11-06)».
-// The tests play through `GameEngine.play()`, so the engine calls only the rules contract.
+// The tests play through `GameEngine.tryPlay()`, so the engine calls only the rules contract.
 
 const origin = square(0, 0);
 const one = piece(origin);
@@ -72,7 +72,7 @@ describe('Hexa Lines rules', () => {
     const domino = piece(origin, square(1, 0));
     const { engine } = linesGame(linesState(squareTopology, 4, { tray: [domino, one] }));
 
-    const outcome = engine.play(new PlacePiece(TrayPosition.of(0), square(1, 2)));
+    const outcome = playMove(engine, new PlacePiece(TrayPosition.of(0), square(1, 2)));
 
     const state = engine.snapshot();
     expect(outcome).toBe(Outcome.playing);
@@ -90,7 +90,7 @@ describe('Hexa Lines rules', () => {
       linesState(squareTopology, 4, { tray: [one], source: [a!, b!, c!, d!] }),
     );
 
-    engine.play(new PlacePiece(TrayPosition.of(0), square(3, 3)));
+    playMove(engine, new PlacePiece(TrayPosition.of(0), square(3, 3)));
 
     const state = engine.snapshot();
     expect(state.trayPieces()).toEqual([a, b, c]);
@@ -112,7 +112,7 @@ describe('Hexa Lines rules', () => {
         linesState(squareTopology, 3, { filled: [square(1, 1)], tray: [domino, one] }),
       );
 
-      const outcome = engine.play(move);
+      const outcome = playMove(engine, move);
 
       const state = engine.snapshot();
       expect(outcome).toBe(Outcome.playing);
@@ -134,7 +134,7 @@ describe('Hexa Lines rules', () => {
         linesState(squareTopology, 3, { filled: line.slice(0, -1), tray: [one, one] }),
       );
 
-      engine.play(new PlacePiece(TrayPosition.of(0), last));
+      playMove(engine, new PlacePiece(TrayPosition.of(0), last));
 
       const state = engine.snapshot();
       expect(line).toHaveLength(3);
@@ -154,8 +154,7 @@ describe('Hexa Lines rules', () => {
     const rules = new LinesRules<TriangleCoord>();
     const valid = new PlacePiece(TrayPosition.of(0), triangle(0, 1));
 
-    expect(rules.isValid(state, valid)).toBe(true);
-    expect(rules.evaluate(state)).toBe(Outcome.playing);
+    expect(accepts(rules, state, valid)).toBe(true);
     const moves = [...rules.validMoves(state)];
     expect(moves).toHaveLength(1);
     expect(moves[0]?.equals(valid, triangleTopology)).toBe(true);
@@ -178,7 +177,7 @@ describe('Hexa Lines rules', () => {
         }),
       );
 
-      engine.play(new PlacePiece(TrayPosition.of(0), triangle(0, 0)));
+      playMove(engine, new PlacePiece(TrayPosition.of(0), triangle(0, 0)));
 
       const state = engine.snapshot();
       expect(line.length).toBeGreaterThanOrEqual(3);
@@ -195,7 +194,7 @@ describe('Hexa Lines rules', () => {
       }),
     );
 
-    const outcome = engine.play(new PlacePiece(TrayPosition.of(0), origin));
+    const outcome = playMove(engine, new PlacePiece(TrayPosition.of(0), origin));
 
     const state = engine.snapshot();
     expect(outcome).toBe(Outcome.playing);
@@ -212,11 +211,11 @@ describe('Hexa Lines rules', () => {
       }),
     );
 
-    engine.play(new PlacePiece(TrayPosition.of(0), square(0, 0)));
+    playMove(engine, new PlacePiece(TrayPosition.of(0), square(0, 0)));
     const first = engine.snapshot();
-    engine.play(new PlacePiece(TrayPosition.of(0), square(0, 1)));
+    playMove(engine, new PlacePiece(TrayPosition.of(0), square(0, 1)));
     const second = engine.snapshot();
-    engine.play(new PlacePiece(TrayPosition.of(0), square(2, 2)));
+    playMove(engine, new PlacePiece(TrayPosition.of(0), square(2, 2)));
     const third = engine.snapshot();
 
     expect([first.currentStreak(), first.lastCombo()]).toEqual([Streak.of(1), LineCount.of(1)]);
@@ -232,7 +231,7 @@ describe('Hexa Lines rules', () => {
       }),
     );
 
-    engine.play(new PlacePiece(TrayPosition.of(0), square(2, 1)));
+    playMove(engine, new PlacePiece(TrayPosition.of(0), square(2, 1)));
 
     // With gravity, (0, 0) would fall into the cleared row.
     expect(filledKeys(engine.snapshot())).toEqual(keys([square(0, 0), square(1, 2)]));
@@ -240,7 +239,7 @@ describe('Hexa Lines rules', () => {
 
   it('should_read_the_board_only_up_to_the_first_valid_move_when_a_caller_asks_for_one_move', () => {
     const reads = { count: 0 };
-    const counting: GridTopology<SquareCoord, SquareAxis, SquareDirection> = {
+    const counting: GridTopology<SquareCoord, SquareAxis> = {
       ...squareTopology,
       key: (c) => {
         reads.count += 1;
@@ -265,9 +264,9 @@ describe('Hexa Lines rules', () => {
 
     expect(Array.isArray(moves)).toBe(false);
     expect(first.done).toBe(false);
-    expect(rules.isValid(state, first.value as PlacePiece<SquareCoord>)).toBe(true);
+    expect(accepts(rules, state, first.value as PlacePiece<SquareCoord>)).toBe(true);
     expect(all).toHaveLength(25 + 20);
-    expect(all.every((move) => rules.isValid(state, move))).toBe(true);
+    expect(all.every((move) => accepts(rules, state, move))).toBe(true);
     expect(firstReads).toBeLessThan(allReads / 10);
   });
 
@@ -275,7 +274,7 @@ describe('Hexa Lines rules', () => {
     const long = piece(origin, square(1, 0), square(2, 0), square(3, 0));
     const { engine } = linesGame(linesState(squareTopology, 3, { tray: [one, long] }));
 
-    const outcome = engine.play(new PlacePiece(TrayPosition.of(0), square(1, 1)));
+    const outcome = playMove(engine, new PlacePiece(TrayPosition.of(0), square(1, 1)));
 
     expect(outcome).toBe(Outcome.gameOver);
     expect(engine.currentPhase()).toBe(GameOverPhase.instance);
@@ -285,7 +284,7 @@ describe('Hexa Lines rules', () => {
   it('should_keep_playing_when_a_tray_piece_still_fits_after_the_placement', () => {
     const { engine } = linesGame(linesState(squareTopology, 3, { tray: [one, one] }));
 
-    const outcome = engine.play(new PlacePiece(TrayPosition.of(0), square(1, 1)));
+    const outcome = playMove(engine, new PlacePiece(TrayPosition.of(0), square(1, 1)));
 
     expect(outcome).toBe(Outcome.playing);
     expect(engine.takeEvents()).toEqual([]);
@@ -297,7 +296,7 @@ describe('Hexa Lines rules', () => {
     );
     const before = engine.snapshot();
 
-    engine.play(new PlacePiece(TrayPosition.of(0), square(1, 1)));
+    playMove(engine, new PlacePiece(TrayPosition.of(0), square(1, 1)));
 
     expect(filledKeys(before)).toEqual([]);
     expect(before.trayPieces()).toEqual([one]);
@@ -326,11 +325,11 @@ describe('Hexa Lines rules edge cases', () => {
     const initial = linesState(squareTopology, 3, { filled: [square(1, 1)], tray: [domino, one] });
     const { engine } = linesGame(initial);
 
-    const outcome = engine.play(move);
+    const outcome = playMove(engine, move);
 
     const state = engine.snapshot();
     return {
-      valid: new LinesRules<SquareCoord>().isValid(initial, move),
+      valid: accepts(new LinesRules<SquareCoord>(), initial, move),
       outcome,
       phase: phaseNameOf(engine.currentPhase()),
       filled: filledKeys(state),
@@ -375,7 +374,7 @@ describe('Hexa Lines rules edge cases', () => {
     // The engine reads a negative zero as 0 (classes.md, issue #86: `of()` stores -0 as 0).
     const { engine } = linesGame(linesState(squareTopology, 4, { tray: [domino, one] }));
 
-    const outcome = engine.play(new PlacePiece(TrayPosition.of(-0), square(1, 2)));
+    const outcome = playMove(engine, new PlacePiece(TrayPosition.of(-0), square(1, 2)));
 
     const state = engine.snapshot();
     expect(outcome).toBe(Outcome.playing);
@@ -393,7 +392,7 @@ describe('Hexa Lines rules edge cases', () => {
     // The game ends when no tray piece fits (REQUIREMENTS.md §1), and an empty tray has none.
     const { engine } = linesGame(linesState(squareTopology, 3, { tray: [one] }));
 
-    const outcome = engine.play(new PlacePiece(TrayPosition.of(0), square(1, 1)));
+    const outcome = playMove(engine, new PlacePiece(TrayPosition.of(0), square(1, 1)));
 
     const state = engine.snapshot();
     expect(outcome).toBe(Outcome.gameOver);
@@ -409,7 +408,7 @@ describe('Hexa Lines rules edge cases', () => {
     const failingSource = new SeededPieceSource<typeof one>(Seed.of(1), () => {
       throw new Error('The source failed.');
     });
-    const failingTopology: GridTopology<SquareCoord, SquareAxis, SquareDirection> = {
+    const failingTopology: GridTopology<SquareCoord, SquareAxis> = {
       ...squareTopology,
       translate: (c, offset) => {
         if (offset.equals(square(2, 2))) throw new Error('The topology failed.');
@@ -439,7 +438,9 @@ describe('Hexa Lines rules edge cases', () => {
       const { engine } = game;
       const tray = engine.snapshot().trayPieces();
 
-      expect(() => engine.play(new PlacePiece(TrayPosition.of(0), square(2, 2)))).toThrow(error);
+      expect(() => playMove(engine, new PlacePiece(TrayPosition.of(0), square(2, 2)))).toThrow(
+        error,
+      );
 
       const state = engine.snapshot();
       expect(engine.currentPhase()).toBe(PlayingPhase.instance);
@@ -453,7 +454,7 @@ describe('Hexa Lines rules edge cases', () => {
   it('should_count_one_line_and_score_one_line_when_the_topology_walks_the_line_from_its_other_end', () => {
     // Gap G107.6 (issue #134). `GridTopology.line()` promises the cells in order, not the start end.
     // This square double walks a line from its far end when the cell has an odd index on the axis.
-    const reversing: GridTopology<SquareCoord, SquareAxis, SquareDirection> = {
+    const reversing: GridTopology<SquareCoord, SquareAxis> = {
       ...squareTopology,
       *line(axis, through, contains) {
         const cells = [...squareTopology.line(axis, through, contains)];
@@ -468,7 +469,7 @@ describe('Hexa Lines rules edge cases', () => {
       new ComboMultiplierDecorator(new LinesScoring<SquareCoord>()),
     );
 
-    engine.play(new PlacePiece(TrayPosition.of(0), origin));
+    playMove(engine, new PlacePiece(TrayPosition.of(0), origin));
 
     const state = engine.snapshot();
     expect(keys([...probe.snapshot().boardCopy().line(SquareAxis.col, square(1, 0))])).toEqual(
@@ -495,7 +496,7 @@ describe('Hexa Lines rules edge cases', () => {
       new ComboMultiplierDecorator(new LinesScoring<SquareCoord>()),
     );
 
-    engine.play(new PlacePiece(TrayPosition.of(0), origin));
+    playMove(engine, new PlacePiece(TrayPosition.of(0), origin));
 
     const state = engine.snapshot();
     for (const axis of squareTopology.axes()) {
@@ -529,9 +530,30 @@ describe('LinesRules atomic turn', () => {
     });
     const before = facts(engine.snapshot());
 
-    expect(() => engine.play(firstValidMove(new LinesRules<SquareCoord>(), start))).toThrow(
+    expect(() => playMove(engine, firstValidMove(new LinesRules<SquareCoord>(), start))).toThrow(
       'The scoring fails.',
     );
     expect(facts(engine.snapshot())).toEqual(before);
+  });
+});
+
+// Issue #413: only the template method calls the steps (classes.md decision 21).
+// A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails
+// when the line compiles, because then the directive is unused.
+describe('LinesRules steps', () => {
+  it('should_reject_at_compile_time_when_a_caller_asks_a_step_of_the_lines_rules', () => {
+    const rules = new LinesRules<SquareCoord>();
+    const askSteps = () => [
+      // @ts-expect-error The step is protected (issue #413).
+      rules.isValid(undefined as never, undefined as never),
+      // @ts-expect-error The step is protected (issue #413).
+      rules.apply(undefined as never, undefined as never),
+      // @ts-expect-error The step is protected (issue #413).
+      rules.resolve(undefined as never),
+      // @ts-expect-error The step is protected (issue #413).
+      rules.evaluate(undefined as never),
+    ];
+
+    expect(askSteps).toBeInstanceOf(Function);
   });
 });

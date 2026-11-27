@@ -16,7 +16,7 @@ import { TrayPosition } from './tray-position';
 // The rules read no field of a move: they pass the move to the state (classes.md decision 43).
 // The `TrayPosition` of a `PlacePiece` checks its own index, so the rules do not check it again.
 export class LinesRules<TCoord> extends BaseGameRules<PlacePiece<TCoord>, LinesState<TCoord>> {
-  isValid(state: LinesState<TCoord>, move: PlacePiece<TCoord>): boolean {
+  protected isValid(state: LinesState<TCoord>, move: PlacePiece<TCoord>): boolean {
     return state.canPlace(move);
   }
 
@@ -39,7 +39,7 @@ export class LinesRules<TCoord> extends BaseGameRules<PlacePiece<TCoord>, LinesS
 
   // Puts the piece on the board and takes it from the tray.
   // When the tray is empty, the next pieces of the source fill it.
-  apply(state: LinesState<TCoord>, move: PlacePiece<TCoord>): LinesState<TCoord> {
+  protected apply(state: LinesState<TCoord>, move: PlacePiece<TCoord>): LinesState<TCoord> {
     state.placePiece(move);
     return state;
   }
@@ -49,13 +49,13 @@ export class LinesRules<TCoord> extends BaseGameRules<PlacePiece<TCoord>, LinesS
   // The rules find every full line first and then clear their union, so a shared cell clears once.
   // The streak counts the placements in a row that clear at least one line.
   // The first placement that clears no line sets it back to 0.
-  resolve(state: LinesState<TCoord>): Resolution {
+  protected resolve(state: LinesState<TCoord>): Resolution {
     state.clearLines(fullLines(state.snapshot().boardCopy()));
     return Resolution.resolved();
   }
 
   // The game ends when no tray piece fits (statement §1.1).
-  evaluate(state: LinesState<TCoord>): Outcome {
+  protected evaluate(state: LinesState<TCoord>): Outcome {
     return this.noValidMove(state) ? Outcome.gameOver : Outcome.playing;
   }
 }

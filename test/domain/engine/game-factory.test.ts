@@ -26,6 +26,7 @@ import { dataOf } from '../../support/engine/game-over';
 import { ManualClock } from '../../support/engine/manual-clock';
 import { phaseNameOf } from '../../support/engine/phase-name';
 import { square } from '../../support/engine/square-topology';
+import { playMove } from '../../support/engine/play-move';
 
 // `GameFactory` assembles the whole aggregate of one match (classes.md decision 40):
 // the id of the match and the family of the variant. The game takes no publisher (#233).
@@ -56,7 +57,7 @@ describe('GameFactory', () => {
     expect(game.snapshot().boardCopy().occupiedCells()).toEqual([]);
     expect(game.offersUndo()).toBe(false);
     expect(game.elapsedTime()).toBeUndefined();
-    expect(game.play(moveAt(0))).toBe(Outcome.playing);
+    expect(playMove(game, moveAt(0))).toBe(Outcome.playing);
     expect(game.snapshot().scoreSoFar()).toEqual(Score.of(1));
   });
 
@@ -65,7 +66,7 @@ describe('GameFactory', () => {
 
     const first = games.createGame();
     const second = games.createGame();
-    first.play(moveAt(0));
+    playMove(first, moveAt(0));
 
     expect([first.equals(second), second.equals(first)]).toEqual([false, false]);
     expect(second.snapshot().boardCopy().occupiedCells()).toEqual([]);
@@ -97,7 +98,7 @@ describe('GameFactory', () => {
       new OnePointScoring(),
     );
 
-    game.play(moveAt(0));
+    playMove(game, moveAt(0));
 
     expect(ids.calls).toBe(1);
     expect(game.equals(sameMatch)).toBe(true);
@@ -130,7 +131,7 @@ describe('GameFactory', () => {
     const first = games.createGame();
     const second = games.createGame();
 
-    first.play(moveAt(0));
+    playMove(first, moveAt(0));
 
     expect([first.canUndo(), second.canUndo()]).toEqual([true, false]);
     first.undo();
@@ -215,7 +216,7 @@ describe('GameFactory', () => {
     // The time before the first turn does not count.
     clock.advance(5_000);
 
-    first.play(moveAt(0));
+    playMove(first, moveAt(0));
     clock.advance(1_000);
 
     expect(first.elapsedTime()).toEqual(ElapsedTime.ofMs(1_000));

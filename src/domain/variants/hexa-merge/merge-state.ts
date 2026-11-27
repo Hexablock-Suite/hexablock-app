@@ -100,7 +100,7 @@ export class MergeSnapshot<
 // A refused input throws a RangeError and leaves the whole state as it was.
 // `tiles` is the source of the new tiles. It lives in the state (classes.md decision 31),
 // and it is a value (classes.md decision 51): a draw replaces it with the next source.
-// So `clone()` shares it, and the rollback of `GameEngine.play()` covers each draw.
+// So `clone()` shares it, and the rollback of `GameEngine.tryPlay()` covers each draw.
 // `targetReached` turns true when a merge makes the target tile, and it stays true:
 // the target is an event, not the end of the game (A3).
 // `merged` holds the tiles that the last move made, one per merge. The gain of the move

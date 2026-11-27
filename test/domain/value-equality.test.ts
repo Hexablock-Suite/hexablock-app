@@ -10,7 +10,6 @@ import { Moves } from '../../src/domain/shared/moves';
 import { Piece } from '../../src/domain/engine/piece';
 import { GameResult, ProgressRecord } from '../../src/domain/progress/progress-model';
 import { Radius } from '../../src/domain/engine/radius';
-import { Range } from '../../src/domain/engine/range';
 import { RegionSize } from '../../src/domain/engine/region-size';
 import { CellNode, ShapeGroup } from '../../src/domain/engine/shape-node';
 import { Score } from '../../src/domain/shared/score';
@@ -23,7 +22,6 @@ import { Chance } from '../../src/domain/variants/hexa-merge/chance';
 import { MergeTile } from '../../src/domain/variants/hexa-merge/merge-tile';
 import { ColorStack } from '../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../src/domain/variants/hexa-sort/goal-count';
-import { Rank } from '../support/engine/rank';
 import { square, squareTopology, type SquareCoord } from '../support/engine/square-topology';
 
 type Same<T> = (left: T, right: T) => boolean;
@@ -161,19 +159,6 @@ describe('equals of the progress values', () => {
   });
 });
 
-describe('equals of Range', () => {
-  // Issue #239: the bounds are value objects that know their order.
-  it('should_be_equal_when_the_bounds_of_two_ranges_share_their_places_in_the_order', () => {
-    const same: Same<Range<Rank>> = (left, right) => left.equals(right);
-    const range = (min: number, max: number) => Range.of(Rank.of(min), Rank.of(max));
-
-    expect(bothWays(same, range(1, 5), range(1, 5))).toEqual(EQUAL);
-    expect(bothWays(same, range(1, 5), range(2, 5))).toEqual(DIFFERENT);
-    expect(bothWays(same, range(1, 5), range(1, 6))).toEqual(DIFFERENT);
-    expect(bothWays(same, range(1, 5), range(0, 6))).toEqual(DIFFERENT);
-  });
-});
-
 describe('equals of the values that hold a coordinate', () => {
   const A = square(0, 0);
   const B = square(1, 0);
@@ -240,17 +225,12 @@ describe('equals of ColorStack', () => {
 // when the line compiles, because then the directive is unused.
 describe('private fields of the value objects', () => {
   it('should_reject_at_compile_time_when_a_caller_reads_a_field_that_no_production_code_reads', () => {
-    const range = Range.of(Rank.of(1), Rank.of(2));
     const placement = Placement.of(Turns.of(1), square(0, 0), squareTopology);
     const readers = [
       // @ts-expect-error `Color.name` is private.
       () => Color.of('red').name,
       // @ts-expect-error `GameId.value` is private.
       () => FIT.value,
-      // @ts-expect-error `Range.min` is private.
-      () => range.min,
-      // @ts-expect-error `Range.max` is private.
-      () => range.max,
       // @ts-expect-error `Placement.rotation` is private.
       () => placement.rotation,
       // @ts-expect-error `Placement.at` is private.
@@ -259,7 +239,7 @@ describe('private fields of the value objects', () => {
       () => ColorStack.empty().chips,
     ];
 
-    expect(readers).toHaveLength(7);
+    expect(readers).toHaveLength(5);
   });
 
   // Unit R17 of the redesign: six more fields that no production code reads.

@@ -26,9 +26,10 @@ import {
 } from '../../../support/variants/hexa-merge/merge-game';
 import { dataOf, gameOversIn } from '../../../support/engine/game-over';
 import { MATCH_ID } from '../../../support/engine/match-id';
+import { playMove } from '../../../support/engine/play-move';
 
 // The new tiles of Hexa Merge (statement §1.4, APP-NFR-07, issue #95).
-// The tests play through `GameEngine.play()` and the rules contract, on the real hex geometry.
+// The tests play through `GameEngine.tryPlay()` and the rules contract, on the real hex geometry.
 // They code against the proposal on issue #57, «Propuesta, pendiente del equipo»:
 // a new tile is 2 with 0.9 and 4 with 0.1, on an empty cell, from one seeded source,
 // and a cloned state gives the same new tile again.
@@ -41,7 +42,7 @@ function playFirstSlides(game: Game, turns: number): Record<string, number>[] {
   for (let i = 0; i < turns; i += 1) {
     const [slide] = game.rules.validMoves(mergeStateOf(game.engine.snapshot()));
     if (slide === undefined) break;
-    game.engine.play(slide);
+    playMove(game.engine, slide);
     boards.push(values(game.engine.snapshot()));
   }
   return boards;
@@ -53,6 +54,17 @@ function added(
   after: Record<string, number>,
 ): Record<string, number> {
   return Object.fromEntries(Object.entries(after).filter(([key]) => !(key in before)));
+}
+
+// The target of `mergeGame()`.
+const TARGET = MergeTile.of(2048);
+
+// The board after the slide alone, before the new tile appears. The state slides a copy
+// with its own business method, because the steps of the rules are protected (issue #413).
+function slidOnly(state: HexMergeState, slide: Slide<HexAxis>): Record<string, number> {
+  const copy = state.clone();
+  copy.slide(slide, TARGET);
+  return values(copy.snapshot());
 }
 
 function seeded(seed: number, fourChance?: Chance): HexMergeState {
@@ -78,9 +90,9 @@ describe('Merge new tiles', () => {
       const before = mergeStateOf(game.engine.snapshot());
       const [slide] = game.rules.validMoves(before);
       if (slide === undefined) break;
-      const slid = values(game.rules.apply(before.clone(), slide).snapshot());
+      const slid = slidOnly(before, slide);
 
-      game.engine.play(slide);
+      playMove(game.engine, slide);
       const after = values(game.engine.snapshot());
 
       const fresh = added(slid, after);
@@ -89,7 +101,8 @@ describe('Merge new tiles', () => {
       expect({ ...after, ...slid }).toEqual(after);
     }
 
-    // A full board has no empty cell, so `resolve()` adds no tile and draws nothing.
+    // A full board has no empty cell, so `MergeState.addNewTile()`, the step that `resolve()`
+    // runs, adds no tile and draws nothing.
     const full = mergeState(
       [
         [hex(0, 0), 2],
@@ -105,7 +118,7 @@ describe('Merge new tiles', () => {
     );
     const next = mergeTileSource(Seed.of(5)).take()[0];
     const resolved = full.clone();
-    game.rules.resolve(resolved);
+    resolved.addNewTile();
     expect(values(resolved.snapshot())).toEqual(values(full.snapshot()));
     expect(resolved.snapshot().tileSource().take()[0]).toEqual(next);
   });
@@ -118,10 +131,8 @@ describe('Merge new tiles', () => {
       for (let i = 0; i < 10; i += 1) {
         const [slide] = game.rules.validMoves(mergeStateOf(game.engine.snapshot()));
         if (slide === undefined) break;
-        const slid = values(
-          game.rules.apply(mergeStateOf(game.engine.snapshot()), slide).snapshot(),
-        );
-        game.engine.play(slide);
+        const slid = slidOnly(mergeStateOf(game.engine.snapshot()), slide);
+        playMove(game.engine, slide);
         const after = values(game.engine.snapshot());
         out.push(...Object.values(added(slid, after)));
         before = after;
@@ -161,11 +172,11 @@ describe('Merge new tiles', () => {
     const saved = mergeStateOf(game.engine.snapshot());
     const slide = [...game.rules.validMoves(saved)][0] as Slide<HexAxis>;
 
-    game.engine.play(slide);
+    playMove(game.engine, slide);
     const played = values(game.engine.snapshot());
     // Undo restores the state with its source, so the same slide gives the same new tile.
     game.engine.start(saved);
-    game.engine.play(slide);
+    playMove(game.engine, slide);
     const replayed = values(game.engine.snapshot());
 
     // The rules change the state that they get in place, and a `Resolution` holds no state.
@@ -174,7 +185,7 @@ describe('Merge new tiles', () => {
     const viaClone = values(copy.snapshot());
     game.rules.playTurn(saved, slide);
     const viaOriginal = values(saved.snapshot());
-    const slid = values(game.rules.apply(saved.clone(), slide).snapshot());
+    const slid = slidOnly(saved, slide);
 
     expect(Object.keys(added(slid, played))).toHaveLength(1);
     expect(replayed).toEqual(played);
@@ -201,7 +212,7 @@ describe('Merge new tiles', () => {
       ),
     );
 
-    const outcome = engine.play(Slide.of(HexAxis.q, SlideSense.forward));
+    const outcome = playMove(engine, Slide.of(HexAxis.q, SlideSense.forward));
 
     expect(outcome).toBe(Outcome.gameOver);
     expect(values(engine.snapshot())).toEqual({
@@ -285,7 +296,7 @@ describe('Merge new tiles edge cases', () => {
   });
 
   it('should_throw_and_draw_the_same_new_tile_on_a_retry_when_the_source_throws_once', () => {
-    // The source lives in the state, and the rollback of `GameEngine.play()` covers each draw
+    // The source lives in the state, and the rollback of `GameEngine.tryPlay()` covers each draw
     // (classes.md decisions 21 and 31). The failing draw reads the generator before it throws.
     // With seed 12 the first two numbers pick different empty cells,
     // so a draw that the rollback misses moves the new tile.
@@ -302,14 +313,14 @@ describe('Merge new tiles edge cases', () => {
     }
     const slide = Slide.of(HexAxis.q, SlideSense.forward);
     const reference = mergeGame(mergeState([[hex(0, 0), 2]], 3, source(false)));
-    reference.engine.play(slide);
+    playMove(reference.engine, slide);
     const { engine } = mergeGame(mergeState([[hex(0, 0), 2]], 3, source(true)));
 
-    expect(() => engine.play(slide)).toThrow('The source failed.');
+    expect(() => playMove(engine, slide)).toThrow('The source failed.');
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(values(engine.snapshot())).toEqual({ '0,0': 2 });
 
-    expect(engine.play(slide)).toBe(Outcome.playing);
+    expect(playMove(engine, slide)).toBe(Outcome.playing);
     expect(Object.keys(values(engine.snapshot()))).toHaveLength(2);
     expect(values(engine.snapshot())).toEqual(values(reference.engine.snapshot()));
     expect(engine.takeEvents()).toEqual([]);

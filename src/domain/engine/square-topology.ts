@@ -1,7 +1,7 @@
 import { BoardShape } from './board-shape';
 import { CoordKey } from './coord-key';
 import { Distance } from './distance';
-import type { GridAxis, GridDirection, GridTopology } from './grid-topology';
+import type { GridAxis, GridTopology } from './grid-topology';
 import type { Radius } from './radius';
 import type { RegionSize } from './region-size';
 import { Turns } from './turns';
@@ -120,15 +120,17 @@ export class SquareAxis implements GridAxis {
 
 // A direction of the square grid: the way from a cell to one of its four neighbors.
 // A square has no diagonal neighbor.
-// It is a value object with a closed set of instances, as `SquareAxis` is.
+// It is private to this file: only `neighbors()` and a ring read it
+// (classes.md decision 16, issue #416).
+// A slide follows an axis and a sense, not a direction.
 // A direction holds its step, and `neighborOf()` gives the neighbor of a cell.
-export class SquareDirection implements GridDirection {
-  static readonly north = new SquareDirection('north', square(0, -1));
-  static readonly east = new SquareDirection('east', square(1, 0));
-  static readonly south = new SquareDirection('south', square(0, 1));
-  static readonly west = new SquareDirection('west', square(-1, 0));
+class SquareDirection {
+  static readonly north = new SquareDirection(square(0, -1));
+  static readonly east = new SquareDirection(square(1, 0));
+  static readonly south = new SquareDirection(square(0, 1));
+  static readonly west = new SquareDirection(square(-1, 0));
 
-  // The closed set, in the order of `SquareTopology.directions()` and of `neighbors()`.
+  // The four directions, in the order of `neighbors()`.
   static readonly all: readonly SquareDirection[] = Object.freeze([
     SquareDirection.north,
     SquareDirection.east,
@@ -136,31 +138,13 @@ export class SquareDirection implements GridDirection {
     SquareDirection.west,
   ]);
 
-  private constructor(
-    private readonly name: string,
-    private readonly step: SquareCoord,
-  ) {
-    // `private` holds only at compile time. The set exists after the last instance,
-    // so the constructor refuses every later call.
-    if (SquareDirection.all !== undefined) {
-      throw new RangeError('The set of square directions is closed.');
-    }
+  private constructor(private readonly step: SquareCoord) {
     Object.freeze(this);
-  }
-
-  // Two directions are equal when they are the same instance.
-  equals(other: GridDirection): boolean {
-    return this === other;
   }
 
   // The neighbor of `c` in this direction.
   neighborOf(c: SquareCoord): SquareCoord {
     return c.plus(this.step);
-  }
-
-  // Gives the name of the direction to `receiver`. It returns nothing.
-  deliverTo(receiver: ValueReceiver<string>): void {
-    receiver.receive(this.name);
   }
 }
 
@@ -171,7 +155,7 @@ const northward = {
 };
 
 // Strategy (statement §3.3, D4): the real square topology. `SquareGeometry` creates it.
-export class SquareTopology implements GridTopology<SquareCoord, SquareAxis, SquareDirection> {
+export class SquareTopology implements GridTopology<SquareCoord, SquareAxis> {
   fullTurn(): Turns {
     return Turns.of(4);
   }
@@ -183,20 +167,6 @@ export class SquareTopology implements GridTopology<SquareCoord, SquareAxis, Squ
 
   neighbors(c: SquareCoord): SquareCoord[] {
     return SquareDirection.all.map((direction) => direction.neighborOf(c));
-  }
-
-  neighbor(c: SquareCoord, direction: SquareDirection): SquareCoord {
-    // The check still runs when a caller casts another value to a direction.
-    // The error carries that value as its `cause`, and the edge delivers its text (issue #237).
-    if (!(direction instanceof SquareDirection)) {
-      throw new RangeError('The square grid has no such direction.', { cause: direction });
-    }
-    return direction.neighborOf(c);
-  }
-
-  // Each call gives a new list, so a change by one caller stays with that caller.
-  directions(): SquareDirection[] {
-    return [...SquareDirection.all];
   }
 
   axes(): SquareAxis[] {
