@@ -44,7 +44,7 @@ export class LinesRules<TCoord> extends BaseGameRules<PlacePiece<TCoord>, LinesS
     return state;
   }
 
-  // Proposal on issue 58, «Propuesta, pendiente del equipo (cola nocturna, 2026-11-06)».
+  // D24 of `docs/REQUIREMENTS.md`. The team accepted the proposal on issue #58 on 2026-11-16.
   // The combo is the count of distinct full lines, on any axis of the topology, after one placement.
   // The rules find every full line first and then clear their union, so a shared cell clears once.
   // The streak counts the placements in a row that clear at least one line.
