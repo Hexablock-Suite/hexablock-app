@@ -5,7 +5,7 @@ import { defineConfig } from 'vite-plus';
 const fixtureIgnore = process.env.LINT_FIXTURES === '1' ? [] : ['test/fixtures/**'];
 
 // Tools write these files. pnpm api:check and pnpm pact:check guard them, not lint or format.
-const generated = ['src/infrastructure/api/schema.d.ts', 'pacts/**'];
+const generated = ['src/infrastructure/api/schema.d.ts', 'src/adapters/api/dto.d.ts', 'pacts/**'];
 
 // Test titles follow should_<expected_result>_when_<condition>. Describe titles are free.
 // Oxlint 1.89 ignores the [pattern, message] form of mustMatch, so the pattern is a string.

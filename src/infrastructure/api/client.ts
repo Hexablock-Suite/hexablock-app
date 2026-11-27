@@ -1,13 +1,11 @@
 import createClient from 'openapi-fetch';
 
+import type { HealthApi } from '../../adapters/api/health-api';
 import type { paths } from './schema';
 
-export type HealthResponse =
-  paths['/v1/health']['get']['responses'][200]['content']['application/json'];
-
-export type ApiClient = {
-  getHealth: () => Promise<HealthResponse>;
-};
+// The driver of the transport interfaces of layer 3 (classes.md decision 22, option A3).
+// Each interface of `src/adapters/api/` covers one resource of hexablock-api.
+export type ApiClient = HealthApi;
 
 // HTTP client for hexablock-api. The types come from the backend OpenAPI document.
 export function createApiClient(baseUrl: string): ApiClient {
