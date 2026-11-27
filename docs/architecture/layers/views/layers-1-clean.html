@@ -79,13 +79,14 @@
           the use cases use. In layer 3, InMemoryGameRepository, LevelGameFactories,
           BundledLevelRepository, GameEventBus and LocalProgressRepository implement the output
           ports, LocalProgressRepository keeps its data through the KeyValueStore interface, and the
-          board components of layer 4 use the board layouts of layer 3. In layer 4, ConsoleLogger
-          implements Logger, DeviceKeyValueStore implements KeyValueStore, and SystemClock,
-          SeededRandomSource and SequentialMatchIds implement the engine interfaces Clock,
-          RandomSource and MatchIdGenerator. The routes use the presenters, and CompositionRoot
-          creates the adapters. The use cases and the presenters use the generic engine, and the
-          four variants implement its contracts. Every arrow points inward, toward layer 1, or stays
-          inside one layer. A dashed border marks a planned part.
+          board components of layer 4 use the board layouts of layer 3. The HTTP adapters of layer 3
+          hold HealthApi and the DTO types, and ApiClient of layer 4 implements HealthApi (decision
+          22). In layer 4, ConsoleLogger implements Logger, DeviceKeyValueStore implements
+          KeyValueStore, and SystemClock, SeededRandomSource and SequentialMatchIds implement the
+          engine interfaces Clock, RandomSource and MatchIdGenerator. The routes use the presenters,
+          and CompositionRoot creates the adapters. The use cases and the presenters use the generic
+          engine, and the four variants implement its contracts. Every arrow points inward, toward
+          layer 1, or stays inside one layer. A dashed border marks a planned part.
         </desc>
         <defs>
           <marker
@@ -232,6 +233,15 @@
         <!-- DeviceKeyValueStore implements KeyValueStore: realization, from layer 4 into layer 3 -->
         <path
           d="M790 166 L790 350"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#layers-triangle)"
+        />
+        <!-- ApiClient implements HealthApi and the other transport interfaces of layer 3: realization, from layer 4 into layer 3 (decision 22) -->
+        <path
+          d="M680 147 L680 230"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -820,12 +830,12 @@
         >
           slideWays · fittedCellSize
         </text>
-        <!-- Component: HTTP client, src/infrastructure/api/ (decision 22) -->
+        <!-- Component: HTTP client, src/infrastructure/api/, the driver of the transport interfaces of layer 3 (decision 22) -->
         <rect
           x="600"
           y="60"
           width="160"
-          height="139"
+          height="87"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -869,52 +879,16 @@
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          schema.d.ts: OpenAPI types
+          schema.d.ts: OpenAPI paths
         </text>
         <text
           x="610"
           y="138"
-          fill="#7d8a94"
+          fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          planned: ApiDtoMapper and
-        </text>
-        <text
-          x="610"
-          y="151"
-          fill="#7d8a94"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          ApiProgressRepository,
-        </text>
-        <text
-          x="610"
-          y="164"
-          fill="#7d8a94"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          ApiLevelRepository,
-        </text>
-        <text
-          x="610"
-          y="177"
-          fill="#7d8a94"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          ApiLeaderboardGateway,
-        </text>
-        <text
-          x="610"
-          y="190"
-          fill="#7d8a94"
-          font-size="8.5"
-          font-family="'IBM Plex Mono', monospace"
-        >
-          ApiAccountGateway
+          driver of HealthApi
         </text>
         <!-- Drivers: each one implements an interface of an inner layer -->
         <text
@@ -1170,6 +1144,75 @@
           font-family="'IBM Plex Mono', monospace"
         >
           one key, two texts
+        </text>
+        <!-- Component: HTTP adapters, src/adapters/api/ (decision 22, #404) -->
+        <rect
+          x="600"
+          y="230"
+          width="160"
+          height="100"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="610"
+          y="244"
+          fill="#5b6873"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          api/ · HTTP
+        </text>
+        <text
+          x="610"
+          y="259"
+          fill="#17212a"
+          font-size="11.5"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          HTTP adapters
+        </text>
+        <line x1="600" y1="266" x2="760" y2="266" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="610"
+          y="282"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          HealthApi · dto.d.ts
+        </text>
+        <text
+          x="610"
+          y="295"
+          fill="#7d8a94"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          planned: ApiDtoMapper,
+        </text>
+        <text
+          x="610"
+          y="308"
+          fill="#7d8a94"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          ApiProgressRepository and
+        </text>
+        <text
+          x="610"
+          y="321"
+          fill="#7d8a94"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          the other Api repositories
         </text>
         <!-- Component: planned adapters -->
         <rect
