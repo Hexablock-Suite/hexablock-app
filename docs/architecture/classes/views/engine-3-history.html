@@ -81,7 +81,9 @@
           MoveCommand keeps two TMemento values, the immutable photos of the state before and after
           the move, which BoardState.snapshot() gives (view 1, decision 34): undo() gives back the
           first and redo() the second. MoveHistory hands each undone command to its protected
-          keepUndone(), which RedoableHistory overrides to keep the command for redo().
+          keepUndone(), which RedoableHistory overrides to keep the command for redo(). IUndoable
+          declares the five members that GameEngine calls: record(), clear(), canUndo(), undo() and
+          redoable(), so the root depends on the interface, not on MoveHistory (decision 27).
         </desc>
         <defs>
           <marker
@@ -596,20 +598,20 @@
           + elapsedMs(): ElapsedTime
         </text>
 
-        <!-- Class: IUndoable (interface) -->
+        <!-- Class: IUndoable (interface: the history that GameEngine depends on, decision 27) -->
         <rect
           x="536"
           y="356"
-          width="160"
-          height="88"
+          width="220"
+          height="152"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="536" y1="404" x2="696" y2="404" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="536" y1="404" x2="756" y2="404" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="616"
+          x="646"
           y="374"
           fill="#5b6873"
           font-size="8"
@@ -620,7 +622,7 @@
           «interface»
         </text>
         <text
-          x="616"
+          x="646"
           y="392"
           fill="#17212a"
           font-size="12"
@@ -631,10 +633,38 @@
           IUndoable
         </text>
         <text x="552" y="420" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + record(command:
+        </text>
+        <text
+          x="560"
+          y="436"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          textLength="186"
+          lengthAdjust="spacingAndGlyphs"
+        >
+          MoveCommand&lt;TMove, TMemento&gt;): void
+        </text>
+        <text x="552" y="452" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + clear(): void
+        </text>
+        <text x="552" y="468" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + canUndo(): boolean
         </text>
-        <text x="552" y="436" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="552" y="484" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + undo(): void
+        </text>
+        <text
+          x="552"
+          y="500"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          textLength="194"
+          lengthAdjust="spacingAndGlyphs"
+        >
+          + redoable(): IRedoable | undefined
         </text>
 
         <!-- Class: IRedoable (interface) -->
@@ -801,6 +831,28 @@
           TMove, TMemento
         </text>
 
+        <rect
+          x="672"
+          y="346"
+          width="96"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="720"
+          y="358"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TMove, TMemento
+        </text>
+
         <!-- The footnote sits below the zone, which grew by 180 for ClockReading (#238) and by 32
              for the after photo and keepUndone() (#178). -->
         <g transform="translate(0 212)">
@@ -812,7 +864,7 @@
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            GameEngine holds zero or one MoveHistory; the variant factory decides. Fit:
+            GameEngine holds zero or one IUndoable; the variant factory decides. Fit:
             RedoableHistory, no limit. Merge: MoveHistory, limit 1. Lines and Sort: none.
           </text>
           <text

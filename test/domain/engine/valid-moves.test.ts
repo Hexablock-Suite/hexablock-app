@@ -29,7 +29,7 @@ class AdjacentRules extends BaseGameRules<SquareCoord, FakeState> {
     }
   }
 
-  isValid(state: FakeState, at: SquareCoord): boolean {
+  protected isValid(state: FakeState, at: SquareCoord): boolean {
     const { board } = state;
     if (!board.contains(at) || board.occupantAt(at) !== undefined) return false;
     for (const n of board.neighborhood(at)) {
@@ -38,16 +38,16 @@ class AdjacentRules extends BaseGameRules<SquareCoord, FakeState> {
     return false;
   }
 
-  apply(state: FakeState, at: SquareCoord): FakeState {
+  protected apply(state: FakeState, at: SquareCoord): FakeState {
     state.board.occupy(at, fakeCell(1));
     return state;
   }
 
-  resolve(_state: FakeState): Resolution {
+  protected resolve(_state: FakeState): Resolution {
     return Resolution.resolved();
   }
 
-  evaluate(state: FakeState): Outcome {
+  protected evaluate(state: FakeState): Outcome {
     return this.noValidMove(state) ? Outcome.gameOver : Outcome.playing;
   }
 }
@@ -62,19 +62,19 @@ class GivenMovesRules extends BaseGameRules<number, FakeState> {
     yield* this.moves();
   }
 
-  isValid(): boolean {
+  protected isValid(): boolean {
     return true;
   }
 
-  apply(state: FakeState): FakeState {
+  protected apply(state: FakeState): FakeState {
     return state;
   }
 
-  resolve(_state: FakeState): Resolution {
+  protected resolve(_state: FakeState): Resolution {
     return Resolution.resolved();
   }
 
-  evaluate(state: FakeState): Outcome {
+  protected evaluate(state: FakeState): Outcome {
     return this.noValidMove(state) ? Outcome.gameOver : Outcome.playing;
   }
 }
@@ -98,12 +98,24 @@ function stateWithOneCell(at: SquareCoord): FakeState {
   return state;
 }
 
+// A board of size × size with every cell filled but `free`.
+function stateWithOneFreeCell(size: number, free: SquareCoord): FakeState {
+  const state = emptyState(size);
+  for (const c of squareTopology.region(RegionSize.of(size)).coordinates()) {
+    if (!c.equals(free)) state.board.occupy(c, fakeCell(1));
+  }
+  return state;
+}
+
+// The steps of the rules are protected (issue #413), so each test runs the end check
+// inside a whole turn: `playTurn()` calls `evaluate()` on the state after the move.
+
 describe('validMoves() and the no-valid-move end check', () => {
   it('should_stop_at_the_first_valid_move_when_the_end_check_runs', () => {
     const rules = new AdjacentRules();
     const state = stateWithOneCell(square(1, 0));
 
-    const outcome = rules.evaluate(state);
+    const outcome = rules.playTurn(state, square(2, 0)).leadsTo();
 
     expect(outcome).toBe(Outcome.playing);
     // (0, 0) is the first cell of the walk, and it touches (1, 0).
@@ -112,9 +124,9 @@ describe('validMoves() and the no-valid-move end check', () => {
 
   it('should_walk_the_whole_board_when_no_move_is_valid', () => {
     const rules = new AdjacentRules();
-    const state = emptyState(5);
+    const state = stateWithOneFreeCell(5, square(4, 4));
 
-    const outcome = rules.evaluate(state);
+    const outcome = rules.playTurn(state, square(4, 4)).leadsTo();
 
     expect(outcome).toBe(Outcome.gameOver);
     expect(rules.visited).toBe(25);
@@ -147,18 +159,16 @@ describe('validMoves() and the no-valid-move end check', () => {
 
   it('should_end_the_game_when_the_board_is_full', () => {
     const rules = new AdjacentRules();
-    const state = emptyState(2);
-    for (const c of squareTopology.region(RegionSize.of(2)).coordinates())
-      state.board.occupy(c, fakeCell(1));
+    const state = stateWithOneFreeCell(2, square(1, 1));
 
-    expect(rules.evaluate(state)).toBe(Outcome.gameOver);
+    expect(rules.playTurn(state, square(1, 1)).leadsTo()).toBe(Outcome.gameOver);
   });
 
   it('should_read_one_move_only_when_the_end_check_runs_on_a_counting_generator', () => {
     const counter = { reads: 0 };
     const rules = new GivenMovesRules(countingMoves(counter));
 
-    expect(rules.evaluate(emptyState(2))).toBe(Outcome.playing);
+    expect(rules.playTurn(emptyState(2), 0).leadsTo()).toBe(Outcome.playing);
     expect(counter.reads).toBe(1);
   });
 
@@ -168,6 +178,6 @@ describe('validMoves() and the no-valid-move end check', () => {
       throw new Error('The end check read past the first move.');
     });
 
-    expect(rules.evaluate(emptyState(2))).toBe(Outcome.playing);
+    expect(rules.playTurn(emptyState(2), 0).leadsTo()).toBe(Outcome.playing);
   });
 });

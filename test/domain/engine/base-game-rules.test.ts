@@ -10,7 +10,7 @@ class RecordingRules extends BaseGameRules<number, number> {
   readonly steps: string[] = [];
   readonly seen: number[] = [];
 
-  isValid(_state: number, move: number): boolean {
+  protected isValid(_state: number, move: number): boolean {
     this.steps.push('isValid');
     return move > 0;
   }
@@ -19,18 +19,18 @@ class RecordingRules extends BaseGameRules<number, number> {
     yield 1;
   }
 
-  apply(state: number, move: number): number {
+  protected apply(state: number, move: number): number {
     this.steps.push('apply');
     return state + move;
   }
 
-  resolve(state: number): Resolution {
+  protected resolve(state: number): Resolution {
     this.steps.push('resolve');
     this.seen.push(state);
     return Resolution.resolved();
   }
 
-  evaluate(state: number): Outcome {
+  protected evaluate(state: number): Outcome {
     this.steps.push('evaluate');
     this.seen.push(state);
     return state >= 100 ? Outcome.victory : Outcome.playing;
@@ -39,7 +39,7 @@ class RecordingRules extends BaseGameRules<number, number> {
 
 // Rules whose `resolve()` refuses the move after `apply()` has changed the state.
 class RejectingRules extends RecordingRules {
-  override resolve(state: number): Resolution {
+  protected override resolve(state: number): Resolution {
     this.steps.push('resolve');
     this.seen.push(state);
     return Resolution.rejected();
@@ -92,6 +92,29 @@ describe('BaseGameRules.playTurn()', () => {
     expect(resolution.wasAccepted()).toBe(false);
     expect(rules.seen).toEqual([]);
     expect(resolution.leadsTo()).toBe(Outcome.playing);
+  });
+});
+
+// Issue #413: the contract keeps only the members that a caller needs (classes.md decision 21).
+// A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails
+// when the line compiles, because then the directive is unused.
+describe('IGameRules members', () => {
+  it('should_reject_at_compile_time_when_a_caller_asks_a_step_through_the_contract', () => {
+    const rules: IGameRules<number, number> = new RecordingRules();
+    const askSteps = () => [
+      // @ts-expect-error The contract declares no isValid() (issue #413).
+      rules.isValid(1, 2),
+      // @ts-expect-error The contract declares no apply() (issue #413).
+      rules.apply(1, 2),
+      // @ts-expect-error The contract declares no resolve() (issue #413).
+      rules.resolve(1),
+      // @ts-expect-error The contract declares no evaluate() (issue #413).
+      rules.evaluate(1),
+    ];
+
+    expect(askSteps).toBeInstanceOf(Function);
+    expect(rules.playTurn(1, 2).wasAccepted()).toBe(true);
+    expect([...rules.validMoves(1)]).toEqual([1]);
   });
 });
 

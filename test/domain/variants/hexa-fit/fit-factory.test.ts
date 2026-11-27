@@ -34,6 +34,7 @@ import { dataOf } from '../../../support/engine/game-over';
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { BOARD_ID, STATE_ID, TIMER_ID } from '../../../support/engine/entity-ids';
 import { delivered } from '../../../support/engine/value-receiver';
+import { playMove } from '../../../support/engine/play-move';
 
 // The Fit factory creates the whole family of Hexa Fit (issue 99, classes.md decision 31).
 
@@ -43,7 +44,7 @@ describe('FitFactory', () => {
 
     const initial = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
     const { engine } = startVariant(factory);
-    const outcome = engine.play(new PlaceFitPiece(A, Turns.of(0), square(0, 0)));
+    const outcome = playMove(engine, new PlaceFitPiece(A, Turns.of(0), square(0, 0)));
 
     expect([factory.isFor(GameId.of('hexa-fit')), factory.isFor(GameId.of('hexa-sort'))]).toEqual([
       true,
@@ -111,7 +112,7 @@ describe('FitFactory', () => {
     const first = startVariant(factory);
     const second = startVariant(factory);
 
-    first.engine.play(new PlaceFitPiece(A, Turns.of(0), square(0, 0)));
+    playMove(first.engine, new PlaceFitPiece(A, Turns.of(0), square(0, 0)));
     clock.advance(1_000);
 
     expect(first.engine.elapsedTime()).toEqual(ElapsedTime.ofMs(1_000));
@@ -164,8 +165,8 @@ describe('FitFactory', () => {
       return { cells: photo.boardCopy().occupiedCells(), placed, moves };
     };
     const start = facts();
-    engine.play(new PlaceFitPiece(A, Turns.of(0), square(0, 0)));
-    engine.play(new PlaceFitPiece(B, Turns.of(0), square(2, 0)));
+    playMove(engine, new PlaceFitPiece(A, Turns.of(0), square(0, 0)));
+    playMove(engine, new PlaceFitPiece(B, Turns.of(0), square(2, 0)));
     const played = facts();
 
     engine.undo();

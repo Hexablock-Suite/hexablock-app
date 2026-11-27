@@ -20,6 +20,7 @@ import {
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 import { seededRandom, StepRandom } from '../../../support/engine/step-random';
+import { playMove } from '../../../support/engine/play-move';
 
 // A Merge factory on a hexagon of 2 rings, with the target 2048.
 // Each match draws its seed from `random` (issue #417).
@@ -86,7 +87,7 @@ describe('MergeFactory', () => {
     const initial = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
     const { engine, rules } = startVariant(factory);
     const slide = firstValidMove(rules, mergeStateOf(engine.snapshot()));
-    const outcome = engine.play(slide);
+    const outcome = playMove(engine, slide);
     const after = engine.snapshot();
 
     expect(factory.isFor(GameId.of('hexa-merge'))).toBe(true);
@@ -107,7 +108,7 @@ describe('MergeFactory', () => {
     const play = (seed: number) => {
       const { engine, rules } = startVariant(mergeFactory(seed));
       const start = values(engine.snapshot());
-      engine.play(firstValidMove(rules, mergeStateOf(engine.snapshot())));
+      playMove(engine, firstValidMove(rules, mergeStateOf(engine.snapshot())));
       return [start, values(engine.snapshot())];
     };
 

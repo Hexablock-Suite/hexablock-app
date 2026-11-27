@@ -950,8 +950,16 @@
         <text x="424" y="562" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           Resolution
         </text>
-        <text x="408" y="578" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + evaluate(state: TState): Outcome
+        <text
+          x="408"
+          y="578"
+          fill="#5b6873"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          textLength="232"
+          lengthAdjust="spacingAndGlyphs"
+        >
+          + validMoves(state: TState): Iterable&lt;TMove&gt;
         </text>
         <rect
           x="572"
@@ -1165,10 +1173,10 @@
           - scoring: IScoringPolicy
         </text>
         <text x="408" y="730" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - history: MoveHistory [0..1]
+          - history: IUndoable [0..1]
         </text>
         <text x="408" y="746" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + play(move: TMove): Outcome
+          + tryPlay(move: TMove): Resolution
         </text>
         <text x="408" y="762" fill="#7d8a94" font-size="9" font-family="'IBM Plex Mono', monospace">
           knows no variant

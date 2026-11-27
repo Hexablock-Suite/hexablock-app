@@ -8,7 +8,7 @@ import { Placement } from '../../../../src/domain/variants/hexa-fit/placement';
 import { square, squareTopology } from '../../../support/engine/square-topology';
 import { A, B } from '../../../support/variants/hexa-fit/fit-game';
 import { fitFactory, threeDominoFitFactory } from '../../../support/variants/hexa-fit/fit-game';
-import { firstValidMove } from '../../../support/engine/variant-game';
+import { firstValidMove, playedOn } from '../../../support/engine/variant-game';
 import { GameStateId } from '../../../../src/domain/engine/game-state-id';
 import { MatchId } from '../../../../src/domain/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
@@ -47,7 +47,7 @@ describe('FitState', () => {
       GameStateId.of(MatchId.of('match-a')),
       BOARD_ID,
     );
-    const moved = rules.apply(first, firstValidMove(rules, first));
+    const moved = playedOn(rules, first, firstValidMove(rules, first));
     const other = threeDominoFitFactory().createInitialState(
       MATCH_ID,
       GameStateId.of(MatchId.of('match-a')),
