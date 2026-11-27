@@ -413,7 +413,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description The body has the wrong shape, or a level breaks a rule: a value of the common part, its section, A5, a lower version than the stored one, or a gameId with no level files. Over a stored level that breaks a rule, a lower version than its stored version is rejected too, when that stored version is valid. Each detail names one level by its gameId and levelId. A level problem saves no level of the batch, except a lower version, which saves the other levels. */
+            /** @description The body has the wrong shape, or a level breaks a rule: a value of the common part, its section, A5, a lower version than the stored one, or a gameId with no level files. Over a stored level that breaks a rule, a lower version than its stored version is rejected too, when that stored version is valid. Each detail names one level by its gameId and levelId. The detail of a level problem ends with its code: `invalid-order`, `invalid-version`, `invalid-topology`, `game-without-levels`, `unknown-topology`, `invalid-section`, `invalid-figure`, `invalid-pieces`, `invalid-witness`, `invalid-stars`, `unequal-area`, `inexact-witness`, `invalid-radius`, `invalid-goals`, `invalid-source` or `older-version`, as docs/level-format.md lists them. A level problem saves no level of the batch, except a lower version, which saves the other levels. */
             400: {
                 headers: {
                     [name: string]: unknown;
