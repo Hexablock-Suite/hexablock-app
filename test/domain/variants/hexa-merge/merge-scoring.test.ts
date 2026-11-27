@@ -27,7 +27,6 @@ function slideRow(tiles: readonly number[], fourChance?: Chance) {
   const row: [HexCoord, number][] = tiles.map((value, i) => [hex(i - 2, 0), value]);
   const { engine } = mergeGame(
     mergeState(row, 3, mergeTileSource(Seed.of(2026), fourChance)),
-    MergeTile.of(2048),
     new MergeScoring<HexCoord, HexAxis>(),
   );
   playMove(engine, east);

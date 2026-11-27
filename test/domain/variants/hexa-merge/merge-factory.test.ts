@@ -137,6 +137,33 @@ describe('MergeFactory', () => {
     expect(tiles.every((tile) => tile.equals(MergeTile.of(4)))).toBe(true);
   });
 
+  // Issue #426: the factory gives the target of the settings to the first state.
+  // Every new tile is a 2, so the first merge makes a 4, the target.
+  it('should_reach_the_target_of_the_settings_when_the_first_merge_of_the_match_makes_it', () => {
+    const factory = new MergeFactory(
+      new HexGeometry(),
+      MergeSettings.of(RegionSize.of(2), MergeTile.of(4), Chance.of(0)),
+      seededRandom(5),
+    );
+    const { engine, rules } = startVariant(factory);
+    const before: boolean[] = [];
+
+    while (engine.snapshot().mergedTiles().length === 0 && before.length < 50) {
+      before.push(engine.snapshot().hasReachedTarget());
+      playMove(engine, firstValidMove(rules, mergeStateOf(engine.snapshot())));
+    }
+
+    expect(before.length).toBeGreaterThan(0);
+    expect(before.every((reached) => !reached)).toBe(true);
+    expect(
+      engine
+        .snapshot()
+        .mergedTiles()
+        .every((tile) => tile.equals(MergeTile.of(4))),
+    ).toBe(true);
+    expect(engine.snapshot().hasReachedTarget()).toBe(true);
+  });
+
   it('should_fill_every_cell_and_stop_when_the_board_has_fewer_cells_than_the_start_tiles', () => {
     // A board with no empty cell gets no new tile, so the rest of the start tiles do not appear.
     const factory = sizedMergeFactory(1);

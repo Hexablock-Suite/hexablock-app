@@ -9,7 +9,12 @@ import { square, squareTopology } from '../../support/engine/square-topology';
 import { firstValidMove, playedOn } from '../../support/engine/variant-game';
 import { A, fitFactory } from '../../support/variants/hexa-fit/fit-game';
 import { linesState, piece } from '../../support/variants/hexa-lines/lines-game';
-import { mergeBoard, mergeState, noNewTiles } from '../../support/variants/hexa-merge/merge-game';
+import {
+  mergeBoard,
+  mergeState,
+  noNewTiles,
+  TARGET,
+} from '../../support/variants/hexa-merge/merge-game';
 import { row, stack, tiles } from '../../support/variants/hexa-sort/sort-game';
 import { PlacePiece } from '../../../src/domain/variants/hexa-lines/place-piece';
 import { TrayPosition } from '../../../src/domain/variants/hexa-lines/tray-position';
@@ -147,7 +152,7 @@ describe('the view of each variant state', () => {
 
   it('should_build_the_view_from_the_target_flag_when_a_merge_state_builds_its_view', () => {
     const notReached = mergeState([]).snapshot().view();
-    const reached = new MergeState(STATE_ID, MATCH_ID, mergeBoard(), noNewTiles(), true)
+    const reached = new MergeState(STATE_ID, MATCH_ID, mergeBoard(), noNewTiles(), TARGET, true)
       .snapshot()
       .view();
 

@@ -101,6 +101,9 @@ export class MergeSnapshot<
 // `tiles` is the source of the new tiles. It lives in the state (classes.md decision 31),
 // and it is a value (classes.md decision 51): a draw replaces it with the next source.
 // So `clone()` shares it, and the rollback of `GameEngine.tryPlay()` covers each draw.
+// `target` is the tile that the player tries to make. The state keeps it, as `SortState` keeps
+// its goal (issue #426): the state decides when the target is reached. The target never changes,
+// so `clone()` copies it, and `restore()` keeps it.
 // `targetReached` turns true when a merge makes the target tile, and it stays true:
 // the target is an event, not the end of the game (A3).
 // `merged` holds the tiles that the last move made, one per merge. The gain of the move
@@ -119,6 +122,7 @@ export class MergeState<
     private readonly matchId: MatchId,
     private readonly board: Board<TCell, TCoord, TAxis>,
     private tiles: IPieceSource<NewTile<TCell>>,
+    private readonly target: TCell,
     private targetReached = false,
     private merged: readonly TCell[] = [],
     private score: Score = Score.of(0),
@@ -146,15 +150,17 @@ export class MergeState<
   // The board vacates every tile, then takes the packed tiles line by line.
   // So `occupiedCells()` lists the tiles in the order of the packed lines.
   // `merged` takes the tiles that the merges of this slide make.
-  // A merge that makes `target` sets `targetReached`. The tile source and the score do not change.
+  // A merge that makes the target of the state sets `targetReached`. The tile source and the score
+  // do not change. The state compares a tile with the target by `canMergeWith()`: two tiles merge
+  // exactly when they are equal (§1.4).
   // A slide that changes no cell, or a slide on an axis of another topology, throws a RangeError
   // before any change.
-  slide(slide: Slide<TAxis>, target: TCell): void {
+  slide(slide: Slide<TAxis>): void {
     const plan = this.planOf(slide);
     if (plan === undefined) throw new RangeError('The slide changes no cell of the board.');
     for (const [c] of this.board.occupiedCells()) this.board.vacate(c);
     for (const [c, cell] of plan.cells) this.board.occupy(c, cell);
-    this.targetReached ||= plan.merged.some((tile) => tile.canMergeWith(target));
+    this.targetReached ||= plan.merged.some((tile) => tile.canMergeWith(this.target));
     this.merged = plan.merged;
   }
 
@@ -207,6 +213,7 @@ export class MergeState<
       this.matchId,
       this.board.clone(),
       this.tiles,
+      this.target,
       this.targetReached,
       [...this.merged],
       this.score,

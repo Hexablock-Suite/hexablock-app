@@ -60,23 +60,37 @@ export function mergeBoard(size = 2): Board<MergeTile, HexCoord, HexAxis> {
   );
 }
 
+// The target of a state that a test builds, unless the test gives its own.
+export const TARGET = MergeTile.of(2048);
+
 // A hexagon of `size` rings with a tile of each given value at its coordinate.
+// The state keeps the target `target` (issue #426).
 export function mergeState(
   tiles: readonly [HexCoord, number][],
   size = 2,
   source: IPieceSource<NewTile<MergeTile>> = noNewTiles(),
   matchId: MatchId = MATCH_ID,
   stateId: GameStateId = STATE_ID,
+  target: MergeTile = TARGET,
 ): HexMergeState {
   const board = mergeBoard(size);
   for (const [at, value] of tiles) board.occupy(at, MergeTile.of(value));
-  return new MergeState(stateId, matchId, board, source);
+  return new MergeState(stateId, matchId, board, source, target);
 }
 
 // The number of a tile. The field is private, and a tile is worth its value in points (issue #59).
 // The points are a `Score`, which delivers its number to a receiver (issue #228).
 export function valueOf(tile: MergeTile): number {
   return delivered(tile.points());
+}
+
+// A hexagon of `size` rings whose state keeps the target `target` (issue #426).
+export function mergeStateFor(
+  target: MergeTile,
+  tiles: readonly [HexCoord, number][],
+  size = 2,
+): HexMergeState {
+  return mergeState(tiles, size, noNewTiles(), MATCH_ID, STATE_ID, target);
 }
 
 // The value of each filled cell, by the topology key of its coordinate.
@@ -91,12 +105,12 @@ export function values<TAxis extends GridAxis>(photo: {
   return out;
 }
 
+// The rules keep no target: the state `initial` keeps it (issue #426).
 export function mergeGame(
   initial: HexMergeState,
-  target = MergeTile.of(2048),
   scoring: IScoringPolicy<HexMergeState> = new NoPointScoring(),
 ) {
-  const rules = new MergeRules<MergeTile, HexCoord, HexAxis>(target);
+  const rules = new MergeRules<MergeTile, HexCoord, HexAxis>();
   const engine = new GameEngine<MergeTile, HexCoord, Slide<HexAxis>, HexMergeState>(
     MATCH_ID,
     GameId.of('hexa-merge'),
@@ -123,13 +137,16 @@ export function mergeFactory(seed = 1): MergeFactory<HexCoord> {
 // takes the photo back with `restore()`. The photo hands out no board (issue #234), and it keeps
 // its ids private (issue #245): the ids of the state and of the board come from `matchId`.
 // The board takes the axis type of the photo, so the topology is cast to it.
+// The photo holds no target, because the target of a state never changes (issue #426).
+// So the new state keeps `target`.
 export function mergeStateOf<TAxis extends GridAxis>(
   photo: MergeSnapshot<MergeTile, HexCoord, TAxis>,
   matchId: MatchId = MATCH_ID,
+  target: MergeTile = TARGET,
 ): MergeState<MergeTile, HexCoord, TAxis> {
   const topology = hexTopology as unknown as GridTopology<HexCoord, TAxis>;
   const board = boardOnTopologyLike(photo.boardCopy(), topology, matchId);
-  const state = new MergeState(GameStateId.of(matchId), matchId, board, photo.tileSource());
+  const state = new MergeState(GameStateId.of(matchId), matchId, board, photo.tileSource(), target);
   state.restore(photo);
   return state;
 }

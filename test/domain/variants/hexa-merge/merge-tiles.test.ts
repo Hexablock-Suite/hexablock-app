@@ -56,14 +56,11 @@ function added(
   return Object.fromEntries(Object.entries(after).filter(([key]) => !(key in before)));
 }
 
-// The target of `mergeGame()`.
-const TARGET = MergeTile.of(2048);
-
 // The board after the slide alone, before the new tile appears. The state slides a copy
 // with its own business method, because the steps of the rules are protected (issue #413).
 function slidOnly(state: HexMergeState, slide: Slide<HexAxis>): Record<string, number> {
   const copy = state.clone();
-  copy.slide(slide, TARGET);
+  copy.slide(slide);
   return values(copy.snapshot());
 }
 

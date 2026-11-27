@@ -14,7 +14,9 @@ import {
   hexTopology,
   mergeBoard,
   mergeState,
+  mergeStateFor,
   noNewTiles,
+  TARGET,
   values,
   valueOf,
   type HexMergeState,
@@ -105,10 +107,7 @@ describe('MergeState', () => {
     const tiles = photo.tileSource();
     const before = state.clone();
 
-    const result: unknown = state.slide(
-      Slide.of(HexAxis.q, SlideSense.forward),
-      MergeTile.of(2048),
-    );
+    const result: unknown = state.slide(Slide.of(HexAxis.q, SlideSense.forward));
 
     expect(result).toBeUndefined();
     expect(values(state.snapshot())).toEqual({ [key(1, 0)]: 4, [key(0, 1)]: 4 });
@@ -129,7 +128,7 @@ describe('MergeState', () => {
       [hex(0, 1), 8],
     ]);
 
-    state.slide(Slide.of(HexAxis.q, SlideSense.backward), MergeTile.of(2048));
+    state.slide(Slide.of(HexAxis.q, SlideSense.backward));
 
     expect(
       state
@@ -145,22 +144,61 @@ describe('MergeState', () => {
   });
 
   it('should_set_the_target_flag_when_a_merge_makes_the_target_tile', () => {
-    const state = mergeState([
+    const state = mergeStateFor(MergeTile.of(16), [
       [hex(0, 0), 8],
       [hex(1, 0), 8],
     ]);
 
-    state.slide(Slide.of(HexAxis.q, SlideSense.backward), MergeTile.of(16));
-    const later = mergeState([[hex(0, 0), 2]]);
-    later.slide(Slide.of(HexAxis.q, SlideSense.forward), MergeTile.of(16));
+    state.slide(Slide.of(HexAxis.q, SlideSense.backward));
+    const later = mergeStateFor(MergeTile.of(16), [[hex(0, 0), 2]]);
+    later.slide(Slide.of(HexAxis.q, SlideSense.forward));
 
     expect(state.snapshot().hasReachedTarget()).toBe(true);
     expect(state.snapshot().mergedTiles()).toEqual([MergeTile.of(16)]);
     expect(later.snapshot().hasReachedTarget()).toBe(false);
-    state.slide(Slide.of(HexAxis.q, SlideSense.forward), MergeTile.of(16));
+    state.slide(Slide.of(HexAxis.q, SlideSense.forward));
     expect([state.snapshot().hasReachedTarget(), state.snapshot().mergedTiles()]).toEqual([
       true,
       [],
+    ]);
+  });
+
+  // Issue #426: the state keeps the target, as `SortState` keeps its goal.
+  it('should_reach_the_target_that_the_state_keeps_when_a_slide_makes_it', () => {
+    const eights = () => {
+      const board = mergeBoard();
+      board.occupy(hex(0, 0), MergeTile.of(8));
+      board.occupy(hex(1, 0), MergeTile.of(8));
+      return board;
+    };
+    const keeps16 = new MergeState(STATE_ID, MATCH_ID, eights(), noNewTiles(), MergeTile.of(16));
+    const keeps32 = new MergeState(STATE_ID, MATCH_ID, eights(), noNewTiles(), MergeTile.of(32));
+    const before = keeps16.snapshot().hasReachedTarget();
+
+    keeps16.slide(Slide.of(HexAxis.q, SlideSense.backward));
+    keeps32.slide(Slide.of(HexAxis.q, SlideSense.backward));
+
+    expect([
+      before,
+      keeps16.snapshot().hasReachedTarget(),
+      keeps32.snapshot().hasReachedTarget(),
+    ]).toEqual([false, true, false]);
+    expect(keeps32.snapshot().mergedTiles()).toEqual([MergeTile.of(16)]);
+  });
+
+  // Issue #426: the engine plays each turn on a copy, so the copy keeps the target.
+  it('should_keep_the_target_when_the_state_is_cloned', () => {
+    const board = mergeBoard();
+    board.occupy(hex(0, 0), MergeTile.of(2));
+    board.occupy(hex(1, 0), MergeTile.of(2));
+    const state = new MergeState(STATE_ID, MATCH_ID, board, noNewTiles(), MergeTile.of(4));
+
+    const copy = state.clone();
+    copy.slide(Slide.of(HexAxis.q, SlideSense.backward));
+
+    expect([state.snapshot().hasReachedTarget(), copy.snapshot().hasReachedTarget()]).toEqual([
+      false,
+      true,
     ]);
   });
 
@@ -176,12 +214,12 @@ describe('MergeState', () => {
     const state = mergeState([[hex(1, 0), 2]]);
     const before = facts(state);
 
-    expect(() => state.slide(Slide.of(HexAxis.q, SlideSense.forward), MergeTile.of(16))).toThrow(
+    expect(() => state.slide(Slide.of(HexAxis.q, SlideSense.forward))).toThrow(
       new RangeError('The slide changes no cell of the board.'),
     );
-    expect(() =>
-      state.slide(Slide.of('w' as unknown as HexAxis, SlideSense.forward), MergeTile.of(16)),
-    ).toThrow(new RangeError('The slide changes no cell of the board.'));
+    expect(() => state.slide(Slide.of('w' as unknown as HexAxis, SlideSense.forward))).toThrow(
+      new RangeError('The slide changes no cell of the board.'),
+    );
     expect(facts(state)).toEqual(before);
   });
 
@@ -202,12 +240,21 @@ describe('MergeState', () => {
   it('should_keep_the_score_when_a_state_is_built_with_a_score', () => {
     const board = mergeBoard();
 
-    const state = new MergeState(STATE_ID, MATCH_ID, board, noNewTiles(), false, [], Score.of(7));
+    const state = new MergeState(
+      STATE_ID,
+      MATCH_ID,
+      board,
+      noNewTiles(),
+      TARGET,
+      false,
+      [],
+      Score.of(7),
+    );
 
     expect(state.snapshot().scoreSoFar()).toEqual(Score.of(7));
-    expect(new MergeState(STATE_ID, MATCH_ID, board, noNewTiles()).snapshot().scoreSoFar()).toEqual(
-      Score.of(0),
-    );
+    expect(
+      new MergeState(STATE_ID, MATCH_ID, board, noNewTiles(), TARGET).snapshot().scoreSoFar(),
+    ).toEqual(Score.of(0));
   });
 
   // The state has its own `GameStateId`, and it still knows its match (classes.md decision 26).
@@ -216,7 +263,7 @@ describe('MergeState', () => {
     const first = mergeState([[hex(1, 0), 2]], 2, noNewTiles(), MATCH_ID, stateId);
     const second = mergeState([], 2, noNewTiles(), MATCH_ID, stateId);
     const before = first.clone();
-    first.slide(Slide.of(HexAxis.q, SlideSense.backward), MergeTile.of(16));
+    first.slide(Slide.of(HexAxis.q, SlideSense.backward));
 
     expect([first.equals(second), second.equals(first), first.equals(before)]).toEqual([
       true,
