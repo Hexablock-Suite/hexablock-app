@@ -39,6 +39,7 @@ function countingPorts() {
       return bundled.list(gameId);
     },
     levelOf: (gameId, levelId) => bundled.levelOf(gameId, levelId),
+    unavailable: (gameId) => bundled.unavailable(gameId),
   };
   const progress: ProgressRepository = {
     owner: () => local.owner(),

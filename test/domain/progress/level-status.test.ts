@@ -18,7 +18,7 @@ const gameId = GameId.of('fake-game');
 
 // A level of the fake game. The section is empty, because the rule reads no section.
 const level = (id: string, order: number, topology = 'hex') =>
-  LevelDefinition.of({ levelId: id, order, topology, section: {} });
+  LevelDefinition.of({ levelId: id, order, version: 1, topology, section: {} });
 
 // A progress that keeps a result with `stars` stars for each level of `won`.
 function progressWith(won: readonly string[], stars = 2): GameProgress {

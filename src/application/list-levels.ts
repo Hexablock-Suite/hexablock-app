@@ -4,7 +4,7 @@ import type { TopologyId } from '../domain/shared/topology-id';
 import type { LevelDefinition } from '../domain/progress/level-definition';
 import { LevelStatus } from '../domain/progress/level-status';
 import type { LevelRepository } from './level-repository';
-import type { LevelSummary } from './level-summary';
+import type { LevelList, LevelSummary } from './level-summary';
 import type { ProgressRepository } from './progress-repository';
 import { caughtError, FailureCode, Result } from './result';
 import type { UseCase } from './use-case';
@@ -27,18 +27,27 @@ export interface ListLevelsRequest {
 // - `LevelStatus.ofEach()` gives the status of each level (S3-12, issue #326): completed, open
 //   or locked. The use case gives it only the levels of the chosen figure, in order,
 //   so a level of another figure never locks a level of this figure.
+// - Apart from the levels, the response holds the id of each unavailable level of the game
+//   that `LevelRepository.unavailable()` names (#307). Such a level has no figure, so every
+//   figure of the game names it, and it is in no chain of open levels.
 // No exception leaves `execute()`. A port that throws gives a `list-failed` failure.
-export class ListLevels implements UseCase<ListLevelsRequest, LevelSummary[]> {
+export class ListLevels implements UseCase<ListLevelsRequest, LevelList> {
   constructor(
     private readonly levels: LevelRepository,
     private readonly progress: ProgressRepository,
   ) {}
 
-  async execute(request: ListLevelsRequest): Promise<Result<LevelSummary[]>> {
+  async execute(request: ListLevelsRequest): Promise<Result<LevelList>> {
     try {
-      const levels = await this.levels.list(request.gameId);
+      const [levels, unavailable] = await Promise.all([
+        this.levels.list(request.gameId),
+        this.levels.unavailable(request.gameId),
+      ]);
       const progress = await this.progress.load(await this.progress.owner(), request.gameId);
-      return Result.success(summariesOf(levelsOnFigure(levels, request.figure), progress));
+      return Result.success({
+        levels: summariesOf(levelsOnFigure(levels, request.figure), progress),
+        unavailable,
+      });
     } catch (thrown) {
       return Result.failure(caughtError(FailureCode.listFailed, thrown));
     }
