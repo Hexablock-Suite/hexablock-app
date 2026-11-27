@@ -3,7 +3,7 @@ import { Outcome } from '../../../../src/domain/engine/outcome';
 import { Score } from '../../../../src/domain/shared/score';
 import { GameOverPhase, PlayingPhase } from '../../../../src/domain/engine/game-phase';
 import type { GridTopology } from '../../../../src/domain/engine/grid-topology';
-import { GameOver } from '../../../../src/domain/engine/game-events';
+import { GameEnded } from '../../../../src/domain/engine/game-events';
 import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
 import { Seed } from '../../../../src/domain/engine/seed';
 import { BaseGameRules, type IGameRules } from '../../../../src/domain/engine/rules';
@@ -278,7 +278,7 @@ describe('Hexa Lines rules', () => {
 
     expect(outcome).toBe(Outcome.gameOver);
     expect(engine.currentPhase()).toBe(GameOverPhase.instance);
-    expect(engine.takeEvents()).toEqual([expect.any(GameOver)]);
+    expect(engine.takeEvents()).toEqual([expect.any(GameEnded)]);
   });
 
   it('should_keep_playing_when_a_tray_piece_still_fits_after_the_placement', () => {
@@ -399,7 +399,7 @@ describe('Hexa Lines rules edge cases', () => {
     expect(engine.currentPhase()).toBe(GameOverPhase.instance);
     expect(state.trayPieces()).toEqual([]);
     expect(filledKeys(state)).toEqual(keys([square(1, 1)]));
-    expect(engine.takeEvents()).toEqual([expect.any(GameOver)]);
+    expect(engine.takeEvents()).toEqual([expect.any(GameEnded)]);
   });
 
   it('should_throw_and_keep_the_game_when_the_source_or_the_topology_throws_during_a_move', () => {

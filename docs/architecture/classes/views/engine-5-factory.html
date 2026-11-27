@@ -75,8 +75,8 @@
           rules, piece source, scoring, board, progress model, initial state and optional history of
           a variant, LevelDefinition, the data of one level file with its level id and its order,
           which directs the ILevelBuilder builder and tells the list of levels its figure and its
-          order, the abstract GameEvent with GameOver, the domain event that the root records when a
-          game ends, the Clock and RandomSource interfaces that layer 4 implements (a variant
+          order, the abstract GameEvent with GameEnded, the domain event that the root records when
+          a game ends, the Clock and RandomSource interfaces that layer 4 implements (a variant
           factory draws a new Seed of the RandomSource in each match), and the MatchIdGenerator
           interface that gives the MatchId of each new match. Each reading of the Clock is a
           ClockReading value object (view 3). The internal ids are local value objects that keep the
@@ -85,7 +85,7 @@
           timed game in createTimer(). GameFactory keeps the GameId of the game, an IVariantFactory
           that answers isFor() for it and the MatchIdGenerator, wraps the rules of a timed game in
           TimedRulesDecorator, gives the same timer to the root and creates the started GameEngine.
-          GameOver keeps the MatchId, the Outcome and the final Score, a value object, GameEvent
+          GameEnded keeps the MatchId, the Outcome and the final Score, a value object, GameEvent
           keeps the GameId, and the fields are private: a listener asks isVictory() or receives the
           data through deliverTo().
         </desc>
@@ -320,7 +320,7 @@
           stroke-width="1"
           marker-end="url(#factory-open)"
         />
-        <!-- GameOver extends GameEvent: generalization -->
+        <!-- GameEnded extends GameEvent: generalization -->
         <line
           x1="884"
           y1="216"
@@ -482,7 +482,7 @@
           GameId) =&gt; void): void
         </text>
 
-        <!-- Class: GameOver (domain event) -->
+        <!-- Class: GameEnded (domain event) -->
         <rect
           x="792"
           y="216"
@@ -514,7 +514,7 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          GameOver
+          GameEnded
         </text>
         <text x="808" y="272" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - matchId: MatchId
@@ -533,7 +533,7 @@
           + deliverTo(receiver:
         </text>
         <text x="819" y="360" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          GameOverReceiver): void
+          GameEndedReceiver): void
         </text>
 
         <!-- Class: Score (value object, decision 41) -->
@@ -599,7 +599,7 @@
         <text x="535" y="338" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           ValueReceiver&lt;number&gt;): void
         </text>
-        <!-- GameOver keeps the final Score as finalScore: use with role and multiplicity (decision 23). The line runs near the top of GameOver, so its label fits above GameOver, under GameEvent. -->
+        <!-- GameEnded keeps the final Score as finalScore: use with role and multiplicity (decision 23). The line runs near the top of GameEnded, so its label fits above GameEnded, under GameEvent. -->
         <line
           x1="792"
           y1="224"

@@ -497,7 +497,7 @@ describe('primitive scan of the domain', () => {
       'BoardState.addPoints',
       'IScoringPolicy.score',
       'ScoringDecorator.score',
-      'GameOver.finalScore',
+      'GameEnded.finalScore',
       'GameResult.score',
       'ProgressRecord.score',
     ]) {
@@ -608,7 +608,7 @@ describe('primitive scan of the domain', () => {
       'ReadonlyBoard<TAxis>',
       'checkOwnSnapshot<TAxis>',
       'TurnReport.outcome',
-      'GameOver.outcome',
+      'GameEnded.outcome',
       'Resolution.outcome',
     ]) {
       expect(places).not.toContain(place);

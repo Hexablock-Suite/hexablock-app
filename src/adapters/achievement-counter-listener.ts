@@ -19,7 +19,7 @@ import type { GameEventListener } from './game-event-listener';
 // - `LinesCleared` keeps its count of lines as a best count, the most lines at once.
 // - `TileMerged` keeps the value of its tile as a best count, the highest tile.
 // - `StackCleared` adds one goal of Hexa Sort to the total.
-// It ignores every other event, `GameOver` included. It receives the game id of an event through
+// It ignores every other event, `GameEnded` included. It receives the game id of an event through
 // `deliverTo()`, as a listener of the edge (rule R-no-delivery-call).
 // An undo takes no count back, because an event is a fact that happened (decision 26).
 // The bus calls `onEvent()` and waits for nothing, but the port saves asynchronously. So each

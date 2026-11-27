@@ -24,7 +24,7 @@ import {
   type HexMergeState,
   mergeStateOf,
 } from '../../../support/variants/hexa-merge/merge-game';
-import { dataOf, gameOversIn } from '../../../support/engine/game-over';
+import { dataOf, gameEndedEventsIn } from '../../../support/engine/game-ended';
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { playMove } from '../../../support/engine/play-move';
 
@@ -223,7 +223,7 @@ describe('Merge new tiles', () => {
     });
     expect([...rules.validMoves(mergeStateOf(engine.snapshot()))]).toEqual([]);
     expect(engine.currentPhase().canPlay()).toBe(false);
-    expect(gameOversIn(engine.takeEvents()).map(dataOf)).toEqual([
+    expect(gameEndedEventsIn(engine.takeEvents()).map(dataOf)).toEqual([
       {
         gameId: GameId.of('hexa-merge'),
         matchId: MATCH_ID,

@@ -46,7 +46,7 @@ export class Resolution {
   }
 
   // The outcome that the turn leads to. Two readers need the value itself:
-  // the `GameOver` event that `GameEngine` builds carries it,
+  // the `GameEnded` event that `GameEngine` builds carries it,
   // and `ApplyMove` puts it in `MoveResult` (classes.md decisions 26 and 29).
   leadsTo(): Outcome {
     return this.outcome;

@@ -24,7 +24,7 @@ import {
   type FakeSnapshot,
   type SourceSnapshot,
 } from '../../support/engine/fake-game';
-import { dataOf } from '../../support/engine/game-over';
+import { dataOf } from '../../support/engine/game-ended';
 import { phaseNameOf } from '../../support/engine/phase-name';
 import {
   square,

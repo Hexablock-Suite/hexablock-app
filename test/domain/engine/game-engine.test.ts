@@ -3,7 +3,7 @@ import { Score } from '../../../src/domain/shared/score';
 import type { Board } from '../../../src/domain/engine/board';
 import type { BoardState } from '../../../src/domain/engine/board-state';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
-import { GameOver } from '../../../src/domain/engine/game-events';
+import { GameEnded } from '../../../src/domain/engine/game-events';
 import { GameId } from '../../../src/domain/shared/game-id';
 import { MatchId } from '../../../src/domain/engine/match-id';
 import { GameOverPhase, PlayingPhase, VictoryPhase } from '../../../src/domain/engine/game-phase';
@@ -23,7 +23,7 @@ import {
   type SourceState,
 } from '../../support/engine/fake-game';
 import { STATE_ID } from '../../support/engine/entity-ids';
-import { dataOf, gameOverOf } from '../../support/engine/game-over';
+import { dataOf, gameEndedOf } from '../../support/engine/game-ended';
 import { phaseNameOf } from '../../support/engine/phase-name';
 import { square, type SquareAxis, type SquareCoord } from '../../support/engine/square-topology';
 import { MATCH_ID } from '../../support/engine/match-id';
@@ -170,7 +170,7 @@ describe('GameEngine.tryPlay()', () => {
     expect(engine.takeEvents()).toEqual([]);
   });
 
-  it('should_record_game_over_with_the_final_score_when_the_board_fills', () => {
+  it('should_record_game_ended_with_the_final_score_when_the_board_fills', () => {
     const { engine } = newGame();
     engine.start(emptyState());
 
@@ -181,7 +181,7 @@ describe('GameEngine.tryPlay()', () => {
     expect(engine.currentPhase()).toBe(GameOverPhase.instance);
     const events = engine.takeEvents();
     expect(events).toHaveLength(1);
-    expect(events[0]).toBeInstanceOf(GameOver);
+    expect(events[0]).toBeInstanceOf(GameEnded);
     expect(dataOf(events[0])).toEqual({
       gameId: GameId.of('fake-game'),
       matchId: MATCH_ID,
@@ -587,7 +587,7 @@ describe('GameEngine review findings', () => {
 
   // The root saves the turn and records its event in one step. The root tells nobody,
   // so no publisher runs inside the turn and none can break it (issue #233).
-  it('should_return_the_resolution_and_record_game_over_when_try_play_ends_the_game', () => {
+  it('should_return_the_resolution_and_record_game_ended_when_try_play_ends_the_game', () => {
     const { engine } = gameWith(new FixedOutcomeRules(Outcome.gameOver));
 
     const turn = engine.tryPlay(place(0, 0));
@@ -660,7 +660,7 @@ describe('GameEngine review findings', () => {
     expect(engine.snapshot().boardCopy().occupantAt(square(0, 0))).toEqual(fakeCell(1));
   });
 
-  it('should_record_game_over_with_the_victory_outcome_when_the_rules_return_victory', () => {
+  it('should_record_game_ended_with_the_victory_outcome_when_the_rules_return_victory', () => {
     const { engine } = gameWith(new FixedOutcomeRules(Outcome.victory));
 
     const outcome = playMove(engine, place(0, 0));
@@ -669,7 +669,7 @@ describe('GameEngine review findings', () => {
     expect(engine.currentPhase()).toBe(VictoryPhase.instance);
     const events = engine.takeEvents();
     expect(events).toHaveLength(1);
-    expect(gameOverOf(events[0]).isVictory()).toBe(true);
+    expect(gameEndedOf(events[0]).isVictory()).toBe(true);
     expect(dataOf(events[0])).toEqual({
       gameId: GameId.of('fake-game'),
       matchId: MATCH_ID,
@@ -788,7 +788,7 @@ describe('GameEngine identity', () => {
     expect(engine.snapshot().isPhotoOf(STATE_ID)).toBe(true);
   });
 
-  it('should_record_game_over_with_the_variant_id_and_the_match_id_when_the_game_ends', () => {
+  it('should_record_game_ended_with_the_variant_id_and_the_match_id_when_the_game_ends', () => {
     const { engine } = matchOf(MatchId.of('match-a'), 1);
 
     playMove(engine, place(0, 0));
