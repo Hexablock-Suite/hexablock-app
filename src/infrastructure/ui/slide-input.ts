@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Platform } from 'react-native';
 
-import { nearestWay, type SlideWay } from '../../adapters/board/slide-ways';
+import { nearestWay, type ScreenWay } from '../../adapters/merge-slide-ways';
 
 // A swipe shorter than this length in px plays nothing (issue #292, as the team prototype).
 export const SWIPE_THRESHOLD = 24;
@@ -42,7 +42,11 @@ interface KeySource {
 
 // The way of a swipe that moves `dx` px to the right and `dy` px down: the way of `ways`
 // nearest to the angle of the swipe. A swipe shorter than `SWIPE_THRESHOLD` gives no way.
-export function swipedWay(ways: readonly SlideWay[], dx: number, dy: number): SlideWay | undefined {
+export function swipedWay(
+  ways: readonly ScreenWay[],
+  dx: number,
+  dy: number,
+): ScreenWay | undefined {
   if (Math.hypot(dx, dy) < SWIPE_THRESHOLD) return undefined;
   return nearestWay(ways, Math.atan2(dy, dx));
 }
@@ -60,7 +64,7 @@ function keySource(): KeySource | undefined {
 // A key with Ctrl, Meta or Alt plays nothing, so a shortcut such as Ctrl+C keeps its job.
 // The hook takes the key events of the whole page while the screen shows the controls.
 // It listens once for each list of ways, and a ref gives the listener the latest `play`.
-export function useSlideKeys(ways: readonly SlideWay[], play: (way: SlideWay) => void): void {
+export function useSlideKeys(ways: readonly ScreenWay[], play: (way: ScreenWay) => void): void {
   const latestPlay = useRef(play);
   useEffect(() => {
     latestPlay.current = play;

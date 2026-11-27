@@ -286,8 +286,9 @@ export class CompositionRoot implements ScreenServices {
 
   // A new session of the game `gameId` on the board figure `figure`, by default the hexagon
   // (#170, #171, #411). Its `GamePresenter` takes the four game use cases of `gameUseCases()`,
-  // so two sessions of one game on one figure share its running game. The session also holds
-  // the screen parts of the registry entry. An id that the registry of the figure does not hold
+  // so two sessions of one game on one figure share its running game. It also takes the state
+  // mapper and the move mapper (#405) of the registry entry. The session also holds the screen
+  // parts of the registry entry. An id that the registry of the figure does not hold
   // throws a RangeError.
   gameSession(gameId: GameId, figure: TopologyId = TopologyId.hex): GameSession {
     const { screen } = this.registry(figure).gameOf(gameId);
@@ -299,6 +300,7 @@ export class CompositionRoot implements ScreenServices {
         undoMove,
         redoMove,
         screen.mapper,
+        screen.moves,
         this.texts,
       ),
       renderer: screen.renderer,

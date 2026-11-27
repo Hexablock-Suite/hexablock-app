@@ -837,7 +837,7 @@
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          slideWays · fittedCellSize
+          cellBoxOf · fittedCellSize
         </text>
         <!-- Component: HTTP client, src/infrastructure/api/, the driver of the transport interfaces of layer 3 (decision 22) -->
         <rect
@@ -1034,7 +1034,7 @@
           ConsoleLogger
         </text>
         <!-- Layer 3: presenters, state mappers, text catalog, driver interface and the adapters of the output ports -->
-        <!-- Component: state mappers -->
+        <!-- Component: state mappers and move mappers (#405), and the slide ways of Merge (#409) -->
         <rect
           x="140"
           y="350"
@@ -1054,7 +1054,7 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.14em"
         >
-          STATE MAPPERS
+          MAPPERS
         </text>
         <text
           x="150"
@@ -1064,7 +1064,7 @@
           font-weight="600"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          State mappers
+          State, move mappers
         </text>
         <line x1="140" y1="386" x2="300" y2="386" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
@@ -1074,7 +1074,7 @@
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          StateMapper
+          StateMapper · MoveMapper
         </text>
         <text
           x="150"
@@ -1083,7 +1083,7 @@
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          LinesStateMapper
+          4 state, 4 move mappers
         </text>
         <text
           x="150"
@@ -1092,7 +1092,7 @@
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          FitStateMapper
+          one of each per variant
         </text>
         <text
           x="150"
@@ -1101,7 +1101,7 @@
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          Sort, MergeStateMapper
+          slideWays (Merge, #409)
         </text>
         <!-- Component: text catalog, src/adapters/texts/ (APP-FR-11) -->
         <rect

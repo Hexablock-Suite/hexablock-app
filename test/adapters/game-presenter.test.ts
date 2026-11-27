@@ -1,5 +1,6 @@
 /** @jest-environment node */
 import { GamePresenter, type GameViewModel } from '../../src/adapters/game-presenter';
+import type { MoveMapper } from '../../src/adapters/move-mapper';
 import type { StateMapper } from '../../src/adapters/state-mapper';
 import { textCatalog, type TextKey } from '../../src/adapters/texts/text-catalog';
 import type { ApplyMoveRequest } from '../../src/application/apply-move';
@@ -75,6 +76,9 @@ function withUndo(
   return answer.ok ? Result.success({ ...answer.value, hasUndo: true, canUndo, canRedo }) : answer;
 }
 
+// A move mapper that gives each intent as its own move, so a test sees the intent it sent.
+const sameMoves: MoveMapper<string, string> = { toMove: (intent) => intent };
+
 // The presenter over four scripted ports and a view that records each model it shows.
 function presenterWith(
   starts: Result<MoveResult<string, Coord, number>>[],
@@ -82,12 +86,21 @@ function presenterWith(
   texts = textCatalog.es,
   undos: Result<MoveResult<string, Coord, number>>[] = [],
   redos: Result<MoveResult<string, Coord, number>>[] = [],
+  moveMapper: MoveMapper<string, string> = sameMoves,
 ) {
   const startGame = new ScriptedUseCase<StartGameRequest>(starts);
   const applyMove = new ScriptedUseCase<ApplyMoveRequest<string>>(moves);
   const undoMove = new ScriptedUseCase<UndoMoveRequest>(undos);
   const redoMove = new ScriptedUseCase<RedoMoveRequest>(redos);
-  const presenter = new GamePresenter(startGame, applyMove, undoMove, redoMove, wordMapper, texts);
+  const presenter = new GamePresenter(
+    startGame,
+    applyMove,
+    undoMove,
+    redoMove,
+    wordMapper,
+    moveMapper,
+    texts,
+  );
   const shown: Model[] = [];
   presenter.attach({ show: (model) => shown.push(model) });
   return { presenter, startGame, applyMove, undoMove, redoMove, shown };
@@ -176,6 +189,33 @@ describe('GamePresenter', () => {
       ],
       payload: 'count 2',
     });
+  });
+
+  // Issue #405: the view sends a plain intent. The move mapper of the game turns it into
+  // the domain move, and `ApplyMove` receives that move.
+  it('should_send_the_move_of_the_move_mapper_through_apply_move_when_the_view_sends_an_intent', async () => {
+    const intents: string[] = [];
+    const words: MoveMapper<string, string> = {
+      toMove: (intent) => {
+        intents.push(intent);
+        return `move of ${intent}`;
+      },
+    };
+    const { presenter, applyMove, shown } = presenterWith(
+      [response([], ['a'], 0)],
+      [response([['a', 'blue']], [], 5)],
+      textCatalog.es,
+      [],
+      [],
+      words,
+    );
+    await presenter.onStart();
+
+    await presenter.onMove('blue on a');
+
+    expect(intents).toEqual(['blue on a']);
+    expect(applyMove.requests).toEqual([{ move: 'move of blue on a' }]);
+    expect(shown.at(-1)?.cells).toEqual([['a', 'cell blue']]);
   });
 
   it('should_name_the_outcome_with_its_text_when_the_move_wins_or_ends_the_game', async () => {

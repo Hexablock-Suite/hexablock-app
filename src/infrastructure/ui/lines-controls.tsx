@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import type { LinesIntent } from '../../adapters/lines-move-mapper';
 import type { LinesCellView, LinesPayloadView } from '../../adapters/lines-state-mapper';
-import { PlacePiece } from '../../domain/variants/hexa-lines/place-piece';
-import { TrayPosition } from '../../domain/variants/hexa-lines/tray-position';
 import { fittedCellSize } from '../../adapters/board/board-fit';
 import { cellBoxOf } from '../../adapters/board/board-layout';
 import { BoardView } from '../board/board-view';
@@ -17,7 +16,7 @@ type LinesProps<TCoord> = MoveControlsProps<
   TCoord,
   LinesCellView,
   LinesPayloadView<TCoord>,
-  PlacePiece<TCoord>
+  LinesIntent<TCoord>
 >;
 
 const PREVIEW = 44;
@@ -25,29 +24,23 @@ const PREVIEW_RENDERER: CellRenderer<string> = {
   render: (color, shape) => <LinesStone color={color} shape={shape} />,
 };
 
+// The move controls of Hexa Lines (classes.md decision 14, issue #174). The player picks
+// a piece of the tray and presses a space. The press sends a `LinesIntent` through
+// `GamePresenter.onMove()`: the index of the piece and the pressed space (#405).
+// `LinesMoveMapper` of layer 3 builds the `PlacePiece`, with the step of the board figure
+// from the pressed space to the offset of the move.
 export class LinesControls<TCoord> implements MoveControls<
   TCoord,
   LinesCellView,
   LinesPayloadView<TCoord>,
-  PlacePiece<TCoord>
+  LinesIntent<TCoord>
 > {
-  constructor(private readonly placementAt: (at: TCoord) => TCoord = (at) => at) {}
-
   render(props: LinesProps<TCoord>) {
-    return <LinesPlay {...props} placementAt={this.placementAt} />;
+    return <LinesPlay {...props} />;
   }
 }
 
-function LinesPlay<TCoord>({
-  model,
-  texts,
-  layoutOf,
-  play,
-  board,
-  placementAt,
-}: LinesProps<TCoord> & {
-  readonly placementAt: (at: TCoord) => TCoord;
-}) {
+function LinesPlay<TCoord>({ model, texts, layoutOf, play, board }: LinesProps<TCoord>) {
   const [choice, choose] = useState<{ tray: LinesPayloadView<TCoord>['tray']; index: number }>();
   const tray = model.payload?.tray;
   // The presenter keeps the tray on rejection and replaces it on success.
@@ -55,8 +48,7 @@ function LinesPlay<TCoord>({
   return (
     <>
       {board((at) => {
-        if (selected !== undefined)
-          play(new PlacePiece(TrayPosition.of(selected), placementAt(at)));
+        if (selected !== undefined) play({ position: selected, at });
       })}
       {tray === undefined ? null : (
         <WoodSign>

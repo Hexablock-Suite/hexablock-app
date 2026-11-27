@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import type { SortIntent } from '../../adapters/sort-move-mapper';
 import type { SortCellView, SortPayloadView } from '../../adapters/sort-state-mapper';
-import { PlaceStack } from '../../domain/variants/hexa-sort/place-stack';
 import type { CellShape } from '../../adapters/board/board-layout';
 import { StackStone } from '../board/sort-cell-renderer';
 import type { MoveControls, MoveControlsProps } from './move-controls';
@@ -13,14 +13,17 @@ type SortProps<TCoord> = MoveControlsProps<
   TCoord,
   SortCellView,
   SortPayloadView,
-  PlaceStack<TCoord>
+  SortIntent<TCoord>
 >;
 
+// The move controls of Hexa Sort (classes.md decision 14, issue #176). A press on a free space
+// sends a `SortIntent` with that space through `GamePresenter.onMove()` (#405), and
+// `SortMoveMapper` of layer 3 builds the `PlaceStack`.
 export class SortControls<TCoord> implements MoveControls<
   TCoord,
   SortCellView,
   SortPayloadView,
-  PlaceStack<TCoord>
+  SortIntent<TCoord>
 > {
   constructor(private readonly preview: CellShape) {}
 
@@ -29,7 +32,7 @@ export class SortControls<TCoord> implements MoveControls<
     const offered = payload?.offered;
     const onPressSpace = (at: TCoord, cell: SortCellView) => {
       // There is only one offer. A free space plays it without a tray choice.
-      if (offered !== undefined && cell.colors.length === 0) play(PlaceStack.on(at));
+      if (offered !== undefined && cell.colors.length === 0) play({ at });
     };
 
     return (

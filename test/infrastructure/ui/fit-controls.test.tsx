@@ -3,6 +3,7 @@ import { StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { BundledLevelRepository } from '../../../src/adapters/bundled-level-repository';
+import { FitMoveMapper } from '../../../src/adapters/fit-move-mapper';
 import { FitStateMapper } from '../../../src/adapters/fit-state-mapper';
 import fit01 from '../../../src/adapters/levels/fit/fit-01.json';
 import fitSquare01 from '../../../src/adapters/levels/fit/fit-square-01.json';
@@ -12,6 +13,7 @@ import fitTriangle01 from '../../../src/adapters/levels/fit/fit-triangle-01.json
 import fitTriangle02 from '../../../src/adapters/levels/fit/fit-triangle-02.json';
 import fitTriangle03 from '../../../src/adapters/levels/fit/fit-triangle-03.json';
 import { GamePresenter } from '../../../src/adapters/game-presenter';
+import type { MoveMapper } from '../../../src/adapters/move-mapper';
 import { textCatalog } from '../../../src/adapters/texts/text-catalog';
 import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
 import { GameId } from '../../../src/domain/shared/game-id';
@@ -97,9 +99,18 @@ interface ScreenFigure<TCoord> {
   readonly layoutOf: (size: number) => BoardLayout<TCoord>;
 }
 
-// The move controls of the game screen. By default they are the Fit controls with no step
-// of the figure, as the hexagon and the square have them.
-type ScreenControls = MoveControls<unknown, unknown, unknown, unknown>;
+// The move controls of the game screen and the move mapper that turns their intents into moves.
+// By default they are the Fit controls and the Fit move mapper with no step of the figure,
+// as the hexagon and the square have them. Since #405 the mapper holds the step of the figure.
+interface ScreenControls {
+  readonly controls: MoveControls<unknown, unknown, unknown, unknown>;
+  readonly moves: MoveMapper<unknown, unknown>;
+}
+
+// The Fit controls and the Fit move mapper with no step of the figure.
+function fitControls(): ScreenControls {
+  return { controls: new FitControls(), moves: new FitMoveMapper() };
+}
 
 // Opens the game screen on the Fit level `level` of the board figure `figure`
 // with the screen parts of Fit.
@@ -107,7 +118,7 @@ async function openLevelOn<TCoord>(
   figure: ScreenFigure<TCoord>,
   level: FitLevel<TCoord>,
   clock = new ManualClock(),
-  controls: ScreenControls = new FitControls(),
+  controls: ScreenControls = fitControls(),
 ): Promise<void> {
   const { startGame, applyMove, undoMove, redoMove } = gameUseCases(
     new FitFactory(figure.geometry, level, clock),
@@ -118,6 +129,7 @@ async function openLevelOn<TCoord>(
     undoMove,
     redoMove,
     new FitStateMapper(figure.geometry.createTopology()),
+    controls.moves,
     textCatalog.es,
   );
   await render(
@@ -127,7 +139,7 @@ async function openLevelOn<TCoord>(
         presenter={presenter}
         renderer={new FitCellRenderer()}
         layoutOf={figure.layoutOf}
-        controls={controls}
+        controls={controls.controls}
         texts={textCatalog.es}
         onBack={jest.fn()}
       />
@@ -291,10 +303,12 @@ function appTriangle() {
   return appFigure(TopologyId.triangle);
 }
 
-// The Fit controls that the composition root registers for the board figure `figureId`.
+// The Fit controls and the Fit move mapper that the composition root registers
+// for the board figure `figureId`.
 function appFitControls(figureId: TopologyId): ScreenControls {
   const root = new CompositionRoot({ clock: new ManualClock(), logger: new RecordingLogger() });
-  return root.registry(figureId).gameOf(GameId.of('hexa-fit')).screen.controls;
+  const { controls, moves } = root.registry(figureId).gameOf(GameId.of('hexa-fit')).screen;
+  return { controls, moves };
 }
 
 // Plays the placements of `order` on the game screen of the triangle, as a player does:
@@ -479,11 +493,11 @@ describe('FitControls', () => {
   // Issue #354 and the trap of #174: on the triangle each cell points up or down, and
   // a placement keeps the orientation of each cell. So the player plays the witness of each
   // bundled square and triangle level on the screen, and each level is won.
-  // These Fit controls have no step of the figure, so the press gives the pressed cell to the
+  // This Fit move mapper has no step of the figure, so the press gives the pressed cell to the
   // move as the offset of the piece. On the triangle an offset counts lattice cells, so the
   // piece can cover other cells than the pressed one: each triangle witness names as its offset
-  // a cell of the figure that is free at its turn. The controls of the app ask the triangle
-  // figure for the offset (#365), and the test of every order below plays them.
+  // a cell of the figure that is free at its turn. The move mapper of the app asks the triangle
+  // figure for the offset (#365, #405), and the test of every order below plays it.
   it('should_reach_the_victory_outcome_when_the_player_plays_the_witness_of_each_square_and_triangle_level', async () => {
     const square = {
       geometry: new SquareGeometry(),
@@ -513,7 +527,7 @@ describe('FitControls', () => {
   });
 
   // Issue #365: on the triangle an offset counts lattice cells, and one lattice cell holds
-  // an up triangle and a down triangle. So the Fit controls ask the triangle figure for the
+  // an up triangle and a down triangle. So the Fit move mapper asks the triangle figure for the
   // offset of a press: the origin of the chosen piece, at its rotation step, lands on the
   // pressed space. The test plays every order of the pieces of the first Fit level of
   // the triangle and of `fit-triangle-01` to `fit-triangle-03`, with each piece at the
@@ -561,7 +575,7 @@ describe('FitControls', () => {
   }, 60_000);
 
   // Issue #365 keeps the hexagon and the square as they are: their figures give no step,
-  // so the Fit controls of the root put the origin of the turned piece on the pressed space.
+  // so the Fit move mapper of the root puts the origin of the turned piece on the pressed space.
   // On `fit-01` the domino `b` turned once on space 2 covers spaces 2 and 5. On the first
   // square level, (0,0) (1,0) (2,0), the domino `a` turned twice on space 1 covers spaces 0 and 1.
   it('should_place_the_origin_of_the_turned_piece_on_the_pressed_space_when_the_figure_is_the_hexagon_or_the_square', async () => {

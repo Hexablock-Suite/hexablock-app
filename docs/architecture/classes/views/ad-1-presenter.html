@@ -1086,7 +1086,7 @@
           + onStart(levelId: LevelId [0..1]): Promise&lt;void&gt;
         </text>
         <text x="352" y="988" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + onMove(move: TMove): Promise&lt;void&gt;
+          + onMove(intent: TIntent): Promise&lt;void&gt;
         </text>
         <text
           x="352"
@@ -1459,9 +1459,9 @@
           TCoord
         </text>
         <rect
-          x="607"
+          x="593"
           y="854"
-          width="165"
+          width="179"
           height="30"
           rx="2"
           fill="#ffffff"
@@ -1470,24 +1470,24 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="689.5"
+          x="682.5"
           y="866"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TCell, TCoord, TMove,
+          TCell, TCoord, TMove, TView,
         </text>
         <text
-          x="689.5"
+          x="682.5"
           y="878"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TView, TCellView, TPayloadView
+          TCellView, TPayloadView, TIntent
         </text>
         <rect
           x="91.3"
@@ -1606,9 +1606,9 @@
           TCoord
         </text>
         <rect
-          x="226"
+          x="218"
           y="226"
-          width="108"
+          width="116"
           height="30"
           rx="2"
           fill="#ffffff"
@@ -1617,7 +1617,7 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="280"
+          x="276"
           y="238"
           fill="#5b6873"
           font-size="8.5"
@@ -1627,14 +1627,14 @@
           TCoord, TCellView,
         </text>
         <text
-          x="280"
+          x="276"
           y="250"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TPayloadView, TMove
+          TPayloadView, TIntent
         </text>
         <rect
           x="154"

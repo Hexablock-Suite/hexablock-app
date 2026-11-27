@@ -28,7 +28,7 @@ const METRICS = {
 async function openLevel(stacks: readonly (readonly string[])[]): Promise<void> {
   const root = new CompositionRoot({ clock: new ManualClock(), logger: new RecordingLogger() });
   const game = root.registry().gameOf(GameId.of('hexa-sort'));
-  const { mapper, controls, renderer, layoutOf } = game.screen;
+  const { mapper, moves, controls, renderer, layoutOf } = game.screen;
   const level = SortLevel.fixed(
     RegionSize.of(2),
     GoalCount.of(2),
@@ -43,6 +43,7 @@ async function openLevel(stacks: readonly (readonly string[])[]): Promise<void> 
     undoMove,
     redoMove,
     mapper,
+    moves,
     textCatalog.es,
   );
   await render(
