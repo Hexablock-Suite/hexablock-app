@@ -86,6 +86,8 @@ const ERROR_TEXTS: Readonly<Record<FailureCode, TextKey>> = {
   'register-failed': 'play.error',
   'login-failed': 'play.error',
   'sign-in-after-sign-up-failed': 'play.error',
+  'session-expired': 'play.error',
+  'sync-failed': 'play.error',
   'unexpected-failure': 'play.error',
 };
 

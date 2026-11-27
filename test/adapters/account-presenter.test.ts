@@ -3,7 +3,9 @@ import { textCatalog, type TextKey } from '../../src/adapters/texts/text-catalog
 import type { Credentials } from '../../src/application/credentials';
 import { FailureCode, Result, UseCaseError } from '../../src/application/result';
 import { Session } from '../../src/application/session';
+import type { SyncProgressRequest } from '../../src/application/sync-progress';
 import type { UseCase } from '../../src/application/use-case';
+import { GameId } from '../../src/domain/shared/game-id';
 
 // #45 (APP-FR-12): the account screen signs the player up or in, and shows the answer.
 
@@ -140,5 +142,84 @@ describe('AccountPresenter', () => {
     await presenter.onLogin(ADA);
 
     expect(shown).toEqual([formOf()]);
+  });
+});
+
+// #46 (APP-FR-13, D27): when the player signs in, the app uploads the progress made with no
+// account. The presenter asks `SyncProgress` for each registered game, and the use case merges the
+// anonymous progress into the account before it sends it.
+describe('AccountPresenter and the sync after a sign-in', () => {
+  const GAMES = [GameId.of('hexa-lines'), GameId.of('hexa-fit')];
+
+  // A `SyncProgress` port that keeps each request and answers `answer`.
+  class SyncingUseCase implements UseCase<SyncProgressRequest, void> {
+    readonly requests: SyncProgressRequest[] = [];
+    constructor(private readonly answer: Result<void> = Result.success(undefined)) {}
+    execute(request: SyncProgressRequest): Promise<Result<void>> {
+      this.requests.push(request);
+      return Promise.resolve(this.answer);
+    }
+  }
+
+  function syncingPresenter(
+    login: Result<Session>[],
+    register: Result<Session>[],
+    sync: SyncingUseCase,
+  ) {
+    return new AccountPresenter(new AnsweringUseCase(register), new AnsweringUseCase(login), es, {
+      syncProgress: sync,
+      gameIds: GAMES,
+    });
+  }
+
+  it('should_sync_the_progress_of_each_game_when_the_sign_in_or_the_sign_up_succeeds', async () => {
+    const sync = new SyncingUseCase();
+    const presenter = syncingPresenter([Result.success(SESSION)], [Result.success(SESSION)], sync);
+
+    await presenter.onLogin(ADA);
+    await presenter.onRegister(ADA);
+
+    expect(sync.requests.map(({ gameId }) => GAMES.findIndex((id) => id.equals(gameId)))).toEqual([
+      0, 1, 0, 1,
+    ]);
+    expect(presenter.viewModel()).toEqual({ ...formOf(), signedIn: 'Sesión iniciada como ada' });
+  });
+
+  it('should_sync_nothing_when_the_sign_in_fails', async () => {
+    const sync = new SyncingUseCase();
+    const presenter = syncingPresenter([failure(FailureCode.wrongCredentials)], [], sync);
+
+    await presenter.onLogin(ADA);
+
+    expect(sync.requests).toEqual([]);
+  });
+
+  it('should_keep_the_signed_in_text_when_the_sync_after_the_sign_in_fails_another_way', async () => {
+    const sync = new SyncingUseCase(
+      Result.failure(new UseCaseError(FailureCode.backendUnreachable, 'No answer.')),
+    );
+    const presenter = syncingPresenter([Result.success(SESSION)], [], sync);
+
+    await presenter.onLogin(ADA);
+
+    expect(presenter.viewModel()).toEqual({ ...formOf(), signedIn: 'Sesión iniciada como ada' });
+  });
+
+  // `SyncProgress` cleared the session, so the player must sign in again. The sync stops there.
+  it('should_show_the_text_of_an_expired_session_when_the_sync_after_the_sign_in_gives_session_expired', async () => {
+    const sync = new SyncingUseCase(
+      Result.failure(
+        new UseCaseError(FailureCode.sessionExpired, 'POST /v1/progress answered 401.'),
+      ),
+    );
+    const presenter = syncingPresenter([Result.success(SESSION)], [], sync);
+
+    await presenter.onLogin(ADA);
+
+    expect(presenter.viewModel()).toEqual({
+      ...formOf(),
+      error: es['account.error.session-expired'],
+    });
+    expect(sync.requests).toHaveLength(1);
   });
 });

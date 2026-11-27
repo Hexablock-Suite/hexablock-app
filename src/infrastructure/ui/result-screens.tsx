@@ -12,21 +12,26 @@ import { LipButton, WoodSign } from './wood';
 // new game of a game with no levels (Lines, Merge), when the view model has one, and the way back
 // to the map. Every visible text comes from the view model, which reads the text catalog
 // (APP-FR-11). The back gesture of the system goes back to the map.
+// When the backend refused the token of the sync after the save (#46), both screens show the
+// request to sign in and a button that calls `onSignIn`.
 export function VictoryScreen({
   model,
   onNext,
   onNewGame,
   onBack,
+  onSignIn,
 }: {
   readonly model: ResultViewModel;
   // Opens the level whose text is `levelId`.
   readonly onNext: (levelId: string) => void;
   readonly onNewGame: () => void;
   readonly onBack: () => void;
+  // Opens the account screen.
+  readonly onSignIn: () => void;
 }) {
   const { next, newGame } = model;
   return (
-    <ResultSign model={model} stone={palette.sun} onBack={onBack}>
+    <ResultSign model={model} stone={palette.sun} onBack={onBack} onSignIn={onSignIn}>
       {next === undefined ? null : (
         <LipButton label={next.label} look="sun" onPress={() => onNext(next.levelId)} />
       )}
@@ -42,13 +47,16 @@ export function DefeatScreen({
   model,
   onRetry,
   onBack,
+  onSignIn,
 }: {
   readonly model: ResultViewModel;
   readonly onRetry: () => void;
   readonly onBack: () => void;
+  // Opens the account screen.
+  readonly onSignIn: () => void;
 }) {
   return (
-    <ResultSign model={model} stone={palette.woodLight} onBack={onBack}>
+    <ResultSign model={model} stone={palette.woodLight} onBack={onBack} onSignIn={onSignIn}>
       {model.retry === undefined ? null : (
         <LipButton label={model.retry} look="sun" onPress={onRetry} />
       )}
@@ -57,19 +65,22 @@ export function DefeatScreen({
 }
 
 // The part that both screens share: a wood sign over a veil with a stone of the color `stone`,
-// the title, the final score, the text of a failed save, the buttons of the screen and the way
-// back to the map.
+// the title, the final score, the text of a failed save, the request to sign in, the buttons of
+// the screen and the way back to the map.
 function ResultSign({
   model,
   stone,
   onBack,
+  onSignIn,
   children,
 }: {
   readonly model: ResultViewModel;
   readonly stone: string;
   readonly onBack: () => void;
+  readonly onSignIn: () => void;
   readonly children: ReactNode;
 }) {
+  const { signIn } = model;
   return (
     <Modal visible transparent animationType="fade" statusBarTranslucent onRequestClose={onBack}>
       <View style={styles.scrim}>
@@ -87,6 +98,14 @@ function ResultSign({
               <Text accessibilityRole="alert" style={styles.error}>
                 {model.error}
               </Text>
+            )}
+            {signIn === undefined ? null : (
+              <>
+                <Text accessibilityRole="alert" style={styles.error}>
+                  {signIn.text}
+                </Text>
+                <LipButton label={signIn.label} look="panel" onPress={onSignIn} />
+              </>
             )}
             {children}
             <LipButton label={model.back} look="panel" onPress={onBack} />

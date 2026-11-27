@@ -1,6 +1,7 @@
 import type { LevelSummary } from '../application/level-summary';
 import type { ListLevelsRequest } from '../application/list-levels';
 import type { MoveResult } from '../application/move-result';
+import type { SyncProgressRequest } from '../application/sync-progress';
 import { caughtError, FailureCode, Result } from '../application/result';
 import type { UseCase } from '../application/use-case';
 import { Outcome } from '../domain/engine/outcome';
@@ -31,6 +32,9 @@ export interface ResultViewModel {
   readonly retry?: string;
   // The text of a failed save or of a failed list. The result stays on the screen.
   readonly error?: string;
+  // The request to sign in again, with its text and the label of its button (#46). It exists only
+  // when the sync after the save gives `session-expired`: the backend refused the token.
+  readonly signIn?: { readonly text: string; readonly label: string };
 }
 
 // The view of MVP: the screen that shows each new view model. `undefined` means no result:
@@ -44,9 +48,12 @@ export interface ResultView {
 // no levels: a level counts its stars with its own star rule, so each level has its own model.
 // A root with no local store throws a RangeError, as `loadProgress()` does.
 // `listLevels()` gives `ListLevels`, and a root with no local store throws a RangeError too.
+// `syncProgress()` gives `SyncProgress` (#46). A root with no backend, no secure store or no local
+// store offers none, and the presenter syncs nothing.
 export interface ResultUseCases {
   saveProgressOf(levelId: LevelId | undefined): Promise<UseCase<GameResult, void>>;
   listLevels(): UseCase<ListLevelsRequest, LevelSummary[]>;
+  syncProgress?(): UseCase<SyncProgressRequest, void>;
 }
 
 // The text of each failure code (issue #322, classes.md decision 62). The table is a `Record`
@@ -74,6 +81,8 @@ const ERROR_TEXTS: Readonly<Record<FailureCode, TextKey>> = {
   'register-failed': 'result.error',
   'login-failed': 'result.error',
   'sign-in-after-sign-up-failed': 'result.error',
+  'session-expired': 'result.session-expired',
+  'sync-failed': 'result.error',
   'unexpected-failure': 'result.error',
 };
 
@@ -88,6 +97,11 @@ const ERROR_TEXTS: Readonly<Record<FailureCode, TextKey>> = {
 //   with their status (S3-12, #326), so the presenter holds no copy of the rule of an open level.
 //   It offers the level after the won level when that level is not locked.
 // - A won game with no levels offers a new game, and a lost game offers a retry.
+// - After a successful save it syncs the progress of the game through `SyncProgress` (#46, D27).
+//   It shows the result first, so no screen waits for the network. `SyncProgress` sends nothing
+//   with no session. A sync that gives `session-expired` adds the request to sign in again.
+//   Any other failed sync shows nothing: the local progress keeps the result, and the log keeps
+//   the failure. A result that the player closed before the sync ends stays closed.
 // The presenter reads only the plain `MoveResult` (decision 29). It builds the `GameResult` from
 // its value objects and opens only the score and the level id, with `deliverTo()` (rule
 // R-no-delivery-call). It keeps no level id: the root keeps the level of the match (decision 61).
@@ -129,7 +143,7 @@ export class ResultPresenter {
     const saved = await this.save(response, victory);
     const next = victory ? await this.nextLevel(response.levelId) : undefined;
     const failure = [saved, next?.result].find((result) => result?.ok === false);
-    this.model = {
+    const model: ResultViewModel = {
       victory,
       title: this.texts[victory ? 'result.victory' : 'result.defeat'],
       scoreLabel: this.texts['result.score'],
@@ -140,13 +154,37 @@ export class ResultPresenter {
         ? {}
         : { error: this.texts[ERROR_TEXTS[failure.error.code]] }),
     };
-    this.view?.show(this.model);
+    this.present(model);
+    if (saved?.ok === true) await this.sync(model);
   }
 
   // Closes the result: the player plays again or starts a new game.
   onClose(): void {
-    this.model = undefined;
-    this.view?.show(this.model);
+    this.present(undefined);
+  }
+
+  // Syncs the progress of the game after a save of the result `shown` (#46). A sync that gives
+  // `session-expired` adds the request to sign in to `shown`, when the screen still shows it.
+  private async sync(shown: ResultViewModel): Promise<void> {
+    const syncProgress = this.useCases.syncProgress;
+    if (syncProgress === undefined) return;
+    const result = await attempt(FailureCode.syncFailed, () =>
+      syncProgress.call(this.useCases).execute({ gameId: this.gameId }),
+    );
+    if (result.ok || result.error.code !== FailureCode.sessionExpired) return;
+    if (this.model !== shown) return;
+    this.present({
+      ...shown,
+      signIn: {
+        text: this.texts[ERROR_TEXTS[result.error.code]],
+        label: this.texts['result.sign-in'],
+      },
+    });
+  }
+
+  private present(model: ResultViewModel | undefined): void {
+    this.model = model;
+    this.view?.show(model);
   }
 
   // The buttons of the result. A won level offers its next level, a won game with no levels
