@@ -7,7 +7,9 @@ import type { AccountApi } from '../../src/adapters/api/account-api';
 import { ApiFailure } from '../../src/adapters/api/api-failure';
 import type { HealthApi } from '../../src/adapters/api/health-api';
 import type { LeaderboardApi } from '../../src/adapters/api/leaderboard-api';
+import type { LevelsApi } from '../../src/adapters/api/levels-api';
 import type { ProgressApi } from '../../src/adapters/api/progress-api';
+import fit01 from '../../src/adapters/levels/fit/fit-01.json';
 import { createApiClient } from '../../src/infrastructure/api/client';
 import { startFakeBackend, type FakeBackend, type FakeRoutes } from '../support/fake-backend';
 import { repoRoot, runNodeScript } from '../support/run-tool';
@@ -69,6 +71,7 @@ const DESCRIPTIONS = [
   'the leaderboard of a level',
   'a leaderboard with a refused token',
   'the leaderboard of a level that is not stored',
+  'the stored levels',
 ];
 
 // The `ApiFailure` that `call` rejects with. A call that resolves fails the test.
@@ -410,6 +413,24 @@ describe('client contract', () => {
         });
     });
 
+    // #48 (APP-FR-15): the app reads the stored levels of the backend, with no token. The provider
+    // state `a level is stored` of hexablock-api #151 stores the example level of the level format,
+    // which the bundled file `fit-01.json` holds too. The pact pins the shape of each level, so a
+    // level that the backend stores later still matches.
+    it('should_give_the_stored_levels_when_the_backend_holds_a_level', async () => {
+      await pact
+        .addInteraction()
+        .given('a level is stored', SYNCED_LEVEL)
+        .uponReceiving('the stored levels')
+        .withRequest('GET', '/v1/levels')
+        .willRespondWith(200, (builder) => builder.jsonBody({ levels: MatchersV3.eachLike(fit01) }))
+        .executeTest(async (mockServer) => {
+          const api: LevelsApi = createApiClient(mockServer.url);
+
+          await expect(api.getLevels()).resolves.toEqual({ levels: [fit01] });
+        });
+    });
+
     // The gateway maps this 404 to `level-has-no-board` (hexablock-api#134).
     it('should_reject_with_the_status_404_when_the_backend_holds_no_level_of_the_leaderboard', async () => {
       await pact
@@ -513,6 +534,8 @@ describe('client contract', () => {
           request.headers.authorization === `Bearer ${STATE_TOKEN}`
             ? { status: 200, body: { ...BOARD_LEVEL, entries: [LEVEL_ROW] } }
             : { status: 401, body: { statusCode: 401 } },
+        // The stored level of the state `a level is stored`.
+        '/v1/levels': { status: 200, body: { levels: [fit01] } },
         [`/v1/leaderboard/hexa-fit/levels/${UNKNOWN_LEVEL}`]: (request) =>
           request.headers.authorization === `Bearer ${STATE_TOKEN}`
             ? { status: 404, body: { statusCode: 404 } }

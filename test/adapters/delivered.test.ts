@@ -82,7 +82,7 @@ function resultPresenterWith(levels: LevelSummary[] = []) {
     TopologyId.square,
     {
       saveProgressOf: async () => ({ execute: async () => Result.success(undefined) }),
-      listLevels: () => ({ execute: async () => Result.success(levels) }),
+      listLevels: () => ({ execute: async () => Result.success({ levels, unavailable: [] }) }),
     },
     textCatalog.es,
   );
@@ -91,7 +91,7 @@ function resultPresenterWith(levels: LevelSummary[] = []) {
 // A level selector of Fit on the square whose `ListLevels` answers `levels`.
 function levelSelectorWith(levels: LevelSummary[]) {
   return new LevelSelectorPresenter(
-    { execute: async () => Result.success(levels) },
+    { execute: async () => Result.success({ levels, unavailable: [] }) },
     { gameId: FIT, figure: TopologyId.square },
     textCatalog.es,
   );

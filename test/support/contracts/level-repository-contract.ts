@@ -14,6 +14,7 @@ export interface LevelData {
   readonly gameId: string;
   readonly levelId: string;
   readonly order: number;
+  readonly version: number;
   readonly topology: string;
   readonly section: unknown;
 }
@@ -25,14 +26,15 @@ const levels = (): LevelData[] => [fitLevelFile(), secondFitLevel(), sortLevelFi
 
 // The contract of the `LevelRepository` port (classes.md decision 58, issues #168 and #172).
 // Every adapter of the port runs the same suite, so they behave the same.
-// `make(levels)` gives a new repository that holds the levels `levels`.
+// `make(levels)` gives a new repository that holds the levels `levels`, or a promise of it: an
+// adapter that reads the backend first gets its answer (#48).
 export function describeLevelRepositoryContract(
   name: string,
-  make: (levels: readonly LevelData[]) => LevelRepository,
+  make: (levels: readonly LevelData[]) => LevelRepository | Promise<LevelRepository>,
 ): void {
   describe(`${name} as a LevelRepository`, () => {
     it('should_list_only_the_levels_of_the_game_when_the_repository_holds_the_levels_of_two_games', async () => {
-      const listed = await make(levels()).list(FIT);
+      const listed = await (await make(levels())).list(FIT);
 
       expect(listed.map((level) => delivered(level.levelId())).sort()).toEqual([
         'fit-01',
@@ -41,12 +43,12 @@ export function describeLevelRepositoryContract(
     });
 
     it('should_list_no_level_when_the_game_has_no_level', async () => {
-      await expect(make(levels()).list(LINES)).resolves.toEqual([]);
+      await expect((await make(levels())).list(LINES)).resolves.toEqual([]);
     });
 
     // Issue #172: `StartGame` starts a level from its id, so the port finds one level.
     it('should_give_the_definition_of_the_level_when_the_game_has_a_level_with_the_id', async () => {
-      const found = await make(levels()).levelOf(FIT, LevelId.of('fit-02'));
+      const found = await (await make(levels())).levelOf(FIT, LevelId.of('fit-02'));
 
       expect(found?.equals(LevelDefinition.of(secondFitLevel()))).toBe(true);
     });
@@ -54,7 +56,7 @@ export function describeLevelRepositoryContract(
     // `sort-01` is a level of another game, `fit-09` is no level,
     // and a game with no levels has no level of any id.
     it('should_give_no_level_when_the_game_has_no_level_with_the_id', async () => {
-      const repository = make(levels());
+      const repository = await make(levels());
 
       const found = [
         await repository.levelOf(FIT, LevelId.of('sort-01')),
@@ -63,6 +65,14 @@ export function describeLevelRepositoryContract(
       ];
 
       expect(found).toEqual([undefined, undefined, undefined]);
+    });
+
+    // Issue #307: a repository that holds only levels that it can give names no unavailable level.
+    it('should_name_no_unavailable_level_when_every_level_of_the_game_can_be_given', async () => {
+      const repository = await make(levels());
+
+      await expect(repository.unavailable(FIT)).resolves.toEqual([]);
+      await expect(repository.unavailable(LINES)).resolves.toEqual([]);
     });
   });
 }

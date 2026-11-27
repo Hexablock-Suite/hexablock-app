@@ -64,28 +64,28 @@
       <h1>The use cases at a glance</h1>
 
       <svg
-        viewBox="0 0 1040 1672"
+        viewBox="0 0 1040 1688"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="mapuc-title mapuc-desc"
       >
         <title id="mapuc-title">HexaBlock use cases map · UML class diagram</title>
         <desc id="mapuc-desc">
-          Overview map of the 62 layer 2 classes in 8 groups, GetGlobalLeaderboard and
-          GetLevelLeaderboard of #47 among the progress use cases with their port
-          LeaderboardGateway, their requests, Leaderboard, LeaderboardRow, LeaderboardRecord and
-          their error LeaderboardFailure among the models, AchievementCounterRepository of #363
-          among the output ports, SyncProgress of #46 among the progress use cases with its ports
-          AnonymousProgress and ProgressGateway, its request SyncProgressRequest and its error
-          SyncFailure, the owner ProgressOwner and the merge AnonymousMerge of #46 among the models
-          with LoadProgressRequest, UndoMoveRequest, RedoMoveRequest and FailureCode, the
-          achievements of #188 among them, with LevelDefinition, LevelStatus, AchievementGoal,
-          LevelsWon, EveryLevelWon, BestCountReached and TotalCountReached of layer 1 as dashed
-          chips (#326, #364). Each line joins two classes: UseCaseAspect implements UseCase and
-          decorates the one it wraps, StartGame, SaveProgress, LoadProgress and Register each
-          implement UseCase for their group, and RedoMove, GetLevelLeaderboard and UpdateSettings
-          keep an output port. No line touches a group frame. Each group names the view that shows
-          its members.
+          Overview map of the 63 layer 2 classes in 8 groups, LevelList of #307 among the models,
+          GetGlobalLeaderboard and GetLevelLeaderboard of #47 among the progress use cases with
+          their port LeaderboardGateway, their requests, Leaderboard, LeaderboardRow,
+          LeaderboardRecord and their error LeaderboardFailure among the models,
+          AchievementCounterRepository of #363 among the output ports, SyncProgress of #46 among the
+          progress use cases with its ports AnonymousProgress and ProgressGateway, its request
+          SyncProgressRequest and its error SyncFailure, the owner ProgressOwner and the merge
+          AnonymousMerge of #46 among the models with LoadProgressRequest, UndoMoveRequest,
+          RedoMoveRequest and FailureCode, the achievements of #188 among them, with
+          LevelDefinition, LevelStatus, AchievementGoal, LevelsWon, EveryLevelWon, BestCountReached
+          and TotalCountReached of layer 1 as dashed chips (#326, #364). Each line joins two
+          classes: UseCaseAspect implements UseCase and decorates the one it wraps, StartGame,
+          SaveProgress, LoadProgress and Register each implement UseCase for their group, and
+          RedoMove, GetLevelLeaderboard and UpdateSettings keep an output port. No line touches a
+          group frame. Each group names the view that shows its members.
         </desc>
         <defs>
           <marker
@@ -138,9 +138,7 @@
             />
           </marker>
         </defs>
-
         <rect width="100%" height="100%" fill="#f3f5f6" />
-
         <!-- Layer zone: layer 2, use cases -->
         <rect
           x="24"
@@ -163,7 +161,6 @@
         >
           LAYER 2 · USE CASES · src/application/
         </text>
-
         <!-- Groups: one dashed frame per package -->
         <!-- Group: aspects -->
         <rect
@@ -410,7 +407,6 @@
         >
           VIEW 3.5
         </text>
-
         <!-- Group: achievements -->
         <rect
           x="56"
@@ -446,7 +442,6 @@
         >
           VIEW 3.6
         </text>
-
         <!-- Dependencies between classes of two groups (drawn before chips). Each line starts on the class that holds, calls or implements and ends on the class it needs. No line touches a frame. -->
         <!-- UseCaseAspect implements UseCase: realization (view 3.1) -->
         <path
@@ -525,7 +520,6 @@
           stroke-width="1"
           marker-end="url(#mapuc-open)"
         />
-
         <!-- Arrow labels: role and multiplicity at the target end -->
         <rect x="542" y="226" width="56" height="12" rx="2" fill="#efe7f8" />
         <text
@@ -575,7 +569,6 @@
         >
           settings 1
         </text>
-
         <!-- Chips: aspects -->
         <g data-class="UseCaseAspect">
           <rect
@@ -862,7 +855,6 @@
             </tspan>
           </text>
         </g>
-
         <!-- SyncProgress, the sync of the progress (#46, decision 66) -->
         <g data-class="SyncProgress">
           <rect
@@ -1554,7 +1546,6 @@
             </tspan>
           </text>
         </g>
-
         <g data-class="ListLevelsRequest">
           <rect
             x="792"
@@ -2092,6 +2083,35 @@
             </tspan>
           </text>
         </g>
+        <!-- LevelList, the response model of ListLevels (#307, decision 68) -->
+        <g data-class="LevelList">
+          <rect
+            x="616"
+            y="1270"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="696"
+            y="1282"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object · view 3.3
+          </text>
+          <text x="696" y="1295" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              LevelList
+            </tspan>
+          </text>
+        </g>
         <!-- Chips: achievements -->
         <g data-class="ListAchievements">
           <rect
@@ -2386,8 +2406,18 @@
           Leaderboard, LeaderboardRow, LeaderboardRecord and LeaderboardFailure exist since #47
           (view 3.7, decision 67).
         </text>
-        <!-- The legend sits 82 lower than before: the footnote has one more line since #326 and one more since #46, and the models group has one more row since #46. Since #47 the shifts of the progress group, of the models group and of the footnote move it again. -->
-        <g transform="translate(0 82)">
+        <text
+          x="24"
+          y="1588"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          LevelList, the response model of ListLevels with the unavailable levels of a game, exists
+          since #307 (view 3.3, decision 68).
+        </text>
+        <!-- The legend sits 82 lower than before: the footnote has one more line since #326 and one more since #46, and the models group has one more row since #46. Since #47 the shifts of the progress group, of the models group and of the footnote move it again, and since #307 the footnote line of LevelList moves it 16 lower. -->
+        <g transform="translate(0 98)">
           <!-- Legend -->
           <line
             x1="24"
@@ -2407,7 +2437,6 @@
           >
             LEGEND
           </text>
-
           <line
             x1="24"
             y1="1550"
@@ -2463,7 +2492,6 @@
           >
             Aggregation · decorator to the type it wraps
           </text>
-
           <rect
             x="24"
             y="1570"

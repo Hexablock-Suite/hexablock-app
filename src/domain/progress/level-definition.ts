@@ -10,15 +10,18 @@ import { LevelId } from './level-id';
 // The text and the numbers of the file stay in the parameter of `of()` and in private fields
 // (APP-NFR-25).
 // `of()` turns the level id into a `LevelId` and the topology into a `TopologyId`.
-// Each one refuses a wrong text. `of()` also refuses an order that is not a whole number of 1 or more.
+// Each one refuses a wrong text. `of()` also refuses an order or a version that is not a whole
+// number of 1 or more.
 // The definition keeps the section as JSON text. Each build parses a new copy,
 // so neither the caller nor a builder can change the section of the definition.
 // A builder reads the topology and the section. The list of levels reads the level id,
-// the order and the topology (#168). It reads no `version`: DS-11 compares two copies later.
+// the order and the topology (#168). The version tells two copies of one level apart:
+// `replaces()` holds the rule of DS-11 (#48).
 export class LevelDefinition {
   private constructor(
     private readonly id: LevelId,
     private readonly order: number,
+    private readonly version: number,
     private readonly topology: TopologyId,
     private readonly section: string,
   ) {
@@ -28,22 +31,32 @@ export class LevelDefinition {
   // A file with no section throws a RangeError. Only a cast or a broken file leaves it out.
   // An order that is not a whole number of 1 or more throws a RangeError,
   // and the error carries the order as its `cause` (issue #237).
+  // A version that is not a whole number of 1 or more throws a RangeError too,
+  // and the error carries the version as its `cause` (#48). The first copy of a level has
+  // the version 1 (DS-6).
   static of(level: {
     levelId: string;
     order: number;
+    version: number;
     topology: string;
     section: unknown;
   }): LevelDefinition {
     const section = JSON.stringify(level.section) as string | undefined;
     if (section === undefined) throw new RangeError('A level file needs a section.');
-    if (!Number.isSafeInteger(level.order) || level.order < 1) {
+    if (!isWholeFromOne(level.order)) {
       throw new RangeError('A level order needs a whole number of 1 or more.', {
         cause: level.order,
+      });
+    }
+    if (!isWholeFromOne(level.version)) {
+      throw new RangeError('A level version needs a whole number of 1 or more.', {
+        cause: level.version,
       });
     }
     return new LevelDefinition(
       LevelId.of(level.levelId),
       level.order,
+      level.version,
       TopologyId.of(level.topology),
       section,
     );
@@ -73,13 +86,29 @@ export class LevelDefinition {
     return this.order < other.order;
   }
 
-  // Two definitions are equal when they hold the same level id, order, topology and section text.
+  // Tells if this copy of a level replaces the copy `other` (DS-11, #48): both copies have one
+  // level id, and this copy has the higher version. A copy of an equal or a lower version does not
+  // replace `other`, and a copy of another level never replaces it. The caller knows which copy
+  // the app bundles, so it keeps the bundled copy when no copy replaces it.
+  replaces(other: LevelDefinition): boolean {
+    return this.id.equals(other.id) && this.version > other.version;
+  }
+
+  // Two definitions are equal when they hold the same level id, order, version, topology and
+  // section text.
   equals(other: LevelDefinition): boolean {
     return (
       this.id.equals(other.id) &&
       this.order === other.order &&
+      this.version === other.version &&
       this.topology.equals(other.topology) &&
       this.section === other.section
     );
   }
+}
+
+// Whether `value` is a whole number of 1 or more, as the level format asks for the order and
+// the version.
+function isWholeFromOne(value: number): boolean {
+  return Number.isSafeInteger(value) && value >= 1;
 }

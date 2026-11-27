@@ -71,6 +71,7 @@ export function factoriesOf<
 export const noLevels: LevelRepository = {
   list: async () => [],
   levelOf: async () => undefined,
+  unavailable: async () => [],
 };
 
 // A `StartGame` of the game `gameId` on the hexagon over `factories` and `games`, as the root

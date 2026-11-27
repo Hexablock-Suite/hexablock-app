@@ -64,7 +64,7 @@
       <h1>Progress and levels: use cases over output ports</h1>
 
       <svg
-        viewBox="0 0 1040 2116"
+        viewBox="0 0 1040 2132"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="ucprogress-title ucprogress-desc"
@@ -77,23 +77,25 @@
           record each result in the progress of its game and LoadProgress to read the saved progress
           of the game of its request back, or undefined when the game has none (#181); ListLevels
           uses LevelRepository and ProgressRepository, takes the game and the chosen figure and
-          returns LevelSummary values, each with a LevelStatus of layer 1, a closed set (completed,
-          open, locked) whose ofEach() gives the status of each level from GameProgress (#326). The
-          leaderboard use cases of #47 and their port LeaderboardGateway live in view 3.7.
-          LevelRepository also finds the one level of a game that a start names by its id (#172).
-          SaveProgress keeps the GameId of its game and returns no value; LoadProgress takes the
-          GameId in its request, as ListLevels does (#410), and answers the whole GameProgress.
-          ProgressRepository gives the ProgressOwner, the last signed-in user or the anonymous
-          owner, with owner(), and loads and updates the GameProgress of one game of that owner in
-          one queue per key in layer 1: one object with the high score and the best result of each
-          level, which gives the stars of a level with starsOf() and delivers its data to a
-          repository of the edge with deliverTo(). AchievementCounterRepository loads and saves the
-          AchievementCounters of one game in layer 1 (#363): its own aggregate, with a best count
-          and a total, each an AchievementCount. SyncProgress (#46) uses SessionStore,
-          ProgressRepository, AnonymousProgress and ProgressGateway: the user of the session is the
-          owner, it merges the anonymous progress into that owner with mergeAnonymousInto(), sends
-          the progress through ProgressGateway, which throws a SyncFailure for a known failure, and
-          merges the answer through update().
+          returns a LevelList (#307): one LevelSummary per level of the figure, each with a
+          LevelStatus of layer 1, a closed set (completed, open, locked) whose ofEach() gives the
+          status of each level from GameProgress (#326). The leaderboard use cases of #47 and their
+          port LeaderboardGateway live in view 3.7. Apart from the summaries, the LevelList holds
+          the LevelId of each unavailable level of the game, which LevelRepository names with
+          unavailable(): a level that breaks a rule (#307). LevelRepository also finds the one level
+          of a game that a start names by its id (#172). SaveProgress keeps the GameId of its game
+          and returns no value; LoadProgress takes the GameId in its request, as ListLevels does
+          (#410), and answers the whole GameProgress. ProgressRepository gives the ProgressOwner,
+          the last signed-in user or the anonymous owner, with owner(), and loads and updates the
+          GameProgress of one game of that owner in one queue per key in layer 1: one object with
+          the high score and the best result of each level, which gives the stars of a level with
+          starsOf() and delivers its data to a repository of the edge with deliverTo().
+          AchievementCounterRepository loads and saves the AchievementCounters of one game in layer
+          1 (#363): its own aggregate, with a best count and a total, each an AchievementCount.
+          SyncProgress (#46) uses SessionStore, ProgressRepository, AnonymousProgress and
+          ProgressGateway: the user of the session is the owner, it merges the anonymous progress
+          into that owner with mergeAnonymousInto(), sends the progress through ProgressGateway,
+          which throws a SyncFailure for a known failure, and merges the answer through update().
         </desc>
         <defs>
           <marker
@@ -146,9 +148,7 @@
             <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
           </marker>
         </defs>
-
         <rect width="100%" height="100%" fill="#f3f5f6" />
-
         <!-- Layer zone: layer 2, use cases -->
         <rect
           x="24"
@@ -171,7 +171,6 @@
         >
           LAYER 2 · USE CASES · src/application/
         </text>
-
         <!-- Layer zone: layer 1, entities -->
         <rect
           x="24"
@@ -194,7 +193,6 @@
         >
           LAYER 1 · ENTITIES · src/domain/progress/ · src/domain/achievements/
         </text>
-
         <!-- Groups -->
         <rect
           x="48"
@@ -218,12 +216,11 @@
         >
           PROGRESS USE CASES · §5.1.9 · §5.2
         </text>
-
         <rect
           x="456"
-          y="224"
+          y="200"
           width="464"
-          height="956"
+          height="980"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -232,7 +229,7 @@
         />
         <text
           x="468"
-          y="240"
+          y="216"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -241,9 +238,8 @@
         >
           OUTPUT PORTS · §3.4
         </text>
-
         <!-- Relationships (drawn before boxes) -->
-        <!-- ListLevels returns LevelSummary values: use -->
+        <!-- ListLevels returns a LevelList: use (#307) -->
         <line
           x1="304"
           y1="136"
@@ -255,12 +251,21 @@
         />
         <!-- LevelSummary holds its LevelStatus as status: use with role and multiplicity (decision 23), down from layer 2 to layer 1 (#326) -->
         <path
-          d="M696,140 H984 Q992,140 992,148 V1624 Q992,1632 984,1632 H960"
+          d="M984,140 Q992,140 992,148 V1624 Q992,1632 984,1632 H960"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#ucprogress-open)"
         />
+        <!-- LevelList holds its LevelSummary values as levels: use with role and multiplicity (#307) -->
+        <path
+          d="M696,124 H760"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucprogress-open)"
+        />
+
         <!-- LevelStatus.ofEach() reads the GameProgress it receives as progress: use with role and multiplicity -->
         <path
           d="M760,1552 V1516"
@@ -362,7 +367,6 @@
           total
           <tspan font-weight="600">1</tspan>
         </text>
-
         <!-- Arrow labels -->
         <rect x="364" y="116" width="48" height="12" rx="2" fill="#efe7f8" />
         <text
@@ -376,12 +380,23 @@
         >
           RETURNS
         </text>
-
         <!-- Role names and multiplicities at the part end -->
-        <rect x="699" y="124" width="43" height="12" rx="2" fill="#efe7f8" />
+        <rect x="708" y="109" width="43" height="12" rx="2" fill="#efe7f8" />
         <text
-          x="740"
-          y="133"
+          x="749"
+          y="118"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+        >
+          levels
+          <tspan font-weight="600">*</tspan>
+        </text>
+        <rect x="944" y="174" width="43" height="12" rx="2" fill="#efe7f8" />
+        <text
+          x="985"
+          y="183"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -450,7 +465,6 @@
           repository
           <tspan font-weight="600">1</tspan>
         </text>
-
         <!-- SyncProgress keeps the ProgressRepository it receives as progress: use with role and multiplicity (decision 23, #46) -->
         <path
           d="M304,976 H424 Q432,976 432,968 V520 Q432,512 440,512 H832 Q840,512 840,504 V492"
@@ -590,9 +604,8 @@
           + execute(request: ListLevelsRequest):
         </text>
         <text x="96" y="252" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          Promise&lt;Result&lt;LevelSummary[]&gt;&gt;
+          Promise&lt;Result&lt;LevelList&gt;&gt;
         </text>
-
         <!-- Class: SaveProgress (use case) -->
         <rect
           x="64"
@@ -654,7 +667,6 @@
         <text x="96" y="456" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Promise&lt;Result&lt;void&gt;&gt;
         </text>
-
         <!-- Class: LoadProgress (use case) -->
         <rect
           x="64"
@@ -713,13 +725,55 @@
         <text x="96" y="708" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           undefined&gt;&gt;
         </text>
-
-        <!-- Class: LevelSummary (interface, value object) -->
+        <!-- Class: LevelSummary (interface, value object; LevelList holds it since #307) -->
+        <rect
+          x="760"
+          y="64"
+          width="224"
+          height="104"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="760" y1="112" x2="984" y2="112" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="872"
+          y="82"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «value object»
+        </text>
+        <text
+          x="872"
+          y="100"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          LevelSummary
+        </text>
+        <text x="776" y="128" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + levelId: LevelId
+        </text>
+        <text x="776" y="144" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + status: LevelStatus
+        </text>
+        <text x="776" y="160" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + stars: Stars [0..1]
+        </text>
+        <!-- Class: LevelList (interface, value object: the response model of ListLevels, #307) -->
         <rect
           x="472"
           y="64"
           width="224"
-          height="104"
+          height="88"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -746,33 +800,30 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          LevelSummary
+          LevelList
         </text>
         <text x="488" y="128" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + levelId: LevelId
+          + levels: LevelSummary [*]
         </text>
         <text x="488" y="144" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + status: LevelStatus
-        </text>
-        <text x="488" y="160" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + stars: Stars [0..1]
+          + unavailable: LevelId [*]
         </text>
 
         <!-- Class: LevelRepository (interface, port) -->
         <rect
           x="472"
-          y="252"
+          y="236"
           width="432"
-          height="88"
+          height="104"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="472" y1="300" x2="904" y2="300" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="472" y1="284" x2="904" y2="284" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="688"
-          y="270"
+          y="254"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -783,7 +834,7 @@
         </text>
         <text
           x="688"
-          y="288"
+          y="272"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -792,12 +843,12 @@
         >
           LevelRepository
         </text>
-        <text x="488" y="316" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="488" y="300" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + list(gameId: GameId): Promise&lt;LevelDefinition[]&gt;
         </text>
         <text
           x="488"
-          y="332"
+          y="316"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -806,7 +857,9 @@
         >
           + levelOf(gameId: GameId, levelId: LevelId): Promise&lt;LevelDefinition | undefined&gt;
         </text>
-
+        <text x="488" y="332" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + unavailable(gameId: GameId): Promise&lt;LevelId[]&gt;
+        </text>
         <!-- Class: ProgressRepository (interface, port: the owner is explicit since the judgment-day round 1 of #46, decision 66) -->
         <rect
           x="472"
@@ -896,7 +949,6 @@
         <text x="488" y="724" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + save(counters: AchievementCounters): Promise&lt;void&gt;
         </text>
-
         <!-- Class: SyncProgress (use case, #46, decision 66) -->
         <rect
           x="64"
@@ -1342,7 +1394,6 @@
         >
           + deliverTo(receiver: AchievementCountersReceiver): void
         </text>
-
         <!-- Class: AchievementCount (value object, #363) -->
         <rect
           x="96"
@@ -1433,7 +1484,6 @@
         >
           + deliverTo(receiver: ValueReceiver&lt;number&gt;): void
         </text>
-
         <!-- Class: GameProgress (aggregate root, S3-04, issue 156) -->
         <rect
           x="616"
@@ -1569,7 +1619,6 @@
         >
           + deliverTo(receiver: GameProgressReceiver): void
         </text>
-
         <!-- Class: LevelStatus (value object of layer 1: a closed set of three instances, decision 45; ofEach() holds the rule of a won, open and locked level, #326) -->
         <rect
           x="560"
@@ -1663,12 +1712,11 @@
         >
           + equals(other: LevelStatus): boolean
         </text>
-
         <!-- Lollipops: input port each use case implements, with its binding -->
         <line x1="80" y1="120" x2="80" y2="104" stroke="#17212a" stroke-width="1" />
         <circle cx="80" cy="99" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text x="91" y="102" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          UseCase‹ListLevelsRequest, LevelSummary[]›
+          UseCase‹ListLevelsRequest, LevelList›
         </text>
         <line x1="80" y1="308" x2="80" y2="292" stroke="#17212a" stroke-width="1" />
         <circle cx="80" cy="287" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
@@ -1680,13 +1728,12 @@
         <text x="91" y="542" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           UseCase‹LoadProgressRequest, GameProgress | undefined›
         </text>
-
         <line x1="80" y1="952" x2="80" y2="936" stroke="#17212a" stroke-width="1" />
         <circle cx="80" cy="931" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text x="91" y="934" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           UseCase‹SyncProgressRequest, void›
         </text>
-        <!-- The footnote and the legend sit 700 lower than the layer zones: layer 1 holds LevelStatus since #326, and LoadProgress joined the use cases in #181 and the counters in #363, and SyncProgress with its ports in #46. Since #47 the legend sits 16 lower again, for the line of the leaderboards. -->
+        <!-- The footnote and the legend sit 700 lower than the layer zones: layer 1 holds LevelStatus since #326, and LoadProgress joined the use cases in #181 and the counters in #363, and SyncProgress with its ports in #46. Since #47 the legend sits 16 lower again, for the line of the leaderboards, and since #307 16 lower again, for the line of LevelList. -->
         <g transform="translate(0 700)">
           <!-- Footnote: classes the budget leaves out -->
           <text
@@ -1706,10 +1753,9 @@
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            or replace them (APP-FR-15, A6). An adapter reads each level file into a LevelDefinition
-            of layer 1 (decision 24). A level builder never reads a file.
+            or replace them by the version rule of DS-11 (APP-FR-15, A6, decision 68). An adapter
+            reads each level into a LevelDefinition of layer 1 (decision 24).
           </text>
-
           <text
             x="24"
             y="1092"
@@ -1843,18 +1889,28 @@
             GetGlobalLeaderboard and GetLevelLeaderboard read the boards of the backend through
             LeaderboardGateway: view 3.7 shows them (#47, decision 67).
           </text>
+          <text
+            x="24"
+            y="1300"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            LevelList holds the summaries and, apart, the LevelId of each unavailable level: a level
+            that breaks a rule, with no status and no figure (#307).
+          </text>
           <!-- Legend -->
           <line
             x1="24"
-            y1="1308"
+            y1="1324"
             x2="1016"
-            y2="1308"
+            y2="1324"
             stroke="rgba(23,33,42,0.10)"
             stroke-width="0.8"
           />
           <text
             x="24"
-            y="1326"
+            y="1342"
             fill="#5b6873"
             font-size="8"
             font-family="'IBM Plex Mono', monospace"
@@ -1862,29 +1918,27 @@
           >
             LEGEND
           </text>
-
           <line
             x1="24"
-            y1="1344"
+            y1="1360"
             x2="52"
-            y2="1344"
+            y2="1360"
             stroke="#5b6873"
             stroke-width="1"
             marker-end="url(#ucprogress-open)"
           />
           <text
             x="60"
-            y="1348"
+            y="1364"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
           >
             Use · attribute, parameter, return, local or new
           </text>
-
           <rect
             x="24"
-            y="1364"
+            y="1380"
             width="28"
             height="12"
             rx="2"
@@ -1894,7 +1948,7 @@
           />
           <text
             x="60"
-            y="1373"
+            y="1389"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1903,7 +1957,7 @@
           </text>
           <rect
             x="184"
-            y="1364"
+            y="1380"
             width="28"
             height="12"
             rx="2"
@@ -1914,7 +1968,7 @@
           />
           <text
             x="220"
-            y="1373"
+            y="1389"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1923,7 +1977,7 @@
           </text>
           <rect
             x="424"
-            y="1364"
+            y="1380"
             width="28"
             height="12"
             rx="2"
@@ -1933,29 +1987,28 @@
           />
           <text
             x="460"
-            y="1373"
+            y="1389"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
           >
             Teal · focal class
           </text>
-          <line x1="600" y1="1370" x2="616" y2="1370" stroke="#17212a" stroke-width="1" />
-          <circle cx="621" cy="1370" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          <line x1="600" y1="1386" x2="616" y2="1386" stroke="#17212a" stroke-width="1" />
+          <circle cx="621" cy="1386" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
           <text
             x="636"
-            y="1373"
+            y="1389"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
           >
             Lollipop · input port + binding
           </text>
-
           <!-- Legend: the «Sprint N» marker of a planned class or member -->
           <text
             x="24"
-            y="1393"
+            y="1409"
             fill="#17212a"
             font-size="8.5"
             font-family="'IBM Plex Mono', monospace"
@@ -1964,7 +2017,7 @@
           </text>
           <text
             x="92"
-            y="1393"
+            y="1409"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"

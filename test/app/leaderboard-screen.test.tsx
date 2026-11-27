@@ -18,7 +18,12 @@ import { DeviceKeyValueStore } from '../../src/infrastructure/device-key-value-s
 import { DeviceSecretStore } from '../../src/infrastructure/device-secret-store';
 import { saveIn } from '../support/adapters/saved-progress';
 import type { FakeRoutes } from '../support/fake-backend';
-import { fakeFetch, useFakeFetch, type FakeFetch } from '../support/fake-fetch';
+import {
+  fakeFetch,
+  requestsBesideLevels,
+  useFakeFetch,
+  type FakeFetch,
+} from '../support/fake-fetch';
 import { repoRoot } from '../support/run-tool';
 
 // The native module of expo-secure-store is missing under Jest, and jest-expo gives functions
@@ -170,11 +175,11 @@ describe('leaderboard route', () => {
       ['1 ada 3 estrellas · 10 movimientos · 0:45'],
       ['2 grace 3 estrellas · 12 movimientos · 1:01'],
     ]);
-    expect(backend.requests.map(({ method, url }) => `${method} ${url}`)).toEqual([
+    expect(requestsBesideLevels(backend).map(({ method, url }) => `${method} ${url}`)).toEqual([
       'GET /v1/leaderboard/hexa-lines',
       'GET /v1/leaderboard/hexa-fit/levels/fit-01',
     ]);
-    expect(backend.requests.map(({ headers }) => headers.authorization)).toEqual([
+    expect(requestsBesideLevels(backend).map(({ headers }) => headers.authorization)).toEqual([
       `Bearer ${TOKEN}`,
       `Bearer ${TOKEN}`,
     ]);
@@ -187,7 +192,7 @@ describe('leaderboard route', () => {
 
     expect(await screen.findByRole('alert', { name: SIGN_IN_NEEDED })).toBeOnTheScreen();
     expect(screen.queryAllByTestId('leaderboard-row')).toEqual([]);
-    expect(backend.requests).toEqual([]);
+    expect(requestsBesideLevels(backend)).toEqual([]);
 
     await fireEvent.press(screen.getByRole('button', { name: 'Iniciar sesión' }));
 
@@ -219,7 +224,7 @@ describe('leaderboard route', () => {
       await screen.findByRole('alert', { name: 'Este nivel aún no tiene clasificación.' }),
     ).toBeOnTheScreen();
     expect(screen.queryByRole('button', { name: 'Iniciar sesión' })).toBeNull();
-    expect(backend.requests.map(({ url }) => url)).toEqual([
+    expect(requestsBesideLevels(backend).map(({ url }) => url)).toEqual([
       '/v1/leaderboard/hexa-fit/levels/fit-square-01',
     ]);
   });
