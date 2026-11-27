@@ -28,6 +28,23 @@
       "type": "Synchronous/HTTP"
     },
     {
+      "description": "a leaderboard with a refused token",
+      "pending": false,
+      "request": {
+        "headers": {
+          "Authorization": [
+            "Bearer a-refused-token"
+          ]
+        },
+        "method": "GET",
+        "path": "/v1/leaderboard/hexa-fit"
+      },
+      "response": {
+        "status": 401
+      },
+      "type": "Synchronous/HTTP"
+    },
+    {
       "description": "a progress sync",
       "pending": false,
       "providerStates": [
@@ -391,6 +408,322 @@
       },
       "response": {
         "status": 400
+      },
+      "type": "Synchronous/HTTP"
+    },
+    {
+      "description": "the global leaderboard of a game",
+      "pending": false,
+      "providerStates": [
+        {
+          "name": "several accounts have results on a stored level",
+          "params": {
+            "gameId": "hexa-fit",
+            "levelId": "fit-01"
+          }
+        }
+      ],
+      "request": {
+        "generators": {
+          "header": {
+            "Authorization": {
+              "expression": "Bearer ${accessToken}",
+              "type": "ProviderState"
+            }
+          }
+        },
+        "headers": {
+          "Authorization": [
+            "Bearer a-token"
+          ]
+        },
+        "matchingRules": {
+          "header": {
+            "Authorization": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          }
+        },
+        "method": "GET",
+        "path": "/v1/leaderboard/hexa-fit"
+      },
+      "response": {
+        "body": {
+          "content": {
+            "gameId": "hexa-fit",
+            "highScores": [],
+            "standings": [
+              {
+                "elapsedMs": 45000,
+                "levelsCompleted": 1,
+                "moves": 10,
+                "rank": 1,
+                "stars": 3,
+                "userId": "00000000-0000-4000-8000-000000000001",
+                "username": "ada"
+              }
+            ]
+          },
+          "contentType": "application/json",
+          "encoded": false
+        },
+        "headers": {
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "matchingRules": {
+          "body": {
+            "$.standings": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            },
+            "$.standings[*].elapsedMs": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "integer"
+                }
+              ]
+            },
+            "$.standings[*].levelsCompleted": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "integer"
+                }
+              ]
+            },
+            "$.standings[*].moves": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "integer"
+                }
+              ]
+            },
+            "$.standings[*].rank": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "integer"
+                }
+              ]
+            },
+            "$.standings[*].stars": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "integer"
+                }
+              ]
+            },
+            "$.standings[*].userId": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+                }
+              ]
+            },
+            "$.standings[*].username": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      },
+      "type": "Synchronous/HTTP"
+    },
+    {
+      "description": "the leaderboard of a level",
+      "pending": false,
+      "providerStates": [
+        {
+          "name": "several accounts have results on a stored level",
+          "params": {
+            "gameId": "hexa-fit",
+            "levelId": "fit-01"
+          }
+        }
+      ],
+      "request": {
+        "generators": {
+          "header": {
+            "Authorization": {
+              "expression": "Bearer ${accessToken}",
+              "type": "ProviderState"
+            }
+          }
+        },
+        "headers": {
+          "Authorization": [
+            "Bearer a-token"
+          ]
+        },
+        "matchingRules": {
+          "header": {
+            "Authorization": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          }
+        },
+        "method": "GET",
+        "path": "/v1/leaderboard/hexa-fit/levels/fit-01"
+      },
+      "response": {
+        "body": {
+          "content": {
+            "entries": [
+              {
+                "elapsedMs": 45000,
+                "moves": 10,
+                "rank": 1,
+                "stars": 3,
+                "userId": "00000000-0000-4000-8000-000000000001",
+                "username": "ada"
+              }
+            ],
+            "gameId": "hexa-fit",
+            "levelId": "fit-01"
+          },
+          "contentType": "application/json",
+          "encoded": false
+        },
+        "headers": {
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "matchingRules": {
+          "body": {
+            "$.entries": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            },
+            "$.entries[*].elapsedMs": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "integer"
+                }
+              ]
+            },
+            "$.entries[*].moves": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "integer"
+                }
+              ]
+            },
+            "$.entries[*].rank": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "integer"
+                }
+              ]
+            },
+            "$.entries[*].stars": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "integer"
+                }
+              ]
+            },
+            "$.entries[*].userId": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+                }
+              ]
+            },
+            "$.entries[*].username": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      },
+      "type": "Synchronous/HTTP"
+    },
+    {
+      "description": "the leaderboard of a level that is not stored",
+      "pending": false,
+      "providerStates": [
+        {
+          "name": "a signed-in account exists",
+          "params": {
+            "username": "ada"
+          }
+        }
+      ],
+      "request": {
+        "generators": {
+          "header": {
+            "Authorization": {
+              "expression": "Bearer ${accessToken}",
+              "type": "ProviderState"
+            }
+          }
+        },
+        "headers": {
+          "Authorization": [
+            "Bearer a-token"
+          ]
+        },
+        "matchingRules": {
+          "header": {
+            "Authorization": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          }
+        },
+        "method": "GET",
+        "path": "/v1/leaderboard/hexa-fit/levels/fit-99"
+      },
+      "response": {
+        "status": 404
       },
       "type": "Synchronous/HTTP"
     },
