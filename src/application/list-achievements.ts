@@ -1,5 +1,5 @@
 import type { GameId } from '../domain/shared/game-id';
-import type { AchievementCounters } from '../domain/achievements/achievement-counters';
+import { AchievementCounters } from '../domain/achievements/achievement-counters';
 import type { GameProgress } from '../domain/progress/game-progress';
 import type { LevelDefinition } from '../domain/progress/level-definition';
 import type { Achievement } from './achievement';
@@ -26,7 +26,8 @@ export interface AchievementSummary {
 // `AchievementCounterRepository`, and passes them to the goal. A goal of the domain decides with
 // them and calls no repository (issues #326 and #364). The saved progress keeps each won level,
 // and the saved counters keep the best count and the total of each game, so a completed
-// achievement stays completed after a restart of the app.
+// achievement stays completed after a restart of the app. A game with no saved counters gets
+// new counters with `AchievementCounters.start()`, so every goal gets the counters (issue #406).
 // - The list follows the order of `achievements`, the list that the composition root gives.
 // - An achievement is completed when its goal is reached. An achievement with no goal
 //   stays in progress.
@@ -66,23 +67,24 @@ export class ListAchievements implements UseCase<ListAchievementsRequest, Achiev
   }
 
   // The levels, the progress and the counters of the game `gameId`. Each game loads once per `execute()`:
-  // `games` keeps each game that this call already loaded.
+  // `games` keeps each game that this call already loaded. A game with no saved counters gets
+  // new counters, with a best count and a total of 0.
   private async savedGame(gameId: GameId, games: SavedGame[]): Promise<SavedGame> {
     const loaded = games.find((game) => game.gameId.equals(gameId));
     if (loaded !== undefined) return loaded;
     const levels = await this.levels.list(gameId);
     const progress = await this.progress.load(gameId);
-    const counters = await this.counters.load(gameId);
+    const counters = (await this.counters.load(gameId)) ?? AchievementCounters.start(gameId);
     const game = { gameId, levels, progress, counters };
     games.push(game);
     return game;
   }
 }
 
-// The data of one game that the goals read: its levels, its saved progress and its saved counters.
+// The data of one game that the goals read: its levels, its saved progress and its counters.
 interface SavedGame {
   readonly gameId: GameId;
   readonly levels: readonly LevelDefinition[];
   readonly progress: GameProgress | undefined;
-  readonly counters: AchievementCounters | undefined;
+  readonly counters: AchievementCounters;
 }
