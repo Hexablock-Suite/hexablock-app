@@ -9,6 +9,7 @@ import type { GeometryFactory } from '../domain/engine/geometry-factory';
 import type { LevelDefinition } from '../domain/engine/level-definition';
 import type { LevelId } from '../domain/engine/level-id';
 import type { MatchIdGenerator } from '../domain/engine/match-id-generator';
+import type { RandomSource } from '../domain/engine/random-source';
 import type { IVariantFactory } from '../domain/engine/variant-factory';
 import { FitFactory } from '../domain/variants/hexa-fit/fit-factory';
 import { FitLevelBuilder } from '../domain/variants/hexa-fit/fit-level-builder';
@@ -90,12 +91,14 @@ export function fitLevelVariant<TCoord>(
 }
 
 // The levels of Hexa Sort on the geometry `geometry`. `SortLevelBuilder` builds each level,
-// and `SortFactory` takes it.
+// and `SortFactory` takes it with the random source `random`. A level file names its seed
+// or its stacks, so its games draw nothing from `random` (issue #417).
 export function sortLevelVariant<TCoord>(
   geometry: GeometryFactory<TCoord>,
+  random: RandomSource,
 ): LevelVariant<ColorStack, TCoord, PlaceStack<TCoord>, SortState<TCoord>> {
   return {
     factoryOf: (definition) =>
-      new SortFactory(geometry, definition.buildWith(new SortLevelBuilder(geometry))),
+      new SortFactory(geometry, definition.buildWith(new SortLevelBuilder(geometry)), random),
   };
 }

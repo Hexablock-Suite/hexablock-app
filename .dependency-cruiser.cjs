@@ -37,6 +37,14 @@ module.exports = {
       to: { path: layer('domain/variants'), pathNot: '(?:^|/)src/domain/variants/$1/' },
     },
     {
+      name: 'sort-and-merge-no-cell-piece',
+      comment:
+        'Hexa Sort and Hexa Merge bind their own TPiece (ColorStack, NewTile): they never import the cell-made Piece or the shape Composite of the engine.',
+      severity: 'error',
+      from: { path: '(?:^|/)src/domain/variants/hexa-(?:sort|merge)/' },
+      to: { path: '(?:^|/)src/domain/engine/(?:piece|shape-node)\\.ts$' },
+    },
+    {
       name: 'application-imports-only-domain',
       comment: 'Application code imports only domain and application code.',
       severity: 'error',

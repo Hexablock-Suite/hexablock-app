@@ -7,7 +7,6 @@ import type { MatchId } from '../../engine/match-id';
 import { Moves } from '../../engine/moves';
 import { Score } from '../../engine/score';
 import type { IPieceSource } from '../../engine/piece-source';
-import type { Piece } from '../../engine/piece';
 import { ClearedStacks } from './cleared-stacks';
 import { ColorStack } from './color-stack';
 import type { GoalCount } from './goal-count';
@@ -17,20 +16,17 @@ import type { TileCount } from './tile-count';
 // The receiver of the data of a `SortView`. An adapter of the edge implements it,
 // for example the state mapper of the Sort screen. No code of `src/domain/` or
 // `src/application/` calls `deliverTo()` (rule R-no-delivery-call).
-export interface SortViewReceiver<TCoord> {
-  receive(
-    offered: Piece<ColorStack, TCoord> | undefined,
-    goalsDone: ClearedStacks,
-    goalsNeeded: GoalCount,
-  ): void;
+export interface SortViewReceiver {
+  receive(offered: ColorStack | undefined, goalsDone: ClearedStacks, goalsNeeded: GoalCount): void;
 }
 
 // The data that the Sort screen draws: the offered stack and the goal counts.
-// Every field is private (issue #245). A piece and a count never change, so the view shares them,
+// Every field is private (issue #245). A stack and a count never change, so the view shares them,
 // and `deliverTo()` gives them to an adapter of the edge.
-export class SortView<TCoord> {
+// The view holds no coordinate, so it takes no `TCoord` (issue #423).
+export class SortView {
   constructor(
-    private readonly offered: Piece<ColorStack, TCoord> | undefined,
+    private readonly offered: ColorStack | undefined,
     private readonly goalsDone: ClearedStacks,
     private readonly goalsNeeded: GoalCount,
   ) {
@@ -38,7 +34,7 @@ export class SortView<TCoord> {
   }
 
   // Gives the offered stack and the two goal counts to `receiver`. It returns nothing.
-  deliverTo(receiver: SortViewReceiver<TCoord>): void {
+  deliverTo(receiver: SortViewReceiver): void {
     receiver.receive(this.offered, this.goalsDone, this.goalsNeeded);
   }
 }
@@ -64,14 +60,14 @@ export class SortSnapshot<TCoord> extends BoardSnapshot<ColorStack, TCoord> {
     matchId: MatchId,
     board: ReadonlyBoard<ColorStack, TCoord>,
     score: Score,
-    private readonly offered: Piece<ColorStack, TCoord> | undefined,
+    private readonly offered: ColorStack | undefined,
     private readonly goalsDone: ClearedStacks,
     private readonly goalsNeeded: GoalCount,
     clearedTiles: readonly TileCount[],
     private readonly placedAt: TCoord | undefined,
-    private readonly source: IPieceSource<Piece<ColorStack, TCoord>>,
+    private readonly source: IPieceSource<ColorStack>,
     private readonly moves: Moves,
-    private readonly shown: SortView<TCoord>,
+    private readonly shown: SortView,
     clearedAt: readonly TCoord[] = [],
   ) {
     super(stateId, matchId, board, score);
@@ -81,7 +77,7 @@ export class SortSnapshot<TCoord> extends BoardSnapshot<ColorStack, TCoord> {
   }
 
   // The stack that the player places next, or `undefined` when the source has ended.
-  offeredStack(): Piece<ColorStack, TCoord> | undefined {
+  offeredStack(): ColorStack | undefined {
     return this.offered;
   }
 
@@ -126,11 +122,11 @@ export class SortSnapshot<TCoord> extends BoardSnapshot<ColorStack, TCoord> {
   }
 
   // The piece source at its position. Only `SortState.restore()` needs it.
-  pieceSource(): IPieceSource<Piece<ColorStack, TCoord>> {
+  pieceSource(): IPieceSource<ColorStack> {
     return this.source;
   }
 
-  view(): SortView<TCoord> {
+  view(): SortView {
     return this.shown;
   }
 }
@@ -144,7 +140,8 @@ export class SortSnapshot<TCoord> extends BoardSnapshot<ColorStack, TCoord> {
 // A refused input throws a RangeError and leaves the whole state as it was.
 // The scoring, the rules and the use cases ask the photo of `snapshot()`, never a field.
 // The piece source lives in the state (classes.md decision 31). The level chooses it:
-// seeded random or a fixed list (A4). A Sort piece is one cell with a stack (decision 6).
+// seeded random or a fixed list (A4). The source gives each stack itself: Sort binds
+// the `TPiece` of its factory to `ColorStack` (classes.md decision 6, issue #423).
 // `offered` is the stack that the player places next. It is `undefined` when the source ends.
 // `goalsDone` counts the cleared stacks, as a `ClearedStacks` (classes.md decision 42).
 // `goalsNeeded` is the goal of the level, a `GoalCount`.
@@ -157,9 +154,9 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
     private readonly stateId: GameStateId,
     private readonly matchId: MatchId,
     private readonly board: Board<ColorStack, TCoord>,
-    private source: IPieceSource<Piece<ColorStack, TCoord>>,
+    private source: IPieceSource<ColorStack>,
     private readonly goalsNeeded: GoalCount,
-    private offered: Piece<ColorStack, TCoord> | undefined,
+    private offered: ColorStack | undefined,
     private goalsDone: ClearedStacks,
     private clearedTiles: TileCount[],
     private placedAt: TCoord | undefined,
@@ -173,7 +170,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
     stateId: GameStateId;
     matchId: MatchId;
     board: Board<ColorStack, TCoord>;
-    source: IPieceSource<Piece<ColorStack, TCoord>>;
+    source: IPieceSource<ColorStack>;
     goalsNeeded: GoalCount;
   }): SortState<TCoord> {
     const state = new SortState(
@@ -219,7 +216,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
     if (!this.isFree(at)) {
       throw new RangeError('The cell already holds a stack.', { cause: this.board.key(at) });
     }
-    this.board.occupy(at, this.offered.occupant());
+    this.board.occupy(at, this.offered);
     this.placedAt = at;
     this.clearedTiles = [];
     this.clearedAt = [];
@@ -270,7 +267,7 @@ export class SortState<TCoord> implements BoardState<ColorStack, TCoord> {
     this.score = this.score.add(points);
   }
 
-  // The photo of the state now. A piece, a goal count and a coordinate never change,
+  // The photo of the state now. A stack, a goal count and a coordinate never change,
   // and the source is a value, so the photo shares them.
   // It holds a frozen list and a copy of the board.
   snapshot(): SortSnapshot<TCoord> {

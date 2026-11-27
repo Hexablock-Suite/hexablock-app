@@ -27,6 +27,7 @@ import { SortLevelBuilder } from '../../src/domain/variants/hexa-sort/sort-level
 import { errorOf, MemoryGameRepository, valueOf } from '../support/application/game-use-cases';
 import { ManualClock } from '../support/engine/manual-clock';
 import { CountingMatchIds } from '../support/engine/match-id';
+import { seededRandom } from '../support/engine/step-random';
 import { startVariant } from '../support/engine/variant-game';
 import { linesFactory } from '../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../support/variants/hexa-merge/merge-game';
@@ -53,7 +54,11 @@ const fitFactoryOf = (file: typeof fit01) =>
     clock,
   );
 const sortFactoryOf = (file: typeof sort01 | typeof sort02) =>
-  new SortFactory(geometry, LevelDefinition.of(file).buildWith(new SortLevelBuilder(geometry)));
+  new SortFactory(
+    geometry,
+    LevelDefinition.of(file).buildWith(new SortLevelBuilder(geometry)),
+    seededRandom(1),
+  );
 
 // One `StartGame` over one game repository, as the composition root builds it for one game.
 // `factory` is the registered factory, for a start with no level id.
@@ -80,7 +85,8 @@ function startGameOf<
 
 // The registered factory of each game with levels is a level that the tests do not start.
 const fitGame = () => startGameOf(FIT, fitFactoryOf(fit01), fitLevelVariant(geometry, clock));
-const sortGame = () => startGameOf(SORT, sortFactoryOf(sort02), sortLevelVariant(geometry));
+const sortGame = () =>
+  startGameOf(SORT, sortFactoryOf(sort02), sortLevelVariant(geometry, seededRandom(1)));
 
 // The cells, the free spaces and the view data of a new game of `factory`.
 function startOf<

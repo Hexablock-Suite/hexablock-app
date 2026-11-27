@@ -12,7 +12,6 @@ import {
   type IPieceSource,
 } from '../../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
-import { Seed } from '../../../../src/domain/engine/seed';
 import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
 import {
   MergeFactory,
@@ -30,6 +29,7 @@ import { MATCH_ID } from '../../engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../engine/entity-ids';
 import { delivered } from '../../engine/value-receiver';
 import { boardOnTopologyLike } from '../../engine/variant-game';
+import { seededRandom } from '../../engine/step-random';
 
 // The Merge game for the rules tests, on the real hexagonal geometry.
 // The rules tests score no points. The scoring tests pass their own policy.
@@ -108,10 +108,12 @@ export function mergeGame(
 }
 
 // A Merge factory on a hexagon of 2 rings, with the target 2048.
+// Each match of the factory starts from the seed `seed` (issue #417).
 export function mergeFactory(seed = 1): MergeFactory<HexCoord> {
   return new MergeFactory(
     new HexGeometry(),
-    MergeSettings.of(RegionSize.of(2), Seed.of(seed), MergeTile.of(2048)),
+    MergeSettings.of(RegionSize.of(2), MergeTile.of(2048)),
+    seededRandom(seed),
   );
 }
 

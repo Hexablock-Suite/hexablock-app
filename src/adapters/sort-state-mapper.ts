@@ -16,9 +16,11 @@ export interface SortPayloadView {
 
 const FREE: SortCellView = Object.freeze({ colors: Object.freeze([]) });
 
-export class SortStateMapper<TCoord> implements StateMapper<
+// The mapper of the Sort screen. The view of a Sort state holds no coordinate,
+// so the mapper takes no `TCoord` (issue #423).
+export class SortStateMapper implements StateMapper<
   ColorStack,
-  SortView<TCoord>,
+  SortView,
   SortCellView,
   SortPayloadView
 > {
@@ -31,12 +33,12 @@ export class SortStateMapper<TCoord> implements StateMapper<
     return FREE;
   }
 
-  toPayload(payload: SortView<TCoord>): SortPayloadView {
+  toPayload(payload: SortView): SortPayloadView {
     let view: SortPayloadView | undefined;
     payload.deliverTo({
       receive: (offered, goalsDone, goalsNeeded) => {
         view = {
-          offered: offered === undefined ? undefined : this.toView(offered.occupant()),
+          offered: offered === undefined ? undefined : this.toView(offered),
           goalsDone: valueOf(goalsDone),
           goalsNeeded: valueOf(goalsNeeded),
         };

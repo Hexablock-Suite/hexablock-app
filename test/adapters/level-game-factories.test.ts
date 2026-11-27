@@ -19,6 +19,7 @@ import { FitFactory } from '../../src/domain/variants/hexa-fit/fit-factory';
 import { FitLevelBuilder } from '../../src/domain/variants/hexa-fit/fit-level-builder';
 import { ManualClock } from '../support/engine/manual-clock';
 import { CountingMatchIds } from '../support/engine/match-id';
+import { seededRandom } from '../support/engine/step-random';
 import { startVariant } from '../support/engine/variant-game';
 import { linesFactory } from '../support/variants/hexa-lines/lines-game';
 import { sortFactory } from '../support/variants/hexa-sort/sort-game';
@@ -124,7 +125,7 @@ describe('LevelGameFactories', () => {
       sortFactory(),
       new CountingMatchIds(),
       new BundledLevelRepository(),
-      sortLevelVariant(new SquareGeometry()),
+      sortLevelVariant(new SquareGeometry(), seededRandom(1)),
     );
 
     await expect(factories.factoryFor(LevelId.of('sort-01'))).rejects.toThrow(

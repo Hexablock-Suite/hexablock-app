@@ -7,14 +7,12 @@ import { GameEngine } from '../../../../src/domain/engine/game-engine';
 import { GameId } from '../../../../src/domain/engine/game-id';
 import { GameStateId } from '../../../../src/domain/engine/game-state-id';
 import type { MatchId } from '../../../../src/domain/engine/match-id';
-import { Piece } from '../../../../src/domain/engine/piece';
 import {
   FixedListPieceSource,
   type IPieceSource,
 } from '../../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
-import { CellNode } from '../../../../src/domain/engine/shape-node';
 import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
 import { ColorStack } from '../../../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../../../src/domain/variants/hexa-sort/goal-count';
@@ -27,6 +25,7 @@ import { square, squareTopology, type SquareCoord } from '../../engine/square-to
 import { MATCH_ID } from '../../engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../engine/entity-ids';
 import { boardLike } from '../../engine/variant-game';
+import { seededRandom } from '../../engine/step-random';
 
 // Hexa Sort test helpers. The board uses the square topology double (D4), so the tests
 // prove that the Sort rules ask the topology for the neighbors and assume no hexagon.
@@ -66,11 +65,6 @@ export function tiles(name: string, count: number): string[] {
   return Array.from({ length: count }, () => name);
 }
 
-// A Sort piece is one cell with a stack (classes.md decision 6).
-export function stackPiece(content: ColorStack): Piece<ColorStack, SquareCoord> {
-  return new Piece(new CellNode(square(0, 0)), content);
-}
-
 // A board of one row of `length` cells, (0, 0) to (length - 1, 0).
 // The board keeps `content` in the order of the list, so `board.occupiedCells()` keeps it too.
 export function row(
@@ -95,7 +89,7 @@ export class NoScoring implements IScoringPolicy<SortState<SquareCoord>> {
 export function sortState(values: {
   board: Board<ColorStack, SquareCoord>;
   offered?: readonly ColorStack[];
-  source?: IPieceSource<Piece<ColorStack, SquareCoord>>;
+  source?: IPieceSource<ColorStack>;
   goalsNeeded?: number;
   matchId?: MatchId;
   stateId?: GameStateId;
@@ -104,7 +98,7 @@ export function sortState(values: {
     stateId: values.stateId ?? STATE_ID,
     matchId: values.matchId ?? MATCH_ID,
     board: values.board,
-    source: values.source ?? new FixedListPieceSource((values.offered ?? []).map(stackPiece)),
+    source: values.source ?? new FixedListPieceSource(values.offered ?? []),
     goalsNeeded: GoalCount.of(values.goalsNeeded ?? 5),
   });
 }
@@ -143,6 +137,7 @@ export function sortFactory(
   return new SortFactory(
     new SquareGeometry(),
     SortLevel.fixed(RegionSize.of(2), GoalCount.of(goalsNeeded), offered),
+    seededRandom(1),
   );
 }
 
