@@ -45,6 +45,12 @@ export interface GameView<TCoord, TCellView, TPayloadView> {
   show(model: GameViewModel<TCoord, TCellView, TPayloadView>): void;
 }
 
+// What hears the end of a game (#180): `ResultPresenter` saves the result and shows it.
+// It gets the response of the move that ends the game.
+export interface GameEndListener {
+  onFinish(response: MoveResult<unknown, unknown>): Promise<void>;
+}
+
 // The text of each outcome. The set of outcomes is closed (classes.md decision 45).
 const OUTCOME_TEXTS: readonly (readonly [Outcome, TextKey])[] = [
   [Outcome.playing, 'play.outcome.playing'],
@@ -90,6 +96,8 @@ const ERROR_TEXTS: Readonly<Record<FailureCode, TextKey>> = {
 // the text of the failure. A rejected move, an undo or a redo that finds no move and a locked
 // level (#397) have their own texts, and any other failure has one general text. The table of texts names every code.
 // Every text comes from the catalog of one language (APP-FR-11).
+// The move that ends a game also goes to the end listener, after the view sees it (#180).
+// The composition root gives `ResultPresenter` as the listener.
 // A view attaches to see each new view model. It sees the current one at once.
 export class GamePresenter<TCell, TCoord, TMove, TView, TCellView, TPayloadView, TIntent> {
   private model: GameViewModel<TCoord, TCellView, TPayloadView>;
@@ -103,6 +111,7 @@ export class GamePresenter<TCell, TCoord, TMove, TView, TCellView, TPayloadView,
     private readonly mapper: StateMapper<TCell, TView, TCellView, TPayloadView>,
     private readonly moves: MoveMapper<TIntent, TMove>,
     private readonly texts: Texts,
+    private readonly ended?: GameEndListener,
   ) {
     this.model = {
       ...this.labels(),
@@ -135,8 +144,13 @@ export class GamePresenter<TCell, TCoord, TMove, TView, TCellView, TPayloadView,
   }
 
   // Plays the move of `intent` through `ApplyMove`. The move mapper builds the domain move (#405).
+  // A move that ends the game goes to the end listener too (#180).
   async onMove(intent: TIntent): Promise<void> {
-    this.present(await this.applyMove.execute({ move: this.moves.toMove(intent) }));
+    const result = await this.applyMove.execute({ move: this.moves.toMove(intent) });
+    this.present(result);
+    if (result.ok && !result.value.outcome.equals(Outcome.playing)) {
+      await this.ended?.onFinish(result.value);
+    }
   }
 
   // Takes back the last move through `UndoMove` (#178).

@@ -8,6 +8,10 @@ import type { Score } from '../shared/score';
 import type { Stars } from './stars';
 
 // The result of one finished game. It is a value object (view 4).
+// It has two ways to build (D26, decision 61). `of()` builds the result of a level:
+// a level counts its moves, and a timed level also gives its time.
+// `endless()` builds the result of a game with no levels, Lines and Merge: they count no moves,
+// so the result keeps the game and the score only.
 // `levelId` exists only for games with levels, and `elapsedMs` only for timed games.
 // Every field is a value object that checks its own value (classes.md decisions 41 and 42).
 // So the result has no check of its own: a `Score`, `Moves`, a `LevelId` and an `ElapsedTime`
@@ -17,7 +21,7 @@ export class GameResult {
   private constructor(
     private readonly gameId: GameId,
     private readonly score: Score,
-    private readonly moves: Moves,
+    private readonly moves?: Moves,
     private readonly levelId?: LevelId,
     private readonly elapsedMs?: ElapsedTime,
   ) {}
@@ -38,12 +42,17 @@ export class GameResult {
     );
   }
 
+  // The result of a game with no levels: its game and its final score (D26).
+  static endless(values: { gameId: GameId; score: Score }): GameResult {
+    return new GameResult(values.gameId, values.score);
+  }
+
   // Two results are equal when every field is equal.
   // The game id comes last, so no condition of this method depends on it (APP-NFR-08).
   equals(other: GameResult): boolean {
     return (
       this.score.equals(other.score) &&
-      this.moves.equals(other.moves) &&
+      sameOptional(this.moves, other.moves, (left, right) => left.equals(right)) &&
       sameOptional(this.levelId, other.levelId, (left, right) => left.equals(right)) &&
       sameOptional(this.elapsedMs, other.elapsedMs, (left, right) => left.equals(right)) &&
       this.gameId.equals(other.gameId)
@@ -71,7 +80,11 @@ export class GameResult {
 
   // The stars that `level` gives to the play of this result.
   // The result gives its moves and its time to the level, and the level answers.
+  // An endless result has no moves, so it throws a RangeError.
   starsBy(level: ILevelStars): Stars {
+    if (this.moves === undefined) {
+      throw new RangeError('An endless result has no moves, so no level counts its stars.');
+    }
     return level.starsFor(this.moves, this.elapsedMs);
   }
 }

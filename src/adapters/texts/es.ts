@@ -12,6 +12,7 @@
 // gives to the achievement (#188).
 // The texts of the level selector live under `levels.<part>`, and the text of each status
 // of a level under `levels.status.<status>` (#173).
+// The texts of the victory screen and of the defeat screen live under `result.<part>` (#180).
 export const es = {
   'home.title': 'HexaBlock Suite',
   'home.brand': 'HexaBlock',
@@ -40,6 +41,15 @@ export const es = {
   'play.error.nothing-to-undo': 'No hay jugada para deshacer',
   'play.error.nothing-to-redo': 'No hay jugada para rehacer',
   'play.error.level-locked': 'Ese nivel está bloqueado. Gana el nivel anterior para abrirlo.',
+  'result.victory': '¡Ganaste!',
+  'result.defeat': 'Fin de la partida',
+  'result.score': 'Puntuación final',
+  'result.next-level': 'Siguiente nivel',
+  'result.new-game': 'Nueva partida',
+  'result.retry': 'Reintentar',
+  'result.back': 'Volver al mapa',
+  'result.error.save': 'No se pudo guardar el resultado.',
+  'result.error': 'No se pudo cerrar la partida. Vuelve al mapa.',
   'play.fit.moves': 'Movimientos',
   'play.fit.tray': 'Bandeja de piezas',
   'play.fit.piece': 'Pieza',

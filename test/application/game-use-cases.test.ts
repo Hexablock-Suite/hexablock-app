@@ -279,6 +279,9 @@ describe('StartGame and ApplyMove', () => {
       const hasUndo = run.gameId === 'hexa-fit' || run.gameId === 'hexa-merge';
       // Only Fit is timed, and this clock does not move.
       const time = run.gameId === 'hexa-fit' ? { elapsedMs: ElapsedTime.ofMs(0) } : {};
+      // Fit and Sort count their moves, and Lines and Merge count none (D26, #180).
+      const counts = run.gameId === 'hexa-fit' || run.gameId === 'hexa-sort';
+      const movesAt = (count: number) => (counts ? { moves: Moves.of(count) } : {});
       // A view keeps its fields private, so the test compares the data that it delivers.
       expect({ ...run.started, payload: viewData(run.started.payload) }).toEqual({
         cells: run.startCells,
@@ -290,6 +293,7 @@ describe('StartGame and ApplyMove', () => {
         hasUndo,
         payload: viewData(run.startState.view()),
         ...time,
+        ...movesAt(0),
       });
       expect({ ...run.played, payload: viewData(run.played.payload) }).toEqual({
         cells: run.after.boardCopy().occupiedCells(),
@@ -301,6 +305,7 @@ describe('StartGame and ApplyMove', () => {
         hasUndo,
         payload: viewData(run.after.view()),
         ...time,
+        ...movesAt(1),
       });
     }
     // Merge starts with two tiles, so the start result carries the cells of the board.
@@ -541,6 +546,7 @@ describe('StartGame and ApplyMove', () => {
       hasUndo: true,
       payload: viewData(saved.view()),
       elapsedMs: ElapsedTime.ofMs(0),
+      moves: Moves.of(1),
     });
     expect(saved.boardCopy().occupiedCells()).not.toEqual([]);
     expect(games.running().currentPhase()).toBe(VictoryPhase.instance);
@@ -571,6 +577,7 @@ describe('StartGame and ApplyMove', () => {
       'elapsedMs',
       'freeSpaces',
       'hasUndo',
+      'moves',
       'outcome',
       'payload',
       'score',
@@ -824,10 +831,11 @@ describe('the variant data of MoveResult', () => {
     const merge = (await startAndPlayOnce(mergeFactory())).played;
     const single = new Piece(new CellNode(square(0, 0)), red);
 
+    // Since #180 Fit and Sort also carry their move count (D26).
     expect([lines, fit, sort, merge].map((result) => Object.keys(result).sort())).toEqual([
       fields,
-      [...fields, 'elapsedMs'].sort(),
-      fields,
+      [...fields, 'elapsedMs', 'moves'].sort(),
+      [...fields, 'moves'].sort(),
       fields,
     ]);
     expect({ ...lines, payload: linesViewData(lines.payload) }).toEqual({
@@ -862,6 +870,7 @@ describe('the variant data of MoveResult', () => {
       hasUndo: true,
       payload: { remaining: [], placed: [A], moves: Moves.of(1) },
       elapsedMs: ElapsedTime.ofMs(0),
+      moves: Moves.of(1),
     });
     expect({ ...sort, payload: sortViewData(sort.payload) }).toEqual({
       cells: [[square(0, 0), stack('red')]],
@@ -876,6 +885,7 @@ describe('the variant data of MoveResult', () => {
         goalsDone: ClearedStacks.of(0),
         goalsNeeded: GoalCount.of(5),
       },
+      moves: Moves.of(1),
     });
     expect({ ...merge, payload: mergeViewData(merge.payload) }).toEqual({
       cells: [

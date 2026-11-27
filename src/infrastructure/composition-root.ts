@@ -10,6 +10,7 @@ import { LocalAchievementCounterRepository } from '../adapters/local-achievement
 import { LocalProgressRepository } from '../adapters/local-progress-repository';
 import { LevelGameFactories } from '../adapters/level-game-factories';
 import { LevelSelectorPresenter } from '../adapters/level-selector-presenter';
+import { ResultPresenter } from '../adapters/result-presenter';
 import { DEFAULT_LANGUAGE, textCatalog, type Texts } from '../adapters/texts/text-catalog';
 import { ApplyMove, type ApplyMoveRequest } from '../application/apply-move';
 import type { GameEventPublisher } from '../application/game-event-publisher';
@@ -19,7 +20,6 @@ import {
   type AchievementSummary,
   type ListAchievementsRequest,
 } from '../application/list-achievements';
-import type { GameFactories } from '../application/game-factories';
 import type { LevelRepository } from '../application/level-repository';
 import type { LevelSummary } from '../application/level-summary';
 import { ListLevels, type ListLevelsRequest } from '../application/list-levels';
@@ -28,6 +28,7 @@ import { LoggingAspect } from '../application/logging-aspect';
 import type { MoveResult, ViewOf } from '../application/move-result';
 import type { ProgressRepository } from '../application/progress-repository';
 import { RedoMove, type RedoMoveRequest } from '../application/redo-move';
+import { SaveProgress } from '../application/save-progress';
 import { StartGame, type StartGameRequest } from '../application/start-game';
 import { UndoMove, type UndoMoveRequest } from '../application/undo-move';
 import type { UseCase } from '../application/use-case';
@@ -37,6 +38,8 @@ import type { Clock } from '../domain/engine/clock';
 import type { Cloneable } from '../domain/engine/cloneable';
 import type { GameId } from '../domain/shared/game-id';
 import type { GameProgress } from '../domain/progress/game-progress';
+import type { LevelId } from '../domain/progress/level-id';
+import type { GameResult } from '../domain/progress/progress-model';
 import { TopologyId } from '../domain/shared/topology-id';
 import type { MatchIdGenerator } from '../domain/engine/match-id-generator';
 import type { CellShape } from '../adapters/board/board-layout';
@@ -53,11 +56,16 @@ import type { WorldTone } from './ui/theme';
 // The game use cases of one game. Each one is behind the `UseCase` input port (decision 9)
 // and inside its aspects, so a presenter never sees a concrete use case.
 // `TView` is the variant data of the response (decision 29).
+// `saveProgressOf()` gives the `SaveProgress` of one level of the game, or of the game with
+// no levels (#180). A level counts its stars with its own star rule, so each call builds the use
+// case with the progress model of that level. A root with no local store rejects the call with a
+// RangeError, as `loadProgress()` throws one.
 export interface GameUseCases<TCell = unknown, TCoord = unknown, TMove = unknown, TView = unknown> {
   readonly startGame: UseCase<StartGameRequest, MoveResult<TCell, TCoord, TView>>;
   readonly applyMove: UseCase<ApplyMoveRequest<TMove>, MoveResult<TCell, TCoord, TView>>;
   readonly undoMove: UseCase<UndoMoveRequest, MoveResult<TCell, TCoord, TView>>;
   readonly redoMove: UseCase<RedoMoveRequest, MoveResult<TCell, TCoord, TView>>;
+  saveProgressOf(levelId: LevelId | undefined): Promise<UseCase<GameResult, void>>;
 }
 
 // The drivers that a test may replace. The app takes the system clock, the console logger
@@ -108,9 +116,12 @@ export interface RootDrivers {
 // Over the same two repositories, it builds `ListLevels` once for the level selector
 // (#173). The store is optional: a root with no store offers none of the three, and asking for
 // one throws a `RangeError`, as for a board figure that the root does not offer.
+// For each game, the root also builds `SaveProgress` over the same progress repository, with
+// the progress model of the level of the finished game (#180). `LevelGameFactories` gives that
+// model, so the root holds no copy of the choice of the level.
 // The root implements `ScreenServices`, the closed interface of the screens (#411). It builds
 // the presenter of each screen over its use cases: `HomePresenter`, `AchievementsPresenter`,
-// `LevelSelectorPresenter` and the `GamePresenter` of a game session. Each call builds a new
+// `LevelSelectorPresenter`, and the `GamePresenter` and the `ResultPresenter` of a game session. Each call builds a new
 // presenter, and the hook of a screen keeps it for the life of that screen. The React context
 // holds the root as `ScreenServices`, so a hook asks for no other piece of the root.
 // The screens show the default language until the player can choose one (#163).
@@ -288,11 +299,23 @@ export class CompositionRoot implements ScreenServices {
   // (#170, #171, #411). Its `GamePresenter` takes the four game use cases of `gameUseCases()`,
   // so two sessions of one game on one figure share its running game. It also takes the state
   // mapper and the move mapper (#405) of the registry entry. The session also holds the screen
-  // parts of the registry entry. An id that the registry of the figure does not hold
-  // throws a RangeError.
+  // parts of the registry entry. Its `ResultPresenter` hears the end of each game of the
+  // `GamePresenter` (#180): it saves the result with `saveProgressOf()` of the game and finds
+  // the next level with `listLevels()`. A root with no local store throws a RangeError for both,
+  // and the presenter shows the text of the failure. An id that the registry of the figure does
+  // not hold throws a RangeError.
   gameSession(gameId: GameId, figure: TopologyId = TopologyId.hex): GameSession {
     const { screen } = this.registry(figure).gameOf(gameId);
-    const { startGame, applyMove, undoMove, redoMove } = this.gameUseCases(gameId, figure);
+    const { startGame, applyMove, undoMove, redoMove, saveProgressOf } = this.gameUseCases(
+      gameId,
+      figure,
+    );
+    const result = new ResultPresenter(
+      gameId,
+      figure,
+      { saveProgressOf, listLevels: () => this.listLevels() },
+      this.texts,
+    );
     return {
       presenter: new GamePresenter(
         startGame,
@@ -302,7 +325,9 @@ export class CompositionRoot implements ScreenServices {
         screen.mapper,
         screen.moves,
         this.texts,
+        result,
       ),
+      result,
       renderer: screen.renderer,
       controls: screen.controls,
       layoutOf: (size) => screen.layoutOf(size),
@@ -340,8 +365,11 @@ interface LevelLock {
 // `decorate`. Every game shares the id generator, the event bus and the level repository,
 // so each one exists once in the app. The logger reaches a use case only through `decorate`.
 // `StartGame` also takes `lock`, so it can refuse a locked level (#397).
+// `saveProgressOf()` builds `SaveProgress` over the progress repository of `lock`, with the
+// progress model that `factories` gives for the level (#180). With no progress repository
+// it rejects with a RangeError.
 function wire<TState extends BoardState<unknown, unknown> & Cloneable<TState>>(
-  factories: GameFactories<unknown, unknown, unknown, TState>,
+  factories: LevelGameFactories<unknown, unknown, unknown, TState>,
   lock: LevelLock,
   events: GameEventPublisher,
   decorate: Decorate,
@@ -355,5 +383,12 @@ function wire<TState extends BoardState<unknown, unknown> & Cloneable<TState>>(
     applyMove: decorate(new ApplyMove(games, events), 'ApplyMove'),
     undoMove: decorate(new UndoMove(games), 'UndoMove'),
     redoMove: decorate(new RedoMove(games), 'RedoMove'),
+    saveProgressOf: async (levelId) => {
+      if (lock.progress === undefined) {
+        throw new RangeError('The root has no local store, so it saves no progress.');
+      }
+      const model = await factories.progressModelFor(levelId);
+      return decorate(new SaveProgress(lock.progress, model, lock.gameId), 'SaveProgress');
+    },
   };
 }

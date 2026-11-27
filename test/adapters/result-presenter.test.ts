@@ -1,0 +1,319 @@
+/** @jest-environment node */
+import { ResultPresenter, type ResultViewModel } from '../../src/adapters/result-presenter';
+import { textCatalog } from '../../src/adapters/texts/text-catalog';
+import type { LevelSummary } from '../../src/application/level-summary';
+import type { ListLevelsRequest } from '../../src/application/list-levels';
+import type { MoveResult } from '../../src/application/move-result';
+import { FailureCode, Result, UseCaseError } from '../../src/application/result';
+import type { UseCase } from '../../src/application/use-case';
+import { Outcome } from '../../src/domain/engine/outcome';
+import { LevelId } from '../../src/domain/progress/level-id';
+import { LevelStatus } from '../../src/domain/progress/level-status';
+import { GameResult } from '../../src/domain/progress/progress-model';
+import { Stars } from '../../src/domain/progress/stars';
+import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
+import { GameId } from '../../src/domain/shared/game-id';
+import { Moves } from '../../src/domain/shared/moves';
+import { Score } from '../../src/domain/shared/score';
+import { TopologyId } from '../../src/domain/shared/topology-id';
+
+// Issue #180 (APP-FR-07, APP-FR-09): `ResultPresenter` ends a game on a result screen.
+// It saves the result through `SaveProgress` (flows.md, use case 2) and finds the next level
+// through `ListLevels`, which holds the rule of an open level (S3-12, #326).
+// The fakes stand for the use cases of the composition root.
+
+const FIT = GameId.of('hexa-fit');
+const LINES = GameId.of('hexa-lines');
+
+// A `SaveProgress` port that keeps each result and answers `answer`.
+class SavingUseCase implements UseCase<GameResult, void> {
+  readonly saved: GameResult[] = [];
+
+  constructor(private readonly answer: Result<void> = Result.success(undefined)) {}
+
+  async execute(request: GameResult): Promise<Result<void>> {
+    this.saved.push(request);
+    return this.answer;
+  }
+}
+
+// A `ListLevels` port that keeps each request and answers `answer`.
+class ListingUseCase implements UseCase<ListLevelsRequest, LevelSummary[]> {
+  readonly requests: ListLevelsRequest[] = [];
+
+  constructor(private readonly answer: Result<LevelSummary[]>) {}
+
+  async execute(request: ListLevelsRequest): Promise<Result<LevelSummary[]>> {
+    this.requests.push(request);
+    return this.answer;
+  }
+}
+
+// The levels of Fit on the square after a won `fit-01`: the next level is open.
+const AFTER_FIRST: LevelSummary[] = [
+  { levelId: LevelId.of('fit-01'), status: LevelStatus.completed, stars: Stars.of(3) },
+  { levelId: LevelId.of('fit-02'), status: LevelStatus.open },
+  { levelId: LevelId.of('fit-03'), status: LevelStatus.locked },
+];
+
+// The final response of a game: a level game has a level id and a move count,
+// and a game with no levels has neither.
+function finalResponse(
+  outcome: Outcome,
+  score: number,
+  level?: { levelId: string; moves: number; elapsedMs?: number },
+): MoveResult<string, string> {
+  return {
+    cells: [],
+    freeSpaces: [],
+    score: Score.of(score),
+    outcome,
+    canUndo: false,
+    canRedo: false,
+    hasUndo: false,
+    payload: undefined,
+    ...(level === undefined
+      ? {}
+      : { levelId: LevelId.of(level.levelId), moves: Moves.of(level.moves) }),
+    ...(level?.elapsedMs === undefined ? {} : { elapsedMs: ElapsedTime.ofMs(level.elapsedMs) }),
+  };
+}
+
+// The presenter of `gameId` on the square over a saving port and a listing port, with a view
+// that records each model it shows. `asked` keeps the level id of each asked `SaveProgress`.
+function presenterWith(
+  gameId: GameId,
+  options: {
+    save?: SavingUseCase;
+    list?: ListingUseCase;
+    saveThrows?: boolean;
+    texts?: typeof textCatalog.es;
+  } = {},
+) {
+  const save = options.save ?? new SavingUseCase();
+  const list = options.list ?? new ListingUseCase(Result.success(AFTER_FIRST));
+  const asked: (LevelId | undefined)[] = [];
+  const presenter = new ResultPresenter(
+    gameId,
+    TopologyId.square,
+    {
+      saveProgressOf: async (levelId) => {
+        asked.push(levelId);
+        if (options.saveThrows === true) {
+          throw new RangeError('The root has no local store, so it saves no progress.');
+        }
+        return save;
+      },
+      listLevels: () => list,
+    },
+    options.texts ?? textCatalog.es,
+  );
+  const shown: (ResultViewModel | undefined)[] = [];
+  presenter.attach({ show: (model) => shown.push(model) });
+  return { presenter, save, list, asked, shown };
+}
+
+describe('ResultPresenter', () => {
+  // Before the end of a game there is no result to show.
+  it('should_show_no_result_when_the_view_attaches_before_the_end_of_a_game', () => {
+    const { presenter, shown } = presenterWith(FIT);
+
+    expect(shown).toEqual([undefined]);
+    expect(presenter.viewModel()).toBeUndefined();
+  });
+
+  // A won level saves a level result and offers the next level, which `ListLevels` opens.
+  it('should_save_the_level_result_and_offer_the_next_level_when_the_player_wins_a_level', async () => {
+    const { presenter, save, list, asked, shown } = presenterWith(FIT);
+
+    await presenter.onFinish(
+      finalResponse(Outcome.victory, 0, { levelId: 'fit-01', moves: 3, elapsedMs: 9000 }),
+    );
+
+    expect(asked).toEqual([LevelId.of('fit-01')]);
+    expect(save.saved).toHaveLength(1);
+    expect(
+      save.saved[0]?.equals(
+        GameResult.of({
+          gameId: FIT,
+          score: Score.of(0),
+          moves: Moves.of(3),
+          levelId: LevelId.of('fit-01'),
+          elapsedMs: ElapsedTime.ofMs(9000),
+        }),
+      ),
+    ).toBe(true);
+    expect(list.requests).toEqual([{ gameId: FIT, figure: TopologyId.square }]);
+    expect(shown.at(-1)).toEqual({
+      victory: true,
+      title: '¡Ganaste!',
+      scoreLabel: 'Puntuación final',
+      score: 0,
+      back: 'Volver al mapa',
+      next: { label: 'Siguiente nivel', levelId: 'fit-02' },
+    });
+  });
+
+  // The last level of a figure has no next level.
+  it('should_offer_no_next_level_when_the_player_wins_the_last_level_of_the_figure', async () => {
+    const { presenter, shown } = presenterWith(FIT);
+
+    await presenter.onFinish(finalResponse(Outcome.victory, 0, { levelId: 'fit-03', moves: 4 }));
+
+    expect(shown.at(-1)).toEqual({
+      victory: true,
+      title: '¡Ganaste!',
+      scoreLabel: 'Puntuación final',
+      score: 0,
+      back: 'Volver al mapa',
+    });
+  });
+
+  // A lost level is not won, so nothing is saved and nothing opens. The screen offers a retry.
+  it('should_save_nothing_and_offer_a_retry_when_the_player_loses_a_level', async () => {
+    const { presenter, save, list, asked, shown } = presenterWith(FIT);
+
+    await presenter.onFinish(finalResponse(Outcome.gameOver, 20, { levelId: 'fit-01', moves: 5 }));
+
+    expect([asked, save.saved, list.requests]).toEqual([[], [], []]);
+    expect(shown.at(-1)).toEqual({
+      victory: false,
+      title: 'Fin de la partida',
+      scoreLabel: 'Puntuación final',
+      score: 20,
+      back: 'Volver al mapa',
+      retry: 'Reintentar',
+    });
+  });
+
+  // Lines and Merge end only by a game over. Their score is the result (D26).
+  it('should_save_the_score_and_offer_a_retry_when_a_game_with_no_levels_ends', async () => {
+    const { presenter, save, list, asked, shown } = presenterWith(LINES);
+
+    await presenter.onFinish(finalResponse(Outcome.gameOver, 130));
+
+    expect(asked).toEqual([undefined]);
+    expect(save.saved[0]?.equals(GameResult.endless({ gameId: LINES, score: Score.of(130) }))).toBe(
+      true,
+    );
+    expect(list.requests).toEqual([]);
+    expect(shown.at(-1)).toEqual({
+      victory: false,
+      title: 'Fin de la partida',
+      scoreLabel: 'Puntuación final',
+      score: 130,
+      back: 'Volver al mapa',
+      retry: 'Reintentar',
+    });
+  });
+
+  // A won game with no levels offers a new game, as the issue asks for Lines and Merge.
+  it('should_save_the_score_and_offer_a_new_game_when_the_player_wins_a_game_with_no_levels', async () => {
+    const { presenter, save, shown } = presenterWith(LINES);
+
+    await presenter.onFinish(finalResponse(Outcome.victory, 2048));
+
+    expect(save.saved).toHaveLength(1);
+    expect(shown.at(-1)).toEqual({
+      victory: true,
+      title: '¡Ganaste!',
+      scoreLabel: 'Puntuación final',
+      score: 2048,
+      back: 'Volver al mapa',
+      newGame: 'Nueva partida',
+    });
+  });
+
+  // A game that goes on has no result.
+  it('should_do_nothing_when_the_response_keeps_the_game_playing', async () => {
+    const { presenter, save, asked, shown } = presenterWith(LINES);
+
+    await presenter.onFinish(finalResponse(Outcome.playing, 10));
+
+    expect([asked, save.saved, shown]).toEqual([[], [], [undefined]]);
+  });
+
+  // A failed save keeps the result on the screen and says that the save failed.
+  // `ListLevels` then finds the next level locked, so the screen offers no next level.
+  it('should_show_the_text_of_a_failed_save_when_save_progress_fails', async () => {
+    const locked: LevelSummary[] = [
+      { levelId: LevelId.of('fit-01'), status: LevelStatus.open },
+      { levelId: LevelId.of('fit-02'), status: LevelStatus.locked },
+      { levelId: LevelId.of('fit-03'), status: LevelStatus.locked },
+    ];
+    const { presenter, shown } = presenterWith(FIT, {
+      save: new SavingUseCase(
+        Result.failure(new UseCaseError(FailureCode.saveFailed, 'The store refused the write.')),
+      ),
+      list: new ListingUseCase(Result.success(locked)),
+    });
+
+    await presenter.onFinish(finalResponse(Outcome.victory, 0, { levelId: 'fit-01', moves: 3 }));
+
+    expect(shown.at(-1)).toEqual({
+      victory: true,
+      title: '¡Ganaste!',
+      scoreLabel: 'Puntuación final',
+      score: 0,
+      back: 'Volver al mapa',
+      error: 'No se pudo guardar el resultado.',
+    });
+  });
+
+  // A root with no local store gives no `SaveProgress`: it throws a RangeError, as for
+  // `loadProgress()`. The presenter shows the text of a failed save and throws nothing.
+  it('should_show_the_text_of_a_failed_save_when_the_root_gives_no_save_progress', async () => {
+    const { presenter, shown } = presenterWith(LINES, { saveThrows: true });
+
+    await presenter.onFinish(finalResponse(Outcome.gameOver, 5));
+
+    expect(shown.at(-1)?.error).toBe('No se pudo guardar el resultado.');
+  });
+
+  // A failed list keeps the result and offers no next level.
+  it('should_show_the_general_text_and_no_next_level_when_list_levels_fails', async () => {
+    const { presenter, shown } = presenterWith(FIT, {
+      list: new ListingUseCase(
+        Result.failure(new UseCaseError(FailureCode.listFailed, 'The levels are missing.')),
+      ),
+    });
+
+    await presenter.onFinish(finalResponse(Outcome.victory, 0, { levelId: 'fit-01', moves: 3 }));
+
+    expect(shown.at(-1)).toEqual({
+      victory: true,
+      title: '¡Ganaste!',
+      scoreLabel: 'Puntuación final',
+      score: 0,
+      back: 'Volver al mapa',
+      error: 'No se pudo cerrar la partida. Vuelve al mapa.',
+    });
+  });
+
+  // A retry or a new game closes the result screen.
+  it('should_show_no_result_when_the_player_closes_the_result', async () => {
+    const { presenter, shown } = presenterWith(LINES);
+    await presenter.onFinish(finalResponse(Outcome.gameOver, 5));
+
+    presenter.onClose();
+
+    expect(shown.at(-1)).toBeUndefined();
+    expect(presenter.viewModel()).toBeUndefined();
+  });
+
+  // Every text comes from the catalog of the language (APP-FR-11).
+  it('should_show_the_english_texts_when_the_presenter_takes_the_english_catalog', async () => {
+    const { presenter, shown } = presenterWith(FIT, { texts: textCatalog.en });
+
+    await presenter.onFinish(finalResponse(Outcome.victory, 0, { levelId: 'fit-01', moves: 3 }));
+
+    expect(shown.at(-1)).toEqual({
+      victory: true,
+      title: 'You won!',
+      scoreLabel: 'Final score',
+      score: 0,
+      back: 'Back to the map',
+      next: { label: 'Next level', levelId: 'fit-02' },
+    });
+  });
+});
