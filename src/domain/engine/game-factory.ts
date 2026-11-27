@@ -9,6 +9,7 @@ import type { MatchIdGenerator } from './match-id-generator';
 import type { IGameRules } from './rules';
 import { TimedRulesDecorator } from './timed-rules-decorator';
 import type { IVariantFactory } from './variant-factory';
+import type { LevelId } from '../progress/level-id';
 
 // The factory of the aggregate (classes.md decision 40). It assembles one whole game:
 // the id of the match, the local ids of the first state and of its board, and the family
@@ -21,6 +22,8 @@ import type { IVariantFactory } from './variant-factory';
 // and that work is the same for every variant, so no variant factory repeats it.
 // It never names a variant and never branches on the game id (rule `engine-no-variants`).
 // The item type of the piece source is `unknown`, because this class reads no piece.
+// `levelId` names the level of the games of a level factory (decision 61, #180).
+// `LevelGameFactories` gives it, and each new game keeps it. A game with no levels has none.
 export class GameFactory<
   TCell,
   TCoord,
@@ -31,6 +34,7 @@ export class GameFactory<
     private readonly gameId: GameId,
     private readonly variant: IVariantFactory<TCell, TCoord, TMove, TState, unknown>,
     private readonly ids: MatchIdGenerator,
+    private readonly levelId?: LevelId,
   ) {}
 
   // A new game that has started. Each call asks the generator for one new `MatchId`,
@@ -50,6 +54,7 @@ export class GameFactory<
       this.variant.createScoring(),
       this.variant.createHistory(),
       timer,
+      this.levelId,
     );
     game.start(
       this.variant.createInitialState(matchId, GameStateId.of(matchId), BoardId.of(matchId)),

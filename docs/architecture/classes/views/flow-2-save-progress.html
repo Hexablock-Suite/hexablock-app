@@ -63,7 +63,7 @@
       <p class="eyebrow">Use case flow · SaveProgress · class view</p>
       <h1>SaveProgress across the four layers: the classes of one saved result</h1>
       <svg
-        viewBox="0 0 1040 1338"
+        viewBox="0 0 1040 1370"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="flowsave-title flowsave-desc"
@@ -71,14 +71,15 @@
         <title id="flowsave-title">HexaBlock SaveProgress flow · UML class diagram</title>
         <desc id="flowsave-desc">
           Cross-layer class diagram of the SaveProgress use case only. In layer 4, VictoryScreen
-          uses ResultPresenter, and ApiClient, the driver, implements the ProgressApi transport
-          interface of layer 3 (decision 22). In layer 3, ResultPresenter uses the UseCase input
-          port, and ApiProgressRepository keeps ApiDtoMapper and ProgressApi and implements the
-          ProgressRepository port of layer 2. In layer 2, SaveProgress implements UseCase, keeps the
-          ProgressRepository port, the IProgressModel strategy and the GameId of its game, starts a
-          GameProgress when the game has none, and returns no value. The port loads and saves the
-          GameProgress of one game. In layer 1, IProgressModel records a GameResult in that
-          GameProgress: the fields of GameResult are private, and its recordWith() creates the
+          shows the view model of ResultPresenter, and ApiClient, the driver, implements the
+          ProgressApi transport interface of layer 3 (decision 22). In layer 3, GamePresenter gives
+          the last MoveResult to ResultPresenter, which builds the GameResult and uses the UseCase
+          input port, and ApiProgressRepository keeps ApiDtoMapper and ProgressApi and implements
+          the ProgressRepository port of layer 2. In layer 2, SaveProgress implements UseCase, keeps
+          the ProgressRepository port, the IProgressModel strategy and the GameId of its game,
+          starts a GameProgress when the game has none, and returns no value. The port loads and
+          saves the GameProgress of one game. In layer 1, IProgressModel records a GameResult in
+          that GameProgress: the fields of GameResult are private, and its recordWith() creates the
           record. Every dependency between layers points down.
         </desc>
         <defs>
@@ -102,7 +103,7 @@
             orient="auto"
             markerUnits="userSpaceOnUse"
           >
-            <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
+            <path d="M0 0 L9 4 L0 8" fill="none" stroke="#5b6873" stroke-width="1" />
           </marker>
         </defs>
         <rect width="100%" height="100%" fill="#f3f5f6" />
@@ -133,7 +134,7 @@
           x="24"
           y="216"
           width="992"
-          height="288"
+          height="320"
           rx="8"
           fill="#e2ebf8"
           stroke="rgba(29,78,216,0.40)"
@@ -153,7 +154,7 @@
         <!-- Layer zone: layer 2 · use cases -->
         <rect
           x="24"
-          y="512"
+          y="544"
           width="992"
           height="344"
           rx="8"
@@ -163,7 +164,7 @@
         />
         <text
           x="40"
-          y="532"
+          y="564"
           fill="#7e22ce"
           font-size="8"
           font-weight="500"
@@ -175,7 +176,7 @@
         <!-- Layer zone: layer 1 · entities -->
         <rect
           x="24"
-          y="864"
+          y="896"
           width="992"
           height="224"
           rx="8"
@@ -185,7 +186,7 @@
         />
         <text
           x="40"
-          y="884"
+          y="916"
           fill="#b45309"
           font-size="8"
           font-weight="500"
@@ -230,7 +231,7 @@
         />
         <!-- ApiProgressRepository implements ProgressRepository: realization, down from layer 3 to layer 2 -->
         <path
-          d="M700 480 V552"
+          d="M700 480 V584"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -239,7 +240,7 @@
         />
         <!-- ResultPresenter keeps the UseCase input port it receives as saveProgress: use with role and multiplicity, down from layer 3 to layer 2 -->
         <path
-          d="M340 488 V552"
+          d="M340 520 V584"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -247,7 +248,7 @@
         />
         <!-- SaveProgress implements UseCase: realization -->
         <path
-          d="M260 684 V624"
+          d="M260 716 V656"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -256,7 +257,7 @@
         />
         <!-- SaveProgress keeps the ProgressRepository it receives as repository: use with role and multiplicity -->
         <path
-          d="M400 704 H592 Q600 704 600 696 V640"
+          d="M400 736 H592 Q600 736 600 728 V672"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -264,7 +265,7 @@
         />
         <!-- SaveProgress keeps the IProgressModel it receives as model: use with role and multiplicity, down from layer 2 to layer 1 -->
         <path
-          d="M340 840 V912"
+          d="M340 872 V944"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -272,7 +273,7 @@
         />
         <!-- SaveProgress takes a GameResult: use, down from layer 2 to layer 1 -->
         <path
-          d="M400 790 H552 Q560 790 560 798 V888"
+          d="M400 822 H552 Q560 822 560 830 V920"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -280,7 +281,7 @@
         />
         <!-- SaveProgress starts the GameProgress of its game when the game has none: use with a verb, down from layer 2 to layer 1 -->
         <path
-          d="M60 816 H44 Q36 816 36 824 V1040 Q36 1048 44 1048 H130"
+          d="M60 848 H44 Q36 848 36 856 V1072 Q36 1080 44 1080 H130"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -288,7 +289,7 @@
         />
         <!-- IProgressModel takes a GameResult: use -->
         <path
-          d="M380 948 H440"
+          d="M380 980 H440"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -296,17 +297,17 @@
         />
         <!-- IProgressModel records the result in the GameProgress of its game: use -->
         <path
-          d="M220 1000 V1028"
+          d="M220 1032 V1060"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#flowsave-open)"
         />
         <!-- Arrow labels -->
-        <rect x="482" y="777" width="36" height="12" rx="2" fill="#efe7f8" />
+        <rect x="482" y="809" width="36" height="12" rx="2" fill="#efe7f8" />
         <text
           x="486"
-          y="786"
+          y="818"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -315,10 +316,10 @@
         >
           TAKES
         </text>
-        <rect x="60" y="1031" width="40.4" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="60" y="1063" width="40.4" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="64"
-          y="1040"
+          y="1072"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -327,10 +328,10 @@
         >
           STARTS
         </text>
-        <rect x="388" y="935" width="36" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="388" y="967" width="36" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="392"
-          y="944"
+          y="976"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -340,17 +341,17 @@
           TAKES
         </text>
         <!-- Role names and multiplicities at the part end -->
-        <rect x="278.1" y="377" width="59.9" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="290" y="377" width="46" height="12" rx="2" fill="#e2ebf8" />
         <text
-          x="336"
+          x="334"
           y="386"
-          fill="#17212a"
+          fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="end"
+          letter-spacing="0.06em"
         >
-          presenter
-          <tspan font-weight="600">1</tspan>
+          SHOWS
         </text>
         <rect x="542" y="344" width="42" height="12" rx="2" fill="#e2ebf8" />
         <text
@@ -376,22 +377,22 @@
           api
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="263.4" y="537" width="74.6" height="12" rx="2" fill="#efe7f8" />
+        <rect x="236" y="569" width="100" height="12" rx="2" fill="#efe7f8" />
         <text
-          x="336"
-          y="546"
-          fill="#17212a"
+          x="334"
+          y="578"
+          fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="end"
+          letter-spacing="0.06em"
         >
-          saveProgress
-          <tspan font-weight="600">1</tspan>
+          SAVEPROGRESSOF()
         </text>
-        <rect x="602" y="647" width="64.8" height="12" rx="2" fill="#efe7f8" />
+        <rect x="602" y="679" width="64.8" height="12" rx="2" fill="#efe7f8" />
         <text
           x="604"
-          y="656"
+          y="688"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -400,10 +401,10 @@
           repository
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="297.7" y="897" width="40.3" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="297.7" y="929" width="40.3" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="336"
-          y="906"
+          y="938"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -432,7 +433,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «route»
+          «component»
         </text>
         <text
           x="240"
@@ -444,16 +445,13 @@
           text-anchor="middle"
         >
           VictoryScreen
-          <tspan data-requirement="APP-FR-07" fill="#5b6873" font-size="8" font-weight="400">
-            «Sprint 3»
-          </tspan>
         </text>
         <line x1="100" y1="112" x2="380" y2="112" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="116" y="128" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - presenter: ResultPresenter
+          - model: ResultViewModel
         </text>
         <text x="116" y="144" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          shown when a game ends
+          ui/result-screens.tsx, over the game route
         </text>
         <!-- Class: ApiDtoMapper (DTO mapper) -->
         <rect
@@ -642,12 +640,67 @@
         <text x="496" y="472" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + save(progress: GameProgress): Promise&lt;void&gt;
         </text>
+        <!-- GamePresenter gives the response of the move that ends a game to ResultPresenter, its end listener (GameEndListener, #180): use with role and multiplicity, inside layer 3 -->
+        <path
+          d="M120 296 V392"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#flowsave-open)"
+        />
+        <rect x="124" y="377" width="58" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="126"
+          y="386"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          ended
+          <tspan font-weight="600">0..1</tspan>
+        </text>
+        <!-- Reference box: GamePresenter, detailed in part 4 · view 4.1 -->
+        <rect
+          x="40"
+          y="256"
+          width="160"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="120"
+          y="270"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          PART 4 · VIEW 4.1
+        </text>
+        <text
+          x="120"
+          y="287"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GamePresenter
+        </text>
         <!-- Class: ResultPresenter -->
         <rect
           x="40"
           y="392"
           width="340"
-          height="96"
+          height="128"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -663,22 +716,25 @@
           text-anchor="middle"
         >
           ResultPresenter
-          <tspan data-requirement="APP-FR-07" fill="#5b6873" font-size="8" font-weight="400">
-            «Sprint 3»
-          </tspan>
         </text>
         <line x1="40" y1="440" x2="380" y2="440" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="56" y="456" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - saveProgress: UseCase&lt;GameResult, void&gt;
+          - useCases: ResultUseCases
         </text>
-        <line x1="40" y1="464" x2="380" y2="464" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="56" y="480" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + onFinish(result: GameResult): Promise&lt;void&gt;
+        <text x="56" y="472" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          builds the GameResult from the MoveResult
+        </text>
+        <line x1="40" y1="480" x2="380" y2="480" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="56" y="496" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + onFinish(response: MoveResult): Promise&lt;void&gt;
+        </text>
+        <text x="56" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + onClose(): void
         </text>
         <!-- Class: UseCase (interface, input port) -->
         <rect
           x="120"
-          y="552"
+          y="584"
           width="340"
           height="72"
           rx="6"
@@ -688,7 +744,7 @@
         />
         <text
           x="290"
-          y="570"
+          y="602"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -699,7 +755,7 @@
         </text>
         <text
           x="290"
-          y="588"
+          y="620"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -708,14 +764,14 @@
         >
           UseCase
         </text>
-        <line x1="120" y1="600" x2="460" y2="600" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="136" y="616" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="120" y1="632" x2="460" y2="632" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="136" y="648" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + execute(request: TRequest): Promise&lt;Result&lt;TResponse&gt;&gt;
         </text>
         <!-- Class: SaveProgress (focal, use case) -->
         <rect
           x="60"
-          y="684"
+          y="716"
           width="340"
           height="156"
           rx="6"
@@ -723,11 +779,11 @@
           stroke="#0f6f74"
           stroke-width="1"
         />
-        <rect x="60" y="684" width="340" height="60" rx="6" fill="rgba(15,111,116,0.10)" />
-        <rect x="60" y="736" width="340" height="8" fill="rgba(15,111,116,0.10)" />
+        <rect x="60" y="716" width="340" height="60" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="60" y="768" width="340" height="8" fill="rgba(15,111,116,0.10)" />
         <text
           x="230"
-          y="702"
+          y="734"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -738,7 +794,7 @@
         </text>
         <text
           x="230"
-          y="720"
+          y="752"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -749,7 +805,7 @@
         </text>
         <text
           x="230"
-          y="734"
+          y="766"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -758,27 +814,27 @@
         >
           APP-FR-09 · APP-FR-13
         </text>
-        <line x1="60" y1="744" x2="400" y2="744" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
-        <text x="76" y="760" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="60" y1="776" x2="400" y2="776" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <text x="76" y="792" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - repository: ProgressRepository
         </text>
-        <text x="76" y="776" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="76" y="808" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - model: IProgressModel
         </text>
-        <text x="76" y="792" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="76" y="824" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - gameId: GameId
         </text>
-        <line x1="60" y1="800" x2="400" y2="800" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
-        <text x="76" y="816" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="60" y1="832" x2="400" y2="832" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <text x="76" y="848" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + execute(request: GameResult):
         </text>
-        <text x="92" y="832" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="92" y="864" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Promise&lt;Result&lt;void&gt;&gt;
         </text>
         <!-- Class: ProgressRepository (interface, output port) -->
         <rect
           x="560"
-          y="552"
+          y="584"
           width="400"
           height="88"
           rx="6"
@@ -788,7 +844,7 @@
         />
         <text
           x="760"
-          y="570"
+          y="602"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -799,7 +855,7 @@
         </text>
         <text
           x="760"
-          y="588"
+          y="620"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -808,17 +864,17 @@
         >
           ProgressRepository
         </text>
-        <line x1="560" y1="600" x2="960" y2="600" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="576" y="616" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="560" y1="632" x2="960" y2="632" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="576" y="648" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + load(gameId: GameId): Promise&lt;GameProgress | undefined&gt;
         </text>
-        <text x="576" y="632" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="576" y="664" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + save(progress: GameProgress): Promise&lt;void&gt;
         </text>
         <!-- Class: IProgressModel (interface of a Strategy: only «interface», and the footnote names the pattern, decision 23) -->
         <rect
           x="60"
-          y="912"
+          y="944"
           width="320"
           height="88"
           rx="6"
@@ -828,7 +884,7 @@
         />
         <text
           x="220"
-          y="930"
+          y="962"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -839,7 +895,7 @@
         </text>
         <text
           x="220"
-          y="948"
+          y="980"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -848,25 +904,25 @@
         >
           IProgressModel
         </text>
-        <line x1="60" y1="960" x2="380" y2="960" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="76" y="976" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="60" y1="992" x2="380" y2="992" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="76" y="1008" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + record(result: GameResult,
         </text>
-        <text x="87" y="992" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="87" y="1024" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           progress: GameProgress): void
         </text>
         <!-- GameResult creates the ProgressRecord in recordWith(): use with a verb -->
         <path
-          d="M736 932 H796"
+          d="M736 964 H796"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#flowsave-open)"
         />
-        <rect x="742" y="915" width="47.2" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="742" y="947" width="47.2" height="12" rx="2" fill="#f9f4dc" />
         <text
           x="746"
-          y="924"
+          y="956"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -878,7 +934,7 @@
         <!-- Class: GameResult (value object, request model, private fields) -->
         <rect
           x="440"
-          y="888"
+          y="920"
           width="296"
           height="160"
           rx="6"
@@ -888,7 +944,7 @@
         />
         <text
           x="588"
-          y="906"
+          y="938"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -899,7 +955,7 @@
         </text>
         <text
           x="588"
-          y="924"
+          y="956"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -908,15 +964,9 @@
         >
           GameResult
         </text>
-        <line x1="440" y1="936" x2="736" y2="936" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="456" y="952" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - gameId: GameId
-        </text>
-        <text x="456" y="968" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - levelId: LevelId [0..1]
-        </text>
+        <line x1="440" y1="968" x2="736" y2="968" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="456" y="984" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - score: Score
+          - gameId: GameId
         </text>
         <text
           x="456"
@@ -925,7 +975,7 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          - moves: Moves
+          - levelId: LevelId [0..1]
         </text>
         <text
           x="456"
@@ -934,12 +984,30 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          - elapsedMs: ElapsedTime [0..1]
+          - score: Score
         </text>
-        <line x1="440" y1="1024" x2="736" y2="1024" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="456"
-          y="1040"
+          y="1032"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          - moves: Moves [0..1]
+        </text>
+        <text
+          x="456"
+          y="1048"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          - elapsedMs: ElapsedTime [0..1]
+        </text>
+        <line x1="440" y1="1056" x2="736" y2="1056" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="456"
+          y="1072"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -949,7 +1017,7 @@
         <!-- Reference box: ProgressRecord, detailed in part 1 · map -->
         <rect
           x="796"
-          y="912"
+          y="944"
           width="180"
           height="40"
           rx="6"
@@ -960,7 +1028,7 @@
         />
         <text
           x="886"
-          y="926"
+          y="958"
           fill="#7d8a94"
           font-size="7"
           font-weight="500"
@@ -972,7 +1040,7 @@
         </text>
         <text
           x="886"
-          y="943"
+          y="975"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -984,7 +1052,7 @@
         <!-- Reference box: GameProgress, detailed in part 3 · view 3.3 -->
         <rect
           x="130"
-          y="1028"
+          y="1060"
           width="180"
           height="40"
           rx="6"
@@ -995,7 +1063,7 @@
         />
         <text
           x="220"
-          y="1042"
+          y="1074"
           fill="#7d8a94"
           font-size="7"
           font-weight="500"
@@ -1007,7 +1075,7 @@
         </text>
         <text
           x="220"
-          y="1059"
+          y="1091"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1019,7 +1087,7 @@
         <!-- UML template boxes: type parameters on the top-right corner -->
         <rect
           x="357.2"
-          y="542"
+          y="574"
           width="114.8"
           height="18"
           rx="2"
@@ -1030,7 +1098,7 @@
         />
         <text
           x="414.6"
-          y="554"
+          y="586"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1041,38 +1109,37 @@
         <!-- Footnote -->
         <text
           x="24"
-          y="1116"
-          fill="#5b6873"
-          font-size="11"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          One saved result, top to bottom: VictoryScreen gives the GameResult to ResultPresenter,
-          which calls the UseCase port. SaveProgress loads the GameProgress
-        </text>
-        <text
-          x="24"
-          y="1132"
-          fill="#5b6873"
-          font-size="11"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          of the game, records the result in it with IProgressModel, a Strategy, and saves it
-          through ProgressRepository (S3-04). Here ApiProgressRepository, an Adapter of layer 3,
-        </text>
-        <text
-          x="24"
           y="1148"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          implements the port, so the progress leaves the app: ApiDtoMapper makes a ProgressDto, and
-          ApiClient, the driver, sends it through ProgressApi to ProgressController.sync() of
-          hexablock-api.
+          One saved result, top to bottom: GamePresenter gives the last MoveResult to
+          ResultPresenter, which builds the GameResult and calls the UseCase port (#180).
         </text>
         <text
           x="24"
           y="1164"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          SaveProgress loads the GameProgress of its game, records the result with IProgressModel, a
+          Strategy, and saves it through ProgressRepository (S3-04).
+        </text>
+        <text
+          x="24"
+          y="1180"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Here ApiProgressRepository, an Adapter of layer 3, implements the port: ApiDtoMapper makes
+          a ProgressDto, and ApiClient sends it to ProgressController.sync().
+        </text>
+        <text
+          x="24"
+          y="1196"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1082,7 +1149,7 @@
         </text>
         <text
           x="24"
-          y="1180"
+          y="1212"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1092,25 +1159,26 @@
         </text>
         <text
           x="24"
-          y="1196"
+          y="1228"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          VictoryScreen is a React component of layer 4, not a class.
+          VictoryScreen is a React component of layer 4, not a class: it shows the view model of
+          ResultPresenter (#180).
         </text>
         <!-- Legend -->
         <line
           x1="24"
-          y1="1220"
+          y1="1252"
           x2="1016"
-          y2="1220"
+          y2="1252"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1238"
+          y="1270"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1120,9 +1188,9 @@
         </text>
         <line
           x1="24"
-          y1="1256"
+          y1="1288"
           x2="52"
-          y2="1256"
+          y2="1288"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -1130,7 +1198,7 @@
         />
         <text
           x="60"
-          y="1259"
+          y="1291"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1139,16 +1207,16 @@
         </text>
         <line
           x1="144"
-          y1="1256"
+          y1="1288"
           x2="172"
-          y2="1256"
+          y2="1288"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#flowsave-open)"
         />
         <text
           x="180"
-          y="1259"
+          y="1291"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1157,7 +1225,7 @@
         </text>
         <rect
           x="444"
-          y="1250"
+          y="1282"
           width="28"
           height="12"
           rx="2"
@@ -1168,7 +1236,7 @@
         />
         <text
           x="480"
-          y="1259"
+          y="1291"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1177,7 +1245,7 @@
         </text>
         <rect
           x="704"
-          y="1250"
+          y="1282"
           width="28"
           height="12"
           rx="2"
@@ -1187,7 +1255,7 @@
         />
         <text
           x="740"
-          y="1259"
+          y="1291"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1196,7 +1264,7 @@
         </text>
         <rect
           x="24"
-          y="1272"
+          y="1304"
           width="28"
           height="12"
           rx="2"
@@ -1206,7 +1274,7 @@
         />
         <text
           x="60"
-          y="1281"
+          y="1313"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1215,7 +1283,7 @@
         </text>
         <rect
           x="144"
-          y="1272"
+          y="1304"
           width="28"
           height="12"
           rx="2"
@@ -1225,7 +1293,7 @@
         />
         <text
           x="180"
-          y="1281"
+          y="1313"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1234,7 +1302,7 @@
         </text>
         <rect
           x="264"
-          y="1272"
+          y="1304"
           width="28"
           height="12"
           rx="2"
@@ -1244,7 +1312,7 @@
         />
         <text
           x="300"
-          y="1281"
+          y="1313"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1253,7 +1321,7 @@
         </text>
         <rect
           x="384"
-          y="1272"
+          y="1304"
           width="28"
           height="12"
           rx="2"
@@ -1263,7 +1331,7 @@
         />
         <text
           x="420"
-          y="1281"
+          y="1313"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1272,7 +1340,7 @@
         </text>
         <rect
           x="504"
-          y="1272"
+          y="1304"
           width="28"
           height="12"
           rx="2"
@@ -1283,7 +1351,7 @@
         />
         <text
           x="540"
-          y="1281"
+          y="1313"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1293,7 +1361,7 @@
         <!-- Legend: the «Sprint N» marker of a planned class or member -->
         <text
           x="24"
-          y="1301"
+          y="1333"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1302,7 +1370,7 @@
         </text>
         <text
           x="92"
-          y="1301"
+          y="1333"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

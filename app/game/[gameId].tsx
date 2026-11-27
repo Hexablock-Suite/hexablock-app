@@ -6,6 +6,8 @@ import { GameId } from '../../src/domain/shared/game-id';
 import { LevelId } from '../../src/domain/progress/level-id';
 import { GameStage } from '../../src/infrastructure/ui/game-stage';
 import { useGameSession } from '../../src/infrastructure/ui/game-session';
+import { DefeatScreen, VictoryScreen } from '../../src/infrastructure/ui/result-screens';
+import { useResult } from '../../src/infrastructure/ui/use-result';
 import {
   useHomePresenter,
   useRouteFigure,
@@ -62,6 +64,9 @@ export function generateStaticParams(): { gameId: string }[] {
 // One registered game on one board figure, at the level whose text is `levelId` when the route
 // names one. The session and the level id live as long as the screen of the game.
 // A blank level id names no level. The map button goes back to the map of the figure.
+// When a game ends, the victory screen or the defeat screen of the result presenter of the
+// session opens over the stage (#180). The next level opens this route with the id of that level.
+// A retry and a new game close the result and start the game again at the same level.
 function Game({
   game,
   figure,
@@ -75,16 +80,39 @@ function Game({
   const [level] = useState(() =>
     levelId === undefined || levelId.trim() === '' ? undefined : LevelId.of(levelId),
   );
+  const result = useResult(session.result);
+  const toMap = () => router.dismissTo({ pathname: '/map', params: { figure: figure.param } });
+  const playAgain = () => {
+    session.result.onClose();
+    void session.presenter.onStart(level);
+  };
   return (
-    <GameStage
-      title={game.name}
-      presenter={session.presenter}
-      renderer={session.renderer}
-      controls={session.controls}
-      layoutOf={session.layoutOf}
-      texts={session.texts}
-      onBack={() => router.dismissTo({ pathname: '/map', params: { figure: figure.param } })}
-      levelId={level}
-    />
+    <>
+      <GameStage
+        title={game.name}
+        presenter={session.presenter}
+        renderer={session.renderer}
+        controls={session.controls}
+        layoutOf={session.layoutOf}
+        texts={session.texts}
+        onBack={toMap}
+        levelId={level}
+      />
+      {result === undefined ? null : result.victory ? (
+        <VictoryScreen
+          model={result}
+          onNext={(next) =>
+            router.replace({
+              pathname: '/game/[gameId]',
+              params: { gameId: game.id, figure: figure.param, levelId: next },
+            })
+          }
+          onNewGame={playAgain}
+          onBack={toMap}
+        />
+      ) : (
+        <DefeatScreen model={result} onRetry={playAgain} onBack={toMap} />
+      )}
+    </>
   );
 }
