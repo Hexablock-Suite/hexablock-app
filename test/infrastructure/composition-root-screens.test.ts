@@ -1,5 +1,8 @@
 /** @jest-environment node */
+import { AccountPresenter } from '../../src/adapters/account-presenter';
 import { AchievementsPresenter } from '../../src/adapters/achievements-presenter';
+import type { AccountApi } from '../../src/adapters/api/account-api';
+import { SessionManager } from '../../src/adapters/session-manager';
 import { GamePresenter } from '../../src/adapters/game-presenter';
 import { HomePresenter } from '../../src/adapters/home-presenter';
 import { LevelSelectorPresenter } from '../../src/adapters/level-selector-presenter';
@@ -15,6 +18,7 @@ import { CompositionRoot } from '../../src/infrastructure/composition-root';
 import { LinesControls } from '../../src/infrastructure/ui/lines-controls';
 import type { ScreenServices } from '../../src/infrastructure/ui/screen-services';
 import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-store';
+import { InMemorySecretStore } from '../support/adapters/in-memory-secret-store';
 import { RecordingLogger } from '../support/application/recording-logger';
 import { ManualClock } from '../support/engine/manual-clock';
 
@@ -99,6 +103,51 @@ describe('CompositionRoot screens', () => {
     );
     expect(() => services.levelSelectorPresenter(FIT, TopologyId.hex)).toThrow(
       'The root has no local store, so it lists no levels.',
+    );
+  });
+
+  // #45: the account screen signs the player in through `Login` of the root, with its aspects,
+  // over the transport of the backend and the secure storage of the drivers.
+  it('should_build_an_account_presenter_that_keeps_the_session_when_the_root_has_a_backend_and_a_secure_store', async () => {
+    const secrets = new InMemorySecretStore();
+    const logger = new RecordingLogger();
+    const api: AccountApi = {
+      signUp: () => Promise.resolve(),
+      signIn: () => Promise.resolve({ accessToken: 'token-of-ada' }),
+      currentUser: () => Promise.resolve({ userId: '0b6f6a4e-1c2d-4e5f-8a9b-0c1d2e3f4a5b' }),
+    };
+    const services: ScreenServices = new CompositionRoot({
+      clock: new ManualClock(),
+      logger,
+      api,
+      secrets,
+    });
+    const account = services.accountPresenter();
+
+    await account.onLogin({ username: 'ada', password: 'correct horse battery' });
+    await services
+      .accountPresenter()
+      .onRegister({ username: 'ada', password: 'correct horse battery' });
+
+    expect(account).toBeInstanceOf(AccountPresenter);
+    expect(account.viewModel().signedIn).toBe(`${textCatalog.es['account.signed-in']} ada`);
+    expect(services.accountPresenter() === account).toBe(false);
+    expect((await new SessionManager(secrets).read())?.token).toBe('token-of-ada');
+    expect(logger.entries.map(({ useCase, outcome }) => `${useCase} ${outcome}`)).toEqual([
+      'Login success',
+      'Register success',
+    ]);
+  });
+
+  it('should_throw_a_range_error_when_a_root_with_no_backend_or_no_secure_store_is_asked_for_the_account_presenter', () => {
+    const services: ScreenServices = new CompositionRoot({
+      clock: new ManualClock(),
+      logger: new RecordingLogger(),
+      secrets: new InMemorySecretStore(),
+    });
+
+    expect(() => services.accountPresenter()).toThrow(
+      new RangeError('The root has no backend or no secure store, so it signs no player in.'),
     );
   });
 });
