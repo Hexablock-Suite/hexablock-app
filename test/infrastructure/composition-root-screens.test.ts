@@ -22,6 +22,7 @@ import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-s
 import { InMemorySecretStore } from '../support/adapters/in-memory-secret-store';
 import { RecordingLogger } from '../support/application/recording-logger';
 import { ManualClock } from '../support/engine/manual-clock';
+import { saveIn } from '../support/adapters/saved-progress';
 
 // Issue #411: the composition root builds the presenter of each screen and answers the questions
 // of the hooks through the closed interface `ScreenServices`. A hook keeps only React state.
@@ -40,7 +41,7 @@ describe('CompositionRoot screens', () => {
     const store = new InMemoryKeyValueStore();
     const saved = GameProgress.start(LINES);
     saved.recordScore(ProgressRecord.of({ gameId: LINES, score: Score.of(36) }));
-    await new LocalProgressRepository(store).save(saved);
+    await saveIn(new LocalProgressRepository(store), saved);
     const services = servicesOver(store);
     const loaded = await services.loadProgress().execute({ gameId: LINES });
     const levels = services.levelSelectorPresenter(FIT, TopologyId.hex);

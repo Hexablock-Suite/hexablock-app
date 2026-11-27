@@ -1,6 +1,7 @@
 /** @jest-environment node */
 import fit01 from '../../src/adapters/levels/fit/fit-01.json';
 import { SessionManager } from '../../src/adapters/session-manager';
+import type { LevelSummary } from '../../src/application/level-summary';
 import type { MoveResult } from '../../src/application/move-result';
 import { Session } from '../../src/application/session';
 import type { GeometryFactory } from '../../src/domain/engine/geometry-factory';
@@ -31,6 +32,7 @@ import { fakeFetch, useFakeFetch, type FakeFetch } from '../support/fake-fetch';
 const BACKEND = 'http://backend.test';
 const FIT = GameId.of('hexa-fit');
 const ADA = { username: 'ada', password: 'correct horse battery' };
+const GRACE = { username: 'grace', password: 'correct horse battery' };
 const USERS: Readonly<Record<string, string>> = {
   ada: '0b6f6a4e-1c2d-4e5f-8a9b-0c1d2e3f4a5b',
   grace: '7c1e2d3f-4a5b-4c6d-8e7f-9a0b1c2d3e4f',
@@ -127,6 +129,18 @@ async function winFit01(root: CompositionRoot): Promise<void> {
       await root.gameSession(FIT, TopologyId.hex).result.onFinish(last);
     },
   });
+}
+
+// The stars of the level `levelId` in the list of the levels of Hexa Fit on the hexagon of `root`,
+// or `undefined` when the progress keeps no result of the level.
+async function starsOf(root: CompositionRoot, levelId: string): Promise<number | undefined> {
+  const levels: LevelSummary[] = valueOf(
+    await root.listLevels().execute({ gameId: FIT, figure: TopologyId.hex }),
+  );
+  const stars = levels.find((summary) => summary.levelId.equals(LevelId.of(levelId)))?.stars;
+  return stars === undefined
+    ? undefined
+    : [0, 1, 2, 3].find((count) => stars.equals(Stars.of(count)));
 }
 
 describe('progress sync through the root', () => {
@@ -228,5 +242,52 @@ describe('progress sync through the root', () => {
 
     expect(session.result.viewModel()?.signIn?.label).toBe('Iniciar sesión');
     expect(session.result.viewModel()?.error).toBeUndefined();
+  });
+
+  // Judgment-day round 1, F3: the progress belongs to the last signed-in user. A 401 clears the
+  // token only, so the levels that the player won stay open.
+  it('should_keep_the_won_levels_when_the_backend_refuses_the_token', async () => {
+    const store = new InMemoryKeyValueStore();
+    const root = rootOver(store, new InMemorySecretStore());
+    await root.accountPresenter().onLogin(ADA);
+    backend.expired.add('token-of-ada');
+
+    await winFit01(root);
+
+    expect(await starsOf(root, 'fit-01')).toBe(3);
+    await expect(store.get('progress:hexa-fit')).resolves.toBeUndefined();
+  });
+
+  // F3: a device that kept a session before #46 keeps its progress under the anonymous key.
+  // At start the app merges it into the key of the user, so the player sees the won levels.
+  it('should_show_the_won_levels_when_the_app_starts_on_a_device_that_kept_a_session_of_version_1', async () => {
+    const store = new InMemoryKeyValueStore();
+    const secrets = new InMemorySecretStore();
+    await secrets.set(
+      'session',
+      JSON.stringify({ version: 1, token: 'token-of-ada', userId: USERS.ada }),
+    );
+    await store.set(
+      'progress:hexa-fit',
+      '{"version":1,"levels":[{"score":0,"levelId":"fit-01","stars":3,"moves":3}]}',
+    );
+
+    const root = rootOver(store, secrets);
+
+    expect(await starsOf(root, 'fit-01')).toBe(3);
+    await expect(store.get(`progress:${USERS.ada}:hexa-fit`)).resolves.toContain('fit-01');
+    await expect(store.get('progress:hexa-fit')).resolves.toBeUndefined();
+  });
+
+  // F3: another user who signs in on the device becomes the owner and sees only its own progress.
+  it('should_show_only_its_own_progress_when_another_player_signs_in', async () => {
+    const root = rootOver(new InMemoryKeyValueStore(), new InMemorySecretStore());
+    await root.accountPresenter().onLogin(ADA);
+    await winFit01(root);
+
+    await root.accountPresenter().onLogin(GRACE);
+
+    expect(await starsOf(root, 'fit-01')).toBeUndefined();
+    expect(valueOf(await root.loadProgress().execute({ gameId: FIT }))).toBeUndefined();
   });
 });

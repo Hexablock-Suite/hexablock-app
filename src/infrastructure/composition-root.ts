@@ -21,6 +21,7 @@ import type { SecretStore } from '../adapters/secret-store';
 import { SessionManager } from '../adapters/session-manager';
 import { DEFAULT_LANGUAGE, textCatalog, type Texts } from '../adapters/texts/text-catalog';
 import { ApplyMove, type ApplyMoveRequest } from '../application/apply-move';
+import type { AnonymousMerge } from '../application/anonymous-progress';
 import type { Credentials } from '../application/credentials';
 import type { GameEventPublisher } from '../application/game-event-publisher';
 import { LoadProgress, type LoadProgressRequest } from '../application/load-progress';
@@ -155,7 +156,10 @@ interface AccountUseCases {
 // `decorate()`, and `accountPresenter()` gives a new `AccountPresenter` over both.
 // A root with no transport or no secure storage throws a `RangeError` from `accountPresenter()`.
 // The sync (#46, APP-FR-13, D27): the root gives the one `SessionManager` to the
-// `LocalProgressRepository`, so the key of the local progress carries the user of the session.
+// `LocalProgressRepository`, so the key of the local progress carries the owner: the last
+// signed-in user, which a refused token does not clear (classes.md decision 66). With the local
+// store, `Register` and `Login` also take the repository in its anonymous role and the id of each
+// registered game, so a sign-in merges the progress played with no account into the account.
 // With the transport, the secure storage and the local store, it builds `SyncProgress` once
 // through `decorate()`, over the session manager, the local repository in its two roles and one
 // `ApiProgressGateway` with the same `ApiDtoMapper`. The `ResultPresenter` of each game session
@@ -226,8 +230,12 @@ export class CompositionRoot implements ScreenServices {
     this.account =
       drivers.api === undefined || sessions === undefined
         ? undefined
-        : accountUseCases(drivers.api, sessions, mapper, (useCase, name) =>
-            this.decorate(useCase, name),
+        : accountUseCases(
+            drivers.api,
+            sessions,
+            mapper,
+            (useCase, name) => this.decorate(useCase, name),
+            local === undefined ? undefined : { anonymous: local, gameIds: this.allGameIds() },
           );
     this.sync =
       drivers.api === undefined || sessions === undefined || local === undefined
@@ -485,16 +493,18 @@ function wire<TState extends BoardState<unknown, unknown> & Cloneable<TState>>(
 
 // `Register` and `Login` over one gateway of the transport `api` with `mapper` and the one session
 // store `session` of the root, each through `decorate` (#45). The two use cases share both, so the
-// app keeps one session.
+// app keeps one session. With `merge`, each sign-in merges the anonymous progress of every game
+// into the progress of the user (#46).
 function accountUseCases(
   api: AccountApi,
   session: SessionStore,
   mapper: ApiDtoMapper,
   decorate: Decorate,
+  merge: AnonymousMerge | undefined,
 ): AccountUseCases {
   const accounts = new ApiAccountGateway(api, mapper);
   return {
-    register: decorate(new Register(accounts, session), 'Register'),
-    login: decorate(new Login(accounts, session), 'Login'),
+    register: decorate(new Register(accounts, session, merge), 'Register'),
+    login: decorate(new Login(accounts, session, merge), 'Login'),
   };
 }

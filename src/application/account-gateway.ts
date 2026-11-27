@@ -1,4 +1,6 @@
+import type { AnonymousMerge } from './anonymous-progress';
 import type { Credentials } from './credentials';
+import { ProgressOwner } from './progress-owner';
 import { caughtError, FailureCode, Result, UseCaseError } from './result';
 import type { Session } from './session';
 import type { SessionStore } from './session-store';
@@ -41,17 +43,27 @@ export interface AccountGateway {
 }
 
 // The answer of `Register` and `Login` (APP-FR-12, view 3.4). `ask` asks the gateway for the
-// session, and `session` keeps it. An `AccountFailure` gives its own code. Any other thrown value,
-// from the gateway or from the store, gives `failed`, the code of the use case.
-// A failure of the gateway keeps no session. No exception leaves this function (decision 28).
+// session, and `session` keeps it, so its user becomes the owner of the progress (#46).
+// With `merge`, the anonymous progress of each game then merges into the progress of that user,
+// locally and before any request of the sync (D27, classes.md decision 66). The repository forgets
+// the anonymous progress of a game only after it saves the merged progress.
+// An `AccountFailure` gives its own code. Any other thrown value, from the gateway, from the store
+// or from the merge, gives `failed`, the code of the use case. A failure of the gateway keeps no
+// session. A failed merge keeps the session and the anonymous progress, and the next sync merges
+// again. No exception leaves this function (decision 28).
 export async function keptSession(
   ask: () => Promise<Session>,
   session: SessionStore,
   failed: FailureCode,
+  merge?: AnonymousMerge,
 ): Promise<Result<Session>> {
   try {
     const signedIn = await ask();
     await session.write(signedIn);
+    const owner = ProgressOwner.of(signedIn.userId);
+    for (const gameId of merge?.gameIds ?? []) {
+      await merge?.anonymous.mergeAnonymousInto(owner, gameId);
+    }
     return Result.success(signedIn);
   } catch (thrown) {
     if (thrown instanceof AccountFailure) {
