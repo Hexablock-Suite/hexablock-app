@@ -18,7 +18,7 @@ import { square, squareTopology } from '../support/engine/square-topology';
 import { linesGame, linesState, piece } from '../support/variants/hexa-lines/lines-game';
 import { mergeGame, mergeState } from '../support/variants/hexa-merge/merge-game';
 import {
-  place,
+  placeFrom,
   row,
   sortGame,
   sortState,
@@ -111,7 +111,7 @@ const oneSortGoal = () => ({
       offered: [stack(...tiles('red', 4)), stack('blue')],
     }),
   ),
-  move: place(1),
+  move: placeFrom(0, 1),
 });
 
 describe('CompositionRoot achievements of the move events', () => {

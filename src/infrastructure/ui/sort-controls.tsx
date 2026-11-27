@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import type { ReactNode } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { SortIntent } from '../../adapters/sort-move-mapper';
 import type { SortCellView, SortPayloadView } from '../../adapters/sort-state-mapper';
@@ -16,9 +17,12 @@ type SortProps<TCoord> = MoveControlsProps<
   SortIntent<TCoord>
 >;
 
-// The move controls of Hexa Sort (classes.md decision 14, issue #176). A press on a free space
-// sends a `SortIntent` with that space through `GamePresenter.onMove()` (#405), and
-// `SortMoveMapper` of layer 3 builds the `PlaceStack`.
+// The move controls of Hexa Sort (classes.md decision 14, issues #176 and #353). Below the board,
+// a wood sign shows what to do next, the tray of three stacks and the goals.
+// A press on a stack of the tray chooses it, and a press on a free space places it:
+// the same two-tap input as Hexa Fit. The press on the space sends a `SortIntent` with
+// the index of the chosen slot and the space through `GamePresenter.onMove()` (#405),
+// and `SortMoveMapper` of layer 3 builds the `PlaceStack`. An empty slot takes no press.
 export class SortControls<TCoord> implements MoveControls<
   TCoord,
   SortCellView,
@@ -27,48 +31,84 @@ export class SortControls<TCoord> implements MoveControls<
 > {
   constructor(private readonly preview: CellShape) {}
 
-  render({ model, texts, play, board }: SortProps<TCoord>): ReactNode {
-    const payload = model.payload;
-    const offered = payload?.offered;
-    const onPressSpace = (at: TCoord, cell: SortCellView) => {
-      // There is only one offer. A free space plays it without a tray choice.
-      if (offered !== undefined && cell.colors.length === 0) play({ at });
-    };
-
-    return (
-      <>
-        {board(onPressSpace)}
-        {payload === undefined ? null : (
-          <WoodSign style={styles.sign}>
-            <View style={styles.row}>
-              <View style={styles.offer}>
-                {offered === undefined ? null : (
-                  <View
-                    accessible
-                    accessibilityLabel={texts['play.sort.offer']}
-                    style={styles.face}
-                  >
-                    <View style={{ width: this.preview.inner, height: this.preview.inner }}>
-                      <StackStone colors={offered.colors} shape={this.preview} />
-                    </View>
-                  </View>
-                )}
-                <Text accessibilityLiveRegion="polite" style={styles.hint}>
-                  {texts[offered === undefined ? 'play.sort.hint.empty' : 'play.sort.hint.place']}
-                </Text>
-              </View>
-              <View accessible accessibilityLiveRegion="polite" style={styles.goals}>
-                <Text style={styles.label}>{texts['play.sort.goals']}</Text>
-                <Text style={styles.progress}>
-                  {`${payload.goalsDone} / ${payload.goalsNeeded}`}
-                </Text>
-              </View>
-            </View>
-          </WoodSign>
-        )}
-      </>
-    );
+  render(props: SortProps<TCoord>): ReactNode {
+    return <SortPlay {...props} preview={this.preview} />;
   }
+}
+
+function SortPlay<TCoord>({
+  model,
+  texts,
+  play,
+  board,
+  preview,
+}: SortProps<TCoord> & { readonly preview: CellShape }) {
+  const [choice, choose] = useState<{ tray: SortPayloadView['tray']; slot: number }>();
+  const payload = model.payload;
+  const tray = payload?.tray;
+  // The presenter keeps the tray on rejection and replaces it on success.
+  // So a placed stack leaves the choice.
+  const selected = choice?.tray === tray ? choice?.slot : undefined;
+  const onPressSpace = (at: TCoord, cell: SortCellView) => {
+    if (selected !== undefined && cell.colors.length === 0) play({ slot: selected, at });
+  };
+
+  return (
+    <>
+      {board(onPressSpace)}
+      {payload === undefined || tray === undefined ? null : (
+        <WoodSign style={styles.sign}>
+          <View style={styles.row}>
+            <Text accessibilityLiveRegion="polite" style={styles.hint}>
+              {texts[hintOf(tray, selected)]}
+            </Text>
+            <View accessible accessibilityLiveRegion="polite" style={styles.goals}>
+              <Text style={styles.label}>{texts['play.sort.goals']}</Text>
+              <Text style={styles.progress}>{`${payload.goalsDone} / ${payload.goalsNeeded}`}</Text>
+            </View>
+          </View>
+          <View
+            accessibilityRole="radiogroup"
+            accessibilityLabel={texts['play.sort.tray']}
+            style={styles.tray}
+          >
+            {tray.map((slot, index) => {
+              const label = `${texts['play.sort.stack']} ${index + 1}`;
+              const empty = slot.colors.length === 0;
+              const checked = index === selected;
+              return (
+                <Pressable
+                  key={label}
+                  accessibilityRole="radio"
+                  accessibilityLabel={label}
+                  accessibilityState={{ checked, disabled: empty }}
+                  disabled={empty}
+                  onPress={() => choose(checked ? undefined : { tray, slot: index })}
+                  style={[styles.face, checked && styles.selected]}
+                >
+                  {empty ? null : (
+                    <View style={{ width: preview.inner, height: preview.inner }}>
+                      <StackStone colors={slot.colors} shape={preview} />
+                    </View>
+                  )}
+                </Pressable>
+              );
+            })}
+          </View>
+        </WoodSign>
+      )}
+    </>
+  );
+}
+
+// What the player does next: choose a stack, place the chosen stack, or nothing,
+// because the tray is empty and the source has ended.
+function hintOf(
+  tray: SortPayloadView['tray'],
+  selected: number | undefined,
+): 'play.sort.hint.empty' | 'play.sort.hint.pick' | 'play.sort.hint.place' {
+  if (tray.every((slot) => slot.colors.length === 0)) return 'play.sort.hint.empty';
+  return selected === undefined ? 'play.sort.hint.pick' : 'play.sort.hint.place';
 }
 
 const styles = StyleSheet.create({
@@ -80,7 +120,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: space.md,
   },
-  offer: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: space.sm },
+  tray: { flexDirection: 'row', justifyContent: 'center', gap: space.sm, marginTop: space.sm },
   face: {
     width: 56,
     height: 56,
@@ -91,6 +131,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: radius.md,
   },
+  selected: { backgroundColor: palette.sun, borderColor: palette.sunDeep },
   hint: { flex: 1, color: palette.ink, fontFamily: serif, fontSize: 14 },
   goals: { alignItems: 'center' },
   label: {

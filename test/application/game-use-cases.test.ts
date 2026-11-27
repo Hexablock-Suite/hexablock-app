@@ -794,13 +794,13 @@ describe('the variant data of MoveResult', () => {
     const sort = await startAndPlayOnce(sortFactory());
     const sortStarted = sortViewData(sort.started.payload);
     const sortPlayed = sortViewData(sort.played.payload);
-    expect(sortStarted.offered).toEqual(sort.startState.offeredStack());
+    expect(sortStarted.tray).toEqual(sort.startState.trayStacks());
     expect(sortStarted.goalsDone).toEqual(sort.startState.goalsReached());
     expect(sortStarted.goalsNeeded).toEqual(sort.startState.goal());
-    expect(sortPlayed.offered).toEqual(sort.after.offeredStack());
+    expect(sortPlayed.tray).toEqual(sort.after.trayStacks());
     expect(sortPlayed.goalsDone).toEqual(sort.after.goalsReached());
     expect(sortPlayed.goalsNeeded).toEqual(sort.after.goal());
-    expect(sort.after.offeredStack()).not.toEqual(sort.startState.offeredStack());
+    expect(sort.after.trayStacks()).not.toEqual(sort.startState.trayStacks());
 
     const merge = await startAndPlayOnce(mergeFactory());
     expect(mergeViewData(merge.started.payload).targetReached).toBe(
@@ -881,7 +881,7 @@ describe('the variant data of MoveResult', () => {
       canRedo: false,
       hasUndo: false,
       payload: {
-        offered: stack('blue'),
+        tray: [undefined, stack('blue'), undefined],
         goalsDone: ClearedStacks.of(0),
         goalsNeeded: GoalCount.of(5),
       },

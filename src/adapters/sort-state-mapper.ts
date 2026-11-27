@@ -9,7 +9,8 @@ export interface SortCellView {
 }
 
 export interface SortPayloadView {
-  readonly offered?: SortCellView;
+  // One view for each slot of the tray, from the first slot. An empty slot has no colors.
+  readonly tray: readonly SortCellView[];
   readonly goalsDone: number;
   readonly goalsNeeded: number;
 }
@@ -38,9 +39,9 @@ export class SortStateMapper implements StateMapper<
   toPayload(payload: SortView): SortPayloadView {
     return onlyValue<SortPayloadView>((keep) =>
       payload.deliverTo({
-        receive: (offered, goalsDone, goalsNeeded) =>
+        receive: (tray, goalsDone, goalsNeeded) =>
           keep({
-            offered: offered === undefined ? undefined : this.toView(offered),
+            tray: tray.map((slot) => (slot === undefined ? FREE : this.toView(slot))),
             goalsDone: valueOf(goalsDone),
             goalsNeeded: valueOf(goalsNeeded),
           }),

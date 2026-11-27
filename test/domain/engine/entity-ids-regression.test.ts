@@ -39,7 +39,7 @@ import {
 } from '../../support/variants/hexa-fit/fit-game';
 import { linesFactory, linesStateOf } from '../../support/variants/hexa-lines/lines-game';
 import { mergeFactory, mergeStateOf } from '../../support/variants/hexa-merge/merge-game';
-import { place, sortFactory, sortStateOf } from '../../support/variants/hexa-sort/sort-game';
+import { placeFrom, sortFactory, sortStateOf } from '../../support/variants/hexa-sort/sort-game';
 import { viewData } from '../../support/variants/view-data';
 import { playMove } from '../../support/engine/play-move';
 
@@ -378,8 +378,8 @@ describe('own ids of the board and the states (T18 probe)', () => {
     const state = sortFactory().createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
     const earlier = state.clone();
 
-    playMove(game, place(0, 0));
-    state.placeOfferedStack(square(0, 0));
+    playMove(game, placeFrom(0, 0, 0));
+    state.placeStack(placeFrom(0, 0, 0));
 
     expect([before, game.snapshot()].every((photo) => photo.isPhotoOf(FIRST_STATE))).toBe(true);
     expect(state.equals(earlier)).toBe(true);
@@ -389,8 +389,10 @@ describe('own ids of the board and the states (T18 probe)', () => {
 describe('aliasing of earlier snapshots (T18 probe)', () => {
   it('should_keep_every_earlier_snapshot_and_view_when_the_game_plays_more_moves', () => {
     const results = [
-      aliasingOf(sortFactory(), [place(0, 0), place(1, 0), place(0, 1)], (photo) =>
-        sortStateOf(photo, FIRST_MATCH),
+      aliasingOf(
+        sortFactory(),
+        [placeFrom(0, 0, 0), placeFrom(1, 1, 0), placeFrom(2, 0, 1)],
+        (photo) => sortStateOf(photo, FIRST_MATCH),
       ),
       aliasingOf(
         linesFactory(),
@@ -475,13 +477,13 @@ describe('atomicity of the state methods (T18 probe)', () => {
     const shown = () => shownBy(state);
 
     const onFreeBoard = allKept([
-      throwOf(shown, () => state.placeOfferedStack(square(9, 9))),
+      throwOf(shown, () => state.placeStack(placeFrom(0, 9, 9))),
       throwOf(shown, () => state.moveRun(square(0, 0), square(0, 1))),
       throwOf(shown, () => state.clearStack(square(0, 0))),
     ]);
-    state.placeOfferedStack(square(0, 0));
+    state.placeStack(placeFrom(0, 0, 0));
     const withOneStack = allKept([
-      throwOf(shown, () => state.placeOfferedStack(square(0, 0))),
+      throwOf(shown, () => state.placeStack(placeFrom(1, 0, 0))),
       throwOf(shown, () => state.moveRun(square(0, 0), square(9, 9))),
       throwOf(shown, () => state.moveRun(square(0, 0), square(0, 0))),
     ]);

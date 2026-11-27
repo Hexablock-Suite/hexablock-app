@@ -15,7 +15,7 @@ import {
   noNewTiles,
   TARGET,
 } from '../../support/variants/hexa-merge/merge-game';
-import { row, stack, tiles } from '../../support/variants/hexa-sort/sort-game';
+import { placeFrom, row, stack, tiles } from '../../support/variants/hexa-sort/sort-game';
 import { PlacePiece } from '../../../src/domain/variants/hexa-lines/place-piece';
 import { TrayPosition } from '../../../src/domain/variants/hexa-lines/tray-position';
 import { MATCH_ID } from '../../support/engine/match-id';
@@ -66,7 +66,7 @@ describe('the view of each variant state', () => {
     expect(calls).toEqual([
       [tray],
       [[fit.piece(A)], [], Moves.of(0)],
-      [offered, ClearedStacks.of(0), GoalCount.of(2)],
+      [[offered, undefined, undefined], ClearedStacks.of(0), GoalCount.of(2)],
       [false],
     ]);
   });
@@ -88,7 +88,7 @@ describe('the view of each variant state', () => {
     expect(linesViewData(state.snapshot().view()).tray).toEqual([second]);
   });
 
-  it('should_build_the_view_from_the_offered_stack_and_the_goals_when_a_sort_state_builds_its_view', () => {
+  it('should_build_the_view_from_the_tray_and_the_goals_when_a_sort_state_builds_its_view', () => {
     const offered = stack('red');
     const goalsNeeded = GoalCount.of(3);
     const state = SortState.start({
@@ -99,29 +99,29 @@ describe('the view of each variant state', () => {
       goalsNeeded,
     });
     // One placement makes a run of 10 tiles, and the clear counts one goal.
-    state.placeOfferedStack(square(1, 0));
+    state.placeStack(placeFrom(0, 1));
     state.moveRun(square(1, 0), square(0, 0));
     state.clearStack(square(0, 0));
 
     const view = state.snapshot().view();
 
     expect(sortViewData(view)).toStrictEqual({
-      offered,
+      tray: [undefined, offered, undefined],
       goalsDone: ClearedStacks.of(1),
       goalsNeeded,
     });
-    expectFrozen(view);
+    expectFrozen(view, sortViewData(view).tray);
 
-    // The source ends, so the next offer is none. A later change must not reach this view.
-    state.offerNext();
+    // The last stack leaves the tray. A later change must not reach this view.
+    state.placeStack(placeFrom(1, 1));
 
     expect(sortViewData(view)).toStrictEqual({
-      offered,
+      tray: [undefined, offered, undefined],
       goalsDone: ClearedStacks.of(1),
       goalsNeeded,
     });
     expect(sortViewData(state.snapshot().view())).toStrictEqual({
-      offered: undefined,
+      tray: [undefined, undefined, undefined],
       goalsDone: ClearedStacks.of(1),
       goalsNeeded,
     });

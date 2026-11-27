@@ -4,7 +4,7 @@ import { Score } from '../../../../src/domain/shared/score';
 import { ClearedStacks } from '../../../../src/domain/variants/hexa-sort/cleared-stacks';
 import { square } from '../../../support/engine/square-topology';
 import {
-  place,
+  placeFrom,
   row,
   sortGame,
   sortState,
@@ -31,7 +31,7 @@ describe('SortScoring', () => {
       new SortScoring<SquareCoord>(),
     );
 
-    expect(playMove(game, place(1))).toBe(Outcome.playing);
+    expect(playMove(game, placeFrom(0, 1))).toBe(Outcome.playing);
 
     expect(game.snapshot().goalsReached()).toEqual(ClearedStacks.of(1));
     expect(game.snapshot().scoreSoFar()).toEqual(Score.of(110));
@@ -45,9 +45,9 @@ describe('SortScoring', () => {
       }),
       new SortScoring<SquareCoord>(),
     );
-    playMove(game, place(1));
+    playMove(game, placeFrom(0, 1));
 
-    expect(playMove(game, place(2))).toBe(Outcome.playing);
+    expect(playMove(game, placeFrom(1, 2))).toBe(Outcome.playing);
 
     expect(game.snapshot().goalsReached()).toEqual(ClearedStacks.of(1));
     expect(game.snapshot().scoreSoFar()).toEqual(Score.of(110));

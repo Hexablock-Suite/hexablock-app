@@ -27,7 +27,7 @@ import { square, squareTopology } from '../support/engine/square-topology';
 import { linesGame, linesState, piece } from '../support/variants/hexa-lines/lines-game';
 import { mergeGame, mergeState } from '../support/variants/hexa-merge/merge-game';
 import {
-  place,
+  placeFrom,
   row,
   sortGame,
   sortState,
@@ -152,7 +152,7 @@ describe('AchievementCounterListener', () => {
           offered: [stack(...tiles('red', 4)), stack('blue')],
         }),
       ),
-      place(1),
+      placeFrom(0, 1),
     );
     await listener.saved();
 

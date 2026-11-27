@@ -335,7 +335,7 @@ function fitScreen<TCoord>(
   };
 }
 
-// The screen parts of Hexa Sort (#176). The offer uses the outline of the origin cell.
+// The screen parts of Hexa Sort (#176). The stacks of the tray use the outline of the origin cell (#353).
 function sortScreen<TCoord>(
   figure: BoardFigure<TCoord>,
 ): ScreenParts<

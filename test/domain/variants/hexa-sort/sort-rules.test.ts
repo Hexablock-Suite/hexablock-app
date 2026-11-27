@@ -4,12 +4,16 @@ import { Board } from '../../../../src/domain/engine/board';
 import { PlayingPhase } from '../../../../src/domain/engine/game-phase';
 import { Moves } from '../../../../src/domain/shared/moves';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
-import type { RandomSource } from '../../../../src/domain/engine/random-source';
 import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
 import { Seed } from '../../../../src/domain/engine/seed';
 import { BaseGameRules } from '../../../../src/domain/engine/rules';
+import { Color } from '../../../../src/domain/engine/color';
+import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
 import { ClearedStacks } from '../../../../src/domain/variants/hexa-sort/cleared-stacks';
-import type { ColorStack } from '../../../../src/domain/variants/hexa-sort/color-stack';
+import { ColorStack } from '../../../../src/domain/variants/hexa-sort/color-stack';
+import { GoalCount } from '../../../../src/domain/variants/hexa-sort/goal-count';
+import { SortFactory } from '../../../../src/domain/variants/hexa-sort/sort-factory';
+import { SortLevel } from '../../../../src/domain/variants/hexa-sort/sort-level';
 import { SortRules } from '../../../../src/domain/variants/hexa-sort/sort-rules';
 import type { SortSnapshot, SortState } from '../../../../src/domain/variants/hexa-sort/sort-state';
 import { TileCount } from '../../../../src/domain/variants/hexa-sort/tile-count';
@@ -17,16 +21,19 @@ import { square, squareTopology, type SquareCoord } from '../../../support/engin
 import {
   chipsAt,
   names,
-  place,
+  placeFrom,
   row,
   sortGame,
   sortState,
   stack,
   tiles,
+  trayOf,
 } from '../../../support/variants/hexa-sort/sort-game';
 import { BOARD_ID } from '../../../support/engine/entity-ids';
 import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
 import { playMove } from '../../../support/engine/play-move';
+import { startVariant } from '../../../support/engine/variant-game';
+import { seededRandom } from '../../../support/engine/step-random';
 
 // The rules of issue #93 and the accepted rules of issue #56: a tie goes to the stack
 // whose coordinate key comes first in key order.
@@ -38,29 +45,82 @@ describe('SortRules contract', () => {
   });
 });
 
-describe('SortRules placement', () => {
+// Issue #353, decision of 2026-11-24: Sort offers a tray of three stacks, as the team prototype.
+// The player chooses one slot, and a used slot stays empty until the tray refills.
+describe('SortRules tray', () => {
+  it('should_place_the_stack_of_the_second_slot_and_keep_the_other_slots_when_the_second_slot_is_chosen', () => {
+    const game = sortGame(
+      sortState({
+        board: row(4),
+        offered: [stack('red'), stack('blue', 'green'), stack('green'), stack('yellow')],
+      }),
+    );
+    expect(trayOf(game.snapshot())).toEqual([['red'], ['blue', 'green'], ['green']]);
+
+    expect(playMove(game, placeFrom(1, 2))).toBe(Outcome.playing);
+
+    expect(chipsAt(game, 2)).toEqual(['blue', 'green']);
+    expect(trayOf(game.snapshot())).toEqual([['red'], [], ['green']]);
+    expect(game.snapshot().moveCount()).toEqual(Moves.of(1));
+  });
+
+  it('should_fill_the_tray_with_the_next_three_stacks_of_the_source_when_the_three_slots_are_used', () => {
+    const game = sortGame(
+      sortState({
+        board: row(6),
+        offered: [
+          stack('red'),
+          stack('blue'),
+          stack('green'),
+          stack('yellow'),
+          stack('red', 'blue'),
+          stack('green', 'yellow'),
+          stack('blue'),
+        ],
+      }),
+    );
+
+    playMove(game, placeFrom(2, 4));
+    playMove(game, placeFrom(0, 0));
+    expect(trayOf(game.snapshot())).toEqual([[], ['blue'], []]);
+    playMove(game, placeFrom(1, 2));
+
+    expect(trayOf(game.snapshot())).toEqual([['yellow'], ['red', 'blue'], ['green', 'yellow']]);
+    expect([chipsAt(game, 0), chipsAt(game, 2), chipsAt(game, 4)]).toEqual([
+      ['red'],
+      ['blue'],
+      ['green'],
+    ]);
+    expect(game.snapshot().moveCount()).toEqual(Moves.of(3));
+  });
+
   it('should_count_only_accepted_moves_when_placements_are_accepted_and_rejected', () => {
     const game = sortGame(sortState({ board: row(3), offered: [stack('red'), stack('blue')] }));
 
     expect(game.snapshot().moveCount()).toEqual(Moves.of(0));
 
-    expect(game.tryPlay(place(0)).wasAccepted()).toBe(true);
+    expect(game.tryPlay(placeFrom(0, 0)).wasAccepted()).toBe(true);
     expect(game.snapshot().moveCount()).toEqual(Moves.of(1));
 
-    expect(game.tryPlay(place(0)).wasAccepted()).toBe(false);
+    expect(game.tryPlay(placeFrom(1, 0)).wasAccepted()).toBe(false);
     expect(game.snapshot().moveCount()).toEqual(Moves.of(1));
 
-    expect(game.tryPlay(place(2)).wasAccepted()).toBe(true);
+    expect(game.tryPlay(placeFrom(1, 2)).wasAccepted()).toBe(true);
     expect(game.snapshot().moveCount()).toEqual(Moves.of(2));
   });
 
-  it('should_put_the_offered_stack_on_the_cell_and_offer_the_next_when_the_cell_is_empty', () => {
-    const game = sortGame(sortState({ board: row(3), offered: [stack('red'), stack('blue')] }));
+  it('should_reject_the_move_and_keep_the_tray_when_the_slot_holds_no_stack', () => {
+    const game = sortGame(
+      sortState({ board: row(4), offered: [stack('red'), stack('blue'), stack('green')] }),
+    );
+    playMove(game, placeFrom(1, 0));
 
-    expect(playMove(game, place(0))).toBe(Outcome.playing);
+    expect(game.tryPlay(placeFrom(1, 2)).wasAccepted()).toBe(false);
+    expect(game.tryPlay(placeFrom(3, 2)).wasAccepted()).toBe(false);
 
-    expect(chipsAt(game, 0)).toEqual(['red']);
-    expect(names(game.snapshot().offeredStack())).toEqual(['blue']);
+    expect(chipsAt(game, 2)).toEqual([]);
+    expect(trayOf(game.snapshot())).toEqual([['red'], [], ['green']]);
+    expect(game.snapshot().moveCount()).toEqual(Moves.of(1));
   });
 
   it('should_reject_the_move_and_keep_the_state_when_the_cell_holds_a_stack', () => {
@@ -68,19 +128,36 @@ describe('SortRules placement', () => {
       sortState({ board: row(3, [[square(0, 0), stack('green')]]), offered: [stack('red')] }),
     );
 
-    expect(playMove(game, place(0))).toBe(Outcome.playing);
+    expect(playMove(game, placeFrom(0, 0))).toBe(Outcome.playing);
 
     expect(chipsAt(game, 0)).toEqual(['green']);
-    expect(names(game.snapshot().offeredStack())).toEqual(['red']);
+    expect(trayOf(game.snapshot())).toEqual([['red'], [], []]);
   });
 
   it('should_reject_the_move_when_the_cell_is_outside_the_board', () => {
     const game = sortGame(sortState({ board: row(2), offered: [stack('red')] }));
 
-    expect(playMove(game, place(5))).toBe(Outcome.playing);
+    expect(playMove(game, placeFrom(0, 5))).toBe(Outcome.playing);
 
     expect(game.snapshot().boardCopy().occupiedCells()).toEqual([]);
-    expect(names(game.snapshot().offeredStack())).toEqual(['red']);
+    expect(trayOf(game.snapshot())).toEqual([['red'], [], []]);
+  });
+
+  // «Propuesta, pendiente del equipo» of #353: a fixed list with fewer than three stacks left
+  // offers the stacks that are left, and the other slots stay empty.
+  it('should_offer_the_stacks_that_are_left_when_the_fixed_list_holds_fewer_than_three', () => {
+    const game = sortGame(
+      sortState({
+        board: row(6),
+        offered: [stack('red'), stack('blue'), stack('green'), stack('yellow')],
+      }),
+    );
+
+    playMove(game, placeFrom(0, 0));
+    playMove(game, placeFrom(1, 2));
+    expect(playMove(game, placeFrom(2, 4))).toBe(Outcome.playing);
+
+    expect(trayOf(game.snapshot())).toEqual([['yellow'], [], []]);
   });
 });
 
@@ -94,7 +171,7 @@ describe('SortRules transfer', () => {
       }),
     );
 
-    playMove(game, place(1));
+    playMove(game, placeFrom(0, 1));
 
     expect(chipsAt(game, 0)).toEqual(['red', 'red', 'blue']);
     expect(chipsAt(game, 1)).toEqual(['green', 'red', 'red', 'red']);
@@ -108,7 +185,7 @@ describe('SortRules transfer', () => {
       }),
     );
 
-    playMove(game, place(1));
+    playMove(game, placeFrom(0, 1));
 
     expect(chipsAt(game, 0)).toEqual(['blue', 'red', 'red', 'red']);
     expect(chipsAt(game, 1)).toEqual(['green']);
@@ -127,7 +204,7 @@ describe('SortRules transfer', () => {
       }),
     );
 
-    playMove(game, place(1));
+    playMove(game, placeFrom(0, 1));
 
     expect(chipsAt(game, 0)).toEqual(['red', 'red', 'red']);
     expect(chipsAt(game, 2)).toEqual(['red', 'red']);
@@ -146,7 +223,7 @@ describe('SortRules transfer', () => {
       }),
     );
 
-    playMove(game, place(2));
+    playMove(game, placeFrom(0, 2));
 
     expect(chipsAt(game, 2)).toEqual(['red', 'red', 'red']);
     expect(chipsAt(game, 1)).toEqual([]);
@@ -164,7 +241,7 @@ describe('SortRules goal', () => {
       }),
     );
 
-    expect(playMove(game, place(1))).toBe(Outcome.playing);
+    expect(playMove(game, placeFrom(0, 1))).toBe(Outcome.playing);
 
     const state = game.snapshot();
     expect(chipsAt(game, 0)).toEqual([]);
@@ -182,7 +259,7 @@ describe('SortRules goal', () => {
       }),
     );
 
-    playMove(game, place(1));
+    playMove(game, placeFrom(0, 1));
 
     expect(chipsAt(game, 0)).toEqual(tiles('red', 9));
     expect(game.snapshot().goalsReached()).toEqual(ClearedStacks.of(0));
@@ -197,8 +274,8 @@ describe('SortRules goal', () => {
       }),
     );
 
-    playMove(game, place(1));
-    playMove(game, place(2));
+    playMove(game, placeFrom(0, 1));
+    playMove(game, placeFrom(1, 2));
 
     expect(game.snapshot().goalsReached()).toEqual(ClearedStacks.of(1));
     expect(game.snapshot().clearedStackHeights()).toEqual([]);
@@ -215,7 +292,7 @@ describe('SortRules end of the game', () => {
       }),
     );
 
-    expect(playMove(game, place(1))).toBe(Outcome.victory);
+    expect(playMove(game, placeFrom(0, 1))).toBe(Outcome.victory);
   });
 
   it('should_lose_when_the_board_is_full', () => {
@@ -223,15 +300,15 @@ describe('SortRules end of the game', () => {
       sortState({ board: row(2), offered: [stack('red'), stack('blue'), stack('green')] }),
     );
 
-    expect(playMove(game, place(0))).toBe(Outcome.playing);
-    expect(playMove(game, place(1))).toBe(Outcome.gameOver);
+    expect(playMove(game, placeFrom(0, 0))).toBe(Outcome.playing);
+    expect(playMove(game, placeFrom(1, 1))).toBe(Outcome.gameOver);
   });
 
   it('should_lose_when_the_fixed_list_has_no_stack_left', () => {
     const game = sortGame(sortState({ board: row(3), offered: [stack('red')] }));
 
-    expect(playMove(game, place(0))).toBe(Outcome.gameOver);
-    expect(game.snapshot().offeredStack()).toBeUndefined();
+    expect(playMove(game, placeFrom(0, 0))).toBe(Outcome.gameOver);
+    expect(trayOf(game.snapshot())).toEqual([[], [], []]);
   });
 });
 
@@ -252,30 +329,105 @@ describe('SortRules colors', () => {
       }),
     );
 
-    playMove(game, place(1));
+    playMove(game, placeFrom(0, 1));
 
     expect(chipsAt(game, 0)).toEqual(['blue', 'red', 'red', 'red']);
     expect(chipsAt(game, 1)).toEqual([]);
   });
 });
 
+// The first `count` stacks that a new source of `level` gives.
+function drawnStacks(level: SortLevel, count: number): ColorStack[] {
+  const found: ColorStack[] = [];
+  const factory = new SortFactory(new SquareGeometry(), level, seededRandom(1));
+  for (const drawn of factory.createPieceSource()) {
+    if (found.length === count) break;
+    found.push(drawn);
+  }
+  return found;
+}
+
+// The runs of `drawn` from the bottom to the top, as color names.
+// A run is the top run of what stays when the runs above it leave (D21).
+function runsOf(drawn: ColorStack): string[][] {
+  const found: string[][] = [];
+  for (let rest = drawn; !rest.isEmpty(); rest = rest.withoutTopRun()) {
+    found.unshift(names(ColorStack.of(rest.topRun())));
+  }
+  return found;
+}
+
+// What a drawn stack breaks of the rule of issue #352: its height, its count of runs,
+// a color outside the level, and two runs next to each other with one color.
+function brokenRules(drawn: ColorStack, colors: readonly string[]): string[] {
+  const runs = runsOf(drawn);
+  const height = runs.flat().length;
+  const tops = runs.map(([color]) => color);
+  return [
+    (height >= 2 && height <= 6) || `height ${height}`,
+    (runs.length >= 1 && runs.length <= Math.min(3, colors.length)) || `${runs.length} runs`,
+    tops.every((color) => color !== undefined && colors.includes(color)) || 'color',
+    tops.every((color, i) => i === 0 || color !== tops[i - 1]) || 'two runs of one color',
+  ].filter((check): check is string => check !== true);
+}
+
+const seededLevel = (seed: number, colors: readonly string[]) =>
+  SortLevel.seeded(
+    RegionSize.of(2),
+    GoalCount.of(3),
+    Seed.of(seed),
+    colors.map((name) => Color.of(name)) as [Color, ...Color[]],
+  );
+
 describe('SortRules piece source (A4)', () => {
+  // Issue #352, decision of 2026-11-24: a seeded stack follows the team prototype.
+  // It holds 2 to 6 tiles in 1 to 3 runs, and two runs next to each other have other colors.
+  // The transfer reads the top run (D21), so the test also checks the run on top.
+  it('should_draw_stacks_of_2_to_6_tiles_in_1_to_3_runs_of_the_level_colors_when_a_seeded_level_gives_stacks', () => {
+    const colors = ['red', 'green', 'blue'];
+
+    const drawn = drawnStacks(seededLevel(20261115, colors), 300);
+
+    expect(drawn.flatMap((each) => brokenRules(each, colors))).toEqual([]);
+    expect(new Set(drawn.map((each) => runsOf(each).flat().length))).toEqual(
+      new Set([2, 3, 4, 5, 6]),
+    );
+    expect(new Set(drawn.map((each) => runsOf(each).length))).toEqual(new Set([1, 2, 3]));
+    for (const each of drawn) {
+      expect(names(ColorStack.of(each.topRun()))).toEqual(runsOf(each).at(-1));
+    }
+  });
+
+  // The count of runs is never more than the colors of the level (issue #352).
+  it('should_draw_no_more_runs_than_the_level_colors_when_a_seeded_level_has_one_or_two_colors', () => {
+    const one = drawnStacks(seededLevel(7, ['blue']), 100);
+    const two = drawnStacks(seededLevel(7, ['red', 'blue']), 100);
+
+    expect(one.flatMap((each) => brokenRules(each, ['blue']))).toEqual([]);
+    expect(new Set(one.map((each) => runsOf(each).length))).toEqual(new Set([1]));
+    expect(two.flatMap((each) => brokenRules(each, ['red', 'blue']))).toEqual([]);
+    expect(new Set(two.map((each) => runsOf(each).length))).toEqual(new Set([1, 2]));
+  });
+
+  // APP-NFR-07: one seed gives the same stacks, so two games of one seeded level play the same.
   it('should_offer_the_same_stacks_when_two_games_use_the_same_seed', () => {
-    const colors = ['red', 'blue', 'green'];
-    const draw = (random: RandomSource) => stack(random.next().pick(colors));
+    const level = seededLevel(7, ['red', 'blue', 'green']);
     const play = () => {
-      const game = sortGame(
-        sortState({ board: row(4), source: new SeededPieceSource(Seed.of(7), draw) }),
-      );
-      playMove(game, place(0));
-      playMove(game, place(3));
-      return [chipsAt(game, 0), chipsAt(game, 3)];
+      const factory = new SortFactory(new SquareGeometry(), level, seededRandom(1));
+      const { engine } = startVariant(factory);
+      const tray = trayOf(engine.snapshot());
+      playMove(engine, placeFrom(1, 0, 0));
+      playMove(engine, placeFrom(0, 1, 1));
+      return {
+        tray,
+        after: trayOf(engine.snapshot()),
+        board: [chipsAt(engine, 0), chipsAt(engine, 1, 1)],
+      };
     };
 
     const first = play();
 
-    expect(first[0]).toHaveLength(1);
-    expect(first[1]).toHaveLength(1);
+    expect(first.tray.map((slot) => slot.length >= 2)).toEqual([true, true, true]);
     expect(play()).toEqual(first);
   });
 });
@@ -308,13 +460,13 @@ describe('SortRules edge cases', () => {
     );
 
     // The green tile joins the nine greens on (1, 0), and the ten greens clear that stack.
-    playMove(game, place(2));
+    playMove(game, placeFrom(0, 2));
     expect(game.snapshot().goalsReached()).toEqual(ClearedStacks.of(1));
     expect(chipsAt(game, 1)).toEqual([]);
 
     // The placed red on (1, 0) ties with the red on (0, 0). The cell (1, 0) comes first
     // in `board.occupiedCells()`, but the key `0,0` comes before the key `1,0`, so (0, 0) wins.
-    playMove(game, place(1));
+    playMove(game, placeFrom(1, 1));
 
     expect(chipsAt(game, 0)).toEqual(['blue', 'red', 'red']);
     expect(chipsAt(game, 1)).toEqual([]);
@@ -332,14 +484,14 @@ describe('SortRules edge cases', () => {
       }),
     );
 
-    const outcome = playMove(game, place(1));
+    const outcome = playMove(game, placeFrom(0, 1));
 
     const state = game.snapshot();
     expect(outcome).toBe(Outcome.playing);
     expect(chipsAt(game, 1)).toEqual([]);
     expect(state.goalsReached()).toEqual(ClearedStacks.of(1));
     expect(state.clearedStackHeights()).toEqual([TileCount.of(13)]);
-    expect(names(state.offeredStack())).toEqual(['green']);
+    expect(trayOf(state)).toEqual([[], ['green'], []]);
   });
 
   it('should_take_the_top_runs_of_every_matching_neighbor_when_the_placed_stack_has_the_longest_run', () => {
@@ -352,7 +504,7 @@ describe('SortRules edge cases', () => {
       }),
     );
 
-    playMove(game, place(1, 1));
+    playMove(game, placeFrom(0, 1, 1));
 
     expect(chipsAt(game, 1, 1)).toEqual(tiles('red', 6));
     for (const at of ring)
@@ -373,7 +525,7 @@ describe('SortRules edge cases', () => {
       }),
     );
 
-    playMove(game, place(1, 1));
+    playMove(game, placeFrom(0, 1, 1));
 
     expect(chipsAt(game, 1, 0)).toEqual(tiles('red', 5));
     expect(chipsAt(game, 1, 1)).toEqual([]);
@@ -383,21 +535,26 @@ describe('SortRules edge cases', () => {
 
   it('should_throw_and_keep_the_game_when_the_source_throws_on_the_next_stack', () => {
     // The rollback covers the whole state and the phase (classes.md decision 21).
+    // The tray takes three stacks at the start, so the fourth draw is the first refill.
     let draws = 0;
     const source = new SeededPieceSource(Seed.of(1), () => {
       draws += 1;
-      if (draws > 1) throw new Error('The source failed.');
+      if (draws > 3) throw new Error('The source failed.');
       return stack('red');
     });
-    const game = sortGame(sortState({ board: row(3), source }));
+    const game = sortGame(sortState({ board: row(5), source }));
+    playMove(game, placeFrom(0, 0));
+    playMove(game, placeFrom(1, 2));
 
-    expect(() => playMove(game, place(0))).toThrow('The source failed.');
+    // The third placement empties the tray, and the refill throws.
+    expect(() => playMove(game, placeFrom(2, 4))).toThrow('The source failed.');
 
     const state = game.snapshot();
     expect(game.currentPhase()).toBe(PlayingPhase.instance);
-    expect(state.boardCopy().occupiedCells()).toEqual([]);
-    expect(names(state.offeredStack())).toEqual(['red']);
-    expect(state.lastPlacedAt()).toBeUndefined();
+    expect([chipsAt(game, 0), chipsAt(game, 2), chipsAt(game, 4)]).toEqual([['red'], ['red'], []]);
+    expect(trayOf(state)).toEqual([[], [], ['red']]);
+    expect(state.lastPlacedAt()).toEqual(square(2, 0));
+    expect(state.moveCount()).toEqual(Moves.of(2));
     expect(state.goalsReached()).toEqual(ClearedStacks.of(0));
   });
 });
@@ -417,7 +574,7 @@ describe('SortRules atomic turn', () => {
     );
     const facts = (state: SortSnapshot<SquareCoord>) => ({
       cells: state.boardCopy().occupiedCells(),
-      offered: state.offeredStack(),
+      tray: state.trayStacks(),
       goalsDone: state.goalsReached(),
       clearedTiles: [...state.clearedStackHeights()],
       placedAt: state.lastPlacedAt(),
@@ -426,7 +583,7 @@ describe('SortRules atomic turn', () => {
     });
     const before = facts(engine.snapshot());
 
-    expect(() => playMove(engine, place(0, 0))).toThrow('The scoring fails.');
+    expect(() => playMove(engine, placeFrom(0, 0, 0))).toThrow('The scoring fails.');
     expect(facts(engine.snapshot())).toEqual(before);
   });
 });

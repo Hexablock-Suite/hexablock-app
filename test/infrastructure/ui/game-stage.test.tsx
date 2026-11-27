@@ -39,11 +39,11 @@ const ORIGIN = new HexGeometry().createCoord([0, 0]);
 // The first intent of each game on the hexagon, as its move controls send it (#405): a press
 // or a slide that the rules accept on a new board. Lines places its first tray piece on the
 // origin, Fit places the single cell `b` of its first level on the origin, Sort places
-// the offered stack on the origin, and Merge slides east.
+// the stack of the first tray slot on the origin (#353), and Merge slides east.
 const FIRST_INTENTS: Readonly<Record<string, unknown>> = {
   'hexa-lines': { position: 0, at: ORIGIN },
   'hexa-fit': { kind: 'place', piece: 'b', rotation: 0, at: ORIGIN },
-  'hexa-sort': { at: ORIGIN },
+  'hexa-sort': { slot: 0, at: ORIGIN },
   'hexa-merge': { toward: 'east' },
 };
 

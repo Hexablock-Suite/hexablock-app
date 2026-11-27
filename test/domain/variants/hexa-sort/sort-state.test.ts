@@ -11,11 +11,12 @@ import { MatchId } from '../../../../src/domain/engine/match-id';
 import { square, type SquareCoord } from '../../../support/engine/square-topology';
 import {
   names,
-  place,
+  placeFrom,
   row,
   sortState,
   stack,
   tiles,
+  trayOf,
 } from '../../../support/variants/hexa-sort/sort-game';
 
 // R7: the Sort state is an entity. It changes only through its business methods,
@@ -23,14 +24,13 @@ import {
 
 // Everything that a refused input must leave unchanged.
 function facts(state: SortState<SquareCoord>) {
-  const offered = state.snapshot().offeredStack();
   return {
     board: state
       .snapshot()
       .boardCopy()
       .occupiedCells()
       .map(([at, cell]) => [at, names(cell)]),
-    offered: offered === undefined ? undefined : names(offered),
+    tray: trayOf(state.snapshot()),
     left: state.snapshot().pieceSource().hasNext(),
     goalsDone: state.snapshot().goalsReached(),
     clearedTiles: [...state.snapshot().clearedStackHeights()],
@@ -40,24 +40,24 @@ function facts(state: SortState<SquareCoord>) {
 }
 
 describe('SortState', () => {
-  it('should_put_the_offered_stack_on_the_cell_and_offer_the_next_when_the_stack_is_placed', () => {
+  it('should_put_the_chosen_stack_on_the_cell_and_empty_its_slot_when_the_stack_is_placed', () => {
     const state = sortState({ board: row(3), offered: [stack('red'), stack('blue', 'blue')] });
 
-    state.placeOfferedStack(square(1, 0));
+    state.placeStack(placeFrom(0, 1));
 
     expect(names(state.snapshot().boardCopy().occupantAt(square(1, 0)))).toEqual(['red']);
     expect(state.snapshot().lastPlacedAt()).toEqual(square(1, 0));
     expect(state.snapshot().clearedStackHeights()).toEqual([]);
-    expect(names(state.snapshot().offeredStack())).toEqual(['blue', 'blue']);
+    expect(trayOf(state.snapshot())).toEqual([[], ['blue', 'blue'], []]);
     expect(state.snapshot().pieceSource().hasNext()).toBe(false);
   });
 
   it('should_offer_no_stack_when_the_last_stack_is_placed', () => {
     const state = sortState({ board: row(2), offered: [stack('red')] });
 
-    state.placeOfferedStack(square(0, 0));
+    state.placeStack(placeFrom(0, 0));
 
-    expect(state.snapshot().offeredStack()).toBeUndefined();
+    expect(trayOf(state.snapshot())).toEqual([[], [], []]);
   });
 
   it('should_place_the_stack_when_the_cell_holds_an_empty_stack', () => {
@@ -66,12 +66,12 @@ describe('SortState', () => {
       offered: [stack('red')],
     });
 
-    state.placeOfferedStack(square(0, 0));
+    state.placeStack(placeFrom(0, 0));
 
     expect(names(state.snapshot().boardCopy().occupantAt(square(0, 0)))).toEqual(['red']);
   });
 
-  it('should_tell_whether_the_offered_stack_can_go_on_a_cell_when_a_cell_is_asked', () => {
+  it('should_tell_whether_the_stack_of_a_slot_can_go_on_a_cell_when_a_move_is_asked', () => {
     const state = sortState({
       board: row(3, [
         [square(0, 0), stack('red')],
@@ -81,11 +81,13 @@ describe('SortState', () => {
     });
     const ended = sortState({ board: row(3), offered: [] });
 
-    expect(state.canPlace(square(0, 0))).toBe(false);
-    expect(state.canPlace(square(1, 0))).toBe(true);
-    expect(state.canPlace(square(2, 0))).toBe(true);
-    expect(state.canPlace(square(3, 0))).toBe(false);
-    expect(ended.canPlace(square(0, 0))).toBe(false);
+    expect(state.canPlace(placeFrom(0, 0))).toBe(false);
+    expect(state.canPlace(placeFrom(0, 1))).toBe(true);
+    expect(state.canPlace(placeFrom(0, 2))).toBe(true);
+    expect(state.canPlace(placeFrom(0, 3))).toBe(false);
+    expect(state.canPlace(placeFrom(1, 2))).toBe(false);
+    expect(state.canPlace(placeFrom(3, 2))).toBe(false);
+    expect(ended.canPlace(placeFrom(0, 0))).toBe(false);
   });
 
   it('should_throw_a_range_error_and_keep_the_state_when_the_stack_cannot_go_on_the_cell', () => {
@@ -97,14 +99,17 @@ describe('SortState', () => {
     const before = facts(state);
     const endedBefore = facts(ended);
 
-    expect(() => state.placeOfferedStack(square(0, 0))).toThrow(
+    expect(() => state.placeStack(placeFrom(0, 0))).toThrow(
       new RangeError('The cell already holds a stack.', { cause: CoordKey.of('0,0') }),
     );
-    expect(() => state.placeOfferedStack(square(5, 0))).toThrow(
+    expect(() => state.placeStack(placeFrom(0, 5))).toThrow(
       new RangeError('The coordinate is outside the board.', { cause: CoordKey.of('5,0') }),
     );
-    expect(() => ended.placeOfferedStack(square(0, 0))).toThrow(
-      new RangeError('No stack is on offer.'),
+    expect(() => state.placeStack(placeFrom(2, 1))).toThrow(
+      new RangeError('The tray holds no stack at slot 2.'),
+    );
+    expect(() => ended.placeStack(placeFrom(0, 0))).toThrow(
+      new RangeError('The tray holds no stack at slot 0.'),
     );
     expect(facts(state)).toEqual(before);
     expect(facts(ended)).toEqual(endedBefore);
@@ -160,7 +165,7 @@ describe('SortState', () => {
       board: row(2, [[square(0, 0), stack('blue', ...tiles('red', 10))]]),
       offered: [stack('red')],
     });
-    state.placeOfferedStack(square(1, 0));
+    state.placeStack(placeFrom(0, 1));
 
     state.clearStack(square(0, 0));
 
@@ -201,9 +206,9 @@ describe('SortState', () => {
   it('should_recover_the_saved_move_count_when_restoring_an_earlier_snapshot', () => {
     const state = sortState({ board: row(3), offered: [stack('red'), stack('blue')] });
     const rules = new SortRules<SquareCoord>();
-    rules.playTurn(state, place(0));
+    rules.playTurn(state, placeFrom(0, 0));
     const saved = state.snapshot();
-    rules.playTurn(state, place(2));
+    rules.playTurn(state, placeFrom(1, 2));
     const later = state.snapshot();
 
     state.restore(saved);
@@ -216,13 +221,38 @@ describe('SortState', () => {
   it('should_keep_the_move_count_independently_when_the_state_is_cloned', () => {
     const state = sortState({ board: row(3), offered: [stack('red'), stack('blue')] });
     const rules = new SortRules<SquareCoord>();
-    rules.playTurn(state, place(0));
+    rules.playTurn(state, placeFrom(0, 0));
     const copy = state.clone();
 
-    rules.playTurn(copy, place(2));
+    rules.playTurn(copy, placeFrom(1, 2));
 
     expect(state.snapshot().moveCount()).toEqual(Moves.of(1));
     expect(copy.snapshot().moveCount()).toEqual(Moves.of(2));
+  });
+
+  // Trap of #353: the photo, `restore()` and the copy keep the whole tray, the empty slots
+  // included, as they keep the move count.
+  it('should_keep_the_whole_tray_with_its_empty_slots_when_a_photo_is_restored_or_the_state_is_copied', () => {
+    const state = sortState({
+      board: row(4),
+      offered: [stack('red'), stack('blue'), stack('green'), stack('yellow')],
+    });
+    state.placeStack(placeFrom(1, 0));
+    const photo = state.snapshot();
+    const copy = state.clone();
+
+    state.placeStack(placeFrom(0, 2));
+    state.placeStack(placeFrom(2, 3));
+    expect(trayOf(state.snapshot())).toEqual([['yellow'], [], []]);
+
+    expect(trayOf(copy.snapshot())).toEqual([['red'], [], ['green']]);
+    expect(trayOf(photo)).toEqual([['red'], [], ['green']]);
+    state.restore(photo);
+    expect(trayOf(state.snapshot())).toEqual([['red'], [], ['green']]);
+    expect(state.snapshot().pieceSource().hasNext()).toBe(true);
+    state.placeStack(placeFrom(2, 2));
+    state.placeStack(placeFrom(0, 3));
+    expect(trayOf(state.snapshot())).toEqual([['yellow'], [], []]);
   });
 
   // The state has its own `GameStateId`, and it still knows its match (classes.md decision 26).
@@ -230,7 +260,7 @@ describe('SortState', () => {
     const stateId = GameStateId.of(MatchId.of('match-a'));
     const first = sortState({ board: row(2), offered: [stack('red')], stateId });
     const second = sortState({ board: row(3), stateId });
-    first.placeOfferedStack(square(0, 0));
+    first.placeStack(placeFrom(0, 0));
 
     expect([first.equals(second), second.equals(first), first.equals(first.clone())]).toEqual([
       true,

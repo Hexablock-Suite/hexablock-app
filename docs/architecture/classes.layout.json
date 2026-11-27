@@ -206,6 +206,8 @@
             "SortView",
             "TileCount",
             "PlaceStack",
+            "TraySlot",
+            "SortTray",
             "SortPlay",
             "SortSnapshot",
             "ClearedStacks",
@@ -716,6 +718,8 @@
             "SortFactory",
             "SortRules",
             "PlaceStack",
+            "TraySlot",
+            "SortTray",
             "SortPlay"
           ]
         },
