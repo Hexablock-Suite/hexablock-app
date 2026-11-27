@@ -269,7 +269,12 @@ function TargetPrompt({ visible, texts, onContinue }: TargetPromptProps) {
 }
 
 const styles = StyleSheet.create({
+  // The swipe area takes the free height of the column, as the board area of the stage does
+  // in the other games (#490). The board area grows inside it and centers the board.
+  // Without the growth, the area has no height on the phone, and the board overflows
+  // onto the title, the score bar and the slide buttons.
   swipeArea: {
+    flex: 1,
     alignSelf: 'stretch',
   },
   pad: {

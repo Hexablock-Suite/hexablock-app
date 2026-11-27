@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen, within } from '@testing-library/react-native';
 import { Dimensions, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -143,6 +143,39 @@ async function boardsAt(width: number): Promise<[string, string, number, number]
     }
   }
   return rows;
+}
+
+// A rendered host node of the screen.
+type HostNode = ReturnType<typeof screen.getByLabelText>;
+
+// The host nodes from `node` up to the root of the screen, `node` first.
+function chainOf(node: HostNode | null): HostNode[] {
+  return node === null ? [] : [node, ...chainOf(node.parent)];
+}
+
+// The flat style of a host node.
+const styleOf = (node: HostNode) => StyleSheet.flatten(node.props.style as never) ?? {};
+
+// True when the node takes a share of the free height of its parent.
+const grows = (node: HostNode) =>
+  Number(styleOf(node).flex ?? 0) > 0 || Number(styleOf(node).flexGrow ?? 0) > 0;
+
+// The board area and the nodes between it and the content column of the stage, area first.
+// The column holds the title, so it is the first node above the board that holds the title too.
+// The board area is the lowest node above the board that grows into the free height (#490).
+// A node with `display: 'contents'`, as the gesture detector renders it, draws no box of its own,
+// so the layout skips it, and so does the chain.
+function boardAreaChain(title: string): HostNode[] {
+  const column = new Set(chainOf(screen.getByRole('header', { name: title })));
+  const above = chainOf(screen.getByLabelText('Tablero')).filter(
+    (node) => styleOf(node).display !== 'contents',
+  );
+  const below = above.slice(
+    0,
+    above.findIndex((node) => column.has(node)),
+  );
+  const area = below.findIndex(grows);
+  return area < 0 ? [] : below.slice(area);
 }
 
 // The renderer hides each space from the screen reader, because the board carries the name.
@@ -314,6 +347,31 @@ describe('GameStage', () => {
         ['{"name":"square"}', 240],
         ['{"name":"triangle"}', CONTENT_WIDTH - 2 * (6 + space.md)],
       ]);
+    });
+  });
+  // Issue #490: on a phone the Merge board covered the title, the score bar and its own
+  // slide buttons. The board area grows into the free height of the column, and it centers
+  // the board in that height. A wrapper that does not grow gives the area no height,
+  // so the board overflows above and below it. The test renderer computes no layout,
+  // so the test reads the rule of the layout: every node between the board area and the column
+  // grows, and the board area holds no button of the move controls.
+  describe('board place', () => {
+    it('should_let_the_board_area_fill_the_free_height_below_the_score_bar_and_hold_no_button_when_each_variant_opens', async () => {
+      const shown: [string, number, unknown[], number][] = [];
+      for (const id of FOUR_VARIANTS) {
+        await show(testRoot().gameSession(GameId.of(id)));
+        const chain = boardAreaChain('Hexa Fit');
+        const stuck = chain.filter((node) => !grows(node)).map(styleOf);
+        const buttons = chain.length === 0 ? -1 : within(chain[0]).queryAllByRole('button').length;
+        shown.push([id, chain.length, stuck, buttons]);
+        await screen.unmount();
+      }
+
+      // One row for each variant: the nodes from the board area to the column, the nodes
+      // among them that do not grow, and the buttons inside the board area.
+      expect(shown.map(([id, length, stuck, buttons]) => [id, length > 0, stuck, buttons])).toEqual(
+        FOUR_VARIANTS.map((id) => [id, true, [], 0]),
+      );
     });
   });
 });
