@@ -17,8 +17,9 @@ export interface ListLevelsRequest {
 }
 
 // Lists the levels of one game with their progress (APP-FR-02, docs/architecture/flows.md,
-// issue #168). It reads and writes nothing: it asks `LevelRepository` for the definitions
-// of the game and `ProgressRepository` for the saved progress of the game.
+// issue #168). It writes nothing: it asks `LevelRepository` for the definitions
+// of the game and `ProgressRepository` for the owner of the progress and the saved progress of the
+// game of that owner (#46).
 // - The list holds only the levels that are played on the chosen figure (S3-08).
 //   A level builder refuses a level of another figure, so a level of another figure
 //   cannot start. A figure with no level gives an empty list.
@@ -36,7 +37,7 @@ export class ListLevels implements UseCase<ListLevelsRequest, LevelSummary[]> {
   async execute(request: ListLevelsRequest): Promise<Result<LevelSummary[]>> {
     try {
       const levels = await this.levels.list(request.gameId);
-      const progress = await this.progress.load(request.gameId);
+      const progress = await this.progress.load(await this.progress.owner(), request.gameId);
       return Result.success(summariesOf(levelsOnFigure(levels, request.figure), progress));
     } catch (thrown) {
       return Result.failure(caughtError(FailureCode.listFailed, thrown));

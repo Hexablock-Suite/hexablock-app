@@ -24,6 +24,7 @@ import { ManualClock } from '../support/engine/manual-clock';
 import { square } from '../support/engine/square-topology';
 import { A } from '../support/variants/hexa-fit/fit-game';
 import { linesFactory } from '../support/variants/hexa-lines/lines-game';
+import { ProgressOwner } from '../../src/application/progress-owner';
 
 // `SaveProgress` records a `GameResult` in the progress of its game with the progress model
 // of the variant, and saves the progress through the `ProgressRepository` port (issue #164).
@@ -116,8 +117,8 @@ describe('SaveProgress', () => {
     ];
     // A new repository over the same store reads the progress, as after a restart.
     const restarted = new LocalProgressRepository(store);
-    const fit = await restarted.load(FIT);
-    const lines = await restarted.load(LINES);
+    const fit = await restarted.load(ProgressOwner.anonymous, FIT);
+    const lines = await restarted.load(ProgressOwner.anonymous, LINES);
 
     expect(results).toEqual([Result.success(undefined), Result.success(undefined)]);
     expect(fit?.keeps(fitRecord(1, 1, 3000))).toBe(true);
@@ -137,8 +138,8 @@ describe('SaveProgress', () => {
       await saveFit.execute(fitPlay(2, 1000)),
       await saveLines.execute(linesPlay(20)),
     ];
-    const fit = await new LocalProgressRepository(store).load(FIT);
-    const lines = await new LocalProgressRepository(store).load(LINES);
+    const fit = await new LocalProgressRepository(store).load(ProgressOwner.anonymous, FIT);
+    const lines = await new LocalProgressRepository(store).load(ProgressOwner.anonymous, LINES);
 
     expect(results).toEqual([Result.success(undefined), Result.success(undefined)]);
     // Two moves win no star, so the stored play with one star stays.
@@ -156,8 +157,8 @@ describe('SaveProgress', () => {
     await saveLines.execute(linesPlay(36));
     await saveFit.execute(fitPlay(1, 1000));
     await saveLines.execute(linesPlay(40));
-    const fit = await new LocalProgressRepository(store).load(FIT);
-    const lines = await new LocalProgressRepository(store).load(LINES);
+    const fit = await new LocalProgressRepository(store).load(ProgressOwner.anonymous, FIT);
+    const lines = await new LocalProgressRepository(store).load(ProgressOwner.anonymous, LINES);
 
     expect(fit?.keeps(fitRecord(2, 1, 1000))).toBe(true);
     expect(fit?.keeps(fitRecord(1, 1, 3000))).toBe(false);
@@ -217,8 +218,8 @@ describe('SaveProgress', () => {
     const mergePlay = GameResult.of({ gameId: MERGE, score: Score.of(900), moves: Moves.of(4) });
 
     const results = [await saveFit.execute(sortPlay), await saveLines.execute(mergePlay)];
-    const fit = await new LocalProgressRepository(store).load(FIT);
-    const lines = await new LocalProgressRepository(store).load(LINES);
+    const fit = await new LocalProgressRepository(store).load(ProgressOwner.anonymous, FIT);
+    const lines = await new LocalProgressRepository(store).load(ProgressOwner.anonymous, LINES);
 
     expect(results.map((result) => (result.ok ? 'success' : result.error.code))).toEqual([
       'save-failed',

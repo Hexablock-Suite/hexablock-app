@@ -42,6 +42,7 @@ import { mergeFactory, mergeStateOf } from '../support/variants/hexa-merge/merge
 import { sortFactory } from '../support/variants/hexa-sort/sort-game';
 import { viewData } from '../support/variants/view-data';
 import { repoRoot } from '../support/run-tool';
+import { ProgressOwner } from '../../src/application/progress-owner';
 
 // `UndoMove` takes back the last move of a variant that has a history (issue 159, APP-FR-08,
 // docs/architecture/flows.md use case 4, classes.md decisions 27 and 34).
@@ -187,7 +188,7 @@ describe('UndoMove', () => {
     const saved = await save.execute(
       GameResult.of({ gameId: MERGE, score: withUndo.finalScore, moves: withUndo.kept }),
     );
-    const progress = await new LocalProgressRepository(store).load(MERGE);
+    const progress = await new LocalProgressRepository(store).load(ProgressOwner.anonymous, MERGE);
 
     // The undone slide scored, and the undo took its points back.
     expect(withUndo.undone?.after.isHigherThan(withUndo.undone.before)).toBe(true);

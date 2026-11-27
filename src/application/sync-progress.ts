@@ -1,7 +1,7 @@
-import { GameProgress } from '../domain/progress/game-progress';
 import type { GameId } from '../domain/shared/game-id';
 import type { AnonymousProgress } from './anonymous-progress';
 import { SyncFailure, type ProgressGateway } from './progress-gateway';
+import { ProgressOwner } from './progress-owner';
 import type { ProgressRepository } from './progress-repository';
 import { caughtError, FailureCode, Result, UseCaseError } from './result';
 import type { SessionStore } from './session-store';
@@ -15,20 +15,25 @@ export interface SyncProgressRequest {
 // Sends the local progress of one game to the backend (APP-FR-13, D27, issue #46,
 // docs/architecture/flows.md use case 2, classes.md decision 66).
 // The local progress is always the store. With no session the use case sends nothing and
-// changes nothing, so play with no account works offline. With a session it:
+// changes nothing, so play with no account works offline. With a session it reads the session once:
+// the user of the session is the owner of the progress for the whole sync, even when the session
+// changes during the request. Then it:
 // 1. Merges the anonymous progress of the game, saved with no account, into the progress of the
-//    account with `GameProgress.mergeWith()` (DS-12). It saves the merged progress, then forgets
-//    the anonymous progress. So the progress merges into the first account that signs in.
-// 2. Sends the progress of the account through the `ProgressGateway` port with the session.
-//    A game with no local progress sends nothing.
-// 3. Merges the answer of the backend into the local progress and saves it. So a better result of
-//    another device reaches this device, and the best result stays.
-// The `ProgressRepository` of the root puts the user id of the session in its key, so it gives
-// the progress of the account. A failed sync never loses local progress: every step before a
-// failure keeps its save, and the anonymous progress stays until the merged progress is saved.
+//    owner through `AnonymousProgress` (DS-12). The repository forgets the anonymous progress only
+//    after it saves the merged progress. A sign-in already merged it, so this step only repeats a
+//    merge that failed.
+// 2. Sends the progress of the owner through the `ProgressGateway` port with the session.
+//    A game with no local progress sends nothing. The request runs outside the queue of the
+//    repository, so a save of the game can run while the request waits.
+// 3. Merges the answer of the backend, through `ProgressRepository.update()`, into the progress that
+//    the repository holds at that moment. So a result saved during the request stays, a better
+//    result of another device reaches this device, and the best result stays.
+// A session that cannot be read gives `sync-failed` and writes nothing. A failed sync never loses
+// local progress: every step before a failure keeps its save.
 // A refused token gives `session-expired` and clears the session through `SessionStore.clear()`,
-// so the screen asks the player to sign in. No answer gives `backend-unreachable`. Any other
-// failure gives `sync-failed`. No exception leaves `execute()` (decision 28).
+// which keeps the owner, so the screen asks the player to sign in and the player keeps the
+// progress. No answer gives `backend-unreachable`. Any other failure gives `sync-failed`.
+// No exception leaves `execute()` (decision 28).
 export class SyncProgress implements UseCase<SyncProgressRequest, void> {
   constructor(
     private readonly sessions: SessionStore,
@@ -41,28 +46,16 @@ export class SyncProgress implements UseCase<SyncProgressRequest, void> {
     try {
       const session = await this.sessions.read();
       if (session === undefined) return Result.success(undefined);
-      const progress = await this.withAnonymous(request.gameId);
+      const owner = ProgressOwner.of(session.userId);
+      await this.anonymous.mergeAnonymousInto(owner, request.gameId);
+      const progress = await this.progress.load(owner, request.gameId);
       if (progress === undefined) return Result.success(undefined);
-      progress.mergeWith(await this.gateway.sync(session, progress));
-      await this.progress.save(progress);
+      const answer = await this.gateway.sync(session, progress);
+      await this.progress.update(owner, request.gameId, (stored) => stored.mergeWith(answer));
       return Result.success(undefined);
     } catch (thrown) {
       return this.failureOf(thrown);
     }
-  }
-
-  // The progress of the account with the anonymous progress of the game merged into it, or
-  // `undefined` when the game has neither. The merged progress is saved before the anonymous
-  // progress is forgotten, so a failed save keeps both.
-  private async withAnonymous(gameId: GameId): Promise<GameProgress | undefined> {
-    const own = await this.progress.load(gameId);
-    const anonymous = await this.anonymous.loadAnonymous(gameId);
-    if (anonymous === undefined) return own;
-    const merged = own ?? GameProgress.start(gameId);
-    merged.mergeWith(anonymous);
-    await this.progress.save(merged);
-    await this.anonymous.forgetAnonymous(gameId);
-    return merged;
   }
 
   // The failure of a thrown value. A refused token also clears the session.

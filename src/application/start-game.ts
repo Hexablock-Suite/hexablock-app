@@ -74,7 +74,10 @@ export class StartGame<
   // A level that the list of the figure does not hold is not locked.
   private async isLocked(levelId: LevelId): Promise<boolean> {
     const levels = levelsOnFigure(await this.levels.list(this.gameId), this.figure);
-    const progress = await this.progress?.load(this.gameId);
+    const progress =
+      this.progress === undefined
+        ? undefined
+        : await this.progress.load(await this.progress.owner(), this.gameId);
     const found = LevelStatus.ofEach(levels, progress).find(([level]) =>
       level.levelId().equals(levelId),
     );

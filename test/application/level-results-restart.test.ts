@@ -29,6 +29,7 @@ import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-s
 import { ManualClock } from '../support/engine/manual-clock';
 import { seededRandom } from '../support/engine/step-random';
 import { delivered } from '../support/engine/value-receiver';
+import { ProgressOwner } from '../../src/application/progress-owner';
 
 // The integration tests of APP-NFR-15 for the two games with levels (issue #183, APP-FR-09).
 // A level result that `SaveProgress` saves survives a restart of the app, and `ListLevels`
@@ -191,7 +192,7 @@ describe.each([
     const saved = await runOf(game, store).save(game.best);
     const restarted = runOf(game, store);
     const rows = await restarted.list();
-    const loaded = await restarted.progress.load(game.gameId);
+    const loaded = await restarted.progress.load(ProgressOwner.anonymous, game.gameId);
 
     expect(saved).toEqual(Result.success(undefined));
     expect(rows).toEqual(await rowsAfterWin(game, game.best.stars));
@@ -209,7 +210,7 @@ describe.each([
     for (const play of game.worse) saved.push(await second.save(play));
     const third = runOf(game, store);
     const rows = await third.list();
-    const loaded = await third.progress.load(game.gameId);
+    const loaded = await third.progress.load(ProgressOwner.anonymous, game.gameId);
 
     expect(saved).toEqual(game.worse.map(() => Result.success(undefined)));
     expect(rows).toEqual(await rowsAfterWin(game, game.best.stars));

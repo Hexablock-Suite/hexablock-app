@@ -5,6 +5,7 @@ import type { LevelDefinition } from '../domain/progress/level-definition';
 import type { Achievement } from './achievement';
 import type { AchievementCounterRepository } from './achievement-counter-repository';
 import type { LevelRepository } from './level-repository';
+import type { ProgressOwner } from './progress-owner';
 import type { ProgressRepository } from './progress-repository';
 import { caughtError, FailureCode, Result } from './result';
 import type { UseCase } from './use-case';
@@ -21,7 +22,8 @@ export interface AchievementSummary {
 }
 
 // Lists the achievements of the player with their status (issue #188).
-// It writes nothing. It loads the levels, the saved progress and the saved counters of the game
+// It writes nothing. It reads the owner of the progress once per `execute()` (#46), and it loads the
+// levels, the saved progress of that owner and the saved counters of the game
 // of each goal, once per game, through `LevelRepository`, `ProgressRepository` and
 // `AchievementCounterRepository`, and passes them to the goal. A goal of the domain decides with
 // them and calls no repository (issues #326 and #364). The saved progress keeps each won level,
@@ -50,6 +52,7 @@ export class ListAchievements implements UseCase<ListAchievementsRequest, Achiev
 
   async execute(_request: ListAchievementsRequest): Promise<Result<AchievementSummary[]>> {
     try {
+      const owner = await this.progress.owner();
       const games: SavedGame[] = [];
       const summaries: AchievementSummary[] = [];
       for (const { id, goal } of this.achievements) {
@@ -57,7 +60,7 @@ export class ListAchievements implements UseCase<ListAchievementsRequest, Achiev
           summaries.push({ id, completed: false });
           continue;
         }
-        const { levels, progress, counters } = await this.savedGame(goal.gameId(), games);
+        const { levels, progress, counters } = await this.savedGame(owner, goal.gameId(), games);
         summaries.push({ id, completed: goal.isReachedBy(levels, progress, counters) });
       }
       return Result.success(summaries);
@@ -66,14 +69,19 @@ export class ListAchievements implements UseCase<ListAchievementsRequest, Achiev
     }
   }
 
-  // The levels, the progress and the counters of the game `gameId`. Each game loads once per `execute()`:
+  // The levels, the progress of `owner` and the counters of the game `gameId`. Each game loads once
+  // per `execute()`:
   // `games` keeps each game that this call already loaded. A game with no saved counters gets
   // new counters, with a best count and a total of 0.
-  private async savedGame(gameId: GameId, games: SavedGame[]): Promise<SavedGame> {
+  private async savedGame(
+    owner: ProgressOwner,
+    gameId: GameId,
+    games: SavedGame[],
+  ): Promise<SavedGame> {
     const loaded = games.find((game) => game.gameId.equals(gameId));
     if (loaded !== undefined) return loaded;
     const levels = await this.levels.list(gameId);
-    const progress = await this.progress.load(gameId);
+    const progress = await this.progress.load(owner, gameId);
     const counters = (await this.counters.load(gameId)) ?? AchievementCounters.start(gameId);
     const game = { gameId, levels, progress, counters };
     games.push(game);

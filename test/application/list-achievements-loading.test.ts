@@ -41,11 +41,12 @@ function countingPorts() {
     levelOf: (gameId, levelId) => bundled.levelOf(gameId, levelId),
   };
   const progress: ProgressRepository = {
-    load: (gameId) => {
+    owner: () => local.owner(),
+    load: (owner, gameId) => {
       reads.push(`progress ${delivered(gameId)}`);
-      return local.load(gameId);
+      return local.load(owner, gameId);
     },
-    save: (saved) => local.save(saved),
+    update: (owner, gameId, change) => local.update(owner, gameId, change),
   };
   const counters: AchievementCounterRepository = {
     load: (gameId) => {
