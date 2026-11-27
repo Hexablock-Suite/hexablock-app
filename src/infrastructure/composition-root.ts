@@ -4,6 +4,8 @@ import { AchievementsPresenter } from '../adapters/achievements-presenter';
 import type { AccountApi } from '../adapters/api/account-api';
 import { ApiAccountGateway } from '../adapters/api/api-account-gateway';
 import { ApiDtoMapper } from '../adapters/api/api-dto-mapper';
+import { ApiProgressGateway } from '../adapters/api/api-progress-gateway';
+import type { ProgressApi } from '../adapters/api/progress-api';
 import { BundledLevelRepository } from '../adapters/bundled-level-repository';
 import { GameEventBus } from '../adapters/game-event-bus';
 import { GamePresenter } from '../adapters/game-presenter';
@@ -39,6 +41,8 @@ import { RedoMove, type RedoMoveRequest } from '../application/redo-move';
 import { Register } from '../application/register';
 import { SaveProgress } from '../application/save-progress';
 import type { Session } from '../application/session';
+import type { SessionStore } from '../application/session-store';
+import { SyncProgress, type SyncProgressRequest } from '../application/sync-progress';
 import { StartGame, type StartGameRequest } from '../application/start-game';
 import { UndoMove, type UndoMoveRequest } from '../application/undo-move';
 import type { UseCase } from '../application/use-case';
@@ -82,14 +86,14 @@ export interface GameUseCases<TCell = unknown, TCoord = unknown, TMove = unknown
 // and `DeviceKeyValueStore`, which `CompositionRootProvider` builds (#188).
 // The store stays optional. A root with no store reads no saved progress,
 // so it lists no achievements and loads no progress.
-// `api` is the transport of the auth resource of hexablock-api, and `secrets` the secure storage
-// of the session (#45): the app takes `ApiClient` and `DeviceSecretStore`. Both stay optional.
-// A root that lacks one signs no player in.
+// `api` is the transport of the auth and the progress resources of hexablock-api, and `secrets`
+// the secure storage of the session (#45, #46): the app takes `ApiClient` and `DeviceSecretStore`.
+// Both stay optional. A root that lacks one signs no player in and syncs no progress.
 export interface RootDrivers {
   readonly clock: Clock;
   readonly logger: Logger;
   readonly store?: KeyValueStore;
-  readonly api?: AccountApi;
+  readonly api?: AccountApi & ProgressApi;
   readonly secrets?: SecretStore;
 }
 
@@ -150,6 +154,13 @@ interface AccountUseCases {
 // scope of decision 18. Over them it builds `Register` and `Login` once, each through
 // `decorate()`, and `accountPresenter()` gives a new `AccountPresenter` over both.
 // A root with no transport or no secure storage throws a `RangeError` from `accountPresenter()`.
+// The sync (#46, APP-FR-13, D27): the root gives the one `SessionManager` to the
+// `LocalProgressRepository`, so the key of the local progress carries the user of the session.
+// With the transport, the secure storage and the local store, it builds `SyncProgress` once
+// through `decorate()`, over the session manager, the local repository in its two roles and one
+// `ApiProgressGateway` with the same `ApiDtoMapper`. The `ResultPresenter` of each game session
+// syncs after each save, and the `AccountPresenter` syncs every registered game after a sign-in.
+// A root that lacks one of the three drivers syncs nothing.
 // The screens show the default language until the player can choose one (#163).
 export class CompositionRoot implements ScreenServices {
   private readonly games: ReadonlyMap<TopologyId, GameRegistry>;
@@ -165,6 +176,7 @@ export class CompositionRoot implements ScreenServices {
   private readonly texts: Texts = textCatalog[DEFAULT_LANGUAGE];
   private readonly progressLoad: UseCase<LoadProgressRequest, GameProgress | undefined> | undefined;
   private readonly account: AccountUseCases | undefined;
+  private readonly sync: UseCase<SyncProgressRequest, void> | undefined;
 
   constructor(drivers: RootDrivers = { clock: new SystemClock(), logger: new ConsoleLogger() }) {
     const random = SeededRandomSource.fromClock(drivers.clock);
@@ -188,8 +200,13 @@ export class CompositionRoot implements ScreenServices {
     }
     this.events = events;
     this.levels = new BundledLevelRepository();
-    this.progress =
-      drivers.store === undefined ? undefined : new LocalProgressRepository(drivers.store);
+    const sessions =
+      drivers.secrets === undefined ? undefined : new SessionManager(drivers.secrets);
+    const local =
+      drivers.store === undefined
+        ? undefined
+        : new LocalProgressRepository(drivers.store, sessions);
+    this.progress = local;
     this.achievements =
       this.progress === undefined || counters === undefined
         ? undefined
@@ -205,11 +222,19 @@ export class CompositionRoot implements ScreenServices {
       this.progress === undefined
         ? undefined
         : this.decorate(new LoadProgress(this.progress), 'LoadProgress');
+    const mapper = new ApiDtoMapper();
     this.account =
-      drivers.api === undefined || drivers.secrets === undefined
+      drivers.api === undefined || sessions === undefined
         ? undefined
-        : accountUseCases(drivers.api, drivers.secrets, (useCase, name) =>
+        : accountUseCases(drivers.api, sessions, mapper, (useCase, name) =>
             this.decorate(useCase, name),
+          );
+    this.sync =
+      drivers.api === undefined || sessions === undefined || local === undefined
+        ? undefined
+        : this.decorate(
+            new SyncProgress(sessions, local, local, new ApiProgressGateway(drivers.api, mapper)),
+            'SyncProgress',
           );
   }
 
@@ -343,10 +368,15 @@ export class CompositionRoot implements ScreenServices {
       gameId,
       figure,
     );
+    const sync = this.sync;
     const result = new ResultPresenter(
       gameId,
       figure,
-      { saveProgressOf, listLevels: () => this.listLevels() },
+      {
+        saveProgressOf,
+        listLevels: () => this.listLevels(),
+        ...(sync === undefined ? {} : { syncProgress: () => sync }),
+      },
       this.texts,
     );
     return {
@@ -369,12 +399,30 @@ export class CompositionRoot implements ScreenServices {
   }
 
   // A new presenter of the account screen over `Register` and `Login` of the root (#45).
+  // With `SyncProgress`, it syncs the progress of every registered game after a sign-in (#46).
   // A root with no transport or no secure storage among its drivers throws a RangeError.
   accountPresenter(): AccountPresenter {
     if (this.account === undefined) {
       throw new RangeError('The root has no backend or no secure store, so it signs no player in.');
     }
-    return new AccountPresenter(this.account.register, this.account.login, this.texts);
+    return new AccountPresenter(
+      this.account.register,
+      this.account.login,
+      this.texts,
+      this.sync === undefined ? undefined : { syncProgress: this.sync, gameIds: this.allGameIds() },
+    );
+  }
+
+  // The id of each registered game of every board figure, once each, in the order of the figures.
+  // The progress of a game is one for every figure, so the sync takes each game once.
+  private allGameIds(): GameId[] {
+    const ids: GameId[] = [];
+    for (const registry of this.games.values()) {
+      for (const id of registry.gameIds()) {
+        if (!ids.some((known) => known.equals(id))) ids.push(id);
+      }
+    }
+    return ids;
   }
 
   // The one place that gives a use case of the root its aspects (#323). `name` names the use case
@@ -435,16 +483,16 @@ function wire<TState extends BoardState<unknown, unknown> & Cloneable<TState>>(
   };
 }
 
-// `Register` and `Login` over one gateway of the transport `api` and one session manager of the
-// secure storage `secrets`, each through `decorate` (#45). The two use cases share both, so the
+// `Register` and `Login` over one gateway of the transport `api` with `mapper` and the one session
+// store `session` of the root, each through `decorate` (#45). The two use cases share both, so the
 // app keeps one session.
 function accountUseCases(
   api: AccountApi,
-  secrets: SecretStore,
+  session: SessionStore,
+  mapper: ApiDtoMapper,
   decorate: Decorate,
 ): AccountUseCases {
-  const accounts = new ApiAccountGateway(api, new ApiDtoMapper());
-  const session = new SessionManager(secrets);
+  const accounts = new ApiAccountGateway(api, mapper);
   return {
     register: decorate(new Register(accounts, session), 'Register'),
     login: decorate(new Login(accounts, session), 'Login'),

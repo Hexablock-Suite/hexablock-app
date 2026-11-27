@@ -2,6 +2,7 @@
 import { AccountPresenter } from '../../src/adapters/account-presenter';
 import { AchievementsPresenter } from '../../src/adapters/achievements-presenter';
 import type { AccountApi } from '../../src/adapters/api/account-api';
+import type { ProgressApi } from '../../src/adapters/api/progress-api';
 import { SessionManager } from '../../src/adapters/session-manager';
 import { GamePresenter } from '../../src/adapters/game-presenter';
 import { HomePresenter } from '../../src/adapters/home-presenter';
@@ -111,10 +112,12 @@ describe('CompositionRoot screens', () => {
   it('should_build_an_account_presenter_that_keeps_the_session_when_the_root_has_a_backend_and_a_secure_store', async () => {
     const secrets = new InMemorySecretStore();
     const logger = new RecordingLogger();
-    const api: AccountApi = {
+    const api: AccountApi & ProgressApi = {
       signUp: () => Promise.resolve(),
       signIn: () => Promise.resolve({ accessToken: 'token-of-ada' }),
       currentUser: () => Promise.resolve({ userId: '0b6f6a4e-1c2d-4e5f-8a9b-0c1d2e3f4a5b' }),
+      syncProgress: (_token, body) =>
+        Promise.resolve({ gameId: body.gameId, highScore: null, updatedAt: '', results: [] }),
     };
     const services: ScreenServices = new CompositionRoot({
       clock: new ManualClock(),
