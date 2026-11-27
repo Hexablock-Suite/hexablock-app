@@ -72,7 +72,7 @@
         <desc id="seqlogin-desc">
           Sequence diagram of one sign-in. The player sends the credentials on AccountScreen in
           layer 4. AccountPresenter in layer 3 calls execute() on Login in layer 2 through the
-          UseCase port. Login calls login() on ApiAccountGateway in layer 4 through the
+          UseCase port. Login calls login() on ApiAccountGateway in layer 3 through the
           AccountGateway port. ApiDtoMapper makes a CredentialsDto, and ApiClient sends it over HTTP
           to AuthController.signIn() of hexablock-api. On success ApiDtoMapper turns the TokenDto
           into a Session, and Login writes it to SessionManager through the SessionStore port and
@@ -362,21 +362,21 @@
           width="132"
           height="64"
           rx="6"
-          fill="#cfdcf3"
-          stroke="rgba(30,58,138,0.50)"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
           stroke-width="1"
         />
         <text
           x="720"
           y="38"
-          fill="#1e3a8a"
+          fill="#1d4ed8"
           font-size="7"
           font-weight="500"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
           letter-spacing="0.14em"
         >
-          LAYER 4
+          LAYER 3
         </text>
         <text
           x="720"
@@ -416,21 +416,21 @@
           width="112"
           height="64"
           rx="6"
-          fill="#cfdcf3"
-          stroke="rgba(30,58,138,0.50)"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
           stroke-width="1"
         />
         <text
           x="858"
           y="38"
-          fill="#1e3a8a"
+          fill="#1d4ed8"
           font-size="7"
           font-weight="500"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
           letter-spacing="0.14em"
         >
-          LAYER 4
+          LAYER 3
         </text>
         <text
           x="858"
@@ -1324,7 +1324,7 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Login class view. Login names only the AccountGateway and SessionStore ports, so the calls
-          out to layer 4 keep the dependency
+          out to layer 3 keep the dependency
         </text>
         <text
           x="24"

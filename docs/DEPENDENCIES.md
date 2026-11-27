@@ -21,7 +21,7 @@ Add Expo and React Native packages with `npx expo install` (rule R-expo-install)
 - `expo-symbols` — part of the dependency set of the Expo SDK 58 default template (commit `28bdbb4`), and `expo-router` lists it as an optional peer; no source file or test imports it today. Keeping or removing it is a separate team decision, recorded on [#186](https://github.com/Hexablock-Suite/hexablock-app/issues/186).
 - `expo-system-ui` — the native side of the `userInterfaceStyle` of `app.json`: `npx expo prebuild` applies its config plugin by default and writes the style into the native projects. No source file imports it.
 - `expo-web-browser` — part of the dependency set of the Expo SDK 58 default template (commit `28bdbb4`); no source file or test imports it today. Keeping or removing it is a separate team decision, recorded on [#186](https://github.com/Hexablock-Suite/hexablock-app/issues/186).
-- `openapi-fetch` — the HTTP client of the backend: `createClient` in `src/infrastructure/api/client.ts`, typed by the generated `src/infrastructure/api/schema.d.ts`.
+- `openapi-fetch` — the HTTP client of the backend: `createClient` in `src/infrastructure/api/client.ts`, typed by the generated `src/infrastructure/api/schema.d.ts` and `src/adapters/api/dto.d.ts`.
 - `react` — the UI library of every screen in `app/` and every component of `src/infrastructure/`, with hooks such as `useState` and `useEffect`.
 - `react-dom` — the DOM renderer that `react-native-web` needs for the web build of the team (`pnpm web`, `pnpm web:build`); `expo` lists it as an optional peer. No source file imports it.
 - `react-native` — the core components and APIs of the screens: `View`, `Text`, `Pressable`, `ScrollView`, `StyleSheet`, `useWindowDimensions`, and `Platform` in `src/infrastructure/ui/theme.ts`.
@@ -45,6 +45,6 @@ Add Expo and React Native packages with `npx expo install` (rule R-expo-install)
 - `dependency-cruiser` — the layer rules of `.dependency-cruiser.cjs`, run by the `arch` script and by `test/gates/architecture-gate.test.ts`.
 - `jest` — the test runner of the `test` script, configured in `jest.config.js` with the projects `app` and `contract`.
 - `jest-expo` — the Jest preset of the `app` project of `jest.config.js`; the `contract` project reuses its TypeScript transform.
-- `openapi-typescript` — `scripts/contract/api-types.mjs`: `pnpm api:generate` writes `src/infrastructure/api/schema.d.ts` from the backend OpenAPI document, and `pnpm api:check` compares it in the CI job contract.
+- `openapi-typescript` — `scripts/contract/api-types.mjs`: `pnpm api:generate` writes `src/infrastructure/api/schema.d.ts` and `src/adapters/api/dto.d.ts` from the backend OpenAPI document, and `pnpm api:check` compares both in the CI job contract.
 - `typescript` — the compiler of the `typecheck` script (`tsc --noEmit`), and the parser with which gate and docs tests read the code, such as `test/gates/state-writes-gate.test.ts` and `test/docs/primitive-types.test.ts`.
 - `vite-plus` — the `defineConfig` of `vite.config.ts`, the `vp` linter and formatter of the `lint`, `format` and `format:check` scripts, the `vp staged` of the pre-commit hook, the `prepare` script that installs the git hooks, and the plugin API of `scripts/lint/hexablock-plugin.mjs`.
