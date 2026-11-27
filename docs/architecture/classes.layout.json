@@ -303,7 +303,19 @@
             "LevelGameFactories",
             "AchievementsView",
             "LevelFile",
-            "MergeStateMapper"
+            "MergeStateMapper",
+            "Compass",
+            "SlideWay",
+            "ScreenWay",
+            "MoveMapper",
+            "LinesMoveMapper",
+            "FitMoveMapper",
+            "SortMoveMapper",
+            "MergeMoveMapper",
+            "LinesIntent",
+            "FitIntent",
+            "SortIntent",
+            "MergeIntent"
           ]
         },
         {
@@ -334,8 +346,6 @@
             "HexLayout",
             "TriangleLayout",
             "SquareLayout",
-            "Compass",
-            "SlideWay",
             "DeliversValues"
           ]
         },
@@ -1025,6 +1035,18 @@
             "InMemoryGameRepository",
             "LevelVariant",
             "MergeStateMapper",
+            "Compass",
+            "SlideWay",
+            "ScreenWay",
+            "MoveMapper",
+            "LinesMoveMapper",
+            "FitMoveMapper",
+            "SortMoveMapper",
+            "MergeMoveMapper",
+            "LinesIntent",
+            "FitIntent",
+            "SortIntent",
+            "MergeIntent",
             "FitStateMapper",
             "LevelGameFactories",
             "LevelFile"
@@ -1044,8 +1066,6 @@
             "TriangleLayout",
             "HexLayout",
             "SquareLayout",
-            "Compass",
-            "SlideWay",
             "DeliversValues"
           ]
         },
