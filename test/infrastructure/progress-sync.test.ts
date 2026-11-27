@@ -136,7 +136,7 @@ async function winFit01(root: CompositionRoot): Promise<void> {
 async function starsOf(root: CompositionRoot, levelId: string): Promise<number | undefined> {
   const levels: LevelSummary[] = valueOf(
     await root.listLevels().execute({ gameId: FIT, figure: TopologyId.hex }),
-  );
+  ).levels;
   const stars = levels.find((summary) => summary.levelId.equals(LevelId.of(levelId)))?.stars;
   return stars === undefined
     ? undefined

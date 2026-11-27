@@ -5,10 +5,13 @@ import type { AccountApi } from '../adapters/api/account-api';
 import { ApiAccountGateway } from '../adapters/api/api-account-gateway';
 import { ApiDtoMapper } from '../adapters/api/api-dto-mapper';
 import { ApiLeaderboardGateway } from '../adapters/api/api-leaderboard-gateway';
+import { ApiLevelRepository } from '../adapters/api/api-level-repository';
 import { ApiProgressGateway } from '../adapters/api/api-progress-gateway';
 import type { LeaderboardApi } from '../adapters/api/leaderboard-api';
+import type { LevelsApi } from '../adapters/api/levels-api';
 import type { ProgressApi } from '../adapters/api/progress-api';
 import { BundledLevelRepository } from '../adapters/bundled-level-repository';
+import { CombinedLevelRepository } from '../adapters/combined-level-repository';
 import { GameEventBus } from '../adapters/game-event-bus';
 import { GamePresenter } from '../adapters/game-presenter';
 import { HomePresenter, type SavedProgresses } from '../adapters/home-presenter';
@@ -36,7 +39,7 @@ import {
   type ListAchievementsRequest,
 } from '../application/list-achievements';
 import type { LevelRepository } from '../application/level-repository';
-import type { LevelSummary } from '../application/level-summary';
+import type { LevelList } from '../application/level-summary';
 import { ListLevels, type ListLevelsRequest } from '../application/list-levels';
 import type { Logger } from '../application/logger';
 import { LoggingAspect } from '../application/logging-aspect';
@@ -92,15 +95,16 @@ export interface GameUseCases<TCell = unknown, TCoord = unknown, TMove = unknown
 // and `DeviceKeyValueStore`, which `CompositionRootProvider` builds (#188).
 // The store stays optional. A root with no store reads no saved progress,
 // so it lists no achievements and loads no progress.
-// `api` is the transport of the auth, the progress and the leaderboard resources of hexablock-api,
-// and `secrets` the secure storage of the session (#45, #46, #47): the app takes `ApiClient` and
-// `DeviceSecretStore`. Both stay optional. A root that lacks one signs no player in, syncs no
-// progress and shows no leaderboard.
+// `api` is the transport of the auth, the progress, the leaderboard and the levels resources of
+// hexablock-api, and `secrets` the secure storage of the session (#45, #46, #47, #48): the app
+// takes `ApiClient` and `DeviceSecretStore`. Both stay optional. A root that lacks one signs no
+// player in, syncs no progress and shows no leaderboard. A root with no `api` plays the bundled
+// levels only.
 export interface RootDrivers {
   readonly clock: Clock;
   readonly logger: Logger;
   readonly store?: KeyValueStore;
-  readonly api?: AccountApi & ProgressApi & LeaderboardApi;
+  readonly api?: AccountApi & ProgressApi & LeaderboardApi & LevelsApi;
   readonly secrets?: SecretStore;
 }
 
@@ -115,7 +119,12 @@ interface AccountUseCases {
 // `CompositionRootProvider`, so `app/` keeps routes only.
 // It builds each driver and adapter once and injects it (single scope, classes.md decision 18):
 // the clock, the random source, the logger, the one id generator of `MatchId`,
-// the event bus and the level repository of the bundled levels.
+// the event bus and the one level repository. With the transport `api` of its drivers, the level
+// repository is a `CombinedLevelRepository` over the bundled levels and one `ApiLevelRepository`
+// (#48, decision 68): every use case of the levels reads the levels of both, and a backend that
+// does not answer leaves the bundled levels. The root starts one refresh of the backend levels
+// when it builds the adapter, and no use case waits for it (D27). With no transport, the level
+// repository is the `BundledLevelRepository` alone.
 // No class has a static `instance()`, so a test passes its own drivers.
 // The game registry maps each `GameId` to its game and the variant factory of that game.
 // The registry pairs each id with its factory in one place, and the root gives that id
@@ -187,7 +196,7 @@ export class CompositionRoot implements ScreenServices {
   private readonly progress: ProgressRepository | undefined;
   private readonly wired = new Map<RegisteredGame, GameUseCases>();
   private readonly achievements: UseCase<ListAchievementsRequest, AchievementSummary[]> | undefined;
-  private readonly levelList: UseCase<ListLevelsRequest, LevelSummary[]> | undefined;
+  private readonly levelList: UseCase<ListLevelsRequest, LevelList> | undefined;
   private readonly texts: Texts = textCatalog[DEFAULT_LANGUAGE];
   private readonly progressLoad: UseCase<LoadProgressRequest, GameProgress | undefined> | undefined;
   private readonly account: AccountUseCases | undefined;
@@ -215,7 +224,7 @@ export class CompositionRoot implements ScreenServices {
       events.subscribe(new AchievementCounterListener(counters, drivers.logger));
     }
     this.events = events;
-    this.levels = new BundledLevelRepository();
+    this.levels = levelRepositoryOf(drivers.api);
     const sessions =
       drivers.secrets === undefined ? undefined : new SessionManager(drivers.secrets);
     const local =
@@ -323,7 +332,7 @@ export class CompositionRoot implements ScreenServices {
   // The level selector lists the levels of one game on one figure with it. Each call gives
   // the same use case. A root with no local store does not offer it, so it throws a RangeError,
   // as for a board figure that it does not offer.
-  listLevels(): UseCase<ListLevelsRequest, LevelSummary[]> {
+  listLevels(): UseCase<ListLevelsRequest, LevelList> {
     if (this.levelList === undefined) {
       throw new RangeError('The root has no local store, so it lists no levels.');
     }
@@ -556,4 +565,16 @@ function leaderboardUseCases(
     global: decorate(new GetGlobalLeaderboard(session, gateway), 'GetGlobalLeaderboard'),
     level: decorate(new GetLevelLeaderboard(session, gateway), 'GetLevelLeaderboard'),
   };
+}
+
+// The one level repository of the root (#48). With the transport `api`, it joins the bundled
+// levels and the levels of the backend, and it starts the first refresh of the backend levels.
+// The refresh never rejects, and no caller waits for it. With no transport, it gives the bundled
+// levels.
+function levelRepositoryOf(api: LevelsApi | undefined): LevelRepository {
+  const bundled = new BundledLevelRepository();
+  if (api === undefined) return bundled;
+  const backend = new ApiLevelRepository(api);
+  void backend.refresh();
+  return new CombinedLevelRepository(bundled, backend);
 }

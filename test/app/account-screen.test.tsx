@@ -3,7 +3,12 @@ import path from 'node:path';
 import { fireEvent, renderRouter, screen } from 'expo-router/testing-library';
 
 import type { FakeRoutes } from '../support/fake-backend';
-import { fakeFetch, useFakeFetch, type FakeFetch } from '../support/fake-fetch';
+import {
+  fakeFetch,
+  requestsBesideLevels,
+  useFakeFetch,
+  type FakeFetch,
+} from '../support/fake-fetch';
 import { repoRoot } from '../support/run-tool';
 
 // The routes of `app/`, with the root layout and its composition root.
@@ -67,11 +72,11 @@ describe('account route', () => {
     await send('Iniciar sesión', 'correct horse battery');
 
     expect(await screen.findByText('Sesión iniciada como ada')).toBeOnTheScreen();
-    expect(backend.requests.map(({ method, url }) => `${method} ${url}`)).toEqual([
+    expect(requestsBesideLevels(backend).map(({ method, url }) => `${method} ${url}`)).toEqual([
       'POST /v1/auth/login',
       'GET /v1/auth/me',
     ]);
-    expect(backend.requests[1]?.headers.authorization).toBe(`Bearer ${TOKEN}`);
+    expect(requestsBesideLevels(backend)[1]?.headers.authorization).toBe(`Bearer ${TOKEN}`);
   });
 
   // The sign-up creates the account, and the sign-in after it fails.

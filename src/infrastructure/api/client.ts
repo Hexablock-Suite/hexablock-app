@@ -4,17 +4,24 @@ import type { AccountApi } from '../../adapters/api/account-api';
 import { ApiFailure } from '../../adapters/api/api-failure';
 import type { HealthApi } from '../../adapters/api/health-api';
 import type { LeaderboardApi } from '../../adapters/api/leaderboard-api';
+import type { LevelsApi } from '../../adapters/api/levels-api';
 import type { ProgressApi } from '../../adapters/api/progress-api';
 import type { paths } from './schema';
 
 // The driver of the transport interfaces of layer 3 (classes.md decision 22, option A3).
 // Each interface of `src/adapters/api/` covers one resource of hexablock-api.
-export type ApiClient = HealthApi & AccountApi & ProgressApi & LeaderboardApi;
+export type ApiClient = HealthApi & AccountApi & ProgressApi & LeaderboardApi & LevelsApi;
+
+// The longest wait for the answer of `GET /v1/levels`, in milliseconds (#48).
+// `fetch` of React Native can wait with no end, so the client stops the request after it.
+// No screen waits for this request: `ApiLevelRepository` answers from its last good answer.
+export const LEVELS_TIMEOUT_MS = 5000;
 
 // HTTP client for hexablock-api. The types come from the backend OpenAPI document.
-// A call of `AccountApi`, `ProgressApi` or `LeaderboardApi` that the backend does not answer with
-// success rejects with an `ApiFailure` with the status of the answer (#45, #46, #47). A call that gets no answer rejects with an
-// `ApiFailure` with no status. The message of a failure names the call, never a body or a token.
+// A call of `AccountApi`, `ProgressApi`, `LeaderboardApi` or `LevelsApi` that the backend does not
+// answer with success rejects with an `ApiFailure` with the status of the answer (#45, #46, #47,
+// #48). A call that gets no answer rejects with an `ApiFailure` with no status. The message of a
+// failure names the call, never a body or a token.
 export function createApiClient(baseUrl: string): ApiClient {
   const client = createClient<paths>({ baseUrl });
 
@@ -91,6 +98,24 @@ export function createApiClient(baseUrl: string): ApiClient {
         throw failureOf(response, 'GET /v1/leaderboard/{gameId}/levels/{levelId}');
       }
       return data;
+    },
+
+    // The stored levels (#48, #307). The route has no guard, so the request sends no token.
+    // The client aborts the request after `LEVELS_TIMEOUT_MS`, and the call rejects as a call
+    // with no answer. The timer stops when the request ends.
+    async getLevels() {
+      const abort = new AbortController();
+      const timer = setTimeout(() => abort.abort(), LEVELS_TIMEOUT_MS);
+      try {
+        const { data, response } = await client.GET('/v1/levels', {
+          signal: abort.signal,
+          fetch: answerOrFail,
+        });
+        if (!response.ok || data === undefined) throw failureOf(response, 'GET /v1/levels');
+        return data;
+      } finally {
+        clearTimeout(timer);
+      }
     },
   };
 }

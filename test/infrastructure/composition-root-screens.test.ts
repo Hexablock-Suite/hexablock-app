@@ -3,6 +3,7 @@ import { AccountPresenter } from '../../src/adapters/account-presenter';
 import { AchievementsPresenter } from '../../src/adapters/achievements-presenter';
 import type { AccountApi } from '../../src/adapters/api/account-api';
 import type { LeaderboardApi } from '../../src/adapters/api/leaderboard-api';
+import type { LevelsApi } from '../../src/adapters/api/levels-api';
 import type { ProgressApi } from '../../src/adapters/api/progress-api';
 import { SessionManager } from '../../src/adapters/session-manager';
 import { GamePresenter } from '../../src/adapters/game-presenter';
@@ -36,10 +37,11 @@ const LINES = GameId.of('hexa-lines');
 const FIT = GameId.of('hexa-fit');
 const ADA = '0b6f6a4e-1c2d-4e5f-8a9b-0c1d2e3f4a5b';
 
-// The boards of a backend that holds no result.
-const NO_BOARDS: LeaderboardApi = {
+// The boards and the levels of a backend that holds no result and no level.
+const NO_BOARDS: LeaderboardApi & LevelsApi = {
   globalLeaderboard: (_token, gameId) => Promise.resolve({ gameId, highScores: [], standings: [] }),
   levelLeaderboard: (_token, gameId, levelId) => Promise.resolve({ gameId, levelId, entries: [] }),
+  getLevels: () => Promise.resolve({ levels: [] }),
 };
 
 // A root over an in-memory store. The hooks see it only as `ScreenServices`.
@@ -124,7 +126,7 @@ describe('CompositionRoot screens', () => {
   it('should_build_an_account_presenter_that_keeps_the_session_when_the_root_has_a_backend_and_a_secure_store', async () => {
     const secrets = new InMemorySecretStore();
     const logger = new RecordingLogger();
-    const api: AccountApi & ProgressApi & LeaderboardApi = {
+    const api: AccountApi & ProgressApi & LeaderboardApi & LevelsApi = {
       ...NO_BOARDS,
       signUp: () => Promise.resolve(),
       signIn: () => Promise.resolve({ accessToken: 'token-of-ada' }),
@@ -163,7 +165,8 @@ describe('CompositionRoot screens', () => {
     const logger = new RecordingLogger();
     const calls: string[] = [];
     const row = { rank: 1, userId: ADA, username: 'ada' };
-    const api: AccountApi & ProgressApi & LeaderboardApi = {
+    const api: AccountApi & ProgressApi & LeaderboardApi & LevelsApi = {
+      getLevels: () => Promise.resolve({ levels: [] }),
       signUp: () => Promise.resolve(),
       signIn: () => Promise.resolve({ accessToken: 'token-of-ada' }),
       currentUser: () => Promise.resolve({ userId: ADA }),
@@ -222,7 +225,7 @@ describe('CompositionRoot screens', () => {
     const noSecrets: ScreenServices = new CompositionRoot({
       clock: new ManualClock(),
       logger: new RecordingLogger(),
-      api: { ...NO_BOARDS } as AccountApi & ProgressApi & LeaderboardApi,
+      api: { ...NO_BOARDS } as AccountApi & ProgressApi & LeaderboardApi & LevelsApi,
     });
     const reason = new RangeError(
       'The root has no backend or no secure store, so it shows no leaderboard.',
