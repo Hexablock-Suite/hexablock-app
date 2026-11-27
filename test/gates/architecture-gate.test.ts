@@ -121,6 +121,24 @@ describe('architecture gate (dependency-cruiser)', () => {
     expect(result.output).toContain('ui-no-variants');
   });
 
+  // Issue #406: each event of a variant records its own count through `CountsForAchievements`.
+  // So the achievement listener of layer 3 imports no variant.
+  it('should_fail_arch_when_the_achievement_listener_imports_a_variant', () => {
+    const result = cruise('listener-imports-variant');
+
+    expect(result.status).not.toBe(0);
+    expect(result.output).toContain('achievement-listener-no-variants');
+  });
+
+  // Issue #407: each variant folder holds its own level function. So `LevelGameFactories`
+  // of layer 3 imports no variant.
+  it('should_fail_arch_when_level_game_factories_imports_a_variant', () => {
+    const result = cruise('level-factories-import-variant');
+
+    expect(result.status).not.toBe(0);
+    expect(result.output).toContain('level-game-factories-no-variants');
+  });
+
   // Issue #411: a hook or a route reads the closed interface of the screens, never the whole
   // composition root. Only the provider of the root imports it.
   it('should_fail_arch_when_a_module_other_than_the_root_provider_imports_the_composition_root', () => {

@@ -16,7 +16,8 @@ export class LinesScoring<TCoord> implements IScoringPolicy<LinesState<TCoord>> 
   }
 
   // The points of the lines that the last placement cleared, before any multiplier.
-  lineBonus(after: LinesSnapshot<TCoord>): Score {
+  // Only `score()` reads it, so it is private (issue #427).
+  private lineBonus(after: LinesSnapshot<TCoord>): Score {
     return after.lastCombo().bonus();
   }
 }

@@ -3,7 +3,7 @@ import type { IScoringPolicy } from '../../engine/scoring-policy';
 import type { FitSnapshot, FitState } from './fit-state';
 
 // The points of one Fit turn. The accepted rule of issue #59 (D22, 2026-11-06):
-// Fit has no score per turn. Its result is the stars (`fitStars`).
+// Fit has no score per turn. Its result is the stars (`starsOf` with Fit thresholds).
 // The points are a `Score` (issue #232), so no number crosses the signature of the file.
 export const FIT_POINTS_PER_TURN = Score.of(0);
 

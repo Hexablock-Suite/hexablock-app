@@ -99,6 +99,22 @@ module.exports = {
       to: { path: layer('domain/variants') },
     },
     {
+      name: 'achievement-listener-no-variants',
+      comment:
+        'Each event of a variant records its own count through CountsForAchievements, so the achievement listener of layer 3 imports no variant (issue #406).',
+      severity: 'error',
+      from: { path: '(?:^|/)src/adapters/achievement-counter-listener\\.ts$' },
+      to: { path: layer('domain/variants') },
+    },
+    {
+      name: 'level-game-factories-no-variants',
+      comment:
+        'Each variant folder holds its own level function, so LevelGameFactories of layer 3 imports no variant (issue #407).',
+      severity: 'error',
+      from: { path: '(?:^|/)src/adapters/level-game-factories\\.ts$' },
+      to: { path: layer('domain/variants') },
+    },
+    {
       name: 'adapters-imports-only-inner-layers',
       comment:
         'Adapter code imports only domain, application and adapter code: no driver, package or Node module.',

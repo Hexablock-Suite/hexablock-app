@@ -1,41 +1,36 @@
 import type { AchievementCounterRepository } from '../application/achievement-counter-repository';
 import type { Logger } from '../application/logger';
 import { caughtError, FailureCode } from '../application/result';
-import { AchievementCount } from '../domain/achievements/achievement-count';
 import { AchievementCounters } from '../domain/achievements/achievement-counters';
+import {
+  countsForAchievements,
+  type CountsForAchievements,
+} from '../domain/achievements/counts-for-achievements';
 import type { GameEvent } from '../domain/engine/game-events';
 import type { GameId } from '../domain/shared/game-id';
-import { LinesCleared } from '../domain/variants/hexa-lines/lines-cleared';
-import { MergeTile } from '../domain/variants/hexa-merge/merge-tile';
-import { TileMerged } from '../domain/variants/hexa-merge/tile-merged';
-import { StackCleared } from '../domain/variants/hexa-sort/stack-cleared';
 import type { GameEventListener } from './game-event-listener';
-import { valueOf } from './saved-json';
-
-// One change of the counters of a game that one event asks for.
-type Step = (counters: AchievementCounters) => void;
-
-const ONE_GOAL = AchievementCount.of(1);
 
 // The first listener of `GameEventBus` (issue #362, part 2 of #277). It hears the events of
 // a move of #361 and saves the counters of the achievements of each game through the
 // `AchievementCounterRepository` port (issue #363, part 3 of #277). The goals of #364 read them.
-// - `LinesCleared`: the count of lines of the placement is a best count, the most lines at once.
-// - `TileMerged`: the value of the new tile is a best count, the highest tile.
-// - `StackCleared`: one goal of Hexa Sort, added to the total.
-// It ignores every other event, `GameOver` included. It tells one event from another by its
-// class, and it receives the data of each event through `deliverTo()`, as a listener of the
-// edge (rule R-no-delivery-call). The engine names no variant, so this listener of layer 3 is the
-// one place that maps the event of a variant to a generic count of `AchievementCounters`.
+// Each event that counts for the achievements implements `CountsForAchievements` of the domain
+// and records its own count (issue #406, classes.md decision 60). So the listener names no
+// event class and imports no variant (rule `achievement-listener-no-variants`):
+// - `LinesCleared` keeps its count of lines as a best count, the most lines at once.
+// - `TileMerged` keeps the value of its tile as a best count, the highest tile.
+// - `StackCleared` adds one goal of Hexa Sort to the total.
+// It ignores every other event, `GameOver` included. It receives the game id of an event through
+// `deliverTo()`, as a listener of the edge (rule R-no-delivery-call).
 // An undo takes no count back, because an event is a fact that happened (decision 26).
 // The bus calls `onEvent()` and waits for nothing, but the port saves asynchronously. So each
-// event queues one save: it loads the counters of its game, or starts them, changes them and
-// saves them. A save starts only after the save before it ends, so two events of one move never
-// overwrite each other. A save that fails, for example over a saved text that the repository
-// cannot read, writes nothing, and the saves after it still run. The listener reports each failed
-// save at once through the `Logger` port of layer 2 (issue #384). The entry names this listener
-// and holds a `save-failed` `UseCaseError` with the thrown value as its `cause`. The listener
-// keeps no failure. A logger that throws stops no save. `saved()` waits for every queued save.
+// event queues one save: it loads the counters of its game, or starts them, lets the event record
+// its count in them and saves them. A save starts only after the save before it ends, so two
+// events of one move never overwrite each other. A save that fails, for example over a saved text
+// that the repository cannot read, writes nothing, and the saves after it still run. The listener
+// reports each failed save at once through the `Logger` port of layer 2 (issue #384). The entry
+// names this listener and holds a `save-failed` `UseCaseError` with the thrown value as its
+// `cause`. The listener keeps no failure. A logger that throws stops no save. `saved()` waits
+// for every queued save.
 export class AchievementCounterListener implements GameEventListener {
   private queue: Promise<void> = Promise.resolve();
 
@@ -45,27 +40,8 @@ export class AchievementCounterListener implements GameEventListener {
   ) {}
 
   onEvent(event: GameEvent): void {
-    if (event instanceof LinesCleared) {
-      event.deliverTo({
-        receive: (gameId, _matchId, lines) =>
-          this.enqueue(gameId, (counters) =>
-            counters.recordBest(AchievementCount.of(valueOf(lines))),
-          ),
-      });
-    } else if (event instanceof TileMerged) {
-      event.deliverTo({
-        receive: (gameId, _matchId, tile) => {
-          if (!(tile instanceof MergeTile)) return;
-          this.enqueue(gameId, (counters) =>
-            counters.recordBest(AchievementCount.of(valueOf(tile))),
-          );
-        },
-      });
-    } else if (event instanceof StackCleared) {
-      event.deliverTo({
-        receive: (gameId) => this.enqueue(gameId, (counters) => counters.addToTotal(ONE_GOAL)),
-      });
-    }
+    if (!countsForAchievements(event)) return;
+    event.deliverTo({ receive: (gameId) => this.enqueue(gameId, event) });
   }
 
   // Waits for every save that the events heard so far queued. It never throws: the logger
@@ -74,10 +50,10 @@ export class AchievementCounterListener implements GameEventListener {
     await this.queue;
   }
 
-  // Queues the save of `step` on the counters of the game `gameId`.
-  private enqueue(gameId: GameId, step: Step): void {
+  // Queues the save of the count of `event` in the counters of the game `gameId`.
+  private enqueue(gameId: GameId, event: CountsForAchievements): void {
     this.queue = this.queue
-      .then(() => this.save(gameId, step))
+      .then(() => this.save(gameId, event))
       .catch((failure: unknown) => this.report(failure));
   }
 
@@ -95,9 +71,9 @@ export class AchievementCounterListener implements GameEventListener {
     }
   }
 
-  private async save(gameId: GameId, step: Step): Promise<void> {
+  private async save(gameId: GameId, event: CountsForAchievements): Promise<void> {
     const counters = (await this.counters.load(gameId)) ?? AchievementCounters.start(gameId);
-    step(counters);
+    event.recordIn(counters);
     await this.counters.save(counters);
   }
 }

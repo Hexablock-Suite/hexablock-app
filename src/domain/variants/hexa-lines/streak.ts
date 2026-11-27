@@ -1,5 +1,5 @@
-import type { Score } from '../../shared/score';
-import { LineCount } from './line-count';
+import { ComboFactor } from './combo-factor';
+import type { LineCount } from './line-count';
 
 // The streak of Hexa Lines: the count of placements in a row that cleared at least one line
 // (statement §1.1, the proposal on issue 58, issue #232).
@@ -32,10 +32,12 @@ export class Streak {
     return lines.isNone() ? Streak.of(0) : Streak.of(this.value + 1);
   }
 
-  // The points that the combo multiplier of this streak and `lines` adds to the line bonus
-  // (issue #59, D22). The multiplier adds the streak to the count of lines (`lines + streak - 1`),
-  // so the streak gives its length to `LineCount` as a count of the same kind.
-  comboBonus(lines: LineCount): Score {
-    return lines.comboBonus(LineCount.of(this.value));
+  // The combo factor of a placement that cleared `lines` in this streak (issue #59, D22):
+  // `lines + streak - 1`. The lines give the factor of their combo in a streak of 1,
+  // and the streak gives the factor of one line in it, its length (issue #427).
+  // A placement that clears no line in a streak of 0 gives -1, so it throws a RangeError.
+  // `ComboMultiplierDecorator` asks only for a placement that clears a line.
+  comboFactor(lines: LineCount): ComboFactor {
+    return lines.comboFactor().inStreak(ComboFactor.of(this.value));
   }
 }

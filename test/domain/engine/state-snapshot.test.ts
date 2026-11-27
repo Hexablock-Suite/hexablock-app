@@ -36,6 +36,7 @@ import {
 } from '../../support/variants/hexa-merge/merge-game';
 import {
   row,
+  placeFrom,
   sortFactory,
   sortState,
   stack,
@@ -80,25 +81,26 @@ describe('the photo of a state', () => {
 
   it('should_hold_the_sort_data_in_a_frozen_photo_when_a_sort_state_takes_its_snapshot', () => {
     const state = sortState({ board: row(2), offered: [stack('red'), stack('blue')] });
-    state.placeOfferedStack(square(1, 0));
+    state.placeStack(placeFrom(0, 1));
 
     const photo = state.snapshot();
 
     expect(Object.isFrozen(photo)).toBe(true);
     expect(Object.isFrozen(photo.clearedStackHeights())).toBe(true);
+    expect(Object.isFrozen(photo.trayStacks())).toBe(true);
     expect(
       json([
-        photo.offeredStack(),
+        photo.trayStacks(),
         photo.goalsReached(),
         photo.clearedStackHeights(),
         photo.lastPlacedAt(),
       ]),
-    ).toBe(json([state.snapshot().offeredStack(), ClearedStacks.of(0), [], square(1, 0)]));
+    ).toBe(json([state.snapshot().trayStacks(), ClearedStacks.of(0), [], square(1, 0)]));
     expect(photo.goalsReached()).toBeInstanceOf(ClearedStacks);
     expect(photo.goal().isReachedBy(ClearedStacks.of(5))).toBe(true);
     expect(json(sortViewData(photo.view()))).toBe(
       json({
-        offered: photo.offeredStack(),
+        tray: photo.trayStacks(),
         goalsDone: ClearedStacks.of(0),
         goalsNeeded: photo.goal(),
       }),
@@ -200,10 +202,15 @@ describe('the restore of a state from its photo', () => {
     expect(json(back.pieceSource().take()[0])).toBe(json(photo.pieceSource().take()[0]));
   });
 
-  it('should_give_back_the_offered_stack_and_the_source_when_sort_restores', () => {
-    const state = sortFactory().createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
+  it('should_give_back_the_tray_and_the_source_when_sort_restores', () => {
+    const state = sortFactory([
+      stack('red'),
+      stack('blue'),
+      stack('green'),
+      stack('yellow'),
+    ]).createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
     const photo = state.snapshot();
-    state.placeOfferedStack(square(0, 0));
+    state.placeStack(placeFrom(0, 0, 0));
     state.addPoints(Score.of(4));
 
     state.restore(photo);
@@ -213,14 +220,14 @@ describe('the restore of a state from its photo', () => {
       json([
         back.boardCopy().occupiedCells(),
         back.scoreSoFar(),
-        back.offeredStack(),
+        back.trayStacks(),
         back.goalsReached(),
       ]),
     ).toBe(
       json([
         photo.boardCopy().occupiedCells(),
         photo.scoreSoFar(),
-        photo.offeredStack(),
+        photo.trayStacks(),
         photo.goalsReached(),
       ]),
     );
@@ -278,18 +285,28 @@ describe('the restore of a state from its photo', () => {
     expect(refill()).toBe(first);
   });
 
-  it('should_offer_the_same_stack_again_when_sort_draws_and_then_restores_its_photo', () => {
-    const state = sortFactory().createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
+  // The tray refills when its three slots are empty (#353), so the third placement draws.
+  it('should_offer_the_same_stacks_again_when_sort_draws_and_then_restores_its_photo', () => {
+    const state = sortFactory([
+      stack('red'),
+      stack('blue'),
+      stack('green'),
+      stack('yellow'),
+    ]).createInitialState(MATCH_ID, OTHER_STATE, BOARD_ID);
     const photo = state.snapshot();
-    state.placeOfferedStack(square(0, 0));
-    const first = json(state.snapshot().offeredStack());
-    expect(first).not.toBe(json(photo.offeredStack()));
+    const refill = () => {
+      state.placeStack(placeFrom(0, 0, 0));
+      state.placeStack(placeFrom(1, 1, 0));
+      state.placeStack(placeFrom(2, 0, 1));
+      return json(state.snapshot().trayStacks());
+    };
+    const first = refill();
+    expect(first).not.toBe(json(photo.trayStacks()));
 
     state.restore(photo);
 
     expect(state.snapshot().pieceSource() === photo.pieceSource()).toBe(true);
-    state.placeOfferedStack(square(0, 0));
-    expect(json(state.snapshot().offeredStack())).toBe(first);
+    expect(refill()).toBe(first);
   });
 
   it('should_add_the_same_tile_again_when_merge_draws_and_then_restores_its_photo', () => {
@@ -354,7 +371,7 @@ describe('the restore of a state from its photo', () => {
     const stranger = sortFactory()
       .createInitialState(MATCH_ID, GameStateId.of(MatchId.of('stranger')), BOARD_ID)
       .snapshot();
-    state.placeOfferedStack(square(0, 0));
+    state.placeStack(placeFrom(0, 0, 0));
     const before = json(state.snapshot().boardCopy().occupiedCells());
 
     expect(() => state.restore(stranger)).toThrow(
@@ -368,7 +385,7 @@ describe('the restore of a state from its photo', () => {
     const other = sortFactory()
       .createInitialState(MATCH_ID, OTHER_STATE, BoardId.of(MatchId.of('another-match')))
       .snapshot();
-    state.placeOfferedStack(square(0, 0));
+    state.placeStack(placeFrom(0, 0, 0));
     const before = json(state.snapshot().boardCopy().occupiedCells());
 
     expect(() => state.restore(other)).toThrow(new RangeError('The snapshot holds another board.'));
@@ -383,7 +400,7 @@ describe('the photo outside the state', () => {
     const members = photo as unknown as Record<string, unknown>;
 
     expect(Object.isFrozen(photo)).toBe(true);
-    for (const method of ['addPoints', 'clone', 'restore', 'placeOfferedStack', 'equals']) {
+    for (const method of ['addPoints', 'clone', 'restore', 'placeStack', 'equals']) {
       expect(members[method]).toBeUndefined();
     }
   });
@@ -409,7 +426,7 @@ describe('the photo outside the state', () => {
       offered: [stack('red')],
     });
     const sortBefore = sort.snapshot();
-    sort.placeOfferedStack(square(1, 0));
+    sort.placeStack(placeFrom(0, 1));
     sort.moveRun(square(1, 0), square(0, 0));
     sort.clearStack(square(0, 0));
 
@@ -513,8 +530,8 @@ describe('the fields of a photo and of a view', () => {
       () => fit.view().remaining,
       // @ts-expect-error `FitView.placed` is private.
       () => fit.view().placed,
-      // @ts-expect-error `SortSnapshot.offered` is private.
-      () => sort.offered,
+      // @ts-expect-error `SortSnapshot.tray` is private.
+      () => sort.tray,
       // @ts-expect-error `SortSnapshot.goalsDone` is private.
       () => sort.goalsDone,
       // @ts-expect-error `SortSnapshot.goalsNeeded` is private.
@@ -525,8 +542,8 @@ describe('the fields of a photo and of a view', () => {
       () => sort.placedAt,
       // @ts-expect-error `SortSnapshot.source` is private.
       () => sort.source,
-      // @ts-expect-error `SortView.offered` is private.
-      () => sort.view().offered,
+      // @ts-expect-error `SortView.tray` is private.
+      () => sort.view().tray,
       // @ts-expect-error `SortView.goalsDone` is private.
       () => sort.view().goalsDone,
       // @ts-expect-error `SortView.goalsNeeded` is private.
@@ -580,8 +597,8 @@ describe('the fields of a state', () => {
       () => sort.source.take(),
       // @ts-expect-error `SortState.goalsNeeded` is private.
       () => sort.goalsNeeded,
-      // @ts-expect-error `SortState.offered` is private.
-      () => sort.offered,
+      // @ts-expect-error `SortState.tray` is private.
+      () => sort.tray,
       // @ts-expect-error `SortState.goalsDone` is private.
       () => sort.goalsDone,
       // @ts-expect-error `SortState.clearedTiles` is private.

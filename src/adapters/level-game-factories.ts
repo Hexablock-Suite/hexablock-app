@@ -1,42 +1,16 @@
 import type { GameFactories } from '../application/game-factories';
 import type { LevelRepository } from '../application/level-repository';
 import type { BoardState } from '../domain/engine/board-state';
-import type { Clock } from '../domain/engine/clock';
 import type { Cloneable } from '../domain/engine/cloneable';
 import { GameFactory } from '../domain/engine/game-factory';
+import type { LevelVariant } from '../domain/engine/level-variant';
 import type { GameId } from '../domain/shared/game-id';
-import type { GeometryFactory } from '../domain/engine/geometry-factory';
-import type { LevelDefinition } from '../domain/progress/level-definition';
 import type { LevelId } from '../domain/progress/level-id';
 import type { MatchIdGenerator } from '../domain/engine/match-id-generator';
 import type { IProgressModel } from '../domain/progress/progress-model';
-import type { RandomSource } from '../domain/engine/random-source';
 import type { IVariantFactory } from '../domain/engine/variant-factory';
-import { FitFactory } from '../domain/variants/hexa-fit/fit-factory';
-import { FitLevelBuilder } from '../domain/variants/hexa-fit/fit-level-builder';
-import type { FitMove } from '../domain/variants/hexa-fit/fit-move';
-import type { FitState } from '../domain/variants/hexa-fit/fit-state';
-import type { PieceId } from '../domain/variants/hexa-fit/piece-id';
-import type { ColorStack } from '../domain/variants/hexa-sort/color-stack';
-import type { PlaceStack } from '../domain/variants/hexa-sort/place-stack';
-import { SortFactory } from '../domain/variants/hexa-sort/sort-factory';
-import { SortLevelBuilder } from '../domain/variants/hexa-sort/sort-level-builder';
-import type { SortState } from '../domain/variants/hexa-sort/sort-state';
 
 const NO_LEVEL = 'The game has no level with this id.';
-
-// The part of a variant with levels that turns one level into a variant factory (issue #172).
-// `factoryOf()` gives the definition the level builder of the variant: the definition directs
-// the builder (classes.md decision 15), and the variant factory takes the built level.
-// The builder refuses a level of another figure (S3-08 in #151).
-export interface LevelVariant<
-  TCell,
-  TCoord,
-  TMove,
-  TState extends BoardState<TCell, TCoord> & Cloneable<TState>,
-> {
-  factoryOf(definition: LevelDefinition): IVariantFactory<TCell, TCoord, TMove, TState, unknown>;
-}
 
 // Adapter of the `GameFactories` port of layer 2 (S3-13 in #151, option D, issue #172).
 // It gives `StartGame` the `GameFactory` of one game.
@@ -54,8 +28,9 @@ export interface LevelVariant<
 // `progressModelFor()` gives the progress model of the same variant factory: a level counts
 // its stars with its own star rule, so the composition root builds `SaveProgress` with the
 // model of the level of the finished game (#180).
-// This file is the code of layer 3 that knows the variants with levels:
-// `fitLevelVariant()` and `sortLevelVariant()` pair each level builder with its variant factory.
+// It names no variant (rule `level-game-factories-no-variants`, issue #407): `LevelVariant`
+// lives in the engine, and each variant folder holds its own level function, which pairs its
+// level builder with its variant factory.
 export class LevelGameFactories<
   TCell,
   TCoord,
@@ -96,29 +71,4 @@ export class LevelGameFactories<
     if (definition === undefined) throw new RangeError(NO_LEVEL, { cause: levelId });
     return levelVariant.factoryOf(definition);
   }
-}
-
-// The levels of Hexa Fit on the geometry `geometry`. `FitLevelBuilder` builds each level,
-// and `FitFactory` takes it with the clock of its level timer (classes.md decision 19).
-export function fitLevelVariant<TCoord>(
-  geometry: GeometryFactory<TCoord>,
-  clock: Clock,
-): LevelVariant<PieceId, TCoord, FitMove<TCoord>, FitState<TCoord>> {
-  return {
-    factoryOf: (definition) =>
-      new FitFactory(geometry, definition.buildWith(new FitLevelBuilder(geometry)), clock),
-  };
-}
-
-// The levels of Hexa Sort on the geometry `geometry`. `SortLevelBuilder` builds each level,
-// and `SortFactory` takes it with the random source `random`. A level file names its seed
-// or its stacks, so its games draw nothing from `random` (issue #417).
-export function sortLevelVariant<TCoord>(
-  geometry: GeometryFactory<TCoord>,
-  random: RandomSource,
-): LevelVariant<ColorStack, TCoord, PlaceStack<TCoord>, SortState<TCoord>> {
-  return {
-    factoryOf: (definition) =>
-      new SortFactory(geometry, definition.buildWith(new SortLevelBuilder(geometry)), random),
-  };
 }

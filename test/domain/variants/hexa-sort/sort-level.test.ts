@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { Color } from '../../../../src/domain/engine/color';
 import { ElapsedTime } from '../../../../src/domain/shared/elapsed-time';
-import type { ILevelStars } from '../../../../src/domain/progress/level-progress';
+import type { IStarsByMoves } from '../../../../src/domain/progress/level-progress';
 import { Moves } from '../../../../src/domain/shared/moves';
 import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
@@ -24,6 +24,10 @@ const GOAL = GoalCount.of(3);
 const red = Color.of('red');
 const blue = Color.of('blue');
 const green = Color.of('green');
+
+// True when a drawn stack holds 2 to 6 tiles, and each one is red (issue #352).
+const onlyRed = (tiles: readonly string[]) =>
+  tiles.length >= 2 && tiles.length <= 6 && tiles.every((tile) => tile === 'red');
 
 function fixed(...stacks: ColorStack[]): SortLevel {
   return SortLevel.fixed(SIZE, GOAL, stacks);
@@ -112,7 +116,7 @@ describe('SortLevel', () => {
       const level = SortLevel.seeded(SIZE, GOAL, Seed.of(seed), [red]);
 
       expect(level.equals(SortLevel.seeded(SIZE, GOAL, Seed.of(seed), [red]))).toBe(true);
-      expect(firstStacks(level, 2)).toEqual([['red'], ['red']]);
+      expect(firstStacks(level, 2).map(onlyRed)).toEqual([true, true]);
     }
   });
 
@@ -150,33 +154,46 @@ describe('SortLevel', () => {
 
     expect(firstStacks(level, 5)).toEqual([['red']]);
     expect(level.equals(fixed(stack('red')))).toBe(true);
-    expect(firstStacks(seeded, 3)).toEqual([['red'], ['red'], ['red']]);
+    expect(firstStacks(seeded, 3).map(onlyRed)).toEqual([true, true, true]);
     expect(seeded.equals(SortLevel.seeded(SIZE, GOAL, Seed.of(7), [red]))).toBe(true);
   });
 
   // A Sort level holds the thresholds of its stars and counts the stars of a play by its moves
-  // (D22, classes.md decision 36, issue #156). `LevelProgress` asks it through `ILevelStars`.
+  // (D22, classes.md decision 36, issue #156). `LevelProgress` asks it through `IStarsByMoves`.
   it('should_count_the_leading_thresholds_that_the_moves_meet_when_the_level_has_thresholds', () => {
     const thresholds = [SortStarThreshold.of(Moves.of(20)), SortStarThreshold.of(Moves.of(10))];
-    const levels: ILevelStars[] = [
+    const levels: IStarsByMoves[] = [
       fixed(stack('red')).withStars(thresholds),
       SortLevel.seeded(SIZE, GOAL, Seed.of(7), [red]).withStars(thresholds),
     ];
     thresholds.push(SortStarThreshold.of(Moves.of(1)));
 
     for (const level of levels) {
-      expect(level.starsFor(Moves.of(10), undefined).equals(Stars.of(2))).toBe(true);
-      expect(level.starsFor(Moves.of(15), undefined).equals(Stars.of(1))).toBe(true);
-      expect(level.starsFor(Moves.of(21), undefined).equals(Stars.of(0))).toBe(true);
-      // A Sort level has no timer, so a time changes no star.
-      expect(level.starsFor(Moves.of(10), ElapsedTime.ofMs(99_000)).equals(Stars.of(2))).toBe(true);
+      expect(level.starsFor(Moves.of(10)).equals(Stars.of(2))).toBe(true);
+      expect(level.starsFor(Moves.of(15)).equals(Stars.of(1))).toBe(true);
+      expect(level.starsFor(Moves.of(21)).equals(Stars.of(0))).toBe(true);
     }
+  });
+
+  // A Sort level has no timer, so it takes no time (issue #424).
+  // A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails
+  // when the line compiles, because then the directive is unused.
+  it('should_reject_at_compile_time_when_a_caller_gives_a_sort_level_the_time_of_a_play', () => {
+    const level = fixed(stack('red')).withStars([SortStarThreshold.of(Moves.of(10))]);
+    const counts = [
+      // @ts-expect-error A Sort level counts its stars by the moves only.
+      () => level.starsFor(Moves.of(10), ElapsedTime.ofMs(99_000)),
+      // @ts-expect-error A Sort level counts its stars by the moves only.
+      () => level.starsFor(Moves.of(10), undefined),
+    ];
+
+    expect(counts).toHaveLength(2);
   });
 
   // A factory method gives a level with no threshold. `SortLevelBuilder` gives a level
   // the thresholds of its file with `withStars()` (#167).
   it('should_give_no_star_when_the_level_holds_no_threshold', () => {
-    expect(fixed(stack('red')).starsFor(Moves.of(0), undefined).equals(Stars.of(0))).toBe(true);
+    expect(fixed(stack('red')).starsFor(Moves.of(0)).equals(Stars.of(0))).toBe(true);
   });
 
   it('should_not_be_equal_when_two_levels_hold_other_star_thresholds', () => {
@@ -205,18 +222,18 @@ describe('SortLevel', () => {
     expect(level.equals(fixed(stack('red')))).toBe(true);
   });
 
-  it('should_draw_one_tile_of_a_level_color_when_a_seeded_level_gives_a_stack', () => {
+  // APP-NFR-07 and issue #352: the seed fixes every part of each drawn stack.
+  it('should_draw_the_same_stacks_twice_when_two_sources_of_a_seeded_level_start_from_one_seed', () => {
     const level = SortLevel.seeded(SIZE, GOAL, Seed.of(42), [red, blue, green]);
 
     const stacks = firstStacks(level, 30);
 
     expect(stacks).toHaveLength(30);
     for (const tiles of stacks) {
-      expect(tiles).toHaveLength(1);
-      expect(['red', 'blue', 'green']).toContain(tiles[0]);
+      expect(tiles.every((tile) => ['red', 'blue', 'green'].includes(tile))).toBe(true);
     }
     // The seed fixes the sequence, and a sequence of 30 draws holds each color.
-    expect(new Set(stacks.map((tiles) => tiles[0])).size).toBe(3);
+    expect(new Set(stacks.flat()).size).toBe(3);
     expect(firstStacks(SortLevel.seeded(SIZE, GOAL, Seed.of(42), [red, blue, green]), 30)).toEqual(
       stacks,
     );

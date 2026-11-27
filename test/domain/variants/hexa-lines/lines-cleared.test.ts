@@ -1,8 +1,10 @@
 /** @jest-environment node */
+import { AchievementCounters } from '../../../../src/domain/achievements/achievement-counters';
 import { GameId } from '../../../../src/domain/shared/game-id';
 import { LineCount } from '../../../../src/domain/variants/hexa-lines/line-count';
 import { LinesCleared } from '../../../../src/domain/variants/hexa-lines/lines-cleared';
 import { MATCH_ID } from '../../../support/engine/match-id';
+import { countsOf } from '../../../support/engine/counters-content';
 import { square, type SquareCoord } from '../../../support/engine/square-topology';
 import { linesClearedDataOf } from '../../../support/variants/hexa-lines/lines-cleared';
 
@@ -32,6 +34,16 @@ describe('LinesCleared', () => {
     cells.push(square(2, 0));
 
     expect(linesClearedDataOf<SquareCoord>(event).cells).toEqual([square(0, 0), square(1, 0)]);
+  });
+
+  // Issue #406: the count of lines of one placement is a best count, the most lines at once.
+  it('should_keep_the_line_count_as_the_best_count_when_the_event_records_in_the_counters', () => {
+    const counters = AchievementCounters.start(LINES);
+
+    new LinesCleared(LINES, MATCH_ID, LineCount.of(3), []).recordIn(counters);
+    new LinesCleared(LINES, MATCH_ID, LineCount.of(2), []).recordIn(counters);
+
+    expect(countsOf(counters)).toEqual({ best: 3, total: 0 });
   });
 
   it('should_throw_a_range_error_when_the_placement_cleared_no_line', () => {

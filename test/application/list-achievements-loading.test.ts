@@ -61,10 +61,10 @@ describe('ListAchievements loading', () => {
   it('should_load_each_game_once_when_two_goals_read_one_game', async () => {
     const { reads, levels, progress, counters } = countingPorts();
     const list = new ListAchievements(levels, progress, counters, [
-      { id: 'fit-3', goal: LevelsWon.of(FIT, 3) },
+      { id: 'fit-3', goal: LevelsWon.of(FIT, AchievementCount.of(3)) },
       { id: 'merge-256' },
-      { id: 'sort-3', goal: LevelsWon.of(SORT, 3) },
-      { id: 'fit-all', goal: new EveryLevelWon(FIT) },
+      { id: 'sort-3', goal: LevelsWon.of(SORT, AchievementCount.of(3)) },
+      { id: 'fit-all', goal: EveryLevelWon.of(FIT) },
     ]);
 
     const result = await list.execute({});
@@ -82,7 +82,7 @@ describe('ListAchievements loading', () => {
     const { counterReads, levels, progress, counters } = countingPorts();
     const list = new ListAchievements(levels, progress, counters, [
       { id: 'merge-256', goal: BestCountReached.of(MERGE, AchievementCount.of(256)) },
-      { id: 'fit-3', goal: LevelsWon.of(FIT, 3) },
+      { id: 'fit-3', goal: LevelsWon.of(FIT, AchievementCount.of(3)) },
       { id: 'merge-2048', goal: BestCountReached.of(MERGE, AchievementCount.of(2048)) },
       { id: 'sort-goals', goal: TotalCountReached.of(SORT, AchievementCount.of(10)) },
     ]);

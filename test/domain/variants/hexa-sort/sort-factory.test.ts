@@ -19,11 +19,12 @@ import { startVariant } from '../../../support/engine/variant-game';
 import {
   chipsAt,
   names,
-  place,
+  placeFrom,
   row,
   sortFactory,
   sortState,
   stack,
+  trayOf,
 } from '../../../support/variants/hexa-sort/sort-game';
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
@@ -31,22 +32,23 @@ import { playMove } from '../../../support/engine/play-move';
 
 // The Sort factory creates the whole family of Hexa Sort (issue 99, classes.md decision 31).
 
-// The offered stack of a new game of `factory`, at the start and after each of two placements.
+// The tray of a new game of `factory`, at the start and after each of two placements.
 // The two cells are not neighbors, so no run moves.
-function offeredInGame(factory: SortFactory<SquareCoord>): string[][] {
+function trayInGame(factory: SortFactory<SquareCoord>): string[][][] {
   const { engine } = startVariant(factory);
-  const offered = [names(engine.snapshot().offeredStack())];
-  for (const move of [place(0, 0), place(1, 1)]) {
+  const trays = [trayOf(engine.snapshot())];
+  for (const move of [placeFrom(0, 0, 0), placeFrom(1, 1, 1)]) {
     playMove(engine, move);
-    offered.push(names(engine.snapshot().offeredStack()));
+    trays.push(trayOf(engine.snapshot()));
   }
-  return offered;
+  return trays;
 }
 
-// The stacks of a new match of `factory`: the offered stack and the next eleven of its source.
+// The stacks of a new match of `factory`: the three stacks of the tray (#353) and the next nine
+// of its source.
 function stacksOfMatch<TCoord>(factory: SortFactory<TCoord>): string[][] {
   const photo = startVariant(factory).engine.snapshot();
-  const found = [names(photo.offeredStack())];
+  const found = photo.trayStacks().map((slot) => names(slot));
   for (const offered of photo.pieceSource()) {
     found.push(names(offered));
     if (found.length === 12) break;
@@ -103,15 +105,15 @@ describe('SortFactory', () => {
 
     const initial = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
     const { engine } = startVariant(factory);
-    const outcome = playMove(engine, place(0, 0));
+    const outcome = playMove(engine, placeFrom(0, 0, 0));
 
     expect(factory.isFor(GameId.of('hexa-sort'))).toBe(true);
     expect(factory.createBoard(BOARD_ID).coordinates()).toHaveLength(4);
-    expect(names(initial.snapshot().offeredStack())).toEqual(['red', 'red']);
+    expect(trayOf(initial.snapshot())).toEqual([['red', 'red'], ['blue'], []]);
     expect(initial.snapshot().goal().equals(GoalCount.of(5))).toBe(true);
     expect(outcome).toBe(Outcome.playing);
     expect(chipsAt(engine, 0, 0)).toEqual(['red', 'red']);
-    expect(names(engine.snapshot().offeredStack())).toEqual(['blue']);
+    expect(trayOf(engine.snapshot())).toEqual([[], ['blue'], []]);
     expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(0));
     expect(engine.takeEvents()).toEqual([]);
   });
@@ -144,13 +146,13 @@ describe('SortFactory', () => {
 
     for (const level of levels) {
       const factory = new SortFactory(new SquareGeometry(), level, seededRandom(1));
-      const first = offeredInGame(factory);
-      const second = offeredInGame(factory);
+      const first = trayInGame(factory);
+      const second = trayInGame(factory);
       // A second factory of an equal level draws the same stacks too.
-      const third = offeredInGame(new SortFactory(new SquareGeometry(), level, seededRandom(1)));
+      const third = trayInGame(new SortFactory(new SquareGeometry(), level, seededRandom(1)));
 
       expect(first).toHaveLength(3);
-      for (const tiles of first) expect(tiles).not.toEqual([]);
+      for (const tiles of first[0] ?? []) expect(tiles).not.toEqual([]);
       expect(second).toEqual(first);
       expect(third).toEqual(first);
     }
@@ -174,16 +176,16 @@ describe('SortFactory', () => {
       const factory = new SortFactory(new SquareGeometry(), level, seededRandom(1));
       const { engine: first } = startVariant(factory);
       const { engine: second } = startVariant(factory);
-      const start = names(second.snapshot().offeredStack());
+      const start = trayOf(second.snapshot());
       const sourceAtStart = second.snapshot().pieceSource();
 
-      playMove(first, place(0, 0));
-      playMove(first, place(1, 1));
+      playMove(first, placeFrom(0, 0, 0));
+      playMove(first, placeFrom(1, 1, 1));
 
-      expect(names(first.snapshot().offeredStack())).not.toEqual([]);
-      expect(names(second.snapshot().offeredStack())).toEqual(start);
+      expect(trayOf(first.snapshot())).not.toEqual(start);
+      expect(trayOf(second.snapshot())).toEqual(start);
       expect(second.snapshot().pieceSource()).toBe(sourceAtStart);
-      expect(names(startVariant(factory).engine.snapshot().offeredStack())).toEqual(start);
+      expect(trayOf(startVariant(factory).engine.snapshot())).toEqual(start);
     }
   });
 

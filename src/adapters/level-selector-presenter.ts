@@ -3,8 +3,7 @@ import type { LevelSummary } from '../application/level-summary';
 import type { Result } from '../application/result';
 import type { UseCase } from '../application/use-case';
 import { LevelStatus } from '../domain/progress/level-status';
-import type { LevelId } from '../domain/progress/level-id';
-import type { Stars } from '../domain/progress/stars';
+import { valueOf } from './delivered';
 import type { TextKey, Texts } from './texts/text-catalog';
 
 // One level on the level selector (#173).
@@ -62,7 +61,7 @@ const STATUS_TEXTS: readonly (readonly [LevelStatus, TextKey])[] = [
 // `ListLevels` gives: the presenter compares the status with `equals()` to find its text.
 // A completed level and an open level start; a locked level does not. The presenter is an
 // adapter of the edge, so it receives the text of the level id and the number of the stars
-// with `deliverTo()` (rule R-no-delivery-call).
+// with `valueOf()` of `delivered.ts` (rule R-no-delivery-call, issue #408).
 // A figure with no level gives an empty list, and the screen shows the text of no levels.
 // A failed `Result` never throws (decision 28): the presenter keeps its levels and shows
 // the text of the failure. A view attaches to see each new view model. It sees the current one
@@ -119,7 +118,7 @@ export class LevelSelectorPresenter {
   // The choice of the level `summary` at the place `at` of the list.
   private choiceOf(summary: LevelSummary, at: number): LevelChoice {
     const choice = {
-      id: idOf(summary.levelId),
+      id: valueOf(summary.levelId),
       name: `${this.texts['levels.level']} ${at + 1}`,
       status: this.texts[statusKeyOf(summary.status)],
       completed: summary.status.equals(LevelStatus.completed),
@@ -127,7 +126,7 @@ export class LevelSelectorPresenter {
     };
     return summary.stars === undefined
       ? choice
-      : { ...choice, stars: `${this.texts['levels.stars']} ${starsOf(summary.stars)}` };
+      : { ...choice, stars: `${this.texts['levels.stars']} ${valueOf(summary.stars)}` };
   }
 }
 
@@ -136,26 +135,4 @@ function statusKeyOf(status: LevelStatus): TextKey {
   const entry = STATUS_TEXTS.find(([each]) => each.equals(status));
   if (entry === undefined) throw new RangeError('The level selector has no text for this status.');
   return entry[1];
-}
-
-// The text of the level id `levelId`.
-function idOf(levelId: LevelId): string {
-  let text = '';
-  levelId.deliverTo({
-    receive: (delivered) => {
-      text = delivered;
-    },
-  });
-  return text;
-}
-
-// The number of the stars `stars`.
-function starsOf(stars: Stars): number {
-  let count = 0;
-  stars.deliverTo({
-    receive: (delivered) => {
-      count = delivered;
-    },
-  });
-  return count;
 }

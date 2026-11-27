@@ -2,6 +2,7 @@ import { GameId } from '../domain/shared/game-id';
 import type { GameProgress } from '../domain/progress/game-progress';
 import type { TopologyId } from '../domain/shared/topology-id';
 import type { ProgressRecord } from '../domain/progress/progress-model';
+import { onlyValue, valueOf } from './delivered';
 import type { TextKey, Texts } from './texts/text-catalog';
 
 // One board figure of the figure selector (#171).
@@ -104,12 +105,7 @@ export class HomePresenter {
   }
 
   private figureChoiceOf(figure: TopologyId): FigureChoice {
-    let id = '';
-    figure.deliverTo({
-      receive: (text) => {
-        id = text;
-      },
-    });
+    const id = valueOf(figure);
     return { id, name: this.text(`figure.${id}`) };
   }
 
@@ -123,27 +119,18 @@ export class HomePresenter {
 
   // The record text of the saved progress of `gameId`, or `undefined` when the game has no
   // saved progress or its progress keeps no high score. The presenter is an adapter of the
-  // edge, so it receives the values through `deliverTo()` (rule R-no-delivery-call).
+  // edge, so it receives the values with the helpers of `delivered.ts`, which call
+  // `deliverTo()` (rule R-no-delivery-call, issue #408).
   private highScoreText(gameId: GameId): string | undefined {
     const progress = this.saved.find(([game]) => game.equals(gameId))?.[1];
     if (progress === undefined) return undefined;
-    let highScore: ProgressRecord | undefined;
-    progress.deliverTo({
-      receive: (_id, record) => {
-        highScore = record;
-      },
-    });
+    const highScore = onlyValue<ProgressRecord | undefined>((keep) =>
+      progress.deliverTo({ receive: (_id, record) => keep(record) }),
+    );
     if (highScore === undefined) return undefined;
-    let score = 0;
-    highScore.deliverTo({
-      receive: (_id, scoreValue) => {
-        scoreValue.deliverTo({
-          receive: (value) => {
-            score = value;
-          },
-        });
-      },
-    });
+    const score = onlyValue<number>((keep) =>
+      highScore.deliverTo({ receive: (_id, scoreValue) => keep(valueOf(scoreValue)) }),
+    );
     return `${this.text('map.highScore')} ${score}`;
   }
 

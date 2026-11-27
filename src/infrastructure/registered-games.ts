@@ -4,7 +4,6 @@ import {
   type FitCellView,
   type FitPayloadView,
 } from '../adapters/fit-state-mapper';
-import { fitLevelVariant, sortLevelVariant } from '../adapters/level-game-factories';
 import { LinesMoveMapper, type LinesIntent } from '../adapters/lines-move-mapper';
 import {
   LinesStateMapper,
@@ -44,6 +43,7 @@ import { triangle, type TriangleCoord } from '../domain/engine/triangle-topology
 import type { Turns } from '../domain/engine/turns';
 import { FitFactory } from '../domain/variants/hexa-fit/fit-factory';
 import { FitLevel } from '../domain/variants/hexa-fit/fit-level';
+import { fitLevelVariant } from '../domain/variants/hexa-fit/fit-level-variant';
 import type { FitMove } from '../domain/variants/hexa-fit/fit-move';
 import type { FitView } from '../domain/variants/hexa-fit/fit-state';
 import { FitStarThreshold } from '../domain/variants/hexa-fit/fit-stars';
@@ -60,6 +60,7 @@ import { GoalCount } from '../domain/variants/hexa-sort/goal-count';
 import type { PlaceStack } from '../domain/variants/hexa-sort/place-stack';
 import { SortFactory } from '../domain/variants/hexa-sort/sort-factory';
 import { SortLevel } from '../domain/variants/hexa-sort/sort-level';
+import { sortLevelVariant } from '../domain/variants/hexa-sort/sort-level-variant';
 import type { SortView } from '../domain/variants/hexa-sort/sort-state';
 import {
   cellBoxOf,
@@ -193,7 +194,7 @@ function latticeCellOf(at: TriangleCoord): TriangleCoord {
 // Fit offers only the levels whose `topology` names the figure (S3-08 in #151,
 // «Propuesta, pendiente del equipo»). A figure with no Fit level has no Fit entry.
 // Fit and Sort also take their `LevelVariant` on the geometry of the figure, so `StartGame`
-// starts a bundled level by its id (#172). The Fit level and the Sort level of each entry
+// starts a bundled level by its id (#172). Each level function lives in its variant folder (#407). The Fit level and the Sort level of each entry
 // are first content: a start with no level id starts them until the level selector (#173).
 // Each variant chooses its state mapper, cell renderer and move controls (#174 to #177),
 // and its move mapper (#405).
@@ -334,7 +335,7 @@ function fitScreen<TCoord>(
   };
 }
 
-// The screen parts of Hexa Sort (#176). The offer uses the outline of the origin cell.
+// The screen parts of Hexa Sort (#176). The stacks of the tray use the outline of the origin cell (#353).
 function sortScreen<TCoord>(
   figure: BoardFigure<TCoord>,
 ): ScreenParts<

@@ -1,6 +1,6 @@
-import type { ValueReceiver } from '../domain/shared/value-receiver';
 import type { ColorStack } from '../domain/variants/hexa-sort/color-stack';
 import type { SortView } from '../domain/variants/hexa-sort/sort-state';
+import { onlyValue, valueOf } from './delivered';
 import type { StateMapper } from './state-mapper';
 
 export interface SortCellView {
@@ -9,7 +9,8 @@ export interface SortCellView {
 }
 
 export interface SortPayloadView {
-  readonly offered?: SortCellView;
+  // One view for each slot of the tray, from the first slot. An empty slot has no colors.
+  readonly tray: readonly SortCellView[];
   readonly goalsDone: number;
   readonly goalsNeeded: number;
 }
@@ -17,7 +18,8 @@ export interface SortPayloadView {
 const FREE: SortCellView = Object.freeze({ colors: Object.freeze([]) });
 
 // The mapper of the Sort screen. The view of a Sort state holds no coordinate,
-// so the mapper takes no `TCoord` (issue #423).
+// so the mapper takes no `TCoord` (issue #423). It reads each value with the helpers of
+// `delivered.ts` (rule R-no-delivery-call, issue #408).
 export class SortStateMapper implements StateMapper<
   ColorStack,
   SortView,
@@ -33,29 +35,17 @@ export class SortStateMapper implements StateMapper<
     return FREE;
   }
 
+  // A view that delivers no data, or delivers it twice, throws an Error.
   toPayload(payload: SortView): SortPayloadView {
-    let view: SortPayloadView | undefined;
-    payload.deliverTo({
-      receive: (offered, goalsDone, goalsNeeded) => {
-        view = {
-          offered: offered === undefined ? undefined : this.toView(offered),
-          goalsDone: valueOf(goalsDone),
-          goalsNeeded: valueOf(goalsNeeded),
-        };
-      },
-    });
-    if (view === undefined) throw new Error('The Sort view delivered no data.');
-    return view;
+    return onlyValue<SortPayloadView>((keep) =>
+      payload.deliverTo({
+        receive: (tray, goalsDone, goalsNeeded) =>
+          keep({
+            tray: tray.map((slot) => (slot === undefined ? FREE : this.toView(slot))),
+            goalsDone: valueOf(goalsDone),
+            goalsNeeded: valueOf(goalsNeeded),
+          }),
+      }),
+    );
   }
-}
-
-function valueOf<T>(source: { deliverTo(receiver: ValueReceiver<T>): void }): T {
-  let value: T | undefined;
-  source.deliverTo({
-    receive: (delivered) => {
-      value = delivered;
-    },
-  });
-  if (value === undefined) throw new Error('The Sort value delivered no data.');
-  return value;
 }

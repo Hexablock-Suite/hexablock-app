@@ -33,20 +33,27 @@ describe('SortStateMapper', () => {
     expect(mapper.toView(ColorStack.empty())).toEqual(mapper.freeView());
   });
 
-  it('should_map_goal_progress_and_the_current_stack_when_the_view_has_an_offer', () => {
+  // Issue #353: the payload holds one view for each slot of the tray, in the order of the slots.
+  it('should_map_goal_progress_and_each_slot_of_the_tray_when_the_view_has_a_tray', () => {
     const stack = ColorStack.of([Color.of('blue'), Color.of('yellow')]);
+    const tray = [stack, undefined, ColorStack.of([Color.of('red')])];
 
-    expect(mapper.toPayload(new SortView(stack, ClearedStacks.of(2), GoalCount.of(4)))).toEqual({
-      offered: { colors: ['blue', 'yellow'] },
+    expect(mapper.toPayload(new SortView(tray, ClearedStacks.of(2), GoalCount.of(4)))).toEqual({
+      tray: [{ colors: ['blue', 'yellow'] }, mapper.freeView(), { colors: ['red'] }],
       goalsDone: 2,
       goalsNeeded: 4,
     });
   });
 
-  it('should_keep_goals_but_map_no_offer_when_the_source_has_ended', () => {
-    const payload = mapper.toPayload(new SortView(undefined, ClearedStacks.of(0), GoalCount.of(3)));
+  it('should_keep_goals_and_map_three_empty_slots_when_the_source_has_ended', () => {
+    const empty = [undefined, undefined, undefined];
 
-    expect(payload).toEqual({ goalsDone: 0, goalsNeeded: 3 });
-    expect(payload.offered).toBeUndefined();
+    const payload = mapper.toPayload(new SortView(empty, ClearedStacks.of(0), GoalCount.of(3)));
+
+    expect(payload).toEqual({
+      tray: [mapper.freeView(), mapper.freeView(), mapper.freeView()],
+      goalsDone: 0,
+      goalsNeeded: 3,
+    });
   });
 });

@@ -12,7 +12,16 @@ const appDir = path.join(repoRoot, 'app');
 // screen, and the player uses their buttons. The tests play the first Sort level of the square,
 // `sort-square-01`: a board of 3 by 3 cells and five fixed stacks, so every run is the same.
 // The spaces go in reading order, so 0, 2, 6 and 8 are the corners and 4 is the center.
+// The player places the stacks in the order of the level: the tray of three (#353) gives
+// the stack n from its slot n modulo 3, and the last two stacks refill the first two slots.
 // The real root logs each use case call to the console, so the tests keep the console quiet.
+// Chooses the stack of the tray that the move `n` of the level order takes, and then presses
+// the space `space`.
+async function placeInOrder(space: number, n: number): Promise<void> {
+  await fireEvent.press(screen.getByRole('radio', { name: `Pila ${(n % 3) + 1}` }));
+  await pressSpace(space);
+}
+
 describe('result screens', () => {
   let info: jest.SpyInstance;
 
@@ -33,13 +42,13 @@ describe('result screens', () => {
     await fireEvent.press(await screen.findByRole('button', { name: /^Nivel 1\b/ }));
     await screen.findByText('En juego');
 
-    for (const space of [0, 2, 6, 8, 4]) await pressSpace(space);
+    for (const [n, space] of [0, 2, 6, 8, 4].entries()) await placeInOrder(space, n);
     expect(await screen.findByRole('header', { name: 'Fin de la partida' })).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Reintentar' }));
     await screen.findByText('En juego');
     const closed = screen.queryByRole('header', { name: 'Fin de la partida' });
 
-    for (const space of [0, 1, 3]) await pressSpace(space);
+    for (const [n, space] of [0, 1, 3].entries()) await placeInOrder(space, n);
     expect(await screen.findByRole('header', { name: '¡Ganaste!' })).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Siguiente nivel' }));
     await screen.findByText('En juego');
@@ -59,7 +68,7 @@ describe('result screens', () => {
     const app = await renderRouter(appDir, { initialUrl: '/levels/hexa-sort?figure=square' });
     await fireEvent.press(await screen.findByRole('button', { name: /^Nivel 1\b/ }));
     await screen.findByText('En juego');
-    for (const space of [0, 2, 6, 8, 4]) await pressSpace(space);
+    for (const [n, space] of [0, 2, 6, 8, 4].entries()) await placeInOrder(space, n);
 
     await fireEvent.press(await screen.findByRole('button', { name: 'Volver al mapa' }));
 

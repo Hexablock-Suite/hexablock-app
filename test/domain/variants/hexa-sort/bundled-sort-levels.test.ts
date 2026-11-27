@@ -7,8 +7,10 @@ import { LevelDefinition } from '../../../../src/domain/progress/level-definitio
 import { Moves } from '../../../../src/domain/shared/moves';
 import { Outcome } from '../../../../src/domain/engine/outcome';
 import { Stars } from '../../../../src/domain/progress/stars';
+import type { ColorStack } from '../../../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../../../src/domain/variants/hexa-sort/goal-count';
 import { PlaceStack } from '../../../../src/domain/variants/hexa-sort/place-stack';
+import { TraySlot } from '../../../../src/domain/variants/hexa-sort/tray-slot';
 import { SortFactory } from '../../../../src/domain/variants/hexa-sort/sort-factory';
 import type { SortLevel } from '../../../../src/domain/variants/hexa-sort/sort-level';
 import { SortLevelBuilder } from '../../../../src/domain/variants/hexa-sort/sort-level-builder';
@@ -116,29 +118,38 @@ const topologiesOf = (files: [string, LevelFile][]) => [
   ...new Set(files.map(([, file]) => file.topology)),
 ];
 
-// The offered stack of a new game of the level of `file`, at the start and after each
-// of three placements, for each of two games that start from one built level.
+// The tray of a new game of the level of `file`, at the start and after each of three
+// placements, for each of two games that start from one built level. The placements use
+// the three slots, so the last one refills the tray (#353).
 // No two of the three cells are neighbors, so no run moves and no stack clears.
-function offeredInTwoGames(file: LevelFile): string[][][] {
+function traysInTwoGames(file: LevelFile): string[][][][] {
   return withGeometryOf(file.topology, {
     use: (geometry) => {
       const factory = new SortFactory(geometry, built(file, geometry), seededRandom(1));
       return [0, 1].map(() => {
         const { engine } = startVariant(factory);
-        const offered = [names(engine.snapshot().offeredStack())];
-        for (const at of figureOf(file).apart) {
-          playMove(engine, PlaceStack.on(geometry.createCoord([...at])));
-          offered.push(names(engine.snapshot().offeredStack()));
+        const trays = [trayNames(engine.snapshot().trayStacks())];
+        for (const [slot, at] of figureOf(file).apart.entries()) {
+          playMove(engine, PlaceStack.on(TraySlot.of(slot), geometry.createCoord([...at])));
+          trays.push(trayNames(engine.snapshot().trayStacks()));
         }
-        return offered;
+        return trays;
       });
     },
   });
 }
 
+// The color names of each slot of a tray. An empty slot gives `[]`.
+const trayNames = (tray: readonly (ColorStack | undefined)[]) => tray.map((slot) => names(slot));
+
+// A plan places the stacks in the order of the level. The tray holds three stacks and refills
+// when the three are used (#353), so move n takes the stack of the slot n modulo 3.
+const planMove = <TCoord>(geometry: GeometryFactory<TCoord>, at: readonly number[], n: number) =>
+  PlaceStack.on(TraySlot.of(n % 3), geometry.createCoord([...at]));
+
 // The first photo of a new game of the level of `file`: the count of cells of its board,
-// whether its goal is the goal of the file, and the names of the offered stack.
-function firstPhoto(file: LevelFile): { cells: number; goal: boolean; offered: string[] } {
+// whether its goal is the goal of the file, and the names of the stacks of the tray.
+function firstPhoto(file: LevelFile): { cells: number; goal: boolean; tray: string[][] } {
   return withGeometryOf(file.topology, {
     use: (geometry) => {
       const { engine } = startVariant(
@@ -148,7 +159,7 @@ function firstPhoto(file: LevelFile): { cells: number; goal: boolean; offered: s
       return {
         cells: photo.boardCopy().coordinates().length,
         goal: photo.goal().equals(GoalCount.of(file.section.goals)),
-        offered: names(photo.offeredStack()),
+        tray: trayNames(photo.trayStacks()),
       };
     },
   });
@@ -164,10 +175,8 @@ function planPlay(
     use: (geometry) => {
       const level = built(file, geometry);
       const { engine } = startVariant(new SortFactory(geometry, level, seededRandom(1)));
-      const outcomes = plan.map((at) =>
-        playMove(engine, PlaceStack.on(geometry.createCoord([...at]))),
-      );
-      return { outcomes, stars: level.starsFor(Moves.of(plan.length), undefined) };
+      const outcomes = plan.map((at, n) => playMove(engine, planMove(geometry, at, n)));
+      return { outcomes, stars: level.starsFor(Moves.of(plan.length)) };
     },
   });
 }
@@ -311,6 +320,26 @@ const PLANS: Readonly<Record<string, readonly [number, number][]>> = {
   ],
 };
 
+// Issue #352: the seeded stacks of `sort-01` hold 2 to 6 tiles, so the star thresholds of the
+// level were checked again on 2026-11-27. A beam search over the seeded game found this play
+// of 13 moves. Each move names the tray slot and the cell (q, r) of the hexagon.
+// The play wins within 20 moves, the threshold of the third star, so each star can be reached.
+const SORT_01_PLAY: readonly (readonly [number, readonly [number, number]])[] = [
+  [1, [-2, 0]],
+  [0, [-2, 1]],
+  [2, [-1, 0]],
+  [0, [-1, 1]],
+  [1, [0, 0]],
+  [2, [0, -2]],
+  [2, [-1, -1]],
+  [0, [-1, 0]],
+  [1, [-1, 0]],
+  [0, [-1, 0]],
+  [1, [-2, 1]],
+  [2, [-2, 0]],
+  [1, [-2, 2]],
+];
+
 // The fields of each object of the format, in the order of its table.
 const LEVEL_FIELDS = ['gameId', 'levelId', 'order', 'version', 'topology', 'section'];
 const SECTION_FIELDS = ['radius', 'goals', 'source', 'stars'];
@@ -393,22 +422,30 @@ describe('bundled Sort levels', () => {
   });
 
   // On hex, the board of radius r holds 3r(r + 1) + 1 cells, on the square (r + 1)² cells
-  // and on the triangle 2(r + 1)² cells. A fixed level offers its first stack first,
-  // and a seeded level offers one tile of one of its colors (decision 47).
-  it('should_start_each_level_with_its_board_its_goal_and_its_first_stack_when_the_sort_factory_builds_it', () => {
+  // and on the triangle 2(r + 1)² cells. A fixed level offers its first three stacks in the tray
+  // (#353), and a seeded level offers three stacks of 2 to 6 tiles of its colors (issue #352).
+  it('should_start_each_level_with_its_board_its_goal_and_its_first_stacks_when_the_sort_factory_builds_it', () => {
     for (const [name, file] of bundledFiles()) {
       const { radius, source } = file.section;
 
-      const { cells, goal, offered } = firstPhoto(file);
+      const { cells, goal, tray } = firstPhoto(file);
 
-      const [tile] = offered;
-      const firstStack =
+      const firstStacks =
         'stacks' in source
-          ? offered.join() === source.stacks[0]?.join()
-          : offered.length === 1 && tile !== undefined && source.colors.includes(tile);
+          ? tray.map((slot) => slot.join()).join('|') ===
+            source.stacks
+              .slice(0, 3)
+              .map((slot) => slot.join())
+              .join('|')
+          : tray.every(
+              (slot) =>
+                slot.length >= 2 &&
+                slot.length <= 6 &&
+                slot.every((tile) => source.colors.includes(tile)),
+            );
       expect([name, cells]).toEqual([name, figureOf(file).cells(radius)]);
       expect([name, goal]).toEqual([name, true]);
-      expect([name, firstStack]).toEqual([name, true]);
+      expect([name, tray.length, firstStacks]).toEqual([name, 3, true]);
     }
   });
 
@@ -418,9 +455,9 @@ describe('bundled Sort levels', () => {
     const files = bundledFiles();
 
     for (const [name, file] of files) {
-      const [first = [], second] = offeredInTwoGames(file);
+      const [first = [], second] = traysInTwoGames(file);
 
-      expect([name, first.length, first.every((stack) => stack.length > 0)]).toEqual([
+      expect([name, first.length, (first[0] ?? []).every((slot) => slot.length > 0)]).toEqual([
         name,
         4,
         true,
@@ -435,11 +472,33 @@ describe('bundled Sort levels', () => {
   it('should_give_the_stars_of_its_file_when_a_bundled_level_counts_the_stars_of_a_play', () => {
     const [[, first]] = bundledFiles();
     const level = withGeometryOf(first.topology, { use: (geometry) => built(first, geometry) });
-    const starsOf = (moves: number) => level.starsFor(Moves.of(moves), undefined);
+    const starsOf = (moves: number) => level.starsFor(Moves.of(moves));
 
     expect(starsOf(35)).toEqual(Stars.of(1));
     expect(starsOf(20)).toEqual(Stars.of(3));
     expect(starsOf(41)).toEqual(Stars.of(0));
+  });
+
+  it('should_win_the_seeded_first_level_with_every_star_when_the_player_follows_its_recorded_play', () => {
+    const [[name, first]] = bundledFiles();
+
+    const { outcomes, moves, stars } = withGeometryOf(first.topology, {
+      use: (geometry) => {
+        const level = built(first, geometry);
+        const { engine } = startVariant(new SortFactory(geometry, level, seededRandom(1)));
+        const played = SORT_01_PLAY.map(([slot, at]) =>
+          playMove(engine, PlaceStack.on(TraySlot.of(slot), geometry.createCoord([...at]))),
+        );
+        const count = engine.snapshot().moveCount();
+        return { outcomes: played, moves: count, stars: level.starsFor(count) };
+      },
+    });
+
+    const playing = SORT_01_PLAY.slice(1).map(() => Outcome.playing);
+    expect(name).toBe('sort-01.json');
+    expect(outcomes).toEqual([...playing, Outcome.victory]);
+    expect(moves).toEqual(Moves.of(SORT_01_PLAY.length));
+    expect(stars).toEqual(Stars.of(3));
   });
 
   // A fixed level can be won. Its plan meets the threshold of its last star,

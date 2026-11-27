@@ -5,6 +5,7 @@ import { ElapsedTime } from '../../shared/elapsed-time';
 import type { GeometryFactory } from '../../engine/geometry-factory';
 import type { TopologyId } from '../../shared/topology-id';
 import type { ILevelBuilder } from '../../progress/level-builder';
+import { fieldsOf } from '../../progress/level-fields';
 import { Moves } from '../../shared/moves';
 import { Piece } from '../../engine/piece';
 import { CellNode, ShapeGroup } from '../../engine/shape-node';
@@ -21,9 +22,6 @@ const BAD_PLACEMENT = 'A placement of a Fit witness needs a piece id, a rotation
 const BAD_STAR = 'A star of a Fit level needs a move count and a time.';
 const UNEQUAL_AREA = 'The pieces of a Fit level do not have the area of its figure.';
 const INEXACT_WITNESS = 'The witness of a Fit level does not cover its figure exactly.';
-
-// The fields of one JSON object of a level file, by name.
-type Fields = Readonly<Record<string, unknown>>;
 
 // Concrete Builder (statement §3.3, classes.md decision 15, D9): it builds a `FitLevel`
 // step by step from the data of a level file. `LevelDefinition` directs it.
@@ -63,7 +61,7 @@ export class FitLevelBuilder<TCoord> implements ILevelBuilder<FitLevel<TCoord>> 
     const { figure, pieces, witness, stars } = fieldsOf(
       section,
       ['figure', 'pieces', 'witness', 'stars'],
-      NO_SECTION,
+      (cause) => new RangeError(NO_SECTION, { cause }),
     );
     return this.withFigure(figure).withPieces(pieces).withWitness(witness).withStars(stars);
   }
@@ -94,7 +92,11 @@ export class FitLevelBuilder<TCoord> implements ILevelBuilder<FitLevel<TCoord>> 
   // Each piece is a text id and its cells, relative to the origin of the piece.
   private withPieces(pieces: unknown): FitLevelBuilder<TCoord> {
     this.pieces = listOf(pieces).map((piece) => {
-      const { id, cells } = fieldsOf(piece, ['id', 'cells'], BAD_PIECE);
+      const { id, cells } = fieldsOf(
+        piece,
+        ['id', 'cells'],
+        (cause) => new RangeError(BAD_PIECE, { cause }),
+      );
       if (typeof id !== 'string') throw new RangeError(BAD_PIECE, { cause: piece });
       const shape = new ShapeGroup(listOf(cells).map((cell) => new CellNode(this.coordOf(cell))));
       return new Piece(shape, PieceId.of(id));
@@ -105,7 +107,11 @@ export class FitLevelBuilder<TCoord> implements ILevelBuilder<FitLevel<TCoord>> 
   // Each placement turns its piece by `rotation` steps of the topology, then moves it by `at`.
   private withWitness(witness: unknown): FitLevelBuilder<TCoord> {
     this.witness = listOf(witness).map((entry) => {
-      const { piece, rotation, at } = fieldsOf(entry, ['piece', 'rotation', 'at'], BAD_PLACEMENT);
+      const { piece, rotation, at } = fieldsOf(
+        entry,
+        ['piece', 'rotation', 'at'],
+        (cause) => new RangeError(BAD_PLACEMENT, { cause }),
+      );
       if (typeof piece !== 'string' || typeof rotation !== 'number') {
         throw new RangeError(BAD_PLACEMENT, { cause: entry });
       }
@@ -120,7 +126,7 @@ export class FitLevelBuilder<TCoord> implements ILevelBuilder<FitLevel<TCoord>> 
       const { maxMoves, maxElapsedMs } = fieldsOf(
         threshold,
         ['maxMoves', 'maxElapsedMs'],
-        BAD_STAR,
+        (cause) => new RangeError(BAD_STAR, { cause }),
       );
       if (typeof maxMoves !== 'number' || typeof maxElapsedMs !== 'number') {
         throw new RangeError(BAD_STAR, { cause: threshold });
@@ -166,20 +172,6 @@ export class FitLevelBuilder<TCoord> implements ILevelBuilder<FitLevel<TCoord>> 
       throw new RangeError(INEXACT_WITNESS);
     }
   }
-}
-
-// The fields of a JSON object that holds every field of `names`.
-// Any other value throws a RangeError with `message`, and the value is its `cause`.
-function fieldsOf(value: unknown, names: readonly string[], message: string): Fields {
-  if (
-    typeof value !== 'object' ||
-    value === null ||
-    Array.isArray(value) ||
-    !names.every((name) => name in value)
-  ) {
-    throw new RangeError(message, { cause: value });
-  }
-  return value as Fields;
 }
 
 // A JSON list of one item or more. Any other value throws a RangeError with the value as `cause`.

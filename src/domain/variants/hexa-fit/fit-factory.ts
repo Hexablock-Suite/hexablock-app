@@ -89,8 +89,8 @@ export class FitFactory<TCoord> implements IVariantFactory<
   }
 
   // Hexa Fit keeps the best result of each level. The level counts the stars of a play
-  // by its moves and its time (D20, classes.md decision 36).
+  // by its moves and its time (D20, classes.md decision 36), so the model counts by both (#424).
   createProgressModel(): LevelProgress {
-    return new LevelProgress(this.level);
+    return LevelProgress.byMovesAndTime(this.level);
   }
 }

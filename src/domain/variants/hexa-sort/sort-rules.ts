@@ -5,6 +5,7 @@ import { BaseGameRules } from '../../engine/rules';
 import type { ColorStack } from './color-stack';
 import { PlaceStack } from './place-stack';
 import type { SortState } from './sort-state';
+import { TraySlot } from './tray-slot';
 
 // A top run of this many tiles of one color clears its stack (statement §1.3).
 // The accepted rule of issue #56: a top run of 10 or more removes the whole stack,
@@ -12,29 +13,36 @@ import type { SortState } from './sort-state';
 // Only this file reads the length (issue #232).
 const GOAL_RUN = 10;
 
-// The rules of Hexa Sort (statement §1.3). The player places the offered stack on an
-// empty cell. Then the top tiles of neighbor stacks with the same top color move,
-// in cascade, to the stack with most of that color.
+// The rules of Hexa Sort (statement §1.3). The player places the stack of one slot of the tray
+// on an empty cell (issue #353). Then the top tiles of neighbor stacks with the same top color
+// move, in cascade, to the stack with most of that color.
 // The rules ask the topology for the neighbors, so they run on any geometry (D4).
-// The rules decide. The state changes itself: the rules call `placeOfferedStack()`,
+// The rules decide. The state changes itself: the rules call `placeStack()`,
 // `moveRun()` and `clearStack()`. The rules ask the photo of the state and `canPlace()`.
 // A photo never changes, so the rules take a new photo after each change of the state.
-// The rules read no field of a move: they ask the move for its cell (classes.md decision 43).
+// The rules read no field of a move: they give the move to the state, and they ask
+// the move for its cell (classes.md decision 43).
 export class SortRules<TCoord> extends BaseGameRules<PlaceStack<TCoord>, SortState<TCoord>> {
   protected isValid(state: SortState<TCoord>, move: PlaceStack<TCoord>): boolean {
-    return state.canPlace(move.cell());
+    return state.canPlace(move);
   }
 
+  // Each slot that holds a stack, on each free cell, from the first slot.
   *validMoves(state: SortState<TCoord>): Iterable<PlaceStack<TCoord>> {
     const photo = state.snapshot();
-    if (photo.offeredStack() === undefined) return;
-    for (const at of photo.boardCopy().coordinates()) {
-      if (state.canPlace(at)) yield PlaceStack.on(at);
+    const cells = photo.boardCopy().coordinates();
+    for (const [index, stack] of photo.trayStacks().entries()) {
+      if (stack === undefined) continue;
+      for (const at of cells) {
+        const move = PlaceStack.on(TraySlot.of(index), at);
+        if (state.canPlace(move)) yield move;
+      }
     }
   }
 
+  // One placed stack counts one move (#176), so the stars by moves keep their meaning.
   protected apply(state: SortState<TCoord>, move: PlaceStack<TCoord>): SortState<TCoord> {
-    state.placeOfferedStack(move.cell());
+    state.placeStack(move);
     state.countMove();
     return state;
   }
@@ -52,7 +60,7 @@ export class SortRules<TCoord> extends BaseGameRules<PlaceStack<TCoord>, SortSta
     return Resolution.resolved();
   }
 
-  // The goals reached win. A board with no empty cell, or no stack left to place, loses.
+  // The goals reached win. A board with no empty cell, or an empty tray, loses.
   protected evaluate(state: SortState<TCoord>): Outcome {
     const photo = state.snapshot();
     if (photo.goal().isReachedBy(photo.goalsReached())) return Outcome.victory;

@@ -2,6 +2,7 @@ import { Color } from '../../engine/color';
 import type { GeometryFactory } from '../../engine/geometry-factory';
 import type { TopologyId } from '../../shared/topology-id';
 import type { ILevelBuilder } from '../../progress/level-builder';
+import { fieldsOf } from '../../progress/level-fields';
 import { Moves } from '../../shared/moves';
 import { RegionSize } from '../../engine/region-size';
 import { Seed } from '../../engine/seed';
@@ -17,9 +18,6 @@ const BAD_GOALS = 'The goals of a Sort level need a number.';
 const BAD_SOURCE = 'The source of a Sort level needs a seed and colors, or stacks.';
 const BAD_COLOR = 'A color of a Sort level is a text.';
 const BAD_STAR = 'A star of a Sort level needs a move count.';
-
-// The fields of one JSON object of a level file, by name.
-type Fields = Readonly<Record<string, unknown>>;
 
 // The piece source of a level file, as value objects (A4): a seed with the colors
 // that a draw picks from, or the stacks in the order of the file.
@@ -63,7 +61,7 @@ export class SortLevelBuilder<TCoord> implements ILevelBuilder<SortLevel> {
     const { radius, goals, source, stars } = fieldsOf(
       section,
       ['radius', 'goals', 'source', 'stars'],
-      NO_SECTION,
+      (cause) => new RangeError(NO_SECTION, { cause }),
     );
     return this.withRadius(radius).withGoals(goals).withSource(source).withStars(stars);
   }
@@ -110,7 +108,11 @@ export class SortLevelBuilder<TCoord> implements ILevelBuilder<SortLevel> {
   // Each stack lists its colors from the bottom tile to the top tile.
   // A source of both kinds, or of no kind, throws a RangeError.
   private withSource(source: unknown): SortLevelBuilder<TCoord> {
-    const { seed, colors, stacks } = fieldsOf(source, [], BAD_SOURCE);
+    const { seed, colors, stacks } = fieldsOf<'seed' | 'colors' | 'stacks'>(
+      source,
+      [],
+      (cause) => new RangeError(BAD_SOURCE, { cause }),
+    );
     if (stacks !== undefined && seed === undefined && colors === undefined) {
       this.source = { stacks: listOf(stacks, (each) => ColorStack.of(listOf(each, colorOf))) };
     } else if (stacks === undefined && typeof seed === 'number' && colors !== undefined) {
@@ -124,7 +126,11 @@ export class SortLevelBuilder<TCoord> implements ILevelBuilder<SortLevel> {
   // Each threshold holds a move count, from the first star up.
   private withStars(stars: unknown): SortLevelBuilder<TCoord> {
     this.stars = listOf(stars, (threshold) => {
-      const { maxMoves } = fieldsOf(threshold, ['maxMoves'], BAD_STAR);
+      const { maxMoves } = fieldsOf(
+        threshold,
+        ['maxMoves'],
+        (cause) => new RangeError(BAD_STAR, { cause }),
+      );
       if (typeof maxMoves !== 'number') throw new RangeError(BAD_STAR, { cause: threshold });
       return SortStarThreshold.of(Moves.of(maxMoves));
     });
@@ -136,20 +142,6 @@ export class SortLevelBuilder<TCoord> implements ILevelBuilder<SortLevel> {
 function colorOf(name: unknown): Color {
   if (typeof name !== 'string') throw new RangeError(BAD_COLOR, { cause: name });
   return Color.of(name);
-}
-
-// The fields of a JSON object that holds every field of `names`.
-// Any other value throws a RangeError with `message`, and the value is its `cause`.
-function fieldsOf(value: unknown, names: readonly string[], message: string): Fields {
-  if (
-    typeof value !== 'object' ||
-    value === null ||
-    Array.isArray(value) ||
-    !names.every((name) => name in value)
-  ) {
-    throw new RangeError(message, { cause: value });
-  }
-  return value as Fields;
 }
 
 // The items of a JSON list of one item or more, each one turned by `item`.

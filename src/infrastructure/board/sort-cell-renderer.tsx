@@ -29,7 +29,7 @@ export class SortCellRenderer implements CellRenderer<SortCellView> {
   }
 }
 
-// The board and the offered stack share the same drawing. The top tile draws last.
+// The board and the stacks of the tray share the same drawing (#353). The top tile draws last.
 export function StackStone({
   colors,
   shape,

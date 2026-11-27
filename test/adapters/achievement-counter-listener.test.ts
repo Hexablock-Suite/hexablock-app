@@ -4,8 +4,12 @@ import { GameEventBus } from '../../src/adapters/game-event-bus';
 import { LocalAchievementCounterRepository } from '../../src/adapters/local-achievement-counter-repository';
 import { ApplyMove } from '../../src/application/apply-move';
 import type { Logger, UseCaseLogEntry } from '../../src/application/logger';
-import { GameOver } from '../../src/domain/engine/game-events';
+import { AchievementCount } from '../../src/domain/achievements/achievement-count';
+import type { AchievementCounters } from '../../src/domain/achievements/achievement-counters';
+import type { CountsForAchievements } from '../../src/domain/achievements/counts-for-achievements';
+import { GameEvent, GameOver } from '../../src/domain/engine/game-events';
 import { GameId } from '../../src/domain/shared/game-id';
+import type { ValueReceiver } from '../../src/domain/shared/value-receiver';
 import { hex, HexAxis } from '../../src/domain/engine/hex-topology';
 import { Outcome } from '../../src/domain/engine/outcome';
 import { Score } from '../../src/domain/shared/score';
@@ -23,7 +27,7 @@ import { square, squareTopology } from '../support/engine/square-topology';
 import { linesGame, linesState, piece } from '../support/variants/hexa-lines/lines-game';
 import { mergeGame, mergeState } from '../support/variants/hexa-merge/merge-game';
 import {
-  place,
+  placeFrom,
   row,
   sortGame,
   sortState,
@@ -37,6 +41,8 @@ import {
 // Merge keeps its highest tile as the best count, and Sort adds each cleared stack, one goal,
 // to the total.
 // Issue #384: a failed save of the counters goes to the `Logger` port, one entry per failed save.
+// Issue #406: each event that counts for an achievement records its own count, so the listener
+// names no event class.
 
 const LINES = GameId.of('hexa-lines');
 const MERGE = GameId.of('hexa-merge');
@@ -100,6 +106,22 @@ const oneLine = () => ({
 
 const SORT_GOAL = new StackCleared(SORT, MATCH_ID, 'a cell', TileCount.of(6));
 
+// The event of a game that no variant of the app has, as a fifth variant writes it (#406).
+// It counts for the achievements: it adds 5 to the total of its game.
+class RegionFilled extends GameEvent implements CountsForAchievements {
+  constructor(gameId: GameId) {
+    super(gameId);
+  }
+
+  deliverTo(receiver: ValueReceiver<GameId>): void {
+    this.withGameId((gameId) => receiver.receive(gameId));
+  }
+
+  recordIn(counters: AchievementCounters): void {
+    counters.addToTotal(AchievementCount.of(5));
+  }
+}
+
 describe('AchievementCounterListener', () => {
   it('should_save_the_most_lines_the_highest_tile_and_the_sort_goals_when_apply_move_plays_through_the_bus', async () => {
     const { counters, listener, bus } = counting();
@@ -130,7 +152,7 @@ describe('AchievementCounterListener', () => {
           offered: [stack(...tiles('red', 4)), stack('blue')],
         }),
       ),
-      place(1),
+      placeFrom(0, 1),
     );
     await listener.saved();
 
@@ -156,6 +178,19 @@ describe('AchievementCounterListener', () => {
     const restarted = new LocalAchievementCounterRepository(first.store);
     expect(countsOf(await restarted.load(LINES))).toEqual({ best: 3, total: 0 });
     expect(countsOf(await restarted.load(SORT))).toEqual({ best: 0, total: 3 });
+  });
+
+  // Issue #406: a new event class implements `CountsForAchievements`, and the listener does not
+  // change.
+  it('should_save_the_count_of_an_event_of_a_new_class_when_the_event_counts_for_the_achievements', async () => {
+    const fill = GameId.of('hexa-fill');
+    const { counters, listener } = counting();
+
+    listener.onEvent(new RegionFilled(fill));
+    listener.onEvent(new RegionFilled(fill));
+    await listener.saved();
+
+    expect(countsOf(await counters.load(fill))).toEqual({ best: 0, total: 10 });
   });
 
   it('should_save_nothing_when_the_listener_hears_only_a_game_over', async () => {

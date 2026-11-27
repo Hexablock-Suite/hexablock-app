@@ -2,13 +2,14 @@ import type { BoardShape } from '../../engine/board-shape';
 import type { CoordKey } from '../../engine/coord-key';
 import type { ElapsedTime } from '../../shared/elapsed-time';
 import type { TopologyId } from '../../shared/topology-id';
-import type { ILevelStars } from '../../progress/level-progress';
+import type { IStarsByMovesAndTime } from '../../progress/level-progress';
 import type { Moves } from '../../shared/moves';
 import type { Piece } from '../../engine/piece';
 import { frozenListOf } from '../../engine/frozen-list';
 import { CellNode, ShapeGroup } from '../../engine/shape-node';
+import { starsOf } from '../../progress/star-count';
 import type { Stars } from '../../progress/stars';
-import { FitPlay, fitStars, type FitStarThreshold } from './fit-stars';
+import { FitPlay, type FitStarThreshold } from './fit-stars';
 import type { PieceId } from './piece-id';
 
 // The part of a geometry that a level asks: whether the geometry is of a family.
@@ -29,8 +30,9 @@ type Family = { isOfFamily(id: TopologyId): boolean };
 // `FitFactory` checks the geometry, because only the factory holds one.
 // The geometry keeps its family private, so the level asks it with `isOfFamily()` (issue #234).
 // `FitLevelBuilder` builds the level from a level file through `of()` (issue #166).
-// `LevelProgress` asks the level for the stars of a play through `ILevelStars` (issue #156).
-export class FitLevel<TCoord> implements ILevelStars {
+// `LevelProgress` asks the level for the stars of a play through `IStarsByMovesAndTime`
+// (issues #156 and #424).
+export class FitLevel<TCoord> implements IStarsByMovesAndTime {
   private constructor(
     private readonly topology: TopologyId,
     private readonly figure: BoardShape<TCoord>,
@@ -60,14 +62,11 @@ export class FitLevel<TCoord> implements ILevelStars {
     return new FitLevel(topology, figure, copy, Object.freeze([...stars]));
   }
 
-  // The stars of a won play of this level: `fitStars()` counts the leading thresholds
+  // The stars of a won play of this level: `starsOf()` counts the leading thresholds
   // that the play meets, by its moves and its time (classes.md decision 36).
-  // A Fit level always has a timer, so a play with no time throws a RangeError.
-  starsFor(moves: Moves, elapsedMs: ElapsedTime | undefined): Stars {
-    if (elapsedMs === undefined) {
-      throw new RangeError('A Fit level counts its stars only with the time of the play.');
-    }
-    return fitStars(FitPlay.of({ moves, elapsedMs }), this.stars);
+  // A Fit level always has a timer, so it always takes the time of the play (issue #424).
+  starsFor(moves: Moves, elapsedMs: ElapsedTime): Stars {
+    return starsOf(FitPlay.of({ moves, elapsedMs }), this.stars);
   }
 
   // True when the level runs on `geometry`: the geometry is of the family that the level names.

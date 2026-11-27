@@ -2,8 +2,9 @@ import type { AchievementCounterRepository } from '../application/achievement-co
 import { AchievementCount } from '../domain/achievements/achievement-count';
 import { AchievementCounters } from '../domain/achievements/achievement-counters';
 import type { GameId } from '../domain/shared/game-id';
+import { onlyValue, valueOf } from './delivered';
 import type { KeyValueStore } from './key-value-store';
-import { isObject, numberIn, onlyValue, valueOf } from './saved-json';
+import { isObject, numberIn } from './saved-json';
 
 // The version of the saved shape of the counters. A new shape gets a new number, so a later app
 // can tell old saved counters from new ones (epic #277).
@@ -23,8 +24,9 @@ interface SavedCounters {
 // decision 57, issue #363). It keeps the counters of each game as one JSON text under the key
 // `achievement-counters:<game id>` of a `KeyValueStore`, next to `progress:<game id>` of
 // `LocalProgressRepository`, so the saved progress does not change.
-// It follows `LocalProgressRepository` and shares its helpers (`saved-json.ts`): it reads each
-// value of the domain with `deliverTo(receiver)` (rule R-no-delivery-call), and on a load it
+// It follows `LocalProgressRepository` and shares its helpers (`saved-json.ts` and
+// `delivered.ts`): it reads each value of the domain with `valueOf()`, which calls
+// `deliverTo(receiver)` (rule R-no-delivery-call), and on a load it
 // builds each count again with `AchievementCount.of()` and the counters with `start()`,
 // `recordBest()` and `addToTotal()`. So the counters keep their rules on the way back.
 // A saved text that is not JSON throws a `SyntaxError`. Saved counters of another version or of

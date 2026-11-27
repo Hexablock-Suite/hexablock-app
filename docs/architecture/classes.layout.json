@@ -88,7 +88,8 @@
             "IPieceSource",
             "SeededPieceSource",
             "IRandomSeeded",
-            "PieceDraw"
+            "PieceDraw",
+            "LevelVariant"
           ]
         },
         {
@@ -103,12 +104,14 @@
             "GameProgress",
             "GameProgressReceiver",
             "ILevelBuilder",
-            "ILevelStars",
+            "IStarsByMoves",
+            "IStarsByMovesAndTime",
             "GameResult",
             "IProgressModel",
             "ProgressRecord",
             "ProgressRecordReceiver",
             "Stars",
+            "IStarThreshold",
             "LevelProgress",
             "HighScoreProgress",
             "LevelStatus"
@@ -124,7 +127,8 @@
             "LevelsWon",
             "EveryLevelWon",
             "BestCountReached",
-            "TotalCountReached"
+            "TotalCountReached",
+            "CountsForAchievements"
           ]
         },
         {
@@ -162,6 +166,7 @@
             "LinesScoring",
             "LinesRules",
             "ComboMultiplierDecorator",
+            "ComboFactor",
             "Streak",
             "CellCount",
             "LineCount",
@@ -201,6 +206,8 @@
             "SortView",
             "TileCount",
             "PlaceStack",
+            "TraySlot",
+            "SortTray",
             "SortPlay",
             "SortSnapshot",
             "ClearedStacks",
@@ -296,7 +303,6 @@
             "GameSelectorViewModel",
             "InMemoryGameRepository",
             "FigureChoice",
-            "LevelVariant",
             "MergePayloadView",
             "BundledLevelRepository",
             "LevelGameFactories",
@@ -518,7 +524,8 @@
             "SquareDirection",
             "IUndoable",
             "Ordered",
-            "VictoryPhase"
+            "VictoryPhase",
+            "LevelVariant"
           ]
         },
         {
@@ -538,9 +545,11 @@
             "IProgressModel",
             "LevelProgress",
             "ProgressRecord",
-            "ILevelStars",
+            "IStarsByMoves",
+            "IStarsByMovesAndTime",
             "GameResult",
             "Stars",
+            "IStarThreshold",
             "LevelStatus"
           ]
         },
@@ -554,7 +563,8 @@
             "LevelsWon",
             "EveryLevelWon",
             "BestCountReached",
-            "TotalCountReached"
+            "TotalCountReached",
+            "CountsForAchievements"
           ]
         },
         {
@@ -572,6 +582,7 @@
             "ColorStack",
             "NewTile",
             "ComboMultiplierDecorator",
+            "ComboFactor",
             "MergeState",
             "FitScoring",
             "LinesSnapshot",
@@ -646,7 +657,6 @@
           "group": "ref|adapters",
           "types": [
             "InMemoryGameRepository",
-            "LevelVariant",
             "FitStateMapper",
             "LocalProgressRepository",
             "LevelGameFactories",
@@ -719,6 +729,8 @@
             "SortFactory",
             "SortRules",
             "PlaceStack",
+            "TraySlot",
+            "SortTray",
             "SortPlay"
           ]
         },
@@ -773,10 +785,13 @@
             "RedoableHistory",
             "MoveHistory",
             "LevelTimer",
-            "ILevelStars",
+            "IStarsByMoves",
+            "IStarsByMovesAndTime",
             "Stars",
             "SeededPieceSource",
-            "RandomSource"
+            "RandomSource",
+            "LevelVariant",
+            "CountsForAchievements"
           ]
         },
         {
@@ -814,7 +829,8 @@
             "CellCount",
             "Streak",
             "LinesSettings",
-            "ComboMultiplierDecorator"
+            "ComboMultiplierDecorator",
+            "ComboFactor"
           ]
         }
       ],
@@ -964,7 +980,9 @@
             "ValueReceiver",
             "HexCoord",
             "LevelId",
-            "TriangleCoord"
+            "TriangleCoord",
+            "LevelVariant",
+            "CountsForAchievements"
           ]
         },
         {
@@ -1038,7 +1056,6 @@
             "GamePresenter",
             "LocalProgressRepository",
             "InMemoryGameRepository",
-            "LevelVariant",
             "MergeStateMapper",
             "Compass",
             "SlideWay",

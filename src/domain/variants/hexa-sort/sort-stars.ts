@@ -1,5 +1,5 @@
 import type { Moves } from '../../shared/moves';
-import { Stars } from '../../progress/stars';
+import type { IStarThreshold } from '../../progress/star-count';
 
 // The moves of one won Sort level. The caller counts the moves.
 // It is a value object (classes.md decision 42): it never changes, and two plays are equal
@@ -32,7 +32,8 @@ export class SortPlay {
 // equal when their limits are equal. The limit stays private: `isMetBy()` compares a play.
 // The order of the thresholds of a level is not checked here:
 // that check belongs to the level builders, which read the level file (issue #49).
-export class SortStarThreshold {
+// `starsOf()` counts the stars of a play with these thresholds (issue #424).
+export class SortStarThreshold implements IStarThreshold<SortPlay> {
   private constructor(private readonly maxMoves: Moves) {
     Object.freeze(this);
   }
@@ -51,14 +52,4 @@ export class SortStarThreshold {
   isMetBy(play: SortPlay): boolean {
     return play.isWithin(this.maxMoves);
   }
-}
-
-// The stars of a won Sort level, by moves, as a `Stars` value object
-// (D22, the accepted rule of issue #59).
-// The stars are cumulative: star N needs star N-1.
-// So the count is the number of leading thresholds that the play meets.
-// `fitStars` counts the same way.
-export function sortStars(play: SortPlay, thresholds: readonly SortStarThreshold[]): Stars {
-  const missed = thresholds.findIndex((threshold) => !threshold.isMetBy(play));
-  return Stars.of(missed < 0 ? thresholds.length : missed);
 }

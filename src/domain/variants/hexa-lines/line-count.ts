@@ -1,5 +1,7 @@
+import { AchievementCount } from '../../achievements/achievement-count';
 import { Score } from '../../shared/score';
 import type { ValueReceiver } from '../../shared/value-receiver';
+import { ComboFactor } from './combo-factor';
 
 // The points of each cleared line, before any multiplier.
 // The value codes the accepted rule of issue #59 (D22, 2026-11-06).
@@ -10,9 +12,9 @@ const POINTS_PER_LINE = 10;
 // It is a value object: it never changes, and two counts are equal when their values are equal.
 // A count of lines is a safe integer of 0 or more. Any other number throws a RangeError.
 // A negative zero is stored as 0. The object is frozen, so no caller writes the value.
-// The value is private, and no operation returns it: the count gives its points as a `Score`.
-// `deliverTo()` gives the number to an adapter of the edge: the counter of the achievements
-// keeps the most lines at once (issue #363).
+// The value is private, and no operation returns it: the count gives its points as a `Score`,
+// and the count of the achievements as an `AchievementCount` (issue #406).
+// `deliverTo()` gives the number to an adapter of the edge.
 export class LineCount {
   private constructor(private readonly value: number) {
     Object.freeze(this);
@@ -38,6 +40,12 @@ export class LineCount {
     receiver.receive(this.value);
   }
 
+  // The count of lines as a count of the achievements. `LinesCleared` keeps it as the best
+  // count of Hexa Lines, the most lines at once (issue #406).
+  asAchievementCount(): AchievementCount {
+    return AchievementCount.of(this.value);
+  }
+
   // True when the placement cleared no line.
   isNone(): boolean {
     return this.value === 0;
@@ -48,15 +56,19 @@ export class LineCount {
     return Score.of(this.value * POINTS_PER_LINE);
   }
 
-  // The points that the combo multiplier adds to the line bonus (issue #59, D22).
-  // The multiplier is `lines + streak - 1`. The base policy gives the line bonus once,
-  // so the combo adds it `multiplier - 1` more times. A placement that clears no line adds nothing.
-  // `streak` is the length of the streak as a count, because the multiplier adds it to the count
-  // of lines. `Streak.comboBonus()` gives it, so no number leaves either value object.
-  // A clearing placement has a streak of 1 or more. A streak of 0 gives a negative product,
-  // and `Score.of()` throws a RangeError.
-  comboBonus(streak: LineCount): Score {
-    if (this.isNone()) return Score.of(0);
-    return Score.of(this.value * POINTS_PER_LINE * (this.value + streak.value - 2));
+  // The combo factor of these lines in a streak of 1: the count of lines (D22, issue #427).
+  // `Streak.comboFactor()` adds the rest of the streak to it.
+  comboFactor(): ComboFactor {
+    return ComboFactor.of(this.value);
+  }
+
+  // The points that the combo factor `factor` adds to the line bonus (issue #59, D22).
+  // The base policy gives the line bonus once, so the factor adds it `factor - 1` more times.
+  // A placement that clears no line has a bonus of 0, so it adds nothing.
+  // Factor 0 comes only from one line in a streak of 0, a photo that no game makes.
+  // It takes the line bonus away once, so `Score.of()` refuses the negative points.
+  comboBonus(factor: ComboFactor): Score {
+    if (factor.equals(ComboFactor.of(0))) return Score.of(-this.value * POINTS_PER_LINE);
+    return factor.extraOn(this.bonus());
   }
 }

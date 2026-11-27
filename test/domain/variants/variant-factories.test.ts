@@ -201,7 +201,7 @@ function figureTests<TCoord>(
 
       expect(keys(start.boardCopy().coordinates())).toEqual(region);
       expect(start.boardCopy().occupiedCells()).toEqual([]);
-      expect(start.offeredStack()?.equals(ColorStack.of([Color.of('red')]))).toBe(true);
+      expect(start.trayStacks()[0]?.equals(ColorStack.of([Color.of('red')]))).toBe(true);
       expect(outcome).toBe(Outcome.playing);
       expect(engine.snapshot().boardCopy().occupiedCells()).toHaveLength(1);
     });
