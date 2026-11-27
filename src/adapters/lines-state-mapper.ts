@@ -1,5 +1,6 @@
 import type { Color } from '../domain/engine/color';
 import type { LinesView } from '../domain/variants/hexa-lines/lines-state';
+import { onlyValue, valueOf } from './delivered';
 import type { StateMapper } from './state-mapper';
 
 export interface LinesCellView {
@@ -24,37 +25,25 @@ export class LinesStateMapper<TCoord> implements StateMapper<
   LinesPayloadView<TCoord>
 > {
   toView(cell: Color): LinesCellView {
-    return { color: nameOf(cell) };
+    return { color: valueOf(cell) };
   }
 
   freeView(): LinesCellView {
     return FREE;
   }
 
+  // A view that delivers no data, or delivers it twice, throws an Error (issue #408).
   toPayload(payload: LinesView<TCoord>): LinesPayloadView<TCoord> {
-    let view: LinesPayloadView<TCoord> | undefined;
-    payload.deliverTo({
-      receive: (tray) => {
-        view = {
-          tray: tray.map((piece) => ({
-            color: nameOf(piece.occupant()),
-            cells: piece.coveredCoordinates(),
-          })),
-        };
-      },
-    });
-    if (view === undefined) throw new Error('The Lines view delivered no data.');
-    return view;
+    return onlyValue<LinesPayloadView<TCoord>>((keep) =>
+      payload.deliverTo({
+        receive: (tray) =>
+          keep({
+            tray: tray.map((piece) => ({
+              color: valueOf(piece.occupant()),
+              cells: piece.coveredCoordinates(),
+            })),
+          }),
+      }),
+    );
   }
-}
-
-function nameOf(color: Color): string {
-  let name: string | undefined;
-  color.deliverTo({
-    receive: (value) => {
-      name = value;
-    },
-  });
-  if (name === undefined) throw new Error('The color delivered no name.');
-  return name;
 }
