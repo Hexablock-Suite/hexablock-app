@@ -184,6 +184,36 @@
       "type": "Synchronous/HTTP"
     },
     {
+      "description": "a sign-up with an invalid body",
+      "pending": false,
+      "providerStates": [
+        {
+          "name": "no account exists"
+        }
+      ],
+      "request": {
+        "body": {
+          "content": {
+            "password": "short",
+            "username": "ada"
+          },
+          "contentType": "application/json",
+          "encoded": false
+        },
+        "headers": {
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "method": "POST",
+        "path": "/v1/auth/register"
+      },
+      "response": {
+        "status": 400
+      },
+      "type": "Synchronous/HTTP"
+    },
+    {
       "description": "the signed-in user",
       "pending": false,
       "providerStates": [

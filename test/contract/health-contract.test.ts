@@ -22,6 +22,9 @@ const pact = new PactV4({
 // The account of the interactions of #45. The provider states of hexablock-api #151 create it.
 const ADA = { username: 'ada', password: 'correct horse battery' };
 const WRONG_PASSWORD = { username: 'ada', password: 'wrong horse battery' };
+// A password shorter than the 8 characters that hexablock-api asks for. The API answers 400 for a
+// field that breaks its rule (`POST /v1/auth/register` in `schema.d.ts`).
+const SHORT_PASSWORD = { username: 'ada', password: 'short' };
 const JSON_HEADERS = { 'Content-Type': 'application/json' };
 // The example token and user id of the mock server. Against the provider, the verifier sends the
 // token that the provider state `a signed-in account exists` gives.
@@ -33,6 +36,7 @@ const DESCRIPTIONS = [
   'a health check',
   'a sign-up with a free username',
   'a sign-up with a taken username',
+  'a sign-up with an invalid body',
   'a sign-in',
   'a sign-in with a wrong password',
   'the signed-in user',
@@ -113,6 +117,26 @@ describe('client contract', () => {
 
           expect(failure.status).toBe(409);
           expect(failure.message).not.toContain(ADA.password);
+        });
+    });
+
+    // The gateway maps this 400 to `invalid-credentials`.
+    it('should_reject_with_the_status_400_when_the_password_breaks_the_rule_of_the_api', async () => {
+      await pact
+        .addInteraction()
+        .given('no account exists')
+        .uponReceiving('a sign-up with an invalid body')
+        .withRequest('POST', '/v1/auth/register', (builder) =>
+          builder.headers(JSON_HEADERS).jsonBody(SHORT_PASSWORD),
+        )
+        .willRespondWith(400)
+        .executeTest(async (mockServer) => {
+          const api: AccountApi = createApiClient(mockServer.url);
+
+          const failure = await failureOf(api.signUp(SHORT_PASSWORD));
+
+          expect(failure.status).toBe(400);
+          expect(failure.message).not.toContain(SHORT_PASSWORD.password);
         });
     });
 
@@ -206,10 +230,13 @@ describe('client contract', () => {
           return { status: 200, body: signedIn ? { accessToken: STATE_TOKEN } : {} };
         },
         '/v1/health': { status: 200, body: health },
-        '/v1/auth/register': () =>
-          state === 'an account exists'
-            ? { status: 409, body: { statusCode: 409 } }
-            : { status: 201, body: {} },
+        // A password shorter than 8 characters breaks the rule of `CredentialsDto`.
+        '/v1/auth/register': (request) =>
+          (JSON.parse(request.body) as { password: string }).password.length < 8
+            ? { status: 400, body: { statusCode: 400 } }
+            : state === 'an account exists'
+              ? { status: 409, body: { statusCode: 409 } }
+              : { status: 201, body: {} },
         '/v1/auth/login': (request) =>
           JSON.parse(request.body).password === ADA.password
             ? { status: 200, body: { accessToken: 'token-of-the-sign-in' } }
