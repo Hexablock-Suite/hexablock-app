@@ -2,6 +2,7 @@
 import type { AnonymousProgress } from '../../src/application/anonymous-progress';
 import type { ProgressGateway } from '../../src/application/progress-gateway';
 import { SyncFailure } from '../../src/application/progress-gateway';
+import { ProgressOwner } from '../../src/application/progress-owner';
 import type { ProgressRepository } from '../../src/application/progress-repository';
 import { FailureCode } from '../../src/application/result';
 import { Session } from '../../src/application/session';
@@ -47,6 +48,9 @@ class MemorySessions implements SessionStore {
   read(): Promise<Session | undefined> {
     return Promise.resolve(this.session);
   }
+  owner(): Promise<string | undefined> {
+    return Promise.resolve(this.session?.userId);
+  }
   write(session: Session): Promise<void> {
     this.session = session;
     return Promise.resolve();
@@ -59,25 +63,38 @@ class MemorySessions implements SessionStore {
 }
 
 // The local progress of the account and the anonymous progress, each in its own map.
-// `failSave` makes each save throw, as a full disk does.
+// `owners` records the owner of each load and update. `failSave` makes each save throw, as a
+// full disk does. The anonymous progress stays when the save of the merge throws.
 class TwoSpaces implements ProgressRepository, AnonymousProgress {
   readonly own = new Map<string, GameProgress>();
   readonly anonymous = new Map<string, GameProgress>();
+  readonly owners: (string | undefined)[] = [];
   failSave = false;
-  load(): Promise<GameProgress | undefined> {
+  owner(): Promise<ProgressOwner> {
+    return Promise.resolve(ProgressOwner.anonymous);
+  }
+  load(owner: ProgressOwner): Promise<GameProgress | undefined> {
+    this.owners.push(owner.userId);
     return Promise.resolve(this.own.get('fit'));
   }
-  save(progress: GameProgress): Promise<void> {
+  update(
+    owner: ProgressOwner,
+    _gameId: GameId,
+    change: (progress: GameProgress) => void,
+  ): Promise<void> {
+    this.owners.push(owner.userId);
+    const stored = this.own.get('fit');
+    const progress = stored === undefined ? GameProgress.start(FIT) : fitCopy(stored);
+    change(progress);
     if (this.failSave) return Promise.reject(new Error('disk full'));
     this.own.set('fit', progress);
     return Promise.resolve();
   }
-  loadAnonymous(): Promise<GameProgress | undefined> {
-    return Promise.resolve(this.anonymous.get('fit'));
-  }
-  forgetAnonymous(): Promise<void> {
+  async mergeAnonymousInto(owner: ProgressOwner, gameId: GameId): Promise<void> {
+    const anonymous = this.anonymous.get('fit');
+    if (anonymous === undefined) return;
+    await this.update(owner, gameId, (progress) => progress.mergeWith(anonymous));
     this.anonymous.delete('fit');
-    return Promise.resolve();
   }
 }
 
@@ -138,6 +155,7 @@ describe('SyncProgress', () => {
     expect(result).toEqual({ ok: true, value: undefined });
     expect(gateway.sent).toHaveLength(1);
     expect(gateway.sent[0]?.session).toBe(ADA);
+    expect(spaces.owners).toEqual([ADA.userId, ADA.userId]);
     expect(sameContent(gateway.sent[0]!.progress, fitWith(level('fit-01', 2, 12, 9000)))).toBe(
       true,
     );
