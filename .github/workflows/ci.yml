@@ -33,6 +33,8 @@ jobs:
 
   # Starts the selected API revision and checks the client contract against it:
   # the committed pact (pnpm contract:verify) and the generated API types (pnpm api:check).
+  # The pact runs against the provider composition of the API, which sets up the provider
+  # state of each interaction (hexablock-api #151, app #45).
   # Then it loads the bundled levels into the API and checks them for drift
   # (pnpm levels:load, pnpm levels:check; hexablock-api issue #158).
   # API_REF selects the revision: empty verifies API main; a paired transition sets
@@ -62,6 +64,8 @@ jobs:
       PACT_DO_NOT_TRACK: 'true'
       PORT: '3000'
       BACKEND_URL: http://localhost:3000
+      # The provider composition of hexablock-api #151, for pnpm contract:verify.
+      PROVIDER_URL: http://localhost:3001
       DATABASE_URL: postgres://hexablock:hexablock@localhost:5432/hexablock
       # Paired transition (app issue #346): verify against the API commit that
       # serves /v1. Empty or removed restores the normal API main verification.
@@ -110,7 +114,24 @@ jobs:
           done
           cat "$RUNNER_TEMP/backend.log"
           exit 1
+      - name: Start the provider composition of the selected API revision
+        working-directory: hexablock-api
+        # The interactions of the account declare provider states (app #45). The verifier sets
+        # up each state through the state-change endpoint of hexablock-api #151, and only the
+        # provider composition mounts it: AppModule on an in-memory PGlite database, run from the
+        # sources with no build. pnpm api:check and the level steps keep the production start of
+        # BACKEND_URL.
+        run: |
+          PORT=3001 nohup node --env-file=.env.example scripts/contract/start-provider.js > "$RUNNER_TEMP/provider.log" 2>&1 &
+          for _ in $(seq 1 30); do
+            if curl --silent --fail "$PROVIDER_URL/v1/health"; then exit 0; fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/provider.log"
+          exit 1
       - run: pnpm contract:verify
+        env:
+          BACKEND_URL: ${{ env.PROVIDER_URL }}
       - run: pnpm api:check
       - name: Sign up a level editor and restart the API with its id
         working-directory: hexablock-api
@@ -151,4 +172,6 @@ jobs:
         run: pnpm exec jest --selectProjects contract test/contract/bundled-levels-sync.test.ts
       - name: Show the backend log
         if: failure()
-        run: cat "$RUNNER_TEMP/backend.log"
+        run: |
+          cat "$RUNNER_TEMP/backend.log"
+          cat "$RUNNER_TEMP/provider.log" || true
