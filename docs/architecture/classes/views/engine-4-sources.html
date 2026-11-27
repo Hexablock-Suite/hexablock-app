@@ -87,13 +87,14 @@
           keeps a GeneratorState and gives a RandomDraw on each next(), so no number leaves it.
           Score is the value object of a score: IScoringPolicy returns one, and GameResult and
           ProgressRecord hold one. Moves, ElapsedTime, Stars and LevelId are the value objects of
-          the counters: GameResult holds a Moves, a LevelId and an ElapsedTime, and ProgressRecord
-          holds a LevelId, Stars, a Moves and an ElapsedTime. Their fields are private: GameResult
-          creates the ProgressRecord of a progress model with recordWith(), and ProgressRecord tells
-          with improves() whether it is better than the stored record, by the order of DS-4.
-          ProgressRecord tells with isOfGame() whether it is a record of a game, so a GameProgress
-          refuses a record of another game. ProgressRecord gives the stars of its level with
-          starsOf(), and its value objects to a repository of the edge with deliverTo().
+          the counters: GameResult holds a Moves (none for a game with no levels, D26), a LevelId
+          and an ElapsedTime, and ProgressRecord holds a LevelId, Stars, a Moves and an ElapsedTime.
+          Their fields are private: GameResult creates the ProgressRecord of a progress model with
+          recordWith(), and ProgressRecord tells with improves() whether it is better than the
+          stored record, by the order of DS-4. ProgressRecord tells with isOfGame() whether it is a
+          record of a game, so a GameProgress refuses a record of another game. ProgressRecord gives
+          the stars of its level with starsOf(), and its value objects to a repository of the edge
+          with deliverTo().
         </desc>
         <defs>
           <marker
@@ -928,7 +929,7 @@
           - score: Score
         </text>
         <text x="624" y="688" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - moves: Moves
+          - moves: Moves [0..1]
         </text>
         <text x="624" y="704" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - elapsedMs: ElapsedTime [0..1]
@@ -1083,7 +1084,7 @@
           text-anchor="start"
         >
           moves
-          <tspan font-weight="600">1</tspan>
+          <tspan font-weight="600">0..1</tspan>
         </text>
         <!-- IProgressModel records each result in the GameProgress of its game: use -->
         <line
@@ -1868,9 +1869,9 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          GameResult holds a Moves, a LevelId and an ElapsedTime, and ProgressRecord holds a
-          LevelId, Stars, a Moves and an ElapsedTime (decision 42). ITimed.elapsedMs() returns an
-          ElapsedTime.
+          GameResult holds a Moves [0..1] (D26), a LevelId and an ElapsedTime, and ProgressRecord
+          holds a LevelId, Stars, a Moves and an ElapsedTime (decision 42). ITimed.elapsedMs()
+          returns an ElapsedTime.
         </text>
 
         <!-- Legend -->
