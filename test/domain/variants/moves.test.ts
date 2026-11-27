@@ -10,6 +10,7 @@ import { PlacePiece } from '../../../src/domain/variants/hexa-lines/place-piece'
 import { TrayPosition } from '../../../src/domain/variants/hexa-lines/tray-position';
 import { SlideSense, Slide } from '../../../src/domain/variants/hexa-merge/slide';
 import { PlaceStack } from '../../../src/domain/variants/hexa-sort/place-stack';
+import { TraySlot } from '../../../src/domain/variants/hexa-sort/tray-slot';
 import { square, SquareAxis, squareTopology } from '../../support/engine/square-topology';
 
 // Issue #205, classes.md decision 43: every move of the four variants is a value object.
@@ -106,8 +107,17 @@ describe('equals of the moves', () => {
       right.equals(left, squareTopology),
     ];
 
-    expect(same(PlaceStack.on(square(1, 2)), PlaceStack.on(square(1, 2)))).toEqual(EQUAL);
-    expect(same(PlaceStack.on(square(1, 2)), PlaceStack.on(square(2, 1)))).toEqual(DIFFERENT);
+    const first = TraySlot.of(0);
+    expect(
+      same(PlaceStack.on(first, square(1, 2)), PlaceStack.on(TraySlot.of(0), square(1, 2))),
+    ).toEqual(EQUAL);
+    expect(same(PlaceStack.on(first, square(1, 2)), PlaceStack.on(first, square(2, 1)))).toEqual(
+      DIFFERENT,
+    );
+    // Issue #353: the move names its tray slot, so two slots give two moves.
+    expect(
+      same(PlaceStack.on(first, square(1, 2)), PlaceStack.on(TraySlot.of(1), square(1, 2))),
+    ).toEqual(DIFFERENT);
   });
 });
 
@@ -160,7 +170,7 @@ describe('private fields of the moves', () => {
     const placeFit = new PlaceFitPiece(A, Turns.of(0), square(0, 0));
     const removeFit = new RemoveFitPiece(A);
     const rotateFit = new RotateFitPiece(A, Turns.of(1));
-    const placeStack = PlaceStack.on(square(0, 0));
+    const placeStack = PlaceStack.on(TraySlot.of(0), square(0, 0));
     const readers = [
       // @ts-expect-error `PlacePiece.trayIndex` is private.
       () => placePiece.trayIndex,
@@ -184,14 +194,16 @@ describe('private fields of the moves', () => {
       () => rotateFit.steps,
       // @ts-expect-error `PlaceStack.at` is private.
       () => placeStack.at,
+      // @ts-expect-error `PlaceStack.slot` is private.
+      () => placeStack.slot,
     ];
 
-    expect(readers).toHaveLength(11);
+    expect(readers).toHaveLength(12);
   });
 
   it('should_reject_at_compile_time_when_a_caller_builds_a_sort_placement_as_a_literal', () => {
     // @ts-expect-error `PlaceStack` is a class with a private field, so a literal is not a move.
-    const literal: PlaceStack<unknown> = { at: square(0, 0) };
+    const literal: PlaceStack<unknown> = { slot: TraySlot.of(0), at: square(0, 0) };
 
     expect(literal).not.toBeInstanceOf(PlaceStack);
   });

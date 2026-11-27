@@ -142,14 +142,14 @@ function sortPoints(stacks: number[]): number {
     MATCH_ID,
     board,
     Score.of(0),
-    undefined,
+    [undefined, undefined, undefined],
     goalsDone,
     goal,
     stacks.map(TileCount.of),
     undefined,
     new FixedListPieceSource([]),
     Moves.of(0),
-    new SortView(undefined, goalsDone, goal),
+    new SortView([undefined, undefined, undefined], goalsDone, goal),
   );
   return turnScore(new SortScoring<SquareCoord>(), after);
 }

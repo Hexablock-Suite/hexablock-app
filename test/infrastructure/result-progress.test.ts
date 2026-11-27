@@ -22,6 +22,7 @@ import { TopologyId } from '../../src/domain/shared/topology-id';
 import { PlaceFitPiece } from '../../src/domain/variants/hexa-fit/fit-move';
 import { PieceId } from '../../src/domain/variants/hexa-fit/piece-id';
 import { PlaceStack } from '../../src/domain/variants/hexa-sort/place-stack';
+import { TraySlot } from '../../src/domain/variants/hexa-sort/tray-slot';
 import { CompositionRoot } from '../../src/infrastructure/composition-root';
 import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-store';
 import { valueOf } from '../support/application/game-use-cases';
@@ -168,7 +169,9 @@ async function winSort(
         SORT,
         figureOf(file.topology),
         file.levelId,
-        plan.map((at) => PlaceStack.on(geometry.createCoord([...at]))),
+        // The plan places the stacks in the order of the level, so the tray of three (#353)
+        // gives move n the stack of the slot n modulo 3.
+        plan.map((at, n) => PlaceStack.on(TraySlot.of(n % 3), geometry.createCoord([...at]))),
       ),
   });
 }

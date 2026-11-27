@@ -19,7 +19,7 @@ import { linesGame, linesState, piece } from '../support/variants/hexa-lines/lin
 import { mergeGame, mergeState } from '../support/variants/hexa-merge/merge-game';
 import { tileMergedDataOf } from '../support/variants/hexa-merge/tile-merged';
 import {
-  place,
+  placeFrom,
   row,
   sortGame,
   sortState,
@@ -110,7 +110,7 @@ describe('ApplyMove events of a move', () => {
     );
     const { applyMove, publisher } = applyMoveOf(game);
 
-    valueOf(await applyMove.execute({ move: place(1) }));
+    valueOf(await applyMove.execute({ move: placeFrom(0, 1) }));
 
     expect(publisher.events).toHaveLength(1);
     const data = stackClearedDataOf<SquareCoord>(publisher.events[0]);
@@ -130,7 +130,7 @@ describe('ApplyMove events of a move', () => {
     );
     const { applyMove, publisher } = applyMoveOf(game);
 
-    valueOf(await applyMove.execute({ move: place(1) }));
+    valueOf(await applyMove.execute({ move: placeFrom(0, 1) }));
 
     expect(publisher.events).toHaveLength(2);
     expect(

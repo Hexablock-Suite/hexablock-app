@@ -86,11 +86,13 @@ describe('game route', () => {
     expect(screen.queryAllByRole('radio')).toEqual([]);
   });
 
-  it('should_place_the_offer_without_showing_undo_when_the_sort_player_presses_a_free_space', async () => {
+  // Issue #353: the player chooses a stack of the tray, and then presses a free space.
+  it('should_place_the_chosen_stack_without_showing_undo_when_the_sort_player_chooses_a_stack_and_presses_a_free_space', async () => {
     await renderRouter(appDir, { initialUrl: '/map' });
     await openFirstLevel('Hexa Sort');
 
     expect(occupiedSpaces()).toEqual([]);
+    await fireEvent.press(screen.getByRole('radio', { name: 'Pila 1' }));
     await pressSpace(0);
 
     expect(occupiedSpaces()).toEqual([0]);

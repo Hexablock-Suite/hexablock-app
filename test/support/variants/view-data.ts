@@ -6,9 +6,8 @@ import type { PieceId } from '../../../src/domain/variants/hexa-fit/piece-id';
 import { LinesView } from '../../../src/domain/variants/hexa-lines/lines-state';
 import { MergeView } from '../../../src/domain/variants/hexa-merge/merge-state';
 import type { ClearedStacks } from '../../../src/domain/variants/hexa-sort/cleared-stacks';
-import type { ColorStack } from '../../../src/domain/variants/hexa-sort/color-stack';
 import type { GoalCount } from '../../../src/domain/variants/hexa-sort/goal-count';
-import { SortView } from '../../../src/domain/variants/hexa-sort/sort-state';
+import { SortView, type SortTray } from '../../../src/domain/variants/hexa-sort/sort-state';
 
 // Reads the view of each variant as an adapter of the edge does. It exists only in test/.
 // A view keeps its fields private and delivers its data to a receiver (issue #245).
@@ -47,15 +46,15 @@ export function fitViewData<TCoord>(view: FitView<TCoord>): {
   );
 }
 
-// The offered stack and the two goal counts that a Sort view delivers.
+// The slots of the tray and the two goal counts that a Sort view delivers (issue #353).
 export function sortViewData(view: SortView): {
-  readonly offered: ColorStack | undefined;
+  readonly tray: SortTray;
   readonly goalsDone: ClearedStacks;
   readonly goalsNeeded: GoalCount;
 } {
   return once((keep) =>
     view.deliverTo({
-      receive: (offered, goalsDone, goalsNeeded) => keep({ offered, goalsDone, goalsNeeded }),
+      receive: (tray, goalsDone, goalsNeeded) => keep({ tray, goalsDone, goalsNeeded }),
     }),
   );
 }

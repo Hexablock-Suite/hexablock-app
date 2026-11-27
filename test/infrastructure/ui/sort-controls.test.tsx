@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { GamePresenter } from '../../../src/adapters/game-presenter';
@@ -62,25 +62,41 @@ async function openLevel(stacks: readonly (readonly string[])[]): Promise<void> 
   await screen.findByText('En juego');
 }
 
-const currentOffer = () => screen.getByLabelText('Pila disponible');
+// The slot `n` of the tray, from 1, as the screen reader names it.
+const slot = (n: number) => screen.getByRole('radio', { name: `Pila ${n}` });
 
+// Chooses the stack of the slot `n` of the tray.
+async function choose(n: number): Promise<void> {
+  await fireEvent.press(slot(n));
+}
+
+// Issue #353: the tray offers three stacks. A tap on a stack chooses it, and a tap on a free
+// space places it, the same two-tap input as Hexa Fit.
 describe('SortControls', () => {
-  it('should_draw_the_offered_stack_on_the_board_and_present_the_next_offer_when_a_free_space_is_pressed', async () => {
-    await openLevel([['red', 'blue', 'red'], ['green']]);
-    const offered = outlinesIn(currentOffer());
-    expect(offered).toHaveLength(6);
+  it('should_place_the_chosen_stack_and_empty_its_slot_when_the_second_stack_of_the_tray_is_chosen_and_a_free_space_is_pressed', async () => {
+    await openLevel([['red', 'blue', 'red'], ['green', 'blue'], ['blue']]);
+    const second = outlinesIn(slot(2));
+    expect([1, 2, 3].map((n) => outlinesIn(slot(n)).length)).toEqual([6, 4, 2]);
     expect(spaces()).toHaveLength(7);
 
     await pressSpace(0);
+    expect(occupiedSpaces()).toEqual([]);
 
-    expect(occupiedSpaces()).toEqual([0]);
-    expect(outlinesIn(spaces()[0])).toEqual(offered);
-    expect(outlinesIn(currentOffer())).toHaveLength(2);
-    expect(screen.queryByRole('button', { name: /^(Deshacer|Rehacer)$/ })).toBeNull();
-
+    await choose(2);
+    expect(slot(2)).toBeChecked();
     await pressSpace(0);
 
-    expect(outlinesIn(currentOffer())).toHaveLength(2);
+    expect(occupiedSpaces()).toEqual([0]);
+    expect(outlinesIn(spaces()[0])).toEqual(second);
+    expect([1, 2, 3].map((n) => outlinesIn(slot(n)).length)).toEqual([6, 0, 2]);
+    expect(slot(2)).toBeDisabled();
+    expect(slot(1)).not.toBeChecked();
+    expect(screen.queryByRole('button', { name: /^(Deshacer|Rehacer)$/ })).toBeNull();
+
+    await choose(2);
+    await pressSpace(1);
+
+    expect(occupiedSpaces()).toEqual([0]);
     expect(screen.queryByRole('alert')).toBeNull();
   });
 
@@ -89,16 +105,20 @@ describe('SortControls', () => {
     await openLevel([redRun, redRun, ['green']]);
     expect(screen.getByText('0 / 2')).toBeOnTheScreen();
 
+    await choose(1);
     await pressSpace(0);
+    await choose(2);
     await pressSpace(1);
 
     expect(screen.getByText('1 / 2')).toBeOnTheScreen();
     expect(occupiedSpaces()).toEqual([]);
 
+    await choose(3);
     await pressSpace(0);
 
     expect(occupiedSpaces()).toEqual([0]);
-    expect(screen.queryByLabelText('Pila disponible')).toBeNull();
+    expect([1, 2, 3].map((n) => outlinesIn(slot(n)).length)).toEqual([0, 0, 0]);
+    expect(screen.getByText('No quedan pilas por colocar.')).toBeOnTheScreen();
 
     await pressSpace(1);
 

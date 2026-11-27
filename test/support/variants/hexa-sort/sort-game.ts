@@ -20,6 +20,7 @@ import { SortFactory } from '../../../../src/domain/variants/hexa-sort/sort-fact
 import { SortLevel } from '../../../../src/domain/variants/hexa-sort/sort-level';
 import { SortRules } from '../../../../src/domain/variants/hexa-sort/sort-rules';
 import { PlaceStack } from '../../../../src/domain/variants/hexa-sort/place-stack';
+import { TraySlot } from '../../../../src/domain/variants/hexa-sort/tray-slot';
 import { SortState, type SortSnapshot } from '../../../../src/domain/variants/hexa-sort/sort-state';
 import { square, squareTopology, type SquareCoord } from '../../engine/square-topology';
 import { MATCH_ID } from '../../engine/match-id';
@@ -118,8 +119,15 @@ export function sortGame(
   return engine;
 }
 
-export function place(col: number, row = 0): PlaceStack<SquareCoord> {
-  return PlaceStack.on(square(col, row));
+// The move that places the stack of the tray slot `slot` on the cell `(col, row)` (issue #353).
+export function placeFrom(slot: number, col: number, row = 0): PlaceStack<SquareCoord> {
+  return PlaceStack.on(TraySlot.of(slot), square(col, row));
+}
+
+// The color names of each slot of the tray of `photo`, from the first slot.
+// An empty slot gives `[]`.
+export function trayOf(photo: SortSnapshot<SquareCoord>): string[][] {
+  return photo.trayStacks().map((slot) => names(slot));
 }
 
 // The color names of the cell `(col, row)`, from the bottom to the top.
