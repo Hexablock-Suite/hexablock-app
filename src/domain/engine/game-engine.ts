@@ -1,7 +1,7 @@
 import type { BoardSnapshot, BoardState, SnapshotOf } from './board-state';
 import type { Cloneable } from './cloneable';
 import type { ElapsedTime } from '../shared/elapsed-time';
-import { GameOver, type GameEvent } from './game-events';
+import { GameEnded, type GameEvent } from './game-events';
 import type { GameId } from '../shared/game-id';
 import { PlayingPhase, ResolvingPhase, type GamePhase } from './game-phase';
 import type { MatchId } from './match-id';
@@ -128,13 +128,13 @@ export class GameEngine<
 
   // One turn: receive the move, let the rules validate, apply, resolve and evaluate it
   // (template method `playTurn()`), score it, record the events of the move, and record
-  // `GameOver` when the game ends. It is the one entry of a turn (classes.md decision 26,
+  // `GameEnded` when the game ends. It is the one entry of a turn (classes.md decision 26,
   // issue #415): `ApplyMove` calls it.
   // It returns the `Resolution` of the turn, which also says
   // whether the rules accepted the move. So the `ApplyMove` use case can return a failure
   // for a rejected move (issue 100). A rejected move always has the outcome `playing`.
   // An accepted turn records the events of its move, which the photo after the move gives
-  // (issue #361). A turn that ends the game also records one `GameOver` event, after them,
+  // (issue #361). A turn that ends the game also records one `GameEnded` event, after them,
   // when the engine saves the turn (classes.md decision 29). A rejected move records no event. The engine builds the event inside the turn, so an error there
   // leaves the turn unsaved. The engine calls no publisher, so no publisher failure reaches
   // the turn (issue #233).
@@ -207,7 +207,7 @@ export class GameEngine<
   // points included (classes.md decision 34, issue #178). They are taken inside the turn,
   // so a photo that throws leaves the turn unsaved.
   // `events` are the events of the turn, in their order: the events of the move that the photo
-  // after the move gives (issue #361), then the `GameOver` of a turn that ends the game.
+  // after the move gives (issue #361), then the `GameEnded` of a turn that ends the game.
   // The root builds each event with its own ids. It reads no variant event by name.
   private resolveTurn(
     state: TState,
@@ -229,7 +229,7 @@ export class GameEngine<
     next.addPoints(this.scoring.score(before, photoOf(next)));
     const after = photoOf(next);
     const phase = resolution.phaseAfter(this.current);
-    const ended = this.gameOverOf(next, resolution);
+    const ended = this.gameEndedOf(next, resolution);
     return {
       next,
       phase,
@@ -245,9 +245,9 @@ export class GameEngine<
 
   // The event of a turn that ends the game, with the final score of `next`.
   // It is `undefined` while the game goes on.
-  private gameOverOf(next: TState, resolution: Resolution): GameOver | undefined {
+  private gameEndedOf(next: TState, resolution: Resolution): GameEnded | undefined {
     if (!resolution.endsTheGame()) return undefined;
-    return new GameOver(
+    return new GameEnded(
       this.gameId,
       this.matchId,
       resolution.leadsTo(),

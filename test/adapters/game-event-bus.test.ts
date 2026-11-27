@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { GameEventBus } from '../../src/adapters/game-event-bus';
 import { ApplyMove } from '../../src/application/apply-move';
-import { GameOver } from '../../src/domain/engine/game-events';
+import { GameEnded } from '../../src/domain/engine/game-events';
 import { GameId } from '../../src/domain/shared/game-id';
 import { Outcome } from '../../src/domain/engine/outcome';
 import { Score } from '../../src/domain/shared/score';
@@ -24,7 +24,7 @@ describeGameEventPublisherContract('GameEventBus with a listener', () => {
   return bus;
 });
 
-const LOST = new GameOver(GameId.of('hexa-lines'), MATCH_ID, Outcome.gameOver, Score.of(10));
+const LOST = new GameEnded(GameId.of('hexa-lines'), MATCH_ID, Outcome.gameOver, Score.of(10));
 
 describe('GameEventBus', () => {
   it('should_give_the_event_to_both_listeners_in_the_order_of_subscription_when_two_listeners_subscribe', () => {

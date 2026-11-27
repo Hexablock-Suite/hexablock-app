@@ -6,9 +6,9 @@ import { Moves } from '../../../src/domain/shared/moves';
 import { Stars } from '../../../src/domain/progress/stars';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
 import {
-  GameOver,
+  GameEnded,
   type GameEvent,
-  type GameOverReceiver,
+  type GameEndedReceiver,
 } from '../../../src/domain/engine/game-events';
 import { GameId } from '../../../src/domain/shared/game-id';
 import { GameProgress } from '../../../src/domain/progress/game-progress';
@@ -42,7 +42,7 @@ import { playMove } from '../../support/engine/play-move';
 // No real scoring: the accepted rule of issue #59 (D22) has its own suite per variant.
 // Each dummy runs through `GameEngine`: the source lives in the state that the engine
 // copies and rolls back, the engine calls the scoring, and a subscriber of the
-// `GameOver` event gives a `GameResult` to the progress model. The engine records the event,
+// `GameEnded` event gives a `GameResult` to the progress model. The engine records the event,
 // and the subscriber takes it after each move, as `ApplyMove` does (issue #233).
 // The model records the result in the progress of the game (issue #156).
 
@@ -106,10 +106,10 @@ class ThreeStarsProgress implements IProgressModel {
   }
 }
 
-// A subscriber of the engine events. On `GameOver` it builds a `GameResult`
+// A subscriber of the engine events. On `GameEnded` it builds a `GameResult`
 // and records it in the progress of the game with the progress model.
 // It counts the recorded results. The event delivers its data to the subscriber.
-class ProgressSubscriber implements GameOverReceiver {
+class ProgressSubscriber implements GameEndedReceiver {
   readonly progress = GameProgress.start(GameId.of('fake-game'));
   recorded = 0;
 
@@ -120,7 +120,7 @@ class ProgressSubscriber implements GameOverReceiver {
 
   // Takes the events that the engine recorded. A test double may ask the class of an event.
   listen(events: readonly GameEvent[]): void {
-    for (const event of events) if (event instanceof GameOver) event.deliverTo(this);
+    for (const event of events) if (event instanceof GameEnded) event.deliverTo(this);
   }
 
   receive(gameId: GameId, _matchId: MatchId, _outcome: Outcome, finalScore: Score): void {

@@ -30,7 +30,7 @@ import {
 } from '../../../support/variants/hexa-fit/fit-game';
 import { fitViewData } from '../../../support/variants/view-data';
 import { repoRoot } from '../../../support/run-tool';
-import { dataOf } from '../../../support/engine/game-over';
+import { dataOf } from '../../../support/engine/game-ended';
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { BOARD_ID, STATE_ID, TIMER_ID } from '../../../support/engine/entity-ids';
 import { delivered } from '../../../support/engine/value-receiver';

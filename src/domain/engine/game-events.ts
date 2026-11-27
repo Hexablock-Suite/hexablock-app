@@ -7,7 +7,7 @@ import type { Score } from '../shared/score';
 // `GameEngine` records each event when it saves the turn, and tells nobody.
 // `ApplyMove` takes the events after the turn and delivers them to the publisher port
 // (classes.md decisions 25 and 29).
-// The engine has one concrete event, `GameOver`. The variants add the events of a move
+// The engine has one concrete event, `GameEnded`. The variants add the events of a move
 // (issue #361): `LinesCleared`, `TileMerged` and `StackCleared`. The photo of the state
 // after a move builds them with the ids that `GameEngine` gives, so the engine names
 // no variant event.
@@ -23,7 +23,10 @@ export abstract class GameEvent {
   }
 }
 
-// The event of a game that ends. `GameEngine` builds it inside the last turn.
+// The event of a game that ends, with a victory or with a defeat. `GameEngine` builds it
+// inside the last turn.
+// Its name says only that the game ended (issue #421). A game over is a defeat only:
+// `GameOverPhase` is the phase after a defeat. `Outcome.gameOver` is the outcome of a defeat.
 // The final score is a `Score`, which is valid when it exists. So the event has no check
 // of its own (classes.md decision 41).
 // The event carries two ids: the `GameId` says which game ended, and the `MatchId` says
@@ -31,7 +34,7 @@ export abstract class GameEvent {
 // one game apart.
 // Every field is private (rule R-domain-private-fields). A listener asks `isVictory()`,
 // or it receives the data through `deliverTo()`.
-export class GameOver extends GameEvent {
+export class GameEnded extends GameEvent {
   constructor(
     gameId: GameId,
     private readonly matchId: MatchId,
@@ -41,23 +44,23 @@ export class GameOver extends GameEvent {
     super(gameId);
   }
 
-  // Tells if the game ends with a victory. Any other end of a game is a game over.
+  // Tells if the game ends with a victory. Any other end of a game is a defeat, a game over.
   isVictory(): boolean {
     return Outcome.victory.equals(this.outcome);
   }
 
   // Gives the data of the event to `receiver`. It returns nothing.
   // Only a listener of the edge calls it (rule R-no-delivery-call).
-  deliverTo(receiver: GameOverReceiver): void {
+  deliverTo(receiver: GameEndedReceiver): void {
     this.withGameId((gameId) =>
       receiver.receive(gameId, this.matchId, this.outcome, this.finalScore),
     );
   }
 }
 
-// The receiver of the data of a `GameOver` event. A listener of the edge implements it,
+// The receiver of the data of a `GameEnded` event. A listener of the edge implements it,
 // for example to save the final score. No code of `src/domain/` or `src/application/`
 // calls `deliverTo()` (rule R-no-delivery-call).
-export interface GameOverReceiver {
+export interface GameEndedReceiver {
   receive(gameId: GameId, matchId: MatchId, outcome: Outcome, finalScore: Score): void;
 }
