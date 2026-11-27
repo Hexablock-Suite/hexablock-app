@@ -30,7 +30,7 @@ import type { ColorStack } from '../../src/domain/variants/hexa-sort/color-stack
 import { GoalCount } from '../../src/domain/variants/hexa-sort/goal-count';
 import type { PlaceStack } from '../../src/domain/variants/hexa-sort/place-stack';
 import { SortState } from '../../src/domain/variants/hexa-sort/sort-state';
-import { dataOf, type GameOverData } from '../support/engine/game-over';
+import { dataOf, type GameEndedData } from '../support/engine/game-ended';
 import { phaseNameOf } from '../support/engine/phase-name';
 import { square, type SquareCoord } from '../support/engine/square-topology';
 import { firstMoveOf, gameIdOf } from '../support/engine/variant-game';
@@ -105,7 +105,7 @@ class ThrowingPublisher implements GameEventPublisher {
 // A publisher that notes the phase of the running game when it receives an event.
 // So a test sees whether `ApplyMove` delivers the event after the engine saves the turn.
 class PhaseReadingPublisher implements GameEventPublisher {
-  readonly received: [GameOverData, string][] = [];
+  readonly received: [GameEndedData, string][] = [];
   private games: { running(): { currentPhase(): GamePhase } } | undefined;
 
   watch(games: { running(): { currentPhase(): GamePhase } }): void {
@@ -379,7 +379,7 @@ describe('StartGame and ApplyMove', () => {
 
   // The root only records its event. `ApplyMove` takes it after the turn and delivers it
   // to the publisher port (issue #233, classes.md decisions 25 and 29).
-  it('should_deliver_one_game_over_with_the_id_of_the_generator_after_the_turn_when_apply_move_plays_the_last_move', async () => {
+  it('should_deliver_one_game_ended_event_with_the_id_of_the_generator_after_the_turn_when_apply_move_plays_the_last_move', async () => {
     const publisher = new PhaseReadingPublisher();
     const factory = fitFactory();
     const { games, startGame, applyMove } = gameUseCases(factory, publisher, {

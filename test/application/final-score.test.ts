@@ -41,7 +41,7 @@ function overflowingGame() {
 
 const MOVE: FakeMove = { at: square(0, 0), cell: fakeCell(1) };
 
-// Before issue #203 the total became `Infinity`, the turn stayed saved and the `GameOver`
+// Before issue #203 the total became `Infinity`, the turn stayed saved and the `GameEnded`
 // event threw. A `Score` checks its sum, so the turn now throws before the engine saves it.
 describe('a total score that passes the largest safe integer', () => {
   it('should_return_a_move_failed_error_when_the_points_of_the_turn_pass_the_largest_safe_integer', async () => {

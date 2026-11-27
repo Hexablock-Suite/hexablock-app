@@ -10,7 +10,7 @@ import { Slide, SlideSense } from '../../src/domain/variants/hexa-merge/slide';
 import { TileCount } from '../../src/domain/variants/hexa-sort/tile-count';
 import { MemoryGameRepository, valueOf, errorOf } from '../support/application/game-use-cases';
 import { RecordingPublisher } from '../support/application/recording-publisher';
-import { dataOf } from '../support/engine/game-over';
+import { dataOf } from '../support/engine/game-ended';
 import { MATCH_ID } from '../support/engine/match-id';
 import { square, squareTopology, type SquareCoord } from '../support/engine/square-topology';
 import { delivered } from '../support/engine/value-receiver';
@@ -120,7 +120,7 @@ describe('ApplyMove events of a move', () => {
     expect(data.height.equals(TileCount.of(11))).toBe(true);
   });
 
-  it('should_deliver_the_events_of_the_move_before_the_game_over_when_the_move_ends_the_game', async () => {
+  it('should_deliver_the_events_of_the_move_before_the_game_ended_event_when_the_move_ends_the_game', async () => {
     const game = sortGame(
       sortState({
         board: row(3, [[square(0, 0), stack(...tiles('red', 6))]]),

@@ -17,7 +17,7 @@ import type { Score } from '../../src/domain/shared/score';
 import type { MergeFactory } from '../../src/domain/variants/hexa-merge/merge-factory';
 import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-store';
 import { RecordingPublisher } from '../support/application/recording-publisher';
-import { dataOf, gameOversIn } from '../support/engine/game-over';
+import { dataOf, gameEndedEventsIn } from '../support/engine/game-ended';
 import { PlayingPhase } from '../../src/domain/engine/game-phase';
 import type { IPieceSource } from '../../src/domain/engine/piece-source';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
@@ -318,7 +318,7 @@ const MERGE = GameId.of('hexa-merge');
 // The most turns of one Merge game on a hexagon of 2 rings. The game ends long before.
 const MOST_TURNS = 500;
 
-// One Merge game through the use cases, from its start to its `GameOver` event.
+// One Merge game through the use cases, from its start to its `GameEnded` event.
 // Each turn plays the first valid slide. With `undoOnce`, the game undoes the first slide
 // that scores, once, and goes on. It gives the score before that slide, the score after it
 // and the score after the undo, the final score of the event and the count of kept slides.
@@ -328,7 +328,7 @@ async function playToTheEnd(factory: MergeFactory<HexCoord>, undoOnce: boolean) 
   let score = valueOf(await startGame.execute({})).score;
   let kept = 0;
   let undone: { before: Score; after: Score; undone: Score } | undefined;
-  for (let turn = 0; gameOversIn(events.events).length === 0; turn += 1) {
+  for (let turn = 0; gameEndedEventsIn(events.events).length === 0; turn += 1) {
     if (turn === MOST_TURNS) throw new RangeError('The Merge game did not end.');
     const slide = firstValidMove(
       factory.createRules(),
@@ -345,7 +345,7 @@ async function playToTheEnd(factory: MergeFactory<HexCoord>, undoOnce: boolean) 
       score = played.score;
     }
   }
-  const [ended] = gameOversIn(events.events);
+  const [ended] = gameEndedEventsIn(events.events);
   return { undone, finalScore: dataOf(ended).finalScore, kept: Moves.of(kept) };
 }
 

@@ -1,5 +1,5 @@
 import type { GameEventPublisher } from '../../../src/application/game-event-publisher';
-import { GameOver } from '../../../src/domain/engine/game-events';
+import { GameEnded } from '../../../src/domain/engine/game-events';
 import { GameId } from '../../../src/domain/shared/game-id';
 import { Outcome } from '../../../src/domain/engine/outcome';
 import { Score } from '../../../src/domain/shared/score';
@@ -14,10 +14,10 @@ export function describeGameEventPublisherContract(
   make: () => GameEventPublisher,
 ): void {
   describe(`${name} as a GameEventPublisher`, () => {
-    const lost = new GameOver(GameId.of('hexa-lines'), MATCH_ID, Outcome.gameOver, Score.of(10));
-    const won = new GameOver(GameId.of('hexa-fit'), MATCH_ID, Outcome.victory, Score.of(0));
+    const lost = new GameEnded(GameId.of('hexa-lines'), MATCH_ID, Outcome.gameOver, Score.of(10));
+    const won = new GameEnded(GameId.of('hexa-fit'), MATCH_ID, Outcome.victory, Score.of(0));
 
-    it('should_accept_the_event_when_a_game_over_is_published', () => {
+    it('should_accept_the_event_when_a_game_ended_event_is_published', () => {
       expect(() => make().publish(lost)).not.toThrow();
     });
 

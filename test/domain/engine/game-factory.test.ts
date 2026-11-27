@@ -22,7 +22,7 @@ import {
   type FakeSnapshot,
 } from '../../support/engine/fake-game';
 import { CountingMatchIds, MATCH_ID } from '../../support/engine/match-id';
-import { dataOf } from '../../support/engine/game-over';
+import { dataOf } from '../../support/engine/game-ended';
 import { ManualClock } from '../../support/engine/manual-clock';
 import { phaseNameOf } from '../../support/engine/phase-name';
 import { square } from '../../support/engine/square-topology';
@@ -88,7 +88,7 @@ describe('GameFactory', () => {
     ]).toEqual([false, false]);
   });
 
-  it('should_give_the_engine_and_its_game_over_event_the_id_of_the_generator_when_the_generator_is_fixed', () => {
+  it('should_give_the_engine_and_its_game_ended_event_the_id_of_the_generator_when_the_generator_is_fixed', () => {
     const ids = new FixedMatchId();
     const game = new GameFactory(FAKE_GAME, fakeGameFactory(1), ids).createGame();
     const sameMatch = new GameEngine(
