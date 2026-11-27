@@ -88,7 +88,8 @@
             "IPieceSource",
             "SeededPieceSource",
             "IRandomSeeded",
-            "PieceDraw"
+            "PieceDraw",
+            "LevelVariant"
           ]
         },
         {
@@ -124,7 +125,8 @@
             "LevelsWon",
             "EveryLevelWon",
             "BestCountReached",
-            "TotalCountReached"
+            "TotalCountReached",
+            "CountsForAchievements"
           ]
         },
         {
@@ -294,7 +296,6 @@
             "GameSelectorViewModel",
             "InMemoryGameRepository",
             "FigureChoice",
-            "LevelVariant",
             "MergePayloadView",
             "BundledLevelRepository",
             "LevelGameFactories",
@@ -507,7 +508,8 @@
             "SquareDirection",
             "IUndoable",
             "Ordered",
-            "VictoryPhase"
+            "VictoryPhase",
+            "LevelVariant"
           ]
         },
         {
@@ -543,7 +545,8 @@
             "LevelsWon",
             "EveryLevelWon",
             "BestCountReached",
-            "TotalCountReached"
+            "TotalCountReached",
+            "CountsForAchievements"
           ]
         },
         {
@@ -635,7 +638,6 @@
           "group": "ref|adapters",
           "types": [
             "InMemoryGameRepository",
-            "LevelVariant",
             "FitStateMapper",
             "LocalProgressRepository",
             "LevelGameFactories",
@@ -765,7 +767,9 @@
             "ILevelStars",
             "Stars",
             "SeededPieceSource",
-            "RandomSource"
+            "RandomSource",
+            "LevelVariant",
+            "CountsForAchievements"
           ]
         },
         {
@@ -956,7 +960,9 @@
             "ValueReceiver",
             "HexCoord",
             "LevelId",
-            "TriangleCoord"
+            "TriangleCoord",
+            "LevelVariant",
+            "CountsForAchievements"
           ]
         },
         {
@@ -1028,7 +1034,6 @@
             "GamePresenter",
             "LocalProgressRepository",
             "InMemoryGameRepository",
-            "LevelVariant",
             "MergeStateMapper",
             "Compass",
             "SlideWay",

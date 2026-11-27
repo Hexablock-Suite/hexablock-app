@@ -79,10 +79,11 @@
           ProgressRepository, AchievementCounterRepository and a list of Achievement values, and
           returns one AchievementSummary per achievement. An Achievement keeps an optional
           AchievementGoal, a Strategy of layer 1 that LevelsWon, EveryLevelWon, BestCountReached and
-          TotalCountReached implement. AchievementCounterRepository loads AchievementCounters of
-          layer 1, and AchievementGoal reads them (#364). ProgressRepository loads GameProgress of
-          layer 1. The goals count the levels that LevelStatus.ofEach() of layer 1 gives as
-          completed, and LevelStatus reads GameProgress (#326).
+          TotalCountReached implement. Each goal has a private constructor and a static of(), and
+          isReachedBy() takes three required parameters (#406). AchievementCounterRepository loads
+          AchievementCounters of layer 1, and AchievementGoal reads them (#364). ProgressRepository
+          loads GameProgress of layer 1. The goals count the levels that LevelStatus.ofEach() of
+          layer 1 gives as completed, and LevelStatus reads GameProgress (#326).
         </desc>
         <defs>
           <marker
@@ -339,21 +340,21 @@
         />
         <!-- BestCountReached and TotalCountReached implement AchievementGoal: realization, one shared head (#364) -->
         <path
-          d="M660 1384 V1368 H788"
+          d="M660 1384 V1376 H788"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
         />
         <path
-          d="M896 1384 V1368 H788"
+          d="M896 1384 V1376 H788"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
         />
         <path
-          d="M788 1368 V1184"
+          d="M788 1376 V1184"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -1049,14 +1050,14 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          counters: AchievementCounters [0..1]): boolean
+          counters: AchievementCounters): boolean
         </text>
         <!-- Class: LevelsWon (a piece of the Strategy pattern: the footnote names it, decision 23; a count of won levels of one game) -->
         <rect
           x="544"
           y="1216"
           width="232"
-          height="136"
+          height="152"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1091,7 +1092,7 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          - count: number
+          - count: AchievementCount
         </text>
         <text
           x="560"
@@ -1111,11 +1112,21 @@
           font-family="'IBM Plex Mono', monospace"
           text-decoration="underline"
         >
-          count: number): LevelsWon
+          count: AchievementCount):
+        </text>
+        <text
+          x="576"
+          y="1344"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          LevelsWon
         </text>
         <text
           x="560"
-          y="1344"
+          y="1360"
           fill="#5b6873"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1127,7 +1138,7 @@
           x="800"
           y="1216"
           width="192"
-          height="104"
+          height="136"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1158,6 +1169,26 @@
         <text
           x="816"
           y="1296"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + of(gameId: GameId):
+        </text>
+        <text
+          x="832"
+          y="1312"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          EveryLevelWon
+        </text>
+        <text
+          x="816"
+          y="1328"
           fill="#5b6873"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1166,7 +1197,7 @@
         </text>
         <text
           x="832"
-          y="1312"
+          y="1344"
           fill="#5b6873"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"

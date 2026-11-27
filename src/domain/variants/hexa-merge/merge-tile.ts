@@ -1,3 +1,4 @@
+import { AchievementCount } from '../../achievements/achievement-count';
 import { Score } from '../../shared/score';
 import type { ValueReceiver } from '../../shared/value-receiver';
 import type { IMergeable } from './mergeable';
@@ -37,6 +38,12 @@ export class MergeTile implements IMergeable<MergeTile> {
   // They are a `Score` (classes.md decision 41).
   points(): Score {
     return Score.of(this.value);
+  }
+
+  // The value of the tile as a count of the achievements. `TileMerged` keeps it as the best
+  // count of Hexa Merge, the highest tile (issue #406).
+  asAchievementCount(): AchievementCount {
+    return AchievementCount.of(this.value);
   }
 
   // Gives the value of the tile to `receiver`. It returns nothing.

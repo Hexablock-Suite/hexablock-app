@@ -1,11 +1,6 @@
 /** @jest-environment node */
 import { BundledLevelRepository } from '../../src/adapters/bundled-level-repository';
-import {
-  fitLevelVariant,
-  LevelGameFactories,
-  sortLevelVariant,
-  type LevelVariant,
-} from '../../src/adapters/level-game-factories';
+import { LevelGameFactories } from '../../src/adapters/level-game-factories';
 import fit01 from '../../src/adapters/levels/fit/fit-01.json';
 import fit02 from '../../src/adapters/levels/fit/fit-02.json';
 import fit03 from '../../src/adapters/levels/fit/fit-03.json';
@@ -18,6 +13,7 @@ import type { ProgressRepository } from '../../src/application/progress-reposito
 import { StartGame } from '../../src/application/start-game';
 import type { BoardState } from '../../src/domain/engine/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
+import type { LevelVariant } from '../../src/domain/engine/level-variant';
 import { GameId } from '../../src/domain/shared/game-id';
 import { GameProgress } from '../../src/domain/progress/game-progress';
 import { TopologyId } from '../../src/domain/shared/topology-id';
@@ -30,8 +26,10 @@ import { Stars } from '../../src/domain/progress/stars';
 import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
 import { FitFactory } from '../../src/domain/variants/hexa-fit/fit-factory';
 import { FitLevelBuilder } from '../../src/domain/variants/hexa-fit/fit-level-builder';
+import { fitLevelVariant } from '../../src/domain/variants/hexa-fit/fit-level-variant';
 import { SortFactory } from '../../src/domain/variants/hexa-sort/sort-factory';
 import { SortLevelBuilder } from '../../src/domain/variants/hexa-sort/sort-level-builder';
+import { sortLevelVariant } from '../../src/domain/variants/hexa-sort/sort-level-variant';
 import { errorOf, MemoryGameRepository, valueOf } from '../support/application/game-use-cases';
 import { ManualClock } from '../support/engine/manual-clock';
 import { CountingMatchIds } from '../support/engine/match-id';

@@ -1,6 +1,6 @@
 /** @jest-environment node */
 import { BundledLevelRepository } from '../../src/adapters/bundled-level-repository';
-import { fitLevelVariant, LevelGameFactories } from '../../src/adapters/level-game-factories';
+import { LevelGameFactories } from '../../src/adapters/level-game-factories';
 import fit01 from '../../src/adapters/levels/fit/fit-01.json';
 import { ApplyMove } from '../../src/application/apply-move';
 import { StartGame } from '../../src/application/start-game';
@@ -14,6 +14,7 @@ import { Moves } from '../../src/domain/shared/moves';
 import { TopologyId } from '../../src/domain/shared/topology-id';
 import { FitFactory } from '../../src/domain/variants/hexa-fit/fit-factory';
 import { FitLevelBuilder } from '../../src/domain/variants/hexa-fit/fit-level-builder';
+import { fitLevelVariant } from '../../src/domain/variants/hexa-fit/fit-level-variant';
 import type { FitMove } from '../../src/domain/variants/hexa-fit/fit-move';
 import { PlaceFitPiece } from '../../src/domain/variants/hexa-fit/fit-move';
 import type { FitState } from '../../src/domain/variants/hexa-fit/fit-state';
