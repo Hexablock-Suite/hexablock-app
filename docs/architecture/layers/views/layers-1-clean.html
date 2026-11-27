@@ -64,7 +64,7 @@
       <h1>The four Clean layers: ports, adapters and drivers</h1>
 
       <svg
-        viewBox="0 0 1040 1416"
+        viewBox="0 0 1040 1432"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="layers-title layers-desc"
@@ -80,14 +80,17 @@
           BundledLevelRepository, GameEventBus and LocalProgressRepository implement the output
           ports, LocalProgressRepository keeps its data through the KeyValueStore interface, and the
           board components of layer 4 use the board layouts of layer 3. The HTTP adapters of layer 3
-          hold HealthApi and the DTO types, and ApiClient of layer 4 implements HealthApi (decision
-          22). In layer 4, ConsoleLogger implements Logger, DeviceKeyValueStore implements
-          KeyValueStore, DeviceSecretStore implements SecretStore, and SystemClock,
-          SeededRandomSource and SequentialMatchIds implement the engine interfaces Clock,
-          RandomSource and MatchIdGenerator. The routes use the presenters, and CompositionRoot
-          creates the adapters. The use cases and the presenters use the generic engine, and the
-          four variants implement its contracts. Every arrow points inward, toward layer 1, or stays
-          inside one layer. A dashed border marks a planned part.
+          hold the transport interfaces HealthApi, AccountApi and ProgressApi, ApiAccountGateway,
+          ApiProgressGateway, ApiDtoMapper and the DTO types, and ApiClient of layer 4 implements
+          the transport interfaces (decision 22). Since #46 ApiProgressGateway implements the
+          ProgressGateway port, and LocalProgressRepository also implements the AnonymousProgress
+          port and reads SessionStore for its key. In layer 4, ConsoleLogger implements Logger,
+          DeviceKeyValueStore implements KeyValueStore, DeviceSecretStore implements SecretStore,
+          and SystemClock, SeededRandomSource and SequentialMatchIds implement the engine interfaces
+          Clock, RandomSource and MatchIdGenerator. The routes use the presenters, and
+          CompositionRoot creates the adapters. The use cases and the presenters use the generic
+          engine, and the four variants implement its contracts. Every arrow points inward, toward
+          layer 1, or stays inside one layer. A dashed border marks a planned part.
         </desc>
         <defs>
           <marker
@@ -172,7 +175,7 @@
         />
         <text
           x="80"
-          y="648"
+          y="655"
           fill="#7e22ce"
           font-size="8"
           font-weight="500"
@@ -183,7 +186,7 @@
         </text>
         <text
           x="80"
-          y="660"
+          y="667"
           fill="#7e22ce"
           font-size="8"
           font-weight="500"
@@ -405,7 +408,7 @@
         />
         <!-- The use cases use the ProgressRepository port: use, inside layer 2 -->
         <path
-          d="M772.5 672 L772.5 614"
+          d="M772.5 672 L772.5 627"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -915,7 +918,7 @@
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          driver of HealthApi
+          driver of the transport APIs
         </text>
         <!-- Drivers: each one implements an interface of an inner layer -->
         <text
@@ -1183,11 +1186,11 @@
         >
           one key, two texts
         </text>
-        <!-- Component: HTTP adapters, src/adapters/api/ (decision 22, #404) -->
+        <!-- Component: HTTP adapters, src/adapters/api/ (decision 22, #404), with the gateway of the sync (#46) -->
         <rect
-          x="600"
+          x="560"
           y="230"
-          width="160"
+          width="200"
           height="100"
           rx="6"
           fill="#ffffff"
@@ -1195,7 +1198,7 @@
           stroke-width="1"
         />
         <text
-          x="610"
+          x="570"
           y="244"
           fill="#5b6873"
           font-size="7"
@@ -1206,7 +1209,7 @@
           api/ · HTTP
         </text>
         <text
-          x="610"
+          x="570"
           y="259"
           fill="#17212a"
           font-size="11.5"
@@ -1215,36 +1218,36 @@
         >
           HTTP adapters
         </text>
-        <line x1="600" y1="266" x2="760" y2="266" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="560" y1="266" x2="760" y2="266" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="610"
+          x="570"
           y="282"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          HealthApi · AccountApi
+          HealthApi · AccountApi · ProgressApi
         </text>
         <text
-          x="610"
+          x="570"
           y="295"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          ApiAccountGateway
+          ApiAccountGateway · dto.d.ts
         </text>
         <text
-          x="610"
+          x="570"
           y="308"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          ApiDtoMapper · dto.d.ts
+          ApiProgressGateway · ApiDtoMapper
         </text>
         <text
-          x="610"
+          x="570"
           y="321"
           fill="#7d8a94"
           font-size="8.5"
@@ -1542,12 +1545,12 @@
           LocalProgressRepository
         </text>
         <!-- Ports on the edge of layer 2: layer 2 owns each one, and an outer layer implements each output port -->
-        <!-- Port: the output ports of the account (#45) -->
+        <!-- Port: the output ports of the account (#45) and the gateway of the sync (#46) -->
         <rect
           x="80"
           y="563"
           width="98"
-          height="34"
+          height="42"
           rx="4"
           fill="#ffffff"
           stroke="#17212a"
@@ -1555,7 +1558,7 @@
         />
         <text
           x="129.0"
-          y="572"
+          y="571"
           fill="#5b6873"
           font-size="7.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1566,7 +1569,7 @@
         </text>
         <text
           x="129.0"
-          y="583"
+          y="581"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1576,7 +1579,7 @@
         </text>
         <text
           x="129.0"
-          y="594"
+          y="591"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1584,10 +1587,20 @@
         >
           SessionStore
         </text>
+        <text
+          x="129.0"
+          y="601"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          ProgressGateway
+        </text>
         <!-- Port: the planned output ports -->
         <rect
           x="80"
-          y="601"
+          y="609"
           width="98"
           height="34"
           rx="4"
@@ -1598,7 +1611,7 @@
         />
         <text
           x="129.0"
-          y="610"
+          y="618"
           fill="#7d8a94"
           font-size="7.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1609,7 +1622,7 @@
         </text>
         <text
           x="129.0"
-          y="621"
+          y="629"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1619,7 +1632,7 @@
         </text>
         <text
           x="129.0"
-          y="632"
+          y="640"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1792,12 +1805,12 @@
         >
           GameEventPublisher
         </text>
-        <!-- Port: ProgressRepository -->
+        <!-- Port: ProgressRepository, and AnonymousProgress, its second role (#46, decision 66) -->
         <rect
           x="715"
           y="578"
           width="115"
-          height="36"
+          height="49"
           rx="4"
           fill="#ffffff"
           stroke="#17212a"
@@ -1824,6 +1837,17 @@
           text-anchor="middle"
         >
           ProgressRepository
+        </text>
+        <text
+          x="772.5"
+          y="619"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          AnonymousProgress
         </text>
         <!-- Port: Logger -->
         <rect
@@ -1968,8 +1992,7 @@
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          StartGame · ApplyMove · UndoMove · RedoMove · SaveProgress · ListLevels · ListAchievements
-          · Register · Login
+          StartGame · ApplyMove · UndoMove · RedoMove · SaveProgress · SyncProgress · ListLevels
         </text>
         <text
           x="258"
@@ -1978,7 +2001,7 @@
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          each one implements UseCase and returns a Result
+          ListAchievements · Register · Login · each one implements UseCase and returns a Result
         </text>
         <text
           x="258"
@@ -2480,21 +2503,31 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
+          Since #46 ApiProgressGateway implements ProgressGateway, and LocalProgressRepository also
+          implements AnonymousProgress and reads SessionStore for its key (decision 66).
+        </text>
+        <text
+          x="24"
+          y="1331"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
           SessionManager implements SessionStore over SecretStore (#45). CompositionRoot creates it
           once, and it will create AudioManager once (decision 18).
         </text>
         <!-- Legend -->
         <line
           x1="24"
-          y1="1339"
+          y1="1355"
           x2="1016"
-          y2="1339"
+          y2="1355"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1357"
+          y="1373"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -2504,16 +2537,16 @@
         </text>
         <line
           x1="24"
-          y1="1375"
+          y1="1391"
           x2="52"
-          y2="1375"
+          y2="1391"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#layers-open)"
         />
         <text
           x="60"
-          y="1379"
+          y="1395"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2522,9 +2555,9 @@
         </text>
         <line
           x1="264"
-          y1="1375"
+          y1="1391"
           x2="292"
-          y2="1375"
+          y2="1391"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -2532,7 +2565,7 @@
         />
         <text
           x="300"
-          y="1379"
+          y="1395"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2541,7 +2574,7 @@
         </text>
         <rect
           x="560"
-          y="1369"
+          y="1385"
           width="28"
           height="12"
           rx="2"
@@ -2551,7 +2584,7 @@
         />
         <text
           x="596"
-          y="1379"
+          y="1395"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2560,7 +2593,7 @@
         </text>
         <rect
           x="816"
-          y="1369"
+          y="1385"
           width="28"
           height="12"
           rx="2"
@@ -2571,7 +2604,7 @@
         />
         <text
           x="852"
-          y="1379"
+          y="1395"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2580,7 +2613,7 @@
         </text>
         <rect
           x="24"
-          y="1393"
+          y="1409"
           width="28"
           height="12"
           rx="2"
@@ -2590,7 +2623,7 @@
         />
         <text
           x="60"
-          y="1403"
+          y="1419"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2599,7 +2632,7 @@
         </text>
         <rect
           x="264"
-          y="1393"
+          y="1409"
           width="28"
           height="12"
           rx="2"
@@ -2609,7 +2642,7 @@
         />
         <text
           x="300"
-          y="1403"
+          y="1419"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2618,7 +2651,7 @@
         </text>
         <rect
           x="504"
-          y="1393"
+          y="1409"
           width="28"
           height="12"
           rx="2"
@@ -2628,7 +2661,7 @@
         />
         <text
           x="540"
-          y="1403"
+          y="1419"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2637,7 +2670,7 @@
         </text>
         <rect
           x="744"
-          y="1393"
+          y="1409"
           width="28"
           height="12"
           rx="2"
@@ -2647,7 +2680,7 @@
         />
         <text
           x="780"
-          y="1403"
+          y="1419"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
