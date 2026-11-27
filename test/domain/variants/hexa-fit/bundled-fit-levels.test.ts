@@ -19,6 +19,7 @@ import { ManualClock } from '../../../support/engine/manual-clock';
 import { startVariant } from '../../../support/engine/variant-game';
 import { repoRoot } from '../../../support/run-tool';
 import { fitLevelFile } from '../../../support/variants/hexa-fit/fit-level-file';
+import { playMove } from '../../../support/engine/play-move';
 
 // The bundled Fit levels (issue #166, APP-FR-05, A5). Each file follows the shared level format
 // of hexablock-api `docs/level-format.md`. The test reads every file of the folder,
@@ -97,7 +98,7 @@ function witnessPlay(file: LevelFile): { outcomes: Outcome[]; moves: Moves; star
     use: (geometry) => {
       const level = built(file, geometry);
       const { engine } = startVariant(new FitFactory(geometry, level, new ManualClock()));
-      const outcomes = witnessMoves(file, geometry).map((move) => engine.play(move));
+      const outcomes = witnessMoves(file, geometry).map((move) => playMove(engine, move));
       const moves = engine.snapshot().moveCount();
       const last = file.section.stars[file.section.stars.length - 1];
       const stars = level.starsFor(moves, ElapsedTime.ofMs(last?.maxElapsedMs ?? 0));

@@ -13,10 +13,11 @@ import {
   valueOf,
   values,
 } from '../../../support/variants/hexa-merge/merge-game';
+import { playMove } from '../../../support/engine/play-move';
 
 // The scoring of Hexa Merge (issue 97, APP-FR-06, statement §1.4).
 // It codes the accepted rule of issue #59 (D22): a slide scores the sum of the values that its merges make,
-// and the new tile adds nothing. The tests play through `GameEngine.play()` with a fixed seed.
+// and the new tile adds nothing. The tests play through `GameEngine.tryPlay()` with a fixed seed.
 
 const east = Slide.of(HexAxis.q, SlideSense.forward);
 
@@ -29,7 +30,7 @@ function slideRow(tiles: readonly number[], fourChance?: Chance) {
     MergeTile.of(2048),
     new MergeScoring<HexCoord, HexAxis>(),
   );
-  engine.play(east);
+  playMove(engine, east);
   return engine.snapshot();
 }
 

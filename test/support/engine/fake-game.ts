@@ -181,7 +181,7 @@ export function sourceState(source: IPieceSource<FakeCell>, size = 2): SourceSta
 // The move is the chosen cell. `apply()` puts the next piece of the state source on it.
 // A move is valid on an empty cell inside the board. The game ends when no valid move is left.
 export class SourceRules extends BaseGameRules<SquareCoord, SourceState> {
-  isValid(state: SourceState, at: SquareCoord): boolean {
+  protected isValid(state: SourceState, at: SquareCoord): boolean {
     return state.board.contains(at) && state.board.occupantAt(at) === undefined;
   }
 
@@ -189,16 +189,16 @@ export class SourceRules extends BaseGameRules<SquareCoord, SourceState> {
     for (const at of state.board.coordinates()) if (this.isValid(state, at)) yield at;
   }
 
-  apply(state: SourceState, at: SquareCoord): SourceState {
+  protected apply(state: SourceState, at: SquareCoord): SourceState {
     state.board.occupy(at, state.draw());
     return state;
   }
 
-  resolve(_state: SourceState): Resolution {
+  protected resolve(_state: SourceState): Resolution {
     return Resolution.resolved();
   }
 
-  evaluate(state: SourceState): Outcome {
+  protected evaluate(state: SourceState): Outcome {
     return this.noValidMove(state) ? Outcome.gameOver : Outcome.playing;
   }
 }
@@ -210,7 +210,7 @@ export class FakeRules extends BaseGameRules<FakeMove, FakeState> {
     super();
   }
 
-  isValid(state: FakeState, move: FakeMove): boolean {
+  protected isValid(state: FakeState, move: FakeMove): boolean {
     this.log.push('isValid');
     return state.board.contains(move.at) && state.board.occupantAt(move.at) === undefined;
   }
@@ -221,18 +221,18 @@ export class FakeRules extends BaseGameRules<FakeMove, FakeState> {
     }
   }
 
-  apply(state: FakeState, move: FakeMove): FakeState {
+  protected apply(state: FakeState, move: FakeMove): FakeState {
     this.log.push('apply');
     state.board.occupy(move.at, move.cell);
     return state;
   }
 
-  resolve(_state: FakeState): Resolution {
+  protected resolve(_state: FakeState): Resolution {
     this.log.push('resolve');
     return Resolution.resolved();
   }
 
-  evaluate(state: FakeState): Outcome {
+  protected evaluate(state: FakeState): Outcome {
     this.log.push('evaluate');
     return state.board.occupiedCells().length === state.board.coordinates().length
       ? Outcome.gameOver

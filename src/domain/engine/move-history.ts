@@ -8,7 +8,7 @@ import type { UndoLimit } from './undo-limit';
 // Without a `limit` the history keeps every command. With a limit it keeps the newest ones.
 // A limit is an `UndoLimit`, which checks its count in `UndoLimit.of()` (issue #243).
 // A variant with no undo has no history at all.
-export class MoveHistory<TMove, TMemento> implements IUndoable {
+export class MoveHistory<TMove, TMemento> implements IUndoable<TMove, TMemento> {
   private done: MoveCommand<TMove, TMemento>[] = [];
 
   constructor(private readonly limit?: UndoLimit) {}

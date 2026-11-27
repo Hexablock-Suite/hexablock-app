@@ -84,6 +84,31 @@ export function firstValidMove<TMove, TState>(
   throw new RangeError('The state has no valid move.');
 }
 
+// Tells whether the rules accept `move` on `state` (issue #413). The steps of the rules
+// are protected, so the helper plays the whole turn through `playTurn()` on a copy.
+// So `state` stays as it was.
+export function accepts<TMove, TState extends Cloneable<TState>>(
+  rules: IGameRules<TMove, TState>,
+  state: TState,
+  move: TMove,
+): boolean {
+  return rules.playTurn(state.clone(), move).wasAccepted();
+}
+
+// Plays one accepted turn of the rules on `state` and gives back that state (issue #413).
+// The rules change the state in place, and a `Resolution` holds no state.
+// A rejected move throws a RangeError, so a test never reads a state that did not move.
+export function playedOn<TMove, TState>(
+  rules: IGameRules<TMove, TState>,
+  state: TState,
+  move: TMove,
+): TState {
+  if (!rules.playTurn(state, move).wasAccepted()) {
+    throw new RangeError('The rules rejected the move.');
+  }
+  return state;
+}
+
 // The first valid move of a new game of `factory`. A new game starts from the first state
 // that the factory creates, so the rules read a new first state with the same content.
 // The engine never gives its state away: `GameEngine.snapshot()` gives a photo (decision 34).

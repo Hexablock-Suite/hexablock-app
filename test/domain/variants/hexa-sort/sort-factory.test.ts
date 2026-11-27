@@ -27,6 +27,7 @@ import {
 } from '../../../support/variants/hexa-sort/sort-game';
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
+import { playMove } from '../../../support/engine/play-move';
 
 // The Sort factory creates the whole family of Hexa Sort (issue 99, classes.md decision 31).
 
@@ -36,7 +37,7 @@ function offeredInGame(factory: SortFactory<SquareCoord>): string[][] {
   const { engine } = startVariant(factory);
   const offered = [names(engine.snapshot().offeredStack())];
   for (const move of [place(0, 0), place(1, 1)]) {
-    engine.play(move);
+    playMove(engine, move);
     offered.push(names(engine.snapshot().offeredStack()));
   }
   return offered;
@@ -102,7 +103,7 @@ describe('SortFactory', () => {
 
     const initial = factory.createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
     const { engine } = startVariant(factory);
-    const outcome = engine.play(place(0, 0));
+    const outcome = playMove(engine, place(0, 0));
 
     expect(factory.isFor(GameId.of('hexa-sort'))).toBe(true);
     expect(factory.createBoard(BOARD_ID).coordinates()).toHaveLength(4);
@@ -176,8 +177,8 @@ describe('SortFactory', () => {
       const start = names(second.snapshot().offeredStack());
       const sourceAtStart = second.snapshot().pieceSource();
 
-      first.play(place(0, 0));
-      first.play(place(1, 1));
+      playMove(first, place(0, 0));
+      playMove(first, place(1, 1));
 
       expect(names(first.snapshot().offeredStack())).not.toEqual([]);
       expect(names(second.snapshot().offeredStack())).toEqual(start);

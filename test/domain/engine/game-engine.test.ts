@@ -27,6 +27,7 @@ import { dataOf, gameOverOf } from '../../support/engine/game-over';
 import { phaseNameOf } from '../../support/engine/phase-name';
 import { square, type SquareAxis, type SquareCoord } from '../../support/engine/square-topology';
 import { MATCH_ID } from '../../support/engine/match-id';
+import { playMove } from '../../support/engine/play-move';
 
 // The turn cycle (statement §3.1): start, receive, validate, apply, resolve, evaluate, notify.
 // The engine records the event of the notify step and tells nobody. `ApplyMove` takes
@@ -96,7 +97,7 @@ class ThrowingStepRules extends FakeRules {
   }
 }
 
-// A scoring policy that calls `engine.play()` again from `score()`, a reentrant call.
+// A scoring policy that calls `engine.tryPlay()` again from `score()`, a reentrant call.
 // It keeps the error of the inner call and scores the outer turn.
 class ReentrantScoring extends OnePointScoring {
   engine: GameEngine<FakeCell, SquareCoord, FakeMove, FakeState> | undefined;
@@ -104,7 +105,7 @@ class ReentrantScoring extends OnePointScoring {
 
   override score(before: FakeSnapshot, after: FakeSnapshot): Score {
     try {
-      this.engine?.play(place(1, 0));
+      this.engine?.tryPlay(place(1, 0));
     } catch (error) {
       this.innerError = error;
     }
@@ -116,13 +117,13 @@ function place(col: number, row: number, value = 1): FakeMove {
   return { at: square(col, row), cell: fakeCell(value) };
 }
 
-describe('GameEngine.play()', () => {
+describe('GameEngine.tryPlay()', () => {
   it('should_run_the_turn_steps_in_order_when_a_valid_move_is_played', () => {
     const log: string[] = [];
     const { engine } = newGame(log);
     engine.start(emptyState());
 
-    engine.play(place(0, 0));
+    playMove(engine, place(0, 0));
 
     expect(log).toEqual(['isValid', 'apply', 'resolve', 'evaluate', 'score']);
   });
@@ -131,7 +132,7 @@ describe('GameEngine.play()', () => {
     const { engine } = newGame();
     engine.start(emptyState());
 
-    const outcome = engine.play(place(1, 0, 7));
+    const outcome = playMove(engine, place(1, 0, 7));
 
     expect(outcome).toBe(Outcome.playing);
     expect(engine.snapshot().boardCopy().occupantAt(square(1, 0))).toEqual(fakeCell(7));
@@ -141,9 +142,9 @@ describe('GameEngine.play()', () => {
   it('should_keep_the_board_and_the_score_when_the_move_is_invalid', () => {
     const { engine } = newGame();
     engine.start(emptyState());
-    engine.play(place(0, 0));
+    playMove(engine, place(0, 0));
 
-    const outcome = engine.play(place(0, 0, 9));
+    const outcome = playMove(engine, place(0, 0, 9));
 
     expect(outcome).toBe(Outcome.playing);
     expect(engine.snapshot().boardCopy().occupantAt(square(0, 0))).toEqual(fakeCell(1));
@@ -160,7 +161,7 @@ describe('GameEngine.play()', () => {
     );
     engine.start(emptyState());
 
-    const outcome = engine.play(place(0, 0));
+    const outcome = playMove(engine, place(0, 0));
 
     expect(outcome).toBe(Outcome.playing);
     expect(engine.snapshot().boardCopy().occupantAt(square(0, 0))).toBeUndefined();
@@ -173,8 +174,8 @@ describe('GameEngine.play()', () => {
     const { engine } = newGame();
     engine.start(emptyState());
 
-    [place(0, 0), place(1, 0), place(0, 1)].forEach((move) => engine.play(move));
-    const outcome = engine.play(place(1, 1));
+    [place(0, 0), place(1, 0), place(0, 1)].forEach((move) => playMove(engine, move));
+    const outcome = playMove(engine, place(1, 1));
 
     expect(outcome).toBe(Outcome.gameOver);
     expect(engine.currentPhase()).toBe(GameOverPhase.instance);
@@ -193,7 +194,7 @@ describe('GameEngine.play()', () => {
     const { engine } = newGame();
     engine.start(emptyState());
 
-    engine.play(place(0, 0));
+    playMove(engine, place(0, 0));
 
     expect(engine.takeEvents()).toEqual([]);
   });
@@ -202,7 +203,7 @@ describe('GameEngine.play()', () => {
   it('should_give_each_recorded_event_once_when_the_events_are_taken_twice', () => {
     const { engine } = newGame();
     engine.start(emptyState(1));
-    engine.play(place(0, 0));
+    playMove(engine, place(0, 0));
 
     const first = engine.takeEvents();
     const second = engine.takeEvents();
@@ -213,7 +214,7 @@ describe('GameEngine.play()', () => {
   it('should_throw_when_play_runs_before_start', () => {
     const { engine } = newGame();
 
-    expect(() => engine.play(place(0, 0))).toThrow('not started');
+    expect(() => playMove(engine, place(0, 0))).toThrow('not started');
   });
 
   it('should_throw_and_keep_the_board_when_the_game_is_paused', () => {
@@ -221,8 +222,8 @@ describe('GameEngine.play()', () => {
     engine.start(emptyState());
     engine.pause();
 
-    expect(() => engine.play(place(0, 0))).toThrow(RangeError);
-    expect(() => engine.play(place(0, 0))).toThrow(
+    expect(() => playMove(engine, place(0, 0))).toThrow(RangeError);
+    expect(() => playMove(engine, place(0, 0))).toThrow(
       new RangeError('The game cannot accept a move in the paused phase.'),
     );
     expect(engine.snapshot().boardCopy().occupiedCells()).toEqual([]);
@@ -234,15 +235,15 @@ describe('GameEngine.play()', () => {
     engine.pause();
     engine.resume();
 
-    expect(engine.play(place(0, 0))).toBe(Outcome.playing);
+    expect(playMove(engine, place(0, 0))).toBe(Outcome.playing);
   });
 
   it('should_throw_when_a_move_comes_after_game_over', () => {
     const { engine } = newGame();
     engine.start(emptyState(1));
-    engine.play(place(0, 0));
+    playMove(engine, place(0, 0));
 
-    expect(() => engine.play(place(0, 0))).toThrow('cannot accept a move');
+    expect(() => playMove(engine, place(0, 0))).toThrow('cannot accept a move');
   });
 
   it('should_keep_the_engine_unchanged_when_a_snapshot_is_changed', () => {
@@ -280,12 +281,12 @@ describe('GameEngine.play()', () => {
     );
     engine.start(emptyState());
 
-    expect(() => engine.play(place(0, 0))).toThrow('resolve failed');
+    expect(() => playMove(engine, place(0, 0))).toThrow('resolve failed');
 
     expect(engine.currentPhase().canPlay()).toBe(true);
     expect(engine.snapshot().boardCopy().occupantAt(square(0, 0))).toBeUndefined();
     expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(0));
-    expect(engine.play(place(0, 0))).toBe(Outcome.playing);
+    expect(playMove(engine, place(0, 0))).toBe(Outcome.playing);
     expect(engine.snapshot().boardCopy().occupantAt(square(0, 0))).toEqual(fakeCell(1));
   });
 
@@ -298,12 +299,12 @@ describe('GameEngine.play()', () => {
     );
     engine.start(emptyState());
 
-    expect(() => engine.play(place(0, 0))).toThrow('score failed');
+    expect(() => playMove(engine, place(0, 0))).toThrow('score failed');
 
     expect(engine.currentPhase().canPlay()).toBe(true);
     expect(engine.snapshot().boardCopy().occupantAt(square(0, 0))).toBeUndefined();
     expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(0));
-    expect(engine.play(place(0, 0))).toBe(Outcome.playing);
+    expect(playMove(engine, place(0, 0))).toBe(Outcome.playing);
     expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(1));
   });
 });
@@ -349,7 +350,7 @@ function armedGame(step: 'apply' | 'evaluate') {
   const rules = new ThrowingStepRules(step);
   const engine = new GameEngine(MATCH_ID, GameId.of('fake-game'), rules, new OnePointScoring());
   engine.start(emptyState());
-  engine.play(place(0, 0));
+  playMove(engine, place(0, 0));
   rules.armed = true;
   return { engine, rules };
 }
@@ -370,32 +371,32 @@ describe('GameEngine edge cases', () => {
   it('should_keep_the_board_the_score_and_the_phase_when_apply_throws', () => {
     const { engine, rules } = armedGame('apply');
 
-    expect(() => engine.play(place(1, 0))).toThrow('apply failed');
+    expect(() => playMove(engine, place(1, 0))).toThrow('apply failed');
 
     expect(summary(engine)).toEqual(afterOneMove);
     rules.armed = false;
-    expect(engine.play(place(1, 0))).toBe(Outcome.playing);
+    expect(playMove(engine, place(1, 0))).toBe(Outcome.playing);
   });
 
   it('should_keep_the_board_the_score_and_the_phase_when_evaluate_throws', () => {
     const { engine, rules } = armedGame('evaluate');
 
-    expect(() => engine.play(place(1, 0))).toThrow('evaluate failed');
+    expect(() => playMove(engine, place(1, 0))).toThrow('evaluate failed');
 
     expect(summary(engine)).toEqual(afterOneMove);
     rules.armed = false;
-    expect(engine.play(place(1, 0))).toBe(Outcome.playing);
+    expect(playMove(engine, place(1, 0))).toBe(Outcome.playing);
   });
 
-  // `play()` enters the resolving phase before it calls the rules and the scoring.
-  // The resolving phase refuses a move, so a reentrant `play()` throws a RangeError.
+  // `tryPlay()` enters the resolving phase before it calls the rules and the scoring.
+  // The resolving phase refuses a move, so a reentrant `tryPlay()` throws a RangeError.
   it('should_reject_a_reentrant_play_when_the_scoring_calls_play_during_a_turn', () => {
     const scoring = new ReentrantScoring();
     const engine = new GameEngine(MATCH_ID, GameId.of('fake-game'), new FakeRules(), scoring);
     scoring.engine = engine;
     engine.start(emptyState());
 
-    const outcome = engine.play(place(0, 0));
+    const outcome = playMove(engine, place(0, 0));
 
     expect(scoring.innerError).toBeInstanceOf(RangeError);
     expect(scoring.innerError).toEqual(
@@ -408,14 +409,14 @@ describe('GameEngine edge cases', () => {
   it('should_start_a_new_game_when_start_runs_after_game_over', () => {
     const { engine } = newGame();
     engine.start(emptyState(1));
-    engine.play(place(0, 0));
+    playMove(engine, place(0, 0));
 
     engine.start(emptyState(1));
 
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(engine.snapshot().boardCopy().occupiedCells()).toEqual([]);
     expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(0));
-    expect(engine.play(place(0, 0))).toBe(Outcome.gameOver);
+    expect(playMove(engine, place(0, 0))).toBe(Outcome.gameOver);
     expect(engine.takeEvents()).toHaveLength(2);
   });
 });
@@ -534,18 +535,18 @@ describe('GameEngine review findings', () => {
       }) as unknown as Resolution;
     const { engine } = gameWith(new FixedResolutionRules(forged));
 
-    const outcome = engine.play(place(0, 0));
+    const outcome = playMove(engine, place(0, 0));
 
     expect(outcome).toBe(Outcome.playing);
     expect(summary(engine)).toEqual(initial);
     expect(engine.takeEvents()).toEqual([]);
-    expect(engine.play(place(0, 0))).toBe(Outcome.playing);
+    expect(playMove(engine, place(0, 0))).toBe(Outcome.playing);
   });
 
   it('should_keep_the_state_when_the_scoring_mutates_before_and_throws', () => {
     const { engine } = gameWith(new FakeRules(), new MutatingThrowingScoring());
 
-    expect(() => engine.play(place(0, 0))).toThrow('score failed');
+    expect(() => playMove(engine, place(0, 0))).toThrow('score failed');
 
     expect(summary(engine)).toEqual(initial);
     expect(engine.takeEvents()).toEqual([]);
@@ -555,7 +556,7 @@ describe('GameEngine review findings', () => {
     for (const points of [Number.NaN, Number.POSITIVE_INFINITY, -1, 0.5]) {
       const { engine } = gameWith(new FakeRules(), new FixedScoring(points));
 
-      expect(() => engine.play(place(0, 0))).toThrow(
+      expect(() => playMove(engine, place(0, 0))).toThrow(
         new RangeError(`A score needs a whole number of 0 or more, not ${points}.`),
       );
 
@@ -567,8 +568,8 @@ describe('GameEngine review findings', () => {
   it('should_add_the_points_when_the_scoring_gives_a_valid_score', () => {
     const { engine } = gameWith(new FakeRules(), new FixedScoring(7));
 
-    engine.play(place(0, 0));
-    engine.play(place(0, 1));
+    playMove(engine, place(0, 0));
+    playMove(engine, place(0, 1));
 
     expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(14));
   });
@@ -576,7 +577,7 @@ describe('GameEngine review findings', () => {
   it('should_throw_a_range_error_and_keep_the_state_when_the_rules_return_an_unknown_outcome', () => {
     const { engine } = gameWith(new FixedOutcomeRules('draw' as unknown as Outcome));
 
-    expect(() => engine.play(place(0, 0))).toThrow(
+    expect(() => playMove(engine, place(0, 0))).toThrow(
       new RangeError('Unknown outcome.', { cause: 'draw' }),
     );
 
@@ -615,7 +616,7 @@ describe('GameEngine review findings', () => {
     );
     engine.start(new PointsPhotoThrowingState(emptyState(1).board));
 
-    expect(() => engine.play(place(0, 0))).toThrow('photo failed');
+    expect(() => playMove(engine, place(0, 0))).toThrow('photo failed');
 
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(engine.snapshot().boardCopy().occupiedCells()).toEqual([]);
@@ -636,12 +637,12 @@ describe('GameEngine review findings', () => {
   it('should_draw_the_same_piece_when_a_turn_is_retried_after_a_throw', () => {
     const engine = sourceGame(new DrawingRules());
 
-    expect(() => engine.play(square(0, 0))).toThrow('apply failed');
+    expect(() => playMove(engine, square(0, 0))).toThrow('apply failed');
     expect(engine.snapshot().boardCopy().occupiedCells()).toEqual([]);
     expect(engine.snapshot().scoreSoFar()).toEqual(Score.of(0));
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
 
-    expect(engine.play(square(0, 0))).toBe(Outcome.playing);
+    expect(playMove(engine, square(0, 0))).toBe(Outcome.playing);
     expect(engine.snapshot().boardCopy().occupantAt(square(0, 0))).toEqual(fakeCell(1));
     expect([...engine.snapshot().source]).toEqual([fakeCell(2), fakeCell(3)]);
   });
@@ -650,19 +651,19 @@ describe('GameEngine review findings', () => {
     const rules = new RejectingDrawRules();
     const engine = sourceGame(rules);
 
-    expect(engine.play(square(0, 0))).toBe(Outcome.playing);
+    expect(playMove(engine, square(0, 0))).toBe(Outcome.playing);
     expect(engine.snapshot().boardCopy().occupiedCells()).toEqual([]);
     expect([...engine.snapshot().source]).toEqual([fakeCell(1), fakeCell(2), fakeCell(3)]);
 
     rules.rejecting = false;
-    expect(engine.play(square(0, 0))).toBe(Outcome.playing);
+    expect(playMove(engine, square(0, 0))).toBe(Outcome.playing);
     expect(engine.snapshot().boardCopy().occupantAt(square(0, 0))).toEqual(fakeCell(1));
   });
 
   it('should_record_game_over_with_the_victory_outcome_when_the_rules_return_victory', () => {
     const { engine } = gameWith(new FixedOutcomeRules(Outcome.victory));
 
-    const outcome = engine.play(place(0, 0));
+    const outcome = playMove(engine, place(0, 0));
 
     expect(outcome).toBe(Outcome.victory);
     expect(engine.currentPhase()).toBe(VictoryPhase.instance);
@@ -707,7 +708,7 @@ describe('GameEngine.currentPhase()', () => {
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(engine.currentPhase().canPlay()).toBe(true);
 
-    [place(0, 0), place(1, 0), place(0, 1), place(1, 1)].forEach((move) => engine.play(move));
+    [place(0, 0), place(1, 0), place(0, 1), place(1, 1)].forEach((move) => playMove(engine, move));
 
     expect(engine.currentPhase()).toBe(GameOverPhase.instance);
     expect(engine.currentPhase().canPlay()).toBe(false);
@@ -727,7 +728,7 @@ describe('GameEngine identity', () => {
   it('should_be_the_same_game_when_two_engines_have_the_same_match_id_whatever_their_boards_hold', () => {
     const first = matchOf(MatchId.of('match-a')).engine;
     const second = matchOf(MatchId.of('match-a'), 3).engine;
-    first.play(place(0, 0));
+    playMove(first, place(0, 0));
 
     expect(first.snapshot().boardCopy().occupiedCells()).not.toEqual(
       second.snapshot().boardCopy().occupiedCells(),
@@ -753,7 +754,7 @@ describe('GameEngine identity', () => {
     const { engine } = matchOf(MatchId.of('match-a'));
     const same = matchOf(MatchId.of('match-a')).engine;
 
-    engine.play(place(0, 0));
+    playMove(engine, place(0, 0));
     engine.pause();
     engine.start(emptyState(2, MatchId.of('match-a')));
 
@@ -763,7 +764,7 @@ describe('GameEngine identity', () => {
   // The state takes its identity from the game, so the game refuses a state of another match.
   it('should_throw_a_range_error_and_keep_the_game_when_the_first_state_belongs_to_another_match', () => {
     const { engine } = matchOf(MatchId.of('match-a'));
-    engine.play(place(0, 0));
+    playMove(engine, place(0, 0));
     const before = engine.snapshot();
 
     expect(() => engine.start(emptyState(2, MatchId.of('match-b')))).toThrow(
@@ -779,8 +780,8 @@ describe('GameEngine identity', () => {
   it('should_keep_the_identity_of_the_match_in_every_state_when_the_game_plays', () => {
     const { engine } = matchOf(MatchId.of('match-a'));
 
-    engine.play(place(0, 0));
-    engine.play(place(1, 0));
+    playMove(engine, place(0, 0));
+    playMove(engine, place(1, 0));
 
     expect(engine.snapshot().belongsTo(MatchId.of('match-a'))).toBe(true);
     // `emptyState()` gives the state of every match the id `STATE_ID`.
@@ -790,7 +791,7 @@ describe('GameEngine identity', () => {
   it('should_record_game_over_with_the_variant_id_and_the_match_id_when_the_game_ends', () => {
     const { engine } = matchOf(MatchId.of('match-a'), 1);
 
-    engine.play(place(0, 0));
+    playMove(engine, place(0, 0));
 
     const events = engine.takeEvents();
     expect(events).toHaveLength(1);
