@@ -75,15 +75,17 @@
         <desc id="geometry-desc">
           Class diagram of layer 1 showing the GeometryFactory abstract factory, which creates the
           coordinate, the topology and the piece shapes of one geometry and turns each coordinate of
-          a level file into a coordinate value for FitLevelBuilder, with HexGeometry creating
-          HexCoord and HexTopology and SquareGeometry creating SquareCoord, the three coordinate
-          value objects HexCoord, SquareCoord and TriangleCoord with private values and their own
-          operations, the value object TopologyId that names a family, which each concrete factory
-          keeps private and which GeometryFactory answers with isOfFamily(), the axis value objects
-          of the three topologies, each a closed set of instances that implements GridAxis, the
-          internal direction classes that each topology keeps private for neighbors(), and
-          BoardBuilder, the builder that the class calls a DDD factory, holding a GeometryFactory
-          and creating the Board.
+          a level file into a coordinate value for FitLevelBuilder, with the three real families:
+          HexGeometry creates HexCoord and HexTopology, SquareGeometry creates SquareCoord and
+          SquareTopology, and TriangleGeometry creates TriangleCoord and TriangleTopology. Each
+          topology implements the engine interface GridTopology. The three coordinate value objects
+          HexCoord, SquareCoord and TriangleCoord keep their values private and have their own
+          operations. The value object TopologyId names a family: each concrete factory keeps it
+          private, and GeometryFactory answers it with isOfFamily(). The axis value objects of the
+          three topologies are each a closed set of instances that implements GridAxis, and the
+          internal direction classes stay private to their topology for neighbors(). BoardBuilder,
+          the builder that the class calls a DDD factory, holds a GeometryFactory and creates the
+          Board.
         </desc>
         <defs>
           <marker
@@ -149,7 +151,7 @@
           x="48"
           y="64"
           width="480"
-          height="464"
+          height="424"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -192,9 +194,9 @@
         <!-- Relationships (drawn before boxes) -->
         <!-- HexGeometry implements GeometryFactory: realization with binding -->
         <line
-          x1="172"
+          x1="136"
           y1="296"
-          x2="172"
+          x2="136"
           y2="220"
           stroke="#17212a"
           stroke-width="1"
@@ -203,9 +205,20 @@
         />
         <!-- SquareGeometry implements GeometryFactory: realization with binding -->
         <line
-          x1="404"
+          x1="288"
           y1="296"
-          x2="404"
+          x2="288"
+          y2="220"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#geo-triangle)"
+        />
+        <!-- TriangleGeometry implements GeometryFactory: realization with binding -->
+        <line
+          x1="420"
+          y1="296"
+          x2="420"
           y2="220"
           stroke="#17212a"
           stroke-width="1"
@@ -222,27 +235,55 @@
           stroke-width="1"
           marker-end="url(#geo-open)"
         />
-        <!-- HexGeometry creates HexCoord: use «create» -->
+        <!-- HexGeometry creates HexTopology in createTopology(): use «create» -->
         <line
-          x1="140"
+          x1="136"
           y1="344"
-          x2="140"
-          y2="560"
+          x2="136"
+          y2="400"
           stroke-width="1"
           marker-end="url(#geo-open)"
           stroke="#5b6873"
         />
-        <!-- SquareGeometry creates SquareCoord: use «create» -->
+        <!-- SquareGeometry creates SquareTopology in createTopology(): use «create» -->
+        <line
+          x1="288"
+          y1="344"
+          x2="288"
+          y2="400"
+          stroke-width="1"
+          marker-end="url(#geo-open)"
+          stroke="#5b6873"
+        />
+        <!-- TriangleGeometry creates TriangleTopology in createTopology(): use «create» -->
+        <line
+          x1="440"
+          y1="344"
+          x2="440"
+          y2="400"
+          stroke-width="1"
+          marker-end="url(#geo-open)"
+          stroke="#5b6873"
+        />
+        <!-- HexGeometry creates HexCoord in createCoord(): use «create». The line runs in the gap between HexTopology and SquareTopology. -->
         <path
-          d="M504 320 H508 Q516 320 516 328 V560"
+          d="M200 320 H204 Q212 320 212 328 V560"
           fill="none"
           stroke-width="1"
           marker-end="url(#geo-open)"
           stroke="#5b6873"
         />
-        <!-- HexGeometry creates HexTopology: use «create» -->
+        <!-- SquareGeometry creates SquareCoord in createCoord(): use «create». The line runs in the gap between SquareTopology and TriangleTopology. -->
         <path
-          d="M232 344 V384 Q232 392 240 392 H396 Q404 392 404 400 V440"
+          d="M352 320 H356 Q364 320 364 328 V560"
+          fill="none"
+          stroke-width="1"
+          marker-end="url(#geo-open)"
+          stroke="#5b6873"
+        />
+        <!-- TriangleGeometry creates TriangleCoord in createCoord(): use «create». The line passes between SquareCoord and TopologyId. -->
+        <path
+          d="M504 320 H608 Q616 320 616 328 V536 Q616 544 624 544 H648 Q656 544 656 552 V560"
           fill="none"
           stroke-width="1"
           marker-end="url(#geo-open)"
@@ -258,19 +299,19 @@
           marker-end="url(#geo-open)"
           stroke="#5b6873"
         />
-        <!-- GeometryFactory asks whether it is of a family with isOfFamily(id: TopologyId): use with a verb. Each concrete factory keeps its TopologyId private (#234) -->
+        <!-- GeometryFactory asks whether it is of a family with isOfFamily(id: TopologyId): use with a verb. Each concrete factory keeps its TopologyId private (#234). The line runs under the Builder frame and enters the top of TopologyId, so it crosses no line of a family (#422). -->
         <path
-          d="M448 190 H544 Q552 190 552 198 V412 Q552 420 560 420 H640"
+          d="M448 190 H544 Q552 190 552 198 V262 Q552 270 560 270 H652 Q660 270 660 278 V356"
           fill="none"
           stroke-width="1"
           marker-end="url(#geo-open)"
           stroke="#5b6873"
         />
-        <!-- Arrow labels -->
-        <rect x="562" y="404" width="64" height="12" rx="2" fill="#f9f4dc" />
+        <!-- Arrow labels. A «bind» label sits on its realization line, so the three labels cross no other line. -->
+        <rect x="574" y="276" width="64" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="594"
-          y="413"
+          x="606"
+          y="285"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -279,11 +320,10 @@
         >
           ISOFFAMILY()
         </text>
-
-        <rect x="180" y="228" width="148" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="68" y="236" width="136" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="254"
-          y="237"
+          x="136"
+          y="245"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -292,10 +332,10 @@
         >
           «bind» TCoord → HexCoord
         </text>
-        <rect x="228" y="260" width="168" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="213" y="256" width="150" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="312"
-          y="269"
+          x="288"
+          y="265"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -303,6 +343,18 @@
           letter-spacing="0.06em"
         >
           «bind» TCoord → SquareCoord
+        </text>
+        <rect x="338" y="276" width="164" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="420"
+          y="285"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          «bind» TCoord → TriangleCoord
         </text>
         <rect x="452" y="136" width="52" height="12" rx="2" fill="#f9f4dc" />
         <text
@@ -316,10 +368,10 @@
         >
           geometry
         </text>
-        <rect x="148" y="400" width="56" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="142" y="366" width="56" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="176"
-          y="409"
+          x="170"
+          y="375"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -328,10 +380,58 @@
         >
           «create»
         </text>
-        <rect x="284" y="372" width="56" height="12" rx="2" fill="#f9f4dc" />
+        <rect x="294" y="366" width="56" height="12" rx="2" fill="#f9f4dc" />
         <text
-          x="312"
-          y="381"
+          x="322"
+          y="375"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          «create»
+        </text>
+        <rect x="446" y="366" width="56" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="474"
+          y="375"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          «create»
+        </text>
+        <rect x="218" y="506" width="56" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="246"
+          y="515"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          «create»
+        </text>
+        <rect x="370" y="506" width="56" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="398"
+          y="515"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          «create»
+        </text>
+        <rect x="554" y="424" width="56" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="582"
+          y="433"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -344,18 +444,6 @@
         <text
           x="732"
           y="265"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.06em"
-        >
-          «create»
-        </text>
-        <rect x="488" y="400" width="56" height="12" rx="2" fill="#f9f4dc" />
-        <text
-          x="516"
-          y="409"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -428,7 +516,7 @@
         <rect
           x="72"
           y="296"
-          width="200"
+          width="128"
           height="48"
           rx="6"
           fill="#ffffff"
@@ -436,7 +524,7 @@
           stroke-width="1"
         />
         <text
-          x="172"
+          x="136"
           y="314"
           fill="#5b6873"
           font-size="8"
@@ -447,7 +535,7 @@
           «factory»
         </text>
         <text
-          x="172"
+          x="136"
           y="332"
           fill="#17212a"
           font-size="12"
@@ -457,11 +545,11 @@
         >
           HexGeometry
         </text>
-        <!-- Class: SquareGeometry (DDD factory in src/domain/engine/ since #160, no test double; a piece of the Abstract Factory pattern: the frame names it, decision 23) -->
+        <!-- Class: SquareGeometry (DDD factory; a piece of the Abstract Factory pattern: the frame names it, decision 23) -->
         <rect
-          x="304"
+          x="224"
           y="296"
-          width="200"
+          width="128"
           height="48"
           rx="6"
           fill="#ffffff"
@@ -469,7 +557,7 @@
           stroke-width="1"
         />
         <text
-          x="404"
+          x="288"
           y="314"
           fill="#5b6873"
           font-size="8"
@@ -480,7 +568,7 @@
           «factory»
         </text>
         <text
-          x="404"
+          x="288"
           y="332"
           fill="#17212a"
           font-size="12"
@@ -489,6 +577,39 @@
           text-anchor="middle"
         >
           SquareGeometry
+        </text>
+        <!-- Class: TriangleGeometry (DDD factory; a piece of the Abstract Factory pattern: the frame names it, decision 23) -->
+        <rect
+          x="376"
+          y="296"
+          width="128"
+          height="48"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="440"
+          y="314"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «factory»
+        </text>
+        <text
+          x="440"
+          y="332"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          TriangleGeometry
         </text>
         <!-- Class: HexCoord (value object): private values, own operations (decision 44) -->
         <rect
@@ -724,11 +845,11 @@
         <text x="659" y="840" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           readonly [number, number]&gt;): void
         </text>
-        <!-- Class: HexTopology -->
+        <!-- Class: HexTopology (the grid of its family: neighbors, lines, rings and regions) -->
         <rect
-          x="304"
-          y="440"
-          width="200"
+          x="72"
+          y="400"
+          width="128"
           height="40"
           rx="6"
           fill="#ffffff"
@@ -736,8 +857,8 @@
           stroke-width="1"
         />
         <text
-          x="404"
-          y="465"
+          x="136"
+          y="425"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -745,6 +866,50 @@
           text-anchor="middle"
         >
           HexTopology
+        </text>
+        <!-- Class: SquareTopology (the grid of its family: neighbors, lines, rings and regions) -->
+        <rect
+          x="224"
+          y="400"
+          width="128"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="288"
+          y="425"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          SquareTopology
+        </text>
+        <!-- Class: TriangleTopology (the grid of its family: neighbors, lines, rings and regions) -->
+        <rect
+          x="376"
+          y="400"
+          width="128"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="440"
+          y="425"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          TriangleTopology
         </text>
         <!-- Class: BoardBuilder (focal, DDD factory; a piece of the Builder pattern: the frame names it, decision 23) -->
         <rect
@@ -1375,11 +1540,23 @@
         >
           + neighborOf(c: TriangleCoord): TriangleCoord
         </text>
-        <!-- Lollipop: HexTopology implements the engine interface GridTopology -->
-        <line x1="320" y1="480" x2="320" y2="496" stroke="#17212a" stroke-width="1" />
-        <circle cx="320" cy="501" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="331" y="504" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          GridTopology‹HexCoord, …›
+        <!-- Lollipop: HexTopology implements the engine interface GridTopology‹HexCoord, HexAxis› (the footnote names the binding) -->
+        <line x1="88" y1="440" x2="88" y2="456" stroke="#17212a" stroke-width="1" />
+        <circle cx="88" cy="461" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="99" y="464" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          GridTopology
+        </text>
+        <!-- Lollipop: SquareTopology implements the engine interface GridTopology‹SquareCoord, SquareAxis› (the footnote names the binding) -->
+        <line x1="240" y1="440" x2="240" y2="456" stroke="#17212a" stroke-width="1" />
+        <circle cx="240" cy="461" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="251" y="464" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          GridTopology
+        </text>
+        <!-- Lollipop: TriangleTopology implements the engine interface GridTopology‹TriangleCoord, TriangleAxis› (the footnote names the binding) -->
+        <line x1="392" y1="440" x2="392" y2="456" stroke="#17212a" stroke-width="1" />
+        <circle cx="392" cy="461" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="403" y="464" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          GridTopology
         </text>
         <!-- UML template boxes: type parameters on the top-right corner -->
         <rect
@@ -1462,8 +1639,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          SquareGeometry creates SquareCoord and SquareTopology, and TriangleGeometry creates
-          TriangleCoord and TriangleTopology. A 3D cell is one more family (§8).
+          Each geometry creates the coordinate and the topology of its own family. A 3D cell is one
+          more family (§8).
         </text>
         <text
           x="24"
@@ -1472,8 +1649,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          HexTopology binds TAxis of GridTopology to HexAxis (decision 45), and an axis steps along
-          itself. A direction is internal to its topology file and serves only neighbors() (#416).
+          Each topology binds GridTopology‹TCoord, TAxis› to its own coordinate and axis (decision
+          45). A direction is internal to its topology file (#416).
         </text>
         <text
           x="24"

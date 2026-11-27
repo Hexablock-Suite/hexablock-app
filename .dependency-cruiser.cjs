@@ -2,6 +2,9 @@
 // Paths match "src/<layer>/" at any depth, so the wrong examples in
 // test/fixtures/arch/<case>/src/ follow the same rules as src/.
 const layer = (name) => `(?:^|/)src/${name}/`;
+// The root of a cruised tree: the repository, or one fixture tree of test/fixtures/arch/.
+// No quantifier wraps the group, so the "unsafe regular expression" check of dependency-cruiser passes.
+const root = '(?:^|^test/fixtures/arch/[^/]+/)';
 const framework =
   '(?:^|/)node_modules/(?:react|react-native|expo[^/]*|@expo/[^/]+)/|^(?:react|react-native|expo[^/]*|@expo/[^/]+)(?:/|$)';
 
@@ -129,6 +132,28 @@ module.exports = {
       severity: 'error',
       from: { pathNot: '(?:^|/)src/infrastructure/root-provider\\.tsx$' },
       to: { path: '(?:^|/)src/infrastructure/composition-root\\.ts$' },
+    },
+    {
+      // A reachability rule, not the orphan rule of dependency-cruiser. Its "from: { orphan: true }"
+      // finds only a module with no importer AND no import, so it misses a module that imports its
+      // interface but has no importer, as NullGameEventPublisher did (issue #412).
+      name: 'no-orphans',
+      comment:
+        'Every module of src/ and app/ is reachable from a route of app/. A module that no route reaches is dead code (issue #433).',
+      severity: 'error',
+      // Expo Router loads each file of app/ by its path, so the routes are the entry points.
+      // app/ holds routes only, so a new route needs no edit here.
+      from: { path: `${root}app/` },
+      to: {
+        path: `${root}(?:src|app)/`,
+        pathNot: [
+          // A route has no importer: the router loads it.
+          `${root}app/`,
+          // The compiler loads an ambient declaration file through tsconfig, not through an import.
+          '\\.d\\.ts$',
+        ],
+        reachable: false,
+      },
     },
   ],
   options: {

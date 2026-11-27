@@ -149,6 +149,19 @@ describe('architecture gate (dependency-cruiser)', () => {
     expect(result.output).toContain('src/infrastructure/ui/use-figures.ts');
   });
 
+  // Issue #433: every module of src/ and app/ is reachable from a route. A module that imports
+  // its interface but has no importer is dead code (issue #412), so the gate reports it.
+  it('should_fail_arch_when_no_route_reaches_a_module', () => {
+    const result = cruise('unreachable-module');
+
+    expect(result.status).not.toBe(0);
+    expect(result.output).toContain('no-orphans');
+    expect(result.output).toContain('src/domain/engine/silent-publisher.ts');
+    expect(result.output).not.toContain('event-publisher.ts');
+    expect(result.output).not.toContain('start-game.ts');
+    expect(result.output).not.toContain('app/index.tsx');
+  });
+
   it('should_pass_arch_when_layers_point_inward', () => {
     const result = cruise('clean');
 

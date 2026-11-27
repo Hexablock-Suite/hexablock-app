@@ -75,12 +75,13 @@
           Extension points of layers 2 to 4 that §8 or the class diagram declare: local and HTTP
           adapters of layer 3 for the layer 2 output ports of storage and backend, with ApiClient of
           layer 4 as the driver of the HTTP adapters (decision 22), the two level origins of A6,
-          GameEventBus and its listeners over the GameEventPublisher port of layer 2, the use case
-          aspects over UseCaseAspect, GameRegistry of layer 4, which keeps the registered games of
-          the composition root, and the planned desktop layout and game module of D5 as dashed
+          which CombinedLevelRepository joins by the rule of DS-11 (decision 68), GameEventBus and
+          its listeners over the GameEventPublisher port of layer 2, the use case aspects over
+          UseCaseAspect, GameRegistry of layer 4, which keeps the registered games of the
+          composition root, and the planned desktop layout and game module of D5 as dashed
           placeholders. GameEventBus keeps its listeners: a use with the attribute name and its
           multiplicity. No box carries a role label of a pattern: the footnotes name the Adapter,
-          the Observer, the Facade and the Decorator.
+          the Composite, the Observer, the Facade and the Decorator.
         </desc>
         <defs>
           <marker
@@ -552,6 +553,66 @@
           font-family="'IBM Plex Mono', monospace"
         >
           LocalSettingsStore
+        </text>
+        <!-- CombinedLevelRepository implements the output port LevelRepository: realization that joins the path of the local adapters (decision 68) -->
+        <path
+          d="M256,440 L296,440"
+          fill="none"
+          stroke-width="1"
+          stroke="#17212a"
+          stroke-dasharray="5,4"
+        />
+        <!-- Class: CombinedLevelRepository (the footnote names its pattern, decision 68). It keeps two parts of the port LevelRepository: the composition root gives it BundledLevelRepository and ApiLevelRepository (#48). -->
+        <rect
+          x="48"
+          y="396"
+          width="208"
+          height="96"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="152.0"
+          y="414"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          A6 · DS-11
+        </text>
+        <text
+          x="152.0"
+          y="432"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          CombinedLevelRepository
+        </text>
+        <line x1="48" y1="442" x2="256" y2="442" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="60"
+          y="460"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          - bundled: LevelRepository
+        </text>
+        <text
+          x="60"
+          y="478"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          - backend: LevelRepository
         </text>
         <!-- Declared extension, no class yet: NewStorageAdapter -->
         <rect x="256" y="284" width="160" height="56" rx="6" fill="#e2ebf8" />
@@ -1048,8 +1109,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Level origin (A6): BundledLevelRepository and ApiLevelRepository both implement
-          LevelRepository, so bundled levels work offline.
+          Level origin (A6, Composite): CombinedLevelRepository joins BundledLevelRepository and
+          ApiLevelRepository by DS-11, so bundled levels work offline.
         </text>
         <text
           x="24"
