@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { ResultPresenter, type ResultViewModel } from '../../src/adapters/result-presenter';
 import { textCatalog } from '../../src/adapters/texts/text-catalog';
-import type { LevelSummary } from '../../src/application/level-summary';
+import type { LevelList, LevelSummary } from '../../src/application/level-summary';
 import type { ListLevelsRequest } from '../../src/application/list-levels';
 import type { MoveResult } from '../../src/application/move-result';
 import { FailureCode, Result, UseCaseError } from '../../src/application/result';
@@ -38,12 +38,12 @@ class SavingUseCase implements UseCase<GameResult, void> {
 }
 
 // A `ListLevels` port that keeps each request and answers `answer`.
-class ListingUseCase implements UseCase<ListLevelsRequest, LevelSummary[]> {
+class ListingUseCase implements UseCase<ListLevelsRequest, LevelList> {
   readonly requests: ListLevelsRequest[] = [];
 
-  constructor(private readonly answer: Result<LevelSummary[]>) {}
+  constructor(private readonly answer: Result<LevelList>) {}
 
-  async execute(request: ListLevelsRequest): Promise<Result<LevelSummary[]>> {
+  async execute(request: ListLevelsRequest): Promise<Result<LevelList>> {
     this.requests.push(request);
     return this.answer;
   }
@@ -91,7 +91,8 @@ function presenterWith(
   } = {},
 ) {
   const save = options.save ?? new SavingUseCase();
-  const list = options.list ?? new ListingUseCase(Result.success(AFTER_FIRST));
+  const list =
+    options.list ?? new ListingUseCase(Result.success({ levels: AFTER_FIRST, unavailable: [] }));
   const asked: (LevelId | undefined)[] = [];
   const presenter = new ResultPresenter(
     gameId,
@@ -245,7 +246,7 @@ describe('ResultPresenter', () => {
       save: new SavingUseCase(
         Result.failure(new UseCaseError(FailureCode.saveFailed, 'The store refused the write.')),
       ),
-      list: new ListingUseCase(Result.success(locked)),
+      list: new ListingUseCase(Result.success({ levels: locked, unavailable: [] })),
     });
 
     await presenter.onFinish(finalResponse(Outcome.victory, 0, { levelId: 'fit-01', moves: 3 }));

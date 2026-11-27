@@ -1,4 +1,4 @@
-import type { LevelSummary } from '../application/level-summary';
+import type { LevelList } from '../application/level-summary';
 import type { ListLevelsRequest } from '../application/list-levels';
 import type { MoveResult } from '../application/move-result';
 import { caughtError, FailureCode, Result } from '../application/result';
@@ -46,7 +46,7 @@ export interface ResultView {
 // `listLevels()` gives `ListLevels`, and a root with no local store throws a RangeError too.
 export interface ResultUseCases {
   saveProgressOf(levelId: LevelId | undefined): Promise<UseCase<GameResult, void>>;
-  listLevels(): UseCase<ListLevelsRequest, LevelSummary[]>;
+  listLevels(): UseCase<ListLevelsRequest, LevelList>;
 }
 
 // The text of each failure code (issue #322, classes.md decision 62). The table is a `Record`
@@ -191,14 +191,15 @@ export class ResultPresenter {
   // with the answer of the list. A game with no level id lists nothing.
   private async nextLevel(
     won: LevelId | undefined,
-  ): Promise<{ result: Result<LevelSummary[]>; levelId?: LevelId } | undefined> {
+  ): Promise<{ result: Result<LevelList>; levelId?: LevelId } | undefined> {
     if (won === undefined) return undefined;
     const result = await attempt(FailureCode.listFailed, () =>
       this.useCases.listLevels().execute({ gameId: this.gameId, figure: this.figure }),
     );
     if (!result.ok) return { result };
-    const at = result.value.findIndex((summary) => summary.levelId.equals(won));
-    const next = at === -1 ? undefined : result.value[at + 1];
+    const { levels } = result.value;
+    const at = levels.findIndex((summary) => summary.levelId.equals(won));
+    const next = at === -1 ? undefined : levels[at + 1];
     if (next === undefined || next.status.equals(LevelStatus.locked)) return { result };
     return { result, levelId: next.levelId };
   }

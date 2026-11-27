@@ -135,4 +135,38 @@ describe('LevelDefinition', () => {
 
     expect(create).toThrow(new RangeError('A level id cannot be empty.'));
   });
+
+  // Issue #48, DS-6: the version of the level format is a whole number of 1 or more.
+  // The error carries the version. Only a cast or a broken file leaves the version out.
+  it('should_throw_a_range_error_when_the_version_of_the_file_is_not_a_whole_number_of_1_or_more', () => {
+    for (const version of [0, -1, 1.5, Number.MAX_SAFE_INTEGER + 1, undefined]) {
+      const create = () =>
+        LevelDefinition.of({ ...fitLevelFile(), version: version as unknown as number });
+
+      expect(create).toThrow(
+        new RangeError('A level version needs a whole number of 1 or more.', { cause: version }),
+      );
+    }
+  });
+
+  // Issue #48: two copies of one level with two versions are two definitions.
+  it('should_not_be_equal_when_two_definitions_hold_another_version', () => {
+    const one = LevelDefinition.of(fitLevelFile());
+    const newer = LevelDefinition.of({ ...fitLevelFile(), version: 2 });
+
+    expect([one.equals(newer), newer.equals(one)]).toEqual([false, false]);
+  });
+
+  // DS-11, issue #48: the copy of a level with the higher version wins. An equal version
+  // does not replace a copy, and a copy of another level never replaces it.
+  it('should_replace_a_copy_of_the_same_level_only_when_its_version_is_higher', () => {
+    const first = LevelDefinition.of(fitLevelFile());
+    const second = LevelDefinition.of({ ...fitLevelFile(), version: 2 });
+    const same = LevelDefinition.of(fitLevelFile());
+    const otherLevel = LevelDefinition.of({ ...fitLevelFile(), levelId: 'fit-02', version: 3 });
+
+    expect([second.replaces(first), first.replaces(second)]).toEqual([true, false]);
+    expect([same.replaces(first), first.replaces(same)]).toEqual([false, false]);
+    expect([otherLevel.replaces(first), first.replaces(otherLevel)]).toEqual([false, false]);
+  });
 });

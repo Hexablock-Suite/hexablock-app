@@ -247,6 +247,7 @@
             "MoveResult",
             "ListLevelsRequest",
             "LevelSummary",
+            "LevelList",
             "LevelRepository",
             "GameEventPublisher",
             "SaveProgress"
@@ -301,6 +302,7 @@
             "FigureChoice",
             "MergePayloadView",
             "BundledLevelRepository",
+            "CombinedLevelRepository",
             "LevelGameFactories",
             "AchievementsView",
             "LevelFile",
@@ -331,7 +333,6 @@
             "AccountPresenter",
             "LocalSettingsStore",
             "ApiProgressRepository",
-            "ApiLevelRepository",
             "ApiLeaderboardGateway",
             "ApiAccountGateway",
             "ApiDtoMapper"
@@ -356,7 +357,7 @@
         },
         {
           "group": "adapters|src/adapters/api",
-          "types": ["HealthApi", "HealthDto"]
+          "types": ["HealthApi", "HealthDto", "ApiLevelRepository", "LevelsApi", "LevelsDto"]
         }
       ],
       "4": [
@@ -633,6 +634,7 @@
             "MoveResult",
             "ListLevelsRequest",
             "LevelSummary",
+            "LevelList",
             "GameFactories",
             "RedoMove",
             "ApplyMove"
@@ -648,6 +650,7 @@
             "LocalProgressRepository",
             "LevelGameFactories",
             "BundledLevelRepository",
+            "CombinedLevelRepository",
             "GamePresenter",
             "HomePresenter"
           ]
@@ -907,6 +910,7 @@
             "GameFactories",
             "ViewOf",
             "LevelSummary",
+            "LevelList",
             "ListLevels",
             "ListLevelsRequest",
             "StartGameRequest",
@@ -927,6 +931,7 @@
             "GamePresenter",
             "LevelGameFactories",
             "BundledLevelRepository",
+            "CombinedLevelRepository",
             "ApiAccountGateway",
             "ApiProgressRepository"
           ]
@@ -1009,7 +1014,6 @@
             "AccountPresenter",
             "LocalSettingsStore",
             "ApiProgressRepository",
-            "ApiLevelRepository",
             "ApiLeaderboardGateway",
             "ApiAccountGateway",
             "ApiDtoMapper"
@@ -1039,6 +1043,7 @@
             "FitTrayPiece",
             "HomePresenter",
             "BundledLevelRepository",
+            "CombinedLevelRepository",
             "GamePresenter",
             "LocalProgressRepository",
             "InMemoryGameRepository",
@@ -1084,7 +1089,7 @@
         },
         {
           "group": "adapters|src/adapters/api",
-          "types": ["HealthApi", "HealthDto"]
+          "types": ["HealthApi", "HealthDto", "ApiLevelRepository", "LevelsApi", "LevelsDto"]
         }
       ]
     },

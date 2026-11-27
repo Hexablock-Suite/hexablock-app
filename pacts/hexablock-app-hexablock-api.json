@@ -26,6 +26,169 @@
         "status": 200
       },
       "type": "Synchronous/HTTP"
+    },
+    {
+      "description": "the stored levels",
+      "pending": false,
+      "providerStates": [
+        {
+          "name": "a level is stored",
+          "params": {
+            "gameId": "hexa-fit",
+            "levelId": "fit-01"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "path": "/v1/levels"
+      },
+      "response": {
+        "body": {
+          "content": {
+            "levels": [
+              {
+                "gameId": "hexa-fit",
+                "levelId": "fit-01",
+                "order": 1,
+                "section": {
+                  "figure": [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      1,
+                      0
+                    ],
+                    [
+                      2,
+                      0
+                    ],
+                    [
+                      0,
+                      1
+                    ],
+                    [
+                      1,
+                      1
+                    ],
+                    [
+                      2,
+                      1
+                    ]
+                  ],
+                  "pieces": [
+                    {
+                      "cells": [
+                        [
+                          0,
+                          0
+                        ],
+                        [
+                          1,
+                          0
+                        ],
+                        [
+                          0,
+                          1
+                        ]
+                      ],
+                      "id": "a"
+                    },
+                    {
+                      "cells": [
+                        [
+                          0,
+                          0
+                        ],
+                        [
+                          1,
+                          0
+                        ]
+                      ],
+                      "id": "b"
+                    },
+                    {
+                      "cells": [
+                        [
+                          0,
+                          0
+                        ]
+                      ],
+                      "id": "c"
+                    }
+                  ],
+                  "stars": [
+                    {
+                      "maxElapsedMs": 120000,
+                      "maxMoves": 12
+                    },
+                    {
+                      "maxElapsedMs": 60000,
+                      "maxMoves": 8
+                    },
+                    {
+                      "maxElapsedMs": 30000,
+                      "maxMoves": 4
+                    }
+                  ],
+                  "witness": [
+                    {
+                      "at": [
+                        0,
+                        0
+                      ],
+                      "piece": "a",
+                      "rotation": 0
+                    },
+                    {
+                      "at": [
+                        2,
+                        0
+                      ],
+                      "piece": "b",
+                      "rotation": 1
+                    },
+                    {
+                      "at": [
+                        1,
+                        1
+                      ],
+                      "piece": "c",
+                      "rotation": 0
+                    }
+                  ]
+                },
+                "topology": "hex",
+                "version": 1
+              }
+            ]
+          },
+          "contentType": "application/json",
+          "encoded": false
+        },
+        "headers": {
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "matchingRules": {
+          "body": {
+            "$.levels": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      },
+      "type": "Synchronous/HTTP"
     }
   ],
   "metadata": {

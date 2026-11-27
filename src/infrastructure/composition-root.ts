@@ -1,6 +1,9 @@
 import { AchievementCounterListener } from '../adapters/achievement-counter-listener';
 import { AchievementsPresenter } from '../adapters/achievements-presenter';
+import { ApiLevelRepository } from '../adapters/api/api-level-repository';
+import type { LevelsApi } from '../adapters/api/levels-api';
 import { BundledLevelRepository } from '../adapters/bundled-level-repository';
+import { CombinedLevelRepository } from '../adapters/combined-level-repository';
 import { GameEventBus } from '../adapters/game-event-bus';
 import { GamePresenter } from '../adapters/game-presenter';
 import { HomePresenter, type SavedProgresses } from '../adapters/home-presenter';
@@ -21,7 +24,7 @@ import {
   type ListAchievementsRequest,
 } from '../application/list-achievements';
 import type { LevelRepository } from '../application/level-repository';
-import type { LevelSummary } from '../application/level-summary';
+import type { LevelList } from '../application/level-summary';
 import { ListLevels, type ListLevelsRequest } from '../application/list-levels';
 import type { Logger } from '../application/logger';
 import { LoggingAspect } from '../application/logging-aspect';
@@ -72,10 +75,13 @@ export interface GameUseCases<TCell = unknown, TCoord = unknown, TMove = unknown
 // and `DeviceKeyValueStore`, which `CompositionRootProvider` builds (#188).
 // The store stays optional. A root with no store reads no saved progress,
 // so it lists no achievements and loads no progress.
+// `levelsApi` is the transport of the levels of hexablock-api (#48). It stays optional too: a root
+// with no transport gives the bundled levels only.
 export interface RootDrivers {
   readonly clock: Clock;
   readonly logger: Logger;
   readonly store?: KeyValueStore;
+  readonly levelsApi?: LevelsApi;
 }
 
 // The composition root (layers.md, Q9, S3-06 in #151, issue #162). It is the only place
@@ -83,7 +89,11 @@ export interface RootDrivers {
 // `CompositionRootProvider`, so `app/` keeps routes only.
 // It builds each driver and adapter once and injects it (single scope, classes.md decision 18):
 // the clock, the random source, the logger, the one id generator of `MatchId`,
-// the event bus and the level repository of the bundled levels.
+// the event bus and the one level repository. With the transport `levelsApi` of its drivers, the
+// level repository is a `CombinedLevelRepository` over the bundled levels and an
+// `ApiLevelRepository` (#48): every use case of the levels reads the levels of both, and a backend
+// that does not answer leaves the bundled levels. With no transport, it is the
+// `BundledLevelRepository` alone.
 // No class has a static `instance()`, so a test passes its own drivers.
 // The game registry maps each `GameId` to its game and the variant factory of that game.
 // The registry pairs each id with its factory in one place, and the root gives that id
@@ -135,7 +145,7 @@ export class CompositionRoot implements ScreenServices {
   private readonly progress: ProgressRepository | undefined;
   private readonly wired = new Map<RegisteredGame, GameUseCases>();
   private readonly achievements: UseCase<ListAchievementsRequest, AchievementSummary[]> | undefined;
-  private readonly levelList: UseCase<ListLevelsRequest, LevelSummary[]> | undefined;
+  private readonly levelList: UseCase<ListLevelsRequest, LevelList> | undefined;
   private readonly texts: Texts = textCatalog[DEFAULT_LANGUAGE];
   private readonly progressLoad: UseCase<LoadProgressRequest, GameProgress | undefined> | undefined;
 
@@ -160,7 +170,7 @@ export class CompositionRoot implements ScreenServices {
       events.subscribe(new AchievementCounterListener(counters, drivers.logger));
     }
     this.events = events;
-    this.levels = new BundledLevelRepository();
+    this.levels = levelRepositoryOf(drivers.levelsApi);
     this.progress =
       drivers.store === undefined ? undefined : new LocalProgressRepository(drivers.store);
     this.achievements =
@@ -239,7 +249,7 @@ export class CompositionRoot implements ScreenServices {
   // The level selector lists the levels of one game on one figure with it. Each call gives
   // the same use case. A root with no local store does not offer it, so it throws a RangeError,
   // as for a board figure that it does not offer.
-  listLevels(): UseCase<ListLevelsRequest, LevelSummary[]> {
+  listLevels(): UseCase<ListLevelsRequest, LevelList> {
     if (this.levelList === undefined) {
       throw new RangeError('The root has no local store, so it lists no levels.');
     }
@@ -391,4 +401,12 @@ function wire<TState extends BoardState<unknown, unknown> & Cloneable<TState>>(
       return decorate(new SaveProgress(lock.progress, model, lock.gameId), 'SaveProgress');
     },
   };
+}
+
+// The one level repository of the root (#48). With the transport `levelsApi`, it joins the bundled
+// levels and the levels of the backend. With no transport, it gives the bundled levels.
+function levelRepositoryOf(levelsApi: LevelsApi | undefined): LevelRepository {
+  const bundled = new BundledLevelRepository();
+  if (levelsApi === undefined) return bundled;
+  return new CombinedLevelRepository(bundled, new ApiLevelRepository(levelsApi));
 }

@@ -42,11 +42,12 @@ import sortTriangle03 from './levels/sort/sort-triangle-03.json';
 
 // The part of a level file that this adapter reads: the common part of the shared level format
 // (hexablock-api `docs/level-format.md`, DS-6) and the section of the game.
-// The adapter reads no `version` yet: DS-11 compares a bundled copy with a copy of the API later.
+// The `version` tells a bundled copy from a copy of the backend (DS-11, #48).
 export interface LevelFile {
   readonly gameId: string;
   readonly levelId: string;
   readonly order: number;
+  readonly version: number;
   readonly topology: string;
   readonly section: unknown;
 }
@@ -102,6 +103,7 @@ const BUNDLED: readonly LevelFile[] = [
 // `LevelDefinition.of()` checks the common part of each file, and `GameId.of()` checks
 // the `gameId`. A file that one of them refuses makes `list()` throw.
 // It finds one level of a game by its level id among the same files (issue #172).
+// Every bundled file is a level that the app can give, so it names no unavailable level (#307).
 // A test can give other files to the constructor, for example a square level.
 export class BundledLevelRepository implements LevelRepository {
   constructor(private readonly files: readonly LevelFile[] = BUNDLED) {}
@@ -116,5 +118,10 @@ export class BundledLevelRepository implements LevelRepository {
   async levelOf(gameId: GameId, levelId: LevelId): Promise<LevelDefinition | undefined> {
     const levels = await this.list(gameId);
     return levels.find((level) => level.levelId().equals(levelId));
+  }
+
+  // No unavailable level: the app checks every bundled file in CI (APP-FR-05).
+  async unavailable(_gameId: GameId): Promise<LevelId[]> {
+    return [];
   }
 }

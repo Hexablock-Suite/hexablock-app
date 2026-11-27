@@ -51,7 +51,7 @@ A new geometry adds one family: a coordinate type, a topology and the piece shap
 Layers 2 to 4 have their own extension points. The view shows only the ones that §8 or the class diagram declare.
 
 - **Database and backend.** A new storage or backend is one more adapter of the layer 2 ports. The use cases do not change (§3.3, §3.4, decision 22).
-- **Level origin (A6).** `BundledLevelRepository` and `ApiLevelRepository` both implement `LevelRepository`, so bundled levels work offline (APP-FR-15).
+- **Level origin (A6).** `BundledLevelRepository` and `ApiLevelRepository` both implement `LevelRepository`, and `CombinedLevelRepository` joins them with the rule of DS-11, so bundled levels work offline (APP-FR-15, #48). A backend that does not answer leaves the bundled levels.
 - **Observer.** A new subscriber implements `GameEventListener` and subscribes to `GameEventBus`, which implements `GameEventPublisher`, the port of layer 2. The engine records its events, and `ApplyMove` delivers them to the port after each turn (#233).
 - **Aspects.** A new aspect extends `UseCaseAspect` and wraps any use case (§3.5, APP-NFR-11).
 - **The game registry.** `GameRegistry` of the composition root lives in layer 4, `src/infrastructure/game-registry.ts` (#162). It keeps one `RegisteredGame` per game, with its variant factory and its screen parts: the state mapper, the cell renderer, the move controls (#175) and the figure layout (#170). So a fifth variant adds one entry and changes no other class. The root builds one registry for each board figure that the player can choose (#171), so the entry of a fifth variant runs on every figure.

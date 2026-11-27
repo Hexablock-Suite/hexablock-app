@@ -163,6 +163,7 @@ async function choose(id: string): Promise<void> {
 interface WitnessFile {
   readonly levelId: string;
   readonly order: number;
+  readonly version: number;
   readonly topology: string;
   readonly section: {
     readonly figure: number[][];

@@ -26,7 +26,7 @@ const count = (value: number) => AchievementCount.of(value);
 const NEW_COUNTERS = AchievementCounters.start(FIT);
 
 const level = (id: string, order: number, topology = 'hex') =>
-  LevelDefinition.of({ levelId: id, order, topology, section: {} });
+  LevelDefinition.of({ levelId: id, order, version: 1, topology, section: {} });
 
 // Four levels of Fit on two figures: a goal counts the levels of every figure.
 const fourLevels = [level('f1', 1), level('f2', 2), level('f3', 3), level('fs1', 1, 'square')];

@@ -11,7 +11,8 @@
 // achievement lives under `achievement.<id>`, where `<id>` is the id that the composition root
 // gives to the achievement (#188).
 // The texts of the level selector live under `levels.<part>`, and the text of each status
-// of a level under `levels.status.<status>` (#173).
+// of a level under `levels.status.<status>` (#173). The section of the unavailable levels has
+// its title and its status text there too (#307).
 // The texts of the victory screen and of the defeat screen live under `result.<part>` (#180).
 export const es = {
   'home.title': 'HexaBlock Suite',
@@ -102,6 +103,8 @@ export const es = {
   'levels.status.completed': 'Completado',
   'levels.status.open': 'Abierto',
   'levels.status.locked': 'Bloqueado',
+  'levels.status.unavailable': 'No disponible',
+  'levels.unavailable': 'No disponibles',
   'achievement.lines-combo': 'Completa 3 líneas a la vez',
   'achievement.merge-256': 'Llega a 256 en Hexa Merge',
   'achievement.merge-2048': 'Llega a 2048 en Hexa Merge',

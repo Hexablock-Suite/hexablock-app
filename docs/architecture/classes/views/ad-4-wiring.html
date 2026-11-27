@@ -76,19 +76,20 @@
           ConsoleLogger and SequentialMatchIds, which implement the RandomSource, Logger and
           MatchIdGenerator interfaces, and the planned AudioManager and SessionManager. It reads
           each BoardFigure, the hexagon, the square and the triangle, keeps one GameRegistry for
-          each figure, which maps each GameId to its registered game, keeps the LevelRepository of
-          the bundled levels, and creates GameEventBus, InMemoryGameRepository and
-          LevelGameFactories, which implements the GameFactories port, in layer 3, so single-scope
-          injection replaces a classic Singleton. With a store in its drivers it also creates one
-          LocalAchievementCounterRepository, which implements the AchievementCounterRepository port,
-          and gives it to the counter listener of the bus (#363). With a store in its drivers it
-          creates LocalProgressRepository once, keeps it as progress for every consumer of the saved
-          progress, and builds ListAchievements over it once, and listAchievements() gives it. It
-          also builds one LoadProgress over it, which reads the saved progress of the game of each
-          request back, and loadProgress() gives it (#181, #410). It builds ListLevels once over the
-          same two repositories for the level selector, and listLevels() gives it (#173).
-          CompositionRoot implements ScreenServices, the closed interface of the screens, and builds
-          the presenter of each screen (#411).
+          each figure, which maps each GameId to its registered game, keeps one LevelRepository: the
+          bundled levels, joined with the levels of the backend in a CombinedLevelRepository when
+          its drivers hold the levelsApi transport (#48), and creates GameEventBus,
+          InMemoryGameRepository and LevelGameFactories, which implements the GameFactories port, in
+          layer 3, so single-scope injection replaces a classic Singleton. With a store in its
+          drivers it also creates one LocalAchievementCounterRepository, which implements the
+          AchievementCounterRepository port, and gives it to the counter listener of the bus (#363).
+          With a store in its drivers it creates LocalProgressRepository once, keeps it as progress
+          for every consumer of the saved progress, and builds ListAchievements over it once, and
+          listAchievements() gives it. It also builds one LoadProgress over it, which reads the
+          saved progress of the game of each request back, and loadProgress() gives it (#181, #410).
+          It builds ListLevels once over the same two repositories for the level selector, and
+          listLevels() gives it (#173). CompositionRoot implements ScreenServices, the closed
+          interface of the screens, and builds the presenter of each screen (#411).
         </desc>
         <defs>
           <marker
@@ -665,7 +666,7 @@
           AchievementSummary[]› [0..1]
         </text>
         <text x="288" y="460" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - levelList: UseCase‹ListLevelsRequest, LevelSummary[]› [0..1]
+          - levelList: UseCase‹ListLevelsRequest, LevelList› [0..1]
         </text>
         <text x="288" y="486" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + figures(): TopologyId[]
@@ -683,7 +684,7 @@
           AchievementSummary[]›
         </text>
         <text x="288" y="556" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + listLevels(): UseCase‹ListLevelsRequest, LevelSummary[]›
+          + listLevels(): UseCase‹ListLevelsRequest, LevelList›
         </text>
         <text x="288" y="570" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + loadProgress(): UseCase‹LoadProgressRequest,
@@ -1136,9 +1137,9 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          StartGame takes one LevelGameFactories per game and figure over the one
-          BundledLevelRepository (#172), and the one LocalProgressRepository, so it refuses a locked
-          level (#397).
+          StartGame takes one LevelGameFactories per game and figure over the one LevelRepository of
+          the root (#172, #48), and the one LocalProgressRepository, so it refuses a locked level
+          (#397).
         </text>
 
         <text

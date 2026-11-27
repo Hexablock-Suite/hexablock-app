@@ -190,7 +190,7 @@ describe('CompositionRoot results', () => {
 
     expect(last.outcome.equals(Outcome.victory)).toBe(true);
     expect(progress?.starsOf(LevelId.of('fit-01'))?.equals(Stars.of(3))).toBe(true);
-    expect(levels.slice(0, 3).map(({ status }) => status)).toEqual([
+    expect(levels.levels.slice(0, 3).map(({ status }) => status)).toEqual([
       LevelStatus.completed,
       LevelStatus.open,
       LevelStatus.locked,

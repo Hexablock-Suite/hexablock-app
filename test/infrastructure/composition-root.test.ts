@@ -273,7 +273,7 @@ describe('CompositionRoot', () => {
     const listed = await root.listLevels().execute({ gameId: FIT, figure: TopologyId.hex });
     const loaded = await root.loadProgress().execute({ gameId: FIT });
 
-    const summaries = listed.ok ? listed.value : [];
+    const summaries = listed.ok ? listed.value.levels : [];
     expect(root.listLevels()).toBe(root.listLevels());
     expect(summaries).toHaveLength(15);
     expect(

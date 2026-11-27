@@ -280,6 +280,7 @@ describe('StartGame with a locked level', () => {
       list: async () => [...shuffled],
       levelOf: async (_gameId, levelId) =>
         shuffled.find((level) => level.levelId().equals(levelId)),
+      unavailable: async () => [],
     };
     const variant = fitLevelVariant(geometry, clock);
     const fresh = startGameOf(FIT, fitFactoryOf(fit01), variant, progressWith(FIT), repository);

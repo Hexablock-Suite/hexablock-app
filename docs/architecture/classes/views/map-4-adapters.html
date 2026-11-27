@@ -64,7 +64,7 @@
       <h1>Adapters, presenters and drivers at a glance</h1>
 
       <svg
-        viewBox="0 0 1040 1981"
+        viewBox="0 0 1040 1997"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="mapad-title mapad-desc"
@@ -1752,6 +1752,24 @@
           </text>
         </g>
 
+        <g data-class="CombinedLevelRepository">
+          <rect
+            x="816"
+            y="1168"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="896" y="1189" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              CombinedLevelRepository
+            </tspan>
+          </text>
+        </g>
+
         <!-- Chips: view models -->
         <g data-class="GameViewModel">
           <rect
@@ -2249,6 +2267,34 @@
             </tspan>
           </text>
         </g>
+        <g data-class="LevelsApi">
+          <rect
+            x="560"
+            y="1602"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="636"
+            y="1614"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="636" y="1627" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              LevelsApi
+            </tspan>
+          </text>
+        </g>
         <!-- Footnote -->
         <text
           x="24"
@@ -2332,7 +2378,7 @@
           LocalAchievementCounterRepository saves the counters of the achievements over the same
           KeyValueStore, and AchievementCounterListener writes them (#363).
         </text>
-        <!-- The last footnote line and the legend sit 32 lower than before: the footnote has one more line since #326 and one more since #363. -->
+        <!-- The last footnote line and the legend sit 48 lower than before: the footnote has one more line since #326, one more since #363 and one more since #48. -->
         <text
           x="24"
           y="1840"
@@ -2343,7 +2389,18 @@
           LevelSelectorScreen, LevelSelectorPresenter and LevelSelectorViewModel exist since #173:
           the presenter calls ListLevels of view 3.3, and the map opens the screen for Fit and Sort.
         </text>
-        <g transform="translate(0 96)">
+        <text
+          x="24"
+          y="1856"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          CombinedLevelRepository joins BundledLevelRepository and ApiLevelRepository over
+          LevelsApi: the copy of a level with the higher version wins (DS-11, #48), and no answer
+          keeps the bundled levels.
+        </text>
+        <g transform="translate(0 112)">
           <text
             x="24"
             y="1760"

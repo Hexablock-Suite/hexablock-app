@@ -64,7 +64,7 @@
       <h1>Progress, levels and leaderboard: use cases over output ports</h1>
 
       <svg
-        viewBox="0 0 1040 1644"
+        viewBox="0 0 1040 1660"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="ucprogress-title ucprogress-desc"
@@ -77,16 +77,18 @@
           record each result in the progress of its game and LoadProgress to read the saved progress
           of the game of its request back, or undefined when the game has none (#181); ListLevels
           uses LevelRepository and ProgressRepository, takes the game and the chosen figure and
-          returns LevelSummary values, each with a LevelStatus of layer 1, a closed set (completed,
-          open, locked) whose ofEach() gives the status of each level from GameProgress (#326), and
-          SyncLeaderboard uses LeaderboardGateway and ProgressRepository. LevelRepository also finds
-          the one level of a game that a start names by its id (#172). SaveProgress keeps the GameId
-          of its game and returns no value; LoadProgress takes the GameId in its request, as
-          ListLevels does (#410), and answers the whole GameProgress. ProgressRepository loads and
-          saves the GameProgress of one game in layer 1: one object with the high score and the best
-          result of each level, which gives the stars of a level with starsOf() and delivers its
-          data to a repository of the edge with deliverTo(). AchievementCounterRepository loads and
-          saves the AchievementCounters of one game in layer 1 (#363): its own aggregate, with a
+          returns a LevelList: the LevelSummary values of the figure, each with a LevelStatus of
+          layer 1, a closed set (completed, open, locked) whose ofEach() gives the status of each
+          level from GameProgress (#326), and apart from them the LevelId of each unavailable level
+          of the game, which never starts (#307), and SyncLeaderboard uses LeaderboardGateway and
+          ProgressRepository. LevelRepository also finds the one level of a game that a start names
+          by its id (#172), and it names the unavailable levels of a game (#307). SaveProgress keeps
+          the GameId of its game and returns no value; LoadProgress takes the GameId in its request,
+          as ListLevels does (#410), and answers the whole GameProgress. ProgressRepository loads
+          and saves the GameProgress of one game in layer 1: one object with the high score and the
+          best result of each level, which gives the stars of a level with starsOf() and delivers
+          its data to a repository of the edge with deliverTo(). AchievementCounterRepository loads
+          and saves the AchievementCounters of one game in layer 1 (#363): its own aggregate, with a
           best count and a total, each an AchievementCount.
         </desc>
         <defs>
@@ -215,9 +217,9 @@
 
         <rect
           x="456"
-          y="224"
+          y="208"
           width="464"
-          height="468"
+          height="484"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -226,7 +228,7 @@
         />
         <text
           x="468"
-          y="240"
+          y="224"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -237,7 +239,7 @@
         </text>
 
         <!-- Relationships (drawn before boxes) -->
-        <!-- ListLevels returns LevelSummary values: use -->
+        <!-- ListLevels returns a LevelList: use (#307) -->
         <line
           x1="304"
           y1="136"
@@ -247,9 +249,31 @@
           stroke-width="1"
           marker-end="url(#ucprogress-open)"
         />
+        <!-- LevelList holds the LevelSummary of each level as levels: use with role and multiplicity (#307) -->
+        <line
+          x1="656"
+          y1="136"
+          x2="720"
+          y2="136"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#ucprogress-open)"
+        />
+        <rect x="660" y="121" width="48" height="12" rx="2" fill="#efe7f8" />
+        <text
+          x="662"
+          y="130"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          levels
+          <tspan font-weight="600">*</tspan>
+        </text>
         <!-- LevelSummary holds its LevelStatus as status: use with role and multiplicity (decision 23), down from layer 2 to layer 1 (#326) -->
         <path
-          d="M696 140 H984 Q992 140 992 148 V1248 Q992 1256 984 1256 H960"
+          d="M904 140 H984 Q992 140 992 148 V1248 Q992 1256 984 1256 H960"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -391,9 +415,9 @@
         </text>
 
         <!-- Role names and multiplicities at the part end -->
-        <rect x="699" y="124" width="43" height="12" rx="2" fill="#efe7f8" />
+        <rect x="908" y="124" width="43" height="12" rx="2" fill="#efe7f8" />
         <text
-          x="740"
+          x="949"
           y="133"
           fill="#17212a"
           font-size="8"
@@ -546,7 +570,7 @@
           + execute(request: ListLevelsRequest):
         </text>
         <text x="96" y="252" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          Promise&lt;Result&lt;LevelSummary[]&gt;&gt;
+          Promise&lt;Result&lt;LevelList&gt;&gt;
         </text>
 
         <!-- Class: SaveProgress (use case) -->
@@ -732,20 +756,20 @@
           Promise&lt;Result&lt;LeaderboardEntry[]&gt;&gt;
         </text>
 
-        <!-- Class: LevelSummary (interface, value object) -->
+        <!-- Class: LevelList (interface, value object): the response of ListLevels, #307 -->
         <rect
           x="472"
           y="64"
-          width="224"
-          height="104"
+          width="184"
+          height="88"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="472" y1="112" x2="696" y2="112" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="472" y1="112" x2="656" y2="112" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="584"
+          x="564"
           y="82"
           fill="#5b6873"
           font-size="8"
@@ -756,7 +780,48 @@
           «interface» «value object»
         </text>
         <text
-          x="584"
+          x="564"
+          y="100"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          LevelList
+        </text>
+        <text x="488" y="128" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + levels: LevelSummary [*]
+        </text>
+        <text x="488" y="144" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + unavailable: LevelId [*]
+        </text>
+
+        <!-- Class: LevelSummary (interface, value object) -->
+        <rect
+          x="720"
+          y="64"
+          width="184"
+          height="104"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="720" y1="112" x2="904" y2="112" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="812"
+          y="82"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface» «value object»
+        </text>
+        <text
+          x="812"
           y="100"
           fill="#17212a"
           font-size="12"
@@ -766,31 +831,31 @@
         >
           LevelSummary
         </text>
-        <text x="488" y="128" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="736" y="128" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + levelId: LevelId
         </text>
-        <text x="488" y="144" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="736" y="144" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + status: LevelStatus
         </text>
-        <text x="488" y="160" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="736" y="160" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + stars: Stars [0..1]
         </text>
 
         <!-- Class: LevelRepository (interface, port) -->
         <rect
           x="472"
-          y="252"
+          y="236"
           width="432"
-          height="88"
+          height="104"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="472" y1="300" x2="904" y2="300" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="472" y1="284" x2="904" y2="284" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="688"
-          y="270"
+          y="254"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -801,7 +866,7 @@
         </text>
         <text
           x="688"
-          y="288"
+          y="272"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -810,12 +875,12 @@
         >
           LevelRepository
         </text>
-        <text x="488" y="316" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="488" y="300" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + list(gameId: GameId): Promise&lt;LevelDefinition[]&gt;
         </text>
         <text
           x="488"
-          y="332"
+          y="316"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -823,6 +888,9 @@
           lengthAdjust="spacingAndGlyphs"
         >
           + levelOf(gameId: GameId, levelId: LevelId): Promise&lt;LevelDefinition | undefined&gt;
+        </text>
+        <text x="488" y="332" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + unavailable(gameId: GameId): Promise&lt;LevelId[]&gt;
         </text>
 
         <!-- Class: ProgressRepository (interface, port) -->
@@ -1376,7 +1444,7 @@
         <line x1="80" y1="120" x2="80" y2="104" stroke="#17212a" stroke-width="1" />
         <circle cx="80" cy="99" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text x="91" y="102" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          UseCase‹ListLevelsRequest, LevelSummary[]›
+          UseCase‹ListLevelsRequest, LevelList›
         </text>
         <line x1="80" y1="308" x2="80" y2="292" stroke="#17212a" stroke-width="1" />
         <circle cx="80" cy="287" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
@@ -1394,7 +1462,7 @@
           UseCase‹GameId, LeaderboardEntry[]›
         </text>
 
-        <!-- The footnote and the legend sit 372 lower than the layer zones: layer 1 holds LevelStatus since #326, and LoadProgress joined the use cases in #181 and the counters in #363. -->
+        <!-- The footnote and the legend sit 372 lower than the layer zones: layer 1 holds LevelStatus since #326, and LoadProgress joined the use cases in #181 and the counters in #363. The footnote has one more line for LevelList (#307). -->
         <g transform="translate(0 372)">
           <!-- Footnote: classes the budget leaves out -->
           <text
@@ -1491,18 +1559,29 @@
             AchievementCounters keeps the counters of the achievements of one game in its own
             aggregate, apart from GameProgress (#363).
           </text>
+          <text
+            x="24"
+            y="1156"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            LevelList holds the summaries of the figure and, apart from them, each unavailable level
+            of the game (#307). An unavailable level has no figure and no status, and it never
+            starts.
+          </text>
           <!-- Legend -->
           <line
             x1="24"
-            y1="1164"
+            y1="1180"
             x2="1016"
-            y2="1164"
+            y2="1180"
             stroke="rgba(23,33,42,0.10)"
             stroke-width="0.8"
           />
           <text
             x="24"
-            y="1182"
+            y="1198"
             fill="#5b6873"
             font-size="8"
             font-family="'IBM Plex Mono', monospace"
@@ -1513,16 +1592,16 @@
 
           <line
             x1="24"
-            y1="1200"
+            y1="1216"
             x2="52"
-            y2="1200"
+            y2="1216"
             stroke="#5b6873"
             stroke-width="1"
             marker-end="url(#ucprogress-open)"
           />
           <text
             x="60"
-            y="1204"
+            y="1220"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1532,7 +1611,7 @@
 
           <rect
             x="24"
-            y="1220"
+            y="1236"
             width="28"
             height="12"
             rx="2"
@@ -1542,7 +1621,7 @@
           />
           <text
             x="60"
-            y="1229"
+            y="1245"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1551,7 +1630,7 @@
           </text>
           <rect
             x="184"
-            y="1220"
+            y="1236"
             width="28"
             height="12"
             rx="2"
@@ -1562,7 +1641,7 @@
           />
           <text
             x="220"
-            y="1229"
+            y="1245"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1571,7 +1650,7 @@
           </text>
           <rect
             x="424"
-            y="1220"
+            y="1236"
             width="28"
             height="12"
             rx="2"
@@ -1581,18 +1660,18 @@
           />
           <text
             x="460"
-            y="1229"
+            y="1245"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
           >
             Teal · focal class
           </text>
-          <line x1="600" y1="1226" x2="616" y2="1226" stroke="#17212a" stroke-width="1" />
-          <circle cx="621" cy="1226" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          <line x1="600" y1="1242" x2="616" y2="1242" stroke="#17212a" stroke-width="1" />
+          <circle cx="621" cy="1242" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
           <text
             x="636"
-            y="1229"
+            y="1245"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -1603,7 +1682,7 @@
           <!-- Legend: the «Sprint N» marker of a planned class or member -->
           <text
             x="24"
-            y="1249"
+            y="1265"
             fill="#17212a"
             font-size="8.5"
             font-family="'IBM Plex Mono', monospace"
@@ -1612,7 +1691,7 @@
           </text>
           <text
             x="92"
-            y="1249"
+            y="1265"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"

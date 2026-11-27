@@ -14,6 +14,7 @@ export interface LevelData {
   readonly gameId: string;
   readonly levelId: string;
   readonly order: number;
+  readonly version: number;
   readonly topology: string;
   readonly section: unknown;
 }
@@ -63,6 +64,14 @@ export function describeLevelRepositoryContract(
       ];
 
       expect(found).toEqual([undefined, undefined, undefined]);
+    });
+
+    // Issue #307: a repository that holds only levels that it can give names no unavailable level.
+    it('should_name_no_unavailable_level_when_every_level_of_the_game_can_be_given', async () => {
+      const repository = make(levels());
+
+      await expect(repository.unavailable(FIT)).resolves.toEqual([]);
+      await expect(repository.unavailable(LINES)).resolves.toEqual([]);
     });
   });
 }
