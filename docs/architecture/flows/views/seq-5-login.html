@@ -63,7 +63,7 @@
       <p class="eyebrow">Use case flow · Login · sequence diagram</p>
       <h1>Login step by step: one sign-in from the screen to the backend and back</h1>
       <svg
-        viewBox="0 0 1240 1206"
+        viewBox="0 0 1240 1266"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="seqlogin-title seqlogin-desc"
@@ -77,7 +77,9 @@
           to AuthController.signIn() of hexablock-api. On success ApiAccountGateway asks ApiClient
           for currentUser() with the token, and ApiClient sends GET /v1/auth/me with the bearer
           token. ApiDtoMapper turns the TokenDto and the CurrentUserDto into a Session, and Login
-          writes it to SessionManager in layer 3 through the SessionStore port and returns a
+          writes it to SessionManager in layer 3 through the SessionStore port, so its user becomes
+          the owner of the progress. Then it merges the progress played with no account into that
+          user through the AnonymousProgress port, for each registered game (#46), and returns a
           successful Result. On a rejected sign-in the backend answers 401, the gateway rejects with
           an AccountFailure, and Login returns a failed Result with the code wrong-credentials.
         </desc>
@@ -559,14 +561,14 @@
           x1="1062"
           y1="24"
           x2="1062"
-          y2="1020"
+          y2="1064"
           stroke="#0f6f74"
           stroke-width="1"
           stroke-dasharray="6,3"
         />
         <text
           x="1056"
-          y="1016"
+          y="1060"
           fill="#0f6f74"
           font-size="7.5"
           font-weight="500"
@@ -578,7 +580,7 @@
         </text>
         <text
           x="1068"
-          y="1016"
+          y="1060"
           fill="#0f6f74"
           font-size="7.5"
           font-weight="500"
@@ -592,7 +594,7 @@
           x1="64"
           y1="88"
           x2="64"
-          y2="1020"
+          y2="1064"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -601,7 +603,7 @@
           x1="182"
           y1="88"
           x2="182"
-          y2="1020"
+          y2="1064"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -610,7 +612,7 @@
           x1="312"
           y1="88"
           x2="312"
-          y2="1020"
+          y2="1064"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -619,7 +621,7 @@
           x1="442"
           y1="88"
           x2="442"
-          y2="1020"
+          y2="1064"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -628,7 +630,7 @@
           x1="576"
           y1="88"
           x2="576"
-          y2="1020"
+          y2="1064"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -637,7 +639,7 @@
           x1="720"
           y1="88"
           x2="720"
-          y2="1020"
+          y2="1064"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -646,7 +648,7 @@
           x1="858"
           y1="88"
           x2="858"
-          y2="1020"
+          y2="1064"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -655,7 +657,7 @@
           x1="986"
           y1="88"
           x2="986"
-          y2="1020"
+          y2="1064"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -664,7 +666,7 @@
           x1="1152"
           y1="88"
           x2="1152"
-          y2="1020"
+          y2="1064"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
@@ -674,7 +676,7 @@
           x="402"
           y="394"
           width="814"
-          height="526"
+          height="570"
           rx="1"
           fill="none"
           stroke="#5b6873"
@@ -703,17 +705,17 @@
         </text>
         <line
           x1="402"
-          y1="782"
+          y1="826"
           x2="1216"
-          y2="782"
+          y2="826"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
         />
-        <rect x="444" y="785" width="187.6" height="12" fill="#f3f5f6" />
+        <rect x="444" y="829" width="187.6" height="12" fill="#f3f5f6" />
         <text
           x="446"
-          y="794"
+          y="838"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -752,7 +754,7 @@
           x="982"
           y="294"
           width="8"
-          height="616"
+          height="660"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
@@ -761,7 +763,7 @@
           x="716"
           y="204"
           width="8"
-          height="706"
+          height="750"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
@@ -770,7 +772,7 @@
           x="438"
           y="174"
           width="8"
-          height="736"
+          height="780"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
@@ -779,7 +781,7 @@
           x="308"
           y="144"
           width="8"
-          height="796"
+          height="840"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
@@ -788,7 +790,7 @@
           x="178"
           y="114"
           width="8"
-          height="876"
+          height="920"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
@@ -834,6 +836,48 @@
           text-anchor="middle"
         >
           signIn() · flow 2
+        </text>
+        <!-- Interaction use: ref AnonymousProgress, the merge at sign-in (#46, decision 66) -->
+        <rect
+          x="452"
+          y="742"
+          width="248"
+          height="36"
+          rx="1"
+          fill="#f3f5f6"
+          stroke="#5b6873"
+          stroke-width="1"
+        />
+        <path d="M452 756 H478 L484 750 V742" fill="#ffffff" stroke="#5b6873" stroke-width="1" />
+        <text
+          x="457"
+          y="752"
+          fill="#17212a"
+          font-size="8.5"
+          font-weight="600"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          ref
+        </text>
+        <text
+          x="590"
+          y="758"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          AnonymousProgress · each game
+        </text>
+        <text
+          x="590"
+          y="771"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          mergeAnonymousInto() · flow 2
         </text>
         <!-- Messages, top to bottom -->
         <!-- Message: player to screen -->
@@ -1255,18 +1299,18 @@
         <!-- Reply: login to presenter -->
         <line
           x1="438"
-          y1="758"
+          y1="802"
           x2="316"
-          y2="758"
+          y2="802"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#seqlogin-reply)"
         />
-        <rect x="320" y="744" width="125.8" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="320" y="788" width="125.8" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="324"
-          y="754"
+          y="798"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1277,18 +1321,18 @@
         <!-- Reply: backend to client -->
         <line
           x1="1152"
-          y1="810"
+          y1="854"
           x2="990"
-          y2="810"
+          y2="854"
           stroke="#0f6f74"
           stroke-width="1.6"
           stroke-dasharray="4,3"
           marker-end="url(#seqlogin-reply)"
         />
-        <rect x="1003" y="796" width="136" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="1003" y="840" width="136" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="1071"
-          y="806"
+          y="850"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1299,18 +1343,18 @@
         <!-- Reply: client to gateway -->
         <line
           x1="982"
-          y1="840"
+          y1="884"
           x2="724"
-          y2="840"
+          y2="884"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#seqlogin-reply)"
         />
-        <rect x="790.1" y="826" width="125.8" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="790.1" y="870" width="125.8" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="853"
-          y="836"
+          y="880"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1321,18 +1365,18 @@
         <!-- Reply: gateway to login -->
         <line
           x1="716"
-          y1="870"
+          y1="914"
           x2="446"
-          y2="870"
+          y2="914"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#seqlogin-reply)"
         />
-        <rect x="520.65" y="856" width="120.7" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="520.65" y="900" width="120.7" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="581"
-          y="866"
+          y="910"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1343,18 +1387,18 @@
         <!-- Reply: login to presenter -->
         <line
           x1="438"
-          y1="900"
+          y1="944"
           x2="316"
-          y2="900"
+          y2="944"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#seqlogin-reply)"
         />
-        <rect x="320" y="886" width="176.8" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="320" y="930" width="176.8" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="324"
-          y="896"
+          y="940"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1365,18 +1409,18 @@
         <!-- Reply: presenter to screen -->
         <line
           x1="308"
-          y1="936"
+          y1="980"
           x2="186"
-          y2="936"
+          y2="980"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
           marker-end="url(#seqlogin-reply)"
         />
-        <rect x="190" y="922" width="120.7" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="190" y="966" width="120.7" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="194"
-          y="932"
+          y="976"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1386,16 +1430,16 @@
         </text>
         <!-- Self message: screen -->
         <path
-          d="M186 966 H214 V980 H194"
+          d="M186 1010 H214 V1024 H194"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqlogin-call)"
         />
-        <rect x="216" y="966" width="156.4" height="13" rx="2" fill="#f3f5f6" />
+        <rect x="216" y="1010" width="156.4" height="13" rx="2" fill="#f3f5f6" />
         <text
           x="220"
-          y="976"
+          y="1020"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1406,7 +1450,7 @@
         <!-- Footnote -->
         <text
           x="24"
-          y="1048"
+          y="1092"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1416,17 +1460,17 @@
         </text>
         <text
           x="24"
-          y="1064"
+          y="1108"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Login class view. Login names only the AccountGateway and SessionStore ports, so the calls
-          out to layer 3 keep the dependency pointing down.
+          Login class view. Login names only its ports, so the calls out to layer 3 keep the
+          dependency pointing down.
         </text>
         <text
           x="24"
-          y="1080"
+          y="1124"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1436,7 +1480,7 @@
         </text>
         <text
           x="24"
-          y="1096"
+          y="1140"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1444,18 +1488,28 @@
           AuthController.me() with the token (API-FR-01, hexablock-api class view 3.3). A rejected
           call comes back as Result.failure(error) (decision 28).
         </text>
+        <text
+          x="24"
+          y="1156"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Since #46 the written session makes its user the owner of the progress, and the ref merges
+          the progress played with no account into that user, before any request (decision 66).
+        </text>
         <!-- Legend -->
         <line
           x1="24"
-          y1="1128"
+          y1="1188"
           x2="1216"
-          y2="1128"
+          y2="1188"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1146"
+          y="1206"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1465,16 +1519,16 @@
         </text>
         <line
           x1="24"
-          y1="1164"
+          y1="1224"
           x2="52"
-          y2="1164"
+          y2="1224"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#seqlogin-call)"
         />
         <text
           x="60"
-          y="1167"
+          y="1227"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1483,9 +1537,9 @@
         </text>
         <line
           x1="245.0"
-          y1="1164"
+          y1="1224"
           x2="273.0"
-          y2="1164"
+          y2="1224"
           stroke="#5b6873"
           stroke-width="1"
           stroke-dasharray="4,3"
@@ -1493,7 +1547,7 @@
         />
         <text
           x="281"
-          y="1167"
+          y="1227"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1502,16 +1556,16 @@
         </text>
         <line
           x1="433.1"
-          y1="1164"
+          y1="1224"
           x2="461.1"
-          y2="1164"
+          y2="1224"
           stroke="#0f6f74"
           stroke-width="1.6"
           marker-end="url(#seqlogin-http)"
         />
         <text
           x="469.1"
-          y="1167"
+          y="1227"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1520,16 +1574,16 @@
         </text>
         <line
           x1="710.4000000000001"
-          y1="1157"
+          y1="1217"
           x2="710.4000000000001"
-          y2="1171"
+          y2="1231"
           stroke="#0f6f74"
           stroke-width="1"
           stroke-dasharray="6,3"
         />
         <text
           x="732.4"
-          y="1167"
+          y="1227"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1538,16 +1592,16 @@
         </text>
         <line
           x1="846.8000000000001"
-          y1="1157"
+          y1="1217"
           x2="846.8000000000001"
-          y2="1171"
+          y2="1231"
           stroke="#7d8a94"
           stroke-width="1"
           stroke-dasharray="3,3"
         />
         <rect
           x="842.8000000000001"
-          y="1160"
+          y="1220"
           width="8"
           height="8"
           fill="#ffffff"
@@ -1556,7 +1610,7 @@
         />
         <text
           x="868.8"
-          y="1167"
+          y="1227"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1565,7 +1619,7 @@
         </text>
         <rect
           x="24"
-          y="1180"
+          y="1240"
           width="28"
           height="12"
           rx="1"
@@ -1575,7 +1629,7 @@
         />
         <text
           x="60"
-          y="1189"
+          y="1249"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1584,7 +1638,7 @@
         </text>
         <rect
           x="235.6"
-          y="1180"
+          y="1240"
           width="28"
           height="12"
           rx="2"
@@ -1594,7 +1648,7 @@
         />
         <text
           x="271.6"
-          y="1189"
+          y="1249"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1603,7 +1657,7 @@
         </text>
         <rect
           x="390.79999999999995"
-          y="1180"
+          y="1240"
           width="28"
           height="12"
           rx="2"
@@ -1613,7 +1667,7 @@
         />
         <text
           x="426.8"
-          y="1189"
+          y="1249"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1622,7 +1676,7 @@
         </text>
         <rect
           x="546.0"
-          y="1180"
+          y="1240"
           width="28"
           height="12"
           rx="2"
@@ -1632,7 +1686,7 @@
         />
         <text
           x="582"
-          y="1189"
+          y="1249"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1641,7 +1695,7 @@
         </text>
         <rect
           x="701.2"
-          y="1180"
+          y="1240"
           width="28"
           height="12"
           rx="2"
@@ -1651,7 +1705,7 @@
         />
         <text
           x="737.2"
-          y="1189"
+          y="1249"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

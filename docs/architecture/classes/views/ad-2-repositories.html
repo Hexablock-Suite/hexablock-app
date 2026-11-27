@@ -75,10 +75,11 @@
           the ProgressApi transport interface and the ApiDtoMapper of layer 3 and implements the
           ProgressGateway port of layer 2 (decisions 22 and 66, #46). ApiClient in layer 4, the
           driver, implements ProgressApi. LocalProgressRepository in layer 3 holds the KeyValueStore
-          driver interface of layer 3 and the SessionStore port, and implements two ports:
-          ProgressRepository with load() and save(), and AnonymousProgress with loadAnonymous() and
-          forgetAnonymous(). It keeps the GameProgress of each game as plain JSON in the store,
-          under a key with the user id of the session, or under the anonymous key with no session.
+          driver interface of layer 3, the SessionStore port and one queue per key, and implements
+          two ports: ProgressRepository with owner(), load() and update(), and AnonymousProgress
+          with mergeAnonymousInto(). It keeps the GameProgress of each game as plain JSON in the
+          store, under a key with the owner, the last signed-in user that SessionStore keeps, or
+          under the anonymous key for the anonymous owner (decision 66).
           LocalAchievementCounterRepository in layer 3 holds the same KeyValueStore and implements
           the AchievementCounterRepository port of layer 2: it keeps the AchievementCounters of each
           game as plain JSON with a version under its own key (#363). DeviceKeyValueStore implements
@@ -280,7 +281,7 @@
         />
         <!-- LocalAchievementCounterRepository keeps the KeyValueStore it receives as store: use with role and multiplicity (decision 23, #363) -->
         <path
-          d="M384 528 H210 Q202 528 202 520 V376"
+          d="M384 596 H210 Q202 596 202 588 V376"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -304,7 +305,7 @@
         />
         <!-- LocalProgressRepository implements ProgressRepository: realization, down from layer 3 to layer 2 -->
         <path
-          d="M700 448 V744 Q700 752 692 752 H620 Q612 752 612 760 V768"
+          d="M700 516 V744 Q700 752 692 752 H620 Q612 752 612 760 V768"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -313,16 +314,16 @@
         />
         <!-- LocalProgressRepository implements AnonymousProgress, the second role of the one repository of the progress (#46, decision 66) -->
         <path
-          d="M714 448 V768"
+          d="M714 516 V768"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
           marker-end="url(#adrepos-triangle)"
         />
-        <!-- LocalProgressRepository keeps the SessionStore it receives as sessions: the key carries the user id (#46, decision 66) -->
+        <!-- LocalProgressRepository keeps the SessionStore it receives as sessions: the key carries the owner (#46, decision 66) -->
         <path
-          d="M728 448 V732 Q728 740 736 740 H876 Q884 740 884 748 V768"
+          d="M728 516 V732 Q728 740 736 740 H876 Q884 740 884 748 V768"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -339,7 +340,7 @@
         />
         <!-- LocalAchievementCounterRepository implements AchievementCounterRepository: realization, down from layer 3 to layer 2 (#363) -->
         <path
-          d="M438 596 V768"
+          d="M438 664 V768"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -689,19 +690,17 @@
         <text x="776" y="688" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           account mappings: flow 5
         </text>
-        <!-- Class: LocalProgressRepository (a piece of the Adapter pattern: the frame names it, decision 23; two roles since #46, decision 66) -->
+        <!-- Class: LocalProgressRepository (a piece of the Adapter pattern: the frame names it, decision 23; two roles since #46, decision 66; the owner and the queue since its judgment-day round 1) -->
         <rect
           x="384"
           y="276"
           width="352"
-          height="172"
+          height="240"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="384" y1="324" x2="736" y2="324" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="384" y1="364" x2="736" y2="364" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="560"
           y="294"
@@ -724,31 +723,45 @@
         >
           LocalProgressRepository
         </text>
+        <line x1="384" y1="324" x2="736" y2="324" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="400" y="340" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - store: KeyValueStore
         </text>
         <text x="400" y="356" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - sessions: SessionStore [0..1]
         </text>
-        <text x="400" y="380" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + load(gameId: GameId): Promise&lt;GameProgress | undefined&gt;
+        <text x="400" y="372" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - queues: Map&lt;string, Promise&lt;void&gt;&gt;
         </text>
+        <line x1="384" y1="380" x2="736" y2="380" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="400" y="396" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + save(progress: GameProgress): Promise&lt;void&gt;
+          + owner(): Promise&lt;ProgressOwner&gt;
         </text>
         <text x="400" y="412" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + loadAnonymous(gameId: GameId):
+          + load(owner: ProgressOwner, gameId: GameId):
         </text>
-        <text x="416" y="424" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="416" y="428" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Promise&lt;GameProgress | undefined&gt;
         </text>
-        <text x="400" y="440" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + forgetAnonymous(gameId: GameId): Promise&lt;void&gt;
+        <text x="400" y="444" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + update(owner: ProgressOwner, gameId: GameId,
+        </text>
+        <text x="416" y="460" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          change: (progress: GameProgress) =&gt; void):
+        </text>
+        <text x="416" y="476" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Promise&lt;void&gt;
+        </text>
+        <text x="400" y="492" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + mergeAnonymousInto(owner: ProgressOwner,
+        </text>
+        <text x="416" y="508" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          gameId: GameId): Promise&lt;void&gt;
         </text>
         <!-- Class: LocalAchievementCounterRepository (adapter of AchievementCounterRepository over KeyValueStore, #363; a piece of the Adapter pattern: the frame names it) -->
         <rect
           x="384"
-          y="472"
+          y="540"
           width="304"
           height="124"
           rx="6"
@@ -756,11 +769,11 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="384" y1="520" x2="688" y2="520" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="384" y1="544" x2="688" y2="544" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="384" y1="588" x2="688" y2="588" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="384" y1="612" x2="688" y2="612" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="536"
-          y="490"
+          y="558"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -771,7 +784,7 @@
         </text>
         <text
           x="536"
-          y="508"
+          y="576"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -780,16 +793,16 @@
         >
           LocalAchievementCounterRepository
         </text>
-        <text x="400" y="536" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="400" y="604" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - store: KeyValueStore
         </text>
-        <text x="400" y="560" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="400" y="628" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + load(gameId: GameId):
         </text>
-        <text x="416" y="572" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="416" y="640" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Promise&lt;AchievementCounters | undefined&gt;
         </text>
-        <text x="400" y="588" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="400" y="656" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + save(counters: AchievementCounters): Promise&lt;void&gt;
         </text>
         <!-- Reference box: AchievementCounterRepository, detailed in view 3.3 (#363) -->
@@ -1027,8 +1040,8 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           LocalProgressRepository saves the GameProgress of each game as plain JSON under
-          progress:&lt;user id&gt;:&lt;game id&gt; with a session, and under progress:&lt;game
-          id&gt; with none.
+          progress:&lt;user id&gt;:&lt;game id&gt; for the owner, the last signed-in user, and under
+          progress:&lt;game id&gt; for the anonymous owner.
         </text>
         <text
           x="24"
@@ -1037,9 +1050,9 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          It reads each value with deliverTo() (decision 57, #164). As AnonymousProgress it loads
-          and forgets progress:&lt;game id&gt;, which SyncProgress merges into an account (decision
-          66).
+          It reads each value with deliverTo() (decision 57, #164). update() runs in one queue per
+          key. As AnonymousProgress it merges progress:&lt;game id&gt; into the owner, then forgets
+          it (decision 66).
         </text>
         <text
           x="24"

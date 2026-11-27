@@ -64,7 +64,7 @@
       <h1>Wiring: the drivers and the composition root</h1>
 
       <svg
-        viewBox="0 0 1100 1944"
+        viewBox="0 0 1100 1960"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="adwiring-title adwiring-desc"
@@ -86,12 +86,13 @@
           implements ProgressRepository and AnonymousProgress, keeps it as progress for every
           consumer of the saved progress, and builds ListAchievements, LoadProgress and ListLevels
           over it once (#181, #188, #173, #410). It creates the one SessionManager and the one
-          ApiDtoMapper (#45). For the sync (#46) it creates ApiProgressGateway over the transport
-          and that mapper, and builds SyncProgress once through decorate() over SessionManager,
-          LocalProgressRepository and the gateway. It gives SyncProgress to each ResultPresenter of
-          gameSession() and to the AccountPresenter of accountPresenter(). CompositionRoot
-          implements ScreenServices, the closed interface of the screens, and builds the presenter
-          of each screen (#411).
+          ApiDtoMapper (#45), and gives Register and Login the LocalProgressRepository in its
+          anonymous role with the id of each game, so a sign-in merges the anonymous progress (#46).
+          For the sync (#46) it creates ApiProgressGateway over the transport and that mapper, and
+          builds SyncProgress once through decorate() over SessionManager, LocalProgressRepository
+          and the gateway. It gives SyncProgress to each ResultPresenter of gameSession() and to the
+          AccountPresenter of accountPresenter(). CompositionRoot implements ScreenServices, the
+          closed interface of the screens, and builds the presenter of each screen (#411).
         </desc>
         <defs>
           <marker
@@ -1185,7 +1186,7 @@
           x="552"
           y="1070"
           width="224"
-          height="88"
+          height="104"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1231,6 +1232,15 @@
           font-family="'IBM Plex Mono', monospace"
         >
           - sessions: SessionStore [0..1]
+        </text>
+        <text
+          x="568"
+          y="1166"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          - queues: Map‹string, Promise‹void››
         </text>
         <!-- Class: SessionManager (adapter of SessionStore, single scope, #45; shared with the sync since #46) -->
         <rect
@@ -1536,11 +1546,11 @@
           AchievementCounterRepository
         </text>
         <!-- LocalProgressRepository implements ProgressRepository and AnonymousProgress, two roles of one repository (decision 66) -->
-        <line x1="568" y1="1158" x2="568" y2="1174" stroke="#17212a" stroke-width="1" />
-        <circle cx="568" cy="1179" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="568" y1="1174" x2="568" y2="1182" stroke="#17212a" stroke-width="1" />
+        <circle cx="568" cy="1187" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="579"
-          y="1182"
+          y="1190"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1714,11 +1724,22 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           The sync (#46, decision 66): LocalProgressRepository takes the same SessionManager, so the
-          key of the saved progress carries the user of the session.
+          key of the saved progress carries the owner, the last signed-in user, and a refused token
+          keeps it.
         </text>
         <text
           x="24"
           y="1778"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          With the store, Register and Login also take LocalProgressRepository in its anonymous role
+          and the id of each game, so a sign-in merges the anonymous progress.
+        </text>
+        <text
+          x="24"
+          y="1794"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1728,7 +1749,7 @@
         </text>
         <text
           x="24"
-          y="1794"
+          y="1810"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1738,7 +1759,7 @@
         </text>
         <text
           x="24"
-          y="1810"
+          y="1826"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1749,15 +1770,15 @@
         <!-- Legend -->
         <line
           x1="24"
-          y1="1834"
+          y1="1850"
           x2="1076"
-          y2="1834"
+          y2="1850"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1852"
+          y="1868"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1767,16 +1788,16 @@
         </text>
         <line
           x1="24"
-          y1="1870"
+          y1="1886"
           x2="52"
-          y2="1870"
+          y2="1886"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#adwiring-open)"
         />
         <text
           x="60"
-          y="1874"
+          y="1890"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1785,7 +1806,7 @@
         </text>
         <rect
           x="24"
-          y="1890"
+          y="1906"
           width="28"
           height="12"
           rx="2"
@@ -1795,7 +1816,7 @@
         />
         <rect
           x="56"
-          y="1890"
+          y="1906"
           width="28"
           height="12"
           rx="2"
@@ -1805,7 +1826,7 @@
         />
         <rect
           x="88"
-          y="1890"
+          y="1906"
           width="28"
           height="12"
           rx="2"
@@ -1815,7 +1836,7 @@
         />
         <text
           x="124"
-          y="1899"
+          y="1915"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1824,7 +1845,7 @@
         </text>
         <rect
           x="248"
-          y="1890"
+          y="1906"
           width="28"
           height="12"
           rx="2"
@@ -1835,7 +1856,7 @@
         />
         <text
           x="284"
-          y="1899"
+          y="1915"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1844,7 +1865,7 @@
         </text>
         <rect
           x="472"
-          y="1890"
+          y="1906"
           width="28"
           height="12"
           rx="2"
@@ -1855,7 +1876,7 @@
         />
         <text
           x="508"
-          y="1899"
+          y="1915"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1864,7 +1885,7 @@
         </text>
         <rect
           x="648"
-          y="1890"
+          y="1906"
           width="28"
           height="12"
           rx="2"
@@ -1875,7 +1896,7 @@
         />
         <text
           x="684"
-          y="1899"
+          y="1915"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1884,7 +1905,7 @@
         </text>
         <rect
           x="872"
-          y="1890"
+          y="1906"
           width="28"
           height="12"
           rx="2"
@@ -1894,18 +1915,18 @@
         />
         <text
           x="908"
-          y="1899"
+          y="1915"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
         </text>
-        <line x1="24" y1="1920" x2="40" y2="1920" stroke="#17212a" stroke-width="1" />
-        <circle cx="45" cy="1920" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="24" y1="1936" x2="40" y2="1936" stroke="#17212a" stroke-width="1" />
+        <circle cx="45" cy="1936" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="60"
-          y="1924"
+          y="1940"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

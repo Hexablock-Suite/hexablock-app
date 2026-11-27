@@ -64,7 +64,7 @@
       <h1>Account and settings: session and settings ports</h1>
 
       <svg
-        viewBox="0 0 1040 816"
+        viewBox="0 0 1040 864"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="ucaccount-title ucaccount-desc"
@@ -77,8 +77,11 @@
           implementing the UseCase input port with its binding. Register and Login use the
           AccountGateway and SessionStore output ports, UpdateSettings uses the SettingsStore output
           port, and AccountGateway returns Session values and rejects with an AccountFailure that
-          carries a failure code. SessionStore also clears the session: SyncProgress of view 3.3
-          calls clear() when the backend refuses the token (#46).
+          carries a failure code. Register and Login also keep an optional AnonymousMerge, so a
+          sign-in merges the progress played with no account into its user (#46). SessionStore also
+          gives owner(), the user id of the last signed-in player, and clears the token:
+          SyncProgress of view 3.3 calls clear() when the backend refuses the token, and the owner
+          stays (#46, decision 66).
         </desc>
         <defs>
           <marker
@@ -139,7 +142,7 @@
           x="24"
           y="24"
           width="992"
-          height="588"
+          height="604"
           rx="8"
           fill="#efe7f8"
           stroke="rgba(126,34,206,0.40)"
@@ -162,7 +165,7 @@
           x="48"
           y="64"
           width="576"
-          height="212"
+          height="228"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -185,7 +188,7 @@
           x="704"
           y="64"
           width="272"
-          height="212"
+          height="228"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -206,7 +209,7 @@
 
         <rect
           x="136"
-          y="308"
+          y="324"
           width="856"
           height="280"
           rx="8"
@@ -217,7 +220,7 @@
         />
         <text
           x="148"
-          y="324"
+          y="340"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -231,9 +234,9 @@
         <!-- Register keeps the SessionStore it receives as session: use with role and multiplicity (decision 23) -->
         <line
           x1="280"
-          y1="260"
+          y1="276"
           x2="280"
-          y2="340"
+          y2="356"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#ucaccount-open)"
@@ -241,16 +244,16 @@
         <!-- Login keeps the SessionStore it receives as session: use with role and multiplicity (decision 23) -->
         <line
           x1="432"
-          y1="260"
+          y1="276"
           x2="432"
-          y2="340"
+          y2="356"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#ucaccount-open)"
         />
         <!-- Register keeps the AccountGateway it receives as accounts: use with role and multiplicity (decision 23) -->
         <path
-          d="M112 260 V516 Q112 524 120 524 H152"
+          d="M112 276 V532 Q112 540 120 540 H152"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -258,7 +261,7 @@
         />
         <!-- Login keeps the AccountGateway it receives as accounts: use with role and multiplicity (decision 23) -->
         <path
-          d="M560 260 V500 Q560 508 552 508 H496"
+          d="M560 276 V516 Q560 524 552 524 H496"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -267,9 +270,9 @@
         <!-- AccountGateway returns Session values: use -->
         <line
           x1="496"
-          y1="540"
+          y1="556"
           x2="608"
-          y2="540"
+          y2="556"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#ucaccount-open)"
@@ -279,17 +282,17 @@
           x1="840"
           y1="244"
           x2="840"
-          y2="340"
+          y2="356"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#ucaccount-open)"
         />
 
         <!-- Arrow labels -->
-        <rect x="520" y="548" width="48" height="12" rx="2" fill="#efe7f8" />
+        <rect x="520" y="564" width="48" height="12" rx="2" fill="#efe7f8" />
         <text
           x="544"
-          y="557"
+          y="573"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -300,10 +303,10 @@
         </text>
 
         <!-- Role names and multiplicities at the part end -->
-        <rect x="284" y="323" width="48" height="12" rx="2" fill="#efe7f8" />
+        <rect x="284" y="339" width="48" height="12" rx="2" fill="#efe7f8" />
         <text
           x="286"
-          y="332"
+          y="348"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -312,10 +315,10 @@
           session
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="436" y="323" width="48" height="12" rx="2" fill="#efe7f8" />
+        <rect x="436" y="339" width="48" height="12" rx="2" fill="#efe7f8" />
         <text
           x="438"
-          y="332"
+          y="348"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -324,10 +327,10 @@
           session
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="56" y="507" width="52" height="12" rx="2" fill="#efe7f8" />
+        <rect x="56" y="523" width="52" height="12" rx="2" fill="#efe7f8" />
         <text
           x="106"
-          y="516"
+          y="532"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -336,10 +339,10 @@
           accounts
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="502" y="494" width="52" height="12" rx="2" fill="#efe7f8" />
+        <rect x="502" y="510" width="52" height="12" rx="2" fill="#efe7f8" />
         <text
           x="552"
-          y="503"
+          y="519"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -348,10 +351,10 @@
           accounts
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="844" y="323" width="52" height="12" rx="2" fill="#efe7f8" />
+        <rect x="844" y="339" width="52" height="12" rx="2" fill="#efe7f8" />
         <text
           x="846"
-          y="332"
+          y="348"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -366,7 +369,7 @@
           x="64"
           y="120"
           width="240"
-          height="140"
+          height="156"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -412,11 +415,14 @@
         <text x="80" y="212" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - session: SessionStore
         </text>
-        <line x1="64" y1="220" x2="304" y2="220" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="80" y="236" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="228" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - merge: AnonymousMerge [0..1]
+        </text>
+        <line x1="64" y1="236" x2="304" y2="236" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="80" y="252" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + execute(request: Credentials):
         </text>
-        <text x="96" y="252" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="96" y="268" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Promise&lt;Result&lt;Session&gt;&gt;
         </text>
 
@@ -425,7 +431,7 @@
           x="368"
           y="120"
           width="240"
-          height="140"
+          height="156"
           rx="6"
           fill="rgba(15,111,116,0.05)"
           stroke="#0f6f74"
@@ -473,11 +479,14 @@
         <text x="384" y="212" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - session: SessionStore
         </text>
-        <line x1="368" y1="220" x2="608" y2="220" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
-        <text x="384" y="236" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="384" y="228" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - merge: AnonymousMerge [0..1]
+        </text>
+        <line x1="368" y1="236" x2="608" y2="236" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <text x="384" y="252" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + execute(request: Credentials):
         </text>
-        <text x="400" y="252" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="400" y="268" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Promise&lt;Result&lt;Session&gt;&gt;
         </text>
 
@@ -540,21 +549,20 @@
           Promise&lt;Result&lt;Settings&gt;&gt;
         </text>
 
-        <!-- Class: SessionStore (interface, port) -->
+        <!-- Class: SessionStore (interface, port; owner() since the judgment-day round 1 of #46, decision 66) -->
         <rect
           x="264"
-          y="340"
+          y="356"
           width="256"
-          height="104"
+          height="120"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="264" y1="388" x2="520" y2="388" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="392"
-          y="358"
+          y="374"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -565,7 +573,7 @@
         </text>
         <text
           x="392"
-          y="376"
+          y="392"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -574,20 +582,24 @@
         >
           SessionStore
         </text>
-        <text x="280" y="404" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="264" y1="404" x2="520" y2="404" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="280" y="420" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + read(): Promise&lt;Session | undefined&gt;
         </text>
-        <text x="280" y="420" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="280" y="436" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + owner(): Promise&lt;string | undefined&gt;
+        </text>
+        <text x="280" y="452" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + write(session: Session): Promise&lt;void&gt;
         </text>
-        <text x="280" y="436" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="280" y="468" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + clear(): Promise&lt;void&gt;
         </text>
 
         <!-- Class: SettingsStore (interface, port) -->
         <rect
           x="704"
-          y="340"
+          y="356"
           width="272"
           height="88"
           rx="6"
@@ -595,10 +607,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="704" y1="388" x2="976" y2="388" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="704" y1="404" x2="976" y2="404" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="840"
-          y="358"
+          y="374"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -609,7 +621,7 @@
         </text>
         <text
           x="840"
-          y="376"
+          y="392"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -621,17 +633,17 @@
             «Sprint 4»
           </tspan>
         </text>
-        <text x="720" y="404" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="720" y="420" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + load(): Promise&lt;Settings&gt;
         </text>
-        <text x="720" y="420" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="720" y="436" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + save(settings: Settings): Promise&lt;void&gt;
         </text>
 
         <!-- Class: AccountGateway (interface, port) -->
         <rect
           x="152"
-          y="484"
+          y="500"
           width="344"
           height="88"
           rx="6"
@@ -639,10 +651,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="152" y1="532" x2="496" y2="532" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="152" y1="548" x2="496" y2="548" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="324"
-          y="502"
+          y="518"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -653,7 +665,7 @@
         </text>
         <text
           x="324"
-          y="520"
+          y="536"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -662,17 +674,17 @@
         >
           AccountGateway
         </text>
-        <text x="168" y="548" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="168" y="564" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + register(credentials: Credentials): Promise&lt;Session&gt;
         </text>
-        <text x="168" y="564" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="168" y="580" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + login(credentials: Credentials): Promise&lt;Session&gt;
         </text>
 
         <!-- Class: Session (value object) -->
         <rect
           x="608"
-          y="484"
+          y="500"
           width="176"
           height="88"
           rx="6"
@@ -680,10 +692,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="608" y1="532" x2="784" y2="532" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="608" y1="548" x2="784" y2="548" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="696"
-          y="502"
+          y="518"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -694,7 +706,7 @@
         </text>
         <text
           x="696"
-          y="520"
+          y="536"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -703,10 +715,10 @@
         >
           Session
         </text>
-        <text x="624" y="548" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="624" y="564" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + token: string
         </text>
-        <text x="624" y="564" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="624" y="580" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + userId: string
         </text>
 
@@ -730,7 +742,7 @@
         <!-- Class: AccountFailure (error of the AccountGateway port, #45) -->
         <rect
           x="800"
-          y="484"
+          y="500"
           width="176"
           height="72"
           rx="6"
@@ -738,10 +750,10 @@
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="800" y1="532" x2="976" y2="532" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="800" y1="548" x2="976" y2="548" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="888"
-          y="502"
+          y="518"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -752,7 +764,7 @@
         </text>
         <text
           x="888"
-          y="520"
+          y="536"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -761,23 +773,23 @@
         >
           AccountFailure
         </text>
-        <text x="816" y="548" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="816" y="564" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + code: AccountFailureCode
         </text>
         <!-- Footnote: classes the budget leaves out -->
         <text
           x="24"
-          y="636"
+          y="652"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          SyncProgress reads SessionStore and calls clear() when the backend refuses the token (view
-          3, #46, decision 66).
+          SyncProgress reads SessionStore and calls clear() when the backend refuses the token;
+          clear() keeps owner(), the last signed-in user (view 3, #46, decision 66).
         </text>
         <text
           x="24"
-          y="652"
+          y="668"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -787,7 +799,7 @@
         </text>
         <text
           x="24"
-          y="668"
+          y="684"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -797,7 +809,7 @@
         </text>
         <text
           x="24"
-          y="684"
+          y="700"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -805,11 +817,31 @@
           A use case keeps its ports as attributes. Each link to a port is a use line that names the
           attribute (decision 23, class of 2026-11-02).
         </text>
-        <!-- Legend -->
-        <line x1="24" y1="708" x2="1016" y2="708" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
         <text
           x="24"
-          y="726"
+          y="716"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          The merge of Register and Login is an AnonymousMerge (#46): the AnonymousProgress port of
+          view 3 and the id of each registered game, so a sign-in
+        </text>
+        <text
+          x="24"
+          y="732"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          merges the progress played with no account into its user, locally and before any request
+          (decision 66).
+        </text>
+        <!-- Legend -->
+        <line x1="24" y1="756" x2="1016" y2="756" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <text
+          x="24"
+          y="774"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -820,16 +852,16 @@
 
         <line
           x1="24"
-          y1="744"
+          y1="792"
           x2="52"
-          y2="744"
+          y2="792"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#ucaccount-open)"
         />
         <text
           x="60"
-          y="748"
+          y="796"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -839,7 +871,7 @@
 
         <rect
           x="24"
-          y="764"
+          y="812"
           width="28"
           height="12"
           rx="2"
@@ -849,7 +881,7 @@
         />
         <text
           x="60"
-          y="773"
+          y="821"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -858,7 +890,7 @@
         </text>
         <rect
           x="184"
-          y="764"
+          y="812"
           width="28"
           height="12"
           rx="2"
@@ -869,7 +901,7 @@
         />
         <text
           x="220"
-          y="773"
+          y="821"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -878,7 +910,7 @@
         </text>
         <rect
           x="424"
-          y="764"
+          y="812"
           width="28"
           height="12"
           rx="2"
@@ -888,18 +920,18 @@
         />
         <text
           x="460"
-          y="773"
+          y="821"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
         </text>
-        <line x1="600" y1="770" x2="616" y2="770" stroke="#17212a" stroke-width="1" />
-        <circle cx="621" cy="770" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="600" y1="818" x2="616" y2="818" stroke="#17212a" stroke-width="1" />
+        <circle cx="621" cy="818" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="636"
-          y="773"
+          y="821"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -909,7 +941,7 @@
         <!-- Legend: the «Sprint N» marker of a planned class or member -->
         <text
           x="24"
-          y="793"
+          y="841"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -918,7 +950,7 @@
         </text>
         <text
           x="92"
-          y="793"
+          y="841"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
