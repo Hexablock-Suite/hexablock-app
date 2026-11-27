@@ -64,7 +64,7 @@
       <h1>Hexa Merge: the bounded generic of §3.1</h1>
 
       <svg
-        viewBox="0 0 1040 1504"
+        viewBox="0 0 1040 1520"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="merge-title merge-desc"
@@ -78,12 +78,14 @@
           the engine interface it implements and its binding. MergeState is an entity inside the
           GameEngine aggregate: its own GameStateId is its identity, it keeps the MatchId of its
           game, and it changes in place only through its business methods. MergeSettings, Chance and
-          NewTile are value objects: the settings hold the board size, the Seed, the target tile and
-          the chance of a 4, and a NewTile is one draw of the tile source. The engine RandomDraw is
-          one draw of the random source from 0 up to 1: the place of a NewTile, and the draw that a
-          Chance compares. It replaced the Merge Draw of issue 232 (issue 243). The undo of a slide
-          goes through GameEngine.undo(), and MergeState.restore() takes back the MergeSnapshot
-          before the slide with its tile source, so the same slide draws the same new tile (#179).
+          NewTile are value objects: the settings hold the board size, the target tile and the
+          chance of a 4, and a NewTile is one draw of the tile source. MergeFactory holds the
+          RandomSource of the root, and each match draws a new Seed from it with pickSeed(). The
+          engine RandomDraw is one draw of the random source from 0 up to 1: the place of a NewTile,
+          and the draw that a Chance compares. It replaced the Merge Draw of issue 232 (issue 243).
+          The undo of a slide goes through GameEngine.undo(), and MergeState.restore() takes back
+          the MergeSnapshot before the slide with its tile source, so the same slide draws the same
+          new tile (#179).
         </desc>
         <defs>
           <marker
@@ -144,7 +146,7 @@
           x="24"
           y="24"
           width="992"
-          height="1248"
+          height="1264"
           rx="8"
           fill="#f9f4dc"
           stroke="rgba(180,83,9,0.45)"
@@ -338,7 +340,7 @@
           x="64"
           y="120"
           width="224"
-          height="72"
+          height="80"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -367,8 +369,11 @@
           MergeFactory
         </text>
         <line x1="64" y1="168" x2="288" y2="168" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="80" y="184" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="182" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - geometry: GeometryFactory&lt;TCoord&gt;
+        </text>
+        <text x="80" y="196" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - random: RandomSource
         </text>
 
         <!-- Class: MergeRules (focal; a piece of the Strategy pattern: the frame names it, decision 23) -->
@@ -954,7 +959,7 @@
           x="64"
           y="880"
           width="328"
-          height="240"
+          height="208"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -987,48 +992,42 @@
           - size: RegionSize
         </text>
         <text x="80" y="960" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - seed: Seed
-        </text>
-        <text x="80" y="976" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - target: MergeTile
         </text>
-        <text x="80" y="992" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="976" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - fourChance: Chance
         </text>
-        <line x1="64" y1="1000" x2="392" y2="1000" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="64" y1="984" x2="392" y2="984" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="80"
+          y="1000"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+          text-decoration="underline"
+        >
+          + of(size: RegionSize, target: MergeTile,
+        </text>
+        <text
+          x="91"
           y="1016"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
           text-decoration="underline"
         >
-          + of(size: RegionSize, seed: Seed,
+          fourChance?: Chance): MergeSettings
         </text>
-        <text
-          x="91"
-          y="1032"
-          fill="#17212a"
-          font-size="9"
-          font-family="'IBM Plex Mono', monospace"
-          text-decoration="underline"
-        >
-          target: MergeTile, fourChance?: Chance): MergeSettings
-        </text>
-        <text x="80" y="1048" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="1032" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + boardSize(): RegionSize
         </text>
-        <text x="80" y="1064" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + tileSeed(): Seed
-        </text>
-        <text x="80" y="1080" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="1048" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + targetTile(): MergeTile
         </text>
-        <text x="80" y="1096" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="1064" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + chanceOfFour(): Chance
         </text>
-        <text x="80" y="1112" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="80" y="1080" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + equals(other: MergeSettings): boolean
         </text>
         <!-- Class: Chance (value object, decision 48) -->
@@ -1246,7 +1245,7 @@
           x="728"
           y="1072"
           width="240"
-          height="184"
+          height="200"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1341,11 +1340,20 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
+          + pickSeed(): Seed
+        </text>
+        <text
+          x="744"
+          y="1248"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
           + deliverTo(receiver:
         </text>
         <text
           x="755"
-          y="1248"
+          y="1264"
           fill="#17212a"
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
@@ -1356,7 +1364,7 @@
         <!-- Footnote: classes the budget leaves out -->
         <text
           x="24"
-          y="1296"
+          y="1312"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1366,7 +1374,7 @@
         </text>
         <text
           x="24"
-          y="1312"
+          y="1328"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1377,7 +1385,7 @@
 
         <text
           x="24"
-          y="1328"
+          y="1344"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1387,18 +1395,17 @@
         </text>
         <text
           x="24"
-          y="1344"
+          y="1360"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          MergeFactory holds a MergeSettings. Its seed is the engine Seed (Part 1, view 4). A draw
-          of the tile source is a NewTile: appearsOn() gives the empty cell and the tile (decision
-          48).
+          MergeFactory holds a MergeSettings and draws a new Seed in each match (#417). A draw of
+          the tile source is a NewTile: appearsOn() gives the empty cell and the tile (decision 48).
         </text>
         <text
           x="24"
-          y="1360"
+          y="1376"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1408,7 +1415,7 @@
         </text>
         <text
           x="24"
-          y="1376"
+          y="1392"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1418,7 +1425,7 @@
         </text>
         <text
           x="24"
-          y="1392"
+          y="1408"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1429,15 +1436,15 @@
         <!-- Legend -->
         <line
           x1="24"
-          y1="1416"
+          y1="1432"
           x2="1016"
-          y2="1416"
+          y2="1432"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1434"
+          y="1450"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1448,9 +1455,9 @@
 
         <line
           x1="24"
-          y1="1452"
+          y1="1468"
           x2="52"
-          y2="1452"
+          y2="1468"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -1458,7 +1465,7 @@
         />
         <text
           x="60"
-          y="1456"
+          y="1472"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1467,16 +1474,16 @@
         </text>
         <line
           x1="144"
-          y1="1452"
+          y1="1468"
           x2="172"
-          y2="1452"
+          y2="1468"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#merge-open)"
         />
         <text
           x="180"
-          y="1456"
+          y="1472"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1485,7 +1492,7 @@
         </text>
         <rect
           x="24"
-          y="1472"
+          y="1488"
           width="28"
           height="12"
           rx="2"
@@ -1495,7 +1502,7 @@
         />
         <text
           x="60"
-          y="1481"
+          y="1497"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1504,7 +1511,7 @@
         </text>
         <rect
           x="184"
-          y="1472"
+          y="1488"
           width="28"
           height="12"
           rx="2"
@@ -1515,7 +1522,7 @@
         />
         <text
           x="220"
-          y="1481"
+          y="1497"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1524,7 +1531,7 @@
         </text>
         <rect
           x="424"
-          y="1472"
+          y="1488"
           width="28"
           height="12"
           rx="2"
@@ -1535,7 +1542,7 @@
         />
         <text
           x="460"
-          y="1481"
+          y="1497"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1544,7 +1551,7 @@
         </text>
         <rect
           x="600"
-          y="1472"
+          y="1488"
           width="28"
           height="12"
           rx="2"
@@ -1554,18 +1561,18 @@
         />
         <text
           x="636"
-          y="1481"
+          y="1497"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
         >
           Teal · focal class
         </text>
-        <line x1="760" y1="1478" x2="776" y2="1478" stroke="#17212a" stroke-width="1" />
-        <circle cx="781" cy="1478" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <line x1="760" y1="1494" x2="776" y2="1494" stroke="#17212a" stroke-width="1" />
+        <circle cx="781" cy="1494" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text
           x="796"
-          y="1481"
+          y="1497"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
