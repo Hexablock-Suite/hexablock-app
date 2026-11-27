@@ -13,12 +13,15 @@
 // The texts of the level selector live under `levels.<part>`, and the text of each status
 // of a level under `levels.status.<status>` (#173).
 // The texts of the victory screen and of the defeat screen live under `result.<part>` (#180).
+// The texts of the account screen live under `account.<part>`, and the text of each failure of
+// a sign-up or a sign-in under `account.error.<code>` (#45).
 export const es = {
   'home.title': 'HexaBlock Suite',
   'home.brand': 'HexaBlock',
   'home.suite': 'Suite',
   'home.play': 'Jugar',
   'home.achievements': 'Logros',
+  'home.account': 'Cuenta',
   'home.figure': 'Figura del tablero',
   'figure.hex': 'Hexágono',
   'figure.square': 'Cuadrado',
@@ -104,6 +107,23 @@ export const es = {
   'levels.status.completed': 'Completado',
   'levels.status.open': 'Abierto',
   'levels.status.locked': 'Bloqueado',
+  'account.title': 'Cuenta',
+  'account.back': 'Atrás',
+  'account.username': 'Nombre de usuario',
+  'account.password': 'Contraseña',
+  'account.sign-up': 'Crear cuenta',
+  'account.sign-in': 'Iniciar sesión',
+  'account.busy': 'Conectando con el servidor',
+  'account.signed-in': 'Sesión iniciada como',
+  'account.error.username-taken': 'Ese nombre de usuario ya existe. Elige otro.',
+  'account.error.wrong-credentials': 'El nombre de usuario o la contraseña no son correctos.',
+  'account.error.invalid-credentials':
+    'El nombre de usuario lleva de 3 a 32 letras, dígitos, puntos, guiones o guiones bajos, y la contraseña de 8 a 128 caracteres.',
+  'account.error.backend-unreachable':
+    'El servidor no responde. Revisa la conexión e inténtalo otra vez.',
+  'account.error.sign-in-after-sign-up-failed':
+    'Tu cuenta se creó, pero no se pudo iniciar sesión. Inicia sesión.',
+  'account.error': 'No se pudo completar. Inténtalo otra vez.',
   'achievement.lines-combo': 'Completa 3 líneas a la vez',
   'achievement.merge-256': 'Llega a 256 en Hexa Merge',
   'achievement.merge-2048': 'Llega a 2048 en Hexa Merge',

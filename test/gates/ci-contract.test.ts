@@ -36,10 +36,32 @@ describe('CI contract', () => {
       /repository: Hexablock-Suite\/hexablock-api\n {10}ref: \$\{\{ env\.API_REF != '' && env\.API_REF \|\| 'main' \}\}/,
     );
     expect(contractJob).toMatch(/curl --silent --fail "\$BACKEND_URL\/v1\/health"/);
-    expect(contractJob).toMatch(/^ {6}- run: pnpm contract:verify\n {6}- run: pnpm api:check$/m);
+    expect(contractJob).toMatch(
+      /^ {6}- run: pnpm contract:verify\n {8}env:\n {10}BACKEND_URL: \$\{\{ env\.PROVIDER_URL \}\}\n {6}- run: pnpm api:check$/m,
+    );
     expect(scripts['contract:verify']).toBe('node scripts/contract/verify-provider.mjs');
     expect(scripts['api:check']).toBe('node scripts/contract/api-types.mjs check');
     expect(scripts['api:generate']).toBe('node scripts/contract/api-types.mjs generate');
+  });
+
+  // hexablock-api #151 and app #45: the interactions of the account declare provider states.
+  // Only the provider composition of the API mounts the state-change endpoint, so the job starts
+  // it next to the API and points pnpm contract:verify at it.
+  it('should_verify_the_pact_against_the_provider_composition_when_job_contract_runs', () => {
+    const contractJob = read('.github/workflows/ci.yml').split(/^ {2}contract:\n/m)[1] ?? '';
+    const verifier = read('scripts/contract/verify-provider.mjs');
+
+    expect(contractJob).toMatch(/^ {6}PROVIDER_URL: http:\/\/localhost:3001$/m);
+    expect(contractJob).toContain(
+      'PORT=3001 nohup node --env-file=.env.example scripts/contract/start-provider.js',
+    );
+    expect(contractJob).toMatch(/curl --silent --fail "\$PROVIDER_URL\/v1\/health"/);
+    expect(contractJob).toMatch(
+      /^ {6}- name: Start the provider composition of the selected API revision\n {8}working-directory: hexablock-api\n(?:.*\n)*? {6}- run: pnpm contract:verify\n/m,
+    );
+    expect(verifier).toContain(
+      "providerStatesSetupUrl: new URL('/v1/_pact/provider-states', backendUrl).href",
+    );
   });
 
   // hexablock-api issue #158: the job loads the bundled levels into a migrated API and checks

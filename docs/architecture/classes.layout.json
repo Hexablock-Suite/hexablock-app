@@ -251,21 +251,23 @@
             "LevelSummary",
             "LevelRepository",
             "GameEventPublisher",
-            "SaveProgress"
+            "SaveProgress",
+            "Credentials",
+            "Session",
+            "SessionStore",
+            "AccountGateway",
+            "AccountFailure",
+            "AccountFailureCode",
+            "Register",
+            "Login"
           ]
         },
         {
           "group": "usecases|planned",
           "types": [
-            "Login",
-            "SessionStore",
-            "Register",
-            "AccountGateway",
-            "Session",
             "UpdateSettings",
             "SettingsStore",
             "SyncLeaderboard",
-            "Credentials",
             "TimingAspect",
             "Settings",
             "LeaderboardEntry",
@@ -323,20 +325,22 @@
             "GameEndListener",
             "ResultUseCases",
             "ResultViewModel",
-            "ResultView"
+            "ResultView",
+            "AccountPresenter",
+            "AccountViewModel",
+            "AccountView",
+            "SecretStore",
+            "SessionManager"
           ]
         },
         {
           "group": "adapters|planned",
           "types": [
             "LeaderboardPresenter",
-            "AccountPresenter",
             "LocalSettingsStore",
             "ApiProgressRepository",
             "ApiLevelRepository",
-            "ApiLeaderboardGateway",
-            "ApiAccountGateway",
-            "ApiDtoMapper"
+            "ApiLeaderboardGateway"
           ]
         },
         {
@@ -358,7 +362,18 @@
         },
         {
           "group": "adapters|src/adapters/api",
-          "types": ["HealthApi", "HealthDto"]
+          "types": [
+            "HealthApi",
+            "HealthDto",
+            "AccountApi",
+            "CredentialsDto",
+            "LoginDto",
+            "TokenDto",
+            "CurrentUserDto",
+            "ApiFailure",
+            "ApiAccountGateway",
+            "ApiDtoMapper"
+          ]
         }
       ],
       "4": [
@@ -378,7 +393,8 @@
             "SequentialMatchIds",
             "SeededRandomSource",
             "BoardFigure",
-            "FactoryUse"
+            "FactoryUse",
+            "DeviceSecretStore"
           ]
         },
         {
@@ -410,18 +426,13 @@
             "TileTone",
             "MergeControls",
             "VictoryScreen",
-            "DefeatScreen"
+            "DefeatScreen",
+            "AccountForm"
           ]
         },
         {
           "group": "infrastructure|planned",
-          "types": [
-            "AudioManager",
-            "SoundLibrary",
-            "LeaderboardScreen",
-            "SessionManager",
-            "AccountScreen"
-          ]
+          "types": ["AudioManager", "SoundLibrary", "LeaderboardScreen"]
         }
       ]
     },
@@ -865,17 +876,11 @@
         {
           "group": "usecases|planned",
           "types": [
-            "Login",
-            "SessionStore",
-            "Register",
             "UpdateSettings",
-            "AccountGateway",
             "SyncLeaderboard",
             "SettingsStore",
             "Settings",
             "TimingAspect",
-            "Credentials",
-            "Session",
             "LeaderboardGateway",
             "AuthorizationAspect",
             "RetryAspect",
@@ -914,7 +919,15 @@
             "ListLevels",
             "ListLevelsRequest",
             "StartGameRequest",
-            "SaveProgress"
+            "SaveProgress",
+            "Credentials",
+            "Session",
+            "SessionStore",
+            "AccountGateway",
+            "AccountFailure",
+            "AccountFailureCode",
+            "Register",
+            "Login"
           ]
         }
       ],
@@ -932,20 +945,15 @@
             "LevelGameFactories",
             "BundledLevelRepository",
             "ApiAccountGateway",
-            "ApiProgressRepository"
+            "ApiProgressRepository",
+            "SessionManager"
           ]
         }
       ],
       "4": [
         {
           "group": "ref|infrastructure",
-          "types": [
-            "CompositionRoot",
-            "RootDrivers",
-            "ConsoleLogger",
-            "GameUseCases",
-            "SessionManager"
-          ]
+          "types": ["CompositionRoot", "RootDrivers", "ConsoleLogger", "GameUseCases"]
         }
       ]
     },
@@ -1001,7 +1009,12 @@
             "RedoMoveRequest",
             "UndoMoveRequest",
             "GameEventPublisher",
-            "GameFactories"
+            "GameFactories",
+            "AccountGateway",
+            "SessionStore",
+            "Session",
+            "Credentials",
+            "AccountFailure"
           ]
         }
       ],
@@ -1010,13 +1023,10 @@
           "group": "adapters|planned",
           "types": [
             "LeaderboardPresenter",
-            "AccountPresenter",
             "LocalSettingsStore",
             "ApiProgressRepository",
             "ApiLevelRepository",
-            "ApiLeaderboardGateway",
-            "ApiAccountGateway",
-            "ApiDtoMapper"
+            "ApiLeaderboardGateway"
           ]
         },
         {
@@ -1066,7 +1076,12 @@
             "GameEndListener",
             "ResultUseCases",
             "ResultViewModel",
-            "ResultView"
+            "ResultView",
+            "AccountPresenter",
+            "AccountViewModel",
+            "AccountView",
+            "SecretStore",
+            "SessionManager"
           ]
         },
         {
@@ -1088,7 +1103,18 @@
         },
         {
           "group": "adapters|src/adapters/api",
-          "types": ["HealthApi", "HealthDto"]
+          "types": [
+            "HealthApi",
+            "HealthDto",
+            "AccountApi",
+            "CredentialsDto",
+            "LoginDto",
+            "TokenDto",
+            "CurrentUserDto",
+            "ApiFailure",
+            "ApiAccountGateway",
+            "ApiDtoMapper"
+          ]
         }
       ]
     },
@@ -1114,7 +1140,8 @@
             "SystemClock",
             "SequentialMatchIds",
             "SeededRandomSource",
-            "FactoryUse"
+            "FactoryUse",
+            "DeviceSecretStore"
           ]
         },
         {
@@ -1131,18 +1158,13 @@
             "TileTone",
             "MergeControls",
             "VictoryScreen",
-            "DefeatScreen"
+            "DefeatScreen",
+            "AccountForm"
           ]
         },
         {
           "group": "infrastructure|planned",
-          "types": [
-            "SoundLibrary",
-            "AudioManager",
-            "LeaderboardScreen",
-            "SessionManager",
-            "AccountScreen"
-          ]
+          "types": ["SoundLibrary", "AudioManager", "LeaderboardScreen"]
         },
         {
           "group": "infrastructure|src/infrastructure/board",

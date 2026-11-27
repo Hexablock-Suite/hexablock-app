@@ -26,6 +26,262 @@
         "status": 200
       },
       "type": "Synchronous/HTTP"
+    },
+    {
+      "description": "a sign-in",
+      "pending": false,
+      "providerStates": [
+        {
+          "name": "an account exists",
+          "params": {
+            "password": "correct horse battery",
+            "username": "ada"
+          }
+        }
+      ],
+      "request": {
+        "body": {
+          "content": {
+            "password": "correct horse battery",
+            "username": "ada"
+          },
+          "contentType": "application/json",
+          "encoded": false
+        },
+        "headers": {
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "method": "POST",
+        "path": "/v1/auth/login"
+      },
+      "response": {
+        "body": {
+          "content": {
+            "accessToken": "a-token"
+          },
+          "contentType": "application/json",
+          "encoded": false
+        },
+        "headers": {
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "matchingRules": {
+          "body": {
+            "$.accessToken": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      },
+      "type": "Synchronous/HTTP"
+    },
+    {
+      "description": "a sign-in with a wrong password",
+      "pending": false,
+      "providerStates": [
+        {
+          "name": "an account exists",
+          "params": {
+            "password": "correct horse battery",
+            "username": "ada"
+          }
+        }
+      ],
+      "request": {
+        "body": {
+          "content": {
+            "password": "wrong horse battery",
+            "username": "ada"
+          },
+          "contentType": "application/json",
+          "encoded": false
+        },
+        "headers": {
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "method": "POST",
+        "path": "/v1/auth/login"
+      },
+      "response": {
+        "status": 401
+      },
+      "type": "Synchronous/HTTP"
+    },
+    {
+      "description": "a sign-up with a free username",
+      "pending": false,
+      "providerStates": [
+        {
+          "name": "no account exists"
+        }
+      ],
+      "request": {
+        "body": {
+          "content": {
+            "password": "correct horse battery",
+            "username": "ada"
+          },
+          "contentType": "application/json",
+          "encoded": false
+        },
+        "headers": {
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "method": "POST",
+        "path": "/v1/auth/register"
+      },
+      "response": {
+        "status": 201
+      },
+      "type": "Synchronous/HTTP"
+    },
+    {
+      "description": "a sign-up with a taken username",
+      "pending": false,
+      "providerStates": [
+        {
+          "name": "an account exists",
+          "params": {
+            "password": "correct horse battery",
+            "username": "ada"
+          }
+        }
+      ],
+      "request": {
+        "body": {
+          "content": {
+            "password": "correct horse battery",
+            "username": "ada"
+          },
+          "contentType": "application/json",
+          "encoded": false
+        },
+        "headers": {
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "method": "POST",
+        "path": "/v1/auth/register"
+      },
+      "response": {
+        "status": 409
+      },
+      "type": "Synchronous/HTTP"
+    },
+    {
+      "description": "a sign-up with an invalid body",
+      "pending": false,
+      "providerStates": [
+        {
+          "name": "no account exists"
+        }
+      ],
+      "request": {
+        "body": {
+          "content": {
+            "password": "short",
+            "username": "ada"
+          },
+          "contentType": "application/json",
+          "encoded": false
+        },
+        "headers": {
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "method": "POST",
+        "path": "/v1/auth/register"
+      },
+      "response": {
+        "status": 400
+      },
+      "type": "Synchronous/HTTP"
+    },
+    {
+      "description": "the signed-in user",
+      "pending": false,
+      "providerStates": [
+        {
+          "name": "a signed-in account exists",
+          "params": {
+            "username": "ada"
+          }
+        }
+      ],
+      "request": {
+        "generators": {
+          "header": {
+            "Authorization": {
+              "expression": "Bearer ${accessToken}",
+              "type": "ProviderState"
+            }
+          }
+        },
+        "headers": {
+          "Authorization": [
+            "Bearer a-token"
+          ]
+        },
+        "matchingRules": {
+          "header": {
+            "Authorization": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          }
+        },
+        "method": "GET",
+        "path": "/v1/auth/me"
+      },
+      "response": {
+        "body": {
+          "content": {
+            "userId": "00000000-0000-4000-8000-000000000001"
+          },
+          "contentType": "application/json",
+          "encoded": false
+        },
+        "headers": {
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "matchingRules": {
+          "body": {
+            "$.userId": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      },
+      "type": "Synchronous/HTTP"
     }
   ],
   "metadata": {

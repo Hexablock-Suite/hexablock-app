@@ -1,5 +1,9 @@
+import { AccountPresenter } from '../adapters/account-presenter';
 import { AchievementCounterListener } from '../adapters/achievement-counter-listener';
 import { AchievementsPresenter } from '../adapters/achievements-presenter';
+import type { AccountApi } from '../adapters/api/account-api';
+import { ApiAccountGateway } from '../adapters/api/api-account-gateway';
+import { ApiDtoMapper } from '../adapters/api/api-dto-mapper';
 import { BundledLevelRepository } from '../adapters/bundled-level-repository';
 import { GameEventBus } from '../adapters/game-event-bus';
 import { GamePresenter } from '../adapters/game-presenter';
@@ -11,8 +15,11 @@ import { LocalProgressRepository } from '../adapters/local-progress-repository';
 import { LevelGameFactories } from '../adapters/level-game-factories';
 import { LevelSelectorPresenter } from '../adapters/level-selector-presenter';
 import { ResultPresenter } from '../adapters/result-presenter';
+import type { SecretStore } from '../adapters/secret-store';
+import { SessionManager } from '../adapters/session-manager';
 import { DEFAULT_LANGUAGE, textCatalog, type Texts } from '../adapters/texts/text-catalog';
 import { ApplyMove, type ApplyMoveRequest } from '../application/apply-move';
+import type { Credentials } from '../application/credentials';
 import type { GameEventPublisher } from '../application/game-event-publisher';
 import { LoadProgress, type LoadProgressRequest } from '../application/load-progress';
 import {
@@ -25,10 +32,13 @@ import type { LevelSummary } from '../application/level-summary';
 import { ListLevels, type ListLevelsRequest } from '../application/list-levels';
 import type { Logger } from '../application/logger';
 import { LoggingAspect } from '../application/logging-aspect';
+import { Login } from '../application/login';
 import type { MoveResult, ViewOf } from '../application/move-result';
 import type { ProgressRepository } from '../application/progress-repository';
 import { RedoMove, type RedoMoveRequest } from '../application/redo-move';
+import { Register } from '../application/register';
 import { SaveProgress } from '../application/save-progress';
+import type { Session } from '../application/session';
 import { StartGame, type StartGameRequest } from '../application/start-game';
 import { UndoMove, type UndoMoveRequest } from '../application/undo-move';
 import type { UseCase } from '../application/use-case';
@@ -72,10 +82,21 @@ export interface GameUseCases<TCell = unknown, TCoord = unknown, TMove = unknown
 // and `DeviceKeyValueStore`, which `CompositionRootProvider` builds (#188).
 // The store stays optional. A root with no store reads no saved progress,
 // so it lists no achievements and loads no progress.
+// `api` is the transport of the auth resource of hexablock-api, and `secrets` the secure storage
+// of the session (#45): the app takes `ApiClient` and `DeviceSecretStore`. Both stay optional.
+// A root that lacks one signs no player in.
 export interface RootDrivers {
   readonly clock: Clock;
   readonly logger: Logger;
   readonly store?: KeyValueStore;
+  readonly api?: AccountApi;
+  readonly secrets?: SecretStore;
+}
+
+// The account use cases of the root (#45): `Register` and `Login` behind the `UseCase` port.
+interface AccountUseCases {
+  readonly register: UseCase<Credentials, Session>;
+  readonly login: UseCase<Credentials, Session>;
 }
 
 // The composition root (layers.md, Q9, S3-06 in #151, issue #162). It is the only place
@@ -124,6 +145,11 @@ export interface RootDrivers {
 // `LevelSelectorPresenter`, and the `GamePresenter` and the `ResultPresenter` of a game session. Each call builds a new
 // presenter, and the hook of a screen keeps it for the life of that screen. The React context
 // holds the root as `ScreenServices`, so a hook asks for no other piece of the root.
+// The account (#45, APP-FR-12): with the transport and the secure storage of its drivers, the root
+// builds one `ApiAccountGateway` with one `ApiDtoMapper` and one `SessionManager`, the single
+// scope of decision 18. Over them it builds `Register` and `Login` once, each through
+// `decorate()`, and `accountPresenter()` gives a new `AccountPresenter` over both.
+// A root with no transport or no secure storage throws a `RangeError` from `accountPresenter()`.
 // The screens show the default language until the player can choose one (#163).
 export class CompositionRoot implements ScreenServices {
   private readonly games: ReadonlyMap<TopologyId, GameRegistry>;
@@ -138,6 +164,7 @@ export class CompositionRoot implements ScreenServices {
   private readonly levelList: UseCase<ListLevelsRequest, LevelSummary[]> | undefined;
   private readonly texts: Texts = textCatalog[DEFAULT_LANGUAGE];
   private readonly progressLoad: UseCase<LoadProgressRequest, GameProgress | undefined> | undefined;
+  private readonly account: AccountUseCases | undefined;
 
   constructor(drivers: RootDrivers = { clock: new SystemClock(), logger: new ConsoleLogger() }) {
     const random = SeededRandomSource.fromClock(drivers.clock);
@@ -178,6 +205,12 @@ export class CompositionRoot implements ScreenServices {
       this.progress === undefined
         ? undefined
         : this.decorate(new LoadProgress(this.progress), 'LoadProgress');
+    this.account =
+      drivers.api === undefined || drivers.secrets === undefined
+        ? undefined
+        : accountUseCases(drivers.api, drivers.secrets, (useCase, name) =>
+            this.decorate(useCase, name),
+          );
   }
 
   // The board figures that the player can choose, in the order of the figure selector (#171).
@@ -335,6 +368,15 @@ export class CompositionRoot implements ScreenServices {
     };
   }
 
+  // A new presenter of the account screen over `Register` and `Login` of the root (#45).
+  // A root with no transport or no secure storage among its drivers throws a RangeError.
+  accountPresenter(): AccountPresenter {
+    if (this.account === undefined) {
+      throw new RangeError('The root has no backend or no secure store, so it signs no player in.');
+    }
+    return new AccountPresenter(this.account.register, this.account.login, this.texts);
+  }
+
   // The one place that gives a use case of the root its aspects (#323). `name` names the use case
   // in the log. The chain runs from the outside in. Today it holds `LoggingAspect` only.
   // A later aspect enters the chain here, and no other line of the root changes.
@@ -390,5 +432,21 @@ function wire<TState extends BoardState<unknown, unknown> & Cloneable<TState>>(
       const model = await factories.progressModelFor(levelId);
       return decorate(new SaveProgress(lock.progress, model, lock.gameId), 'SaveProgress');
     },
+  };
+}
+
+// `Register` and `Login` over one gateway of the transport `api` and one session manager of the
+// secure storage `secrets`, each through `decorate` (#45). The two use cases share both, so the
+// app keeps one session.
+function accountUseCases(
+  api: AccountApi,
+  secrets: SecretStore,
+  decorate: Decorate,
+): AccountUseCases {
+  const accounts = new ApiAccountGateway(api, new ApiDtoMapper());
+  const session = new SessionManager(secrets);
+  return {
+    register: decorate(new Register(accounts, session), 'Register'),
+    login: decorate(new Login(accounts, session), 'Login'),
   };
 }

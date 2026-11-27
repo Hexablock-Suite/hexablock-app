@@ -18,6 +18,13 @@ export const FailureCode = Object.freeze({
   loadFailed: 'load-failed',
   listFailed: 'list-failed',
   levelLocked: 'level-locked',
+  usernameTaken: 'username-taken',
+  wrongCredentials: 'wrong-credentials',
+  invalidCredentials: 'invalid-credentials',
+  backendUnreachable: 'backend-unreachable',
+  registerFailed: 'register-failed',
+  loginFailed: 'login-failed',
+  signInAfterSignUpFailed: 'sign-in-after-sign-up-failed',
   unexpectedFailure: 'unexpected-failure',
 } as const);
 

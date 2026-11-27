@@ -11,6 +11,11 @@ export type FakeRequest = {
   body: string;
 };
 
+// A path answers with a fixed route, or with the route that a function gives for each request.
+export type FakeAnswer = FakeRoute | ((request: FakeRequest) => FakeRoute);
+
+export type FakeRoutes = Record<string, FakeAnswer>;
+
 export type FakeBackend = { url: string; requests: FakeRequest[]; close: () => Promise<void> };
 
 const closeServer = (server: Server) =>
@@ -18,21 +23,24 @@ const closeServer = (server: Server) =>
     server.close((error) => (error ? reject(error) : resolve()));
   });
 
-// Starts an HTTP server on a free local port. It answers each path with a fixed JSON body.
+// Starts an HTTP server on a free local port. It answers each path with a JSON body: a fixed one,
+// or the one that the function of the path gives for the request.
 // Every other path answers 404. It keeps each request in requests, in the order of arrival.
-export async function startFakeBackend(routes: Record<string, FakeRoute>): Promise<FakeBackend> {
+export async function startFakeBackend(routes: FakeRoutes): Promise<FakeBackend> {
   const requests: FakeRequest[] = [];
   const server = createServer((request, response) => {
     let body = '';
     request.on('data', (chunk) => (body += chunk));
     request.on('end', () => {
-      requests.push({
+      const received: FakeRequest = {
         method: request.method ?? '',
         url: request.url ?? '',
         headers: request.headers,
         body,
-      });
-      const route = routes[request.url ?? ''];
+      };
+      requests.push(received);
+      const answer = routes[received.url];
+      const route = typeof answer === 'function' ? answer(received) : answer;
       response.writeHead(route?.status ?? 404, { 'Content-Type': 'application/json' });
       response.end(JSON.stringify(route?.body ?? { message: 'Not Found' }));
     });

@@ -1,5 +1,6 @@
 import { createContext, useContext } from 'react';
 
+import type { AccountPresenter } from '../../adapters/account-presenter';
 import type { AchievementsPresenter } from '../../adapters/achievements-presenter';
 import type { GamePresenter } from '../../adapters/game-presenter';
 import type { HomePresenter, SavedProgresses } from '../../adapters/home-presenter';
@@ -55,6 +56,8 @@ export interface ScreenServices {
   levelSelectorPresenter(gameId: GameId, figure: TopologyId): LevelSelectorPresenter;
   // A new session of the game `gameId` on the board figure `figure` (#170, #171).
   gameSession(gameId: GameId, figure: TopologyId): GameSession;
+  // A new presenter of the account screen, which signs the player up or in (#45).
+  accountPresenter(): AccountPresenter;
 }
 
 // The screen services of the app for the routes below the root layout.

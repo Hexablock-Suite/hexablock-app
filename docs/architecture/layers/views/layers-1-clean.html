@@ -82,11 +82,12 @@
           board components of layer 4 use the board layouts of layer 3. The HTTP adapters of layer 3
           hold HealthApi and the DTO types, and ApiClient of layer 4 implements HealthApi (decision
           22). In layer 4, ConsoleLogger implements Logger, DeviceKeyValueStore implements
-          KeyValueStore, and SystemClock, SeededRandomSource and SequentialMatchIds implement the
-          engine interfaces Clock, RandomSource and MatchIdGenerator. The routes use the presenters,
-          and CompositionRoot creates the adapters. The use cases and the presenters use the generic
-          engine, and the four variants implement its contracts. Every arrow points inward, toward
-          layer 1, or stays inside one layer. A dashed border marks a planned part.
+          KeyValueStore, DeviceSecretStore implements SecretStore, and SystemClock,
+          SeededRandomSource and SequentialMatchIds implement the engine interfaces Clock,
+          RandomSource and MatchIdGenerator. The routes use the presenters, and CompositionRoot
+          creates the adapters. The use cases and the presenters use the generic engine, and the
+          four variants implement its contracts. Every arrow points inward, toward layer 1, or stays
+          inside one layer. A dashed border marks a planned part.
         </desc>
         <defs>
           <marker
@@ -239,6 +240,23 @@
           stroke-dasharray="5,4"
           marker-end="url(#layers-triangle)"
         />
+        <!-- DeviceSecretStore implements SecretStore: realization, from layer 4 into layer 3 (#45) -->
+        <path
+          d="M772 121 L764 121 L764 350"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#layers-triangle)"
+        />
+        <!-- SessionManager keeps the session through SecretStore: use, inside layer 3 (#45) -->
+        <path
+          d="M816 432 L816 404"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#layers-open)"
+        />
         <!-- ApiClient implements HealthApi and the other transport interfaces of layer 3: realization, from layer 4 into layer 3 (decision 22) -->
         <path
           d="M680 147 L680 230"
@@ -321,7 +339,7 @@
         />
         <!-- LocalProgressRepository keeps its data through KeyValueStore: use, inside layer 3 -->
         <path
-          d="M760 512 L760 389"
+          d="M760 512 L760 404"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -916,7 +934,7 @@
           x="772"
           y="76"
           width="96"
-          height="53"
+          height="26"
           rx="4"
           fill="#ffffff"
           stroke="#7d8a94"
@@ -925,18 +943,7 @@
         />
         <text
           x="820.0"
-          y="99"
-          fill="#7d8a94"
-          font-size="10"
-          font-weight="600"
-          font-family="'IBM Plex Sans', sans-serif"
-          text-anchor="middle"
-        >
-          SessionManager
-        </text>
-        <text
-          x="820.0"
-          y="113"
+          y="93"
           fill="#7d8a94"
           font-size="10"
           font-weight="600"
@@ -944,6 +951,28 @@
           text-anchor="middle"
         >
           AudioManager
+        </text>
+        <!-- Component: driver of SecretStore (#45) -->
+        <rect
+          x="772"
+          y="108"
+          width="104"
+          height="26"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="824.0"
+          y="127"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          DeviceSecretStore
         </text>
         <!-- Component: drivers of the engine interfaces -->
         <rect
@@ -1194,25 +1223,25 @@
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          HealthApi · dto.d.ts
+          HealthApi · AccountApi
         </text>
         <text
           x="610"
           y="295"
-          fill="#7d8a94"
+          fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          planned: ApiDtoMapper,
+          ApiAccountGateway
         </text>
         <text
           x="610"
           y="308"
-          fill="#7d8a94"
+          fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          ApiProgressRepository and
+          ApiDtoMapper · dto.d.ts
         </text>
         <text
           x="610"
@@ -1221,7 +1250,7 @@
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          the other Api repositories
+          planned: the others
         </text>
         <!-- Component: planned adapters -->
         <rect
@@ -1266,12 +1295,12 @@
         >
           LocalSettingsStore: SettingsStore
         </text>
-        <!-- Interface: KeyValueStore, the driver interface of layer 3 -->
+        <!-- Interfaces: KeyValueStore and SecretStore (#45), the driver interfaces of layer 3 -->
         <rect
           x="722"
           y="350"
           width="100"
-          height="39"
+          height="54"
           rx="4"
           fill="#ffffff"
           stroke="#17212a"
@@ -1286,7 +1315,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface»
+          «interfaces»
         </text>
         <text
           x="772.0"
@@ -1298,6 +1327,39 @@
           text-anchor="middle"
         >
           KeyValueStore
+        </text>
+        <text
+          x="772.0"
+          y="397"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          SecretStore
+        </text>
+        <!-- Component: SessionManager, the adapter of the SessionStore port (#45, decision 18) -->
+        <rect
+          x="772"
+          y="432"
+          width="88"
+          height="26"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="816.0"
+          y="451"
+          fill="#17212a"
+          font-size="10"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          SessionManager
         </text>
         <!-- Component: presenters and view models -->
         <rect
@@ -1480,12 +1542,54 @@
           LocalProgressRepository
         </text>
         <!-- Ports on the edge of layer 2: layer 2 owns each one, and an outer layer implements each output port -->
+        <!-- Port: the output ports of the account (#45) -->
+        <rect
+          x="80"
+          y="563"
+          width="98"
+          height="34"
+          rx="4"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <text
+          x="129.0"
+          y="572"
+          fill="#5b6873"
+          font-size="7.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «port»
+        </text>
+        <text
+          x="129.0"
+          y="583"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          AccountGateway
+        </text>
+        <text
+          x="129.0"
+          y="594"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          SessionStore
+        </text>
         <!-- Port: the planned output ports -->
         <rect
           x="80"
-          y="570"
+          y="601"
           width="98"
-          height="64"
+          height="34"
           rx="4"
           fill="#ffffff"
           stroke="#7d8a94"
@@ -1494,7 +1598,7 @@
         />
         <text
           x="129.0"
-          y="582"
+          y="610"
           fill="#7d8a94"
           font-size="7.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1505,7 +1609,7 @@
         </text>
         <text
           x="129.0"
-          y="596"
+          y="621"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1515,27 +1619,7 @@
         </text>
         <text
           x="129.0"
-          y="607"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          AccountGateway
-        </text>
-        <text
-          x="129.0"
-          y="618"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          SessionStore
-        </text>
-        <text
-          x="129.0"
-          y="629"
+          y="632"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1885,6 +1969,7 @@
           font-family="'IBM Plex Mono', monospace"
         >
           StartGame · ApplyMove · UndoMove · RedoMove · SaveProgress · ListLevels · ListAchievements
+          · Register · Login
         </text>
         <text
           x="258"
@@ -1902,7 +1987,7 @@
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          planned: SyncLeaderboard · Register · Login · UpdateSettings
+          planned: SyncLeaderboard · UpdateSettings
         </text>
         <!-- Component: request and response models -->
         <rect
@@ -2385,8 +2470,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Planned: the HTTP repositories implement the repository and gateway ports (decision 22),
-          and SessionManager implements SessionStore.
+          Planned: the other HTTP repositories implement the repository and gateway ports (decision
+          22). ApiAccountGateway implements AccountGateway since #45.
         </text>
         <text
           x="24"
@@ -2395,8 +2480,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          The planned SessionManager and AudioManager get a single scope: CompositionRoot creates
-          each one once (decision 18).
+          SessionManager implements SessionStore over SecretStore (#45). CompositionRoot creates it
+          once, and it will create AudioManager once (decision 18).
         </text>
         <!-- Legend -->
         <line

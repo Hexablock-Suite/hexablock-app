@@ -9,7 +9,7 @@ Every rule ends with an HTML comment marker (`rule: R-<id>`) and names its gate:
 ```bash
 pnpm install          # dependencies and git hooks
 pnpm verify           # lint, format:check, typecheck, test, pact:check, arch (CI runs this)
-BACKEND_URL=http://localhost:3000 pnpm contract:verify  # pact against a running backend
+BACKEND_URL=http://localhost:3001 pnpm contract:verify  # pact against the provider composition of hexablock-api (#151)
 BACKEND_URL=http://localhost:3000 pnpm api:check        # generated API types against it
 BACKEND_URL=http://localhost:3000 LEVEL_EDITOR_TOKEN=<token> pnpm levels:load  # send the bundled levels to PUT /v1/levels
 BACKEND_URL=http://localhost:3000 pnpm levels:check     # fail when a bundled level differs from the stored copy

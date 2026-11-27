@@ -64,7 +64,7 @@
       <h1>Wiring: the drivers and the composition root</h1>
 
       <svg
-        viewBox="0 0 1040 1469"
+        viewBox="0 0 1040 1485"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="adwiring-title adwiring-desc"
@@ -74,21 +74,20 @@
           Class diagram across layers 4 and 3 showing CompositionRoot in layer 4, in
           src/infrastructure/composition-root.ts, creating each driver once: SeededRandomSource,
           ConsoleLogger and SequentialMatchIds, which implement the RandomSource, Logger and
-          MatchIdGenerator interfaces, and the planned AudioManager and SessionManager. It reads
-          each BoardFigure, the hexagon, the square and the triangle, keeps one GameRegistry for
-          each figure, which maps each GameId to its registered game, keeps the LevelRepository of
-          the bundled levels, and creates GameEventBus, InMemoryGameRepository and
-          LevelGameFactories, which implements the GameFactories port, in layer 3, so single-scope
-          injection replaces a classic Singleton. With a store in its drivers it also creates one
-          LocalAchievementCounterRepository, which implements the AchievementCounterRepository port,
-          and gives it to the counter listener of the bus (#363). With a store in its drivers it
-          creates LocalProgressRepository once, keeps it as progress for every consumer of the saved
-          progress, and builds ListAchievements over it once, and listAchievements() gives it. It
-          also builds one LoadProgress over it, which reads the saved progress of the game of each
-          request back, and loadProgress() gives it (#181, #410). It builds ListLevels once over the
-          same two repositories for the level selector, and listLevels() gives it (#173).
-          CompositionRoot implements ScreenServices, the closed interface of the screens, and builds
-          the presenter of each screen (#411).
+          MatchIdGenerator interfaces, and the planned AudioManager. It reads each BoardFigure, the
+          hexagon, the square and the triangle, keeps one GameRegistry for each figure, which maps
+          each GameId to its registered game, keeps the LevelRepository of the bundled levels, and
+          creates GameEventBus, InMemoryGameRepository and LevelGameFactories, which implements the
+          GameFactories port, in layer 3, so single-scope injection replaces a classic Singleton.
+          With a store in its drivers it also creates one LocalAchievementCounterRepository, which
+          implements the AchievementCounterRepository port, and gives it to the counter listener of
+          the bus (#363). With a store in its drivers it creates LocalProgressRepository once, keeps
+          it as progress for every consumer of the saved progress, and builds ListAchievements over
+          it once, and listAchievements() gives it. It also builds one LoadProgress over it, which
+          reads the saved progress of the game of each request back, and loadProgress() gives it
+          (#181, #410). It builds ListLevels once over the same two repositories for the level
+          selector, and listLevels() gives it (#173). CompositionRoot implements ScreenServices, the
+          closed interface of the screens, and builds the presenter of each screen (#411).
         </desc>
         <defs>
           <marker
@@ -236,9 +235,9 @@
           stroke-width="1"
           marker-end="url(#adwiring-open)"
         />
-        <!-- CompositionRoot creates the planned SessionManager: use «create» -->
+        <!-- CompositionRoot creates the one SessionManager in layer 3: use «create», down from layer 4 to layer 3 (#45) -->
         <path
-          d="M680 296 H860 Q868 296 868 288 V184"
+          d="M680 560 H982 Q990 560 990 568 V1016"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -364,8 +363,8 @@
         </text>
         <rect x="872" y="222" width="47" height="12" rx="2" fill="#cfdcf3" />
         <text
-          x="874"
-          y="231"
+          x="934"
+          y="1004"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -570,33 +569,6 @@
         </text>
         <text x="568" y="192" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - made: number
-        </text>
-
-        <!-- Class: SessionManager (driver, single scope, planned) -->
-        <rect
-          x="768"
-          y="120"
-          width="200"
-          height="64"
-          rx="6"
-          fill="#ffffff"
-          stroke="#17212a"
-          stroke-width="1"
-        />
-        <line x1="768" y1="160" x2="968" y2="160" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text
-          x="868"
-          y="145"
-          fill="#17212a"
-          font-size="12"
-          font-weight="600"
-          font-family="'IBM Plex Sans', sans-serif"
-          text-anchor="middle"
-        >
-          SessionManager
-        </text>
-        <text x="784" y="176" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          secure storage library to choose
         </text>
 
         <!-- Class: CompositionRoot (focal, composition root) -->
@@ -1039,11 +1011,6 @@
         <text x="579" y="102" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           MatchIdGenerator
         </text>
-        <line x1="784" y1="120" x2="784" y2="104" stroke="#17212a" stroke-width="1" />
-        <circle cx="784" cy="99" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="795" y="102" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          SessionStore
-        </text>
         <line x1="376" y1="928" x2="376" y2="944" stroke="#17212a" stroke-width="1" />
         <circle cx="376" cy="949" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text x="387" y="952" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
@@ -1076,6 +1043,56 @@
           ProgressRepository
         </text>
 
+        <!-- Class: SessionManager (adapter of SessionStore, single scope, #45) -->
+        <rect
+          x="832"
+          y="1016"
+          width="176"
+          height="72"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line
+          x1="832"
+          y1="1064"
+          x2="1008"
+          y2="1064"
+          stroke="rgba(23,33,42,0.22)"
+          stroke-width="1"
+        />
+        <text
+          x="920"
+          y="1046"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          SessionManager
+        </text>
+        <text
+          x="848"
+          y="1080"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          - secrets: SecretStore
+        </text>
+        <line x1="848" y1="1088" x2="848" y2="1104" stroke="#17212a" stroke-width="1" />
+        <circle cx="848" cy="1109" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text
+          x="859"
+          y="1112"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          SessionStore
+        </text>
         <!-- Footnote -->
         <text
           x="24"
@@ -1094,8 +1111,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Not drawn: SystemClock, created the same way. AudioManager and SessionManager are planned.
-          Only registered-games.ts names a variant factory. Q9 can move the root.
+          Not drawn: SystemClock, created the same way. AudioManager is planned. Only
+          registered-games.ts names a variant factory. Q9 can move the root.
         </text>
         <text
           x="24"
@@ -1204,8 +1221,18 @@
           It implements ScreenServices: it builds a new presenter for each screen, and the hook of
           the screen keeps it. A hook sees only ScreenServices (decision 18, #411).
         </text>
-        <!-- The legend sits 64 lower than before: the footnote has one more line since #326, one more since #363, one more since #173 and one more since #411. -->
-        <g transform="translate(0 120)">
+        <text
+          x="24"
+          y="1348"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          With the transport and the SecretStore that CompositionRootProvider passes, the root
+          builds SessionManager, Register and Login once (#45, decision 65).
+        </text>
+        <!-- The legend sits 136 lower than before: the footnote has one more line since #326, one more since #363, one more since #173 and one more since #411 and one more since #45. -->
+        <g transform="translate(0 136)">
           <!-- Legend -->
           <line
             x1="24"

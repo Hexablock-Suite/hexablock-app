@@ -7,15 +7,21 @@ import { fileURLToPath } from 'node:url';
 import { Verifier } from '@pact-foundation/pact';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const backendUrl = process.env.BACKEND_URL ?? 'http://localhost:3000';
 
 const verifier = new Verifier({
   provider: 'hexablock-api',
-  providerBaseUrl: process.env.BACKEND_URL ?? 'http://localhost:3000',
+  providerBaseUrl: backendUrl,
   pactUrls: [path.join(repoRoot, 'pacts/hexablock-app-hexablock-api.json')],
   logLevel: 'warn',
-  // GET /v1/health needs no provider state.
-  // When an interaction declares a state with given(), add stateChangeUrl here.
-  // It points at a backend test route that prepares that state before each interaction.
+  // The interactions of the account (#45) declare a provider state with given().
+  // Before and after each interaction, the verifier posts to the state-change endpoint of
+  // hexablock-api #151, also for an interaction with no state. Only the provider composition of
+  // the API mounts that endpoint: `node --env-file=.env.example scripts/contract/start-provider.js`
+  // in hexablock-api. Pact JS 17 logs that this option is deprecated, but it still applies it.
+  // A state can give values, such as the token of `a signed-in account exists`, and the verifier
+  // puts them into the request.
+  providerStatesSetupUrl: new URL('/v1/_pact/provider-states', backendUrl).href,
 });
 
 try {

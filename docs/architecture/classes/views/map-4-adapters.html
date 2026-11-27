@@ -64,24 +64,25 @@
       <h1>Adapters, presenters and drivers at a glance</h1>
 
       <svg
-        viewBox="0 0 1040 1981"
+        viewBox="0 0 1040 1997"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="mapad-title mapad-desc"
       >
         <title id="mapad-title">HexaBlock adapters map · UML class diagram</title>
         <desc id="mapad-desc">
-          Overview map of the 66 classes of layers 4 and 3 in 14 groups. The board layout group of
+          Overview map of the 69 classes of layers 4 and 3 in 14 groups. The board layout group of
           layer 3 holds BoardLayout, HexLayout, SquareLayout and TriangleLayout (#393). The
           composition root group holds CompositionRoot, GameRegistry, BoardFigure and the
-          ScreenServices interface of the screens (#411), the drivers group holds
-          SequentialMatchIds, the move controls group holds MoveControls, FitControls and
-          MergeControls, and the events group holds GameEventBus, GameEventListener and
-          AchievementCounterListener. Each line joins two classes: GameScreen renders BoardView and
-          keeps its GamePresenter and its MoveControls, CompositionRoot creates
-          InMemoryGameRepository, DeviceKeyValueStore implements KeyValueStore, GamePresenter keeps
-          its StateMapper and LocalProgressRepository keeps its KeyValueStore. No line touches a
-          group frame. Each group names the view that shows its members.
+          ScreenServices interface of the screens (#411), the drivers group holds SequentialMatchIds
+          and DeviceSecretStore, the repositories group holds SessionManager (#45), the move
+          controls group holds MoveControls, FitControls and MergeControls, and the events group
+          holds GameEventBus, GameEventListener and AchievementCounterListener. Each line joins two
+          classes: GameScreen renders BoardView and keeps its GamePresenter and its MoveControls,
+          CompositionRoot creates InMemoryGameRepository, DeviceKeyValueStore implements
+          KeyValueStore, DeviceSecretStore implements SecretStore, GamePresenter keeps its
+          StateMapper and LocalProgressRepository keeps its KeyValueStore. No line touches a group
+          frame. Each group names the view that shows its members.
         </desc>
         <defs>
           <marker
@@ -453,7 +454,7 @@
           x="744"
           y="806"
           width="240"
-          height="78"
+          height="128"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -660,6 +661,15 @@
         <!-- DeviceKeyValueStore implements KeyValueStore: realization, down into layer 3 (view 4.2) -->
         <path
           d="M968 209 L1000 209 L1000 851 L968 851"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#mapad-triangle)"
+        />
+        <!-- DeviceSecretStore implements SecretStore: realization, down into layer 3 (#45, view 4.4). It runs right of the line of DeviceKeyValueStore and crosses no line. -->
+        <path
+          d="M968 159 L1008 159 L1008 901 L968 901"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -1032,7 +1042,7 @@
             </tspan>
           </text>
         </g>
-        <g data-class="SessionManager">
+        <g data-class="ConsoleLogger">
           <rect
             x="672"
             y="92"
@@ -1045,7 +1055,7 @@
           />
           <text x="742" y="113" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              SessionManager
+              ConsoleLogger
             </tspan>
           </text>
         </g>
@@ -1083,7 +1093,7 @@
             </tspan>
           </text>
         </g>
-        <g data-class="ConsoleLogger">
+        <g data-class="DeviceSecretStore">
           <rect
             x="828"
             y="142"
@@ -1096,7 +1106,7 @@
           />
           <text x="898" y="163" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              ConsoleLogger
+              DeviceSecretStore
             </tspan>
           </text>
         </g>
@@ -1540,6 +1550,34 @@
             </tspan>
           </text>
         </g>
+        <g data-class="SecretStore">
+          <rect
+            x="848"
+            y="884"
+            width="120"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="908"
+            y="896"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="908" y="909" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              SecretStore
+            </tspan>
+          </text>
+        </g>
         <!-- Chips: state mappers -->
         <g data-class="StateMapper">
           <rect
@@ -1731,6 +1769,23 @@
           <text x="892" y="1139" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               LevelGameFactories
+            </tspan>
+          </text>
+        </g>
+        <g data-class="SessionManager">
+          <rect
+            x="816"
+            y="1168"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="892" y="1189" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              SessionManager
             </tspan>
           </text>
         </g>
@@ -2249,6 +2304,23 @@
             </tspan>
           </text>
         </g>
+        <g data-class="ApiFailure">
+          <rect
+            x="560"
+            y="1602"
+            width="152"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="636" y="1623" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              ApiFailure
+            </tspan>
+          </text>
+        </g>
         <!-- Footnote -->
         <text
           x="24"
@@ -2343,7 +2415,18 @@
           LevelSelectorScreen, LevelSelectorPresenter and LevelSelectorViewModel exist since #173:
           the presenter calls ListLevels of view 3.3, and the map opens the screen for Fit and Sort.
         </text>
-        <g transform="translate(0 96)">
+        <!-- The last footnote line and the legend sit 16 lower again: the footnote has one more line since #45. -->
+        <text
+          x="24"
+          y="1856"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Since #45 SessionManager of layer 3 keeps the session through SecretStore, and
+          DeviceSecretStore of layer 4 implements SecretStore over the secure store (decision 65).
+        </text>
+        <g transform="translate(0 112)">
           <text
             x="24"
             y="1760"
