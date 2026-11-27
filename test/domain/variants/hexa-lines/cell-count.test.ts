@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { Score } from '../../../../src/domain/engine/score';
+import { Score } from '../../../../src/domain/shared/score';
 import { CellCount } from '../../../../src/domain/variants/hexa-lines/cell-count';
 
 // The count of cells that one Lines placement put on the board (issue #232).

@@ -1,5 +1,5 @@
-import { ElapsedTime } from './elapsed-time';
-import type { ValueReceiver } from './value-receiver';
+import { ElapsedTime } from '../shared/elapsed-time';
+import type { ValueReceiver } from '../shared/value-receiver';
 
 // One reading of the engine `Clock` (issue #238, classes.md decisions 19 and 25).
 // A reading counts milliseconds from an origin that the clock chooses. The origin is not a date,

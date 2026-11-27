@@ -1,7 +1,7 @@
 import type { AchievementCounterRepository } from '../application/achievement-counter-repository';
-import { AchievementCount } from '../domain/engine/achievement-count';
-import { AchievementCounters } from '../domain/engine/achievement-counters';
-import type { GameId } from '../domain/engine/game-id';
+import { AchievementCount } from '../domain/achievements/achievement-count';
+import { AchievementCounters } from '../domain/achievements/achievement-counters';
+import type { GameId } from '../domain/shared/game-id';
 import type { KeyValueStore } from './key-value-store';
 import { isObject, numberIn, onlyValue, valueOf } from './saved-json';
 

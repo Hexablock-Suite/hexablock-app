@@ -1,5 +1,5 @@
 import { GameEvent } from '../../engine/game-events';
-import type { GameId } from '../../engine/game-id';
+import type { GameId } from '../../shared/game-id';
 import type { MatchId } from '../../engine/match-id';
 
 // The event of one merge of a Hexa Merge slide: the tile that the merge made (issue #361).

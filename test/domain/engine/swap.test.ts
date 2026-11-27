@@ -1,17 +1,17 @@
 /** @jest-environment node */
-import { Score } from '../../../src/domain/engine/score';
-import { ElapsedTime } from '../../../src/domain/engine/elapsed-time';
-import { LevelId } from '../../../src/domain/engine/level-id';
-import { Moves } from '../../../src/domain/engine/moves';
-import { Stars } from '../../../src/domain/engine/stars';
+import { Score } from '../../../src/domain/shared/score';
+import { ElapsedTime } from '../../../src/domain/shared/elapsed-time';
+import { LevelId } from '../../../src/domain/progress/level-id';
+import { Moves } from '../../../src/domain/shared/moves';
+import { Stars } from '../../../src/domain/progress/stars';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
 import {
   GameOver,
   type GameEvent,
   type GameOverReceiver,
 } from '../../../src/domain/engine/game-events';
-import { GameId } from '../../../src/domain/engine/game-id';
-import { GameProgress } from '../../../src/domain/engine/game-progress';
+import { GameId } from '../../../src/domain/shared/game-id';
+import { GameProgress } from '../../../src/domain/progress/game-progress';
 import type { MatchId } from '../../../src/domain/engine/match-id';
 import { GameOverPhase } from '../../../src/domain/engine/game-phase';
 import { Outcome } from '../../../src/domain/engine/outcome';
@@ -24,7 +24,7 @@ import {
   GameResult,
   ProgressRecord,
   type IProgressModel,
-} from '../../../src/domain/engine/progress-model';
+} from '../../../src/domain/progress/progress-model';
 import type { IScoringPolicy } from '../../../src/domain/engine/scoring-policy';
 import { fakeCell, type FakeCell } from '../../support/engine/fake-cell';
 import {

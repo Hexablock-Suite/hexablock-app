@@ -1,7 +1,7 @@
-import type { GameId } from '../domain/engine/game-id';
-import type { AchievementCounters } from '../domain/engine/achievement-counters';
-import type { GameProgress } from '../domain/engine/game-progress';
-import type { LevelDefinition } from '../domain/engine/level-definition';
+import type { GameId } from '../domain/shared/game-id';
+import type { AchievementCounters } from '../domain/achievements/achievement-counters';
+import type { GameProgress } from '../domain/progress/game-progress';
+import type { LevelDefinition } from '../domain/progress/level-definition';
 import type { Achievement } from './achievement';
 import type { AchievementCounterRepository } from './achievement-counter-repository';
 import type { LevelRepository } from './level-repository';

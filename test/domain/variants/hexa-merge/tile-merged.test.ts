@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { GameId } from '../../../../src/domain/engine/game-id';
+import { GameId } from '../../../../src/domain/shared/game-id';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
 import { TileMerged } from '../../../../src/domain/variants/hexa-merge/tile-merged';
 import { MATCH_ID } from '../../../support/engine/match-id';

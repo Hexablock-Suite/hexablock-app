@@ -1,4 +1,4 @@
-import type { Score } from '../../engine/score';
+import type { Score } from '../../shared/score';
 import { ScoringDecorator } from '../../engine/scoring-decorator';
 import type { LinesScoring } from './lines-scoring';
 import type { LinesSnapshot, LinesState } from './lines-state';

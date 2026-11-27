@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { Score } from '../../../../src/domain/engine/score';
+import { Score } from '../../../../src/domain/shared/score';
 import { TileCount } from '../../../../src/domain/variants/hexa-sort/tile-count';
 
 // The count of tiles of one Sort stack, its height (issue #232).

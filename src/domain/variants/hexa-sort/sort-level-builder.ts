@@ -1,7 +1,8 @@
 import { Color } from '../../engine/color';
-import type { GeometryFactory, TopologyId } from '../../engine/geometry-factory';
-import type { ILevelBuilder } from '../../engine/level-builder';
-import { Moves } from '../../engine/moves';
+import type { GeometryFactory } from '../../engine/geometry-factory';
+import type { TopologyId } from '../../shared/topology-id';
+import type { ILevelBuilder } from '../../progress/level-builder';
+import { Moves } from '../../shared/moves';
 import { RegionSize } from '../../engine/region-size';
 import { Seed } from '../../engine/seed';
 import { ColorStack } from './color-stack';

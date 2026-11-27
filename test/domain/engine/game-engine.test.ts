@@ -1,10 +1,10 @@
 /** @jest-environment node */
-import { Score } from '../../../src/domain/engine/score';
+import { Score } from '../../../src/domain/shared/score';
 import type { Board } from '../../../src/domain/engine/board';
 import type { BoardState } from '../../../src/domain/engine/board-state';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
 import { GameOver } from '../../../src/domain/engine/game-events';
-import { GameId } from '../../../src/domain/engine/game-id';
+import { GameId } from '../../../src/domain/shared/game-id';
 import { MatchId } from '../../../src/domain/engine/match-id';
 import { GameOverPhase, PlayingPhase, VictoryPhase } from '../../../src/domain/engine/game-phase';
 import { Outcome } from '../../../src/domain/engine/outcome';

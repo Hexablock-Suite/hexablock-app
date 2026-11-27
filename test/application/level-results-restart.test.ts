@@ -6,21 +6,21 @@ import type { LevelSummary } from '../../src/application/level-summary';
 import { ListLevels } from '../../src/application/list-levels';
 import { Result } from '../../src/application/result';
 import { SaveProgress } from '../../src/application/save-progress';
-import { ElapsedTime } from '../../src/domain/engine/elapsed-time';
-import { GameId } from '../../src/domain/engine/game-id';
-import { TopologyId } from '../../src/domain/engine/geometry-factory';
+import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
+import { GameId } from '../../src/domain/shared/game-id';
+import { TopologyId } from '../../src/domain/shared/topology-id';
 import { HexGeometry } from '../../src/domain/engine/hex-geometry';
-import type { LevelDefinition } from '../../src/domain/engine/level-definition';
-import { LevelId } from '../../src/domain/engine/level-id';
-import { LevelStatus } from '../../src/domain/engine/level-status';
-import { Moves } from '../../src/domain/engine/moves';
+import type { LevelDefinition } from '../../src/domain/progress/level-definition';
+import { LevelId } from '../../src/domain/progress/level-id';
+import { LevelStatus } from '../../src/domain/progress/level-status';
+import { Moves } from '../../src/domain/shared/moves';
 import {
   GameResult,
   ProgressRecord,
   type IProgressModel,
-} from '../../src/domain/engine/progress-model';
-import { Score } from '../../src/domain/engine/score';
-import { Stars } from '../../src/domain/engine/stars';
+} from '../../src/domain/progress/progress-model';
+import { Score } from '../../src/domain/shared/score';
+import { Stars } from '../../src/domain/progress/stars';
 import { FitFactory } from '../../src/domain/variants/hexa-fit/fit-factory';
 import { FitLevelBuilder } from '../../src/domain/variants/hexa-fit/fit-level-builder';
 import { SortFactory } from '../../src/domain/variants/hexa-sort/sort-factory';

@@ -5,7 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { GamePresenter } from '../../../src/adapters/game-presenter';
 import { textCatalog } from '../../../src/adapters/texts/text-catalog';
-import { GameId } from '../../../src/domain/engine/game-id';
+import { GameId } from '../../../src/domain/shared/game-id';
 import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
 import { RegionSize } from '../../../src/domain/engine/region-size';
 import { MergeFactory, MergeSettings } from '../../../src/domain/variants/hexa-merge/merge-factory';

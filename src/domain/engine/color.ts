@@ -1,4 +1,4 @@
-import type { ValueReceiver } from './value-receiver';
+import type { ValueReceiver } from '../shared/value-receiver';
 
 // The color of one cell or one tile (statement §1.5). Hexa Lines fills a cell with a color,
 // and a Hexa Sort stack holds a list of colors. Classes.md decision 5 puts `Color` in the engine,

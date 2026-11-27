@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { GameChoice } from '../../src/adapters/home-presenter';
 import type { LevelChoice } from '../../src/adapters/level-selector-presenter';
-import { GameId } from '../../src/domain/engine/game-id';
+import { GameId } from '../../src/domain/shared/game-id';
 import type { CellShape } from '../../src/adapters/board/board-layout';
 import { FigureStone } from '../../src/infrastructure/ui/figure-stone';
 import { Scenery } from '../../src/infrastructure/ui/scenery';

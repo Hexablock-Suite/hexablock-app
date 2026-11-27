@@ -1,16 +1,16 @@
 /** @jest-environment node */
-import { TopologyId } from '../../../../src/domain/engine/geometry-factory';
+import { TopologyId } from '../../../../src/domain/shared/topology-id';
 import { Outcome } from '../../../../src/domain/engine/outcome';
-import { ElapsedTime } from '../../../../src/domain/engine/elapsed-time';
-import { Score } from '../../../../src/domain/engine/score';
+import { ElapsedTime } from '../../../../src/domain/shared/elapsed-time';
+import { Score } from '../../../../src/domain/shared/score';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { BoardShape } from '../../../../src/domain/engine/board-shape';
-import { GameId } from '../../../../src/domain/engine/game-id';
+import { GameId } from '../../../../src/domain/shared/game-id';
 import { LevelTimer } from '../../../../src/domain/engine/level-timer';
 import { LevelTimerId } from '../../../../src/domain/engine/level-timer-id';
 import { MatchId } from '../../../../src/domain/engine/match-id';
-import { Moves } from '../../../../src/domain/engine/moves';
+import { Moves } from '../../../../src/domain/shared/moves';
 import { RedoableHistory } from '../../../../src/domain/engine/redoable-history';
 import { TimedRulesDecorator } from '../../../../src/domain/engine/timed-rules-decorator';
 import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';

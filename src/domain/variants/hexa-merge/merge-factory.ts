@@ -1,10 +1,10 @@
 import type { Board } from '../../engine/board';
 import type { BoardId } from '../../engine/board-id';
 import { BoardBuilder } from '../../engine/board-builder';
-import { GameId } from '../../engine/game-id';
+import { GameId } from '../../shared/game-id';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { GeometryFactory } from '../../engine/geometry-factory';
-import { HighScoreProgress } from '../../engine/high-score-progress';
+import { HighScoreProgress } from '../../progress/high-score-progress';
 import type { GridAxis } from '../../engine/grid-topology';
 import type { MatchId } from '../../engine/match-id';
 import { MoveHistory } from '../../engine/move-history';

@@ -35,7 +35,7 @@ import {
   triangle as supportTriangle,
   triangleTopology,
 } from '../../support/engine/triangle-topology';
-import type { ValueReceiver } from '../../../src/domain/engine/value-receiver';
+import type { ValueReceiver } from '../../../src/domain/shared/value-receiver';
 import { delivered } from '../../support/engine/value-receiver';
 
 // Issue 160: the same `GridTopology` tests run on the three real topologies.

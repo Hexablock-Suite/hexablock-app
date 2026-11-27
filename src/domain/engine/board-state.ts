@@ -1,11 +1,11 @@
 import type { ReadonlyBoard } from './board';
 import type { Cloneable } from './cloneable';
 import type { GameEvent } from './game-events';
-import type { GameId } from './game-id';
+import type { GameId } from '../shared/game-id';
 import type { GameStateId } from './game-state-id';
 import type { GridAxis } from './grid-topology';
 import type { MatchId } from './match-id';
-import type { Score } from './score';
+import type { Score } from '../shared/score';
 
 // The photo of one state at one moment (classes.md decisions 7, 29 and 34).
 // It is the Memento of the state: `BoardState.snapshot()` gives it, and `restore()` takes it back.

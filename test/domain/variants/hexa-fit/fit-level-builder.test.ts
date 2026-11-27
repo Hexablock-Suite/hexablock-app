@@ -1,11 +1,11 @@
 /** @jest-environment node */
 import { BoardShape } from '../../../../src/domain/engine/board-shape';
-import { ElapsedTime } from '../../../../src/domain/engine/elapsed-time';
-import { TopologyId } from '../../../../src/domain/engine/geometry-factory';
+import { ElapsedTime } from '../../../../src/domain/shared/elapsed-time';
+import { TopologyId } from '../../../../src/domain/shared/topology-id';
 import { HexGeometry } from '../../../../src/domain/engine/hex-geometry';
 import { hex, HexTopology, type HexCoord } from '../../../../src/domain/engine/hex-topology';
-import { LevelDefinition } from '../../../../src/domain/engine/level-definition';
-import { Moves } from '../../../../src/domain/engine/moves';
+import { LevelDefinition } from '../../../../src/domain/progress/level-definition';
+import { Moves } from '../../../../src/domain/shared/moves';
 import { Piece } from '../../../../src/domain/engine/piece';
 import { CellNode, ShapeGroup } from '../../../../src/domain/engine/shape-node';
 import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';

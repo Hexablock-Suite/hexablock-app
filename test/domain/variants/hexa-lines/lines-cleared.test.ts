@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { GameId } from '../../../../src/domain/engine/game-id';
+import { GameId } from '../../../../src/domain/shared/game-id';
 import { LineCount } from '../../../../src/domain/variants/hexa-lines/line-count';
 import { LinesCleared } from '../../../../src/domain/variants/hexa-lines/lines-cleared';
 import { MATCH_ID } from '../../../support/engine/match-id';

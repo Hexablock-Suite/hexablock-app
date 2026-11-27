@@ -1,13 +1,13 @@
 /** @jest-environment node */
 import { BoardShape } from '../../../../src/domain/engine/board-shape';
-import { ElapsedTime } from '../../../../src/domain/engine/elapsed-time';
-import { TopologyId } from '../../../../src/domain/engine/geometry-factory';
+import { ElapsedTime } from '../../../../src/domain/shared/elapsed-time';
+import { TopologyId } from '../../../../src/domain/shared/topology-id';
 import { HexGeometry } from '../../../../src/domain/engine/hex-geometry';
-import { Moves } from '../../../../src/domain/engine/moves';
+import { Moves } from '../../../../src/domain/shared/moves';
 import { Piece } from '../../../../src/domain/engine/piece';
 import { CellNode, ShapeGroup } from '../../../../src/domain/engine/shape-node';
 import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
-import { Stars } from '../../../../src/domain/engine/stars';
+import { Stars } from '../../../../src/domain/progress/stars';
 import { FitLevel } from '../../../../src/domain/variants/hexa-fit/fit-level';
 import { FitStarThreshold } from '../../../../src/domain/variants/hexa-fit/fit-stars';
 import type { PieceId } from '../../../../src/domain/variants/hexa-fit/piece-id';

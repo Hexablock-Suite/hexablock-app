@@ -1,4 +1,4 @@
-import { GameId } from '../../../src/domain/engine/game-id';
+import { GameId } from '../../../src/domain/shared/game-id';
 
 const VARIANT_IDS = ['hexa-lines', 'hexa-fit', 'hexa-sort', 'hexa-merge'];
 

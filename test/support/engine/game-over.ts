@@ -3,10 +3,10 @@ import {
   type GameEvent,
   type GameOverReceiver,
 } from '../../../src/domain/engine/game-events';
-import type { GameId } from '../../../src/domain/engine/game-id';
+import type { GameId } from '../../../src/domain/shared/game-id';
 import type { MatchId } from '../../../src/domain/engine/match-id';
 import type { Outcome } from '../../../src/domain/engine/outcome';
-import type { Score } from '../../../src/domain/engine/score';
+import type { Score } from '../../../src/domain/shared/score';
 
 // Reads a `GameOver` event as a listener of the edge does. It exists only in test/.
 // The event keeps its fields private and delivers them to a receiver (issue #233).

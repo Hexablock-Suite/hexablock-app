@@ -1,8 +1,8 @@
 /** @jest-environment node */
-import { ElapsedTime } from '../../../src/domain/engine/elapsed-time';
-import { Score } from '../../../src/domain/engine/score';
+import { ElapsedTime } from '../../../src/domain/shared/elapsed-time';
+import { Score } from '../../../src/domain/shared/score';
 import { GameEngine } from '../../../src/domain/engine/game-engine';
-import { GameId } from '../../../src/domain/engine/game-id';
+import { GameId } from '../../../src/domain/shared/game-id';
 import { GameOverPhase, PlayingPhase } from '../../../src/domain/engine/game-phase';
 import { LevelTimer } from '../../../src/domain/engine/level-timer';
 import { LevelTimerId } from '../../../src/domain/engine/level-timer-id';

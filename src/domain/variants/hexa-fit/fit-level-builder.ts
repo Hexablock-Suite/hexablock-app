@@ -1,10 +1,11 @@
 import { BoardShape } from '../../engine/board-shape';
 import { CoordKey } from '../../engine/coord-key';
 import { CoordKeyMap } from '../../engine/coord-key-map';
-import { ElapsedTime } from '../../engine/elapsed-time';
-import type { GeometryFactory, TopologyId } from '../../engine/geometry-factory';
-import type { ILevelBuilder } from '../../engine/level-builder';
-import { Moves } from '../../engine/moves';
+import { ElapsedTime } from '../../shared/elapsed-time';
+import type { GeometryFactory } from '../../engine/geometry-factory';
+import type { TopologyId } from '../../shared/topology-id';
+import type { ILevelBuilder } from '../../progress/level-builder';
+import { Moves } from '../../shared/moves';
 import { Piece } from '../../engine/piece';
 import { CellNode, ShapeGroup } from '../../engine/shape-node';
 import { Turns } from '../../engine/turns';

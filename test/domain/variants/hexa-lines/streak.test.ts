@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { Score } from '../../../../src/domain/engine/score';
+import { Score } from '../../../../src/domain/shared/score';
 import { LineCount } from '../../../../src/domain/variants/hexa-lines/line-count';
 import { Streak } from '../../../../src/domain/variants/hexa-lines/streak';
 

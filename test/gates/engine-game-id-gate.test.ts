@@ -7,9 +7,16 @@ import { repoRoot } from '../support/run-tool';
 
 // APP-NFR-08 (Liskov substitution): the engine treats every variant the same way,
 // so no file in `src/domain/engine/` or its subfolders branches on the game id.
+// The gate also reads `src/domain/shared/`, `src/domain/progress/` and `src/domain/achievements/`,
+// the folders that left the engine folder in issue #420.
 
 const engineDir = path.join(repoRoot, 'src/domain/engine');
 const fixtureDir = path.join(repoRoot, 'test/fixtures/engine-game-id');
+const domainDir = path.join(repoRoot, 'src/domain');
+const genericDirs = [
+  engineDir,
+  ...['shared', 'progress', 'achievements'].map((dir) => path.join(domainDir, dir)),
+];
 
 // A variant id is a kebab-case slug that starts with `hexa-`, for example `hexa-lines`.
 const VARIANT_ID = /^hexa-[a-z0-9-]+$/;
@@ -98,6 +105,15 @@ function scan(dir: string): string[] {
     .flatMap((file) => gameIdConditionals(readFileSync(path.join(dir, file), 'utf8'), file));
 }
 
+// The `.ts` and `.tsx` files of every folder that the gate reads, relative to `src/domain/`.
+function genericFiles(): string[] {
+  return genericDirs.flatMap((dir) =>
+    readdirSync(dir, { recursive: true, encoding: 'utf8' })
+      .filter((file) => /\.tsx?$/.test(file))
+      .map((file) => path.relative(domainDir, path.join(dir, file))),
+  );
+}
+
 describe('engine game id gate', () => {
   it('should_report_each_wrong_conditional_when_the_fixtures_branch_on_the_game_id', () => {
     expect(scan(fixtureDir)).toEqual([
@@ -125,6 +141,20 @@ describe('engine game id gate', () => {
   it('should_report_nothing_when_the_real_engine_is_scanned', () => {
     expect(readdirSync(engineDir).filter((file) => file.endsWith('.ts')).length).toBeGreaterThan(0);
     expect(scan(engineDir)).toEqual([]);
+  });
+
+  // Issue #420: the shared leaves, the progress and the achievements left the engine folder.
+  // The gate still reads them, so the move does not shrink the scanned code.
+  it('should_scan_the_sibling_folders_of_the_engine_when_the_real_domain_is_read', () => {
+    expect(genericFiles()).toEqual(
+      expect.arrayContaining([
+        'engine/game-engine.ts',
+        'shared/score.ts',
+        'progress/game-progress.ts',
+        'achievements/achievement-goal.ts',
+      ]),
+    );
+    expect(genericDirs.flatMap((dir) => scan(dir))).toEqual([]);
   });
 
   // The rule forbids a branch on the game id, so `&&` and `||` count as `if` (APP-NFR-08).

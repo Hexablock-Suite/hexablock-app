@@ -1,4 +1,4 @@
-import type { ElapsedTime } from './elapsed-time';
+import type { ElapsedTime } from '../shared/elapsed-time';
 
 // The timer capability of statement §3.2 (classes.md decisions 3, 19 and 27).
 // The root keeps it as an optional part, and `GameEngine.elapsedTime()` reads it.

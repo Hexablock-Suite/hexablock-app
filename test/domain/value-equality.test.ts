@@ -1,21 +1,21 @@
 /** @jest-environment node */
 import { BoardShape } from '../../src/domain/engine/board-shape';
 import { Color } from '../../src/domain/engine/color';
-import { ElapsedTime } from '../../src/domain/engine/elapsed-time';
-import { GameId } from '../../src/domain/engine/game-id';
-import { LevelId } from '../../src/domain/engine/level-id';
+import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
+import { GameId } from '../../src/domain/shared/game-id';
+import { LevelId } from '../../src/domain/progress/level-id';
 import { MoveCommand } from '../../src/domain/engine/move-command';
 import { MoveHistory } from '../../src/domain/engine/move-history';
-import { Moves } from '../../src/domain/engine/moves';
+import { Moves } from '../../src/domain/shared/moves';
 import { Piece } from '../../src/domain/engine/piece';
-import { GameResult, ProgressRecord } from '../../src/domain/engine/progress-model';
+import { GameResult, ProgressRecord } from '../../src/domain/progress/progress-model';
 import { Radius } from '../../src/domain/engine/radius';
 import { Range } from '../../src/domain/engine/range';
 import { RegionSize } from '../../src/domain/engine/region-size';
 import { CellNode, ShapeGroup } from '../../src/domain/engine/shape-node';
-import { Score } from '../../src/domain/engine/score';
+import { Score } from '../../src/domain/shared/score';
 import { Seed } from '../../src/domain/engine/seed';
-import { Stars } from '../../src/domain/engine/stars';
+import { Stars } from '../../src/domain/progress/stars';
 import { Turns } from '../../src/domain/engine/turns';
 import { UndoLimit } from '../../src/domain/engine/undo-limit';
 import { Placement } from '../../src/domain/variants/hexa-fit/placement';

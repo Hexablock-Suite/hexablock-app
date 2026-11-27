@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { Outcome } from '../../../../src/domain/engine/outcome';
-import { Score } from '../../../../src/domain/engine/score';
-import { GameId } from '../../../../src/domain/engine/game-id';
+import { Score } from '../../../../src/domain/shared/score';
+import { GameId } from '../../../../src/domain/shared/game-id';
 import { PlayingPhase } from '../../../../src/domain/engine/game-phase';
 import { hex, HexAxis } from '../../../../src/domain/engine/hex-topology';
 import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';

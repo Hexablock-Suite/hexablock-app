@@ -1,4 +1,4 @@
-import { Score } from '../../engine/score';
+import { Score } from '../../shared/score';
 
 // The points of each placed cell.
 // The value codes the accepted rule of issue #59 (D22, 2026-11-06).

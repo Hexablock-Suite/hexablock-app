@@ -50,6 +50,32 @@ describe('architecture gate (dependency-cruiser)', () => {
     expect(result.output).toContain('sort-and-merge-no-cell-piece');
   });
 
+  // Issue #420: the folders of the domain form no cycle. The shared leaves import no other
+  // folder, the progress imports only the shared leaves, and the achievements import the shared
+  // leaves and the progress.
+  it('should_fail_arch_when_a_shared_leaf_imports_another_domain_folder', () => {
+    const result = cruise('shared-imports-engine');
+
+    expect(result.status).not.toBe(0);
+    expect(result.output).toContain('shared-imports-only-shared');
+  });
+
+  it('should_fail_arch_when_progress_imports_a_domain_folder_other_than_shared', () => {
+    const result = cruise('progress-imports-engine');
+
+    expect(result.status).not.toBe(0);
+    expect(result.output).toContain('progress-imports-only-shared');
+    expect(result.output).toContain('src/domain/engine/board.ts');
+    expect(result.output).toContain('src/domain/achievements/achievement-goal.ts');
+  });
+
+  it('should_fail_arch_when_achievements_import_a_domain_folder_other_than_shared_and_progress', () => {
+    const result = cruise('achievements-imports-engine');
+
+    expect(result.status).not.toBe(0);
+    expect(result.output).toContain('achievements-imports-only-shared-and-progress');
+  });
+
   it('should_fail_arch_when_application_imports_an_adapter', () => {
     const result = cruise('application-imports-outside');
 

@@ -1,7 +1,7 @@
 import type { LevelRepository } from '../../../src/application/level-repository';
-import { GameId } from '../../../src/domain/engine/game-id';
-import { LevelDefinition } from '../../../src/domain/engine/level-definition';
-import { LevelId } from '../../../src/domain/engine/level-id';
+import { GameId } from '../../../src/domain/shared/game-id';
+import { LevelDefinition } from '../../../src/domain/progress/level-definition';
+import { LevelId } from '../../../src/domain/progress/level-id';
 import { delivered } from '../engine/value-receiver';
 import { fitLevelFile } from '../variants/hexa-fit/fit-level-file';
 import { sortLevelFile } from '../variants/hexa-sort/sort-level-file';

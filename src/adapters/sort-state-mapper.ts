@@ -1,4 +1,4 @@
-import type { ValueReceiver } from '../domain/engine/value-receiver';
+import type { ValueReceiver } from '../domain/shared/value-receiver';
 import type { ColorStack } from '../domain/variants/hexa-sort/color-stack';
 import type { SortView } from '../domain/variants/hexa-sort/sort-state';
 import type { StateMapper } from './state-mapper';

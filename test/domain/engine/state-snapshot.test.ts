@@ -1,10 +1,10 @@
 /** @jest-environment node */
 import { Outcome } from '../../../src/domain/engine/outcome';
-import { Moves } from '../../../src/domain/engine/moves';
-import { Score } from '../../../src/domain/engine/score';
+import { Moves } from '../../../src/domain/shared/moves';
+import { Score } from '../../../src/domain/shared/score';
 import type { Board } from '../../../src/domain/engine/board';
 import { BoardId } from '../../../src/domain/engine/board-id';
-import { GameId } from '../../../src/domain/engine/game-id';
+import { GameId } from '../../../src/domain/shared/game-id';
 import { GameStateId } from '../../../src/domain/engine/game-state-id';
 import { MatchId } from '../../../src/domain/engine/match-id';
 import { hex, HexAxis, type HexCoord } from '../../../src/domain/engine/hex-topology';

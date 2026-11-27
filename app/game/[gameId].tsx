@@ -2,8 +2,8 @@ import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 
 import type { GameChoice } from '../../src/adapters/home-presenter';
-import { GameId } from '../../src/domain/engine/game-id';
-import { LevelId } from '../../src/domain/engine/level-id';
+import { GameId } from '../../src/domain/shared/game-id';
+import { LevelId } from '../../src/domain/progress/level-id';
 import { GameStage } from '../../src/infrastructure/ui/game-stage';
 import { useGameSession } from '../../src/infrastructure/ui/game-session';
 import {

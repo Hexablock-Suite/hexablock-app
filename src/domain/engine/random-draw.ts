@@ -1,5 +1,5 @@
 import { Seed } from './seed';
-import type { ValueReceiver } from './value-receiver';
+import type { ValueReceiver } from '../shared/value-receiver';
 
 // The count of seeds: the unsigned 32-bit integers (classes.md decision 48).
 const SEEDS = 4294967296;

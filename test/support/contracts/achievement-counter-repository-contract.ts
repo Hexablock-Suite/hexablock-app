@@ -1,7 +1,7 @@
 import type { AchievementCounterRepository } from '../../../src/application/achievement-counter-repository';
-import { AchievementCount } from '../../../src/domain/engine/achievement-count';
-import { AchievementCounters } from '../../../src/domain/engine/achievement-counters';
-import { GameId } from '../../../src/domain/engine/game-id';
+import { AchievementCount } from '../../../src/domain/achievements/achievement-count';
+import { AchievementCounters } from '../../../src/domain/achievements/achievement-counters';
+import { GameId } from '../../../src/domain/shared/game-id';
 import { countersContentOf, countsOf } from '../engine/counters-content';
 
 const LINES = GameId.of('hexa-lines');

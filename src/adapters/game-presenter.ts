@@ -5,7 +5,7 @@ import type { FailureCode, Result, UseCaseError } from '../application/result';
 import type { StartGameRequest } from '../application/start-game';
 import type { UndoMoveRequest } from '../application/undo-move';
 import type { UseCase } from '../application/use-case';
-import type { LevelId } from '../domain/engine/level-id';
+import type { LevelId } from '../domain/progress/level-id';
 import { Outcome } from '../domain/engine/outcome';
 import type { StateMapper } from './state-mapper';
 import type { TextKey, Texts } from './texts/text-catalog';

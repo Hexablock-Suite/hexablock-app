@@ -1,12 +1,12 @@
 /** @jest-environment node */
 import sort01 from '../../../../src/adapters/levels/sort/sort-01.json';
 import { HexGeometry } from '../../../../src/domain/engine/hex-geometry';
-import { LevelDefinition } from '../../../../src/domain/engine/level-definition';
+import { LevelDefinition } from '../../../../src/domain/progress/level-definition';
 import { SortLevelBuilder } from '../../../../src/domain/variants/hexa-sort/sort-level-builder';
 import { seededRandom, StepRandom } from '../../../support/engine/step-random';
 import { Outcome } from '../../../../src/domain/engine/outcome';
-import { Score } from '../../../../src/domain/engine/score';
-import { GameId } from '../../../../src/domain/engine/game-id';
+import { Score } from '../../../../src/domain/shared/score';
+import { GameId } from '../../../../src/domain/shared/game-id';
 import { Color } from '../../../../src/domain/engine/color';
 import { RegionSize } from '../../../../src/domain/engine/region-size';
 import { Seed } from '../../../../src/domain/engine/seed';

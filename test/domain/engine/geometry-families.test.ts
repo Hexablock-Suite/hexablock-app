@@ -1,6 +1,7 @@
 /** @jest-environment node */
 import { Area } from '../../../src/domain/engine/area';
-import { TopologyId, type GeometryFactory } from '../../../src/domain/engine/geometry-factory';
+import type { GeometryFactory } from '../../../src/domain/engine/geometry-factory';
+import { TopologyId } from '../../../src/domain/shared/topology-id';
 import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
 import { SquareGeometry } from '../../../src/domain/engine/square-geometry';
 import { SquareTopology } from '../../../src/domain/engine/square-topology';

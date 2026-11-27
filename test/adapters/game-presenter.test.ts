@@ -9,10 +9,10 @@ import { FailureCode, Result, UseCaseError } from '../../src/application/result'
 import type { StartGameRequest } from '../../src/application/start-game';
 import type { UndoMoveRequest } from '../../src/application/undo-move';
 import type { UseCase } from '../../src/application/use-case';
-import { ElapsedTime } from '../../src/domain/engine/elapsed-time';
-import { LevelId } from '../../src/domain/engine/level-id';
+import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
+import { LevelId } from '../../src/domain/progress/level-id';
 import { Outcome } from '../../src/domain/engine/outcome';
-import { Score } from '../../src/domain/engine/score';
+import { Score } from '../../src/domain/shared/score';
 
 // Issue #170: `GamePresenter` calls `StartGame` and `ApplyMove` through the `UseCase` port and
 // turns each plain `MoveResult` into a `GameViewModel` with its `StateMapper` (MVP, layers.md).

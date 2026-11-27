@@ -1,8 +1,8 @@
 /** @jest-environment node */
 import { LocalAchievementCounterRepository } from '../../src/adapters/local-achievement-counter-repository';
-import { AchievementCount } from '../../src/domain/engine/achievement-count';
-import { AchievementCounters } from '../../src/domain/engine/achievement-counters';
-import { GameId } from '../../src/domain/engine/game-id';
+import { AchievementCount } from '../../src/domain/achievements/achievement-count';
+import { AchievementCounters } from '../../src/domain/achievements/achievement-counters';
+import { GameId } from '../../src/domain/shared/game-id';
 import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-store';
 import { describeAchievementCounterRepositoryContract } from '../support/contracts/achievement-counter-repository-contract';
 import { countsOf } from '../support/engine/counters-content';

@@ -1,11 +1,11 @@
 /** @jest-environment node */
 import { HomePresenter } from '../../src/adapters/home-presenter';
 import { textCatalog } from '../../src/adapters/texts/text-catalog';
-import { GameId } from '../../src/domain/engine/game-id';
-import { GameProgress } from '../../src/domain/engine/game-progress';
-import { TopologyId } from '../../src/domain/engine/geometry-factory';
-import { ProgressRecord } from '../../src/domain/engine/progress-model';
-import { Score } from '../../src/domain/engine/score';
+import { GameId } from '../../src/domain/shared/game-id';
+import { GameProgress } from '../../src/domain/progress/game-progress';
+import { TopologyId } from '../../src/domain/shared/topology-id';
+import { ProgressRecord } from '../../src/domain/progress/progress-model';
+import { Score } from '../../src/domain/shared/score';
 
 // Issue #169: `HomePresenter` gives the view models of the home screen and of the game
 // selector map. It takes the ids of the registered games, the board figures of the root

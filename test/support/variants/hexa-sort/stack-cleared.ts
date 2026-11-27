@@ -1,5 +1,5 @@
 import type { GameEvent } from '../../../../src/domain/engine/game-events';
-import type { GameId } from '../../../../src/domain/engine/game-id';
+import type { GameId } from '../../../../src/domain/shared/game-id';
 import type { MatchId } from '../../../../src/domain/engine/match-id';
 import {
   StackCleared,

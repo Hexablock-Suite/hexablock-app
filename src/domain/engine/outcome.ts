@@ -1,4 +1,4 @@
-import type { ValueReceiver } from './value-receiver';
+import type { ValueReceiver } from '../shared/value-receiver';
 
 // The result of a turn for the game as a whole (classes.md decision 45, issue #207).
 // It is a value object with a closed set of three instances: `playing`, `victory` and `gameOver`.

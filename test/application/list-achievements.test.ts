@@ -7,21 +7,21 @@ import { ListAchievements, type AchievementSummary } from '../../src/application
 import type { AchievementCounterRepository } from '../../src/application/achievement-counter-repository';
 import type { ProgressRepository } from '../../src/application/progress-repository';
 import type { Result } from '../../src/application/result';
-import { AchievementCount } from '../../src/domain/engine/achievement-count';
-import { AchievementCounters } from '../../src/domain/engine/achievement-counters';
+import { AchievementCount } from '../../src/domain/achievements/achievement-count';
+import { AchievementCounters } from '../../src/domain/achievements/achievement-counters';
 import {
   BestCountReached,
   EveryLevelWon,
   LevelsWon,
   TotalCountReached,
-} from '../../src/domain/engine/achievement-goal';
-import { GameId } from '../../src/domain/engine/game-id';
-import { GameProgress } from '../../src/domain/engine/game-progress';
-import { LevelId } from '../../src/domain/engine/level-id';
-import { Moves } from '../../src/domain/engine/moves';
-import { ProgressRecord } from '../../src/domain/engine/progress-model';
-import { Score } from '../../src/domain/engine/score';
-import { Stars } from '../../src/domain/engine/stars';
+} from '../../src/domain/achievements/achievement-goal';
+import { GameId } from '../../src/domain/shared/game-id';
+import { GameProgress } from '../../src/domain/progress/game-progress';
+import { LevelId } from '../../src/domain/progress/level-id';
+import { Moves } from '../../src/domain/shared/moves';
+import { ProgressRecord } from '../../src/domain/progress/progress-model';
+import { Score } from '../../src/domain/shared/score';
+import { Stars } from '../../src/domain/progress/stars';
 import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-store';
 import { delivered } from '../support/engine/value-receiver';
 

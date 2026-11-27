@@ -9,6 +9,9 @@
   ],
   "folders": [
     { "path": "src/domain/engine/", "layer": 1, "part": "engine" },
+    { "path": "src/domain/shared/", "layer": 1, "part": "engine" },
+    { "path": "src/domain/progress/", "layer": 1, "part": "engine" },
+    { "path": "src/domain/achievements/", "layer": 1, "part": "engine" },
     { "path": "src/domain/variants/", "layer": 1, "part": "variants" },
     { "path": "src/application/", "layer": 2, "part": "usecases" },
     { "path": "src/adapters/", "layer": 3, "part": "adapters" },

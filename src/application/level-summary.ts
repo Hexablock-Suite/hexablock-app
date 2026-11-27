@@ -1,6 +1,6 @@
-import type { LevelId } from '../domain/engine/level-id';
-import type { LevelStatus } from '../domain/engine/level-status';
-import type { Stars } from '../domain/engine/stars';
+import type { LevelId } from '../domain/progress/level-id';
+import type { LevelStatus } from '../domain/progress/level-status';
+import type { Stars } from '../domain/progress/stars';
 
 // One level in the list of levels: the plain response model of `ListLevels` (issue #168).
 // It holds no `LevelDefinition`, so a presenter cannot build a level from it.

@@ -1,10 +1,10 @@
 import type { Board } from '../../engine/board';
 import type { BoardId } from '../../engine/board-id';
 import { BoardBuilder } from '../../engine/board-builder';
-import { GameId } from '../../engine/game-id';
+import { GameId } from '../../shared/game-id';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { GeometryFactory } from '../../engine/geometry-factory';
-import { LevelProgress } from '../../engine/level-progress';
+import { LevelProgress } from '../../progress/level-progress';
 import type { MatchId } from '../../engine/match-id';
 import {
   FixedListPieceSource,

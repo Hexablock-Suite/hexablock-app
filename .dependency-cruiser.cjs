@@ -30,6 +30,30 @@ module.exports = {
       to: { path: layer('domain/variants') },
     },
     {
+      name: 'shared-imports-only-shared',
+      comment:
+        'The shared leaves of the domain (src/domain/shared/) import no other folder of the domain (issue #420).',
+      severity: 'error',
+      from: { path: layer('domain/shared') },
+      to: { path: layer('domain'), pathNot: layer('domain/shared') },
+    },
+    {
+      name: 'progress-imports-only-shared',
+      comment:
+        'The progress and the levels (src/domain/progress/) import only the shared leaves of the domain (issue #420).',
+      severity: 'error',
+      from: { path: layer('domain/progress') },
+      to: { path: layer('domain'), pathNot: '(?:^|/)src/domain/(?:shared|progress)/' },
+    },
+    {
+      name: 'achievements-imports-only-shared-and-progress',
+      comment:
+        'The achievements (src/domain/achievements/) import only the shared leaves and the progress (issue #420).',
+      severity: 'error',
+      from: { path: layer('domain/achievements') },
+      to: { path: layer('domain'), pathNot: '(?:^|/)src/domain/(?:shared|progress|achievements)/' },
+    },
+    {
       name: 'variants-isolated',
       comment: 'A variant never imports another variant.',
       severity: 'error',

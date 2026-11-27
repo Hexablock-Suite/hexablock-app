@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { Score } from '../../../../src/domain/engine/score';
+import { Score } from '../../../../src/domain/shared/score';
 import { hex, HexAxis } from '../../../../src/domain/engine/hex-topology';
 import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
 import { GameStateId } from '../../../../src/domain/engine/game-state-id';

@@ -1,4 +1,4 @@
-import type { ValueReceiver } from '../../engine/value-receiver';
+import type { ValueReceiver } from '../../shared/value-receiver';
 import { ClearedStacks } from './cleared-stacks';
 
 // The goal of one Hexa Sort level: the count of stacks that the player must clear to win.

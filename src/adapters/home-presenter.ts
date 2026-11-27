@@ -1,7 +1,7 @@
-import { GameId } from '../domain/engine/game-id';
-import type { GameProgress } from '../domain/engine/game-progress';
-import type { TopologyId } from '../domain/engine/geometry-factory';
-import type { ProgressRecord } from '../domain/engine/progress-model';
+import { GameId } from '../domain/shared/game-id';
+import type { GameProgress } from '../domain/progress/game-progress';
+import type { TopologyId } from '../domain/shared/topology-id';
+import type { ProgressRecord } from '../domain/progress/progress-model';
 import type { TextKey, Texts } from './texts/text-catalog';
 
 // One board figure of the figure selector (#171).

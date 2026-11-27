@@ -1,12 +1,12 @@
 import type { Achievement } from '../application/achievement';
-import { AchievementCount } from '../domain/engine/achievement-count';
+import { AchievementCount } from '../domain/achievements/achievement-count';
 import {
   BestCountReached,
   EveryLevelWon,
   LevelsWon,
   TotalCountReached,
-} from '../domain/engine/achievement-goal';
-import { GameId } from '../domain/engine/game-id';
+} from '../domain/achievements/achievement-goal';
+import { GameId } from '../domain/shared/game-id';
 
 // The achievements of the player, in the order of the achievements screen (issue #188).
 // They come from the team prototype, https://prototipo-hexablock.vercel.app/.
