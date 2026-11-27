@@ -1,10 +1,13 @@
 import type { Board } from '../../engine/board';
 import type { BoardId } from '../../engine/board-id';
 import { BoardBuilder } from '../../engine/board-builder';
+import type { Clock } from '../../engine/clock';
 import { GameId } from '../../shared/game-id';
 import type { GameStateId } from '../../engine/game-state-id';
 import type { GeometryFactory } from '../../engine/geometry-factory';
 import { LevelProgress } from '../../progress/level-progress';
+import { LevelTimer } from '../../engine/level-timer';
+import { LevelTimerId } from '../../engine/level-timer-id';
 import type { MatchId } from '../../engine/match-id';
 import {
   FixedListPieceSource,
@@ -30,6 +33,8 @@ import { SortState } from './sort-state';
 // The random source comes by injection (R-domain-determinism, classes.md decision 25).
 // A level seeded each match draws a new seed from it in each match (issue #417).
 // A level file names its seed or its stacks, so the factory draws nothing for it.
+// The clock times each level (issue #46): the backend asks for the time of each level result
+// (DS-5), though Sort gives no star by time (D22).
 export class SortFactory<TCoord> implements IVariantFactory<
   ColorStack,
   TCoord,
@@ -43,6 +48,7 @@ export class SortFactory<TCoord> implements IVariantFactory<
     private readonly geometry: GeometryFactory<TCoord>,
     private readonly level: SortLevel,
     private readonly random: RandomSource,
+    private readonly clock: Clock,
   ) {}
 
   // True when `gameId` names Hexa Sort. The id stays private (issue #234).
@@ -54,9 +60,12 @@ export class SortFactory<TCoord> implements IVariantFactory<
     return new SortRules<TCoord>();
   }
 
-  // Hexa Sort has no timer (classes.md decision 19).
-  createTimer(_matchId: MatchId): undefined {
-    return undefined;
+  // Hexa Sort times each level as Hexa Fit does (classes.md decision 19, issue #46).
+  // `GameFactory` wraps the rules in `TimedRulesDecorator` with this timer. The time ranks two
+  // plays with equal stars and moves (DS-4), and the sync sends it (DS-5). It gives no star.
+  // Each call gives a new timer with a local id from the `MatchId` (decision 52).
+  createTimer(matchId: MatchId): LevelTimer {
+    return new LevelTimer(LevelTimerId.of(matchId), this.clock);
   }
 
   createScoring(): IScoringPolicy<SortState<TCoord>> {

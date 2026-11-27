@@ -108,15 +108,31 @@ describe('The time of a Fit level', () => {
   });
 
   it('should_give_no_elapsed_ms_field_when_the_variant_has_no_timer', async () => {
-    const runs = [
-      await firstTurnFields(linesFactory()),
-      await firstTurnFields(sortFactory()),
-      await firstTurnFields(mergeFactory()),
-    ];
+    const runs = [await firstTurnFields(linesFactory()), await firstTurnFields(mergeFactory())];
 
     for (const fields of runs) {
       expect(fields).not.toContain('elapsedMs');
     }
+  });
+});
+
+// Issue #46: the backend asks for the time of each level result (DS-5), so Sort times its levels
+// with `LevelTimer`, as Fit does. Sort gives no star by time (D22).
+describe('The time of a Sort level', () => {
+  it('should_give_the_elapsed_ms_of_the_play_when_a_fake_clock_times_a_sort_level', async () => {
+    const clock = new ManualClock();
+    const factory = sortFactory(undefined, undefined, clock);
+    const { startGame, applyMove, games } = gameUseCases(factory);
+    const started = valueOf(await startGame.execute({}));
+    // The time before the first turn does not count.
+    clock.advance(9_000);
+
+    const played = valueOf(await applyMove.execute({ move: firstMoveOf(factory) }));
+    clock.advance(4_000);
+
+    expect(started.elapsedMs).toEqual(ElapsedTime.ofMs(0));
+    expect(played.elapsedMs).toEqual(ElapsedTime.ofMs(0));
+    expect(games.running().elapsedTime()).toEqual(ElapsedTime.ofMs(4_000));
   });
 });
 

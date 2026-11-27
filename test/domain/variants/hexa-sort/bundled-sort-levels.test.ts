@@ -21,6 +21,7 @@ import { repoRoot } from '../../../support/run-tool';
 import { names } from '../../../support/variants/hexa-sort/sort-game';
 import { sortLevelFile } from '../../../support/variants/hexa-sort/sort-level-file';
 import { playMove } from '../../../support/engine/play-move';
+import { ManualClock } from '../../../support/engine/manual-clock';
 
 // The bundled Sort levels (issue #167, APP-FR-05, A4). Each file follows the shared level format
 // of hexablock-api `docs/level-format.md`. The test reads every file of the folder,
@@ -125,7 +126,12 @@ const topologiesOf = (files: [string, LevelFile][]) => [
 function traysInTwoGames(file: LevelFile): string[][][][] {
   return withGeometryOf(file.topology, {
     use: (geometry) => {
-      const factory = new SortFactory(geometry, built(file, geometry), seededRandom(1));
+      const factory = new SortFactory(
+        geometry,
+        built(file, geometry),
+        seededRandom(1),
+        new ManualClock(),
+      );
       return [0, 1].map(() => {
         const { engine } = startVariant(factory);
         const trays = [trayNames(engine.snapshot().trayStacks())];
@@ -153,7 +159,7 @@ function firstPhoto(file: LevelFile): { cells: number; goal: boolean; tray: stri
   return withGeometryOf(file.topology, {
     use: (geometry) => {
       const { engine } = startVariant(
-        new SortFactory(geometry, built(file, geometry), seededRandom(1)),
+        new SortFactory(geometry, built(file, geometry), seededRandom(1), new ManualClock()),
       );
       const photo = engine.snapshot();
       return {
@@ -174,7 +180,9 @@ function planPlay(
   return withGeometryOf(file.topology, {
     use: (geometry) => {
       const level = built(file, geometry);
-      const { engine } = startVariant(new SortFactory(geometry, level, seededRandom(1)));
+      const { engine } = startVariant(
+        new SortFactory(geometry, level, seededRandom(1), new ManualClock()),
+      );
       const outcomes = plan.map((at, n) => playMove(engine, planMove(geometry, at, n)));
       return { outcomes, stars: level.starsFor(Moves.of(plan.length)) };
     },
@@ -485,7 +493,9 @@ describe('bundled Sort levels', () => {
     const { outcomes, moves, stars } = withGeometryOf(first.topology, {
       use: (geometry) => {
         const level = built(first, geometry);
-        const { engine } = startVariant(new SortFactory(geometry, level, seededRandom(1)));
+        const { engine } = startVariant(
+          new SortFactory(geometry, level, seededRandom(1), new ManualClock()),
+        );
         const played = SORT_01_PLAY.map(([slot, at]) =>
           playMove(engine, PlaceStack.on(TraySlot.of(slot), geometry.createCoord([...at]))),
         );

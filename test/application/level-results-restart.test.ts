@@ -91,6 +91,7 @@ const SORT: LevelGame = {
       geometry,
       definition.buildWith(new SortLevelBuilder(geometry)),
       seededRandom(1),
+      new ManualClock(),
     ).createProgressModel(),
   best: { moves: 36, stars: 1 },
   worse: [

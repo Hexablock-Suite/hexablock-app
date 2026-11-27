@@ -275,12 +275,12 @@ describe('StartGame and ApplyMove', () => {
       ['hexa-merge', Outcome.playing, Outcome.playing],
     ]);
     for (const run of runs) {
-      // Fit wins with its one move, so only the Merge game keeps a move to undo.
-      const hasUndo = run.gameId === 'hexa-fit' || run.gameId === 'hexa-merge';
-      // Only Fit is timed, and this clock does not move.
-      const time = run.gameId === 'hexa-fit' ? { elapsedMs: ElapsedTime.ofMs(0) } : {};
       // Fit and Sort count their moves, and Lines and Merge count none (D26, #180).
       const counts = run.gameId === 'hexa-fit' || run.gameId === 'hexa-sort';
+      // Fit wins with its one move, so only the Merge game keeps a move to undo.
+      const hasUndo = run.gameId === 'hexa-fit' || run.gameId === 'hexa-merge';
+      // Fit and Sort are timed (#46), and this clock does not move.
+      const time = counts ? { elapsedMs: ElapsedTime.ofMs(0) } : {};
       const movesAt = (count: number) => (counts ? { moves: Moves.of(count) } : {});
       // A view keeps its fields private, so the test compares the data that it delivers.
       expect({ ...run.started, payload: viewData(run.started.payload) }).toEqual({
@@ -831,11 +831,11 @@ describe('the variant data of MoveResult', () => {
     const merge = (await startAndPlayOnce(mergeFactory())).played;
     const single = new Piece(new CellNode(square(0, 0)), red);
 
-    // Since #180 Fit and Sort also carry their move count (D26).
+    // Since #180 Fit and Sort also carry their move count (D26), and since #46 Sort its time.
     expect([lines, fit, sort, merge].map((result) => Object.keys(result).sort())).toEqual([
       fields,
       [...fields, 'elapsedMs', 'moves'].sort(),
-      [...fields, 'moves'].sort(),
+      [...fields, 'elapsedMs', 'moves'].sort(),
       fields,
     ]);
     expect({ ...lines, payload: linesViewData(lines.payload) }).toEqual({
@@ -886,6 +886,7 @@ describe('the variant data of MoveResult', () => {
         goalsNeeded: GoalCount.of(5),
       },
       moves: Moves.of(1),
+      elapsedMs: ElapsedTime.ofMs(0),
     });
     expect({ ...merge, payload: mergeViewData(merge.payload) }).toEqual({
       cells: [

@@ -193,6 +193,7 @@ function figureTests<TCoord>(
         geometry,
         SortLevel.fixed(size, GoalCount.of(5), [offered, offered]),
         seededRandom(1),
+        new ManualClock(),
       );
       const { engine, rules } = startVariant(factory);
       const start = engine.snapshot();
@@ -265,15 +266,17 @@ describe('IVariantFactory', () => {
     ]);
   });
 
-  // Only Hexa Fit is timed (classes.md decision 19). A factory gives the timer as a part,
-  // as it gives the history (issue #234).
-  it('should_give_a_timer_only_for_the_fit_level_when_each_factory_creates_a_timer', () => {
-    const untimed = [linesFactory(), sortFactory(), mergeFactory()].map((factory) =>
+  // The variants with levels are timed (classes.md decision 19). Since #46 Sort times its levels
+  // too: the backend asks for the time of each level result, though Sort gives no star by time.
+  // A factory gives the timer as a part, as it gives the history (issue #234).
+  it('should_give_a_timer_only_for_the_variants_with_levels_when_each_factory_creates_a_timer', () => {
+    const untimed = [linesFactory(), mergeFactory()].map((factory) =>
       factory.createTimer(MATCH_ID),
     );
 
-    expect(untimed).toEqual([undefined, undefined, undefined]);
+    expect(untimed).toEqual([undefined, undefined]);
     expect(fitFactory().createTimer(MATCH_ID)).toBeInstanceOf(LevelTimer);
+    expect(sortFactory().createTimer(MATCH_ID)).toBeInstanceOf(LevelTimer);
   });
 
   // Each factory gives the progress model of its game (issue #156, classes.md decision 31).
@@ -338,6 +341,7 @@ describe('IVariantFactory', () => {
         ColorStack.of([Color.of('red')]),
       ]).withStars([SortStarThreshold.of(Moves.of(5)), SortStarThreshold.of(Moves.of(3))]),
       seededRandom(1),
+      new ManualClock(),
     );
     sort.createProgressModel().record(
       GameResult.of({

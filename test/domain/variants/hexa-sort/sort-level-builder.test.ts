@@ -18,6 +18,7 @@ import {
   sortFixedSource,
   sortLevelFile,
 } from '../../../support/variants/hexa-sort/sort-level-file';
+import { ManualClock } from '../../../support/engine/manual-clock';
 
 // The Sort level builder builds a `SortLevel` from a level file (issue #167, classes.md decision 15).
 // `LevelDefinition` directs it. The builder turns each number of the file into its value object,
@@ -73,7 +74,7 @@ describe('SortLevelBuilder', () => {
   it('should_give_every_cell_within_the_radius_when_the_sort_factory_builds_the_board_of_the_level', () => {
     const cells = [1, 2, 3].map((radius) => {
       const level = built(withSection((section) => ({ ...section, radius })));
-      return new SortFactory(hexGeometry, level, seededRandom(1))
+      return new SortFactory(hexGeometry, level, seededRandom(1), new ManualClock())
         .createBoard(BOARD_ID)
         .coordinates().length;
     });

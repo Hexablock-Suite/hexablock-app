@@ -64,6 +64,7 @@ const sortFactoryOf = (file: typeof sort01 | typeof sort02) =>
     geometry,
     LevelDefinition.of(file).buildWith(new SortLevelBuilder(geometry)),
     seededRandom(1),
+    new ManualClock(),
   );
 
 // A progress repository that keeps a won result of each level of `won` for the game `gameId`.
@@ -120,7 +121,11 @@ function startGameOf<
 const fitGame = (progress = progressWith(FIT, 'fit-01', 'fit-02')) =>
   startGameOf(FIT, fitFactoryOf(fit01), fitLevelVariant(geometry, clock), progress);
 const sortGame = () =>
-  startGameOf(SORT, sortFactoryOf(sort02), sortLevelVariant(geometry, seededRandom(1)));
+  startGameOf(
+    SORT,
+    sortFactoryOf(sort02),
+    sortLevelVariant(geometry, seededRandom(1), new ManualClock()),
+  );
 
 // The cells, the free spaces and the view data of a new game of `factory`.
 function startOf<
