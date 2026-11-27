@@ -1,10 +1,6 @@
 /** @jest-environment node */
 import { BundledLevelRepository } from '../../src/adapters/bundled-level-repository';
-import {
-  fitLevelVariant,
-  LevelGameFactories,
-  sortLevelVariant,
-} from '../../src/adapters/level-game-factories';
+import { LevelGameFactories } from '../../src/adapters/level-game-factories';
 import fit01 from '../../src/adapters/levels/fit/fit-01.json';
 import fit03 from '../../src/adapters/levels/fit/fit-03.json';
 import type { BoardState } from '../../src/domain/engine/board-state';
@@ -17,6 +13,8 @@ import { LevelId } from '../../src/domain/progress/level-id';
 import { SquareGeometry } from '../../src/domain/engine/square-geometry';
 import { FitFactory } from '../../src/domain/variants/hexa-fit/fit-factory';
 import { FitLevelBuilder } from '../../src/domain/variants/hexa-fit/fit-level-builder';
+import { fitLevelVariant } from '../../src/domain/variants/hexa-fit/fit-level-variant';
+import { sortLevelVariant } from '../../src/domain/variants/hexa-sort/sort-level-variant';
 import { ManualClock } from '../support/engine/manual-clock';
 import { CountingMatchIds } from '../support/engine/match-id';
 import { seededRandom } from '../support/engine/step-random';

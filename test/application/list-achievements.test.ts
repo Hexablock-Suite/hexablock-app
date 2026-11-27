@@ -101,7 +101,7 @@ describe('ListAchievements', () => {
   // «Win 3 levels of Hexa Fit»: three won levels complete it, two do not.
   // A level is won when the progress keeps a result of it, zero stars included (S3-12).
   it('should_complete_a_count_of_won_levels_when_the_progress_keeps_that_many_levels', async () => {
-    const achievement = { id: 'fit-3', goal: LevelsWon.of(FIT, 3) };
+    const achievement = { id: 'fit-3', goal: LevelsWon.of(FIT, AchievementCount.of(3)) };
 
     const two = await listOf([achievement], await progressWith(FIT, ['fit-01', 'fit-02'])).execute(
       {},
@@ -119,9 +119,10 @@ describe('ListAchievements', () => {
   it('should_keep_a_count_of_won_levels_in_progress_when_another_game_won_the_levels', async () => {
     const progress = await progressWith(FIT, ['fit-01', 'fit-02', 'fit-03']);
 
-    const result = await listOf([{ id: 'sort-3', goal: LevelsWon.of(SORT, 3) }], progress).execute(
-      {},
-    );
+    const result = await listOf(
+      [{ id: 'sort-3', goal: LevelsWon.of(SORT, AchievementCount.of(3)) }],
+      progress,
+    ).execute({});
 
     expect(rowsOf(result)).toEqual([['sort-3', false]]);
   });
@@ -130,8 +131,8 @@ describe('ListAchievements', () => {
   // A game with no levels never completes it.
   it('should_complete_every_level_won_only_when_each_level_of_the_game_is_won', async () => {
     const achievements = [
-      { id: 'fit-all', goal: new EveryLevelWon(FIT) },
-      { id: 'lines-all', goal: new EveryLevelWon(LINES) },
+      { id: 'fit-all', goal: EveryLevelWon.of(FIT) },
+      { id: 'lines-all', goal: EveryLevelWon.of(LINES) },
     ];
 
     const some = await listOf(achievements, await progressWith(FIT, ['fit-01', 'fit-03'])).execute(
@@ -158,7 +159,11 @@ describe('ListAchievements', () => {
     const progress = await progressWith(FIT, ['fit-01', 'fit-02', 'fit-03']);
 
     const result = await listOf(
-      [{ id: 'merge-256' }, { id: 'fit-3', goal: LevelsWon.of(FIT, 3) }, { id: 'sort-goals' }],
+      [
+        { id: 'merge-256' },
+        { id: 'fit-3', goal: LevelsWon.of(FIT, AchievementCount.of(3)) },
+        { id: 'sort-goals' },
+      ],
       progress,
     ).execute({});
 
@@ -221,7 +226,10 @@ describe('ListAchievements', () => {
       save: () => Promise.resolve(),
     };
 
-    const result = await listOf([{ id: 'fit-3', goal: LevelsWon.of(FIT, 3) }], broken).execute({});
+    const result = await listOf(
+      [{ id: 'fit-3', goal: LevelsWon.of(FIT, AchievementCount.of(3)) }],
+      broken,
+    ).execute({});
 
     expect(rowsOf(result)).toBe('list-failed');
     expect(result.ok ? undefined : result.error.message).toBe('The store is gone.');
@@ -237,19 +245,19 @@ describe('ListAchievements', () => {
   });
 
   // A count of won levels is a whole number of 1 or more. The error carries the count.
+  // An `AchievementCount` is a whole number of 0 or more, so 0 is the one count left to refuse.
   it('should_throw_a_range_error_when_a_count_of_won_levels_is_not_a_whole_number_of_1_or_more', () => {
-    for (const count of [0, -1, 2.5, Number.NaN]) {
-      let caught: unknown;
-      try {
-        LevelsWon.of(FIT, count);
-      } catch (error) {
-        caught = error;
-      }
-
-      expect(caught).toEqual(
-        new RangeError('A count of won levels needs a whole number of 1 or more.'),
-      );
-      expect((caught as Error).cause).toBe(count);
+    const zero = AchievementCount.of(0);
+    let caught: unknown;
+    try {
+      LevelsWon.of(FIT, zero);
+    } catch (error) {
+      caught = error;
     }
+
+    expect(caught).toEqual(
+      new RangeError('A count of won levels needs a whole number of 1 or more.'),
+    );
+    expect((caught as Error).cause).toBe(zero);
   });
 });

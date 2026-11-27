@@ -1,3 +1,5 @@
+import type { AchievementCounters } from '../../achievements/achievement-counters';
+import type { CountsForAchievements } from '../../achievements/counts-for-achievements';
 import { GameEvent } from '../../engine/game-events';
 import type { GameId } from '../../shared/game-id';
 import type { MatchId } from '../../engine/match-id';
@@ -13,7 +15,8 @@ import type { LineCount } from './line-count';
 // no event.
 // Every field is private (rule R-domain-private-fields). A listener receives the data
 // through `deliverTo()`.
-export class LinesCleared<TCoord> extends GameEvent {
+// The event counts for the achievements (issue #406): its count of lines is a best count.
+export class LinesCleared<TCoord> extends GameEvent implements CountsForAchievements {
   private readonly cells: readonly TCoord[];
 
   constructor(
@@ -33,6 +36,12 @@ export class LinesCleared<TCoord> extends GameEvent {
   // Only a listener of the edge calls it (rule R-no-delivery-call).
   deliverTo(receiver: LinesClearedReceiver<TCoord>): void {
     this.withGameId((gameId) => receiver.receive(gameId, this.matchId, this.lines, this.cells));
+  }
+
+  // Keeps the count of lines of the placement as the best count of the game:
+  // the most lines at once (issue #406).
+  recordIn(counters: AchievementCounters): void {
+    counters.recordBest(this.lines.asAchievementCount());
   }
 }
 

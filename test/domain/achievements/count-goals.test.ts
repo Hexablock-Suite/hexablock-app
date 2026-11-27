@@ -12,6 +12,8 @@ import { GameId } from '../../../src/domain/shared/game-id';
 // A goal receives the counters that the use case loaded, and it calls no repository.
 // The engine names no variant, so a goal reads a generic count: the composition root names
 // the game and the number, for example «reach 256 in Hexa Merge».
+// Issue #406: `isReachedBy()` always gets the counters. A game with no saved counters gets
+// new counters, with a best count and a total of 0.
 
 const GAME = GameId.of('a-game');
 const count = (value: number) => AchievementCount.of(value);
@@ -44,8 +46,9 @@ describe('BestCountReached', () => {
   });
 
   it('should_not_be_reached_when_the_game_has_no_saved_counters', () => {
-    expect(BestCountReached.of(GAME, count(3)).isReachedBy([], undefined, undefined)).toBe(false);
-    expect(BestCountReached.of(GAME, count(3)).isReachedBy([], undefined)).toBe(false);
+    const counters = AchievementCounters.start(GAME);
+
+    expect(BestCountReached.of(GAME, count(3)).isReachedBy([], undefined, counters)).toBe(false);
   });
 
   it('should_name_its_game_when_the_use_case_asks_for_it', () => {
@@ -71,8 +74,9 @@ describe('TotalCountReached', () => {
   });
 
   it('should_not_be_reached_when_the_game_has_no_saved_counters', () => {
-    expect(TotalCountReached.of(GAME, count(10)).isReachedBy([], undefined, undefined)).toBe(false);
-    expect(TotalCountReached.of(GAME, count(10)).isReachedBy([], undefined)).toBe(false);
+    const counters = AchievementCounters.start(GAME);
+
+    expect(TotalCountReached.of(GAME, count(10)).isReachedBy([], undefined, counters)).toBe(false);
   });
 
   it('should_name_its_game_when_the_use_case_asks_for_it', () => {

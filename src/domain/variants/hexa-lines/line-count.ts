@@ -1,3 +1,4 @@
+import { AchievementCount } from '../../achievements/achievement-count';
 import { Score } from '../../shared/score';
 import type { ValueReceiver } from '../../shared/value-receiver';
 import { ComboFactor } from './combo-factor';
@@ -11,9 +12,9 @@ const POINTS_PER_LINE = 10;
 // It is a value object: it never changes, and two counts are equal when their values are equal.
 // A count of lines is a safe integer of 0 or more. Any other number throws a RangeError.
 // A negative zero is stored as 0. The object is frozen, so no caller writes the value.
-// The value is private, and no operation returns it: the count gives its points as a `Score`.
-// `deliverTo()` gives the number to an adapter of the edge: the counter of the achievements
-// keeps the most lines at once (issue #363).
+// The value is private, and no operation returns it: the count gives its points as a `Score`,
+// and the count of the achievements as an `AchievementCount` (issue #406).
+// `deliverTo()` gives the number to an adapter of the edge.
 export class LineCount {
   private constructor(private readonly value: number) {
     Object.freeze(this);
@@ -37,6 +38,12 @@ export class LineCount {
   // No code of the domain or of the use cases calls it (rule R-no-delivery-call).
   deliverTo(receiver: ValueReceiver<number>): void {
     receiver.receive(this.value);
+  }
+
+  // The count of lines as a count of the achievements. `LinesCleared` keeps it as the best
+  // count of Hexa Lines, the most lines at once (issue #406).
+  asAchievementCount(): AchievementCount {
+    return AchievementCount.of(this.value);
   }
 
   // True when the placement cleared no line.
