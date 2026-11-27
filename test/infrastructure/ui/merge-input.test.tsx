@@ -9,10 +9,9 @@ import { TopologyId } from '../../../src/domain/shared/topology-id';
 import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
 import { RegionSize } from '../../../src/domain/engine/region-size';
 import { SquareGeometry } from '../../../src/domain/engine/square-geometry';
-import type { GridAxis } from '../../../src/domain/engine/grid-topology';
-import type { Slide } from '../../../src/domain/variants/hexa-merge/slide';
 import { HexLayout } from '../../../src/adapters/board/hex-layout';
-import { slideWays, type Compass, type SlideWay } from '../../../src/adapters/board/slide-ways';
+import type { MergeIntent } from '../../../src/adapters/merge-move-mapper';
+import { slideWays, type Compass, type SlideWay } from '../../../src/adapters/merge-slide-ways';
 import { SquareLayout } from '../../../src/adapters/board/square-layout';
 import { CompositionRoot } from '../../../src/infrastructure/composition-root';
 import type { GameSession } from '../../../src/infrastructure/ui/screen-services';
@@ -78,20 +77,21 @@ async function show(session: GameSession): Promise<void> {
   await screen.findByText('En juego');
 }
 
-// Records each move that the controls give to the presenter, and lets the presenter play it.
+// Records each intent that the controls give to the presenter, and lets the presenter play it.
 function recordMoves(session: GameSession): jest.SpyInstance {
   return jest.spyOn(session.presenter, 'onMove');
 }
 
-// The slides that the presenter received, in order.
-function playedOf(spy: jest.SpyInstance): Slide<GridAxis>[] {
-  return spy.mock.calls.map(([move]) => move as Slide<GridAxis>);
+// The compass names of the intents that the presenter received, in order (#405).
+function playedOf(spy: jest.SpyInstance): Compass[] {
+  return spy.mock.calls.map(([intent]) => (intent as MergeIntent).toward);
 }
 
-// True when `played` holds the slides of `expected`, in the same order.
-function sameSlides(played: readonly Slide<GridAxis>[], expected: readonly SlideWay[]): boolean {
+// True when `played` names the ways of `expected`, in the same order. The move mapper of
+// the session gives the slide of each way, and its own test checks it.
+function sameSlides(played: readonly Compass[], expected: readonly SlideWay[]): boolean {
   return (
-    played.length === expected.length && played.every((move, i) => move.equals(expected[i].move))
+    played.length === expected.length && played.every((toward, i) => toward === expected[i].compass)
   );
 }
 

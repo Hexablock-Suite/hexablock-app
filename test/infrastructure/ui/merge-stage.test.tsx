@@ -118,6 +118,7 @@ function targetFourSession(): GameSession {
       undoMove,
       redoMove,
       parts.mapper,
+      parts.moves,
       textCatalog.es,
     ),
     renderer: parts.renderer,

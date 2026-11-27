@@ -2,23 +2,17 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 
+import type { MergeIntent } from '../../adapters/merge-move-mapper';
+import type { ScreenWay } from '../../adapters/merge-slide-ways';
 import type { MergeCellView, MergePayloadView } from '../../adapters/merge-state-mapper';
 import type { Texts } from '../../adapters/texts/text-catalog';
-import type { GridAxis } from '../../domain/engine/grid-topology';
-import type { Slide } from '../../domain/variants/hexa-merge/slide';
-import type { SlideWay } from '../../adapters/board/slide-ways';
 import { Hexagon, HexStone } from './hex-stone';
 import type { MoveControls, MoveControlsProps } from './move-controls';
 import { swipedWay, useSlideKeys } from './slide-input';
 import { lip, palette, radius, serif, space } from './theme';
 import { LipButton, WoodSign } from './wood';
 
-type MergeProps<TCoord> = MoveControlsProps<
-  TCoord,
-  MergeCellView,
-  MergePayloadView,
-  Slide<GridAxis>
->;
+type MergeProps<TCoord> = MoveControlsProps<TCoord, MergeCellView, MergePayloadView, MergeIntent>;
 
 // A slide button: a round face wide enough for a finger, over its lip.
 const BUTTON = 48;
@@ -34,7 +28,9 @@ function ignoreSpace(): void {}
 // of the composition root chooses them for Merge, with the slides of the board figure.
 // Below the board, one button for each slide sits on a ring around a wood hexagon, at the angle
 // of its way on the screen: six on the hexagon, four on the square. Each button names its way
-// and plays its `Slide` through `GamePresenter.onMove()`.
+// and sends a `MergeIntent` with the compass name of the way through `GamePresenter.onMove()`.
+// `MergeMoveMapper` of layer 3 gives the domain move of that way, so the controls name no class
+// of the variant (#405).
 // Since #292 a swipe anywhere on the board plays a slide too, and on the web the arrow keys
 // and the keys Q, E, Z and C play one. Each plays the way nearest to its own angle.
 // The swipe area holds the board only, so a press that starts on a slide button or on the undo
@@ -53,9 +49,9 @@ export class MergeControls<TCoord> implements MoveControls<
   TCoord,
   MergeCellView,
   MergePayloadView,
-  Slide<GridAxis>
+  MergeIntent
 > {
-  constructor(private readonly ways: readonly SlideWay[]) {}
+  constructor(private readonly ways: readonly ScreenWay[]) {}
 
   render(props: MergeProps<TCoord>): ReactNode {
     return <MergePlay ways={this.ways} {...props} />;
@@ -70,11 +66,12 @@ function MergePlay<TCoord>({
   play,
   undo,
   board,
-}: MergeProps<TCoord> & { readonly ways: readonly SlideWay[] }) {
+}: MergeProps<TCoord> & { readonly ways: readonly ScreenWay[] }) {
   const [continued, setContinued] = useState(false);
   const reached = model.payload?.targetReached === true;
   const ring = ringOf(ways);
-  useSlideKeys(ways, (way) => play(way.move));
+  const slide = (way: ScreenWay) => play({ toward: way.compass });
+  useSlideKeys(ways, slide);
 
   // An undo can take the target tile back, and then the flag turns false.
   // The screen forgets the continue, so the prompt opens when a merge makes the target again.
@@ -84,7 +81,7 @@ function MergePlay<TCoord>({
 
   return (
     <>
-      <SwipeArea ways={ways} onSwipe={(way) => play(way.move)}>
+      <SwipeArea ways={ways} onSwipe={slide}>
         {board(ignoreSpace)}
       </SwipeArea>
       <View style={[styles.pad, { width: ring.width, height: ring.height }]}>
@@ -102,7 +99,7 @@ function MergePlay<TCoord>({
             angle={way.angle}
             left={left}
             top={top}
-            onPress={() => play(way.move)}
+            onPress={() => slide(way)}
           />
         ))}
       </View>
@@ -124,8 +121,8 @@ function MergePlay<TCoord>({
 }
 
 interface SwipeAreaProps {
-  readonly ways: readonly SlideWay[];
-  readonly onSwipe: (way: SlideWay) => void;
+  readonly ways: readonly ScreenWay[];
+  readonly onSwipe: (way: ScreenWay) => void;
   readonly children: ReactNode;
 }
 
@@ -158,7 +155,7 @@ interface Ring {
   readonly height: number;
   readonly hub: { readonly x: number; readonly y: number };
   readonly places: readonly {
-    readonly way: SlideWay;
+    readonly way: ScreenWay;
     readonly left: number;
     readonly top: number;
   }[];
@@ -170,7 +167,7 @@ interface Ring {
 // `Math.sin` and `Math.cos` in its own way, so the last bit of a result can differ between
 // the web server and the browser. A whole pixel hides that bit, so the style of the server HTML
 // matches the style of the client, and the screen hydrates with no warning.
-function ringOf(ways: readonly SlideWay[]): Ring {
+function ringOf(ways: readonly ScreenWay[]): Ring {
   const turns = ways.map((way) => way.angle).sort((a, b) => a - b);
   const steps = turns.map((angle, i) => (turns[i + 1] ?? turns[0] + 2 * Math.PI) - angle);
   const narrowest = Math.min(Math.PI, ...steps);

@@ -27,7 +27,7 @@ const METRICS = {
 
 async function openGame<TCoord>(figure: TopologyId, factory: LinesFactory<TCoord>): Promise<void> {
   const root = new CompositionRoot({ clock: new ManualClock(), logger: new RecordingLogger() });
-  const { mapper, controls, renderer, layoutOf } = root
+  const { mapper, moves, controls, renderer, layoutOf } = root
     .registry(figure)
     .gameOf(GameId.of('hexa-lines')).screen;
   const { startGame, applyMove, undoMove, redoMove } = gameUseCases(factory);
@@ -37,6 +37,7 @@ async function openGame<TCoord>(figure: TopologyId, factory: LinesFactory<TCoord
     undoMove,
     redoMove,
     mapper,
+    moves,
     textCatalog.es,
   );
   await render(

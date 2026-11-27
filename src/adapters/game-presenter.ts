@@ -7,6 +7,7 @@ import type { UndoMoveRequest } from '../application/undo-move';
 import type { UseCase } from '../application/use-case';
 import type { LevelId } from '../domain/progress/level-id';
 import { Outcome } from '../domain/engine/outcome';
+import type { MoveMapper } from './move-mapper';
 import type { StateMapper } from './state-mapper';
 import type { TextKey, Texts } from './texts/text-catalog';
 
@@ -79,6 +80,8 @@ const ERROR_TEXTS: Readonly<Record<FailureCode, TextKey>> = {
 // input port (decision 9), so it never sees a concrete use case. It reads only the plain `MoveResult` (decision 29): it never calls
 // a method of `Board` or of a photo (#234). The `StateMapper` of the game turns each occupied
 // cell, each free space and the payload into the data of the screen (decision 14).
+// The move controls send a plain intent, and the `MoveMapper` of the game turns it into
+// the domain move before `ApplyMove` (decision 14, #405).
 // So the presenter names no variant, and one presenter class serves every game.
 // A timed game shows the time of play of the response: the root reads it, so the screen
 // reads no clock (#175). A variant with undo shows the undo and the redo of the response:
@@ -88,7 +91,7 @@ const ERROR_TEXTS: Readonly<Record<FailureCode, TextKey>> = {
 // level (#397) have their own texts, and any other failure has one general text. The table of texts names every code.
 // Every text comes from the catalog of one language (APP-FR-11).
 // A view attaches to see each new view model. It sees the current one at once.
-export class GamePresenter<TCell, TCoord, TMove, TView, TCellView, TPayloadView> {
+export class GamePresenter<TCell, TCoord, TMove, TView, TCellView, TPayloadView, TIntent> {
   private model: GameViewModel<TCoord, TCellView, TPayloadView>;
   private view: GameView<TCoord, TCellView, TPayloadView> | undefined;
 
@@ -98,6 +101,7 @@ export class GamePresenter<TCell, TCoord, TMove, TView, TCellView, TPayloadView>
     private readonly undoMove: UseCase<UndoMoveRequest, MoveResult<TCell, TCoord, TView>>,
     private readonly redoMove: UseCase<RedoMoveRequest, MoveResult<TCell, TCoord, TView>>,
     private readonly mapper: StateMapper<TCell, TView, TCellView, TPayloadView>,
+    private readonly moves: MoveMapper<TIntent, TMove>,
     private readonly texts: Texts,
   ) {
     this.model = {
@@ -130,9 +134,9 @@ export class GamePresenter<TCell, TCoord, TMove, TView, TCellView, TPayloadView>
     this.present(await this.startGame.execute(levelId === undefined ? {} : { levelId }));
   }
 
-  // Plays one move through `ApplyMove`.
-  async onMove(move: TMove): Promise<void> {
-    this.present(await this.applyMove.execute({ move }));
+  // Plays the move of `intent` through `ApplyMove`. The move mapper builds the domain move (#405).
+  async onMove(intent: TIntent): Promise<void> {
+    this.present(await this.applyMove.execute({ move: this.moves.toMove(intent) }));
   }
 
   // Takes back the last move through `UndoMove` (#178).

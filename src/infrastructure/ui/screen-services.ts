@@ -20,7 +20,7 @@ import type { WorldTone } from './theme';
 // and the texts of the screen (#175). The registry hides the type of a cell view,
 // so the session keeps it hidden too.
 export interface GameSession {
-  readonly presenter: GamePresenter<unknown, unknown, unknown, unknown, unknown, unknown>;
+  readonly presenter: GamePresenter<unknown, unknown, unknown, unknown, unknown, unknown, unknown>;
   readonly renderer: CellRenderer<unknown>;
   readonly controls: MoveControls<unknown, unknown, unknown, unknown>;
   readonly layoutOf: (size: number) => BoardLayout<unknown>;

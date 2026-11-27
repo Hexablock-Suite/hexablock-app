@@ -556,7 +556,7 @@
         </text>
         <line x1="320" y1="312" x2="756" y2="312" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="336" y="328" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + onMove(move: TMove): Promise&lt;void&gt;
+          + onMove(intent: TIntent): Promise&lt;void&gt;
         </text>
         <text x="336" y="344" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + onEvent(event: GameEvent): void
@@ -1122,9 +1122,9 @@
         </text>
         <!-- UML template boxes: type parameters on the top-right corner -->
         <rect
-          x="603"
+          x="589"
           y="202"
-          width="165"
+          width="179"
           height="30"
           rx="2"
           fill="#ffffff"
@@ -1133,24 +1133,24 @@
           stroke-dasharray="4,3"
         />
         <text
-          x="685.5"
+          x="678.5"
           y="214"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TCell, TCoord, TMove,
+          TCell, TCoord, TMove, TView,
         </text>
         <text
-          x="685.5"
+          x="678.5"
           y="226"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
         >
-          TView, TCellView, TPayloadView
+          TCellView, TPayloadView, TIntent
         </text>
         <rect
           x="79.3"

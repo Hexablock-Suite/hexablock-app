@@ -104,6 +104,23 @@ describe('architecture gate (dependency-cruiser)', () => {
     expect(result.output).toContain('adapters-imports-only-inner-layers');
   });
 
+  // Issue #409: the board layouts of layer 3 serve every variant, so they import no variant.
+  it('should_fail_arch_when_a_board_layout_imports_a_variant', () => {
+    const result = cruise('board-imports-variant');
+
+    expect(result.status).not.toBe(0);
+    expect(result.output).toContain('board-layouts-no-variants');
+  });
+
+  // Issue #405: the move controls send a plain intent, and a move mapper of layer 3 builds
+  // the domain move. So no file of `src/infrastructure/ui/` imports a variant.
+  it('should_fail_arch_when_a_move_control_imports_a_variant', () => {
+    const result = cruise('ui-imports-variant');
+
+    expect(result.status).not.toBe(0);
+    expect(result.output).toContain('ui-no-variants');
+  });
+
   // Issue #411: a hook or a route reads the closed interface of the screens, never the whole
   // composition root. Only the provider of the root imports it.
   it('should_fail_arch_when_a_module_other_than_the_root_provider_imports_the_composition_root', () => {
