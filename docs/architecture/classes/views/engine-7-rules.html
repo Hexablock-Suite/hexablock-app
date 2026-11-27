@@ -77,9 +77,11 @@
           and the Outcome and no state, in private fields that a reader asks through wasAccepted(),
           endsTheGame(), phaseAfter() and leadsTo(), LinesRules and FitRules extending it, and
           TimedRulesDecorator, which implements IGameRules, wraps an inner IGameRules and times the
-          game with a LevelTimer. The decorator times playTurn() and passes the other five
-          operations, validMoves() included, to its inner rules (decision 33). It hands out no
-          timer: the root keeps the same timer and answers elapsedTime() (decision 27).
+          game with a LevelTimer. IGameRules declares only validMoves() and playTurn(), and the
+          steps isValid(), apply(), resolve() and evaluate() are protected in BaseGameRules, so only
+          the template method calls them (decision 21). The decorator times playTurn() and passes
+          validMoves() to its inner rules (decision 33). It hands out no timer: the root keeps the
+          same timer and answers elapsedTime() (decision 27).
         </desc>
         <defs>
           <marker
@@ -239,7 +241,7 @@
           x1="456"
           y1="336"
           x2="456"
-          y2="268"
+          y2="204"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -265,7 +267,7 @@
         <!-- TimedRulesDecorator holds the LevelTimer it receives as timer: use -->
         <line
           x1="844"
-          y1="544"
+          y1="488"
           x2="844"
           y2="608"
           stroke="#5b6873"
@@ -292,12 +294,10 @@
           stroke-width="1"
           marker-end="url(#rules-triangle)"
         />
-        <!-- IGameRules returns a Resolution: use, through the return type of resolve() and playTurn() -->
-        <line
-          x1="296"
-          y1="256"
-          x2="228"
-          y2="256"
+        <!-- IGameRules returns a Resolution: use, through the return type of playTurn() -->
+        <path
+          d="M296 188 H262 Q254 188 254 196 V248 H228"
+          fill="none"
           stroke-width="1"
           marker-end="url(#rules-open)"
           stroke="#5b6873"
@@ -391,7 +391,7 @@
           x="296"
           y="100"
           width="320"
-          height="168"
+          height="104"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -421,24 +421,12 @@
           IGameRules
         </text>
         <text x="312" y="164" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + isValid(state: TState, move: TMove): boolean
-        </text>
-        <text x="312" y="180" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + validMoves(state: TState): Iterable&lt;TMove&gt;
         </text>
-        <text x="312" y="196" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + apply(state: TState, move: TMove): TState
-        </text>
-        <text x="312" y="212" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + resolve(state: TState): Resolution
-        </text>
-        <text x="312" y="228" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + evaluate(state: TState): Outcome
-        </text>
-        <text x="312" y="244" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="312" y="180" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + playTurn(state: TState, move: TMove):
         </text>
-        <text x="328" y="260" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="328" y="196" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Resolution
         </text>
         <!-- Class: BaseGameRules (abstract, focal; playTurn() is the template method that the frame and the footnote name, decision 23) -->
@@ -506,7 +494,7 @@
           font-family="'IBM Plex Mono', monospace"
           font-style="italic"
         >
-          + isValid(state: TState, move: TMove): boolean
+          # isValid(state: TState, move: TMove): boolean
         </text>
         <text
           x="300"
@@ -526,7 +514,7 @@
           font-family="'IBM Plex Mono', monospace"
           font-style="italic"
         >
-          + apply(state: TState, move: TMove): TState
+          # apply(state: TState, move: TMove): TState
         </text>
         <text
           x="300"
@@ -536,7 +524,7 @@
           font-family="'IBM Plex Mono', monospace"
           font-style="italic"
         >
-          + resolve(state: TState): Resolution
+          # resolve(state: TState): Resolution
         </text>
         <text
           x="300"
@@ -546,17 +534,17 @@
           font-family="'IBM Plex Mono', monospace"
           font-style="italic"
         >
-          + evaluate(state: TState): Outcome
+          # evaluate(state: TState): Outcome
         </text>
         <text x="300" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           # noValidMove(state: TState): boolean
         </text>
-        <!-- Class: TimedRulesDecorator (a piece of the Decorator pattern: the frame names it, decision 23). It times playTurn() and passes the other five operations to its inner rules (decision 33). -->
+        <!-- Class: TimedRulesDecorator (a piece of the Decorator pattern: the frame names it, decision 23). It times playTurn() and passes validMoves() to its inner rules (decisions 21 and 33). -->
         <rect
           x="704"
           y="336"
           width="280"
-          height="208"
+          height="152"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -582,24 +570,12 @@
           - timer: LevelTimer
         </text>
         <text x="720" y="440" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + isValid(state: TState, move: TMove): boolean
-        </text>
-        <text x="720" y="456" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + validMoves(state: TState): Iterable&lt;TMove&gt;
         </text>
-        <text x="720" y="472" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + apply(state: TState, move: TMove): TState
-        </text>
-        <text x="720" y="488" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + resolve(state: TState): Resolution
-        </text>
-        <text x="720" y="504" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + evaluate(state: TState): Outcome
-        </text>
-        <text x="720" y="520" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="720" y="456" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + playTurn(state: TState, move: TMove):
         </text>
-        <text x="736" y="536" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="736" y="472" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Resolution
         </text>
         <!-- Reference box: GameEngine, detailed in part 1 · view 1 -->
@@ -895,7 +871,7 @@
         >
           TMove, TState
         </text>
-        <!-- Footnote: classes the budget leaves out. The zone grew by 56 for the operations that TimedRulesDecorator passes on (#21). -->
+        <!-- Footnote: classes the budget leaves out. The zone grew by 56 for the operations that TimedRulesDecorator passed on (#21); #413 left it two of them. -->
         <text
           x="24"
           y="704"
@@ -904,7 +880,7 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           GameEngine calls playTurn() through IGameRules and never names BaseGameRules, so the
-          Strategy of D1 stays. playTurn() is the template method over the italic abstract steps.
+          Strategy of D1 stays. playTurn() is the template method over the protected abstract steps.
         </text>
         <text
           x="24"
@@ -933,8 +909,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          The other five operations of TimedRulesDecorator, validMoves() included, pass to the inner
-          rules (decision 33).
+          IGameRules declares only validMoves() and playTurn(), so TimedRulesDecorator passes only
+          validMoves() unchanged to the inner rules (decisions 21 and 33).
         </text>
         <!-- Legend -->
         <line x1="24" y1="772" x2="1016" y2="772" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />

@@ -21,7 +21,7 @@ const GOAL_RUN = 10;
 // A photo never changes, so the rules take a new photo after each change of the state.
 // The rules read no field of a move: they ask the move for its cell (classes.md decision 43).
 export class SortRules<TCoord> extends BaseGameRules<PlaceStack<TCoord>, SortState<TCoord>> {
-  isValid(state: SortState<TCoord>, move: PlaceStack<TCoord>): boolean {
+  protected isValid(state: SortState<TCoord>, move: PlaceStack<TCoord>): boolean {
     return state.canPlace(move.cell());
   }
 
@@ -33,7 +33,7 @@ export class SortRules<TCoord> extends BaseGameRules<PlaceStack<TCoord>, SortSta
     }
   }
 
-  apply(state: SortState<TCoord>, move: PlaceStack<TCoord>): SortState<TCoord> {
+  protected apply(state: SortState<TCoord>, move: PlaceStack<TCoord>): SortState<TCoord> {
     state.placeOfferedStack(move.cell());
     state.countMove();
     return state;
@@ -42,7 +42,7 @@ export class SortRules<TCoord> extends BaseGameRules<PlaceStack<TCoord>, SortSta
   // The cascade starts at the placed stack. Each transfer changes the stacks it touches,
   // so the cascade checks them again. Each transfer joins two runs into one,
   // so the number of runs on the board falls and the cascade ends.
-  resolve(state: SortState<TCoord>): Resolution {
+  protected resolve(state: SortState<TCoord>): Resolution {
     const placedAt = state.snapshot().lastPlacedAt();
     const pending: TCoord[] = placedAt === undefined ? [] : [placedAt];
     for (let at = pending.shift(); at !== undefined; at = pending.shift()) {
@@ -53,7 +53,7 @@ export class SortRules<TCoord> extends BaseGameRules<PlaceStack<TCoord>, SortSta
   }
 
   // The goals reached win. A board with no empty cell, or no stack left to place, loses.
-  evaluate(state: SortState<TCoord>): Outcome {
+  protected evaluate(state: SortState<TCoord>): Outcome {
     const photo = state.snapshot();
     if (photo.goal().isReachedBy(photo.goalsReached())) return Outcome.victory;
     return this.noValidMove(state) ? Outcome.gameOver : Outcome.playing;

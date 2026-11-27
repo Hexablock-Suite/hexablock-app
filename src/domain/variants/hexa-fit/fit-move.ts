@@ -141,8 +141,8 @@ export class RotateFitPiece {
 export type FitMove<TCoord> = PlaceFitPiece<TCoord> | RemoveFitPiece | RotateFitPiece;
 
 // True when `other` is an object of the class of `move`. A move compares its parts only
-// with a move of its own class, so two moves of two kinds are never equal.
-// The check names no move class, so a new kind of move uses it as it is.
+// with a move of its own class, so two moves of two classes are never equal.
+// The check names no move class, so a new move class uses it as it is.
 function isOfClassOf<TMove>(move: TMove, other: unknown): other is TMove {
   return (
     typeof other === 'object' &&

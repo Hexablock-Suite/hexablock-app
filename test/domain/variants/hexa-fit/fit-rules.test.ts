@@ -26,6 +26,7 @@ import { Placement } from '../../../../src/domain/variants/hexa-fit/placement';
 import { FitState, type FitSnapshot } from '../../../../src/domain/variants/hexa-fit/fit-state';
 import { PieceId } from '../../../../src/domain/variants/hexa-fit/piece-id';
 import { fitStateOf } from '../../../support/variants/hexa-fit/fit-game';
+import { accepts } from '../../../support/engine/variant-game';
 import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
 import {
   triangle,
@@ -37,6 +38,7 @@ import { MATCH_ID } from '../../../support/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 import { delivered } from '../../../support/engine/value-receiver';
 import { fitViewData } from '../../../support/variants/view-data';
+import { playMove } from '../../../support/engine/play-move';
 
 // The Fit rules suite (APP-NFR-12: one rules suite per variant).
 // The square double keeps the coordinates easy to read. The triangle double has
@@ -120,7 +122,7 @@ describe('FitRules', () => {
   it('should_put_the_piece_on_its_cells_and_take_it_from_the_tray_when_it_lies_on_free_figure_cells', () => {
     const engine = engineOn(dominoLevel());
 
-    const outcome = engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)));
+    const outcome = playMove(engine, new PlaceFitPiece(A, NO_TURN, square(0, 0)));
 
     expect(outcome).toBe(Outcome.playing);
     expect(cellsOf(engine.snapshot())).toEqual(['0,0=a', '1,0=a']);
@@ -129,10 +131,10 @@ describe('FitRules', () => {
 
   it('should_reject_the_piece_and_keep_the_board_when_it_overlaps_another_piece', () => {
     const engine = engineOn(dominoLevel());
-    engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)));
+    playMove(engine, new PlaceFitPiece(A, NO_TURN, square(0, 0)));
 
     // Both cells lie inside the figure, and both hold the piece a.
-    const outcome = engine.play(new PlaceFitPiece(B, NO_TURN, square(0, 0)));
+    const outcome = playMove(engine, new PlaceFitPiece(B, NO_TURN, square(0, 0)));
 
     expect(outcome).toBe(Outcome.playing);
     expect(cellsOf(engine.snapshot())).toEqual(['0,0=a', '1,0=a']);
@@ -142,7 +144,7 @@ describe('FitRules', () => {
   it('should_reject_the_piece_and_keep_the_board_when_it_leaves_the_figure', () => {
     const engine = engineOn(dominoLevel());
 
-    const outcome = engine.play(new PlaceFitPiece(A, NO_TURN, square(1, 1)));
+    const outcome = playMove(engine, new PlaceFitPiece(A, NO_TURN, square(1, 1)));
 
     expect(outcome).toBe(Outcome.playing);
     expect(cellsOf(engine.snapshot())).toEqual([]);
@@ -153,8 +155,8 @@ describe('FitRules', () => {
     const rules = new FitRules<SquareCoord>();
     const state = played(rules, dominoLevel(), new PlaceFitPiece(A, NO_TURN, square(0, 0)));
 
-    expect(rules.isValid(state, new PlaceFitPiece(A, NO_TURN, square(0, 1)))).toBe(false);
-    expect(rules.isValid(state, new PlaceFitPiece(PieceId.of('z'), NO_TURN, square(0, 1)))).toBe(
+    expect(accepts(rules, state, new PlaceFitPiece(A, NO_TURN, square(0, 1)))).toBe(false);
+    expect(accepts(rules, state, new PlaceFitPiece(PieceId.of('z'), NO_TURN, square(0, 1)))).toBe(
       false,
     );
   });
@@ -163,16 +165,16 @@ describe('FitRules', () => {
     const engine = engineOn(dominoLevel());
 
     // A quarter turn maps the cells (0,0) and (1,0) to (0,0) and (0,1).
-    engine.play(new PlaceFitPiece(A, Turns.of(1), square(1, 0)));
+    playMove(engine, new PlaceFitPiece(A, Turns.of(1), square(1, 0)));
 
     expect(cellsOf(engine.snapshot())).toEqual(['1,0=a', '1,1=a']);
   });
 
   it('should_free_the_cells_and_return_the_piece_to_the_tray_when_a_placed_piece_is_removed', () => {
     const engine = engineOn(dominoLevel());
-    engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)));
+    playMove(engine, new PlaceFitPiece(A, NO_TURN, square(0, 0)));
 
-    const outcome = engine.play(new RemoveFitPiece(A));
+    const outcome = playMove(engine, new RemoveFitPiece(A));
 
     expect(outcome).toBe(Outcome.playing);
     expect(cellsOf(engine.snapshot())).toEqual([]);
@@ -234,10 +236,10 @@ describe('FitRules', () => {
 
   it('should_turn_the_piece_over_its_own_cell_when_the_turned_piece_keeps_that_cell', () => {
     const engine = engineOn(dominoLevel());
-    engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)));
+    playMove(engine, new PlaceFitPiece(A, NO_TURN, square(0, 0)));
 
     // A quarter turn keeps the cell (0,0), which the piece a already holds.
-    const outcome = engine.play(new RotateFitPiece(A, Turns.of(1)));
+    const outcome = playMove(engine, new RotateFitPiece(A, Turns.of(1)));
 
     expect(outcome).toBe(Outcome.playing);
     expect(cellsOf(engine.snapshot())).toEqual(['0,0=a', '0,1=a']);
@@ -245,10 +247,10 @@ describe('FitRules', () => {
 
   it('should_reject_a_rotation_and_keep_the_board_when_the_turned_piece_leaves_the_figure', () => {
     const engine = engineOn(dominoLevel());
-    engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 1)));
+    playMove(engine, new PlaceFitPiece(A, NO_TURN, square(0, 1)));
 
     // A quarter turn would put the second cell on (0,2), below the figure.
-    const outcome = engine.play(new RotateFitPiece(A, Turns.of(1)));
+    const outcome = playMove(engine, new RotateFitPiece(A, Turns.of(1)));
 
     expect(outcome).toBe(Outcome.playing);
     expect(cellsOf(engine.snapshot())).toEqual(['0,1=a', '1,1=a']);
@@ -256,9 +258,9 @@ describe('FitRules', () => {
 
   it('should_win_and_record_game_over_when_the_pieces_cover_the_figure_exactly', () => {
     const engine = engineOn(dominoLevel());
-    engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)));
+    playMove(engine, new PlaceFitPiece(A, NO_TURN, square(0, 0)));
 
-    const outcome = engine.play(new PlaceFitPiece(B, NO_TURN, square(0, 1)));
+    const outcome = playMove(engine, new PlaceFitPiece(B, NO_TURN, square(0, 1)));
 
     expect(outcome).toBe(Outcome.victory);
     expect(engine.currentPhase()).toBe(VictoryPhase.instance);
@@ -279,7 +281,7 @@ describe('FitRules', () => {
       FitState.start(STATE_ID, MATCH_ID, figure(squareTopology, shape), pieces()),
     );
 
-    const outcome = engine.play(new PlaceFitPiece(A, NO_TURN, square(1, 0)));
+    const outcome = playMove(engine, new PlaceFitPiece(A, NO_TURN, square(1, 0)));
 
     expect(outcome).toBe(Outcome.playing);
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
@@ -296,7 +298,7 @@ describe('FitRules', () => {
     const moves = [...rules.validMoves(state)];
 
     expect(moves.length).toBeGreaterThan(0);
-    for (const move of moves) expect(rules.isValid(state, move)).toBe(true);
+    for (const move of moves) expect(accepts(rules, state, move)).toBe(true);
     expect(moves).toContainEqual(new PlaceFitPiece(B, NO_TURN, square(0, 1)));
     expect(moves).toContainEqual(new RemoveFitPiece(A));
   });
@@ -398,10 +400,9 @@ describe('FitRules edge cases', () => {
     );
     const engine = engineOn(empty);
 
-    const outcome = engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)));
+    const outcome = playMove(engine, new PlaceFitPiece(A, NO_TURN, square(0, 0)));
 
     expect(trayOf(empty)).toEqual([]);
-    expect(rules.evaluate(empty)).toBe(Outcome.playing);
     expect([...rules.validMoves(empty)]).toEqual([]);
     expect(outcome).toBe(Outcome.playing);
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
@@ -421,8 +422,8 @@ describe('FitRules edge cases', () => {
     );
     const engine = engineOn(start);
 
-    const overlap = engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)));
-    const free = engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 1)));
+    const overlap = playMove(engine, new PlaceFitPiece(A, NO_TURN, square(0, 0)));
+    const free = playMove(engine, new PlaceFitPiece(A, NO_TURN, square(0, 1)));
 
     expect(cellsOf(start)).toEqual(['0,0=x']);
     expect(overlap).toBe(Outcome.playing);
@@ -436,47 +437,50 @@ describe('FitRules edge cases', () => {
     const rules = new FitRules<SquareCoord>();
     const state = dominoLevel();
 
-    expect(() => rules.apply(state, new RotateFitPiece(A, Turns.of(1)))).toThrow(
+    const rotate = new RotateFitPiece(A, Turns.of(1));
+
+    // `playTurn()` rejects the move first, so the test asks the move for its change.
+    expect(rules.playTurn(state, rotate).wasAccepted()).toBe(false);
+    expect(() => rotate.applyTo(state)).toThrow(
       new RangeError('The piece is not on the figure.', { cause: A }),
     );
     expect(cellsOf(state)).toEqual([]);
     expect(trayOf(state)).toEqual(['a', 'b']);
   });
 
-  it('should_throw_a_range_error_and_keep_the_game_when_a_move_of_unknown_kind_arrives_through_a_cast', () => {
+  // Issue #425: no Fit move has a `kind`, so the message names the class of the value.
+  it('should_throw_a_range_error_that_names_the_class_and_keep_the_game_when_an_unknown_move_arrives_through_a_cast', () => {
     // A value outside the `FitMove` union reaches the rules only through a cast (fit-rules.ts).
+    class JumpMove {}
     const rules = new FitRules<SquareCoord>();
-    const jump = { kind: 'jump', pieceId: A } as unknown as FitMove<SquareCoord>;
+    const jump = new JumpMove() as unknown as FitMove<SquareCoord>;
+    const state = dominoLevel();
     const engine = engineOn(dominoLevel());
 
-    expect(() => rules.isValid(dominoLevel(), jump)).toThrow(RangeError);
-    expect(() => rules.isValid(dominoLevel(), jump)).toThrow('Unknown Fit move: jump.');
-    expect(() => rules.apply(dominoLevel(), jump)).toThrow(RangeError);
-    expect(() => rules.apply(dominoLevel(), jump)).toThrow('Unknown Fit move: jump.');
-    expect(() => engine.play(jump)).toThrow(RangeError);
+    expect(() => rules.playTurn(state, jump)).toThrow(
+      new RangeError('Unknown Fit move: JumpMove.'),
+    );
+    expect(() => playMove(engine, jump)).toThrow(new RangeError('Unknown Fit move: JumpMove.'));
+    expect(cellsOf(state)).toEqual([]);
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(cellsOf(engine.snapshot())).toEqual([]);
     expect(trayOf(engine.snapshot())).toEqual(['a', 'b']);
   });
 
   // Issue #244: the rules ask each move for its own check and its own change.
-  // An object that holds the parts of a move has no move operation, so it is no move,
-  // even when it carries the `kind` of a move.
-  it('should_throw_a_range_error_and_keep_the_state_when_an_object_with_the_parts_of_a_move_arrives_through_a_cast', () => {
+  // An object that holds the parts of a move has no move operation, so it is no move.
+  // Issue #425: the message names the class of the value, and it reads no `kind`.
+  it('should_throw_a_range_error_that_names_the_class_and_keep_the_state_when_an_object_with_the_parts_of_a_move_arrives_through_a_cast', () => {
     const rules = new FitRules<SquareCoord>();
     const state = dominoLevel();
-    const cast = (value: object) => value as unknown as FitMove<SquareCoord>;
-    const place = cast({ kind: 'place', pieceId: A, rotation: NO_TURN, at: square(0, 0) });
-    const bare = cast({ pieceId: A });
+    const cast = (value: unknown) => value as FitMove<SquareCoord>;
+    const place = cast({ pieceId: A, rotation: NO_TURN, at: square(0, 0) });
+    const bare = cast(Object.assign(Object.create(null) as object, { pieceId: A }));
+    const empty = cast(null);
 
-    expect(() => rules.isValid(state, place)).toThrow(RangeError);
-    expect(() => rules.isValid(state, place)).toThrow(new RangeError('Unknown Fit move: place.'));
-    expect(() => rules.apply(state, place)).toThrow(RangeError);
-    expect(() => rules.apply(state, place)).toThrow(new RangeError('Unknown Fit move: place.'));
-    expect(() => rules.isValid(state, bare)).toThrow(
-      new RangeError('Unknown Fit move: undefined.'),
-    );
-    expect(() => rules.apply(state, bare)).toThrow(new RangeError('Unknown Fit move: undefined.'));
+    expect(() => rules.playTurn(state, place)).toThrow(new RangeError('Unknown Fit move: Object.'));
+    expect(() => rules.playTurn(state, bare)).toThrow(new RangeError('Unknown Fit move: object.'));
+    expect(() => rules.playTurn(state, empty)).toThrow(new RangeError('Unknown Fit move: null.'));
     expect(cellsOf(state)).toEqual([]);
     expect(trayOf(state)).toEqual(['a', 'b']);
     expect(state.snapshot().moveCount()).toEqual(Moves.of(0));
@@ -523,14 +527,14 @@ describe('FitRules edge cases', () => {
       ),
     );
 
-    expect(() => engine.play(new PlaceFitPiece(A, Turns.of(2), square(1, 0)))).toThrow(
+    expect(() => playMove(engine, new PlaceFitPiece(A, Turns.of(2), square(1, 0)))).toThrow(
       'The topology failed.',
     );
 
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
     expect(cellsOf(engine.snapshot())).toEqual([]);
     expect(trayOf(engine.snapshot())).toEqual(['a', 'b']);
-    expect(engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)))).toBe(Outcome.playing);
+    expect(playMove(engine, new PlaceFitPiece(A, NO_TURN, square(0, 0)))).toBe(Outcome.playing);
     expect(cellsOf(engine.snapshot())).toEqual(['0,0=a', '1,0=a']);
   });
 
@@ -550,9 +554,9 @@ describe('FitRules edge cases', () => {
         new FixedListPieceSource([piece(A, domino), piece(B, domino)]),
       ),
     );
-    engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)));
+    playMove(engine, new PlaceFitPiece(A, NO_TURN, square(0, 0)));
 
-    const outcome = engine.play(new RotateFitPiece(A, Turns.of(1)));
+    const outcome = playMove(engine, new RotateFitPiece(A, Turns.of(1)));
 
     expect(outcome).toBe(Outcome.playing);
     expect(engine.currentPhase()).toBe(PlayingPhase.instance);
@@ -582,7 +586,7 @@ describe('FitRules move count', () => {
 
   it('should_keep_the_move_count_when_a_move_is_rejected', () => {
     const engine = engineOn(dominoLevel());
-    engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 1)));
+    playMove(engine, new PlaceFitPiece(A, NO_TURN, square(0, 1)));
 
     // B overlaps A, a quarter turn puts A below the figure, and B is not on the figure.
     const reports = [
@@ -627,18 +631,18 @@ describe('FitRules in place', () => {
       new RotateFitPiece(A, Turns.of(1)),
       new RemoveFitPiece(A),
     ]) {
-      const result = rules.apply(state, move);
+      const accepted = rules.playTurn(state, move).wasAccepted();
       seen.push({
-        same: result === state,
+        accepted,
         cells: cellsOf(state),
         moves: state.snapshot().moveCount(),
       });
     }
 
     expect(seen).toEqual([
-      { same: true, cells: ['0,0=a', '1,0=a'], moves: Moves.of(1) },
-      { same: true, cells: ['0,0=a', '0,1=a'], moves: Moves.of(2) },
-      { same: true, cells: [], moves: Moves.of(3) },
+      { accepted: true, cells: ['0,0=a', '1,0=a'], moves: Moves.of(1) },
+      { accepted: true, cells: ['0,0=a', '0,1=a'], moves: Moves.of(2) },
+      { accepted: true, cells: [], moves: Moves.of(3) },
     ]);
     // The board keeps its id: the same board changes in place.
     expect(state.snapshot().boardCopy().equals(board)).toBe(true);
@@ -654,7 +658,7 @@ describe('FitRules in place', () => {
     };
     const engine = engineOn(dominoLevel(), failing);
     const playing = engineOn(dominoLevel());
-    playing.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)));
+    playMove(playing, new PlaceFitPiece(A, NO_TURN, square(0, 0)));
     const placed = engineOn(fitStateOf(playing.snapshot(), dominoPieces()), failing);
     const facts = (state: FitSnapshot<SquareCoord>) => ({
       cells: cellsOf(state),
@@ -664,11 +668,34 @@ describe('FitRules in place', () => {
     });
     const before = [facts(engine.snapshot()), facts(placed.snapshot())];
 
-    expect(() => engine.play(new PlaceFitPiece(A, NO_TURN, square(0, 0)))).toThrow(
+    expect(() => playMove(engine, new PlaceFitPiece(A, NO_TURN, square(0, 0)))).toThrow(
       'The scoring fails.',
     );
-    expect(() => placed.play(new RotateFitPiece(A, Turns.of(1)))).toThrow('The scoring fails.');
-    expect(() => placed.play(new RemoveFitPiece(A))).toThrow('The scoring fails.');
+    expect(() => playMove(placed, new RotateFitPiece(A, Turns.of(1)))).toThrow(
+      'The scoring fails.',
+    );
+    expect(() => playMove(placed, new RemoveFitPiece(A))).toThrow('The scoring fails.');
     expect([facts(engine.snapshot()), facts(placed.snapshot())]).toEqual(before);
+  });
+});
+
+// Issue #413: only the template method calls the steps (classes.md decision 21).
+// A `@ts-expect-error` line is a compile-time test: `pnpm typecheck` fails
+// when the line compiles, because then the directive is unused.
+describe('FitRules steps', () => {
+  it('should_reject_at_compile_time_when_a_caller_asks_a_step_of_the_fit_rules', () => {
+    const rules = new FitRules<SquareCoord>();
+    const askSteps = () => [
+      // @ts-expect-error The step is protected (issue #413).
+      rules.isValid(undefined as never, undefined as never),
+      // @ts-expect-error The step is protected (issue #413).
+      rules.apply(undefined as never, undefined as never),
+      // @ts-expect-error The step is protected (issue #413).
+      rules.resolve(undefined as never),
+      // @ts-expect-error The step is protected (issue #413).
+      rules.evaluate(undefined as never),
+    ];
+
+    expect(askSteps).toBeInstanceOf(Function);
   });
 });

@@ -45,8 +45,8 @@ export class Resolution {
     return phase.after(this.outcome);
   }
 
-  // The outcome that the turn leads to. Three readers need the value itself:
-  // the `GameOver` event carries it, `GameEngine.play()` returns it,
+  // The outcome that the turn leads to. Two readers need the value itself:
+  // the `GameOver` event that `GameEngine` builds carries it,
   // and `ApplyMove` puts it in `MoveResult` (classes.md decisions 26 and 29).
   leadsTo(): Outcome {
     return this.outcome;

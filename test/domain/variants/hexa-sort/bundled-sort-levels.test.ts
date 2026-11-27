@@ -18,6 +18,7 @@ import { seededRandom } from '../../../support/engine/step-random';
 import { repoRoot } from '../../../support/run-tool';
 import { names } from '../../../support/variants/hexa-sort/sort-game';
 import { sortLevelFile } from '../../../support/variants/hexa-sort/sort-level-file';
+import { playMove } from '../../../support/engine/play-move';
 
 // The bundled Sort levels (issue #167, APP-FR-05, A4). Each file follows the shared level format
 // of hexablock-api `docs/level-format.md`. The test reads every file of the folder,
@@ -126,7 +127,7 @@ function offeredInTwoGames(file: LevelFile): string[][][] {
         const { engine } = startVariant(factory);
         const offered = [names(engine.snapshot().offeredStack())];
         for (const at of figureOf(file).apart) {
-          engine.play(PlaceStack.on(geometry.createCoord([...at])));
+          playMove(engine, PlaceStack.on(geometry.createCoord([...at])));
           offered.push(names(engine.snapshot().offeredStack()));
         }
         return offered;
@@ -163,7 +164,9 @@ function planPlay(
     use: (geometry) => {
       const level = built(file, geometry);
       const { engine } = startVariant(new SortFactory(geometry, level, seededRandom(1)));
-      const outcomes = plan.map((at) => engine.play(PlaceStack.on(geometry.createCoord([...at]))));
+      const outcomes = plan.map((at) =>
+        playMove(engine, PlaceStack.on(geometry.createCoord([...at]))),
+      );
       return { outcomes, stars: level.starsFor(Moves.of(plan.length), undefined) };
     },
   });

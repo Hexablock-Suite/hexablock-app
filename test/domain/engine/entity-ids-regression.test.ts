@@ -12,7 +12,6 @@ import { PlayingPhase } from '../../../src/domain/engine/game-phase';
 import { LevelTimer } from '../../../src/domain/engine/level-timer';
 import { MatchId } from '../../../src/domain/engine/match-id';
 import type { MatchIdGenerator } from '../../../src/domain/engine/match-id-generator';
-import type { Outcome } from '../../../src/domain/engine/outcome';
 import type { Resolution } from '../../../src/domain/engine/resolution';
 import type { IGameRules } from '../../../src/domain/engine/rules';
 import { Turns } from '../../../src/domain/engine/turns';
@@ -42,6 +41,7 @@ import { linesFactory, linesStateOf } from '../../support/variants/hexa-lines/li
 import { mergeFactory, mergeStateOf } from '../../support/variants/hexa-merge/merge-game';
 import { place, sortFactory, sortStateOf } from '../../support/variants/hexa-sort/sort-game';
 import { viewData } from '../../support/variants/view-data';
+import { playMove } from '../../support/engine/play-move';
 
 // The regression probe of T18 (classes.md decisions 7 and 26). The verifier of the own ids
 // wrote it. It pins four things at the public interface:
@@ -258,24 +258,8 @@ function allKept(results: readonly ReturnType<typeof throwOf>[]) {
 class ThrowingAfterTurnRules<TMove, TState> implements IGameRules<TMove, TState> {
   constructor(private readonly inner: IGameRules<TMove, TState>) {}
 
-  isValid(state: TState, move: TMove): boolean {
-    return this.inner.isValid(state, move);
-  }
-
   validMoves(state: TState): Iterable<TMove> {
     return this.inner.validMoves(state);
-  }
-
-  apply(state: TState, move: TMove): TState {
-    return this.inner.apply(state, move);
-  }
-
-  resolve(state: TState): Resolution {
-    return this.inner.resolve(state);
-  }
-
-  evaluate(state: TState): Outcome {
-    return this.inner.evaluate(state);
   }
 
   playTurn(state: TState, move: TMove): Resolution {
@@ -371,7 +355,7 @@ describe('own ids of the board and the states (T18 probe)', () => {
     const first = games.createGame();
     const second = games.createGame();
 
-    first.play(new PlaceFitPiece(A, Turns.of(0), square(0, 0)));
+    playMove(first, new PlaceFitPiece(A, Turns.of(0), square(0, 0)));
     clock.advance(1_000);
 
     expect([first.elapsedTime(), second.elapsedTime()]).toEqual([
@@ -394,7 +378,7 @@ describe('own ids of the board and the states (T18 probe)', () => {
     const state = sortFactory().createInitialState(MATCH_ID, STATE_ID, BOARD_ID);
     const earlier = state.clone();
 
-    game.play(place(0, 0));
+    playMove(game, place(0, 0));
     state.placeOfferedStack(square(0, 0));
 
     expect([before, game.snapshot()].every((photo) => photo.isPhotoOf(FIRST_STATE))).toBe(true);

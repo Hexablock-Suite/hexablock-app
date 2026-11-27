@@ -21,7 +21,7 @@ const NO_TURN = Turns.of(0);
 // `placed()` and `remaining()`. They read no field of the board, of a piece or of a move
 // (classes.md decisions 43 and 49). They ask the board for its coordinates and its full turn.
 export class FitRules<TCoord> extends BaseGameRules<FitMove<TCoord>, FitState<TCoord>> {
-  isValid(state: FitState<TCoord>, move: FitMove<TCoord>): boolean {
+  protected isValid(state: FitState<TCoord>, move: FitMove<TCoord>): boolean {
     return knownMove(move).isValidOn(state, state.snapshot());
   }
 
@@ -52,28 +52,36 @@ export class FitRules<TCoord> extends BaseGameRules<FitMove<TCoord>, FitState<TC
   }
 
   // The move changes the state in place, and the rules return the same state object.
-  apply(state: FitState<TCoord>, move: FitMove<TCoord>): FitState<TCoord> {
+  protected apply(state: FitState<TCoord>, move: FitMove<TCoord>): FitState<TCoord> {
     knownMove(move).applyTo(state);
     state.countMove();
     return state;
   }
 
   // Fit has no resolution: the move only places, removes or turns a piece.
-  resolve(_state: FitState<TCoord>): Resolution {
+  protected resolve(_state: FitState<TCoord>): Resolution {
     return Resolution.resolved();
   }
 
   // A piece goes only on free figure cells, so a full figure is an exact cover.
-  evaluate(state: FitState<TCoord>): Outcome {
+  protected evaluate(state: FitState<TCoord>): Outcome {
     return state.snapshot().boardCopy().isFull() ? Outcome.victory : Outcome.playing;
   }
 }
 
 // A value outside the `FitMove` union reaches the rules only through a cast.
 // It has no move operations, so the rules refuse it with a RangeError before they call one.
-// The message names the `kind` text that it carries.
-// A null or undefined value passes the optional read, and its `kind` read throws a TypeError.
+// The message names the class of the value, so a reader sees what arrived (issue #425).
 function knownMove<TCoord>(move: FitMove<TCoord>): FitMove<TCoord> {
   if (typeof move?.isValidOn === 'function' && typeof move.applyTo === 'function') return move;
-  throw new RangeError(`Unknown Fit move: ${String((move as { kind?: unknown }).kind)}.`);
+  throw new RangeError(`Unknown Fit move: ${classNameOf(move)}.`);
+}
+
+// The name of the constructor of a value. A value with no named constructor,
+// such as `null` or an object with no prototype, gives its type instead.
+function classNameOf(value: unknown): string {
+  if (value === null) return 'null';
+  const maker: unknown = (value as { constructor?: unknown } | undefined)?.constructor;
+  if (typeof maker === 'function' && maker.name !== '') return maker.name;
+  return typeof value;
 }

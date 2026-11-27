@@ -6,7 +6,7 @@ import { ClearedStacks } from '../../../src/domain/variants/hexa-sort/cleared-st
 import { GoalCount } from '../../../src/domain/variants/hexa-sort/goal-count';
 import { SortState } from '../../../src/domain/variants/hexa-sort/sort-state';
 import { square, squareTopology } from '../../support/engine/square-topology';
-import { firstValidMove } from '../../support/engine/variant-game';
+import { firstValidMove, playedOn } from '../../support/engine/variant-game';
 import { A, fitFactory } from '../../support/variants/hexa-fit/fit-game';
 import { linesState, piece } from '../../support/variants/hexa-lines/lines-game';
 import { mergeBoard, mergeState, noNewTiles } from '../../support/variants/hexa-merge/merge-game';
@@ -131,7 +131,7 @@ describe('the view of each variant state', () => {
     const domino = start.piece(A);
 
     const before = start.snapshot().view();
-    const after = rules.apply(start, firstValidMove(rules, start)).snapshot().view();
+    const after = playedOn(rules, start, firstValidMove(rules, start)).snapshot().view();
 
     expect(fitViewData(before)).toEqual({ remaining: [domino], placed: [], moves: Moves.of(0) });
     expect(fitViewData(after)).toEqual({ remaining: [], placed: [A], moves: Moves.of(1) });
