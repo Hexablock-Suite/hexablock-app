@@ -63,7 +63,7 @@
       <p class="eyebrow">Use case flow · Login · class view</p>
       <h1>Login across the layers: the classes of one sign-in</h1>
       <svg
-        viewBox="0 0 1100 1186"
+        viewBox="0 0 1100 1250"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="flowlogin-title flowlogin-desc"
@@ -72,12 +72,13 @@
         <desc id="flowlogin-desc">
           Cross-layer class diagram of the Login use case only. In layer 4, AccountScreen uses
           AccountPresenter; ApiClient, the driver, implements the AccountApi transport interface of
-          layer 3 (decision 22); SessionManager implements the SessionStore port of layer 2. In
-          layer 3, AccountPresenter uses the UseCase input port, and ApiAccountGateway keeps
-          ApiDtoMapper and AccountApi and implements the AccountGateway port of layer 2. In layer 2,
-          Login implements UseCase, takes Credentials and keeps the AccountGateway and SessionStore
-          ports; AccountGateway returns a Session. Login touches no entity of layer 1. Every
-          dependency between layers points down.
+          layer 3 (decision 22); DeviceSecretStore, the driver of the secure storage, implements the
+          SecretStore driver interface of layer 3. In layer 3, AccountPresenter uses the UseCase
+          input port; ApiAccountGateway keeps ApiDtoMapper and AccountApi and implements the
+          AccountGateway port of layer 2; SessionManager keeps SecretStore and implements the
+          SessionStore port of layer 2. In layer 2, Login implements UseCase, takes Credentials and
+          keeps the AccountGateway and SessionStore ports; AccountGateway returns a Session. Login
+          touches no entity of layer 1. Every dependency between layers points down.
         </desc>
         <defs>
           <marker
@@ -131,7 +132,7 @@
           x="24"
           y="208"
           width="1052"
-          height="292"
+          height="340"
           rx="8"
           fill="#e2ebf8"
           stroke="rgba(29,78,216,0.40)"
@@ -151,7 +152,7 @@
         <!-- Layer zone: layer 2 -->
         <rect
           x="24"
-          y="508"
+          y="556"
           width="1052"
           height="464"
           rx="8"
@@ -161,7 +162,7 @@
         />
         <text
           x="40"
-          y="528"
+          y="576"
           fill="#7e22ce"
           font-size="8"
           font-weight="500"
@@ -173,7 +174,7 @@
         <!-- Relationships (drawn before boxes) -->
         <!-- ApiAccountGateway keeps the ApiDtoMapper it receives as mapper: use with role and multiplicity, inside layer 3 -->
         <path
-          d="M740 380 V356"
+          d="M740 380 V360"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -181,7 +182,7 @@
         />
         <!-- ApiAccountGateway keeps the AccountApi it receives as api: use with role and multiplicity, inside layer 3 -->
         <path
-          d="M940 380 V316"
+          d="M940 380 V348"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -189,7 +190,7 @@
         />
         <!-- ApiClient implements AccountApi: realization, down from layer 4 to layer 3 (decision 22) -->
         <path
-          d="M930 164 V232"
+          d="M930 168 V232"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -204,9 +205,26 @@
           stroke-width="1"
           marker-end="url(#flowlogin-open)"
         />
-        <!-- SessionManager implements SessionStore: realization, down from layer 4 to layer 2 -->
+        <!-- DeviceSecretStore implements SecretStore: realization, down from layer 4 to layer 3 (#45) -->
         <path
-          d="M316 144 V688"
+          d="M320 152 V232"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#flowlogin-triangle)"
+        />
+        <!-- SessionManager keeps the SecretStore it receives as secrets: use with role and multiplicity, inside layer 3 -->
+        <path
+          d="M180 380 V320"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#flowlogin-open)"
+        />
+        <!-- SessionManager implements SessionStore: realization, down from layer 3 to layer 2 (decision 18) -->
+        <path
+          d="M300 492 V736"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -215,7 +233,7 @@
         />
         <!-- ApiAccountGateway implements AccountGateway: realization, down from layer 3 to layer 2 -->
         <path
-          d="M860 492 V688"
+          d="M860 508 V736"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -224,7 +242,7 @@
         />
         <!-- AccountPresenter keeps the UseCase input port it receives as login: use with role and multiplicity, down from layer 3 to layer 2 -->
         <path
-          d="M400 484 V552"
+          d="M400 516 V600"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -232,7 +250,7 @@
         />
         <!-- Login implements UseCase: realization -->
         <path
-          d="M500 688 V624"
+          d="M500 736 V672"
           fill="none"
           stroke="#17212a"
           stroke-width="1"
@@ -241,7 +259,7 @@
         />
         <!-- Login keeps the SessionStore it receives as session: use with role and multiplicity -->
         <path
-          d="M380 736 H320"
+          d="M380 784 H320"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -249,7 +267,7 @@
         />
         <!-- Login keeps the AccountGateway it receives as accounts: use with role and multiplicity -->
         <path
-          d="M620 736 H680"
+          d="M620 784 H680"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -257,7 +275,7 @@
         />
         <!-- Login takes Credentials: use -->
         <path
-          d="M500 828 V868"
+          d="M500 876 V916"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -265,17 +283,17 @@
         />
         <!-- AccountGateway returns Session values: use -->
         <path
-          d="M850 776 V868"
+          d="M850 824 V916"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#flowlogin-open)"
         />
         <!-- Arrow labels -->
-        <rect x="502" y="843" width="34.4" height="12" rx="2" fill="#efe7f8" />
+        <rect x="502" y="891" width="34.4" height="12" rx="2" fill="#efe7f8" />
         <text
           x="506"
-          y="852"
+          y="900"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -284,10 +302,10 @@
         >
           TAKES
         </text>
-        <rect x="852" y="817" width="44.96" height="12" rx="2" fill="#efe7f8" />
+        <rect x="852" y="865" width="44.96" height="12" rx="2" fill="#efe7f8" />
         <text
           x="856"
-          y="826"
+          y="874"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -309,16 +327,28 @@
           mapper
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="942" y="330" width="28" height="12" rx="2" fill="#e2ebf8" />
+        <rect x="942" y="356" width="28" height="12" rx="2" fill="#e2ebf8" />
         <text
           x="944"
-          y="339"
+          y="365"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="start"
         >
           api
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <rect x="184" y="344" width="50.2" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="186"
+          y="353"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          secrets
           <tspan font-weight="600">1</tspan>
         </text>
         <rect x="484" y="371" width="59.8" height="12" rx="2" fill="#e2ebf8" />
@@ -333,10 +363,10 @@
           presenter
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="404" y="535" width="40.6" height="12" rx="2" fill="#efe7f8" />
+        <rect x="404" y="583" width="40.6" height="12" rx="2" fill="#efe7f8" />
         <text
           x="406"
-          y="544"
+          y="592"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -345,10 +375,10 @@
           login
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="322" y="723" width="50.2" height="12" rx="2" fill="#efe7f8" />
+        <rect x="322" y="771" width="50.2" height="12" rx="2" fill="#efe7f8" />
         <text
           x="324"
-          y="732"
+          y="780"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -357,10 +387,10 @@
           session
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="623" y="723" width="55" height="12" rx="2" fill="#efe7f8" />
+        <rect x="623" y="771" width="55" height="12" rx="2" fill="#efe7f8" />
         <text
           x="676"
-          y="732"
+          y="780"
           fill="#17212a"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -369,20 +399,111 @@
           accounts
           <tspan font-weight="600">1</tspan>
         </text>
-        <!-- Class: SessionManager (driver, single scope) -->
+        <!-- Class: DeviceSecretStore (driver of SecretStore, #45) -->
         <rect
           x="40"
           y="56"
-          width="290"
+          width="300"
+          height="96"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="40" y1="112" x2="340" y2="112" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="190"
+          y="74"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «driver»
+        </text>
+        <text
+          x="190"
+          y="92"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          DeviceSecretStore
+        </text>
+        <text
+          x="190"
+          y="106"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          device-secret-store.ts
+        </text>
+        <text x="56" y="128" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + get(key: string): Promise&lt;string | undefined&gt;
+        </text>
+        <text x="56" y="144" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + set(key: string, value: string): Promise&lt;void&gt;
+        </text>
+        <!-- Class: SecretStore (driver interface of layer 3, #45) -->
+        <rect
+          x="40"
+          y="232"
+          width="300"
           height="88"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
+        <line x1="40" y1="280" x2="340" y2="280" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="185"
-          y="86"
+          x="190"
+          y="250"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface»
+        </text>
+        <text
+          x="190"
+          y="268"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          SecretStore
+        </text>
+        <text x="56" y="296" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + get(key: string): Promise&lt;string | undefined&gt;
+        </text>
+        <text x="56" y="312" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + set(key: string, value: string): Promise&lt;void&gt;
+        </text>
+        <!-- Class: SessionManager (adapter of SessionStore, single scope, decision 18) -->
+        <rect
+          x="40"
+          y="380"
+          width="280"
+          height="112"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="40" y1="428" x2="320" y2="428" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="180"
+          y="410"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -390,23 +511,23 @@
           text-anchor="middle"
         >
           SessionManager
-          <tspan data-requirement="APP-FR-12" fill="#5b6873" font-size="8" font-weight="400">
-            «Sprint 4»
-          </tspan>
         </text>
-        <line x1="40" y1="104" x2="330" y2="104" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="56" y="120" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="40" y1="452" x2="320" y2="452" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="56" y="444" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - secrets: SecretStore
+        </text>
+        <text x="56" y="468" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + read(): Promise&lt;Session | undefined&gt;
+        </text>
+        <text x="56" y="484" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + write(session: Session): Promise&lt;void&gt;
-        </text>
-        <text x="56" y="136" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
-          secure storage library to choose
         </text>
         <!-- Class: ApiDtoMapper (DTO mapper) -->
         <rect
           x="500"
           y="232"
           width="280"
-          height="124"
+          height="128"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -434,9 +555,6 @@
           text-anchor="middle"
         >
           ApiDtoMapper
-          <tspan data-requirement="APP-FR-12" fill="#5b6873" font-size="8" font-weight="400">
-            «Sprint 4»
-          </tspan>
         </text>
         <text x="516" y="296" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + toCredentialsDto(credentials: Credentials):
@@ -445,9 +563,12 @@
           CredentialsDto
         </text>
         <text x="516" y="324" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + toSession(dto: TokenDto): Session
+          + toSession(token: TokenDto,
         </text>
-        <text x="516" y="348" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="532" y="336" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          user: CurrentUserDto): Session
+        </text>
+        <text x="516" y="352" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
           other mappings: view 4.2
         </text>
         <!-- Class: ApiClient (HTTP client, a type alias: the driver of the transport interfaces of layer 3, decision 22) -->
@@ -455,7 +576,7 @@
           x="800"
           y="56"
           width="260"
-          height="108"
+          height="112"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -498,26 +619,25 @@
           + getHealth(): Promise&lt;HealthDto&gt;
         </text>
         <text x="816" y="144" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + signIn(body: CredentialsDto):
+          + signUp(), signIn(), currentUser()
         </text>
-        <text x="832" y="156" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          Promise&lt;TokenDto&gt;
-          <tspan data-requirement="APP-FR-12" fill="#5b6873" font-size="8">«Sprint 4»</tspan>
+        <text x="816" y="160" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          as AccountApi declares them
         </text>
         <!-- Class: AccountApi (transport interface of layer 3, decision 22) -->
         <rect
-          x="800"
+          x="790"
           y="232"
-          width="260"
-          height="84"
+          width="276"
+          height="116"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="800" y1="280" x2="1060" y2="280" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="790" y1="280" x2="1066" y2="280" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
-          x="930"
+          x="928"
           y="250"
           fill="#5b6873"
           font-size="8"
@@ -528,7 +648,7 @@
           «interface»
         </text>
         <text
-          x="930"
+          x="928"
           y="268"
           fill="#17212a"
           font-size="12"
@@ -537,15 +657,18 @@
           text-anchor="middle"
         >
           AccountApi
-          <tspan data-requirement="APP-FR-12" fill="#5b6873" font-size="8" font-weight="400">
-            «Sprint 4»
-          </tspan>
         </text>
-        <text x="816" y="296" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + signIn(body: CredentialsDto):
+        <text x="806" y="296" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + signUp(body: CredentialsDto): Promise&lt;void&gt;
         </text>
-        <text x="832" y="308" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          Promise&lt;TokenDto&gt;
+        <text x="806" y="312" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + signIn(body: LoginDto): Promise&lt;TokenDto&gt;
+        </text>
+        <text x="806" y="328" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + currentUser(token: string):
+        </text>
+        <text x="822" y="340" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Promise&lt;CurrentUserDto&gt;
         </text>
         <!-- Class: AccountScreen (component, route) -->
         <rect
@@ -579,9 +702,6 @@
           text-anchor="middle"
         >
           AccountScreen
-          <tspan data-requirement="APP-FR-12" fill="#5b6873" font-size="8" font-weight="400">
-            «Sprint 4»
-          </tspan>
         </text>
         <line x1="360" y1="104" x2="620" y2="104" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="376" y="120" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
@@ -595,7 +715,7 @@
           x="700"
           y="380"
           width="320"
-          height="112"
+          height="128"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -604,7 +724,7 @@
         <line x1="700" y1="428" x2="1020" y2="428" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="860"
-          y="409"
+          y="410"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -612,9 +732,6 @@
           text-anchor="middle"
         >
           ApiAccountGateway
-          <tspan data-requirement="APP-FR-12" fill="#5b6873" font-size="8" font-weight="400">
-            «Sprint 4»
-          </tspan>
         </text>
         <line x1="700" y1="468" x2="1020" y2="468" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="716" y="444" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
@@ -624,6 +741,9 @@
           - mapper: ApiDtoMapper
         </text>
         <text x="716" y="484" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + register(credentials: Credentials): Promise&lt;Session&gt;
+        </text>
+        <text x="716" y="500" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + login(credentials: Credentials): Promise&lt;Session&gt;
         </text>
         <!-- Class: AccountPresenter -->
@@ -631,12 +751,13 @@
           x="340"
           y="388"
           width="320"
-          height="96"
+          height="128"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
+        <line x1="340" y1="436" x2="660" y2="436" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="500"
           y="418"
@@ -647,22 +768,24 @@
           text-anchor="middle"
         >
           AccountPresenter
-          <tspan data-requirement="APP-FR-12" fill="#5b6873" font-size="8" font-weight="400">
-            «Sprint 4»
-          </tspan>
         </text>
-        <line x1="340" y1="436" x2="660" y2="436" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <line x1="340" y1="460" x2="660" y2="460" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="340" y1="476" x2="660" y2="476" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text x="356" y="452" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - register: UseCase&lt;Credentials, Session&gt;
+        </text>
+        <text x="356" y="468" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - login: UseCase&lt;Credentials, Session&gt;
         </text>
-        <text x="356" y="476" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="356" y="492" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + onRegister(credentials: Credentials): Promise&lt;void&gt;
+        </text>
+        <text x="356" y="508" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + onLogin(credentials: Credentials): Promise&lt;void&gt;
         </text>
         <!-- Class: UseCase (interface, input port) -->
         <rect
           x="336"
-          y="552"
+          y="600"
           width="330"
           height="72"
           rx="6"
@@ -672,7 +795,7 @@
         />
         <text
           x="501"
-          y="570"
+          y="618"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -683,7 +806,7 @@
         </text>
         <text
           x="501"
-          y="588"
+          y="636"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -692,14 +815,14 @@
         >
           UseCase
         </text>
-        <line x1="336" y1="600" x2="666" y2="600" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="352" y="616" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="336" y1="648" x2="666" y2="648" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="352" y="664" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + execute(request: TRequest): Promise&lt;Result&lt;TResponse&gt;&gt;
         </text>
         <!-- Class: SessionStore (interface, output port) -->
         <rect
           x="40"
-          y="688"
+          y="736"
           width="280"
           height="104"
           rx="6"
@@ -709,7 +832,7 @@
         />
         <text
           x="180"
-          y="706"
+          y="754"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -720,7 +843,7 @@
         </text>
         <text
           x="180"
-          y="724"
+          y="772"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -728,24 +851,21 @@
           text-anchor="middle"
         >
           SessionStore
-          <tspan data-requirement="APP-FR-12" fill="#5b6873" font-size="8" font-weight="400">
-            «Sprint 4»
-          </tspan>
         </text>
-        <line x1="40" y1="736" x2="320" y2="736" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="56" y="752" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="40" y1="784" x2="320" y2="784" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="56" y="800" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + read(): Promise&lt;Session | undefined&gt;
         </text>
-        <text x="56" y="768" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="56" y="816" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + write(session: Session): Promise&lt;void&gt;
         </text>
-        <text x="56" y="784" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + clear(): Promise&lt;void&gt;
+        <text x="56" y="832" fill="#5b6873" font-size="9" font-family="'IBM Plex Mono', monospace">
+          no clear() yet: decision 65
         </text>
         <!-- Class: Login (focal, use case) -->
         <rect
           x="380"
-          y="688"
+          y="736"
           width="240"
           height="140"
           rx="6"
@@ -753,11 +873,11 @@
           stroke="#0f6f74"
           stroke-width="1"
         />
-        <rect x="380" y="688" width="240" height="60" rx="6" fill="rgba(15,111,116,0.10)" />
-        <rect x="380" y="740" width="240" height="8" fill="rgba(15,111,116,0.10)" />
+        <rect x="380" y="736" width="240" height="60" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="380" y="788" width="240" height="8" fill="rgba(15,111,116,0.10)" />
         <text
           x="500"
-          y="706"
+          y="754"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -768,7 +888,7 @@
         </text>
         <text
           x="500"
-          y="724"
+          y="772"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -776,13 +896,10 @@
           text-anchor="middle"
         >
           Login
-          <tspan data-requirement="APP-FR-12" fill="#5b6873" font-size="8" font-weight="400">
-            «Sprint 4»
-          </tspan>
         </text>
         <text
           x="500"
-          y="738"
+          y="786"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -791,24 +908,24 @@
         >
           APP-FR-12
         </text>
-        <line x1="380" y1="748" x2="620" y2="748" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
-        <line x1="380" y1="788" x2="620" y2="788" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
-        <text x="396" y="764" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="380" y1="796" x2="620" y2="796" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <line x1="380" y1="836" x2="620" y2="836" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <text x="396" y="812" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - accounts: AccountGateway
         </text>
-        <text x="396" y="780" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="396" y="828" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - session: SessionStore
         </text>
-        <text x="396" y="804" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="396" y="852" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + execute(request: Credentials):
         </text>
-        <text x="412" y="820" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="412" y="868" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           Promise&lt;Result&lt;Session&gt;&gt;
         </text>
         <!-- Class: AccountGateway (interface, output port) -->
         <rect
           x="680"
-          y="688"
+          y="736"
           width="320"
           height="88"
           rx="6"
@@ -818,7 +935,7 @@
         />
         <text
           x="840"
-          y="706"
+          y="754"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -829,7 +946,7 @@
         </text>
         <text
           x="840"
-          y="724"
+          y="772"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -837,21 +954,18 @@
           text-anchor="middle"
         >
           AccountGateway
-          <tspan data-requirement="APP-FR-12" fill="#5b6873" font-size="8" font-weight="400">
-            «Sprint 4»
-          </tspan>
         </text>
-        <line x1="680" y1="736" x2="1000" y2="736" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="696" y="752" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="680" y1="784" x2="1000" y2="784" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="696" y="800" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + register(credentials: Credentials): Promise&lt;Session&gt;
         </text>
-        <text x="696" y="768" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="696" y="816" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + login(credentials: Credentials): Promise&lt;Session&gt;
         </text>
         <!-- Reference box: Credentials, detailed in part 3 · map -->
         <rect
           x="440"
-          y="868"
+          y="916"
           width="120"
           height="40"
           rx="6"
@@ -862,7 +976,7 @@
         />
         <text
           x="500"
-          y="882"
+          y="930"
           fill="#7d8a94"
           font-size="7"
           font-weight="500"
@@ -874,7 +988,7 @@
         </text>
         <text
           x="500"
-          y="899"
+          y="947"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -886,7 +1000,7 @@
         <!-- Class: Session (value object) -->
         <rect
           x="780"
-          y="868"
+          y="916"
           width="140"
           height="88"
           rx="6"
@@ -896,7 +1010,7 @@
         />
         <text
           x="850"
-          y="886"
+          y="934"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -907,7 +1021,7 @@
         </text>
         <text
           x="850"
-          y="904"
+          y="952"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -915,21 +1029,18 @@
           text-anchor="middle"
         >
           Session
-          <tspan data-requirement="APP-FR-12" fill="#5b6873" font-size="8" font-weight="400">
-            «Sprint 4»
-          </tspan>
         </text>
-        <line x1="780" y1="916" x2="920" y2="916" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="796" y="932" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <line x1="780" y1="964" x2="920" y2="964" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text x="796" y="980" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + token: string
         </text>
-        <text x="796" y="948" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="796" y="996" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + userId: string
         </text>
         <!-- UML template boxes: type parameters on the top-right corner -->
         <rect
           x="563.1"
-          y="542"
+          y="590"
           width="114.9"
           height="18"
           rx="2"
@@ -940,7 +1051,7 @@
         />
         <text
           x="620.55"
-          y="554"
+          y="602"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -951,7 +1062,7 @@
         <!-- Footnote -->
         <text
           x="24"
-          y="1002"
+          y="1050"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -961,7 +1072,7 @@
         </text>
         <text
           x="24"
-          y="1018"
+          y="1066"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -971,27 +1082,37 @@
         </text>
         <text
           x="24"
-          y="1034"
+          y="1082"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          AccountGateway: ApiDtoMapper makes a CredentialsDto, and ApiClient, the driver, sends it
-          through AccountApi to AuthController.signIn() of hexablock-api (API-FR-01).
+          AccountGateway: ApiDtoMapper makes a CredentialsDto, and ApiClient sends it through
+          AccountApi to AuthController.signIn() of hexablock-api (API-FR-01).
         </text>
         <text
           x="24"
-          y="1050"
+          y="1098"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          SessionManager implements SessionStore and keeps the token. Login touches no entity, so
-          this view has no layer 1 band.
+          Then ApiAccountGateway asks AuthController.me() for the user id, with the token: the first
+          request that sends it. Register takes the same path with register().
         </text>
         <text
           x="24"
-          y="1066"
+          y="1114"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          SessionManager implements SessionStore over SecretStore, and DeviceSecretStore keeps the
+          session with expo-secure-store (#45). No layer 1 band: Login touches no entity.
+        </text>
+        <text
+          x="24"
+          y="1130"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1001,15 +1122,15 @@
         <!-- Legend -->
         <line
           x1="24"
-          y1="1090"
+          y1="1154"
           x2="1076"
-          y2="1090"
+          y2="1154"
           stroke="rgba(23,33,42,0.10)"
           stroke-width="0.8"
         />
         <text
           x="24"
-          y="1108"
+          y="1172"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -1019,9 +1140,9 @@
         </text>
         <line
           x1="24"
-          y1="1126"
+          y1="1190"
           x2="52"
-          y2="1126"
+          y2="1190"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -1029,7 +1150,7 @@
         />
         <text
           x="60"
-          y="1129"
+          y="1193"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1038,16 +1159,16 @@
         </text>
         <line
           x1="155.7"
-          y1="1126"
+          y1="1190"
           x2="183.7"
-          y2="1126"
+          y2="1190"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#flowlogin-open)"
         />
         <text
           x="191.7"
-          y="1129"
+          y="1193"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1056,7 +1177,7 @@
         </text>
         <rect
           x="461.3"
-          y="1120"
+          y="1184"
           width="28"
           height="12"
           rx="2"
@@ -1067,7 +1188,7 @@
         />
         <text
           x="497.3"
-          y="1129"
+          y="1193"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1076,7 +1197,7 @@
         </text>
         <rect
           x="743.4000000000001"
-          y="1120"
+          y="1184"
           width="28"
           height="12"
           rx="2"
@@ -1086,7 +1207,7 @@
         />
         <text
           x="779.4"
-          y="1129"
+          y="1193"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1095,7 +1216,7 @@
         </text>
         <rect
           x="24"
-          y="1142"
+          y="1206"
           width="28"
           height="12"
           rx="2"
@@ -1105,7 +1226,7 @@
         />
         <text
           x="60"
-          y="1151"
+          y="1215"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1114,7 +1235,7 @@
         </text>
         <rect
           x="169.8"
-          y="1142"
+          y="1206"
           width="28"
           height="12"
           rx="2"
@@ -1124,7 +1245,7 @@
         />
         <text
           x="205.8"
-          y="1151"
+          y="1215"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1133,7 +1254,7 @@
         </text>
         <rect
           x="315.6"
-          y="1142"
+          y="1206"
           width="28"
           height="12"
           rx="2"
@@ -1143,7 +1264,7 @@
         />
         <text
           x="351.6"
-          y="1151"
+          y="1215"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1152,7 +1273,7 @@
         </text>
         <rect
           x="461.40000000000003"
-          y="1142"
+          y="1206"
           width="28"
           height="12"
           rx="2"
@@ -1163,7 +1284,7 @@
         />
         <text
           x="497.4"
-          y="1151"
+          y="1215"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -1173,7 +1294,7 @@
         <!-- Legend: the «Sprint N» marker of a planned class or member -->
         <text
           x="24"
-          y="1171"
+          y="1235"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1182,7 +1303,7 @@
         </text>
         <text
           x="92"
-          y="1171"
+          y="1235"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
