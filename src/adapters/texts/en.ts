@@ -13,12 +13,15 @@
 // The texts of the level selector live under `levels.<part>`, and the text of each status
 // of a level under `levels.status.<status>` (#173).
 // The texts of the victory screen and of the defeat screen live under `result.<part>` (#180).
+// The texts of the account screen live under `account.<part>`, and the text of each failure of
+// a sign-up or a sign-in under `account.error.<code>` (#45).
 export const en = {
   'home.title': 'HexaBlock Suite',
   'home.brand': 'HexaBlock',
   'home.suite': 'Suite',
   'home.play': 'Play',
   'home.achievements': 'Achievements',
+  'home.account': 'Account',
   'home.figure': 'Board figure',
   'figure.hex': 'Hexagon',
   'figure.square': 'Square',
@@ -102,6 +105,21 @@ export const en = {
   'levels.status.completed': 'Completed',
   'levels.status.open': 'Open',
   'levels.status.locked': 'Locked',
+  'account.title': 'Account',
+  'account.back': 'Back',
+  'account.username': 'Username',
+  'account.password': 'Password',
+  'account.sign-up': 'Sign up',
+  'account.sign-in': 'Sign in',
+  'account.busy': 'Connecting to the server',
+  'account.signed-in': 'Signed in as',
+  'account.error.username-taken': 'That username is taken. Choose another one.',
+  'account.error.wrong-credentials': 'The username or the password is wrong.',
+  'account.error.invalid-credentials':
+    'A username has 3 to 32 letters, digits, dots, hyphens or underscores, and a password has 8 to 128 characters.',
+  'account.error.backend-unreachable':
+    'The server does not answer. Check the connection and try again.',
+  'account.error': 'That did not work. Try again.',
   'achievement.lines-combo': 'Clear 3 lines at once',
   'achievement.merge-256': 'Reach 256 in Hexa Merge',
   'achievement.merge-2048': 'Reach 2048 in Hexa Merge',

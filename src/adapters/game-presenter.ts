@@ -78,6 +78,12 @@ const ERROR_TEXTS: Readonly<Record<FailureCode, TextKey>> = {
   'load-failed': 'play.error',
   'list-failed': 'play.error',
   'level-locked': 'play.error.level-locked',
+  'username-taken': 'play.error',
+  'wrong-credentials': 'play.error',
+  'invalid-credentials': 'play.error',
+  'backend-unreachable': 'play.error',
+  'register-failed': 'play.error',
+  'login-failed': 'play.error',
   'unexpected-failure': 'play.error',
 };
 

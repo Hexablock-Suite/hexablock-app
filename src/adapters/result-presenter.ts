@@ -66,6 +66,12 @@ const ERROR_TEXTS: Readonly<Record<FailureCode, TextKey>> = {
   'load-failed': 'result.error',
   'list-failed': 'result.error',
   'level-locked': 'result.error',
+  'username-taken': 'result.error',
+  'wrong-credentials': 'result.error',
+  'invalid-credentials': 'result.error',
+  'backend-unreachable': 'result.error',
+  'register-failed': 'result.error',
+  'login-failed': 'result.error',
   'unexpected-failure': 'result.error',
 };
 
