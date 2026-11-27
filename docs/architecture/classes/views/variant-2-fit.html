@@ -75,20 +75,21 @@
           GeometryFactory, builds FitLevel from the topology and the section of a level file that
           LevelDefinition gives it, checks A5 in build() and creates FitLevel. FitLevel keeps the
           thresholds of its stars as stars and counts the stars of a play with starsFor(), so it
-          implements ILevelStars, the star rule that LevelProgress asks. FitFactory holds one
-          FitLevel and a Clock and creates FitRules and FitScoring. It builds the LevelTimerId of
-          each timer from the MatchId of the game. FitRules uses FitMove as TMove and FitState as
-          TState. Each Fit move holds its own check, isValidOn(), and its own change, applyTo(), so
-          FitRules asks the move and never tells the moves apart by their class (decision 43).
-          Lollipops show the engine interface each variant class implements, with its binding.
-          PieceId, the cell content, and Placement, the rotation and the offset of a placed piece,
-          are value objects. PieceRegister is the value object that holds the pieces and the
-          placements of FitState and finds an entry with PieceId.equals(). FitState is an entity
-          inside the GameEngine aggregate: its own GameStateId is its identity, it keeps the MatchId
-          of its game, and it changes in place only through its business methods. FitPlay holds the
-          Moves and the ElapsedTime of one won level in private fields, and FitStarThreshold tells
-          whether a play meets its two limits: it gives them to isWithin() of the play. Both are
-          value objects.
+          implements IStarsByMovesAndTime, the star rule by moves and time that LevelProgress asks
+          (issue 424). FitStarThreshold implements IStarThreshold, so starsOf() counts the stars of
+          a play. FitFactory holds one FitLevel and a Clock and creates FitRules and FitScoring. It
+          builds the LevelTimerId of each timer from the MatchId of the game. FitRules uses FitMove
+          as TMove and FitState as TState. Each Fit move holds its own check, isValidOn(), and its
+          own change, applyTo(), so FitRules asks the move and never tells the moves apart by their
+          class (decision 43). Lollipops show the engine interface each variant class implements,
+          with its binding. PieceId, the cell content, and Placement, the rotation and the offset of
+          a placed piece, are value objects. PieceRegister is the value object that holds the pieces
+          and the placements of FitState and finds an entry with PieceId.equals(). FitState is an
+          entity inside the GameEngine aggregate: its own GameStateId is its identity, it keeps the
+          MatchId of its game, and it changes in place only through its business methods. FitPlay
+          holds the Moves and the ElapsedTime of one won level in private fields, and
+          FitStarThreshold tells whether a play meets its two limits: it gives them to isWithin() of
+          the play. Both are value objects.
         </desc>
         <defs>
           <marker
@@ -411,7 +412,12 @@
           font-size="9"
           font-family="'IBM Plex Mono', monospace"
         >
-          ILevelStars
+          IStarsByMovesAndTime
+        </text>
+        <line x1="360" y1="680" x2="360" y2="692" stroke="#17212a" stroke-width="1" />
+        <circle cx="360" cy="697" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text x="371" y="700" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          IStarThreshold‹FitPlay›
         </text>
 
         <!-- Class: FitMove (a type alias with no kind word: a closed union of three value objects) -->
@@ -784,7 +790,7 @@
           + starsFor(moves: Moves, elapsedMs:
         </text>
         <text x="720" y="940" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          ElapsedTime | undefined): Stars
+          ElapsedTime): Stars
         </text>
         <text x="712" y="954" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + runsOn(geometry: { isOfFamily(id:
@@ -1817,8 +1823,9 @@
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            starsFor() of ILevelStars counts with fitStars(play, thresholds) the leading thresholds
-            that the play meets (decision 36). Moves, ElapsedTime and Stars: Part 1, view 4.
+            starsFor() of IStarsByMovesAndTime counts with starsOf(play, thresholds) the leading
+            thresholds that the play meets (decision 36, #424). Moves, ElapsedTime and Stars: Part
+            1, view 4.
           </text>
           <text
             x="24"

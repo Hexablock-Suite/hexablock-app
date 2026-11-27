@@ -79,18 +79,20 @@
           value object with private fields: the size of its board region, its goal and the data of
           its piece source, which is the seed with its colors, the colors alone or the fixed list of
           stacks, and the thresholds of its stars, which it counts for LevelProgress as an
-          ILevelStars. It holds no piece source, and SortFactory builds a new source from that data
-          for each game, with a new seed of its RandomSource in each match for the default level.
-          The source gives ColorStack draws, so SortFactory binds TPiece to ColorStack. The diagram
-          shows SortRules typed by SortState and SortState holding ColorStack cells, each variant
-          class marked with the engine interface it implements and its binding. GoalCount is the
-          value object of the goal of a level, and ClearedStacks is the value object of the count of
-          cleared stacks that the goal reads. SortPlay holds the Moves of one won level in a private
-          field, and SortStarThreshold tells whether a play meets its limit: it gives the limit to
-          isWithin() of the play. SortState is an entity inside the GameEngine aggregate: its own
-          GameStateId is its identity, it keeps the MatchId of its game, and it changes in place
-          only through its business methods. TileCount is the value object of the height of a stack:
-          ColorStack gives it, and SortState keeps the TileCount of each cleared stack.
+          IStarsByMoves, the star rule by moves (issue 424). SortStarThreshold implements
+          IStarThreshold, so starsOf() counts the stars of a play. It holds no piece source, and
+          SortFactory builds a new source from that data for each game, with a new seed of its
+          RandomSource in each match for the default level. The source gives ColorStack draws, so
+          SortFactory binds TPiece to ColorStack. The diagram shows SortRules typed by SortState and
+          SortState holding ColorStack cells, each variant class marked with the engine interface it
+          implements and its binding. GoalCount is the value object of the goal of a level, and
+          ClearedStacks is the value object of the count of cleared stacks that the goal reads.
+          SortPlay holds the Moves of one won level in a private field, and SortStarThreshold tells
+          whether a play meets its limit: it gives the limit to isWithin() of the play. SortState is
+          an entity inside the GameEngine aggregate: its own GameStateId is its identity, it keeps
+          the MatchId of its game, and it changes in place only through its business methods.
+          TileCount is the value object of the height of a stack: ColorStack gives it, and SortState
+          keeps the TileCount of each cleared stack.
         </desc>
         <defs>
           <marker
@@ -786,7 +788,7 @@
           + withStars(stars: SortStarThreshold[]): SortLevel
         </text>
         <text x="80" y="546" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + starsFor(moves: Moves, elapsedMs: ElapsedTime [0..1]): Stars
+          + starsFor(moves: Moves): Stars
         </text>
         <text x="80" y="560" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + sourceWith(builders: SortSourceBuilders&lt;TSource&gt;): TSource
@@ -888,7 +890,7 @@
           font-family="'IBM Plex Mono', monospace"
           text-anchor="end"
         >
-          ILevelStars
+          IStarsByMoves
         </text>
 
         <!-- Class: ClearedStacks (value object, decision 42) -->
@@ -1085,6 +1087,18 @@
         </text>
         <text x="64" y="1200" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           + isMetBy(play: SortPlay): boolean
+        </text>
+        <!-- Lollipop: SortStarThreshold implements IStarThreshold of the progress folder (issue 424) -->
+        <line x1="312" y1="1144" x2="324" y2="1144" stroke="#17212a" stroke-width="1" />
+        <circle cx="329" cy="1144" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+        <text
+          x="340"
+          y="1147"
+          fill="#17212a"
+          font-size="9"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          IStarThreshold‹SortPlay›
         </text>
         <!-- Class: GoalCount (value object) -->
         <rect
@@ -1377,7 +1391,7 @@
         >
           TCoord
         </text>
-        <!-- The footnote and the legend sit below the zone, which grew by 100 and then by 144. It grew by 32 more for the delivery operation of ClearedStacks (#228). The footnote has one more line for TileCount (#232). The zone grew by 40 more for the star thresholds of SortLevel (#156), and by 48 more for the fields of SortLevelBuilder (#167). SortLevel grew by 28 for seededEachMatch() (#417): its ILevelStars lollipop moved to its top edge, and SortLevelBuilder moved down by 12. -->
+        <!-- The footnote and the legend sit below the zone, which grew by 100 and then by 144. It grew by 32 more for the delivery operation of ClearedStacks (#228). The footnote has one more line for TileCount (#232). The zone grew by 40 more for the star thresholds of SortLevel (#156), and by 48 more for the fields of SortLevelBuilder (#167). SortLevel grew by 28 for seededEachMatch() (#417): its ILevelStars lollipop moved to its top edge, and SortLevelBuilder moved down by 12. The lollipop names IStarsByMoves since #424, and SortStarThreshold has an IStarThreshold lollipop on its right edge. -->
         <g transform="translate(0 568)">
           <!-- Footnote: classes the budget leaves out -->
           <text
@@ -1449,9 +1463,9 @@
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            starsFor() of ILevelStars counts with sortStars() the leading thresholds that the play
-            meets, so a level with no threshold gives 0 stars (decision 36). Moves, Stars: Part 1,
-            view 4.
+            starsFor() of IStarsByMoves counts with starsOf() the leading thresholds that the play
+            meets, so a level with no threshold gives 0 stars (decision 36, #424). Moves, Stars:
+            Part 1, view 4.
           </text>
           <text
             x="24"
