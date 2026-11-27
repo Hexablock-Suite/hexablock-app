@@ -3,7 +3,6 @@ import { Outcome } from '../../src/domain/engine/outcome';
 import { ApplyMove } from '../../src/application/apply-move';
 import type { GameEventPublisher } from '../../src/application/game-event-publisher';
 import type { GameRepository } from '../../src/application/game-repository';
-import { StartGame } from '../../src/application/start-game';
 import type { BoardState } from '../../src/domain/engine/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
 import { GameEngine } from '../../src/domain/engine/game-engine';
@@ -42,6 +41,7 @@ import {
   gameUseCases,
   MemoryGameRepository,
   valueOf,
+  startGameOver,
 } from '../support/application/game-use-cases';
 import { RecordingPublisher } from '../support/application/recording-publisher';
 import { UseCaseError } from '../../src/application/result';
@@ -346,9 +346,10 @@ describe('StartGame and ApplyMove', () => {
     valueOf(await applyMove.execute({ move }));
     const oldGame = games.running();
     const before = runningGameOf(games);
-    const broken = new StartGame(
+    const broken = startGameOver(
       factoriesOf(new GameFactory(LINES, brokenStart(linesFactory()), new CountingMatchIds())),
       games,
+      LINES,
     );
 
     const error = errorOf(await broken.execute({}));
@@ -405,7 +406,7 @@ describe('StartGame and ApplyMove', () => {
     valueOf(await working.startGame.execute({}));
     const oldGame = working.games.running();
     const before = runningGameOf(working.games);
-    const broken = new StartGame(
+    const broken = startGameOver(
       factoriesOf(
         new GameFactory(LINES, linesFactory(), {
           next: () => {
@@ -414,6 +415,7 @@ describe('StartGame and ApplyMove', () => {
         }),
       ),
       working.games,
+      LINES,
     );
 
     const error = errorOf(await broken.execute({}));
@@ -458,9 +460,10 @@ describe('StartGame and ApplyMove', () => {
   });
 
   it('should_return_a_start_failed_failure_when_the_repository_throws_on_replace', async () => {
-    const startGame = new StartGame(
+    const startGame = startGameOver(
       factoriesOf(new GameFactory(LINES, linesFactory(), new CountingMatchIds())),
       new ThrowingRepository('replace'),
+      LINES,
     );
 
     const error = errorOf(await startGame.execute({}));

@@ -4,7 +4,7 @@ import { fireEvent, renderRouter, screen } from 'expo-router/testing-library';
 
 import { generateStaticParams } from '../../app/game/[gameId]';
 import { repoRoot } from '../support/run-tool';
-import { occupiedSpaces, pressSpace } from '../support/ui/board-spaces';
+import { occupiedSpaces, pressSpace, spaces } from '../support/ui/board-spaces';
 import { outlinesIn } from '../support/ui/cell-outlines';
 
 // The routes of `app/`, with the root layout and its composition root.
@@ -121,6 +121,34 @@ describe('game route', () => {
     expect(
       new Set(outlinesIn(screen.getByRole('button', { name: /^Hexa Sort/ })).map((o) => o.corners)),
     ).toEqual(new Set([3]));
+  });
+
+  // Issue #397: a link can name a locked level. `StartGame` refuses it, so no game starts,
+  // and the screen says why with a text of the catalog. A new device has won no level,
+  // so only `fit-01` is open.
+  it('should_show_the_locked_level_text_and_start_no_game_when_the_route_names_a_locked_level', async () => {
+    await renderRouter(appDir, { initialUrl: '/game/hexa-fit?levelId=fit-09' });
+
+    expect(
+      await screen.findByText('Ese nivel está bloqueado. Gana el nivel anterior para abrirlo.'),
+    ).toBeOnTheScreen();
+    expect(screen.getByText('Preparando el tablero')).toBeOnTheScreen();
+    expect(screen.queryByText('En juego')).toBeNull();
+    expect(spaces()).toEqual([]);
+  });
+
+  // Issue #397: a repeated parameter reaches the route as a list. The route reads the first
+  // value of each one, so the screen opens the game of the path and the first level named.
+  // `fit-01` has six cells.
+  it('should_start_the_first_level_named_when_the_route_repeats_the_level_id_or_the_game_id', async () => {
+    await renderRouter(appDir, {
+      initialUrl: '/game/hexa-fit?levelId=fit-01&levelId=fit-09&gameId=hexa-lines',
+    });
+
+    await screen.findByText('En juego');
+
+    expect(screen.getByRole('header', { name: 'Hexa Fit' })).toBeOnTheScreen();
+    expect(spaces()).toHaveLength(6);
   });
 
   // Issue #287: the web export renders one page of the game route for each registered game,
