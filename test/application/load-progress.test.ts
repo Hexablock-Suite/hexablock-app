@@ -27,7 +27,7 @@ describe('LoadProgress', () => {
     progress.recordScore(highScoreOf(36));
     await repository.save(progress);
 
-    const result = await new LoadProgress(repository, LINES).execute({});
+    const result = await new LoadProgress(repository).execute({ gameId: LINES });
 
     expect(result.ok ? result.value?.keeps(highScoreOf(36)) : false).toBe(true);
   });
@@ -36,9 +36,25 @@ describe('LoadProgress', () => {
   it('should_return_no_progress_when_the_game_has_none_saved', async () => {
     const repository = new LocalProgressRepository(new InMemoryKeyValueStore());
 
-    const result = await new LoadProgress(repository, LINES).execute({});
+    const result = await new LoadProgress(repository).execute({ gameId: LINES });
 
     expect(result).toEqual(Result.success(undefined));
+  });
+
+  // Issue #410: the request names the game, as the request of `ListLevels` does.
+  // So one `LoadProgress` reads the saved progress of every game.
+  it('should_read_the_game_of_each_request_when_one_use_case_loads_two_games', async () => {
+    const repository = new LocalProgressRepository(new InMemoryKeyValueStore());
+    const progress = GameProgress.start(LINES);
+    progress.recordScore(highScoreOf(36));
+    await repository.save(progress);
+    const useCase = new LoadProgress(repository);
+
+    const lines = await useCase.execute({ gameId: LINES });
+    const merge = await useCase.execute({ gameId: GameId.of('hexa-merge') });
+
+    expect(lines.ok ? lines.value?.keeps(highScoreOf(36)) : false).toBe(true);
+    expect(merge).toEqual(Result.success(undefined));
   });
 
   it('should_fail_with_load_failed_when_the_progress_repository_throws', async () => {
@@ -47,7 +63,7 @@ describe('LoadProgress', () => {
       save: () => Promise.resolve(),
     };
 
-    const result = await new LoadProgress(broken, LINES).execute({});
+    const result = await new LoadProgress(broken).execute({ gameId: LINES });
 
     expect(result.ok ? undefined : result.error.code).toBe('load-failed');
     expect(result.ok ? undefined : result.error.message).toBe('The store is gone.');

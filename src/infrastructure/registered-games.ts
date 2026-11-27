@@ -177,7 +177,8 @@ function latticeCellOf(at: TriangleCoord): TriangleCoord {
 }
 
 // The games of the registry of the board figure `figure`, in the order of the game selector.
-// The composition root calls the only module that names a variant factory: this one.
+// This module is the only one that names a variant factory. The composition root calls it,
+// and `route-ids.ts` calls it for the pages of the web export (#411).
 // Each entry names the `GameId` of its game next to its factory, and `registered()`
 // checks the pair with `isFor()` (issue #234).
 // Every variant factory takes the `GeometryFactory` of the figure, so the choice of the figure

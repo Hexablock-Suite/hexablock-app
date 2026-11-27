@@ -1,20 +1,18 @@
 import { Redirect, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { GameChoice } from '../src/adapters/home-presenter';
 import type { CellShape } from '../src/adapters/board/board-layout';
-import { useCompositionRoot } from '../src/infrastructure/composition-root-provider';
 import { FigureStone } from '../src/infrastructure/ui/figure-stone';
 import { Scenery } from '../src/infrastructure/ui/scenery';
 import { column, palette, serif, space, type WorldTone } from '../src/infrastructure/ui/theme';
 import {
-  homePresenterOf,
   useFigureShapes,
   useGameLevels,
   useGameTones,
+  useHomePresenter,
   useRouteFigure,
   useSavedProgresses,
   type RouteFigure,
@@ -41,11 +39,8 @@ export default function GameSelectorScreen() {
 // The map of the games of the board figure `figure`. It renders before the saved progress
 // arrives, and the hook of the map re-renders it with the records (#181).
 function GameSelector({ figure }: { readonly figure: RouteFigure }) {
-  const root = useCompositionRoot();
-  // The registered games of the figure, once per figure, so the load runs once per list.
-  const games = useMemo(() => root.registry(figure.figure).gameIds(), [root, figure.figure]);
-  const saved = useSavedProgresses(games);
-  const view = homePresenterOf(root, figure.figure, saved).gameSelector();
+  const saved = useSavedProgresses(figure.figure);
+  const view = useHomePresenter(figure.figure, saved).gameSelector();
   const toneOf = useGameTones(figure.figure);
   const hasLevels = useGameLevels(figure.figure);
   const stone = useFigureShapes()(figure.param, STONE);

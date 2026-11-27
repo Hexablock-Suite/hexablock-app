@@ -18,12 +18,12 @@ import {
   type WorldTone,
 } from '../../src/infrastructure/ui/theme';
 import {
-  levelRouteIds,
   useFigureShapes,
   useHomePresenter,
   useRouteFigure,
   type RouteFigure,
 } from '../../src/infrastructure/ui/use-home-presenter';
+import { levelRouteIds } from '../../src/infrastructure/route-ids';
 import { useLevelSelector } from '../../src/infrastructure/ui/use-level-selector';
 import { LipButton, WoodSign } from '../../src/infrastructure/ui/wood';
 

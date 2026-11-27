@@ -3,16 +3,18 @@ import { renderRouter, screen } from 'expo-router/testing-library';
 import { Text } from 'react-native';
 
 import RootLayout from '../../app/_layout';
-import { useCompositionRoot } from '../../src/infrastructure/composition-root-provider';
+import { TopologyId } from '../../src/domain/shared/topology-id';
+import { useScreenServices } from '../../src/infrastructure/ui/screen-services';
 
-// A route that reads the composition root and shows the count of registered games.
+// A route that reads the screen services of the root and shows the count of registered games.
 function GameCount() {
-  const root = useCompositionRoot();
-  return <Text>{`${root.registry().gameIds().length} games`}</Text>;
+  const services = useScreenServices();
+  return <Text>{`${services.gameIds(TopologyId.hex).length} games`}</Text>;
 }
 
 // Issue #162: `app/_layout.tsx` only calls the composition root and holds no wiring.
-// Each route reads the root that the layout builds.
+// Each route reads the root that the layout builds, through the closed interface
+// `ScreenServices` (#411).
 describe('RootLayout', () => {
   it('should_give_each_route_the_composition_root_when_the_root_layout_renders', async () => {
     await renderRouter({ _layout: RootLayout, index: GameCount });

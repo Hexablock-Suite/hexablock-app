@@ -3,12 +3,11 @@ import { Dimensions, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { textCatalog } from '../../../src/adapters/texts/text-catalog';
 import type { MoveResult } from '../../../src/application/move-result';
 import { GameId } from '../../../src/domain/shared/game-id';
 import type { Score } from '../../../src/domain/shared/score';
 import { CompositionRoot } from '../../../src/infrastructure/composition-root';
-import { gameSessionOf, type GameSession } from '../../../src/infrastructure/ui/game-session';
+import type { GameSession } from '../../../src/infrastructure/ui/screen-services';
 import { GameStage } from '../../../src/infrastructure/ui/game-stage';
 import { CONTENT_WIDTH, space } from '../../../src/infrastructure/ui/theme';
 import { valueOf } from '../../support/application/game-use-cases';
@@ -114,7 +113,7 @@ async function boardsAt(width: number): Promise<[string, string, number, number]
           <SafeAreaProvider initialMetrics={METRICS}>
             <GameStage
               title="Hexa"
-              {...gameSessionOf(testRoot(), gameId, textCatalog.es, figure)}
+              {...testRoot().gameSession(gameId, figure)}
               onBack={jest.fn()}
             />
           </SafeAreaProvider>
@@ -136,7 +135,7 @@ const free = () => screen.queryAllByTestId('space-free', { includeHiddenElements
 describe('GameStage', () => {
   it('should_start_the_game_and_draw_every_space_of_the_board_when_the_screen_opens', async () => {
     const logger = new RecordingLogger();
-    const session = gameSessionOf(testRoot(logger), GameId.of('hexa-fit'), textCatalog.es);
+    const session = testRoot(logger).gameSession(GameId.of('hexa-fit'));
 
     await show(session);
 
@@ -158,7 +157,7 @@ describe('GameStage', () => {
       const gameId = GameId.of(id);
       const logger = new RecordingLogger();
       const root = testRoot(logger);
-      const session = gameSessionOf(root, gameId, textCatalog.es);
+      const session = root.gameSession(gameId);
       const expected = await referenceMove(gameId);
       await show(session);
 
@@ -182,7 +181,7 @@ describe('GameStage', () => {
   it('should_keep_the_board_and_show_the_rejected_move_text_when_the_rules_reject_the_move', async () => {
     const root = testRoot();
     const gameId = GameId.of('hexa-lines');
-    const session = gameSessionOf(root, gameId, textCatalog.es);
+    const session = root.gameSession(gameId);
     const move = firstMoveIn(root, gameId);
     await show(session);
     await act(() => session.presenter.onMove(move));
@@ -198,7 +197,7 @@ describe('GameStage', () => {
   // A game with no move controls of its own plays no move when the player presses a space.
   it('should_play_no_move_when_the_player_presses_a_space_of_a_game_with_no_move_controls', async () => {
     const logger = new RecordingLogger();
-    await show(gameSessionOf(testRoot(logger), GameId.of('hexa-lines'), textCatalog.es));
+    await show(testRoot(logger).gameSession(GameId.of('hexa-lines')));
     const board = [free().length, occupied().length];
 
     await pressSpace(0);
@@ -213,7 +212,7 @@ describe('GameStage', () => {
   it('should_show_the_undo_on_the_fit_and_merge_screens_and_the_redo_only_on_the_fit_screen_when_each_game_opens', async () => {
     const shown: [string, number, number][] = [];
     for (const id of FOUR_VARIANTS) {
-      await show(gameSessionOf(testRoot(), GameId.of(id), textCatalog.es));
+      await show(testRoot().gameSession(GameId.of(id)));
       shown.push([
         id,
         screen.queryAllByRole('button', { name: 'Deshacer' }).length,
@@ -232,7 +231,7 @@ describe('GameStage', () => {
 
   it('should_call_back_when_the_player_presses_the_map_button', async () => {
     const onBack = jest.fn();
-    await show(gameSessionOf(testRoot(), GameId.of('hexa-merge'), textCatalog.es), onBack);
+    await show(testRoot().gameSession(GameId.of('hexa-merge')), onBack);
 
     await fireEvent.press(screen.getByRole('button', { name: 'Mapa' }));
 
@@ -250,7 +249,7 @@ describe('GameStage', () => {
       const shown: [number, number, number, string][] = [];
       for (const width of [360, 375, 430]) {
         setWindowWidth(width);
-        await show(gameSessionOf(testRoot(), GameId.of('hexa-lines'), textCatalog.es));
+        await show(testRoot().gameSession(GameId.of('hexa-lines')));
         const { board, frame } = boardWidths();
         const spaces = free().length + occupied().length;
         shown.push([width, spaces, marginOf(width, frame), (board / 9).toFixed(2)]);

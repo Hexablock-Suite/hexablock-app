@@ -61,7 +61,7 @@ describe('CompositionRoot decorate', () => {
     await undoMove.execute({});
     await redoMove.execute({});
     await root.listAchievements().execute({});
-    await root.loadProgress(GameId.of('hexa-lines')).execute({});
+    await root.loadProgress().execute({ gameId: GameId.of('hexa-lines') });
     await root.listLevels().execute({ gameId: GameId.of('hexa-fit'), figure: TopologyId.hex });
 
     expect(logger.entries.map((entry) => [entry.useCase, entry.outcome])).toEqual([

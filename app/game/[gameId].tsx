@@ -7,11 +7,11 @@ import { LevelId } from '../../src/domain/progress/level-id';
 import { GameStage } from '../../src/infrastructure/ui/game-stage';
 import { useGameSession } from '../../src/infrastructure/ui/game-session';
 import {
-  gameRouteIds,
   useHomePresenter,
   useRouteFigure,
   type RouteFigure,
 } from '../../src/infrastructure/ui/use-home-presenter';
+import { gameRouteIds } from '../../src/infrastructure/route-ids';
 
 // The game screen, the route of one game (issue #170, S3-07 in #151, a proposal that waits
 // for the team). The game selector map opens it with the id of a registered game and the text

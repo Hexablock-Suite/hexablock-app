@@ -11,7 +11,7 @@ import { RegionSize } from '../../../src/domain/engine/region-size';
 import { MergeFactory, MergeSettings } from '../../../src/domain/variants/hexa-merge/merge-factory';
 import { MergeTile } from '../../../src/domain/variants/hexa-merge/merge-tile';
 import { CompositionRoot } from '../../../src/infrastructure/composition-root';
-import { gameSessionOf, type GameSession } from '../../../src/infrastructure/ui/game-session';
+import type { GameSession } from '../../../src/infrastructure/ui/screen-services';
 import { GameStage } from '../../../src/infrastructure/ui/game-stage';
 import { gameUseCases } from '../../support/application/game-use-cases';
 import { RecordingLogger } from '../../support/application/recording-logger';
@@ -96,7 +96,7 @@ async function undo(session: GameSession): Promise<void> {
 // the same seed in every run. With that seed, the first two tiles can slide to the east.
 function realMergeSession(logger: RecordingLogger): GameSession {
   const root = new CompositionRoot({ clock: new ManualClock(), logger });
-  return gameSessionOf(root, GameId.of('hexa-merge'), textCatalog.es);
+  return root.gameSession(GameId.of('hexa-merge'));
 }
 
 // The real root plays to 2048, which no test reaches. So this session plays a game with
@@ -312,7 +312,7 @@ describe('Merge on the game screen', () => {
   it('should_show_no_slide_button_when_another_game_opens', async () => {
     const root = new CompositionRoot({ clock: new ManualClock(), logger: new RecordingLogger() });
     for (const id of ['hexa-lines', 'hexa-fit', 'hexa-sort']) {
-      await show(gameSessionOf(root, GameId.of(id), textCatalog.es));
+      await show(root.gameSession(GameId.of(id)));
 
       expect([id, screen.queryAllByRole('button', { name: /^Deslizar/ })]).toEqual([id, []]);
       await screen.unmount();
