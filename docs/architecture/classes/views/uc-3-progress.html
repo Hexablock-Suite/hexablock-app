@@ -60,36 +60,36 @@
   </head>
   <body>
     <div class="frame">
-      <p class="eyebrow">Class diagram · Part 3 · View 3 of 6</p>
-      <h1>Progress, levels and leaderboard: use cases over output ports</h1>
+      <p class="eyebrow">Class diagram · Part 3 · View 3 of 7</p>
+      <h1>Progress and levels: use cases over output ports</h1>
 
       <svg
-        viewBox="0 0 1040 2100"
+        viewBox="0 0 1040 2116"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="ucprogress-title ucprogress-desc"
       >
         <title id="ucprogress-title">HexaBlock progress use cases · UML class diagram</title>
         <desc id="ucprogress-desc">
-          Class diagram of layer 2 showing the use cases SaveProgress, LoadProgress, ListLevels,
-          SyncLeaderboard and SyncProgress, each implementing the UseCase input port with its
-          binding, and the output ports they use: SaveProgress and LoadProgress use
-          ProgressRepository, SaveProgress to record each result in the progress of its game and
-          LoadProgress to read the saved progress of the game of its request back, or undefined when
-          the game has none (#181); ListLevels uses LevelRepository and ProgressRepository, takes
-          the game and the chosen figure and returns LevelSummary values, each with a LevelStatus of
-          layer 1, a closed set (completed, open, locked) whose ofEach() gives the status of each
-          level from GameProgress (#326), and SyncLeaderboard uses LeaderboardGateway and
-          ProgressRepository. LevelRepository also finds the one level of a game that a start names
-          by its id (#172). SaveProgress keeps the GameId of its game and returns no value;
-          LoadProgress takes the GameId in its request, as ListLevels does (#410), and answers the
-          whole GameProgress. ProgressRepository gives the ProgressOwner, the last signed-in user or
-          the anonymous owner, with owner(), and loads and updates the GameProgress of one game of
-          that owner in one queue per key in layer 1: one object with the high score and the best
-          result of each level, which gives the stars of a level with starsOf() and delivers its
-          data to a repository of the edge with deliverTo(). AchievementCounterRepository loads and
-          saves the AchievementCounters of one game in layer 1 (#363): its own aggregate, with a
-          best count and a total, each an AchievementCount. SyncProgress (#46) uses SessionStore,
+          Class diagram of layer 2 showing the use cases SaveProgress, LoadProgress, ListLevels and
+          SyncProgress, each implementing the UseCase input port with its binding, and the output
+          ports they use: SaveProgress and LoadProgress use ProgressRepository, SaveProgress to
+          record each result in the progress of its game and LoadProgress to read the saved progress
+          of the game of its request back, or undefined when the game has none (#181); ListLevels
+          uses LevelRepository and ProgressRepository, takes the game and the chosen figure and
+          returns LevelSummary values, each with a LevelStatus of layer 1, a closed set (completed,
+          open, locked) whose ofEach() gives the status of each level from GameProgress (#326). The
+          leaderboard use cases of #47 and their port LeaderboardGateway live in view 3.7.
+          LevelRepository also finds the one level of a game that a start names by its id (#172).
+          SaveProgress keeps the GameId of its game and returns no value; LoadProgress takes the
+          GameId in its request, as ListLevels does (#410), and answers the whole GameProgress.
+          ProgressRepository gives the ProgressOwner, the last signed-in user or the anonymous
+          owner, with owner(), and loads and updates the GameProgress of one game of that owner in
+          one queue per key in layer 1: one object with the high score and the best result of each
+          level, which gives the stars of a level with starsOf() and delivers its data to a
+          repository of the edge with deliverTo(). AchievementCounterRepository loads and saves the
+          AchievementCounters of one game in layer 1 (#363): its own aggregate, with a best count
+          and a total, each an AchievementCount. SyncProgress (#46) uses SessionStore,
           ProgressRepository, AnonymousProgress and ProgressGateway: the user of the session is the
           owner, it merges the anonymous progress into that owner with mergeAnonymousInto(), sends
           the progress through ProgressGateway, which throws a SyncFailure for a known failure, and
@@ -255,7 +255,7 @@
         />
         <!-- LevelSummary holds its LevelStatus as status: use with role and multiplicity (decision 23), down from layer 2 to layer 1 (#326) -->
         <path
-          d="M696 140 H984 Q992 140 992 148 V1624 Q992 1632 984 1632 H960"
+          d="M696,140 H984 Q992,140 992,148 V1624 Q992,1632 984,1632 H960"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -263,7 +263,7 @@
         />
         <!-- LevelStatus.ofEach() reads the GameProgress it receives as progress: use with role and multiplicity -->
         <path
-          d="M760 1552 V1516"
+          d="M760,1552 V1516"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -271,7 +271,7 @@
         />
         <!-- ListLevels keeps the LevelRepository it receives as levels: use with role and multiplicity (decision 23) -->
         <path
-          d="M304 172 H392 Q400 172 400 180 V280 Q400 288 408 288 H472"
+          d="M304,172 H392 Q400,172 400,180 V280 Q400,288 408,288 H472"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -279,7 +279,7 @@
         />
         <!-- ListLevels keeps the ProgressRepository it receives as progress: use with role and multiplicity (decision 23) -->
         <path
-          d="M304 204 H360 Q368 204 368 212 V364 Q368 372 376 372 H472"
+          d="M304,204 H360 Q368,204 368,212 V364 Q368,372 376,372 H472"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -297,32 +297,15 @@
         />
         <!-- LoadProgress keeps the ProgressRepository it receives as repository: use with role and multiplicity (decision 23) -->
         <path
-          d="M304 638 H352 Q360 638 360 630 V444 Q360 436 368 436 H472"
+          d="M304,638 H352 Q360,638 360,630 V444 Q360,436 368,436 H472"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#ucprogress-open)"
         />
-        <!-- SyncLeaderboard keeps the ProgressRepository it receives as progress: use with role and multiplicity (decision 23) -->
-        <path
-          d="M304 796 H376 Q384 796 384 788 V428 Q384 420 392 420 H472"
-          fill="none"
-          stroke="#5b6873"
-          stroke-width="1"
-          marker-end="url(#ucprogress-open)"
-        />
-        <!-- SyncLeaderboard keeps the LeaderboardGateway it receives as gateway: use with role and multiplicity (decision 23) -->
-        <path
-          d="M304 808 H400 Q408 808 408 800 V612 Q408 604 416 604 H472"
-          fill="none"
-          stroke="#5b6873"
-          stroke-width="1"
-          marker-end="url(#ucprogress-open)"
-        />
-
         <!-- ProgressRepository loads and saves the GameProgress of one game: use, down from layer 2 to layer 1 -->
         <path
-          d="M864 428 H920 Q928 428 928 436 V1276"
+          d="M864,428 H920 Q928,428 928,436 V1276"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -330,7 +313,7 @@
         />
         <!-- AchievementCounterRepository loads and saves the AchievementCounters of one game: use, down from layer 2 to layer 1 (#363) -->
         <path
-          d="M904 688 H908 Q912 688 912 696 V1188 Q912 1196 904 1196 H496 Q488 1196 488 1204 V1292"
+          d="M904,688 H908 Q912,688 912,696 V1188 Q912,1196 904,1196 H496 Q488,1196 488,1204 V1292"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -467,34 +450,10 @@
           repository
           <tspan font-weight="600">1</tspan>
         </text>
-        <rect x="402" y="407" width="52" height="12" rx="2" fill="#efe7f8" />
-        <text
-          x="452"
-          y="416"
-          fill="#17212a"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="end"
-        >
-          progress
-          <tspan font-weight="600">1</tspan>
-        </text>
-        <rect x="406" y="591" width="48" height="12" rx="2" fill="#efe7f8" />
-        <text
-          x="452"
-          y="600"
-          fill="#17212a"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="end"
-        >
-          gateway
-          <tspan font-weight="600">1</tspan>
-        </text>
 
         <!-- SyncProgress keeps the ProgressRepository it receives as progress: use with role and multiplicity (decision 23, #46) -->
         <path
-          d="M304 976 H424 Q432 976 432 968 V520 Q432 512 440 512 H832 Q840 512 840 504 V492"
+          d="M304,976 H424 Q432,976 432,968 V520 Q432,512 440,512 H832 Q840,512 840,504 V492"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -502,7 +461,7 @@
         />
         <!-- SyncProgress keeps the AnonymousProgress it receives as anonymous: use with role and multiplicity (decision 23, #46) -->
         <path
-          d="M304 1000 H472"
+          d="M304,1000 H472"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -510,7 +469,7 @@
         />
         <!-- SyncProgress keeps the ProgressGateway it receives as gateway: use with role and multiplicity (decision 23, #46) -->
         <path
-          d="M304 1084 H472"
+          d="M304,1084 H472"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -518,7 +477,7 @@
         />
         <!-- SyncProgress keeps the SessionStore it receives as sessions: use with role and multiplicity (decision 23, #46) -->
         <path
-          d="M184 1140 V1172"
+          d="M184,1140 V1172"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -755,68 +714,6 @@
           undefined&gt;&gt;
         </text>
 
-        <!-- Class: SyncLeaderboard (use case) -->
-        <rect
-          x="64"
-          y="764"
-          width="240"
-          height="140"
-          rx="6"
-          fill="#ffffff"
-          stroke="#17212a"
-          stroke-width="1"
-        />
-        <line x1="64" y1="824" x2="304" y2="824" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text
-          x="184"
-          y="782"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «use case»
-        </text>
-        <text
-          x="184"
-          y="800"
-          fill="#17212a"
-          font-size="12"
-          font-weight="600"
-          font-family="'IBM Plex Sans', sans-serif"
-          text-anchor="middle"
-        >
-          SyncLeaderboard
-          <tspan data-requirement="APP-FR-14" fill="#5b6873" font-size="8" font-weight="400">
-            «Sprint 4»
-          </tspan>
-        </text>
-        <text
-          x="184"
-          y="814"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          APP-FR-14
-        </text>
-        <text x="80" y="840" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - gateway: LeaderboardGateway
-        </text>
-        <text x="80" y="856" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - progress: ProgressRepository
-        </text>
-        <line x1="64" y1="864" x2="304" y2="864" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text x="80" y="880" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + execute(request: GameId):
-        </text>
-        <text x="96" y="896" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          Promise&lt;Result&lt;LeaderboardEntry[]&gt;&gt;
-        </text>
-
         <!-- Class: LevelSummary (interface, value object) -->
         <rect
           x="472"
@@ -959,50 +856,6 @@
         <text x="504" y="484" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           change: (progress: GameProgress) =&gt; void): Promise&lt;void&gt;
         </text>
-        <!-- Class: LeaderboardGateway (interface, port) -->
-        <rect
-          x="472"
-          y="524"
-          width="432"
-          height="88"
-          rx="6"
-          fill="#ffffff"
-          stroke="#17212a"
-          stroke-width="1"
-        />
-        <line x1="472" y1="572" x2="904" y2="572" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
-        <text
-          x="688"
-          y="542"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «interface» «port»
-        </text>
-        <text
-          x="688"
-          y="560"
-          fill="#17212a"
-          font-size="12"
-          font-weight="600"
-          font-family="'IBM Plex Sans', sans-serif"
-          text-anchor="middle"
-        >
-          LeaderboardGateway
-          <tspan data-requirement="APP-FR-14" fill="#5b6873" font-size="8" font-weight="400">
-            «Sprint 4»
-          </tspan>
-        </text>
-        <text x="488" y="588" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + submit(result: GameResult): Promise&lt;void&gt;
-        </text>
-        <text x="488" y="604" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          + top(gameId: GameId, levelId?: string): Promise&lt;LeaderboardEntry[]&gt;
-        </text>
-
         <!-- Class: AchievementCounterRepository (interface, port, #363) -->
         <rect
           x="472"
@@ -1827,18 +1680,13 @@
         <text x="91" y="542" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           UseCase‹LoadProgressRequest, GameProgress | undefined›
         </text>
-        <line x1="80" y1="764" x2="80" y2="748" stroke="#17212a" stroke-width="1" />
-        <circle cx="80" cy="743" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
-        <text x="91" y="746" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          UseCase‹GameId, LeaderboardEntry[]›
-        </text>
 
         <line x1="80" y1="952" x2="80" y2="936" stroke="#17212a" stroke-width="1" />
         <circle cx="80" cy="931" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
         <text x="91" y="934" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           UseCase‹SyncProgressRequest, void›
         </text>
-        <!-- The footnote and the legend sit 700 lower than the layer zones: layer 1 holds LevelStatus since #326, and LoadProgress joined the use cases in #181 and the counters in #363, and SyncProgress with its ports in #46. -->
+        <!-- The footnote and the legend sit 700 lower than the layer zones: layer 1 holds LevelStatus since #326, and LoadProgress joined the use cases in #181 and the counters in #363, and SyncProgress with its ports in #46. Since #47 the legend sits 16 lower again, for the line of the leaderboards. -->
         <g transform="translate(0 700)">
           <!-- Footnote: classes the budget leaves out -->
           <text
@@ -1985,18 +1833,28 @@
             ProgressOwner is the owner of the progress: the last signed-in user, or the anonymous
             owner. A use case reads it once with owner().
           </text>
+          <text
+            x="24"
+            y="1284"
+            fill="#5b6873"
+            font-size="11"
+            font-family="'IBM Plex Sans', sans-serif"
+          >
+            GetGlobalLeaderboard and GetLevelLeaderboard read the boards of the backend through
+            LeaderboardGateway: view 3.7 shows them (#47, decision 67).
+          </text>
           <!-- Legend -->
           <line
             x1="24"
-            y1="1292"
+            y1="1308"
             x2="1016"
-            y2="1292"
+            y2="1308"
             stroke="rgba(23,33,42,0.10)"
             stroke-width="0.8"
           />
           <text
             x="24"
-            y="1310"
+            y="1326"
             fill="#5b6873"
             font-size="8"
             font-family="'IBM Plex Mono', monospace"
@@ -2007,16 +1865,16 @@
 
           <line
             x1="24"
-            y1="1328"
+            y1="1344"
             x2="52"
-            y2="1328"
+            y2="1344"
             stroke="#5b6873"
             stroke-width="1"
             marker-end="url(#ucprogress-open)"
           />
           <text
             x="60"
-            y="1332"
+            y="1348"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2026,7 +1884,7 @@
 
           <rect
             x="24"
-            y="1348"
+            y="1364"
             width="28"
             height="12"
             rx="2"
@@ -2036,7 +1894,7 @@
           />
           <text
             x="60"
-            y="1357"
+            y="1373"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2045,7 +1903,7 @@
           </text>
           <rect
             x="184"
-            y="1348"
+            y="1364"
             width="28"
             height="12"
             rx="2"
@@ -2056,7 +1914,7 @@
           />
           <text
             x="220"
-            y="1357"
+            y="1373"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2065,7 +1923,7 @@
           </text>
           <rect
             x="424"
-            y="1348"
+            y="1364"
             width="28"
             height="12"
             rx="2"
@@ -2075,18 +1933,18 @@
           />
           <text
             x="460"
-            y="1357"
+            y="1373"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
           >
             Teal · focal class
           </text>
-          <line x1="600" y1="1354" x2="616" y2="1354" stroke="#17212a" stroke-width="1" />
-          <circle cx="621" cy="1354" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          <line x1="600" y1="1370" x2="616" y2="1370" stroke="#17212a" stroke-width="1" />
+          <circle cx="621" cy="1370" r="5" fill="#ffffff" stroke="#17212a" stroke-width="1" />
           <text
             x="636"
-            y="1357"
+            y="1373"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2097,7 +1955,7 @@
           <!-- Legend: the «Sprint N» marker of a planned class or member -->
           <text
             x="24"
-            y="1377"
+            y="1393"
             fill="#17212a"
             font-size="8.5"
             font-family="'IBM Plex Mono', monospace"
@@ -2106,7 +1964,7 @@
           </text>
           <text
             x="92"
-            y="1377"
+            y="1393"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"

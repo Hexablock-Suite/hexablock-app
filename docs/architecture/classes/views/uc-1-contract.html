@@ -60,7 +60,7 @@
   </head>
   <body>
     <div class="frame">
-      <p class="eyebrow">Class diagram · Part 3 · View 1 of 6</p>
+      <p class="eyebrow">Class diagram · Part 3 · View 1 of 7</p>
       <h1>The use case contract and its aspects: Decorator for AOP</h1>
 
       <svg
@@ -77,10 +77,11 @@
           decorator implements UseCase, wraps one inner UseCase and turns every exception into a
           failed Result. The logging, timing, retry and authorization aspects extend it, and the
           composition root wraps each use case through decorate(), today in LoggingAspect alone.
-          SyncProgress reads the session itself, so AuthorizationAspect stays planned for
-          SyncLeaderboard. The logging and timing aspects use the Logger output port. Logger takes a
-          UseCaseLogEntry with the use case name, the outcome, the time, the error and the failed
-          deliveries of a success, and the adapter writes the text.
+          SyncProgress and the two leaderboard use cases of #47 read the session themselves, so
+          AuthorizationAspect stays planned with no use case to guard. The logging and timing
+          aspects use the Logger output port. Logger takes a UseCaseLogEntry with the use case name,
+          the outcome, the time, the error and the failed deliveries of a success, and the adapter
+          writes the text.
         </desc>
         <defs>
           <marker
@@ -835,8 +836,9 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          AuthorizationAspect stays planned for SyncLeaderboard. RetryAspect is planned with no
-          sprint: #46 delivered APP-FR-13 without it. Clock is an interface of the engine.
+          AuthorizationAspect stays planned: the leaderboards of #47 read SessionStore too.
+          RetryAspect is planned with no sprint: #46 delivered APP-FR-13 without it. Clock is an
+          engine interface.
         </text>
         <text
           x="24"

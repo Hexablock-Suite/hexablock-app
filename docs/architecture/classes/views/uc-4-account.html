@@ -60,7 +60,7 @@
   </head>
   <body>
     <div class="frame">
-      <p class="eyebrow">Class diagram · Part 3 · View 4 of 6</p>
+      <p class="eyebrow">Class diagram · Part 3 · View 4 of 7</p>
       <h1>Account and settings: session and settings ports</h1>
 
       <svg
@@ -794,8 +794,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          AuthorizationAspect, planned, reads SessionStore before SyncLeaderboard runs (view 1).
-          Settings holds the mute option and the language.
+          GetGlobalLeaderboard and GetLevelLeaderboard read SessionStore too, and clear() it on a
+          refused token (view 7, #47). Settings holds the mute option and the language.
         </text>
         <text
           x="24"

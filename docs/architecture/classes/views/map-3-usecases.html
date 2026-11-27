@@ -64,14 +64,17 @@
       <h1>The use cases at a glance</h1>
 
       <svg
-        viewBox="0 0 1040 1556"
+        viewBox="0 0 1040 1672"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="mapuc-title mapuc-desc"
       >
         <title id="mapuc-title">HexaBlock use cases map · UML class diagram</title>
         <desc id="mapuc-desc">
-          Overview map of the 56 layer 2 classes in 8 groups, AchievementCounterRepository of #363
+          Overview map of the 62 layer 2 classes in 8 groups, GetGlobalLeaderboard and
+          GetLevelLeaderboard of #47 among the progress use cases with their port
+          LeaderboardGateway, their requests, Leaderboard, LeaderboardRow, LeaderboardRecord and
+          their error LeaderboardFailure among the models, AchievementCounterRepository of #363
           among the output ports, SyncProgress of #46 among the progress use cases with its ports
           AnonymousProgress and ProgressGateway, its request SyncProgressRequest and its error
           SyncFailure, the owner ProgressOwner and the merge AnonymousMerge of #46 among the models
@@ -80,9 +83,9 @@
           LevelsWon, EveryLevelWon, BestCountReached and TotalCountReached of layer 1 as dashed
           chips (#326, #364). Each line joins two classes: UseCaseAspect implements UseCase and
           decorates the one it wraps, StartGame, SaveProgress, LoadProgress and Register each
-          implement UseCase for their group, and RedoMove, SyncLeaderboard and UpdateSettings keep
-          an output port. No line touches a group frame. Each group names the view that shows its
-          members.
+          implement UseCase for their group, and RedoMove, GetLevelLeaderboard and UpdateSettings
+          keep an output port. No line touches a group frame. Each group names the view that shows
+          its members.
         </desc>
         <defs>
           <marker
@@ -143,7 +146,7 @@
           x="24"
           y="24"
           width="992"
-          height="1372"
+          height="1472"
           rx="8"
           fill="#efe7f8"
           stroke="rgba(126,34,206,0.40)"
@@ -272,7 +275,7 @@
           x="436"
           y="382"
           width="192"
-          height="278"
+          height="328"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -340,7 +343,7 @@
         <!-- Group: output ports -->
         <rect
           x="148"
-          y="690"
+          y="740"
           width="744"
           height="228"
           rx="8"
@@ -351,7 +354,7 @@
         />
         <text
           x="160"
-          y="706"
+          y="756"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -362,7 +365,7 @@
         </text>
         <text
           x="880"
-          y="706"
+          y="756"
           fill="#1d4ed8"
           font-size="8"
           font-weight="500"
@@ -375,9 +378,9 @@
         <!-- Group: request and response models -->
         <rect
           x="56"
-          y="942"
+          y="992"
           width="928"
-          height="278"
+          height="328"
           rx="8"
           fill="none"
           stroke="rgba(91,104,115,0.55)"
@@ -386,7 +389,7 @@
         />
         <text
           x="68"
-          y="958"
+          y="1008"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -397,7 +400,7 @@
         </text>
         <text
           x="972"
-          y="958"
+          y="1008"
           fill="#1d4ed8"
           font-size="8"
           font-weight="500"
@@ -411,7 +414,7 @@
         <!-- Group: achievements -->
         <rect
           x="56"
-          y="1244"
+          y="1344"
           width="928"
           height="128"
           rx="8"
@@ -422,7 +425,7 @@
         />
         <text
           x="68"
-          y="1260"
+          y="1360"
           fill="#5b6873"
           font-size="8"
           font-weight="500"
@@ -433,7 +436,7 @@
         </text>
         <text
           x="972"
-          y="1260"
+          y="1360"
           fill="#1d4ed8"
           font-size="8"
           font-weight="500"
@@ -500,15 +503,15 @@
         />
         <!-- RedoMove keeps the GameRepository as games: use with role and multiplicity (view 3.2) -->
         <path
-          d="M340,594 L340,718"
+          d="M340,594 L340,768"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#mapuc-open)"
         />
-        <!-- SyncLeaderboard keeps the ProgressRepository as progress: use with role and multiplicity (view 3.3). It starts below SyncProgress since #46. -->
+        <!-- GetLevelLeaderboard keeps the LeaderboardGateway as gateway: use with role and multiplicity (view 3.7). It starts below the last progress use case since #47. -->
         <path
-          d="M500,644 L500,718"
+          d="M500,694 L500,768"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -516,7 +519,7 @@
         />
         <!-- UpdateSettings keeps the SettingsStore as settings: use with role and multiplicity (view 3.4) -->
         <path
-          d="M700,544 L700,718"
+          d="M700,544 L700,768"
           fill="none"
           stroke="#5b6873"
           stroke-width="1"
@@ -536,10 +539,10 @@
         >
           decorate 1
         </text>
-        <rect x="346" y="646" width="40" height="12" rx="2" fill="#efe7f8" />
+        <rect x="346" y="646" width="40" height="62" rx="2" fill="#efe7f8" />
         <text
           x="366"
-          y="655"
+          y="705"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -548,22 +551,22 @@
         >
           games 1
         </text>
-        <rect x="506" y="668" width="56" height="12" rx="2" fill="#efe7f8" />
+        <rect x="506" y="718" width="56" height="12" rx="2" fill="#efe7f8" />
         <text
           x="534"
-          y="677"
+          y="727"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
           text-anchor="middle"
           letter-spacing="0.06em"
         >
-          progress 1
+          gateway 1
         </text>
-        <rect x="706" y="646" width="56" height="12" rx="2" fill="#efe7f8" />
+        <rect x="706" y="646" width="56" height="62" rx="2" fill="#efe7f8" />
         <text
           x="734"
-          y="655"
+          y="705"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -825,7 +828,7 @@
             </tspan>
           </text>
         </g>
-        <g data-class="SyncLeaderboard">
+        <g data-class="GetGlobalLeaderboard">
           <rect
             x="452"
             y="610"
@@ -838,10 +841,28 @@
           />
           <text x="532" y="631" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              SyncLeaderboard
+              GetGlobalLeaderboard
             </tspan>
           </text>
         </g>
+        <g data-class="GetLevelLeaderboard">
+          <rect
+            x="452"
+            y="660"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="532" y="681" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              GetLevelLeaderboard
+            </tspan>
+          </text>
+        </g>
+
         <!-- SyncProgress, the sync of the progress (#46, decision 66) -->
         <g data-class="SyncProgress">
           <rect
@@ -916,118 +937,6 @@
         <g data-class="GameRepository">
           <rect
             x="164"
-            y="718"
-            width="244"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text
-            x="286"
-            y="730"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            interface
-          </text>
-          <text x="286" y="743" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              GameRepository
-            </tspan>
-          </text>
-        </g>
-        <g data-class="ProgressRepository">
-          <rect
-            x="424"
-            y="718"
-            width="140"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text
-            x="494"
-            y="730"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            interface
-          </text>
-          <text x="494" y="743" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              ProgressRepository
-            </tspan>
-          </text>
-        </g>
-        <g data-class="LevelRepository">
-          <rect
-            x="580"
-            y="768"
-            width="140"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text
-            x="650"
-            y="780"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            interface
-          </text>
-          <text x="650" y="793" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              LevelRepository
-            </tspan>
-          </text>
-        </g>
-        <g data-class="LeaderboardGateway">
-          <rect
-            x="736"
-            y="718"
-            width="140"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text
-            x="806"
-            y="730"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            interface
-          </text>
-          <text x="806" y="743" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              LeaderboardGateway
-            </tspan>
-          </text>
-        </g>
-        <g data-class="AccountGateway">
-          <rect
-            x="164"
             y="768"
             width="244"
             height="34"
@@ -1049,11 +958,11 @@
           </text>
           <text x="286" y="793" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              AccountGateway
+              GameRepository
             </tspan>
           </text>
         </g>
-        <g data-class="SessionStore">
+        <g data-class="LeaderboardGateway">
           <rect
             x="424"
             y="768"
@@ -1077,14 +986,14 @@
           </text>
           <text x="494" y="793" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              SessionStore
+              LeaderboardGateway
             </tspan>
           </text>
         </g>
-        <g data-class="SettingsStore">
+        <g data-class="LevelRepository">
           <rect
             x="580"
-            y="718"
+            y="818"
             width="140"
             height="34"
             rx="4"
@@ -1094,7 +1003,7 @@
           />
           <text
             x="650"
-            y="730"
+            y="830"
             fill="#5b6873"
             font-size="7"
             font-family="'IBM Plex Mono', monospace"
@@ -1103,13 +1012,13 @@
           >
             interface
           </text>
-          <text x="650" y="743" fill="#17212a" text-anchor="middle">
+          <text x="650" y="843" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              SettingsStore
+              LevelRepository
             </tspan>
           </text>
         </g>
-        <g data-class="Logger">
+        <g data-class="ProgressRepository">
           <rect
             x="736"
             y="768"
@@ -1133,11 +1042,11 @@
           </text>
           <text x="806" y="793" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              Logger
+              ProgressRepository
             </tspan>
           </text>
         </g>
-        <g data-class="GameEventPublisher">
+        <g data-class="AccountGateway">
           <rect
             x="164"
             y="818"
@@ -1161,11 +1070,11 @@
           </text>
           <text x="286" y="843" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              GameEventPublisher
+              AccountGateway
             </tspan>
           </text>
         </g>
-        <g data-class="GameFactories">
+        <g data-class="SessionStore">
           <rect
             x="424"
             y="818"
@@ -1189,15 +1098,15 @@
           </text>
           <text x="494" y="843" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              GameFactories
+              SessionStore
             </tspan>
           </text>
         </g>
-        <g data-class="AchievementCounterRepository">
+        <g data-class="SettingsStore">
           <rect
             x="580"
-            y="818"
-            width="296"
+            y="768"
+            width="140"
             height="34"
             rx="4"
             fill="#ffffff"
@@ -1205,7 +1114,35 @@
             stroke-width="1"
           />
           <text
-            x="728"
+            x="650"
+            y="780"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="650" y="793" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              SettingsStore
+            </tspan>
+          </text>
+        </g>
+        <g data-class="Logger">
+          <rect
+            x="736"
+            y="818"
+            width="140"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="806"
             y="830"
             fill="#5b6873"
             font-size="7"
@@ -1215,14 +1152,13 @@
           >
             interface
           </text>
-          <text x="728" y="843" fill="#17212a" text-anchor="middle">
+          <text x="806" y="843" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              AchievementCounterRepository
+              Logger
             </tspan>
           </text>
         </g>
-        <!-- The two ports of the sync (#46, decision 66) -->
-        <g data-class="AnonymousProgress">
+        <g data-class="GameEventPublisher">
           <rect
             x="164"
             y="868"
@@ -1246,11 +1182,11 @@
           </text>
           <text x="286" y="893" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              AnonymousProgress
+              GameEventPublisher
             </tspan>
           </text>
         </g>
-        <g data-class="ProgressGateway">
+        <g data-class="GameFactories">
           <rect
             x="424"
             y="868"
@@ -1274,154 +1210,97 @@
           </text>
           <text x="494" y="893" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              GameFactories
+            </tspan>
+          </text>
+        </g>
+        <g data-class="AchievementCounterRepository">
+          <rect
+            x="580"
+            y="868"
+            width="296"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="728"
+            y="880"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="728" y="893" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              AchievementCounterRepository
+            </tspan>
+          </text>
+        </g>
+        <!-- The two ports of the sync (#46, decision 66) -->
+        <g data-class="AnonymousProgress">
+          <rect
+            x="164"
+            y="918"
+            width="244"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="286"
+            y="930"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="286" y="943" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              AnonymousProgress
+            </tspan>
+          </text>
+        </g>
+        <g data-class="ProgressGateway">
+          <rect
+            x="424"
+            y="918"
+            width="140"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="494"
+            y="930"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="494" y="943" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               ProgressGateway
             </tspan>
           </text>
         </g>
         <!-- Chips: request and response models -->
         <g data-class="StartGameRequest">
-          <rect
-            x="88"
-            y="970"
-            width="160"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text
-            x="168"
-            y="982"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            value object
-          </text>
-          <text x="168" y="995" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              StartGameRequest
-            </tspan>
-          </text>
-        </g>
-        <g data-class="ApplyMoveRequest">
-          <rect
-            x="264"
-            y="970"
-            width="160"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text
-            x="344"
-            y="982"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            value object
-          </text>
-          <text x="344" y="995" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              ApplyMoveRequest
-            </tspan>
-          </text>
-        </g>
-        <g data-class="MoveResult">
-          <rect
-            x="440"
-            y="970"
-            width="160"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text
-            x="520"
-            y="982"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            value object
-          </text>
-          <text x="520" y="995" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              MoveResult
-            </tspan>
-          </text>
-        </g>
-        <g data-class="LevelSummary">
-          <rect
-            x="616"
-            y="970"
-            width="160"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text
-            x="696"
-            y="982"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            value object
-          </text>
-          <text x="696" y="995" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              LevelSummary
-            </tspan>
-          </text>
-        </g>
-        <!-- LevelDefinition lives in layer 1 since #166: a dashed chip, detailed in Part 1, view 5 -->
-        <g data-class="LevelDefinition">
-          <rect
-            x="792"
-            y="970"
-            width="160"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#5b6873"
-            stroke-width="1"
-            stroke-dasharray="4,3"
-          />
-          <text
-            x="872"
-            y="982"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            engine · part 1 · view 5
-          </text>
-          <text x="872" y="995" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              LevelDefinition
-            </tspan>
-          </text>
-        </g>
-        <g data-class="LeaderboardEntry">
           <rect
             x="88"
             y="1020"
@@ -1445,11 +1324,11 @@
           </text>
           <text x="168" y="1045" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              LeaderboardEntry
+              StartGameRequest
             </tspan>
           </text>
         </g>
-        <g data-class="Credentials">
+        <g data-class="ApplyMoveRequest">
           <rect
             x="264"
             y="1020"
@@ -1473,11 +1352,11 @@
           </text>
           <text x="344" y="1045" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              Credentials
+              ApplyMoveRequest
             </tspan>
           </text>
         </g>
-        <g data-class="Session">
+        <g data-class="MoveResult">
           <rect
             x="440"
             y="1020"
@@ -1501,11 +1380,11 @@
           </text>
           <text x="520" y="1045" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              Session
+              MoveResult
             </tspan>
           </text>
         </g>
-        <g data-class="Settings">
+        <g data-class="LevelSummary">
           <rect
             x="616"
             y="1020"
@@ -1529,12 +1408,12 @@
           </text>
           <text x="696" y="1045" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              Settings
+              LevelSummary
             </tspan>
           </text>
         </g>
-
-        <g data-class="ListLevelsRequest">
+        <!-- LevelDefinition lives in layer 1 since #166: a dashed chip, detailed in Part 1, view 5 -->
+        <g data-class="LevelDefinition">
           <rect
             x="792"
             y="1020"
@@ -1542,8 +1421,9 @@
             height="34"
             rx="4"
             fill="#ffffff"
-            stroke="#17212a"
+            stroke="#5b6873"
             stroke-width="1"
+            stroke-dasharray="4,3"
           />
           <text
             x="872"
@@ -1554,15 +1434,15 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            value object
+            engine · part 1 · view 5
           </text>
           <text x="872" y="1045" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              ListLevelsRequest
+              LevelDefinition
             </tspan>
           </text>
         </g>
-        <g data-class="Result">
+        <g data-class="Leaderboard">
           <rect
             x="88"
             y="1070"
@@ -1586,11 +1466,11 @@
           </text>
           <text x="168" y="1095" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              Result
+              Leaderboard
             </tspan>
           </text>
         </g>
-        <g data-class="UseCaseError">
+        <g data-class="Credentials">
           <rect
             x="264"
             y="1070"
@@ -1614,11 +1494,11 @@
           </text>
           <text x="344" y="1095" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              UseCaseError
+              Credentials
             </tspan>
           </text>
         </g>
-        <g data-class="UseCaseLogEntry">
+        <g data-class="Session">
           <rect
             x="440"
             y="1070"
@@ -1642,12 +1522,11 @@
           </text>
           <text x="520" y="1095" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              UseCaseLogEntry
+              Session
             </tspan>
           </text>
         </g>
-        <!-- LevelStatus lives in layer 1 since #326: a dashed chip -->
-        <g data-class="LevelStatus">
+        <g data-class="Settings">
           <rect
             x="616"
             y="1070"
@@ -1655,9 +1534,8 @@
             height="34"
             rx="4"
             fill="#ffffff"
-            stroke="#5b6873"
+            stroke="#17212a"
             stroke-width="1"
-            stroke-dasharray="4,3"
           />
           <text
             x="696"
@@ -1668,15 +1546,16 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            engine · view 3.3
+            value object
           </text>
           <text x="696" y="1095" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              LevelStatus
+              Settings
             </tspan>
           </text>
         </g>
-        <g data-class="AccountFailure">
+
+        <g data-class="ListLevelsRequest">
           <rect
             x="792"
             y="1070"
@@ -1696,16 +1575,15 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            error · view 3.4
+            value object
           </text>
           <text x="872" y="1095" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              AccountFailure
+              ListLevelsRequest
             </tspan>
           </text>
         </g>
-        <!-- The request and the error of the sync (#46) -->
-        <g data-class="SyncProgressRequest">
+        <g data-class="Result">
           <rect
             x="88"
             y="1120"
@@ -1729,11 +1607,11 @@
           </text>
           <text x="168" y="1145" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              SyncProgressRequest
+              Result
             </tspan>
           </text>
         </g>
-        <g data-class="SyncFailure">
+        <g data-class="UseCaseError">
           <rect
             x="264"
             y="1120"
@@ -1753,16 +1631,15 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            error · view 3.3
+            value object
           </text>
           <text x="344" y="1145" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              SyncFailure
+              UseCaseError
             </tspan>
           </text>
         </g>
-        <!-- The request of LoadProgress (#410), and the owner of the progress and the merge of a sign-in (#46) -->
-        <g data-class="LoadProgressRequest">
+        <g data-class="UseCaseLogEntry">
           <rect
             x="440"
             y="1120"
@@ -1786,11 +1663,12 @@
           </text>
           <text x="520" y="1145" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              LoadProgressRequest
+              UseCaseLogEntry
             </tspan>
           </text>
         </g>
-        <g data-class="ProgressOwner">
+        <!-- LevelStatus lives in layer 1 since #326: a dashed chip -->
+        <g data-class="LevelStatus">
           <rect
             x="616"
             y="1120"
@@ -1798,8 +1676,9 @@
             height="34"
             rx="4"
             fill="#ffffff"
-            stroke="#17212a"
+            stroke="#5b6873"
             stroke-width="1"
+            stroke-dasharray="4,3"
           />
           <text
             x="696"
@@ -1810,15 +1689,15 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            value object · view 3.3
+            engine · view 3.3
           </text>
           <text x="696" y="1145" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              ProgressOwner
+              LevelStatus
             </tspan>
           </text>
         </g>
-        <g data-class="AnonymousMerge">
+        <g data-class="AccountFailure">
           <rect
             x="792"
             y="1120"
@@ -1838,16 +1717,16 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            value object
+            error · view 3.4
           </text>
           <text x="872" y="1145" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              AnonymousMerge
+              AccountFailure
             </tspan>
           </text>
         </g>
-        <!-- The requests of UndoMove and RedoMove, and the failure codes of UseCaseError -->
-        <g data-class="UndoMoveRequest">
+        <!-- The request and the error of the sync (#46) -->
+        <g data-class="SyncProgressRequest">
           <rect
             x="88"
             y="1170"
@@ -1871,11 +1750,11 @@
           </text>
           <text x="168" y="1195" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              UndoMoveRequest
+              SyncProgressRequest
             </tspan>
           </text>
         </g>
-        <g data-class="RedoMoveRequest">
+        <g data-class="SyncFailure">
           <rect
             x="264"
             y="1170"
@@ -1888,6 +1767,35 @@
           />
           <text
             x="344"
+            y="1182"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            error · view 3.3
+          </text>
+          <text x="344" y="1195" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              SyncFailure
+            </tspan>
+          </text>
+        </g>
+        <!-- The request of LoadProgress (#410), and the owner of the progress and the merge of a sign-in (#46) -->
+        <g data-class="LoadProgressRequest">
+          <rect
+            x="440"
+            y="1170"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="520"
             y="1182"
             fill="#5b6873"
             font-size="7"
@@ -1897,15 +1805,15 @@
           >
             value object
           </text>
-          <text x="344" y="1195" fill="#17212a" text-anchor="middle">
+          <text x="520" y="1195" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              RedoMoveRequest
+              LoadProgressRequest
             </tspan>
           </text>
         </g>
-        <g data-class="FailureCode">
+        <g data-class="ProgressOwner">
           <rect
-            x="440"
+            x="616"
             y="1170"
             width="160"
             height="34"
@@ -1915,7 +1823,7 @@
             stroke-width="1"
           />
           <text
-            x="520"
+            x="696"
             y="1182"
             fill="#5b6873"
             font-size="7"
@@ -1923,126 +1831,18 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            enumeration
+            value object · view 3.3
           </text>
-          <text x="520" y="1195" fill="#17212a" text-anchor="middle">
+          <text x="696" y="1195" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              FailureCode
+              ProgressOwner
             </tspan>
           </text>
         </g>
-        <!-- Chips: achievements -->
-        <g data-class="ListAchievements">
-          <rect
-            x="88"
-            y="1272"
-            width="160"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text x="168" y="1293" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              ListAchievements
-            </tspan>
-          </text>
-        </g>
-        <!-- AchievementGoal lives in layer 1 since #326: a dashed chip -->
-        <g data-class="AchievementGoal">
-          <rect
-            x="264"
-            y="1272"
-            width="160"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#5b6873"
-            stroke-width="1"
-            stroke-dasharray="4,3"
-          />
-          <text
-            x="344"
-            y="1284"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            engine · view 3.6
-          </text>
-          <text x="344" y="1297" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              AchievementGoal
-            </tspan>
-          </text>
-        </g>
-        <!-- LevelsWon lives in layer 1 since #326: a dashed chip -->
-        <g data-class="LevelsWon">
-          <rect
-            x="440"
-            y="1272"
-            width="160"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#5b6873"
-            stroke-width="1"
-            stroke-dasharray="4,3"
-          />
-          <text
-            x="520"
-            y="1284"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            engine · view 3.6
-          </text>
-          <text x="520" y="1297" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              LevelsWon
-            </tspan>
-          </text>
-        </g>
-        <!-- EveryLevelWon lives in layer 1 since #326: a dashed chip -->
-        <g data-class="EveryLevelWon">
-          <rect
-            x="616"
-            y="1272"
-            width="160"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#5b6873"
-            stroke-width="1"
-            stroke-dasharray="4,3"
-          />
-          <text
-            x="696"
-            y="1284"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            engine · view 3.6
-          </text>
-          <text x="696" y="1297" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              EveryLevelWon
-            </tspan>
-          </text>
-        </g>
-        <g data-class="Achievement">
+        <g data-class="AnonymousMerge">
           <rect
             x="792"
-            y="1272"
+            y="1170"
             width="160"
             height="34"
             rx="4"
@@ -2052,7 +1852,7 @@
           />
           <text
             x="872"
-            y="1284"
+            y="1182"
             fill="#5b6873"
             font-size="7"
             font-family="'IBM Plex Mono', monospace"
@@ -2061,16 +1861,17 @@
           >
             value object
           </text>
-          <text x="872" y="1297" fill="#17212a" text-anchor="middle">
+          <text x="872" y="1195" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              Achievement
+              AnonymousMerge
             </tspan>
           </text>
         </g>
-        <g data-class="ListAchievementsRequest">
+        <!-- The requests of UndoMove and RedoMove, and the failure codes of UseCaseError -->
+        <g data-class="UndoMoveRequest">
           <rect
             x="88"
-            y="1322"
+            y="1220"
             width="160"
             height="34"
             rx="4"
@@ -2080,7 +1881,7 @@
           />
           <text
             x="168"
-            y="1334"
+            y="1232"
             fill="#5b6873"
             font-size="7"
             font-family="'IBM Plex Mono', monospace"
@@ -2089,16 +1890,16 @@
           >
             value object
           </text>
-          <text x="168" y="1347" fill="#17212a" text-anchor="middle">
+          <text x="168" y="1245" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              ListAchievementsRequest
+              UndoMoveRequest
             </tspan>
           </text>
         </g>
-        <g data-class="AchievementSummary">
+        <g data-class="RedoMoveRequest">
           <rect
             x="264"
-            y="1322"
+            y="1220"
             width="160"
             height="34"
             rx="4"
@@ -2108,7 +1909,7 @@
           />
           <text
             x="344"
-            y="1334"
+            y="1232"
             fill="#5b6873"
             font-size="7"
             font-family="'IBM Plex Mono', monospace"
@@ -2117,17 +1918,233 @@
           >
             value object
           </text>
-          <text x="344" y="1347" fill="#17212a" text-anchor="middle">
+          <text x="344" y="1245" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              AchievementSummary
+              RedoMoveRequest
             </tspan>
           </text>
         </g>
-        <!-- BestCountReached lives in layer 1 since #364: a dashed chip -->
-        <g data-class="BestCountReached">
+        <g data-class="FailureCode">
           <rect
             x="440"
-            y="1322"
+            y="1220"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="520"
+            y="1232"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            enumeration
+          </text>
+          <text x="520" y="1245" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              FailureCode
+            </tspan>
+          </text>
+        </g>
+        <g data-class="GlobalLeaderboardRequest">
+          <rect
+            x="616"
+            y="1220"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="696"
+            y="1232"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="696" y="1245" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              GlobalLeaderboardRequest
+            </tspan>
+          </text>
+        </g>
+        <g data-class="LevelLeaderboardRequest">
+          <rect
+            x="792"
+            y="1220"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="872"
+            y="1232"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="872" y="1245" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              LevelLeaderboardRequest
+            </tspan>
+          </text>
+        </g>
+        <g data-class="LeaderboardRow">
+          <rect
+            x="88"
+            y="1270"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="168"
+            y="1282"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="168" y="1295" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              LeaderboardRow
+            </tspan>
+          </text>
+        </g>
+        <g data-class="LeaderboardRecord">
+          <rect
+            x="264"
+            y="1270"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="344"
+            y="1282"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            union
+          </text>
+          <text x="344" y="1295" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              LeaderboardRecord
+            </tspan>
+          </text>
+        </g>
+        <g data-class="LeaderboardFailure">
+          <rect
+            x="440"
+            y="1270"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="520"
+            y="1282"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            error · view 3.7
+          </text>
+          <text x="520" y="1295" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              LeaderboardFailure
+            </tspan>
+          </text>
+        </g>
+        <!-- Chips: achievements -->
+        <g data-class="ListAchievements">
+          <rect
+            x="88"
+            y="1372"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="168" y="1393" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              ListAchievements
+            </tspan>
+          </text>
+        </g>
+        <!-- AchievementGoal lives in layer 1 since #326: a dashed chip -->
+        <g data-class="AchievementGoal">
+          <rect
+            x="264"
+            y="1372"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#5b6873"
+            stroke-width="1"
+            stroke-dasharray="4,3"
+          />
+          <text
+            x="344"
+            y="1384"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            engine · view 3.6
+          </text>
+          <text x="344" y="1397" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              AchievementGoal
+            </tspan>
+          </text>
+        </g>
+        <!-- LevelsWon lives in layer 1 since #326: a dashed chip -->
+        <g data-class="LevelsWon">
+          <rect
+            x="440"
+            y="1372"
             width="160"
             height="34"
             rx="4"
@@ -2138,7 +2155,7 @@
           />
           <text
             x="520"
-            y="1334"
+            y="1384"
             fill="#5b6873"
             font-size="7"
             font-family="'IBM Plex Mono', monospace"
@@ -2147,17 +2164,17 @@
           >
             engine · view 3.6
           </text>
-          <text x="520" y="1347" fill="#17212a" text-anchor="middle">
+          <text x="520" y="1397" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              BestCountReached
+              LevelsWon
             </tspan>
           </text>
         </g>
-        <!-- TotalCountReached lives in layer 1 since #364: a dashed chip -->
-        <g data-class="TotalCountReached">
+        <!-- EveryLevelWon lives in layer 1 since #326: a dashed chip -->
+        <g data-class="EveryLevelWon">
           <rect
             x="616"
-            y="1322"
+            y="1372"
             width="160"
             height="34"
             rx="4"
@@ -2168,7 +2185,7 @@
           />
           <text
             x="696"
-            y="1334"
+            y="1384"
             fill="#5b6873"
             font-size="7"
             font-family="'IBM Plex Mono', monospace"
@@ -2177,7 +2194,151 @@
           >
             engine · view 3.6
           </text>
-          <text x="696" y="1347" fill="#17212a" text-anchor="middle">
+          <text x="696" y="1397" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              EveryLevelWon
+            </tspan>
+          </text>
+        </g>
+        <g data-class="Achievement">
+          <rect
+            x="792"
+            y="1372"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="872"
+            y="1384"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="872" y="1397" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              Achievement
+            </tspan>
+          </text>
+        </g>
+        <g data-class="ListAchievementsRequest">
+          <rect
+            x="88"
+            y="1422"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="168"
+            y="1434"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="168" y="1447" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              ListAchievementsRequest
+            </tspan>
+          </text>
+        </g>
+        <g data-class="AchievementSummary">
+          <rect
+            x="264"
+            y="1422"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="344"
+            y="1434"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            value object
+          </text>
+          <text x="344" y="1447" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              AchievementSummary
+            </tspan>
+          </text>
+        </g>
+        <!-- BestCountReached lives in layer 1 since #364: a dashed chip -->
+        <g data-class="BestCountReached">
+          <rect
+            x="440"
+            y="1422"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#5b6873"
+            stroke-width="1"
+            stroke-dasharray="4,3"
+          />
+          <text
+            x="520"
+            y="1434"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            engine · view 3.6
+          </text>
+          <text x="520" y="1447" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              BestCountReached
+            </tspan>
+          </text>
+        </g>
+        <!-- TotalCountReached lives in layer 1 since #364: a dashed chip -->
+        <g data-class="TotalCountReached">
+          <rect
+            x="616"
+            y="1422"
+            width="160"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#5b6873"
+            stroke-width="1"
+            stroke-dasharray="4,3"
+          />
+          <text
+            x="696"
+            y="1434"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            engine · view 3.6
+          </text>
+          <text x="696" y="1447" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               TotalCountReached
             </tspan>
@@ -2186,7 +2347,7 @@
         <!-- Footnote -->
         <text
           x="24"
-          y="1424"
+          y="1524"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2196,7 +2357,7 @@
         </text>
         <text
           x="24"
-          y="1440"
+          y="1540"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2206,7 +2367,7 @@
         </text>
         <text
           x="24"
-          y="1456"
+          y="1556"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
@@ -2214,20 +2375,31 @@
           SyncProgress, its ports AnonymousProgress and ProgressGateway, SyncProgressRequest,
           SyncFailure, ProgressOwner and AnonymousMerge exist since #46 (decision 66).
         </text>
-        <!-- The legend sits 82 lower than before: the footnote has one more line since #326 and one more since #46, and the models group has one more row since #46. -->
+        <text
+          x="24"
+          y="1572"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          GetGlobalLeaderboard, GetLevelLeaderboard, their requests, LeaderboardGateway,
+          Leaderboard, LeaderboardRow, LeaderboardRecord and LeaderboardFailure exist since #47
+          (view 3.7, decision 67).
+        </text>
+        <!-- The legend sits 82 lower than before: the footnote has one more line since #326 and one more since #46, and the models group has one more row since #46. Since #47 the shifts of the progress group, of the models group and of the footnote move it again. -->
         <g transform="translate(0 82)">
           <!-- Legend -->
           <line
             x1="24"
-            y1="1398"
+            y1="1514"
             x2="1016"
-            y2="1398"
+            y2="1514"
             stroke="rgba(23,33,42,0.10)"
             stroke-width="0.8"
           />
           <text
             x="24"
-            y="1416"
+            y="1532"
             fill="#5b6873"
             font-size="8"
             font-family="'IBM Plex Mono', monospace"
@@ -2238,16 +2410,16 @@
 
           <line
             x1="24"
-            y1="1434"
+            y1="1550"
             x2="52"
-            y2="1434"
+            y2="1550"
             stroke="#5b6873"
             stroke-width="1"
             marker-end="url(#mapuc-open)"
           />
           <text
             x="60"
-            y="1438"
+            y="1554"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2256,9 +2428,9 @@
           </text>
           <line
             x1="384"
-            y1="1434"
+            y1="1550"
             x2="412"
-            y2="1434"
+            y2="1550"
             stroke="#17212a"
             stroke-width="1"
             stroke-dasharray="5,4"
@@ -2266,7 +2438,7 @@
           />
           <text
             x="420"
-            y="1438"
+            y="1554"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2275,16 +2447,16 @@
           </text>
           <line
             x1="680"
-            y1="1434"
+            y1="1550"
             x2="708"
-            y2="1434"
+            y2="1550"
             stroke="#17212a"
             stroke-width="1"
             marker-start="url(#mapuc-diamond-hollow)"
           />
           <text
             x="716"
-            y="1438"
+            y="1554"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2294,7 +2466,7 @@
 
           <rect
             x="24"
-            y="1454"
+            y="1570"
             width="28"
             height="12"
             rx="2"
@@ -2304,7 +2476,7 @@
           />
           <text
             x="60"
-            y="1463"
+            y="1579"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2313,7 +2485,7 @@
           </text>
           <rect
             x="184"
-            y="1454"
+            y="1570"
             width="28"
             height="12"
             rx="2"
@@ -2324,7 +2496,7 @@
           />
           <text
             x="220"
-            y="1463"
+            y="1579"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2333,7 +2505,7 @@
           </text>
           <rect
             x="432"
-            y="1454"
+            y="1570"
             width="28"
             height="12"
             rx="2"
@@ -2343,7 +2515,7 @@
           />
           <text
             x="468"
-            y="1463"
+            y="1579"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2352,7 +2524,7 @@
           </text>
           <text
             x="632"
-            y="1463"
+            y="1579"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
@@ -2370,7 +2542,7 @@
           </text>
           <rect
             x="824"
-            y="1454"
+            y="1570"
             width="28"
             height="12"
             rx="2"
@@ -2380,7 +2552,7 @@
           />
           <text
             x="860"
-            y="1463"
+            y="1579"
             fill="#5b6873"
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"

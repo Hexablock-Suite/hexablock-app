@@ -1191,7 +1191,7 @@
           x="560"
           y="230"
           width="200"
-          height="100"
+          height="113"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -1235,7 +1235,7 @@
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          ApiAccountGateway · dto.d.ts
+          LeaderboardApi · ApiAccountGateway
         </text>
         <text
           x="570"
@@ -1249,11 +1249,20 @@
         <text
           x="570"
           y="321"
+          fill="#17212a"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          ApiLeaderboardGateway · dto.d.ts
+        </text>
+        <text
+          x="570"
+          y="334"
           fill="#7d8a94"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          planned: the others
+          planned: ApiLevelRepository
         </text>
         <!-- Component: planned adapters -->
         <rect
@@ -1545,12 +1554,12 @@
           LocalProgressRepository
         </text>
         <!-- Ports on the edge of layer 2: layer 2 owns each one, and an outer layer implements each output port -->
-        <!-- Port: the output ports of the account (#45) and the gateway of the sync (#46) -->
+        <!-- Port: the output ports of the account (#45), the gateway of the sync (#46) and the gateway of the leaderboards (#47) -->
         <rect
           x="80"
           y="563"
           width="98"
-          height="42"
+          height="52"
           rx="4"
           fill="#ffffff"
           stroke="#17212a"
@@ -1597,12 +1606,22 @@
         >
           ProgressGateway
         </text>
-        <!-- Port: the planned output ports -->
+        <text
+          x="129.0"
+          y="611"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          LeaderboardGateway
+        </text>
+        <!-- Port: the planned output port -->
         <rect
           x="80"
-          y="609"
+          y="619"
           width="98"
-          height="34"
+          height="24"
           rx="4"
           fill="#ffffff"
           stroke="#7d8a94"
@@ -1611,7 +1630,7 @@
         />
         <text
           x="129.0"
-          y="618"
+          y="628"
           fill="#7d8a94"
           font-size="7.5"
           font-family="'IBM Plex Mono', monospace"
@@ -1622,17 +1641,7 @@
         </text>
         <text
           x="129.0"
-          y="629"
-          fill="#7d8a94"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-        >
-          LeaderboardGateway
-        </text>
-        <text
-          x="129.0"
-          y="640"
+          y="639"
           fill="#7d8a94"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -2001,16 +2010,17 @@
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          ListAchievements · Register · Login · each one implements UseCase and returns a Result
+          ListAchievements · Register · Login · GetGlobalLeaderboard · GetLevelLeaderboard
         </text>
         <text
           x="258"
           y="750"
-          fill="#7d8a94"
+          fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          planned: SyncLeaderboard · UpdateSettings
+          each one implements UseCase and returns a Result ·
+          <tspan fill="#7d8a94">planned: UpdateSettings</tspan>
         </text>
         <!-- Component: request and response models -->
         <rect
@@ -2493,8 +2503,9 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Planned: the other HTTP repositories implement the repository and gateway ports (decision
-          22). ApiAccountGateway implements AccountGateway since #45.
+          Planned: ApiLevelRepository implements LevelRepository (decision 22). ApiAccountGateway
+          implements AccountGateway since #45, and ApiLeaderboardGateway LeaderboardGateway since
+          #47.
         </text>
         <text
           x="24"
