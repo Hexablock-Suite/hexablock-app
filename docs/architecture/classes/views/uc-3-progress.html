@@ -91,11 +91,12 @@
           the high score and the best result of each level, which gives the stars of a level with
           starsOf() and delivers its data to a repository of the edge with deliverTo().
           AchievementCounterRepository loads and saves the AchievementCounters of one game in layer
-          1 (#363): its own aggregate, with a best count and a total, each an AchievementCount.
-          SyncProgress (#46) uses SessionStore, ProgressRepository, AnonymousProgress and
-          ProgressGateway: the user of the session is the owner, it merges the anonymous progress
-          into that owner with mergeAnonymousInto(), sends the progress through ProgressGateway,
-          which throws a SyncFailure for a known failure, and merges the answer through update().
+          1 (#363): its own object, apart from GameProgress, with a best count and a total, each an
+          AchievementCount. SyncProgress (#46) uses SessionStore, ProgressRepository,
+          AnonymousProgress and ProgressGateway: the user of the session is the owner, it merges the
+          anonymous progress into that owner with mergeAnonymousInto(), sends the progress through
+          ProgressGateway, which throws a SyncFailure for a known failure, and merges the answer
+          through update().
         </desc>
         <defs>
           <marker
@@ -1268,7 +1269,7 @@
         >
           SessionStore
         </text>
-        <!-- Class: AchievementCounters (aggregate root of the counters of the achievements of one game, #363) -->
+        <!-- Class: AchievementCounters (the counters of the achievements of one game, #363) -->
         <rect
           x="96"
           y="1292"
@@ -1282,18 +1283,7 @@
         <line x1="96" y1="1340" x2="504" y2="1340" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="300"
-          y="1310"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «entity» «aggregate root»
-        </text>
-        <text
-          x="300"
-          y="1328"
+          y="1321"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1484,7 +1474,7 @@
         >
           + deliverTo(receiver: ValueReceiver&lt;number&gt;): void
         </text>
-        <!-- Class: GameProgress (aggregate root, S3-04, issue 156) -->
+        <!-- Class: GameProgress (S3-04, issue 156) -->
         <rect
           x="616"
           y="1276"
@@ -1498,18 +1488,7 @@
         <line x1="616" y1="1324" x2="952" y2="1324" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="784"
-          y="1294"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «entity» «aggregate root»
-        </text>
-        <text
-          x="784"
-          y="1312"
+          y="1305"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1827,7 +1806,7 @@
             font-family="'IBM Plex Sans', sans-serif"
           >
             AchievementCounters keeps the counters of the achievements of one game in its own
-            aggregate, apart from GameProgress (#363).
+            object, apart from GameProgress (#363).
           </text>
           <text
             x="24"

@@ -76,17 +76,17 @@
           IMergeable with T bound to MergeTile, MergeRules typed by MergeState and Slide, and
           MergeFactory binding TCell to MergeTile on MergeRules and creating MergeScoring, each
           variant class marked with the engine interface it implements and its binding. MergeState
-          is an entity inside the GameEngine aggregate: its own GameStateId is its identity, it
-          keeps the MatchId of its game, and it changes in place only through its business methods.
-          It keeps the target tile, as SortState keeps its goal, so MergeRules holds no target
-          (#426). MergeSettings, Chance and NewTile are value objects: the settings hold the board
-          size, the target tile and the chance of a 4, and a NewTile is one draw of the tile source.
-          MergeFactory holds the RandomSource of the root, and each match draws a new Seed from it
-          with pickSeed(). The engine RandomDraw is one draw of the random source from 0 up to 1:
-          the place of a NewTile, and the draw that a Chance compares. It replaced the Merge Draw of
-          issue 232 (issue 243). The undo of a slide goes through GameEngine.undo(), and
-          MergeState.restore() takes back the MergeSnapshot before the slide with its tile source,
-          so the same slide draws the same new tile (#179).
+          is a part of GameEngine: its own GameStateId is its identity, it keeps the MatchId of its
+          game, and it changes in place only through its business methods. It keeps the target tile,
+          as SortState keeps its goal, so MergeRules holds no target (#426). MergeSettings, Chance
+          and NewTile are value objects: the settings hold the board size, the target tile and the
+          chance of a 4, and a NewTile is one draw of the tile source. MergeFactory holds the
+          RandomSource of the root, and each match draws a new Seed from it with pickSeed(). The
+          engine RandomDraw is one draw of the random source from 0 up to 1: the place of a NewTile,
+          and the draw that a Chance compares. It replaced the Merge Draw of issue 232 (issue 243).
+          The undo of a slide goes through GameEngine.undo(), and MergeState.restore() takes back
+          the MergeSnapshot before the slide with its tile source, so the same slide draws the same
+          new tile (#179).
         </desc>
         <defs>
           <marker
@@ -433,7 +433,7 @@
           sum of the merged values
         </text>
 
-        <!-- Class: MergeState (entity) -->
+        <!-- Class: MergeState (a part of GameEngine) -->
         <rect
           x="384"
           y="448"
@@ -448,18 +448,7 @@
         <line x1="384" y1="630" x2="600" y2="630" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="492"
-          y="466"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «entity»
-        </text>
-        <text
-          x="492"
-          y="484"
+          y="477"
           fill="#17212a"
           font-size="12"
           font-weight="600"

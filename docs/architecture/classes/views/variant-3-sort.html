@@ -89,13 +89,13 @@
           ClearedStacks is the value object of the count of cleared stacks that the goal reads.
           SortPlay holds the Moves of one won level in a private field, and SortStarThreshold tells
           whether a play meets its limit: it gives the limit to isWithin() of the play. SortState is
-          an entity inside the GameEngine aggregate: its own GameStateId is its identity, it keeps
-          the MatchId of its game, and it changes in place only through its business methods.
-          TileCount is the value object of the height of a stack: ColorStack gives it, and SortState
-          keeps the TileCount of each cleared stack. SortState keeps a tray of three slots, and
-          PlaceStack names a TraySlot of the tray and the cell that takes its stack (issue 353). A
-          seeded draw gives a stack of 2 to 6 tiles in 1 to 3 color runs (issue 352). SortFactory
-          also holds a Clock and gives each game a LevelTimer, which gives no star (issue 46).
+          a part of GameEngine: its own GameStateId is its identity, it keeps the MatchId of its
+          game, and it changes in place only through its business methods. TileCount is the value
+          object of the height of a stack: ColorStack gives it, and SortState keeps the TileCount of
+          each cleared stack. SortState keeps a tray of three slots, and PlaceStack names a TraySlot
+          of the tray and the cell that takes its stack (issue 353). A seeded draw gives a stack of
+          2 to 6 tiles in 1 to 3 color runs (issue 352). SortFactory also holds a Clock and gives
+          each game a LevelTimer, which gives no star (issue 46).
         </desc>
         <defs>
           <marker
@@ -451,7 +451,7 @@
           cascade transfer, clears a stack of 10
         </text>
 
-        <!-- Class: SortState (entity) -->
+        <!-- Class: SortState (a part of GameEngine) -->
         <rect
           x="520"
           y="392"
@@ -466,18 +466,7 @@
         <line x1="520" y1="616" x2="740" y2="616" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="630"
-          y="410"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «entity»
-        </text>
-        <text
-          x="630"
-          y="428"
+          y="421"
           fill="#17212a"
           font-size="12"
           font-weight="600"
