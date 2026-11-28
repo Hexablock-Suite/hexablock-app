@@ -1,0 +1,1093 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Move mappers · UML class diagram</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --color-paper: #f3f5f6;
+        --color-ink: #17212a;
+        --color-muted: #5b6873;
+        --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+        --font-serif: 'Instrument Serif', serif;
+        --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+      }
+      body {
+        font-family: var(--font-sans);
+        background: var(--color-paper);
+        color: var(--color-ink);
+        padding: 3rem 2rem;
+      }
+      .frame {
+        max-width: 1240px;
+        margin: 0 auto;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-muted);
+        margin-bottom: 0.5rem;
+      }
+      h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        margin-bottom: 1.5rem;
+      }
+      svg {
+        width: 100%;
+        min-width: 900px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <p class="eyebrow">Class diagram · Part 4 · View 5 of 5</p>
+      <h1>Moving a piece: the move mappers</h1>
+
+      <svg
+        viewBox="0 0 1040 816"
+        xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-labelledby="admoves-title admoves-desc"
+      >
+        <title id="admoves-title">HexaBlock move mappers · UML class diagram</title>
+        <desc id="admoves-desc">
+          Class diagram across layers 3 and 1 showing GamePresenter, which keeps the MoveMapper of
+          its game as moves, the MoveMapper interface with toMove(), and the four mappers that
+          implement it: LinesMoveMapper builds a PlacePiece, FitMoveMapper builds a FitMove,
+          SortMoveMapper builds a PlaceStack, and MergeMoveMapper gives the Slide of the way that
+          the intent names (#405).
+        </desc>
+        <defs>
+          <marker
+            id="admoves-triangle"
+            markerWidth="16"
+            markerHeight="12"
+            refX="15"
+            refY="6"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 0, 16 6, 0 12" fill="#ffffff" stroke="#17212a" stroke-width="1" />
+          </marker>
+          <marker
+            id="admoves-open"
+            markerWidth="10"
+            markerHeight="8"
+            refX="9"
+            refY="4"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <path d="M0,0 L9,4 L0,8" fill="none" stroke="#5b6873" stroke-width="1" />
+          </marker>
+        </defs>
+        <rect width="100%" height="100%" fill="#f3f5f6" />
+        <!-- Layer zone: layer 3, interface adapters -->
+        <rect
+          x="24"
+          y="24"
+          width="992"
+          height="468"
+          rx="8"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="44"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 3 · INTERFACE ADAPTERS · src/adapters/
+        </text>
+        <!-- Layer zone: layer 1, entities -->
+        <rect
+          x="24"
+          y="500"
+          width="992"
+          height="112"
+          rx="8"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="40"
+          y="520"
+          fill="#b45309"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LAYER 1 · ENTITIES · src/domain/variants/
+        </text>
+        <!-- Pattern group: the move mapper Strategy (D3, decision 14, #405) -->
+        <rect
+          x="40"
+          y="120"
+          width="960"
+          height="356"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="52"
+          y="136"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          STRATEGY · D3 · #405
+        </text>
+        <!-- Relationships (drawn before boxes) -->
+        <!-- GamePresenter keeps the MoveMapper of its game as moves: use with role and multiplicity (decision 23) -->
+        <path
+          d="M520 100 V164"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#admoves-open)"
+        />
+        <!-- LinesMoveMapper implements MoveMapper: realization with binding -->
+        <path
+          d="M120 340 V272 H400 V236"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#admoves-triangle)"
+        />
+        <!-- FitMoveMapper implements MoveMapper: realization with binding -->
+        <path
+          d="M330 340 V288 H480 V236"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#admoves-triangle)"
+        />
+        <!-- SortMoveMapper implements MoveMapper: realization with binding -->
+        <path
+          d="M560 340 V236"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#admoves-triangle)"
+        />
+        <!-- MergeMoveMapper implements MoveMapper: realization with binding -->
+        <path
+          d="M802 340 V272 H640 V236"
+          fill="none"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#admoves-triangle)"
+        />
+        <!-- LinesMoveMapper builds a PlacePiece: use, down from layer 3 to layer 1 -->
+        <path
+          d="M168 456 V556"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#admoves-open)"
+        />
+        <!-- FitMoveMapper builds a FitMove: use, down from layer 3 to layer 1 -->
+        <path
+          d="M404 456 V556"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#admoves-open)"
+        />
+        <!-- SortMoveMapper builds a PlaceStack: use, down from layer 3 to layer 1 -->
+        <path
+          d="M640 456 V556"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#admoves-open)"
+        />
+        <!-- MergeMoveMapper gives the Slide of a way: use, down from layer 3 to layer 1 -->
+        <path
+          d="M876 456 V556"
+          fill="none"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#admoves-open)"
+        />
+        <!-- Arrow labels -->
+        <rect x="124" y="290" width="157.7" height="36" rx="2" fill="#e2ebf8" />
+        <text
+          x="126"
+          y="298"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          «bind»
+        </text>
+        <text
+          x="126"
+          y="310"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          TIntent → LinesIntent&lt;TCoord&gt;
+        </text>
+        <text
+          x="126"
+          y="322"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          TMove → PlacePiece&lt;TCoord&gt;
+        </text>
+        <rect x="334" y="290" width="147.1" height="36" rx="2" fill="#e2ebf8" />
+        <text
+          x="336"
+          y="298"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          «bind»
+        </text>
+        <text
+          x="336"
+          y="310"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          TIntent → FitIntent&lt;TCoord&gt;
+        </text>
+        <text
+          x="336"
+          y="322"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          TMove → FitMove&lt;TCoord&gt;
+        </text>
+        <rect x="564" y="290" width="152.4" height="36" rx="2" fill="#e2ebf8" />
+        <text
+          x="566"
+          y="298"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          «bind»
+        </text>
+        <text
+          x="566"
+          y="310"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          TIntent → SortIntent&lt;TCoord&gt;
+        </text>
+        <text
+          x="566"
+          y="322"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          TMove → PlaceStack&lt;TCoord&gt;
+        </text>
+        <rect x="806" y="290" width="125.89999999999999" height="36" rx="2" fill="#e2ebf8" />
+        <text
+          x="808"
+          y="298"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          «bind»
+        </text>
+        <text
+          x="808"
+          y="310"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          TIntent → MergeIntent
+        </text>
+        <text
+          x="808"
+          y="322"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+          letter-spacing="0.06em"
+        >
+          TMove → Slide&lt;GridAxis&gt;
+        </text>
+        <rect x="174" y="528" width="44" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="196"
+          y="537"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          BUILDS
+        </text>
+        <rect x="410" y="528" width="44" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="432"
+          y="537"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          BUILDS
+        </text>
+        <rect x="646" y="528" width="44" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="668"
+          y="537"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          BUILDS
+        </text>
+        <rect x="882" y="528" width="38" height="12" rx="2" fill="#f9f4dc" />
+        <text
+          x="901"
+          y="537"
+          fill="#7d8a94"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.06em"
+        >
+          GIVES
+        </text>
+        <!-- Role names and multiplicities at the part end -->
+        <rect x="526" y="144" width="44" height="12" rx="2" fill="#e2ebf8" />
+        <text
+          x="528"
+          y="153"
+          fill="#17212a"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="start"
+        >
+          moves
+          <tspan font-weight="600">1</tspan>
+        </text>
+        <!-- Reference box: GamePresenter, detailed in view 4.1 -->
+        <rect
+          x="430"
+          y="60"
+          width="180"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="520"
+          y="74"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          VIEW 4.1
+        </text>
+        <text
+          x="520"
+          y="90"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          GamePresenter
+        </text>
+        <!-- Class: MoveMapper (focal; interface of the move mapper Strategy, D3: only «interface», and the frame names the pattern, decision 23) -->
+        <rect
+          x="360"
+          y="164"
+          width="320"
+          height="72"
+          rx="6"
+          fill="rgba(15,111,116,0.05)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <rect x="360" y="164" width="320" height="48" rx="6" fill="rgba(15,111,116,0.10)" />
+        <rect x="360" y="204" width="320" height="8" fill="rgba(15,111,116,0.10)" />
+        <line x1="360" y1="212" x2="680" y2="212" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
+        <text
+          x="520"
+          y="182"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «interface»
+        </text>
+        <text
+          x="520"
+          y="200"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          MoveMapper
+        </text>
+        <text x="376" y="228" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + toMove(intent: TIntent): TMove
+        </text>
+        <!-- Class: LinesMoveMapper (the move mapper of Hexa Lines) -->
+        <rect
+          x="56"
+          y="340"
+          width="224"
+          height="116"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="56" y1="372" x2="280" y2="372" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="56" y1="408" x2="280" y2="408" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="168"
+          y="361"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          LinesMoveMapper
+        </text>
+        <text x="68" y="388" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - placementAt: (at: TCoord)
+        </text>
+        <text x="84" y="400" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          =&gt; TCoord
+        </text>
+        <text x="68" y="424" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + toMove(intent:
+        </text>
+        <text x="84" y="436" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          LinesIntent&lt;TCoord&gt;):
+        </text>
+        <text x="84" y="448" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          PlacePiece&lt;TCoord&gt;
+        </text>
+        <!-- Class: FitMoveMapper (the move mapper of Hexa Fit) -->
+        <rect
+          x="292"
+          y="340"
+          width="224"
+          height="116"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="292" y1="372" x2="516" y2="372" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="292" y1="408" x2="516" y2="408" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="404"
+          y="361"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          FitMoveMapper
+        </text>
+        <text x="304" y="388" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - placementAt: (at: TCoord,
+        </text>
+        <text x="320" y="400" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          rotation: Turns) =&gt; TCoord
+        </text>
+        <text x="304" y="424" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + toMove(intent:
+        </text>
+        <text x="320" y="436" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          FitIntent&lt;TCoord&gt;):
+        </text>
+        <text x="320" y="448" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          FitMove&lt;TCoord&gt;
+        </text>
+        <!-- Class: SortMoveMapper (the move mapper of Hexa Sort) -->
+        <rect
+          x="528"
+          y="340"
+          width="224"
+          height="116"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="528" y1="372" x2="752" y2="372" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="528" y1="408" x2="752" y2="408" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="640"
+          y="361"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          SortMoveMapper
+        </text>
+
+        <text x="540" y="424" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + toMove(intent:
+        </text>
+        <text x="556" y="436" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          SortIntent&lt;TCoord&gt;):
+        </text>
+        <text x="556" y="448" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          PlaceStack&lt;TCoord&gt;
+        </text>
+        <!-- Class: MergeMoveMapper (the move mapper of Hexa Merge) -->
+        <rect
+          x="764"
+          y="340"
+          width="224"
+          height="116"
+          rx="6"
+          fill="#ffffff"
+          stroke="#17212a"
+          stroke-width="1"
+        />
+        <line x1="764" y1="372" x2="988" y2="372" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="764" y1="408" x2="988" y2="408" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <text
+          x="876"
+          y="361"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          MergeMoveMapper
+        </text>
+        <text x="776" y="388" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - ways: SlideWay[]
+        </text>
+        <text x="776" y="424" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          + toMove(intent: MergeIntent):
+        </text>
+        <text x="792" y="436" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          Slide&lt;GridAxis&gt;
+        </text>
+        <!-- Reference box: PlacePiece, detailed in the view of Hexa Lines -->
+        <rect
+          x="78"
+          y="556"
+          width="180"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="168"
+          y="570"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          PART 2 · HEXA LINES
+        </text>
+        <text
+          x="168"
+          y="586"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          PlacePiece
+        </text>
+        <!-- Reference box: FitMove, detailed in the view of Hexa Fit -->
+        <rect
+          x="314"
+          y="556"
+          width="180"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="404"
+          y="570"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          PART 2 · HEXA FIT
+        </text>
+        <text
+          x="404"
+          y="586"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          FitMove
+        </text>
+        <!-- Reference box: PlaceStack, detailed in the view of Hexa Sort -->
+        <rect
+          x="550"
+          y="556"
+          width="180"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="640"
+          y="570"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          PART 2 · HEXA SORT
+        </text>
+        <text
+          x="640"
+          y="586"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          PlaceStack
+        </text>
+        <!-- Reference box: Slide, detailed in the view of Hexa Merge -->
+        <rect
+          x="786"
+          y="556"
+          width="180"
+          height="40"
+          rx="6"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="876"
+          y="570"
+          fill="#7d8a94"
+          font-size="7"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.14em"
+        >
+          PART 2 · HEXA MERGE
+        </text>
+        <text
+          x="876"
+          y="586"
+          fill="#17212a"
+          font-size="12"
+          font-weight="600"
+          font-family="'IBM Plex Sans', sans-serif"
+          text-anchor="middle"
+        >
+          Slide
+        </text>
+        <!-- UML template boxes: type parameters on the top-right corner -->
+        <rect
+          x="620"
+          y="155"
+          width="84"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="662"
+          y="167"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TIntent, TMove
+        </text>
+        <rect
+          x="228"
+          y="331"
+          width="44"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="250"
+          y="343"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCoord
+        </text>
+        <rect
+          x="464"
+          y="331"
+          width="44"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="486"
+          y="343"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCoord
+        </text>
+        <rect
+          x="700"
+          y="331"
+          width="44"
+          height="18"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="722"
+          y="343"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+        >
+          TCoord
+        </text>
+        <!-- Footnote -->
+        <text
+          x="24"
+          y="640"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          The move controls of layer 4 send a plain intent, such as the index of a tray slot, and
+          the MoveMapper of the game turns it into the move of its variant (decision 14, #405).
+        </text>
+        <text
+          x="24"
+          y="656"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          GamePresenter calls toMove() before ApplyMove, so it never names a variant. The game
+          registry pairs the mapper of each game with its move controls, so both name the same
+          TIntent.
+        </text>
+        <text
+          x="24"
+          y="672"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          LinesMoveMapper and FitMoveMapper take from the board figure the step from the pressed
+          space to the offset of the move, as the triangle needs (#174, #365).
+        </text>
+        <text
+          x="24"
+          y="688"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          MergeMoveMapper keeps the slide ways of the figure, and a way that the figure does not
+          have throws a RangeError (#177). MoveMapper is the interface of a Strategy (D3).
+        </text>
+        <!-- Legend -->
+        <line x1="24" y1="712" x2="1016" y2="712" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <text
+          x="24"
+          y="730"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          LEGEND
+        </text>
+        <line
+          x1="24"
+          y1="748"
+          x2="52"
+          y2="748"
+          stroke="#17212a"
+          stroke-width="1"
+          stroke-dasharray="5,4"
+          marker-end="url(#admoves-triangle)"
+        />
+        <text
+          x="60"
+          y="752"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Realization
+        </text>
+        <line
+          x1="144"
+          y1="748"
+          x2="172"
+          y2="748"
+          stroke="#5b6873"
+          stroke-width="1"
+          marker-end="url(#admoves-open)"
+        />
+        <text
+          x="180"
+          y="752"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Use · attribute, parameter, return, local or new
+        </text>
+        <rect
+          x="24"
+          y="768"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#e2ebf8"
+          stroke="rgba(29,78,216,0.40)"
+          stroke-width="1"
+        />
+        <rect
+          x="56"
+          y="768"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#f9f4dc"
+          stroke="rgba(180,83,9,0.45)"
+          stroke-width="1"
+        />
+        <text
+          x="92"
+          y="777"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Zones · layers 3 and 1
+        </text>
+        <rect
+          x="216"
+          y="768"
+          width="28"
+          height="12"
+          rx="2"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="252"
+          y="777"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Dashed frame · GoF pattern or principle
+        </text>
+        <rect
+          x="440"
+          y="768"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#7d8a94"
+          stroke-width="1"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="476"
+          y="777"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Reference box · detailed in another view
+        </text>
+        <rect
+          x="672"
+          y="768"
+          width="28"
+          height="12"
+          rx="2"
+          fill="#ffffff"
+          stroke="#5b6873"
+          stroke-width="0.8"
+          stroke-dasharray="4,3"
+        />
+        <text
+          x="708"
+          y="777"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Corner box · type parameters
+        </text>
+        <rect
+          x="864"
+          y="768"
+          width="28"
+          height="12"
+          rx="2"
+          fill="rgba(15,111,116,0.10)"
+          stroke="#0f6f74"
+          stroke-width="1"
+        />
+        <text
+          x="900"
+          y="777"
+          fill="#5b6873"
+          font-size="8.5"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Teal · focal class
+        </text>
+      </svg>
+    </div>
+  </body>
+</html>
