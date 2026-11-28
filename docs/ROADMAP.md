@@ -54,19 +54,19 @@ These hold in every sprint, and each sprint's exit check includes them:
 - **APP-NFR-24 — Integrity.** _Check:_ no gate; the reviewer of each pull request checks the citations.
 - The gates that were green before sprint 0 stay green:
 
-| ID         | Exit check                                                                                                                                                                   |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| APP-NFR-14 | Gate `test/gates/test-title-gate.test.ts` (rule R-test-names).                                                                                                               |
-| APP-NFR-17 | `pnpm pact:check` passes, and `pacts/` is committed.                                                                                                                         |
-| APP-NFR-18 | The `verify` job of `.github/workflows/` runs on every pull request.                                                                                                         |
-| APP-NFR-21 | The commit-msg hook and gate `test/gates/commit-message-gate.test.ts` (rule R-conventional-commits).                                                                         |
-| API-FR-05  | `pnpm openapi:export` writes `openapi/openapi.json`, and `test/health.e2e-spec.ts` fails when the committed file differs from the code (rule R-openapi-drift).               |
-| API-NFR-01 | Gate `test/gates/test-name.gate.spec.ts` (rule R-test-names).                                                                                                                |
-| API-NFR-02 | Repository tests run on PGlite through `test/support/test-database.ts`, and gate `test/integration/in-memory-database.spec.ts` covers the harness (rule R-database-harness). |
-| API-NFR-04 | The CI `contract` job runs `scripts/contract/verify-provider.js` against the client's pact (rule R-contract).                                                                |
-| API-NFR-05 | The CI `verify` job runs on every pull request, and gate `test/gates/ci-contract.spec.ts` keeps it in step with `pnpm verify` (rule R-verify-parity).                        |
-| API-NFR-11 | Gate `test/gates/determinism.gate.spec.ts` (rule R-deterministic-core).                                                                                                      |
-| API-NFR-13 | `commitlint.config.cjs`, the commit-msg hook and gate `test/gates/commit-message.gate.spec.ts` (rule R-conventional-commits).                                                |
+| ID         | Exit check                                                                                                                                                                                                                                          |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| APP-NFR-14 | Gate `test/gates/test-title-gate.test.ts` (rule R-test-names).                                                                                                                                                                                      |
+| APP-NFR-17 | `pnpm pact:check` passes, and `pacts/` is committed.                                                                                                                                                                                                |
+| APP-NFR-18 | The `verify` job of `.github/workflows/` runs on every pull request.                                                                                                                                                                                |
+| APP-NFR-21 | The commit-msg hook and gate `test/gates/commit-message-gate.test.ts` (rule R-conventional-commits).                                                                                                                                                |
+| API-FR-05  | `pnpm openapi:export` writes `openapi/openapi.json`, and `test/health.e2e-spec.ts` fails when the committed file differs from the code (rule R-openapi-drift).                                                                                      |
+| API-NFR-01 | Gate `test/gates/test-name.gate.spec.ts` for the names (rule R-test-names), and two lint rules of `vite.config.ts` that `pnpm lint` runs, `vitest/expect-expect` and `typescript/no-floating-promises`. No gate checks that a test names no double. |
+| API-NFR-02 | Repository tests run on PGlite through `test/support/test-database.ts`, and gate `test/integration/in-memory-database.spec.ts` covers the harness (rule R-database-harness).                                                                        |
+| API-NFR-04 | The CI `contract` job runs `scripts/contract/verify-provider.js` against the client's pact (rule R-contract).                                                                                                                                       |
+| API-NFR-05 | The CI `verify` job runs on every pull request, and gate `test/gates/ci-contract.spec.ts` keeps it in step with `pnpm verify` (rule R-verify-parity).                                                                                               |
+| API-NFR-11 | Gate `test/gates/determinism.gate.spec.ts` (rule R-deterministic-core).                                                                                                                                                                             |
+| API-NFR-13 | `commitlint.config.cjs`, the commit-msg hook and gate `test/gates/commit-message.gate.spec.ts` (rule R-conventional-commits).                                                                                                                       |
 
 ## Sprint 0 — Design week (2026-10-26 to 2026-11-01), tag `v0.0.0`
 

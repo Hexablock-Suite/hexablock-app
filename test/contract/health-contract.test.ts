@@ -50,6 +50,17 @@ const REFUSED_TOKEN = 'a-refused-token';
 const BOARD_LEVEL = { gameId: 'hexa-fit', levelId: 'fit-01' };
 const UNKNOWN_LEVEL = 'fit-99';
 const RESULTS_STATE = 'several accounts have results on a stored level';
+// #480: the high scores of the global board of a game that keeps a score. The provider state
+// `several accounts have high scores in a game` signs in ada, grace and linus, syncs the scores 300,
+// 200 and 100 and no level result, and gives the token of ada. So the standings are empty.
+const SCORE_GAME = { gameId: 'hexa-lines' };
+const SCORES_STATE = 'several accounts have high scores in a game';
+// #485: the unavailable levels of the stored levels. The provider state `a broken level is stored`
+// stores a row of the example level whose Fit section breaks its rule. The row is the only stored
+// level, so `GET /v1/levels` answers no valid level and names the row in `unavailable`.
+const BROKEN_LEVEL = { gameId: 'hexa-fit', levelId: 'fit-01' };
+const BROKEN_STATE = 'a broken level is stored';
+const EXAMPLE_REASON = 'invalid-figure';
 const EXAMPLE_ENTRY = {
   rank: MatchersV3.integer(1),
   userId: MatchersV3.uuid(EXAMPLE_USER),
@@ -68,10 +79,12 @@ const DESCRIPTIONS = [
   'a progress sync',
   'a progress sync with a refused token',
   'the global leaderboard of a game',
+  'the high scores of the global leaderboard of a game',
   'the leaderboard of a level',
   'a leaderboard with a refused token',
   'the leaderboard of a level that is not stored',
   'the stored levels',
+  'the stored levels with an unavailable level',
 ];
 
 // The `ApiFailure` that `call` rejects with. A call that resolves fails the test.
@@ -348,6 +361,41 @@ describe('client contract', () => {
         });
     });
 
+    // #480 (APP-FR-14): the global board of Lines ranks the high scores (S3-03).
+    it('should_send_the_token_and_give_the_high_scores_when_the_app_reads_the_global_leaderboard_of_a_score_game', async () => {
+      await pact
+        .addInteraction()
+        .given(SCORES_STATE, SCORE_GAME)
+        .uponReceiving('the high scores of the global leaderboard of a game')
+        .withRequest('GET', '/v1/leaderboard/hexa-lines', (builder) =>
+          builder.headers({
+            Authorization: MatchersV3.fromProviderState(
+              'Bearer ${accessToken}',
+              `Bearer ${EXAMPLE_TOKEN}`,
+            ),
+          }),
+        )
+        .willRespondWith(200, (builder) =>
+          builder.jsonBody({
+            gameId: 'hexa-lines',
+            highScores: MatchersV3.eachLike({
+              ...EXAMPLE_ENTRY,
+              highScore: MatchersV3.integer(300),
+            }),
+            standings: [],
+          }),
+        )
+        .executeTest(async (mockServer) => {
+          const api: LeaderboardApi = createApiClient(mockServer.url);
+
+          await expect(api.globalLeaderboard(EXAMPLE_TOKEN, 'hexa-lines')).resolves.toEqual({
+            gameId: 'hexa-lines',
+            highScores: [{ rank: 1, userId: EXAMPLE_USER, username: 'ada', highScore: 300 }],
+            standings: [],
+          });
+        });
+    });
+
     // #47 (APP-FR-14): the board of one level ranks the best result of each player (DS-4).
     it('should_send_the_token_and_give_the_entries_when_the_app_reads_the_leaderboard_of_a_level', async () => {
       await pact
@@ -431,6 +479,34 @@ describe('client contract', () => {
         });
     });
 
+    // #485 (#307): the backend names a stored level that breaks a rule in `unavailable`.
+    // `ApiLevelRepository` reads its `gameId` and its `levelId`.
+    it('should_give_the_unavailable_levels_when_the_backend_holds_a_broken_level', async () => {
+      await pact
+        .addInteraction()
+        .given(BROKEN_STATE, BROKEN_LEVEL)
+        .uponReceiving('the stored levels with an unavailable level')
+        .withRequest('GET', '/v1/levels')
+        .willRespondWith(200, (builder) =>
+          builder.jsonBody({
+            levels: [],
+            unavailable: MatchersV3.eachLike({
+              gameId: MatchersV3.string(BROKEN_LEVEL.gameId),
+              levelId: MatchersV3.string(BROKEN_LEVEL.levelId),
+              reason: MatchersV3.string(EXAMPLE_REASON),
+            }),
+          }),
+        )
+        .executeTest(async (mockServer) => {
+          const api: LevelsApi = createApiClient(mockServer.url);
+
+          await expect(api.getLevels()).resolves.toEqual({
+            levels: [],
+            unavailable: [{ ...BROKEN_LEVEL, reason: EXAMPLE_REASON }],
+          });
+        });
+    });
+
     // The gateway maps this 404 to `level-has-no-board` (hexablock-api#134).
     it('should_reject_with_the_status_404_when_the_backend_holds_no_level_of_the_leaderboard', async () => {
       await pact
@@ -477,6 +553,8 @@ describe('client contract', () => {
       elapsedMs: 45000,
     };
     const BOARD_ROW = { ...LEVEL_ROW, levelsCompleted: 1 };
+    // The high score of ada in the state of #480.
+    const SCORE_ROW = { rank: 1, userId: EXAMPLE_USER, username: 'ada', highScore: 300 };
     let backend: FakeBackend | undefined;
 
     afterEach(async () => {
@@ -487,16 +565,20 @@ describe('client contract', () => {
     // A fake provider that honors every interaction of the pact (hexablock-api #151).
     // It keeps the provider state that the verifier set up last before the current interaction,
     // and it gives the token of the states `a signed-in account exists` and `several accounts have
-    // results on a stored level`. An interaction of #46 sets up two states, and the sync answers
-    // only the token of the state. The boards of #47 answer only that token too, and only the
-    // level of the state has a board.
+    // results on a stored level` and `several accounts have high scores in a game`. An interaction
+    // of #46 sets up two states, and the sync answers only the token of the state. The boards of
+    // #47 and #480 answer only that token too, and only the level of the state has a board. The
+    // stored levels follow the state: `a broken level is stored` gives the broken row of #485.
     function fakeProvider(health: unknown = { status: 'ok' }): FakeRoutes {
       let state = '';
       return {
         '/v1/_pact/provider-states': (request) => {
           const change = JSON.parse(request.body || '{}') as { state?: string; action?: string };
           state = change.action === 'setup' ? (change.state ?? '') : '';
-          const signedIn = state === 'a signed-in account exists' || state === RESULTS_STATE;
+          const signedIn =
+            state === 'a signed-in account exists' ||
+            state === RESULTS_STATE ||
+            state === SCORES_STATE;
           return { status: 200, body: signedIn ? { accessToken: STATE_TOKEN } : {} };
         },
         '/v1/health': { status: 200, body: health },
@@ -530,12 +612,23 @@ describe('client contract', () => {
           request.headers.authorization === `Bearer ${STATE_TOKEN}`
             ? { status: 200, body: { gameId: 'hexa-fit', highScores: [], standings: [BOARD_ROW] } }
             : { status: 401, body: { statusCode: 401 } },
+        '/v1/leaderboard/hexa-lines': (request) =>
+          request.headers.authorization === `Bearer ${STATE_TOKEN}`
+            ? { status: 200, body: { ...SCORE_GAME, highScores: [SCORE_ROW], standings: [] } }
+            : { status: 401, body: { statusCode: 401 } },
         '/v1/leaderboard/hexa-fit/levels/fit-01': (request) =>
           request.headers.authorization === `Bearer ${STATE_TOKEN}`
             ? { status: 200, body: { ...BOARD_LEVEL, entries: [LEVEL_ROW] } }
             : { status: 401, body: { statusCode: 401 } },
-        // The stored level of the state `a level is stored`.
-        '/v1/levels': { status: 200, body: { levels: [fit01] } },
+        // The stored level of the state `a level is stored`, or the broken row of the state
+        // `a broken level is stored`.
+        '/v1/levels': () =>
+          state === BROKEN_STATE
+            ? {
+                status: 200,
+                body: { levels: [], unavailable: [{ ...BROKEN_LEVEL, reason: EXAMPLE_REASON }] },
+              }
+            : { status: 200, body: { levels: [fit01] } },
         [`/v1/leaderboard/hexa-fit/levels/${UNKNOWN_LEVEL}`]: (request) =>
           request.headers.authorization === `Bearer ${STATE_TOKEN}`
             ? { status: 404, body: { statusCode: 404 } }
@@ -579,6 +672,8 @@ describe('client contract', () => {
           'a signed-in account exists',
           'a level is stored',
           RESULTS_STATE,
+          SCORES_STATE,
+          BROKEN_STATE,
         ]),
       );
       expect(me?.headers.authorization).toBe(`Bearer ${STATE_TOKEN}`);
