@@ -1,4 +1,4 @@
-import type { GameRepository } from '../application/game-repository';
+import type { GameRepository } from '../application/ports/game-repository';
 import type { BoardState } from '../domain/engine/board/board-state';
 import type { Cloneable } from '../domain/engine/cloneable';
 import type { GameEngine } from '../domain/engine/turn/game-engine';

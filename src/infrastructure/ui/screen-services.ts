@@ -9,7 +9,7 @@ import type { LevelSelectorPresenter } from '../../adapters/level-selector-prese
 import type { ResultPresenter } from '../../adapters/result-presenter';
 import type { BoardLayout, CellShape } from '../../adapters/board/board-layout';
 import type { Texts } from '../../adapters/texts/text-catalog';
-import type { LoadProgressRequest } from '../../application/load-progress';
+import type { LoadProgressRequest } from '../../application/progress/load-progress';
 import type { UseCase } from '../../application/use-case';
 import type { GameProgress } from '../../domain/progress/game-progress';
 import type { LevelId } from '../../domain/progress/level-id';

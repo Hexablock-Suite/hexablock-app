@@ -3,9 +3,9 @@ import {
   type LeaderboardViewModel,
 } from '../../src/adapters/leaderboard-presenter';
 import { textCatalog } from '../../src/adapters/texts/text-catalog';
-import type { GlobalLeaderboardRequest } from '../../src/application/get-global-leaderboard';
-import type { LevelLeaderboardRequest } from '../../src/application/get-level-leaderboard';
-import type { Leaderboard, LeaderboardRow } from '../../src/application/leaderboard';
+import type { GlobalLeaderboardRequest } from '../../src/application/leaderboard/get-global-leaderboard';
+import type { LevelLeaderboardRequest } from '../../src/application/leaderboard/get-level-leaderboard';
+import type { Leaderboard, LeaderboardRow } from '../../src/application/ports/leaderboard';
 import {
   FailureCode,
   Result,

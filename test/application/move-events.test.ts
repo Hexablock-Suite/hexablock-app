@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { ApplyMove } from '../../src/application/apply-move';
+import { ApplyMove } from '../../src/application/game/apply-move';
 import { GameId } from '../../src/domain/shared/game-id';
 import { hex, HexAxis } from '../../src/domain/engine/geometry/hex-topology';
 import { LineCount } from '../../src/domain/variants/hexa-lines/line-count';

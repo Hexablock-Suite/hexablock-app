@@ -7,10 +7,10 @@ import type {
   LevelLeaderboardDto,
 } from '../../src/adapters/api/leaderboard-api';
 import { valueOf } from '../../src/adapters/delivered';
-import type { Leaderboard, LeaderboardRecord } from '../../src/application/leaderboard';
-import { LeaderboardFailure } from '../../src/application/leaderboard-gateway';
+import type { Leaderboard, LeaderboardRecord } from '../../src/application/ports/leaderboard';
+import { LeaderboardFailure } from '../../src/application/ports/leaderboard-gateway';
 import { FailureCode } from '../../src/application/result';
-import { Session } from '../../src/application/session';
+import { Session } from '../../src/application/ports/session';
 import { LevelId } from '../../src/domain/progress/level-id';
 import { GameId } from '../../src/domain/shared/game-id';
 

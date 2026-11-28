@@ -1,5 +1,5 @@
-import { ProgressOwner } from '../../../src/application/progress-owner';
-import type { ProgressRepository } from '../../../src/application/progress-repository';
+import { ProgressOwner } from '../../../src/application/ports/progress-owner';
+import type { ProgressRepository } from '../../../src/application/ports/progress-repository';
 import type { GameProgress } from '../../../src/domain/progress/game-progress';
 import { contentOf } from '../engine/progress-content';
 

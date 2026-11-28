@@ -1,9 +1,9 @@
 import { AccountPresenter, type AccountViewModel } from '../../src/adapters/account-presenter';
 import { textCatalog, type TextKey } from '../../src/adapters/texts/text-catalog';
-import type { Credentials } from '../../src/application/credentials';
+import type { Credentials } from '../../src/application/ports/credentials';
 import { FailureCode, Result, UseCaseError } from '../../src/application/result';
-import { Session } from '../../src/application/session';
-import type { SyncProgressRequest } from '../../src/application/sync-progress';
+import { Session } from '../../src/application/ports/session';
+import type { SyncProgressRequest } from '../../src/application/progress/sync-progress';
 import type { UseCase } from '../../src/application/use-case';
 import { GameId } from '../../src/domain/shared/game-id';
 

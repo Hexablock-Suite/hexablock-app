@@ -2,12 +2,12 @@
 import { Outcome } from '../../src/domain/engine/events/outcome';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import type { GameEventPublisher } from '../../src/application/game-event-publisher';
-import type { Logger, UseCaseLogEntry } from '../../src/application/logger';
-import { LoggingAspect } from '../../src/application/logging-aspect';
+import type { GameEventPublisher } from '../../src/application/ports/game-event-publisher';
+import type { Logger, UseCaseLogEntry } from '../../src/application/aspects/logger';
+import { LoggingAspect } from '../../src/application/aspects/logging-aspect';
 import { Result, UseCaseError } from '../../src/application/result';
 import type { UseCase } from '../../src/application/use-case';
-import { UseCaseAspect } from '../../src/application/use-case-aspect';
+import { UseCaseAspect } from '../../src/application/aspects/use-case-aspect';
 import type { BoardState } from '../../src/domain/engine/board/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
 import type { GameEvent } from '../../src/domain/engine/events/game-events';
@@ -230,20 +230,23 @@ describe('LoggingAspect', () => {
     // `ApplyMove` holds no aspect and logs no call. Its success carries a publisher failure,
     // and `LoggingAspect` writes it (issue #342).
     const read = (file: string) =>
-      readFileSync(join(__dirname, '../../src/application', file), 'utf8');
+      readFileSync(join(__dirname, '../../src/application/game', file), 'utf8');
     for (const file of ['start-game.ts', 'apply-move.ts']) {
       expect(read(file)).not.toMatch(/\b(UseCaseAspect|LoggingAspect|Clock)\b/);
-      expect(read(file)).not.toMatch(/from '\.\/(logging-aspect|use-case-aspect)'/);
+      expect(read(file)).not.toMatch(/from '[^']*\/(logging-aspect|use-case-aspect)'/);
     }
     expect(read('start-game.ts')).not.toMatch(/\b(Logger|UseCaseLogEntry)\b/);
-    expect(read('start-game.ts')).not.toMatch(/from '\.\/logger'/);
+    expect(read('start-game.ts')).not.toMatch(/from '[^']*\/logger'/);
   });
 
   // `LoggingAspect` is the only writer of the log (issue #342, decision 37).
   it('should_find_no_logger_in_apply_move_when_its_source_is_read', () => {
-    const source = readFileSync(join(__dirname, '../../src/application/apply-move.ts'), 'utf8');
+    const source = readFileSync(
+      join(__dirname, '../../src/application/game/apply-move.ts'),
+      'utf8',
+    );
 
-    expect(source).not.toMatch(/Logger|logEntryOf|from '\.\/logger'/);
+    expect(source).not.toMatch(/Logger|logEntryOf|from '[^']*\/logger'/);
   });
 
   // The log names the call by `name`, so an empty name helps no one (G118.4).

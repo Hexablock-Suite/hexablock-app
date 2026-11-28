@@ -247,70 +247,92 @@
       ],
       "2": [
         {
-          "group": "usecases|src/application",
+          "group": "usecases|src/application/game",
           "types": [
             "ApplyMove",
             "UndoMoveRequest",
             "ApplyMoveRequest",
             "ViewOf",
-            "GameRepository",
-            "ListAchievements",
-            "LoggingAspect",
-            "Result",
-            "ProgressRepository",
             "RedoMoveRequest",
-            "UseCase",
-            "AccountFailureCode",
-            "Logger",
-            "UseCaseError",
             "StartGame",
-            "ListLevels",
-            "LevelSummary",
             "UndoMove",
-            "ListAchievementsRequest",
-            "GameEventPublisher",
-            "SyncFailureCode",
-            "Achievement",
-            "AchievementSummary",
-            "UseCaseAspect",
-            "FailureCode",
-            "LevelRepository",
-            "ListLevelsRequest",
-            "LeaderboardFailureCode",
             "RedoMove",
             "StartGameRequest",
-            "UseCaseLogEntry",
+            "MoveResult"
+          ]
+        },
+        {
+          "group": "usecases|src/application/progress",
+          "types": [
             "LoadProgressRequest",
             "SaveProgress",
-            "SessionStore",
             "SyncProgressRequest",
-            "GameFactories",
-            "LevelList",
-            "ProgressOwner",
-            "AnonymousMerge",
-            "MoveResult",
-            "SyncFailure",
             "SyncProgress",
+            "LoadProgress"
+          ]
+        },
+        {
+          "group": "usecases|src/application/account",
+          "types": ["Register", "Login"]
+        },
+        {
+          "group": "usecases|src/application/leaderboard",
+          "types": [
             "GlobalLeaderboardRequest",
             "LevelLeaderboardRequest",
-            "LoadProgress",
+            "GetLevelLeaderboard",
+            "GetGlobalLeaderboard"
+          ]
+        },
+        {
+          "group": "usecases|src/application/levels",
+          "types": ["ListLevels", "LevelSummary", "ListLevelsRequest", "LevelList"]
+        },
+        {
+          "group": "usecases|src/application/achievements",
+          "types": [
+            "ListAchievements",
+            "ListAchievementsRequest",
+            "Achievement",
+            "AchievementSummary"
+          ]
+        },
+        {
+          "group": "usecases|src/application/ports",
+          "types": [
+            "GameRepository",
+            "ProgressRepository",
+            "AccountFailureCode",
+            "GameEventPublisher",
+            "SyncFailureCode",
+            "LevelRepository",
+            "LeaderboardFailureCode",
+            "SessionStore",
+            "GameFactories",
+            "ProgressOwner",
+            "AnonymousMerge",
+            "SyncFailure",
             "AnonymousProgress",
             "ProgressGateway",
             "AchievementCounterRepository",
             "Credentials",
             "AccountFailure",
-            "GetLevelLeaderboard",
             "Session",
-            "Register",
-            "GetGlobalLeaderboard",
             "AccountGateway",
             "Leaderboard",
-            "Login",
             "LeaderboardRow",
             "LeaderboardFailure",
             "LeaderboardGateway",
             "LeaderboardRecord"
           ]
+        },
+        {
+          "group": "usecases|src/application/aspects",
+          "types": ["LoggingAspect", "Logger", "UseCaseAspect", "UseCaseLogEntry"]
+        },
+        {
+          "group": "usecases|src/application",
+          "types": ["Result", "UseCase", "UseCaseError", "FailureCode"]
         },
         {
           "group": "usecases|planned",
@@ -1092,70 +1114,92 @@
           ]
         },
         {
-          "group": "usecases|src/application",
+          "group": "usecases|src/application/game",
           "types": [
             "ApplyMove",
             "RedoMoveRequest",
             "ApplyMoveRequest",
-            "UseCaseAspect",
-            "ListAchievements",
-            "UseCaseError",
-            "LevelRepository",
             "MoveResult",
             "ViewOf",
             "UndoMoveRequest",
-            "GameEventPublisher",
-            "UseCaseLogEntry",
-            "AccountFailureCode",
-            "Result",
-            "ProgressRepository",
-            "LevelSummary",
             "RedoMove",
-            "ListAchievementsRequest",
-            "UseCase",
-            "Achievement",
-            "AchievementSummary",
-            "SyncFailureCode",
-            "ListLevels",
-            "GameRepository",
-            "ListLevelsRequest",
-            "LoggingAspect",
-            "FailureCode",
-            "LeaderboardFailureCode",
             "UndoMove",
-            "SyncProgressRequest",
-            "Logger",
-            "SaveProgress",
-            "SessionStore",
             "StartGame",
+            "StartGameRequest"
+          ]
+        },
+        {
+          "group": "usecases|src/application/progress",
+          "types": [
+            "SyncProgressRequest",
+            "SaveProgress",
             "LoadProgressRequest",
-            "LevelList",
+            "LoadProgress",
+            "SyncProgress"
+          ]
+        },
+        {
+          "group": "usecases|src/application/account",
+          "types": ["Register", "Login"]
+        },
+        {
+          "group": "usecases|src/application/leaderboard",
+          "types": [
+            "GlobalLeaderboardRequest",
+            "LevelLeaderboardRequest",
+            "GetGlobalLeaderboard",
+            "GetLevelLeaderboard"
+          ]
+        },
+        {
+          "group": "usecases|src/application/levels",
+          "types": ["LevelSummary", "ListLevels", "ListLevelsRequest", "LevelList"]
+        },
+        {
+          "group": "usecases|src/application/achievements",
+          "types": [
+            "ListAchievements",
+            "ListAchievementsRequest",
+            "Achievement",
+            "AchievementSummary"
+          ]
+        },
+        {
+          "group": "usecases|src/application/ports",
+          "types": [
+            "LevelRepository",
+            "GameEventPublisher",
+            "AccountFailureCode",
+            "ProgressRepository",
+            "SyncFailureCode",
+            "GameRepository",
+            "LeaderboardFailureCode",
+            "SessionStore",
             "ProgressOwner",
             "AnonymousMerge",
             "GameFactories",
             "SyncFailure",
-            "GlobalLeaderboardRequest",
-            "StartGameRequest",
-            "LevelLeaderboardRequest",
-            "LoadProgress",
-            "SyncProgress",
             "AnonymousProgress",
             "AchievementCounterRepository",
             "ProgressGateway",
             "Credentials",
             "AccountFailure",
-            "GetGlobalLeaderboard",
             "Session",
-            "Register",
             "LeaderboardFailure",
             "AccountGateway",
-            "GetLevelLeaderboard",
-            "Login",
             "Leaderboard",
             "LeaderboardRow",
             "LeaderboardGateway",
             "LeaderboardRecord"
           ]
+        },
+        {
+          "group": "usecases|src/application/aspects",
+          "types": ["UseCaseAspect", "UseCaseLogEntry", "LoggingAspect", "Logger"]
+        },
+        {
+          "group": "usecases|src/application",
+          "types": ["UseCaseError", "Result", "UseCase", "FailureCode"]
         }
       ],
       "3": [

@@ -2,8 +2,8 @@
 import { AchievementCounterListener } from '../../src/adapters/achievement-counter-listener';
 import { GameEventBus } from '../../src/adapters/game-event-bus';
 import { LocalAchievementCounterRepository } from '../../src/adapters/local-achievement-counter-repository';
-import { ApplyMove } from '../../src/application/apply-move';
-import type { Logger, UseCaseLogEntry } from '../../src/application/logger';
+import { ApplyMove } from '../../src/application/game/apply-move';
+import type { Logger, UseCaseLogEntry } from '../../src/application/aspects/logger';
 import { AchievementCount } from '../../src/domain/achievements/achievement-count';
 import type { AchievementCounters } from '../../src/domain/achievements/achievement-counters';
 import type { CountsForAchievements } from '../../src/domain/achievements/counts-for-achievements';

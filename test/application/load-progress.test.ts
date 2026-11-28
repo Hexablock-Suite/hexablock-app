@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
-import { LoadProgress } from '../../src/application/load-progress';
-import type { ProgressRepository } from '../../src/application/progress-repository';
+import { LoadProgress } from '../../src/application/progress/load-progress';
+import type { ProgressRepository } from '../../src/application/ports/progress-repository';
 import { Result } from '../../src/application/result';
 import { GameId } from '../../src/domain/shared/game-id';
 import { GameProgress } from '../../src/domain/progress/game-progress';
@@ -9,7 +9,7 @@ import { ProgressRecord } from '../../src/domain/progress/progress-model';
 import { Score } from '../../src/domain/shared/score';
 import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-store';
 import { saveIn } from '../support/adapters/saved-progress';
-import { ProgressOwner } from '../../src/application/progress-owner';
+import { ProgressOwner } from '../../src/application/ports/progress-owner';
 
 // `LoadProgress` reads the saved progress of one game (S3-16 in #151, issue #181, APP-FR-04).
 // The tests run the real `LocalProgressRepository` over the in-memory `KeyValueStore`, and

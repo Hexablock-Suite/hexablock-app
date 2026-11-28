@@ -7,10 +7,10 @@ import fit03 from '../../src/adapters/levels/fit/fit-03.json';
 import sort01 from '../../src/adapters/levels/sort/sort-01.json';
 import sort02 from '../../src/adapters/levels/sort/sort-02.json';
 import fitSquare01 from '../../src/adapters/levels/fit/fit-square-01.json';
-import type { LevelRepository } from '../../src/application/level-repository';
-import type { MoveResult } from '../../src/application/move-result';
-import type { ProgressRepository } from '../../src/application/progress-repository';
-import { StartGame } from '../../src/application/start-game';
+import type { LevelRepository } from '../../src/application/ports/level-repository';
+import type { MoveResult } from '../../src/application/game/move-result';
+import type { ProgressRepository } from '../../src/application/ports/progress-repository';
+import { StartGame } from '../../src/application/game/start-game';
 import type { BoardState } from '../../src/domain/engine/board/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
 import type { LevelVariant } from '../../src/domain/engine/factory/level-variant';
@@ -38,7 +38,7 @@ import { startVariant } from '../support/engine/variant-game';
 import { linesFactory } from '../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../support/variants/hexa-merge/merge-game';
 import { viewData } from '../support/variants/view-data';
-import { ProgressOwner } from '../../src/application/progress-owner';
+import { ProgressOwner } from '../../src/application/ports/progress-owner';
 
 // Issue #172 (S3-13 in #151, option D): `StartGameRequest` names the level, and `StartGame`
 // asks its `GameFactories` port for the factory of that level. The composition root builds

@@ -4,8 +4,8 @@ import {
   type LevelSelectorViewModel,
 } from '../../src/adapters/level-selector-presenter';
 import { textCatalog } from '../../src/adapters/texts/text-catalog';
-import type { ListLevelsRequest } from '../../src/application/list-levels';
-import type { LevelList, LevelSummary } from '../../src/application/level-summary';
+import type { ListLevelsRequest } from '../../src/application/levels/list-levels';
+import type { LevelList, LevelSummary } from '../../src/application/levels/level-summary';
 import { Result, UseCaseError } from '../../src/application/result';
 import type { UseCase } from '../../src/application/use-case';
 import { GameId } from '../../src/domain/shared/game-id';

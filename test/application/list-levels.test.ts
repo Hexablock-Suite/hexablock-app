@@ -1,12 +1,12 @@
 /** @jest-environment node */
 import { BundledLevelRepository } from '../../src/adapters/bundled-level-repository';
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
-import type { LevelRepository } from '../../src/application/level-repository';
-import type { LevelList, LevelSummary } from '../../src/application/level-summary';
-import { ListLevels, type ListLevelsRequest } from '../../src/application/list-levels';
-import type { ProgressRepository } from '../../src/application/progress-repository';
+import type { LevelRepository } from '../../src/application/ports/level-repository';
+import type { LevelList, LevelSummary } from '../../src/application/levels/level-summary';
+import { ListLevels, type ListLevelsRequest } from '../../src/application/levels/list-levels';
+import type { ProgressRepository } from '../../src/application/ports/progress-repository';
 import { Result } from '../../src/application/result';
-import { SaveProgress } from '../../src/application/save-progress';
+import { SaveProgress } from '../../src/application/progress/save-progress';
 import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
 import { GameId } from '../../src/domain/shared/game-id';
 import { GameProgress } from '../../src/domain/progress/game-progress';
@@ -26,7 +26,7 @@ import { ManualClock } from '../support/engine/manual-clock';
 import { delivered } from '../support/engine/value-receiver';
 import { fitLevelFile, squareFitLevelFile } from '../support/variants/hexa-fit/fit-level-file';
 import { saveIn } from '../support/adapters/saved-progress';
-import { ProgressOwner } from '../../src/application/progress-owner';
+import { ProgressOwner } from '../../src/application/ports/progress-owner';
 
 // `ListLevels` lists the levels of a game on the chosen figure with their status and stars
 // (issue #168, APP-FR-02, S3-12 and S3-08 in #151). The tests run the real

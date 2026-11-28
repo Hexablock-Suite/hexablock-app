@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { GamePresenter } from '../../src/adapters/game-presenter';
 import { textCatalog } from '../../src/adapters/texts/text-catalog';
-import type { MoveResult } from '../../src/application/move-result';
+import type { MoveResult } from '../../src/application/game/move-result';
 import { Result } from '../../src/application/result';
 import type { UseCase } from '../../src/application/use-case';
 import { Outcome } from '../../src/domain/engine/events/outcome';

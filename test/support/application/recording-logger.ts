@@ -1,4 +1,4 @@
-import type { Logger, UseCaseLogEntry } from '../../../src/application/logger';
+import type { Logger, UseCaseLogEntry } from '../../../src/application/aspects/logger';
 
 // A test double of the `Logger` port. It keeps every entry in call order.
 export class RecordingLogger implements Logger {

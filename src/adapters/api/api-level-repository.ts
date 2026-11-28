@@ -1,4 +1,4 @@
-import type { LevelRepository } from '../../application/level-repository';
+import type { LevelRepository } from '../../application/ports/level-repository';
 import { LevelDefinition } from '../../domain/progress/level-definition';
 import { LevelId } from '../../domain/progress/level-id';
 import type { GameId } from '../../domain/shared/game-id';

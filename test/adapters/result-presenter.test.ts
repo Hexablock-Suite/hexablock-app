@@ -1,10 +1,10 @@
 /** @jest-environment node */
 import { ResultPresenter, type ResultViewModel } from '../../src/adapters/result-presenter';
 import { textCatalog } from '../../src/adapters/texts/text-catalog';
-import type { LevelList, LevelSummary } from '../../src/application/level-summary';
-import type { ListLevelsRequest } from '../../src/application/list-levels';
-import type { MoveResult } from '../../src/application/move-result';
-import type { SyncProgressRequest } from '../../src/application/sync-progress';
+import type { LevelList, LevelSummary } from '../../src/application/levels/level-summary';
+import type { ListLevelsRequest } from '../../src/application/levels/list-levels';
+import type { MoveResult } from '../../src/application/game/move-result';
+import type { SyncProgressRequest } from '../../src/application/progress/sync-progress';
 import { FailureCode, Result, UseCaseError } from '../../src/application/result';
 import type { UseCase } from '../../src/application/use-case';
 import { Outcome } from '../../src/domain/engine/events/outcome';

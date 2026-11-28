@@ -2,8 +2,8 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import type { GameRepository } from '../../src/application/game-repository';
-import { RedoMove } from '../../src/application/redo-move';
+import type { GameRepository } from '../../src/application/ports/game-repository';
+import { RedoMove } from '../../src/application/game/redo-move';
 import type { BoardState } from '../../src/domain/engine/board/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
 import { Turns } from '../../src/domain/engine/geometry/turns';
@@ -173,7 +173,7 @@ describe('RedoMove', () => {
   });
 
   it('should_name_no_variant_and_no_history_when_its_source_is_read', () => {
-    const source = readFileSync(join(repoRoot, 'src/application/redo-move.ts'), 'utf8');
+    const source = readFileSync(join(repoRoot, 'src/application/game/redo-move.ts'), 'utf8');
 
     expect(source).not.toMatch(/hexa-|domain\/variants|Lines|Fit|Sort|Merge|History/);
   });

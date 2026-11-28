@@ -1,7 +1,10 @@
-import type { Leaderboard } from '../../application/leaderboard';
-import { LeaderboardFailure, type LeaderboardGateway } from '../../application/leaderboard-gateway';
+import type { Leaderboard } from '../../application/ports/leaderboard';
+import {
+  LeaderboardFailure,
+  type LeaderboardGateway,
+} from '../../application/ports/leaderboard-gateway';
 import { FailureCode } from '../../application/result';
-import type { Session } from '../../application/session';
+import type { Session } from '../../application/ports/session';
 import type { LevelId } from '../../domain/progress/level-id';
 import type { GameId } from '../../domain/shared/game-id';
 import { valueOf } from '../delivered';

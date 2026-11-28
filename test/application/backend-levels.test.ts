@@ -4,9 +4,9 @@ import { BundledLevelRepository } from '../../src/adapters/bundled-level-reposit
 import { CombinedLevelRepository } from '../../src/adapters/combined-level-repository';
 import { LocalAchievementCounterRepository } from '../../src/adapters/local-achievement-counter-repository';
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
-import type { LevelList } from '../../src/application/level-summary';
-import { ListAchievements } from '../../src/application/list-achievements';
-import { ListLevels } from '../../src/application/list-levels';
+import type { LevelList } from '../../src/application/levels/level-summary';
+import { ListAchievements } from '../../src/application/achievements/list-achievements';
+import { ListLevels } from '../../src/application/levels/list-levels';
 import type { Result } from '../../src/application/result';
 import { EveryLevelWon } from '../../src/domain/achievements/achievement-goal';
 import { GameProgress } from '../../src/domain/progress/game-progress';

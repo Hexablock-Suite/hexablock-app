@@ -1,7 +1,7 @@
-import type { Credentials } from '../application/credentials';
+import type { Credentials } from '../application/ports/credentials';
 import { FailureCode, type Result } from '../application/result';
-import type { Session } from '../application/session';
-import type { SyncProgressRequest } from '../application/sync-progress';
+import type { Session } from '../application/ports/session';
+import type { SyncProgressRequest } from '../application/progress/sync-progress';
 import type { UseCase } from '../application/use-case';
 import type { GameId } from '../domain/shared/game-id';
 import type { TextKey, Texts } from './texts/text-catalog';

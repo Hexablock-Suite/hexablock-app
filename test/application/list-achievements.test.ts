@@ -2,10 +2,13 @@
 import { BundledLevelRepository } from '../../src/adapters/bundled-level-repository';
 import { LocalAchievementCounterRepository } from '../../src/adapters/local-achievement-counter-repository';
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
-import type { Achievement } from '../../src/application/achievement';
-import { ListAchievements, type AchievementSummary } from '../../src/application/list-achievements';
-import type { AchievementCounterRepository } from '../../src/application/achievement-counter-repository';
-import type { ProgressRepository } from '../../src/application/progress-repository';
+import type { Achievement } from '../../src/application/achievements/achievement';
+import {
+  ListAchievements,
+  type AchievementSummary,
+} from '../../src/application/achievements/list-achievements';
+import type { AchievementCounterRepository } from '../../src/application/ports/achievement-counter-repository';
+import type { ProgressRepository } from '../../src/application/ports/progress-repository';
 import type { Result } from '../../src/application/result';
 import { AchievementCount } from '../../src/domain/achievements/achievement-count';
 import { AchievementCounters } from '../../src/domain/achievements/achievement-counters';
@@ -25,7 +28,7 @@ import { Stars } from '../../src/domain/progress/stars';
 import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-store';
 import { delivered } from '../support/engine/value-receiver';
 import { saveIn } from '../support/adapters/saved-progress';
-import { ProgressOwner } from '../../src/application/progress-owner';
+import { ProgressOwner } from '../../src/application/ports/progress-owner';
 
 // `ListAchievements` gives each achievement of its list with its status: completed or in
 // progress (issue #188). The level achievements read the saved progress of a game and the levels

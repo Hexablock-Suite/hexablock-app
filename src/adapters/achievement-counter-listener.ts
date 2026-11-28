@@ -1,5 +1,5 @@
-import type { AchievementCounterRepository } from '../application/achievement-counter-repository';
-import type { Logger } from '../application/logger';
+import type { AchievementCounterRepository } from '../application/ports/achievement-counter-repository';
+import type { Logger } from '../application/aspects/logger';
 import { caughtError, FailureCode } from '../application/result';
 import { AchievementCounters } from '../domain/achievements/achievement-counters';
 import {

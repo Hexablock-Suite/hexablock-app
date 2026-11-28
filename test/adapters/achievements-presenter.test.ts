@@ -7,7 +7,7 @@ import { textCatalog } from '../../src/adapters/texts/text-catalog';
 import type {
   AchievementSummary,
   ListAchievementsRequest,
-} from '../../src/application/list-achievements';
+} from '../../src/application/achievements/list-achievements';
 import { Result, UseCaseError } from '../../src/application/result';
 import type { UseCase } from '../../src/application/use-case';
 

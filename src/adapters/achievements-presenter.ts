@@ -1,4 +1,7 @@
-import type { AchievementSummary, ListAchievementsRequest } from '../application/list-achievements';
+import type {
+  AchievementSummary,
+  ListAchievementsRequest,
+} from '../application/achievements/list-achievements';
 import type { Result } from '../application/result';
 import type { UseCase } from '../application/use-case';
 import type { TextKey, Texts } from './texts/text-catalog';

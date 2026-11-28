@@ -2,10 +2,10 @@
 import { BundledLevelRepository } from '../../src/adapters/bundled-level-repository';
 import { LocalAchievementCounterRepository } from '../../src/adapters/local-achievement-counter-repository';
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
-import type { AchievementCounterRepository } from '../../src/application/achievement-counter-repository';
-import type { LevelRepository } from '../../src/application/level-repository';
-import { ListAchievements } from '../../src/application/list-achievements';
-import type { ProgressRepository } from '../../src/application/progress-repository';
+import type { AchievementCounterRepository } from '../../src/application/ports/achievement-counter-repository';
+import type { LevelRepository } from '../../src/application/ports/level-repository';
+import { ListAchievements } from '../../src/application/achievements/list-achievements';
+import type { ProgressRepository } from '../../src/application/ports/progress-repository';
 import { AchievementCount } from '../../src/domain/achievements/achievement-count';
 import {
   BestCountReached,

@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { logEntryOf } from '../../src/application/logger';
+import { logEntryOf } from '../../src/application/aspects/logger';
 import { Result, UseCaseError } from '../../src/application/result';
 import { ConsoleLogger, type LogSink } from '../../src/infrastructure/console-logger';
 import { RecordingLogger } from '../support/application/recording-logger';

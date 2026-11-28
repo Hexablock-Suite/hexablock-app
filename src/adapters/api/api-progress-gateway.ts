@@ -1,6 +1,6 @@
-import { SyncFailure, type ProgressGateway } from '../../application/progress-gateway';
+import { SyncFailure, type ProgressGateway } from '../../application/ports/progress-gateway';
 import { FailureCode } from '../../application/result';
-import type { Session } from '../../application/session';
+import type { Session } from '../../application/ports/session';
 import type { GameProgress } from '../../domain/progress/game-progress';
 import type { ApiDtoMapper } from './api-dto-mapper';
 import { ApiFailure } from './api-failure';

@@ -1,8 +1,8 @@
 /** @jest-environment node */
 import { Outcome } from '../../src/domain/engine/events/outcome';
-import { ApplyMove } from '../../src/application/apply-move';
-import type { GameEventPublisher } from '../../src/application/game-event-publisher';
-import type { GameRepository } from '../../src/application/game-repository';
+import { ApplyMove } from '../../src/application/game/apply-move';
+import type { GameEventPublisher } from '../../src/application/ports/game-event-publisher';
+import type { GameRepository } from '../../src/application/ports/game-repository';
 import type { BoardState } from '../../src/domain/engine/board/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
 import { GameEngine } from '../../src/domain/engine/turn/game-engine';

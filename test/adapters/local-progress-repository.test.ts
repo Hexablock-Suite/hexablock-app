@@ -1,8 +1,8 @@
 /** @jest-environment node */
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
 import { SessionManager } from '../../src/adapters/session-manager';
-import { ProgressOwner } from '../../src/application/progress-owner';
-import { Session } from '../../src/application/session';
+import { ProgressOwner } from '../../src/application/ports/progress-owner';
+import { Session } from '../../src/application/ports/session';
 import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
 import { GameId } from '../../src/domain/shared/game-id';
 import { GameProgress } from '../../src/domain/progress/game-progress';

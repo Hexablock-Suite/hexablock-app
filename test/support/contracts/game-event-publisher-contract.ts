@@ -1,4 +1,4 @@
-import type { GameEventPublisher } from '../../../src/application/game-event-publisher';
+import type { GameEventPublisher } from '../../../src/application/ports/game-event-publisher';
 import { GameEnded } from '../../../src/domain/engine/events/game-events';
 import { GameId } from '../../../src/domain/shared/game-id';
 import { Outcome } from '../../../src/domain/engine/events/outcome';

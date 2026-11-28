@@ -4,10 +4,10 @@ import { phaseNameOf } from '../support/engine/phase-name';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
-import type { GameRepository } from '../../src/application/game-repository';
+import type { GameRepository } from '../../src/application/ports/game-repository';
 import { Result } from '../../src/application/result';
-import { SaveProgress } from '../../src/application/save-progress';
-import { UndoMove } from '../../src/application/undo-move';
+import { SaveProgress } from '../../src/application/progress/save-progress';
+import { UndoMove } from '../../src/application/game/undo-move';
 import type { BoardState } from '../../src/domain/engine/board/board-state';
 import { GameId } from '../../src/domain/shared/game-id';
 import type { HexCoord } from '../../src/domain/engine/geometry/hex-topology';
@@ -42,7 +42,7 @@ import { mergeFactory, mergeStateOf } from '../support/variants/hexa-merge/merge
 import { sortFactory } from '../support/variants/hexa-sort/sort-game';
 import { viewData } from '../support/variants/view-data';
 import { repoRoot } from '../support/run-tool';
-import { ProgressOwner } from '../../src/application/progress-owner';
+import { ProgressOwner } from '../../src/application/ports/progress-owner';
 
 // `UndoMove` takes back the last move of a variant that has a history (issue 159, APP-FR-08,
 // docs/architecture/flows.md use case 4, classes.md decisions 27 and 34).
@@ -213,7 +213,7 @@ describe('UndoMove', () => {
   });
 
   it('should_name_no_variant_when_its_source_is_read', () => {
-    const source = readFileSync(join(repoRoot, 'src/application/undo-move.ts'), 'utf8');
+    const source = readFileSync(join(repoRoot, 'src/application/game/undo-move.ts'), 'utf8');
 
     expect(source).not.toMatch(/hexa-|domain\/variants|Lines|Fit|Sort|Merge/);
   });

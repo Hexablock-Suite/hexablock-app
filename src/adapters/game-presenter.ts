@@ -1,9 +1,9 @@
-import type { ApplyMoveRequest } from '../application/apply-move';
-import type { MoveResult } from '../application/move-result';
-import type { RedoMoveRequest } from '../application/redo-move';
+import type { ApplyMoveRequest } from '../application/game/apply-move';
+import type { MoveResult } from '../application/game/move-result';
+import type { RedoMoveRequest } from '../application/game/redo-move';
 import type { FailureCode, Result, UseCaseError } from '../application/result';
-import type { StartGameRequest } from '../application/start-game';
-import type { UndoMoveRequest } from '../application/undo-move';
+import type { StartGameRequest } from '../application/game/start-game';
+import type { UndoMoveRequest } from '../application/game/undo-move';
 import type { UseCase } from '../application/use-case';
 import type { LevelId } from '../domain/progress/level-id';
 import { Outcome } from '../domain/engine/events/outcome';

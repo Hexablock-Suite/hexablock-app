@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { ApplyMove } from '../../src/application/apply-move';
+import { ApplyMove } from '../../src/application/game/apply-move';
 import { GameEngine } from '../../src/domain/engine/turn/game-engine';
 import { GameId } from '../../src/domain/shared/game-id';
 import { PlayingPhase } from '../../src/domain/engine/turn/game-phase';

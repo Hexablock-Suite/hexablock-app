@@ -1,4 +1,4 @@
-import type { GameEventPublisher } from '../application/game-event-publisher';
+import type { GameEventPublisher } from '../application/ports/game-event-publisher';
 import type { GameEvent } from '../domain/engine/events/game-events';
 import type { GameEventListener } from './game-event-listener';
 

@@ -211,7 +211,7 @@ The variant classes stay generic over `TCoord`, like the engine, so a variant ru
 
 ## Part 3: the use cases
 
-`src/application/`, layer 2. It imports only `src/domain/` and `src/application/` (rule `application-imports-only-domain`), and never `src/domain/variants/` (rule `application-no-variants`). Each use case names the requirement it serves.
+`src/application/`, layer 2. It imports only `src/domain/` and `src/application/` (rule `application-imports-only-domain`), and never `src/domain/variants/` (rule `application-no-variants`). Each use case names the requirement it serves. Since #500 the use cases sit in one folder per group, with the ports in `ports/` and the aspects in `aspects/`, and the rule `application-folders-no-cycle` keeps the folders free of cycles ([README of the use cases](../../src/application/README.md)).
 
 ### Map of the use cases
 
@@ -376,7 +376,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
    The statement lists `IUndoable`, `ITimed` and `IRandomSeeded`.
    Merge undoes one move and never redoes, so redo gets its own interface (§3.2 ISP, §5.1.8).
    `RedoableHistory` implements it, and its `redoable()` returns the history itself (#178).
-   `RedoMove` in `src/application/redo-move.ts` asks the root, as `UndoMove` does: it asks `GameEngine.canRedo()`, returns a failed `Result` with the code `nothing-to-redo` when it is false, and then calls `GameEngine.redo()`.
+   `RedoMove` in `src/application/game/redo-move.ts` asks the root, as `UndoMove` does: it asks `GameEngine.canRedo()`, returns a failed `Result` with the code `nothing-to-redo` when it is false, and then calls `GameEngine.redo()`.
    The root has no `offersRedo()`: a variant with no redo always answers `canRedo()` false, so `RedoMove` needs no other failure.
    A redo that the engine refuses, for example in a paused game, gives `redo-failed`, and a repository with no game gives `no-running-game`.
    A redo gives back the photo after the move (decision 34), so in Fit an undo and then a redo give back the same board, the same score and the same move count (APP-FR-08).
@@ -484,7 +484,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     `Register` and `Login` call the backend through this port.
     [layers.md](layers.md) shows it.
     `ApiAccountGateway` in layer 3, `src/adapters/api/`, implements it (decision 22).
-    Since #45 the port lives in `src/application/account-gateway.ts`: `register(credentials)` and `login(credentials)` each give the `Session` of the account, and a known failure throws an `AccountFailure` with its failure code (decision 65).
+    Since #45 the port lives in `src/application/ports/account-gateway.ts`: `register(credentials)` and `login(credentials)` each give the `Session` of the account, and a known failure throws an `AccountFailure` with its failure code (decision 65).
 12. **`SettingsStore` (proposal).**
     `UpdateSettings` keeps the mute option and the language through this port.
     [layers.md](layers.md) shows it.
@@ -695,7 +695,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     It builds one `GameEventBus`, subscribes `AchievementCounterListener` to it, and gives the bus to every `ApplyMove` (#233, #362).
     `gameUseCases(gameId, figure)` builds one `StartGame`, `ApplyMove`, `UndoMove` and `RedoMove` per game and figure over one `InMemoryGameRepository`, each through `decorate()`, and gives the same `GameUseCases` on each call for that game on that figure.
     Since #323 every use case of the root goes through one private `decorate(useCase, name)`.
-    It builds the chain of aspects with `wrapInAspects()` of `src/application/use-case-aspect.ts`, from the outside in: the first aspect sees the call first and the result last.
+    It builds the chain of aspects with `wrapInAspects()` of `src/application/aspects/use-case-aspect.ts`, from the outside in: the first aspect sees the call first and the result last.
     Today the chain holds `LoggingAspect` only, so a later aspect enters it in one place.
     `StartGame` takes one `LevelGameFactories` over the one `BundledLevelRepository` of the root, so it starts every level of its game (decision 59).
     **The board figure (#171, APP-FR-16).**
@@ -904,7 +904,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     The backend has another meaning, the instant of a sync, so the two repositories share no time type.
     Each `next()` of `MatchIdGenerator` gives a domain value object, never a text, and an id that it did not give before (decision 40).
     No generator gives the id of a state, of a board or of a level timer: those ids are local, and the factory builds them from the `MatchId` (decision 52, #236).
-    `GameEventPublisher` is a port of layer 2 in `src/application/game-event-publisher.ts` (#233).
+    `GameEventPublisher` is a port of layer 2 in `src/application/ports/game-event-publisher.ts` (#233).
     The engine takes no event sink: the root records its events, and `ApplyMove` takes them after the turn and delivers each one to the port (decisions 26 and 29).
     Since #361 the port also gets the events of a move, `LinesCleared`, `TileMerged` and `StackCleared`, through the same `publish(event: GameEvent)`: the port does not change.
     `GameEventBus` of layer 3 implements the port (view 4.3, #362).
@@ -1834,14 +1834,14 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     D27 in [REQUIREMENTS.md](../REQUIREMENTS.md) (#325) puts the user in the local key, so the device keeps one progress per game and user, and the progress played without an account merges into the first account that signs in with the rule of DS-12 inside `GameProgress`. #45 keeps the user id of the account in the `Session` (decision 65), and #46 builds the key and the merge.
     View 4 and view 3.3.
 57. **The repository of the progress and its saved shape (#164, proposal).**
-    `ProgressRepository` in `src/application/progress-repository.ts` is the output port and the repository of the progress aggregate of decision 56.
+    `ProgressRepository` in `src/application/ports/progress-repository.ts` is the output port and the repository of the progress aggregate of decision 56.
     `load(gameId: GameId): Promise<GameProgress | undefined>` gives back the whole root, or `undefined` when the game has no saved progress, and `save(progress: GameProgress): Promise<void>` saves it in place of the saved one.
-    `SaveProgress` in `src/application/save-progress.ts` implements `UseCase<GameResult, void>`.
+    `SaveProgress` in `src/application/progress/save-progress.ts` implements `UseCase<GameResult, void>`.
     It loads the progress of its game, or starts one with `GameProgress.start()`, records the result in it with its `IProgressModel`, and saves it.
     It changes one aggregate, the progress (decision 52).
     A `GameResult` keeps its game id private, so `SaveProgress` takes the `GameId` of its game in its constructor with the model of that game, as `GameFactory` takes the id of its game (decision 40).
     Its response is empty: `record()` returns nothing, so the use case has no record to return.
-    `LoadProgress` in `src/application/load-progress.ts` gives the read of the saved progress back (S3-16 of #151, #181): it implements `UseCase<LoadProgressRequest, GameProgress | undefined>`, its request names the `GameId` of the game, as the request of `ListLevels` does (#410), it takes the `ProgressRepository` port in its constructor, and `execute({ gameId })` returns the saved `GameProgress` as it is, or `undefined` when the game has none; it starts no progress.
+    `LoadProgress` in `src/application/progress/load-progress.ts` gives the read of the saved progress back (S3-16 of #151, #181): it implements `UseCase<LoadProgressRequest, GameProgress | undefined>`, its request names the `GameId` of the game, as the request of `ListLevels` does (#410), it takes the `ProgressRepository` port in its constructor, and `execute({ gameId })` returns the saved `GameProgress` as it is, or `undefined` when the game has none; it starts no progress.
     A port or a model that throws in `SaveProgress` gives the failure `save-failed`, and a port that throws in `LoadProgress` gives the failure `load-failed` (decision 62).
     `LocalProgressRepository` in `src/adapters/local-progress-repository.ts` implements the port over `KeyValueStore`.
     It keeps one JSON text per game under the key `progress:<game id>`, for example `{"version":1,"levels":[{"score":0,"levelId":"fit-01","stars":2,"moves":12,"elapsedMs":3000}]}` for Hexa Fit and `{"version":1,"highScore":{"score":36},"levels":[]}` for Hexa Lines.
@@ -1864,7 +1864,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     The engine names no variant, so the counts say nothing of what they count.
     Since #406 each event of a variant records its own count through `CountsForAchievements` (decision 60): `LinesCleared` keeps its lines and `TileMerged` its tile as a best count, and each `StackCleared`, one goal of Hexa Sort, adds one to the total.
     `AchievementCounterListener` of layer 3 loads and saves the counters around each event.
-    `AchievementCounterRepository` in `src/application/achievement-counter-repository.ts` is its port, with `load(gameId)` and `save(counters)` as `ProgressRepository` has.
+    `AchievementCounterRepository` in `src/application/ports/achievement-counter-repository.ts` is its port, with `load(gameId)` and `save(counters)` as `ProgressRepository` has.
     `LocalAchievementCounterRepository` implements it over the same `KeyValueStore`, under its own key `achievement-counters:<game id>`, for example `{"version":1,"best":3,"total":0}`.
     It shares the JSON helpers of `src/adapters/saved-json.ts` with `LocalProgressRepository`, so both read and check a saved text the same way: another `version`, a part of the wrong type and a count that `AchievementCount.of()` refuses throw a `RangeError`, a text that is not JSON throws a `SyntaxError`, and a load never writes, so the store keeps the old text.
     The counters do not go into the saved progress: the shape of `progress:<game id>` and its `version` 1 do not change, one repository serves one aggregate (decision 52), and the writer of the counters and `SaveProgress` never write the same saved text.
@@ -1876,7 +1876,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     A root with no store subscribes no counter listener.
     Views 3.3, 4 and 4.2 and flow 2.
 58. **The list of levels: `LevelRepository`, `BundledLevelRepository` and `ListLevels` (#168, proposal).**
-    `LevelRepository` in `src/application/level-repository.ts` is the output port of the levels.
+    `LevelRepository` in `src/application/ports/level-repository.ts` is the output port of the levels.
     `list(gameId: GameId): Promise<LevelDefinition[]>` gives the definition of each level of one game in a new list, in no fixed order, and an empty list for a game with no levels.
     A level is data of the catalogue that the player never changes, so the port only reads.
     The catalogue is not an aggregate (decision 52), and the port keeps the name that the views gave it since decision 22.
@@ -1887,7 +1887,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     A new level file adds one import, and the test of the adapter reads the folders, so a file that the list misses fails it.
     The constructor takes other files for a test, for example a square level.
     Since #48 `ApiLevelRepository` implements it over the levels of the backend, and `CombinedLevelRepository` joins the two with the rule of DS-11 (decision 68).
-    `ListLevels` in `src/application/list-levels.ts` implements `UseCase<ListLevelsRequest, LevelList>` (`LevelSummary[]` until #307).
+    `ListLevels` in `src/application/levels/list-levels.ts` implements `UseCase<ListLevelsRequest, LevelList>` (`LevelSummary[]` until #307).
     `ListLevelsRequest` holds the `GameId` of the game and the chosen figure as a `TopologyId`: the level selector of #173 passes the `TopologyId` of the `BoardFigure` that the player chose (#171).
     The use case loads the definitions and the progress of the game, keeps the levels that answer `isPlayedOn(figure)` (S3-08), orders them with `comesBefore()` and gives one `LevelSummary` per level.
     The filter and the order live in `levelsOnFigure()` of `list-levels.ts`, and `StartGame` reads the same list since #397 (decision 59).
@@ -1902,7 +1902,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     Their ids name the figure, such as `fit-square-01` and `sort-triangle-01`, and each figure numbers its levels from 1, so a new level of one figure changes no id of another figure: an id is the key of a saved result (decision 57).
     A game with no saved progress has no completed level.
     A port that throws gives the failure `list-failed`.
-    `LevelSummary` in `src/application/level-summary.ts` is the plain response model of the use case, in the form of `MoveResult` (decision 29): `levelId: LevelId`, `status: LevelStatus` and, only for a completed level, `stars: Stars`.
+    `LevelSummary` in `src/application/levels/level-summary.ts` is the plain response model of the use case, in the form of `MoveResult` (decision 29): `levelId: LevelId`, `status: LevelStatus` and, only for a completed level, `stars: Stars`.
     It carries the value objects, and a presenter receives their values with `deliverTo()`.
     `LevelStatus` has a closed set of three instances, `completed`, `open` and `locked`, in the form of decision 45: a private constructor that refuses every call after the last instance, one frozen instance per value and `equals()` by identity.
     It has no `of()` and no `deliverTo()`, because no file names a status and no reader needs its text yet.
@@ -1917,13 +1917,13 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     Since #172 `levelOf(gameId: GameId, levelId: LevelId): Promise<LevelDefinition | undefined>` gives the definition of one level of a game, or `undefined` when the game has no level with that id.
     `LevelGameFactories` asks it when a game starts (decision 59).
     `BundledLevelRepository` finds the level in its own `list()`, and it runs the contract suite of the port, `test/support/contracts/level-repository-contract.ts`.
-    Since #307 the port also has `unavailable(gameId: GameId): Promise<LevelId[]>`, and `LevelList` in `src/application/level-summary.ts`, the response of `ListLevels`, holds the summaries of the figure in `levels` and the unavailable levels of the game in `unavailable` (decision 68).
+    Since #307 the port also has `unavailable(gameId: GameId): Promise<LevelId[]>`, and `LevelList` in `src/application/levels/level-summary.ts`, the response of `ListLevels`, holds the summaries of the figure in `levels` and the unavailable levels of the game in `unavailable` (decision 68).
     The team confirms S3-12, S3-08 and S3-04 of #151, «Propuesta, pendiente del equipo».
     Views 4, 5 and 3.3 and the map of Part 3.
 59. **A level starts from its `levelId`: the `GameFactories` port and `LevelGameFactories` (#172, proposal).**
     S3-13 of #151 picks option D.
-    `StartGameRequest` in `src/application/start-game.ts` has one optional member, `levelId: LevelId`: a game with levels names the chosen level, and a game with no levels, such as Hexa Lines and Hexa Merge, starts with none.
-    `GameFactories<TCell, TCoord, TMove, TState>` in `src/application/game-factories.ts` is an output port of layer 2.
+    `StartGameRequest` in `src/application/game/start-game.ts` has one optional member, `levelId: LevelId`: a game with levels names the chosen level, and a game with no levels, such as Hexa Lines and Hexa Merge, starts with none.
+    `GameFactories<TCell, TCoord, TMove, TState>` in `src/application/ports/game-factories.ts` is an output port of layer 2.
     `factoryFor(levelId?: LevelId): Promise<GameFactory<TCell, TCoord, TMove, TState>>` gives the factory of the aggregate (decision 40) for the chosen level, and with no level id the factory of the game that the composition root registered.
     `StartGame` takes the port in its constructor in place of a `GameFactory`: it asks the port for the factory of the level of the request, then asks that factory for the started game.
     So the use case keeps the choice of the level, and no file of `src/application/` names a variant (decision 31).
@@ -1965,9 +1965,9 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
 60. **The achievements screen: `ListAchievements` and its goals (#188, proposal).**
     The team prototype names the achievements, and #188 lists seven of them: clear 3 lines at once, reach 256 and reach 2048 in Hexa Merge, win 3 levels of Hexa Fit and of Hexa Sort, win every Hexa Fit level, and complete 10 goals in Hexa Sort.
     No requirement of `docs/REQUIREMENTS.md` asks for them.
-    `ListAchievements` in `src/application/list-achievements.ts` implements `UseCase<ListAchievementsRequest, AchievementSummary[]>`.
+    `ListAchievements` in `src/application/achievements/list-achievements.ts` implements `UseCase<ListAchievementsRequest, AchievementSummary[]>`.
     Its request has no member, and it gives one `AchievementSummary` per achievement, in the order of its list: the `id` of the achievement and `completed: boolean`.
-    `Achievement` in `src/application/achievement.ts` is plain data: an `id` and an optional `AchievementGoal`.
+    `Achievement` in `src/application/achievements/achievement.ts` is plain data: an `id` and an optional `AchievementGoal`.
     Since #326 `AchievementGoal`, `LevelsWon` and `EveryLevelWon` live in layer 1, in `src/domain/achievements/achievement-goal.ts`, and import nothing from layer 2: a goal such as «win 3 levels of Hexa Fit» holds on paper, with no software, and a domain object calls no repository (decision of the product owner of 2026-11-23).
     `AchievementGoal` is a Strategy with two queries.
     `gameId(): GameId` names the game whose data the goal reads, an identity query in the form of `LevelDefinition.levelId()`.
@@ -2043,7 +2043,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     Today `GameResult.of` in `src/domain/progress/progress-model.ts` requires `moves`, and #176 and #180 build the second form.
     The saved format does not change: `ProgressRecord` already keeps only the game id and the score for a game with no levels (decision 57), so only the construction of `GameResult` changes.
     One read path serves both games.
-    `MoveResult` in `src/application/move-result.ts` carries the optional move count and the optional level id to the presenter, as it carries `score` and `elapsedMs`: as value objects that no use case opens (rule R-no-delivery-call).
+    `MoveResult` in `src/application/game/move-result.ts` carries the optional move count and the optional level id to the presenter, as it carries `score` and `elapsedMs`: as value objects that no use case opens (rule R-no-delivery-call).
     `moveResultOf()` is the one place that fills them.
     The aggregate root keeps the level id.
     The level of a match is a fact of the match, and it never changes while the match lives.
@@ -2211,13 +2211,13 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     A progress of another game throws a `RangeError`, and the progress stays as it was.
     So the merge rule has one home in the aggregate, and it reads no field of another object (rule R-domain-private-fields).
     **The ports.**
-    `ProgressGateway` in `src/application/progress-gateway.ts` sends a progress with the `Session` and gives back the progress that the backend keeps after the sync.
+    `ProgressGateway` in `src/application/ports/progress-gateway.ts` sends a progress with the `Session` and gives back the progress that the backend keeps after the sync.
     It is no repository: the local progress stays the store.
     A known failure throws a `SyncFailure` with the code `session-expired` or `backend-unreachable`.
-    `AnonymousProgress` in `src/application/anonymous-progress.ts` merges the anonymous space, the progress saved with no account, into the progress of an owner with `mergeAnonymousInto(owner, gameId)`, and forgets it only after the merged progress is saved, so a failed save keeps it.
+    `AnonymousProgress` in `src/application/ports/anonymous-progress.ts` merges the anonymous space, the progress saved with no account, into the progress of an owner with `mergeAnonymousInto(owner, gameId)`, and forgets it only after the merged progress is saved, so a failed save keeps it.
     It is a second role of the one repository of the progress aggregate (decision 52), so `SaveProgress` and `ListLevels` do not see it (ISP).
     **The owner (judgment-day round 1, option A).**
-    The progress belongs to `ProgressOwner`, a value object in `src/application/progress-owner.ts`: the last signed-in user, or the anonymous owner.
+    The progress belongs to `ProgressOwner`, a value object in `src/application/ports/progress-owner.ts`: the last signed-in user, or the anonymous owner.
     `SessionStore` keeps the user id apart from the token: `owner()` gives it, `clear()` forgets the token only, and `write()` of another session changes the owner.
     So a 401 keeps the levels of the player open.
     `SessionManager` writes the version 2 shape `{version, userId, token?}` and still reads the version 1 shape of #45.
@@ -2279,7 +2279,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     **The use cases.**
     One input port per board, as hexablock-api#218 decided for the API: `GetGlobalLeaderboard` implements `UseCase<GlobalLeaderboardRequest, Leaderboard>`, and `GetLevelLeaderboard` implements `UseCase<LevelLeaderboardRequest, Leaderboard>`.
     The board of a level has its own request with the `LevelId` and its own failure, `level-has-no-board`, so a second port keeps each request exact and adds no optional field.
-    Both share `readBoard()` of `src/application/leaderboard.ts`, so the rule of the session has one home.
+    Both share `readBoard()` of `src/application/ports/leaderboard.ts`, so the rule of the session has one home.
     Both routes of the API need a token, so the use case reads the session through `SessionStore`, as `SyncProgress` does (decision 66), and no `AuthorizationAspect` wraps it.
     With no session it calls no backend and gives `sign-in-required`.
     A `LeaderboardFailure` of the `LeaderboardGateway` port gives its code: `session-expired` for a refused token, which also clears the token through `SessionStore.clear()` and keeps the owner of the progress, `backend-unreachable` for no answer, and `level-has-no-board` for a level that the backend does not hold (hexablock-api#134).

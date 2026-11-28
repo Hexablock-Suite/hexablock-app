@@ -11,7 +11,7 @@ import { Turns } from '../../src/domain/engine/geometry/turns';
 import type { IVariantFactory } from '../../src/domain/engine/factory/variant-factory';
 import { PlaceFitPiece } from '../../src/domain/variants/hexa-fit/fit-move';
 import type { FitView } from '../../src/domain/variants/hexa-fit/fit-state';
-import type { MoveResult } from '../../src/application/move-result';
+import type { MoveResult } from '../../src/application/game/move-result';
 import type { Result } from '../../src/application/result';
 import { gameUseCases, valueOf } from '../support/application/game-use-cases';
 import { ManualClock } from '../support/engine/manual-clock';

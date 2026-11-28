@@ -2,10 +2,10 @@
 import { BundledLevelRepository } from '../../src/adapters/bundled-level-repository';
 import type { KeyValueStore } from '../../src/adapters/key-value-store';
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
-import type { LevelSummary } from '../../src/application/level-summary';
-import { ListLevels } from '../../src/application/list-levels';
+import type { LevelSummary } from '../../src/application/levels/level-summary';
+import { ListLevels } from '../../src/application/levels/list-levels';
 import { Result } from '../../src/application/result';
-import { SaveProgress } from '../../src/application/save-progress';
+import { SaveProgress } from '../../src/application/progress/save-progress';
 import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
 import { GameId } from '../../src/domain/shared/game-id';
 import { TopologyId } from '../../src/domain/shared/topology-id';
@@ -29,7 +29,7 @@ import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-s
 import { ManualClock } from '../support/engine/manual-clock';
 import { seededRandom } from '../support/engine/step-random';
 import { delivered } from '../support/engine/value-receiver';
-import { ProgressOwner } from '../../src/application/progress-owner';
+import { ProgressOwner } from '../../src/application/ports/progress-owner';
 
 // The integration tests of APP-NFR-15 for the two games with levels (issue #183, APP-FR-09).
 // A level result that `SaveProgress` saves survives a restart of the app, and `ListLevels`

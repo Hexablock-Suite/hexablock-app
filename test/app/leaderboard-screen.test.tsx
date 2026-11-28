@@ -6,8 +6,8 @@ import { fireEvent, renderRouter, screen, within } from 'expo-router/testing-lib
 import { generateStaticParams } from '../../app/leaderboard/[gameId]';
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
 import { SessionManager } from '../../src/adapters/session-manager';
-import { ProgressOwner } from '../../src/application/progress-owner';
-import { Session } from '../../src/application/session';
+import { ProgressOwner } from '../../src/application/ports/progress-owner';
+import { Session } from '../../src/application/ports/session';
 import { GameProgress } from '../../src/domain/progress/game-progress';
 import { LevelId } from '../../src/domain/progress/level-id';
 import { ProgressRecord } from '../../src/domain/progress/progress-model';

@@ -3,7 +3,7 @@ import { ApiLevelRepository } from '../../src/adapters/api/api-level-repository'
 import type { LevelsApi } from '../../src/adapters/api/levels-api';
 import { BundledLevelRepository } from '../../src/adapters/bundled-level-repository';
 import { CombinedLevelRepository } from '../../src/adapters/combined-level-repository';
-import type { LevelRepository } from '../../src/application/level-repository';
+import type { LevelRepository } from '../../src/application/ports/level-repository';
 import { GameId } from '../../src/domain/shared/game-id';
 import { LevelDefinition } from '../../src/domain/progress/level-definition';
 import { LevelId } from '../../src/domain/progress/level-id';

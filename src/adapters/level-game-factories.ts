@@ -1,5 +1,5 @@
-import type { GameFactories } from '../application/game-factories';
-import type { LevelRepository } from '../application/level-repository';
+import type { GameFactories } from '../application/ports/game-factories';
+import type { LevelRepository } from '../application/ports/level-repository';
 import type { BoardState } from '../domain/engine/board/board-state';
 import type { Cloneable } from '../domain/engine/cloneable';
 import { GameFactory } from '../domain/engine/factory/game-factory';

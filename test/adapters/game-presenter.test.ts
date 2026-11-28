@@ -3,12 +3,12 @@ import { GamePresenter, type GameViewModel } from '../../src/adapters/game-prese
 import type { MoveMapper } from '../../src/adapters/move-mapper';
 import type { StateMapper } from '../../src/adapters/state-mapper';
 import { textCatalog, type TextKey } from '../../src/adapters/texts/text-catalog';
-import type { ApplyMoveRequest } from '../../src/application/apply-move';
-import type { MoveResult } from '../../src/application/move-result';
-import type { RedoMoveRequest } from '../../src/application/redo-move';
+import type { ApplyMoveRequest } from '../../src/application/game/apply-move';
+import type { MoveResult } from '../../src/application/game/move-result';
+import type { RedoMoveRequest } from '../../src/application/game/redo-move';
 import { FailureCode, Result, UseCaseError } from '../../src/application/result';
-import type { StartGameRequest } from '../../src/application/start-game';
-import type { UndoMoveRequest } from '../../src/application/undo-move';
+import type { StartGameRequest } from '../../src/application/game/start-game';
+import type { UndoMoveRequest } from '../../src/application/game/undo-move';
 import type { UseCase } from '../../src/application/use-case';
 import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
 import { LevelId } from '../../src/domain/progress/level-id';

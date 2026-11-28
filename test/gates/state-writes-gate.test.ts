@@ -294,7 +294,7 @@ describe('state writes gate (R7 and R8)', () => {
         'src/domain/variants/hexa-lines/lines-rules.ts',
         'src/domain/variants/hexa-sort/sort-rules.ts',
         'src/domain/variants/hexa-merge/merge-rules.ts',
-        'src/application/apply-move.ts',
+        'src/application/game/apply-move.ts',
       ]),
     );
     expect(violations).toEqual([]);

@@ -1,11 +1,11 @@
 /** @jest-environment node */
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
-import type { ProgressGateway } from '../../src/application/progress-gateway';
+import type { ProgressGateway } from '../../src/application/ports/progress-gateway';
 import { FailureCode } from '../../src/application/result';
-import { SaveProgress } from '../../src/application/save-progress';
-import { Session } from '../../src/application/session';
-import type { SessionStore } from '../../src/application/session-store';
-import { SyncProgress } from '../../src/application/sync-progress';
+import { SaveProgress } from '../../src/application/progress/save-progress';
+import { Session } from '../../src/application/ports/session';
+import type { SessionStore } from '../../src/application/ports/session-store';
+import { SyncProgress } from '../../src/application/progress/sync-progress';
 import { GameProgress } from '../../src/domain/progress/game-progress';
 import { LevelId } from '../../src/domain/progress/level-id';
 import {

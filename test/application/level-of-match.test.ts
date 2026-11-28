@@ -2,9 +2,9 @@
 import { BundledLevelRepository } from '../../src/adapters/bundled-level-repository';
 import { LevelGameFactories } from '../../src/adapters/level-game-factories';
 import fit01 from '../../src/adapters/levels/fit/fit-01.json';
-import { ApplyMove } from '../../src/application/apply-move';
-import { StartGame } from '../../src/application/start-game';
-import { UndoMove } from '../../src/application/undo-move';
+import { ApplyMove } from '../../src/application/game/apply-move';
+import { StartGame } from '../../src/application/game/start-game';
+import { UndoMove } from '../../src/application/game/undo-move';
 import { HexGeometry } from '../../src/domain/engine/geometry/hex-geometry';
 import { Turns } from '../../src/domain/engine/geometry/turns';
 import { LevelDefinition } from '../../src/domain/progress/level-definition';

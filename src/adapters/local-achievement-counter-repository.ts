@@ -1,4 +1,4 @@
-import type { AchievementCounterRepository } from '../application/achievement-counter-repository';
+import type { AchievementCounterRepository } from '../application/ports/achievement-counter-repository';
 import { AchievementCount } from '../domain/achievements/achievement-count';
 import { AchievementCounters } from '../domain/achievements/achievement-counters';
 import type { GameId } from '../domain/shared/game-id';

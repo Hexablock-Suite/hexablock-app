@@ -1,6 +1,6 @@
 import type { MoveMapper } from '../adapters/move-mapper';
 import type { StateMapper } from '../adapters/state-mapper';
-import type { ViewOf } from '../application/move-result';
+import type { ViewOf } from '../application/game/move-result';
 import type { BoardState } from '../domain/engine/board/board-state';
 import type { Cloneable } from '../domain/engine/cloneable';
 import type { GameId } from '../domain/shared/game-id';

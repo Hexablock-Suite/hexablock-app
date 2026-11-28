@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
 import { Result } from '../../src/application/result';
-import { SaveProgress } from '../../src/application/save-progress';
+import { SaveProgress } from '../../src/application/progress/save-progress';
 import { BoardShape } from '../../src/domain/engine/geometry/board-shape';
 import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
 import { GameId } from '../../src/domain/shared/game-id';
@@ -24,7 +24,7 @@ import { ManualClock } from '../support/engine/manual-clock';
 import { square } from '../support/engine/square-topology';
 import { A } from '../support/variants/hexa-fit/fit-game';
 import { linesFactory } from '../support/variants/hexa-lines/lines-game';
-import { ProgressOwner } from '../../src/application/progress-owner';
+import { ProgressOwner } from '../../src/application/ports/progress-owner';
 
 // `SaveProgress` records a `GameResult` in the progress of its game with the progress model
 // of the variant, and saves the progress through the `ProgressRepository` port (issue #164).

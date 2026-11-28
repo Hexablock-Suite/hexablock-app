@@ -1,4 +1,4 @@
-import type { GameRepository } from '../../../src/application/game-repository';
+import type { GameRepository } from '../../../src/application/ports/game-repository';
 import { GameFactory } from '../../../src/domain/engine/factory/game-factory';
 import type { FakeCell } from '../engine/fake-cell';
 import { fakeGameFactory, type FakeMove, type FakeState } from '../engine/fake-game';

@@ -1,9 +1,9 @@
 /** @jest-environment node */
 import fit01 from '../../src/adapters/levels/fit/fit-01.json';
 import { SessionManager } from '../../src/adapters/session-manager';
-import type { LevelSummary } from '../../src/application/level-summary';
-import type { MoveResult } from '../../src/application/move-result';
-import { Session } from '../../src/application/session';
+import type { LevelSummary } from '../../src/application/levels/level-summary';
+import type { MoveResult } from '../../src/application/game/move-result';
+import { Session } from '../../src/application/ports/session';
 import type { GeometryFactory } from '../../src/domain/engine/geometry/geometry-factory';
 import { Turns } from '../../src/domain/engine/geometry/turns';
 import { LevelId } from '../../src/domain/progress/level-id';

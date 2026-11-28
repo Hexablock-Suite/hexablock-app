@@ -1,6 +1,6 @@
 /** @jest-environment node */
 import { GameEventBus } from '../../src/adapters/game-event-bus';
-import { ApplyMove } from '../../src/application/apply-move';
+import { ApplyMove } from '../../src/application/game/apply-move';
 import { GameEnded } from '../../src/domain/engine/events/game-events';
 import { GameId } from '../../src/domain/shared/game-id';
 import { Outcome } from '../../src/domain/engine/events/outcome';

@@ -1,5 +1,5 @@
 import { SessionManager } from '../../src/adapters/session-manager';
-import { Session } from '../../src/application/session';
+import { Session } from '../../src/application/ports/session';
 import { InMemorySecretStore } from '../support/adapters/in-memory-secret-store';
 
 // #45 (APP-FR-12): `SessionManager` keeps the session of the signed-in player in the secure

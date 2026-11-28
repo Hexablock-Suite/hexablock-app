@@ -3,7 +3,7 @@ import { Dimensions, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import type { MoveResult } from '../../../src/application/move-result';
+import type { MoveResult } from '../../../src/application/game/move-result';
 import { GameId } from '../../../src/domain/shared/game-id';
 import { HexGeometry } from '../../../src/domain/engine/geometry/hex-geometry';
 import type { Score } from '../../../src/domain/shared/score';

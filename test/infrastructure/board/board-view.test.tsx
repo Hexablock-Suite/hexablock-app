@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { StyleSheet, View } from 'react-native';
 
-import type { MoveResult } from '../../../src/application/move-result';
+import type { MoveResult } from '../../../src/application/game/move-result';
 import { hex, type HexCoord } from '../../../src/domain/engine/geometry/hex-topology';
 import { Outcome } from '../../../src/domain/engine/events/outcome';
 import { Score } from '../../../src/domain/shared/score';
