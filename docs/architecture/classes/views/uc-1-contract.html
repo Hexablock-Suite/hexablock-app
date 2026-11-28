@@ -86,7 +86,8 @@
           SessionStore and a SessionNeed, required or optional. The logging aspect uses the Logger
           output port and reads the engine Clock before and after the call (#343). Logger takes a
           UseCaseLogEntry with the use case name, the outcome, the duration of the call, the error
-          and the failed deliveries of a success, and the adapter writes the text.
+          and the failed deliveries of a success, and the adapter writes the text. Each aspect box
+          carries the stereotype «aspect», and UseCaseAspect carries «abstract» «aspect» (#345).
         </desc>
         <defs>
           <marker
@@ -286,7 +287,7 @@
         <!-- LoggingAspect keeps the Logger it receives as logger: use with role and multiplicity (decision 23) -->
         <line
           x1="520"
-          y1="520"
+          y1="528"
           x2="520"
           y2="584"
           stroke="#5b6873"
@@ -405,7 +406,7 @@
           + execute(request: TRequest): Promise&lt;Result&lt;TResponse&gt;&gt;
         </text>
 
-        <!-- Class: UseCaseAspect (abstract; a piece of the Decorator pattern: the frame names it, decision 23) -->
+        <!-- Class: UseCaseAspect («abstract» «aspect»; a piece of the Decorator pattern: the frame names it, decision 23) -->
         <rect
           x="344"
           y="264"
@@ -427,7 +428,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «abstract»
+          «abstract» «aspect»
         </text>
         <text
           x="520"
@@ -451,21 +452,32 @@
           # around(request: TRequest): Promise&lt;Result&lt;TResponse&gt;&gt;
         </text>
 
-        <!-- Class: RetryAspect (planned with no sprint: it comes only if the sync needs it, #46 delivered APP-FR-13 without it, so it carries no marker) -->
+        <!-- Class: RetryAspect («aspect»; planned with no sprint: it comes only if the sync needs it, #46 delivered APP-FR-13 without it, so it carries no marker) -->
         <rect
           x="84"
           y="424"
           width="200"
-          height="64"
+          height="72"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="84" y1="464" x2="284" y2="464" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="84" y1="472" x2="284" y2="472" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="184"
-          y="449"
+          y="442"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «aspect»
+        </text>
+        <text
+          x="184"
+          y="460"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -474,25 +486,36 @@
         >
           RetryAspect
         </text>
-        <text x="100" y="480" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="100" y="488" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - attempts: number
         </text>
 
-        <!-- Class: LoggingAspect (it reads the engine Clock for the duration of each call, #343) -->
+        <!-- Class: LoggingAspect («aspect»; it reads the engine Clock for the duration of each call, #343) -->
         <rect
           x="420"
           y="424"
           width="200"
-          height="96"
+          height="104"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="420" y1="464" x2="620" y2="464" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="420" y1="472" x2="620" y2="472" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="520"
-          y="449"
+          y="442"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «aspect»
+        </text>
+        <text
+          x="520"
+          y="460"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -501,31 +524,42 @@
         >
           LoggingAspect
         </text>
-        <text x="436" y="480" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="436" y="488" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - logger: Logger
         </text>
-        <text x="436" y="496" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="436" y="504" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - name: string
         </text>
-        <text x="436" y="512" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="436" y="520" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - clock: Clock
         </text>
 
-        <!-- Class: SessionAspect (#481) -->
+        <!-- Class: SessionAspect («aspect», #481) -->
         <rect
           x="756"
           y="424"
           width="200"
-          height="80"
+          height="88"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
           stroke-width="1"
         />
-        <line x1="756" y1="464" x2="956" y2="464" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
+        <line x1="756" y1="472" x2="956" y2="472" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="856"
-          y="449"
+          y="442"
+          fill="#5b6873"
+          font-size="8"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="middle"
+          letter-spacing="0.08em"
+        >
+          «aspect»
+        </text>
+        <text
+          x="856"
+          y="460"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -534,10 +568,10 @@
         >
           SessionAspect
         </text>
-        <text x="772" y="480" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="772" y="488" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - sessions: SessionStore
         </text>
-        <text x="772" y="496" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+        <text x="772" y="504" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
           - need: SessionNeed
         </text>
 
