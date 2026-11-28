@@ -57,6 +57,17 @@ module.exports = {
       to: { path: layer('domain'), pathNot: '(?:^|/)src/domain/(?:shared|progress|achievements)/' },
     },
     {
+      // A folder rule: dependency-cruiser joins the modules of each folder and finds the cycles
+      // between folders. A cycle between two folders needs no cycle between two modules.
+      name: 'engine-folders-no-cycle',
+      comment:
+        'The subfolders of src/domain/engine/ form no cycle: a subfolder imports only the subfolders that its README row names (issue #499).',
+      severity: 'error',
+      scope: 'folder',
+      from: { path: '(?:^|/)src/domain/engine/[^/]+$' },
+      to: { path: '(?:^|/)src/domain/engine/[^/]+$', circular: true },
+    },
+    {
       name: 'variants-isolated',
       comment: 'A variant never imports another variant.',
       severity: 'error',

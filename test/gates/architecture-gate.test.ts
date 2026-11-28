@@ -76,6 +76,15 @@ describe('architecture gate (dependency-cruiser)', () => {
     expect(result.output).toContain('achievements-imports-only-shared-and-progress');
   });
 
+  // Issue #499: the subfolders of the engine form no cycle. In the fixture `board/` imports `turn/`,
+  // and `turn/` imports `board/` through other files, so the cycle is between folders only.
+  it('should_fail_arch_when_two_subfolders_of_the_engine_import_each_other', () => {
+    const result = cruise('engine-folders-cycle');
+
+    expect(result.status).not.toBe(0);
+    expect(result.output).toContain('engine-folders-no-cycle');
+  });
+
   it('should_fail_arch_when_application_imports_an_adapter', () => {
     const result = cruise('application-imports-outside');
 
