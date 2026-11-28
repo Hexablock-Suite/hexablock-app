@@ -42,6 +42,7 @@ Each sprint of [`docs/ROADMAP.md`](docs/ROADMAP.md) closes with a version sectio
 
 ### Changed
 
+- `docs/architecture/classes.drawio` is generated again with the generator of Hexablock-Suite/.github#14: each reference box of an aspect class carries «aspect» (`LoggingAspect` twice, `SessionAspect`), as the solid boxes do.
 - The architecture docs and views drop the tactical DDD words («aggregate root», «entity», «domain event» and the aggregate frame): `GameEngine` is the Facade of a game (§3.3) in decision 26, view 1 and the pattern tables, decision 52 lists the rules of the game boundary, D9 names `BoardBuilder` a Builder, and rule R-aggregate-rules becomes R-game-boundary; «value object» and «use case» stay ([#501](https://github.com/Hexablock-Suite/hexablock-app/issues/501)).
 - `LoggingAspect` writes the duration of each use case call in its one log entry, read through the engine `Clock` that the composition root passes, and a logger that throws after the call no longer changes the result; `TimingAspect` leaves every document and view ([#343](https://github.com/Hexablock-Suite/hexablock-app/issues/343)).
 - Decision 69, the AOP section of the README, APP-NFR-11 and view 3.1 write the aspect chain of each use case from the outside in, with `LoggingAspect` outside `SessionAspect` so that the log keeps each call that the session rejects ([#344](https://github.com/Hexablock-Suite/hexablock-app/issues/344)).
