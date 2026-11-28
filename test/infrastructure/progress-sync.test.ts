@@ -198,7 +198,7 @@ describe('progress sync through the root', () => {
     expect(own?.starsOf(LevelId.of('fit-01'))?.equals(Stars.of(3))).toBe(true);
   });
 
-  // A failed sync never loses local progress. A refused token clears the session.
+  // A failed sync never loses local progress. `SessionAspect` clears the session on a refused token.
   it('should_keep_the_saved_result_and_clear_the_session_when_the_backend_refuses_the_token', async () => {
     const store = new InMemoryKeyValueStore();
     const secrets = new InMemorySecretStore();

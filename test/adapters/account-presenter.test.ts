@@ -205,7 +205,7 @@ describe('AccountPresenter and the sync after a sign-in', () => {
     expect(presenter.viewModel()).toEqual({ ...formOf(), signedIn: 'Sesión iniciada como ada' });
   });
 
-  // `SyncProgress` cleared the session, so the player must sign in again. The sync stops there.
+  // `SessionAspect` cleared the session, so the player must sign in again. The sync stops there.
   it('should_show_the_text_of_an_expired_session_when_the_sync_after_the_sign_in_gives_session_expired', async () => {
     const sync = new SyncingUseCase(
       Result.failure(

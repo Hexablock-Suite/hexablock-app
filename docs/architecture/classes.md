@@ -2369,7 +2369,8 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     The use cases no longer clear the session: `readBoard()` and `SyncProgress` only give `session-expired`.
     Each use case still reads the session for its token, because its gateway needs it, so a call reads the session twice.
     `readBoard()` still gives `sign-in-required` with no session, because the session can disappear between the two reads.
-    Option B removed the planned aspect from the README, this file and the views, and kept the check of the session in each use case.
+    Option B would remove the planned aspect from the README, this file and the views, and keep the check of the session in each use case.
+    Option B was not chosen.
     View 3.1 draws `SessionAspect` as a class of the code, and views 3.4 and 3.7, the map of Part 3 and view 4 of [extensibility.md](extensibility.md) name it.
 
 ## Render the images
