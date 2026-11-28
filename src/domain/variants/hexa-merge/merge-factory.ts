@@ -25,7 +25,8 @@ import type { NewTile } from './new-tile';
 import type { Slide } from './slide';
 
 // The count of tiles on the first board. Statement §1.4 does not give it.
-// The value follows 2048, as the chance of a 4 does (issue 57): two tiles.
+// D23 of `docs/REQUIREMENTS.md` gives two tiles: the value follows 2048, as the chance of a 4 does.
+// The team accepted D23 on 2026-11-16 (#57).
 // Only this file reads the two counts (issue #232).
 const START_TILES = 2;
 

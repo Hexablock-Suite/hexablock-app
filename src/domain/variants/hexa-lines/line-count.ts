@@ -8,7 +8,8 @@ import { ComboFactor } from './combo-factor';
 const POINTS_PER_LINE = 10;
 
 // The count of lines that one Hexa Lines placement cleared: the combo of the placement
-// (statement §1.1, issue #232). The proposal on issue 58 counts each distinct full line once.
+// (statement §1.1, issue #232). D24 of `docs/REQUIREMENTS.md` counts each distinct full line once.
+// The team accepted D24 on 2026-11-16 (#58).
 // It is a value object: it never changes, and two counts are equal when their values are equal.
 // A count of lines is a safe integer of 0 or more. Any other number throws a RangeError.
 // A negative zero is stored as 0. The object is frozen, so no caller writes the value.

@@ -2,7 +2,8 @@ import { ComboFactor } from './combo-factor';
 import type { LineCount } from './line-count';
 
 // The streak of Hexa Lines: the count of placements in a row that cleared at least one line
-// (statement §1.1, the proposal on issue 58, issue #232).
+// (statement §1.1, D24 of `docs/REQUIREMENTS.md`, issue #232).
+// The team accepted D24 on 2026-11-16 (#58).
 // It is a value object: it never changes, and two streaks are equal when their values are equal.
 // A streak is a safe integer of 0 or more. Any other number throws a RangeError.
 // A negative zero is stored as 0. The object is frozen, so no caller writes the value.
