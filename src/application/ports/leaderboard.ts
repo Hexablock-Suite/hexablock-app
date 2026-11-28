@@ -48,14 +48,14 @@ export interface Leaderboard {
 // The text of the failure of a board with no session.
 const NO_SESSION = 'A board needs a signed-in player.';
 
-// The rule of both leaderboard use cases (#47). A board needs a signed-in player, because the
-// backend guards both routes with a token. The function reads the session once:
-// - With no session it gives `sign-in-required` and calls no backend.
-// - With a session it reads the board through `read` with that session.
-// A `LeaderboardFailure` gives its code. `session-expired` also clears the session through
-// `SessionStore.clear()`, which keeps the owner of the progress (decision 66), so the screen asks
-// the player to sign in. A session that cannot be read and any other thrown value give
-// `leaderboard-failed`. A clear that throws still gives `session-expired`.
+// The read of both leaderboard use cases (#47). The backend guards both routes with a token, so
+// the function reads the session once for that token, and it reads the board through `read` with
+// that session. `SessionAspect` holds the rule of the session (#481, classes.md decision 69): it
+// rejects a call with no session before this function runs, and it clears a refused session.
+// So this function never clears the session. With no session it still gives `sign-in-required`
+// and calls no backend: the session can disappear between the read of the aspect and this read.
+// A `LeaderboardFailure` gives its code, `session-expired` for a refused token among them.
+// A session that cannot be read and any other thrown value give `leaderboard-failed`.
 // No exception leaves the function (decision 28).
 export async function readBoard(
   sessions: SessionStore,
@@ -73,21 +73,14 @@ export async function readBoard(
   try {
     return Result.success(await read(session));
   } catch (thrown) {
-    return failureOf(sessions, thrown);
+    return failureOf(thrown);
   }
 }
 
-// The failure of a thrown value. A refused token also clears the session.
-async function failureOf(sessions: SessionStore, thrown: unknown): Promise<Result<Leaderboard>> {
+// The failure of a thrown value.
+function failureOf(thrown: unknown): Result<Leaderboard> {
   if (!(thrown instanceof LeaderboardFailure)) {
     return Result.failure(caughtError(FailureCode.leaderboardFailed, thrown));
-  }
-  if (thrown.code === FailureCode.sessionExpired) {
-    try {
-      await sessions.clear();
-    } catch {
-      // The token stays. The backend refuses it again at the next request.
-    }
   }
   return Result.failure(new UseCaseError(thrown.code, thrown.message, false, thrown));
 }
