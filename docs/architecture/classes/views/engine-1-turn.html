@@ -71,31 +71,30 @@
       >
         <title id="engine-turn-title">HexaBlock engine turn · UML class diagram</title>
         <desc id="engine-turn-desc">
-          Class diagram of layer 1 showing GameEngine, the aggregate root of a game, running each
-          turn through the IGameRules strategy, whose playTurn() is the template method of
-          BaseGameRules and returns a Resolution that holds an Outcome, scoring with the
+          Class diagram of layer 1 showing GameEngine, the one entry of a game and a Facade (§3.3),
+          running each turn through the IGameRules strategy, whose playTurn() is the template method
+          of BaseGameRules and returns a Resolution that holds an Outcome, scoring with the
           IScoringPolicy strategy, holding a GamePhase state, recording the GameEvent objects of its
           turns, which ApplyMove takes with takeEvents() and delivers, and bounding its TState
-          parameter by BoardState and Cloneable of TState in its template box. A dark dashed frame
-          marks the boundary of the game aggregate: the root and its internal entities, the
-          BoardState, the Board of the state and the timer of a timed game. The root joins the state
-          and the timer, an ITimed, with a filled diamond. BoardState declares no board, and the
-          reference boxes of the board and of ITimed name views 2 and 3. IGameRules declares only
-          validMoves() and playTurn() (decision 21). The optional history, an IUndoable that
-          declares the five members the root calls (decision 27), and the optional timer stay
-          inside: the root answers for them with undo(), redo(), canUndo(), canRedo(), offersUndo()
-          and elapsedTime(). BoardState is an entity inside the GameEngine aggregate: its own
-          GameStateId is its identity, it keeps the MatchId of its game, its fields are private, and
-          it changes in place only through its business methods. Its snapshot() creates a
-          BoardSnapshot, the immutable photo of the Memento pattern: GameEngine.snapshot() returns
-          it, IScoringPolicy reads two of them as SnapshotOf of its TState, the photo type that
-          snapshot() gives, and the history keeps them for the undo. BoardSnapshot is abstract and
-          its fields are private: a reader asks isPhotoOf(), belongsTo(), boardCopy() and
-          scoreSoFar(), and each variant photo implements view(). Resolution is a value object: it
-          holds no state, its two fields are private, a reader asks wasAccepted(), endsTheGame(),
-          phaseAfter() and leadsTo(), and equals() compares accepted and outcome. Score is the value
-          object of the score and of the points of a turn: IScoringPolicy returns one, BoardState
-          adds it, and BoardSnapshot gives the score with scoreSoFar().
+          parameter by BoardState and Cloneable of TState in its template box. GameEngine owns its
+          parts: the BoardState, the Board of the state and the timer of a timed game. The root
+          joins the state and the timer, an ITimed, with a filled diamond. BoardState declares no
+          board, and the reference boxes of the board and of ITimed name views 2 and 3. IGameRules
+          declares only validMoves() and playTurn() (decision 21). The optional history, an
+          IUndoable that declares the five members the root calls (decision 27), and the optional
+          timer stay inside: the root answers for them with undo(), redo(), canUndo(), canRedo(),
+          offersUndo() and elapsedTime(). BoardState is a part of GameEngine: its own GameStateId is
+          its identity, it keeps the MatchId of its game, its fields are private, and it changes in
+          place only through its business methods. Its snapshot() creates a BoardSnapshot, the
+          immutable photo of the Memento pattern: GameEngine.snapshot() returns it, IScoringPolicy
+          reads two of them as SnapshotOf of its TState, the photo type that snapshot() gives, and
+          the history keeps them for the undo. BoardSnapshot is abstract and its fields are private:
+          a reader asks isPhotoOf(), belongsTo(), boardCopy() and scoreSoFar(), and each variant
+          photo implements view(). Resolution is a value object: it holds no state, its two fields
+          are private, a reader asks wasAccepted(), endsTheGame(), phaseAfter() and leadsTo(), and
+          equals() compares accepted and outcome. Score is the value object of the score and of the
+          points of a turn: IScoringPolicy returns one, BoardState adds it, and BoardSnapshot gives
+          the score with scoreSoFar().
         </desc>
         <defs>
           <marker
@@ -182,30 +181,6 @@
           OBSERVER · §3.3
         </text>
 
-        <!-- Group: the boundary of the game aggregate, the root and its internal entities (decisions 26 and 52, #21). A dark dashed frame, so it differs from the frame of a pattern. -->
-        <rect
-          x="364"
-          y="188"
-          width="332"
-          height="892"
-          rx="8"
-          fill="none"
-          stroke="#17212a"
-          stroke-width="1.2"
-          stroke-dasharray="6,3"
-        />
-        <text
-          x="376"
-          y="204"
-          fill="#17212a"
-          font-size="8"
-          font-weight="500"
-          font-family="'IBM Plex Mono', monospace"
-          letter-spacing="0.14em"
-        >
-          AGGREGATE · DECISION 52
-        </text>
-
         <rect
           x="40"
           y="172"
@@ -275,7 +250,7 @@
           COMMAND · §3.3 · §5.1.8
         </text>
 
-        <!-- Relationships (drawn before boxes). Decision 23: a filled diamond goes only from the root to an internal entity, and every other attribute is a use with its name and multiplicity. -->
+        <!-- Relationships (drawn before boxes). Decision 23: a filled diamond goes only from GameEngine to a part that it owns, and every other attribute is a use with its name and multiplicity. -->
         <!-- GameEngine keeps the IGameRules it receives as rules: use with role and multiplicity -->
         <line
           x1="380"
@@ -326,7 +301,7 @@
           marker-end="url(#t-open)"
           stroke="#5b6873"
         />
-        <!-- GameEngine holds its BoardState as state: composition from the root to an internal entity, with a hop over the outcome line -->
+        <!-- GameEngine holds its BoardState as state: composition from GameEngine to a part that it owns, with a hop over the outcome line -->
         <path
           d="M460,680 V756 a 8,8 0 0,1 0,16 V792"
           fill="none"
@@ -334,7 +309,7 @@
           stroke-width="1"
           marker-start="url(#t-diamond-filled)"
         />
-        <!-- GameEngine holds the timer of a timed game as an ITimed: composition from the root to an internal entity, to the type of the field -->
+        <!-- GameEngine holds the timer of a timed game as an ITimed: composition from GameEngine to a part that it owns, to the type of the field -->
         <line
           x1="616"
           y1="680"
@@ -382,7 +357,7 @@
           marker-end="url(#t-open)"
         />
 
-        <!-- BoardSnapshot keeps its Score as score: use with role and multiplicity, below the frame of the aggregate -->
+        <!-- BoardSnapshot keeps its Score as score: use with role and multiplicity, below the BoardState -->
         <path
           d="M194,984 V1100 H870 V976"
           fill="none"
@@ -599,7 +574,7 @@
           0..1
         </text>
 
-        <!-- Class: GameEvent (abstract domain event, detailed in view 5) -->
+        <!-- Class: GameEvent (abstract event, detailed in view 5) -->
         <rect
           x="396"
           y="92"
@@ -620,7 +595,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «abstract» «domain event»
+          «abstract»
         </text>
         <text
           x="520"
@@ -638,7 +613,7 @@
           - gameId: GameId
         </text>
 
-        <!-- Class: GameEngine (focal, aggregate root) -->
+        <!-- Class: GameEngine (focal; a footnote names it the Facade of a game, decision 26) -->
         <rect
           x="380"
           y="216"
@@ -655,18 +630,7 @@
         <line x1="380" y1="432" x2="680" y2="432" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text
           x="530"
-          y="238"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «aggregate root»
-        </text>
-        <text
-          x="530"
-          y="256"
+          y="245"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1001,7 +965,7 @@
           + redoable(): IRedoable | undefined
         </text>
 
-        <!-- Class: BoardState (interface, entity inside the aggregate) -->
+        <!-- Class: BoardState (interface, a part that GameEngine owns) -->
         <rect
           x="396"
           y="792"
@@ -1023,7 +987,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «interface» «entity»
+          «interface»
         </text>
         <text
           x="520"
@@ -1640,7 +1604,7 @@
           TCell, TCoord
         </text>
 
-        <!-- The footnote and the legend sit below the zone, which grew by 32 and then by 80 for the Outcome box (#207). It grew by 32 more for the delivery operation of Score (#228), by 32 more for the queries of BoardSnapshot (#245), and by 148 more for the frame of the aggregate, its two reference boxes and the score line below it (#21). -->
+        <!-- The footnote and the legend sit below the zone, which grew by 32 and then by 80 for the Outcome box (#207). It grew by 32 more for the delivery operation of Score (#228), by 32 more for the queries of BoardSnapshot (#245), and by 148 more for a frame of #21 (removed by #501), its two reference boxes and the score line below it (#21). -->
         <g transform="translate(0 380)">
           <!-- Footnote -->
           <text
@@ -1670,9 +1634,9 @@
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            Aggregate root: MatchId is its identity. A game changes only through tryPlay(), undo()
-            and redo(), while currentPhase().canPlay() is true. snapshot() returns the photo
-            (decisions 26, 34).
+            GameEngine is the Facade of a game (§3.3): MatchId is its identity. A game changes only
+            through tryPlay(), undo() and redo(), while currentPhase().canPlay() is true (decision
+            26).
           </text>
           <text
             x="24"
@@ -1703,8 +1667,8 @@
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            The dark dashed frame is the boundary of the game aggregate: the root and its internal
-            entities, the state, its board and the timer, which have local ids (decisions 26, 52).
+            The state, its board and the timer are parts of GameEngine with local ids (decision 52).
+            snapshot() returns the photo (decision 34).
           </text>
           <text
             x="24"
@@ -1713,7 +1677,7 @@
             font-size="11"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            The phase, the history and the two Strategies are parts of the aggregate too: each one
+            The phase, the history and the two Strategies are parts of GameEngine too: each one
             stays in the frame of its pattern, and the root keeps it with a use (decision 23).
           </text>
           <text
@@ -1763,7 +1727,7 @@
             font-size="8.5"
             font-family="'IBM Plex Sans', sans-serif"
           >
-            Composition · aggregate root to internal entity
+            Composition · whole to a part that it owns
           </text>
           <line
             x1="304"
@@ -1828,33 +1792,13 @@
             width="28"
             height="12"
             rx="2"
-            fill="none"
-            stroke="#17212a"
-            stroke-width="1.2"
-            stroke-dasharray="6,3"
-          />
-          <text
-            x="380"
-            y="953"
-            fill="#5b6873"
-            font-size="8.5"
-            font-family="'IBM Plex Sans', sans-serif"
-          >
-            Dark dashed frame · boundary of an aggregate
-          </text>
-          <rect
-            x="584"
-            y="944"
-            width="28"
-            height="12"
-            rx="2"
             fill="#ffffff"
             stroke="#5b6873"
             stroke-width="0.8"
             stroke-dasharray="4,3"
           />
           <text
-            x="620"
+            x="380"
             y="953"
             fill="#5b6873"
             font-size="8.5"

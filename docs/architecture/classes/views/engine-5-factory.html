@@ -76,9 +76,9 @@
           a variant, LevelDefinition, the data of one level file with its level id, its order and
           its version, which directs the ILevelBuilder builder, tells the list of levels its figure
           and its order, and tells with replaces() if one copy of a level replaces another copy by
-          the rule of DS-11, the abstract GameEvent with GameEnded, the domain event that the root
-          records when a game ends, with a note that GameEngine records it in the turn that ends a
-          match, the Clock and RandomSource interfaces that layer 4 implements, with a note that
+          the rule of DS-11, the abstract GameEvent with GameEnded, the event that the root records
+          when a game ends, with a note that GameEngine records it in the turn that ends a match,
+          the Clock and RandomSource interfaces that layer 4 implements, with a note that
           GameFactory uses neither and the composition root injects both into the variant factories
           (a variant factory draws a new Seed of the RandomSource in each match), and the
           MatchIdGenerator interface that gives the MatchId of each new match. Each reading of the
@@ -246,7 +246,7 @@
           TIME AND RANDOMNESS · APP-NFR-07
         </text>
 
-        <!-- Pattern group: the factory of the aggregate -->
+        <!-- Pattern group: the factory of the game -->
         <rect
           x="40"
           y="868"
@@ -267,7 +267,7 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.14em"
         >
-          FACTORY OF THE AGGREGATE · DECISION 40
+          FACTORY OF THE GAME · DECISION 40
         </text>
         <!-- Pattern group: the identity of a match -->
         <rect
@@ -474,7 +474,7 @@
         >
           (view 1). GameEnded carries the final Score.
         </text>
-        <!-- Class: GameEvent (abstract, domain event) -->
+        <!-- Class: GameEvent (abstract event) -->
         <rect
           x="792"
           y="92"
@@ -495,7 +495,7 @@
           text-anchor="middle"
           letter-spacing="0.08em"
         >
-          «abstract» «domain event»
+          «abstract»
         </text>
         <text
           x="884"
@@ -520,7 +520,7 @@
           GameId) =&gt; void): void
         </text>
 
-        <!-- Class: GameEnded (domain event) -->
+        <!-- Class: GameEnded (event) -->
         <rect
           x="792"
           y="216"
@@ -534,18 +534,7 @@
         <line x1="792" y1="256" x2="976" y2="256" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="884"
-          y="231"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «domain event»
-        </text>
-        <text
-          x="884"
-          y="247"
+          y="241"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -1315,7 +1304,7 @@
         >
           boolean
         </text>
-        <!-- Class: GameFactory (factory of the aggregate) -->
+        <!-- Class: GameFactory (factory of the game) -->
         <rect
           x="56"
           y="896"

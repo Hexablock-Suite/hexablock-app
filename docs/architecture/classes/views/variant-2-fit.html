@@ -84,12 +84,11 @@
           class (decision 43). Lollipops show the engine interface each variant class implements,
           with its binding. PieceId, the cell content, and Placement, the rotation and the offset of
           a placed piece, are value objects. PieceRegister is the value object that holds the pieces
-          and the placements of FitState and finds an entry with PieceId.equals(). FitState is an
-          entity inside the GameEngine aggregate: its own GameStateId is its identity, it keeps the
-          MatchId of its game, and it changes in place only through its business methods. FitPlay
-          holds the Moves and the ElapsedTime of one won level in private fields, and
-          FitStarThreshold tells whether a play meets its two limits: it gives them to isWithin() of
-          the play. Both are value objects.
+          and the placements of FitState and finds an entry with PieceId.equals(). FitState is a
+          part of GameEngine: its own GameStateId is its identity, it keeps the MatchId of its game,
+          and it changes in place only through its business methods. FitPlay holds the Moves and the
+          ElapsedTime of one won level in private fields, and FitStarThreshold tells whether a play
+          meets its two limits: it gives them to isWithin() of the play. Both are value objects.
         </desc>
         <defs>
           <marker
@@ -453,7 +452,7 @@
           | RotateFitPiece
         </text>
 
-        <!-- Class: FitState (entity) -->
+        <!-- Class: FitState (a part of GameEngine) -->
         <rect
           x="40"
           y="208"
@@ -468,18 +467,7 @@
         <line x1="40" y1="376" x2="310" y2="376" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="175"
-          y="226"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «entity»
-        </text>
-        <text
-          x="175"
-          y="244"
+          y="237"
           fill="#17212a"
           font-size="12"
           font-weight="600"

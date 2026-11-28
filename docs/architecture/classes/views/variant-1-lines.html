@@ -76,16 +76,15 @@
           binding TState to LinesState. It binds no inner type, because it reads no member of
           LinesScoring, and LinesFactory wraps a LinesScoring in it (issue 427). LinesRules uses
           LinesState as TState and PlacePiece as TMove. Lollipops show the engine interface each
-          variant class implements, with its binding. LinesState is an entity inside the GameEngine
-          aggregate: its own GameStateId is its identity, it keeps the MatchId of its game, and it
-          changes in place only through its business methods. LinesSettings is a value object that
-          LinesFactory holds: the board size, and the shapes and the colors that a draw picks from.
-          LinesFactory also holds the RandomSource of the root, and each match draws a new Seed from
-          it. Streak, LineCount and CellCount are the three counts of the last placement that
-          LinesState keeps: value objects that give their points as a Score. A PlacePiece names its
-          tray piece with a TrayPosition (issue 232). ComboFactor is the combo multiplier lines +
-          streak - 1: Streak builds it from the lines, and LineCount applies it to its line bonus
-          (issue 427).
+          variant class implements, with its binding. LinesState is a part of GameEngine: its own
+          GameStateId is its identity, it keeps the MatchId of its game, and it changes in place
+          only through its business methods. LinesSettings is a value object that LinesFactory
+          holds: the board size, and the shapes and the colors that a draw picks from. LinesFactory
+          also holds the RandomSource of the root, and each match draws a new Seed from it. Streak,
+          LineCount and CellCount are the three counts of the last placement that LinesState keeps:
+          value objects that give their points as a Score. A PlacePiece names its tray piece with a
+          TrayPosition (issue 232). ComboFactor is the combo multiplier lines + streak - 1: Streak
+          builds it from the lines, and LineCount applies it to its line bonus (issue 427).
         </desc>
         <defs>
           <marker
@@ -400,7 +399,7 @@
           { key(c: TCoord): CoordKey }): boolean
         </text>
 
-        <!-- Class: LinesState (entity) -->
+        <!-- Class: LinesState (a part of GameEngine) -->
         <rect
           x="36"
           y="64"
@@ -415,18 +414,7 @@
         <line x1="36" y1="260" x2="260" y2="260" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="148"
-          y="82"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «entity»
-        </text>
-        <text
-          x="148"
-          y="100"
+          y="93"
           fill="#17212a"
           font-size="12"
           font-weight="600"
