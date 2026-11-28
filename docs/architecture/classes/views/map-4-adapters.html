@@ -64,31 +64,33 @@
       <h1>Adapters, presenters and drivers at a glance</h1>
 
       <svg
-        viewBox="0 0 1040 2211"
+        viewBox="0 0 1040 2227"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="mapad-title mapad-desc"
       >
         <title id="mapad-title">HexaBlock adapters map · UML class diagram</title>
         <desc id="mapad-desc">
-          Overview map of the 74 classes of layers 4 and 3 in 14 groups. Since #48 the repositories
-          group holds CombinedLevelRepository and the HTTP group holds LevelsApi, the transport
-          interface of ApiLevelRepository; since #307 the view models group holds
-          UnavailableSection. Since #47 the routes group holds LeaderboardScreen, the presenters
-          group LeaderboardPresenter, the view models group LeaderboardViewModel, and the HTTP group
-          ApiLeaderboardGateway and its transport interface LeaderboardApi. The board layout group
-          of layer 3 holds BoardLayout, HexLayout, SquareLayout and TriangleLayout (#393). The
-          composition root group holds CompositionRoot, GameRegistry, BoardFigure and the
-          ScreenServices interface of the screens (#411), the drivers group holds SequentialMatchIds
-          and DeviceSecretStore, the repositories group holds SessionManager (#45), the HTTP group
-          holds ApiProgressGateway (#46) and ApiLeaderboardGateway (#47), the move controls group
-          holds MoveControls, FitControls and MergeControls, and the events group holds
-          GameEventBus, GameEventListener and AchievementCounterListener. Each line joins two
-          classes: GameScreen renders BoardView and keeps its GamePresenter and its MoveControls,
-          CompositionRoot creates InMemoryGameRepository, DeviceKeyValueStore implements
-          KeyValueStore, DeviceSecretStore implements SecretStore, GamePresenter keeps its
-          StateMapper and LocalProgressRepository keeps its KeyValueStore. No line touches a group
-          frame. Each group names the view that shows its members.
+          Overview map of the 79 classes of layers 4 and 3 in 15 groups. Since #405 the move mappers
+          group of layer 3 holds MoveMapper, LinesMoveMapper, FitMoveMapper, SortMoveMapper and
+          MergeMoveMapper. Since #48 the repositories group holds CombinedLevelRepository and the
+          HTTP group holds LevelsApi, the transport interface of ApiLevelRepository; since #307 the
+          view models group holds UnavailableSection. Since #47 the routes group holds
+          LeaderboardScreen, the presenters group LeaderboardPresenter, the view models group
+          LeaderboardViewModel, and the HTTP group ApiLeaderboardGateway and its transport interface
+          LeaderboardApi. The board layout group of layer 3 holds BoardLayout, HexLayout,
+          SquareLayout and TriangleLayout (#393). The composition root group holds CompositionRoot,
+          GameRegistry, BoardFigure and the ScreenServices interface of the screens (#411), the
+          drivers group holds SequentialMatchIds and DeviceSecretStore, the repositories group holds
+          SessionManager (#45), the HTTP group holds ApiProgressGateway (#46) and
+          ApiLeaderboardGateway (#47), the move controls group holds MoveControls, FitControls and
+          MergeControls, and the events group holds GameEventBus, GameEventListener and
+          AchievementCounterListener. Each line joins two classes: GameScreen renders BoardView and
+          keeps its GamePresenter and its MoveControls, CompositionRoot creates
+          InMemoryGameRepository, DeviceKeyValueStore implements KeyValueStore, DeviceSecretStore
+          implements SecretStore, GamePresenter keeps its StateMapper and LocalProgressRepository
+          keeps its KeyValueStore. No line touches a group frame. Each group names the view that
+          shows its members.
         </desc>
         <defs>
           <marker
@@ -2172,6 +2174,138 @@
             </tspan>
           </text>
         </g>
+        <!-- Group: move mappers (layer 3, decision 14, #405) -->
+        <rect
+          x="744"
+          y="1292"
+          width="240"
+          height="266"
+          rx="8"
+          fill="none"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
+        />
+        <text
+          x="756"
+          y="1308"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.14em"
+        >
+          MOVE MAPPERS · STRATEGY
+        </text>
+        <text
+          x="972"
+          y="1308"
+          fill="#1d4ed8"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          text-anchor="end"
+          letter-spacing="0.14em"
+        >
+          VIEW 4.5
+        </text>
+        <!-- Chips: move mappers -->
+        <g data-class="MoveMapper">
+          <rect
+            x="756"
+            y="1320"
+            width="216"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text
+            x="864"
+            y="1332"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            interface
+          </text>
+          <text x="864" y="1345" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              MoveMapper
+            </tspan>
+          </text>
+        </g>
+        <g data-class="LinesMoveMapper">
+          <rect
+            x="756"
+            y="1364"
+            width="216"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="864" y="1385" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              LinesMoveMapper
+            </tspan>
+          </text>
+        </g>
+        <g data-class="FitMoveMapper">
+          <rect
+            x="756"
+            y="1408"
+            width="216"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="864" y="1429" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              FitMoveMapper
+            </tspan>
+          </text>
+        </g>
+        <g data-class="SortMoveMapper">
+          <rect
+            x="756"
+            y="1452"
+            width="216"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="864" y="1473" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              SortMoveMapper
+            </tspan>
+          </text>
+        </g>
+        <g data-class="MergeMoveMapper">
+          <rect
+            x="756"
+            y="1496"
+            width="216"
+            height="34"
+            rx="4"
+            fill="#ffffff"
+            stroke="#17212a"
+            stroke-width="1"
+          />
+          <text x="864" y="1517" fill="#17212a" text-anchor="middle">
+            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
+              MergeMoveMapper
+            </tspan>
+          </text>
+        </g>
         <!-- Group: HTTP repositories and transport interfaces (layer 3, decision 22, #404) -->
         <rect
           x="40"
@@ -2598,7 +2732,18 @@
           Since #307 LevelSelectorViewModel holds an UnavailableSection with each level of the
           backend that breaks a rule.
         </text>
-        <g transform="translate(0 160)">
+        <!-- The last footnote line and the legend sit 16 lower again: the footnote has one more line since #469. -->
+        <text
+          x="24"
+          y="2086"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          Since #405 each game has its own move mapper: MoveMapper turns the intent of the move
+          controls into the move of the variant (view 4.5).
+        </text>
+        <g transform="translate(0 176)">
           <text
             x="24"
             y="1926"

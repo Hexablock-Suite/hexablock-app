@@ -33,6 +33,13 @@ How they were taken, on 2026-11-22:
 - The home screen, the map and the achievements screen opened by their address. Each game screen opened with a click on its world on the map, on the hexagon. A reload of each game screen also opens it.
 - The script kept the browser console of each screen. With the hexagon, the default figure, no screen showed an error or a warning. The console shows only the log lines of the use cases, such as `StartGame: success`.
 
+The two Hexa Sort screenshots were taken again on 2026-11-28 (#469), because the tray offers three stacks since #453:
+
+- The code is `main` at `dc12b75`. `expo export --platform web` wrote the export to a temporary directory outside the repository, and a small static server outside the repository served it on `127.0.0.1`.
+- The same kind of Playwright script drove headless Chromium with a fresh context, at the same two viewports and a device scale of 1.
+- Since #173 the map opens the level selector for Hexa Sort. The script clicked Hexa Sort on the map, then «Nivel 1», so the game screen shows the level `sort-01` with its tray of three stacks.
+- The console showed only the log lines of the use cases, such as `StartGame: success`, and no error or warning.
+
 ## What works on the web
 
 Measured in the export on 2026-11-22, in headless Chromium:
