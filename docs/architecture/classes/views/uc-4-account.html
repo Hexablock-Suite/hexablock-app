@@ -80,8 +80,8 @@
           carries a failure code. Register and Login also keep an optional AnonymousMerge, so a
           sign-in merges the progress played with no account into its user (#46). SessionStore also
           gives owner(), the user id of the last signed-in player, and clears the token:
-          SyncProgress of view 3.3 calls clear() when the backend refuses the token, and the owner
-          stays (#46, decision 66).
+          SessionAspect of view 3.1 calls clear() when the backend refuses the token, and the owner
+          stays (#46, #481, decision 66).
         </desc>
         <defs>
           <marker
@@ -784,8 +784,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          SyncProgress reads SessionStore and calls clear() when the backend refuses the token;
-          clear() keeps owner(), the last signed-in user (view 3, #46, decision 66).
+          SessionAspect calls clear() when the backend refuses the token (view 3.1, #481); clear()
+          keeps owner(), the last signed-in user (#46, decision 66).
         </text>
         <text
           x="24"
@@ -794,8 +794,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          GetGlobalLeaderboard and GetLevelLeaderboard read SessionStore too, and clear() it on a
-          refused token (view 7, #47). Settings holds the mute option and the language.
+          SyncProgress, GetGlobalLeaderboard and GetLevelLeaderboard read SessionStore for the token
+          (views 3 and 7). Settings holds the mute option and the language.
         </text>
         <text
           x="24"

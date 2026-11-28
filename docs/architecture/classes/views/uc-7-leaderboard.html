@@ -787,8 +787,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          Both use cases share readBoard() of leaderboard.ts. With no session it gives
-          sign-in-required and calls no backend. A refused token gives session-expired
+          SessionAspect of view 3.1 gives sign-in-required with no session and calls no backend
+          (#481). A refused token gives session-expired, and the aspect
         </text>
         <text
           x="24"
@@ -797,8 +797,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          and clears the token through SessionStore.clear(), which keeps the owner of the progress
-          (decision 66). A LeaderboardFailure also gives backend-unreachable,
+          clears the token through SessionStore.clear(), which keeps the owner of the progress
+          (decision 66). Through readBoard(), a LeaderboardFailure also gives backend-unreachable,
         </text>
         <text
           x="24"
