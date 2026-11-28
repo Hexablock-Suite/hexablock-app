@@ -30,9 +30,9 @@ export interface SyncProgressRequest {
 //    result of another device reaches this device, and the best result stays.
 // A session that cannot be read gives `sync-failed` and writes nothing. A failed sync never loses
 // local progress: every step before a failure keeps its save.
-// A refused token gives `session-expired` and clears the session through `SessionStore.clear()`,
-// which keeps the owner, so the screen asks the player to sign in and the player keeps the
-// progress. No answer gives `backend-unreachable`. Any other failure gives `sync-failed`.
+// A refused token gives `session-expired`, so the screen asks the player to sign in and the player
+// keeps the progress. The use case never clears the session: `SessionAspect` clears it (#481).
+// No answer gives `backend-unreachable`. Any other failure gives `sync-failed`.
 // No exception leaves `execute()` (decision 28).
 export class SyncProgress implements UseCase<SyncProgressRequest, void> {
   constructor(
@@ -58,12 +58,11 @@ export class SyncProgress implements UseCase<SyncProgressRequest, void> {
     }
   }
 
-  // The failure of a thrown value. A refused token also clears the session.
-  private async failureOf(thrown: unknown): Promise<Result<void>> {
+  // The failure of a thrown value.
+  private failureOf(thrown: unknown): Result<void> {
     if (!(thrown instanceof SyncFailure)) {
       return Result.failure(caughtError(FailureCode.syncFailed, thrown));
     }
-    if (thrown.code === FailureCode.sessionExpired) await this.sessions.clear();
     return Result.failure(new UseCaseError(thrown.code, thrown.message, false, thrown));
   }
 }
