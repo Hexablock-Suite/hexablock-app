@@ -11,7 +11,7 @@ Seven classes is a target, not a limit: a view that needs more boxes to show one
 | View                                                             | Classes | Reason                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | ---------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | View 5, wiring a variant (`engine-5-factory`)                    | 14      | `MatchIdGenerator` and its `MatchId` stand with the three local ids built from it: five boxes (decisions 7, 26, 30, 50 and 52). `GameFactory`, `IVariantFactory` and the engine interfaces that the wiring injects take the rest, and `LevelDefinition` (decision 24). `Score` stands next to `GameEnded`, which carries it (decision 41). Two notes say why `GameFactory` has no line to the Observer frame, `Clock` and `RandomSource`: `GameEngine` records `GameEnded`, and the composition root injects the two interfaces into the variant factories (#422).                                                                                                                                                                                                                                                                                                       |
-| View 1, the turn (`engine-1-turn`)                               | 14      | One turn touches the aggregate root, its two Strategies, its phase, its history and the event that it records, the state with its photo and the photo type `SnapshotOf`, the `Resolution`, the `Outcome` and the `Score` of the turn, and the reference boxes of `Board` and `ITimed`, the type of the timer, inside the frame of the aggregate (#21, #373).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| View 1, the turn (`engine-1-turn`)                               | 14      | One turn touches `GameEngine`, the Facade of a game, its two Strategies, its phase, its history and the event that it records, the state with its photo and the photo type `SnapshotOf`, the `Resolution`, the `Outcome` and the `Score` of the turn, and the reference boxes of `Board` and `ITimed`, the type of the timer (#21, #373).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | View 4, piece sources, scoring and progress (`engine-4-sources`) | 20      | Three Strategies stand side by side with their concrete classes and value objects. `Moves`, `ElapsedTime`, `Stars` and `LevelId` stand below `GameResult` and `ProgressRecord`, which hold them (decision 42). `Seed` stands by `SeededPieceSource` (decision 48). The progress models stand by the star rules `IStarsByMoves` and `IStarsByMovesAndTime`, by `IStarThreshold` with `starsOf()`, and by `GameProgress` (#156, #424).                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | Hexa Fit (`variant-2-fit`)                                       | 15      | A variant view shows the whole family of one variant. Fit adds the level, its builder, five value objects: `PieceId`, `Placement`, `FitPlay`, `FitStarThreshold` (decision 42) and `PieceRegister` (decision 49), and the three moves `PlaceFitPiece`, `RemoveFitPiece` and `RotateFitPiece` (decision 43).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | View 2, board and pieces (`engine-2-board`)                      | 8       | The board comes with its shape, its space and its topology, next to the three classes of the shape Composite.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
@@ -20,7 +20,7 @@ Seven classes is a target, not a limit: a view that needs more boxes to show one
 | Hexa Lines (`variant-1-lines`)                                   | 12      | The whole family of Lines, with the engine `ScoringDecorator`, the move `PlacePiece` and the value object `LinesSettings` (decision 48). The three counts of a placement and the `TrayPosition` of a move stand in one row below them (decision 54).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | View 3.1, the use case contract (`uc-1-contract`)                | 8       | The two aspects and the planned `RetryAspect` are one box each around `UseCase` and `UseCaseAspect`, with the `Logger` port and its entry. `SyncProgress` stands for the use cases that implement `UseCase`, with its binding (#46).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | View 3.2, playing a game (`uc-2-game`)                           | 8       | The four game use cases share the `GameRepository` port, and `StartGame` also keeps the `GameFactories` port that gives the factory of the chosen level (#172) and the level and progress ports that refuse a locked level (#397).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| View 3.3, progress and levels (`uc-3-progress`)                  | 18      | The use cases and their ports stand above `GameProgress`, the object of one game that `ProgressRepository` loads and saves (S3-04): the high score and the best result of each level (#156). `LoadProgress` joins `SaveProgress` to read the progress back (#181). `ListLevels` returns a `LevelList` (#307): a `LevelSummary` with its `LevelStatus` for each level, which lives in layer 1 since #326 (#168), and apart the ids that `LevelRepository.unavailable()` names. `AchievementCounterRepository` loads and saves `AchievementCounters`, its own aggregate, with its two `AchievementCount` values (#363). `SyncProgress` joins with its ports `AnonymousProgress` and `ProgressGateway`, the `SyncFailure` that the gateway throws and the reference box of `SessionStore` (#46), and `ProgressOwner`, the owner that the progress ports take (decision 66). |
+| View 3.3, progress and levels (`uc-3-progress`)                  | 18      | The use cases and their ports stand above `GameProgress`, the object of one game that `ProgressRepository` loads and saves (S3-04): the high score and the best result of each level (#156). `LoadProgress` joins `SaveProgress` to read the progress back (#181). `ListLevels` returns a `LevelList` (#307): a `LevelSummary` with its `LevelStatus` for each level, which lives in layer 1 since #326 (#168), and apart the ids that `LevelRepository.unavailable()` names. `AchievementCounterRepository` loads and saves `AchievementCounters`, a unit of its own, with its two `AchievementCount` values (#363). `SyncProgress` joins with its ports `AnonymousProgress` and `ProgressGateway`, the `SyncFailure` that the gateway throws and the reference box of `SessionStore` (#46), and `ProgressOwner`, the owner that the progress ports take (decision 66). |
 | View 4.4, wiring (`ad-4-wiring`)                                 | 19      | The root creates each driver once: three drivers of today and the two planned single-scope managers, and it receives `ApiClient`. It keeps `GameRegistry` and `BoardFigure`, creates the five adapters of layer 3, keeps one `LocalProgressRepository`, and gives one `LocalAchievementCounterRepository` to the counter listener (decision 18, #172, #188, #323, #363). For the sync it creates `ApiDtoMapper` and `ApiProgressGateway`, builds `SyncProgress` through `decorate()` and gives it to `ResultPresenter` and `AccountPresenter` (#46). With the transport, its one `LevelRepository` is a `CombinedLevelRepository` over the bundled levels and the backend levels (#48).                                                                                                                                                                                  |
 | View 4.2, repositories (`ad-2-repositories`)                     | 18      | The two local repositories share the `KeyValueStore` driver interface and its driver, and each one implements its own port: `ProgressRepository` and `AchievementCounterRepository` (#164, #363). `LocalProgressRepository` also implements `AnonymousProgress`, keeps `SessionStore` for the owner of the progress and keeps one queue per key. `ApiProgressGateway`, its mapper and its transport interface `ProgressApi` stand in layer 3 and implement `ProgressGateway`, and `ApiClient`, their driver, in layer 4 (decisions 22 and 66). `CombinedLevelRepository`, a Composite, joins `BundledLevelRepository` and `ApiLevelRepository`, which reads `GET /v1/levels` through `LevelsApi`. The three implement `LevelRepository`, and `ApiClient` implements `LevelsApi` (#48, #307, decision 68). The reference boxes of the six ports stand in layer 2.         |
 | View 3, undo and redo (`engine-3-history`)                       | 8       | The Command history with its redo (#178), the three capability interfaces of §3.2 that the history and the timer implement, and `LevelTimer` with the `ClockReading` of its start and its stop (#238).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
@@ -65,7 +65,7 @@ A hand edit of that order survives. Move the boxes in draw.io, run `pin.mjs` of 
 
 - The colored zone is the Clean layer, with the colors of [layers.md](layers.md). Parts 1 and 2 are layer 1, entities, so their zones are yellow.
 - In parts 3 and 4, one view can show several layers. The zones are bands, with the outer layer at the top and the inner layer at the bottom, so every dependency points down.
-- A dashed frame groups the classes of one GoF pattern or one design principle. Its label names the source, for example `STRATEGY · §3.3 · D1`. A dark dashed frame labelled `AGGREGATE` marks the boundary of an aggregate (decision 52).
+- A dashed frame groups the classes of one GoF pattern or one design principle. Its label names the source, for example `STRATEGY · §3.3 · D1`. No dark frame marks the game boundary: in view 1 the filled diamonds of `GameEngine` show it and a note names `GameEngine` the Facade of a game, and the map of Part 1 gives `GameEngine` and its parts a group of their own (decisions 23, 26 and 52).
 - The title of a frame names its pattern, or a note of the view names it. No box carries a role label of a pattern, such as `«Strategy»` or `«Decorator»`: the interface of a pattern carries only `«interface»`, and a concrete piece of a pattern carries no role label (decision 23). Zone, frame and stereotype never carry the same information.
   `«aspect»` marks an aspect class: `UseCaseAspect` and each class that extends it, such as `LoggingAspect`, `SessionAspect` and the planned `RetryAspect`, all in `src/application/aspects/`.
   The class of 2026-11-23 draws each aspect with it.
@@ -82,7 +82,7 @@ A hand edit of that order survives. Move the boxes in draw.io, run `pin.mjs` of 
 - An italic class name or operation is abstract.
 - An underlined operation is static, for example `Score.of()`.
 - A solid line with an open arrowhead is a use: the other class is an attribute, a parameter, a return value, a local variable or a `new`. Every dependency between two layers is a use. When the class keeps the other class in an attribute, the arrow end names the attribute and its multiplicity, even when it is 1, for example `games 1`. Otherwise the line carries a verb, for example `PLAY()` or `«create»`.
-- A filled diamond (composition) at the end of the aggregate root marks each internal entity of its aggregate.
+- A filled diamond (composition) at the end of a whole marks each part with identity that lives only inside it: `GameEngine` keeps its state and the timer of a timed game that way (decision 23).
   The other end names the attribute and its multiplicity.
   A hollow diamond (aggregation) at the end of a decorator joins it to the type that it wraps, with the label `decorate` and the multiplicity `1` at the other end.
   An aspect is a decorator.
@@ -100,17 +100,19 @@ A hand edit of that order survives. Move the boxes in draw.io, run `pin.mjs` of 
 - In the variants map, a dashed chip is an engine type. Each class in its row implements or extends it.
 - A dashed box with no members is a class that another view details. Its eyebrow names that view, for example `PART 1 · VIEW 1`.
 - Under the name of a use case, an ID such as `APP-FR-08` names the requirement it serves.
-- `UseCase` and `UseCaseAspect` name architecture roles, not game concepts. `UseCase` is the generic input port, the «input boundary» of Clean Architecture, and every use case implements it (decision 9). `UseCaseAspect` is the abstract base of the AOP decorators of view 3.1. APP-NFR-11 asks one aspect to cover the four variants, so all use cases need one shared contract, and its name states that role. The professor's rule «Tiene que tener semántica del problema» (class of 2026-10-16) applies to the entities, the concrete use cases and the ports, and they follow it: for example `ApplyMove`, `MoveHistory` and `GameRepository`.
+- `UseCase` and `UseCaseAspect` name architecture roles, not game concepts. `UseCase` is the generic input port, the «input boundary» of Clean Architecture, and every use case implements it (decision 9). `UseCaseAspect` is the abstract base of the AOP decorators of view 3.1. APP-NFR-11 asks one aspect to cover the four variants, so all use cases need one shared contract, and its name states that role. The professor's rule «Tiene que tener semántica del problema» (class of 2026-10-16) applies to the classes of layer 1, the concrete use cases and the ports, and they follow it: for example `ApplyMove`, `MoveHistory` and `GameRepository`.
 - `«port»` marks an interface of layer 2 that an outer layer implements.
   Ports live in the application layer (decision 25).
   The engine and layer 3 have other interfaces that an outer layer implements, such as `Clock`, `KeyValueStore` and `HealthApi`.
   They carry `«interface»` only.
-  `«aggregate root»` marks the entity that guards a game (decision 26).
-  `«value object»`, `«entity»`, `«aggregate root»`, `«domain event»`, `«factory»` and `«repository»` are the tactical stereotypes of the domain design.
+  `«value object»`, `«factory»` and `«repository»` are the stereotypes of the domain design.
+  Since #501 no box carries `«aggregate root»`, `«entity»` or `«domain event»`: the app uses no tactical word of Domain-Driven Design but `«value object»` (option C of #497).
+  `«value object»` stays until the professor answers the question of #497 (Martin Fowler, bliki «ValueObject»).
+  `GameEngine` carries no role label: the text of view 1 names it the Facade of a game (statement §3.3, decision 26).
   A factory box carries `«factory»`, next to `«interface»` on an interface such as `GeometryFactory`, and no role label: the title of its frame names its design pattern, for example `HexGeometry` in the `ABSTRACT FACTORY` frame of view 6.
   A repository port carries `«repository»` next to `«port»`, and a repository adapter carries `«repository»` only.
-  A box with no tactical stereotype is a piece of a design pattern: the title of its frame or a note of the view names the pattern (decision 23).
-  `GameRepository` carries `«repository»` next to `«port»`: it is the repository of the game aggregate (decision 10).
+  A box with no stereotype of the domain design is a piece of a design pattern: the title of its frame or a note of the view names the pattern (decision 23).
+  `GameRepository` carries `«repository»` next to `«port»`: it is the repository of the running game (decision 10).
   A question in the stereotype line, such as `«composition root» · Q9`, marks a placement that the professor's answer can move.
   The screens, such as `GameScreen`, and `BoardView` are React components of layer 4, not classes.
   No box carries a label for it: a note of each view that draws one says so.
@@ -153,12 +155,12 @@ A hand edit of that order survives. Move the boxes in draw.io, run `pin.mjs` of 
 
 ### Map of the engine
 
-![Map of the generic engine: the 74 classes by name in sixteen groups, each group with the view that shows its members; a dark dashed frame marks the game aggregate, GameEngine with its internal entities BoardState, Board and LevelTimer; BoardSnapshot sits in the turn group and ReadonlyBoard in the board group; class-to-class uses join GameEngine to IGameRules, GamePhase, MoveHistory, IScoringPolicy and GameEvent, which it records, IVariantFactory to IGameRules, and GeometryFactory to ShapeNode](classes/views/overview-engine.png)
+![Map of the generic engine: the 74 classes by name in sixteen groups, each group with the view that shows its members; the game group holds GameEngine, the Facade of a game, with its parts BoardState, Board and LevelTimer; BoardSnapshot sits in the turn group and ReadonlyBoard in the board group; class-to-class uses join GameEngine to IGameRules, GamePhase, MoveHistory, IScoringPolicy and GameEvent, which it records, IVariantFactory to IGameRules, and GeometryFactory to ShapeNode](classes/views/overview-engine.png)
 
 ### View 1: the turn
 
-![The turn: a dark dashed frame marks the game aggregate, GameEngine with its internal entities BoardState, Board and the timer; the root joins the state and the timer, an ITimed, with a filled diamond, and the board and ITimed are reference boxes; BoardState declares no board;
-GameEngine, the aggregate root of a game, runs each turn through IGameRules, whose playTurn() is the template method of BaseGameRules, and scores with IScoringPolicy, the two interfaces of the Strategy frame; GamePhase stands in the State frame, MoveHistory in the Command frame and GameEvent in the Observer frame;
+![The turn: GameEngine joins its parts BoardState and the timer, an ITimed, with a filled diamond, and the board and ITimed are reference boxes; BoardState declares no board;
+GameEngine, the Facade of a game, runs each turn through IGameRules, whose playTurn() is the template method of BaseGameRules, and scores with IScoringPolicy, the two interfaces of the Strategy frame; GamePhase stands in the State frame, MoveHistory in the Command frame and GameEvent in the Observer frame;
 it records the GameEvent objects of its turns, and ApplyMove takes them with takeEvents(); each turn returns a Resolution, a value object that carries an Outcome, the value object with the closed set playing, victory and gameOver;
 BoardState creates BoardSnapshot, the immutable photo of the Memento pattern that the scoring reads and the undo keeps, and IScoringPolicy reads the photos through the type alias SnapshotOf; Score is the value object of the score and of the points of a turn](classes/views/engine-1-turn.png)
 
@@ -168,7 +170,7 @@ BoardState creates BoardSnapshot, the immutable photo of the Memento pattern tha
 
 ### View 3: undo and redo
 
-![Undo and redo: MoveCommand, MoveHistory and RedoableHistory in the Command and Memento frame, the IUndoable, IRedoable and ITimed capabilities, and LevelTimer, an entity with its LevelTimerId that keeps its start and its stop as ClockReading values](classes/views/engine-3-history.png)
+![Undo and redo: MoveCommand, MoveHistory and RedoableHistory in the Command and Memento frame, the IUndoable, IRedoable and ITimed capabilities, and LevelTimer, with its own LevelTimerId, which keeps its start and its stop as ClockReading values](classes/views/engine-3-history.png)
 
 ### View 4: piece sources, scoring and progress
 
@@ -176,11 +178,11 @@ BoardState creates BoardSnapshot, the immutable photo of the Memento pattern tha
 
 ### View 5: wiring a variant
 
-![Wiring a variant: IVariantFactory creates the rules, piece source, scoring and board; LevelDefinition, the data of one level file, directs ILevelBuilder, the game events, the Clock and RandomSource interfaces of the engine, the MatchIdGenerator, which gives the MatchId of each new match, the local ids that keep that MatchId (the GameStateId of its state, the BoardId of its board and the LevelTimerId of the timer of a timed game), and GameFactory, the factory of the aggregate, which creates the started GameEngine; GameEnded extends the abstract GameEvent, keeps its fields private and carries the final Score; two notes say why GameFactory has no line to the game events, the Clock and the RandomSource](classes/views/engine-5-factory.png)
+![Wiring a variant: IVariantFactory creates the rules, piece source, scoring and board; LevelDefinition, the data of one level file, directs ILevelBuilder, the game events, the Clock and RandomSource interfaces of the engine, the MatchIdGenerator, which gives the MatchId of each new match, the local ids that keep that MatchId (the GameStateId of its state, the BoardId of its board and the LevelTimerId of the timer of a timed game), and GameFactory, the factory of a whole game, which creates the started GameEngine; GameEnded extends the abstract GameEvent, keeps its fields private and carries the final Score; two notes say why GameFactory has no line to the game events, the Clock and the RandomSource](classes/views/engine-5-factory.png)
 
 ### View 6: geometry and board
 
-![Geometry and board: GeometryFactory with HexGeometry, SquareGeometry and TriangleGeometry in the Abstract Factory frame, each with the coordinate and the topology that it creates, HexTopology, SquareTopology and TriangleTopology with their GridTopology interface, TopologyId, the axis classes and the internal direction classes of the three topologies, and BoardBuilder, the DDD factory of the board, in the Builder frame](classes/views/engine-6-geometry.png)
+![Geometry and board: GeometryFactory with HexGeometry, SquareGeometry and TriangleGeometry in the Abstract Factory frame, each with the coordinate and the topology that it creates, HexTopology, SquareTopology and TriangleTopology with their GridTopology interface, TopologyId, the axis classes and the internal direction classes of the three topologies, and BoardBuilder, the builder of the board, in the Builder frame](classes/views/engine-6-geometry.png)
 
 ### View 7: the rules template
 
@@ -246,7 +248,7 @@ Since D27 in [REQUIREMENTS.md](../REQUIREMENTS.md) (#325), `SaveProgress` and `L
 ![Progress and levels: SaveProgress, LoadProgress and ListLevels over their repository ports; LoadProgress reads the progress of the game of its request back, or undefined when the game has none (#181, #410); ListLevels takes the game and the chosen figure and returns a LevelList (#307): one LevelSummary with a LevelStatus per level and, apart, the LevelId of each unavailable level;
 LevelStatus in layer 1 gives the status of each level with ofEach() and reads GameProgress; LevelRepository also finds one level of a game by its id and names its unavailable levels with unavailable() (#307);
 ProgressRepository gives the ProgressOwner with owner(), the last signed-in user or the anonymous owner, and loads and updates GameProgress of that owner in one queue per key, the one object of a game with the high score and the best result of each level, which gives the stars of a level;
-AchievementCounterRepository loads and saves AchievementCounters, the counters of the achievements of one game in their own aggregate, with a best count and a total, each an AchievementCount (#363);
+AchievementCounterRepository loads and saves AchievementCounters, the counters of the achievements of one game, saved apart from the progress, with a best count and a total, each an AchievementCount (#363);
 SyncProgress (#46) reads the session through SessionStore, merges the anonymous progress into the owner of the session through mergeAnonymousInto() of AnonymousProgress, loads the progress and merges the answer through load() and update() of ProgressRepository, and sends the progress through ProgressGateway, which throws a SyncFailure;
 GameProgress merges another progress of its game with mergeWith(); the footnote names the leaderboard use cases of view 3.7 (#47)](classes/views/uc-3-progress.png)
 
@@ -341,7 +343,7 @@ Since #46 this view draws the path of D27 in [REQUIREMENTS.md](../REQUIREMENTS.m
 
 ## Patterns
 
-The fourteen patterns of §3.3 all appear, and all fourteen stay after the team audit of 2026-10-30 (D14). Eleven live in layer 1; Adapter, Facade and Singleton live in layers 3 and 4. D7 asks for a written reason for each one, so the Reason column names the requirement behind it. A view names each pattern in the title of a frame or in a note, and no box carries the role of its class in the pattern (decision 23). In the Views column, a plain number is a view of part 1, and `3.1` is view 1 of part 3.
+The fourteen patterns of §3.3 all appear, and all fourteen stay after the team audit of 2026-10-30 (D14). Twelve live in layer 1, Facade included through `GameEngine` (decision 26); Adapter and Singleton live in layers 3 and 4, and so does `AudioManager`, the other Facade. D7 asks for a written reason for each one, so the Reason column names the requirement behind it. A view names each pattern in the title of a frame or in a note, and no box carries the role of its class in the pattern (decision 23). In the Views column, a plain number is a view of part 1, and `3.1` is view 1 of part 3.
 
 | Pattern          | Classes                                                                                                                                                                                      | Reason                                                                                                                                                                       | Views                              |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
@@ -354,10 +356,10 @@ The fourteen patterns of §3.3 all appear, and all fourteen stay after the team 
 | Composite        | `ShapeNode`, `CellNode`, `ShapeGroup`                                                                                                                                                        | Pieces made of cells. A Fit figure is a flat group of cells too, and no region type exists (§3.3, piece shape row of §8). Only the shapes: Fit stars are data (decision 36). | 2                                  |
 | Iterator         | `Board.line()`, `ring()` and `neighborhood()`; `IPieceSource`; `IGameRules.validMoves()`                                                                                                     | Traversal by axis, ring and neighbors (§3.1, §3.3). The piece sequence, finite or endless (decisions 32 and 51). The lazy list of valid moves (§3.1, decision 33).           | 2, 4, 7                            |
 | Decorator        | `ScoringDecorator`, `ComboMultiplierDecorator`; `TimedRulesDecorator`; `UseCaseAspect` and its two aspects                                                                                   | The Lines combo and streak multiplier (§1.1), scoring row of §8. Fit stars use time (§1.2, D14). The aspects of §3.5 (A2).                                                   | 4, 7, Lines, 3.1                   |
-| Builder          | `ILevelBuilder`, `FitLevelBuilder`, `SortLevelBuilder`; `BoardBuilder`, the DDD factory of the board                                                                                         | Levels of parts from configuration files, built step by step (§3.3, §5.1.5), the Fit check of A5. Two construction paths for the board (D9).                                 | 5, 6, Fit, Sort                    |
+| Builder          | `ILevelBuilder`, `FitLevelBuilder`, `SortLevelBuilder`; `BoardBuilder`, the builder of the board                                                                                             | Levels of parts from configuration files, built step by step (§3.3, §5.1.5), the Fit check of A5. Two construction paths for the board (D9).                                 | 5, 6, Fit, Sort                    |
 | Observer         | `GameEventPublisher`, a port of layer 2, and the `GameEvent` classes; `GameEventBus` in layer 3                                                                                              | Score, audio and screens react to game events (§3.3). `GameEventBus` is not a Mediator (decision 35).                                                                        | 1, 5, 4.3                          |
 | Adapter          | `LocalProgressRepository` and the other local repositories in layer 3; `ApiProgressGateway` and the other HTTP adapters in layer 3; `DeviceKeyValueStore`, `ApiClient` and the other drivers | A new database or backend means a new adapter, and the use cases do not change (§3.3, §3.4).                                                                                 | 4.2, 4.4                           |
-| Facade           | `AudioManager`                                                                                                                                                                               | Sound effects and music behind one interface, with mute (§3.3, §5.1.10).                                                                                                     | 4.3                                |
+| Facade           | `GameEngine`, the one entry of a game; `AudioManager`                                                                                                                                        | A game changes only through `tryPlay()`, `undo()` and `redo()` (§3.3, decision 26). Sound effects and music behind one interface, with mute (§3.3, §5.1.10).                 | 1, 4.3                             |
 | Singleton        | `AudioManager` and `SessionManager`, created once by `CompositionRoot`                                                                                                                       | §3.3 allows single-scope dependency injection in place of a classic Singleton. One instance for the whole app (D12, Q9).                                                     | 4.3, 4.4                           |
 
 Two patterns outside the fourteen are named on purpose. Memento lives inside the Command row and adds no row (decision 34). Visitor is discarded: D3 allows it only inside the shape Composite, and no class implements it (decision 35).
@@ -419,9 +421,9 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
    So inside one level an id picks exactly one piece.
    That key is a fact of the level, not an identity that the piece carries.
 7. **The board and the state change in place, only through business methods.**
-   The board is an entity inside the state, and the state is an entity inside the aggregate of decision 26.
-   Each entity has its own id (class of 2026-11-09).
-   Only the root has global identity, so the id of an entity inside the aggregate is local: it has a meaning only inside its aggregate (decision 52).
+   The board is a part of the state, and the state is a part of the game boundary of decision 26.
+   Both have identity, so each one has its own id (class of 2026-11-09).
+   Only the root of the game has global identity, so the id of a part is local: it has a meaning only inside its game (decision 52).
    So the board has its own `BoardId`, a value object: `Board.equals(other)` compares two boards by that id only, and `clone()` keeps it.
    `GameFactory` builds the id of each new board from the `MatchId` of the root with `BoardId.of(matchId)`, and passes it to `IVariantFactory.createInitialState()`, which builds the board with `createBoard(boardId)` (decision 40).
    The id keeps the `MatchId` of its match, and two ids are equal when their matches are equal.
@@ -435,7 +437,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
    The rules decide and call these methods.
    They assign no field of a state, and the engine assigns none either; the gate `test/gates/state-writes-gate.test.ts` checks it.
    A refused input throws a `RangeError` and leaves the whole state as it was.
-   One mutation style holds for every state: an entity keeps its object, so every business method changes the state in place and returns nothing.
+   One mutation style holds for every state: a state has identity and stays one object, so every business method changes the state in place and returns nothing.
    `MergeState.slide()` and `FitState.place()`, `remove()` and `countMove()` follow it too.
    `IGameRules.apply(state, move): TState` keeps its signature and returns the same state object.
    The engine plays each turn on a copy of its state, so a turn that throws midway leaves the state of the game as it was (decision 34).
@@ -446,7 +448,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
    `ReadonlyBoard` has no `clone()`, so the photo hands out no board that a caller owns, and only a state copies its own board (#234).
    `TAxis` lets the Merge photo give the board of its topology.
    Each variant photo, `LinesSnapshot`, `FitSnapshot`, `SortSnapshot` or `MergeSnapshot`, extends it with the private data of the variant and the piece source, a value object that the photo shares with the state (decision 51), and implements `view()`.
-   The photo has the Memento role and no tactical stereotype: nobody asks which photo is which, and the class of 2026-11-09 makes an object an entity only when that question matters.
+   The photo has the Memento role and no stereotype: nobody asks which photo is which, and the class of 2026-11-09 gives an object an identity only when that question matters.
    How a reader reads the photo and the view depends on where it stands.
    Inside the domain or in a use case, a reader asks a query with a business name, never a field and never a getter.
    Each query returns a value object, the read-only board, a list of them, a coordinate, `undefined` for a value that the state does not have, or a `boolean`, never a primitive (APP-NFR-25).
@@ -485,10 +487,10 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
    Each use case binds it, for example `UseCase‹ApplyMoveRequest‹TMove›, MoveResult‹TCell, TCoord››`.
    The cost: a use case cannot add a second method to its port.
    Decision 69 lists the aspect chain of each use case, from the outside in, with the reason of each place (#344).
-10. **`GameRepository`, the repository of the game aggregate (proposal).**
+10. **`GameRepository`, the repository of the running game (proposal).**
     The game use cases need the running engine between two calls.
-    `GameRepository`, a port in layer 2, is the repository of the game aggregate of decision 26, and `InMemoryGameRepository` in layer 3 implements it.
-    The reason is the rule of the classes of 2026-11-13 and 2026-11-14 (decision 52): each aggregate has its repository in the design, also when its implementation keeps the data in memory, and only the root of an aggregate has one.
+    `GameRepository`, a port in layer 2, is the repository of the running game, the boundary of decision 26, and `InMemoryGameRepository` in layer 3 implements it.
+    The reason is the rule of the classes of 2026-11-13 and 2026-11-14 (decision 52): each boundary has its repository in the design, also when its implementation keeps the data in memory, and only the root of a boundary has one.
     The repository saves and gives back the whole root, `GameEngine`, with the parts inside the boundary of decision 26: `replace(game)` saves it, and `current()` gives it back.
     It has no search by an id, because the game use cases ask only for the running game.
     A requirement for more than one game, or for a saved game that goes on, adds a search by `MatchId` to this repository, not a new port.
@@ -622,8 +624,8 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     Only `build()` returns the level.
     In class on 2026-10-30 the professor put a builder on the board too.
     It builds the logical structure of the board and nothing more.
-    In DDD terms, this builder is the factory of the board.
-    So `BoardBuilder` in layer 1 is a Builder and the DDD factory of the board.
+    Each step returns the builder, and only `build()` returns the board.
+    So `BoardBuilder` in layer 1 is a Builder (statement §3.3).
     It holds a `GeometryFactory` and has two construction paths: `withRegion(size)` for Lines, Sort and Merge, and `withFigure(figure)` for the Fit figure (§1.2).
     `SortFactory` asks it for the board region of the level, `FitFactory` asks it for the figure board, and `LinesFactory` and `MergeFactory` use it with no level.
     Reasons: the two construction paths, the square, triangle and 3D rows of §8 (D4), and the generic coordinate of decision 16.
@@ -761,13 +763,13 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     Since #413 `IGameRules` declares only `validMoves()` and `playTurn()` (decision 21), so the decorator wraps two members: `validMoves()` only passes to the inner rules, so a question outside a turn does not move the clock.
     A rejected move starts nothing and stops nothing.
     The timer lives outside the cloned state, so an undo takes the move back and the clock goes on.
-    `LevelTimer` is an entity inside the aggregate of decision 26: it changes in place through `start()`, `stop()`, `pause()` and `resume()`, so it is not a value object.
+    `LevelTimer` is a part with identity inside the game of decision 26: it changes in place through `start()`, `stop()`, `pause()` and `resume()`, so it is not a value object.
     Its `LevelTimerId`, a value object, is its identity: the timer takes the id in its constructor, the id never changes, and `LevelTimer.equals(other)` compares two timers by that id only, whatever their `ClockReading` values hold (decision 50).
     **A pause stops the clock (#428, option A1, decided on 2026-11-26).**
     Until #428 a pause did not stop the clock, and the reason was that the engine does not tell the rules about a pause.
     That reason was about the rules, but the root holds the timer (decision 26), and the root is the only class that knows about a pause.
     The time of a Fit level counts for its stars (DS-6), so a clock that runs during a pause punishes the player for an interruption.
-    And after any operation on the aggregate, all its invariants hold (class of 2026-11-13), so the root tells its timer about a pause.
+    And after any operation on the game, all its invariants hold (class of 2026-11-13), so the root tells its timer about a pause.
     So option A1 won: `ITimed` declares `pause()` and `resume()` beside `elapsedMs()`, and `GameEngine.pause()` and `resume()` call them for a timed game.
     `LevelTimer` keeps the `ClockReading` of the pause in progress as `pausedAt` and the sum of the ended pauses as the `ElapsedTime` `pausedFor`, and `elapsedMs()` leaves both out with `ElapsedTime.plus()` and `minus()` (decision 42).
     It never changes `startedAt`.
@@ -788,7 +790,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     Since #46 `SortFactory` takes the `Clock` too and gives each game a timer in the same way: the backend asks for the time of each level result (DS-5), though Sort gives no star by time (D22, decision 66).
     Only Lines and Merge have no timer.
     **The path of the time (#234).**
-    The variant factory gives the timer as an optional part of the aggregate, as it gives the history (decision 3): `IVariantFactory.createTimer(matchId)` returns a new `LevelTimer`, or `undefined` for a variant with no timer.
+    The variant factory gives the timer as an optional part of the game, as it gives the history (decision 3): `IVariantFactory.createTimer(matchId)` returns a new `LevelTimer`, or `undefined` for a variant with no timer.
     `GameFactory` wraps the plain rules of `createRules()` in `TimedRulesDecorator` with that timer and gives the same timer to the root (decision 40).
     So the decorator starts and stops the timer, and the root reads it.
     The root keeps the timer as `ITimed`, which shows no id, and it hands out no timer: `GameEngine.elapsedTime()` returns the `ElapsedTime` of a timed game, or `undefined` for a game with no timer (decision 27).
@@ -851,19 +853,21 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     Option C of #404 typed the transport with `unknown` and checked each shape at run time.
     Since D27 in [REQUIREMENTS.md](../REQUIREMENTS.md) (#325), the progress reaches the backend through the gateway port of `SyncProgress`, not through `ProgressRepository`: #46 builds it (decision 66).
     View 4.2, the map of Part 4 and flows 2 and 5.
-23. **Uses between layers, a filled diamond for the composition of an aggregate, and a hollow diamond for a decorator.**
+23. **Uses between layers, a filled diamond for a part that lives only inside its whole, and a hollow diamond for a decorator.**
     In the consultation of 2026-10-30 the professor said that a port kept as an attribute is an aggregation.
     In the class of 2026-11-02 he corrected it.
-    He asked for explicit dependencies (use, extend, implement) between layers, and for a diamond only where it is needed, such as an entity that holds a Strategy.
+    He asked for explicit dependencies (use, extend, implement) between layers, and for a diamond only where it is needed, such as a class that holds a Strategy.
     He added that the rule is for the relations between layers.
     So every dependency between two layers is a use: a solid line with an open arrowhead.
     When the class keeps the other class in an attribute, the arrow end names the attribute and its multiplicity.
     Until 2026-11-15, a diamond stayed inside one layer only where it made a GoF pattern visible: «Aquí sí porque quiero hacer visible el patrón estratégico».
     The class of 2026-11-14 changed that.
-    The professor's solution of the exercise of 2026-11-06 joins the aggregate root to each internal entity with a filled diamond and its multiplicity, because an internal entity exists only inside its aggregate, and only the root creates and changes it.
+    The professor's solution of the exercise of 2026-11-06 joins a whole to each part with identity by a filled diamond and its multiplicity, because such a part exists only inside its whole, and only the whole creates and changes it.
     The same solution reaches the value objects, the Strategy and the object that the Decorator wraps with use arrows, although each one is an attribute.
-    His class document of 2026-11-09 also joins the root of its aggregate to its internal entity with a filled diamond.
-    So on 2026-11-15 the team took one rule for the diamond: a filled diamond goes only from the aggregate root to each internal entity of its aggregate, with its multiplicity.
+    His class document of 2026-11-09 also joins a whole to its part with identity by a filled diamond.
+    So on 2026-11-15 the team took one rule for the diamond: a filled diamond goes only from a whole to each part with identity that lives only inside it, with its multiplicity.
+    In the app the whole is `GameEngine`, and its parts with identity are its state and the timer of a timed game (decision 26).
+    Until #501 this rule used the words of Domain-Driven Design: the rule and the pairs that it draws stay, and only the words changed (option C of #497).
     Every other attribute is a use with the attribute name and its multiplicity, a piece of a GoF pattern included, because the class box already shows the attribute: for example `GameEngine` with `IGameRules` and `IScoringPolicy`, `Board` with its `BoardShape`, and `Piece` with its `ShapeNode`.
     A pattern stays visible through the title of its frame.
     The interface of a pattern carries only `«interface»`, and a concrete piece of a pattern carries no role label, as in the professor's drawings of the class of 2026-11-14 (design decision of 2026-11-15).
@@ -877,7 +881,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     The diamond sits on the class that declares the wrapped attribute, and a decorator that inherits that attribute draws no second diamond.
     `ComboMultiplierDecorator` extends `ScoringDecorator`, which declares `inner` and carries the diamond to `IScoringPolicy`.
     So view `variant-1-lines` shows the `extends` of the subclass and its use `«bind»` to `LinesScoring`, the type that it binds to the inner policy, as the code says.
-    Everything else of the rule of 2026-11-15 stays: a filled diamond goes from an aggregate root to each internal entity, and a use arrow reaches a value object, the Strategy of a context, a port and the children of the Composite `ShapeGroup`.
+    Everything else of the rule of 2026-11-15 stays: a filled diamond goes from a whole to each part with identity, and a use arrow reaches a value object, the Strategy of a context, a port and the children of the Composite `ShapeGroup`.
     A Strategy and a Composite keep that form until the professor answers about them.
     The views `engine-4-sources`, `engine-7-rules`, `uc-1-contract` and `map-3-usecases` draw the pairs `ScoringDecorator` to `IScoringPolicy`, `TimedRulesDecorator` to `IGameRules` and `UseCaseAspect` to `UseCase` that way, each with `Aggregation` in its legend, and [`classes.drawio`](classes.drawio) draws each pair as an aggregation labelled `decorate 1`.
     **The change of 2026-11-28: an aspect carries `«aspect»` (#345).**
@@ -957,28 +961,30 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     `SystemClock` builds the `ClockReading` of each reading.
     `SequentialMatchIds` and `SeededRandomSource` take a reading as a start value, so they receive its number through `deliverTo()`, as adapters of the edge (#238).
     Views 1, 3, 5, 3.1, 4.2 and the map of Part 4.
-26. **`GameEngine` is the aggregate root of a game (proposal).**
-    The aggregate holds the state with its board, the `GamePhase`, the optional history (an `IUndoable`, decision 27) and, in a timed game, the `LevelTimer`.
-    The root is an entity, and a `MatchId` is its identity (decision 30).
+26. **`GameEngine` is the one entry of a game, a Facade (proposal).**
+    Statement §3.3 names the Facade pattern, and `GameEngine` is the Facade of a game: code outside the game talks only to it (#501, option C of #497).
+    A game holds the state with its board, the `GamePhase`, the optional history (an `IUndoable`, decision 27) and, in a timed game, the `LevelTimer`.
+    `GameEngine` is the root of that group: `GameRepository` saves the whole game through it (decision 10).
+    The root has identity, and a `MatchId` is its identity (decision 30).
     It takes the id in its constructor, and the id never changes.
-    The state is an entity inside the aggregate, and it has its own identity, a `GameStateId` value object.
+    The state is a part of the game, and it has its own identity, a `GameStateId` value object.
     The id is local (decision 52): `GameFactory` builds it from the `MatchId` of the root with `GameStateId.of(matchId)`.
     `BoardState.equals(other)` compares two states by that id only.
     The state also keeps the `MatchId` of its game: `GameFactory` gives the same `MatchId` to the engine and to `IVariantFactory.createInitialState(matchId, stateId, boardId)`, and `BoardState.belongsTo(match)` tells whether a state is the state of a match.
     A clone keeps both ids, because the clone is the same state at an earlier moment, and a move changes the state in place, so it keeps them too.
     `GameEngine.start()` throws a `RangeError` for a state of another match and keeps its old state.
-    The `LevelTimer` of a timed game is an entity inside the aggregate boundary too (decision of 2026-11-09, #214).
+    The `LevelTimer` of a timed game is a part with identity inside the game boundary too (decision of 2026-11-09, #214).
     It has its own identity, a `LevelTimerId` value object that the timed variant factory builds from the `MatchId` in `createTimer(matchId)`, and `LevelTimer.equals(other)` compares two timers by that id only (decisions 19 and 50).
     The root keeps the timer as an optional part, as it keeps the history: `GameFactory` gives the same timer to the root and to the `TimedRulesDecorator` that the root holds as its rules (decision 19, #234).
     The decorator starts and stops it, and the root reads the time of play from it.
-    So no caller outside the aggregate starts or stops the timer, and no caller gets it.
+    So no caller outside the game starts or stops the timer, and no caller gets it.
     The root is the only door to its parts (decision 52): `undo()`, `redo()`, `canUndo()`, `canRedo()`, `offersUndo()` and `elapsedTime()` answer for the history and the timer, and no method returns either part (decision 27).
     `Resolution` holds no state (a team decision of the domain redesign): it keeps whether the rules accepted the move and the `Outcome`, both in private fields (#240).
     It is a value object (decision of 2026-11-10 on #212): it is immutable, it has no identity, and `equals(other)` compares `accepted` and `outcome`.
     A reader asks a query with a business name: `wasAccepted()`, `endsTheGame()`, which is false for a rejected move, and `phaseAfter(phase)`, the phase that follows the turn.
     `BaseGameRules`, `TimedRulesDecorator`, the root and `ApplyMove` read a resolution only through these queries.
     `leadsTo()` returns the `Outcome` itself, because two readers need the value: the `GameEnded` event carries it, and `MoveResult.outcome` holds it (decision 29).
-    No engine code compares two resolutions today; the stereotype follows the rule of the class of 2026-11-09, that every domain concept carries its tactical stereotype.
+    No engine code compares two resolutions today; the stereotype follows the rule of the class of 2026-11-09, that every domain concept carries its stereotype.
     Since #207 `Outcome` is a class with a closed set of instances (decision 45), so `Resolution.equals()` compares the two outcomes with `Outcome.equals()`.
     `equals(other)` compares two engines by that id, whatever their boards, scores and phases hold.
     `GameFactory` creates the root with the id of an injected generator, so the engine reads no random source and no clock for it (decision 40).
@@ -1019,35 +1025,35 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     Since #362 a listener of layer 3 may tell one event from another with `instanceof`, and it receives the data of an event through `deliverTo()`.
     Since #406 `AchievementCounterListener` asks no class: it asks `countsForAchievements()` of the domain, and each event that counts records its own count (decision 60).
     `ApplyMove` calls it after each turn (decision 29).
-    `GameRepository` is the repository of this aggregate: it saves and gives back the whole root between two calls (decision 10).
+    `GameRepository` is the repository of the running game: it saves and gives back the whole root between two calls (decision 10).
     The scoring policy is the Strategy that the root holds (decision of 2026-11-15, #230): the root calls `IScoringPolicy.score(before, after)` and does not know the concrete policy.
     The policy computes points from two photos of the state and keeps no game data.
     The resolution stays in the rules, which call the business methods of the state (decision 7).
     View 1 and the map of Part 1.
 
     **Why this root and this boundary.**
-    The class of 2026-11-14 asks the design to justify the root and the boundary of each aggregate, and `GameRepository` saves the whole root, so the boundary says what «whole» spans.
+    The class of 2026-11-14 asks the design to justify the root and the boundary of each group that changes as one unit, and `GameRepository` saves the whole root, so the boundary says what «whole» spans.
     `GameEngine` is the root because it is the only object that guards the invariant of a game: a game changes only through `tryPlay()`, `undo()` and `redo()`, and the root checks the phase before each change.
-    Its `MatchId` is the identity of the whole aggregate in the system (decision 52).
+    Its `MatchId` is the identity of the whole game in the system (decision 52).
     The state with its board and, in a timed game, the `LevelTimer` are inside the boundary, with the `GamePhase` and the optional history.
     They change together: one accepted turn changes the board, the score and the phase as one unit, and the turn that ends a timed game also stops the timer (decisions 19 and 21).
     They have no meaning outside their match: a state belongs to one `MatchId`, and its board and the timer live and end with that game.
-    So the boundary is not smaller: a board or a state as an aggregate of its own would split one turn across two aggregates, and one transaction would change both.
+    So the boundary is not smaller: a board or a state as a boundary of its own would split one turn across two boundaries, and one transaction would change both.
     The progress of the player is outside the boundary.
     It is another concept of the business: it gathers the results of many matches, for example the stars of each level, and it has its own port, `ProgressRepository`.
-    It changes after the game ends, in a transaction of its own: `SaveProgress` takes `GameResult`, the summary data of a match, and never an internal entity of the game.
+    It changes after the game ends, in a transaction of its own: `SaveProgress` takes `GameResult`, the summary data of a match, and never a part of the game.
     `GameResult`, `ProgressRecord`, `FitPlay` and `SortPlay` keep every field private (#240): a progress model asks `GameResult.recordWith()` for its record, and `GameProgress` asks `ProgressRecord.improves()` for the better record (#156), and a star threshold asks the play `isWithin()` (decision 42).
-    So the boundary is not larger: an aggregate that held the progress would put two concepts of the business in one aggregate, and each move of one match would also change the record of every match of the player (decision 52).
+    So the boundary is not larger: a boundary that held the progress would put two concepts of the business in one boundary, and each move of one match would also change the record of every match of the player (decision 52).
 
 27. **The root answers for its capabilities (#234).**
-    The class of 2026-11-13 makes the root the only door of the aggregate (decision 52), so the root hands out neither its history nor its timer.
+    The class of 2026-11-13 makes the root the only door of the game (decision 52), so the root hands out neither its history nor its timer.
     `GameEngine.undo()` and `redo()` act through the capabilities that the variant factory gave, and `canUndo()`, `canRedo()` and `offersUndo()` answer the questions of a use case.
     `offersUndo()` tells whether the variant has undo at all, because a false `canUndo()` cannot tell «no undo» from «undo used».
     `undo()` throws a `RangeError` for a game with no history, and `redo()` throws one for a history that cannot redo.
     `UndoMove` asks `offersUndo()` and `canUndo()`, returns a failed `Result` when one of them is false, and then calls `undo()`.
     `RedoMove` asks `canRedo()` and calls `redo()` (#178).
     So no use case reads a history or names its class, and a new history type changes no use case.
-    Inside the aggregate the capabilities stay: `MoveHistory` implements `IUndoable`, and `MoveHistory.redoable()` gives the `IRedoable` of a history that can redo, so the root reads the redo with no check of the history class.
+    Inside the game the capabilities stay: `MoveHistory` implements `IUndoable`, and `MoveHistory.redoable()` gives the `IRedoable` of a history that can redo, so the root reads the redo with no check of the history class.
     **The root depends on `IUndoable` (#414, option A, decided on 2026-11-26).**
     `IUndoable<TMove, TMemento>` declares the five members that the root calls: `record()`, `clear()`, `canUndo()`, `undo()` and `redoable()`.
     `GameEngine` keeps its history as an `IUndoable`, and `IVariantFactory.createHistory()` returns one, so neither names the class `MoveHistory`.
@@ -1276,8 +1282,8 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     `applyTo(start, step, topology)` runs `step`, one rotation step of the topology, once for each step of the normalized count.
     `shorter(): Iterable<Turns>` gives each count from 0 up to the count, without the count.
     `GridTopology.fullTurn(): Turns` gives the full turn of a topology, 6 steps for a hexagon and 4 for a square, so no topology shows a number of rotation steps and `FitRules.validMoves()` reads `fullTurn().shorter()`.
-39. **The space of the board is an entity, and `TCell` stays a value.**
-    The class of 2026-11-09 models the place on the board as an entity, because it «puede pasar de libre a ocupada».
+39. **The space of the board has identity, and `TCell` stays a value.**
+    The class of 2026-11-09 models the place on the board as an object with identity, because it «puede pasar de libre a ocupada».
     `BoardSpace<TCell, TCoord>` in `src/domain/engine/board/board.ts` is that place.
     The topology key of its coordinate is its identity, and `equals()` compares that key.
     Its state is the `TCell` that occupies it, or none when it is free.
@@ -1292,13 +1298,13 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     How a domain object shows its state is closed for HexaBlock (design decisions of 2026-11-10, 2026-11-12 and 2026-11-15): it has no getter and no public field, a reader in the domain or in a use case asks a query with a business name, and an adapter of the edge receives a value through `deliverTo(receiver)` (rule R-no-delivery-call).
     Gate `test/docs/domain-private-fields.test.ts` checks every `.ts` file under `src/domain/`, and its baseline list names the issue that removes each public field and getter of today (#231).
     Only the name `deliverTo` still waits for the professor.
-40. **`GameFactory` creates the whole aggregate.**
-    `GameFactory<TCell, TCoord, TMove, TState>` in `src/domain/engine/factory/game-factory.ts` is the DDD factory of the aggregate: it creates the root with all its parts as one piece.
+40. **`GameFactory` creates the whole game.**
+    `GameFactory<TCell, TCoord, TMove, TState>` in `src/domain/engine/factory/game-factory.ts` is the factory of a whole game: it creates the root with all its parts as one piece.
     It takes the `GameId` of the game, an `IVariantFactory` and a `MatchIdGenerator`.
     The composition root finds the variant factory of the chosen game with `isFor(gameId)` and gives both, so the variant factory keeps its id private (decision 30, #234).
     It takes no publisher, because the root records its events and `ApplyMove` delivers them (#233).
     Only the root has global identity (decision 52): the generator gives the `MatchId`, and `GameFactory` builds the local ids of the first state and of its board from it, with `GameStateId.of(matchId)` and `BoardId.of(matchId)`.
-    The design decision of 2026-11-15 (#236) replaced the generators of the internal ids that the decision of 2026-11-10 asked for: the factory builds each internal id without a collaborator from outside the domain, and each entity still has its own id and its `equals()`.
+    The design decision of 2026-11-15 (#236) replaced the generators of the internal ids that the decision of 2026-11-10 asked for: the factory builds each internal id without a collaborator from outside the domain, and each part with identity still has its own id and its `equals()`.
     **The generator guarantees uniqueness** (decision of 2026-11-10 on #212): each `next()` of `MatchIdGenerator` gives an id that the generator did not give before.
     `GameFactory` does not check it and keeps no list of the ids that it gave: such a list would live only as long as one `GameFactory`, and no code compares two games of different matches.
     Each internal id keeps the `MatchId` of its match, so the states, the boards and the timers of two matches are different.
@@ -1367,7 +1373,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     `isForSameLevelAs(other)` tells whether two records are results of one level, and since #372 `isOfGame(gameId)` tells whether a record is of a game (decision 56).
     `ITimed.elapsedMs()` and `LevelTimer.elapsedMs()` return an `ElapsedTime`.
     `LevelTimer` still gives 0 for a clock that goes back, and it drops a fraction of a millisecond, because an `ElapsedTime` is a whole number.
-    `LevelTimer` stayed a plain class here: it became an entity in #214 (decision 50).
+    `LevelTimer` stayed a plain class here: it got an identity of its own in #214 (decision 50).
     `FitState` keeps a `Moves` in a private field, its photo carries it as `FitSnapshot.moves`, and `FitState.countMove()` still changes the state in place (decision 7): it replaces the `Moves` with `plusOne()`.
     `FitState.restore()` no longer checks the count of a photo, because a `Moves` is valid when it exists.
     The count of cleared Sort stacks is a counter too: `ClearedStacks` in `src/domain/variants/hexa-sort/cleared-stacks.ts`, with `plusOne()` and `isAtLeast()`.
@@ -1604,7 +1610,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     It comes after decisions 46 and 47.
     View 4, the Lines and Merge views, the Sort view, flow 1 and the sequence view of `ApplyMove`.
 49. **The board and the piece close their fields (#211).**
-    The rule of the class of 2026-11-09 says that the attributes of an entity and of a value object are private.
+    The rule of the class of 2026-11-09 says that the attributes of an object with identity and of a value object are private.
     `BoardShape.cells`, `Board.shape`, `Board.topology`, `Piece.shape`, `Piece.content` and `PieceId.value` are private, and `ReadonlyBoard` shows no field.
     Each reader asks an operation with a business name or passes the object on, and no code of `src/` holds the topology of a board.
     `Board` and `ReadonlyBoard` answer for the shape with `coordinates()`, every coordinate of the board in the order of its shape as a new list, `isFull()`, which is true when a cell occupies every coordinate, and `freeSpaces()`, the coordinate of each free space in the order of the shape as a new list (#170).
@@ -1631,11 +1637,11 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     It comes last, after decisions 43, 44 and 48, because they rewrote most of its readers.
     Views 2, Lines and Fit.
     The `Board` boxes of flows 1, 3 and 4 already drew no field.
-50. **`LevelTimer` is an entity with its own id (#214).**
-    The rule of the class of 2026-11-09 says that every entity has an id that identifies it, and the rule of 2026-11-10 says that each entity has an id of its own, as `Board` has `BoardId` and the states have `GameStateId`.
-    The timer changes in place through `start()` and `stop()`, so it is an entity, not a value object, and the team decided on 2026-11-09 that it lives inside the `GameEngine` aggregate (decision 26).
+50. **`LevelTimer` has its own id (#214).**
+    The rule of the class of 2026-11-09 says that every object with identity has an id that identifies it, and the rule of 2026-11-10 says that each such object has an id of its own, as `Board` has `BoardId` and the states have `GameStateId`.
+    The timer changes in place through `start()` and `stop()`, so it has identity and is not a value object, and the team decided on 2026-11-09 that it lives inside the game of `GameEngine` (decision 26).
     `LevelTimerId` in `src/domain/engine/turn/level-timer-id.ts` is a value object in the form of `BoardId`: a private constructor, the factory method `LevelTimerId.of(matchId)`, a private `MatchId` and `equals()`, which compares the two matches.
-    The id is local (decision 52): it has a meaning only inside the aggregate of its match, so no generator gives it (#236).
+    The id is local (decision 52): it has a meaning only inside the game of its match, so no generator gives it (#236).
     `LevelTimer` takes its `LevelTimerId` and its `Clock` in its constructor, and it keeps the start and the stop of the game as two `ClockReading` values (#238).
     The id never changes, and `LevelTimer.equals(other)` compares two timers by that id only: a started timer and an idle timer with one id are equal, and two timers with different ids that read one clock are different.
     The id reaches the timer through `FitFactory`: `IVariantFactory.createTimer(matchId)` takes the `MatchId` of the game, because the timer needs it when it is born, and `FitFactory` builds the `LevelTimerId` from it in each call (#234).
@@ -1668,77 +1674,82 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     The pieces that each game draws through `StartGame`, `ApplyMove` and `UndoMove` are the same as before, for every seed.
     `seed` of `SeededPieceSource` stayed a readable number until decision 48, and it is a private `Seed` now: `isSeededWith(seed)` tells whether the source draws from a seed (#234).
     View 4, and view 1 of [extensibility.md](extensibility.md).
-52. **The rules of an aggregate and of a domain service.**
+52. **The rules of the game boundary and of a service of layer 1.**
     They come from the classes of 2026-11-13 and 2026-11-14, and the team took them on 2026-11-15.
-    They hold for every aggregate of the app: the game aggregate of decision 26 and any later one.
+    Since #501 they use the words of the game, not the words of Domain-Driven Design, and «value object» stays (option C of #497): each rule stays, and only its words changed.
+    A boundary is a group of objects that code outside reaches only through one object, its root.
+    The rules hold for every boundary of the app: the game of decision 26, the progress of decision 56, the counters of the achievements of decision 57 and any later one.
     Where the code of today does not follow a rule yet, the rule names the issue that changes the code.
     The decision that describes the code of today stays as it is until that issue lands.
     - **One unit of change.**
-      An aggregate is a group of entities and value objects that changes as one unit.
+      A boundary is a group of objects with identity and value objects that changes as one unit.
       It is not a collection.
-      After each operation on the aggregate, all its invariants hold, and the aggregate is also the limit of one transaction.
+      After each operation on the boundary, all its invariants hold, and the boundary is also the limit of one transaction.
     - **Only the root is reachable.**
-      Code outside the aggregate talks only to the root, and the root is the facade of its parts.
-      No public method returns an internal entity or another aggregate: data leaves the aggregate as summary data, never as an internal entity.
+      Code outside the boundary talks only to the root, and the root is the Facade of its parts (statement §3.3).
+      `GameEngine` is the root and the Facade of a game: a game changes only through `tryPlay()`, `undo()` and `redo()` (decision 26).
+      No public method returns a part with identity or another boundary: data leaves the boundary as summary data, never as a part.
     - **Global identity only in the root.**
-      The root is an entity, and its identity is unique in the whole system: the `MatchId` of the game aggregate.
-      An internal entity has a local identity: its id has a meaning only inside its aggregate.
+      The root has identity, and its identity is unique in the whole system: the `MatchId` of the game.
+      A part with identity has a local identity: its id has a meaning only inside its boundary.
       So `GameFactory` builds the `GameStateId` and the `BoardId` from the `MatchId`, and a timed variant factory builds the `LevelTimerId` from it (decisions 7, 26, 40 and 50).
-    - **Entities and value objects.**
-      An entity compares with `equals()` by its id only, whatever its other fields hold.
+    - **Objects with identity and value objects.**
+      An object with identity compares with `equals()` by its id only, whatever its other fields hold.
       A value object has no identity: it compares with `equals()` by all its attributes, and it never changes, so each operation returns a new value object.
       This is the rule of the class of 2026-11-09, and the code follows it.
-    - **One repository per aggregate.**
-      Each aggregate has its repository in the design, also when its implementation keeps the data in memory.
-      The repository saves and gives back the whole root, and no internal entity has a repository.
-      The repository of the game aggregate is `GameRepository` (decision 10).
-    - **One aggregate per transaction.**
-      One transaction changes one aggregate.
-      Another aggregate takes the change later, so the design accepts eventual consistency outside the boundary.
-      An operation that must change two aggregates at once shows a boundary in the wrong place.
+    - **One repository per boundary.**
+      Each boundary has its repository in the design, also when its implementation keeps the data in memory.
+      The repository saves and gives back the whole root, and no part has a repository.
+      The repository of the running game is `GameRepository` (decision 10).
+    - **One boundary per transaction.**
+      One transaction changes one boundary.
+      Another boundary takes the change later, so the design accepts eventual consistency between two boundaries.
+      An operation that must change two boundaries at once shows a boundary in the wrong place.
     - **References by identity.**
-      An aggregate refers to another aggregate only by the system id of its root, never by the object and never by a business key that can change.
-      An aggregate can keep a local view with only the data that it needs from another aggregate.
-      `GameId` is not such a reference: it names a variant of the catalogue (decision 30), and the catalogue is not an aggregate.
-      If the catalogue becomes an aggregate, a reference to it uses a system id.
-      `GameProgress` is an aggregate whose identity is the `GameId` of its game, because the device keeps one progress per game: its `equals()` compares only that id.
+      A boundary refers to another boundary only by the system id of its root, never by the object and never by a business key that can change.
+      A boundary can keep a local view with only the data that it needs from another boundary.
+      `GameId` is not such a reference: it names a variant of the catalogue (decision 30), and the catalogue is not a boundary.
+      If the catalogue becomes a boundary, a reference to it uses a system id.
+      `GameProgress` is the root of a boundary whose identity is the `GameId` of its game, because the device keeps one progress per game: its `equals()` compares only that id.
       `GameId` is a business key, but the reason of the rule holds: the team fixes each `GameId` in the code, and no user changes it.
       This identity stops being enough when an account owns progress (D27 in [REQUIREMENTS.md](../REQUIREMENTS.md)): then a progress belongs to a user in a game. #46 decides then whether the identity becomes its own value object.
     - **Events, not questions.**
-      An aggregate never asks another aggregate.
-      It tells its changes through a domain event: it only emits the event, to nobody in particular, and each listener reacts (Observer).
-      The game root records its `GameEnded` event and tells nobody, and `ApplyMove` takes the event after the turn and delivers it to the publisher port (decisions 25, 26 and 29).
+      A boundary never asks another boundary.
+      It tells its changes through a game event: it only emits the event, to nobody in particular, and each listener reacts (Observer).
+      `GameEngine` records its `GameEnded` event and tells nobody, and `ApplyMove` takes the event after the turn and delivers it to the publisher port (decisions 25, 26 and 29).
     - **Small and cohesive.**
       A value object is never a root.
-      Two concepts of the business never share one aggregate.
-      Cohesion decides the size of an aggregate, not a count of classes.
-      An entity becomes an aggregate of its own only with a written reason.
-      The game aggregate holds the parts of one match, and the history and the timer are optional parts that the variant factory gives (decision 3).
+      Two concepts of the business never share one boundary.
+      Cohesion decides the size of a boundary, not a count of classes.
+      An object with identity becomes a boundary of its own only with a written reason.
+      The game holds the parts of one match, and the history and the timer are optional parts that the variant factory gives (decision 3).
     - **The boundary in the diagram.**
-      The class diagram shows the boundary of each aggregate.
+      The class diagram shows the game boundary.
       The form of the line does not matter.
-      View 1 and the map of Part 1 draw the game aggregate as a dark dashed frame labelled `AGGREGATE · DECISION 52`, so it differs from the grey frame of a pattern (#21).
-      The frame holds the root and its internal entities: `GameEngine`, its `BoardState`, the `Board` of the state and the `LevelTimer` of a timed game.
-      Each internal entity has a local id.
+      View 1 shows it with the filled diamonds of `GameEngine` (decision 23), and the text of view 1 names `GameEngine` the Facade of a game.
+      No box carries the role label of the Facade, by the rule on role labels (decision 23).
+      Until #501, view 1 and the map of Part 1 drew a dark dashed frame around the game, and #501 removed that frame (option C of #497).
+      The game boundary holds `GameEngine`, its `BoardState`, the `Board` of the state and the `LevelTimer` of a timed game.
+      Each part with identity has a local id.
       View 1 shows the board and the timer as reference boxes, and the map gives the four classes a group of their own.
       In view 1 the root joins the state and the timer with a filled diamond (decision 23).
-      The state keeps the board, not the root, so a use `board 1` joins them inside the frame.
-      The `GamePhase`, the optional `MoveHistory` and the two Strategies are parts of the aggregate too (decision 26), and each one is a piece of a pattern: it stays in the frame of its pattern, and the root keeps it with a use.
-    - **Domain services.**
-      A domain service is a business operation of the domain layer that belongs to no entity, value object or aggregate.
-      First give the responsibility to an aggregate.
-      It leaves the aggregate only when the code must load other aggregates or create objects of another aggregate.
-      A domain service exposes one public method that validates or computes, and it can use private methods.
+      The state keeps the board, not the root, so a use `board 1` joins them.
+      The `GamePhase`, the optional `MoveHistory` and the two Strategies are parts of the game too (decision 26), and each one is a piece of a pattern: it stays in the frame of its pattern, and the root keeps it with a use.
+    - **Services of layer 1.**
+      A service of layer 1 is a business operation that belongs to no object with identity, no value object and no boundary.
+      First give the responsibility to a boundary.
+      The operation leaves the boundary only when the code must load other boundaries or create objects of another boundary.
+      A service of layer 1 exposes one public method that validates or computes, and it can use private methods.
       It takes and returns domain objects.
       It keeps no state, and it guarantees a result, not an invariant.
       It receives the objects already loaded and never calls a repository.
-      It never touches the infrastructure: a message to a player is the work of an application service.
-      Its name and its method are verbs of the ubiquitous language, never a `Helper` or a `Manager`.
-      It can work with another domain service.
-      It replaces no entity: the rules of each aggregate stay inside the aggregate.
-      A use case is an application service, not a domain service.
-      A Strategy that the root holds is a piece of the aggregate, not a domain service (decision 26).
-      The domain has no domain service today.
+      It never touches the infrastructure: a message to a player is the work of a use case.
+      Its name and its method are verbs of the business, never a `Helper` or a `Manager`.
+      It can work with another service of layer 1.
+      It replaces no object with identity: the rules of each boundary stay inside the boundary.
+      A use case is a service of layer 2, not a service of layer 1.
+      A Strategy that the root holds is a piece of the game, not a service of layer 1 (decision 26).
+      Layer 1 has no such service today.
 53. **The home screen and the game selector map (#169, proposal).**
     The home screen and the game selector map follow MVP ([layers.md](layers.md)).
     `HomePresenter` in `src/adapters/home-presenter.ts` is the presenter of both views, and it imports no React.
@@ -1855,7 +1866,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
 56. **The local progress of a game is one `GameProgress` (#156, S3-04).**
     S3-04 of #151, marked «Propuesta, pendiente del equipo», keeps the local progress of one game as one object with the high score and the list of per-level results, the shape of DS-5 and DS-12, so a later sync maps it one to one.
     `GameProgress` in `src/domain/progress/game-progress.ts` is that object.
-    It is an entity, and the root of its own aggregate, because `ProgressRepository` saves it whole and a value object is never a root (decision 52).
+    It has identity, and it is the root of a boundary of its own, because `ProgressRepository` saves it whole and a value object is never a root (decision 52).
     Its identity is its `GameId`: the device keeps one progress per game, and two progresses of one game are equal whatever they keep.
     Its three fields are private: the game id, the high score as a `ProgressRecord` [0..1] and the best `ProgressRecord` of each level, one per level in the order of the first result.
     `start(gameId)` gives a progress with no high score and no level result.
@@ -1877,11 +1888,11 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     D27 in [REQUIREMENTS.md](../REQUIREMENTS.md) (#325) puts the user in the local key, so the device keeps one progress per game and user, and the progress played without an account merges into the first account that signs in with the rule of DS-12 inside `GameProgress`. #45 keeps the user id of the account in the `Session` (decision 65), and #46 builds the key and the merge.
     View 4 and view 3.3.
 57. **The repository of the progress and its saved shape (#164, proposal).**
-    `ProgressRepository` in `src/application/ports/progress-repository.ts` is the output port and the repository of the progress aggregate of decision 56.
+    `ProgressRepository` in `src/application/ports/progress-repository.ts` is the output port and the repository of the progress boundary of decision 56.
     `load(gameId: GameId): Promise<GameProgress | undefined>` gives back the whole root, or `undefined` when the game has no saved progress, and `save(progress: GameProgress): Promise<void>` saves it in place of the saved one.
     `SaveProgress` in `src/application/progress/save-progress.ts` implements `UseCase<GameResult, void>`.
     It loads the progress of its game, or starts one with `GameProgress.start()`, records the result in it with its `IProgressModel`, and saves it.
-    It changes one aggregate, the progress (decision 52).
+    It changes one boundary, the progress (decision 52).
     A `GameResult` keeps its game id private, so `SaveProgress` takes the `GameId` of its game in its constructor with the model of that game, as `GameFactory` takes the id of its game (decision 40).
     Its response is empty: `record()` returns nothing, so the use case has no record to return.
     `LoadProgress` in `src/application/progress/load-progress.ts` gives the read of the saved progress back (S3-16 of #151, #181): it implements `UseCase<LoadProgressRequest, GameProgress | undefined>`, its request names the `GameId` of the game, as the request of `ListLevels` does (#410), it takes the `ProgressRepository` port in its constructor, and `execute({ gameId })` returns the saved `GameProgress` as it is, or `undefined` when the game has none; it starts no progress.
@@ -1900,7 +1911,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     The composition root does not build `SaveProgress` yet, because no screen calls it (#180), and it builds one `LoadProgress` over its one `LocalProgressRepository`, which `loadProgress()` gives (decision 18, #410).
     D27 in [REQUIREMENTS.md](../REQUIREMENTS.md) (#325) keeps `SaveProgress` on the local repository with no session, gives the path to the backend to `SyncProgress` and its gateway port in place of the planned `ApiProgressRepository`, and adds the user to the key `progress:<game id>`. #45 and #46 change the code: since #46 the port has `owner()`, `load(owner, gameId)` and `update(owner, gameId, change)`, and `save()` is gone (decision 66).
     Since #363 (part 3 of #277) the counters of the achievements have a repository of their own.
-    `AchievementCounters` in `src/domain/achievements/achievement-counters.ts` is an entity and the root of its own aggregate, with the `GameId` of its game as identity.
+    `AchievementCounters` in `src/domain/achievements/achievement-counters.ts` has identity and is the root of a boundary of its own, with the `GameId` of its game as identity.
     It keeps two `AchievementCount` values: `best`, the highest count of one move, which `recordBest(count)` keeps only when the count is above it, and `total`, which `addToTotal(count)` adds to.
     `bestReaches(count)` and `totalReaches(count)` answer a goal, and `deliverTo(receiver: AchievementCountersReceiver): void` gives the game id and the two counts to a repository of the edge.
     `AchievementCount` is a value object: a safe integer of 0 or more, with `of()`, `equals()`, `isAtLeast()`, `plus()` and `deliverTo()`.
@@ -1910,7 +1921,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     `AchievementCounterRepository` in `src/application/ports/achievement-counter-repository.ts` is its port, with `load(gameId)` and `save(counters)` as `ProgressRepository` has.
     `LocalAchievementCounterRepository` implements it over the same `KeyValueStore`, under its own key `achievement-counters:<game id>`, for example `{"version":1,"best":3,"total":0}`.
     It shares the JSON helpers of `src/adapters/saved-json.ts` with `LocalProgressRepository`, so both read and check a saved text the same way: another `version`, a part of the wrong type and a count that `AchievementCount.of()` refuses throw a `RangeError`, a text that is not JSON throws a `SyntaxError`, and a load never writes, so the store keeps the old text.
-    The counters do not go into the saved progress: the shape of `progress:<game id>` and its `version` 1 do not change, one repository serves one aggregate (decision 52), and the writer of the counters and `SaveProgress` never write the same saved text.
+    The counters do not go into the saved progress: the shape of `progress:<game id>` and its `version` 1 do not change, one repository serves one boundary (decision 52), and the writer of the counters and `SaveProgress` never write the same saved text.
     The listener runs after each move and the bus waits for nothing, so the listener queues each save after the save before it, and `saved()` waits for the queue.
     A failed save writes nothing, and the saves after it still run.
     Since #384 the listener reports each failed save at once through the `Logger` port of layer 2: one `"failure"` entry with the name `AchievementCounterListener` and a `save-failed` `UseCaseError` that keeps the thrown value as its `cause` (decision 37).
@@ -1922,7 +1933,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     `LevelRepository` in `src/application/ports/level-repository.ts` is the output port of the levels.
     `list(gameId: GameId): Promise<LevelDefinition[]>` gives the definition of each level of one game in a new list, in no fixed order, and an empty list for a game with no levels.
     A level is data of the catalogue that the player never changes, so the port only reads.
-    The catalogue is not an aggregate (decision 52), and the port keeps the name that the views gave it since decision 22.
+    The catalogue is not a boundary (decision 52), and the port keeps the name that the views gave it since decision 22.
     `BundledLevelRepository` in `src/adapters/bundled-level-repository.ts` implements it over the level files of `src/adapters/levels/<game>/` (A6).
     It imports each file as a JSON module: TypeScript reads it through `resolveJsonModule` of the Expo base configuration, Metro bundles it and Jest loads it.
     So the device needs no file system, and rule `adapters-imports-only-inner-layers` holds, because the files live in layer 3.
@@ -1967,7 +1978,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     S3-13 of #151 picks option D.
     `StartGameRequest` in `src/application/game/start-game.ts` has one optional member, `levelId: LevelId`: a game with levels names the chosen level, and a game with no levels, such as Hexa Lines and Hexa Merge, starts with none.
     `GameFactories<TCell, TCoord, TMove, TState>` in `src/application/ports/game-factories.ts` is an output port of layer 2.
-    `factoryFor(levelId?: LevelId): Promise<GameFactory<TCell, TCoord, TMove, TState>>` gives the factory of the aggregate (decision 40) for the chosen level, and with no level id the factory of the game that the composition root registered.
+    `factoryFor(levelId?: LevelId): Promise<GameFactory<TCell, TCoord, TMove, TState>>` gives the factory of a whole game (decision 40) for the chosen level, and with no level id the factory of the game that the composition root registered.
     `StartGame` takes the port in its constructor in place of a `GameFactory`: it asks the port for the factory of the level of the request, then asks that factory for the started game.
     So the use case keeps the choice of the level, and no file of `src/application/` names a variant (decision 31).
     A port that rejects the level gives `start-failed`, and the repository keeps its old game.
@@ -2088,18 +2099,18 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     One read path serves both games.
     `MoveResult` in `src/application/game/move-result.ts` carries the optional move count and the optional level id to the presenter, as it carries `score` and `elapsedMs`: as value objects that no use case opens (rule R-no-delivery-call).
     `moveResultOf()` is the one place that fills them.
-    The aggregate root keeps the level id.
+    The root of the game keeps the level id.
     The level of a match is a fact of the match, and it never changes while the match lives.
     So `GameEngine` keeps the optional `LevelId` of its match, as it keeps the `GameId` of its variant: `LevelGameFactories.factoryFor(levelId)` gives the id to the `GameFactory` that it creates for the level, and `GameFactory` gives it to the root.
     A game with no levels has none.
-    A `LevelId` is not an identity of the aggregate: like `GameId`, it names an entry of a catalogue.
-    So the rule «global identity only in the root» of decision 52 holds, and the state entities keep only local ids (decision 26).
+    A `LevelId` is not an identity of the game: like `GameId`, it names an entry of a catalogue.
+    So the rule «global identity only in the root» of decision 52 holds, and the states keep only local ids (decision 26).
     The root answers one query with a business name for the level id, and `moveResultOf()` asks it, as it asks `elapsedTime()`.
     `GameRepository` saves the whole root, so the level id of the running game is saved with it, and undo and redo never touch it.
     Decision 55 stays: `GamePresenter.onStart(levelId?)` passes the id on and never reads it.
     Decision 59 stays: `StartGame` still chooses the level through the `GameFactories` port.
     Three keepers of the level id stay out.
-    The presenter does not keep it: the fact of a running game would live in an adapter of layer 3, outside the aggregate, next to the game that the repository holds (decisions 52 and 55).
+    The presenter does not keep it: the fact of a running game would live in an adapter of layer 3, outside the game, next to the game that the repository holds (decisions 52 and 55).
     The level photo does not offer it next to `moveCount()`: each state with levels would keep and clone a value that none of its rules reads, once per variant with levels.
     A use case or a new session object of layer 2 does not keep it: the match and its level would live in two stores that `StartGame` must replace together, and the four use cases that build a `MoveResult` (`StartGame`, `ApplyMove`, `UndoMove` and `RedoMove`) would each need it. #176 added the Sort counter and `moveCount()` of the Sort photo.
     Since #180 the rest is code.
@@ -2252,13 +2263,13 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     **The merge.**
     `GameProgress.mergeWith(other)` merges a progress of the same game into the progress: each record of `other` goes through `recordScore()` or `recordLevel()`, so the best record stays by the rule of DS-12, and a tie keeps the record of the progress.
     A progress of another game throws a `RangeError`, and the progress stays as it was.
-    So the merge rule has one home in the aggregate, and it reads no field of another object (rule R-domain-private-fields).
+    So the merge rule has one home in the boundary of the progress, and it reads no field of another object (rule R-domain-private-fields).
     **The ports.**
     `ProgressGateway` in `src/application/ports/progress-gateway.ts` sends a progress with the `Session` and gives back the progress that the backend keeps after the sync.
     It is no repository: the local progress stays the store.
     A known failure throws a `SyncFailure` with the code `session-expired` or `backend-unreachable`.
     `AnonymousProgress` in `src/application/ports/anonymous-progress.ts` merges the anonymous space, the progress saved with no account, into the progress of an owner with `mergeAnonymousInto(owner, gameId)`, and forgets it only after the merged progress is saved, so a failed save keeps it.
-    It is a second role of the one repository of the progress aggregate (decision 52), so `SaveProgress` and `ListLevels` do not see it (ISP).
+    It is a second role of the one repository of the progress boundary (decision 52), so `SaveProgress` and `ListLevels` do not see it (ISP).
     **The owner (judgment-day round 1, option A).**
     The progress belongs to `ProgressOwner`, a value object in `src/application/ports/progress-owner.ts`: the last signed-in user, or the anonymous owner.
     `SessionStore` keeps the user id apart from the token: `owner()` gives it, `clear()` forgets the token only, and `write()` of another session changes the owner.
