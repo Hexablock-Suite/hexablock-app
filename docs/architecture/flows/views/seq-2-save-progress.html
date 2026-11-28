@@ -2004,8 +2004,8 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           is the only one that leaves the app: POST /v1/progress of API-FR-02, guarded by the token.
-          A 401 throws SyncFailure(session-expired); SyncProgress calls clear(), which keeps the
-          owner, and returns a failure.
+          A 401 throws SyncFailure(session-expired); SyncProgress fails, and SessionAspect calls
+          clear(), which keeps the owner.
         </text>
         <text
           x="24"

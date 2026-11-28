@@ -375,7 +375,7 @@ describe('ResultPresenter', () => {
     expect(sync.requests).toHaveLength(0);
   });
 
-  // The token lives 24 hours and has no refresh. `SyncProgress` clears the session, and the result
+  // The token lives 24 hours and has no refresh. `SessionAspect` clears the session, and the result
   // asks the player to sign in. The result stays, because the local progress keeps it.
   it('should_ask_the_player_to_sign_in_and_keep_the_result_when_the_sync_gives_session_expired', async () => {
     const sync = new SyncingUseCase(

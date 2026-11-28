@@ -187,6 +187,9 @@ export interface operations {
             /** @description The user exists. The body is empty. */
             201: {
                 headers: {
+                    "X-RateLimit-Limit": components["headers"]["X-RateLimit-Limit"];
+                    "X-RateLimit-Remaining": components["headers"]["X-RateLimit-Remaining"];
+                    "X-RateLimit-Reset": components["headers"]["X-RateLimit-Reset"];
                     [name: string]: unknown;
                 };
                 content?: never;
@@ -194,6 +197,9 @@ export interface operations {
             /** @description A field is missing or breaks its rule. */
             400: {
                 headers: {
+                    "X-RateLimit-Limit": components["headers"]["X-RateLimit-Limit"];
+                    "X-RateLimit-Remaining": components["headers"]["X-RateLimit-Remaining"];
+                    "X-RateLimit-Reset": components["headers"]["X-RateLimit-Reset"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -203,6 +209,19 @@ export interface operations {
             /** @description Another user has this username, or one that differs only in letter case. */
             409: {
                 headers: {
+                    "X-RateLimit-Limit": components["headers"]["X-RateLimit-Limit"];
+                    "X-RateLimit-Remaining": components["headers"]["X-RateLimit-Remaining"];
+                    "X-RateLimit-Reset": components["headers"]["X-RateLimit-Reset"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+            /** @description This client sent more requests to this route in one minute than the rate limit allows (AUTH_RATE_LIMIT, 10 by default). The use case does not run. The Retry-After header gives the seconds to wait. */
+            429: {
+                headers: {
+                    "Retry-After": components["headers"]["Retry-After"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -227,6 +246,9 @@ export interface operations {
             /** @description The credentials are valid. */
             200: {
                 headers: {
+                    "X-RateLimit-Limit": components["headers"]["X-RateLimit-Limit"];
+                    "X-RateLimit-Remaining": components["headers"]["X-RateLimit-Remaining"];
+                    "X-RateLimit-Reset": components["headers"]["X-RateLimit-Reset"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -236,6 +258,9 @@ export interface operations {
             /** @description A field is missing or is not a string. */
             400: {
                 headers: {
+                    "X-RateLimit-Limit": components["headers"]["X-RateLimit-Limit"];
+                    "X-RateLimit-Remaining": components["headers"]["X-RateLimit-Remaining"];
+                    "X-RateLimit-Reset": components["headers"]["X-RateLimit-Reset"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -245,6 +270,19 @@ export interface operations {
             /** @description The username or the password is wrong. */
             401: {
                 headers: {
+                    "X-RateLimit-Limit": components["headers"]["X-RateLimit-Limit"];
+                    "X-RateLimit-Remaining": components["headers"]["X-RateLimit-Remaining"];
+                    "X-RateLimit-Reset": components["headers"]["X-RateLimit-Reset"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+            /** @description This client sent more requests to this route in one minute than the rate limit allows (AUTH_RATE_LIMIT, 10 by default). The use case does not run. The Retry-After header gives the seconds to wait. */
+            429: {
+                headers: {
+                    "Retry-After": components["headers"]["Retry-After"];
                     [name: string]: unknown;
                 };
                 content: {

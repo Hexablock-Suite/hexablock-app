@@ -75,12 +75,13 @@
           whose execute() returns a Result, and SyncProgress (#46), a use case of the code, which
           implements UseCase bound to SyncProgressRequest and void. The abstract UseCaseAspect
           decorator implements UseCase, wraps one inner UseCase and turns every exception into a
-          failed Result. The logging, timing, retry and authorization aspects extend it, and the
-          composition root wraps each use case through decorate(), today in LoggingAspect alone.
-          SyncProgress and the two leaderboard use cases of #47 read the session themselves, so
-          AuthorizationAspect stays planned with no use case to guard. The logging and timing
-          aspects use the Logger output port. Logger takes a UseCaseLogEntry with the use case name,
-          the outcome, the time, the error and the failed deliveries of a success, and the adapter
+          failed Result. The logging, timing, retry and session aspects extend it, and the
+          composition root wraps each use case through decorate(), with LoggingAspect outside.
+          SessionAspect (#481) requires a session before the two leaderboard use cases of #47 and
+          clears the session when the backend refuses the token, also for SyncProgress. It holds a
+          SessionStore and a SessionNeed, required or optional. The logging and timing aspects use
+          the Logger output port. Logger takes a UseCaseLogEntry with the use case name, the
+          outcome, the time, the error and the failed deliveries of a success, and the adapter
           writes the text.
         </desc>
         <defs>
@@ -280,7 +281,7 @@
           stroke-width="1"
           marker-end="url(#uccontract-triangle)"
         />
-        <!-- AuthorizationAspect extends UseCaseAspect: inheritance -->
+        <!-- SessionAspect extends UseCaseAspect: inheritance -->
         <path
           d="M856 424 V408 Q856 400 848 400 H648 Q640 400 640 392 V376"
           fill="none"
@@ -568,12 +569,12 @@
           - name: string
         </text>
 
-        <!-- Class: AuthorizationAspect -->
+        <!-- Class: SessionAspect (#481) -->
         <rect
           x="756"
           y="424"
           width="200"
-          height="64"
+          height="80"
           rx="6"
           fill="#ffffff"
           stroke="#17212a"
@@ -589,13 +590,13 @@
           font-family="'IBM Plex Sans', sans-serif"
           text-anchor="middle"
         >
-          AuthorizationAspect
-          <tspan data-requirement="APP-FR-12" fill="#5b6873" font-size="8" font-weight="400">
-            «Sprint 4»
-          </tspan>
+          SessionAspect
         </text>
         <text x="772" y="480" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
-          - session: SessionStore
+          - sessions: SessionStore
+        </text>
+        <text x="772" y="496" fill="#17212a" font-size="9" font-family="'IBM Plex Mono', monospace">
+          - need: SessionNeed
         </text>
 
         <!-- Class: Logger (interface, output port) -->
@@ -816,8 +817,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          today in LoggingAspect alone, for example new LoggingAspect(syncProgress, logger,
-          'SyncProgress') (#323, #46).
+          with LoggingAspect outside SessionAspect, so the log keeps each call that the session
+          rejects (#323, #481).
         </text>
         <text
           x="24"
@@ -826,8 +827,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          SyncProgress reads the session itself through SessionStore, so no aspect checks the
-          session before it (decision 66).
+          SessionAspect gives sign-in-required to a leaderboard with no session and clears a refused
+          session (decision 69).
         </text>
         <text
           x="24"
@@ -836,9 +837,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          AuthorizationAspect stays planned: the leaderboards of #47 read SessionStore too.
-          RetryAspect is planned with no sprint: #46 delivered APP-FR-13 without it. Clock is an
-          engine interface.
+          The use cases still read the session for the token. RetryAspect is planned with no sprint:
+          #46 delivered APP-FR-13 without it. Clock is an engine interface.
         </text>
         <text
           x="24"

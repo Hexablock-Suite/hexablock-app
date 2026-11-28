@@ -43,6 +43,7 @@ import type { LevelList } from '../application/levels/level-summary';
 import { ListLevels, type ListLevelsRequest } from '../application/levels/list-levels';
 import type { Logger } from '../application/aspects/logger';
 import { LoggingAspect } from '../application/aspects/logging-aspect';
+import { SessionAspect, type SessionNeed } from '../application/aspects/session-aspect';
 import { Login } from '../application/account/login';
 import type { MoveResult, ViewOf } from '../application/game/move-result';
 import type { ProgressRepository } from '../application/ports/progress-repository';
@@ -149,6 +150,8 @@ interface AccountUseCases {
 // log (#384).
 // A root with no store has no place for the counters, so it subscribes no counter listener.
 // Every use case of the root goes through `decorate()`, which gives it its aspects (#323).
+// Each use case has its own chain: `LoggingAspect` first, then the aspects of that use case.
+// The leaderboards and the sync add `SessionAspect` over the one `SessionManager` (#481).
 // With the local store of its drivers, the root builds one `LocalProgressRepository` and keeps it
 // for every consumer of the saved progress (#323). Over it, the root builds `ListAchievements` once
 // (#188), with its one level repository, the one counter repository of the listener (#364)
@@ -176,14 +179,14 @@ interface AccountUseCases {
 // store, `Register` and `Login` also take the repository in its anonymous role and the id of each
 // registered game, so a sign-in merges the progress played with no account into the account.
 // With the transport, the secure storage and the local store, it builds `SyncProgress` once
-// through `decorate()`, over the session manager, the local repository in its two roles and one
+// through `decorate()` with a `SessionAspect` that clears a refused session, over the session manager, the local repository in its two roles and one
 // `ApiProgressGateway` with the same `ApiDtoMapper`. The `ResultPresenter` of each game session
 // syncs after each save, and the `AccountPresenter` syncs every registered game after a sign-in.
 // A root that lacks one of the three drivers syncs nothing.
 // The leaderboards (#47, APP-FR-14): with the transport and the secure storage, the root builds
 // one `ApiLeaderboardGateway` with the same `ApiDtoMapper`, and over it and the one
 // `SessionManager` it builds `GetGlobalLeaderboard` and `GetLevelLeaderboard` once, each through
-// `decorate()`. `leaderboardPresenter()` gives a new `LeaderboardPresenter` over both. A root that
+// `decorate()` with a `SessionAspect` that requires the session. `leaderboardPresenter()` gives a new `LeaderboardPresenter` over both. A root that
 // lacks one of the two drivers throws a `RangeError` from `leaderboardPresenter()`.
 // The screens show the default language until the player can choose one (#163).
 export class CompositionRoot implements ScreenServices {
@@ -264,12 +267,13 @@ export class CompositionRoot implements ScreenServices {
         : this.decorate(
             new SyncProgress(sessions, local, local, new ApiProgressGateway(drivers.api, mapper)),
             'SyncProgress',
+            [sessionAspect(sessions, 'optional')],
           );
     this.leaderboards =
       drivers.api === undefined || sessions === undefined
         ? undefined
-        : leaderboardUseCases(new ApiLeaderboardGateway(drivers.api, mapper), sessions, (u, n) =>
-            this.decorate(u, n),
+        : leaderboardUseCases(new ApiLeaderboardGateway(drivers.api, mapper), sessions, (u, n, a) =>
+            this.decorate(u, n, a),
           );
   }
 
@@ -478,21 +482,41 @@ export class CompositionRoot implements ScreenServices {
   }
 
   // The one place that gives a use case of the root its aspects (#323). `name` names the use case
-  // in the log. The chain runs from the outside in. Today it holds `LoggingAspect` only.
-  // A later aspect enters the chain here, and no other line of the root changes.
+  // in the log. The chain runs from the outside in. `LoggingAspect` is always the outer aspect, so
+  // the log keeps each call, also a call that an inner aspect rejects (APP-NFR-11, #481).
+  // `aspects` are the inner aspects of this one use case, from the outside in.
+  // Today only the leaderboards and the sync have one: `SessionAspect`.
   private decorate<TRequest, TResponse>(
     useCase: UseCase<TRequest, TResponse>,
     name: string,
+    aspects: readonly Aspect<TRequest, TResponse>[] = [],
   ): UseCase<TRequest, TResponse> {
-    return wrapInAspects(useCase, [(inner) => new LoggingAspect(inner, this.logger, name)]);
+    return wrapInAspects(useCase, [
+      (inner) => new LoggingAspect(inner, this.logger, name),
+      ...aspects,
+    ]);
   }
 }
 
-// Gives a use case of the root its aspects. `name` names the use case in the log.
+// Builds one aspect around the use case that it gets.
+type Aspect<TRequest, TResponse> = (
+  inner: UseCase<TRequest, TResponse>,
+) => UseCase<TRequest, TResponse>;
+
+// Gives a use case of the root its aspects. `name` names the use case in the log, and `aspects`
+// are the inner aspects of this use case.
 type Decorate = <TRequest, TResponse>(
   useCase: UseCase<TRequest, TResponse>,
   name: string,
+  aspects?: readonly Aspect<TRequest, TResponse>[],
 ) => UseCase<TRequest, TResponse>;
+
+// The `SessionAspect` of a use case over the one session store `sessions` of the root (#481).
+// `required` rejects a call with no session. Both needs clear a session that the backend refuses.
+function sessionAspect(sessions: SessionStore, need: SessionNeed) {
+  return <TRequest, TResponse>(inner: UseCase<TRequest, TResponse>): UseCase<TRequest, TResponse> =>
+    new SessionAspect(inner, sessions, need);
+}
 
 // What `StartGame` reads to refuse a locked level (#397): the one level repository and the
 // progress repository of the root, the id of the game and the figure.
@@ -555,15 +579,19 @@ function accountUseCases(
 
 // `GetGlobalLeaderboard` and `GetLevelLeaderboard` over one gateway and the one session store
 // `session` of the root, each through `decorate` (#47). Each board has its own input port, as
-// hexablock-api#218 decided.
+// hexablock-api#218 decided. Each one has a `SessionAspect` that requires the session (#481).
 function leaderboardUseCases(
   gateway: ApiLeaderboardGateway,
   session: SessionStore,
   decorate: Decorate,
 ): LeaderboardBoards {
   return {
-    global: decorate(new GetGlobalLeaderboard(session, gateway), 'GetGlobalLeaderboard'),
-    level: decorate(new GetLevelLeaderboard(session, gateway), 'GetLevelLeaderboard'),
+    global: decorate(new GetGlobalLeaderboard(session, gateway), 'GetGlobalLeaderboard', [
+      sessionAspect(session, 'required'),
+    ]),
+    level: decorate(new GetLevelLeaderboard(session, gateway), 'GetLevelLeaderboard', [
+      sessionAspect(session, 'required'),
+    ]),
   };
 }
 

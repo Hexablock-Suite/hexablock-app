@@ -20,6 +20,7 @@ import { Score } from '../../src/domain/shared/score';
 // hexablock-api through the `LeaderboardGateway` port with the session of the player. Each board
 // has its own input port, as hexablock-api#218 decided. The backend ranks the rows (S3-03, DS-4),
 // so the use cases keep the rows and their ranks as the gateway gives them.
+// Since #481 `SessionAspect` clears the session on a refused token, so these use cases never clear it.
 
 const LINES = GameId.of('hexa-lines');
 const FIT = GameId.of('hexa-fit');
@@ -150,8 +151,9 @@ describe('GetGlobalLeaderboard and GetLevelLeaderboard', () => {
     },
   );
 
+  // #481: `SessionAspect` clears the session on a refused token, so the use case keeps it.
   it.each(['global', 'level'])(
-    'should_clear_the_session_and_fail_with_session_expired_when_the_backend_refuses_the_token',
+    'should_fail_with_session_expired_and_keep_the_session_when_the_backend_refuses_the_token',
     async (board) => {
       const sessions = new MemorySessions(ADA);
       const gateway = new FakeGateway(
@@ -163,8 +165,8 @@ describe('GetGlobalLeaderboard and GetLevelLeaderboard', () => {
         .read();
 
       expect(codeOf(result)).toBe(FailureCode.sessionExpired);
-      expect(sessions.clears).toBe(1);
-      await expect(sessions.read()).resolves.toBeUndefined();
+      expect(sessions.clears).toBe(0);
+      await expect(sessions.read()).resolves.toBe(ADA);
     },
   );
 

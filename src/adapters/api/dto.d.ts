@@ -378,6 +378,15 @@ export interface components {
     responses: never;
     parameters: never;
     requestBodies: never;
-    headers: never;
+    headers: {
+        /** @description The requests that this client may send to this route in one minute. */
+        "X-RateLimit-Limit": number;
+        /** @description The requests that this client may still send to this route in the current minute. */
+        "X-RateLimit-Remaining": number;
+        /** @description The seconds until the current minute of the rate limit ends. */
+        "X-RateLimit-Reset": number;
+        /** @description The seconds until this client may send a request to this route again. */
+        "Retry-After": number;
+    };
     pathItems: never;
 }

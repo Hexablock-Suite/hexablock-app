@@ -328,7 +328,7 @@
         },
         {
           "group": "usecases|src/application/aspects",
-          "types": ["LoggingAspect", "Logger", "UseCaseAspect", "UseCaseLogEntry"]
+          "types": ["LoggingAspect", "Logger", "SessionAspect", "UseCaseAspect", "UseCaseLogEntry"]
         },
         {
           "group": "usecases|src/application",
@@ -336,14 +336,7 @@
         },
         {
           "group": "usecases|planned",
-          "types": [
-            "UpdateSettings",
-            "SettingsStore",
-            "TimingAspect",
-            "Settings",
-            "AuthorizationAspect",
-            "RetryAspect"
-          ]
+          "types": ["UpdateSettings", "SettingsStore", "TimingAspect", "Settings", "RetryAspect"]
         }
       ],
       "3": [
@@ -1104,14 +1097,7 @@
       "2": [
         {
           "group": "usecases|planned",
-          "types": [
-            "UpdateSettings",
-            "SettingsStore",
-            "Settings",
-            "TimingAspect",
-            "AuthorizationAspect",
-            "RetryAspect"
-          ]
+          "types": ["UpdateSettings", "SettingsStore", "Settings", "TimingAspect", "RetryAspect"]
         },
         {
           "group": "usecases|src/application/game",
@@ -1195,7 +1181,7 @@
         },
         {
           "group": "usecases|src/application/aspects",
-          "types": ["UseCaseAspect", "UseCaseLogEntry", "LoggingAspect", "Logger"]
+          "types": ["UseCaseAspect", "UseCaseLogEntry", "LoggingAspect", "Logger", "SessionAspect"]
         },
         {
           "group": "usecases|src/application",

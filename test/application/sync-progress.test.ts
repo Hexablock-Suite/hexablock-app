@@ -21,7 +21,8 @@ import { contentOf, sameContent } from '../support/engine/progress-content';
 // Issue #46 (APP-FR-13, D27): `SyncProgress` sends the local progress of one game to the backend
 // through the `ProgressGateway` port and merges the answer into the local progress (DS-12).
 // The progress played with no account merges into the first account that signs in.
-// A failed sync never loses local progress. A refused token clears the session.
+// A failed sync never loses local progress. A refused token gives `session-expired`, and since #481
+// `SessionAspect` clears the session, not the use case.
 
 const FIT = GameId.of('hexa-fit');
 const ADA = new Session('token-of-ada', '0b6f6a4e-1c2d-4e5f-8a9b-0c1d2e3f4a5b');
@@ -217,9 +218,9 @@ describe('SyncProgress', () => {
     expect(spaces.own.size).toBe(0);
   });
 
-  // The token lives 24 hours and has no refresh. A 401 clears the session, and the screen asks
-  // the player to sign in. The local progress stays.
-  it('should_clear_the_session_keep_the_local_progress_and_give_session_expired_when_the_backend_refuses_the_token', async () => {
+  // The token lives 24 hours and has no refresh. A 401 gives `session-expired`, and the screen asks
+  // the player to sign in. The local progress stays. `SessionAspect` clears the session (#481).
+  it('should_keep_the_session_and_the_local_progress_and_give_session_expired_when_the_backend_refuses_the_token', async () => {
     const spaces = new TwoSpaces();
     const local = fitWith(level('fit-01', 2, 12, 9000));
     spaces.own.set('fit', local);
@@ -235,8 +236,8 @@ describe('SyncProgress', () => {
 
     expect(result.ok ? undefined : result.error.code).toBe(FailureCode.sessionExpired);
     expect(result.ok ? undefined : result.error.message).toBe('POST /v1/progress answered 401.');
-    expect(sessions.clears).toBe(1);
-    await expect(sessions.read()).resolves.toBeUndefined();
+    expect(sessions.clears).toBe(0);
+    await expect(sessions.read()).resolves.toBe(ADA);
     expect(sameContent(spaces.own.get('fit')!, fitWith(level('fit-01', 2, 12, 9000)))).toBe(true);
   });
 

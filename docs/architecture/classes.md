@@ -222,9 +222,9 @@ UseCaseAspect, StartGame, SaveProgress, LoadProgress and Register implement UseC
 
 ### View 3.1: the use case contract and its aspects
 
-![The use case contract: every use case implements UseCase, as SyncProgress does with its binding to SyncProgressRequest and void (#46), and the composition root wraps each one through decorate(), today in LoggingAspect alone; the aspect decorators wrap it for logging, timing, retry and authorization; AuthorizationAspect stays planned with no use case to guard, because SyncProgress and the two leaderboard use cases of #47 read the session themselves, and RetryAspect is planned with no sprint because #46 delivered APP-FR-13 without it; the Logger port takes a UseCaseLogEntry, which also carries the failed deliveries of a success](classes/views/uc-1-contract.png)
+![The use case contract: every use case implements UseCase, as SyncProgress does with its binding to SyncProgressRequest and void (#46), and the composition root wraps each one through decorate(), with LoggingAspect outside; the aspect decorators wrap it for logging, timing, retry and the session; SessionAspect of #481 requires a session before the two leaderboard use cases of #47 and clears a refused session, also for SyncProgress, and RetryAspect is planned with no sprint because #46 delivered APP-FR-13 without it; the Logger port takes a UseCaseLogEntry, which also carries the failed deliveries of a success](classes/views/uc-1-contract.png)
 
-Since D27 in [REQUIREMENTS.md](../REQUIREMENTS.md) (#325), `SaveProgress` and `ListLevels` need no session. Since #46 `SyncProgress` reads the session itself through the `SessionStore` port and sends nothing with no session (decision 66), so no aspect checks the session before it. Since #47 `GetGlobalLeaderboard` and `GetLevelLeaderboard` read it the same way (decision 67). `AuthorizationAspect` stays planned with no use case to guard: each use case that needs a session reads it, because its gateway needs the token. This view draws `SyncProgress` and its realization of `UseCase` since #46 (#338). View 3.3 and flow 2 draw the ports of `SyncProgress`.
+Since D27 in [REQUIREMENTS.md](../REQUIREMENTS.md) (#325), `SaveProgress` and `ListLevels` need no session. Since #46 `SyncProgress` reads the session through the `SessionStore` port and sends nothing with no session (decision 66). Since #47 `GetGlobalLeaderboard` and `GetLevelLeaderboard` read it the same way (decision 67). Since #481 `SessionAspect` requires the session before both leaderboards and clears a session that the backend refuses, also for `SyncProgress` (decision 69). The app does not authorize: the backend checks the token. Each use case still reads the session, because its gateway needs the token. This view draws `SyncProgress` and its realization of `UseCase` since #46 (#338). View 3.3 and flow 2 draw the ports of `SyncProgress`.
 
 ### View 3.2: playing a game
 
@@ -241,7 +241,7 @@ GameProgress merges another progress of its game with mergeWith(); the footnote 
 
 ### View 3.4: account and settings
 
-![Account and settings: Register, Login and UpdateSettings over the AccountGateway, SessionStore and SettingsStore ports; Register and Login also keep an optional AnonymousMerge, so a sign-in merges the progress played with no account into its user (#46); AccountGateway returns a Session and rejects with an AccountFailure; SessionStore reads, writes and clears the session and gives owner(), the user of the last sign-in, and SyncProgress of view 3.3 clears the token when the backend refuses it, which keeps the owner (#46)](classes/views/uc-4-account.png)
+![Account and settings: Register, Login and UpdateSettings over the AccountGateway, SessionStore and SettingsStore ports; Register and Login also keep an optional AnonymousMerge, so a sign-in merges the progress played with no account into its user (#46); AccountGateway returns a Session and rejects with an AccountFailure; SessionStore reads, writes and clears the session and gives owner(), the user of the last sign-in, and SessionAspect of view 3.1 clears the token when the backend refuses it, which keeps the owner (#46, #481)](classes/views/uc-4-account.png)
 
 ### View 3.5: results and response models
 
@@ -2192,7 +2192,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     It keeps the session as one versioned JSON text under the key `session` of the driver interface `SecretStore` of layer 3.
     `DeviceSecretStore` of layer 4 implements that interface with `expo-secure-store`: the Keychain of iOS and the Keystore of Android.
     So the token never goes to the plain storage of the progress, and the rule of layers 3 and 4 holds with no exception for the session (#437).
-    `SessionStore` offers `read()` and `write()`, and since #46 `owner()` and `clear()`: the token of hexablock-api lives 24 hours and has no refresh, so `SyncProgress` clears the token when the backend refuses it, and `owner()` keeps the user as the owner of the local progress (decision 66).
+    `SessionStore` offers `read()` and `write()`, and since #46 `owner()` and `clear()`: the token of hexablock-api lives 24 hours and has no refresh, so the token is cleared when the backend refuses it (since #481 by `SessionAspect`, decision 69), and `owner()` keeps the user as the owner of the local progress (decision 66).
     A sign-out is still planned.
     The web build of the team has no native secure storage, so there the write of the session fails and the screen shows the general failure text.
     **The screen and the address.**
@@ -2237,9 +2237,10 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     Then it merges the answer with `mergeWith()` through `update()`, into the progress that the repository holds at that moment.
     So a result saved during the request stays, and a better result of another device reaches this device.
     A failed sync never loses local progress: every step before a failure keeps its save, and the anonymous progress stays until the merged progress is saved.
-    A `SyncFailure` gives its code, and `session-expired` also calls `SessionStore.clear()`, which keeps the owner.
+    A `SyncFailure` gives its code, `session-expired` among them.
     Any other failure gives `sync-failed` (decision 62).
-    `SyncProgress` reads the session itself because the gateway needs its token, so no `AuthorizationAspect` wraps it.
+    `SyncProgress` reads the session itself because the gateway needs its token.
+    Since #481 `SessionAspect` wraps it and calls `SessionStore.clear()` on `session-expired`, which keeps the owner (decision 69).
     **The key with the owner.**
     `LocalProgressRepository` takes the one `SessionManager` of the root, and `owner()` reads the owner from it.
     The key of a user is `progress:<user id>:<game id>`, and the key of the anonymous owner is `progress:<game id>`, the key of every progress saved before #46.
@@ -2279,10 +2280,11 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     **The use cases.**
     One input port per board, as hexablock-api#218 decided for the API: `GetGlobalLeaderboard` implements `UseCase<GlobalLeaderboardRequest, Leaderboard>`, and `GetLevelLeaderboard` implements `UseCase<LevelLeaderboardRequest, Leaderboard>`.
     The board of a level has its own request with the `LevelId` and its own failure, `level-has-no-board`, so a second port keeps each request exact and adds no optional field.
-    Both share `readBoard()` of `src/application/ports/leaderboard.ts`, so the rule of the session has one home.
-    Both routes of the API need a token, so the use case reads the session through `SessionStore`, as `SyncProgress` does (decision 66), and no `AuthorizationAspect` wraps it.
+    Both share `readBoard()` of `src/application/ports/leaderboard.ts`, so the failures have one home.
+    Both routes of the API need a token, so the use case reads the session through `SessionStore`, as `SyncProgress` does (decision 66).
+    Since #481 `SessionAspect` requires the session before both use cases (decision 69).
     With no session it calls no backend and gives `sign-in-required`.
-    A `LeaderboardFailure` of the `LeaderboardGateway` port gives its code: `session-expired` for a refused token, which also clears the token through `SessionStore.clear()` and keeps the owner of the progress, `backend-unreachable` for no answer, and `level-has-no-board` for a level that the backend does not hold (hexablock-api#134).
+    A `LeaderboardFailure` of the `LeaderboardGateway` port gives its code: `session-expired` for a refused token, on which `SessionAspect` clears the token through `SessionStore.clear()` and keeps the owner of the progress, `backend-unreachable` for no answer, and `level-has-no-board` for a level that the backend does not hold (hexablock-api#134).
     A session that cannot be read and any other thrown value give `leaderboard-failed` (decision 62).
     **The model.**
     `Leaderboard` is the plain response model of both use cases: its `LeaderboardRow` values keep the order and the `rank` of the backend, so a full tie shares a rank (1, 1, 3), and the app never sorts and never computes a rank.
@@ -2349,6 +2351,27 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     It pins the shape of each level with a type matcher, so a level that the backend stores later still matches.
     No provider state stores a broken row, so the pact does not pin `unavailable`: the unit tests of `ApiLevelRepository` and the generated type `LevelsDto` cover it.
     Views 3.3, 4.2 and 5, the maps of Parts 3 and 4, flow 3 and the layer view `layers-1-clean` of [layers.md](layers.md) draw the classes of #48 and #307.
+
+69. **The session aspect: `SessionAspect` (#481, APP-FR-12, APP-NFR-11).**
+    The decision of odjaramillo on 2026-11-28 on #481 is option A, reformulated: the planned authorization aspect becomes a class of the code, `SessionAspect`.
+    The app does not authorize: the backend checks the token.
+    The app requires a session before a use case that needs one, and it clears the session when the backend rejects the token.
+    So the check of the session lives in `SessionAspect`, not in the use cases.
+    `SessionAspect` in `src/application/aspects/session-aspect.ts` extends `UseCaseAspect` and keeps the `SessionStore` port and a `SessionNeed`, `required` or `optional`.
+    With `required`, a call with no session gives `sign-in-required`, and the use case and its backend do not run.
+    A session that cannot be read lets the call through, so the use case gives its own failure, for example `leaderboard-failed`.
+    With either need, a result with `session-expired` calls `SessionStore.clear()`, which keeps the owner of the progress (decision 66).
+    A clear that throws still gives `session-expired`, because the backend refuses the token again at the next request.
+    The composition root wraps `GetGlobalLeaderboard` and `GetLevelLeaderboard` with `required`.
+    It wraps `SyncProgress` with `optional`, because a sync with no session succeeds and sends nothing (D27).
+    Every other use case gets `LoggingAspect` only, so `decorate()` takes the inner aspects of each use case.
+    `LoggingAspect` stays outside `SessionAspect`, so the log keeps each call that the session rejects (row «Log each call, rejected calls included» of [REQUIREMENTS.md](../REQUIREMENTS.md)).
+    The use cases no longer clear the session: `readBoard()` and `SyncProgress` only give `session-expired`.
+    Each use case still reads the session for its token, because its gateway needs it, so a call reads the session twice.
+    `readBoard()` still gives `sign-in-required` with no session, because the session can disappear between the two reads.
+    Option B would remove the planned aspect from the README, this file and the views, and keep the check of the session in each use case.
+    Option B was not chosen.
+    View 3.1 draws `SessionAspect` as a class of the code, and views 3.4 and 3.7, the map of Part 3 and view 4 of [extensibility.md](extensibility.md) name it.
 
 ## Render the images
 
