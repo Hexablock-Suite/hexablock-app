@@ -64,7 +64,7 @@
       <h1>The use case contract and its aspects: Decorator for AOP</h1>
 
       <svg
-        viewBox="0 0 1040 996"
+        viewBox="0 0 1040 1128"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-labelledby="uccontract-title uccontract-desc"
@@ -76,7 +76,11 @@
           implements UseCase bound to SyncProgressRequest and void. The abstract UseCaseAspect
           decorator implements UseCase, wraps one inner UseCase and turns every exception into a
           failed Result. The logging and session aspects and the planned retry aspect extend it, and
-          the composition root wraps each use case through decorate(), with LoggingAspect outside.
+          the composition root wraps each use case through decorate(). The chain of each use case
+          runs from the outside in (#344): both leaderboards get LoggingAspect, then SessionAspect
+          with required, then the use case; SyncProgress gets LoggingAspect, then SessionAspect with
+          optional; every other use case gets LoggingAspect only. The log sits outside the session
+          check, so a call that the session rejects still leaves one entry with its duration.
           SessionAspect (#481) requires a session before the two leaderboard use cases of #47 and
           clears the session when the backend refuses the token, also for SyncProgress. It holds a
           SessionStore and a SessionNeed, required or optional. The logging aspect uses the Logger
@@ -746,7 +750,7 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Every use case implements UseCase, as SyncProgress does (view 3.3). The composition root
-          wraps each one through decorate(),
+          wraps each one through decorate().
         </text>
         <text
           x="24"
@@ -755,8 +759,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          with LoggingAspect outside SessionAspect, so the log keeps each call that the session
-          rejects (#323, #481).
+          execute() never throws to the presenter: it returns a Result (view 3.5). The use cases
+          still read the session for the token.
         </text>
         <text
           x="24"
@@ -765,8 +769,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          SessionAspect gives sign-in-required to a leaderboard with no session and clears a refused
-          session (decision 69).
+          LoggingAspect passes one UseCaseLogEntry, not a message, to Logger, with the duration from
+          the engine interface Clock (#343).
         </text>
         <text
           x="24"
@@ -775,8 +779,8 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          The use cases still read the session for the token. RetryAspect comes only if the sync
-          needs it: #46 delivered APP-FR-13 without it.
+          The adapter in layer 4 writes the text. RetryAspect would run the inner use case again
+          while the error of the Result is retryable.
         </text>
         <text
           x="24"
@@ -785,25 +789,128 @@
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          execute() never throws to the presenter: it returns a Result (view 3.5). RetryAspect would
-          run the inner use case again while the error of the Result is retryable.
+          RetryAspect is planned and is not in the chain below: #46 delivered APP-FR-13 without it.
+        </text>
+
+        <!-- The aspect chain of each use case, from the outside in (#344, decision 69) -->
+        <text
+          x="24"
+          y="878"
+          fill="#5b6873"
+          font-size="8"
+          font-weight="500"
+          font-family="'IBM Plex Mono', monospace"
+          letter-spacing="0.18em"
+        >
+          THE ASPECT CHAIN OF EACH USE CASE · FROM THE OUTSIDE IN · DECISION 69
         </text>
         <text
           x="24"
-          y="864"
+          y="896"
+          fill="#5b6873"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          GetGlobalLeaderboard, GetLevelLeaderboard
+        </text>
+        <text
+          x="320"
+          y="896"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          LoggingAspect → SessionAspect (required) → use case
+        </text>
+        <text
+          x="24"
+          y="911"
+          fill="#5b6873"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          SyncProgress
+        </text>
+        <text
+          x="320"
+          y="911"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          LoggingAspect → SessionAspect (optional) → use case
+        </text>
+        <text
+          x="24"
+          y="926"
+          fill="#5b6873"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          every other use case
+        </text>
+        <text
+          x="320"
+          y="926"
+          fill="#17212a"
+          font-size="9.5"
+          font-family="'IBM Plex Mono', monospace"
+        >
+          LoggingAspect → use case
+        </text>
+        <text
+          x="24"
+          y="950"
           fill="#5b6873"
           font-size="11"
           font-family="'IBM Plex Sans', sans-serif"
         >
-          LoggingAspect passes one UseCaseLogEntry, not a message, to Logger, with the duration from
-          the engine interface Clock (#343). The adapter in layer 4 writes the text.
+          Why this order: the log sits outside the session check, so a call that the session rejects
+          leaves one failure entry
+        </text>
+        <text
+          x="24"
+          y="966"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          with the code sign-in-required and its duration (APP-NFR-11). With the session check
+          outside, a rejected call would never reach the log.
+        </text>
+        <text
+          x="24"
+          y="982"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          SessionAspect wraps the use case itself: it stops a call with no session before the use
+          case and its backend run,
+        </text>
+        <text
+          x="24"
+          y="998"
+          fill="#5b6873"
+          font-size="11"
+          font-family="'IBM Plex Sans', sans-serif"
+        >
+          and it sees the result of the use case first, so it clears a refused session before
+          LoggingAspect writes the session-expired entry.
         </text>
 
         <!-- Legend -->
-        <line x1="24" y1="888" x2="1016" y2="888" stroke="rgba(23,33,42,0.10)" stroke-width="0.8" />
+        <line
+          x1="24"
+          y1="1020"
+          x2="1016"
+          y2="1020"
+          stroke="rgba(23,33,42,0.10)"
+          stroke-width="0.8"
+        />
         <text
           x="24"
-          y="906"
+          y="1038"
           fill="#5b6873"
           font-size="8"
           font-family="'IBM Plex Mono', monospace"
@@ -814,16 +921,16 @@
 
         <line
           x1="24"
-          y1="924"
+          y1="1056"
           x2="52"
-          y2="924"
+          y2="1056"
           stroke="#17212a"
           stroke-width="1"
           marker-end="url(#uccontract-triangle)"
         />
         <text
           x="60"
-          y="928"
+          y="1060"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -832,9 +939,9 @@
         </text>
         <line
           x1="144"
-          y1="924"
+          y1="1056"
           x2="172"
-          y2="924"
+          y2="1056"
           stroke="#17212a"
           stroke-width="1"
           stroke-dasharray="5,4"
@@ -842,7 +949,7 @@
         />
         <text
           x="180"
-          y="928"
+          y="1060"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -851,16 +958,16 @@
         </text>
         <line
           x1="264"
-          y1="924"
+          y1="1056"
           x2="292"
-          y2="924"
+          y2="1056"
           stroke="#5b6873"
           stroke-width="1"
           marker-end="url(#uccontract-open)"
         />
         <text
           x="300"
-          y="928"
+          y="1060"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -869,16 +976,16 @@
         </text>
         <line
           x1="520"
-          y1="924"
+          y1="1056"
           x2="548"
-          y2="924"
+          y2="1056"
           stroke="#17212a"
           stroke-width="1"
           marker-start="url(#uccontract-diamond-hollow)"
         />
         <text
           x="556"
-          y="928"
+          y="1060"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -888,7 +995,7 @@
 
         <rect
           x="24"
-          y="944"
+          y="1076"
           width="28"
           height="12"
           rx="2"
@@ -898,7 +1005,7 @@
         />
         <text
           x="60"
-          y="953"
+          y="1085"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -907,7 +1014,7 @@
         </text>
         <rect
           x="204"
-          y="944"
+          y="1076"
           width="28"
           height="12"
           rx="2"
@@ -918,7 +1025,7 @@
         />
         <text
           x="240"
-          y="953"
+          y="1085"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -927,7 +1034,7 @@
         </text>
         <rect
           x="444"
-          y="944"
+          y="1076"
           width="28"
           height="12"
           rx="2"
@@ -938,7 +1045,7 @@
         />
         <text
           x="480"
-          y="953"
+          y="1085"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -947,7 +1054,7 @@
         </text>
         <rect
           x="620"
-          y="944"
+          y="1076"
           width="28"
           height="12"
           rx="2"
@@ -957,7 +1064,7 @@
         />
         <text
           x="656"
-          y="953"
+          y="1085"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"
@@ -967,7 +1074,7 @@
         <!-- Legend: the «Sprint N» marker of a planned class or member -->
         <text
           x="24"
-          y="973"
+          y="1105"
           fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
@@ -976,7 +1083,7 @@
         </text>
         <text
           x="92"
-          y="973"
+          y="1105"
           fill="#5b6873"
           font-size="8.5"
           font-family="'IBM Plex Sans', sans-serif"

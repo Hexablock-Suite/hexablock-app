@@ -223,7 +223,7 @@ UseCaseAspect, StartGame, SaveProgress, LoadProgress and Register implement UseC
 
 ### View 3.1: the use case contract and its aspects
 
-![The use case contract: every use case implements UseCase, as SyncProgress does with its binding to SyncProgressRequest and void (#46), and the composition root wraps each one through decorate(), with LoggingAspect outside; the aspect decorators wrap it for logging and the session; LoggingAspect reads the engine Clock before and after the call and puts the duration in its one entry (#343); SessionAspect of #481 requires a session before the two leaderboard use cases of #47 and clears a refused session, also for SyncProgress, and RetryAspect comes only if the sync needs it, because #46 delivered APP-FR-13 without it; the Logger port takes a UseCaseLogEntry, which carries the duration of the call and the failed deliveries of a success](classes/views/uc-1-contract.png)
+![The use case contract: every use case implements UseCase, as SyncProgress does with its binding to SyncProgressRequest and void (#46), and the composition root wraps each one through decorate(); a footnote lists the aspect chain of each use case from the outside in, with LoggingAspect outside SessionAspect so that the log keeps each call that the session rejects (#344); the aspect decorators wrap it for logging and the session; LoggingAspect reads the engine Clock before and after the call and puts the duration in its one entry (#343); SessionAspect of #481 requires a session before the two leaderboard use cases of #47 and clears a refused session, also for SyncProgress, and RetryAspect comes only if the sync needs it, because #46 delivered APP-FR-13 without it; the Logger port takes a UseCaseLogEntry, which carries the duration of the call and the failed deliveries of a success](classes/views/uc-1-contract.png)
 
 Since D27 in [REQUIREMENTS.md](../REQUIREMENTS.md) (#325), `SaveProgress` and `ListLevels` need no session. Since #46 `SyncProgress` reads the session through the `SessionStore` port and sends nothing with no session (decision 66). Since #47 `GetGlobalLeaderboard` and `GetLevelLeaderboard` read it the same way (decision 67). Since #481 `SessionAspect` requires the session before both leaderboards and clears a session that the backend refuses, also for `SyncProgress` (decision 69). The app does not authorize: the backend checks the token. Each use case still reads the session, because its gateway needs the token. This view draws `SyncProgress` and its realization of `UseCase` since #46 (#338). View 3.3 and flow 2 draw the ports of `SyncProgress`.
 
@@ -474,6 +474,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
    [layers.md](layers.md) shows the same generic port.
    Each use case binds it, for example `UseCase‹ApplyMoveRequest‹TMove›, MoveResult‹TCell, TCoord››`.
    The cost: a use case cannot add a second method to its port.
+   Decision 69 lists the aspect chain of each use case, from the outside in, with the reason of each place (#344).
 10. **`GameRepository`, the repository of the game aggregate (proposal).**
     The game use cases need the running engine between two calls.
     `GameRepository`, a port in layer 2, is the repository of the game aggregate of decision 26, and `InMemoryGameRepository` in layer 3 implements it.
@@ -702,7 +703,8 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     `gameUseCases(gameId, figure)` builds one `StartGame`, `ApplyMove`, `UndoMove` and `RedoMove` per game and figure over one `InMemoryGameRepository`, each through `decorate()`, and gives the same `GameUseCases` on each call for that game on that figure.
     Since #323 every use case of the root goes through one private `decorate(useCase, name)`.
     It builds the chain of aspects with `wrapInAspects()` of `src/application/aspects/use-case-aspect.ts`, from the outside in: the first aspect sees the call first and the result last.
-    Today the chain holds `LoggingAspect` only, so a later aspect enters it in one place.
+    `decorate()` takes the inner aspects of each use case, so a later aspect enters a chain in one place.
+    Decision 69 lists the chain of each use case (#344).
     `StartGame` takes one `LevelGameFactories` over the one `BundledLevelRepository` of the root, so it starts every level of its game (decision 59).
     **The board figure (#171, APP-FR-16).**
     The root builds one `GameRegistry` for each `BoardFigure` of `boardFigures()` in `src/infrastructure/registered-games.ts`: the hexagon, the square and the triangle, in the order of the figure selector, and keeps them in `games: Map<TopologyId, GameRegistry>`.
@@ -2371,7 +2373,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     No provider state stores a broken row, so the pact does not pin `unavailable`: the unit tests of `ApiLevelRepository` and the generated type `LevelsDto` cover it.
     Views 3.3, 4.2 and 5, the maps of Parts 3 and 4, flow 3 and the layer view `layers-1-clean` of [layers.md](layers.md) draw the classes of #48 and #307.
 
-69. **The session aspect: `SessionAspect` (#481, APP-FR-12, APP-NFR-11).**
+69. **The session aspect, `SessionAspect`, and the aspect chain of each use case (#481, #344, APP-FR-12, APP-NFR-11).**
     The decision of odjaramillo on 2026-11-28 on #481 is option A, reformulated: the planned authorization aspect becomes a class of the code, `SessionAspect`.
     The app does not authorize: the backend checks the token.
     The app requires a session before a use case that needs one, and it clears the session when the backend rejects the token.
@@ -2381,10 +2383,22 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     A session that cannot be read lets the call through, so the use case gives its own failure, for example `leaderboard-failed`.
     With either need, a result with `session-expired` calls `SessionStore.clear()`, which keeps the owner of the progress (decision 66).
     A clear that throws still gives `session-expired`, because the backend refuses the token again at the next request.
-    The composition root wraps `GetGlobalLeaderboard` and `GetLevelLeaderboard` with `required`.
-    It wraps `SyncProgress` with `optional`, because a sync with no session succeeds and sends nothing (D27).
-    Every other use case gets `LoggingAspect` only, so `decorate()` takes the inner aspects of each use case.
-    `LoggingAspect` stays outside `SessionAspect`, so the log keeps each call that the session rejects (row «Log each call, rejected calls included» of [REQUIREMENTS.md](../REQUIREMENTS.md)).
+    **The aspect chain of each use case, from the outside in (#344).**
+    The composition root builds each chain through `decorate()`, and `wrapInAspects()` puts the first aspect outside.
+    `GetGlobalLeaderboard` and `GetLevelLeaderboard`: `LoggingAspect`, `SessionAspect` with `required`, the use case.
+    `SyncProgress`: `LoggingAspect`, `SessionAspect` with `optional`, the use case.
+    The need of `SyncProgress` is `optional`, because a sync with no session succeeds and sends nothing (D27).
+    Each other use case: `LoggingAspect`, then the use case.
+    These are `StartGame`, `ApplyMove`, `UndoMove`, `RedoMove`, `ListLevels`, `SaveProgress`, `LoadProgress`, `ListAchievements`, `Register` and `Login`.
+    `SaveProgress` and `ListLevels` need no session (D27), so they get no `SessionAspect`.
+    Why this order: the log sits outside the session check, so a call that the session rejects leaves one `failure` entry with the code `sign-in-required` and its duration.
+    This is the decision of the product owner of 2026-11-23, the row «Log each call, rejected calls included» of [REQUIREMENTS.md](../REQUIREMENTS.md) and APP-NFR-11.
+    With the session check outside, a rejected call would never reach the log.
+    `SessionAspect` wraps the use case itself, so it stops a call with no session before the use case and its backend run.
+    It also sees the result of the use case first, so it clears a refused session before `LoggingAspect` writes the `session-expired` entry.
+    The use case is the inner end of each chain.
+    `RetryAspect` is planned and is not in the chain, because #46 delivered the sync without it.
+    `test/infrastructure/composition-root-session.test.ts` checks through the root that a board read with no session calls no backend and leaves one `sign-in-required` entry.
     The use cases no longer clear the session: `readBoard()` and `SyncProgress` only give `session-expired`.
     Each use case still reads the session for its token, because its gateway needs it, so a call reads the session twice.
     `readBoard()` still gives `sign-in-required` with no session, because the session can disappear between the two reads.
