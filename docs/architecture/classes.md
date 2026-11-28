@@ -705,6 +705,8 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     It builds the chain of aspects with `wrapInAspects()` of `src/application/aspects/use-case-aspect.ts`, from the outside in: the first aspect sees the call first and the result last.
     `decorate()` takes the inner aspects of each use case, so a later aspect enters a chain in one place.
     Decision 69 lists the chain of each use case (#344).
+    `test/infrastructure/composition-root-decorate.test.ts` checks through the root that each use case of decision 69 leaves its own log entry.
+    It also checks that `LoggingAspect` sees a call of a leaderboard before `SessionAspect` and sees its result after it.
     `StartGame` takes one `LevelGameFactories` over the one `BundledLevelRepository` of the root, so it starts every level of its game (decision 59).
     **The board figure (#171, APP-FR-16).**
     The root builds one `GameRegistry` for each `BoardFigure` of `boardFigures()` in `src/infrastructure/registered-games.ts`: the hexagon, the square and the triangle, in the order of the figure selector, and keeps them in `games: Map<TopologyId, GameRegistry>`.
@@ -724,6 +726,8 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     `RootDrivers` takes the transport `api` and the secure storage `secrets` for them: the app gets `ApiClient` and `DeviceSecretStore`.
     **The saved progress (#181).**
     With the local store of its drivers, the root builds one `LocalProgressRepository` and keeps it as `progress` for every consumer of the saved progress (#323).
+    Two saves of Hexa Fit on two figures at the same time go through the one queue of that repository, so the progress keeps both results.
+    `test/infrastructure/composition-root-decorate.test.ts` checks through the root that `ListLevels` and `LoadProgress` then read both results.
     Over it, the root builds `ListAchievements` once (#188) and `ListLevels` once (#173, decision 63), and it builds `LoadProgress` once (#410), each through `decorate()`: `loadProgress(): UseCase<LoadProgressRequest, GameProgress | undefined>` gives it.
     Its request names the game, as the request of `ListLevels` does, so one instance reads every game.
     The store stays optional: a root with no store offers none of them, so `listAchievements()`, `listLevels()` and `loadProgress()` throw a `RangeError`, as for a board figure that the root does not offer.
