@@ -72,11 +72,11 @@
         <title id="board-title">HexaBlock board and pieces · UML class diagram</title>
         <desc id="board-desc">
           Class diagram of layer 1 showing Board, generic over the cell, the coordinate and the axis
-          class, keeping one BoardSpace entity for each written coordinate, using its BoardShape and
-          taking its geometry from the GridTopology strategy, the ShapeNode composite of CellNode
-          leaves and ShapeGroup children, and Piece using a ShapeNode as a prototype that clones
-          itself. Board is an entity: its BoardId is its identity, and equals() compares two boards
-          by it. Board, BoardShape and Piece keep their fields private: a reader asks an operation.
+          class, keeping one BoardSpace for each written coordinate, using its BoardShape and taking
+          its geometry from the GridTopology strategy, the ShapeNode composite of CellNode leaves
+          and ShapeGroup children, and Piece using a ShapeNode as a prototype that clones itself.
+          Board has its own identity, its BoardId, and equals() compares two boards by it. Board,
+          BoardShape and Piece keep their fields private: a reader asks an operation.
         </desc>
         <defs>
           <marker
@@ -447,7 +447,7 @@
         >
           1
         </text>
-        <!-- Class: Board (focal, entity inside the state; Iterator and Prototype: the frame names them, decision 23) -->
+        <!-- Class: Board (focal, a part of the state; Iterator and Prototype: the frame names them, decision 23) -->
         <rect
           x="72"
           y="92"
@@ -464,18 +464,7 @@
         <line x1="72" y1="196" x2="448" y2="196" stroke="rgba(15,111,116,0.40)" stroke-width="1" />
         <text
           x="260"
-          y="110"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «entity»
-        </text>
-        <text
-          x="260"
-          y="128"
+          y="121"
           fill="#17212a"
           font-size="12"
           font-weight="600"
@@ -680,7 +669,7 @@
           + keys(topology: { key(c: TCoord): CoordKey }): CoordKey[]
         </text>
 
-        <!-- Class: BoardSpace (entity) -->
+        <!-- Class: BoardSpace -->
         <rect
           x="72"
           y="720"
@@ -694,18 +683,7 @@
         <line x1="72" y1="756" x2="556" y2="756" stroke="rgba(23,33,42,0.22)" stroke-width="1" />
         <text
           x="314"
-          y="734"
-          fill="#5b6873"
-          font-size="8"
-          font-family="'IBM Plex Mono', monospace"
-          text-anchor="middle"
-          letter-spacing="0.08em"
-        >
-          «entity»
-        </text>
-        <text
-          x="314"
-          y="750"
+          y="743"
           fill="#17212a"
           font-size="12"
           font-weight="600"

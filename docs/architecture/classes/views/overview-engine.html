@@ -71,8 +71,8 @@
       >
         <title id="ovengine-title">HexaBlock generic engine map · UML class diagram</title>
         <desc id="ovengine-desc">
-          Overview map of the 74 layer 1 engine classes in 16 groups. A dark dashed frame marks the
-          boundary of the game aggregate: GameEngine, the aggregate root, with its internal entities
+          Overview map of the 74 layer 1 engine classes in 16 groups. The game group holds
+          GameEngine, the one entry of a game and a Facade (§3.3), with the parts that it owns:
           BoardState, Board and LevelTimer. Each line joins two classes: GameEngine keeps its
           IGameRules, its GamePhase, its optional MoveHistory and its IScoringPolicy and records
           GameEvent objects, IVariantFactory creates the IGameRules and GeometryFactory creates the
@@ -635,7 +635,7 @@
         >
           VIEWS 1, 7
         </text>
-        <!-- Group: the game aggregate, the root and its internal entities (decisions 26 and 52, #21). A dark dashed frame, so it differs from a group of a pattern. -->
+        <!-- Group: game, GameEngine and the parts that it owns (decisions 26 and 52). GameEngine is the Facade of a game (§3.3). -->
         <rect
           x="616"
           y="492"
@@ -643,20 +643,20 @@
           height="128"
           rx="8"
           fill="none"
-          stroke="#17212a"
-          stroke-width="1.2"
-          stroke-dasharray="6,3"
+          stroke="rgba(91,104,115,0.55)"
+          stroke-width="1"
+          stroke-dasharray="4,4"
         />
         <text
           x="628"
           y="508"
-          fill="#17212a"
+          fill="#5b6873"
           font-size="8"
           font-weight="500"
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.14em"
         >
-          AGGREGATE · DECISION 52
+          FACADE · DECISION 26
         </text>
         <text
           x="972"
@@ -978,7 +978,7 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            abstract · domain event
+            abstract
           </text>
           <text x="612" y="277" fill="#17212a" text-anchor="middle">
             <tspan
@@ -1002,18 +1002,7 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text
-            x="612"
-            y="214"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            domain event
-          </text>
-          <text x="612" y="227" fill="#17212a" text-anchor="middle">
+          <text x="612" y="223" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               GameEnded
             </tspan>
@@ -1388,18 +1377,7 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text
-            x="200"
-            y="716"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            entity
-          </text>
-          <text x="200" y="729" fill="#17212a" text-anchor="middle">
+          <text x="200" y="725" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               BoardSpace
             </tspan>
@@ -1737,18 +1715,7 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text
-            x="634"
-            y="866"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            entity
-          </text>
-          <text x="634" y="879" fill="#17212a" text-anchor="middle">
+          <text x="634" y="875" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               GameProgress
             </tspan>
@@ -2215,18 +2182,7 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text
-            x="908"
-            y="532"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            entity
-          </text>
-          <text x="908" y="545" fill="#17212a" text-anchor="middle">
+          <text x="908" y="541" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               LevelTimer
             </tspan>
@@ -2272,18 +2228,7 @@
             stroke="#0f6f74"
             stroke-width="1"
           />
-          <text
-            x="732"
-            y="532"
-            fill="#5b6873"
-            font-size="7"
-            font-family="'IBM Plex Mono', monospace"
-            text-anchor="middle"
-            letter-spacing="0.08em"
-          >
-            aggregate root
-          </text>
-          <text x="732" y="545" fill="#17212a" text-anchor="middle">
+          <text x="732" y="541" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               GameEngine
             </tspan>
@@ -2746,26 +2691,6 @@
           font-family="'IBM Plex Sans', sans-serif"
         >
           Use · class to class: role and multiplicity, or a verb; no line touches a frame
-        </text>
-        <rect
-          x="432"
-          y="1518"
-          width="28"
-          height="12"
-          rx="2"
-          fill="none"
-          stroke="#17212a"
-          stroke-width="1.2"
-          stroke-dasharray="6,3"
-        />
-        <text
-          x="468"
-          y="1528"
-          fill="#5b6873"
-          font-size="8.5"
-          font-family="'IBM Plex Sans', sans-serif"
-        >
-          Dark dashed frame · boundary of an aggregate (decision 52)
         </text>
         <rect
           x="24"
