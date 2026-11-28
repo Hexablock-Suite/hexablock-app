@@ -71,7 +71,7 @@
       >
         <title id="mapuc-title">HexaBlock use cases map · UML class diagram</title>
         <desc id="mapuc-desc">
-          Overview map of the 63 layer 2 classes in 8 groups, LevelList of #307 among the models,
+          Overview map of the 62 layer 2 classes in 8 groups, LevelList of #307 among the models,
           GetGlobalLeaderboard and GetLevelLeaderboard of #47 among the progress use cases with
           their port LeaderboardGateway, their requests, Leaderboard, LeaderboardRow,
           LeaderboardRecord and their error LeaderboardFailure among the models,
@@ -85,7 +85,8 @@
           classes: UseCaseAspect implements UseCase and decorates the one it wraps, StartGame,
           SaveProgress, LoadProgress and Register each implement UseCase for their group, and
           RedoMove, GetLevelLeaderboard and UpdateSettings keep an output port. No line touches a
-          group frame. Each group names the view that shows its members.
+          group frame. Each group names the view that shows its members. Each aspect chip carries
+          the stereotype aspect, and UseCaseAspect carries abstract · aspect (#345).
         </desc>
         <defs>
           <marker
@@ -590,7 +591,7 @@
             text-anchor="middle"
             letter-spacing="0.08em"
           >
-            abstract
+            abstract · aspect
           </text>
           <text x="520" y="117" fill="#17212a" text-anchor="middle">
             <tspan
@@ -605,23 +606,6 @@
         </g>
         <g data-class="LoggingAspect">
           <rect
-            x="232"
-            y="142"
-            width="124"
-            height="34"
-            rx="4"
-            fill="#ffffff"
-            stroke="#17212a"
-            stroke-width="1"
-          />
-          <text x="294" y="163" fill="#17212a" text-anchor="middle">
-            <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              LoggingAspect
-            </tspan>
-          </text>
-        </g>
-        <g data-class="TimingAspect">
-          <rect
             x="368"
             y="142"
             width="124"
@@ -631,9 +615,20 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="430" y="163" fill="#17212a" text-anchor="middle">
+          <text
+            x="430"
+            y="154"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            aspect
+          </text>
+          <text x="430" y="167" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
-              TimingAspect
+              LoggingAspect
             </tspan>
           </text>
         </g>
@@ -648,7 +643,18 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="610" y="163" fill="#17212a" text-anchor="middle">
+          <text
+            x="610"
+            y="154"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            aspect
+          </text>
+          <text x="610" y="167" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               RetryAspect
             </tspan>
@@ -665,7 +671,18 @@
             stroke="#17212a"
             stroke-width="1"
           />
-          <text x="746" y="163" fill="#17212a" text-anchor="middle">
+          <text
+            x="746"
+            y="154"
+            fill="#5b6873"
+            font-size="7"
+            font-family="'IBM Plex Mono', monospace"
+            text-anchor="middle"
+            letter-spacing="0.08em"
+          >
+            aspect
+          </text>
+          <text x="746" y="167" fill="#17212a" text-anchor="middle">
             <tspan font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="600">
               SessionAspect
             </tspan>

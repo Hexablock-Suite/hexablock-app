@@ -93,7 +93,8 @@
           Clock, RandomSource and MatchIdGenerator. The routes use the presenters, and
           CompositionRoot creates the adapters. The use cases and the presenters use the generic
           engine, and the four variants implement its contracts. Every arrow points inward, toward
-          layer 1, or stays inside one layer. A dashed border marks a planned part.
+          layer 1, or stays inside one layer. A dashed border marks a planned part. The box of the
+          aspect decorators carries the stereotype «aspect» (#345).
         </desc>
         <defs>
           <marker
@@ -1962,7 +1963,7 @@
           font-family="'IBM Plex Mono', monospace"
           letter-spacing="0.14em"
         >
-          ASPECTS
+          «aspect» · ASPECTS
         </text>
         <text
           x="90"
@@ -1996,11 +1997,11 @@
         <text
           x="90"
           y="750"
-          fill="#7d8a94"
+          fill="#17212a"
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          planned: timing, retry,
+          SessionAspect
         </text>
         <text
           x="90"
@@ -2009,7 +2010,7 @@
           font-size="8.5"
           font-family="'IBM Plex Mono', monospace"
         >
-          authorization
+          planned: retry
         </text>
         <!-- Component: use cases -->
         <rect

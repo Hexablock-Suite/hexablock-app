@@ -655,12 +655,13 @@ describe('CompositionRoot', () => {
     });
   });
 
+  // The system clock measures the call, so the line ends with its duration (issue #343).
   it('should_write_each_call_to_the_console_when_the_root_takes_no_driver', async () => {
     const info = jest.spyOn(console, 'info').mockImplementation(() => undefined);
 
     await new CompositionRoot().gameUseCases(GameId.of('hexa-lines')).startGame.execute({});
 
-    expect(info).toHaveBeenCalledWith('StartGame: success');
+    expect(info).toHaveBeenCalledWith(expect.stringMatching(/^StartGame: success in \d+ ms$/));
     info.mockRestore();
   });
 });

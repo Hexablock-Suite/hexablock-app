@@ -18,7 +18,7 @@ Seven classes is a target, not a limit: a view that needs more boxes to show one
 | Hexa Sort (`variant-3-sort`)                                     | 13      | The whole family of Sort, with its cell `ColorStack`, its move `PlaceStack`, its level, its builder, `GoalCount`, `ClearedStacks`, `SortPlay` and `SortStarThreshold` (decision 42), and `TileCount` (decision 54).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | Hexa Merge (`variant-4-merge`)                                   | 12      | The whole family of Merge, with the bound `IMergeable`, the move `Slide` and its `SlideSense`, and three value objects: `MergeSettings`, `Chance` and `NewTile` (decision 48), and the engine `RandomDraw` that `NewTile` and `Chance` take (decisions 48 and 54).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | Hexa Lines (`variant-1-lines`)                                   | 12      | The whole family of Lines, with the engine `ScoringDecorator`, the move `PlacePiece` and the value object `LinesSettings` (decision 48). The three counts of a placement and the `TrayPosition` of a move stand in one row below them (decision 54).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| View 3.1, the use case contract (`uc-1-contract`)                | 9       | The four aspects are one box each around `UseCase` and `UseCaseAspect`, with the `Logger` port and its entry. `SyncProgress` stands for the use cases that implement `UseCase`, with its binding (#46).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| View 3.1, the use case contract (`uc-1-contract`)                | 8       | The two aspects and the planned `RetryAspect` are one box each around `UseCase` and `UseCaseAspect`, with the `Logger` port and its entry. `SyncProgress` stands for the use cases that implement `UseCase`, with its binding (#46).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | View 3.2, playing a game (`uc-2-game`)                           | 8       | The four game use cases share the `GameRepository` port, and `StartGame` also keeps the `GameFactories` port that gives the factory of the chosen level (#172) and the level and progress ports that refuse a locked level (#397).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | View 3.3, progress and levels (`uc-3-progress`)                  | 18      | The use cases and their ports stand above `GameProgress`, the object of one game that `ProgressRepository` loads and saves (S3-04): the high score and the best result of each level (#156). `LoadProgress` joins `SaveProgress` to read the progress back (#181). `ListLevels` returns a `LevelList` (#307): a `LevelSummary` with its `LevelStatus` for each level, which lives in layer 1 since #326 (#168), and apart the ids that `LevelRepository.unavailable()` names. `AchievementCounterRepository` loads and saves `AchievementCounters`, its own aggregate, with its two `AchievementCount` values (#363). `SyncProgress` joins with its ports `AnonymousProgress` and `ProgressGateway`, the `SyncFailure` that the gateway throws and the reference box of `SessionStore` (#46), and `ProgressOwner`, the owner that the progress ports take (decision 66). |
 | View 4.4, wiring (`ad-4-wiring`)                                 | 19      | The root creates each driver once: three drivers of today and the two planned single-scope managers, and it receives `ApiClient`. It keeps `GameRegistry` and `BoardFigure`, creates the five adapters of layer 3, keeps one `LocalProgressRepository`, and gives one `LocalAchievementCounterRepository` to the counter listener (decision 18, #172, #188, #323, #363). For the sync it creates `ApiDtoMapper` and `ApiProgressGateway`, builds `SyncProgress` through `decorate()` and gives it to `ResultPresenter` and `AccountPresenter` (#46). With the transport, its one `LevelRepository` is a `CombinedLevelRepository` over the bundled levels and the backend levels (#48).                                                                                                                                                                                  |
@@ -67,6 +67,15 @@ A hand edit of that order survives. Move the boxes in draw.io, run `pin.mjs` of 
 - In parts 3 and 4, one view can show several layers. The zones are bands, with the outer layer at the top and the inner layer at the bottom, so every dependency points down.
 - A dashed frame groups the classes of one GoF pattern or one design principle. Its label names the source, for example `STRATEGY · §3.3 · D1`. A dark dashed frame labelled `AGGREGATE` marks the boundary of an aggregate (decision 52).
 - The title of a frame names its pattern, or a note of the view names it. No box carries a role label of a pattern, such as `«Strategy»` or `«Decorator»`: the interface of a pattern carries only `«interface»`, and a concrete piece of a pattern carries no role label (decision 23). Zone, frame and stereotype never carry the same information.
+  `«aspect»` marks an aspect class: `UseCaseAspect` and each class that extends it, such as `LoggingAspect`, `SessionAspect` and the planned `RetryAspect`, all in `src/application/aspects/`.
+  The class of 2026-11-23 draws each aspect with it.
+  It marks a cross-cutting concern of §3.5 (APP-NFR-11), not the role of the class in the Decorator pattern, so the rule against role labels does not apply to it.
+  That rule stays for the other patterns (decision of the product owner of 2026-11-23, decision 23, #345).
+  Each solid box of an aspect class carries `«aspect»`, and a new aspect class carries it from its first view.
+  `UseCaseAspect` carries `«abstract» «aspect»` on one line, as a port carries `«interface» «port»`.
+  A chip of a map writes its stereotype without guillemets, as it writes `interface`: `aspect`, and `abstract · aspect` on `UseCaseAspect`.
+  A list box of aspects, in view 4 of [extensibility.md](extensibility.md) and in the layer diagram, carries `«aspect»` in its eyebrow, as a list box of ports carries `«interface» «port»`.
+  A dashed box, such as the declared `CachingAspect` of view 4 of [extensibility.md](extensibility.md), shows its eyebrow and its name only, as every dashed box does.
 - The dashed box at the top right of a class holds its type parameters. This is the UML template notation that §4.1 asks for. A class declares there every parameter that its members name, for example `TCoord`. A bound on a parameter goes in the same box, for example `TState extends BoardState‹TCell, TCoord› & Cloneable‹TState›` on `GameEngine`. No line draws a bound, because a bound is not a parameter, a return value or a local variable.
 - Every operation shows the type of each parameter and its return type. One operation has the same signature in every view. Every use case box shows `execute()` with the request and response types of its `UseCase` binding. In the class of 2026-11-02 the professor said that a class with no operations, or with operations that leave out their parameters, is wrong.
 - The teal class is the focal class of the view.
@@ -217,13 +226,14 @@ The variant classes stay generic over `TCoord`, like the engine, so a variant ru
 ### Map of the use cases
 
 ![Map of the use cases:
-the 63 classes of layer 2 in eight groups, LevelList of #307 among the models, AchievementCounterRepository of #363 among the output ports, AccountFailure of #45 among the models, SyncProgress of #46 among the progress use cases with its ports AnonymousProgress and ProgressGateway among the output ports and SyncProgressRequest, SyncFailure, ProgressOwner and AnonymousMerge among the models with LoadProgressRequest, UndoMoveRequest, RedoMoveRequest and FailureCode, the achievements of #188 among them, with LevelDefinition, LevelStatus, AchievementGoal, LevelsWon, EveryLevelWon, BestCountReached and TotalCountReached of layer 1 as dashed chips, each group with the view that shows its members;
+the 62 classes of layer 2 in eight groups, LevelList of #307 among the models, AchievementCounterRepository of #363 among the output ports, AccountFailure of #45 among the models, SyncProgress of #46 among the progress use cases with its ports AnonymousProgress and ProgressGateway among the output ports and SyncProgressRequest, SyncFailure, ProgressOwner and AnonymousMerge among the models with LoadProgressRequest, UndoMoveRequest, RedoMoveRequest and FailureCode, the achievements of #188 among them, with LevelDefinition, LevelStatus, AchievementGoal, LevelsWon, EveryLevelWon, BestCountReached and TotalCountReached of layer 1 as dashed chips, each group with the view that shows its members;
 GetGlobalLeaderboard and GetLevelLeaderboard of #47 among the progress use cases with their port LeaderboardGateway, and their requests, Leaderboard, LeaderboardRow, LeaderboardRecord and LeaderboardFailure among the models;
+the aspect chips carry aspect, and UseCaseAspect carries abstract · aspect (#345);
 UseCaseAspect, StartGame, SaveProgress, LoadProgress and Register implement UseCase, and RedoMove, GetLevelLeaderboard and UpdateSettings keep an output port](classes/views/map-3-usecases.png)
 
 ### View 3.1: the use case contract and its aspects
 
-![The use case contract: every use case implements UseCase, as SyncProgress does with its binding to SyncProgressRequest and void (#46), and the composition root wraps each one through decorate(), with LoggingAspect outside; the aspect decorators wrap it for logging, timing, retry and the session; SessionAspect of #481 requires a session before the two leaderboard use cases of #47 and clears a refused session, also for SyncProgress, and RetryAspect is planned with no sprint because #46 delivered APP-FR-13 without it; the Logger port takes a UseCaseLogEntry, which also carries the failed deliveries of a success](classes/views/uc-1-contract.png)
+![The use case contract: every use case implements UseCase, as SyncProgress does with its binding to SyncProgressRequest and void (#46), and the composition root wraps each one through decorate(); a footnote lists the aspect chain of each use case from the outside in, with LoggingAspect outside SessionAspect so that the log keeps each call that the session rejects (#344); the aspect decorators wrap it for logging and the session; UseCaseAspect carries «abstract» «aspect», and LoggingAspect, SessionAspect and RetryAspect carry «aspect» (#345); LoggingAspect reads the engine Clock before and after the call and puts the duration in its one entry (#343); SessionAspect of #481 requires a session before the two leaderboard use cases of #47 and clears a refused session, also for SyncProgress, and RetryAspect comes only if the sync needs it, because #46 delivered APP-FR-13 without it; the Logger port takes a UseCaseLogEntry, which carries the duration of the call and the failed deliveries of a success](classes/views/uc-1-contract.png)
 
 Since D27 in [REQUIREMENTS.md](../REQUIREMENTS.md) (#325), `SaveProgress` and `ListLevels` need no session. Since #46 `SyncProgress` reads the session through the `SessionStore` port and sends nothing with no session (decision 66). Since #47 `GetGlobalLeaderboard` and `GetLevelLeaderboard` read it the same way (decision 67). Since #481 `SessionAspect` requires the session before both leaderboards and clears a session that the backend refuses, also for `SyncProgress` (decision 69). The app does not authorize: the backend checks the token. Each use case still reads the session, because its gateway needs the token. This view draws `SyncProgress` and its realization of `UseCase` since #46 (#338). View 3.3 and flow 2 draw the ports of `SyncProgress`.
 
@@ -343,7 +353,7 @@ The fourteen patterns of §3.3 all appear, and all fourteen stay after the team 
 | Prototype        | `Cloneable`: `Board`, `Piece`, `BoardState`, `RandomSource`                                                                                                                                  | The engine plays each turn on a clone of the state, and each photo holds a board clone (§3.3). Pieces and piece sources never change: no copy clones them (decision 51).     | 2, 4                               |
 | Composite        | `ShapeNode`, `CellNode`, `ShapeGroup`                                                                                                                                                        | Pieces made of cells. A Fit figure is a flat group of cells too, and no region type exists (§3.3, piece shape row of §8). Only the shapes: Fit stars are data (decision 36). | 2                                  |
 | Iterator         | `Board.line()`, `ring()` and `neighborhood()`; `IPieceSource`; `IGameRules.validMoves()`                                                                                                     | Traversal by axis, ring and neighbors (§3.1, §3.3). The piece sequence, finite or endless (decisions 32 and 51). The lazy list of valid moves (§3.1, decision 33).           | 2, 4, 7                            |
-| Decorator        | `ScoringDecorator`, `ComboMultiplierDecorator`; `TimedRulesDecorator`; `UseCaseAspect` and its four aspects                                                                                  | The Lines combo and streak multiplier (§1.1), scoring row of §8. Fit stars use time (§1.2, D14). The aspects of §3.5 (A2).                                                   | 4, 7, Lines, 3.1                   |
+| Decorator        | `ScoringDecorator`, `ComboMultiplierDecorator`; `TimedRulesDecorator`; `UseCaseAspect` and its two aspects                                                                                   | The Lines combo and streak multiplier (§1.1), scoring row of §8. Fit stars use time (§1.2, D14). The aspects of §3.5 (A2).                                                   | 4, 7, Lines, 3.1                   |
 | Builder          | `ILevelBuilder`, `FitLevelBuilder`, `SortLevelBuilder`; `BoardBuilder`, the DDD factory of the board                                                                                         | Levels of parts from configuration files, built step by step (§3.3, §5.1.5), the Fit check of A5. Two construction paths for the board (D9).                                 | 5, 6, Fit, Sort                    |
 | Observer         | `GameEventPublisher`, a port of layer 2, and the `GameEvent` classes; `GameEventBus` in layer 3                                                                                              | Score, audio and screens react to game events (§3.3). `GameEventBus` is not a Mediator (decision 35).                                                                        | 1, 5, 4.3                          |
 | Adapter          | `LocalProgressRepository` and the other local repositories in layer 3; `ApiProgressGateway` and the other HTTP adapters in layer 3; `DeviceKeyValueStore`, `ApiClient` and the other drivers | A new database or backend means a new adapter, and the use cases do not change (§3.3, §3.4).                                                                                 | 4.2, 4.4                           |
@@ -474,6 +484,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
    [layers.md](layers.md) shows the same generic port.
    Each use case binds it, for example `UseCase‹ApplyMoveRequest‹TMove›, MoveResult‹TCell, TCoord››`.
    The cost: a use case cannot add a second method to its port.
+   Decision 69 lists the aspect chain of each use case, from the outside in, with the reason of each place (#344).
 10. **`GameRepository`, the repository of the game aggregate (proposal).**
     The game use cases need the running engine between two calls.
     `GameRepository`, a port in layer 2, is the repository of the game aggregate of decision 26, and `InMemoryGameRepository` in layer 3 implements it.
@@ -702,7 +713,10 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     `gameUseCases(gameId, figure)` builds one `StartGame`, `ApplyMove`, `UndoMove` and `RedoMove` per game and figure over one `InMemoryGameRepository`, each through `decorate()`, and gives the same `GameUseCases` on each call for that game on that figure.
     Since #323 every use case of the root goes through one private `decorate(useCase, name)`.
     It builds the chain of aspects with `wrapInAspects()` of `src/application/aspects/use-case-aspect.ts`, from the outside in: the first aspect sees the call first and the result last.
-    Today the chain holds `LoggingAspect` only, so a later aspect enters it in one place.
+    `decorate()` takes the inner aspects of each use case, so a later aspect enters a chain in one place.
+    Decision 69 lists the chain of each use case (#344).
+    `test/infrastructure/composition-root-decorate.test.ts` checks through the root that each use case of decision 69 leaves its own log entry.
+    It also checks that `LoggingAspect` sees a call of a leaderboard before `SessionAspect` and sees its result after it.
     `StartGame` takes one `LevelGameFactories` over the one `BundledLevelRepository` of the root, so it starts every level of its game (decision 59).
     **The board figure (#171, APP-FR-16).**
     The root builds one `GameRegistry` for each `BoardFigure` of `boardFigures()` in `src/infrastructure/registered-games.ts`: the hexagon, the square and the triangle, in the order of the figure selector, and keeps them in `games: Map<TopologyId, GameRegistry>`.
@@ -722,6 +736,8 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     `RootDrivers` takes the transport `api` and the secure storage `secrets` for them: the app gets `ApiClient` and `DeviceSecretStore`.
     **The saved progress (#181).**
     With the local store of its drivers, the root builds one `LocalProgressRepository` and keeps it as `progress` for every consumer of the saved progress (#323).
+    Two saves of Hexa Fit on two figures at the same time go through the one queue of that repository, so the progress keeps both results.
+    `test/infrastructure/composition-root-decorate.test.ts` checks through the root that `ListLevels` and `LoadProgress` then read both results.
     Over it, the root builds `ListAchievements` once (#188) and `ListLevels` once (#173, decision 63), and it builds `LoadProgress` once (#410), each through `decorate()`: `loadProgress(): UseCase<LoadProgressRequest, GameProgress | undefined>` gives it.
     Its request names the game, as the request of `ListLevels` does, so one instance reads every game.
     The store stays optional: a root with no store offers none of them, so `listAchievements()`, `listLevels()` and `loadProgress()` throw a `RangeError`, as for a board figure that the root does not offer.
@@ -864,6 +880,14 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     Everything else of the rule of 2026-11-15 stays: a filled diamond goes from an aggregate root to each internal entity, and a use arrow reaches a value object, the Strategy of a context, a port and the children of the Composite `ShapeGroup`.
     A Strategy and a Composite keep that form until the professor answers about them.
     The views `engine-4-sources`, `engine-7-rules`, `uc-1-contract` and `map-3-usecases` draw the pairs `ScoringDecorator` to `IScoringPolicy`, `TimedRulesDecorator` to `IGameRules` and `UseCaseAspect` to `UseCase` that way, each with `Aggregation` in its legend, and [`classes.drawio`](classes.drawio) draws each pair as an aggregation labelled `decorate 1`.
+    **The change of 2026-11-28: an aspect carries `«aspect»` (#345).**
+    In the class of 2026-11-23 the professor drew each aspect with `<aspect>`, as `<aspect> Autorizador` and `<aspect> Logging`.
+    So each aspect class carries the stereotype `«aspect»`: `UseCaseAspect` carries `«abstract» «aspect»`, and `LoggingAspect`, `SessionAspect` and the planned `RetryAspect` carry `«aspect»`.
+    `«aspect»` stays although no other piece of a pattern carries a role label.
+    It marks a cross-cutting concern of §3.5 (APP-NFR-11), not the role of the class in the Decorator pattern.
+    A box with no stereotype reads as any class of layer 2, so `«aspect»` says what the class is for.
+    The product owner decided on 2026-11-23 that the aspect classes of both repositories carry `«aspect»`, and that the role labels of the GoF patterns stay off (hexablock-api#182 does the same in the backend).
+    View 3.1, the map of Part 3, view 4 of [extensibility.md](extensibility.md) and the layer diagram of [layers.md](layers.md) draw it, and [`classes.drawio`](classes.drawio) takes it from the views.
     Views of parts 1 to 4 and of [extensibility.md](extensibility.md).
 24. **An adapter reads the level file, and `LevelDefinition` lives in layer 1.**
     An adapter in an outer layer reads each level file and creates a `LevelDefinition`.
@@ -1042,8 +1066,14 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     An empty or blank `code` throws `RangeError("A use case error needs a code.")`, because the presenter picks its message by the code (G117.6).
     `caughtError(code, thrown)` builds the error of a caught exception and keeps the thrown value as its `cause`, so the log still shows a programming error.
     It never throws: a thrown value whose text `String()` cannot build, such as `Object.create(null)`, gets the fixed message «The thrown value has no text.» and stays the `cause` (issue #138).
-    `RetryAspect` runs the use case again while the error is retryable, and the presenter shows the message through `GameViewModel.error`.
-    Since issue #132 no aspect breaks this promise: `UseCaseAspect.execute()` turns every exception, from the inner use case or from the aspect's own work such as a logger that throws, into a failed `Result` with the code `unexpected-failure` (G118.1, G118.2).
+    The presenter shows the message through `GameViewModel.error`.
+    A `RetryAspect` would run the use case again while the error is retryable, but it comes only if the sync needs it (#46).
+    Since issue #132 no aspect breaks this promise: `UseCaseAspect.execute()` turns every exception, from the inner use case or from the aspect's own work, into a failed `Result` with the code `unexpected-failure` (G118.1, G118.2).
+    A failure of the log after the inner call does not rewrite the result (#343).
+    The use case already did its work, so `LoggingAspect` returns the `Result` of the inner use case, a success or a failure, with no added field.
+    `LoggingAspect` catches an exception of the logger or of the clock after the call and drops it.
+    That failure goes into no `Result` and into no response: the `Logger` adapter owns the report of its own failure.
+    Known cost: when the logger throws, nothing reports it, because `ConsoleLogger` is the only logger today.
     An aspect puts its concern in the protected `around()` and calls `super.around()` to run the inner use case, which gives an `unexpected-failure` `Result` when the inner promise rejects.
     A failed `Result` of the inner use case passes through unchanged.
     Decision 62 lists the failure codes.
@@ -1201,14 +1231,21 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     Team decision D20.
     View 2 and the Fit view.
 37. **The `Logger` port takes a log entry, not a message.**
-    `Logger.log(entry: UseCaseLogEntry): void` receives the name of the use case, the outcome (`"success"` or `"failure"`), the elapsed time when `TimingAspect` measures it, and the `UseCaseError` of a failed `Result`.
-    `LoggingAspect` and `TimingAspect` build the entry, and `LoggingAspect(inner, logger, name)` rejects an empty or blank `name` with `RangeError("A logging aspect needs a name.")` (G118.4).
+    `Logger.log(entry: UseCaseLogEntry): void` receives the name of the use case, the outcome (`"success"` or `"failure"`), the duration of the call in `elapsedMs`, and the `UseCaseError` of a failed `Result`.
+    `LoggingAspect` builds the entry, and `LoggingAspect(inner, logger, name, clock)` rejects an empty or blank `name` with `RangeError("A logging aspect needs a name.")` (G118.4).
+    `LoggingAspect` reads the engine `Clock` before and after the inner call, and `ClockReading.elapsedSince()` gives the duration as an `ElapsedTime` (#343).
+    The entry keeps one shape for a success and for a failure: the use case, the outcome, the duration and the error of a failure.
+    The composition root gives each `LoggingAspect` the `Clock` of its drivers.
+    There is no separate timing aspect: statement §3.5 asks the log aspect for the entry, the exit and the duration of a call, so the duration is data of the log aspect.
+    A second aspect that writes would leave two entries per call, with nothing that joins them (product owner, 2026-11-23).
     `LoggingAspect` is the only writer of the log for a use case: it writes one entry per call, and no use case takes the `Logger` (#342).
     Since #384 `AchievementCounterListener` of layer 3 also takes the `Logger` port: it writes one `"failure"` entry with the name `AchievementCounterListener` and a `save-failed` error for each failed save of the counters (decision 57).
+    So the field `useCase` names the source of the entry: a use case or a listener.
+    The entry of the listener is not a call, so it has no duration.
     A success can carry failed deliveries, as `ApplyMove` does when its publisher throws (decision 29).
     Then the one entry is a `"success"` entry that also carries them in `failedDeliveries`.
     `logEntryOf()` copies the field `failedDeliveries` from the value of any success, so `LoggingAspect` names no use case and no response type.
-    `ConsoleLogger`, the adapter in layer 4, writes the text.
+    `ConsoleLogger`, the adapter in layer 4, writes the text, and it ends the line of a measured call with ` in <n> ms`.
     In the class of 2026-11-02 the professor said that a message parameter makes the caller build the message, and that the message belongs in the implementation of the port, a secondary adapter.
     So no use case and no aspect formats a message.
     View 3.1 and the map of Part 3.
@@ -2358,7 +2395,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     No provider state stores a broken row, so the pact does not pin `unavailable`: the unit tests of `ApiLevelRepository` and the generated type `LevelsDto` cover it.
     Views 3.3, 4.2 and 5, the maps of Parts 3 and 4, flow 3 and the layer view `layers-1-clean` of [layers.md](layers.md) draw the classes of #48 and #307.
 
-69. **The session aspect: `SessionAspect` (#481, APP-FR-12, APP-NFR-11).**
+69. **The session aspect, `SessionAspect`, and the aspect chain of each use case (#481, #344, APP-FR-12, APP-NFR-11).**
     The decision of odjaramillo on 2026-11-28 on #481 is option A, reformulated: the planned authorization aspect becomes a class of the code, `SessionAspect`.
     The app does not authorize: the backend checks the token.
     The app requires a session before a use case that needs one, and it clears the session when the backend rejects the token.
@@ -2368,10 +2405,22 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     A session that cannot be read lets the call through, so the use case gives its own failure, for example `leaderboard-failed`.
     With either need, a result with `session-expired` calls `SessionStore.clear()`, which keeps the owner of the progress (decision 66).
     A clear that throws still gives `session-expired`, because the backend refuses the token again at the next request.
-    The composition root wraps `GetGlobalLeaderboard` and `GetLevelLeaderboard` with `required`.
-    It wraps `SyncProgress` with `optional`, because a sync with no session succeeds and sends nothing (D27).
-    Every other use case gets `LoggingAspect` only, so `decorate()` takes the inner aspects of each use case.
-    `LoggingAspect` stays outside `SessionAspect`, so the log keeps each call that the session rejects (row «Log each call, rejected calls included» of [REQUIREMENTS.md](../REQUIREMENTS.md)).
+    **The aspect chain of each use case, from the outside in (#344).**
+    The composition root builds each chain through `decorate()`, and `wrapInAspects()` puts the first aspect outside.
+    `GetGlobalLeaderboard` and `GetLevelLeaderboard`: `LoggingAspect`, `SessionAspect` with `required`, the use case.
+    `SyncProgress`: `LoggingAspect`, `SessionAspect` with `optional`, the use case.
+    The need of `SyncProgress` is `optional`, because a sync with no session succeeds and sends nothing (D27).
+    Each other use case: `LoggingAspect`, then the use case.
+    These are `StartGame`, `ApplyMove`, `UndoMove`, `RedoMove`, `ListLevels`, `SaveProgress`, `LoadProgress`, `ListAchievements`, `Register` and `Login`.
+    `SaveProgress` and `ListLevels` need no session (D27), so they get no `SessionAspect`.
+    Why this order: the log sits outside the session check, so a call that the session rejects leaves one `failure` entry with the code `sign-in-required` and its duration.
+    This is the decision of the product owner of 2026-11-23, the row «Log each call, rejected calls included» of [REQUIREMENTS.md](../REQUIREMENTS.md) and APP-NFR-11.
+    With the session check outside, a rejected call would never reach the log.
+    `SessionAspect` wraps the use case itself, so it stops a call with no session before the use case and its backend run.
+    It also sees the result of the use case first, so it clears a refused session before `LoggingAspect` writes the `session-expired` entry.
+    The use case is the inner end of each chain.
+    `RetryAspect` is planned and is not in the chain, because #46 delivered the sync without it.
+    `test/infrastructure/composition-root-session.test.ts` checks through the root that a board read with no session calls no backend and leaves one `sign-in-required` entry.
     The use cases no longer clear the session: `readBoard()` and `SyncProgress` only give `session-expired`.
     Each use case still reads the session for its token, because its gateway needs it, so a call reads the session twice.
     `readBoard()` still gives `sign-in-required` with no session, because the session can disappear between the two reads.

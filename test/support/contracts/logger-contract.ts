@@ -1,6 +1,7 @@
 import type { Logger } from '../../../src/application/aspects/logger';
 import { Result, UseCaseError } from '../../../src/application/result';
 import { logEntryOf } from '../../../src/application/aspects/logger';
+import { ElapsedTime } from '../../../src/domain/shared/elapsed-time';
 
 // A logger under test and the count of records that it wrote.
 export interface LoggerUnderTest {
@@ -46,7 +47,11 @@ export function describeLoggerContract(name: string, make: () => LoggerUnderTest
     it('should_write_one_record_per_entry_when_an_entry_holds_the_elapsed_time', () => {
       const subject = make();
 
-      subject.logger.log({ useCase: 'UndoMove', outcome: 'success', elapsedMs: 12 });
+      subject.logger.log({
+        useCase: 'UndoMove',
+        outcome: 'success',
+        elapsedMs: ElapsedTime.ofMs(12),
+      });
       subject.logger.log(logEntryOf('UndoMove', Result.success(1)));
 
       expect(subject.written()).toBe(2);

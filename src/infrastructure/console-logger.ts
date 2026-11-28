@@ -1,3 +1,4 @@
+import { valueOf } from '../adapters/delivered';
 import type { Logger, UseCaseLogEntry } from '../application/aspects/logger';
 
 // Where the logger writes its text. The global `console` fits it.
@@ -10,7 +11,7 @@ export interface LogSink {
 // so this class is the only place that formats the text.
 // The line: `<use case>: <outcome>`, then ` <code> (<message>)` for an error,
 // then `, failed delivery <code> (<message>)` for each failed delivery (issue #342),
-// then ` in <n> ms` for a measured call. For example `ApplyMove: failure move-rejected (...)`
+// then ` in <n> ms`, the duration of a measured call (issue #343). For example `ApplyMove: failure move-rejected (...)`
 // or `ApplyMove: success, failed delivery publish-failed (...)`.
 // A rejected move is a normal part of a game, so every line goes to `info()`.
 export class ConsoleLogger implements Logger {
@@ -21,7 +22,7 @@ export class ConsoleLogger implements Logger {
     const deliveries = (entry.failedDeliveries ?? [])
       .map((failed) => `, failed delivery ${failed.code} (${failed.message})`)
       .join('');
-    const time = entry.elapsedMs === undefined ? '' : ` in ${entry.elapsedMs} ms`;
+    const time = entry.elapsedMs === undefined ? '' : ` in ${valueOf(entry.elapsedMs)} ms`;
     this.sink.info(`${entry.useCase}: ${entry.outcome}${error}${deliveries}${time}`);
   }
 }

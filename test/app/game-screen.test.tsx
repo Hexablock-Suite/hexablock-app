@@ -65,7 +65,8 @@ describe('game route', () => {
     }
 
     expect(drawn).toEqual(FOUR_BOARDS);
-    expect(info).toHaveBeenCalledWith('StartGame: success');
+    // The system clock measures each call, so the line ends with its duration (issue #343).
+    expect(info).toHaveBeenCalledWith(expect.stringMatching(/^StartGame: success in \d+ ms$/));
   });
 
   // Issue #175: the player solves the Fit level of the hexagon on the game screen. The level
