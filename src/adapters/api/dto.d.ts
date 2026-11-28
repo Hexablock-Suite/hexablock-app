@@ -291,7 +291,7 @@ export interface components {
              */
             userId: string;
             /**
-             * @description The username of the account of the player, as the player typed it at sign-up (#230).
+             * @description The username of the account of the player, as the player typed it at sign-up.
              * @example ada
              */
             username: string;
@@ -310,7 +310,7 @@ export interface components {
              */
             userId: string;
             /**
-             * @description The username of the account of the player, as the player typed it at sign-up (#230).
+             * @description The username of the account of the player, as the player typed it at sign-up.
              * @example ada
              */
             username: string;
@@ -355,7 +355,7 @@ export interface components {
              */
             userId: string;
             /**
-             * @description The username of the account of the player, as the player typed it at sign-up (#230).
+             * @description The username of the account of the player, as the player typed it at sign-up.
              * @example ada
              */
             username: string;
