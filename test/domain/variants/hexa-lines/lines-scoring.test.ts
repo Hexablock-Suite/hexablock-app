@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { Score } from '../../../../src/domain/shared/score';
-import { ScoringDecorator } from '../../../../src/domain/engine/scoring-decorator';
-import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
+import { ScoringDecorator } from '../../../../src/domain/engine/turn/scoring-decorator';
+import type { IScoringPolicy } from '../../../../src/domain/engine/turn/scoring-policy';
 import { CellCount } from '../../../../src/domain/variants/hexa-lines/cell-count';
 import { ComboMultiplierDecorator } from '../../../../src/domain/variants/hexa-lines/combo-multiplier-decorator';
 import { LineCount } from '../../../../src/domain/variants/hexa-lines/line-count';

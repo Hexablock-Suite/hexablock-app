@@ -1,7 +1,7 @@
-import type { GridAxis } from '../../engine/grid-topology';
-import { Outcome } from '../../engine/outcome';
-import { Resolution } from '../../engine/resolution';
-import { BaseGameRules } from '../../engine/rules';
+import type { GridAxis } from '../../engine/geometry/grid-topology';
+import { Outcome } from '../../engine/events/outcome';
+import { Resolution } from '../../engine/turn/resolution';
+import { BaseGameRules } from '../../engine/turn/rules';
 import type { IMergeable } from './mergeable';
 import type { MergeState } from './merge-state';
 import { Slide, SlideSense } from './slide';

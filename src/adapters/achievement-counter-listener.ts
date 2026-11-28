@@ -1,12 +1,12 @@
-import type { AchievementCounterRepository } from '../application/achievement-counter-repository';
-import type { Logger } from '../application/logger';
+import type { AchievementCounterRepository } from '../application/ports/achievement-counter-repository';
+import type { Logger } from '../application/aspects/logger';
 import { caughtError, FailureCode } from '../application/result';
 import { AchievementCounters } from '../domain/achievements/achievement-counters';
 import {
   countsForAchievements,
   type CountsForAchievements,
 } from '../domain/achievements/counts-for-achievements';
-import type { GameEvent } from '../domain/engine/game-events';
+import type { GameEvent } from '../domain/engine/events/game-events';
 import type { GameId } from '../domain/shared/game-id';
 import type { GameEventListener } from './game-event-listener';
 

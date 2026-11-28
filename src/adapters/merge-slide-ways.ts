@@ -1,6 +1,6 @@
-import { CoordKeyMap } from '../domain/engine/coord-key-map';
-import type { GridAxis, GridTopology } from '../domain/engine/grid-topology';
-import type { RegionSize } from '../domain/engine/region-size';
+import { CoordKeyMap } from '../domain/engine/geometry/coord-key-map';
+import type { GridAxis, GridTopology } from '../domain/engine/geometry/grid-topology';
+import type { RegionSize } from '../domain/engine/geometry/region-size';
 import { Slide, SlideSense } from '../domain/variants/hexa-merge/slide';
 import type { BoardLayout } from './board/board-layout';
 

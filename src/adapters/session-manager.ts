@@ -1,5 +1,5 @@
-import { Session } from '../application/session';
-import type { SessionStore } from '../application/session-store';
+import { Session } from '../application/ports/session';
+import type { SessionStore } from '../application/ports/session-store';
 import { isObject, optionalTextIn } from './saved-json';
 import type { SecretStore } from './secret-store';
 

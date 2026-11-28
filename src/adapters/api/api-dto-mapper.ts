@@ -1,6 +1,6 @@
-import type { Credentials } from '../../application/credentials';
-import type { Leaderboard, LeaderboardRow } from '../../application/leaderboard';
-import { Session } from '../../application/session';
+import type { Credentials } from '../../application/ports/credentials';
+import type { Leaderboard, LeaderboardRow } from '../../application/ports/leaderboard';
+import { Session } from '../../application/ports/session';
 import { GameProgress } from '../../domain/progress/game-progress';
 import { LevelId } from '../../domain/progress/level-id';
 import { ProgressRecord } from '../../domain/progress/progress-model';

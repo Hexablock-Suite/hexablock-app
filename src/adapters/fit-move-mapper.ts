@@ -1,4 +1,4 @@
-import { Turns } from '../domain/engine/turns';
+import { Turns } from '../domain/engine/geometry/turns';
 import { PlaceFitPiece, RemoveFitPiece, type FitMove } from '../domain/variants/hexa-fit/fit-move';
 import { PieceId } from '../domain/variants/hexa-fit/piece-id';
 import type { MoveMapper } from './move-mapper';

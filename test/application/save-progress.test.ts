@@ -1,19 +1,19 @@
 /** @jest-environment node */
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
 import { Result } from '../../src/application/result';
-import { SaveProgress } from '../../src/application/save-progress';
-import { BoardShape } from '../../src/domain/engine/board-shape';
+import { SaveProgress } from '../../src/application/progress/save-progress';
+import { BoardShape } from '../../src/domain/engine/geometry/board-shape';
 import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
 import { GameId } from '../../src/domain/shared/game-id';
 import { GameProgress } from '../../src/domain/progress/game-progress';
 import { TopologyId } from '../../src/domain/shared/topology-id';
 import { LevelId } from '../../src/domain/progress/level-id';
 import { Moves } from '../../src/domain/shared/moves';
-import { Piece } from '../../src/domain/engine/piece';
+import { Piece } from '../../src/domain/engine/board/piece';
 import { GameResult, ProgressRecord } from '../../src/domain/progress/progress-model';
 import { Score } from '../../src/domain/shared/score';
-import { CellNode, ShapeGroup } from '../../src/domain/engine/shape-node';
-import { SquareGeometry } from '../../src/domain/engine/square-geometry';
+import { CellNode, ShapeGroup } from '../../src/domain/engine/geometry/shape-node';
+import { SquareGeometry } from '../../src/domain/engine/geometry/square-geometry';
 import { Stars } from '../../src/domain/progress/stars';
 import { FitFactory } from '../../src/domain/variants/hexa-fit/fit-factory';
 import { FitLevel } from '../../src/domain/variants/hexa-fit/fit-level';
@@ -24,7 +24,7 @@ import { ManualClock } from '../support/engine/manual-clock';
 import { square } from '../support/engine/square-topology';
 import { A } from '../support/variants/hexa-fit/fit-game';
 import { linesFactory } from '../support/variants/hexa-lines/lines-game';
-import { ProgressOwner } from '../../src/application/progress-owner';
+import { ProgressOwner } from '../../src/application/ports/progress-owner';
 
 // `SaveProgress` records a `GameResult` in the progress of its game with the progress model
 // of the variant, and saves the progress through the `ProgressRepository` port (issue #164).

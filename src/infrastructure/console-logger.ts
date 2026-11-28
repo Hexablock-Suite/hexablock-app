@@ -1,4 +1,4 @@
-import type { Logger, UseCaseLogEntry } from '../application/logger';
+import type { Logger, UseCaseLogEntry } from '../application/aspects/logger';
 
 // Where the logger writes its text. The global `console` fits it.
 export interface LogSink {

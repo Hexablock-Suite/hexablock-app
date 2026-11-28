@@ -1,4 +1,4 @@
-import type { CoordKey } from '../../engine/coord-key';
+import type { CoordKey } from '../../engine/geometry/coord-key';
 import type { TraySlot } from './tray-slot';
 
 // The move of Hexa Sort: place the stack of the tray slot `slot` on the cell `at`

@@ -1,11 +1,11 @@
 /** @jest-environment node */
-import { Outcome } from '../../../../src/domain/engine/outcome';
+import { Outcome } from '../../../../src/domain/engine/events/outcome';
 import { Score } from '../../../../src/domain/shared/score';
 import { GameId } from '../../../../src/domain/shared/game-id';
-import type { Piece } from '../../../../src/domain/engine/piece';
-import { CellNode, ShapeGroup } from '../../../../src/domain/engine/shape-node';
-import { RegionSize } from '../../../../src/domain/engine/region-size';
-import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
+import type { Piece } from '../../../../src/domain/engine/board/piece';
+import { CellNode, ShapeGroup } from '../../../../src/domain/engine/geometry/shape-node';
+import { RegionSize } from '../../../../src/domain/engine/geometry/region-size';
+import { SquareGeometry } from '../../../../src/domain/engine/geometry/square-geometry';
 import {
   LinesFactory,
   LinesSettings,

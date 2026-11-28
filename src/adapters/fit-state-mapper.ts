@@ -1,5 +1,5 @@
-import type { GridTopology } from '../domain/engine/grid-topology';
-import type { Piece } from '../domain/engine/piece';
+import type { GridTopology } from '../domain/engine/geometry/grid-topology';
+import type { Piece } from '../domain/engine/board/piece';
 import type { FitView } from '../domain/variants/hexa-fit/fit-state';
 import type { PieceId } from '../domain/variants/hexa-fit/piece-id';
 import { onlyValue, valueOf } from './delivered';

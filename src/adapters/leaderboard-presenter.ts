@@ -1,6 +1,10 @@
-import type { GlobalLeaderboardRequest } from '../application/get-global-leaderboard';
-import type { LevelLeaderboardRequest } from '../application/get-level-leaderboard';
-import type { Leaderboard, LeaderboardRecord, LeaderboardRow } from '../application/leaderboard';
+import type { GlobalLeaderboardRequest } from '../application/leaderboard/get-global-leaderboard';
+import type { LevelLeaderboardRequest } from '../application/leaderboard/get-level-leaderboard';
+import type {
+  Leaderboard,
+  LeaderboardRecord,
+  LeaderboardRow,
+} from '../application/ports/leaderboard';
 import type { FailureCode, Result, UseCaseError } from '../application/result';
 import type { UseCase } from '../application/use-case';
 import type { LevelId } from '../domain/progress/level-id';

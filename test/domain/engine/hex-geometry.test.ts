@@ -1,9 +1,9 @@
 /** @jest-environment node */
-import { Area } from '../../../src/domain/engine/area';
-import type { GeometryFactory } from '../../../src/domain/engine/geometry-factory';
-import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
-import { HexAxis, hex, type HexCoord } from '../../../src/domain/engine/hex-topology';
-import { Turns } from '../../../src/domain/engine/turns';
+import { Area } from '../../../src/domain/engine/geometry/area';
+import type { GeometryFactory } from '../../../src/domain/engine/geometry/geometry-factory';
+import { HexGeometry } from '../../../src/domain/engine/geometry/hex-geometry';
+import { HexAxis, hex, type HexCoord } from '../../../src/domain/engine/geometry/hex-topology';
+import { Turns } from '../../../src/domain/engine/geometry/turns';
 import { delivered } from '../../support/engine/value-receiver';
 
 // `HexGeometry` is the real geometry family (issue 153, classes.md decision 17, D11).

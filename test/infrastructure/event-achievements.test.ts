@@ -2,10 +2,10 @@
 import { AchievementCounterListener } from '../../src/adapters/achievement-counter-listener';
 import { GameEventBus } from '../../src/adapters/game-event-bus';
 import { LocalAchievementCounterRepository } from '../../src/adapters/local-achievement-counter-repository';
-import type { AchievementSummary } from '../../src/application/list-achievements';
-import { ApplyMove } from '../../src/application/apply-move';
+import type { AchievementSummary } from '../../src/application/achievements/list-achievements';
+import { ApplyMove } from '../../src/application/game/apply-move';
 import type { Result } from '../../src/application/result';
-import { hex, HexAxis } from '../../src/domain/engine/hex-topology';
+import { hex, HexAxis } from '../../src/domain/engine/geometry/hex-topology';
 import { PlacePiece } from '../../src/domain/variants/hexa-lines/place-piece';
 import { TrayPosition } from '../../src/domain/variants/hexa-lines/tray-position';
 import { Slide, SlideSense } from '../../src/domain/variants/hexa-merge/slide';

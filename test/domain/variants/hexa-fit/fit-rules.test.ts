@@ -1,20 +1,20 @@
 /** @jest-environment node */
-import { Outcome } from '../../../../src/domain/engine/outcome';
+import { Outcome } from '../../../../src/domain/engine/events/outcome';
 import { Moves } from '../../../../src/domain/shared/moves';
 import { Score } from '../../../../src/domain/shared/score';
-import { Board } from '../../../../src/domain/engine/board';
-import { BoardShape } from '../../../../src/domain/engine/board-shape';
-import { GameEnded } from '../../../../src/domain/engine/game-events';
-import { GameEngine } from '../../../../src/domain/engine/game-engine';
+import { Board } from '../../../../src/domain/engine/board/board';
+import { BoardShape } from '../../../../src/domain/engine/geometry/board-shape';
+import { GameEnded } from '../../../../src/domain/engine/events/game-events';
+import { GameEngine } from '../../../../src/domain/engine/turn/game-engine';
 import { GameId } from '../../../../src/domain/shared/game-id';
-import { PlayingPhase, VictoryPhase } from '../../../../src/domain/engine/game-phase';
-import type { GridTopology } from '../../../../src/domain/engine/grid-topology';
-import { Piece } from '../../../../src/domain/engine/piece';
-import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
-import { RegionSize } from '../../../../src/domain/engine/region-size';
-import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
-import { CellNode, ShapeGroup } from '../../../../src/domain/engine/shape-node';
-import { Turns } from '../../../../src/domain/engine/turns';
+import { PlayingPhase, VictoryPhase } from '../../../../src/domain/engine/turn/game-phase';
+import type { GridTopology } from '../../../../src/domain/engine/geometry/grid-topology';
+import { Piece } from '../../../../src/domain/engine/board/piece';
+import { FixedListPieceSource } from '../../../../src/domain/engine/random/piece-source';
+import { RegionSize } from '../../../../src/domain/engine/geometry/region-size';
+import type { IScoringPolicy } from '../../../../src/domain/engine/turn/scoring-policy';
+import { CellNode, ShapeGroup } from '../../../../src/domain/engine/geometry/shape-node';
+import { Turns } from '../../../../src/domain/engine/geometry/turns';
 import {
   PlaceFitPiece,
   RemoveFitPiece,

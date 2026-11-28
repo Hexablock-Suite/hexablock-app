@@ -6,9 +6,9 @@ import type {
   ProgressDto,
   SyncProgressDto,
 } from '../../src/adapters/api/progress-api';
-import { SyncFailure } from '../../src/application/progress-gateway';
+import { SyncFailure } from '../../src/application/ports/progress-gateway';
 import { FailureCode } from '../../src/application/result';
-import { Session } from '../../src/application/session';
+import { Session } from '../../src/application/ports/session';
 import { GameProgress } from '../../src/domain/progress/game-progress';
 import { LevelId } from '../../src/domain/progress/level-id';
 import { ProgressRecord } from '../../src/domain/progress/progress-model';

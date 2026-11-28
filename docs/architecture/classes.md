@@ -139,7 +139,7 @@ A hand edit of that order survives. Move the boxes in draw.io, run `pin.mjs` of 
 
 ## Part 1: the generic engine
 
-`src/domain/engine/`, with its sibling folders `src/domain/shared/`, `src/domain/progress/` and `src/domain/achievements/` (decision 64). It imports no variant and no framework (rules `domain-no-framework` and `engine-no-variants`). Three folder rules keep the four folders free of cycles: `shared-imports-only-shared`, `progress-imports-only-shared` and `achievements-imports-only-shared-and-progress`.
+`src/domain/engine/`, with its sibling folders `src/domain/shared/`, `src/domain/progress/` and `src/domain/achievements/` (decision 64). It imports no variant and no framework (rules `domain-no-framework` and `engine-no-variants`). Three folder rules keep the four folders free of cycles: `shared-imports-only-shared`, `progress-imports-only-shared` and `achievements-imports-only-shared-and-progress`. Since #499 the engine has subfolders by game concern, and the rule `engine-folders-no-cycle` keeps them free of cycles too ([README of the engine](../../src/domain/engine/README.md)).
 
 ### Map of the engine
 
@@ -211,7 +211,7 @@ The variant classes stay generic over `TCoord`, like the engine, so a variant ru
 
 ## Part 3: the use cases
 
-`src/application/`, layer 2. It imports only `src/domain/` and `src/application/` (rule `application-imports-only-domain`), and never `src/domain/variants/` (rule `application-no-variants`). Each use case names the requirement it serves.
+`src/application/`, layer 2. It imports only `src/domain/` and `src/application/` (rule `application-imports-only-domain`), and never `src/domain/variants/` (rule `application-no-variants`). Each use case names the requirement it serves. Since #500 the use cases sit in one folder per group, with the ports in `ports/` and the aspects in `aspects/`, and the rule `application-folders-no-cycle` keeps the folders free of cycles ([README of the use cases](../../src/application/README.md)).
 
 ### Map of the use cases
 
@@ -361,9 +361,9 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
    `GameEngine` holds zero or one history, an `IUndoable` (decision 27), and the variant factory decides.
    Fit gets `RedoableHistory` with no limit, Merge gets `MoveHistory` with limit 1, and Lines and Sort get none.
    So Hexa Lines never implements `IUndoable` (§3.2).
-   Since #243 the limit is an `UndoLimit` in `src/domain/engine/undo-limit.ts`, not a number: `UndoLimit.of(value)` takes a safe integer of one or more and throws a `RangeError` for any other number, `equals()` compares two limits, and `newestOf(items)` gives the newest items that the limit keeps.
+   Since #243 the limit is an `UndoLimit` in `src/domain/engine/history/undo-limit.ts`, not a number: `UndoLimit.of(value)` takes a safe integer of one or more and throws a `RangeError` for any other number, `equals()` compares two limits, and `newestOf(items)` gives the newest items that the limit keeps.
    The constructor of `MoveHistory` takes the optional `UndoLimit` and makes no check, and `MergeFactory` passes `UndoLimit.of(1)`.
-   Since #178 `FitFactory` gives a `RedoableHistory` in `src/domain/engine/redoable-history.ts`, with no limit, so Fit undoes and redoes every move.
+   Since #178 `FitFactory` gives a `RedoableHistory` in `src/domain/engine/history/redoable-history.ts`, with no limit, so Fit undoes and redoes every move.
    `RedoableHistory<TMove, TMemento>` extends `MoveHistory` and keeps each undone `MoveCommand` in its private `undone` list, newest last.
    `MoveHistory.undo()` gives each undone command to its protected hook `keepUndone(command)`: a plain history forgets the command, and `RedoableHistory` keeps it.
    `redo()` plays the newest undone command again and puts it back among the done commands, so an undo can take it back again.
@@ -376,7 +376,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
    The statement lists `IUndoable`, `ITimed` and `IRandomSeeded`.
    Merge undoes one move and never redoes, so redo gets its own interface (§3.2 ISP, §5.1.8).
    `RedoableHistory` implements it, and its `redoable()` returns the history itself (#178).
-   `RedoMove` in `src/application/redo-move.ts` asks the root, as `UndoMove` does: it asks `GameEngine.canRedo()`, returns a failed `Result` with the code `nothing-to-redo` when it is false, and then calls `GameEngine.redo()`.
+   `RedoMove` in `src/application/game/redo-move.ts` asks the root, as `UndoMove` does: it asks `GameEngine.canRedo()`, returns a failed `Result` with the code `nothing-to-redo` when it is false, and then calls `GameEngine.redo()`.
    The root has no `offersRedo()`: a variant with no redo always answers `canRedo()` false, so `RedoMove` needs no other failure.
    A redo that the engine refuses, for example in a paused game, gives `redo-failed`, and a repository with no game gives `no-running-game`.
    A redo gives back the photo after the move (decision 34), so in Fit an undo and then a redo give back the same board, the same score and the same move count (APP-FR-08).
@@ -395,7 +395,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
    Hexa Merge binds it to `NewTile<MergeTile>`: one draw gives the new tile and the empty cell where it appears (decision 48).
    Since #423 Hexa Sort binds it to `ColorStack`: `SortFactory.createPieceSource()` gives an `IPieceSource<ColorStack>`, `SortState` and `SortSnapshot` keep a tray of `ColorStack` slots (#353), and `SortView`, `SortViewReceiver` and `SortStateMapper` take no `TCoord`.
    Until #423 a Sort piece was a `Piece` with a shape of one cell on the first cell of the level region, and no code read that shape: the player names the cell of a placement, and the state mapper reads only the stack.
-   The rule `sort-and-merge-no-cell-piece` of `.dependency-cruiser.cjs` keeps `hexa-sort` and `hexa-merge` from importing `engine/piece` and `engine/shape-node`, and `test/gates/architecture-gate.test.ts` checks it on the fixture `sort-imports-piece`.
+   The rule `sort-and-merge-no-cell-piece` of `.dependency-cruiser.cjs` keeps `hexa-sort` and `hexa-merge` from importing `engine/board/piece` and `engine/geometry/shape-node`, and `test/gates/architecture-gate.test.ts` checks it on the fixture `sort-imports-piece`.
    In Hexa Fit the content is a `PieceId`.
    The id is part of the value of the piece, as the color is in Hexa Lines, and it is not an identity of the piece (design decision of 2026-11-15).
    A piece never changes, so it has no life cycle that an identity must follow, and `Piece.equals()` compares the shape and the content: two pieces with one shape and one id are the same piece.
@@ -484,7 +484,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     `Register` and `Login` call the backend through this port.
     [layers.md](layers.md) shows it.
     `ApiAccountGateway` in layer 3, `src/adapters/api/`, implements it (decision 22).
-    Since #45 the port lives in `src/application/account-gateway.ts`: `register(credentials)` and `login(credentials)` each give the `Session` of the account, and a known failure throws an `AccountFailure` with its failure code (decision 65).
+    Since #45 the port lives in `src/application/ports/account-gateway.ts`: `register(credentials)` and `login(credentials)` each give the `Session` of the account, and a known failure throws an `AccountFailure` with its failure code (decision 65).
 12. **`SettingsStore` (proposal).**
     `UpdateSettings` keeps the mute option and the language through this port.
     [layers.md](layers.md) shows it.
@@ -695,7 +695,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     It builds one `GameEventBus`, subscribes `AchievementCounterListener` to it, and gives the bus to every `ApplyMove` (#233, #362).
     `gameUseCases(gameId, figure)` builds one `StartGame`, `ApplyMove`, `UndoMove` and `RedoMove` per game and figure over one `InMemoryGameRepository`, each through `decorate()`, and gives the same `GameUseCases` on each call for that game on that figure.
     Since #323 every use case of the root goes through one private `decorate(useCase, name)`.
-    It builds the chain of aspects with `wrapInAspects()` of `src/application/use-case-aspect.ts`, from the outside in: the first aspect sees the call first and the result last.
+    It builds the chain of aspects with `wrapInAspects()` of `src/application/aspects/use-case-aspect.ts`, from the outside in: the first aspect sees the call first and the result last.
     Today the chain holds `LoggingAspect` only, so a later aspect enters it in one place.
     `StartGame` takes one `LevelGameFactories` over the one `BundledLevelRepository` of the root, so it starts every level of its game (decision 59).
     **The board figure (#171, APP-FR-16).**
@@ -904,7 +904,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     The backend has another meaning, the instant of a sync, so the two repositories share no time type.
     Each `next()` of `MatchIdGenerator` gives a domain value object, never a text, and an id that it did not give before (decision 40).
     No generator gives the id of a state, of a board or of a level timer: those ids are local, and the factory builds them from the `MatchId` (decision 52, #236).
-    `GameEventPublisher` is a port of layer 2 in `src/application/game-event-publisher.ts` (#233).
+    `GameEventPublisher` is a port of layer 2 in `src/application/ports/game-event-publisher.ts` (#233).
     The engine takes no event sink: the root records its events, and `ApplyMove` takes them after the turn and delivers each one to the port (decisions 26 and 29).
     Since #361 the port also gets the events of a move, `LinesCleared`, `TileMerged` and `StackCleared`, through the same `publish(event: GameEvent)`: the port does not change.
     `GameEventBus` of layer 3 implements the port (view 4.3, #362).
@@ -1212,7 +1212,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     Until #418 `Range<T extends Ordered<T>>` in `src/domain/engine/range.ts` was a closed interval `[min, max]` with `contains(value: T): boolean` and `equals()`, and only its tests built one.
     A class with no client is still read, tested and drawn, so #418 removed it with its tests.
     A future interval limit between two value objects uses `Range<T>` as hexablock-api does (`src/domain/shared/range.ts` there, APP-NFR-25): `T` implements `Ordered<T>`, so the range orders its bounds with `isBefore()` and no order is a number.
-    The bound `Ordered<T>` in `src/domain/engine/ordered.ts` stays, because `Distance` and `CoordKey` implement it.
+    The bound `Ordered<T>` in `src/domain/engine/geometry/ordered.ts` stays, because `Distance` and `CoordKey` implement it.
     It holds only `isBefore(other: T): boolean`, so the order answers with a boolean, and no public signature of `src/domain/` takes or returns an order as a number (#239).
     Before #239 a `Compare<T>` function gave the order as a negative number, zero or a positive number, and `Range.ofNumbers(min, max)` built a range of `number`.
     The class of 2026-11-14 asks for a range whose `T` is a comparable value object, and the class of 2026-11-09 forbids a primitive in the domain model, so both left with #239.
@@ -1235,7 +1235,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     `GridTopology.fullTurn(): Turns` gives the full turn of a topology, 6 steps for a hexagon and 4 for a square, so no topology shows a number of rotation steps and `FitRules.validMoves()` reads `fullTurn().shorter()`.
 39. **The space of the board is an entity, and `TCell` stays a value.**
     The class of 2026-11-09 models the place on the board as an entity, because it «puede pasar de libre a ocupada».
-    `BoardSpace<TCell, TCoord>` in `src/domain/engine/board.ts` is that place.
+    `BoardSpace<TCell, TCoord>` in `src/domain/engine/board/board.ts` is that place.
     The topology key of its coordinate is its identity, and `equals()` compares that key.
     Its state is the `TCell` that occupies it, or none when it is free.
     Only `occupy()` and `vacate()` change that state, and `vacate()` throws a `RangeError` for a free space.
@@ -1250,7 +1250,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     Gate `test/docs/domain-private-fields.test.ts` checks every `.ts` file under `src/domain/`, and its baseline list names the issue that removes each public field and getter of today (#231).
     Only the name `deliverTo` still waits for the professor.
 40. **`GameFactory` creates the whole aggregate.**
-    `GameFactory<TCell, TCoord, TMove, TState>` in `src/domain/engine/game-factory.ts` is the DDD factory of the aggregate: it creates the root with all its parts as one piece.
+    `GameFactory<TCell, TCoord, TMove, TState>` in `src/domain/engine/factory/game-factory.ts` is the DDD factory of the aggregate: it creates the root with all its parts as one piece.
     It takes the `GameId` of the game, an `IVariantFactory` and a `MatchIdGenerator`.
     The composition root finds the variant factory of the chosen game with `isFor(gameId)` and gives both, so the variant factory keeps its id private (decision 30, #234).
     It takes no publisher, because the root records its events and `ApplyMove` delivers them (#233).
@@ -1391,9 +1391,9 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     Does a branded text count as a primitive?
     The team answered on 2026-11-16 (#246, option A, Oscar): yes.
     So `CoordKey` is no longer `string & { brand }`.
-    It is a value object of the engine in `src/domain/engine/coord-key.ts`, with a private constructor, a private `readonly` text and a frozen instance: `CoordKey.of(text: string): CoordKey` makes a key and checks no format, because each coordinate class owns the format of its keys, `equals(other: CoordKey): boolean` compares two keys by value, `isBefore(other: CoordKey): boolean` orders them by plain string order (the bound `Ordered` of decision 38, for the tie of Hexa Sort, #56), `CoordKey.sameKeys(left, right): boolean` tells if two lists hold equal keys in any order, and `deliverTo(receiver: ValueReceiver<string>): void` gives the text to an adapter of the edge only (rule R-no-delivery-call).
+    It is a value object of the engine in `src/domain/engine/geometry/coord-key.ts`, with a private constructor, a private `readonly` text and a frozen instance: `CoordKey.of(text: string): CoordKey` makes a key and checks no format, because each coordinate class owns the format of its keys, `equals(other: CoordKey): boolean` compares two keys by value, `isBefore(other: CoordKey): boolean` orders them by plain string order (the bound `Ordered` of decision 38, for the tie of Hexa Sort, #56), `CoordKey.sameKeys(left, right): boolean` tells if two lists hold equal keys in any order, and `deliverTo(receiver: ValueReceiver<string>): void` gives the text to an adapter of the edge only (rule R-no-delivery-call).
     A `Map` and a `Set` compare an object by reference, and each call of `key()` gives a new object.
-    So `CoordKeyMap<TValue>` in `src/domain/engine/coord-key-map.ts` keys a value by a `CoordKey` and compares the keys with `equals()`: `has()`, `find()`, `set()`, `delete()`, `values()` and `entries()`.
+    So `CoordKeyMap<TValue>` in `src/domain/engine/geometry/coord-key-map.ts` keys a value by a `CoordKey` and compares the keys with `equals()`: `has()`, `find()`, `set()`, `delete()`, `values()` and `entries()`.
     It keeps the order of the first write, as a `Map` does, so `Board.occupiedCells()` keeps its order.
     `Board` keeps the keys of its shape and its spaces in two `CoordKeyMap`, `BoardSpace.equals()` compares the identities with `equals()`, and the states of Hexa Lines and Hexa Merge, the rings of `TriangleTopology`, the witness check of Hexa Fit and the slide ways of layer 4 use it in place of a `Set` or a `Map`.
     Hexa Lines names a line by the list of its keys and compares two names with `sameKeys()`.
@@ -1413,7 +1413,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     `RegionSize` has `indexes(start, axis)`, one cell for each index of a side, `offsets(origin, axis)`, the cells of an axis that are nearer to `origin` than the size, and `holds(distance)`, which tells if a `Distance` is below the size.
     An axis is any object with `forward(from)` and `backward(from)`, such as `HexAxis.q`, so a topology walks the cells and builds no coordinate from a number.
     The cells and their order are the same as before #243.
-    `Distance` in `src/domain/engine/distance.ts` is the count of steps between two cells: a value object with a private constructor, `Distance.of(value)`, which takes a safe integer of zero or more and stores `-0` as 0, a private count, `equals()` and `isBefore()` (the bound `Ordered` of decision 38).
+    `Distance` in `src/domain/engine/geometry/distance.ts` is the count of steps between two cells: a value object with a private constructor, `Distance.of(value)`, which takes a safe integer of zero or more and stores `-0` as 0, a private count, `equals()` and `isBefore()` (the bound `Ordered` of decision 38).
     `HexCoord.distanceTo()` and `SquareCoord.distanceTo()` give it.
     The README table «Primitive types» has no row for these operations.
     Since #165 each coordinate has `deliverTo(receiver: ValueReceiver<readonly [number, number]>): void`: it gives its two values, `[q, r]` or `[col, row]`, to a receiver of the edge and returns nothing (decision 41).
@@ -1458,7 +1458,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     An object literal is no longer a level.
     `of()` makes every check that needs only the level.
     A level with two pieces of one id throws a `RangeError`, with the message that `FitState.start()` gave before (since #237 the message names no id, and the error carries the id as its `cause`), and so does a piece list that holds `undefined`, with the message of `FixedListPieceSource`.
-    Since #419 the engine function `frozenListOf()` in `src/domain/engine/frozen-list.ts` copies a list, freezes the copy and refuses `undefined` with that message, and `FixedListPieceSource`, `FitLevel`, `SortLevel` and `LinesSettings` call it, so no value object builds a piece source to copy a list.
+    Since #419 the engine function `frozenListOf()` in `src/domain/engine/random/frozen-list.ts` copies a list, freezes the copy and refuses `undefined` with that message, and `FixedListPieceSource`, `FitLevel`, `SortLevel` and `LinesSettings` call it, so no value object builds a piece source to copy a list.
     So such a level cannot exist.
     Before #208 the first error came when the game started and the second when the factory created the piece source.
     `of()` copies the piece list and the list of star thresholds and freezes each copy, so a change to an array of the caller does not change the level, and the level never lets a list out that a caller can write.
@@ -1517,16 +1517,16 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     `SortFactory.createProgressModel()` gives the level to `LevelProgress`.
     The Sort view.
 48. **Settings are classes and the seed is a value object (#210).**
-    `Seed` in `src/domain/engine/seed.ts` is the seed of a match (#417): a value object with a private constructor, the factory method `Seed.of(value)`, a private value, `equals()` and a frozen instance.
+    `Seed` in `src/domain/engine/random/seed.ts` is the seed of a match (#417): a value object with a private constructor, the factory method `Seed.of(value)`, a private value, `equals()` and a frozen instance.
     It holds a whole number from 0 to 4294967295, and `of()` is the only place that checks the range: any other number throws a `RangeError` with the message that `Mulberry32Random` gave before, and `-0` counts as 0.
     Since #239 `of()` compares the number itself, with no `Range` (decision 38).
     `IRandomSeeded.isSeededWith()`, `SeededPieceSource`, `SortLevel.seeded()`, `SortSourceBuilders.seeded()`, and `mergeTileSource()` take a `Seed`, so no public signature of `src/domain/` takes a seed as a number.
     Since #417 the two settings hold no seed, and `RandomDraw.pickSeed()` gives the `Seed` of a draw: the draw times 4294967296, rounded down.
     `Mulberry32Random` has a private constructor and the factory method `Mulberry32Random.from(seed)`.
     `Seed.generatorState()` gives the generator its first state, and no other code asks for it.
-    Since #243 that state is a `GeneratorState` in `src/domain/engine/generator-state.ts`, not a number: a value object with `GeneratorState.of(value)`, which takes a whole number from 0 to 4294967295, `equals()`, `advanced()`, the next state, and `draw()`, the draw of a state.
+    Since #243 that state is a `GeneratorState` in `src/domain/engine/random/generator-state.ts`, not a number: a value object with `GeneratorState.of(value)`, which takes a whole number from 0 to 4294967295, `equals()`, `advanced()`, the next state, and `draw()`, the draw of a state.
     The Mulberry32 arithmetic works on the private number of the state, so `Mulberry32Random` holds a `GeneratorState` and the same seed gives the same draws as before.
-    `RandomSource.next()` gives a `RandomDraw` (`src/domain/engine/random-draw.ts`): a value object with `RandomDraw.of(value)`, which takes a number from 0 up to 1 and throws a `RangeError` for any other number, `equals()`, `isBelow(other)`, which tells if the draw falls below another draw, `pick(items)`, the item at the place of the draw, and `deliverTo(receiver)`.
+    `RandomSource.next()` gives a `RandomDraw` (`src/domain/engine/random/random-draw.ts`): a value object with `RandomDraw.of(value)`, which takes a number from 0 up to 1 and throws a `RangeError` for any other number, `equals()`, `isBelow(other)`, which tells if the draw falls below another draw, `pick(items)`, the item at the place of the draw, and `deliverTo(receiver)`.
     Hexa Merge takes the `RandomDraw` as it is: `NewTile.of()` keeps it as the place, and `Chance.hits()` compares it with the chance, so the Merge `Draw` of #232 is gone (decision 54).
     Until #417 the composition root of layer 4 called `deliverTo()` to draw the seed of a game.
     Since #417 a variant factory asks `pickSeed()`, so the number of a draw leaves it only through `deliverTo()` to an adapter of the edge (rule R-no-delivery-call).
@@ -1591,7 +1591,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
 50. **`LevelTimer` is an entity with its own id (#214).**
     The rule of the class of 2026-11-09 says that every entity has an id that identifies it, and the rule of 2026-11-10 says that each entity has an id of its own, as `Board` has `BoardId` and the states have `GameStateId`.
     The timer changes in place through `start()` and `stop()`, so it is an entity, not a value object, and the team decided on 2026-11-09 that it lives inside the `GameEngine` aggregate (decision 26).
-    `LevelTimerId` in `src/domain/engine/level-timer-id.ts` is a value object in the form of `BoardId`: a private constructor, the factory method `LevelTimerId.of(matchId)`, a private `MatchId` and `equals()`, which compares the two matches.
+    `LevelTimerId` in `src/domain/engine/turn/level-timer-id.ts` is a value object in the form of `BoardId`: a private constructor, the factory method `LevelTimerId.of(matchId)`, a private `MatchId` and `equals()`, which compares the two matches.
     The id is local (decision 52): it has a meaning only inside the aggregate of its match, so no generator gives it (#236).
     `LevelTimer` takes its `LevelTimerId` and its `Clock` in its constructor, and it keeps the start and the stop of the game as two `ClockReading` values (#238).
     The id never changes, and `LevelTimer.equals(other)` compares two timers by that id only: a started timer and an idle timer with one id are equal, and two timers with different ids that read one clock are different.
@@ -1834,14 +1834,14 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     D27 in [REQUIREMENTS.md](../REQUIREMENTS.md) (#325) puts the user in the local key, so the device keeps one progress per game and user, and the progress played without an account merges into the first account that signs in with the rule of DS-12 inside `GameProgress`. #45 keeps the user id of the account in the `Session` (decision 65), and #46 builds the key and the merge.
     View 4 and view 3.3.
 57. **The repository of the progress and its saved shape (#164, proposal).**
-    `ProgressRepository` in `src/application/progress-repository.ts` is the output port and the repository of the progress aggregate of decision 56.
+    `ProgressRepository` in `src/application/ports/progress-repository.ts` is the output port and the repository of the progress aggregate of decision 56.
     `load(gameId: GameId): Promise<GameProgress | undefined>` gives back the whole root, or `undefined` when the game has no saved progress, and `save(progress: GameProgress): Promise<void>` saves it in place of the saved one.
-    `SaveProgress` in `src/application/save-progress.ts` implements `UseCase<GameResult, void>`.
+    `SaveProgress` in `src/application/progress/save-progress.ts` implements `UseCase<GameResult, void>`.
     It loads the progress of its game, or starts one with `GameProgress.start()`, records the result in it with its `IProgressModel`, and saves it.
     It changes one aggregate, the progress (decision 52).
     A `GameResult` keeps its game id private, so `SaveProgress` takes the `GameId` of its game in its constructor with the model of that game, as `GameFactory` takes the id of its game (decision 40).
     Its response is empty: `record()` returns nothing, so the use case has no record to return.
-    `LoadProgress` in `src/application/load-progress.ts` gives the read of the saved progress back (S3-16 of #151, #181): it implements `UseCase<LoadProgressRequest, GameProgress | undefined>`, its request names the `GameId` of the game, as the request of `ListLevels` does (#410), it takes the `ProgressRepository` port in its constructor, and `execute({ gameId })` returns the saved `GameProgress` as it is, or `undefined` when the game has none; it starts no progress.
+    `LoadProgress` in `src/application/progress/load-progress.ts` gives the read of the saved progress back (S3-16 of #151, #181): it implements `UseCase<LoadProgressRequest, GameProgress | undefined>`, its request names the `GameId` of the game, as the request of `ListLevels` does (#410), it takes the `ProgressRepository` port in its constructor, and `execute({ gameId })` returns the saved `GameProgress` as it is, or `undefined` when the game has none; it starts no progress.
     A port or a model that throws in `SaveProgress` gives the failure `save-failed`, and a port that throws in `LoadProgress` gives the failure `load-failed` (decision 62).
     `LocalProgressRepository` in `src/adapters/local-progress-repository.ts` implements the port over `KeyValueStore`.
     It keeps one JSON text per game under the key `progress:<game id>`, for example `{"version":1,"levels":[{"score":0,"levelId":"fit-01","stars":2,"moves":12,"elapsedMs":3000}]}` for Hexa Fit and `{"version":1,"highScore":{"score":36},"levels":[]}` for Hexa Lines.
@@ -1864,7 +1864,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     The engine names no variant, so the counts say nothing of what they count.
     Since #406 each event of a variant records its own count through `CountsForAchievements` (decision 60): `LinesCleared` keeps its lines and `TileMerged` its tile as a best count, and each `StackCleared`, one goal of Hexa Sort, adds one to the total.
     `AchievementCounterListener` of layer 3 loads and saves the counters around each event.
-    `AchievementCounterRepository` in `src/application/achievement-counter-repository.ts` is its port, with `load(gameId)` and `save(counters)` as `ProgressRepository` has.
+    `AchievementCounterRepository` in `src/application/ports/achievement-counter-repository.ts` is its port, with `load(gameId)` and `save(counters)` as `ProgressRepository` has.
     `LocalAchievementCounterRepository` implements it over the same `KeyValueStore`, under its own key `achievement-counters:<game id>`, for example `{"version":1,"best":3,"total":0}`.
     It shares the JSON helpers of `src/adapters/saved-json.ts` with `LocalProgressRepository`, so both read and check a saved text the same way: another `version`, a part of the wrong type and a count that `AchievementCount.of()` refuses throw a `RangeError`, a text that is not JSON throws a `SyntaxError`, and a load never writes, so the store keeps the old text.
     The counters do not go into the saved progress: the shape of `progress:<game id>` and its `version` 1 do not change, one repository serves one aggregate (decision 52), and the writer of the counters and `SaveProgress` never write the same saved text.
@@ -1876,7 +1876,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     A root with no store subscribes no counter listener.
     Views 3.3, 4 and 4.2 and flow 2.
 58. **The list of levels: `LevelRepository`, `BundledLevelRepository` and `ListLevels` (#168, proposal).**
-    `LevelRepository` in `src/application/level-repository.ts` is the output port of the levels.
+    `LevelRepository` in `src/application/ports/level-repository.ts` is the output port of the levels.
     `list(gameId: GameId): Promise<LevelDefinition[]>` gives the definition of each level of one game in a new list, in no fixed order, and an empty list for a game with no levels.
     A level is data of the catalogue that the player never changes, so the port only reads.
     The catalogue is not an aggregate (decision 52), and the port keeps the name that the views gave it since decision 22.
@@ -1887,7 +1887,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     A new level file adds one import, and the test of the adapter reads the folders, so a file that the list misses fails it.
     The constructor takes other files for a test, for example a square level.
     Since #48 `ApiLevelRepository` implements it over the levels of the backend, and `CombinedLevelRepository` joins the two with the rule of DS-11 (decision 68).
-    `ListLevels` in `src/application/list-levels.ts` implements `UseCase<ListLevelsRequest, LevelList>` (`LevelSummary[]` until #307).
+    `ListLevels` in `src/application/levels/list-levels.ts` implements `UseCase<ListLevelsRequest, LevelList>` (`LevelSummary[]` until #307).
     `ListLevelsRequest` holds the `GameId` of the game and the chosen figure as a `TopologyId`: the level selector of #173 passes the `TopologyId` of the `BoardFigure` that the player chose (#171).
     The use case loads the definitions and the progress of the game, keeps the levels that answer `isPlayedOn(figure)` (S3-08), orders them with `comesBefore()` and gives one `LevelSummary` per level.
     The filter and the order live in `levelsOnFigure()` of `list-levels.ts`, and `StartGame` reads the same list since #397 (decision 59).
@@ -1902,7 +1902,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     Their ids name the figure, such as `fit-square-01` and `sort-triangle-01`, and each figure numbers its levels from 1, so a new level of one figure changes no id of another figure: an id is the key of a saved result (decision 57).
     A game with no saved progress has no completed level.
     A port that throws gives the failure `list-failed`.
-    `LevelSummary` in `src/application/level-summary.ts` is the plain response model of the use case, in the form of `MoveResult` (decision 29): `levelId: LevelId`, `status: LevelStatus` and, only for a completed level, `stars: Stars`.
+    `LevelSummary` in `src/application/levels/level-summary.ts` is the plain response model of the use case, in the form of `MoveResult` (decision 29): `levelId: LevelId`, `status: LevelStatus` and, only for a completed level, `stars: Stars`.
     It carries the value objects, and a presenter receives their values with `deliverTo()`.
     `LevelStatus` has a closed set of three instances, `completed`, `open` and `locked`, in the form of decision 45: a private constructor that refuses every call after the last instance, one frozen instance per value and `equals()` by identity.
     It has no `of()` and no `deliverTo()`, because no file names a status and no reader needs its text yet.
@@ -1917,13 +1917,13 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     Since #172 `levelOf(gameId: GameId, levelId: LevelId): Promise<LevelDefinition | undefined>` gives the definition of one level of a game, or `undefined` when the game has no level with that id.
     `LevelGameFactories` asks it when a game starts (decision 59).
     `BundledLevelRepository` finds the level in its own `list()`, and it runs the contract suite of the port, `test/support/contracts/level-repository-contract.ts`.
-    Since #307 the port also has `unavailable(gameId: GameId): Promise<LevelId[]>`, and `LevelList` in `src/application/level-summary.ts`, the response of `ListLevels`, holds the summaries of the figure in `levels` and the unavailable levels of the game in `unavailable` (decision 68).
+    Since #307 the port also has `unavailable(gameId: GameId): Promise<LevelId[]>`, and `LevelList` in `src/application/levels/level-summary.ts`, the response of `ListLevels`, holds the summaries of the figure in `levels` and the unavailable levels of the game in `unavailable` (decision 68).
     The team confirms S3-12, S3-08 and S3-04 of #151, «Propuesta, pendiente del equipo».
     Views 4, 5 and 3.3 and the map of Part 3.
 59. **A level starts from its `levelId`: the `GameFactories` port and `LevelGameFactories` (#172, proposal).**
     S3-13 of #151 picks option D.
-    `StartGameRequest` in `src/application/start-game.ts` has one optional member, `levelId: LevelId`: a game with levels names the chosen level, and a game with no levels, such as Hexa Lines and Hexa Merge, starts with none.
-    `GameFactories<TCell, TCoord, TMove, TState>` in `src/application/game-factories.ts` is an output port of layer 2.
+    `StartGameRequest` in `src/application/game/start-game.ts` has one optional member, `levelId: LevelId`: a game with levels names the chosen level, and a game with no levels, such as Hexa Lines and Hexa Merge, starts with none.
+    `GameFactories<TCell, TCoord, TMove, TState>` in `src/application/ports/game-factories.ts` is an output port of layer 2.
     `factoryFor(levelId?: LevelId): Promise<GameFactory<TCell, TCoord, TMove, TState>>` gives the factory of the aggregate (decision 40) for the chosen level, and with no level id the factory of the game that the composition root registered.
     `StartGame` takes the port in its constructor in place of a `GameFactory`: it asks the port for the factory of the level of the request, then asks that factory for the started game.
     So the use case keeps the choice of the level, and no file of `src/application/` names a variant (decision 31).
@@ -1940,7 +1940,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     A request with no level id reads no level and no progress.
     `LevelGameFactories` in `src/adapters/level-game-factories.ts` implements the port in layer 3.
     It takes the `GameId` of the game, the registered variant factory, the one `MatchIdGenerator` of the root, the `LevelRepository` and an optional `LevelVariant`, and it builds the `GameFactory` of the registered variant factory once.
-    `LevelVariant` lives in `src/domain/engine/level-variant.ts`, because it names only domain types (#407).
+    `LevelVariant` lives in `src/domain/engine/factory/level-variant.ts`, because it names only domain types (#407).
     For a level id it asks `LevelRepository.levelOf()` for the definition (decision 58).
     Its `LevelVariant` turns the definition into a variant factory: `factoryOf(definition)` creates the level builder of the variant, gives it to `LevelDefinition.buildWith()`, the Director of decision 15, and creates the variant factory of the built level.
     Then `LevelGameFactories` creates a `GameFactory` over that variant factory with the same id generator.
@@ -1965,9 +1965,9 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
 60. **The achievements screen: `ListAchievements` and its goals (#188, proposal).**
     The team prototype names the achievements, and #188 lists seven of them: clear 3 lines at once, reach 256 and reach 2048 in Hexa Merge, win 3 levels of Hexa Fit and of Hexa Sort, win every Hexa Fit level, and complete 10 goals in Hexa Sort.
     No requirement of `docs/REQUIREMENTS.md` asks for them.
-    `ListAchievements` in `src/application/list-achievements.ts` implements `UseCase<ListAchievementsRequest, AchievementSummary[]>`.
+    `ListAchievements` in `src/application/achievements/list-achievements.ts` implements `UseCase<ListAchievementsRequest, AchievementSummary[]>`.
     Its request has no member, and it gives one `AchievementSummary` per achievement, in the order of its list: the `id` of the achievement and `completed: boolean`.
-    `Achievement` in `src/application/achievement.ts` is plain data: an `id` and an optional `AchievementGoal`.
+    `Achievement` in `src/application/achievements/achievement.ts` is plain data: an `id` and an optional `AchievementGoal`.
     Since #326 `AchievementGoal`, `LevelsWon` and `EveryLevelWon` live in layer 1, in `src/domain/achievements/achievement-goal.ts`, and import nothing from layer 2: a goal such as «win 3 levels of Hexa Fit» holds on paper, with no software, and a domain object calls no repository (decision of the product owner of 2026-11-23).
     `AchievementGoal` is a Strategy with two queries.
     `gameId(): GameId` names the game whose data the goal reads, an identity query in the form of `LevelDefinition.levelId()`.
@@ -2043,7 +2043,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     Today `GameResult.of` in `src/domain/progress/progress-model.ts` requires `moves`, and #176 and #180 build the second form.
     The saved format does not change: `ProgressRecord` already keeps only the game id and the score for a game with no levels (decision 57), so only the construction of `GameResult` changes.
     One read path serves both games.
-    `MoveResult` in `src/application/move-result.ts` carries the optional move count and the optional level id to the presenter, as it carries `score` and `elapsedMs`: as value objects that no use case opens (rule R-no-delivery-call).
+    `MoveResult` in `src/application/game/move-result.ts` carries the optional move count and the optional level id to the presenter, as it carries `score` and `elapsedMs`: as value objects that no use case opens (rule R-no-delivery-call).
     `moveResultOf()` is the one place that fills them.
     The aggregate root keeps the level id.
     The level of a match is a fact of the match, and it never changes while the match lives.
@@ -2138,6 +2138,11 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     Since #406 it also holds `counts-for-achievements` (decision 60).
     `createProgressModel()` stays in `IVariantFactory` (decision 31), so the engine imports the progress through one type import, in `variant-factory.ts`.
     Since #407 `level-variant.ts` adds a second type import, `LevelDefinition` (decision 59).
+    Since #499 `src/domain/engine/` has subfolders by game concern: `turn/`, `board/`, `geometry/`, `history/`, `events/`, `factory/` and `random/`.
+    `MatchId`, `Color` and `Cloneable` stay at the root of the folder.
+    A subfolder imports only the subfolders after it, so the subfolders form no cycle.
+    `events/` is its own subfolder, because `board-state.ts` imports `game-events.ts` and `game-engine.ts` imports `board-state.ts`.
+    The rule `engine-folders-no-cycle` of `.dependency-cruiser.cjs` refuses a cycle between two subfolders, and the README of the folder says what each subfolder may import.
     Reasons: the 12 files of the progress and the achievements import only the five leaves and `TopologyId` from the engine, and in the engine only `variant-factory.ts` imports them, as a type.
     `IProgressModel.record()` names `GameProgress`, so the interface cannot stay in the engine without a cycle between two folders.
     The `shared` folder breaks that cycle.
@@ -2206,13 +2211,13 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     A progress of another game throws a `RangeError`, and the progress stays as it was.
     So the merge rule has one home in the aggregate, and it reads no field of another object (rule R-domain-private-fields).
     **The ports.**
-    `ProgressGateway` in `src/application/progress-gateway.ts` sends a progress with the `Session` and gives back the progress that the backend keeps after the sync.
+    `ProgressGateway` in `src/application/ports/progress-gateway.ts` sends a progress with the `Session` and gives back the progress that the backend keeps after the sync.
     It is no repository: the local progress stays the store.
     A known failure throws a `SyncFailure` with the code `session-expired` or `backend-unreachable`.
-    `AnonymousProgress` in `src/application/anonymous-progress.ts` merges the anonymous space, the progress saved with no account, into the progress of an owner with `mergeAnonymousInto(owner, gameId)`, and forgets it only after the merged progress is saved, so a failed save keeps it.
+    `AnonymousProgress` in `src/application/ports/anonymous-progress.ts` merges the anonymous space, the progress saved with no account, into the progress of an owner with `mergeAnonymousInto(owner, gameId)`, and forgets it only after the merged progress is saved, so a failed save keeps it.
     It is a second role of the one repository of the progress aggregate (decision 52), so `SaveProgress` and `ListLevels` do not see it (ISP).
     **The owner (judgment-day round 1, option A).**
-    The progress belongs to `ProgressOwner`, a value object in `src/application/progress-owner.ts`: the last signed-in user, or the anonymous owner.
+    The progress belongs to `ProgressOwner`, a value object in `src/application/ports/progress-owner.ts`: the last signed-in user, or the anonymous owner.
     `SessionStore` keeps the user id apart from the token: `owner()` gives it, `clear()` forgets the token only, and `write()` of another session changes the owner.
     So a 401 keeps the levels of the player open.
     `SessionManager` writes the version 2 shape `{version, userId, token?}` and still reads the version 1 shape of #45.
@@ -2274,7 +2279,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     **The use cases.**
     One input port per board, as hexablock-api#218 decided for the API: `GetGlobalLeaderboard` implements `UseCase<GlobalLeaderboardRequest, Leaderboard>`, and `GetLevelLeaderboard` implements `UseCase<LevelLeaderboardRequest, Leaderboard>`.
     The board of a level has its own request with the `LevelId` and its own failure, `level-has-no-board`, so a second port keeps each request exact and adds no optional field.
-    Both share `readBoard()` of `src/application/leaderboard.ts`, so the rule of the session has one home.
+    Both share `readBoard()` of `src/application/ports/leaderboard.ts`, so the rule of the session has one home.
     Both routes of the API need a token, so the use case reads the session through `SessionStore`, as `SyncProgress` does (decision 66), and no `AuthorizationAspect` wraps it.
     With no session it calls no backend and gives `sign-in-required`.
     A `LeaderboardFailure` of the `LeaderboardGateway` port gives its code: `session-expired` for a refused token, which also clears the token through `SessionStore.clear()` and keeps the owner of the progress, `backend-unreachable` for no answer, and `level-has-no-board` for a level that the backend does not hold (hexablock-api#134).

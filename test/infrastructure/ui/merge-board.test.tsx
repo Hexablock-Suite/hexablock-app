@@ -2,9 +2,9 @@ import { render, screen } from '@testing-library/react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { textCatalog } from '../../../src/adapters/texts/text-catalog';
-import { Mulberry32Random } from '../../../src/domain/engine/mulberry32-random';
-import { RegionSize } from '../../../src/domain/engine/region-size';
-import { Seed } from '../../../src/domain/engine/seed';
+import { Mulberry32Random } from '../../../src/domain/engine/random/mulberry32-random';
+import { RegionSize } from '../../../src/domain/engine/geometry/region-size';
+import { Seed } from '../../../src/domain/engine/random/seed';
 import { slideWays } from '../../../src/adapters/merge-slide-ways';
 import { boardFigures, mergeOn } from '../../../src/infrastructure/registered-games';
 import { BOARD_ID } from '../../support/engine/entity-ids';

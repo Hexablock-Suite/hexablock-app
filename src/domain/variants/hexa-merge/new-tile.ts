@@ -1,4 +1,4 @@
-import type { RandomDraw } from '../../engine/random-draw';
+import type { RandomDraw } from '../../engine/random/random-draw';
 import type { IMergeable } from './mergeable';
 
 // One draw of the Merge tile source: the tile that appears after a slide, and where.

@@ -1,11 +1,11 @@
-import type { Board, ReadonlyBoard } from '../../engine/board';
-import { BoardSnapshot, checkOwnSnapshot, type BoardState } from '../../engine/board-state';
-import type { GameStateId } from '../../engine/game-state-id';
+import type { Board, ReadonlyBoard } from '../../engine/board/board';
+import { BoardSnapshot, checkOwnSnapshot, type BoardState } from '../../engine/board/board-state';
+import type { GameStateId } from '../../engine/board/game-state-id';
 import type { MatchId } from '../../engine/match-id';
 import { Moves } from '../../shared/moves';
 import { Score } from '../../shared/score';
-import type { Piece } from '../../engine/piece';
-import type { IPieceSource } from '../../engine/piece-source';
+import type { Piece } from '../../engine/board/piece';
+import type { IPieceSource } from '../../engine/random/piece-source';
 import type { PieceId } from './piece-id';
 import { PieceRegister } from './piece-register';
 import type { Placement } from './placement';

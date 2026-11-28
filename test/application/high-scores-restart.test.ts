@@ -1,8 +1,8 @@
 /** @jest-environment node */
 import type { KeyValueStore } from '../../src/adapters/key-value-store';
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
-import { LoadProgress } from '../../src/application/load-progress';
-import { SaveProgress } from '../../src/application/save-progress';
+import { LoadProgress } from '../../src/application/progress/load-progress';
+import { SaveProgress } from '../../src/application/progress/save-progress';
 import { Result } from '../../src/application/result';
 import { HighScoreProgress } from '../../src/domain/progress/high-score-progress';
 import { GameId } from '../../src/domain/shared/game-id';

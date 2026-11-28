@@ -1,7 +1,7 @@
-import type { GeometryFactory } from '../../../src/domain/engine/geometry-factory';
-import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
-import { SquareGeometry } from '../../../src/domain/engine/square-geometry';
-import { TriangleGeometry } from '../../../src/domain/engine/triangle-geometry';
+import type { GeometryFactory } from '../../../src/domain/engine/geometry/geometry-factory';
+import { HexGeometry } from '../../../src/domain/engine/geometry/hex-geometry';
+import { SquareGeometry } from '../../../src/domain/engine/geometry/square-geometry';
+import { TriangleGeometry } from '../../../src/domain/engine/geometry/triangle-geometry';
 
 // A test that needs the geometry of one board figure. The geometry keeps its coordinate type,
 // so the test reads the coordinates of a level file through it (issue #354).

@@ -1,15 +1,15 @@
 /** @jest-environment node */
-import { Outcome } from '../../../src/domain/engine/outcome';
+import { Outcome } from '../../../src/domain/engine/events/outcome';
 import { Moves } from '../../../src/domain/shared/moves';
 import { Score } from '../../../src/domain/shared/score';
-import type { Board } from '../../../src/domain/engine/board';
-import { BoardId } from '../../../src/domain/engine/board-id';
+import type { Board } from '../../../src/domain/engine/board/board';
+import { BoardId } from '../../../src/domain/engine/board/board-id';
 import { GameId } from '../../../src/domain/shared/game-id';
-import { GameStateId } from '../../../src/domain/engine/game-state-id';
+import { GameStateId } from '../../../src/domain/engine/board/game-state-id';
 import { MatchId } from '../../../src/domain/engine/match-id';
-import { hex, HexAxis, type HexCoord } from '../../../src/domain/engine/hex-topology';
-import { Resolution } from '../../../src/domain/engine/resolution';
-import { Turns } from '../../../src/domain/engine/turns';
+import { hex, HexAxis, type HexCoord } from '../../../src/domain/engine/geometry/hex-topology';
+import { Resolution } from '../../../src/domain/engine/turn/resolution';
+import { Turns } from '../../../src/domain/engine/geometry/turns';
 import { FitScoring } from '../../../src/domain/variants/hexa-fit/fit-scoring';
 import { Placement } from '../../../src/domain/variants/hexa-fit/placement';
 import { CellCount } from '../../../src/domain/variants/hexa-lines/cell-count';
@@ -42,7 +42,7 @@ import {
   stack,
   tiles,
 } from '../../support/variants/hexa-sort/sort-game';
-import { GameFactory } from '../../../src/domain/engine/game-factory';
+import { GameFactory } from '../../../src/domain/engine/factory/game-factory';
 import {
   fitViewData,
   linesViewData,

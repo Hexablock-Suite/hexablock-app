@@ -2,13 +2,13 @@ import {
   AccountFailure,
   type AccountFailureCode,
   type AccountGateway,
-} from '../../src/application/account-gateway';
-import type { Credentials } from '../../src/application/credentials';
-import { Login } from '../../src/application/login';
-import { Register } from '../../src/application/register';
+} from '../../src/application/ports/account-gateway';
+import type { Credentials } from '../../src/application/ports/credentials';
+import { Login } from '../../src/application/account/login';
+import { Register } from '../../src/application/account/register';
 import { FailureCode, type Result } from '../../src/application/result';
-import { Session } from '../../src/application/session';
-import type { SessionStore } from '../../src/application/session-store';
+import { Session } from '../../src/application/ports/session';
+import type { SessionStore } from '../../src/application/ports/session-store';
 import type { UseCase } from '../../src/application/use-case';
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
 import { GameId } from '../../src/domain/shared/game-id';

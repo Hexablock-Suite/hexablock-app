@@ -1,4 +1,4 @@
-import type { MatchIdGenerator } from '../../../src/domain/engine/match-id-generator';
+import type { MatchIdGenerator } from '../../../src/domain/engine/factory/match-id-generator';
 
 // The count of ids that the suite asks for.
 const IDS = 50;

@@ -3,9 +3,9 @@ import { HexLayout } from '../../src/adapters/board/hex-layout';
 import { SquareLayout } from '../../src/adapters/board/square-layout';
 import { MergeMoveMapper } from '../../src/adapters/merge-move-mapper';
 import { slideWays } from '../../src/adapters/merge-slide-ways';
-import { HexGeometry } from '../../src/domain/engine/hex-geometry';
-import { RegionSize } from '../../src/domain/engine/region-size';
-import { SquareGeometry } from '../../src/domain/engine/square-geometry';
+import { HexGeometry } from '../../src/domain/engine/geometry/hex-geometry';
+import { RegionSize } from '../../src/domain/engine/geometry/region-size';
+import { SquareGeometry } from '../../src/domain/engine/geometry/square-geometry';
 
 // Issue #405: the Merge controls send a plain intent, the compass name of a way on the screen.
 // `MergeMoveMapper` of layer 3 keeps the slide ways of the board figure and gives the `Slide`

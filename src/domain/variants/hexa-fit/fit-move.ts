@@ -1,6 +1,6 @@
-import type { ReadonlyBoard } from '../../engine/board';
-import type { CoordKey } from '../../engine/coord-key';
-import type { Turns } from '../../engine/turns';
+import type { ReadonlyBoard } from '../../engine/board/board';
+import type { CoordKey } from '../../engine/geometry/coord-key';
+import type { Turns } from '../../engine/geometry/turns';
 import type { FitSnapshot, FitState } from './fit-state';
 import type { PieceId } from './piece-id';
 import { Placement } from './placement';

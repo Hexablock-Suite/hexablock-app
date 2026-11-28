@@ -1,4 +1,4 @@
-import type { Board as Grid } from '../../engine/board';
+import type { Board as Grid } from '../../engine/board/board';
 import type { BoardState } from '../../engine/board-state';
 import type { Color } from './color';
 

@@ -1,11 +1,11 @@
 import { Color } from '../../engine/color';
-import type { GeometryFactory } from '../../engine/geometry-factory';
+import type { GeometryFactory } from '../../engine/geometry/geometry-factory';
 import type { TopologyId } from '../../shared/topology-id';
 import type { ILevelBuilder } from '../../progress/level-builder';
 import { fieldsOf } from '../../progress/level-fields';
 import { Moves } from '../../shared/moves';
-import { RegionSize } from '../../engine/region-size';
-import { Seed } from '../../engine/seed';
+import { RegionSize } from '../../engine/geometry/region-size';
+import { Seed } from '../../engine/random/seed';
 import { ColorStack } from './color-stack';
 import { GoalCount } from './goal-count';
 import { SortLevel } from './sort-level';

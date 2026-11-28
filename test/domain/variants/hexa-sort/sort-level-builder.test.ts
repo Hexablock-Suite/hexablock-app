@@ -1,11 +1,11 @@
 /** @jest-environment node */
 import { Color } from '../../../../src/domain/engine/color';
 import { TopologyId } from '../../../../src/domain/shared/topology-id';
-import { HexGeometry } from '../../../../src/domain/engine/hex-geometry';
+import { HexGeometry } from '../../../../src/domain/engine/geometry/hex-geometry';
 import { LevelDefinition } from '../../../../src/domain/progress/level-definition';
 import { Moves } from '../../../../src/domain/shared/moves';
-import { RegionSize } from '../../../../src/domain/engine/region-size';
-import { Seed } from '../../../../src/domain/engine/seed';
+import { RegionSize } from '../../../../src/domain/engine/geometry/region-size';
+import { Seed } from '../../../../src/domain/engine/random/seed';
 import { GoalCount } from '../../../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../../../src/domain/variants/hexa-sort/sort-factory';
 import { SortLevel } from '../../../../src/domain/variants/hexa-sort/sort-level';

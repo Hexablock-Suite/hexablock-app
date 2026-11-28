@@ -1,5 +1,5 @@
 import { MatchId } from '../../../src/domain/engine/match-id';
-import type { MatchIdGenerator } from '../../../src/domain/engine/match-id-generator';
+import type { MatchIdGenerator } from '../../../src/domain/engine/factory/match-id-generator';
 
 // Match ids for the tests. They exist only in test/.
 

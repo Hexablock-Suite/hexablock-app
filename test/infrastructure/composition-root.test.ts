@@ -14,7 +14,7 @@ import { LevelStatus } from '../../src/domain/progress/level-status';
 import { ProgressRecord } from '../../src/domain/progress/progress-model';
 import { Score } from '../../src/domain/shared/score';
 import { Stars } from '../../src/domain/progress/stars';
-import { Turns } from '../../src/domain/engine/turns';
+import { Turns } from '../../src/domain/engine/geometry/turns';
 import { PlaceFitPiece } from '../../src/domain/variants/hexa-fit/fit-move';
 import { PieceId } from '../../src/domain/variants/hexa-fit/piece-id';
 import { StackCleared } from '../../src/domain/variants/hexa-sort/stack-cleared';

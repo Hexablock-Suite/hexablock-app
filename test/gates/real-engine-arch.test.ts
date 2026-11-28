@@ -36,7 +36,7 @@ function copyRealEngine(name: string): string {
       recursive: true,
     });
   }
-  expect(existsSync(path.join(root, 'src/domain/engine/game-engine.ts'))).toBe(true);
+  expect(existsSync(path.join(root, 'src/domain/engine/turn/game-engine.ts'))).toBe(true);
   return root;
 }
 
@@ -66,8 +66,8 @@ describe('architecture gate on the real engine code', () => {
       'export const linesRules = 1;\n',
     );
     appendFileSync(
-      path.join(root, 'src/domain/engine/game-engine.ts'),
-      "\nexport { linesRules } from '../variants/hexa-lines/rules';\n",
+      path.join(root, 'src/domain/engine/turn/game-engine.ts'),
+      "\nexport { linesRules } from '../../variants/hexa-lines/rules';\n",
     );
 
     const result = cruise(root);
@@ -81,7 +81,7 @@ describe('architecture gate on the real engine code', () => {
     const root = copyRealEngine('progress-import');
     appendFileSync(
       path.join(root, 'src/domain/progress/progress-model.ts'),
-      "\nexport type { GameEngine } from '../engine/game-engine';\n",
+      "\nexport type { GameEngine } from '../engine/turn/game-engine';\n",
     );
 
     const result = cruise(root);
@@ -93,7 +93,7 @@ describe('architecture gate on the real engine code', () => {
   it('should_fail_domain_no_framework_when_the_real_game_engine_imports_react', () => {
     const root = copyRealEngine('framework-import');
     appendFileSync(
-      path.join(root, 'src/domain/engine/game-engine.ts'),
+      path.join(root, 'src/domain/engine/turn/game-engine.ts'),
       "\nexport { useState } from 'react';\n",
     );
 

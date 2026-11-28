@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { LinesMoveMapper } from '../../src/adapters/lines-move-mapper';
-import { HexGeometry } from '../../src/domain/engine/hex-geometry';
-import type { HexCoord } from '../../src/domain/engine/hex-topology';
+import { HexGeometry } from '../../src/domain/engine/geometry/hex-geometry';
+import type { HexCoord } from '../../src/domain/engine/geometry/hex-topology';
 import { PlacePiece } from '../../src/domain/variants/hexa-lines/place-piece';
 import { TrayPosition } from '../../src/domain/variants/hexa-lines/tray-position';
 

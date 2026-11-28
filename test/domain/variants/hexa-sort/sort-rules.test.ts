@@ -1,14 +1,14 @@
 /** @jest-environment node */
-import { Outcome } from '../../../../src/domain/engine/outcome';
-import { Board } from '../../../../src/domain/engine/board';
-import { PlayingPhase } from '../../../../src/domain/engine/game-phase';
+import { Outcome } from '../../../../src/domain/engine/events/outcome';
+import { Board } from '../../../../src/domain/engine/board/board';
+import { PlayingPhase } from '../../../../src/domain/engine/turn/game-phase';
 import { Moves } from '../../../../src/domain/shared/moves';
-import { RegionSize } from '../../../../src/domain/engine/region-size';
-import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
-import { Seed } from '../../../../src/domain/engine/seed';
-import { BaseGameRules } from '../../../../src/domain/engine/rules';
+import { RegionSize } from '../../../../src/domain/engine/geometry/region-size';
+import { SeededPieceSource } from '../../../../src/domain/engine/random/piece-source';
+import { Seed } from '../../../../src/domain/engine/random/seed';
+import { BaseGameRules } from '../../../../src/domain/engine/turn/rules';
 import { Color } from '../../../../src/domain/engine/color';
-import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
+import { SquareGeometry } from '../../../../src/domain/engine/geometry/square-geometry';
 import { ClearedStacks } from '../../../../src/domain/variants/hexa-sort/cleared-stacks';
 import { ColorStack } from '../../../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../../../src/domain/variants/hexa-sort/goal-count';
@@ -30,7 +30,7 @@ import {
   trayOf,
 } from '../../../support/variants/hexa-sort/sort-game';
 import { BOARD_ID } from '../../../support/engine/entity-ids';
-import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
+import type { IScoringPolicy } from '../../../../src/domain/engine/turn/scoring-policy';
 import { playMove } from '../../../support/engine/play-move';
 import { startVariant } from '../../../support/engine/variant-game';
 import { seededRandom } from '../../../support/engine/step-random';

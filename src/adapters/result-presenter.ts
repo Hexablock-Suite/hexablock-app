@@ -1,10 +1,10 @@
-import type { LevelList } from '../application/level-summary';
-import type { ListLevelsRequest } from '../application/list-levels';
-import type { MoveResult } from '../application/move-result';
-import type { SyncProgressRequest } from '../application/sync-progress';
+import type { LevelList } from '../application/levels/level-summary';
+import type { ListLevelsRequest } from '../application/levels/list-levels';
+import type { MoveResult } from '../application/game/move-result';
+import type { SyncProgressRequest } from '../application/progress/sync-progress';
 import { caughtError, FailureCode, Result } from '../application/result';
 import type { UseCase } from '../application/use-case';
-import { Outcome } from '../domain/engine/outcome';
+import { Outcome } from '../domain/engine/events/outcome';
 import type { LevelId } from '../domain/progress/level-id';
 import { LevelStatus } from '../domain/progress/level-status';
 import { GameResult } from '../domain/progress/progress-model';

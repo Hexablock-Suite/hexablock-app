@@ -1,12 +1,12 @@
-import type { BoardShape } from '../../engine/board-shape';
-import type { CoordKey } from '../../engine/coord-key';
+import type { BoardShape } from '../../engine/geometry/board-shape';
+import type { CoordKey } from '../../engine/geometry/coord-key';
 import type { ElapsedTime } from '../../shared/elapsed-time';
 import type { TopologyId } from '../../shared/topology-id';
 import type { IStarsByMovesAndTime } from '../../progress/level-progress';
 import type { Moves } from '../../shared/moves';
-import type { Piece } from '../../engine/piece';
-import { frozenListOf } from '../../engine/frozen-list';
-import { CellNode, ShapeGroup } from '../../engine/shape-node';
+import type { Piece } from '../../engine/board/piece';
+import { frozenListOf } from '../../engine/random/frozen-list';
+import { CellNode, ShapeGroup } from '../../engine/geometry/shape-node';
 import { starsOf } from '../../progress/star-count';
 import type { Stars } from '../../progress/stars';
 import { FitPlay, type FitStarThreshold } from './fit-stars';

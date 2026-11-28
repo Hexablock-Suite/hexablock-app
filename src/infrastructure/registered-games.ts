@@ -23,24 +23,24 @@ import {
   type SortCellView,
   type SortPayloadView,
 } from '../adapters/sort-state-mapper';
-import { BoardShape } from '../domain/engine/board-shape';
-import type { Clock } from '../domain/engine/clock';
+import { BoardShape } from '../domain/engine/geometry/board-shape';
+import type { Clock } from '../domain/engine/turn/clock';
 import { Color } from '../domain/engine/color';
 import { ElapsedTime } from '../domain/shared/elapsed-time';
 import { GameId } from '../domain/shared/game-id';
-import type { GeometryFactory } from '../domain/engine/geometry-factory';
+import type { GeometryFactory } from '../domain/engine/geometry/geometry-factory';
 import { TopologyId } from '../domain/shared/topology-id';
-import type { GridAxis } from '../domain/engine/grid-topology';
-import { HexGeometry } from '../domain/engine/hex-geometry';
+import type { GridAxis } from '../domain/engine/geometry/grid-topology';
+import { HexGeometry } from '../domain/engine/geometry/hex-geometry';
 import { Moves } from '../domain/shared/moves';
-import { Piece } from '../domain/engine/piece';
-import type { RandomSource } from '../domain/engine/random-source';
-import { RegionSize } from '../domain/engine/region-size';
-import { CellNode, ShapeGroup } from '../domain/engine/shape-node';
-import { SquareGeometry } from '../domain/engine/square-geometry';
-import { TriangleGeometry } from '../domain/engine/triangle-geometry';
-import { triangle, type TriangleCoord } from '../domain/engine/triangle-topology';
-import type { Turns } from '../domain/engine/turns';
+import { Piece } from '../domain/engine/board/piece';
+import type { RandomSource } from '../domain/engine/random/random-source';
+import { RegionSize } from '../domain/engine/geometry/region-size';
+import { CellNode, ShapeGroup } from '../domain/engine/geometry/shape-node';
+import { SquareGeometry } from '../domain/engine/geometry/square-geometry';
+import { TriangleGeometry } from '../domain/engine/geometry/triangle-geometry';
+import { triangle, type TriangleCoord } from '../domain/engine/geometry/triangle-topology';
+import type { Turns } from '../domain/engine/geometry/turns';
 import { FitFactory } from '../domain/variants/hexa-fit/fit-factory';
 import { FitLevel } from '../domain/variants/hexa-fit/fit-level';
 import { fitLevelVariant } from '../domain/variants/hexa-fit/fit-level-variant';

@@ -1,7 +1,7 @@
-import { Outcome } from '../../engine/outcome';
-import { Resolution } from '../../engine/resolution';
-import { BaseGameRules } from '../../engine/rules';
-import { Turns } from '../../engine/turns';
+import { Outcome } from '../../engine/events/outcome';
+import { Resolution } from '../../engine/turn/resolution';
+import { BaseGameRules } from '../../engine/turn/rules';
+import { Turns } from '../../engine/geometry/turns';
 import { PlaceFitPiece, RemoveFitPiece, RotateFitPiece, type FitMove } from './fit-move';
 import type { FitState } from './fit-state';
 

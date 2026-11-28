@@ -1,17 +1,17 @@
 /** @jest-environment node */
-import { Board } from '../../../src/domain/engine/board';
-import type { BoardState } from '../../../src/domain/engine/board-state';
+import { Board } from '../../../src/domain/engine/board/board';
+import type { BoardState } from '../../../src/domain/engine/board/board-state';
 import { Color } from '../../../src/domain/engine/color';
-import { Distance } from '../../../src/domain/engine/distance';
-import { CoordKey } from '../../../src/domain/engine/coord-key';
-import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
-import { HexTopology } from '../../../src/domain/engine/hex-topology';
-import { Radius } from '../../../src/domain/engine/radius';
-import { RegionSize } from '../../../src/domain/engine/region-size';
-import { SquareTopology } from '../../../src/domain/engine/square-topology';
-import { TriangleTopology } from '../../../src/domain/engine/triangle-topology';
-import { Turns } from '../../../src/domain/engine/turns';
-import type { GridAxis, GridTopology } from '../../../src/domain/engine/grid-topology';
+import { Distance } from '../../../src/domain/engine/geometry/distance';
+import { CoordKey } from '../../../src/domain/engine/geometry/coord-key';
+import { HexGeometry } from '../../../src/domain/engine/geometry/hex-geometry';
+import { HexTopology } from '../../../src/domain/engine/geometry/hex-topology';
+import { Radius } from '../../../src/domain/engine/geometry/radius';
+import { RegionSize } from '../../../src/domain/engine/geometry/region-size';
+import { SquareTopology } from '../../../src/domain/engine/geometry/square-topology';
+import { TriangleTopology } from '../../../src/domain/engine/geometry/triangle-topology';
+import { Turns } from '../../../src/domain/engine/geometry/turns';
+import type { GridAxis, GridTopology } from '../../../src/domain/engine/geometry/grid-topology';
 import type { FakeCell } from '../../support/engine/fake-cell';
 import { emptyState } from '../../support/engine/fake-game';
 import {

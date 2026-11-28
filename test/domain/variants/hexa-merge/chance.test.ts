@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { RandomDraw } from '../../../../src/domain/engine/random-draw';
+import { RandomDraw } from '../../../../src/domain/engine/random/random-draw';
 import { Chance } from '../../../../src/domain/variants/hexa-merge/chance';
 
 // The chance of a 4 is a value object (issue 210, the decision comment of 2026-11-10).

@@ -1,8 +1,8 @@
 /** @jest-environment node */
-import { Board } from '../../../src/domain/engine/board';
-import { Radius } from '../../../src/domain/engine/radius';
-import { RegionSize } from '../../../src/domain/engine/region-size';
-import { Turns } from '../../../src/domain/engine/turns';
+import { Board } from '../../../src/domain/engine/board/board';
+import { Radius } from '../../../src/domain/engine/geometry/radius';
+import { RegionSize } from '../../../src/domain/engine/geometry/region-size';
+import { Turns } from '../../../src/domain/engine/geometry/turns';
 import { fakeCell, type FakeCell } from '../../support/engine/fake-cell';
 import {
   square,

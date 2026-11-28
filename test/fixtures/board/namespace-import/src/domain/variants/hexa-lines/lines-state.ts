@@ -1,4 +1,4 @@
-import type * as engine from '../../engine/board';
+import type * as engine from '../../engine/board/board';
 import type { BoardState } from '../../engine/board-state';
 import type { Color } from './color';
 

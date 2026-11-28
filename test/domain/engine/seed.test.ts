@@ -1,10 +1,10 @@
 /** @jest-environment node */
-import { GeneratorState } from '../../../src/domain/engine/generator-state';
-import { Mulberry32Random } from '../../../src/domain/engine/mulberry32-random';
-import { SeededPieceSource } from '../../../src/domain/engine/piece-source';
-import { RandomDraw } from '../../../src/domain/engine/random-draw';
-import type { RandomSource } from '../../../src/domain/engine/random-source';
-import { Seed } from '../../../src/domain/engine/seed';
+import { GeneratorState } from '../../../src/domain/engine/random/generator-state';
+import { Mulberry32Random } from '../../../src/domain/engine/random/mulberry32-random';
+import { SeededPieceSource } from '../../../src/domain/engine/random/piece-source';
+import { RandomDraw } from '../../../src/domain/engine/random/random-draw';
+import type { RandomSource } from '../../../src/domain/engine/random/random-source';
+import { Seed } from '../../../src/domain/engine/random/seed';
 import { delivered } from '../../support/engine/value-receiver';
 
 // The seed of a game is a value object (issue 210, classes.md decision 48).

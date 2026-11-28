@@ -1,16 +1,16 @@
 /** @jest-environment node */
-import { Outcome } from '../../src/domain/engine/outcome';
+import { Outcome } from '../../src/domain/engine/events/outcome';
 import { phaseNameOf } from '../support/engine/phase-name';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
-import type { GameRepository } from '../../src/application/game-repository';
+import type { GameRepository } from '../../src/application/ports/game-repository';
 import { Result } from '../../src/application/result';
-import { SaveProgress } from '../../src/application/save-progress';
-import { UndoMove } from '../../src/application/undo-move';
-import type { BoardState } from '../../src/domain/engine/board-state';
+import { SaveProgress } from '../../src/application/progress/save-progress';
+import { UndoMove } from '../../src/application/game/undo-move';
+import type { BoardState } from '../../src/domain/engine/board/board-state';
 import { GameId } from '../../src/domain/shared/game-id';
-import type { HexCoord } from '../../src/domain/engine/hex-topology';
+import type { HexCoord } from '../../src/domain/engine/geometry/hex-topology';
 import { Moves } from '../../src/domain/shared/moves';
 import { GameResult, ProgressRecord } from '../../src/domain/progress/progress-model';
 import type { Score } from '../../src/domain/shared/score';
@@ -18,13 +18,13 @@ import type { MergeFactory } from '../../src/domain/variants/hexa-merge/merge-fa
 import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-store';
 import { RecordingPublisher } from '../support/application/recording-publisher';
 import { dataOf, gameEndedEventsIn } from '../support/engine/game-ended';
-import { PlayingPhase } from '../../src/domain/engine/game-phase';
-import type { IPieceSource } from '../../src/domain/engine/piece-source';
+import { PlayingPhase } from '../../src/domain/engine/turn/game-phase';
+import type { IPieceSource } from '../../src/domain/engine/random/piece-source';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
 import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
 import { MatchId } from '../../src/domain/engine/match-id';
-import { Turns } from '../../src/domain/engine/turns';
-import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
+import { Turns } from '../../src/domain/engine/geometry/turns';
+import type { IVariantFactory } from '../../src/domain/engine/factory/variant-factory';
 import { PlaceFitPiece } from '../../src/domain/variants/hexa-fit/fit-move';
 import type { MergeTile } from '../../src/domain/variants/hexa-merge/merge-tile';
 import type { NewTile } from '../../src/domain/variants/hexa-merge/new-tile';
@@ -42,7 +42,7 @@ import { mergeFactory, mergeStateOf } from '../support/variants/hexa-merge/merge
 import { sortFactory } from '../support/variants/hexa-sort/sort-game';
 import { viewData } from '../support/variants/view-data';
 import { repoRoot } from '../support/run-tool';
-import { ProgressOwner } from '../../src/application/progress-owner';
+import { ProgressOwner } from '../../src/application/ports/progress-owner';
 
 // `UndoMove` takes back the last move of a variant that has a history (issue 159, APP-FR-08,
 // docs/architecture/flows.md use case 4, classes.md decisions 27 and 34).
@@ -213,7 +213,7 @@ describe('UndoMove', () => {
   });
 
   it('should_name_no_variant_when_its_source_is_read', () => {
-    const source = readFileSync(join(repoRoot, 'src/application/undo-move.ts'), 'utf8');
+    const source = readFileSync(join(repoRoot, 'src/application/game/undo-move.ts'), 'utf8');
 
     expect(source).not.toMatch(/hexa-|domain\/variants|Lines|Fit|Sort|Merge/);
   });

@@ -1,6 +1,6 @@
-import type { Logger } from '../../../src/application/logger';
+import type { Logger } from '../../../src/application/aspects/logger';
 import { Result, UseCaseError } from '../../../src/application/result';
-import { logEntryOf } from '../../../src/application/logger';
+import { logEntryOf } from '../../../src/application/aspects/logger';
 
 // A logger under test and the count of records that it wrote.
 export interface LoggerUnderTest {

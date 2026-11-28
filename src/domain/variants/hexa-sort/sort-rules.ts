@@ -1,7 +1,7 @@
-import type { ReadonlyBoard } from '../../engine/board';
-import { Outcome } from '../../engine/outcome';
-import { Resolution } from '../../engine/resolution';
-import { BaseGameRules } from '../../engine/rules';
+import type { ReadonlyBoard } from '../../engine/board/board';
+import { Outcome } from '../../engine/events/outcome';
+import { Resolution } from '../../engine/turn/resolution';
+import { BaseGameRules } from '../../engine/turn/rules';
 import type { ColorStack } from './color-stack';
 import { PlaceStack } from './place-stack';
 import type { SortState } from './sort-state';

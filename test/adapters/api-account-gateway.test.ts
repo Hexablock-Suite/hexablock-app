@@ -8,10 +8,10 @@ import type {
 import { ApiAccountGateway } from '../../src/adapters/api/api-account-gateway';
 import { ApiDtoMapper } from '../../src/adapters/api/api-dto-mapper';
 import { ApiFailure } from '../../src/adapters/api/api-failure';
-import { AccountFailure } from '../../src/application/account-gateway';
-import type { Credentials } from '../../src/application/credentials';
+import { AccountFailure } from '../../src/application/ports/account-gateway';
+import type { Credentials } from '../../src/application/ports/credentials';
 import { FailureCode } from '../../src/application/result';
-import { Session } from '../../src/application/session';
+import { Session } from '../../src/application/ports/session';
 
 // #45 (APP-FR-12, decision 22): `ApiAccountGateway` signs the player up and in through the
 // transport interface `AccountApi`, and `ApiDtoMapper` turns the DTOs into a `Session`.

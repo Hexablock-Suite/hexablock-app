@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { CoordKey } from '../../../../src/domain/engine/coord-key';
+import { CoordKey } from '../../../../src/domain/engine/geometry/coord-key';
 import { TrayPosition } from '../../../../src/domain/variants/hexa-lines/tray-position';
 import { squareTopology, square } from '../../../support/engine/square-topology';
 import { delivered } from '../../../support/engine/value-receiver';

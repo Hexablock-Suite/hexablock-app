@@ -1,16 +1,20 @@
 /** @jest-environment node */
 import { TopologyId } from '../../../src/domain/shared/topology-id';
-import { hex, HexAxis, HexTopology } from '../../../src/domain/engine/hex-topology';
-import { Outcome } from '../../../src/domain/engine/outcome';
-import { square, SquareAxis, SquareTopology } from '../../../src/domain/engine/square-topology';
+import { hex, HexAxis, HexTopology } from '../../../src/domain/engine/geometry/hex-topology';
+import { Outcome } from '../../../src/domain/engine/events/outcome';
+import {
+  square,
+  SquareAxis,
+  SquareTopology,
+} from '../../../src/domain/engine/geometry/square-topology';
 import {
   triangle,
   TriangleAxis,
   TriangleTopology,
-} from '../../../src/domain/engine/triangle-topology';
-import * as hexFile from '../../../src/domain/engine/hex-topology';
-import * as squareFile from '../../../src/domain/engine/square-topology';
-import * as triangleFile from '../../../src/domain/engine/triangle-topology';
+} from '../../../src/domain/engine/geometry/triangle-topology';
+import * as hexFile from '../../../src/domain/engine/geometry/hex-topology';
+import * as squareFile from '../../../src/domain/engine/geometry/square-topology';
+import * as triangleFile from '../../../src/domain/engine/geometry/triangle-topology';
 import type { ValueReceiver } from '../../../src/domain/shared/value-receiver';
 import { deliveries, RecordingReceiver } from '../../support/engine/value-receiver';
 

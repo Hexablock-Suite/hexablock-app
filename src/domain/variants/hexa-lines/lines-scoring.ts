@@ -1,5 +1,5 @@
 import type { Score } from '../../shared/score';
-import type { IScoringPolicy } from '../../engine/scoring-policy';
+import type { IScoringPolicy } from '../../engine/turn/scoring-policy';
 import type { LinesSnapshot, LinesState } from './lines-state';
 
 // Strategy (D1): the base scoring of Hexa Lines (issue 97). It gives the points of the placed

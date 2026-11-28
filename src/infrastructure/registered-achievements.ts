@@ -1,4 +1,4 @@
-import type { Achievement } from '../application/achievement';
+import type { Achievement } from '../application/achievements/achievement';
 import { AchievementCount } from '../domain/achievements/achievement-count';
 import {
   BestCountReached,

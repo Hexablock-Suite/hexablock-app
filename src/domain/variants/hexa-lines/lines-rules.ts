@@ -1,9 +1,9 @@
-import type { ReadonlyBoard } from '../../engine/board';
+import type { ReadonlyBoard } from '../../engine/board/board';
 import type { Color } from '../../engine/color';
-import { CoordKey } from '../../engine/coord-key';
-import { Outcome } from '../../engine/outcome';
-import { Resolution } from '../../engine/resolution';
-import { BaseGameRules } from '../../engine/rules';
+import { CoordKey } from '../../engine/geometry/coord-key';
+import { Outcome } from '../../engine/events/outcome';
+import { Resolution } from '../../engine/turn/resolution';
+import { BaseGameRules } from '../../engine/turn/rules';
 import type { LinesState } from './lines-state';
 import { PlacePiece } from './place-piece';
 import { TrayPosition } from './tray-position';

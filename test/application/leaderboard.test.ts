@@ -1,14 +1,14 @@
 /** @jest-environment node */
-import { GetGlobalLeaderboard } from '../../src/application/get-global-leaderboard';
-import { GetLevelLeaderboard } from '../../src/application/get-level-leaderboard';
-import type { Leaderboard } from '../../src/application/leaderboard';
+import { GetGlobalLeaderboard } from '../../src/application/leaderboard/get-global-leaderboard';
+import { GetLevelLeaderboard } from '../../src/application/leaderboard/get-level-leaderboard';
+import type { Leaderboard } from '../../src/application/ports/leaderboard';
 import {
   LeaderboardFailure,
   type LeaderboardGateway,
-} from '../../src/application/leaderboard-gateway';
+} from '../../src/application/ports/leaderboard-gateway';
 import { FailureCode, type Result } from '../../src/application/result';
-import { Session } from '../../src/application/session';
-import type { SessionStore } from '../../src/application/session-store';
+import { Session } from '../../src/application/ports/session';
+import type { SessionStore } from '../../src/application/ports/session-store';
 import { LevelId } from '../../src/domain/progress/level-id';
 import { Stars } from '../../src/domain/progress/stars';
 import { ElapsedTime } from '../../src/domain/shared/elapsed-time';

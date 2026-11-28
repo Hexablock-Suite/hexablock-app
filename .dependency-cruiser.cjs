@@ -57,6 +57,17 @@ module.exports = {
       to: { path: layer('domain'), pathNot: '(?:^|/)src/domain/(?:shared|progress|achievements)/' },
     },
     {
+      // A folder rule: dependency-cruiser joins the modules of each folder and finds the cycles
+      // between folders. A cycle between two folders needs no cycle between two modules.
+      name: 'engine-folders-no-cycle',
+      comment:
+        'The subfolders of src/domain/engine/ form no cycle: a subfolder imports only the subfolders that its README row names (issue #499).',
+      severity: 'error',
+      scope: 'folder',
+      from: { path: '(?:^|/)src/domain/engine/[^/]+$' },
+      to: { path: '(?:^|/)src/domain/engine/[^/]+$', circular: true },
+    },
+    {
       name: 'variants-isolated',
       comment: 'A variant never imports another variant.',
       severity: 'error',
@@ -69,7 +80,7 @@ module.exports = {
         'Hexa Sort and Hexa Merge bind their own TPiece (ColorStack, NewTile): they never import the cell-made Piece or the shape Composite of the engine.',
       severity: 'error',
       from: { path: '(?:^|/)src/domain/variants/hexa-(?:sort|merge)/' },
-      to: { path: '(?:^|/)src/domain/engine/(?:piece|shape-node)\\.ts$' },
+      to: { path: '(?:^|/)src/domain/engine/(?:board/piece|geometry/shape-node)\\.ts$' },
     },
     {
       name: 'application-imports-only-domain',
@@ -84,6 +95,17 @@ module.exports = {
       severity: 'error',
       from: { path: layer('application') },
       to: { path: layer('domain/variants') },
+    },
+    {
+      // A folder rule, as engine-folders-no-cycle: a cycle between two folders needs no cycle
+      // between two modules.
+      name: 'application-folders-no-cycle',
+      comment:
+        'The folders of src/application/ form no cycle: a folder imports only the folders that its README row names (issue #500).',
+      severity: 'error',
+      scope: 'folder',
+      from: { path: '(?:^|/)src/application/[^/]+$' },
+      to: { path: '(?:^|/)src/application/[^/]+$', circular: true },
     },
     {
       name: 'board-layouts-no-variants',

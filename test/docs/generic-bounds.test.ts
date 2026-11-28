@@ -67,7 +67,7 @@ function boundsIn(source: string): Bound[] {
 
 function codeBounds(): Bound[] {
   return engineDirs.flatMap((dir) =>
-    readdirSync(dir)
+    readdirSync(dir, { recursive: true, encoding: 'utf8' })
       .filter((file) => file.endsWith('.ts'))
       .flatMap((file) => boundsIn(readFileSync(path.join(dir, file), 'utf8'))),
   );

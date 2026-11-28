@@ -1,7 +1,7 @@
-import type { AnonymousProgress } from '../application/anonymous-progress';
-import { ProgressOwner } from '../application/progress-owner';
-import type { ProgressRepository } from '../application/progress-repository';
-import type { SessionStore } from '../application/session-store';
+import type { AnonymousProgress } from '../application/ports/anonymous-progress';
+import { ProgressOwner } from '../application/ports/progress-owner';
+import type { ProgressRepository } from '../application/ports/progress-repository';
+import type { SessionStore } from '../application/ports/session-store';
 import { ElapsedTime } from '../domain/shared/elapsed-time';
 import type { GameId } from '../domain/shared/game-id';
 import { GameProgress } from '../domain/progress/game-progress';

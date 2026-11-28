@@ -1,4 +1,4 @@
-import type { TriangleCoord } from '../../domain/engine/triangle-topology';
+import type { TriangleCoord } from '../../domain/engine/geometry/triangle-topology';
 import { valuesOf, type BoardLayout, type ScreenPoint } from './board-layout';
 
 // √3 / 2: the step between two triangles of one row, in cell sizes.

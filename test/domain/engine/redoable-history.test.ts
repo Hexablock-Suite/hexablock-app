@@ -1,6 +1,6 @@
 /** @jest-environment node */
-import { MoveCommand } from '../../../src/domain/engine/move-command';
-import { RedoableHistory } from '../../../src/domain/engine/redoable-history';
+import { MoveCommand } from '../../../src/domain/engine/history/move-command';
+import { RedoableHistory } from '../../../src/domain/engine/history/redoable-history';
 
 // Issue #178: `RedoableHistory` is the history of Hexa Fit. It undoes with no limit, as
 // `MoveHistory` does, and it keeps each undone command, so a redo plays it again

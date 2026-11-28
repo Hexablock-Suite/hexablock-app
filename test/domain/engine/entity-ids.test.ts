@@ -1,7 +1,7 @@
 /** @jest-environment node */
-import { BoardId } from '../../../src/domain/engine/board-id';
-import { GameStateId } from '../../../src/domain/engine/game-state-id';
-import { LevelTimerId } from '../../../src/domain/engine/level-timer-id';
+import { BoardId } from '../../../src/domain/engine/board/board-id';
+import { GameStateId } from '../../../src/domain/engine/board/game-state-id';
+import { LevelTimerId } from '../../../src/domain/engine/turn/level-timer-id';
 import { MatchId } from '../../../src/domain/engine/match-id';
 import { BOARD_ID, STATE_ID, TIMER_ID } from '../../support/engine/entity-ids';
 

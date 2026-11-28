@@ -1,5 +1,5 @@
-import { RandomDraw } from '../../../src/domain/engine/random-draw';
-import type { RandomSource } from '../../../src/domain/engine/random-source';
+import { RandomDraw } from '../../../src/domain/engine/random/random-draw';
+import type { RandomSource } from '../../../src/domain/engine/random/random-source';
 
 // A random source that gives the numbers of a list in order, and starts again after the last one.
 // It doubles the boundary `RandomSource` only (rule R-rules-suite). It exists only in test/.

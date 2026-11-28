@@ -1,7 +1,7 @@
-import type { CoordKey } from '../../engine/coord-key';
-import type { ReadonlyBoard } from '../../engine/board';
-import type { Piece } from '../../engine/piece';
-import type { Turns } from '../../engine/turns';
+import type { CoordKey } from '../../engine/geometry/coord-key';
+import type { ReadonlyBoard } from '../../engine/board/board';
+import type { Piece } from '../../engine/board/piece';
+import type { Turns } from '../../engine/geometry/turns';
 import type { PieceId } from './piece-id';
 
 // Where a piece lies on the figure: its rotation and its offset. It is a value object.

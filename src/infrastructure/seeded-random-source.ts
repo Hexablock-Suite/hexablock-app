@@ -1,8 +1,8 @@
-import type { Clock } from '../domain/engine/clock';
-import { Mulberry32Random } from '../domain/engine/mulberry32-random';
-import type { RandomDraw } from '../domain/engine/random-draw';
-import type { RandomSource } from '../domain/engine/random-source';
-import { Seed } from '../domain/engine/seed';
+import type { Clock } from '../domain/engine/turn/clock';
+import { Mulberry32Random } from '../domain/engine/random/mulberry32-random';
+import type { RandomDraw } from '../domain/engine/random/random-draw';
+import type { RandomSource } from '../domain/engine/random/random-source';
+import { Seed } from '../domain/engine/random/seed';
 
 // The count of seeds: the unsigned 32-bit integers (classes.md decision 48).
 const SEEDS = 2 ** 32;

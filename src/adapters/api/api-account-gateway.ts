@@ -2,10 +2,10 @@ import {
   AccountFailure,
   type AccountFailureCode,
   type AccountGateway,
-} from '../../application/account-gateway';
-import type { Credentials } from '../../application/credentials';
+} from '../../application/ports/account-gateway';
+import type { Credentials } from '../../application/ports/credentials';
 import { FailureCode } from '../../application/result';
-import type { Session } from '../../application/session';
+import type { Session } from '../../application/ports/session';
 import type { AccountApi } from './account-api';
 import type { ApiDtoMapper } from './api-dto-mapper';
 import { ApiFailure } from './api-failure';

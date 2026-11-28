@@ -1,6 +1,6 @@
 import { Result } from '../../src/application/result';
 import type { UseCase } from '../../src/application/use-case';
-import { UseCaseAspect, wrapInAspects } from '../../src/application/use-case-aspect';
+import { UseCaseAspect, wrapInAspects } from '../../src/application/aspects/use-case-aspect';
 
 // Issue #323: the composition root gives each use case its aspects through one chain.
 // The chain runs from the outside in: the first aspect of the list is the outer one.

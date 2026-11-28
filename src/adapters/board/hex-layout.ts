@@ -1,4 +1,4 @@
-import type { HexCoord } from '../../domain/engine/hex-topology';
+import type { HexCoord } from '../../domain/engine/geometry/hex-topology';
 import { valuesOf, type BoardLayout, type ScreenPoint } from './board-layout';
 
 // √3 / 2: the height of a row of hexagons, in cell sizes.

@@ -1,5 +1,5 @@
-import type { Clock } from '../../../src/domain/engine/clock';
-import { ClockReading } from '../../../src/domain/engine/clock-reading';
+import type { Clock } from '../../../src/domain/engine/turn/clock';
+import { ClockReading } from '../../../src/domain/engine/turn/clock-reading';
 
 // A `Clock` that moves only when a test moves it. It exists only in test/.
 // It starts far from zero, so a test cannot take a reading for a duration.

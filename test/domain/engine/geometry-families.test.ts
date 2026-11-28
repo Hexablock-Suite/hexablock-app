@@ -1,16 +1,16 @@
 /** @jest-environment node */
-import { Area } from '../../../src/domain/engine/area';
-import type { GeometryFactory } from '../../../src/domain/engine/geometry-factory';
+import { Area } from '../../../src/domain/engine/geometry/area';
+import type { GeometryFactory } from '../../../src/domain/engine/geometry/geometry-factory';
 import { TopologyId } from '../../../src/domain/shared/topology-id';
-import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
-import { SquareGeometry } from '../../../src/domain/engine/square-geometry';
-import { SquareTopology } from '../../../src/domain/engine/square-topology';
-import { TriangleGeometry } from '../../../src/domain/engine/triangle-geometry';
+import { HexGeometry } from '../../../src/domain/engine/geometry/hex-geometry';
+import { SquareGeometry } from '../../../src/domain/engine/geometry/square-geometry';
+import { SquareTopology } from '../../../src/domain/engine/geometry/square-topology';
+import { TriangleGeometry } from '../../../src/domain/engine/geometry/triangle-geometry';
 import {
   isUp,
   TriangleTopology,
   type TriangleCoord,
-} from '../../../src/domain/engine/triangle-topology';
+} from '../../../src/domain/engine/geometry/triangle-topology';
 import { delivered } from '../../support/engine/value-receiver';
 
 // The real square and triangle families (issue 160, classes.md decision 17, D11).

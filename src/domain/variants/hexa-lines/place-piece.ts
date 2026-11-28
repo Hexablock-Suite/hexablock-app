@@ -1,6 +1,6 @@
-import type { CoordKey } from '../../engine/coord-key';
-import type { ReadonlyBoard } from '../../engine/board';
-import type { Piece } from '../../engine/piece';
+import type { CoordKey } from '../../engine/geometry/coord-key';
+import type { ReadonlyBoard } from '../../engine/board/board';
+import type { Piece } from '../../engine/board/piece';
 import type { TrayPosition } from './tray-position';
 
 // The Hexa Lines move: put the tray piece at `position` on the board.

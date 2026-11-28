@@ -1,11 +1,11 @@
 import { ApiAccountGateway } from '../../src/adapters/api/api-account-gateway';
 import { ApiDtoMapper } from '../../src/adapters/api/api-dto-mapper';
 import { SessionManager } from '../../src/adapters/session-manager';
-import type { Credentials } from '../../src/application/credentials';
-import { Login } from '../../src/application/login';
-import { Register } from '../../src/application/register';
+import type { Credentials } from '../../src/application/ports/credentials';
+import { Login } from '../../src/application/account/login';
+import { Register } from '../../src/application/account/register';
 import { FailureCode } from '../../src/application/result';
-import { Session } from '../../src/application/session';
+import { Session } from '../../src/application/ports/session';
 import { createApiClient } from '../../src/infrastructure/api/client';
 import { InMemorySecretStore } from '../support/adapters/in-memory-secret-store';
 import type { FakeRoutes } from '../support/fake-backend';

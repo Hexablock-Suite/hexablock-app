@@ -1,11 +1,11 @@
 /** @jest-environment node */
 import { Score } from '../../../../src/domain/shared/score';
-import { hex, HexAxis } from '../../../../src/domain/engine/hex-topology';
-import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
-import { GameStateId } from '../../../../src/domain/engine/game-state-id';
+import { hex, HexAxis } from '../../../../src/domain/engine/geometry/hex-topology';
+import { FixedListPieceSource } from '../../../../src/domain/engine/random/piece-source';
+import { GameStateId } from '../../../../src/domain/engine/board/game-state-id';
 import { MatchId } from '../../../../src/domain/engine/match-id';
-import { RandomDraw } from '../../../../src/domain/engine/random-draw';
-import { RegionSize } from '../../../../src/domain/engine/region-size';
+import { RandomDraw } from '../../../../src/domain/engine/random/random-draw';
+import { RegionSize } from '../../../../src/domain/engine/geometry/region-size';
 import { MergeState } from '../../../../src/domain/variants/hexa-merge/merge-state';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
 import { NewTile } from '../../../../src/domain/variants/hexa-merge/new-tile';

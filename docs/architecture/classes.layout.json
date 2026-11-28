@@ -3,94 +3,115 @@
     "all-classes": {
       "1": [
         {
-          "group": "engine|src/domain/engine",
+          "group": "engine|src/domain/engine/turn",
           "types": [
             "GameEngine",
             "Clock",
             "ClockReading",
             "VictoryPhase",
-            "HexAxis",
-            "HexGeometry",
-            "GridAxis",
             "TimedRulesDecorator",
-            "GridTopology",
-            "GameFactory",
             "PlayingPhase",
-            "Ordered",
             "LevelTimer",
-            "HexCoord",
-            "TriangleCoord",
             "BaseGameRules",
             "GameOverPhase",
-            "Distance",
-            "ShapeGroup",
-            "GameEnded",
-            "GameEndedReceiver",
             "ResolvingPhase",
-            "BoardShape",
-            "MoveCommand",
-            "GameEvent",
             "LevelTimerId",
             "PausedPhase",
-            "TriangleAxis",
-            "TriangleDirection",
-            "Area",
-            "Outcome",
             "ITimed",
-            "RedoableHistory",
-            "Turns",
-            "GeneratorState",
-            "BoardSpace",
-            "IVariantFactory",
-            "SquareGeometry",
-            "SquareDirection",
-            "IRedoable",
-            "CoordKeyMap",
-            "IUndoable",
-            "MatchIdGenerator",
-            "MatchId",
-            "CoordKey",
-            "SquareCoord",
-            "TriangleGeometry",
-            "CellNode",
-            "MoveHistory",
-            "UndoLimit",
             "GamePhase",
-            "RandomSource",
+            "Resolution",
+            "IGameRules",
+            "IScoringPolicy",
+            "ScoringDecorator"
+          ]
+        },
+        {
+          "group": "engine|src/domain/engine/board",
+          "types": [
+            "BoardSpace",
             "BoardId",
-            "Radius",
-            "ShapeNode",
-            "SquareAxis",
-            "HexTopology",
-            "PieceDraw",
             "GameStateId",
             "SnapshotOf",
             "ReadonlyBoard",
             "Piece",
-            "LevelVariant",
-            "Resolution",
+            "BoardState",
+            "Board",
+            "BoardSnapshot",
+            "BoardBuilder"
+          ]
+        },
+        {
+          "group": "engine|src/domain/engine/geometry",
+          "types": [
+            "HexAxis",
+            "HexGeometry",
+            "GridAxis",
+            "GridTopology",
+            "Ordered",
+            "HexCoord",
+            "TriangleCoord",
+            "Distance",
+            "ShapeGroup",
+            "BoardShape",
+            "TriangleAxis",
+            "TriangleDirection",
+            "Area",
+            "Turns",
+            "SquareGeometry",
+            "SquareDirection",
+            "CoordKeyMap",
+            "CoordKey",
+            "SquareCoord",
+            "TriangleGeometry",
+            "CellNode",
+            "Radius",
+            "ShapeNode",
+            "SquareAxis",
+            "HexTopology",
             "SquareTopology",
             "TriangleTopology",
-            "BoardState",
-            "Cloneable",
             "GeometryFactory",
-            "Board",
             "RegionSize",
-            "IGameRules",
-            "Color",
-            "BoardSnapshot",
+            "HexDirection"
+          ]
+        },
+        {
+          "group": "engine|src/domain/engine/history",
+          "types": [
+            "MoveCommand",
+            "RedoableHistory",
+            "IRedoable",
+            "IUndoable",
+            "MoveHistory",
+            "UndoLimit"
+          ]
+        },
+        {
+          "group": "engine|src/domain/engine/events",
+          "types": ["GameEnded", "GameEndedReceiver", "GameEvent", "Outcome"]
+        },
+        {
+          "group": "engine|src/domain/engine/factory",
+          "types": ["GameFactory", "IVariantFactory", "MatchIdGenerator", "LevelVariant"]
+        },
+        {
+          "group": "engine|src/domain/engine/random",
+          "types": [
+            "GeneratorState",
+            "RandomSource",
+            "PieceDraw",
             "IRandomSeeded",
-            "HexDirection",
-            "BoardBuilder",
-            "IScoringPolicy",
             "Mulberry32Random",
             "RandomDraw",
             "FixedListPieceSource",
-            "ScoringDecorator",
             "Seed",
             "IPieceSource",
             "SeededPieceSource"
           ]
+        },
+        {
+          "group": "engine|src/domain/engine",
+          "types": ["MatchId", "Cloneable", "Color"]
         },
         {
           "group": "engine|src/domain/shared",
@@ -226,70 +247,92 @@
       ],
       "2": [
         {
-          "group": "usecases|src/application",
+          "group": "usecases|src/application/game",
           "types": [
             "ApplyMove",
             "UndoMoveRequest",
             "ApplyMoveRequest",
             "ViewOf",
-            "GameRepository",
-            "ListAchievements",
-            "LoggingAspect",
-            "Result",
-            "ProgressRepository",
             "RedoMoveRequest",
-            "UseCase",
-            "AccountFailureCode",
-            "Logger",
-            "UseCaseError",
             "StartGame",
-            "ListLevels",
-            "LevelSummary",
             "UndoMove",
-            "ListAchievementsRequest",
-            "GameEventPublisher",
-            "SyncFailureCode",
-            "Achievement",
-            "AchievementSummary",
-            "UseCaseAspect",
-            "FailureCode",
-            "LevelRepository",
-            "ListLevelsRequest",
-            "LeaderboardFailureCode",
             "RedoMove",
             "StartGameRequest",
-            "UseCaseLogEntry",
+            "MoveResult"
+          ]
+        },
+        {
+          "group": "usecases|src/application/progress",
+          "types": [
             "LoadProgressRequest",
             "SaveProgress",
-            "SessionStore",
             "SyncProgressRequest",
-            "GameFactories",
-            "LevelList",
-            "ProgressOwner",
-            "AnonymousMerge",
-            "MoveResult",
-            "SyncFailure",
             "SyncProgress",
+            "LoadProgress"
+          ]
+        },
+        {
+          "group": "usecases|src/application/account",
+          "types": ["Register", "Login"]
+        },
+        {
+          "group": "usecases|src/application/leaderboard",
+          "types": [
             "GlobalLeaderboardRequest",
             "LevelLeaderboardRequest",
-            "LoadProgress",
+            "GetLevelLeaderboard",
+            "GetGlobalLeaderboard"
+          ]
+        },
+        {
+          "group": "usecases|src/application/levels",
+          "types": ["ListLevels", "LevelSummary", "ListLevelsRequest", "LevelList"]
+        },
+        {
+          "group": "usecases|src/application/achievements",
+          "types": [
+            "ListAchievements",
+            "ListAchievementsRequest",
+            "Achievement",
+            "AchievementSummary"
+          ]
+        },
+        {
+          "group": "usecases|src/application/ports",
+          "types": [
+            "GameRepository",
+            "ProgressRepository",
+            "AccountFailureCode",
+            "GameEventPublisher",
+            "SyncFailureCode",
+            "LevelRepository",
+            "LeaderboardFailureCode",
+            "SessionStore",
+            "GameFactories",
+            "ProgressOwner",
+            "AnonymousMerge",
+            "SyncFailure",
             "AnonymousProgress",
             "ProgressGateway",
             "AchievementCounterRepository",
             "Credentials",
             "AccountFailure",
-            "GetLevelLeaderboard",
             "Session",
-            "Register",
-            "GetGlobalLeaderboard",
             "AccountGateway",
             "Leaderboard",
-            "Login",
             "LeaderboardRow",
             "LeaderboardFailure",
             "LeaderboardGateway",
             "LeaderboardRecord"
           ]
+        },
+        {
+          "group": "usecases|src/application/aspects",
+          "types": ["LoggingAspect", "Logger", "UseCaseAspect", "UseCaseLogEntry"]
+        },
+        {
+          "group": "usecases|src/application",
+          "types": ["Result", "UseCase", "UseCaseError", "FailureCode"]
         },
         {
           "group": "usecases|planned",
@@ -528,80 +571,63 @@
     "part-engine": {
       "1": [
         {
-          "group": "engine|src/domain/engine",
+          "group": "engine|src/domain/engine/turn",
           "types": [
             "GameEngine",
-            "IRandomSeeded",
             "Clock",
-            "PieceDraw",
-            "RandomDraw",
-            "IPieceSource",
             "BaseGameRules",
-            "Piece",
             "ClockReading",
-            "Color",
-            "GameStateId",
-            "GameEndedReceiver",
-            "FixedListPieceSource",
             "TimedRulesDecorator",
             "LevelTimer",
-            "MatchId",
-            "GridAxis",
-            "Cloneable",
-            "BoardSpace",
-            "GeneratorState",
             "ScoringDecorator",
-            "ReadonlyBoard",
-            "GameFactory",
-            "SeededPieceSource",
-            "RedoableHistory",
-            "GameEvent",
-            "CoordKeyMap",
-            "BoardShape",
-            "IVariantFactory",
-            "UndoLimit",
-            "Seed",
-            "MoveHistory",
-            "BoardSnapshot",
-            "Turns",
-            "GridTopology",
-            "Area",
-            "Mulberry32Random",
-            "IRedoable",
-            "CoordKey",
-            "BoardId",
             "IScoringPolicy",
-            "Distance",
-            "CellNode",
-            "MoveCommand",
-            "RegionSize",
-            "GameEnded",
-            "SnapshotOf",
-            "Ordered",
-            "ShapeNode",
-            "BoardState",
             "LevelTimerId",
             "ResolvingPhase",
-            "LevelVariant",
-            "RandomSource",
-            "MatchIdGenerator",
-            "ShapeGroup",
             "IGameRules",
             "GameOverPhase",
             "Resolution",
             "PlayingPhase",
             "PausedPhase",
-            "Outcome",
             "ITimed",
-            "Radius",
             "GamePhase",
-            "VictoryPhase",
-            "IUndoable",
-            "GeometryFactory",
+            "VictoryPhase"
+          ]
+        },
+        {
+          "group": "engine|src/domain/engine/board",
+          "types": [
+            "Piece",
+            "GameStateId",
+            "BoardSpace",
+            "ReadonlyBoard",
+            "BoardSnapshot",
+            "BoardId",
+            "SnapshotOf",
+            "BoardState",
             "BoardBuilder",
+            "Board"
+          ]
+        },
+        {
+          "group": "engine|src/domain/engine/geometry",
+          "types": [
+            "GridAxis",
+            "CoordKeyMap",
+            "BoardShape",
+            "Turns",
+            "GridTopology",
+            "Area",
+            "CoordKey",
+            "Distance",
+            "CellNode",
+            "RegionSize",
+            "Ordered",
+            "ShapeNode",
+            "ShapeGroup",
+            "Radius",
+            "GeometryFactory",
             "HexAxis",
             "TriangleTopology",
-            "Board",
             "HexGeometry",
             "TriangleGeometry",
             "SquareGeometry",
@@ -616,6 +642,44 @@
             "TriangleDirection",
             "SquareDirection"
           ]
+        },
+        {
+          "group": "engine|src/domain/engine/history",
+          "types": [
+            "RedoableHistory",
+            "UndoLimit",
+            "MoveHistory",
+            "IRedoable",
+            "MoveCommand",
+            "IUndoable"
+          ]
+        },
+        {
+          "group": "engine|src/domain/engine/events",
+          "types": ["GameEndedReceiver", "GameEvent", "GameEnded", "Outcome"]
+        },
+        {
+          "group": "engine|src/domain/engine/factory",
+          "types": ["GameFactory", "IVariantFactory", "LevelVariant", "MatchIdGenerator"]
+        },
+        {
+          "group": "engine|src/domain/engine/random",
+          "types": [
+            "IRandomSeeded",
+            "PieceDraw",
+            "RandomDraw",
+            "IPieceSource",
+            "FixedListPieceSource",
+            "GeneratorState",
+            "SeededPieceSource",
+            "Seed",
+            "Mulberry32Random",
+            "RandomSource"
+          ]
+        },
+        {
+          "group": "engine|src/domain/engine",
+          "types": ["Color", "MatchId", "Cloneable"]
         },
         {
           "group": "engine|src/domain/shared",
@@ -1050,70 +1114,92 @@
           ]
         },
         {
-          "group": "usecases|src/application",
+          "group": "usecases|src/application/game",
           "types": [
             "ApplyMove",
             "RedoMoveRequest",
             "ApplyMoveRequest",
-            "UseCaseAspect",
-            "ListAchievements",
-            "UseCaseError",
-            "LevelRepository",
             "MoveResult",
             "ViewOf",
             "UndoMoveRequest",
-            "GameEventPublisher",
-            "UseCaseLogEntry",
-            "AccountFailureCode",
-            "Result",
-            "ProgressRepository",
-            "LevelSummary",
             "RedoMove",
-            "ListAchievementsRequest",
-            "UseCase",
-            "Achievement",
-            "AchievementSummary",
-            "SyncFailureCode",
-            "ListLevels",
-            "GameRepository",
-            "ListLevelsRequest",
-            "LoggingAspect",
-            "FailureCode",
-            "LeaderboardFailureCode",
             "UndoMove",
-            "SyncProgressRequest",
-            "Logger",
-            "SaveProgress",
-            "SessionStore",
             "StartGame",
+            "StartGameRequest"
+          ]
+        },
+        {
+          "group": "usecases|src/application/progress",
+          "types": [
+            "SyncProgressRequest",
+            "SaveProgress",
             "LoadProgressRequest",
-            "LevelList",
+            "LoadProgress",
+            "SyncProgress"
+          ]
+        },
+        {
+          "group": "usecases|src/application/account",
+          "types": ["Register", "Login"]
+        },
+        {
+          "group": "usecases|src/application/leaderboard",
+          "types": [
+            "GlobalLeaderboardRequest",
+            "LevelLeaderboardRequest",
+            "GetGlobalLeaderboard",
+            "GetLevelLeaderboard"
+          ]
+        },
+        {
+          "group": "usecases|src/application/levels",
+          "types": ["LevelSummary", "ListLevels", "ListLevelsRequest", "LevelList"]
+        },
+        {
+          "group": "usecases|src/application/achievements",
+          "types": [
+            "ListAchievements",
+            "ListAchievementsRequest",
+            "Achievement",
+            "AchievementSummary"
+          ]
+        },
+        {
+          "group": "usecases|src/application/ports",
+          "types": [
+            "LevelRepository",
+            "GameEventPublisher",
+            "AccountFailureCode",
+            "ProgressRepository",
+            "SyncFailureCode",
+            "GameRepository",
+            "LeaderboardFailureCode",
+            "SessionStore",
             "ProgressOwner",
             "AnonymousMerge",
             "GameFactories",
             "SyncFailure",
-            "GlobalLeaderboardRequest",
-            "StartGameRequest",
-            "LevelLeaderboardRequest",
-            "LoadProgress",
-            "SyncProgress",
             "AnonymousProgress",
             "AchievementCounterRepository",
             "ProgressGateway",
             "Credentials",
             "AccountFailure",
-            "GetGlobalLeaderboard",
             "Session",
-            "Register",
             "LeaderboardFailure",
             "AccountGateway",
-            "GetLevelLeaderboard",
-            "Login",
             "Leaderboard",
             "LeaderboardRow",
             "LeaderboardGateway",
             "LeaderboardRecord"
           ]
+        },
+        {
+          "group": "usecases|src/application/aspects",
+          "types": ["UseCaseAspect", "UseCaseLogEntry", "LoggingAspect", "Logger"]
+        },
+        {
+          "group": "usecases|src/application",
+          "types": ["UseCaseError", "Result", "UseCase", "FailureCode"]
         }
       ],
       "3": [

@@ -1,17 +1,17 @@
 /** @jest-environment node */
-import { Outcome } from '../../../../src/domain/engine/outcome';
-import { Seed } from '../../../../src/domain/engine/seed';
+import { Outcome } from '../../../../src/domain/engine/events/outcome';
+import { Seed } from '../../../../src/domain/engine/random/seed';
 import { Score } from '../../../../src/domain/shared/score';
-import { Board } from '../../../../src/domain/engine/board';
-import { GameEngine } from '../../../../src/domain/engine/game-engine';
-import { MoveHistory } from '../../../../src/domain/engine/move-history';
-import { UndoLimit } from '../../../../src/domain/engine/undo-limit';
+import { Board } from '../../../../src/domain/engine/board/board';
+import { GameEngine } from '../../../../src/domain/engine/turn/game-engine';
+import { MoveHistory } from '../../../../src/domain/engine/history/move-history';
+import { UndoLimit } from '../../../../src/domain/engine/history/undo-limit';
 import { GameId } from '../../../../src/domain/shared/game-id';
-import { PlayingPhase } from '../../../../src/domain/engine/game-phase';
-import { hex, HexAxis, type HexCoord } from '../../../../src/domain/engine/hex-topology';
-import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
-import { RegionSize } from '../../../../src/domain/engine/region-size';
-import { BaseGameRules } from '../../../../src/domain/engine/rules';
+import { PlayingPhase } from '../../../../src/domain/engine/turn/game-phase';
+import { hex, HexAxis, type HexCoord } from '../../../../src/domain/engine/geometry/hex-topology';
+import { FixedListPieceSource } from '../../../../src/domain/engine/random/piece-source';
+import { RegionSize } from '../../../../src/domain/engine/geometry/region-size';
+import { BaseGameRules } from '../../../../src/domain/engine/turn/rules';
 import { MergeRules } from '../../../../src/domain/variants/hexa-merge/merge-rules';
 import {
   MergeState,
@@ -37,7 +37,7 @@ import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 import { mergeTileSource } from '../../../../src/domain/variants/hexa-merge/merge-tile-source';
 import { accepts, firstValidMove } from '../../../support/engine/variant-game';
 import { deliveries } from '../../../support/engine/value-receiver';
-import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
+import type { IScoringPolicy } from '../../../../src/domain/engine/turn/scoring-policy';
 import { delivered } from '../../../support/engine/value-receiver';
 import { playMove } from '../../../support/engine/play-move';
 

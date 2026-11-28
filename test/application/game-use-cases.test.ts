@@ -1,27 +1,34 @@
 /** @jest-environment node */
-import { Outcome } from '../../src/domain/engine/outcome';
-import { ApplyMove } from '../../src/application/apply-move';
-import type { GameEventPublisher } from '../../src/application/game-event-publisher';
-import type { GameRepository } from '../../src/application/game-repository';
-import type { BoardState } from '../../src/domain/engine/board-state';
+import { Outcome } from '../../src/domain/engine/events/outcome';
+import { ApplyMove } from '../../src/application/game/apply-move';
+import type { GameEventPublisher } from '../../src/application/ports/game-event-publisher';
+import type { GameRepository } from '../../src/application/ports/game-repository';
+import type { BoardState } from '../../src/domain/engine/board/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
-import { GameEngine } from '../../src/domain/engine/game-engine';
-import type { GameEvent } from '../../src/domain/engine/game-events';
-import { GameFactory } from '../../src/domain/engine/game-factory';
+import { GameEngine } from '../../src/domain/engine/turn/game-engine';
+import type { GameEvent } from '../../src/domain/engine/events/game-events';
+import { GameFactory } from '../../src/domain/engine/factory/game-factory';
 import { GameId } from '../../src/domain/shared/game-id';
 import { MatchId } from '../../src/domain/engine/match-id';
-import { PlayingPhase, VictoryPhase, type GamePhase } from '../../src/domain/engine/game-phase';
-import { MoveHistory } from '../../src/domain/engine/move-history';
-import { hex } from '../../src/domain/engine/hex-topology';
-import { Piece } from '../../src/domain/engine/piece';
-import { CellNode } from '../../src/domain/engine/shape-node';
-import { FixedListPieceSource, type IPieceSource } from '../../src/domain/engine/piece-source';
-import type { Resolution } from '../../src/domain/engine/resolution';
+import {
+  PlayingPhase,
+  VictoryPhase,
+  type GamePhase,
+} from '../../src/domain/engine/turn/game-phase';
+import { MoveHistory } from '../../src/domain/engine/history/move-history';
+import { hex } from '../../src/domain/engine/geometry/hex-topology';
+import { Piece } from '../../src/domain/engine/board/piece';
+import { CellNode } from '../../src/domain/engine/geometry/shape-node';
+import {
+  FixedListPieceSource,
+  type IPieceSource,
+} from '../../src/domain/engine/random/piece-source';
+import type { Resolution } from '../../src/domain/engine/turn/resolution';
 import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
 import { Moves } from '../../src/domain/shared/moves';
 import { Score } from '../../src/domain/shared/score';
-import type { IRedoable } from '../../src/domain/engine/undo-capabilities';
-import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
+import type { IRedoable } from '../../src/domain/engine/history/undo-capabilities';
+import type { IVariantFactory } from '../../src/domain/engine/factory/variant-factory';
 import { PlacePiece } from '../../src/domain/variants/hexa-lines/place-piece';
 import { TrayPosition } from '../../src/domain/variants/hexa-lines/tray-position';
 import { MergeTile } from '../../src/domain/variants/hexa-merge/merge-tile';

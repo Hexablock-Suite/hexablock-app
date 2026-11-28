@@ -1,12 +1,12 @@
 /** @jest-environment node */
-import { Board } from '../../../src/domain/engine/board';
-import { BoardBuilder } from '../../../src/domain/engine/board-builder';
-import type { GeometryFactory } from '../../../src/domain/engine/geometry-factory';
+import { Board } from '../../../src/domain/engine/board/board';
+import { BoardBuilder } from '../../../src/domain/engine/board/board-builder';
+import type { GeometryFactory } from '../../../src/domain/engine/geometry/geometry-factory';
 import { TopologyId } from '../../../src/domain/shared/topology-id';
-import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
-import { hex, type HexCoord } from '../../../src/domain/engine/hex-topology';
-import { RegionSize } from '../../../src/domain/engine/region-size';
-import { CellNode, ShapeGroup } from '../../../src/domain/engine/shape-node';
+import { HexGeometry } from '../../../src/domain/engine/geometry/hex-geometry';
+import { hex, type HexCoord } from '../../../src/domain/engine/geometry/hex-topology';
+import { RegionSize } from '../../../src/domain/engine/geometry/region-size';
+import { CellNode, ShapeGroup } from '../../../src/domain/engine/geometry/shape-node';
 import { square, squareTopology, type SquareCoord } from '../../support/engine/square-topology';
 import { BOARD_ID } from '../../support/engine/entity-ids';
 

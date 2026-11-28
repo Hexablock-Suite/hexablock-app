@@ -3,10 +3,10 @@ import {
   FixedListPieceSource,
   SeededPieceSource,
   type IPieceSource,
-} from '../../../src/domain/engine/piece-source';
-import type { RandomSource } from '../../../src/domain/engine/random-source';
-import { Mulberry32Random } from '../../../src/domain/engine/mulberry32-random';
-import { Seed } from '../../../src/domain/engine/seed';
+} from '../../../src/domain/engine/random/piece-source';
+import type { RandomSource } from '../../../src/domain/engine/random/random-source';
+import { Mulberry32Random } from '../../../src/domain/engine/random/mulberry32-random';
+import { Seed } from '../../../src/domain/engine/random/seed';
 import { delivered } from '../../support/engine/value-receiver';
 
 // A draw function that turns one random draw into a piece name.

@@ -26,14 +26,14 @@ const files = [
 ];
 
 const ALLOWED_IMPORTS = new Set([
-  '../application/apply-move',
-  '../application/move-result',
-  '../application/redo-move',
+  '../application/game/apply-move',
+  '../application/game/move-result',
+  '../application/game/redo-move',
+  '../application/game/start-game',
+  '../application/game/undo-move',
   '../application/result',
-  '../application/start-game',
-  '../application/undo-move',
   '../application/use-case',
-  '../domain/engine/outcome',
+  '../domain/engine/events/outcome',
   '../domain/progress/level-id',
   '../domain/shared/score',
   '../domain/shared/value-receiver',

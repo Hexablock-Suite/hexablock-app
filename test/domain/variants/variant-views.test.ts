@@ -1,6 +1,6 @@
 /** @jest-environment node */
 import { Moves } from '../../../src/domain/shared/moves';
-import { FixedListPieceSource } from '../../../src/domain/engine/piece-source';
+import { FixedListPieceSource } from '../../../src/domain/engine/random/piece-source';
 import { MergeState } from '../../../src/domain/variants/hexa-merge/merge-state';
 import { ClearedStacks } from '../../../src/domain/variants/hexa-sort/cleared-stacks';
 import { GoalCount } from '../../../src/domain/variants/hexa-sort/goal-count';

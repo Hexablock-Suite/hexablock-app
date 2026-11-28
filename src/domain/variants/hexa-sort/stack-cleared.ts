@@ -1,7 +1,7 @@
 import { AchievementCount } from '../../achievements/achievement-count';
 import type { AchievementCounters } from '../../achievements/achievement-counters';
 import type { CountsForAchievements } from '../../achievements/counts-for-achievements';
-import { GameEvent } from '../../engine/game-events';
+import { GameEvent } from '../../engine/events/game-events';
 import type { GameId } from '../../shared/game-id';
 import type { MatchId } from '../../engine/match-id';
 import type { TileCount } from './tile-count';

@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { RandomDraw } from '../../../../src/domain/engine/random-draw';
+import { RandomDraw } from '../../../../src/domain/engine/random/random-draw';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
 import { NewTile } from '../../../../src/domain/variants/hexa-merge/new-tile';
 

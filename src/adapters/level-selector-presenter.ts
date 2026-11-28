@@ -1,5 +1,5 @@
-import type { ListLevelsRequest } from '../application/list-levels';
-import type { LevelList, LevelSummary } from '../application/level-summary';
+import type { ListLevelsRequest } from '../application/levels/list-levels';
+import type { LevelList, LevelSummary } from '../application/levels/level-summary';
 import type { Result } from '../application/result';
 import type { UseCase } from '../application/use-case';
 import type { LevelId } from '../domain/progress/level-id';

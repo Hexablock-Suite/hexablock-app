@@ -1,9 +1,9 @@
 /** @jest-environment node */
-import { CoordKey } from '../../../src/domain/engine/coord-key';
-import { CoordKeyMap } from '../../../src/domain/engine/coord-key-map';
-import { hex, HexTopology } from '../../../src/domain/engine/hex-topology';
-import { square, SquareTopology } from '../../../src/domain/engine/square-topology';
-import { triangle, TriangleTopology } from '../../../src/domain/engine/triangle-topology';
+import { CoordKey } from '../../../src/domain/engine/geometry/coord-key';
+import { CoordKeyMap } from '../../../src/domain/engine/geometry/coord-key-map';
+import { hex, HexTopology } from '../../../src/domain/engine/geometry/hex-topology';
+import { square, SquareTopology } from '../../../src/domain/engine/geometry/square-topology';
+import { triangle, TriangleTopology } from '../../../src/domain/engine/geometry/triangle-topology';
 import { delivered } from '../../support/engine/value-receiver';
 
 // Issue #246: a branded key counts as a primitive (decision of 2026-11-16, option A).

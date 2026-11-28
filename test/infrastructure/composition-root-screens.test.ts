@@ -12,7 +12,7 @@ import { LeaderboardPresenter } from '../../src/adapters/leaderboard-presenter';
 import { LevelSelectorPresenter } from '../../src/adapters/level-selector-presenter';
 import { LocalProgressRepository } from '../../src/adapters/local-progress-repository';
 import { textCatalog } from '../../src/adapters/texts/text-catalog';
-import { Session } from '../../src/application/session';
+import { Session } from '../../src/application/ports/session';
 import { LevelId } from '../../src/domain/progress/level-id';
 import { GameProgress } from '../../src/domain/progress/game-progress';
 import { ProgressRecord } from '../../src/domain/progress/progress-model';

@@ -1,11 +1,11 @@
 /** @jest-environment node */
-import { CoordKey } from '../../../../src/domain/engine/coord-key';
+import { CoordKey } from '../../../../src/domain/engine/geometry/coord-key';
 import { Score } from '../../../../src/domain/shared/score';
-import { Board } from '../../../../src/domain/engine/board';
-import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
-import { GameStateId } from '../../../../src/domain/engine/game-state-id';
+import { Board } from '../../../../src/domain/engine/board/board';
+import { FixedListPieceSource } from '../../../../src/domain/engine/random/piece-source';
+import { GameStateId } from '../../../../src/domain/engine/board/game-state-id';
 import { MatchId } from '../../../../src/domain/engine/match-id';
-import { RegionSize } from '../../../../src/domain/engine/region-size';
+import { RegionSize } from '../../../../src/domain/engine/geometry/region-size';
 import type { Color } from '../../../../src/domain/engine/color';
 import { CellCount } from '../../../../src/domain/variants/hexa-lines/cell-count';
 import { LineCount } from '../../../../src/domain/variants/hexa-lines/line-count';

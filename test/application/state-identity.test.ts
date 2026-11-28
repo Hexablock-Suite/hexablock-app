@@ -1,17 +1,17 @@
 /** @jest-environment node */
-import { BoardId } from '../../src/domain/engine/board-id';
-import type { BoardSnapshot, BoardState } from '../../src/domain/engine/board-state';
+import { BoardId } from '../../src/domain/engine/board/board-id';
+import type { BoardSnapshot, BoardState } from '../../src/domain/engine/board/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
 import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
-import { GameStateId } from '../../src/domain/engine/game-state-id';
+import { GameStateId } from '../../src/domain/engine/board/game-state-id';
 import { MatchId } from '../../src/domain/engine/match-id';
-import { Outcome } from '../../src/domain/engine/outcome';
+import { Outcome } from '../../src/domain/engine/events/outcome';
 import { Score } from '../../src/domain/shared/score';
-import { Turns } from '../../src/domain/engine/turns';
-import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
+import { Turns } from '../../src/domain/engine/geometry/turns';
+import type { IVariantFactory } from '../../src/domain/engine/factory/variant-factory';
 import { PlaceFitPiece } from '../../src/domain/variants/hexa-fit/fit-move';
 import type { FitView } from '../../src/domain/variants/hexa-fit/fit-state';
-import type { MoveResult } from '../../src/application/move-result';
+import type { MoveResult } from '../../src/application/game/move-result';
 import type { Result } from '../../src/application/result';
 import { gameUseCases, valueOf } from '../support/application/game-use-cases';
 import { ManualClock } from '../support/engine/manual-clock';

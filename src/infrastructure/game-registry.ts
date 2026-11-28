@@ -1,11 +1,11 @@
 import type { MoveMapper } from '../adapters/move-mapper';
 import type { StateMapper } from '../adapters/state-mapper';
-import type { ViewOf } from '../application/move-result';
-import type { BoardState } from '../domain/engine/board-state';
+import type { ViewOf } from '../application/game/move-result';
+import type { BoardState } from '../domain/engine/board/board-state';
 import type { Cloneable } from '../domain/engine/cloneable';
 import type { GameId } from '../domain/shared/game-id';
-import type { LevelVariant } from '../domain/engine/level-variant';
-import type { IVariantFactory } from '../domain/engine/variant-factory';
+import type { LevelVariant } from '../domain/engine/factory/level-variant';
+import type { IVariantFactory } from '../domain/engine/factory/variant-factory';
 import type { BoardLayout } from '../adapters/board/board-layout';
 import type { CellRenderer } from './board/cell-renderer';
 import type { MoveControls } from './ui/move-controls';

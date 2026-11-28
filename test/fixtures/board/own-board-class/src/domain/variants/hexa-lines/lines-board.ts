@@ -1,4 +1,4 @@
-import { Board } from '../../engine/board';
+import { Board } from '../../engine/board/board';
 import type { Color } from './color';
 
 // Wrong on purpose: a variant declares a board class of its own (APP-NFR-01).

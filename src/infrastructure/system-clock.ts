@@ -1,5 +1,5 @@
-import type { Clock } from '../domain/engine/clock';
-import { ClockReading } from '../domain/engine/clock-reading';
+import type { Clock } from '../domain/engine/turn/clock';
+import { ClockReading } from '../domain/engine/turn/clock-reading';
 
 // The clock driver (issue #162). It implements the engine interface `Clock`
 // (classes.md decision 25) with the time of the system.

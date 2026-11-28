@@ -1,4 +1,4 @@
-import type { GameEvent } from '../../../../src/domain/engine/game-events';
+import type { GameEvent } from '../../../../src/domain/engine/events/game-events';
 import type { GameId } from '../../../../src/domain/shared/game-id';
 import type { MatchId } from '../../../../src/domain/engine/match-id';
 import {

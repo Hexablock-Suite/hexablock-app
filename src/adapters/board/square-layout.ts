@@ -1,4 +1,4 @@
-import type { SquareCoord } from '../../domain/engine/square-topology';
+import type { SquareCoord } from '../../domain/engine/geometry/square-topology';
 import { valuesOf, type BoardLayout, type ScreenPoint } from './board-layout';
 
 // The corners of a square with a side of 1, clockwise from the top left corner.

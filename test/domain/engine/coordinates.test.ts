@@ -1,14 +1,18 @@
 /** @jest-environment node */
-import { Distance } from '../../../src/domain/engine/distance';
-import { hex, HexCoord, HexTopology } from '../../../src/domain/engine/hex-topology';
-import { Radius } from '../../../src/domain/engine/radius';
-import { RegionSize } from '../../../src/domain/engine/region-size';
-import { square, SquareCoord, SquareTopology } from '../../../src/domain/engine/square-topology';
+import { Distance } from '../../../src/domain/engine/geometry/distance';
+import { hex, HexCoord, HexTopology } from '../../../src/domain/engine/geometry/hex-topology';
+import { Radius } from '../../../src/domain/engine/geometry/radius';
+import { RegionSize } from '../../../src/domain/engine/geometry/region-size';
+import {
+  square,
+  SquareCoord,
+  SquareTopology,
+} from '../../../src/domain/engine/geometry/square-topology';
 import {
   triangle,
   TriangleCoord,
   TriangleTopology,
-} from '../../../src/domain/engine/triangle-topology';
+} from '../../../src/domain/engine/geometry/triangle-topology';
 import { deliveries } from '../../support/engine/value-receiver';
 import { delivered } from '../../support/engine/value-receiver';
 

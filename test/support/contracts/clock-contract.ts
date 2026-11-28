@@ -1,5 +1,5 @@
-import type { Clock } from '../../../src/domain/engine/clock';
-import { ClockReading } from '../../../src/domain/engine/clock-reading';
+import type { Clock } from '../../../src/domain/engine/turn/clock';
+import { ClockReading } from '../../../src/domain/engine/turn/clock-reading';
 import { delivered } from '../engine/value-receiver';
 
 // The contract of the engine interface `Clock` (classes.md decision 25, issues #162 and #238).

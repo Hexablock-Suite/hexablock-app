@@ -1,4 +1,4 @@
-import type { RandomSource } from '../../../src/domain/engine/random-source';
+import type { RandomSource } from '../../../src/domain/engine/random/random-source';
 import { delivered } from '../engine/value-receiver';
 
 // The count of draws that the range test reads.

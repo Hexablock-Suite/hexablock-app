@@ -1,12 +1,12 @@
 /** @jest-environment node */
-import { Board, type ReadonlyBoard } from '../../../src/domain/engine/board';
-import { BoardShape } from '../../../src/domain/engine/board-shape';
+import { Board, type ReadonlyBoard } from '../../../src/domain/engine/board/board';
+import { BoardShape } from '../../../src/domain/engine/geometry/board-shape';
 import { Color } from '../../../src/domain/engine/color';
-import { HexAxis, HexTopology, hex } from '../../../src/domain/engine/hex-topology';
-import { Piece } from '../../../src/domain/engine/piece';
-import { RegionSize } from '../../../src/domain/engine/region-size';
-import { CellNode, ShapeGroup } from '../../../src/domain/engine/shape-node';
-import { Turns } from '../../../src/domain/engine/turns';
+import { HexAxis, HexTopology, hex } from '../../../src/domain/engine/geometry/hex-topology';
+import { Piece } from '../../../src/domain/engine/board/piece';
+import { RegionSize } from '../../../src/domain/engine/geometry/region-size';
+import { CellNode, ShapeGroup } from '../../../src/domain/engine/geometry/shape-node';
+import { Turns } from '../../../src/domain/engine/geometry/turns';
 import { PieceId } from '../../../src/domain/variants/hexa-fit/piece-id';
 import { BOARD_ID } from '../../support/engine/entity-ids';
 import { delivered, RecordingReceiver } from '../../support/engine/value-receiver';

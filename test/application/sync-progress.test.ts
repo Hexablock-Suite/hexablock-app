@@ -1,13 +1,13 @@
 /** @jest-environment node */
-import type { AnonymousProgress } from '../../src/application/anonymous-progress';
-import type { ProgressGateway } from '../../src/application/progress-gateway';
-import { SyncFailure } from '../../src/application/progress-gateway';
-import { ProgressOwner } from '../../src/application/progress-owner';
-import type { ProgressRepository } from '../../src/application/progress-repository';
+import type { AnonymousProgress } from '../../src/application/ports/anonymous-progress';
+import type { ProgressGateway } from '../../src/application/ports/progress-gateway';
+import { SyncFailure } from '../../src/application/ports/progress-gateway';
+import { ProgressOwner } from '../../src/application/ports/progress-owner';
+import type { ProgressRepository } from '../../src/application/ports/progress-repository';
 import { FailureCode } from '../../src/application/result';
-import { Session } from '../../src/application/session';
-import type { SessionStore } from '../../src/application/session-store';
-import { SyncProgress } from '../../src/application/sync-progress';
+import { Session } from '../../src/application/ports/session';
+import type { SessionStore } from '../../src/application/ports/session-store';
+import { SyncProgress } from '../../src/application/progress/sync-progress';
 import { GameProgress } from '../../src/domain/progress/game-progress';
 import { LevelId } from '../../src/domain/progress/level-id';
 import { ProgressRecord } from '../../src/domain/progress/progress-model';

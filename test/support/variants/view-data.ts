@@ -1,6 +1,6 @@
 import type { Color } from '../../../src/domain/engine/color';
 import type { Moves } from '../../../src/domain/shared/moves';
-import type { Piece } from '../../../src/domain/engine/piece';
+import type { Piece } from '../../../src/domain/engine/board/piece';
 import { FitView } from '../../../src/domain/variants/hexa-fit/fit-state';
 import type { PieceId } from '../../../src/domain/variants/hexa-fit/piece-id';
 import { LinesView } from '../../../src/domain/variants/hexa-lines/lines-state';

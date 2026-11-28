@@ -65,7 +65,7 @@ describe('architecture gate (dependency-cruiser)', () => {
 
     expect(result.status).not.toBe(0);
     expect(result.output).toContain('progress-imports-only-shared');
-    expect(result.output).toContain('src/domain/engine/board.ts');
+    expect(result.output).toContain('src/domain/engine/board/board.ts');
     expect(result.output).toContain('src/domain/achievements/achievement-goal.ts');
   });
 
@@ -74,6 +74,24 @@ describe('architecture gate (dependency-cruiser)', () => {
 
     expect(result.status).not.toBe(0);
     expect(result.output).toContain('achievements-imports-only-shared-and-progress');
+  });
+
+  // Issue #499: the subfolders of the engine form no cycle. In the fixture `board/` imports `turn/`,
+  // and `turn/` imports `board/` through other files, so the cycle is between folders only.
+  it('should_fail_arch_when_two_subfolders_of_the_engine_import_each_other', () => {
+    const result = cruise('engine-folders-cycle');
+
+    expect(result.status).not.toBe(0);
+    expect(result.output).toContain('engine-folders-no-cycle');
+  });
+
+  // Issue #500: the folders of the use cases form no cycle. In the fixture `game/` imports `levels/`,
+  // and `levels/` imports `game/` through other files, so the cycle is between folders only.
+  it('should_fail_arch_when_two_folders_of_the_use_cases_import_each_other', () => {
+    const result = cruise('application-folders-cycle');
+
+    expect(result.status).not.toBe(0);
+    expect(result.output).toContain('application-folders-no-cycle');
   });
 
   it('should_fail_arch_when_application_imports_an_adapter', () => {

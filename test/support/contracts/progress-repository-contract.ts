@@ -1,4 +1,4 @@
-import type { ProgressRepository } from '../../../src/application/progress-repository';
+import type { ProgressRepository } from '../../../src/application/ports/progress-repository';
 import { saveIn } from '../adapters/saved-progress';
 import { ElapsedTime } from '../../../src/domain/shared/elapsed-time';
 import { GameId } from '../../../src/domain/shared/game-id';

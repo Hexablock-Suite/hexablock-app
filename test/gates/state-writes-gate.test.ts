@@ -27,7 +27,7 @@ const scanned = ['src/domain', 'src/application'];
 // The files that may call `occupy()` and `vacate()`: the board and the variant states.
 function mayChangeTheBoard(file: string): boolean {
   return (
-    file === 'src/domain/engine/board.ts' ||
+    file === 'src/domain/engine/board/board.ts' ||
     /^src\/domain\/variants\/[^/]+\/[^/]+-state\.ts$/.test(file)
   );
 }
@@ -219,8 +219,8 @@ describe('state writes gate (R7 and R8)', () => {
       '}',
     ].join('\n');
 
-    expect(scanSource('src/domain/engine/piece-source.ts', text)).toEqual([
-      'src/domain/engine/piece-source.ts:4: writes other.score',
+    expect(scanSource('src/domain/engine/random/piece-source.ts', text)).toEqual([
+      'src/domain/engine/random/piece-source.ts:4: writes other.score',
     ]);
   });
 
@@ -228,11 +228,11 @@ describe('state writes gate (R7 and R8)', () => {
     const text = 'this.board.occupy(at, cell);\nthis.board.vacate(at);\nspace.vacate();';
 
     expect(scanSource('src/domain/variants/hexa-sort/sort-state.ts', text)).toEqual([]);
-    expect(scanSource('src/domain/engine/board.ts', text)).toEqual([]);
-    expect(scanSource('src/domain/engine/game-engine.ts', text)).toEqual([
-      'src/domain/engine/game-engine.ts:1: calls this.board.occupy()',
-      'src/domain/engine/game-engine.ts:2: calls this.board.vacate()',
-      'src/domain/engine/game-engine.ts:3: calls space.vacate()',
+    expect(scanSource('src/domain/engine/board/board.ts', text)).toEqual([]);
+    expect(scanSource('src/domain/engine/turn/game-engine.ts', text)).toEqual([
+      'src/domain/engine/turn/game-engine.ts:1: calls this.board.occupy()',
+      'src/domain/engine/turn/game-engine.ts:2: calls this.board.vacate()',
+      'src/domain/engine/turn/game-engine.ts:3: calls space.vacate()',
     ]);
   });
 
@@ -290,11 +290,11 @@ describe('state writes gate (R7 and R8)', () => {
 
     expect(files).toEqual(
       expect.arrayContaining([
-        'src/domain/engine/game-engine.ts',
+        'src/domain/engine/turn/game-engine.ts',
         'src/domain/variants/hexa-lines/lines-rules.ts',
         'src/domain/variants/hexa-sort/sort-rules.ts',
         'src/domain/variants/hexa-merge/merge-rules.ts',
-        'src/application/apply-move.ts',
+        'src/application/game/apply-move.ts',
       ]),
     );
     expect(violations).toEqual([]);
