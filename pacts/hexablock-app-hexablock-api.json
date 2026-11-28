@@ -552,6 +552,118 @@
       "type": "Synchronous/HTTP"
     },
     {
+      "description": "the high scores of the global leaderboard of a game",
+      "pending": false,
+      "providerStates": [
+        {
+          "name": "several accounts have high scores in a game",
+          "params": {
+            "gameId": "hexa-lines"
+          }
+        }
+      ],
+      "request": {
+        "generators": {
+          "header": {
+            "Authorization": {
+              "expression": "Bearer ${accessToken}",
+              "type": "ProviderState"
+            }
+          }
+        },
+        "headers": {
+          "Authorization": [
+            "Bearer a-token"
+          ]
+        },
+        "matchingRules": {
+          "header": {
+            "Authorization": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          }
+        },
+        "method": "GET",
+        "path": "/v1/leaderboard/hexa-lines"
+      },
+      "response": {
+        "body": {
+          "content": {
+            "gameId": "hexa-lines",
+            "highScores": [
+              {
+                "highScore": 300,
+                "rank": 1,
+                "userId": "00000000-0000-4000-8000-000000000001",
+                "username": "ada"
+              }
+            ],
+            "standings": []
+          },
+          "contentType": "application/json",
+          "encoded": false
+        },
+        "headers": {
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "matchingRules": {
+          "body": {
+            "$.highScores": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            },
+            "$.highScores[*].highScore": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "integer"
+                }
+              ]
+            },
+            "$.highScores[*].rank": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "integer"
+                }
+              ]
+            },
+            "$.highScores[*].userId": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+                }
+              ]
+            },
+            "$.highScores[*].username": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      },
+      "type": "Synchronous/HTTP"
+    },
+    {
       "description": "the leaderboard of a level",
       "pending": false,
       "providerStates": [
@@ -951,6 +1063,83 @@
                 {
                   "match": "type",
                   "min": 1
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      },
+      "type": "Synchronous/HTTP"
+    },
+    {
+      "description": "the stored levels with an unavailable level",
+      "pending": false,
+      "providerStates": [
+        {
+          "name": "a broken level is stored",
+          "params": {
+            "gameId": "hexa-fit",
+            "levelId": "fit-01"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "path": "/v1/levels"
+      },
+      "response": {
+        "body": {
+          "content": {
+            "levels": [],
+            "unavailable": [
+              {
+                "gameId": "hexa-fit",
+                "levelId": "fit-01",
+                "reason": "invalid-figure"
+              }
+            ]
+          },
+          "contentType": "application/json",
+          "encoded": false
+        },
+        "headers": {
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "matchingRules": {
+          "body": {
+            "$.unavailable": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            },
+            "$.unavailable[*].gameId": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.unavailable[*].levelId": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.unavailable[*].reason": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
                 }
               ]
             }
