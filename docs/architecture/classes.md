@@ -2373,6 +2373,19 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     Option B was not chosen.
     View 3.1 draws `SessionAspect` as a class of the code, and views 3.4 and 3.7, the map of Part 3 and view 4 of [extensibility.md](extensibility.md) name it.
 
+70. **The game architecture: Clean Architecture with the turn-based patterns of _Game Programming Patterns_ (#494, APP-NFR-10).**
+    APP-NFR-10 accepts Clean Architecture plus an architecture made for games, when the team cites its reference and documents it.
+    The reference is Robert Nystrom, _Game Programming Patterns_, in its web edition (<https://gameprogrammingpatterns.com/>).
+    The app is a turn-based game: its state changes only when a move arrives through `GameEngine.tryPlay()`.
+    So the app keeps the four layers of [layers.md](layers.md), and the choice adds no layer and no class.
+    The app uses three patterns of the book: Command (view 3), State (view 1) and Observer (views 1, 5 and 4.3).
+    It has no Game Loop and no Update Method, because it has no game time apart from the moves and no animation.
+    It has no Event Queue, because `ApplyMove` publishes the events of a turn in the same call (decision 29).
+    The section «Game architecture» of [layers.md](layers.md#game-architecture) gives the reason for each chapter.
+    Option rejected: an Entity Component System, because a board of a few dozen cells needs no speed of many objects, and its plain data breaks the private fields of the domain.
+    Option rejected: the framework boardgame.io, because it would own the game state and the turns, and layer 1 would depend on a package.
+    The section «Considered and not used» of the [README](../../README.md#considered-and-not-used) gives both reasons.
+
 ## Render the images
 
 The maps and the views come from the HTML files in [`classes/views/`](classes/views/). Each file holds one inline SVG drawn with the diagram-design skill. Open the file in a browser to see the drawing. The `.png` image next to it is that SVG rendered at scale 2 by a headless browser. After you edit a file, export the image again with `/diagram-design:export-diagram docs/architecture/classes/views/<view>.html --png-only`, then run `pnpm format`. The formatter changes the HTML layout only; the drawing stays the same. Commit each `.html` file together with its `.png` image. When a class is added or removed, update its map and its view in the same commit.
