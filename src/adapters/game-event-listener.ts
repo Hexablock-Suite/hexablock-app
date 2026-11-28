@@ -1,4 +1,4 @@
-import type { GameEvent } from '../domain/engine/game-events';
+import type { GameEvent } from '../domain/engine/events/game-events';
 
 // A listener of the game events (Observer, view 4.3, issue #362).
 // It subscribes to `GameEventBus`, and the bus gives it each event that `ApplyMove` publishes,

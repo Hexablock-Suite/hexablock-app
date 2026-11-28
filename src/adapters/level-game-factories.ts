@@ -1,14 +1,14 @@
 import type { GameFactories } from '../application/game-factories';
 import type { LevelRepository } from '../application/level-repository';
-import type { BoardState } from '../domain/engine/board-state';
+import type { BoardState } from '../domain/engine/board/board-state';
 import type { Cloneable } from '../domain/engine/cloneable';
-import { GameFactory } from '../domain/engine/game-factory';
-import type { LevelVariant } from '../domain/engine/level-variant';
+import { GameFactory } from '../domain/engine/factory/game-factory';
+import type { LevelVariant } from '../domain/engine/factory/level-variant';
 import type { GameId } from '../domain/shared/game-id';
 import type { LevelId } from '../domain/progress/level-id';
-import type { MatchIdGenerator } from '../domain/engine/match-id-generator';
+import type { MatchIdGenerator } from '../domain/engine/factory/match-id-generator';
 import type { IProgressModel } from '../domain/progress/progress-model';
-import type { IVariantFactory } from '../domain/engine/variant-factory';
+import type { IVariantFactory } from '../domain/engine/factory/variant-factory';
 
 const NO_LEVEL = 'The game has no level with this id.';
 

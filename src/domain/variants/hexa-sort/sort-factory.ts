@@ -1,23 +1,23 @@
-import type { Board } from '../../engine/board';
-import type { BoardId } from '../../engine/board-id';
-import { BoardBuilder } from '../../engine/board-builder';
-import type { Clock } from '../../engine/clock';
+import type { Board } from '../../engine/board/board';
+import type { BoardId } from '../../engine/board/board-id';
+import { BoardBuilder } from '../../engine/board/board-builder';
+import type { Clock } from '../../engine/turn/clock';
 import { GameId } from '../../shared/game-id';
-import type { GameStateId } from '../../engine/game-state-id';
-import type { GeometryFactory } from '../../engine/geometry-factory';
+import type { GameStateId } from '../../engine/board/game-state-id';
+import type { GeometryFactory } from '../../engine/geometry/geometry-factory';
 import { LevelProgress } from '../../progress/level-progress';
-import { LevelTimer } from '../../engine/level-timer';
-import { LevelTimerId } from '../../engine/level-timer-id';
+import { LevelTimer } from '../../engine/turn/level-timer';
+import { LevelTimerId } from '../../engine/turn/level-timer-id';
 import type { MatchId } from '../../engine/match-id';
 import {
   FixedListPieceSource,
   SeededPieceSource,
   type IPieceSource,
-} from '../../engine/piece-source';
-import type { RandomSource } from '../../engine/random-source';
-import type { IGameRules } from '../../engine/rules';
-import type { IScoringPolicy } from '../../engine/scoring-policy';
-import type { IVariantFactory } from '../../engine/variant-factory';
+} from '../../engine/random/piece-source';
+import type { RandomSource } from '../../engine/random/random-source';
+import type { IGameRules } from '../../engine/turn/rules';
+import type { IScoringPolicy } from '../../engine/turn/scoring-policy';
+import type { IVariantFactory } from '../../engine/factory/variant-factory';
 import type { ColorStack } from './color-stack';
 import type { SortLevel } from './sort-level';
 import { SortRules } from './sort-rules';

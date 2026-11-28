@@ -1,6 +1,6 @@
-import type { Clock } from '../../engine/clock';
-import type { GeometryFactory } from '../../engine/geometry-factory';
-import type { LevelVariant } from '../../engine/level-variant';
+import type { Clock } from '../../engine/turn/clock';
+import type { GeometryFactory } from '../../engine/geometry/geometry-factory';
+import type { LevelVariant } from '../../engine/factory/level-variant';
 import { FitFactory } from './fit-factory';
 import { FitLevelBuilder } from './fit-level-builder';
 import type { FitMove } from './fit-move';

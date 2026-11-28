@@ -1,15 +1,15 @@
 /** @jest-environment node */
 import { ElapsedTime } from '../../../src/domain/shared/elapsed-time';
 import { Score } from '../../../src/domain/shared/score';
-import { GameEngine } from '../../../src/domain/engine/game-engine';
+import { GameEngine } from '../../../src/domain/engine/turn/game-engine';
 import { GameId } from '../../../src/domain/shared/game-id';
-import { GameOverPhase, PlayingPhase } from '../../../src/domain/engine/game-phase';
-import { LevelTimer } from '../../../src/domain/engine/level-timer';
-import { LevelTimerId } from '../../../src/domain/engine/level-timer-id';
+import { GameOverPhase, PlayingPhase } from '../../../src/domain/engine/turn/game-phase';
+import { LevelTimer } from '../../../src/domain/engine/turn/level-timer';
+import { LevelTimerId } from '../../../src/domain/engine/turn/level-timer-id';
 import { MatchId } from '../../../src/domain/engine/match-id';
-import { Outcome } from '../../../src/domain/engine/outcome';
-import type { IScoringPolicy } from '../../../src/domain/engine/scoring-policy';
-import { TimedRulesDecorator } from '../../../src/domain/engine/timed-rules-decorator';
+import { Outcome } from '../../../src/domain/engine/events/outcome';
+import type { IScoringPolicy } from '../../../src/domain/engine/turn/scoring-policy';
+import { TimedRulesDecorator } from '../../../src/domain/engine/turn/timed-rules-decorator';
 import { fakeCell, type FakeCell } from '../../support/engine/fake-cell';
 import {
   emptyState,

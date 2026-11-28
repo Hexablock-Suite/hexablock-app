@@ -1,16 +1,20 @@
 import { Score } from '../../../../src/domain/shared/score';
-import { Board, type ReadonlyBoard } from '../../../../src/domain/engine/board';
-import { GameEngine } from '../../../../src/domain/engine/game-engine';
+import { Board, type ReadonlyBoard } from '../../../../src/domain/engine/board/board';
+import { GameEngine } from '../../../../src/domain/engine/turn/game-engine';
 import { GameId } from '../../../../src/domain/shared/game-id';
-import { GameStateId } from '../../../../src/domain/engine/game-state-id';
+import { GameStateId } from '../../../../src/domain/engine/board/game-state-id';
 import type { MatchId } from '../../../../src/domain/engine/match-id';
-import type { GridTopology } from '../../../../src/domain/engine/grid-topology';
-import { Piece } from '../../../../src/domain/engine/piece';
-import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
-import { RegionSize } from '../../../../src/domain/engine/region-size';
-import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
-import { CellNode, ShapeGroup, type ShapeNode } from '../../../../src/domain/engine/shape-node';
-import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
+import type { GridTopology } from '../../../../src/domain/engine/geometry/grid-topology';
+import { Piece } from '../../../../src/domain/engine/board/piece';
+import { FixedListPieceSource } from '../../../../src/domain/engine/random/piece-source';
+import { RegionSize } from '../../../../src/domain/engine/geometry/region-size';
+import type { IScoringPolicy } from '../../../../src/domain/engine/turn/scoring-policy';
+import {
+  CellNode,
+  ShapeGroup,
+  type ShapeNode,
+} from '../../../../src/domain/engine/geometry/shape-node';
+import { SquareGeometry } from '../../../../src/domain/engine/geometry/square-geometry';
 import { Color } from '../../../../src/domain/engine/color';
 import {
   LinesFactory,

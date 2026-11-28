@@ -1,5 +1,5 @@
 import type { Score } from '../../shared/score';
-import { ScoringDecorator } from '../../engine/scoring-decorator';
+import { ScoringDecorator } from '../../engine/turn/scoring-decorator';
 import type { LinesSnapshot, LinesState } from './lines-state';
 
 // Decorator (classes.md patterns table): it wraps the base `LinesScoring` and multiplies

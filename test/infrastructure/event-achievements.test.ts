@@ -5,7 +5,7 @@ import { LocalAchievementCounterRepository } from '../../src/adapters/local-achi
 import type { AchievementSummary } from '../../src/application/list-achievements';
 import { ApplyMove } from '../../src/application/apply-move';
 import type { Result } from '../../src/application/result';
-import { hex, HexAxis } from '../../src/domain/engine/hex-topology';
+import { hex, HexAxis } from '../../src/domain/engine/geometry/hex-topology';
 import { PlacePiece } from '../../src/domain/variants/hexa-lines/place-piece';
 import { TrayPosition } from '../../src/domain/variants/hexa-lines/tray-position';
 import { Slide, SlideSense } from '../../src/domain/variants/hexa-merge/slide';

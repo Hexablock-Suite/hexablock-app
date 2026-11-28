@@ -1,4 +1,4 @@
-import type { Board } from '../../engine/board';
+import type { Board } from '../../engine/board/board';
 import type { PieceId } from './piece-id';
 
 // Right: a type alias names the engine `Board` with the cell type of the variant.

@@ -1,4 +1,4 @@
-import type { GridAxis } from '../domain/engine/grid-topology';
+import type { GridAxis } from '../domain/engine/geometry/grid-topology';
 import type { Slide } from '../domain/variants/hexa-merge/slide';
 import type { Compass, SlideWay } from './merge-slide-ways';
 import type { MoveMapper } from './move-mapper';

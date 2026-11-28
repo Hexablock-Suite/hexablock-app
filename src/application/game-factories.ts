@@ -1,6 +1,6 @@
-import type { BoardState } from '../domain/engine/board-state';
+import type { BoardState } from '../domain/engine/board/board-state';
 import type { Cloneable } from '../domain/engine/cloneable';
-import type { GameFactory } from '../domain/engine/game-factory';
+import type { GameFactory } from '../domain/engine/factory/game-factory';
 import type { LevelId } from '../domain/progress/level-id';
 
 // Output port of the factories of one game (S3-13 in #151, option D, issue #172).

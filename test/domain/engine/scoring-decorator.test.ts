@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { Score } from '../../../src/domain/shared/score';
-import { ScoringDecorator } from '../../../src/domain/engine/scoring-decorator';
-import type { IScoringPolicy } from '../../../src/domain/engine/scoring-policy';
+import { ScoringDecorator } from '../../../src/domain/engine/turn/scoring-decorator';
+import type { IScoringPolicy } from '../../../src/domain/engine/turn/scoring-policy';
 
 // The abstract Decorator of the scoring (issue 146, classes.md patterns table, view engine-4).
 // The state type exists only in this test, so the engine test imports no variant (APP-NFR-13).

@@ -1,8 +1,13 @@
 /** @jest-environment node */
-import { hex, HexTopology, HexAxis, type HexCoord } from '../../../src/domain/engine/hex-topology';
-import { Radius } from '../../../src/domain/engine/radius';
-import { RegionSize } from '../../../src/domain/engine/region-size';
-import { Turns } from '../../../src/domain/engine/turns';
+import {
+  hex,
+  HexTopology,
+  HexAxis,
+  type HexCoord,
+} from '../../../src/domain/engine/geometry/hex-topology';
+import { Radius } from '../../../src/domain/engine/geometry/radius';
+import { RegionSize } from '../../../src/domain/engine/geometry/region-size';
+import { Turns } from '../../../src/domain/engine/geometry/turns';
 import { delivered } from '../../support/engine/value-receiver';
 
 // The real hexagonal topology (issue 153, classes.md decision 17).

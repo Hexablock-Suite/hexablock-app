@@ -1,14 +1,14 @@
 /** @jest-environment node */
-import { Board, BoardSpace } from '../../../src/domain/engine/board';
-import { BoardId } from '../../../src/domain/engine/board-id';
+import { Board, BoardSpace } from '../../../src/domain/engine/board/board';
+import { BoardId } from '../../../src/domain/engine/board/board-id';
 import { MatchId } from '../../../src/domain/engine/match-id';
-import { BoardShape } from '../../../src/domain/engine/board-shape';
-import { CoordKey } from '../../../src/domain/engine/coord-key';
-import { Distance } from '../../../src/domain/engine/distance';
-import type { GridTopology } from '../../../src/domain/engine/grid-topology';
-import { Radius } from '../../../src/domain/engine/radius';
-import { RegionSize } from '../../../src/domain/engine/region-size';
-import { Turns } from '../../../src/domain/engine/turns';
+import { BoardShape } from '../../../src/domain/engine/geometry/board-shape';
+import { CoordKey } from '../../../src/domain/engine/geometry/coord-key';
+import { Distance } from '../../../src/domain/engine/geometry/distance';
+import type { GridTopology } from '../../../src/domain/engine/geometry/grid-topology';
+import { Radius } from '../../../src/domain/engine/geometry/radius';
+import { RegionSize } from '../../../src/domain/engine/geometry/region-size';
+import { Turns } from '../../../src/domain/engine/geometry/turns';
 import { ColorStack } from '../../../src/domain/variants/hexa-sort/color-stack';
 import { BOARD_ID } from '../../support/engine/entity-ids';
 

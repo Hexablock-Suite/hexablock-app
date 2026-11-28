@@ -148,7 +148,7 @@ describe('engine game id gate', () => {
   it('should_scan_the_sibling_folders_of_the_engine_when_the_real_domain_is_read', () => {
     expect(genericFiles()).toEqual(
       expect.arrayContaining([
-        'engine/game-engine.ts',
+        'engine/turn/game-engine.ts',
         'shared/score.ts',
         'progress/game-progress.ts',
         'achievements/achievement-goal.ts',

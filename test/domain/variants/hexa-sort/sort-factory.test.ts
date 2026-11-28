@@ -1,20 +1,20 @@
 /** @jest-environment node */
 import sort01 from '../../../../src/adapters/levels/sort/sort-01.json';
-import { HexGeometry } from '../../../../src/domain/engine/hex-geometry';
+import { HexGeometry } from '../../../../src/domain/engine/geometry/hex-geometry';
 import { LevelDefinition } from '../../../../src/domain/progress/level-definition';
 import { SortLevelBuilder } from '../../../../src/domain/variants/hexa-sort/sort-level-builder';
 import { seededRandom, StepRandom } from '../../../support/engine/step-random';
-import { Outcome } from '../../../../src/domain/engine/outcome';
+import { Outcome } from '../../../../src/domain/engine/events/outcome';
 import { Score } from '../../../../src/domain/shared/score';
 import { GameId } from '../../../../src/domain/shared/game-id';
 import { Color } from '../../../../src/domain/engine/color';
-import { RegionSize } from '../../../../src/domain/engine/region-size';
-import { Seed } from '../../../../src/domain/engine/seed';
-import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
+import { RegionSize } from '../../../../src/domain/engine/geometry/region-size';
+import { Seed } from '../../../../src/domain/engine/random/seed';
+import { SquareGeometry } from '../../../../src/domain/engine/geometry/square-geometry';
 import { GoalCount } from '../../../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../../../src/domain/variants/hexa-sort/sort-factory';
 import { SortLevel } from '../../../../src/domain/variants/hexa-sort/sort-level';
-import type { SquareCoord } from '../../../../src/domain/engine/square-topology';
+import type { SquareCoord } from '../../../../src/domain/engine/geometry/square-topology';
 import { startVariant } from '../../../support/engine/variant-game';
 import {
   chipsAt,

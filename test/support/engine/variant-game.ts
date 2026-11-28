@@ -1,17 +1,17 @@
-import { Board, type ReadonlyBoard } from '../../../src/domain/engine/board';
-import { BoardBuilder } from '../../../src/domain/engine/board-builder';
-import { BoardId } from '../../../src/domain/engine/board-id';
-import { BoardShape } from '../../../src/domain/engine/board-shape';
-import type { BoardState, SnapshotOf } from '../../../src/domain/engine/board-state';
+import { Board, type ReadonlyBoard } from '../../../src/domain/engine/board/board';
+import { BoardBuilder } from '../../../src/domain/engine/board/board-builder';
+import { BoardId } from '../../../src/domain/engine/board/board-id';
+import { BoardShape } from '../../../src/domain/engine/geometry/board-shape';
+import type { BoardState, SnapshotOf } from '../../../src/domain/engine/board/board-state';
 import type { Cloneable } from '../../../src/domain/engine/cloneable';
-import { GameFactory } from '../../../src/domain/engine/game-factory';
+import { GameFactory } from '../../../src/domain/engine/factory/game-factory';
 import { GameId } from '../../../src/domain/shared/game-id';
-import type { GeometryFactory } from '../../../src/domain/engine/geometry-factory';
-import type { GridAxis, GridTopology } from '../../../src/domain/engine/grid-topology';
+import type { GeometryFactory } from '../../../src/domain/engine/geometry/geometry-factory';
+import type { GridAxis, GridTopology } from '../../../src/domain/engine/geometry/grid-topology';
 import type { MatchId } from '../../../src/domain/engine/match-id';
-import type { IGameRules } from '../../../src/domain/engine/rules';
-import { CellNode, ShapeGroup } from '../../../src/domain/engine/shape-node';
-import type { IVariantFactory } from '../../../src/domain/engine/variant-factory';
+import type { IGameRules } from '../../../src/domain/engine/turn/rules';
+import { CellNode, ShapeGroup } from '../../../src/domain/engine/geometry/shape-node';
+import type { IVariantFactory } from '../../../src/domain/engine/factory/variant-factory';
 import { MATCH_ID } from './match-id';
 import { BOARD_ID, STATE_ID } from './entity-ids';
 

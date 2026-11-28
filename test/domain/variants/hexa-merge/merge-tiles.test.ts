@@ -1,12 +1,12 @@
 /** @jest-environment node */
-import { Outcome } from '../../../../src/domain/engine/outcome';
+import { Outcome } from '../../../../src/domain/engine/events/outcome';
 import { Score } from '../../../../src/domain/shared/score';
 import { GameId } from '../../../../src/domain/shared/game-id';
-import { PlayingPhase } from '../../../../src/domain/engine/game-phase';
-import { hex, HexAxis } from '../../../../src/domain/engine/hex-topology';
-import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
-import type { RandomSource } from '../../../../src/domain/engine/random-source';
-import { Seed } from '../../../../src/domain/engine/seed';
+import { PlayingPhase } from '../../../../src/domain/engine/turn/game-phase';
+import { hex, HexAxis } from '../../../../src/domain/engine/geometry/hex-topology';
+import { SeededPieceSource } from '../../../../src/domain/engine/random/piece-source';
+import type { RandomSource } from '../../../../src/domain/engine/random/random-source';
+import { Seed } from '../../../../src/domain/engine/random/seed';
 import { Chance } from '../../../../src/domain/variants/hexa-merge/chance';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';
 import {

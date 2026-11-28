@@ -1,5 +1,5 @@
 import type { GameEventPublisher } from '../application/game-event-publisher';
-import type { GameEvent } from '../domain/engine/game-events';
+import type { GameEvent } from '../domain/engine/events/game-events';
 import type { GameEventListener } from './game-event-listener';
 
 // The event bus of the app (Observer, view 4.3, issue #362). It implements the

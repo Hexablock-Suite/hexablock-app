@@ -1,4 +1,4 @@
-import { RandomDraw } from '../../engine/random-draw';
+import { RandomDraw } from '../../engine/random/random-draw';
 
 // The chance that a new Merge tile is a 4 (statement §1.4, issue #210).
 // It is a value object: it never changes, and two chances are equal when their values are equal.

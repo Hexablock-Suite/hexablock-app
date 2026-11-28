@@ -6,7 +6,7 @@ import type { StartGameRequest } from '../application/start-game';
 import type { UndoMoveRequest } from '../application/undo-move';
 import type { UseCase } from '../application/use-case';
 import type { LevelId } from '../domain/progress/level-id';
-import { Outcome } from '../domain/engine/outcome';
+import { Outcome } from '../domain/engine/events/outcome';
 import { valueOf, type Delivers } from './delivered';
 import type { MoveMapper } from './move-mapper';
 import type { StateMapper } from './state-mapper';

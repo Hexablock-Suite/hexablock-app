@@ -1,16 +1,16 @@
 /** @jest-environment node */
-import { Outcome } from '../../../src/domain/engine/outcome';
+import { Outcome } from '../../../src/domain/engine/events/outcome';
 import { Score } from '../../../src/domain/shared/score';
-import type { Board, ReadonlyBoard } from '../../../src/domain/engine/board';
-import { GameEngine } from '../../../src/domain/engine/game-engine';
+import type { Board, ReadonlyBoard } from '../../../src/domain/engine/board/board';
+import { GameEngine } from '../../../src/domain/engine/turn/game-engine';
 import { GameId } from '../../../src/domain/shared/game-id';
-import { MoveHistory } from '../../../src/domain/engine/move-history';
-import { FixedListPieceSource } from '../../../src/domain/engine/piece-source';
-import { RedoableHistory } from '../../../src/domain/engine/redoable-history';
-import { Resolution } from '../../../src/domain/engine/resolution';
-import { GameFactory } from '../../../src/domain/engine/game-factory';
-import type { MoveCommand } from '../../../src/domain/engine/move-command';
-import type { IRedoable, IUndoable } from '../../../src/domain/engine/undo-capabilities';
+import { MoveHistory } from '../../../src/domain/engine/history/move-history';
+import { FixedListPieceSource } from '../../../src/domain/engine/random/piece-source';
+import { RedoableHistory } from '../../../src/domain/engine/history/redoable-history';
+import { Resolution } from '../../../src/domain/engine/turn/resolution';
+import { GameFactory } from '../../../src/domain/engine/factory/game-factory';
+import type { MoveCommand } from '../../../src/domain/engine/history/move-command';
+import type { IRedoable, IUndoable } from '../../../src/domain/engine/history/undo-capabilities';
 import { fakeCell, type FakeCell } from '../../support/engine/fake-cell';
 import {
   emptyState,

@@ -2,10 +2,10 @@ import {
   GameEnded,
   type GameEvent,
   type GameEndedReceiver,
-} from '../../../src/domain/engine/game-events';
+} from '../../../src/domain/engine/events/game-events';
 import type { GameId } from '../../../src/domain/shared/game-id';
 import type { MatchId } from '../../../src/domain/engine/match-id';
-import type { Outcome } from '../../../src/domain/engine/outcome';
+import type { Outcome } from '../../../src/domain/engine/events/outcome';
 import type { Score } from '../../../src/domain/shared/score';
 
 // Reads a `GameEnded` event as a listener of the edge does. It exists only in test/.

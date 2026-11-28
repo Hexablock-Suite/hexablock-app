@@ -1,5 +1,5 @@
 import { Score } from '../../shared/score';
-import type { IScoringPolicy } from '../../engine/scoring-policy';
+import type { IScoringPolicy } from '../../engine/turn/scoring-policy';
 import type { SortSnapshot, SortState } from './sort-state';
 
 // The scoring of Hexa Sort (issue #98, APP-FR-06). Statement §1.3 defines no points,

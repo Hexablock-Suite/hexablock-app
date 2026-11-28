@@ -1,7 +1,7 @@
-import type { Clock } from '../../engine/clock';
-import type { GeometryFactory } from '../../engine/geometry-factory';
-import type { LevelVariant } from '../../engine/level-variant';
-import type { RandomSource } from '../../engine/random-source';
+import type { Clock } from '../../engine/turn/clock';
+import type { GeometryFactory } from '../../engine/geometry/geometry-factory';
+import type { LevelVariant } from '../../engine/factory/level-variant';
+import type { RandomSource } from '../../engine/random/random-source';
 import type { ColorStack } from './color-stack';
 import type { PlaceStack } from './place-stack';
 import { SortFactory } from './sort-factory';

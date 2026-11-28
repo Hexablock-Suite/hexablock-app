@@ -1,10 +1,10 @@
-import type { BoardSnapshot, BoardState, SnapshotOf } from '../domain/engine/board-state';
+import type { BoardSnapshot, BoardState, SnapshotOf } from '../domain/engine/board/board-state';
 import type { Cloneable } from '../domain/engine/cloneable';
 import type { ElapsedTime } from '../domain/shared/elapsed-time';
-import type { GameEngine } from '../domain/engine/game-engine';
+import type { GameEngine } from '../domain/engine/turn/game-engine';
 import type { LevelId } from '../domain/progress/level-id';
 import type { Moves } from '../domain/shared/moves';
-import type { Outcome } from '../domain/engine/outcome';
+import type { Outcome } from '../domain/engine/events/outcome';
 import type { Score } from '../domain/shared/score';
 import type { UseCaseError } from './result';
 

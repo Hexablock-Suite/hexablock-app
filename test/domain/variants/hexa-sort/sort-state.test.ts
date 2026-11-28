@@ -1,12 +1,12 @@
 /** @jest-environment node */
-import { CoordKey } from '../../../../src/domain/engine/coord-key';
+import { CoordKey } from '../../../../src/domain/engine/geometry/coord-key';
 import { Moves } from '../../../../src/domain/shared/moves';
 import { Score } from '../../../../src/domain/shared/score';
 import { ClearedStacks } from '../../../../src/domain/variants/hexa-sort/cleared-stacks';
 import { SortRules } from '../../../../src/domain/variants/hexa-sort/sort-rules';
 import type { SortState } from '../../../../src/domain/variants/hexa-sort/sort-state';
 import { TileCount } from '../../../../src/domain/variants/hexa-sort/tile-count';
-import { GameStateId } from '../../../../src/domain/engine/game-state-id';
+import { GameStateId } from '../../../../src/domain/engine/board/game-state-id';
 import { MatchId } from '../../../../src/domain/engine/match-id';
 import { square, type SquareCoord } from '../../../support/engine/square-topology';
 import {

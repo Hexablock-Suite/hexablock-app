@@ -1,10 +1,10 @@
 /** @jest-environment node */
 import { FitStateMapper } from '../../src/adapters/fit-state-mapper';
-import { HexGeometry } from '../../src/domain/engine/hex-geometry';
-import { hex, type HexCoord } from '../../src/domain/engine/hex-topology';
+import { HexGeometry } from '../../src/domain/engine/geometry/hex-geometry';
+import { hex, type HexCoord } from '../../src/domain/engine/geometry/hex-topology';
 import { Moves } from '../../src/domain/shared/moves';
-import { Piece } from '../../src/domain/engine/piece';
-import { CellNode, ShapeGroup } from '../../src/domain/engine/shape-node';
+import { Piece } from '../../src/domain/engine/board/piece';
+import { CellNode, ShapeGroup } from '../../src/domain/engine/geometry/shape-node';
 import { FitView } from '../../src/domain/variants/hexa-fit/fit-state';
 import { PieceId } from '../../src/domain/variants/hexa-fit/piece-id';
 import { delivered } from '../support/engine/value-receiver';

@@ -1,9 +1,9 @@
 /** @jest-environment node */
-import type { Clock } from '../../src/domain/engine/clock';
-import { ClockReading } from '../../src/domain/engine/clock-reading';
-import { Mulberry32Random } from '../../src/domain/engine/mulberry32-random';
-import type { RandomSource } from '../../src/domain/engine/random-source';
-import { Seed } from '../../src/domain/engine/seed';
+import type { Clock } from '../../src/domain/engine/turn/clock';
+import { ClockReading } from '../../src/domain/engine/turn/clock-reading';
+import { Mulberry32Random } from '../../src/domain/engine/random/mulberry32-random';
+import type { RandomSource } from '../../src/domain/engine/random/random-source';
+import { Seed } from '../../src/domain/engine/random/seed';
 import { SeededRandomSource } from '../../src/infrastructure/seeded-random-source';
 import { describeRandomSourceContract } from '../support/contracts/random-source-contract';
 import { delivered } from '../support/engine/value-receiver';

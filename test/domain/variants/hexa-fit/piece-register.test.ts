@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { Turns } from '../../../../src/domain/engine/turns';
+import { Turns } from '../../../../src/domain/engine/geometry/turns';
 import { PlaceFitPiece, RemoveFitPiece } from '../../../../src/domain/variants/hexa-fit/fit-move';
 import { PieceId } from '../../../../src/domain/variants/hexa-fit/piece-id';
 import { PieceRegister } from '../../../../src/domain/variants/hexa-fit/piece-register';

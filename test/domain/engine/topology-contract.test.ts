@@ -1,22 +1,27 @@
 /** @jest-environment node */
-import type { GridAxis, GridTopology } from '../../../src/domain/engine/grid-topology';
-import { hex, HexAxis, HexTopology, type HexCoord } from '../../../src/domain/engine/hex-topology';
-import { Radius } from '../../../src/domain/engine/radius';
-import { RegionSize } from '../../../src/domain/engine/region-size';
+import type { GridAxis, GridTopology } from '../../../src/domain/engine/geometry/grid-topology';
+import {
+  hex,
+  HexAxis,
+  HexTopology,
+  type HexCoord,
+} from '../../../src/domain/engine/geometry/hex-topology';
+import { Radius } from '../../../src/domain/engine/geometry/radius';
+import { RegionSize } from '../../../src/domain/engine/geometry/region-size';
 import {
   square,
   SquareAxis,
   SquareTopology,
   type SquareCoord,
-} from '../../../src/domain/engine/square-topology';
+} from '../../../src/domain/engine/geometry/square-topology';
 import {
   isUp,
   triangle,
   TriangleAxis,
   TriangleTopology,
   type TriangleCoord,
-} from '../../../src/domain/engine/triangle-topology';
-import { Turns } from '../../../src/domain/engine/turns';
+} from '../../../src/domain/engine/geometry/triangle-topology';
+import { Turns } from '../../../src/domain/engine/geometry/turns';
 import { square as supportSquare, squareTopology } from '../../support/engine/square-topology';
 import {
   isUp as supportIsUp,

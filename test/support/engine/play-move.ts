@@ -1,5 +1,5 @@
-import type { Outcome } from '../../../src/domain/engine/outcome';
-import type { Resolution } from '../../../src/domain/engine/resolution';
+import type { Outcome } from '../../../src/domain/engine/events/outcome';
+import type { Resolution } from '../../../src/domain/engine/turn/resolution';
 
 // Plays one turn and gives its outcome. `GameEngine.tryPlay()` is the one entry of a turn
 // (classes.md decision 26, issue #415), so this helper asks it and reads `leadsTo()`.

@@ -1,17 +1,17 @@
 /** @jest-environment node */
-import { Outcome } from '../../../src/domain/engine/outcome';
+import { Outcome } from '../../../src/domain/engine/events/outcome';
 import { Score } from '../../../src/domain/shared/score';
-import { GameEngine } from '../../../src/domain/engine/game-engine';
-import { GameFactory } from '../../../src/domain/engine/game-factory';
-import { BoardId } from '../../../src/domain/engine/board-id';
+import { GameEngine } from '../../../src/domain/engine/turn/game-engine';
+import { GameFactory } from '../../../src/domain/engine/factory/game-factory';
+import { BoardId } from '../../../src/domain/engine/board/board-id';
 import { GameId } from '../../../src/domain/shared/game-id';
-import { GameStateId } from '../../../src/domain/engine/game-state-id';
+import { GameStateId } from '../../../src/domain/engine/board/game-state-id';
 import { MatchId } from '../../../src/domain/engine/match-id';
-import type { MatchIdGenerator } from '../../../src/domain/engine/match-id-generator';
+import type { MatchIdGenerator } from '../../../src/domain/engine/factory/match-id-generator';
 import { ElapsedTime } from '../../../src/domain/shared/elapsed-time';
-import { LevelTimer } from '../../../src/domain/engine/level-timer';
-import { LevelTimerId } from '../../../src/domain/engine/level-timer-id';
-import { MoveHistory } from '../../../src/domain/engine/move-history';
+import { LevelTimer } from '../../../src/domain/engine/turn/level-timer';
+import { LevelTimerId } from '../../../src/domain/engine/turn/level-timer-id';
+import { MoveHistory } from '../../../src/domain/engine/history/move-history';
 import { fakeCell } from '../../support/engine/fake-cell';
 import {
   fakeGameFactory,

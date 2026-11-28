@@ -65,7 +65,7 @@ describe('architecture gate (dependency-cruiser)', () => {
 
     expect(result.status).not.toBe(0);
     expect(result.output).toContain('progress-imports-only-shared');
-    expect(result.output).toContain('src/domain/engine/board.ts');
+    expect(result.output).toContain('src/domain/engine/board/board.ts');
     expect(result.output).toContain('src/domain/achievements/achievement-goal.ts');
   });
 

@@ -1,6 +1,10 @@
 /** @jest-environment node */
-import { Area } from '../../../src/domain/engine/area';
-import { CellNode, ShapeGroup, type ShapeNode } from '../../../src/domain/engine/shape-node';
+import { Area } from '../../../src/domain/engine/geometry/area';
+import {
+  CellNode,
+  ShapeGroup,
+  type ShapeNode,
+} from '../../../src/domain/engine/geometry/shape-node';
 
 describe('ShapeGroup', () => {
   it('should_keep_the_area_when_the_caller_changes_the_children_array', () => {

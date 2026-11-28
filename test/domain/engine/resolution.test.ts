@@ -5,9 +5,9 @@ import {
   PlayingPhase,
   ResolvingPhase,
   VictoryPhase,
-} from '../../../src/domain/engine/game-phase';
-import { Outcome } from '../../../src/domain/engine/outcome';
-import { Resolution } from '../../../src/domain/engine/resolution';
+} from '../../../src/domain/engine/turn/game-phase';
+import { Outcome } from '../../../src/domain/engine/events/outcome';
+import { Resolution } from '../../../src/domain/engine/turn/resolution';
 
 // The fields of a resolution are private (issue #240). A reader asks its queries.
 const won = () => Resolution.resolved().evaluated(Outcome.victory);

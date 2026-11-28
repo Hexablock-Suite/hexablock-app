@@ -1,5 +1,5 @@
 import { Score } from '../../shared/score';
-import type { IScoringPolicy } from '../../engine/scoring-policy';
+import type { IScoringPolicy } from '../../engine/turn/scoring-policy';
 import type { FitSnapshot, FitState } from './fit-state';
 
 // The points of one Fit turn. The accepted rule of issue #59 (D22, 2026-11-06):

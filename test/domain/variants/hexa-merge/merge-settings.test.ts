@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { RegionSize } from '../../../../src/domain/engine/region-size';
+import { RegionSize } from '../../../../src/domain/engine/geometry/region-size';
 import { Chance } from '../../../../src/domain/variants/hexa-merge/chance';
 import { MergeSettings } from '../../../../src/domain/variants/hexa-merge/merge-factory';
 import { MergeTile } from '../../../../src/domain/variants/hexa-merge/merge-tile';

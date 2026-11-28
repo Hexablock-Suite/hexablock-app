@@ -1,6 +1,6 @@
-import type { Clock } from '../domain/engine/clock';
+import type { Clock } from '../domain/engine/turn/clock';
 import { MatchId } from '../domain/engine/match-id';
-import type { MatchIdGenerator } from '../domain/engine/match-id-generator';
+import type { MatchIdGenerator } from '../domain/engine/factory/match-id-generator';
 
 // The one id generator of the app (classes.md decisions 25 and 52, issue #162).
 // It implements the engine interface `MatchIdGenerator`. Only the root of the game aggregate

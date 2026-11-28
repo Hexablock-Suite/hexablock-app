@@ -1,10 +1,10 @@
 import type { Color } from '../../engine/color';
 import type { IStarsByMoves } from '../../progress/level-progress';
 import type { Moves } from '../../shared/moves';
-import { frozenListOf } from '../../engine/frozen-list';
-import type { RandomSource } from '../../engine/random-source';
-import type { RegionSize } from '../../engine/region-size';
-import type { Seed } from '../../engine/seed';
+import { frozenListOf } from '../../engine/random/frozen-list';
+import type { RandomSource } from '../../engine/random/random-source';
+import type { RegionSize } from '../../engine/geometry/region-size';
+import type { Seed } from '../../engine/random/seed';
 import { starsOf } from '../../progress/star-count';
 import type { Stars } from '../../progress/stars';
 import { ColorStack } from './color-stack';

@@ -7,9 +7,9 @@ import { Stars } from '../../src/domain/progress/stars';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { Board } from '../../src/domain/engine/board';
-import { FixedListPieceSource } from '../../src/domain/engine/piece-source';
-import { RegionSize } from '../../src/domain/engine/region-size';
+import { Board } from '../../src/domain/engine/board/board';
+import { FixedListPieceSource } from '../../src/domain/engine/random/piece-source';
+import { RegionSize } from '../../src/domain/engine/geometry/region-size';
 import { FIT_POINTS_PER_TURN } from '../../src/domain/variants/hexa-fit/fit-scoring';
 import { FitPlay, FitStarThreshold } from '../../src/domain/variants/hexa-fit/fit-stars';
 import { ComboMultiplierDecorator } from '../../src/domain/variants/hexa-lines/combo-multiplier-decorator';
@@ -228,7 +228,7 @@ describe('README scoring section', () => {
 
   it('should_report_the_link_when_its_target_file_does_not_exist', () => {
     const section =
-      '[`A`](src/domain/engine/board.ts), [`B`](src/missing.ts), [#59](https://x.test/59)';
+      '[`A`](src/domain/engine/board/board.ts), [`B`](src/missing.ts), [#59](https://x.test/59)';
 
     expect(brokenLinks(section)).toEqual(['src/missing.ts']);
   });

@@ -4,7 +4,7 @@ import { textCatalog } from '../../src/adapters/texts/text-catalog';
 import type { MoveResult } from '../../src/application/move-result';
 import { Result } from '../../src/application/result';
 import type { UseCase } from '../../src/application/use-case';
-import { Outcome } from '../../src/domain/engine/outcome';
+import { Outcome } from '../../src/domain/engine/events/outcome';
 import { Score } from '../../src/domain/shared/score';
 
 // Issue #180: the end of a game reaches `ResultPresenter`. `GamePresenter` gives the response

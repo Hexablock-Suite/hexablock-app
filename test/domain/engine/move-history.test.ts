@@ -1,7 +1,7 @@
 /** @jest-environment node */
-import { MoveCommand } from '../../../src/domain/engine/move-command';
-import { MoveHistory } from '../../../src/domain/engine/move-history';
-import { UndoLimit } from '../../../src/domain/engine/undo-limit';
+import { MoveCommand } from '../../../src/domain/engine/history/move-command';
+import { MoveHistory } from '../../../src/domain/engine/history/move-history';
+import { UndoLimit } from '../../../src/domain/engine/history/undo-limit';
 
 // `MoveHistory` is the Command invoker and the Memento caretaker (classes.md decisions 3 and 34).
 // A test state is a plain string, because the history never reads the state.

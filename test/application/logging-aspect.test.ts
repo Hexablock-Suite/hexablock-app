@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { Outcome } from '../../src/domain/engine/outcome';
+import { Outcome } from '../../src/domain/engine/events/outcome';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { GameEventPublisher } from '../../src/application/game-event-publisher';
@@ -8,10 +8,10 @@ import { LoggingAspect } from '../../src/application/logging-aspect';
 import { Result, UseCaseError } from '../../src/application/result';
 import type { UseCase } from '../../src/application/use-case';
 import { UseCaseAspect } from '../../src/application/use-case-aspect';
-import type { BoardState } from '../../src/domain/engine/board-state';
+import type { BoardState } from '../../src/domain/engine/board/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
-import type { GameEvent } from '../../src/domain/engine/game-events';
-import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
+import type { GameEvent } from '../../src/domain/engine/events/game-events';
+import type { IVariantFactory } from '../../src/domain/engine/factory/variant-factory';
 import { PlacePiece } from '../../src/domain/variants/hexa-lines/place-piece';
 import { TrayPosition } from '../../src/domain/variants/hexa-lines/tray-position';
 import { square } from '../support/engine/square-topology';

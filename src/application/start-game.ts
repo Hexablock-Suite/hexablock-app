@@ -1,10 +1,10 @@
-import type { BoardState } from '../domain/engine/board-state';
+import type { BoardState } from '../domain/engine/board/board-state';
 import type { Cloneable } from '../domain/engine/cloneable';
 import type { GameId } from '../domain/shared/game-id';
 import type { TopologyId } from '../domain/shared/topology-id';
 import type { LevelId } from '../domain/progress/level-id';
 import { LevelStatus } from '../domain/progress/level-status';
-import { Outcome } from '../domain/engine/outcome';
+import { Outcome } from '../domain/engine/events/outcome';
 import type { GameFactories } from './game-factories';
 import type { GameRepository } from './game-repository';
 import type { LevelRepository } from './level-repository';

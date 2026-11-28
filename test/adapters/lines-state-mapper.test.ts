@@ -1,8 +1,8 @@
 /** @jest-environment node */
 import { LinesStateMapper } from '../../src/adapters/lines-state-mapper';
 import { Color } from '../../src/domain/engine/color';
-import { Piece } from '../../src/domain/engine/piece';
-import { CellNode, ShapeGroup } from '../../src/domain/engine/shape-node';
+import { Piece } from '../../src/domain/engine/board/piece';
+import { CellNode, ShapeGroup } from '../../src/domain/engine/geometry/shape-node';
 import { LinesView } from '../../src/domain/variants/hexa-lines/lines-state';
 import { square, type SquareCoord } from '../support/engine/square-topology';
 

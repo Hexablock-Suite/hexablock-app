@@ -1,5 +1,5 @@
 import type { GameEventListener } from '../../../src/adapters/game-event-listener';
-import type { GameEvent } from '../../../src/domain/engine/game-events';
+import type { GameEvent } from '../../../src/domain/engine/events/game-events';
 
 // A double of a `GameEventListener` (issue #362). It exists only in test/.
 // It keeps each event that the bus gives it, in the order of arrival, and writes its name

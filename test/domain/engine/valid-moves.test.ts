@@ -1,8 +1,8 @@
 /** @jest-environment node */
-import { Outcome } from '../../../src/domain/engine/outcome';
-import { RegionSize } from '../../../src/domain/engine/region-size';
-import { Resolution } from '../../../src/domain/engine/resolution';
-import { BaseGameRules } from '../../../src/domain/engine/rules';
+import { Outcome } from '../../../src/domain/engine/events/outcome';
+import { RegionSize } from '../../../src/domain/engine/geometry/region-size';
+import { Resolution } from '../../../src/domain/engine/turn/resolution';
+import { BaseGameRules } from '../../../src/domain/engine/turn/rules';
 import { fakeCell } from '../../support/engine/fake-cell';
 import { emptyState, type FakeState } from '../../support/engine/fake-game';
 import {

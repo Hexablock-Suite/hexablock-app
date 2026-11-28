@@ -1,9 +1,13 @@
 /** @jest-environment node */
 import type { Color } from '../../../../src/domain/engine/color';
-import { RandomDraw } from '../../../../src/domain/engine/random-draw';
-import type { RandomSource } from '../../../../src/domain/engine/random-source';
-import { RegionSize } from '../../../../src/domain/engine/region-size';
-import { CellNode, ShapeGroup, type ShapeNode } from '../../../../src/domain/engine/shape-node';
+import { RandomDraw } from '../../../../src/domain/engine/random/random-draw';
+import type { RandomSource } from '../../../../src/domain/engine/random/random-source';
+import { RegionSize } from '../../../../src/domain/engine/geometry/region-size';
+import {
+  CellNode,
+  ShapeGroup,
+  type ShapeNode,
+} from '../../../../src/domain/engine/geometry/shape-node';
 import { LinesSettings } from '../../../../src/domain/variants/hexa-lines/lines-factory';
 import { square, squareTopology, type SquareCoord } from '../../../support/engine/square-topology';
 import { blue, red } from '../../../support/variants/hexa-lines/lines-game';

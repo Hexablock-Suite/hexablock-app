@@ -1,5 +1,5 @@
 import type { GameRepository } from '../../../src/application/game-repository';
-import { GameFactory } from '../../../src/domain/engine/game-factory';
+import { GameFactory } from '../../../src/domain/engine/factory/game-factory';
 import type { FakeCell } from '../engine/fake-cell';
 import { fakeGameFactory, type FakeMove, type FakeState } from '../engine/fake-game';
 import { CountingMatchIds } from '../engine/match-id';

@@ -1,15 +1,15 @@
 /** @jest-environment node */
-import { CoordKey } from '../../../../src/domain/engine/coord-key';
+import { CoordKey } from '../../../../src/domain/engine/geometry/coord-key';
 import { Moves } from '../../../../src/domain/shared/moves';
 import { Score } from '../../../../src/domain/shared/score';
-import { Turns } from '../../../../src/domain/engine/turns';
+import { Turns } from '../../../../src/domain/engine/geometry/turns';
 import { PieceId } from '../../../../src/domain/variants/hexa-fit/piece-id';
 import { Placement } from '../../../../src/domain/variants/hexa-fit/placement';
 import { square, squareTopology } from '../../../support/engine/square-topology';
 import { A, B } from '../../../support/variants/hexa-fit/fit-game';
 import { fitFactory, threeDominoFitFactory } from '../../../support/variants/hexa-fit/fit-game';
 import { firstValidMove, playedOn } from '../../../support/engine/variant-game';
-import { GameStateId } from '../../../../src/domain/engine/game-state-id';
+import { GameStateId } from '../../../../src/domain/engine/board/game-state-id';
 import { MatchId } from '../../../../src/domain/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 import { MATCH_ID } from '../../../support/engine/match-id';

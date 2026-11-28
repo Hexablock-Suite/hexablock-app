@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { Score } from '../../../../src/domain/shared/score';
-import { Seed } from '../../../../src/domain/engine/seed';
-import { hex, HexAxis, type HexCoord } from '../../../../src/domain/engine/hex-topology';
+import { Seed } from '../../../../src/domain/engine/random/seed';
+import { hex, HexAxis, type HexCoord } from '../../../../src/domain/engine/geometry/hex-topology';
 import { MergeScoring } from '../../../../src/domain/variants/hexa-merge/merge-scoring';
 import { Chance } from '../../../../src/domain/variants/hexa-merge/chance';
 import { mergeTileSource } from '../../../../src/domain/variants/hexa-merge/merge-tile-source';

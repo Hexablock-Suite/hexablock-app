@@ -1,6 +1,6 @@
-import { SeededPieceSource } from '../../engine/piece-source';
-import type { RandomSource } from '../../engine/random-source';
-import type { Seed } from '../../engine/seed';
+import { SeededPieceSource } from '../../engine/random/piece-source';
+import type { RandomSource } from '../../engine/random/random-source';
+import type { Seed } from '../../engine/random/seed';
 import { Chance } from './chance';
 import { MergeTile } from './merge-tile';
 import { NewTile } from './new-tile';

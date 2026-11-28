@@ -1,6 +1,6 @@
-import { BoardId } from '../../../src/domain/engine/board-id';
-import { GameStateId } from '../../../src/domain/engine/game-state-id';
-import { LevelTimerId } from '../../../src/domain/engine/level-timer-id';
+import { BoardId } from '../../../src/domain/engine/board/board-id';
+import { GameStateId } from '../../../src/domain/engine/board/game-state-id';
+import { LevelTimerId } from '../../../src/domain/engine/turn/level-timer-id';
 import { MATCH_ID } from './match-id';
 
 // The ids of the board, of the state and of the level timer for the tests.

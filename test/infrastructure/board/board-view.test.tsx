@@ -2,11 +2,14 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import { StyleSheet, View } from 'react-native';
 
 import type { MoveResult } from '../../../src/application/move-result';
-import { hex, type HexCoord } from '../../../src/domain/engine/hex-topology';
-import { Outcome } from '../../../src/domain/engine/outcome';
+import { hex, type HexCoord } from '../../../src/domain/engine/geometry/hex-topology';
+import { Outcome } from '../../../src/domain/engine/events/outcome';
 import { Score } from '../../../src/domain/shared/score';
-import { square, type SquareCoord } from '../../../src/domain/engine/square-topology';
-import { triangle, type TriangleCoord } from '../../../src/domain/engine/triangle-topology';
+import { square, type SquareCoord } from '../../../src/domain/engine/geometry/square-topology';
+import {
+  triangle,
+  type TriangleCoord,
+} from '../../../src/domain/engine/geometry/triangle-topology';
 import { cellBoxOf, type BoardLayout } from '../../../src/adapters/board/board-layout';
 import { BoardView } from '../../../src/infrastructure/board/board-view';
 import type { CellRenderer } from '../../../src/infrastructure/board/cell-renderer';

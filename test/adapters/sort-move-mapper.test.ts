@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { SortMoveMapper } from '../../src/adapters/sort-move-mapper';
-import { HexGeometry } from '../../src/domain/engine/hex-geometry';
-import type { HexCoord } from '../../src/domain/engine/hex-topology';
+import { HexGeometry } from '../../src/domain/engine/geometry/hex-geometry';
+import type { HexCoord } from '../../src/domain/engine/geometry/hex-topology';
 import { PlaceStack } from '../../src/domain/variants/hexa-sort/place-stack';
 import { TraySlot } from '../../src/domain/variants/hexa-sort/tray-slot';
 

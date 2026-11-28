@@ -1,12 +1,12 @@
 /** @jest-environment node */
-import { Outcome } from '../../../../src/domain/engine/outcome';
+import { Outcome } from '../../../../src/domain/engine/events/outcome';
 import { Score } from '../../../../src/domain/shared/score';
-import { GameOverPhase, PlayingPhase } from '../../../../src/domain/engine/game-phase';
-import type { GridTopology } from '../../../../src/domain/engine/grid-topology';
-import { GameEnded } from '../../../../src/domain/engine/game-events';
-import { SeededPieceSource } from '../../../../src/domain/engine/piece-source';
-import { Seed } from '../../../../src/domain/engine/seed';
-import { BaseGameRules, type IGameRules } from '../../../../src/domain/engine/rules';
+import { GameOverPhase, PlayingPhase } from '../../../../src/domain/engine/turn/game-phase';
+import type { GridTopology } from '../../../../src/domain/engine/geometry/grid-topology';
+import { GameEnded } from '../../../../src/domain/engine/events/game-events';
+import { SeededPieceSource } from '../../../../src/domain/engine/random/piece-source';
+import { Seed } from '../../../../src/domain/engine/random/seed';
+import { BaseGameRules, type IGameRules } from '../../../../src/domain/engine/turn/rules';
 import { Color } from '../../../../src/domain/engine/color';
 import { ComboMultiplierDecorator } from '../../../../src/domain/variants/hexa-lines/combo-multiplier-decorator';
 import { LineCount } from '../../../../src/domain/variants/hexa-lines/line-count';
@@ -41,8 +41,8 @@ import {
 import { MATCH_ID } from '../../../support/engine/match-id';
 import { BOARD_ID, STATE_ID } from '../../../support/engine/entity-ids';
 import { accepts, boardLike, firstValidMove } from '../../../support/engine/variant-game';
-import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
-import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
+import { SquareGeometry } from '../../../../src/domain/engine/geometry/square-geometry';
+import type { IScoringPolicy } from '../../../../src/domain/engine/turn/scoring-policy';
 import { delivered } from '../../../support/engine/value-receiver';
 import { playMove } from '../../../support/engine/play-move';
 

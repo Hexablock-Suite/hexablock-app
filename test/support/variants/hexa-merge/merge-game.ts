@@ -1,18 +1,18 @@
-import type { GridAxis, GridTopology } from '../../../../src/domain/engine/grid-topology';
+import type { GridAxis, GridTopology } from '../../../../src/domain/engine/geometry/grid-topology';
 import { Score } from '../../../../src/domain/shared/score';
-import { Board, type ReadonlyBoard } from '../../../../src/domain/engine/board';
-import { GameEngine } from '../../../../src/domain/engine/game-engine';
+import { Board, type ReadonlyBoard } from '../../../../src/domain/engine/board/board';
+import { GameEngine } from '../../../../src/domain/engine/turn/game-engine';
 import { GameId } from '../../../../src/domain/shared/game-id';
-import { GameStateId } from '../../../../src/domain/engine/game-state-id';
+import { GameStateId } from '../../../../src/domain/engine/board/game-state-id';
 import type { MatchId } from '../../../../src/domain/engine/match-id';
-import { HexGeometry } from '../../../../src/domain/engine/hex-geometry';
-import type { HexAxis, HexCoord } from '../../../../src/domain/engine/hex-topology';
+import { HexGeometry } from '../../../../src/domain/engine/geometry/hex-geometry';
+import type { HexAxis, HexCoord } from '../../../../src/domain/engine/geometry/hex-topology';
 import {
   FixedListPieceSource,
   type IPieceSource,
-} from '../../../../src/domain/engine/piece-source';
-import { RegionSize } from '../../../../src/domain/engine/region-size';
-import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
+} from '../../../../src/domain/engine/random/piece-source';
+import { RegionSize } from '../../../../src/domain/engine/geometry/region-size';
+import type { IScoringPolicy } from '../../../../src/domain/engine/turn/scoring-policy';
 import {
   MergeFactory,
   MergeSettings,

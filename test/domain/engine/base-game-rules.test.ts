@@ -1,7 +1,7 @@
 /** @jest-environment node */
-import { Outcome } from '../../../src/domain/engine/outcome';
-import { Resolution } from '../../../src/domain/engine/resolution';
-import { BaseGameRules, type IGameRules } from '../../../src/domain/engine/rules';
+import { Outcome } from '../../../src/domain/engine/events/outcome';
+import { Resolution } from '../../../src/domain/engine/turn/resolution';
+import { BaseGameRules, type IGameRules } from '../../../src/domain/engine/turn/rules';
 
 // A fake rules subclass that exists only in this test. Its state is a number,
 // a move is a number, and it writes the name of each step it runs.

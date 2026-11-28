@@ -1,10 +1,10 @@
 /** @jest-environment node */
-import { Area } from '../../../src/domain/engine/area';
-import { Board } from '../../../src/domain/engine/board';
-import { Piece } from '../../../src/domain/engine/piece';
-import { RegionSize } from '../../../src/domain/engine/region-size';
-import { CellNode, ShapeGroup } from '../../../src/domain/engine/shape-node';
-import { Turns } from '../../../src/domain/engine/turns';
+import { Area } from '../../../src/domain/engine/geometry/area';
+import { Board } from '../../../src/domain/engine/board/board';
+import { Piece } from '../../../src/domain/engine/board/piece';
+import { RegionSize } from '../../../src/domain/engine/geometry/region-size';
+import { CellNode, ShapeGroup } from '../../../src/domain/engine/geometry/shape-node';
+import { Turns } from '../../../src/domain/engine/geometry/turns';
 import { fakeCell } from '../../support/engine/fake-cell';
 import {
   TriangleAxis,

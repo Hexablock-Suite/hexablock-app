@@ -6,7 +6,7 @@ import {
   countsForAchievements,
   type CountsForAchievements,
 } from '../domain/achievements/counts-for-achievements';
-import type { GameEvent } from '../domain/engine/game-events';
+import type { GameEvent } from '../domain/engine/events/game-events';
 import type { GameId } from '../domain/shared/game-id';
 import type { GameEventListener } from './game-event-listener';
 

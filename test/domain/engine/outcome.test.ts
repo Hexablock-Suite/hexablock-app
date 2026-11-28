@@ -4,8 +4,8 @@ import {
   PlayingPhase,
   ResolvingPhase,
   VictoryPhase,
-} from '../../../src/domain/engine/game-phase';
-import { Outcome } from '../../../src/domain/engine/outcome';
+} from '../../../src/domain/engine/turn/game-phase';
+import { Outcome } from '../../../src/domain/engine/events/outcome';
 
 // Issue #207 (classes.md decision 45): `Outcome` is a class with a closed set of three instances.
 // `closed-sets.test.ts` holds the tests that every closed set shares.

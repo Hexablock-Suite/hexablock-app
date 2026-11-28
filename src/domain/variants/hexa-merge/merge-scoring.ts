@@ -1,6 +1,6 @@
-import type { GridAxis } from '../../engine/grid-topology';
+import type { GridAxis } from '../../engine/geometry/grid-topology';
 import { Score } from '../../shared/score';
-import type { IScoringPolicy } from '../../engine/scoring-policy';
+import type { IScoringPolicy } from '../../engine/turn/scoring-policy';
 import type { MergeSnapshot, MergeState } from './merge-state';
 import type { MergeTile } from './merge-tile';
 

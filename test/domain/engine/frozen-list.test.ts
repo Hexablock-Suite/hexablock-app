@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { frozenListOf } from '../../../src/domain/engine/frozen-list';
+import { frozenListOf } from '../../../src/domain/engine/random/frozen-list';
 
 // Issue #419: a value object copies each list that it takes and refuses `undefined`.
 // One engine function does it, so no value object builds a piece source to copy a list.

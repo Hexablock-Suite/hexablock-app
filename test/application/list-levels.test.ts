@@ -11,7 +11,7 @@ import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
 import { GameId } from '../../src/domain/shared/game-id';
 import { GameProgress } from '../../src/domain/progress/game-progress';
 import { TopologyId } from '../../src/domain/shared/topology-id';
-import { HexGeometry } from '../../src/domain/engine/hex-geometry';
+import { HexGeometry } from '../../src/domain/engine/geometry/hex-geometry';
 import { LevelDefinition } from '../../src/domain/progress/level-definition';
 import { LevelId } from '../../src/domain/progress/level-id';
 import { LevelStatus } from '../../src/domain/progress/level-status';

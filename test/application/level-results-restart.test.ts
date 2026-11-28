@@ -9,7 +9,7 @@ import { SaveProgress } from '../../src/application/save-progress';
 import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
 import { GameId } from '../../src/domain/shared/game-id';
 import { TopologyId } from '../../src/domain/shared/topology-id';
-import { HexGeometry } from '../../src/domain/engine/hex-geometry';
+import { HexGeometry } from '../../src/domain/engine/geometry/hex-geometry';
 import type { LevelDefinition } from '../../src/domain/progress/level-definition';
 import { LevelId } from '../../src/domain/progress/level-id';
 import { LevelStatus } from '../../src/domain/progress/level-status';

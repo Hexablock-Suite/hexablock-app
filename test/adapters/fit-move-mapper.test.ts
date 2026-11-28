@@ -1,8 +1,8 @@
 /** @jest-environment node */
 import { FitMoveMapper } from '../../src/adapters/fit-move-mapper';
-import { HexGeometry } from '../../src/domain/engine/hex-geometry';
-import type { HexCoord } from '../../src/domain/engine/hex-topology';
-import { Turns } from '../../src/domain/engine/turns';
+import { HexGeometry } from '../../src/domain/engine/geometry/hex-geometry';
+import type { HexCoord } from '../../src/domain/engine/geometry/hex-topology';
+import { Turns } from '../../src/domain/engine/geometry/turns';
 import { PlaceFitPiece, RemoveFitPiece } from '../../src/domain/variants/hexa-fit/fit-move';
 import { PieceId } from '../../src/domain/variants/hexa-fit/piece-id';
 

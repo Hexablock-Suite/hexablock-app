@@ -1,4 +1,4 @@
-import type { CoordKey } from '../../engine/coord-key';
+import type { CoordKey } from '../../engine/geometry/coord-key';
 
 // The place of one piece in the Hexa Lines tray, from 0 (issue #232).
 // A `PlacePiece` names its tray piece with it (classes.md decision 43).

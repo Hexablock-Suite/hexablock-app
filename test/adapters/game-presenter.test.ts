@@ -12,7 +12,7 @@ import type { UndoMoveRequest } from '../../src/application/undo-move';
 import type { UseCase } from '../../src/application/use-case';
 import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
 import { LevelId } from '../../src/domain/progress/level-id';
-import { Outcome } from '../../src/domain/engine/outcome';
+import { Outcome } from '../../src/domain/engine/events/outcome';
 import { Score } from '../../src/domain/shared/score';
 
 // Issue #170: `GamePresenter` calls `StartGame` and `ApplyMove` through the `UseCase` port and

@@ -1,11 +1,11 @@
 /** @jest-environment node */
-import { hex, HexTopology, type HexCoord } from '../../../src/domain/engine/hex-topology';
+import { hex, HexTopology, type HexCoord } from '../../../src/domain/engine/geometry/hex-topology';
 import {
   square,
   SquareTopology,
   type SquareCoord,
-} from '../../../src/domain/engine/square-topology';
-import { triangle, TriangleTopology } from '../../../src/domain/engine/triangle-topology';
+} from '../../../src/domain/engine/geometry/square-topology';
+import { triangle, TriangleTopology } from '../../../src/domain/engine/geometry/triangle-topology';
 import {
   valuesOf,
   type BoardLayout,

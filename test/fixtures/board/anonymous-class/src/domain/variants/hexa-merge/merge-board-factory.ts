@@ -1,4 +1,4 @@
-import { Board } from '../../engine/board';
+import { Board } from '../../engine/board/board';
 import type { MergeTile } from './merge-tile';
 
 // Wrong on purpose: an anonymous class extends the engine `Board` (APP-NFR-01).

@@ -6,9 +6,9 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { GameId } from '../../../src/domain/shared/game-id';
 import { TopologyId } from '../../../src/domain/shared/topology-id';
-import { HexGeometry } from '../../../src/domain/engine/hex-geometry';
-import { RegionSize } from '../../../src/domain/engine/region-size';
-import { SquareGeometry } from '../../../src/domain/engine/square-geometry';
+import { HexGeometry } from '../../../src/domain/engine/geometry/hex-geometry';
+import { RegionSize } from '../../../src/domain/engine/geometry/region-size';
+import { SquareGeometry } from '../../../src/domain/engine/geometry/square-geometry';
 import { HexLayout } from '../../../src/adapters/board/hex-layout';
 import type { MergeIntent } from '../../../src/adapters/merge-move-mapper';
 import { slideWays, type Compass, type SlideWay } from '../../../src/adapters/merge-slide-ways';

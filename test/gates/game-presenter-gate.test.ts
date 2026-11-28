@@ -33,7 +33,7 @@ const ALLOWED_IMPORTS = new Set([
   '../application/start-game',
   '../application/undo-move',
   '../application/use-case',
-  '../domain/engine/outcome',
+  '../domain/engine/events/outcome',
   '../domain/progress/level-id',
   '../domain/shared/score',
   '../domain/shared/value-receiver',

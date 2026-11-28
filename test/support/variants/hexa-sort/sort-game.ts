@@ -1,19 +1,19 @@
 import { Score } from '../../../../src/domain/shared/score';
-import { Board } from '../../../../src/domain/engine/board';
-import { BoardShape } from '../../../../src/domain/engine/board-shape';
+import { Board } from '../../../../src/domain/engine/board/board';
+import { BoardShape } from '../../../../src/domain/engine/geometry/board-shape';
 import { Color } from '../../../../src/domain/engine/color';
-import type { CoordKey } from '../../../../src/domain/engine/coord-key';
-import { GameEngine } from '../../../../src/domain/engine/game-engine';
+import type { CoordKey } from '../../../../src/domain/engine/geometry/coord-key';
+import { GameEngine } from '../../../../src/domain/engine/turn/game-engine';
 import { GameId } from '../../../../src/domain/shared/game-id';
-import { GameStateId } from '../../../../src/domain/engine/game-state-id';
+import { GameStateId } from '../../../../src/domain/engine/board/game-state-id';
 import type { MatchId } from '../../../../src/domain/engine/match-id';
 import {
   FixedListPieceSource,
   type IPieceSource,
-} from '../../../../src/domain/engine/piece-source';
-import { RegionSize } from '../../../../src/domain/engine/region-size';
-import type { IScoringPolicy } from '../../../../src/domain/engine/scoring-policy';
-import { SquareGeometry } from '../../../../src/domain/engine/square-geometry';
+} from '../../../../src/domain/engine/random/piece-source';
+import { RegionSize } from '../../../../src/domain/engine/geometry/region-size';
+import type { IScoringPolicy } from '../../../../src/domain/engine/turn/scoring-policy';
+import { SquareGeometry } from '../../../../src/domain/engine/geometry/square-geometry';
 import { ColorStack } from '../../../../src/domain/variants/hexa-sort/color-stack';
 import { GoalCount } from '../../../../src/domain/variants/hexa-sort/goal-count';
 import { SortFactory } from '../../../../src/domain/variants/hexa-sort/sort-factory';
@@ -28,7 +28,7 @@ import { BOARD_ID, STATE_ID } from '../../engine/entity-ids';
 import { boardLike } from '../../engine/variant-game';
 import { seededRandom } from '../../engine/step-random';
 import { ManualClock } from '../../engine/manual-clock';
-import type { Clock } from '../../../../src/domain/engine/clock';
+import type { Clock } from '../../../../src/domain/engine/turn/clock';
 
 // Hexa Sort test helpers. The board uses the square topology double (D4), so the tests
 // prove that the Sort rules ask the topology for the neighbors and assume no hexagon.

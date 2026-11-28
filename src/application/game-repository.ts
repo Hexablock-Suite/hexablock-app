@@ -1,6 +1,6 @@
-import type { BoardState } from '../domain/engine/board-state';
+import type { BoardState } from '../domain/engine/board/board-state';
 import type { Cloneable } from '../domain/engine/cloneable';
-import type { GameEngine } from '../domain/engine/game-engine';
+import type { GameEngine } from '../domain/engine/turn/game-engine';
 
 // Output port and repository of the game aggregate (classes.md decisions 10 and 52).
 // It saves and gives back the whole aggregate root, `GameEngine` (decision 26).

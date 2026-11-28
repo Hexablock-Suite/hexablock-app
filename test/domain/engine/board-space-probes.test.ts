@@ -1,7 +1,7 @@
 /** @jest-environment node */
-import { Board, BoardSpace } from '../../../src/domain/engine/board';
-import { CoordKey } from '../../../src/domain/engine/coord-key';
-import { RegionSize } from '../../../src/domain/engine/region-size';
+import { Board, BoardSpace } from '../../../src/domain/engine/board/board';
+import { CoordKey } from '../../../src/domain/engine/geometry/coord-key';
+import { RegionSize } from '../../../src/domain/engine/geometry/region-size';
 import { square, squareTopology } from '../../support/engine/square-topology';
 import { BOARD_ID } from '../../support/engine/entity-ids';
 

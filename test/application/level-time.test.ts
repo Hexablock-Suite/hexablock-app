@@ -1,6 +1,6 @@
 /** @jest-environment node */
-import { Outcome } from '../../src/domain/engine/outcome';
-import type { BoardState } from '../../src/domain/engine/board-state';
+import { Outcome } from '../../src/domain/engine/events/outcome';
+import type { BoardState } from '../../src/domain/engine/board/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
 import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
 import { GameId } from '../../src/domain/shared/game-id';
@@ -8,8 +8,8 @@ import { Moves } from '../../src/domain/shared/moves';
 import { GameResult } from '../../src/domain/progress/progress-model';
 import { starsOf } from '../../src/domain/progress/star-count';
 import { Stars } from '../../src/domain/progress/stars';
-import { Turns } from '../../src/domain/engine/turns';
-import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
+import { Turns } from '../../src/domain/engine/geometry/turns';
+import type { IVariantFactory } from '../../src/domain/engine/factory/variant-factory';
 import { PlaceFitPiece } from '../../src/domain/variants/hexa-fit/fit-move';
 import { FitPlay, FitStarThreshold } from '../../src/domain/variants/hexa-fit/fit-stars';
 import { gameUseCases, valueOf } from '../support/application/game-use-cases';

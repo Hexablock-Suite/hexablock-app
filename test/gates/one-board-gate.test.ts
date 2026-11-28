@@ -3,13 +3,13 @@ import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import * as ts from 'typescript';
 
-import { Board, type ReadonlyBoard } from '../../src/domain/engine/board';
-import { hex, type HexAxis, type HexCoord } from '../../src/domain/engine/hex-topology';
-import { FixedListPieceSource } from '../../src/domain/engine/piece-source';
-import { Piece } from '../../src/domain/engine/piece';
-import { RegionSize } from '../../src/domain/engine/region-size';
-import { CellNode, ShapeGroup } from '../../src/domain/engine/shape-node';
-import { Turns } from '../../src/domain/engine/turns';
+import { Board, type ReadonlyBoard } from '../../src/domain/engine/board/board';
+import { hex, type HexAxis, type HexCoord } from '../../src/domain/engine/geometry/hex-topology';
+import { FixedListPieceSource } from '../../src/domain/engine/random/piece-source';
+import { Piece } from '../../src/domain/engine/board/piece';
+import { RegionSize } from '../../src/domain/engine/geometry/region-size';
+import { CellNode, ShapeGroup } from '../../src/domain/engine/geometry/shape-node';
+import { Turns } from '../../src/domain/engine/geometry/turns';
 import { FitState } from '../../src/domain/variants/hexa-fit/fit-state';
 import { PieceId } from '../../src/domain/variants/hexa-fit/piece-id';
 import { Placement } from '../../src/domain/variants/hexa-fit/placement';
@@ -30,7 +30,7 @@ import { BOARD_ID, STATE_ID } from '../support/engine/entity-ids';
 // The static check reads `src/domain/variants/` with the TypeScript parser. It reports:
 // - a class whose name ends with `Board`,
 // - a class that extends `Board` or a class whose name ends with `Board`,
-// - a class member `board` whose type is not the `Board` of `engine/board`.
+// - a class member `board` whose type is not the `Board` of `engine/board/board`.
 // The runtime checks build the state of each variant and read the class of its board.
 // Known gap, accepted in APP-NFR-01 (gap G112.1): the scan does not catch a class with
 // another name that keeps the cells in a `Map`. The `board` member check and the typed
@@ -42,7 +42,7 @@ type BoardScan = {
   holders: string[];
 };
 
-const engineBoardModule = /(^|\/)engine\/board$/;
+const engineBoardModule = /(^|\/)engine\/board\/board$/;
 
 // The local names that an import binds to the `Board` export of the engine module.
 // A namespace import `* as engine` binds the qualified name `engine.Board`.

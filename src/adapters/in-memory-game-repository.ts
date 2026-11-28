@@ -1,7 +1,7 @@
 import type { GameRepository } from '../application/game-repository';
-import type { BoardState } from '../domain/engine/board-state';
+import type { BoardState } from '../domain/engine/board/board-state';
 import type { Cloneable } from '../domain/engine/cloneable';
-import type { GameEngine } from '../domain/engine/game-engine';
+import type { GameEngine } from '../domain/engine/turn/game-engine';
 
 // Adapter of the `GameRepository` port: the repository of the game aggregate
 // (classes.md decisions 10 and 52, issue #162). It keeps zero or one root in memory.

@@ -1,6 +1,6 @@
-import type { BoardState } from '../domain/engine/board-state';
+import type { BoardState } from '../domain/engine/board/board-state';
 import type { Cloneable } from '../domain/engine/cloneable';
-import type { GameEvent } from '../domain/engine/game-events';
+import type { GameEvent } from '../domain/engine/events/game-events';
 import type { GameEventPublisher } from './game-event-publisher';
 import { moveResultOf, type MoveResult, type ViewOf } from './move-result';
 import { caughtError, FailureCode, Result, UseCaseError } from './result';

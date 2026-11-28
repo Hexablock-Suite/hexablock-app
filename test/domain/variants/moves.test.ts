@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { Turns } from '../../../src/domain/engine/turns';
+import { Turns } from '../../../src/domain/engine/geometry/turns';
 import {
   PlaceFitPiece,
   RemoveFitPiece,

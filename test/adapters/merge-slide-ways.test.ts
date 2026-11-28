@@ -1,10 +1,10 @@
 /** @jest-environment node */
-import { HexGeometry } from '../../src/domain/engine/hex-geometry';
-import { HexAxis } from '../../src/domain/engine/hex-topology';
-import { RegionSize } from '../../src/domain/engine/region-size';
-import { SquareGeometry } from '../../src/domain/engine/square-geometry';
-import { SquareAxis } from '../../src/domain/engine/square-topology';
-import { TriangleGeometry } from '../../src/domain/engine/triangle-geometry';
+import { HexGeometry } from '../../src/domain/engine/geometry/hex-geometry';
+import { HexAxis } from '../../src/domain/engine/geometry/hex-topology';
+import { RegionSize } from '../../src/domain/engine/geometry/region-size';
+import { SquareGeometry } from '../../src/domain/engine/geometry/square-geometry';
+import { SquareAxis } from '../../src/domain/engine/geometry/square-topology';
+import { TriangleGeometry } from '../../src/domain/engine/geometry/triangle-geometry';
 import { Slide, SlideSense } from '../../src/domain/variants/hexa-merge/slide';
 import { HexLayout } from '../../src/adapters/board/hex-layout';
 import { slideWays, type SlideWay } from '../../src/adapters/merge-slide-ways';

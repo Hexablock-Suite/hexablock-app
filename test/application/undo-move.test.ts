@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { Outcome } from '../../src/domain/engine/outcome';
+import { Outcome } from '../../src/domain/engine/events/outcome';
 import { phaseNameOf } from '../support/engine/phase-name';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -8,9 +8,9 @@ import type { GameRepository } from '../../src/application/game-repository';
 import { Result } from '../../src/application/result';
 import { SaveProgress } from '../../src/application/save-progress';
 import { UndoMove } from '../../src/application/undo-move';
-import type { BoardState } from '../../src/domain/engine/board-state';
+import type { BoardState } from '../../src/domain/engine/board/board-state';
 import { GameId } from '../../src/domain/shared/game-id';
-import type { HexCoord } from '../../src/domain/engine/hex-topology';
+import type { HexCoord } from '../../src/domain/engine/geometry/hex-topology';
 import { Moves } from '../../src/domain/shared/moves';
 import { GameResult, ProgressRecord } from '../../src/domain/progress/progress-model';
 import type { Score } from '../../src/domain/shared/score';
@@ -18,13 +18,13 @@ import type { MergeFactory } from '../../src/domain/variants/hexa-merge/merge-fa
 import { InMemoryKeyValueStore } from '../support/adapters/in-memory-key-value-store';
 import { RecordingPublisher } from '../support/application/recording-publisher';
 import { dataOf, gameEndedEventsIn } from '../support/engine/game-ended';
-import { PlayingPhase } from '../../src/domain/engine/game-phase';
-import type { IPieceSource } from '../../src/domain/engine/piece-source';
+import { PlayingPhase } from '../../src/domain/engine/turn/game-phase';
+import type { IPieceSource } from '../../src/domain/engine/random/piece-source';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
 import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
 import { MatchId } from '../../src/domain/engine/match-id';
-import { Turns } from '../../src/domain/engine/turns';
-import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
+import { Turns } from '../../src/domain/engine/geometry/turns';
+import type { IVariantFactory } from '../../src/domain/engine/factory/variant-factory';
 import { PlaceFitPiece } from '../../src/domain/variants/hexa-fit/fit-move';
 import type { MergeTile } from '../../src/domain/variants/hexa-merge/merge-tile';
 import type { NewTile } from '../../src/domain/variants/hexa-merge/new-tile';

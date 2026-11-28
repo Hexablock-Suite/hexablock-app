@@ -139,7 +139,7 @@ A hand edit of that order survives. Move the boxes in draw.io, run `pin.mjs` of 
 
 ## Part 1: the generic engine
 
-`src/domain/engine/`, with its sibling folders `src/domain/shared/`, `src/domain/progress/` and `src/domain/achievements/` (decision 64). It imports no variant and no framework (rules `domain-no-framework` and `engine-no-variants`). Three folder rules keep the four folders free of cycles: `shared-imports-only-shared`, `progress-imports-only-shared` and `achievements-imports-only-shared-and-progress`.
+`src/domain/engine/`, with its sibling folders `src/domain/shared/`, `src/domain/progress/` and `src/domain/achievements/` (decision 64). It imports no variant and no framework (rules `domain-no-framework` and `engine-no-variants`). Three folder rules keep the four folders free of cycles: `shared-imports-only-shared`, `progress-imports-only-shared` and `achievements-imports-only-shared-and-progress`. Since #499 the engine has subfolders by game concern, and the rule `engine-folders-no-cycle` keeps them free of cycles too ([README of the engine](../../src/domain/engine/README.md)).
 
 ### Map of the engine
 
@@ -361,9 +361,9 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
    `GameEngine` holds zero or one history, an `IUndoable` (decision 27), and the variant factory decides.
    Fit gets `RedoableHistory` with no limit, Merge gets `MoveHistory` with limit 1, and Lines and Sort get none.
    So Hexa Lines never implements `IUndoable` (§3.2).
-   Since #243 the limit is an `UndoLimit` in `src/domain/engine/undo-limit.ts`, not a number: `UndoLimit.of(value)` takes a safe integer of one or more and throws a `RangeError` for any other number, `equals()` compares two limits, and `newestOf(items)` gives the newest items that the limit keeps.
+   Since #243 the limit is an `UndoLimit` in `src/domain/engine/history/undo-limit.ts`, not a number: `UndoLimit.of(value)` takes a safe integer of one or more and throws a `RangeError` for any other number, `equals()` compares two limits, and `newestOf(items)` gives the newest items that the limit keeps.
    The constructor of `MoveHistory` takes the optional `UndoLimit` and makes no check, and `MergeFactory` passes `UndoLimit.of(1)`.
-   Since #178 `FitFactory` gives a `RedoableHistory` in `src/domain/engine/redoable-history.ts`, with no limit, so Fit undoes and redoes every move.
+   Since #178 `FitFactory` gives a `RedoableHistory` in `src/domain/engine/history/redoable-history.ts`, with no limit, so Fit undoes and redoes every move.
    `RedoableHistory<TMove, TMemento>` extends `MoveHistory` and keeps each undone `MoveCommand` in its private `undone` list, newest last.
    `MoveHistory.undo()` gives each undone command to its protected hook `keepUndone(command)`: a plain history forgets the command, and `RedoableHistory` keeps it.
    `redo()` plays the newest undone command again and puts it back among the done commands, so an undo can take it back again.
@@ -395,7 +395,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
    Hexa Merge binds it to `NewTile<MergeTile>`: one draw gives the new tile and the empty cell where it appears (decision 48).
    Since #423 Hexa Sort binds it to `ColorStack`: `SortFactory.createPieceSource()` gives an `IPieceSource<ColorStack>`, `SortState` and `SortSnapshot` keep a tray of `ColorStack` slots (#353), and `SortView`, `SortViewReceiver` and `SortStateMapper` take no `TCoord`.
    Until #423 a Sort piece was a `Piece` with a shape of one cell on the first cell of the level region, and no code read that shape: the player names the cell of a placement, and the state mapper reads only the stack.
-   The rule `sort-and-merge-no-cell-piece` of `.dependency-cruiser.cjs` keeps `hexa-sort` and `hexa-merge` from importing `engine/piece` and `engine/shape-node`, and `test/gates/architecture-gate.test.ts` checks it on the fixture `sort-imports-piece`.
+   The rule `sort-and-merge-no-cell-piece` of `.dependency-cruiser.cjs` keeps `hexa-sort` and `hexa-merge` from importing `engine/board/piece` and `engine/geometry/shape-node`, and `test/gates/architecture-gate.test.ts` checks it on the fixture `sort-imports-piece`.
    In Hexa Fit the content is a `PieceId`.
    The id is part of the value of the piece, as the color is in Hexa Lines, and it is not an identity of the piece (design decision of 2026-11-15).
    A piece never changes, so it has no life cycle that an identity must follow, and `Piece.equals()` compares the shape and the content: two pieces with one shape and one id are the same piece.
@@ -1212,7 +1212,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     Until #418 `Range<T extends Ordered<T>>` in `src/domain/engine/range.ts` was a closed interval `[min, max]` with `contains(value: T): boolean` and `equals()`, and only its tests built one.
     A class with no client is still read, tested and drawn, so #418 removed it with its tests.
     A future interval limit between two value objects uses `Range<T>` as hexablock-api does (`src/domain/shared/range.ts` there, APP-NFR-25): `T` implements `Ordered<T>`, so the range orders its bounds with `isBefore()` and no order is a number.
-    The bound `Ordered<T>` in `src/domain/engine/ordered.ts` stays, because `Distance` and `CoordKey` implement it.
+    The bound `Ordered<T>` in `src/domain/engine/geometry/ordered.ts` stays, because `Distance` and `CoordKey` implement it.
     It holds only `isBefore(other: T): boolean`, so the order answers with a boolean, and no public signature of `src/domain/` takes or returns an order as a number (#239).
     Before #239 a `Compare<T>` function gave the order as a negative number, zero or a positive number, and `Range.ofNumbers(min, max)` built a range of `number`.
     The class of 2026-11-14 asks for a range whose `T` is a comparable value object, and the class of 2026-11-09 forbids a primitive in the domain model, so both left with #239.
@@ -1235,7 +1235,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     `GridTopology.fullTurn(): Turns` gives the full turn of a topology, 6 steps for a hexagon and 4 for a square, so no topology shows a number of rotation steps and `FitRules.validMoves()` reads `fullTurn().shorter()`.
 39. **The space of the board is an entity, and `TCell` stays a value.**
     The class of 2026-11-09 models the place on the board as an entity, because it «puede pasar de libre a ocupada».
-    `BoardSpace<TCell, TCoord>` in `src/domain/engine/board.ts` is that place.
+    `BoardSpace<TCell, TCoord>` in `src/domain/engine/board/board.ts` is that place.
     The topology key of its coordinate is its identity, and `equals()` compares that key.
     Its state is the `TCell` that occupies it, or none when it is free.
     Only `occupy()` and `vacate()` change that state, and `vacate()` throws a `RangeError` for a free space.
@@ -1250,7 +1250,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     Gate `test/docs/domain-private-fields.test.ts` checks every `.ts` file under `src/domain/`, and its baseline list names the issue that removes each public field and getter of today (#231).
     Only the name `deliverTo` still waits for the professor.
 40. **`GameFactory` creates the whole aggregate.**
-    `GameFactory<TCell, TCoord, TMove, TState>` in `src/domain/engine/game-factory.ts` is the DDD factory of the aggregate: it creates the root with all its parts as one piece.
+    `GameFactory<TCell, TCoord, TMove, TState>` in `src/domain/engine/factory/game-factory.ts` is the DDD factory of the aggregate: it creates the root with all its parts as one piece.
     It takes the `GameId` of the game, an `IVariantFactory` and a `MatchIdGenerator`.
     The composition root finds the variant factory of the chosen game with `isFor(gameId)` and gives both, so the variant factory keeps its id private (decision 30, #234).
     It takes no publisher, because the root records its events and `ApplyMove` delivers them (#233).
@@ -1391,9 +1391,9 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     Does a branded text count as a primitive?
     The team answered on 2026-11-16 (#246, option A, Oscar): yes.
     So `CoordKey` is no longer `string & { brand }`.
-    It is a value object of the engine in `src/domain/engine/coord-key.ts`, with a private constructor, a private `readonly` text and a frozen instance: `CoordKey.of(text: string): CoordKey` makes a key and checks no format, because each coordinate class owns the format of its keys, `equals(other: CoordKey): boolean` compares two keys by value, `isBefore(other: CoordKey): boolean` orders them by plain string order (the bound `Ordered` of decision 38, for the tie of Hexa Sort, #56), `CoordKey.sameKeys(left, right): boolean` tells if two lists hold equal keys in any order, and `deliverTo(receiver: ValueReceiver<string>): void` gives the text to an adapter of the edge only (rule R-no-delivery-call).
+    It is a value object of the engine in `src/domain/engine/geometry/coord-key.ts`, with a private constructor, a private `readonly` text and a frozen instance: `CoordKey.of(text: string): CoordKey` makes a key and checks no format, because each coordinate class owns the format of its keys, `equals(other: CoordKey): boolean` compares two keys by value, `isBefore(other: CoordKey): boolean` orders them by plain string order (the bound `Ordered` of decision 38, for the tie of Hexa Sort, #56), `CoordKey.sameKeys(left, right): boolean` tells if two lists hold equal keys in any order, and `deliverTo(receiver: ValueReceiver<string>): void` gives the text to an adapter of the edge only (rule R-no-delivery-call).
     A `Map` and a `Set` compare an object by reference, and each call of `key()` gives a new object.
-    So `CoordKeyMap<TValue>` in `src/domain/engine/coord-key-map.ts` keys a value by a `CoordKey` and compares the keys with `equals()`: `has()`, `find()`, `set()`, `delete()`, `values()` and `entries()`.
+    So `CoordKeyMap<TValue>` in `src/domain/engine/geometry/coord-key-map.ts` keys a value by a `CoordKey` and compares the keys with `equals()`: `has()`, `find()`, `set()`, `delete()`, `values()` and `entries()`.
     It keeps the order of the first write, as a `Map` does, so `Board.occupiedCells()` keeps its order.
     `Board` keeps the keys of its shape and its spaces in two `CoordKeyMap`, `BoardSpace.equals()` compares the identities with `equals()`, and the states of Hexa Lines and Hexa Merge, the rings of `TriangleTopology`, the witness check of Hexa Fit and the slide ways of layer 4 use it in place of a `Set` or a `Map`.
     Hexa Lines names a line by the list of its keys and compares two names with `sameKeys()`.
@@ -1413,7 +1413,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     `RegionSize` has `indexes(start, axis)`, one cell for each index of a side, `offsets(origin, axis)`, the cells of an axis that are nearer to `origin` than the size, and `holds(distance)`, which tells if a `Distance` is below the size.
     An axis is any object with `forward(from)` and `backward(from)`, such as `HexAxis.q`, so a topology walks the cells and builds no coordinate from a number.
     The cells and their order are the same as before #243.
-    `Distance` in `src/domain/engine/distance.ts` is the count of steps between two cells: a value object with a private constructor, `Distance.of(value)`, which takes a safe integer of zero or more and stores `-0` as 0, a private count, `equals()` and `isBefore()` (the bound `Ordered` of decision 38).
+    `Distance` in `src/domain/engine/geometry/distance.ts` is the count of steps between two cells: a value object with a private constructor, `Distance.of(value)`, which takes a safe integer of zero or more and stores `-0` as 0, a private count, `equals()` and `isBefore()` (the bound `Ordered` of decision 38).
     `HexCoord.distanceTo()` and `SquareCoord.distanceTo()` give it.
     The README table «Primitive types» has no row for these operations.
     Since #165 each coordinate has `deliverTo(receiver: ValueReceiver<readonly [number, number]>): void`: it gives its two values, `[q, r]` or `[col, row]`, to a receiver of the edge and returns nothing (decision 41).
@@ -1458,7 +1458,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     An object literal is no longer a level.
     `of()` makes every check that needs only the level.
     A level with two pieces of one id throws a `RangeError`, with the message that `FitState.start()` gave before (since #237 the message names no id, and the error carries the id as its `cause`), and so does a piece list that holds `undefined`, with the message of `FixedListPieceSource`.
-    Since #419 the engine function `frozenListOf()` in `src/domain/engine/frozen-list.ts` copies a list, freezes the copy and refuses `undefined` with that message, and `FixedListPieceSource`, `FitLevel`, `SortLevel` and `LinesSettings` call it, so no value object builds a piece source to copy a list.
+    Since #419 the engine function `frozenListOf()` in `src/domain/engine/random/frozen-list.ts` copies a list, freezes the copy and refuses `undefined` with that message, and `FixedListPieceSource`, `FitLevel`, `SortLevel` and `LinesSettings` call it, so no value object builds a piece source to copy a list.
     So such a level cannot exist.
     Before #208 the first error came when the game started and the second when the factory created the piece source.
     `of()` copies the piece list and the list of star thresholds and freezes each copy, so a change to an array of the caller does not change the level, and the level never lets a list out that a caller can write.
@@ -1517,16 +1517,16 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     `SortFactory.createProgressModel()` gives the level to `LevelProgress`.
     The Sort view.
 48. **Settings are classes and the seed is a value object (#210).**
-    `Seed` in `src/domain/engine/seed.ts` is the seed of a match (#417): a value object with a private constructor, the factory method `Seed.of(value)`, a private value, `equals()` and a frozen instance.
+    `Seed` in `src/domain/engine/random/seed.ts` is the seed of a match (#417): a value object with a private constructor, the factory method `Seed.of(value)`, a private value, `equals()` and a frozen instance.
     It holds a whole number from 0 to 4294967295, and `of()` is the only place that checks the range: any other number throws a `RangeError` with the message that `Mulberry32Random` gave before, and `-0` counts as 0.
     Since #239 `of()` compares the number itself, with no `Range` (decision 38).
     `IRandomSeeded.isSeededWith()`, `SeededPieceSource`, `SortLevel.seeded()`, `SortSourceBuilders.seeded()`, and `mergeTileSource()` take a `Seed`, so no public signature of `src/domain/` takes a seed as a number.
     Since #417 the two settings hold no seed, and `RandomDraw.pickSeed()` gives the `Seed` of a draw: the draw times 4294967296, rounded down.
     `Mulberry32Random` has a private constructor and the factory method `Mulberry32Random.from(seed)`.
     `Seed.generatorState()` gives the generator its first state, and no other code asks for it.
-    Since #243 that state is a `GeneratorState` in `src/domain/engine/generator-state.ts`, not a number: a value object with `GeneratorState.of(value)`, which takes a whole number from 0 to 4294967295, `equals()`, `advanced()`, the next state, and `draw()`, the draw of a state.
+    Since #243 that state is a `GeneratorState` in `src/domain/engine/random/generator-state.ts`, not a number: a value object with `GeneratorState.of(value)`, which takes a whole number from 0 to 4294967295, `equals()`, `advanced()`, the next state, and `draw()`, the draw of a state.
     The Mulberry32 arithmetic works on the private number of the state, so `Mulberry32Random` holds a `GeneratorState` and the same seed gives the same draws as before.
-    `RandomSource.next()` gives a `RandomDraw` (`src/domain/engine/random-draw.ts`): a value object with `RandomDraw.of(value)`, which takes a number from 0 up to 1 and throws a `RangeError` for any other number, `equals()`, `isBelow(other)`, which tells if the draw falls below another draw, `pick(items)`, the item at the place of the draw, and `deliverTo(receiver)`.
+    `RandomSource.next()` gives a `RandomDraw` (`src/domain/engine/random/random-draw.ts`): a value object with `RandomDraw.of(value)`, which takes a number from 0 up to 1 and throws a `RangeError` for any other number, `equals()`, `isBelow(other)`, which tells if the draw falls below another draw, `pick(items)`, the item at the place of the draw, and `deliverTo(receiver)`.
     Hexa Merge takes the `RandomDraw` as it is: `NewTile.of()` keeps it as the place, and `Chance.hits()` compares it with the chance, so the Merge `Draw` of #232 is gone (decision 54).
     Until #417 the composition root of layer 4 called `deliverTo()` to draw the seed of a game.
     Since #417 a variant factory asks `pickSeed()`, so the number of a draw leaves it only through `deliverTo()` to an adapter of the edge (rule R-no-delivery-call).
@@ -1591,7 +1591,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
 50. **`LevelTimer` is an entity with its own id (#214).**
     The rule of the class of 2026-11-09 says that every entity has an id that identifies it, and the rule of 2026-11-10 says that each entity has an id of its own, as `Board` has `BoardId` and the states have `GameStateId`.
     The timer changes in place through `start()` and `stop()`, so it is an entity, not a value object, and the team decided on 2026-11-09 that it lives inside the `GameEngine` aggregate (decision 26).
-    `LevelTimerId` in `src/domain/engine/level-timer-id.ts` is a value object in the form of `BoardId`: a private constructor, the factory method `LevelTimerId.of(matchId)`, a private `MatchId` and `equals()`, which compares the two matches.
+    `LevelTimerId` in `src/domain/engine/turn/level-timer-id.ts` is a value object in the form of `BoardId`: a private constructor, the factory method `LevelTimerId.of(matchId)`, a private `MatchId` and `equals()`, which compares the two matches.
     The id is local (decision 52): it has a meaning only inside the aggregate of its match, so no generator gives it (#236).
     `LevelTimer` takes its `LevelTimerId` and its `Clock` in its constructor, and it keeps the start and the stop of the game as two `ClockReading` values (#238).
     The id never changes, and `LevelTimer.equals(other)` compares two timers by that id only: a started timer and an idle timer with one id are equal, and two timers with different ids that read one clock are different.
@@ -1940,7 +1940,7 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     A request with no level id reads no level and no progress.
     `LevelGameFactories` in `src/adapters/level-game-factories.ts` implements the port in layer 3.
     It takes the `GameId` of the game, the registered variant factory, the one `MatchIdGenerator` of the root, the `LevelRepository` and an optional `LevelVariant`, and it builds the `GameFactory` of the registered variant factory once.
-    `LevelVariant` lives in `src/domain/engine/level-variant.ts`, because it names only domain types (#407).
+    `LevelVariant` lives in `src/domain/engine/factory/level-variant.ts`, because it names only domain types (#407).
     For a level id it asks `LevelRepository.levelOf()` for the definition (decision 58).
     Its `LevelVariant` turns the definition into a variant factory: `factoryOf(definition)` creates the level builder of the variant, gives it to `LevelDefinition.buildWith()`, the Director of decision 15, and creates the variant factory of the built level.
     Then `LevelGameFactories` creates a `GameFactory` over that variant factory with the same id generator.
@@ -2138,6 +2138,11 @@ Decisions 41 to 49 planned the units of the domain redesign, and each one names 
     Since #406 it also holds `counts-for-achievements` (decision 60).
     `createProgressModel()` stays in `IVariantFactory` (decision 31), so the engine imports the progress through one type import, in `variant-factory.ts`.
     Since #407 `level-variant.ts` adds a second type import, `LevelDefinition` (decision 59).
+    Since #499 `src/domain/engine/` has subfolders by game concern: `turn/`, `board/`, `geometry/`, `history/`, `events/`, `factory/` and `random/`.
+    `MatchId`, `Color` and `Cloneable` stay at the root of the folder.
+    A subfolder imports only the subfolders after it, so the subfolders form no cycle.
+    `events/` is its own subfolder, because `board-state.ts` imports `game-events.ts` and `game-engine.ts` imports `board-state.ts`.
+    The rule `engine-folders-no-cycle` of `.dependency-cruiser.cjs` refuses a cycle between two subfolders, and the README of the folder says what each subfolder may import.
     Reasons: the 12 files of the progress and the achievements import only the five leaves and `TopologyId` from the engine, and in the engine only `variant-factory.ts` imports them, as a type.
     `IProgressModel.record()` names `GameProgress`, so the interface cannot stay in the engine without a cycle between two folders.
     The `shared` folder breaks that cycle.

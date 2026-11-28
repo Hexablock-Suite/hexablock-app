@@ -1,9 +1,9 @@
 /** @jest-environment node */
-import { Outcome } from '../../../src/domain/engine/outcome';
+import { Outcome } from '../../../src/domain/engine/events/outcome';
 import { GameId } from '../../../src/domain/shared/game-id';
 import { MatchId } from '../../../src/domain/engine/match-id';
 import { Score } from '../../../src/domain/shared/score';
-import { GameEvent, GameEnded } from '../../../src/domain/engine/game-events';
+import { GameEvent, GameEnded } from '../../../src/domain/engine/events/game-events';
 import {
   GameOverPhase,
   PausedPhase,
@@ -11,7 +11,7 @@ import {
   ResolvingPhase,
   VictoryPhase,
   type GamePhase,
-} from '../../../src/domain/engine/game-phase';
+} from '../../../src/domain/engine/turn/game-phase';
 import { dataOf } from '../../support/engine/game-ended';
 import { MATCH_ID } from '../../support/engine/match-id';
 import { RecordingReceiver } from '../../support/engine/value-receiver';

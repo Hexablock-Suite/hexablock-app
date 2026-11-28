@@ -3,12 +3,12 @@ import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { ElapsedTime } from '../../../../src/domain/shared/elapsed-time';
-import type { GeometryFactory } from '../../../../src/domain/engine/geometry-factory';
+import type { GeometryFactory } from '../../../../src/domain/engine/geometry/geometry-factory';
 import { LevelDefinition } from '../../../../src/domain/progress/level-definition';
 import { Moves } from '../../../../src/domain/shared/moves';
-import { Outcome } from '../../../../src/domain/engine/outcome';
+import { Outcome } from '../../../../src/domain/engine/events/outcome';
 import { Stars } from '../../../../src/domain/progress/stars';
-import { Turns } from '../../../../src/domain/engine/turns';
+import { Turns } from '../../../../src/domain/engine/geometry/turns';
 import { FitFactory } from '../../../../src/domain/variants/hexa-fit/fit-factory';
 import type { FitLevel } from '../../../../src/domain/variants/hexa-fit/fit-level';
 import { FitLevelBuilder } from '../../../../src/domain/variants/hexa-fit/fit-level-builder';

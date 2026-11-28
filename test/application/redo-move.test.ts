@@ -4,10 +4,10 @@ import { join } from 'node:path';
 
 import type { GameRepository } from '../../src/application/game-repository';
 import { RedoMove } from '../../src/application/redo-move';
-import type { BoardState } from '../../src/domain/engine/board-state';
+import type { BoardState } from '../../src/domain/engine/board/board-state';
 import type { Cloneable } from '../../src/domain/engine/cloneable';
-import { Turns } from '../../src/domain/engine/turns';
-import type { IVariantFactory } from '../../src/domain/engine/variant-factory';
+import { Turns } from '../../src/domain/engine/geometry/turns';
+import type { IVariantFactory } from '../../src/domain/engine/factory/variant-factory';
 import { PlaceFitPiece } from '../../src/domain/variants/hexa-fit/fit-move';
 import {
   errorOf,

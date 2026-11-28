@@ -5,7 +5,7 @@ import {
   ResolvingPhase,
   VictoryPhase,
   type GamePhase,
-} from '../../../src/domain/engine/game-phase';
+} from '../../../src/domain/engine/turn/game-phase';
 
 const PHASE_NAMES = new Map<GamePhase, string>([
   [PlayingPhase.instance, 'playing'],

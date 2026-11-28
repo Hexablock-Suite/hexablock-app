@@ -4,28 +4,28 @@ import { ElapsedTime } from '../../../src/domain/shared/elapsed-time';
 import { LevelId } from '../../../src/domain/progress/level-id';
 import { Moves } from '../../../src/domain/shared/moves';
 import { Stars } from '../../../src/domain/progress/stars';
-import { GameEngine } from '../../../src/domain/engine/game-engine';
+import { GameEngine } from '../../../src/domain/engine/turn/game-engine';
 import {
   GameEnded,
   type GameEvent,
   type GameEndedReceiver,
-} from '../../../src/domain/engine/game-events';
+} from '../../../src/domain/engine/events/game-events';
 import { GameId } from '../../../src/domain/shared/game-id';
 import { GameProgress } from '../../../src/domain/progress/game-progress';
 import type { MatchId } from '../../../src/domain/engine/match-id';
-import { GameOverPhase } from '../../../src/domain/engine/game-phase';
-import { Outcome } from '../../../src/domain/engine/outcome';
+import { GameOverPhase } from '../../../src/domain/engine/turn/game-phase';
+import { Outcome } from '../../../src/domain/engine/events/outcome';
 import {
   piecesFrom,
   type IPieceSource,
   type PieceDraw,
-} from '../../../src/domain/engine/piece-source';
+} from '../../../src/domain/engine/random/piece-source';
 import {
   GameResult,
   ProgressRecord,
   type IProgressModel,
 } from '../../../src/domain/progress/progress-model';
-import type { IScoringPolicy } from '../../../src/domain/engine/scoring-policy';
+import type { IScoringPolicy } from '../../../src/domain/engine/turn/scoring-policy';
 import { fakeCell, type FakeCell } from '../../support/engine/fake-cell';
 import {
   SourceRules,

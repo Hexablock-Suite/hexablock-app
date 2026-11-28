@@ -1,10 +1,10 @@
 /** @jest-environment node */
-import { hex } from '../../../src/domain/engine/hex-topology';
-import { square } from '../../../src/domain/engine/square-topology';
+import { hex } from '../../../src/domain/engine/geometry/hex-topology';
+import { square } from '../../../src/domain/engine/geometry/square-topology';
 import { fittedCellSize } from '../../../src/adapters/board/board-fit';
 import { HexLayout } from '../../../src/adapters/board/hex-layout';
 import { SquareLayout } from '../../../src/adapters/board/square-layout';
-import { triangle } from '../../../src/domain/engine/triangle-topology';
+import { triangle } from '../../../src/domain/engine/geometry/triangle-topology';
 import { TriangleLayout } from '../../../src/adapters/board/triangle-layout';
 
 // Issue #170: the game screen draws the whole board in the width of the screen.

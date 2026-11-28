@@ -1,18 +1,18 @@
 /** @jest-environment node */
-import { Outcome } from '../../../../src/domain/engine/outcome';
+import { Outcome } from '../../../../src/domain/engine/events/outcome';
 import { ElapsedTime } from '../../../../src/domain/shared/elapsed-time';
 import { Moves } from '../../../../src/domain/shared/moves';
 import { Score } from '../../../../src/domain/shared/score';
 import { starsOf } from '../../../../src/domain/progress/star-count';
 import { Stars } from '../../../../src/domain/progress/stars';
-import { Board } from '../../../../src/domain/engine/board';
-import { GameEngine } from '../../../../src/domain/engine/game-engine';
+import { Board } from '../../../../src/domain/engine/board/board';
+import { GameEngine } from '../../../../src/domain/engine/turn/game-engine';
 import { GameId } from '../../../../src/domain/shared/game-id';
-import { Piece } from '../../../../src/domain/engine/piece';
-import { FixedListPieceSource } from '../../../../src/domain/engine/piece-source';
-import { RegionSize } from '../../../../src/domain/engine/region-size';
-import { CellNode, ShapeGroup } from '../../../../src/domain/engine/shape-node';
-import { Turns } from '../../../../src/domain/engine/turns';
+import { Piece } from '../../../../src/domain/engine/board/piece';
+import { FixedListPieceSource } from '../../../../src/domain/engine/random/piece-source';
+import { RegionSize } from '../../../../src/domain/engine/geometry/region-size';
+import { CellNode, ShapeGroup } from '../../../../src/domain/engine/geometry/shape-node';
+import { Turns } from '../../../../src/domain/engine/geometry/turns';
 import { PlaceFitPiece, type FitMove } from '../../../../src/domain/variants/hexa-fit/fit-move';
 import { FitRules } from '../../../../src/domain/variants/hexa-fit/fit-rules';
 import {

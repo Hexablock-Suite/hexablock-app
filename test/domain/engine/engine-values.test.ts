@@ -1,9 +1,9 @@
 /** @jest-environment node */
-import { Area } from '../../../src/domain/engine/area';
-import { Distance } from '../../../src/domain/engine/distance';
-import { GeneratorState } from '../../../src/domain/engine/generator-state';
-import { RandomDraw } from '../../../src/domain/engine/random-draw';
-import { UndoLimit } from '../../../src/domain/engine/undo-limit';
+import { Area } from '../../../src/domain/engine/geometry/area';
+import { Distance } from '../../../src/domain/engine/geometry/distance';
+import { GeneratorState } from '../../../src/domain/engine/random/generator-state';
+import { RandomDraw } from '../../../src/domain/engine/random/random-draw';
+import { UndoLimit } from '../../../src/domain/engine/history/undo-limit';
 import { delivered } from '../../support/engine/value-receiver';
 
 // Issue #243: the value objects that replace the last primitives of the engine signatures.

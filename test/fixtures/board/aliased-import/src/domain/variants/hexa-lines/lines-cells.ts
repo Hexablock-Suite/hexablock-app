@@ -1,4 +1,4 @@
-import { Board as Grid } from '../../engine/board';
+import { Board as Grid } from '../../engine/board/board';
 import type { Color } from './color';
 
 // Wrong on purpose: a class extends the engine `Board` through an import alias (APP-NFR-01).

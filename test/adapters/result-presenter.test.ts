@@ -7,7 +7,7 @@ import type { MoveResult } from '../../src/application/move-result';
 import type { SyncProgressRequest } from '../../src/application/sync-progress';
 import { FailureCode, Result, UseCaseError } from '../../src/application/result';
 import type { UseCase } from '../../src/application/use-case';
-import { Outcome } from '../../src/domain/engine/outcome';
+import { Outcome } from '../../src/domain/engine/events/outcome';
 import { LevelId } from '../../src/domain/progress/level-id';
 import { LevelStatus } from '../../src/domain/progress/level-status';
 import { GameResult } from '../../src/domain/progress/progress-model';

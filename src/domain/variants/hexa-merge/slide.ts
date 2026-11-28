@@ -1,4 +1,4 @@
-import type { GridAxis } from '../../engine/grid-topology';
+import type { GridAxis } from '../../engine/geometry/grid-topology';
 import type { ValueReceiver } from '../../shared/value-receiver';
 
 // The way a slide goes along the line that `Board.line()` gives: toward its last

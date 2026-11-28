@@ -73,7 +73,7 @@ describe('README SOLID principles', () => {
   it('should_report_the_link_when_it_points_to_a_missing_file', () => {
     const section = [
       '- **Interface segregation.** See [IUndoable](src/domain/engine/undoable.ts).',
-      '- **Liskov substitution.** See [rules](src/domain/engine/rules.ts#L18).',
+      '- **Liskov substitution.** See [rules](src/domain/engine/turn/rules.ts#L18).',
     ].join('\n');
 
     expect(brokenLinks(section)).toEqual(['src/domain/engine/undoable.ts']);
