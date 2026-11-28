@@ -85,6 +85,15 @@ describe('architecture gate (dependency-cruiser)', () => {
     expect(result.output).toContain('engine-folders-no-cycle');
   });
 
+  // Issue #500: the folders of the use cases form no cycle. In the fixture `game/` imports `levels/`,
+  // and `levels/` imports `game/` through other files, so the cycle is between folders only.
+  it('should_fail_arch_when_two_folders_of_the_use_cases_import_each_other', () => {
+    const result = cruise('application-folders-cycle');
+
+    expect(result.status).not.toBe(0);
+    expect(result.output).toContain('application-folders-no-cycle');
+  });
+
   it('should_fail_arch_when_application_imports_an_adapter', () => {
     const result = cruise('application-imports-outside');
 

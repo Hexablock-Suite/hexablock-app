@@ -97,6 +97,17 @@ module.exports = {
       to: { path: layer('domain/variants') },
     },
     {
+      // A folder rule, as engine-folders-no-cycle: a cycle between two folders needs no cycle
+      // between two modules.
+      name: 'application-folders-no-cycle',
+      comment:
+        'The folders of src/application/ form no cycle: a folder imports only the folders that its README row names (issue #500).',
+      severity: 'error',
+      scope: 'folder',
+      from: { path: '(?:^|/)src/application/[^/]+$' },
+      to: { path: '(?:^|/)src/application/[^/]+$', circular: true },
+    },
+    {
       name: 'board-layouts-no-variants',
       comment:
         'The board layouts of layer 3 (src/adapters/board/) serve every variant, so they import no variant (issue #409).',
