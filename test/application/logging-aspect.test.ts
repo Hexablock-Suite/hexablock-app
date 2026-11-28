@@ -22,6 +22,10 @@ import { fitFactory } from '../support/variants/hexa-fit/fit-game';
 import { linesFactory } from '../support/variants/hexa-lines/lines-game';
 import { mergeFactory } from '../support/variants/hexa-merge/merge-game';
 import { sortFactory } from '../support/variants/hexa-sort/sort-game';
+import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
+import type { Clock } from '../../src/domain/engine/turn/clock';
+import type { ClockReading } from '../../src/domain/engine/turn/clock-reading';
+import { ManualClock } from '../support/engine/manual-clock';
 
 // One `LoggingAspect` class wraps the generic use cases of the four variants (issue 101,
 // APP-NFR-11, classes.md decisions 9 and 37, view 3.1).
@@ -52,6 +56,33 @@ class FixedUseCase implements UseCase<string, number> {
   async execute(request: string): Promise<Result<number>> {
     this.requests.push(request);
     return this.result;
+  }
+}
+
+// A use case that moves the clock by `ms` milliseconds, then gives the answer of `answer()`.
+// An answer that throws makes the use case reject, as a use case with a bug would.
+class TimedUseCase implements UseCase<string, number> {
+  constructor(
+    private readonly clock: ManualClock,
+    private readonly ms: number,
+    private readonly answer: () => Result<number>,
+  ) {}
+
+  async execute(_request: string): Promise<Result<number>> {
+    this.clock.advance(this.ms);
+    return this.answer();
+  }
+}
+
+// A clock that gives its first reading and throws on each later reading.
+class FailingLaterClock implements Clock {
+  private readonly clock = new ManualClock();
+  private reads = 0;
+
+  now(): ClockReading {
+    this.reads += 1;
+    if (this.reads > 1) throw new Error('The clock is gone.');
+    return this.clock.now();
   }
 }
 
@@ -186,19 +217,61 @@ describe('LoggingAspect', () => {
     ]);
   });
 
-  it('should_pass_a_frozen_entry_with_no_message_and_no_time_when_the_aspect_logs_a_call', async () => {
+  // The entry holds data and the duration of the call, never a message (issue #343).
+  it('should_pass_a_frozen_entry_with_its_time_and_no_message_when_the_aspect_logs_a_call', async () => {
     const logger = new RecordingLogger();
+    const clock = new ManualClock();
     const error = new UseCaseError('move-failed', 'It failed.');
 
-    await new LoggingAspect(new FixedUseCase(Result.success(1)), logger, 'Fixed').execute('a');
-    await new LoggingAspect(new FixedUseCase(Result.failure(error)), logger, 'Fixed').execute('b');
+    await new LoggingAspect(new FixedUseCase(Result.success(1)), logger, 'Fixed', clock).execute(
+      'a',
+    );
+    await new LoggingAspect(
+      new FixedUseCase(Result.failure(error)),
+      logger,
+      'Fixed',
+      clock,
+    ).execute('b');
 
     expect(logger.entries.map((entry) => Object.keys(entry).sort())).toEqual([
-      ['outcome', 'useCase'],
-      ['error', 'outcome', 'useCase'],
+      ['elapsedMs', 'outcome', 'useCase'],
+      ['elapsedMs', 'error', 'outcome', 'useCase'],
     ]);
+    expect(logger.entries.every((entry) => entry.elapsedMs instanceof ElapsedTime)).toBe(true);
     expect(logger.entries.every((entry) => Object.isFrozen(entry))).toBe(true);
   });
+
+  // The aspect reads the clock before and after the inner call. The one entry of the call
+  // carries the time between the two readings, for a success and for a failure (issue #343).
+  it.each<['success' | 'failure', number, () => Result<number>]>([
+    ['success', 25, () => Result.success(1)],
+    ['failure', 40, () => Result.failure(new UseCaseError('move-failed', 'It failed.'))],
+    [
+      'failure',
+      7,
+      () => {
+        throw new TypeError('The use case has a bug.');
+      },
+    ],
+  ])(
+    'should_put_the_duration_of_the_call_in_its_one_entry_when_the_aspect_reads_the_clock',
+    async (outcome, ms, answer) => {
+      const logger = new RecordingLogger();
+      const clock = new ManualClock();
+
+      const result = await new LoggingAspect(
+        new TimedUseCase(clock, ms, answer),
+        logger,
+        'Timed',
+        clock,
+      ).execute('x');
+
+      expect(logger.entries).toHaveLength(1);
+      expect(logger.entries[0].outcome).toBe(outcome);
+      expect(logger.entries[0].elapsedMs?.equals(ElapsedTime.ofMs(ms))).toBe(true);
+      expect(logger.entries[0].error).toBe(result.ok ? undefined : result.error);
+    },
+  );
 
   it('should_return_the_result_error_unchanged_when_the_logger_tries_to_change_its_entry', async () => {
     // The entry is frozen, but its error is the object of the `Result`.
@@ -307,20 +380,59 @@ describe('UseCaseAspect', () => {
     ]);
   });
 
-  // The aspect's own work fails here: the logger throws after the inner call (G118.1).
-  it('should_return_an_unexpected_failure_with_the_cause_when_the_logger_throws', async () => {
+  // The log fails after the inner call, so the use case already did its work.
+  // The aspect drops the failure of the logger and returns the inner result (issue #343).
+  it.each<[Result<number>]>([
+    [Result.success(5)],
+    [Result.failure(new UseCaseError('move-failed', 'It failed.', true))],
+  ])(
+    'should_return_the_inner_result_unchanged_when_the_logger_throws_after_the_call',
+    async (answer) => {
+      const inner = new FixedUseCase(answer);
+
+      const result = await new LoggingAspect(
+        inner,
+        new ThrowingLogger(),
+        'Fixed',
+        new ManualClock(),
+      ).execute('x');
+
+      expect(result).toBe(inner.result);
+      expect(Object.keys(result).sort()).toEqual(Object.keys(answer).sort());
+      expect(inner.requests).toEqual(['x']);
+    },
+  );
+
+  // The clock is read after the inner call too, so a clock that fails there rewrites nothing.
+  it('should_return_the_inner_result_unchanged_when_the_clock_throws_after_the_call', async () => {
+    const logger = new RecordingLogger();
     const inner = new FixedUseCase(Result.success(5));
 
-    const result = await new LoggingAspect(inner, new ThrowingLogger(), 'Fixed').execute('x');
+    const result = await new LoggingAspect(inner, logger, 'Fixed', new FailingLaterClock()).execute(
+      'x',
+    );
+
+    expect(result).toBe(inner.result);
+    expect(logger.entries).toEqual([]);
+  });
+
+  // An exception of the inner use case is a failure of the call, whatever the logger does.
+  it('should_return_an_unexpected_failure_when_the_inner_use_case_rejects_and_the_logger_throws', async () => {
+    const thrown = new TypeError('The use case has a bug.');
+
+    const result = await new LoggingAspect(
+      new RejectingUseCase(thrown),
+      new ThrowingLogger(),
+      'Broken',
+      new ManualClock(),
+    ).execute('x');
 
     const error = errorOf(result);
-    expect([error.code, error.message, error.retryable]).toEqual([
+    expect([error.code, error.message, error.cause]).toEqual([
       'unexpected-failure',
-      'The log disk is full.',
-      false,
+      'The use case has a bug.',
+      thrown,
     ]);
-    expect(error.cause).toEqual(new Error('The log disk is full.'));
-    expect(inner.requests).toEqual(['x']);
   });
 
   it('should_return_the_inner_result_unchanged_when_the_plain_aspect_wraps_a_use_case', async () => {

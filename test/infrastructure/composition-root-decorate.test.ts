@@ -2,6 +2,9 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
+import type { Clock } from '../../src/domain/engine/turn/clock';
+import { ClockReading } from '../../src/domain/engine/turn/clock-reading';
+import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
 import { GameId } from '../../src/domain/shared/game-id';
 import { TopologyId } from '../../src/domain/shared/topology-id';
 import { CompositionRoot } from '../../src/infrastructure/composition-root';
@@ -25,6 +28,16 @@ const USE_CASES = [
   'LoadProgress',
   'ListLevels',
 ];
+
+// A clock that moves 7 ms forward at each reading.
+class SteppingClock implements Clock {
+  private ms = 1_000_000;
+
+  now(): ClockReading {
+    this.ms += 7;
+    return ClockReading.of(this.ms);
+  }
+}
 
 // The number of matches of `pattern` in `text`.
 function countOf(text: string, pattern: RegExp): number {
@@ -73,6 +86,23 @@ describe('CompositionRoot decorate', () => {
       ['LoadProgress', 'success'],
       ['ListLevels', 'success'],
     ]);
+  });
+
+  // The root gives `LoggingAspect` the clock of its drivers (issue #343).
+  // `LoadProgress` reads no clock, so the aspect reads it twice: one step of 7 ms.
+  it('should_log_the_duration_from_the_clock_of_its_drivers_when_the_root_decorates_a_use_case', async () => {
+    const logger = new RecordingLogger();
+    const root = new CompositionRoot({
+      clock: new SteppingClock(),
+      logger,
+      store: new InMemoryKeyValueStore(),
+    });
+
+    await root.loadProgress().execute({ gameId: GameId.of('hexa-lines') });
+
+    expect(logger.entries).toHaveLength(1);
+    expect(logger.entries[0].useCase).toBe('LoadProgress');
+    expect(logger.entries[0].elapsedMs?.equals(ElapsedTime.ofMs(7))).toBe(true);
   });
 
   // The progress repository of the root is one object for every consumer of the saved progress.

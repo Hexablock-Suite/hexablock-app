@@ -1,6 +1,7 @@
 /** @jest-environment node */
 import { logEntryOf } from '../../src/application/aspects/logger';
 import { Result, UseCaseError } from '../../src/application/result';
+import { ElapsedTime } from '../../src/domain/shared/elapsed-time';
 import { ConsoleLogger, type LogSink } from '../../src/infrastructure/console-logger';
 import { RecordingLogger } from '../support/application/recording-logger';
 import { describeLoggerContract } from '../support/contracts/logger-contract';
@@ -48,7 +49,12 @@ describe('ConsoleLogger', () => {
     const sink = new RecordingSink();
     const error = new UseCaseError('no-undo', 'The variant has no undo.');
 
-    new ConsoleLogger(sink).log({ useCase: 'UndoMove', outcome: 'failure', elapsedMs: 3, error });
+    new ConsoleLogger(sink).log({
+      useCase: 'UndoMove',
+      outcome: 'failure',
+      elapsedMs: ElapsedTime.ofMs(3),
+      error,
+    });
 
     expect(sink.lines).toEqual(['UndoMove: failure no-undo (The variant has no undo.) in 3 ms']);
   });
@@ -65,7 +71,7 @@ describe('ConsoleLogger', () => {
     new ConsoleLogger(sink).log({
       useCase: 'ApplyMove',
       outcome: 'success',
-      elapsedMs: 4,
+      elapsedMs: ElapsedTime.ofMs(4),
       failedDeliveries: [failedDeliveries[0]],
     });
 

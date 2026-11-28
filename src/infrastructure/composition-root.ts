@@ -193,6 +193,7 @@ export class CompositionRoot implements ScreenServices {
   private readonly games: ReadonlyMap<TopologyId, GameRegistry>;
   private readonly boards: ReadonlyMap<TopologyId, BoardFigure<unknown>>;
   private readonly logger: Logger;
+  private readonly clock: Clock;
   private readonly ids: MatchIdGenerator;
   private readonly events: GameEventPublisher;
   private readonly levels: LevelRepository;
@@ -217,6 +218,7 @@ export class CompositionRoot implements ScreenServices {
       ]),
     );
     this.logger = drivers.logger;
+    this.clock = drivers.clock;
     this.ids = new SequentialMatchIds(drivers.clock);
     const events = new GameEventBus();
     const counters =
@@ -484,6 +486,7 @@ export class CompositionRoot implements ScreenServices {
   // The one place that gives a use case of the root its aspects (#323). `name` names the use case
   // in the log. The chain runs from the outside in. `LoggingAspect` is always the outer aspect, so
   // the log keeps each call, also a call that an inner aspect rejects (APP-NFR-11, #481).
+  // `LoggingAspect` gets the logger and the clock of the drivers, so each entry carries its duration (#343).
   // `aspects` are the inner aspects of this one use case, from the outside in.
   // Today only the leaderboards and the sync have one: `SessionAspect`.
   private decorate<TRequest, TResponse>(
@@ -492,7 +495,7 @@ export class CompositionRoot implements ScreenServices {
     aspects: readonly Aspect<TRequest, TResponse>[] = [],
   ): UseCase<TRequest, TResponse> {
     return wrapInAspects(useCase, [
-      (inner) => new LoggingAspect(inner, this.logger, name),
+      (inner) => new LoggingAspect(inner, this.logger, name, this.clock),
       ...aspects,
     ]);
   }
